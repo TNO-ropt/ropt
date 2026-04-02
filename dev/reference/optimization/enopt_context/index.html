@@ -2343,7 +2343,7 @@ transformations that are applied to the input upon creation.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.context.EnOptContext.backend">backend</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            BackendConfig (ropt.config.BackendConfig)" href="#ropt.config.BackendConfig">BackendConfig</a></code>
+                  <code><span title="ropt.context._validated_types.BackendInstance">BackendInstance</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3349,6 +3349,12 @@ optimizer:</p>
     cause the optimization to terminate mid-batch, potentially earlier than
     a corresponding <code>max_batches</code> limit would.</p>
 </li>
+<li>
+<p><strong><code>output_dir</code></strong>: An optional output directory where the optimizer can
+    store files.</p>
+</li>
+<li><strong><code>stdout</code></strong>: Redirect optimizer standard output to the given file.</li>
+<li><strong><code>stderr</code></strong>: Redirect optimizer standard error to the given file.</li>
 </ul>
 
 
@@ -3381,6 +3387,39 @@ optimizer:</p>
             <td>
               <div class="doc-md-description">
                 <p>Maximum number of batch evaluations (optional).</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.OptimizerConfig.output_dir">output_dir</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Output directory for the optimizer (optional).</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.OptimizerConfig.stdout">stdout</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>File to redirect optimizer standard output (optional).</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.OptimizerConfig.stderr">stderr</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>File to redirect optimizer standard error (optional).</p>
               </div>
             </td>
           </tr>
@@ -3446,13 +3485,9 @@ optimizer backend:</p>
 <li><strong><code>parallel</code></strong>: If <code>True</code>, allows the optimizer to use parallelized
   function evaluations. This typically applies to gradient-free methods and
   may be ignored.</li>
-<li><strong><code>output_dir</code></strong>: An optional output directory where the optimizer can
-  store files.</li>
 <li><strong><code>options</code></strong>: A dictionary or list of strings for generic optimizer
   options. The required format and interpretation depend on the specific
   optimization method.</li>
-<li><strong><code>stdout</code></strong>: Redirect optimizer standard output to the given file.</li>
-<li><strong><code>stderr</code></strong>: Redirect optimizer standard error to the given file.</li>
 </ul>
 
 
@@ -3511,17 +3546,6 @@ optimizer backend:</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.config.BackendConfig.output_dir">output_dir</span></code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Output directory for the optimizer (optional).</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
             <td><code><span title="ropt.config.BackendConfig.options">options</span></code></td>
             <td>
                   <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a>] | <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#list">list</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>] | None</code>
@@ -3529,28 +3553,6 @@ optimizer backend:</p>
             <td>
               <div class="doc-md-description">
                 <p>Generic options for the optimizer (optional).</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.config.BackendConfig.stdout">stdout</span></code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>File to redirect optimizer standard output (optional).</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.config.BackendConfig.stderr">stderr</span></code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>File to redirect optimizer standard error (optional).</p>
               </div>
             </td>
           </tr>

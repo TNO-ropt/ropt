@@ -1241,6 +1241,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#ropt.backend.Backend.init" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        init
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ropt.backend.Backend.start" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1289,6 +1300,17 @@
     <span class="md-ellipsis">
       
         is_parallel
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.backend.Backend.init" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        init
       
     </span>
   </a>
@@ -2032,6 +2054,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#ropt.backend.Backend.init" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        init
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ropt.backend.Backend.start" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2080,6 +2113,17 @@
     <span class="md-ellipsis">
       
         is_parallel
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.backend.Backend.init" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        init
       
     </span>
   </a>
@@ -2421,10 +2465,7 @@ act as factories for specific optimization algorithms or backends.</p>
   </span>
 
 </h4>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">create</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">context</span><span class="p">:</span> <span class="n">EnOptContext</span><span class="p">,</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">optimizer_callback</span><span class="p">:</span> <span class="n">OptimizerCallback</span><span class="p">,</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Backend</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">create</span><span class="p">(</span><span class="n">backend_config</span><span class="p">:</span> <span class="n">BackendConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Backend</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2432,7 +2473,7 @@ act as factories for specific optimization algorithms or backends.</p>
         <p>Create an Backend instance.</p>
 <p>This abstract class method serves as a factory for creating concrete
 <a class="autorefs autorefs-internal" title="            Backend" href="#ropt.backend.Backend"><code>Backend</code></a> objects. Plugin
-implementations must override this method to return an instance of their
+implementations must override this method to return an instance of  their
 specific <code>Backend</code> subclass.</p>
 <p>The <a class="autorefs autorefs-internal" title="            PluginManager" href="../../plugin_manager/#ropt.plugins.manager.PluginManager"><code>PluginManager</code></a> calls this
 method when an optimization workflow requires an optimizer provided by
@@ -2452,32 +2493,15 @@ this plugin.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                <code>context</code>
+                <code>backend_config</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            EnOptContext (ropt.context.EnOptContext)" href="../../../optimization/enopt_context/#ropt.context.EnOptContext">EnOptContext</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The  context object containing the
-                optimization settings.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>optimizer_callback</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.core.OptimizerCallback" href="../../../core/optimizer/#ropt.core.OptimizerCallback">OptimizerCallback</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            BackendConfig (ropt.config.BackendConfig)" href="../../../optimization/enopt_context/#ropt.config.BackendConfig">BackendConfig</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The callback function used by the optimizer to
-                request evaluations.</p>
+                <p>The configuration object containing the
+            backend settings.</p>
               </div>
             </td>
             <td>
@@ -2716,10 +2740,7 @@ act as factories for specific optimization algorithms or backends.</p>
   </span>
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">create</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">context</span><span class="p">:</span> <span class="n">EnOptContext</span><span class="p">,</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">optimizer_callback</span><span class="p">:</span> <span class="n">OptimizerCallback</span><span class="p">,</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Backend</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">create</span><span class="p">(</span><span class="n">backend_config</span><span class="p">:</span> <span class="n">BackendConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Backend</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2727,7 +2748,7 @@ act as factories for specific optimization algorithms or backends.</p>
         <p>Create an Backend instance.</p>
 <p>This abstract class method serves as a factory for creating concrete
 <a class="autorefs autorefs-internal" title="            Backend" href="#ropt.backend.Backend"><code>Backend</code></a> objects. Plugin
-implementations must override this method to return an instance of their
+implementations must override this method to return an instance of  their
 specific <code>Backend</code> subclass.</p>
 <p>The <a class="autorefs autorefs-internal" title="            PluginManager" href="../../plugin_manager/#ropt.plugins.manager.PluginManager"><code>PluginManager</code></a> calls this
 method when an optimization workflow requires an optimizer provided by
@@ -2747,32 +2768,15 @@ this plugin.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                <code>context</code>
+                <code>backend_config</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            EnOptContext (ropt.context.EnOptContext)" href="../../../optimization/enopt_context/#ropt.context.EnOptContext">EnOptContext</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The  context object containing the
-                optimization settings.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>optimizer_callback</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.core.OptimizerCallback" href="../../../core/optimizer/#ropt.core.OptimizerCallback">OptimizerCallback</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            BackendConfig (ropt.config.BackendConfig)" href="../../../optimization/enopt_context/#ropt.config.BackendConfig">BackendConfig</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The callback function used by the optimizer to
-                request evaluations.</p>
+                <p>The configuration object containing the
+            backend settings.</p>
               </div>
             </td>
             <td>
@@ -3153,6 +3157,86 @@ resources or handle parallel execution appropriately.</p>
 <div class="doc doc-object doc-function">
 
 
+<h4 id="ropt.backend.Backend.init" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">init</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+  </span>
+
+</h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">init</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">context</span><span class="p">:</span> <span class="n">EnOptContext</span><span class="p">,</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">optimizer_callback</span><span class="p">:</span> <span class="n">OptimizerCallback</span><span class="p">,</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Initialize the optimizer with the given context and callback.</p>
+<p>This abstract method must be implemented by concrete <code>Backend</code> subclasses
+to set up the optimizer with the provided optimization context and
+callback function.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>context</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            EnOptContext (ropt.context.EnOptContext)" href="../../../optimization/enopt_context/#ropt.context.EnOptContext">EnOptContext</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>An instance of <code>EnOptContext</code> containing details
+                about the optimization problem setup.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>optimizer_callback</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.core.OptimizerCallback" href="../../../core/optimizer/#ropt.core.OptimizerCallback">OptimizerCallback</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>An instance of <code>OptimizerCallback</code> that allows
+                the optimizer to request function and gradient
+                evaluations from the <code>ropt</code> core during execution.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
 <h4 id="ropt.backend.Backend.start" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">start</span>
 
@@ -3392,6 +3476,86 @@ resources or handle parallel execution appropriately.</p>
 
 
 
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.backend.Backend.init" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">init</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+  </span>
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">init</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">context</span><span class="p">:</span> <span class="n">EnOptContext</span><span class="p">,</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">optimizer_callback</span><span class="p">:</span> <span class="n">OptimizerCallback</span><span class="p">,</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Initialize the optimizer with the given context and callback.</p>
+<p>This abstract method must be implemented by concrete <code>Backend</code> subclasses
+to set up the optimizer with the provided optimization context and
+callback function.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>context</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            EnOptContext (ropt.context.EnOptContext)" href="../../../optimization/enopt_context/#ropt.context.EnOptContext">EnOptContext</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>An instance of <code>EnOptContext</code> containing details
+                about the optimization problem setup.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>optimizer_callback</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.core.OptimizerCallback" href="../../../core/optimizer/#ropt.core.OptimizerCallback">OptimizerCallback</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>An instance of <code>OptimizerCallback</code> that allows
+                the optimizer to request function and gradient
+                evaluations from the <code>ropt</code> core during execution.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
 
 <div class="doc doc-object doc-function">
 
