@@ -275,7 +275,7 @@
     
     
       <li class="md-tabs__item md-tabs__item--active">
-        <a href="../../../optimization/enopt_context/" class="md-tabs__link">
+        <a href="../../../optimization/configuration/" class="md-tabs__link">
           
   
   
@@ -634,7 +634,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../optimization/enopt_context/" class="md-nav__link">
+      <a href="../../../optimization/configuration/" class="md-nav__link">
         
   
   
@@ -1890,7 +1890,7 @@ weighting.</p>
   inherit from the
   <a class="autorefs autorefs-internal" title="            ropt.realization_filter.RealizationFilter" href="#ropt.realization_filter.RealizationFilter"><code>RealizationFilter</code></a>
   abstract base class. These classes are initialized with the optimization
-  configuration (<a class="autorefs autorefs-internal" title="            EnOptContext" href="../../../optimization/enopt_context/#ropt.context.EnOptContext"><code>EnOptContext</code></a>) and the index of the
+  configuration (<a class="autorefs autorefs-internal" title="            EnOptContext" href="../../../optimization/configuration/#ropt.context.EnOptContext"><code>EnOptContext</code></a>) and the index of the
   specific filter configuration to use (<code>filter_index</code>). The core functionality
   is provided by the <code>get_realization_weights</code> method, which calculates and
   returns weights for each realization based on their objective and constraint
@@ -2009,7 +2009,7 @@ this plugin.</p>
                 <code>filter_config</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            RealizationFilterConfig (ropt.config.RealizationFilterConfig)" href="../../../optimization/enopt_context/#ropt.config.RealizationFilterConfig">RealizationFilterConfig</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            RealizationFilterConfig (ropt.config.RealizationFilterConfig)" href="../../../optimization/configuration/#ropt.config.RealizationFilterConfig">RealizationFilterConfig</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2158,7 +2158,7 @@ this plugin.</p>
                 <code>filter_config</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            RealizationFilterConfig (ropt.config.RealizationFilterConfig)" href="../../../optimization/enopt_context/#ropt.config.RealizationFilterConfig">RealizationFilterConfig</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            RealizationFilterConfig (ropt.config.RealizationFilterConfig)" href="../../../optimization/configuration/#ropt.config.RealizationFilterConfig">RealizationFilterConfig</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2284,7 +2284,7 @@ this plugin.</p>
                 <code>context</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            EnOptContext (ropt.context.EnOptContext)" href="../../../optimization/enopt_context/#ropt.context.EnOptContext">EnOptContext</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            EnOptContext (ropt.context.EnOptContext)" href="../../../optimization/configuration/#ropt.context.EnOptContext">EnOptContext</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2442,8 +2442,8 @@ before use, hence any non-negative weight value is permissible.</p>
 <p>This class provides several methods for calculating realization weights based
 on objective or constraint values. The specific method and its parameters
 are configured via the
-<a class="autorefs autorefs-internal" title="            RealizationFilterConfig" href="../../../optimization/enopt_context/#ropt.config.RealizationFilterConfig"><code>RealizationFilterConfig</code></a>
-in the main <a class="autorefs autorefs-internal" title="            EnOptContext" href="../../../optimization/enopt_context/#ropt.context.EnOptContext"><code>EnOptContext</code></a>.</p>
+<a class="autorefs autorefs-internal" title="            RealizationFilterConfig" href="../../../optimization/configuration/#ropt.config.RealizationFilterConfig"><code>RealizationFilterConfig</code></a>
+in the main <a class="autorefs autorefs-internal" title="            EnOptContext" href="../../../optimization/configuration/#ropt.context.EnOptContext"><code>EnOptContext</code></a>.</p>
 <p><strong>Supported Methods:</strong></p>
 <ul>
 <li>
@@ -2538,7 +2538,7 @@ values and assigns weights only to those within a specified rank range.</p>
 <ol>
 <li>A weighted sum is calculated for each realization using the objective
    values specified by the <code>sort</code> indices and the corresponding weights from
-   the main <a class="autorefs autorefs-internal" title="            EnOptContext" href="../../../optimization/enopt_context/#ropt.context.EnOptContext"><code>EnOptContext</code></a>. If only one objective
+   the main <a class="autorefs autorefs-internal" title="            EnOptContext" href="../../../optimization/configuration/#ropt.context.EnOptContext"><code>EnOptContext</code></a>. If only one objective
    index is provided in <code>sort</code>, no weighting is applied.</li>
 <li>Realizations are sorted based on this calculated value (ascending).</li>
 <li>Realizations whose rank falls within the range [<code>first</code>, <code>last</code>]
@@ -2760,7 +2760,7 @@ realizations.</p>
 <ol>
 <li>A weighted sum is calculated for each realization using the objective
    values specified by the <code>sort</code> indices and the corresponding weights
-   from the main <a class="autorefs autorefs-internal" title="            EnOptContext" href="../../../optimization/enopt_context/#ropt.context.EnOptContext"><code>EnOptContext</code></a>. If only
+   from the main <a class="autorefs autorefs-internal" title="            EnOptContext" href="../../../optimization/configuration/#ropt.context.EnOptContext"><code>EnOptContext</code></a>. If only
    one objective index is provided in <code>sort</code>, no weighting is applied.</li>
 <li>Realizations are conceptually sorted based on this calculated value
    (ascending, assuming minimization).</li>

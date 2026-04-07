@@ -275,7 +275,7 @@
     
     
       <li class="md-tabs__item md-tabs__item--active">
-        <a href="../enopt_context/" class="md-tabs__link">
+        <a href="../configuration/" class="md-tabs__link">
           
   
   
@@ -634,7 +634,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../enopt_context/" class="md-nav__link">
+      <a href="../configuration/" class="md-nav__link">
         
   
   
@@ -2300,7 +2300,7 @@ for:</p>
 <p><strong>Workflow and Integration:</strong></p>
 <ol>
 <li><strong>Configuration:</strong> Transformation objects are passed to the
-    <a class="autorefs autorefs-internal" title="            EnOptContext" href="../enopt_context/#ropt.context.EnOptContext"><code>EnOptContext</code></a> during configuration validation.
+    <a class="autorefs autorefs-internal" title="            EnOptContext" href="../configuration/#ropt.context.EnOptContext"><code>EnOptContext</code></a> during configuration validation.
     instance. This ensures that the entire optimization process is aware of and
     configured for the transformed space. The transformation objects are stored
     in the configuration object.</li>
@@ -2423,7 +2423,7 @@ considered:</p>
   methods.</li>
 <li><strong>Perturbation Magnitude Transformation:</strong> Stochastic gradient-based
   algorithms use perturbations with specified magnitudes (see
-  <a class="autorefs autorefs-internal" title="            GradientConfig" href="../enopt_context/#ropt.config.GradientConfig"><code>perturbation_magnitudes</code></a>). These magnitudes
+  <a class="autorefs autorefs-internal" title="            GradientConfig" href="../configuration/#ropt.config.GradientConfig"><code>perturbation_magnitudes</code></a>). These magnitudes
   are typically defined in the user domain and must be transformed to the
   optimizer domain using the
   <a class="autorefs autorefs-internal" title="            magnitudes_to_optimizer
@@ -4591,7 +4591,7 @@ constraints remain valid in the optimizer's space.</p>
 <p>When linearly transforming variables to the optimizer domain, the
 coefficients (<span class="arithmatex">\(\mathbf{A}\)</span>) and right-hand-side values (<span class="arithmatex">\(\mathbf{b}\)</span>)
 must be converted to remain valid (see also the configuration for
-<a class="autorefs autorefs-internal" title="            LinearConstraintsConfig" href="../enopt_context/#ropt.config.LinearConstraintsConfig">linear constraints</a>). If the
+<a class="autorefs autorefs-internal" title="            LinearConstraintsConfig" href="../configuration/#ropt.config.LinearConstraintsConfig">linear constraints</a>). If the
 linear transformation of the variables to the optimizer domain is given
 by:</p>
 <div class="arithmatex">\[ \hat{\mathbf{x}} = \mathbf{S} \mathbf{x} + \mathbf{o}\]</div>

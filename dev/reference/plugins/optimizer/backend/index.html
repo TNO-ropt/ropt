@@ -275,7 +275,7 @@
     
     
       <li class="md-tabs__item md-tabs__item--active">
-        <a href="../../../optimization/enopt_context/" class="md-tabs__link">
+        <a href="../../../optimization/configuration/" class="md-tabs__link">
           
   
   
@@ -634,7 +634,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../optimization/enopt_context/" class="md-nav__link">
+      <a href="../../../optimization/configuration/" class="md-nav__link">
         
   
   
@@ -2380,7 +2380,7 @@ third-party packages.</p>
 <li><strong>Backend Implementation:</strong> The actual optimization logic resides in classes
   that inherit from the <a class="autorefs autorefs-internal" title="            Backend" href="#ropt.backend.Backend"><code>Backend</code></a> abstract base
   class. These classes are initialized with the optimization configuration
-  (<a class="autorefs autorefs-internal" title="            EnOptContext" href="../../../optimization/enopt_context/#ropt.context.EnOptContext"><code>EnOptContext</code></a>) and an
+  (<a class="autorefs autorefs-internal" title="            EnOptContext" href="../../../optimization/configuration/#ropt.context.EnOptContext"><code>EnOptContext</code></a>) and an
   <a class="autorefs autorefs-internal" title="            ropt.core.OptimizerCallback" href="../../../core/optimizer/#ropt.core.OptimizerCallback"><code>OptimizerCallback</code></a>. The callback is used by
   the backend to request function and gradient evaluations from <code>ropt</code>. The
   optimization process is initiated by calling the backend's <code>start</code> method.</li>
@@ -2496,7 +2496,7 @@ this plugin.</p>
                 <code>backend_config</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            BackendConfig (ropt.config.BackendConfig)" href="../../../optimization/enopt_context/#ropt.config.BackendConfig">BackendConfig</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            BackendConfig (ropt.config.BackendConfig)" href="../../../optimization/configuration/#ropt.config.BackendConfig">BackendConfig</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2561,7 +2561,7 @@ this plugin.</p>
         <p>Validate the optimizer-specific options for a given method.</p>
 <p>This class method is intended to check if the <code>options</code> dictionary,
 typically provided in the
-<a class="autorefs autorefs-internal" title="            BackendConfig" href="../../../optimization/enopt_context/#ropt.config.BackendConfig"><code>BackendConfig</code></a>, contains valid keys
+<a class="autorefs autorefs-internal" title="            BackendConfig" href="../../../optimization/configuration/#ropt.config.BackendConfig"><code>BackendConfig</code></a>, contains valid keys
 and values for the specified optimization <code>method</code> supported by this
 plugin.</p>
 <p>This default implementation performs no validation. Subclasses should
@@ -2771,7 +2771,7 @@ this plugin.</p>
                 <code>backend_config</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            BackendConfig (ropt.config.BackendConfig)" href="../../../optimization/enopt_context/#ropt.config.BackendConfig">BackendConfig</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            BackendConfig (ropt.config.BackendConfig)" href="../../../optimization/configuration/#ropt.config.BackendConfig">BackendConfig</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2836,7 +2836,7 @@ this plugin.</p>
         <p>Validate the optimizer-specific options for a given method.</p>
 <p>This class method is intended to check if the <code>options</code> dictionary,
 typically provided in the
-<a class="autorefs autorefs-internal" title="            BackendConfig" href="../../../optimization/enopt_context/#ropt.config.BackendConfig"><code>BackendConfig</code></a>, contains valid keys
+<a class="autorefs autorefs-internal" title="            BackendConfig" href="../../../optimization/configuration/#ropt.config.BackendConfig"><code>BackendConfig</code></a>, contains valid keys
 and values for the specified optimization <code>method</code> supported by this
 plugin.</p>
 <p>This default implementation performs no validation. Subclasses should
@@ -3014,7 +3014,7 @@ implementations within the <code>ropt</code> framework. Backend plugins provide
 classes derived from <code>Backend</code> that encapsulate the logic of specific
 optimization algorithms.</p>
 <p>Instances of <code>Backend</code> subclasses must be initialized with an
-<a class="autorefs autorefs-internal" title="            EnOptContext" href="../../../optimization/enopt_context/#ropt.context.EnOptContext"><code>EnOptContext</code></a> object detailing the optimization
+<a class="autorefs autorefs-internal" title="            EnOptContext" href="../../../optimization/configuration/#ropt.context.EnOptContext"><code>EnOptContext</code></a> object detailing the optimization
 setup and an <a class="autorefs autorefs-internal" title="            ropt.core.OptimizerCallback" href="../../../core/optimizer/#ropt.core.OptimizerCallback"><code>OptimizerCallback</code></a> function.
 The callback is crucial as it allows the optimizer to request function and
 gradient evaluations from the <code>ropt</code> core during its execution.</p>
@@ -3068,7 +3068,7 @@ objective function values, its implementation should override this
 property to return <code>True</code>.</p>
 <p>This is particularly relevant in ensemble-based optimization where
 evaluations might fail for all realizations. When <code>allow_nan</code> is <code>True</code>,
-setting <a class="autorefs autorefs-internal" title="            RealizationsConfig" href="../../../optimization/enopt_context/#ropt.config.RealizationsConfig"><code>realization_min_success</code></a> to
+setting <a class="autorefs autorefs-internal" title="            RealizationsConfig" href="../../../optimization/configuration/#ropt.config.RealizationsConfig"><code>realization_min_success</code></a> to
 zero allows the evaluation process to return <code>NaN</code> instead of raising an
 error, enabling the optimizer to potentially continue.</p>
 
@@ -3196,7 +3196,7 @@ callback function.</p>
                 <code>context</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            EnOptContext (ropt.context.EnOptContext)" href="../../../optimization/enopt_context/#ropt.context.EnOptContext">EnOptContext</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            EnOptContext (ropt.context.EnOptContext)" href="../../../optimization/configuration/#ropt.context.EnOptContext">EnOptContext</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3337,7 +3337,7 @@ implementations within the <code>ropt</code> framework. Backend plugins provide
 classes derived from <code>Backend</code> that encapsulate the logic of specific
 optimization algorithms.</p>
 <p>Instances of <code>Backend</code> subclasses must be initialized with an
-<a class="autorefs autorefs-internal" title="            EnOptContext" href="../../../optimization/enopt_context/#ropt.context.EnOptContext"><code>EnOptContext</code></a> object detailing the optimization
+<a class="autorefs autorefs-internal" title="            EnOptContext" href="../../../optimization/configuration/#ropt.context.EnOptContext"><code>EnOptContext</code></a> object detailing the optimization
 setup and an <a class="autorefs autorefs-internal" title="            ropt.core.OptimizerCallback" href="../../../core/optimizer/#ropt.core.OptimizerCallback"><code>OptimizerCallback</code></a> function.
 The callback is crucial as it allows the optimizer to request function and
 gradient evaluations from the <code>ropt</code> core during its execution.</p>
@@ -3391,7 +3391,7 @@ objective function values, its implementation should override this
 property to return <code>True</code>.</p>
 <p>This is particularly relevant in ensemble-based optimization where
 evaluations might fail for all realizations. When <code>allow_nan</code> is <code>True</code>,
-setting <a class="autorefs autorefs-internal" title="            RealizationsConfig" href="../../../optimization/enopt_context/#ropt.config.RealizationsConfig"><code>realization_min_success</code></a> to
+setting <a class="autorefs autorefs-internal" title="            RealizationsConfig" href="../../../optimization/configuration/#ropt.config.RealizationsConfig"><code>realization_min_success</code></a> to
 zero allows the evaluation process to return <code>NaN</code> instead of raising an
 error, enabling the optimizer to potentially continue.</p>
 
@@ -3519,7 +3519,7 @@ callback function.</p>
                 <code>context</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            EnOptContext (ropt.context.EnOptContext)" href="../../../optimization/enopt_context/#ropt.context.EnOptContext">EnOptContext</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            EnOptContext (ropt.context.EnOptContext)" href="../../../optimization/configuration/#ropt.context.EnOptContext">EnOptContext</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -4259,7 +4259,7 @@ A similar structure is used for <code>required_constraints</code>.</p>
                 <code>context</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            EnOptContext (ropt.context.EnOptContext)" href="../../../optimization/enopt_context/#ropt.context.EnOptContext">EnOptContext</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            EnOptContext (ropt.context.EnOptContext)" href="../../../optimization/configuration/#ropt.context.EnOptContext">EnOptContext</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -4509,11 +4509,11 @@ are removed entirely, as they become trivial constants.</p>
                 <code>context</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            EnOptContext (ropt.context.EnOptContext)" href="../../../optimization/enopt_context/#ropt.context.EnOptContext">EnOptContext</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            EnOptContext (ropt.context.EnOptContext)" href="../../../optimization/configuration/#ropt.context.EnOptContext">EnOptContext</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The <a class="autorefs autorefs-internal" title="            EnOptContext" href="../../../optimization/enopt_context/#ropt.context.EnOptContext"><code>EnOptContext</code></a> object
+                <p>The <a class="autorefs autorefs-internal" title="            EnOptContext" href="../../../optimization/configuration/#ropt.context.EnOptContext"><code>EnOptContext</code></a> object
             containing the variable mask and linear constraints.</p>
               </div>
             </td>
@@ -4599,12 +4599,12 @@ SciPy's
 <a href="https://docs.scipy.org/doc/scipy/reference/optimize.html"><code>scipy.optimize</code></a>
 module, enabling their use within <code>ropt</code>.</p>
 <p>To select an optimizer, set the <code>method</code> field within the
-<a class="autorefs autorefs-internal" title="            BackendConfig" href="../../../optimization/enopt_context/#ropt.config.BackendConfig"><code>optimizer</code></a> section of the
-<a class="autorefs autorefs-internal" title="            EnOptContext" href="../../../optimization/enopt_context/#ropt.context.EnOptContext"><code>EnOptContext</code></a> configuration object to the desired
+<a class="autorefs autorefs-internal" title="            BackendConfig" href="../../../optimization/configuration/#ropt.config.BackendConfig"><code>optimizer</code></a> section of the
+<a class="autorefs autorefs-internal" title="            EnOptContext" href="../../../optimization/configuration/#ropt.context.EnOptContext"><code>EnOptContext</code></a> configuration object to the desired
 algorithm's name. Most methods support the general options defined in the
-<a class="autorefs autorefs-internal" title="            EnOptContext" href="../../../optimization/enopt_context/#ropt.context.EnOptContext"><code>EnOptContext</code></a> object. For algorithm-specific
+<a class="autorefs autorefs-internal" title="            EnOptContext" href="../../../optimization/configuration/#ropt.context.EnOptContext"><code>EnOptContext</code></a> object. For algorithm-specific
 options, use the <code>options</code> dictionary within the
-<a class="autorefs autorefs-internal" title="            BackendConfig" href="../../../optimization/enopt_context/#ropt.config.BackendConfig"><code>optimizer</code></a> section.</p>
+<a class="autorefs autorefs-internal" title="            BackendConfig" href="../../../optimization/configuration/#ropt.config.BackendConfig"><code>optimizer</code></a> section.</p>
 <p>The table below lists the included methods together with the method-specific
 options that are supported. Click on the method name to consult the
 corresponding
@@ -4712,7 +4712,7 @@ documentation:</p>
 optimization independently and communicates with this class to request
 function evaluations, report optimizer states, and handle any errors.</p>
 <p>Typically, the optimizer is specified within an
-<a class="autorefs autorefs-internal" title="            BackendConfig" href="../../../optimization/enopt_context/#ropt.config.BackendConfig"><code>BackendConfig</code></a> via the <code>method</code> field,
+<a class="autorefs autorefs-internal" title="            BackendConfig" href="../../../optimization/configuration/#ropt.config.BackendConfig"><code>BackendConfig</code></a> via the <code>method</code> field,
 which either provides the algorithm name directly or follows the form
 <code>plugin-name/method-name</code>. In the first case, <code>ropt</code> searches among all
 available optimizer plugins to find the specified method. In the second

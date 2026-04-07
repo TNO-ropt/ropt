@@ -275,7 +275,7 @@
     
     
       <li class="md-tabs__item md-tabs__item--active">
-        <a href="../../optimization/enopt_context/" class="md-tabs__link">
+        <a href="../../optimization/configuration/" class="md-tabs__link">
           
   
   
@@ -634,7 +634,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../optimization/enopt_context/" class="md-nav__link">
+      <a href="../../optimization/configuration/" class="md-nav__link">
         
   
   
@@ -2406,7 +2406,7 @@
 
 
         <p>Enumerates the types of optimization variables.</p>
-<p>Specified in <a class="autorefs autorefs-internal" title="            VariablesConfig" href="../../optimization/enopt_context/#ropt.config.VariablesConfig"><code>VariablesConfig</code></a>, this
+<p>Specified in <a class="autorefs autorefs-internal" title="            VariablesConfig" href="../../optimization/configuration/#ropt.config.VariablesConfig"><code>VariablesConfig</code></a>, this
 information allows optimization backends to adapt their behavior.</p>
 
 
@@ -2510,7 +2510,7 @@ information allows optimization backends to adapt their behavior.</p>
 outside the defined lower and upper bounds. This enumeration defines
 different methods to adjust these perturbed values back within the valid
 range. The chosen strategy is configured in the
-<a class="autorefs autorefs-internal" title="            GradientConfig" href="../../optimization/enopt_context/#ropt.config.GradientConfig"><code>GradientConfig</code></a>.</p>
+<a class="autorefs autorefs-internal" title="            GradientConfig" href="../../optimization/configuration/#ropt.config.GradientConfig"><code>GradientConfig</code></a>.</p>
 
 
 
@@ -2651,7 +2651,7 @@ range. The chosen strategy is configured in the
 <p>Before a generated perturbation sample is added to a variable's current
 value (during gradient estimation, for example), it can be scaled. This
 enumeration defines the available scaling methods, configured in the
-<a class="autorefs autorefs-internal" title="            GradientConfig" href="../../optimization/enopt_context/#ropt.config.GradientConfig"><code>GradientConfig</code></a>.</p>
+<a class="autorefs autorefs-internal" title="            GradientConfig" href="../../optimization/configuration/#ropt.config.GradientConfig"><code>GradientConfig</code></a>.</p>
 
 
 
@@ -2718,7 +2718,7 @@ enumeration defines the available scaling methods, configured in the
         <p>Multiply the perturbation value <span class="arithmatex">\(p_i\)</span> by the range defined by the bounds
 of the variables <span class="arithmatex">\(c_i\)</span>: <span class="arithmatex">\(\hat{p}_i = (c_{i,\text{max}} - c_{i,\text{min}})
 \times p_i\)</span>. The bounds will generally be defined in the configuration for
-the variables (see <a class="autorefs autorefs-internal" title="            VariablesConfig" href="../../optimization/enopt_context/#ropt.config.VariablesConfig"><code>VariablesConfig</code></a>).</p>
+the variables (see <a class="autorefs autorefs-internal" title="            VariablesConfig" href="../../optimization/configuration/#ropt.config.VariablesConfig"><code>VariablesConfig</code></a>).</p>
 
     </div>
 

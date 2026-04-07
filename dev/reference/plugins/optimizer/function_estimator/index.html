@@ -275,7 +275,7 @@
     
     
       <li class="md-tabs__item md-tabs__item--active">
-        <a href="../../../optimization/enopt_context/" class="md-tabs__link">
+        <a href="../../../optimization/configuration/" class="md-tabs__link">
           
   
   
@@ -634,7 +634,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../optimization/enopt_context/" class="md-nav__link">
+      <a href="../../../optimization/configuration/" class="md-nav__link">
         
   
   
@@ -1823,7 +1823,7 @@ deviation (<code>stddev</code>) of the realization results.</p>
   that inherit from the
   <a class="autorefs autorefs-internal" title="            ropt.function_estimator.FunctionEstimator" href="#ropt.function_estimator.FunctionEstimator"><code>FunctionEstimator</code></a>
   abstract base class. These classes are initialized with the optimization
-  configuration (<a class="autorefs autorefs-internal" title="            EnOptContext" href="../../../optimization/enopt_context/#ropt.context.EnOptContext"><code>EnOptContext</code></a>) and the index of the
+  configuration (<a class="autorefs autorefs-internal" title="            EnOptContext" href="../../../optimization/configuration/#ropt.context.EnOptContext"><code>EnOptContext</code></a>) and the index of the
   specific estimator configuration to use (<code>estimator_index</code>). The core
   functionality is provided by the <code>calculate_function</code> and <code>calculate_gradient</code>
   methods, which combine the function values and gradients from multiple
@@ -1949,7 +1949,7 @@ this plugin.</p>
                 <code>estimator_config</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            FunctionEstimatorConfig (ropt.config.FunctionEstimatorConfig)" href="../../../optimization/enopt_context/#ropt.config.FunctionEstimatorConfig">FunctionEstimatorConfig</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            FunctionEstimatorConfig (ropt.config.FunctionEstimatorConfig)" href="../../../optimization/configuration/#ropt.config.FunctionEstimatorConfig">FunctionEstimatorConfig</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2104,7 +2104,7 @@ this plugin.</p>
                 <code>estimator_config</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            FunctionEstimatorConfig (ropt.config.FunctionEstimatorConfig)" href="../../../optimization/enopt_context/#ropt.config.FunctionEstimatorConfig">FunctionEstimatorConfig</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            FunctionEstimatorConfig (ropt.config.FunctionEstimatorConfig)" href="../../../optimization/configuration/#ropt.config.FunctionEstimatorConfig">FunctionEstimatorConfig</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2247,7 +2247,7 @@ initialization based on the provided configuration.</p>
                 <code>context</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            EnOptContext (ropt.context.EnOptContext)" href="../../../optimization/enopt_context/#ropt.context.EnOptContext">EnOptContext</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            EnOptContext (ropt.context.EnOptContext)" href="../../../optimization/configuration/#ropt.context.EnOptContext">EnOptContext</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2398,7 +2398,7 @@ the chain rule applies).</p>
 <details class="note" open>
   <summary>Interaction with <code>merge_realizations</code></summary>
   <p>The <code>merge_realizations</code> flag in the
-<a class="autorefs autorefs-internal" title="            GradientConfig" href="../../../optimization/enopt_context/#ropt.config.GradientConfig"><code>GradientConfig</code></a> determines how the
+<a class="autorefs autorefs-internal" title="            GradientConfig" href="../../../optimization/configuration/#ropt.config.GradientConfig"><code>GradientConfig</code></a> determines how the
 initial gradient estimate(s) are computed by <code>ropt</code> <em>before</em> being
 passed to this <code>calculate_gradient</code> method.</p>
 <ul>
@@ -2539,8 +2539,8 @@ initialization (<code>__init__</code>) and raise a <code>ValueError</code> if
 <p>This class provides methods for combining objective function values and
 gradients from an ensemble of realizations into a single representative
 value or gradient. The specific method is configured via the
-<a class="autorefs autorefs-internal" title="            FunctionEstimatorConfig" href="../../../optimization/enopt_context/#ropt.config.FunctionEstimatorConfig"><code>FunctionEstimatorConfig</code></a> in the main
-<a class="autorefs autorefs-internal" title="            EnOptContext" href="../../../optimization/enopt_context/#ropt.context.EnOptContext"><code>EnOptContext</code></a>.</p>
+<a class="autorefs autorefs-internal" title="            FunctionEstimatorConfig" href="../../../optimization/configuration/#ropt.config.FunctionEstimatorConfig"><code>FunctionEstimatorConfig</code></a> in the main
+<a class="autorefs autorefs-internal" title="            EnOptContext" href="../../../optimization/configuration/#ropt.context.EnOptContext"><code>EnOptContext</code></a>.</p>
 <p><strong>Supported Methods:</strong></p>
 <ul>
 <li>
