@@ -15,8 +15,8 @@ from ._validated_types import Array1D  # noqa: TC001
 class RealizationsConfig(BaseModel):
     """Configuration class for realizations.
 
-    This class, `RealizationsConfig`, defines the configuration for realizations
-    used when calculating objectives and constraints.
+    `RealizationsConfig` defines realization ensemble settings for an
+    [`EnOptContext`][ropt.context.EnOptContext] object.
 
     To optimize an ensemble of functions, a set of realizations is defined. When
     the optimizer requests a function value or a gradient, these are calculated for

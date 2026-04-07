@@ -10,12 +10,12 @@ from pydantic import BaseModel, ConfigDict
 class VariableTransformConfig(BaseModel):
     """Configuration class for variable transforms.
 
-    This class, `VariableTransformConfig`, defines the configuration for
-    variable transforms. Variable transforms are generally configured as a tuple
-    of `VariableTransformConfig` objects in the context object passed to an
-    optimization step. For instance, `variable_transforms` field of the
-    [`EnOptContext`][ropt.context.EnOptContext] context object defines the
-    available transforms for the optimization.
+    `VariableTransformConfig` configures a
+    [`VariableTransform`][ropt.transforms.VariableTransform] plugin that
+    transforms variables to the optimizer's domain. Variable transforms are
+    configured as a tuple in the `variable_transforms` field of
+    [`EnOptContext`][ropt.context.EnOptContext]. Variables reference a specific
+    transform by its index in that tuple.
 
     The `method` field specifies the transform method to use for the variables.
     The `options` field allows passing a dictionary of key-value pairs to
@@ -42,11 +42,12 @@ class VariableTransformConfig(BaseModel):
 class ObjectiveTransformConfig(BaseModel):
     """Configuration class for objective transforms.
 
-    This class, `ObjectiveTransformConfig`, defines the configuration for
-    objective transforms. Objective transforms are generally configured as a
-    tuple of `ObjectiveTransformConfig` objects in a configuration class of an
-    optimization step. For instance, `objective_transforms` field of the
-    `EnOptContext` defines the available transforms for the optimization.
+    `ObjectiveTransformConfig` configures an
+    [`ObjectiveTransform`][ropt.transforms.ObjectiveTransform] plugin that
+    transforms objective values. Objective transforms are configured as a tuple
+    in the `objective_transforms` field of
+    [`EnOptContext`][ropt.context.EnOptContext]. Objectives reference a specific
+    transform by its index in that tuple.
 
     The `method` field specifies the transform method to use for the objectives.
     The `options` field allows passing a dictionary of key-value pairs to
@@ -73,12 +74,12 @@ class ObjectiveTransformConfig(BaseModel):
 class NonlinearConstraintTransformConfig(BaseModel):
     """Configuration class for nonlinear constraint transforms.
 
-    This class, `NonlinearConstraintTransformConfig`, defines the configuration
-    for nonlinear constraint transforms. Nonlinear constraint transforms are
-    generally configured as a tuple of `NonlinearConstraintTransformConfig`
-    objects in a configuration class of an optimization step. For instance,
-    `nonlinear_constraint_transforms` field of the `EnOptContext` defines the
-    available transforms for the optimization.
+    `NonlinearConstraintTransformConfig` configures a
+    [`NonlinearConstraintTransform`][ropt.transforms.NonlinearConstraintTransform]
+    plugin that transforms constraint values. Nonlinear constraint transforms are
+    configured as a tuple in the `nonlinear_constraint_transforms` field of
+    [`EnOptContext`][ropt.context.EnOptContext]. Constraints reference a specific
+    transform by its index in that tuple.
 
     The `method` field specifies the transform method to use for the nonlinear
     constraints. The `options` field allows passing a dictionary of key-value

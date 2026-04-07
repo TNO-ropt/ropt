@@ -18,34 +18,30 @@ from ._validated_types import (  # noqa: TC001
 class NonlinearConstraintsConfig(BaseModel):
     r"""Configuration class for non-linear constraints.
 
-    This class, `NonlinearConstraintsConfig`, defines non-linear constraints ,
-    for instance as part of an [`EnOptContext`][ropt.context.EnOptContext] object.
+    `NonlinearConstraintsConfig` defines nonlinear constraints used as the
+    `nonlinear_constraints` field of an
+    [`EnOptContext`][ropt.context.EnOptContext] object.
 
-    Non-linear constraints are defined by comparing a constraint function to a
+    Nonlinear constraints are defined by comparing a constraint function to a
     right-hand-side value, allowing for equality or inequality constraints. The
-    `lower_bounds` and `upper_bounds` fields, which are `numpy` arrays, specify the
-    bounds on these right-hand-side values. The length of these arrays determines
-    the number of constraint functions.
+    `lower_bounds` and `upper_bounds` fields, which are `numpy` arrays, specify
+    the bounds on these right-hand-side values. The length of these arrays
+    determines the number of constraint functions.
 
     Less-than and greater-than inequality constraints can be specified by
     setting the lower bounds to $-\infty$, or the upper bounds to $+\infty$,
     respectively. Equality constraints are specified by setting the lower bounds
     equal to the upper bounds.
 
-    Non-linear constraints can optionally be processed using [`realization
-    filters`][ropt.config.RealizationFilterConfig] and [`function
-    estimators`][ropt.config.FunctionEstimatorConfig].The `realization_filters`
-    and `function_estimators` attributes, if provided, must be arrays of integer
-    indices. Each index in the `realization_filters` array corresponds to a
-    constraint function (by position) and specifies which filter to use. The
-    available filters must be defined elsewhere as a tuple of realization filter
-    configurations. For instance, for optimization these are defined in the
-    [`EnOptContext.realization_filters`][ropt.context.EnOptContext] configuration
-    class. The same logic applies to the `function_estimators` array . If an
-    index is invalid (e.g., out of bounds for the corresponding object tuple),
-    no filter or estimator is applied to that specific constraint function. If
-    these attributes are not provided (`None`), no filters or estimators are
-    applied at all.
+    Constraint functions can optionally be processed using [`realization
+    filters`][ropt.realization_filter.RealizationFilter] and [`function
+    estimators`][ropt.function_estimator.FunctionEstimator] objects. The
+    `realization_filters` and `function_estimators` fields are integer index
+    arrays: each entry selects a filter or estimator by its position in the
+    corresponding tuple defined in [`EnOptContext`][ropt.context.EnOptContext].
+    An out-of-range index means no filter or estimator is applied to that
+    constraint. If a field uses its default value of `-1`, no filter or
+    estimator is applied at all.
 
     Attributes:
         lower_bounds:        Lower bounds for the right-hand-side values.

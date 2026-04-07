@@ -16,20 +16,19 @@ from pydantic import (
 class BackendConfig(BaseModel):
     """Configuration class for the optimization backend.
 
-    This class, `BackendConfig`, defines the configuration for the optimization
-    algorithms implemented in the optimization backends.
+    `BackendConfig` defines the configuration for the optimization algorithm
+    used by an optimization backend plugin. The `method` field selects the
+    algorithm using a `"plugin/method"` string (e.g. `"scipy/default"`).
 
-    While optimization methods can have diverse parameters, this class provides a
-    standardized set of settings that are commonly used and forwarded to the
-    optimizer backend:
+    While optimization methods can have diverse parameters, this class provides
+    a standardized set of settings that are commonly used and forwarded to the
+    backend:
 
-    - **`max_iterations`**: The maximum number of iterations allowed. The
-      optimizer may choose to ignore this.
-      optimizer callback may ask to evaluate a batch of multiple functions and
-      gradients at once. This setting will limit the number of those calls.
+    - **`max_iterations`**: The maximum number of iterations allowed. The exact
+      definition depends on the optimizer backend, and it may be ignored.
     - **`convergence_tolerance`**: The convergence tolerance used as a stopping
-      criterion.
-      The exact definition depends on the optimizer, and it may be ignored.
+      criterion. The exact definition depends on the optimizer, and it may be
+      ignored.
     - **`parallel`**: If `True`, allows the optimizer to use parallelized
       function evaluations. This typically applies to gradient-free methods and
       may be ignored.

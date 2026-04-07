@@ -37,68 +37,75 @@ _global_lock = threading.Lock()
 
 
 class EnOptContext(BaseModel):
-    """The primary context class for an optimization run.
+    """The primary context object for a single optimization run.
 
-    `EnOptContext` orchestrates the configuration of an entire optimization
-    workflow. It contains nested configuration classes that define specific
-    aspects of the optimization, such as variables, objectives, constraints,
-    realizations, and the optimizer itself.
+    `EnOptContext` holds all information needed to run an ensemble-based
+    optimization: variables, objectives, constraints, realizations, gradient
+    settings, samplers, filters, and the optimizer/backend. It is constructed
+    from plain Python dicts or config objects and validated on creation.
 
-    `realization_filters`, `function_estimators`, and `samplers` are configured
-    as tuples. Other configuration fields reference these objects by their index
-    within the tuples. This makes it possible to share these objects between
-    entities. For example, [`VariablesConfig`][ropt.config.VariablesConfig] has
-    a `samplers` field, which is an array of indices specifying the sampler to
-    use for each variable. If only a single sampler is needed, the `samplers`
-    field in `EnOptContext` should contain a single sampler configuration, and
-    the `samplers` field in the `VariablesConfig` configuration contains only
-    zeros to specify that each variable should use this entry. In case of
-    multiple samplers, multiple sampler configurations are defined, and each
-    entry in `samplers` array in `VariablesConfig` points to desired sampler.
+    **Index-based sharing**
 
-    The optional `names` attribute is a dictionary that stores the names of the
-    various entities, such as variables, objectives, and constraints. The
-    supported name types are defined in the [`AxisName`][ropt.enums.AxisName]
-    enumeration. This information is optional, as it is not strictly necessary
-    for the optimization, but it can be useful for labeling and interpreting
-    results. For instance, when present, it is used to create a multi-index
-    results that are exported as data frames.
+    All tuple-based plugin fields (`realization_filters`, `function_estimators`,
+    `samplers`, `variable_transforms`, `objective_transforms`, and
+    `nonlinear_constraint_transforms`) are referenced by index from other config
+    fields. For example, the `samplers` field of
+    [`VariablesConfig`][ropt.config.VariablesConfig] is an integer array whose
+    values index into the `samplers` tuple — use all zeros when a single sampler
+    is shared across all variables, or distinct indices when different samplers
+    are needed per variable. The same pattern applies to transform indices in
+    [`VariablesConfig`][ropt.config.VariablesConfig],
+    [`ObjectiveFunctionsConfig`][ropt.config.ObjectiveFunctionsConfig], and
+    [`NonlinearConstraintsConfig`][ropt.config.NonlinearConstraintsConfig].
 
-    Info:
-        Many nested configuration classes use `numpy` arrays. These arrays
-        typically have a size determined by a configured property (e.g., the
-        number of variables) or a size of one. In the latter case, the single
-        value is broadcasted to all relevant elements. For example,
-        [`VariablesConfig`][ropt.config.VariablesConfig] defines properties like
-        initial values and bounds as `numpy` arrays, which must either match the
-        number of variables or have a size of one.
+    **Optional names**
+
+    The `names` attribute maps axis types (see [`AxisName`][ropt.enums.AxisName])
+    to ordered sequences of labels for variables, objectives, and constraints.
+    It is not required for the optimization itself, but when present it is used
+    to produce labelled multi-index results in exported data frames.
+
+    **Plugin instances**
+
+    The `backend` field and all tuple-based plugin fields (`realization_filters`,
+    `function_estimators`, `samplers`, `variable_transforms`,
+    `objective_transforms`, and `nonlinear_constraint_transforms`) store plugin
+    instances. Instead of constructing instances manually, these fields can be
+    initialized with a configuration object or a plain dict of settings — Pydantic
+    will resolve and instantiate the appropriate plugin automatically. Each config
+    class has a `method` field that selects the plugin implementation. The
+    configuration classes are defined in the [`ropt.config`][ropt.config]
+    sub-package.
+
+    **Broadcasting**
+
+    Many nested config classes represent per-variable or per-objective
+    properties (e.g., bounds, perturbation magnitudes) as `numpy` arrays. A
+    size-1 array is broadcast to all elements; otherwise the array length must
+    match the count of the corresponding entities.
 
     Warning:
-        `EnOptContext` objects are immutable and hold the in-memory configuration
-        for an optimization run. For persistence, do not serialize the object
-        itself. Instead, store the original contents used for its creation.
-
-        Round-trip serialization (e.g., to/from JSON) is not a supported use
-        case and may lead to data loss due to the complex types it contains,
-        such as `numpy` arrays, or to unexpected behavior because of the
-        transformations that are applied to the input upon creation.
+        `EnOptContext` objects are immutable after construction. Do not attempt
+        to serialize and round-trip them (e.g., to/from JSON): `numpy` arrays
+        and plugin instances cannot survive a round-trip faithfully. Persist the
+        raw input dicts instead.
 
     Attributes:
-        variables:                       Configuration for the optimization variables.
-        objectives:                      Configuration for the objective functions.
-        linear_constraints:              Configuration for linear constraints.
-        nonlinear_constraints:           Configuration for non-linear constraints.
-        realizations:                    Configuration for the realizations.
-        optimizer:                       Configuration for the ensemble optimizer.
-        backend:                         Configuration for the optimization backend.
-        gradient:                        Configuration for gradient calculations.
-        realization_filters:             Configuration for realization filters.
-        function_estimators:             Configuration for function estimators.
-        samplers:                        Configuration for samplers.
-        variable_transforms:             Configuration for variable transforms.
-        objective_transforms:            Configuration for objective transforms.
-        nonlinear_constraint_transforms: Configuration for nonlinear constraint transforms.
-        names:                           Optional mapping of axis types to names.
+        variables:                       Variable settings.
+        objectives:                      Objective function settings.
+        linear_constraints:              Optional linear constraint settings.
+        nonlinear_constraints:           Optional nonlinear constraint settings.
+        realizations:                    Ensemble realization settings.
+        optimizer:                       Optimizer settings.
+        backend:                         Backend plugin instance used for function evaluations.
+        gradient:                        Gradient estimation settings.
+        realization_filters:             Tuple of realization filter plugin instances.
+        function_estimators:             Tuple of function estimator plugin instances.
+        samplers:                        Tuple of sampler plugin instances.
+        variable_transforms:             Tuple of variable transform plugin instances.
+        objective_transforms:            Tuple of objective transform plugin instances.
+        nonlinear_constraint_transforms: Tuple of nonlinear constraint transform plugin instances.
+        names:                           Optional mapping of axis names to label sequences.
     """
 
     variables: VariablesConfig

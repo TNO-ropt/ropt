@@ -10,12 +10,9 @@ from pydantic import BaseModel, ConfigDict, PositiveInt
 class OptimizerConfig(BaseModel):
     """Configuration class for the optimization algorithm.
 
-    This class, `BackendConfig`, defines the configuration for the optimization
-    algorithm used in an [`EnOptContext`][ropt.context.EnOptContext] object.
-
-    While optimization methods can have diverse parameters, this class provides a
-    standardized set of settings that are commonly used and forwarded to the
-    optimizer:
+    `OptimizerConfig` defines workflow-level settings for an optimization run,
+    configured as the `optimizer` field of
+    [`EnOptContext`][ropt.context.EnOptContext].
 
       - **`max_batches`**: This limit restricts the total number of *calls* made
         to the evaluation function provided to `ropt`. An optimizer might request

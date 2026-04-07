@@ -18,8 +18,7 @@ from ._validated_types import (  # noqa: TC001
 class ObjectiveFunctionsConfig(BaseModel):
     """Configuration class for objective functions.
 
-    This class, `ObjectiveFunctionsConfig`, defines the configuration for
-    objective functions. for instance, as part of an
+    `ObjectiveFunctionsConfig` defines objective function settings for an
     [`EnOptContext`][ropt.context.EnOptContext] object.
 
     `ropt` supports multi-objective optimization. Multiple objectives are
@@ -30,19 +29,14 @@ class ObjectiveFunctionsConfig(BaseModel):
     `[0.5, 0.5]`).
 
     Objective functions can optionally be processed using [`realization
-    filters`][ropt.config.RealizationFilterConfig] and [`function
-    estimators`][ropt.config.FunctionEstimatorConfig].The `realization_filters`
-    and `function_estimators` attributes, if provided, must be arrays of integer
-    indices. Each index in the `realization_filters` array corresponds to a
-    objective (by position) and specifies which filter to use. The available
-    filters must be defined elsewhere as a tuple of realization filter
-    configurations. For instance, for optimization these are defined in the
-    [`EnOptContext.realization_filters`][ropt.context.EnOptContext] context
-    class. The same logic applies to the `function_estimators` array . If an
-    index is invalid (e.g., out of bounds for the corresponding object tuple),
-    no filter or estimator is applied to that specific objective. If these
-    attributes are not provided (`None`), no filters or estimators are applied
-    at all.
+    filters`][ropt.realization_filter.RealizationFilter], [`function
+    estimators`][ropt.function_estimator.FunctionEstimator], and
+    [`transforms`][ropt.transforms.ObjectiveTransform] objects. The
+    `realization_filters`, `function_estimators`, and `transforms` fields are
+    integer index arrays: each entry selects an object by its position in the
+    corresponding tuple defined in [`EnOptContext`][ropt.context.EnOptContext].
+    An out-of-range index means no object is applied to that objective. If a
+    field uses its default value of `-1`, no object is applied at all.
 
     Attributes:
         weights:             Weights for the objective functions (default: 1.0).

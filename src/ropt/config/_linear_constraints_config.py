@@ -14,8 +14,8 @@ from ropt.config._validated_types import Array1D, Array2D  # noqa: TC001
 class LinearConstraintsConfig(BaseModel):
     r"""Configuration class for linear constraints.
 
-    This class, `LinearConstraintsConfig`, defines linear constraints used in an
-    optimization, for instance as part of an
+    `LinearConstraintsConfig` defines linear constraints used as the
+    `linear_constraints` field of an
     [`EnOptContext`][ropt.context.EnOptContext] object.
 
     Linear constraints are defined by a set of linear equations involving the

@@ -10,11 +10,12 @@ from pydantic import BaseModel, ConfigDict
 class RealizationFilterConfig(BaseModel):
     """Configuration class for realization filters.
 
-    This class, `RealizationFilterConfig`, defines the configuration for
-    realization filters. Realization filters are generally configured as a tuple
-    in another configuration object. For instance, the `realization_filters`
-    field of the [`EnOptContext`][ropt.context.EnOptContext] context object
-    defines the available filters for the optimization.
+    `RealizationFilterConfig` configures a
+    [`RealizationFilter`][ropt.realization_filter.RealizationFilter] plugin that
+    adjusts per-realization weights. Realization filters are configured as a
+    tuple in the `realization_filters` field of
+    [`EnOptContext`][ropt.context.EnOptContext]. Objectives and constraints
+    reference a specific filter by its index in that tuple.
 
     By default, objective and constraint functions, as well as their gradients,
     are calculated as a weighted function of all realizations. Realization

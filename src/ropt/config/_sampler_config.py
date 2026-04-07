@@ -10,13 +10,11 @@ from pydantic import BaseModel, ConfigDict
 class SamplerConfig(BaseModel):
     """Configuration class for samplers.
 
-    This class, `SamplerConfig`, defines the configuration for samplers used in
-    an [`EnOptContext`][ropt.context.EnOptContext] object. Samplers are
-    configured as a tuple in the `samplers` field of the
-    [`EnOptContext`][ropt.context.EnOptContext] class, defining the available
-    samplers for the optimization. The `samplers` field in the
-    [`GradientConfig`][ropt.config.GradientConfig] specifies the index of the
-    sampler to use for each variable.
+    `SamplerConfig` configures a [`Sampler`][ropt.sampler.Sampler] plugin that
+    generates variable perturbations for gradient estimation. Samplers are
+    configured as a tuple in the `samplers` field of
+    [`EnOptContext`][ropt.context.EnOptContext]. Variables reference a specific
+    sampler by its index in that tuple via their `samplers` field.
 
     Samplers generate perturbations added to variables for gradient
     calculations. These perturbations can be deterministic or stochastic.

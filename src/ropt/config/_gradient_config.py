@@ -17,10 +17,9 @@ from .constants import DEFAULT_NUMBER_OF_PERTURBATIONS
 class GradientConfig(BaseModel):
     """Configuration class for gradient calculations.
 
-    This class, `GradientConfig`, defines the configuration of gradient
-    calculations. It is used in an [`EnOptContext`][ropt.context.EnOptContext]
-    object as the `gradient` field to specify how gradients are calculated in
-    gradient-based optimizers.
+    `GradientConfig` specifies how gradients are estimated in gradient-based
+    optimizers. It is used as the `gradient` field of
+    [`EnOptContext`][ropt.context.EnOptContext].
 
     Gradients are estimated using function values calculated from perturbed
     variables and the unperturbed variables. The `number_of_perturbations` field
