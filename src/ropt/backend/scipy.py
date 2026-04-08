@@ -60,6 +60,7 @@ _CONSTRAINT_SUPPORT_BOUNDS: Final = {
         "Powell",
         "L-BFGS-B",
         "TNC",
+        "COBYLA",
         "SLSQP",
         "differential_evolution",
     ]
