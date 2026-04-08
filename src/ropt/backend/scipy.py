@@ -41,6 +41,7 @@ SUPPORTED_SCIPY_METHODS: Final[set[str]] = {
         "L-BFGS-B",
         "TNC",
         "COBYLA",
+        "COBYQA",
         "SLSQP",
         "differential_evolution",
     )
@@ -61,27 +62,28 @@ _CONSTRAINT_SUPPORT_BOUNDS: Final = {
         "L-BFGS-B",
         "TNC",
         "COBYLA",
+        "COBYQA",
         "SLSQP",
         "differential_evolution",
     ]
 }
 _CONSTRAINT_SUPPORT_LINEAR_EQ: Final = {
-    name.lower() for name in ["SLSQP", "differential_evolution"]
+    name.lower() for name in ["COBYQA", "SLSQP", "differential_evolution"]
 }
 _CONSTRAINT_SUPPORT_LINEAR_INEQ: Final = {
-    name.lower() for name in ["COBYLA", "SLSQP", "differential_evolution"]
+    name.lower() for name in ["COBYLA", "COBYQA", "SLSQP", "differential_evolution"]
 }
 _CONSTRAINT_SUPPORT_NONLINEAR_EQ: Final = {
-    name.lower() for name in ["SLSQP", "differential_evolution"]
+    name.lower() for name in ["COBYQA", "SLSQP", "differential_evolution"]
 }
 _CONSTRAINT_SUPPORT_NONLINEAR_INEQ: Final = {
-    name.lower() for name in ["COBYLA", "SLSQP", "differential_evolution"]
+    name.lower() for name in ["COBYLA", "COBYQA", "SLSQP", "differential_evolution"]
 }
 
 # These methods do not use a gradient:
 _NO_GRADIENT: Final = {
     name.lower()
-    for name in ["Nelder-Mead", "Powell", "COBYLA", "differential_evolution"]
+    for name in ["Nelder-Mead", "Powell", "COBYLA", "COBYQA", "differential_evolution"]
 }
 
 
@@ -246,7 +248,7 @@ class SciPyBackend(Backend):
         if nonlinear_bounds is not None:
             bounds.append(nonlinear_bounds)
         if (
-            self._method != "differential_evolution"
+            self._method not in {"differential_evolution", "cobyqa"}
             and self._linear_constraint_bounds is not None
         ):
             bounds.append(self._linear_constraint_bounds)
@@ -283,7 +285,7 @@ class SciPyBackend(Backend):
         if (bounds := self._get_constraint_bounds(nonlinear_bounds)) is not None:
             self._normalized_constraints = NormalizedConstraints()
             self._normalized_constraints.set_bounds(*bounds)
-        if self._method == "differential_evolution":
+        if self._method in {"differential_evolution", "cobyqa"}:
             return self._initialize_constraints_object(lin_coef, lin_lower, lin_upper)
 
         return self._initialize_constraints_dict(lin_coef)
@@ -353,6 +355,8 @@ class SciPyBackend(Backend):
             self._constraint_functions(variables).transpose()
         )
         assert self._normalized_constraints.constraints is not None
+        if variables.ndim == 1:
+            return self._normalized_constraints.constraints[:, 0]
         return self._normalized_constraints.constraints
 
     def _jac_object(
@@ -379,14 +383,24 @@ class SciPyBackend(Backend):
             assert lin_upper is not None
             constraints.append(LinearConstraint(lin_coef, lin_lower, lin_upper))
         if self._normalized_constraints is not None:
-            ub = [
-                0.0 if is_eq else np.inf for is_eq in self._normalized_constraints.is_eq
-            ]
-            constraints.append(
-                NonlinearConstraint(
-                    fun=self._fun_object, jac=self._jac_object, lb=0.0, ub=ub
+            ub = np.fromiter(
+                (
+                    0.0 if is_eq else np.inf
+                    for is_eq in self._normalized_constraints.is_eq
                 ),
+                dtype=np.float64,
             )
+            lb = np.zeros_like(ub)
+            if self._method in _NO_GRADIENT:
+                constraints.append(
+                    NonlinearConstraint(fun=self._fun_object, lb=lb, ub=ub)
+                )
+            else:
+                constraints.append(
+                    NonlinearConstraint(
+                        fun=self._fun_object, jac=self._jac_object, lb=lb, ub=ub
+                    )
+                )
         return constraints
 
     def _function(self, variables: NDArray[np.float64], /) -> NDArray[np.float64]:

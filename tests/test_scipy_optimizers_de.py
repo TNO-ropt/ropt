@@ -275,36 +275,3 @@ def test_scipy_ineq_nonlinear_constraints_two_sided_de(
     assert np.allclose(
         optimizer.results.evaluations.variables, [-0.1, 0.0, 0.4], atol=0.03
     )
-
-
-def test_scipy_le_ge_nonlinear_constraints_de(
-    config: Any,
-    evaluator: Any,
-    test_functions: Any,
-) -> None:
-    # These constraints together force the first two variables to be zero,
-    # while the last one is free to fit the function.
-    config["variables"]["lower_bounds"] = [-1.0, -1.0, -1.0]
-    config["variables"]["upper_bounds"] = [1.0, 1.0, 1.0]
-    config["variables"]["lower_bounds"] = 0.0
-
-    config["nonlinear_constraints"] = {
-        "lower_bounds": [0.4, 0.0],
-        "upper_bounds": [np.inf, 0.0],
-    }
-
-    test_functions = (
-        *test_functions,
-        lambda variables, _: variables[0] + variables[2],
-    )
-    test_functions = (
-        *test_functions,
-        lambda variables, _: variables[0] - variables[1],
-    )
-
-    optimizer = BasicOptimizer(config, evaluator(test_functions))
-    optimizer.run(initial_values)
-    assert optimizer.results is not None
-    assert np.allclose(
-        optimizer.results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.03
-    )

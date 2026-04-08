@@ -167,6 +167,19 @@ SCIPY_OPTIONS_SCHEMA: dict[str, Any] = {
             },
             "url": "https://docs.scipy.org/doc/scipy/reference/optimize.minimize-cobyla.html",
         },
+        "COBYQA": {
+            "options": {
+                "disp": bool,
+                "maxfev": int,
+                "maxiter": int,
+                "f_target": float,
+                "feasibility_tol": float,
+                "initial_tr_radius": float,
+                "final_tr_radius": float,
+                "scale": bool,
+            },
+            "url": "https://docs.scipy.org/doc/scipy/reference/optimize.minimize-cobyqa.html",
+        },
         "SLSQP": {
             "options": {
                 "disp": bool,
