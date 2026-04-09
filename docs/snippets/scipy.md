@@ -11,4 +11,5 @@
 |[COBYLA](https://docs.scipy.org/doc/scipy/reference/optimize.minimize-cobyla.html)|disp, maxiter, rhobeg, tol, catol|
 |[COBYQA](https://docs.scipy.org/doc/scipy/reference/optimize.minimize-cobyqa.html)|disp, maxfev, maxiter, f_target, feasibility_tol, initial_tr_radius, final_tr_radius, scale|
 |[SLSQP](https://docs.scipy.org/doc/scipy/reference/optimize.minimize-slsqp.html)|disp, maxiter, ftol, eps, finite_diff_rel_step|
+|[trust-constr](https://docs.scipy.org/doc/scipy/reference/optimize.minimize-trustconstr.html)|gtol, xtol, barrier_tol, sparse_jacobian, initial_tr_radius, initial_constr_penalty, initial_barrier_parameter, initial_barrier_tolerance, factorization_method, finite_diff_rel_step, maxiter, verbose, disp|
 |[differential_evolution](https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.differential_evolution.html)|disp, maxiter, strategy, popsize, tol, mutation, recombination, rng, polish, init, atol, updating|

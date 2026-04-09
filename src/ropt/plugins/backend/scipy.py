@@ -190,6 +190,29 @@ SCIPY_OPTIONS_SCHEMA: dict[str, Any] = {
             },
             "url": "https://docs.scipy.org/doc/scipy/reference/optimize.minimize-slsqp.html",
         },
+        "trust-constr": {
+            "options": {
+                "gtol": float,
+                "xtol": float,
+                "barrier_tol": float,
+                "sparse_jacobian": bool,
+                "initial_tr_radius": float,
+                "initial_constr_penalty": float,
+                "initial_barrier_parameter": float,
+                "initial_barrier_tolerance": float,
+                "factorization_method": Literal[
+                    "NormalEquation",
+                    "AugmentedSystem",
+                    "QRFactorization",
+                    "SVDFactorization",
+                ],
+                "finite_diff_rel_step": float,
+                "maxiter": int,
+                "verbose": int,
+                "disp": bool,
+            },
+            "url": "https://docs.scipy.org/doc/scipy/reference/optimize.minimize-trustconstr.html",
+        },
         "differential_evolution": {
             "options": {
                 "disp": bool,

@@ -36,10 +36,10 @@ def config_fixture() -> dict[str, Any]:
     return {
         "variables": {
             "variable_count": len(initial_values),
-            "perturbation_magnitudes": 0.01,
+            "perturbation_magnitudes": 0.0001,
         },
         "backend": {
-            "convergence_tolerance": 1e-4,
+            "convergence_tolerance": 1e-5,
             "max_iterations": 25,
         },
         "objectives": {

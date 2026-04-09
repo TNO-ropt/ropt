@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import copy
+import warnings
 from collections.abc import Callable
 from functools import partial
 from typing import TYPE_CHECKING, Any, ClassVar, Final
@@ -43,6 +44,7 @@ SUPPORTED_SCIPY_METHODS: Final[set[str]] = {
         "COBYLA",
         "COBYQA",
         "SLSQP",
+        "trust-constr",
         "differential_evolution",
     )
 }
@@ -64,20 +66,25 @@ _CONSTRAINT_SUPPORT_BOUNDS: Final = {
         "COBYLA",
         "COBYQA",
         "SLSQP",
+        "trust-constr",
         "differential_evolution",
     ]
 }
 _CONSTRAINT_SUPPORT_LINEAR_EQ: Final = {
-    name.lower() for name in ["COBYQA", "SLSQP", "differential_evolution"]
+    name.lower()
+    for name in ["COBYQA", "SLSQP", "trust-constr", "differential_evolution"]
 }
 _CONSTRAINT_SUPPORT_LINEAR_INEQ: Final = {
-    name.lower() for name in ["COBYLA", "COBYQA", "SLSQP", "differential_evolution"]
+    name.lower()
+    for name in ["COBYLA", "COBYQA", "SLSQP", "trust-constr", "differential_evolution"]
 }
 _CONSTRAINT_SUPPORT_NONLINEAR_EQ: Final = {
-    name.lower() for name in ["COBYQA", "SLSQP", "differential_evolution"]
+    name.lower()
+    for name in ["COBYQA", "SLSQP", "trust-constr", "differential_evolution"]
 }
 _CONSTRAINT_SUPPORT_NONLINEAR_INEQ: Final = {
-    name.lower() for name in ["COBYLA", "COBYQA", "SLSQP", "differential_evolution"]
+    name.lower()
+    for name in ["COBYLA", "COBYQA", "SLSQP", "trust-constr", "differential_evolution"]
 }
 
 # These methods do not use a gradient:
@@ -86,6 +93,8 @@ _NO_GRADIENT: Final = {
     for name in ["Nelder-Mead", "Powell", "COBYLA", "COBYQA", "differential_evolution"]
 }
 
+# These methods use constraint objects instead of dicts:
+_USE_CONSTRAINT_OBJECTS: Final = {"differential_evolution", "cobyqa", "trust-constr"}
 
 _ConstraintType = str | Callable[..., float] | Callable[..., NDArray[np.float64]]
 
@@ -196,16 +205,18 @@ class SciPyBackend(Backend):
                 **self._options,
             )
         else:
-            minimize(  # type: ignore[call-overload,misc]
-                fun=self._function,
-                x0=initial_values[self._context.variables.mask],
-                tol=self._config.convergence_tolerance,
-                method=self._method,
-                bounds=self._bounds,
-                jac=(False if self._method in _NO_GRADIENT else self._gradient),
-                constraints=self._constraints,
-                options=self._options or None,
-            )
+            with warnings.catch_warnings():
+                warnings.filterwarnings("ignore", message="delta_grad == 0.0")
+                minimize(  # type: ignore[call-overload,misc]
+                    fun=self._function,
+                    x0=initial_values[self._context.variables.mask],
+                    tol=self._config.convergence_tolerance,
+                    method=self._method,
+                    bounds=self._bounds,
+                    jac=(False if self._method in _NO_GRADIENT else self._gradient),
+                    constraints=self._constraints,
+                    options=self._options or None,
+                )
 
     @property
     def allow_nan(self) -> bool:
@@ -248,7 +259,7 @@ class SciPyBackend(Backend):
         if nonlinear_bounds is not None:
             bounds.append(nonlinear_bounds)
         if (
-            self._method not in {"differential_evolution", "cobyqa"}
+            self._method not in _USE_CONSTRAINT_OBJECTS
             and self._linear_constraint_bounds is not None
         ):
             bounds.append(self._linear_constraint_bounds)
@@ -285,7 +296,7 @@ class SciPyBackend(Backend):
         if (bounds := self._get_constraint_bounds(nonlinear_bounds)) is not None:
             self._normalized_constraints = NormalizedConstraints()
             self._normalized_constraints.set_bounds(*bounds)
-        if self._method in {"differential_evolution", "cobyqa"}:
+        if self._method in _USE_CONSTRAINT_OBJECTS:
             return self._initialize_constraints_object(lin_coef, lin_lower, lin_upper)
 
         return self._initialize_constraints_dict(lin_coef)
