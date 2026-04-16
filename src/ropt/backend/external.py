@@ -5,9 +5,9 @@ from __future__ import annotations
 import multiprocessing
 import traceback
 from functools import partial
+from importlib.util import find_spec
 from typing import TYPE_CHECKING, Any, Final
 
-import cloudpickle
 import numpy as np
 
 from ropt.backend import Backend
@@ -21,6 +21,11 @@ if TYPE_CHECKING:
 
     from ropt.config import BackendConfig
     from ropt.context import EnOptContext
+
+_HAVE_CLOUDPICKLE: Final = find_spec("cloudpickle") is not None
+
+if _HAVE_CLOUDPICKLE:
+    import cloudpickle
 
 
 _PROCESS_TIMEOUT: Final = 10
@@ -54,6 +59,10 @@ class ExternalBackend(Backend):
             backend_config: The configuration for the backend, containing the
                             method name and options.
         """
+        if not _HAVE_CLOUDPICKLE:
+            msg = "The cloudpickle module must be installed to use ExternalBackend"
+            raise NotImplementedError(msg)
+
         self._backend_config = backend_config.model_copy(
             update={"method": backend_config.method.split("/", maxsplit=1)[1]}
         )
