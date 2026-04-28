@@ -9,10 +9,10 @@
       
       
       
-        <link rel="prev" href="../../context/">
+        <link rel="prev" href="../bases/">
       
       
-        <link rel="next" href="../optimizer/">
+        <link rel="next" href="../../realization_filter/">
       
       
         
@@ -23,7 +23,7 @@
     
     
       
-        <title>Ensemble Evaluator - ropt Documentation</title>
+        <title>Default Plugins - ropt Documentation</title>
       
     
     
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#ropt.core.EnsembleEvaluator" class="md-skip">
+        <a href="#ropt.plugins.backend.scipy.SciPyBackendPlugin" class="md-skip">
           Skip to content
         </a>
       
@@ -118,7 +118,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Ensemble Evaluator
+              Default Plugins
             
           </span>
         </div>
@@ -646,184 +646,17 @@
                 
   
   
-    
-  
-  
-  
-    
-    
-    
-    
-      
-      
-        
-          
-          
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_4" checked>
-        
-          
-          <label class="md-nav__link" for="__nav_3_4" id="__nav_3_4_label" tabindex="">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Core
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_4_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_3_4">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Core
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-    
-  
-  
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Ensemble Evaluator
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Ensemble Evaluator
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#ropt.core.EnsembleEvaluator" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        EnsembleEvaluator
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="EnsembleEvaluator">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.core.EnsembleEvaluator.__init__" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        __init__
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.core.EnsembleEvaluator.calculate" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        calculate
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
   
   
     <li class="md-nav__item">
-      <a href="../optimizer/" class="md-nav__link">
+      <a href="../../core/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Ensemble Optimizer
+    Core
   
 
     
@@ -832,14 +665,6 @@
   
 
       </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
     </li>
   
 
@@ -860,6 +685,34 @@
     
   
     Enums
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../evaluator/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evaluator
   
 
     
@@ -961,8 +814,10 @@
                 
   
   
+    
   
   
+  
     
     
     
@@ -976,16 +831,14 @@
       
     
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
         
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_9" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_10" checked>
         
           
-          <label class="md-nav__link" for="__nav_3_9" id="__nav_3_9_label" tabindex="">
+          <label class="md-nav__link" for="__nav_3_10" id="__nav_3_10_label" tabindex="">
             
   
   
@@ -1003,8 +856,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_9_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_9">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_10_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3_10">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -1021,7 +874,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../plugins/plugin_manager/" class="md-nav__link">
+      <a href="../manager/" class="md-nav__link">
         
   
   
@@ -1049,14 +902,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../plugins/optimizer/backend/" class="md-nav__link">
+      <a href="../bases/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Backend Plugins
+    Plugin Bases
   
 
     
@@ -1074,17 +927,42 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../../plugins/optimizer/function_estimator/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Default Plugins
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
   <span class="md-ellipsis">
     
   
-    Function Estimator Plugins
+    Default Plugins
   
 
     
@@ -1093,62 +971,112 @@
   
 
       </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../plugins/optimizer/realization_filter/" class="md-nav__link">
+      
         
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Realization Filter Plugins
-  
 
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
   
   
   
   
-    <li class="md-nav__item">
-      <a href="../../plugins/optimizer/sampler/" class="md-nav__link">
-        
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.backend.scipy.SciPyBackendPlugin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SciPyBackendPlugin
+      
+    </span>
+  </a>
   
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.backend.external.ExternalBackendPlugin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ExternalBackendPlugin
+      
+    </span>
+  </a>
   
-  <span class="md-ellipsis">
-    
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.function_estimator.default.DefaultFunctionEstimatorPlugin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DefaultFunctionEstimatorPlugin
+      
+    </span>
+  </a>
   
-    Sampler Plugins
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.realization_filter.default.DefaultRealizationFilterPlugin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DefaultRealizationFilterPlugin
+      
+    </span>
+  </a>
   
-
-    
-  </span>
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.sampler.scipy.SciPySamplerPlugin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SciPySamplerPlugin
+      
+    </span>
+  </a>
   
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.transforms.default.DefaultVariableTransformPlugin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DefaultVariableTransformPlugin
+      
+    </span>
+  </a>
   
-
-      </a>
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.transforms.default.DefaultObjectiveTransformPlugin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DefaultObjectiveTransformPlugin
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.transforms.default.DefaultNonlinearConstraintTransformPlugin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DefaultNonlinearConstraintTransformPlugin
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1196,72 +1124,15 @@
   
   
   
-    
-    
-    
-    
-      
-      
-        
-          
-          
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_11" >
-        
-          
-          <label class="md-nav__link" for="__nav_3_11" id="__nav_3_11_label" tabindex="">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Optimization
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_11_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_11">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Optimization
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
     <li class="md-nav__item">
-      <a href="../../optimization/evaluator/" class="md-nav__link">
+      <a href="../../results/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Function Evaluations
+    Results
   
 
     
@@ -1282,14 +1153,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../optimization/results/" class="md-nav__link">
+      <a href="../../sampler/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Optimization Results
+    Sampler
   
 
     
@@ -1310,107 +1181,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../optimization/domain_transforms/" class="md-nav__link">
+      <a href="../../transforms/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Domain Transforms
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    
-    
-    
-    
-      
-      
-        
-          
-          
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_12" >
-        
-          
-          <label class="md-nav__link" for="__nav_3_12" id="__nav_3_12_label" tabindex="">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Workflows
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_12_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_12">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Workflows
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../workflow/compute_steps/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Compute Steps
+    Transforms
   
 
     
@@ -1431,14 +1209,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../workflow/event_handler/" class="md-nav__link">
+      <a href="../../workflow/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Event Handlers
+    Workflow
   
 
     
@@ -1447,98 +1225,6 @@
   
 
       </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../workflow/evaluator/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Evaluators
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../workflow/server/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Servers
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../workflow/basic_optimizer/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Basic Optimizer
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
     </li>
   
 
@@ -1576,41 +1262,90 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#ropt.core.EnsembleEvaluator" class="md-nav__link">
+  <a href="#ropt.plugins.backend.scipy.SciPyBackendPlugin" class="md-nav__link">
     <span class="md-ellipsis">
       
-        EnsembleEvaluator
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="EnsembleEvaluator">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.core.EnsembleEvaluator.__init__" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        __init__
+        SciPyBackendPlugin
       
     </span>
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.core.EnsembleEvaluator.calculate" class="md-nav__link">
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.backend.external.ExternalBackendPlugin" class="md-nav__link">
     <span class="md-ellipsis">
       
-        calculate
+        ExternalBackendPlugin
       
     </span>
   </a>
   
 </li>
-        
-      </ul>
-    </nav>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.function_estimator.default.DefaultFunctionEstimatorPlugin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DefaultFunctionEstimatorPlugin
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.realization_filter.default.DefaultRealizationFilterPlugin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DefaultRealizationFilterPlugin
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.sampler.scipy.SciPySamplerPlugin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SciPySamplerPlugin
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.transforms.default.DefaultVariableTransformPlugin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DefaultVariableTransformPlugin
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.transforms.default.DefaultObjectiveTransformPlugin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DefaultObjectiveTransformPlugin
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.transforms.default.DefaultNonlinearConstraintTransformPlugin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DefaultNonlinearConstraintTransformPlugin
+      
+    </span>
+  </a>
   
 </li>
       
@@ -1634,33 +1369,26 @@
   
 
 
-  <h1>Ensemble Evaluator</h1>
+  <h1>Default Plugins</h1>
 
 <div class="doc doc-object doc-class">
 
 
 
-<h2 id="ropt.core.EnsembleEvaluator" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.core.EnsembleEvaluator</span>
+<h2 id="ropt.plugins.backend.scipy.SciPyBackendPlugin" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.plugins.backend.scipy.SciPyBackendPlugin</span>
 
 
 </h2>
 
 
     <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="            ropt.plugins.backend.BackendPlugin (ropt.plugins.backend._base.BackendPlugin)" href="../bases/#ropt.plugins.backend.BackendPlugin">BackendPlugin</a></code></p>
 
 
 
-        <p>Construct functions and gradients from an ensemble of functions.</p>
-<p>The <code>EnsembleEvaluator</code> class is responsible for calculating functions and
-gradients from an ensemble of functions. It leverages the settings defined
-in an <a class="autorefs autorefs-internal" title="            EnOptContext" href="../../context/#ropt.context.EnOptContext"><code>EnOptContext</code></a> context object to guide
-the calculations.</p>
-<p>The core functionality relies on an evaluator callable, (usually provided by
-an <a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.Evaluator" href="../../workflow/evaluator/#ropt.workflow.evaluators.Evaluator"><code>Evaluator</code></a> object), which is used to
-evaluate the individual functions within the ensemble. The evaluator
-provides the raw function values, which are then processed by the
-<code>EnsembleEvaluator</code> to produce the final function and gradient estimates.</p>
+        <p>The SciPy backend plugin class.</p>
 
 
 
@@ -1678,209 +1406,289 @@ provides the raw function values, which are then processed by the
 
 
 
-
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="ropt.core.EnsembleEvaluator.__init__" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">__init__</span>
-
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">__init__</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">context</span><span class="p">:</span> <span class="n">EnOptContext</span><span class="p">,</span> <span class="n">evaluator</span><span class="p">:</span> <span class="n">EvaluatorCallback</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Initialize the EnsembleEvaluator.</p>
-<p>This method sets up the <code>EnsembleEvaluator</code> with the necessary
-configuration, evaluator, and plugins.</p>
-<p>The <code>context</code> object contains all the settings required for the ensemble
-evaluation, such as the number of realizations, the function estimators,
-and the gradient settings. The <code>evaluator</code> callable is usually provide
-by a <a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.Evaluator" href="../../workflow/evaluator/#ropt.workflow.evaluators.Evaluator"><code>Evaluator</code></a> object. The
-<code>plugin_manager</code> is used to load the realization filters, function
-estimators, and samplers.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>context</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            EnOptContext (ropt.context.EnOptContext)" href="../../context/#ropt.context.EnOptContext">EnOptContext</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The optimization context object.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>evaluator</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.evaluator.EvaluatorCallback" href="../../optimization/evaluator/#ropt.evaluator.EvaluatorCallback">EvaluatorCallback</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The callable for evaluating individual functions.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
+  </div>
 
     </div>
 
 </div>
 
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="ropt.plugins.backend.external.ExternalBackendPlugin" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.plugins.backend.external.ExternalBackendPlugin</span>
+
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="            ropt.plugins.backend.BackendPlugin (ropt.plugins.backend._base.BackendPlugin)" href="../bases/#ropt.plugins.backend.BackendPlugin">BackendPlugin</a></code></p>
+
+
+
+        <p>The external optimizer plugin class.</p>
 
 
 
 
 
-<div class="doc doc-object doc-function">
 
 
-<h3 id="ropt.core.EnsembleEvaluator.calculate" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">calculate</span>
 
 
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">calculate</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">variables</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="o">*</span><span class="p">,</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">compute_functions</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">compute_gradients</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Results</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Evaluate the given variable vectors.</p>
-<p>This method calculates functions, gradients, or both, based on the
-provided variable vectors and the specified flags.</p>
-<p>The <code>variables</code> argument can be a single vector or a matrix where each
-row is a variable vector.</p>
 
 
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>variables</code>
-            </td>
-            <td>
-                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The variable vectors to evaluate.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>compute_functions</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Whether to calculate functions.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>compute_gradients</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Whether to calculate gradients.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
+<div class="doc doc-children">
 
 
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a>[<a class="autorefs autorefs-internal" title="            ropt.results.Results
 
 
-  
-      dataclass
-  " href="../../optimization/results/#ropt.results.Results">Results</a>, ...]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The results for function evaluations and/or gradient evaluations.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
 
+  </div>
 
     </div>
 
 </div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="ropt.plugins.function_estimator.default.DefaultFunctionEstimatorPlugin" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.plugins.function_estimator.default.DefaultFunctionEstimatorPlugin</span>
+
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="            ropt.plugins.function_estimator.FunctionEstimatorPlugin (ropt.plugins.function_estimator._base.FunctionEstimatorPlugin)" href="../bases/#ropt.plugins.function_estimator.FunctionEstimatorPlugin">FunctionEstimatorPlugin</a></code></p>
+
+
+
+        <p>Default filter estimator plugin class.</p>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="ropt.plugins.realization_filter.default.DefaultRealizationFilterPlugin" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.plugins.realization_filter.default.DefaultRealizationFilterPlugin</span>
+
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="            ropt.plugins.realization_filter.RealizationFilterPlugin (ropt.plugins.realization_filter._base.RealizationFilterPlugin)" href="../bases/#ropt.plugins.realization_filter.RealizationFilterPlugin">RealizationFilterPlugin</a></code></p>
+
+
+
+        <p>Default realization filter plugin class.</p>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="ropt.plugins.sampler.scipy.SciPySamplerPlugin" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.plugins.sampler.scipy.SciPySamplerPlugin</span>
+
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="            ropt.plugins.sampler.SamplerPlugin (ropt.plugins.sampler._base.SamplerPlugin)" href="../bases/#ropt.plugins.sampler.SamplerPlugin">SamplerPlugin</a></code></p>
+
+
+
+        <p>Default sampler plugin class.</p>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="ropt.plugins.transforms.default.DefaultVariableTransformPlugin" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.plugins.transforms.default.DefaultVariableTransformPlugin</span>
+
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="            ropt.plugins.transforms.VariableTransformPlugin (ropt.plugins.transforms._base.VariableTransformPlugin)" href="../bases/#ropt.plugins.transforms.VariableTransformPlugin">VariableTransformPlugin</a></code></p>
+
+
+
+        <p>Default variable transform plugin class.</p>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="ropt.plugins.transforms.default.DefaultObjectiveTransformPlugin" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.plugins.transforms.default.DefaultObjectiveTransformPlugin</span>
+
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="            ropt.plugins.transforms.ObjectiveTransformPlugin (ropt.plugins.transforms._base.ObjectiveTransformPlugin)" href="../bases/#ropt.plugins.transforms.ObjectiveTransformPlugin">ObjectiveTransformPlugin</a></code></p>
+
+
+
+        <p>Default objective transform plugin class.</p>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="ropt.plugins.transforms.default.DefaultNonlinearConstraintTransformPlugin" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.plugins.transforms.default.DefaultNonlinearConstraintTransformPlugin</span>
+
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="            ropt.plugins.transforms.NonlinearConstraintTransformPlugin (ropt.plugins.transforms._base.NonlinearConstraintTransformPlugin)" href="../bases/#ropt.plugins.transforms.NonlinearConstraintTransformPlugin">NonlinearConstraintTransformPlugin</a></code></p>
+
+
+
+        <p>Default nonlinear constraint transform plugin class.</p>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
 
 
 
@@ -1925,7 +1733,7 @@ row is a variable vector.</p>
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../../context/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Context">
+          <a href="../bases/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Plugin Bases">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -1935,20 +1743,20 @@ row is a variable vector.</p>
                 Previous
               </span>
               <div class="md-ellipsis">
-                Context
+                Plugin Bases
               </div>
             </div>
           </a>
         
         
           
-          <a href="../optimizer/" class="md-footer__link md-footer__link--next" aria-label="Next: Ensemble Optimizer">
+          <a href="../../realization_filter/" class="md-footer__link md-footer__link--next" aria-label="Next: Realization Filter">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Ensemble Optimizer
+                Realization Filter
               </div>
             </div>
             <div class="md-footer__button md-icon">
