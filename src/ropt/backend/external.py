@@ -13,7 +13,7 @@ import numpy as np
 from ropt.backend import Backend
 from ropt.core import OptimizerCallback, OptimizerCallbackResult
 from ropt.enums import ExitCode
-from ropt.exceptions import ComputeStepAborted
+from ropt.exceptions import Abort
 from ropt.plugins.manager import get_plugin
 
 if TYPE_CHECKING:
@@ -167,7 +167,7 @@ def _run(
 
     try:
         backend.start(np.asarray(initial_values, dtype=np.float64))
-    except ComputeStepAborted:
+    except Abort:
         pass
     except Exception as exc:  # noqa: BLE001
         tb_str = traceback.format_exc()
@@ -197,4 +197,4 @@ def _callback(
     if isinstance(result, OptimizerCallbackResult):
         return result
     assert isinstance(result, ExitCode)
-    raise ComputeStepAborted(exit_code=result)
+    raise Abort(exit_code=result)

@@ -3,7 +3,7 @@
 from .enums import ExitCode
 
 
-class ComputeStepAborted(Exception):  # noqa: N818
+class Abort(Exception):  # noqa: N818
     """Raised when a compute step is aborted prematurely.
 
     This exception signals that an optimization or another compute step could
@@ -15,7 +15,7 @@ class ComputeStepAborted(Exception):  # noqa: N818
     """
 
     def __init__(self, exit_code: ExitCode) -> None:
-        """Initialize the ComputeStepAborted exception.
+        """Initialize the Abort exception.
 
         Stores the reason for the abortion, which can be accessed via the
         `exit_code` attribute.

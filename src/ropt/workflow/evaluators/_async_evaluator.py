@@ -10,7 +10,7 @@ import numpy as np
 
 from ropt.enums import ExitCode
 from ropt.evaluator import EvaluatorContext, EvaluatorResult
-from ropt.exceptions import ComputeStepAborted, ServerFailure
+from ropt.exceptions import Abort, ServerFailure
 from ropt.workflow.servers import ResultsQueue, Server, Task
 
 from .base import Evaluator
@@ -64,10 +64,10 @@ class AsyncEvaluator(Evaluator):
             The result of calling the wrapped evaluator function.
 
         Raises:
-            ComputeStepAborted: raise if the server is not running.
+            Abort: raise if the server is not running.
         """
         if not self._server.is_running():
-            raise ComputeStepAborted(ExitCode.ABORT_FROM_ERROR)
+            raise Abort(ExitCode.ABORT_FROM_ERROR)
 
         self._batch_id += 1
 
@@ -96,13 +96,13 @@ class AsyncEvaluator(Evaluator):
             while self._server.is_running():
                 try:
                     if (task := results_queue.get(timeout=1)) is None:
-                        raise ComputeStepAborted(ExitCode.ABORT_FROM_ERROR)
+                        raise Abort(ExitCode.ABORT_FROM_ERROR)
                     _handle_result(task, results, evaluation_info, variables.shape[0])
                     break
                 except queue.Empty:
                     continue
             if not self._server.is_running():
-                raise ComputeStepAborted(ExitCode.ABORT_FROM_ERROR)
+                raise Abort(ExitCode.ABORT_FROM_ERROR)
 
         return EvaluatorResult(
             batch_id=self._batch_id,
@@ -156,7 +156,7 @@ class AsyncEvaluator(Evaluator):
             raise
 
         if not self._server.is_running():
-            raise ComputeStepAborted(ExitCode.ABORT_FROM_ERROR)
+            raise Abort(ExitCode.ABORT_FROM_ERROR)
 
 
 def _handle_result(

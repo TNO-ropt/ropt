@@ -10,7 +10,7 @@ import numpy as np
 from ropt.core import EnsembleEvaluator as CoreEnsembleEvaluator
 from ropt.enums import EnOptEventType, ExitCode
 from ropt.events import EnOptEvent
-from ropt.exceptions import ComputeStepAborted
+from ropt.exceptions import Abort
 from ropt.results import FunctionResults
 
 from .base import ComputeStep
@@ -109,7 +109,7 @@ class EnsembleEvaluator(ComputeStep):
             results = ensemble_evaluator.calculate(
                 variables, compute_functions=True, compute_gradients=False
             )
-        except ComputeStepAborted as exc:
+        except Abort as exc:
             exit_code = exc.exit_code
 
         assert results

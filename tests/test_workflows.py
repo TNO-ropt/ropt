@@ -9,7 +9,7 @@ import pytest
 
 from ropt.context import EnOptContext
 from ropt.enums import EnOptEventType, ExitCode
-from ropt.exceptions import ComputeStepAborted
+from ropt.exceptions import Abort
 from ropt.results import FunctionResults
 from ropt.workflow import BasicOptimizer
 from ropt.workflow.compute_steps import EnsembleEvaluator, EnsembleOptimizer
@@ -563,7 +563,7 @@ def test_optimization_abort(config: Any, evaluator: Any) -> None:
 
         last_evaluation += 1
         if last_evaluation == 1:
-            raise ComputeStepAborted(exit_code=ExitCode.USER_ABORT)
+            raise Abort(exit_code=ExitCode.USER_ABORT)
 
     tracker = Tracker()
     step = EnsembleOptimizer(evaluator=evaluator())

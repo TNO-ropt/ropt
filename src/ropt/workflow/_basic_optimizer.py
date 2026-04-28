@@ -14,7 +14,7 @@ import numpy as np
 
 from ropt.context import EnOptContext
 from ropt.enums import EnOptEventType, ExitCode
-from ropt.exceptions import ComputeStepAborted
+from ropt.exceptions import Abort
 from ropt.workflow.evaluators import Evaluator
 
 from .compute_steps import EnsembleOptimizer
@@ -225,7 +225,7 @@ class BasicOptimizer:
 
         def _check_abort_callback(event: EnOptEvent) -> None:  # noqa: ARG001
             if callback():
-                raise ComputeStepAborted(exit_code=ExitCode.USER_ABORT)
+                raise Abort(exit_code=ExitCode.USER_ABORT)
 
         self._observers.append((EnOptEventType.START_EVALUATION, _check_abort_callback))
 

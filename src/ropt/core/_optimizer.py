@@ -10,7 +10,7 @@ from typing import TYPE_CHECKING, Protocol
 import numpy as np
 
 from ropt.enums import ExitCode
-from ropt.exceptions import ComputeStepAborted
+from ropt.exceptions import Abort
 from ropt.results import FunctionResults, GradientResults
 
 from ._callback import OptimizerCallbackResult
@@ -147,7 +147,7 @@ class EnsembleOptimizer:
         try:
             with self._redirector.start():
                 self._backend.start(variables)
-        except ComputeStepAborted as exc:
+        except Abort as exc:
             exit_code = exc.exit_code
         return exit_code
 
@@ -221,10 +221,10 @@ class EnsembleOptimizer:
     def _check_stopping_criteria(self) -> None:
         max_functions = self._context.optimizer.max_functions
         if max_functions is not None and self._completed_functions >= max_functions:
-            raise ComputeStepAborted(exit_code=ExitCode.MAX_FUNCTIONS_REACHED)
+            raise Abort(exit_code=ExitCode.MAX_FUNCTIONS_REACHED)
         max_batches = self._context.optimizer.max_batches
         if max_batches is not None and self._completed_batches >= max_batches:
-            raise ComputeStepAborted(exit_code=ExitCode.MAX_BATCHES_REACHED)
+            raise Abort(exit_code=ExitCode.MAX_BATCHES_REACHED)
 
     def _run_evaluations(
         self,
@@ -272,7 +272,7 @@ class EnsembleOptimizer:
                 self._signal_evaluation(results)
 
             if exit_code is not None:
-                raise ComputeStepAborted(exit_code=exit_code)
+                raise Abort(exit_code=exit_code)
 
         return results
 
