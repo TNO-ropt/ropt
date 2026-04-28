@@ -43,44 +43,20 @@ class DefaultFunctionEstimator(FunctionEstimator):
         for gradient calculation.
     """
 
-    def __init__(self, estimator_config: FunctionEstimatorConfig) -> None:
-        """Initialize the function estimator object.
-
-        See the
-        [ropt.function_estimator.FunctionEstimator][]
-        abstract base class.
-
-        # noqa
-        """
+    def __init__(self, estimator_config: FunctionEstimatorConfig) -> None:  # noqa: D107
         self._estimator_config = estimator_config
         _, _, self._method = self._estimator_config.method.lower().rpartition("/")
         if self._method == "default":
             self._method = "mean"
 
-    def init(self, context: EnOptContext) -> None:
-        """Initialize the function estimator object.
-
-        See the
-        [ropt.function_estimator.FunctionEstimator][]
-        abstract base class.
-
-        # noqa
-        """
+    def init(self, context: EnOptContext) -> None:  # noqa: D102
         self._context = context
 
-    def calculate_function(
+    def calculate_function(  # noqa: D102
         self,
         functions: NDArray[np.float64],
         weights: NDArray[np.float64],
     ) -> NDArray[np.float64]:
-        """Calculate a function from function values for each realization.
-
-        See the
-        [ropt.function_estimator.FunctionEstimator][]
-        abstract base class.
-
-        # noqa
-        """  # noqa: DOC201, DOC501
         if self._method == "stddev" and self._context.gradient.merge_realizations:
             msg = (
                 "The stddev estimator does not support merging "
@@ -95,20 +71,12 @@ class DefaultFunctionEstimator(FunctionEstimator):
         msg = f"Function estimator method not supported: {estimator_method}"
         raise ValueError(msg)
 
-    def calculate_gradient(
+    def calculate_gradient(  # noqa: D102
         self,
         functions: NDArray[np.float64],
         gradient: NDArray[np.float64],
         weights: NDArray[np.float64],
     ) -> NDArray[np.float64]:
-        """Calculate a gradient from gradients of the realizations.
-
-        See the
-        [ropt.function_estimator.FunctionEstimator][]
-        abstract base class.
-
-        # noqa
-        """  # noqa: DOC201, DOC501
         if self._method == "stddev" and self._context.gradient.merge_realizations:
             msg = (
                 "The stddev estimator does not support merging "

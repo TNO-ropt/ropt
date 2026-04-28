@@ -68,13 +68,7 @@ class SciPySampler(Sampler):
     documentation for available options.
     """
 
-    def __init__(self, sampler_config: SamplerConfig) -> None:
-        """Initialize the sampler object.
-
-        See the [ropt.plugins.sampler.Sampler][] abstract base class.
-
-        # noqa
-        """
+    def __init__(self, sampler_config: SamplerConfig) -> None:  # noqa: D107
         self._sampler_config = sampler_config
         _, _, self._method = self._sampler_config.method.lower().rpartition("/")
         if self._method == "default":
@@ -85,18 +79,12 @@ class SciPySampler(Sampler):
             raise NotImplementedError(msg)
         self._sampler: rv_continuous | QMCEngine | None = None
 
-    def init(
+    def init(  # noqa: D102
         self,
         context: EnOptContext,
         mask: NDArray[np.bool_] | None,
         rng: Generator,
     ) -> None:
-        """Initialize the sampler object.
-
-        See the [ropt.plugins.sampler.Sampler][] abstract base class.
-
-        # noqa
-        """
         self._context = context
         self._mask = mask
         self._rng = rng
@@ -105,13 +93,7 @@ class SciPySampler(Sampler):
                 self._sampler_config.options
             )
 
-    def generate_samples(self) -> NDArray[np.float64]:
-        """Generate a set of samples.
-
-        See the [ropt.plugins.sampler.base.Sampler][] abstract base class.
-
-        # noqa
-        """  # noqa: DOC201
+    def generate_samples(self) -> NDArray[np.float64]:  # noqa: D102
         variable_count = self._context.variables.variable_count
         realization_count = self._context.realizations.weights.size
         perturbation_count = self._context.gradient.number_of_perturbations

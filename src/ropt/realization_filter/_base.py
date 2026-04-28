@@ -9,11 +9,20 @@ if TYPE_CHECKING:
     import numpy as np
     from numpy.typing import NDArray
 
+    from ropt.config._realization_filter_config import RealizationFilterConfig
     from ropt.context import EnOptContext
 
 
 class RealizationFilter(ABC):
     """Abstract base class for realization filter classes."""
+
+    @abstractmethod
+    def __init__(self, filter_config: RealizationFilterConfig) -> None:  # D107
+        """Initialize the realization filter plugin.
+
+        Args:
+            filter_config: The realization filter configuration.
+        """
 
     @abstractmethod
     def init(self, context: EnOptContext) -> None:

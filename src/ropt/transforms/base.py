@@ -9,6 +9,12 @@ if TYPE_CHECKING:
     import numpy as np
     from numpy.typing import NDArray
 
+    from ropt.config import (
+        NonlinearConstraintTransformConfig,
+        ObjectiveTransformConfig,
+        VariableTransformConfig,
+    )
+
 
 class VariableTransform(ABC):
     """Abstract base class for variable transformations.
@@ -52,6 +58,18 @@ class VariableTransform(ABC):
       [`linear_constraints_diffs_from_optimizer`][ropt.transforms.VariableTransform.linear_constraints_diffs_from_optimizer]
       method.
     """
+
+    @abstractmethod
+    def __init__(
+        self,
+        transform_config: VariableTransformConfig,
+    ) -> None:
+        """Initialize the variable transform.
+
+        Args:
+            transform_config: The configuration object containing settings for this
+                variable transform.
+        """
 
     @abstractmethod
     def init(self, mask: NDArray[np.bool_]) -> None:
@@ -244,6 +262,18 @@ class ObjectiveTransform(ABC):
     """
 
     @abstractmethod
+    def __init__(
+        self,
+        transform_config: ObjectiveTransformConfig,
+    ) -> None:
+        """Initialize the objective transform.
+
+        Args:
+            transform_config: The configuration object containing settings for this
+                objective transform.
+        """
+
+    @abstractmethod
     def init(self, mask: NDArray[np.bool_]) -> None:
         """Set the mask for the objective transform.
 
@@ -342,6 +372,18 @@ class NonlinearConstraintTransform(ABC):
       [`nonlinear_constraint_diffs_from_optimizer`][ropt.transforms.NonlinearConstraintTransform.nonlinear_constraint_diffs_from_optimizer]
       method.
     """
+
+    @abstractmethod
+    def __init__(
+        self,
+        transform_config: NonlinearConstraintTransformConfig,
+    ) -> None:
+        """Initialize the constraint transform.
+
+        Args:
+            transform_config: The configuration object containing settings for this
+                constraint transform.
+        """
 
     @abstractmethod
     def init(self, mask: NDArray[np.bool_]) -> None:

@@ -135,13 +135,7 @@ class SciPyBackend(Backend):
         "bounds": _CONSTRAINT_REQUIRES_BOUNDS,
     }
 
-    def __init__(self, backend_config: BackendConfig) -> None:
-        """Initialize the SciPy optimizer backend.
-
-        Args:
-            backend_config: The configuration for the backend, containing the
-                            method name and options.
-        """
+    def __init__(self, backend_config: BackendConfig) -> None:  # noqa: D107
         self._config = backend_config
         _, _, self._method = backend_config.method.lower().rpartition("/")
         if self._method == "default":
@@ -150,15 +144,9 @@ class SciPyBackend(Backend):
             msg = f"SciPy optimizer algorithm {self._method} is not supported"
             raise NotImplementedError(msg)
 
-    def init(
+    def init(  # noqa: D102
         self, context: EnOptContext, optimizer_callback: OptimizerCallback
     ) -> None:
-        """Initialize the optimizer implemented by the SciPy plugin.
-
-        See the [ropt.backend.Backend][] abstract base class.
-
-        # noqa
-        """
         self._optimizer_callback = optimizer_callback
         self._context = context
         validate_supported_constraints(
@@ -176,13 +164,7 @@ class SciPyBackend(Backend):
         self._cached_function: NDArray[np.float64] | None = None
         self._cached_gradient: NDArray[np.float64] | None = None
 
-    def start(self, initial_values: NDArray[np.float64]) -> None:
-        """Start the optimization.
-
-        See the [ropt.backend.Backend][] abstract base class.
-
-        # noqa
-        """
+    def start(self, initial_values: NDArray[np.float64]) -> None:  # noqa: D102
         self._cached_variables = None
         self._cached_function = None
         self._cached_gradient = None
@@ -219,23 +201,11 @@ class SciPyBackend(Backend):
                 )
 
     @property
-    def allow_nan(self) -> bool:
-        """Whether NaN is allowed.
-
-        See the [ropt.backend.Backend][] abstract base class.
-
-        # noqa
-        """
+    def allow_nan(self) -> bool:  # noqa: D102
         return self._method == "differential_evolution"
 
     @property
-    def is_parallel(self) -> bool:
-        """Whether the current run is parallel.
-
-        See the [ropt.backend.Backend][] abstract base class.
-
-        # noqa
-        """
+    def is_parallel(self) -> bool:  # noqa: D102
         return self._parallel
 
     def _initialize_bounds(self) -> Bounds | None:

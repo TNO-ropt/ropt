@@ -1,8 +1,3 @@
-::: ropt.context
-    options:
-        members:
-            - EnOptContext
-
 ::: ropt.config
     options:
         members:

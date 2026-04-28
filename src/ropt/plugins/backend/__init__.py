@@ -9,9 +9,9 @@ third-party packages.
 
 `ropt` includes the following backends by default:
 
-* [`SciPyBackend`][ropt.plugins.backend.scipy.SciPyBackend]: Provides
+* [`SciPyBackend`][ropt.backend.scipy.SciPyBackend]: Provides
   access to various algorithms from the `scipy.optimize` library.
-* [`ExternalBackend`][ropt.plugins.backend.external.ExternalBackend]:
+* [`ExternalBackend`][ropt.backend.external.ExternalBackend]:
   Enables running other backend plugins in a separate external process, useful
   for isolation or specific execution environments.
 

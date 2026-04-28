@@ -10,24 +10,12 @@ class SciPySamplerPlugin(SamplerPlugin):
     """Default sampler plugin class."""
 
     @classmethod
-    def create(
+    def create(  # noqa: D102
         cls,
         sampler_config: SamplerConfig,
     ) -> SciPySampler:
-        """Initialize the sampler plugin.
-
-        See the [ropt.plugins.sampler.SamplerPlugin][] abstract base class.
-
-        # noqa
-        """  # noqa: DOC201
         return SciPySampler(sampler_config)
 
     @classmethod
-    def is_supported(cls, method: str) -> bool:
-        """Check if a method is supported.
-
-        See the [ropt.plugins.base.Plugin][] abstract base class.
-
-        # noqa
-        """  # noqa: DOC201
+    def is_supported(cls, method: str) -> bool:  # noqa: D102
         return method.lower() in (SCIPY_SAMPLER_SUPPORTED_METHODS | {"default"})

@@ -8,7 +8,7 @@ custom strategies for aggregating ensemble results.
 **Built-in Function Estimator Plugins:**
 
 The default
-[`DefaultFunctionEstimator`][ropt.plugins.function_estimator.default.DefaultFunctionEstimator]
+[`DefaultFunctionEstimator`][ropt.function_estimator.default.DefaultFunctionEstimator]
 class provides methods for calculating the weighted mean (`mean`) and standard
 deviation (`stddev`) of the realization results.
 

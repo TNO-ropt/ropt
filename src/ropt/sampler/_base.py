@@ -10,6 +10,7 @@ if TYPE_CHECKING:
     from numpy.random import Generator
     from numpy.typing import NDArray
 
+    from ropt.config._sampler_config import SamplerConfig
     from ropt.context import EnOptContext
 
 
@@ -28,6 +29,14 @@ class Sampler(ABC):
     Subclasses must implement a `generate_samples` that contains the sample
     generation logic.
     """
+
+    @abstractmethod
+    def __init__(self, sampler_config: SamplerConfig) -> None:
+        """Initialize the sampler object.
+
+        Args:
+            sampler_config: The configuration object containing settings for this sampler.
+        """
 
     @abstractmethod
     def init(

@@ -211,15 +211,9 @@ class DefaultRealizationFilter(RealizationFilter):
         [`CVaRConstraintOptions`][ropt.realization_filter.default.CVaRConstraintOptions].
     """
 
-    def __init__(self, filter_config: RealizationFilterConfig) -> None:  # D107
-        """Initialize the realization filter plugin.
-
-        See the
-        [ropt.realization_filter.RealizationFilter][]
-        base class.
-
-        # noqa
-        """
+    def __init__(  # noqa: D107
+        self, filter_config: RealizationFilterConfig
+    ) -> None:  # D107
         self._filter_config = filter_config
         self._filter_options: (
             SortObjectiveOptions
@@ -231,30 +225,14 @@ class DefaultRealizationFilter(RealizationFilter):
         assert isinstance(self._filter_config, RealizationFilterConfig)
         _, _, self._method = self._filter_config.method.lower().rpartition("/")
 
-    def init(self, context: EnOptContext) -> None:
-        """Initialize the realization filter.
-
-        See the
-        [ropt.realization_filter.RealizationFilter][]
-        base class.
-
-        # noqa
-        """
+    def init(self, context: EnOptContext) -> None:  # noqa: D102
         self._context = context
 
-    def get_realization_weights(  # D107
+    def get_realization_weights(  # D107  # noqa: D102
         self,
         objectives: NDArray[np.float64],
         constraints: NDArray[np.float64] | None,
     ) -> NDArray[np.float64]:
-        """Return the updated weights of the realizations.
-
-        See the
-        [ropt.realization_filter.RealizationFilter][]
-        abstract base class.
-
-        # noqa
-        """  # noqa: DOC501
         match self._method:
             case "sort-objective":
                 self._filter_options = SortObjectiveOptions.model_validate(

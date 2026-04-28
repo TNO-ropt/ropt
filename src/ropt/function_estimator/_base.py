@@ -9,6 +9,7 @@ if TYPE_CHECKING:
     import numpy as np
     from numpy.typing import NDArray
 
+    from ropt.config import FunctionEstimatorConfig
     from ropt.context import EnOptContext
 
 
@@ -32,6 +33,14 @@ class FunctionEstimator(ABC):
     - `calculate_gradient`: To combine gradient values from realizations.
 
     """
+
+    @abstractmethod
+    def __init__(self, estimator_config: FunctionEstimatorConfig) -> None:
+        """Initialize the function estimator object.
+
+        Args:
+            estimator_config: The function estimator configuration.
+        """
 
     @abstractmethod
     def init(self, context: EnOptContext) -> None:

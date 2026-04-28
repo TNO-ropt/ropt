@@ -22,35 +22,17 @@ class SciPyBackendPlugin(BackendPlugin):
     """The SciPy backend plugin class."""
 
     @classmethod
-    def create(cls, backend_config: BackendConfig) -> SciPyBackend:
-        """Initialize the backend plugin.
-
-        See the [ropt.plugins.backend.BackendPlugin][] abstract base class.
-
-        # noqa
-        """  # noqa: DOC201
+    def create(cls, backend_config: BackendConfig) -> SciPyBackend:  # noqa: D102
         return SciPyBackend(backend_config)
 
     @classmethod
-    def is_supported(cls, method: str) -> bool:
-        """Check if a method is supported.
-
-        See the [ropt.plugins.backend.BackendPlugin][] abstract base class.
-
-        # noqa
-        """  # noqa: DOC201
+    def is_supported(cls, method: str) -> bool:  # noqa: D102
         return method.lower() in (SUPPORTED_SCIPY_METHODS | {"default"})
 
     @classmethod
-    def validate_options(
+    def validate_options(  # noqa: D102
         cls, method: str, options: dict[str, Any] | list[str] | None
     ) -> None:
-        """Validate the options of a given method.
-
-        See the [ropt.plugins.backend.BackendPlugin][] abstract base class.
-
-        # noqa
-        """  # noqa: DOC501
         if options is not None:
             if not isinstance(options, dict):
                 msg = "SciPy backend options must be a dictionary"

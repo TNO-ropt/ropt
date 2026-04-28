@@ -7,6 +7,7 @@ import numpy as np
 import pytest
 from numpy.typing import NDArray
 
+from ropt.config._realization_filter_config import RealizationFilterConfig
 from ropt.context import EnOptContext
 from ropt.realization_filter import RealizationFilter
 from ropt.realization_filter.default import (
@@ -660,6 +661,9 @@ def test_cvar_filter_mixed(
 
 
 class CustomRealizationFilter(RealizationFilter):
+    def __init__(self, _: RealizationFilterConfig) -> None:  # D107
+        pass
+
     def get_realization_weights(  # noqa: PLR6301
         self,
         objectives: NDArray[np.float64],
@@ -675,7 +679,9 @@ def test_custom_realization_filter(
     config: Any, evaluator: Any, test_functions: Any
 ) -> None:
     config["objectives"]["realization_filters"] = 0
-    config["realization_filters"] = [CustomRealizationFilter()]
+    config["realization_filters"] = [
+        CustomRealizationFilter(RealizationFilterConfig(method="custom"))
+    ]
     optimizer = BasicOptimizer(config, evaluator(test_functions))
     optimizer.run(initial_values)
     assert optimizer.results is not None

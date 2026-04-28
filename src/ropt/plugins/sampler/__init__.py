@@ -5,7 +5,7 @@ vectors. This module allows for the extension of `ropt` with custom samplers.
 
 **Built-in Sampler Plugins:**
 
-By default, the [`SciPySampler`][ropt.plugins.sampler.scipy.SciPySampler] sampler
+By default, the [`SciPySampler`][ropt.sampler.scipy.SciPySampler] sampler
 is installed, which provides several sampling methods based on the `scipy.stats`
 and `scipy.stats.qmc` packages.
 

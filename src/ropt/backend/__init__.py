@@ -5,6 +5,20 @@ algorithms into `ropt` via its plugin system. Backend plugins allow `ropt` to
 utilize various optimization techniques, either built-in or provided by
 third-party packages.
 
+Backends must derive from the [`Backend`][ropt.backend._base.Backend] base class
+and implement the required interface to be compatible with `ropt`. This includes
+methods for initializing the backend, performing optimization steps, and
+handling any specific requirements of the optimization algorithms they support.
+
+**Built-in Backends:**
+
+- [`SciPyBackend`][ropt.backend.scipy.SciPyBackend]: A backend that interfaces
+  with optimization algorithms from the SciPy library, supporting a wide range
+  of methods for unconstrained and constrained optimization.
+- [`ExternalBackend`][ropt.backend.external.ExternalBackend]: A backend that
+  allows optimization via an external process, enabling the use of optimization
+  algorithms that may not be directly integrated into `ropt` but can be executed
+  as separate processes.
 
 **Utilities:**
 

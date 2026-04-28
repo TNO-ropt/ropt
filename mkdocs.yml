@@ -34,7 +34,7 @@ plugins:
       default_handler: python
       handlers:
         python:
-          paths: [src, examples]
+          paths: [ src, examples ]
           options:
             show_source: false
             show_bases: true
@@ -46,7 +46,8 @@ plugins:
             members_order: source
             show_symbol_type_heading: true
             separate_signature: true
-            show_signature_annotations: True
+            show_signature_annotations: true
+            group_by_category: false
           inventories:
             - https://docs.python.org/3/objects.inv
             - https://docs.pydantic.dev/latest/objects.inv
@@ -67,11 +68,12 @@ markdown_extensions:
   - pymdownx.tabbed:
       alternate_style: true
   - pymdownx.snippets:
-      base_path: ["docs/snippets"]
+      base_path: [ "docs/snippets" ]
   - pymdownx.emoji:
-      emoji_index: !!python/name:material.extensions.emoji.twemoji 
-      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+      emoji_index: !!python/name:material.extensions.emoji.twemoji ""
+      emoji_generator:
 
+        !!python/name:material.extensions.emoji.to_svg ""
 extra_css:
   - stylesheets/extra.css
 
@@ -91,36 +93,29 @@ repo_name: TNO-ropt/ropt
 
 nav:
   - "About": index.md
-  - "Usage": 
+  - "Usage":
       - "Background": usage/background.md
       - "Basic Optimization": usage/basic.md
       - "Optimization workflows": usage/workflows.md
   - "Reference":
-      - "Optimization":
-        - "Configuration": reference/optimization/configuration.md
-        - "Function Evaluations": reference/optimization/evaluator.md
-        - "Optimization Results": reference/optimization/results.md
-        - "Domain Transforms": reference/optimization/domain_transforms.md
-      - "Workflows":
-          - "Compute Steps": reference/workflow/compute_steps.md
-          - "Event Handlers": reference/workflow/event_handler.md
-          - "Evaluators": reference/workflow/evaluator.md
-          - "Servers": reference/workflow/server.md
-          - "Basic Optimizer": reference/workflow/basic_optimizer.md
+      - "Backend": reference/backend.md
+      - "Configuration": reference/config.md
+      - "Context": reference/context.md
+      - "Core": reference/core.md
+      - "Enums": reference/enums.md
+      - "Evaluator": reference/evaluator.md
+      - "Events": reference/events.md
+      - "Exceptions": reference/exceptions.md
+      - "Function Estimator": reference/function_estimator.md
       - "Plugins":
-        - "Plugin Manager": reference/plugins/plugin_manager.md
-        - "Backend Plugins": reference/plugins/optimizer/backend.md
-        - "Sampler Plugins": reference/plugins/optimizer/sampler.md
-        - "Realization Filter Plugins": reference/plugins/optimizer/realization_filter.md
-        - "Function estimator Plugins": reference/plugins/optimizer/function_estimator.md
-      - "Miscellaneous":
-        - "Enumerations": reference/miscellaneous/enums.md
-        - "Exceptions": reference/miscellaneous/exceptions.md
-        - "Events": reference/miscellaneous/events.md
-      - "Core":
-        - "Ensemble Evaluator": reference/core/evaluator.md
-        - "Ensemble Optimizer": reference/core/optimizer.md
-
+        - "Plugin Manager": reference/plugins/manager.md
+        - "Plugin Bases": reference/plugins/bases.md
+        - "Default Plugins": reference/plugins/defaults.md
+      - "Realization Filter": reference/realization_filter.md
+      - "Results": reference/results.md
+      - "Sampler": reference/sampler.md
+      - "Transforms": reference/transforms.md
+      - "Workflow": reference/workflow.md
 
 exclude_docs: |
   /snippets/

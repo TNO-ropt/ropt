@@ -13,22 +13,9 @@ class DefaultRealizationFilterPlugin(RealizationFilterPlugin):
     """Default realization filter plugin class."""
 
     @classmethod
-    def create(cls, filter_config: RealizationFilterConfig) -> DefaultRealizationFilter:
-        """Initialize the realization filter plugin.
-
-        See the [ropt.plugins.realization_filter.RealizationFilterPlugin][]
-        abstract base class.
-
-        # noqa
-        """  # noqa: DOC201
+    def create(cls, filter_config: RealizationFilterConfig) -> DefaultRealizationFilter:  # noqa: D102
         return DefaultRealizationFilter(filter_config)
 
     @classmethod
-    def is_supported(cls, method: str) -> bool:
-        """Check if a method is supported.
-
-        See the [ropt.plugins.base.Plugin][] abstract base class.
-
-        # noqa
-        """  # noqa: DOC201
+    def is_supported(cls, method: str) -> bool:  # noqa: D102
         return method.lower() in DEFAULT_REALIZATION_FILTER_METHODS

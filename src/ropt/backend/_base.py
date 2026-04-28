@@ -9,6 +9,7 @@ if TYPE_CHECKING:
     import numpy as np
     from numpy.typing import NDArray
 
+    from ropt.config import BackendConfig
     from ropt.context import EnOptContext
     from ropt.core import OptimizerCallback
 
@@ -37,6 +38,15 @@ class Backend(ABC):
     - `allow_nan`:   To indicate if the algorithm can handle NaN function values.
     - `is_parallel`: To indicate if the algorithm may perform parallel evaluations.
     """
+
+    @abstractmethod
+    def __init__(self, backend_config: BackendConfig) -> None:
+        """Initialize the SciPy optimizer backend.
+
+        Args:
+            backend_config: The configuration for the backend, containing the
+                            method name and options.
+        """
 
     @abstractmethod
     def init(

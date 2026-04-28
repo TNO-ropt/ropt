@@ -56,7 +56,7 @@ class Plugin(ABC):
         return `False`.
 
         For instance, the
-        [`external`][ropt.plugins.backend.external.ExternalBackend] optimizer
+        [`external`][ropt.backend.external.ExternalBackend] optimizer
         plugin acts as a wrapper for other optimizers run in separate processes.
         It doesn't provide methods directly and must always be explicitly
         requested, so it overrides this method to return `False`.

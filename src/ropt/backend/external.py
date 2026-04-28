@@ -52,13 +52,7 @@ class ExternalBackend(Backend):
     method `method-name` and launch it as an external process.
     """
 
-    def __init__(self, backend_config: BackendConfig) -> None:
-        """Initialize the external optimizer backend.
-
-        Args:
-            backend_config: The configuration for the backend, containing the
-                            method name and options.
-        """
+    def __init__(self, backend_config: BackendConfig) -> None:  # noqa: D107
         if not _HAVE_CLOUDPICKLE:
             msg = "The cloudpickle module must be installed to use ExternalBackend"
             raise NotImplementedError(msg)
@@ -71,15 +65,9 @@ class ExternalBackend(Backend):
             self._backend_config.method, self._backend_config.options
         )
 
-    def init(
+    def init(  # noqa: D102
         self, context: EnOptContext, optimizer_callback: OptimizerCallback
     ) -> None:
-        """Initialize the optimizer.
-
-        See the [ropt.backend.Backend][] abstract base class.
-
-        # noqa
-        """
         self._context = context
         self._optimizer_callback = optimizer_callback
         backend = self._backend_plugin.create(self._backend_config)
@@ -90,13 +78,7 @@ class ExternalBackend(Backend):
         self._is_parallel: bool = backend.is_parallel
         del backend
 
-    def start(self, initial_values: NDArray[np.float64]) -> None:
-        """Start the optimization.
-
-        See the [ropt.backend.Backend][] abstract base class.
-
-        # noqa
-        """
+    def start(self, initial_values: NDArray[np.float64]) -> None:  # noqa: D102
         context = multiprocessing.get_context("spawn")
         request_queue = context.Queue()
         result_queue = context.Queue()
@@ -157,23 +139,11 @@ class ExternalBackend(Backend):
             raise exception
 
     @property
-    def allow_nan(self) -> bool:
-        """Whether NaN is allowed.
-
-        See the [ropt.backend.Backend][] abstract base class.
-
-        # noqa
-        """
+    def allow_nan(self) -> bool:  # noqa: D102
         return self._allow_nan
 
     @property
-    def is_parallel(self) -> bool:
-        """Whether the current run is parallel.
-
-        See the [ropt.backend.Backend][] abstract base class.
-
-        # noqa
-        """
+    def is_parallel(self) -> bool:  # noqa: D102
         return self._is_parallel
 
 

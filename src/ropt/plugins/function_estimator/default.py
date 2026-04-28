@@ -19,24 +19,11 @@ class DefaultFunctionEstimatorPlugin(FunctionEstimatorPlugin):
     """Default filter estimator plugin class."""
 
     @classmethod
-    def create(
+    def create(  # noqa: D102
         cls, estimator_config: FunctionEstimatorConfig
     ) -> DefaultFunctionEstimator:
-        """Initialize the realization filter plugin.
-
-        See the [ropt.plugins.function_estimator.FunctionEstimatorPlugin][]
-        abstract base class.
-
-        # noqa
-        """  # noqa: DOC201
         return DefaultFunctionEstimator(estimator_config)
 
     @classmethod
-    def is_supported(cls, method: str) -> bool:
-        """Check if a method is supported.
-
-        See the [ropt.plugins.base.Plugin][] abstract base class.
-
-        # noqa
-        """  # noqa: DOC201
+    def is_supported(cls, method: str) -> bool:  # noqa: D102
         return method.lower() in DEFAULT_FUNCTION_ESTIMATOR_METHODS
