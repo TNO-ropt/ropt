@@ -18,7 +18,7 @@ if TYPE_CHECKING:
 
 @dataclass(slots=True)
 class ConstraintInfo(ResultField):
-    """Stores information about constraint differences and violations.
+    """Store information about constraint differences and violations.
 
     The `ConstraintInfo` class stores the differences between variable or
     constraint values and their respective bounds. It also calculates and stores
@@ -124,10 +124,6 @@ class ConstraintInfo(ResultField):
     )
 
     def __post_init__(self) -> None:
-        """Make all array fields immutable copies.
-
-        # noqa
-        """
         self.bound_lower = _immutable_copy(self.bound_lower)
         self.bound_upper = _immutable_copy(self.bound_upper)
         self.linear_lower = _immutable_copy(self.linear_lower)
@@ -163,22 +159,20 @@ class ConstraintInfo(ResultField):
         variables: NDArray[np.float64],
         constraints: NDArray[np.float64] | None,
     ) -> ConstraintInfo | None:
-        """Add constraint difference information.
+        """Create a `ConstraintInfo` object with constraint difference data.
 
-        This stores the following constraint differences:
-        1. The difference between variables and their lower and upper bounds.
-        2. The difference between the linear constraints with their
-           right-hand-side upper and lower bounds, calculated for given variables.
-        3. The differences between non-linear constraint values and their
-           right-hand-side upper and lower bounds.
+        This calculates differences between variables/constraints and their
+        bounds. Differences for non-linear constraints are optional. All fields
+        default to `None` and are only populated if bounds are present and finite.
 
         Args:
-            context:      The ensemble optimizer context object.
-            variables:   The variables to check.
-            constraints: The constraints to check (optional).
+            context:      The optimizer context containing bound definitions.
+            variables:    Variable values to check against bounds.
+            constraints:  Non-linear constraint values, if present.
 
         Returns:
-            A newly created ConstraintInfo object or None.
+            A newly created `ConstraintInfo` object, or `None` if no bounds
+            are available.
         """
         diffs: dict[str, NDArray[np.float64] | None] = {}
 
@@ -205,6 +199,20 @@ class ConstraintInfo(ResultField):
         return None
 
     def transform_from_optimizer(self, context: EnOptContext) -> ConstraintInfo:
+        """Transform constraint differences from optimizer space to user space.
+
+        Constraint differences (lower and upper bound violations) for variables,
+        linear constraints, and non-linear constraints are mapped back to user
+        space using the inverse transform chain. Violation fields are
+        recalculated after transformation.
+
+        Args:
+            context: The context used by the source of the results.
+
+        Returns:
+            A new `ConstraintInfo` object with all differences transformed to
+            user space.
+        """
         if (
             not context.variable_transforms
             and not context.nonlinear_constraint_transforms

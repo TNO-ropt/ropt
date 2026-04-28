@@ -1,4 +1,4 @@
-"""The optimization event class."""
+"""Optimization event data structures."""
 
 from __future__ import annotations
 
@@ -13,17 +13,16 @@ if TYPE_CHECKING:
 
 @dataclass(slots=True)
 class EnOptEvent:
-    """Stores data related to an optimization event.
+    """Container for data emitted with optimization workflow events.
 
-    During the execution of an optimization workflow, events are triggered to
-    signal specific occurrences. Callbacks can be registered to react to these
-    events and will receive an `EnOptEvent` object containing relevant
-    information.
+    Events are raised during optimization to signal lifecycle milestones and
+    intermediate outcomes. Registered callbacks receive an EnOptEvent instance
+    with event metadata, the current context, and any associated results.
 
     Attributes:
-        event_type: The type of event that occurred.
-        context:    The optimizer context associated with the event.
-        results:    A tuple containing results.
+        event_type:  Type of event that occurred.
+        context:     Optimizer context associated with the event.
+        results:     Tuple of result objects associated with the event.
     """
 
     event_type: EnOptEventType

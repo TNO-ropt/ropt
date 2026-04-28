@@ -19,7 +19,7 @@ TypeResults = TypeVar("TypeResults", bound="Results")
 
 @dataclass(slots=True)
 class FunctionResults(Results):
-    """Stores results related to function evaluations.
+    """Store results related to function evaluations.
 
     The `FunctionResults` class extends the base
     [`Results`][ropt.results.Results] class to store data specific to function
@@ -30,21 +30,21 @@ class FunctionResults(Results):
        realization. See
        [`FunctionEvaluations`][ropt.results.FunctionEvaluations].
 
-    2. **Realizations:** Information about the realizations, such as weights for
-       objectives and constraints, and whether each realization was successful.
+     2. **Realizations:** Information about realizations, such as weights for
+         objectives and constraints and whether each realization was successful.
        See [`Realizations`][ropt.results.Realizations].
 
-    3. **Functions:** The calculated objective and constraint function values,
+    3. **Functions:** Calculated objective and constraint function values,
        typically aggregated across realizations. See
        [`Functions`][ropt.results.Functions].
 
-    4. **Constraint Info:** Details about constraint differences and violations.
-       See [`ConstraintInfo`][ropt.results.ConstraintInfo].
+    4. **Constraint Info:** Details about constraint differences and
+       violations. See [`ConstraintInfo`][ropt.results.ConstraintInfo].
 
     Attributes:
-        evaluations:     Results of the function evaluations.
-        realizations:    The calculated parameters of the realizations.
-        functions:       The calculated functions.
+        evaluations:     Function-evaluation results.
+        realizations:    Realization-specific parameters.
+        functions:       Aggregated function values, if available.
         constraint_info: Information on constraint differences and violations.
     """
 
@@ -54,7 +54,11 @@ class FunctionResults(Results):
     constraint_info: ConstraintInfo | None = None
 
     def transform_from_optimizer(self, context: EnOptContext) -> FunctionResults:
-        """Apply transformations from optimizer space.
+        """Transform results from optimizer space to user space.
+
+        This applies inverse transformations to all transformable sub-fields
+        (`evaluations`, `functions`, and `constraint_info` when present).
+        Realization metadata is passed through unchanged.
 
         Args:
             context: The context used by the source of the results.

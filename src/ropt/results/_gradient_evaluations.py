@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 
 @dataclass(slots=True)
 class GradientEvaluations(ResultField):
-    """Stores the results of evaluations for gradient calculations.
+    """Store results of evaluations used for gradient calculations.
 
     The `GradientEvaluations` class stores the results of evaluating the
     objective and constraint functions for perturbed variables, which is
@@ -92,6 +92,13 @@ class GradientEvaluations(ResultField):
             - [`AxisName.REALIZATION`][ropt.enums.AxisName.REALIZATION]
             - [`AxisName.PERTURBATION`][ropt.enums.AxisName.PERTURBATION]
 
+    Note: Evaluation info data type.
+        The data type of the evaluation info fields is not fixed. Each field in
+        the `evaluation_info` dictionary can have its own data type, which must
+        be a two-dimensional array of any type supported by `numpy`, including
+        object arrays. This allows for maximum flexibility in the kind of
+        metadata that can be included, such as strings, integers, floats, or
+        even complex objects.
 
     Attributes:
         variables:             The unperturbed variable vector.
@@ -149,10 +156,6 @@ class GradientEvaluations(ResultField):
     )
 
     def __post_init__(self) -> None:
-        """Make all array fields immutable copies.
-
-        # noqa
-        """
         self.variables = _immutable_copy(self.variables)
         self.perturbed_variables = _immutable_copy(self.perturbed_variables)
         self.perturbed_objectives = _immutable_copy(self.perturbed_objectives)
@@ -167,17 +170,20 @@ class GradientEvaluations(ResultField):
         perturbed_constraints: NDArray[np.float64] | None = None,
         evaluation_info: dict[str, NDArray[Any]] | None = None,
     ) -> GradientEvaluations:
-        """Create a FunctionEvaluations object with the given information.
+        """Create a `GradientEvaluations` object with the given data.
 
         Args:
             variables:             The unperturbed variable vector.
-            perturbed_variables:   The unperturbed variable vector.
-            perturbed_objectives:  The objective functions for each realization.
-            perturbed_constraints: The constraint functions for each realization.
+            perturbed_variables:   Perturbed variable values for each
+                                   realization and perturbation.
+            perturbed_objectives:  Objective function values for each
+                                   realization and perturbation.
+            perturbed_constraints: Constraint function values for each
+                                   realization and perturbation.
             evaluation_info:       Optional info for each evaluation.
 
         Returns:
-            A new FunctionEvaluations object.
+            A new `GradientEvaluations` object.
         """
         return GradientEvaluations(
             variables=variables,
@@ -188,7 +194,11 @@ class GradientEvaluations(ResultField):
         )
 
     def transform_from_optimizer(self, context: EnOptContext) -> GradientEvaluations:
-        """Apply transformations from optimizer space.
+        """Transform values from optimizer space to user space.
+
+        Variable, objective, and non-linear constraint values are mapped back
+        to user space using inverse transform chains. Evaluation metadata is
+        passed through unchanged.
 
         Args:
             context: The context used by the source of the results.

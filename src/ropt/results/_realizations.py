@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 
 @dataclass(slots=True)
 class Realizations(ResultField):
-    """Stores information about the realizations.
+    """Store information about realizations.
 
     The `Realizations` class stores data related to the individual realizations
     used in the optimization process.
@@ -24,9 +24,8 @@ class Realizations(ResultField):
 
     === "Active Realizations"
 
-        `active_realizations`: A boolean array indicating whether each
-        realization's evaluation was evaluated. `True` indicates that a
-        realization was evaluated:
+        `active_realizations`: A boolean array indicating which realizations
+        were evaluated. `True` indicates that a realization was evaluated:
 
         - Shape $(n_r,)$, where:
             - $n_r$ is the number of realizations.
@@ -57,7 +56,7 @@ class Realizations(ResultField):
             - [`AxisName.REALIZATION`][ropt.enums.AxisName.REALIZATION]
 
         These weights may change during optimization, depending on the type of
-        objective calculation
+        objective calculation.
 
     === "Constraint Weights"
 
@@ -72,13 +71,15 @@ class Realizations(ResultField):
             - [`AxisName.REALIZATION`][ropt.enums.AxisName.REALIZATION]
 
         These weights may change during optimization, depending on the type of
-        constraint calculation
+        constraint calculation.
 
     Attributes:
         active_realizations: Boolean array indicating active realizations.
         failed_realizations: Boolean array indicating failed realizations.
-        objective_weights:   Weights for each objective in each realization.
-        constraint_weights:  Weights for each constraint in each realization.
+        objective_weights:   Weights for each objective in each realization,
+                             if available.
+        constraint_weights:  Weights for each constraint in each realization,
+                             if available.
     """
 
     active_realizations: NDArray[np.bool_] = field(
@@ -111,10 +112,6 @@ class Realizations(ResultField):
     )
 
     def __post_init__(self) -> None:
-        """Make all array fields immutable copies.
-
-        # noqa
-        """
         self.active_realizations = _immutable_copy(self.active_realizations)
         self.failed_realizations = _immutable_copy(self.failed_realizations)
         self.objective_weights = _immutable_copy(self.objective_weights)

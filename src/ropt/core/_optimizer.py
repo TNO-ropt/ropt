@@ -54,8 +54,8 @@ class EnsembleOptimizer:
     The [`EnsembleOptimizer`][ropt.core.EnsembleOptimizer] class provides the
     core functionality for running ensemble-based optimizations. Direct use of
     this class is generally discouraged. Instead, use the
-    [`BasicOptimizer`][ropt.workflow.BasicOptimizer] class or build a workflow
-    containing the optimization steps.
+    [`BasicOptimizer`][ropt.workflow.BasicOptimizer] class or build a custom
+    workflow containing the optimization steps.
     """
 
     def __init__(
@@ -67,8 +67,7 @@ class EnsembleOptimizer:
         """Initialize the EnsembleOptimizer.
 
         This class orchestrates ensemble-based optimizations. It requires an
-        optimization context object, an evaluator, and a plugin manager to
-        function.
+        optimization context object and an evaluator to function.
 
         The `EnsembleOptimizer` needs the following to define a single
         optimization run:
@@ -78,14 +77,9 @@ class EnsembleOptimizer:
         2.  An [`EnsembleEvaluator`][ropt.core.EnsembleEvaluator]
             object: This object is responsible for evaluating functions.
 
-        Additionally, an optional callbacks can be provided that is invoked
-        before and after each function evaluation.:
-        [`SignalEvaluationCallback`][ropt.core.SignalEvaluationCallback]:
-
-        The optimizer plugins are used by the ensemble optimizer to implement
-        the actual optimization process. The `EnsembleOptimizer` class provides
-        the callback function to these plugins needed (see
-        [OptimizerCallback][ropt.core.OptimizerCallback])
+        Additionally, an optional
+        [`callback`][ropt.core.SignalEvaluationCallback] can be provided that is
+        invoked before and after each function evaluation.
 
         Args:
             context:            The ensemble optimization context.
@@ -140,7 +134,7 @@ class EnsembleOptimizer:
 
         Returns:
             An [`ExitCode`][ropt.enums.ExitCode] indicating the reason for
-            termination.
+                termination.
         """
         self._initial_variables = variables.copy()
         exit_code = ExitCode.OPTIMIZER_FINISHED

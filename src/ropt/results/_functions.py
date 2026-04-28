@@ -17,16 +17,14 @@ if TYPE_CHECKING:
 
 @dataclass(slots=True)
 class Functions(ResultField):
-    """Stores the calculated objective and constraint function values.
+    """Store calculated objective and constraint function values.
 
     The `Functions` class stores the calculated values of the objective and
     constraint functions. These values are typically derived from the
-    evaluations performed across all realizations, often through a process like
-    averaging. The optimizer may handle multiple objectives and constraints.
-    Multiple objectives are combined into a single objective, which is stored
-    in the `target_objective` field. This is the target value that is being
-    optimized. Multiple constraints are handled
-    individually by the optimizer.
+    evaluations performed across realizations, often through aggregation. The
+    optimizer may handle multiple objectives and constraints. Multiple
+    objectives are combined into a single target objective stored in
+    `target_objective`. Multiple constraints are handled individually.
 
 
     **Result descriptions**
@@ -64,7 +62,7 @@ class Functions(ResultField):
     Attributes:
         target_objective: The target objective value used by the optimizer.
         objectives:       The value of each individual objective.
-        constraints:      The value of each individual constraint.
+        constraints:      The value of each individual constraint, if present.
     """
 
     target_objective: NDArray[np.float64] = field(
@@ -83,10 +81,6 @@ class Functions(ResultField):
     )
 
     def __post_init__(self) -> None:
-        """Make all array fields immutable copies.
-
-        # noqa
-        """
         self.target_objective = _immutable_copy(self.target_objective)
         self.objectives = _immutable_copy(self.objectives)
         self.constraints = _immutable_copy(self.constraints)
@@ -98,12 +92,12 @@ class Functions(ResultField):
         objectives: NDArray[np.float64],
         constraints: NDArray[np.float64] | None = None,
     ) -> Functions:
-        """Create a Functions object with the given information.
+        """Create a `Functions` object from pre-aggregated function values.
 
         Args:
             target_objective: The target objective used by the optimizer.
-            objectives:       The objective functions for each realization.
-            constraints:      The constraint functions for each realization.
+            objectives:       Objective function values.
+            constraints:      Constraint function values.
 
         Returns:
             A new Functions object.
@@ -115,7 +109,11 @@ class Functions(ResultField):
         )
 
     def transform_from_optimizer(self, context: EnOptContext) -> Functions:
-        """Apply transformations from optimizer space.
+        """Transform values from optimizer space to user space.
+
+        The target objective is left unchanged because it is the scalar value
+        optimized by the optimizer. Objective and non-linear constraint arrays
+        are mapped back to user space using the inverse transform chain.
 
         Args:
             context: The context used by the source of the results.

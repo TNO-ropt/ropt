@@ -2,9 +2,10 @@
 
 During the optimization process, the calculation of functions and gradients
 generates data that needs to be reported. To facilitate this, new results are
-passed to callbacks as a sequence of [`Results`][ropt.results.Results] objects.
-These objects can be instances of either the
-[`FunctionResults`][ropt.results.FunctionResults] or
+attached to [`EnOptEvent`][ropt.events.EnOptEvent] objects that are passed to
+callbacks. The event payload stores results as a sequence of
+[`Results`][ropt.results.Results] objects. These objects can be instances of
+either the [`FunctionResults`][ropt.results.FunctionResults] or
 [`GradientResults`][ropt.results.GradientResults] classes, which store the
 results of function and gradient evaluations, respectively.
 
@@ -20,7 +21,7 @@ multi-dimensional arrays is stored as metadata associated with each field. These
 fields are derived from the [`ResultField`][ropt.results.ResultField] class,
 which provides a [`get_axes`][ropt.results.ResultField.get_axes] class method
 for retrieving the axes. For instance, for the `objectives` field, this method
-would return:
+returns:
 
 ```py
 >>> from ropt.results import FunctionEvaluations
@@ -29,35 +30,34 @@ would return:
 ```
 Given that the first axis denotes realizations and the second axis denotes
 objectives, each row in the array represents the set of objective values for a
-specific realization. This metadata provides the necessary context for exporting
-and reporting code to associate each element in the result matrix with its
-corresponding realization and objective, as specified in the optimizer
-configuration. The pandas exporting code, for example, utilizes this information
-to construct a multi-index for the output DataFrame and to transform the
-multi-dimensional data into multiple columns.
+specific realization. The metadata associates each element in the result matrix
+with its corresponding realization and objective as defined in the optimizer
+configuration. The pandas exporting code, for example, uses this information to
+construct a multi-index for the output DataFrame and to expand multi-dimensional
+data into multiple columns.
 
 The [`AxisName`][ropt.enums.AxisName] enumeration currently defines the
 following axes:
 
-- [`AxisName.OBJECTIVE`][ropt.enums.AxisName.OBJECTIVE] The index along this
-  axis refers to the objective number as specified in the
+- [`AxisName.OBJECTIVE`][ropt.enums.AxisName.OBJECTIVE]:
+  The index along this axis refers to the objective number as specified in the
   [`EnOptContext`][ropt.context.EnOptContext] configuration.
-- [`AxisName.NONLINEAR_CONSTRAINT`][ropt.enums.AxisName.NONLINEAR_CONSTRAINT]
+- [`AxisName.NONLINEAR_CONSTRAINT`][ropt.enums.AxisName.NONLINEAR_CONSTRAINT]:
   The index along this axis corresponds to the non-linear constraint index
   defined in the [`EnOptContext`][ropt.context.EnOptContext] configuration.
-- [`AxisName.LINEAR_CONSTRAINT`][ropt.enums.AxisName.LINEAR_CONSTRAINT] The
-  index along this axis corresponds to the linear constraint index defined in
-  the [`EnOptContext`][ropt.context.EnOptContext] configuration.
-- [`AxisName.VARIABLE`][ropt.enums.AxisName.VARIABLE] The index along this axis
-  refers to the variable number as specified by the
+- [`AxisName.LINEAR_CONSTRAINT`][ropt.enums.AxisName.LINEAR_CONSTRAINT]:
+  The index along this axis corresponds to the linear constraint index defined
+  in the [`EnOptContext`][ropt.context.EnOptContext] configuration.
+- [`AxisName.VARIABLE`][ropt.enums.AxisName.VARIABLE]:
+  The index along this axis refers to the variable number as specified by the
   [`EnOptContext`][ropt.context.EnOptContext] configuration.
-- [`AxisName.REALIZATION`][ropt.enums.AxisName.REALIZATION]: When results
-  involve an ensemble, this axis represents the different realizations, where
-  the index corresponds to the realization number.
-- [`AxisName.PERTURBATION`][ropt.enums.AxisName.PERTURBATION] For gradient
-  calculations, multiple variable perturbations are used. The objectives and
-  constraints calculated for each perturbation are reported along this axis,
-  which represents the perturbation index.
+- [`AxisName.REALIZATION`][ropt.enums.AxisName.REALIZATION]:
+  When results involve an ensemble, this axis represents the different
+  realizations, where the index corresponds to the realization number.
+- [`AxisName.PERTURBATION`][ropt.enums.AxisName.PERTURBATION]:
+  For gradient calculations, multiple variable perturbations are used. The
+  objectives and constraints calculated for each perturbation are reported along
+  this axis, which represents the perturbation index.
 
 Refer to the documentation of the individual result classes for the exact
 dimensions of each result field. The dimensionality of the data and the order of
@@ -66,7 +66,7 @@ the axes are fixed and listed sequentially for every field.
 Note:
     The dimensionality associated with a result axis is fixed. For instance,
     even with only a single objective, results containing objective values will
-    still include a [`AxisName.OBJECTIVE`][ropt.enums.AxisName.OBJECTIVE]
+    still include an [`AxisName.OBJECTIVE`][ropt.enums.AxisName.OBJECTIVE]
     axis of length one.
 """
 

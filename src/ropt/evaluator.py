@@ -49,9 +49,9 @@ class EvaluatorContext:
     def get_active_evaluations(self, array: NDArray[T]) -> NDArray[T]:
         """Filter an array based on the active property.
 
-        This is a utility method, which can be used if only the active property
-        is used to exclude variable rows that are inactive, i.e. where none of
-        the objects or constraints are needed.
+        This is a utility method, which can be used if the active property is
+        used to exclude variable rows that are inactive, i.e. where none of the
+        objects or constraints are needed.
 
         This method filters a one- or two-dimensional array by retaining only
         those entries or rows that correspond to active. The activity of
@@ -75,8 +75,8 @@ class EvaluatorContext:
     ) -> NDArray[T]:
         """Expand an array by inserting fill values for inactive variables.
 
-        This is a utility method, which can be used if only the active property
-        is used to exclude variable rows that are fully inactive.
+        This is a utility method, which can be used if the active property is
+        used to exclude variable rows that are fully inactive.
 
         This method takes an array and expands it to its original dimensions by
         inserting a specified `fill_value` at positions corresponding to
@@ -141,16 +141,12 @@ class EvaluatorResult:
 
 
 class EvaluatorCallback(Protocol):
-    """Defines the call signature for evaluator callbacks.
-
-    Events handlers define a callback to handler events emitted during the
-    optimization process.
-    """
+    """Defines the call signature for evaluator callbacks."""
 
     def __call__(
         self, variables: NDArray[np.float64], context: EvaluatorContext, /
     ) -> EvaluatorResult:
-        """Handle an event.
+        """Evaluate the given variables within the provided context.
 
         Args:
             variables: The variables to pass to the evaluation function.

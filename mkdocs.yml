@@ -98,24 +98,34 @@ nav:
       - "Basic Optimization": usage/basic.md
       - "Optimization workflows": usage/workflows.md
   - "Reference":
-      - "Backend": reference/backend.md
-      - "Configuration": reference/config.md
-      - "Context": reference/context.md
-      - "Core": reference/core.md
-      - "Enums": reference/enums.md
-      - "Evaluator": reference/evaluator.md
-      - "Events": reference/events.md
-      - "Exceptions": reference/exceptions.md
-      - "Function Estimator": reference/function_estimator.md
+      - "Configuration":
+        - "Configuration Classes": reference/config.md
+        - "Context Class": reference/context.md
+      - "Ensemble Optimization":
+        - "Core Classes": reference/core.md
+        - "Evaluator Classes": reference/evaluator.md
+      - "Result Handling":
+        - "Optimization   Events": reference/events.md
+        - "Evaluation Results": reference/results.md
+      - "Optimization Components":
+        - "Function Estimators": reference/function_estimator.md
+        - "Realization Filters": reference/realization_filter.md
+        - "Optimizer Backends": reference/backend.md
+        - "Samplers": reference/sampler.md
+        - "Transforms": reference/transforms.md
       - "Plugins":
-        - "Plugin Manager": reference/plugins/manager.md
-        - "Plugin Bases": reference/plugins/bases.md
-        - "Default Plugins": reference/plugins/defaults.md
-      - "Realization Filter": reference/realization_filter.md
-      - "Results": reference/results.md
-      - "Sampler": reference/sampler.md
-      - "Transforms": reference/transforms.md
-      - "Workflow": reference/workflow.md
+        - "Default Plugins": reference/default_plugins.md
+        - "Plugin Manager": reference/plugin_manager.md
+        - "Plugin Bases": reference/plugin_bases.md
+      - "Workflows":
+        - "Steps": reference/workflow_steps.md
+        - "Event Handlers": reference/workflow_event_handlers.md
+        - "Servers": reference/workflow_servers.md
+        - "Evaluators": reference/workflow_evaluators.md
+        - "Basic Optimization Workflow": reference/basic_optimizer.md
+        - "Workflow Utilities": reference/workflow_utils.md
+      - "Enumerations": reference/enums.md
+      - "Exceptions": reference/exceptions.md
 
 exclude_docs: |
   /snippets/

@@ -27,7 +27,7 @@ class Results(ABC):
     """Abstract base class for storing optimization results.
 
     The `Results` class serves as a foundation for storing various types of
-    optimization results. It is not intended to be instantiated directly but
+    optimization results. It is not intended to be instantiated directly, but
     rather serves as a base for derived classes like
     [`FunctionResults`][ropt.results.FunctionResults] and
     [`GradientResults`][ropt.results.GradientResults], which hold the actual
@@ -48,8 +48,7 @@ class Results(ABC):
         [`AxisName`][ropt.enums.AxisName] enumeration. This information is
         optional, as it is not strictly necessary for the optimization, but it
         can be useful for labeling and interpreting results. For instance, when
-        present, it is used to create a multi-index results that are exported as
-        data frames.
+        present, it is used to name the columns of exported data frames.
 
     The derived classes, [`FunctionResults`][ropt.results.FunctionResults] and
     [`GradientResults`][ropt.results.GradientResults], extend this base class
@@ -80,17 +79,16 @@ class Results(ABC):
     ) -> pd.DataFrame:
         """Export a field to a pandas DataFrame.
 
-        Exports the values of a single field to a `pandas` DataFrame.
-        The field to export is selected by the `field_name` argument.
-        Typically, such a field contains multiple sub-fields. By default,
-        all sub-fields are exported as columns in the DataFrame, but a
-        subset can be selected using the `select` argument.
+        Export the values of a single field to a `pandas` DataFrame. The field
+        is selected by the `field_name` argument. Typically, such a field
+        contains multiple sub-fields. The `select` argument controls which
+        sub-fields are exported as columns.
 
         Sub-fields may be multi-dimensional arrays, which are exported in a
         stacked manner. Using the axis types found in the metadata, the exporter
         constructs a multi-index labeled with the corresponding names provided
         via the `names` field. If `names` does not contain a key/value pair for
-        the the axis, numerical indices are used. These multi-indices can
+        the axis, numerical indices are used. These multi-indices can
         optionally be unstacked into multiple columns by providing the axis
         types to unstack via the `unstack` argument.
 
@@ -156,6 +154,6 @@ class Results(ABC):
             context: The context used by the source of the results.
 
         Returns:
-            A new `FunctionResults` object with all relevant data transformed
-            back to the user domain.
+            A new `Results` object with all relevant data transformed back to
+                the user domain.
         """

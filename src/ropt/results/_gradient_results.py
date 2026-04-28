@@ -17,7 +17,7 @@ TypeResults = TypeVar("TypeResults", bound="Results")
 
 @dataclass(slots=True)
 class GradientResults(Results):
-    """Stores results related to gradient evaluations.
+    """Store results related to gradient evaluations.
 
     The `GradientResults` class extends the base
     [`Results`][ropt.results.Results] class to store data specific to gradient
@@ -28,18 +28,17 @@ class GradientResults(Results):
        constraint values for each realization and perturbation. See
        [`GradientEvaluations`][ropt.results.GradientEvaluations].
 
-    2. **Realizations:** Information about the realizations, such as weights for
-       objectives and constraints, and whether each realization was successful.
+     2. **Realizations:** Information about realizations, such as weights for
+         objectives and constraints and whether each realization was successful.
        See [`Realizations`][ropt.results.Realizations].
 
-    3. **Gradients:** The calculated gradients of the objectives and constraints.
+    3. **Gradients:** Calculated gradients of objectives and constraints.
        See [`Gradients`][ropt.results.Gradients].
 
     Attributes:
-        evaluations:  Results of the function evaluations for perturbed
-                      variables.
-        realizations: The calculated parameters of the realizations.
-        gradients:    The calculated gradients.
+        evaluations:  Function-evaluation results for perturbed variables.
+        realizations: Realization-specific parameters.
+        gradients:    Calculated gradients, if available.
     """
 
     evaluations: GradientEvaluations
@@ -47,7 +46,11 @@ class GradientResults(Results):
     gradients: Gradients | None
 
     def transform_from_optimizer(self, context: EnOptContext) -> GradientResults:
-        """Apply transformations from optimizer space.
+        """Transform results from optimizer space to user space.
+
+        This applies inverse transformations to transformable sub-fields
+        (`evaluations` and `gradients` when present). Realization metadata is
+        passed through unchanged.
 
         Args:
             context: The context used by the source of the results.

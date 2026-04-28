@@ -2,36 +2,25 @@
     options:
         members: []
 ::: ropt.results.Results
-    options:
-        members:
-            - transform_from_optimizer
-            - to_dataframe
 ::: ropt.results.ResultField
-    options:
-        members:
-            - get_axes
 ::: ropt.results.FunctionResults
-    options:
-        members: []
 ::: ropt.results.GradientResults
-    options:
-        members: []
 ::: ropt.results.Functions
     options:
-        members: []
+        members: [create, transform_from_optimizer]
 ::: ropt.results.Gradients
     options:
-        members: []
+        members: [create, transform_from_optimizer]
 ::: ropt.results.FunctionEvaluations
     options:
-        members: []
+        members: [create, transform_from_optimizer]
 ::: ropt.results.GradientEvaluations
     options:
-        members: []
+        members: [create, transform_from_optimizer]
 ::: ropt.results.Realizations
     options:
         members: []
 ::: ropt.results.ConstraintInfo
     options:
-        members: []
+        members: [create]
 ::: ropt.results.results_to_dataframe

@@ -62,14 +62,12 @@ class EnsembleEvaluator:
         """Initialize the EnsembleEvaluator.
 
         This method sets up the `EnsembleEvaluator` with the necessary
-        configuration, evaluator, and plugins.
+        optimization context object and evaluator callable.
 
         The `context` object contains all the settings required for the ensemble
         evaluation, such as the number of realizations, the function estimators,
         and the gradient settings. The `evaluator` callable is usually provide
-        by a [`Evaluator`][ropt.workflow.evaluators.Evaluator] object. The
-        `plugin_manager` is used to load the realization filters, function
-        estimators, and samplers.
+        by a [`Evaluator`][ropt.workflow.evaluators.Evaluator] object.
 
         Args:
             context:   The optimization context object.
@@ -97,6 +95,12 @@ class EnsembleEvaluator:
 
         The `variables` argument can be a single vector or a matrix where each
         row is a variable vector.
+
+        This method returns a tuple of [`Results`][ropt.results.Results]
+        objects, which can be the result of function evaluations
+        ([`FunctionResults`][ropt.results.FunctionResults]), gradient
+        evaluations ([`GradientResults`][ropt.results.GradientResults]), or
+        both, depending on the specified flags.
 
         Args:
             variables:         The variable vectors to evaluate.

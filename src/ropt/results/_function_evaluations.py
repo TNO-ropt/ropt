@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 
 @dataclass(slots=True)
 class FunctionEvaluations(ResultField):
-    """Stores the results of function evaluations.
+    """Store the results of function evaluations.
 
     The `FunctionEvaluations` class stores the results of evaluating the
     objective and constraint functions for a set of variables.
@@ -66,7 +66,7 @@ class FunctionEvaluations(ResultField):
     === "Evaluation Info"
 
         `evaluation_info`: Optional metadata associated with each realization,
-        potentially provided by the evaluator. If provided, each value in the
+        potentially provided by the evaluator.If provided, each value in the
         info dictionary must be a one-dimensional array of arbitrary type
         supported by `numpy` (including objects):
 
@@ -75,8 +75,16 @@ class FunctionEvaluations(ResultField):
         - Axis type:
             - [`AxisName.REALIZATION`][ropt.enums.AxisName.REALIZATION]
 
+    Note: Evaluation info data type.
+        The data type of the evaluation info fields is not fixed. Each field in
+        the `evaluation_info` dictionary can have its own data type, which must
+        be a one-dimensional array of any type supported by `numpy`, including
+        object arrays. This allows for maximum flexibility in the kind of
+        metadata that can be included, such as strings, integers, floats, or
+        even complex objects.
+
     Attributes:
-        variables:       The variable vector:
+        variables:       The variable vector.
         objectives:      The objective function values for each realization.
         constraints:     The constraint function values for each realization.
         evaluation_info: Optional metadata for each evaluated realization.
@@ -112,10 +120,6 @@ class FunctionEvaluations(ResultField):
     )
 
     def __post_init__(self) -> None:
-        """Make all array fields immutable copies.
-
-        # noqa
-        """
         self.variables = _immutable_copy(self.variables)
         self.objectives = _immutable_copy(self.objectives)
         self.constraints = _immutable_copy(self.constraints)
@@ -128,7 +132,7 @@ class FunctionEvaluations(ResultField):
         constraints: NDArray[np.float64] | None = None,
         evaluation_info: dict[str, NDArray[Any]] | None = None,
     ) -> FunctionEvaluations:
-        """Create a FunctionEvaluations object with the given information.
+        """Create a `FunctionEvaluations` object with the given data.
 
         Args:
             variables:       The unperturbed variable vector.
@@ -147,10 +151,14 @@ class FunctionEvaluations(ResultField):
         )
 
     def transform_from_optimizer(self, context: EnOptContext) -> FunctionEvaluations:
-        """Apply transformations from optimizer space.
+        """Transform values from optimizer space to user space.
+
+        Variable, objective, and non-linear constraint values are mapped back
+        to user space using inverse transform chains. Evaluation metadata is
+        passed through unchanged.
 
         Args:
-            context: The ensemble optimizer context object.
+            context: The context used by the source of the results.
 
         Returns:
             The transformed results.

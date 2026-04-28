@@ -11,7 +11,7 @@ TypeResultField = TypeVar("TypeResultField", bound="ResultField")
 
 @dataclass(slots=True)
 class ResultField:
-    """Base class for fields within `Results` objects.
+    """Base class for field containers within `Results` objects.
 
     The `ResultField` class serves as a foundation for defining the various data
     fields that can be stored within [`Results`][ropt.results.Results] objects.
@@ -24,27 +24,27 @@ class ResultField:
     - Retrieve the axes associated with a specific field.
 
     Derived classes, such as
-    [`FunctionEvaluations`][ropt.results.FunctionEvaluations] or
+    [`FunctionEvaluations`][ropt.results.FunctionEvaluations] and
     [`Gradients`][ropt.results.Gradients], extend this base class to define
     specific data structures for different types of optimization results.
     """
 
     @classmethod
     def get_axes(cls, name: str) -> tuple[AxisName, ...]:
-        """Retrieve the axes associated with a specific field.
+        """Return the axes metadata associated with a specific field.
 
-        Fields within a `ResultField` object that store multi-dimensional
-        `numpy` arrays, contain metadata that describes the meaning of each
-        dimension in the array. This method retrieves the axes of a field within
-        a ResultField object from that meta-data, returning a tuple of
-        `AxisName`][ropt.enums.AxisName] enums.
+        Fields within a `ResultField` class that store multi-dimensional `numpy`
+        arrays include metadata that describes the meaning of each dimension in
+        the array. This method retrieves the axes metadata for a field and
+        returns it as a tuple of [`AxisName`][ropt.enums.AxisName] values.
 
         Args:
-            name: The name of the field (sub-field) within the
-                  `ResultField` instance or class.
+            name: The name of the field (sub-field) within the `ResultField`
+                dataclass.
 
         Returns:
-            A tuple of [`AxisName`][ropt.enums.AxisName] enums, representing the axes of the field.
+            A tuple of [`AxisName`][ropt.enums.AxisName] values representing
+                the axes of the field.
 
         Raises:
             ValueError: If the provided field name is not recognized.

@@ -18,15 +18,16 @@ if TYPE_CHECKING:
 
 @dataclass(slots=True)
 class Gradients(ResultField):
-    """Stores the calculated objective and constraint gradients.
+    """Store calculated objective and constraint gradients.
 
     The `Gradients` class stores the calculated gradients of the objective and
     constraint functions. These gradients are typically derived from function
-    evaluations across all realizations, often through a process like averaging.
-    The optimizer may handle multiple objectives and constraints. Multiple
-    objective gradients are combined into a single vector, which is stored in
-    the `target_objective` field. This is the gradient used by the optimizer.
-    Multiple constraint gradients are handled individually by the optimizer.
+    evaluations across all realizations, often through an aggregation process
+    like averaging. The optimizer may handle multiple objectives and
+    constraints. Multiple objective gradients are combined into a single vector,
+    which is stored in the `target_objective` field. This is the gradient used
+    by the optimizer. Multiple constraint gradients are handled individually by
+    the optimizer.
 
     **Result descriptions**
 
@@ -40,7 +41,7 @@ class Gradients(ResultField):
         - Axis type:
             - [`AxisName.VARIABLE`][ropt.enums.AxisName.VARIABLE]
 
-    === "Objective  Gradients"
+    === "Objective Gradients"
 
         `objectives`: The calculated gradients of each objective with respect to
         each variable. This is a two-dimensional array of floating point values:
@@ -68,7 +69,7 @@ class Gradients(ResultField):
     Attributes:
         target_objective: The gradient of the target objective.
         objectives:       The gradient of each individual objective.
-        constraints:      The gradient of each individual constraint.
+        constraints:      The gradient of each individual constraint, if present.
     """
 
     target_objective: NDArray[np.float64] = field(
@@ -93,10 +94,6 @@ class Gradients(ResultField):
     )
 
     def __post_init__(self) -> None:
-        """Make all array fields immutable copies.
-
-        # noqa
-        """
         self.target_objective = _immutable_copy(self.target_objective)
         self.objectives = _immutable_copy(self.objectives)
         self.constraints = _immutable_copy(self.constraints)
@@ -108,15 +105,15 @@ class Gradients(ResultField):
         objectives: NDArray[np.float64],
         constraints: NDArray[np.float64] | None = None,
     ) -> Gradients:
-        """Create a Gradients object with the given information.
+        """Create a `Gradients` object from pre-aggregated gradient values.
 
         Args:
             target_objective: The gradient of the target objective.
-            objectives:       The objective gradients for each realization.
-            constraints:      The constraint gradients for each realization.
+            objectives:       Objective gradients.
+            constraints:      Constraint gradients.
 
         Returns:
-            A new Functions object.
+            A new `Gradients` object.
         """
         return Gradients(
             target_objective=target_objective,
@@ -125,7 +122,11 @@ class Gradients(ResultField):
         )
 
     def transform_from_optimizer(self, context: EnOptContext) -> Gradients:
-        """Apply transformations from optimizer space.
+        """Transform gradients from optimizer space to user space.
+
+        Objective and non-linear constraint gradients are mapped back to user
+        space using the inverse transform chain. The target objective gradient
+        is preserved as-is.
 
         Args:
             context: The context used by the source of the results.
