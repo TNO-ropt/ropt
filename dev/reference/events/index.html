@@ -1740,7 +1740,7 @@
 
     <div class="doc doc-contents first">
 
-        <p>The optimization event class.</p>
+        <p>Optimization event data structures.</p>
 
 
 
@@ -1790,11 +1790,10 @@
 
 
 
-        <p>Stores data related to an optimization event.</p>
-<p>During the execution of an optimization workflow, events are triggered to
-signal specific occurrences. Callbacks can be registered to react to these
-events and will receive an <code>EnOptEvent</code> object containing relevant
-information.</p>
+        <p>Container for data emitted with optimization workflow events.</p>
+<p>Events are raised during optimization to signal lifecycle milestones and
+intermediate outcomes. Registered callbacks receive an EnOptEvent instance
+with event metadata, the current context, and any associated results.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -1814,7 +1813,7 @@ information.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The type of event that occurred.</p>
+                <p>Type of event that occurred.</p>
               </div>
             </td>
           </tr>
@@ -1825,7 +1824,7 @@ information.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The optimizer context associated with the event.</p>
+                <p>Optimizer context associated with the event.</p>
               </div>
             </td>
           </tr>
@@ -1841,7 +1840,7 @@ information.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A tuple containing results.</p>
+                <p>Tuple of result objects associated with the event.</p>
               </div>
             </td>
           </tr>
