@@ -1061,43 +1061,9 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="function_estimator">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.function_estimator--core-interface" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Core Interface
-      
-    </span>
-  </a>
-  
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.function_estimator--integration-with-optimization" class="md-nav__link">
-    <span class="md-ellipsis">
       
-        Integration with Optimization
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.function_estimator--built-in-and-custom-estimators" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Built-in and Custom Estimators
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
+        <li class="md-nav__item">
   <a href="#ropt.function_estimator.FunctionEstimator" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1108,17 +1074,6 @@
   
     <nav class="md-nav" aria-label="FunctionEstimator">
       <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.function_estimator.FunctionEstimator--lifecycle" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Lifecycle:
-      
-    </span>
-  </a>
-  
-</li>
         
           <li class="md-nav__item">
   <a href="#ropt.function_estimator.FunctionEstimator.__init__" class="md-nav__link">
@@ -1168,11 +1123,6 @@
     </nav>
   
 </li>
-        
-      </ul>
-    </nav>
-  
-</li>
       
         <li class="md-nav__item">
   <a href="#ropt.plugins.function_estimator.default.DefaultFunctionEstimator" class="md-nav__link">
@@ -1182,23 +1132,6 @@
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="DefaultFunctionEstimator">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plugins.function_estimator.default.DefaultFunctionEstimator--supported-aggregation-methods" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Supported Aggregation Methods
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -1809,43 +1742,9 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="function_estimator">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.function_estimator--core-interface" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Core Interface
-      
-    </span>
-  </a>
-  
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.function_estimator--integration-with-optimization" class="md-nav__link">
-    <span class="md-ellipsis">
       
-        Integration with Optimization
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.function_estimator--built-in-and-custom-estimators" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Built-in and Custom Estimators
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
+        <li class="md-nav__item">
   <a href="#ropt.function_estimator.FunctionEstimator" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1856,17 +1755,6 @@
   
     <nav class="md-nav" aria-label="FunctionEstimator">
       <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.function_estimator.FunctionEstimator--lifecycle" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Lifecycle:
-      
-    </span>
-  </a>
-  
-</li>
         
           <li class="md-nav__item">
   <a href="#ropt.function_estimator.FunctionEstimator.__init__" class="md-nav__link">
@@ -1916,11 +1804,6 @@
     </nav>
   
 </li>
-        
-      </ul>
-    </nav>
-  
-</li>
       
         <li class="md-nav__item">
   <a href="#ropt.plugins.function_estimator.default.DefaultFunctionEstimator" class="md-nav__link">
@@ -1930,23 +1813,6 @@
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="DefaultFunctionEstimator">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plugins.function_estimator.default.DefaultFunctionEstimator--supported-aggregation-methods" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Supported Aggregation Methods
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -1990,12 +1856,12 @@ values used by the optimizer. In ensemble-based workflows, each realization
 contributes objective/constraint function values and gradients; estimators
 combine those per-realization arrays with realization weights to produce one
 representative function value and one representative gradient.</p>
-<h4 id="ropt.function_estimator--core-interface">Core Interface</h4>
+<p><strong>Core Interface</strong></p>
 <p>All estimator implementations inherit from the
-<a class="autorefs autorefs-internal" title="            FunctionEstimator" href="#ropt.function_estimator.FunctionEstimator"><code>FunctionEstimator</code></a> base class,
+<a class="autorefs autorefs-internal" title="            ropt.function_estimator.FunctionEstimator" href="#ropt.function_estimator.FunctionEstimator"><code>FunctionEstimator</code></a> base class,
 which defines the estimator lifecycle (<code>__init__</code>, <code>init</code>) and the two required
 aggregation methods (<code>calculate_function</code>, <code>calculate_gradient</code>).</p>
-<h4 id="ropt.function_estimator--integration-with-optimization">Integration with Optimization</h4>
+<p><strong>Integration with Optimization</strong></p>
 <p>Function estimators are accessed via an
 <a class="autorefs autorefs-internal" title="            EnOptContext" href="../context/#ropt.context.EnOptContext"><code>EnOptContext</code></a> object through its
 <code>function_estimators</code> field, a tuple of function estimator instances. Estimators
@@ -2003,7 +1869,7 @@ are instantiated either directly as objects or via
 <a class="autorefs autorefs-internal" title="            FunctionEstimatorConfig" href="../config/#ropt.config.FunctionEstimatorConfig"><code>FunctionEstimatorConfig</code></a> objects, which
 are used by the plugin system to create instances based on the configured method
 string (e.g., <code>"mean"</code> or <code>"stddev"</code>).</p>
-<h4 id="ropt.function_estimator--built-in-and-custom-estimators">Built-in and Custom Estimators</h4>
+<p><strong>Built-in and Custom Estimators</strong></p>
 <p>The
 <a class="autorefs autorefs-internal" title="            ropt.plugins.function_estimator.default.DefaultFunctionEstimator" href="#ropt.plugins.function_estimator.default.DefaultFunctionEstimator"><code>DefaultFunctionEstimator</code></a>
 class provides two commonly used aggregation strategies:</p>
@@ -2030,20 +1896,24 @@ configured via <code>FunctionEstimatorConfig</code> objects.</p>
 
 
 
+  </div>
 
+    </div>
+
+</div>
 
 <div class="doc doc-object doc-class">
 
 
 
-<h3 id="ropt.function_estimator.FunctionEstimator" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">FunctionEstimator</span>
+<h2 id="ropt.function_estimator.FunctionEstimator" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.function_estimator.FunctionEstimator</span>
 
 
-</h3>
+</h2>
 
 
-    <div class="doc doc-contents ">
+    <div class="doc doc-contents first">
             <p class="doc doc-class-bases">
               Bases: <code><a class="autorefs autorefs-external" title="abc.ABC" href="https://docs.python.org/3/library/abc.html#abc.ABC">ABC</a></code></p>
 
@@ -2056,7 +1926,7 @@ for combining per-realization objective/constraint function values and
 gradients into single representative values using realization weights.</p>
 <p>The aggregated values produced by estimators are used directly by the
 optimizer during each iteration.</p>
-<h5 id="ropt.function_estimator.FunctionEstimator--lifecycle">Lifecycle:</h5>
+<p><strong>Lifecycle</strong></p>
 <ol>
 <li>Instantiation via <code>__init__</code>: Called by the plugin system with a
    configuration object.</li>
@@ -2094,7 +1964,7 @@ optimizer during each iteration.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.function_estimator.FunctionEstimator.__init__" class="doc doc-heading">
+<h3 id="ropt.function_estimator.FunctionEstimator.__init__" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">__init__</span>
 
 
@@ -2102,7 +1972,7 @@ optimizer during each iteration.</p>
       <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
   </span>
 
-</h4>
+</h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">__init__</span><span class="p">(</span><span class="n">estimator_config</span><span class="p">:</span> <span class="n">FunctionEstimatorConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
@@ -2159,7 +2029,7 @@ method and any method-specific options.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.function_estimator.FunctionEstimator.init" class="doc doc-heading">
+<h3 id="ropt.function_estimator.FunctionEstimator.init" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">init</span>
 
 
@@ -2167,7 +2037,7 @@ method and any method-specific options.</p>
       <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
   </span>
 
-</h4>
+</h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">init</span><span class="p">(</span><span class="n">context</span><span class="p">:</span> <span class="n">EnOptContext</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
@@ -2224,7 +2094,7 @@ and state for the current workflow.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.function_estimator.FunctionEstimator.calculate_function" class="doc doc-heading">
+<h3 id="ropt.function_estimator.FunctionEstimator.calculate_function" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">calculate_function</span>
 
 
@@ -2232,7 +2102,7 @@ and state for the current workflow.</p>
       <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
   </span>
 
-</h4>
+</h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">calculate_function</span><span class="p">(</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">functions</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span> <span class="n">weights</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]</span>
@@ -2331,7 +2201,7 @@ or importance of each realization.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.function_estimator.FunctionEstimator.calculate_gradient" class="doc doc-heading">
+<h3 id="ropt.function_estimator.FunctionEstimator.calculate_gradient" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">calculate_gradient</span>
 
 
@@ -2339,7 +2209,7 @@ or importance of each realization.</p>
       <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
   </span>
 
-</h4>
+</h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">calculate_gradient</span><span class="p">(</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">functions</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">gradient</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span>
@@ -2488,19 +2358,6 @@ deviation).</p>
 
 </div>
 
-
-
-
-
-
-
-
-  </div>
-
-    </div>
-
-</div>
-
 <div class="doc doc-object doc-class">
 
 
@@ -2514,18 +2371,18 @@ deviation).</p>
 
     <div class="doc doc-contents first">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="            FunctionEstimator (ropt.function_estimator.FunctionEstimator)" href="#ropt.function_estimator.FunctionEstimator">FunctionEstimator</a></code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="            ropt.function_estimator.FunctionEstimator" href="#ropt.function_estimator.FunctionEstimator">FunctionEstimator</a></code></p>
 
 
 
         <p>Default implementation of function estimator with mean and stddev methods.</p>
-<p>Implements the <a class="autorefs autorefs-internal" title="            FunctionEstimator" href="#ropt.function_estimator.FunctionEstimator"><code>FunctionEstimator</code></a>
+<p>Implements the <a class="autorefs autorefs-internal" title="            ropt.function_estimator.FunctionEstimator" href="#ropt.function_estimator.FunctionEstimator"><code>FunctionEstimator</code></a>
 interface to provide two standard aggregation strategies for combining
 objective/constraint function values and gradients from multiple realizations.</p>
 <p>The specific method is selected via the <code>method</code> field of the
 <a class="autorefs autorefs-internal" title="            FunctionEstimatorConfig" href="../config/#ropt.config.FunctionEstimatorConfig"><code>FunctionEstimatorConfig</code></a>, which is
 passed to the parent class during initialization.</p>
-<h4 id="ropt.plugins.function_estimator.default.DefaultFunctionEstimator--supported-aggregation-methods">Supported Aggregation Methods</h4>
+<p><strong>Supported Aggregation Methods</strong></p>
 <ul>
 <li><strong><code>mean</code> (or <code>default</code>)</strong>:
    Computes the weighted average of realization function values and
