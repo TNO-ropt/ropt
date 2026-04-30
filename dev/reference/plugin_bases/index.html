@@ -1336,17 +1336,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#ropt.plugins.backend.BackendPlugin.validate_options" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        validate_options
-      
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -1880,17 +1869,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#ropt.plugins.backend.BackendPlugin.validate_options" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        validate_options
-      
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -2202,139 +2180,6 @@ this plugin.</p>
             <td>
               <div class="doc-md-description">
                 <p>An initialized instance of an <code>Backend</code> subclass.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="ropt.plugins.backend.BackendPlugin.validate_options" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">validate_options</span>
-
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
-  </span>
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">validate_options</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">options</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Validate the optimizer-specific options for a given method.</p>
-<p>This class method is intended to check if the <code>options</code> dictionary,
-typically provided in the
-<a class="autorefs autorefs-internal" title="            BackendConfig" href="../config/#ropt.config.BackendConfig"><code>BackendConfig</code></a>, contains valid keys
-and values for the specified optimization <code>method</code> supported by this
-plugin.</p>
-<p>This default implementation performs no validation. Subclasses should
-override this method to implement validation logic specific to the
-methods they support, potentially using schema validation tools like
-Pydantic.</p>
-<p>The raised exception must be a ValueError, or derive from a ValueError.</p>
-
-
-<details class="note" open>
-  <summary>Note</summary>
-  <p>It is expected that the optimizer either receives a dictionary, or a
-list of options. This method should test if the type of the options
-is as expected, and raise a <code>ValueError</code> with an appropriate message
-if this is not the case.</p>
-</details>
-
-<details class="warning" open>
-  <summary>Method name with prefix</summary>
-  <p>The method string may be prefixed in the form "backend/method", take
-this into account when parsing the method name.</p>
-</details>
-
-<details class="warning" open>
-  <summary>Handling the default method</summary>
-  <p>The the method string may be set to "default", in which case it should
-be mapped to the correct default method of the backend.</p>
-</details>
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>method</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The specific optimization method name (e.g., "slsqp",
-     "my_backend/variant1").</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>options</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a>] | <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#list">list</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>] | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The dictionary or a list of strings of options.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-<p><span class="doc-section-title">Raises:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#ValueError">ValueError</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>If the provided options are invalid for the specified
-        method.</p>
               </div>
             </td>
           </tr>

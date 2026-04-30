@@ -1187,6 +1187,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#ropt.backend.Backend.validate_options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        validate_options
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1995,6 +2006,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#ropt.backend.Backend.validate_options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        validate_options
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2631,6 +2653,87 @@ resources or handle parallel execution appropriately.</p>
           </tr>
       </tbody>
     </table>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="ropt.backend.Backend.validate_options" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">validate_options</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+  </span>
+
+</h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">validate_options</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Validate the optimizer-specific options.</p>
+<p>This method is intended to validate the <code>options</code> dictionary, passed
+upon creation of the optimizer via the
+<a class="autorefs autorefs-internal" title="            BackendConfig" href="../config/#ropt.config.BackendConfig"><code>BackendConfig</code></a> configuration object. It
+should check if the options contains valid keys and values for the
+specified optimization <code>method</code>.</p>
+<p>Subclasses should override this method to implement validation logic
+specific to the methods they support, potentially using schema
+validation tools like Pydantic.</p>
+<p>The raised exception must be a ValueError, or derive from a ValueError.</p>
+
+
+<details class="note" open>
+  <summary>Note</summary>
+  <p>It is expected that the optimizer either receives a dictionary, or a
+list of options. This method should test if the type of the options
+is as expected, and raise a <code>ValueError</code> with an appropriate message
+if this is not the case.</p>
+</details>
+
+<details class="warning" open>
+  <summary>Method name with prefix</summary>
+  <p>The method string may be prefixed in the form "backend/method", take
+this into account when parsing the method name.</p>
+</details>
+
+<details class="warning" open>
+  <summary>Handling the default method</summary>
+  <p>The the method string may be set to "default", in which case it should
+be mapped to the correct default method of the backend.</p>
+</details>
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#ValueError">ValueError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the provided options are invalid.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
 
     </div>
 
