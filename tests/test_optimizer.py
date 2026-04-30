@@ -81,6 +81,12 @@ def test_invalid_options(config: Any, external: str) -> None:
         validate_backend_options(method, config["backend"]["options"])
 
 
+def test_common_options(config: Any, external: str) -> None:
+    config["backend"]["options"] = {"disp": True}
+    config["backend"]["method"] = f"{external}{_SLSQP}"
+    validate_backend_options(config["backend"]["method"], config["backend"]["options"])
+
+
 def test_max_functions_exceeded(config: Any, evaluator: Any, external: str) -> None:
     last_evaluation = 0
 

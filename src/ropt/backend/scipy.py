@@ -117,9 +117,8 @@ class SciPyBackend(Backend):
     options, use the `options` dictionary within the
     [`optimizer`][ropt.config.BackendConfig] section.
 
-    The table below lists the included methods together with the method-specific
-    options that are supported. Click on the method name to consult the
-    corresponding
+    Below are the supported options. Click on the common options, or on
+    the method name to consult the corresponding
     [`scipy.optimize`](https://docs.scipy.org/doc/scipy/reference/optimize.html)
     documentation:
 
@@ -565,11 +564,16 @@ class SciPyBackend(Backend):
 
 
 SCIPY_OPTIONS_SCHEMA: dict[str, Any] = {
+    "common": {
+        "options": {
+            "disp": bool,
+            "maxiter": int,
+        },
+        "url": "https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.minimize.html#scipy.optimize.minimize",
+    },
     "methods": {
         "Nelder-Mead": {
             "options": {
-                "disp": bool,
-                "maxiter": int,
                 "maxfev": int,
                 "xatol": float,
                 "fatol": float,
@@ -579,8 +583,6 @@ SCIPY_OPTIONS_SCHEMA: dict[str, Any] = {
         },
         "Powell": {
             "options": {
-                "disp": bool,
-                "maxiter": int,
                 "maxfev": int,
                 "xtol": float,
                 "ftol": float,
@@ -589,8 +591,6 @@ SCIPY_OPTIONS_SCHEMA: dict[str, Any] = {
         },
         "CG": {
             "options": {
-                "disp": bool,
-                "maxiter": int,
                 "gtol": float,
                 "norm": float,
                 "eps": float,
@@ -602,8 +602,6 @@ SCIPY_OPTIONS_SCHEMA: dict[str, Any] = {
         },
         "BFGS": {
             "options": {
-                "disp": bool,
-                "maxiter": int,
                 "gtol": float,
                 "norm": float,
                 "eps": float,
@@ -616,8 +614,6 @@ SCIPY_OPTIONS_SCHEMA: dict[str, Any] = {
         },
         "Newton-CG": {
             "options": {
-                "disp": bool,
-                "maxiter": int,
                 "xtol": float,
                 "eps": float,
                 "c1": float,
@@ -628,7 +624,6 @@ SCIPY_OPTIONS_SCHEMA: dict[str, Any] = {
         "L-BFGS-B": {
             "options": {
                 "disp": int,
-                "maxiter": int,
                 "maxcor": int,
                 "ftol": float,
                 "gtol": float,
@@ -642,7 +637,6 @@ SCIPY_OPTIONS_SCHEMA: dict[str, Any] = {
         },
         "TNC": {
             "options": {
-                "disp": bool,
                 "maxfun": int,
                 "eps": float,
                 "scale": list[float],
@@ -659,11 +653,10 @@ SCIPY_OPTIONS_SCHEMA: dict[str, Any] = {
                 "finite_diff_rel_step": float,
             },
             "url": "https://docs.scipy.org/doc/scipy/reference/optimize.minimize-tnc.html",
+            "exclude": {"maxiter"},
         },
         "COBYLA": {
             "options": {
-                "disp": bool,
-                "maxiter": int,
                 "rhobeg": float,
                 "tol": float,
                 "catol": float,
@@ -672,9 +665,7 @@ SCIPY_OPTIONS_SCHEMA: dict[str, Any] = {
         },
         "COBYQA": {
             "options": {
-                "disp": bool,
                 "maxfev": int,
-                "maxiter": int,
                 "f_target": float,
                 "feasibility_tol": float,
                 "initial_tr_radius": float,
@@ -685,8 +676,6 @@ SCIPY_OPTIONS_SCHEMA: dict[str, Any] = {
         },
         "SLSQP": {
             "options": {
-                "disp": bool,
-                "maxiter": int,
                 "ftol": float,
                 "eps": float,
                 "finite_diff_rel_step": float,
@@ -710,16 +699,12 @@ SCIPY_OPTIONS_SCHEMA: dict[str, Any] = {
                     "SVDFactorization",
                 ],
                 "finite_diff_rel_step": float,
-                "maxiter": int,
                 "verbose": int,
-                "disp": bool,
             },
             "url": "https://docs.scipy.org/doc/scipy/reference/optimize.minimize-trustconstr.html",
         },
         "differential_evolution": {
             "options": {
-                "disp": bool,
-                "maxiter": int,
                 "strategy": Literal[
                     "best1bin"
                     "best1exp"

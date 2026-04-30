@@ -13,7 +13,7 @@ Classes:
 from __future__ import annotations
 
 from textwrap import dedent
-from typing import TYPE_CHECKING, Any, Generic, TypeVar
+from typing import TYPE_CHECKING, Any, Generic, Self, TypeVar
 
 from pydantic import BaseModel, ConfigDict, HttpUrl, create_model, model_validator
 
@@ -57,8 +57,22 @@ class OptionsSchemaModel(BaseModel):
     """
 
     methods: dict[str, MethodSchemaModel[Any]]
+    common: MethodSchemaModel[Any] | None = None
 
     model_config = ConfigDict(extra="forbid", frozen=True)
+
+    @model_validator(mode="after")
+    def _check_common_options(self) -> Self:
+        if self.common is not None:
+            common_options = set(self.common.options)
+            for method_name, method_schema in self.methods.items():
+                if method_schema.exclude - common_options:
+                    msg = (
+                        f"Option(s) {method_schema.exclude - common_options} are "
+                        f"excluded from `{method_name}` schema but not defined in `common`."
+                    )
+                    raise ValueError(msg)
+        return self
 
     def get_options_model(self, method: str) -> type[BaseModel]:
         """Creates a Pydantic model for validating options of a specific method.
@@ -86,9 +100,19 @@ class OptionsSchemaModel(BaseModel):
             }
             if method_name.lower() == method.lower():
                 break
+
         if options is None:
             msg = f"Method `{method}` not found in schema."
             raise ValueError(msg)
+
+        if self.common is not None:
+            options.update(
+                {
+                    option: (type_ | None, None)
+                    for option, type_ in self.common.options.items()
+                    if option not in method_schema.exclude and option not in options
+                }
+            )
 
         def _extra_validator(self: Any) -> Any:  # noqa: ANN401
             if self.__pydantic_extra__:
@@ -117,12 +141,14 @@ class MethodSchemaModel(BaseModel, Generic[T]):
     this method.
 
     Attributes:
-        options: A list of option dictionaries.
+        options: A dictionary of option names and their types.
         url:     An optional URL for the plugin.
+        exclude: A set of common options to exclude for this method.
     """
 
     options: dict[str, T]
     url: HttpUrl | None = None
+    exclude: set[str] = set()
 
     model_config = ConfigDict(extra="forbid", frozen=True)
 
@@ -132,30 +158,73 @@ def gen_options_table(schema: dict[str, Any]) -> str:
 
     This function takes a schema dictionary, validates it against the
     [`OptionsSchemaModel`][ropt.config.options.OptionsSchemaModel], and then
-    generates a Markdown table that summarizes the available methods and their
-    options. Each row in the table represents a method, and the columns list the
-    method's name and its configurable options. If a URL is provided for a
-    method, the method name will be hyperlinked to that URL in the table.
+    generates a Markdown document that summarizes the available methods and
+    their options. Common options are listed first, followed by a table of
+    method-specific options. Each row in the table represents a method, and the
+    columns list the method's name and its configurable options. If a URL is
+    provided for a method, the method name will be hyperlinked to that URL in
+    the table.
 
     Args:
         schema: A dictionary representing the schema of plugin options.
 
     Returns:
-        A string containing a Markdown table that documents the plugin options.
+        A string containing the documented plugin options.
     """
-    OptionsSchemaModel.model_validate(schema)
+    options_schema = OptionsSchemaModel.model_validate(schema)
+
+    common_string = ""
+    common_options = set()
+    if options_schema.common is not None:
+        options = ", ".join(key for key in options_schema.common.options)
+        if options_schema.common.url is not None:
+            options = f"[{options}]({options_schema.common.url})"
+        common_string = f"**Common Options:**\n\n{options}\n"
+        common_options = set(options_schema.common.options)
 
     docstring = dedent("""
-    | Method | Method Options |
-    |--------|----------------|
+    **Method-specific Options:**
+
+    | Method | Options |
+    |--------|---------|
     """)
 
-    for method, method_schema in schema["methods"].items():
-        url = MethodSchemaModel.model_validate(method_schema).url
-        options = ", ".join(key for key in method_schema["options"])
-        if url:
-            docstring += f"|[{method}]({url})|{options}|\n"
-        else:
-            docstring += f"|{method}:|{options}|\n"
+    override_note: int | None = None
+    exclude_note: int | None = None
+    notes: list[str] = []
+    for method, method_schema in options_schema.methods.items():
+        method_string = (
+            method if method_schema.url is None else f"[{method}]({method_schema.url})"
+        )
+        options = ", ".join(
+            f"*{key}*" if key in common_options else key
+            for key in method_schema.options
+        )
+        if set(method_schema.options).intersection(common_options):
+            if override_note is None:
+                override_note = len(notes) + 1
+                notes.append(
+                    f"{override_note}. Options in *italics* override a common option "
+                    "with a different type or behavior."
+                )
+            method_string += f"^{override_note}^"
 
-    return docstring
+        if method_schema.exclude:
+            exclude = ", ".join(f"~~{key}~~" for key in method_schema.exclude)
+            if exclude_note is None:
+                exclude_note = len(notes) + 1
+                notes.append(
+                    f"{exclude_note}. Options with ~~strikethrough~~ indicate a common "
+                    "option that is not supported."
+                )
+            method_string += f"^{exclude_note}^"
+            options_string = f"{options}, {exclude}"
+        else:
+            options_string = options
+        docstring += f"|{method_string}|{options_string}|\n"
+
+    if notes:
+        notes_string = "Notes" if len(notes) > 1 else "Note"
+        docstring += f"\n**{notes_string}:**\n\n" + "\n".join(notes) + "\n"
+
+    return common_string + docstring
