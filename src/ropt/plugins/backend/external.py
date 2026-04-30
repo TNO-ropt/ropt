@@ -1,11 +1,11 @@
-"""External optimzers plugin."""
+"""External optimizers plugin."""
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from ropt.backend.external import ExternalBackend
-from ropt.plugins.manager import get_plugin, get_plugin_name
+from ropt.plugins.manager import get_plugin_name
 
 from ._base import BackendPlugin
 
@@ -27,10 +27,3 @@ class ExternalBackendPlugin(BackendPlugin):
     @classmethod
     def allows_discovery(cls) -> bool:  # noqa: D102
         return False
-
-    @classmethod
-    def validate_options(  # noqa: D102
-        cls, method: str, options: dict[str, Any] | list[str] | None
-    ) -> None:
-        method = method.split("/", maxsplit=1)[1]
-        get_plugin("backend", method).validate_options(method, options)

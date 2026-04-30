@@ -118,3 +118,37 @@ class Backend(ABC):
             `True` if the optimizer allows parallel evaluations.
         """
         return False
+
+    @abstractmethod
+    def validate_options(self) -> None:
+        """Validate the optimizer-specific options.
+
+        This method is intended to validate the `options` dictionary, passed
+        upon creation of the optimizer via the
+        [`BackendConfig`][ropt.config.BackendConfig] configuration object. It
+        should check if the options contains valid keys and values for the
+        specified optimization `method`.
+
+        Subclasses should override this method to implement validation logic
+        specific to the methods they support, potentially using schema
+        validation tools like Pydantic.
+
+        The raised exception must be a ValueError, or derive from a ValueError.
+
+        Note:
+            It is expected that the optimizer either receives a dictionary, or a
+            list of options. This method should test if the type of the options
+            is as expected, and raise a `ValueError` with an appropriate message
+            if this is not the case.
+
+        Warning: Method name with prefix
+            The method string may be prefixed in the form "backend/method", take
+            this into account when parsing the method name.
+
+        Warning: Handling the default method
+            The the method string may be set to "default", in which case it should
+            be mapped to the correct default method of the backend.
+
+        Raises:
+            ValueError: If the provided options are invalid.
+        """

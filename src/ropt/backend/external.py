@@ -61,9 +61,6 @@ class ExternalBackend(Backend):
             update={"method": backend_config.method.split("/", maxsplit=1)[1]}
         )
         self._backend_plugin = get_plugin("backend", method=self._backend_config.method)
-        self._backend_plugin.validate_options(
-            self._backend_config.method, self._backend_config.options
-        )
 
     def init(  # noqa: D102
         self, context: EnOptContext, optimizer_callback: OptimizerCallback
@@ -76,7 +73,6 @@ class ExternalBackend(Backend):
         )
         self._allow_nan: bool = backend.allow_nan
         self._is_parallel: bool = backend.is_parallel
-        del backend
 
     def start(self, initial_values: NDArray[np.float64]) -> None:  # noqa: D102
         context = multiprocessing.get_context("spawn")
@@ -137,6 +133,11 @@ class ExternalBackend(Backend):
 
         if exception is not None:
             raise exception
+
+    def validate_options(  # noqa: D102
+        self,
+    ) -> None:
+        self._backend_plugin.create(self._backend_config).validate_options()
 
     @property
     def allow_nan(self) -> bool:  # noqa: D102

@@ -29,19 +29,20 @@ T = TypeVar("T")
 
 def _convert_backend(value: Backend | BackendConfig | dict[str, Any]) -> Backend:
     if isinstance(value, Backend):
+        value.validate_options()
         return value
     if isinstance(value, BackendConfig):
         plugin = get_plugin("backend", method=value.method)
-        plugin.validate_options(value.method, value.options)
         result = plugin.create(value)
         assert isinstance(result, Backend)
+        result.validate_options()
         return result
     if isinstance(value, dict):
         backend_config = BackendConfig.model_validate(value)
         plugin = get_plugin("backend", method=backend_config.method)
-        plugin.validate_options(backend_config.method, backend_config.options)
         result = plugin.create(backend_config)
         assert isinstance(result, Backend)
+        result.validate_options()
         return result
     msg = "Value must be a Backend instance, a BackendConfig instance, or a dict."
     raise ValueError(msg)

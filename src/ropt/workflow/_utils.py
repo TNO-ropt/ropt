@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from ropt.config import BackendConfig
 from ropt.plugins.manager import get_plugin, get_plugin_name
 
 
@@ -59,4 +60,8 @@ def validate_backend_options(method: str, options: dict[str, Any] | list[str]) -
         method:  The specific optimization method name.
         options: The dictionary or a list of strings of options.
     """
-    get_plugin("backend", method).validate_options(method, options)
+    plugin = get_plugin("backend", method)
+    backend_config = BackendConfig.model_validate(
+        {"method": method, "options": options}
+    )
+    plugin.create(backend_config).validate_options()
