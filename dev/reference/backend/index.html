@@ -2798,69 +2798,76 @@ algorithm's name. Most methods support the general options defined in the
 <a class="autorefs autorefs-internal" title="            EnOptContext" href="../context/#ropt.context.EnOptContext"><code>EnOptContext</code></a> object. For algorithm-specific
 options, use the <code>options</code> dictionary within the
 <a class="autorefs autorefs-internal" title="            BackendConfig" href="../config/#ropt.config.BackendConfig"><code>optimizer</code></a> section.</p>
-<p>The table below lists the included methods together with the method-specific
-options that are supported. Click on the method name to consult the
-corresponding
+<p>Below are the supported options. Click on the common options, or on
+the method name to consult the corresponding
 <a href="https://docs.scipy.org/doc/scipy/reference/optimize.html"><code>scipy.optimize</code></a>
 documentation:</p>
+<p><strong>Common Options:</strong></p>
+<p><a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.minimize.html#scipy.optimize.minimize">disp, maxiter</a></p>
+<p><strong>Method-specific Options:</strong></p>
 <table>
 <thead>
 <tr>
 <th>Method</th>
-<th>Method Options</th>
+<th>Options</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><a href="https://docs.scipy.org/doc/scipy/reference/optimize.minimize-neldermead.html">Nelder-Mead</a></td>
-<td>disp, maxiter, maxfev, xatol, fatol, adaptive</td>
+<td>maxfev, xatol, fatol, adaptive</td>
 </tr>
 <tr>
 <td><a href="https://docs.scipy.org/doc/scipy/reference/optimize.minimize-powell.html">Powell</a></td>
-<td>disp, maxiter, maxfev, xtol, ftol</td>
+<td>maxfev, xtol, ftol</td>
 </tr>
 <tr>
 <td><a href="https://docs.scipy.org/doc/scipy/reference/optimize.minimize-cg.html">CG</a></td>
-<td>disp, maxiter, gtol, norm, eps, finite_diff_rel_step, c1, c2</td>
+<td>gtol, norm, eps, finite_diff_rel_step, c1, c2</td>
 </tr>
 <tr>
 <td><a href="https://docs.scipy.org/doc/scipy/reference/optimize.minimize-bfgs.html">BFGS</a></td>
-<td>disp, maxiter, gtol, norm, eps, finite_diff_rel_step, xrtol, c1, c2</td>
+<td>gtol, norm, eps, finite_diff_rel_step, xrtol, c1, c2</td>
 </tr>
 <tr>
 <td><a href="https://docs.scipy.org/doc/scipy/reference/optimize.minimize-newtoncg.html">Newton-CG</a></td>
-<td>disp, maxiter, xtol, eps, c1, c2</td>
+<td>xtol, eps, c1, c2</td>
 </tr>
 <tr>
-<td><a href="https://docs.scipy.org/doc/scipy/reference/optimize.minimize-lbfgsb.html">L-BFGS-B</a></td>
-<td>disp, maxiter, maxcor, ftol, gtol, eps, maxfun, iprint, maxls, finite_diff_rel_step</td>
+<td><a href="https://docs.scipy.org/doc/scipy/reference/optimize.minimize-lbfgsb.html">L-BFGS-B</a><sup>1</sup></td>
+<td><em>disp</em>, maxcor, ftol, gtol, eps, maxfun, iprint, maxls, finite_diff_rel_step</td>
 </tr>
 <tr>
-<td><a href="https://docs.scipy.org/doc/scipy/reference/optimize.minimize-tnc.html">TNC</a></td>
-<td>disp, maxfun, eps, scale, offset, maxCGit, eta, stepmx, accuracy, minfev, ftol, xtol, gtol, rescale, finite_diff_rel_step</td>
+<td><a href="https://docs.scipy.org/doc/scipy/reference/optimize.minimize-tnc.html">TNC</a><sup>2</sup></td>
+<td>maxfun, eps, scale, offset, maxCGit, eta, stepmx, accuracy, minfev, ftol, xtol, gtol, rescale, finite_diff_rel_step, <del>maxiter</del></td>
 </tr>
 <tr>
 <td><a href="https://docs.scipy.org/doc/scipy/reference/optimize.minimize-cobyla.html">COBYLA</a></td>
-<td>disp, maxiter, rhobeg, tol, catol</td>
+<td>rhobeg, tol, catol</td>
 </tr>
 <tr>
 <td><a href="https://docs.scipy.org/doc/scipy/reference/optimize.minimize-cobyqa.html">COBYQA</a></td>
-<td>disp, maxfev, maxiter, f_target, feasibility_tol, initial_tr_radius, final_tr_radius, scale</td>
+<td>maxfev, f_target, feasibility_tol, initial_tr_radius, final_tr_radius, scale</td>
 </tr>
 <tr>
 <td><a href="https://docs.scipy.org/doc/scipy/reference/optimize.minimize-slsqp.html">SLSQP</a></td>
-<td>disp, maxiter, ftol, eps, finite_diff_rel_step</td>
+<td>ftol, eps, finite_diff_rel_step</td>
 </tr>
 <tr>
 <td><a href="https://docs.scipy.org/doc/scipy/reference/optimize.minimize-trustconstr.html">trust-constr</a></td>
-<td>gtol, xtol, barrier_tol, sparse_jacobian, initial_tr_radius, initial_constr_penalty, initial_barrier_parameter, initial_barrier_tolerance, factorization_method, finite_diff_rel_step, maxiter, verbose, disp</td>
+<td>gtol, xtol, barrier_tol, sparse_jacobian, initial_tr_radius, initial_constr_penalty, initial_barrier_parameter, initial_barrier_tolerance, factorization_method, finite_diff_rel_step, verbose</td>
 </tr>
 <tr>
 <td><a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.differential_evolution.html">differential_evolution</a></td>
-<td>disp, maxiter, strategy, popsize, tol, mutation, recombination, rng, polish, init, atol, updating</td>
+<td>strategy, popsize, tol, mutation, recombination, rng, polish, init, atol, updating</td>
 </tr>
 </tbody>
 </table>
+<p><strong>Notes:</strong></p>
+<ol>
+<li>Options in <em>italics</em> override a common option with a different type or behavior.</li>
+<li>Options with <del>strikethrough</del> indicate a common option that is not supported.</li>
+</ol>
 
 
 

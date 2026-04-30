@@ -4230,7 +4230,7 @@ this method.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A list of option dictionaries.</p>
+                <p>A dictionary of option names and their types.</p>
               </div>
             </td>
           </tr>
@@ -4242,6 +4242,17 @@ this method.</p>
             <td>
               <div class="doc-md-description">
                 <p>An optional URL for the plugin.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.options.MethodSchemaModel.exclude_common">exclude_common</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#set">set</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A set of common options to exclude for this method.</p>
               </div>
             </td>
           </tr>
@@ -4291,10 +4302,12 @@ this method.</p>
         <p>Generates a Markdown table documenting plugin options.</p>
 <p>This function takes a schema dictionary, validates it against the
 <a class="autorefs autorefs-internal" title="            OptionsSchemaModel" href="#ropt.config.options.OptionsSchemaModel"><code>OptionsSchemaModel</code></a>, and then
-generates a Markdown table that summarizes the available methods and their
-options. Each row in the table represents a method, and the columns list the
-method's name and its configurable options. If a URL is provided for a
-method, the method name will be hyperlinked to that URL in the table.</p>
+generates a Markdown document that summarizes the available methods and
+their options. Common options are listed first, followed by a table of
+method-specific options. Each row in the table represents a method, and the
+columns list the method's name and its configurable options. If a URL is
+provided for a method, the method name will be hyperlinked to that URL in
+the table.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
