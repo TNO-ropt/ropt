@@ -1877,9 +1877,13 @@ class provides two commonly used aggregation strategies:</p>
 <li><code>mean</code>: Weighted average of realization values/gradients.</li>
 <li><code>stddev</code>: Weighted standard deviation of values with chain-rule gradients.</li>
 </ul>
-<p>Users can implement custom estimators by subclassing <code>FunctionEstimator</code> and
-registering them with the plugin system, allowing them to be selected and
-configured via <code>FunctionEstimatorConfig</code> objects.</p>
+<p>Users can implement custom estimators by subclassing <code>FunctionEstimator</code>. Those
+subclasses can be instantiated directly and passed into an
+<a class="autorefs autorefs-internal" title="            EnOptContext" href="../context/#ropt.context.EnOptContext"><code>EnOptContext</code></a> object through its
+<code>function_estimators</code> field. Registering a custom estimator with the plugin
+system is optional and only required when the estimator should be selected and
+configured via <code>FunctionEstimatorConfig</code> objects instead of being instantiated
+explicitly by the user.</p>
 
 
 
@@ -1939,6 +1943,8 @@ optimizer during each iteration.</p>
 </ol>
 <p>Subclasses must implement:</p>
 <ul>
+<li><code>__init__</code>: Stores estimator configuration and performs lightweight setup.</li>
+<li><code>init</code>: Receives the optimization context for context-dependent initialization.</li>
 <li><code>calculate_function</code>: Combines function values from all realizations.</li>
 <li><code>calculate_gradient</code>: Combines gradients from all realizations.</li>
 </ul>

@@ -1942,9 +1942,13 @@ class provides commonly used weighting strategies, including:</p>
 <li><code>sort</code>: Assign weights based on ranking objective and constraint values.</li>
 <li><code>cvar</code>: Assign weights based on a Conditional Value-at-Risk selection.</li>
 </ul>
-<p>Users can implement custom filters by subclassing <code>RealizationFilter</code> and
-registering them with the plugin system, allowing them to be selected and
-configured via <code>RealizationFilterConfig</code> objects.</p>
+<p>Users can implement custom filters by subclassing <code>RealizationFilter</code>. Those
+subclasses can be instantiated directly and passed into an
+<a class="autorefs autorefs-internal" title="            EnOptContext" href="../context/#ropt.context.EnOptContext"><code>EnOptContext</code></a> object through its
+<code>realization_filters</code> field. Registering a custom filter with the plugin
+system is optional and only required when the filter should be selected and
+configured via <code>RealizationFilterConfig</code> objects instead of being instantiated
+explicitly by the user.</p>
 
 
 
@@ -2004,6 +2008,8 @@ constraint values.</p>
 </ol>
 <p>Subclasses must implement:</p>
 <ul>
+<li><code>__init__</code>: Stores filter configuration and performs lightweight setup.</li>
+<li><code>init</code>: Receives the optimization context for context-dependent initialization.</li>
 <li><code>get_realization_weights</code>: Returns one weight per realization based on
   the current objective and constraint values.</li>
 </ul>

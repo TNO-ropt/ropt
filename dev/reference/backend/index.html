@@ -2238,29 +2238,41 @@
 
     <div class="doc doc-contents first">
 
-        <p>Framework and Implementations for Optimizer backends.</p>
-<p>This module provides the necessary components for integrating optimization
-algorithms into <code>ropt</code> via its plugin system. Backend plugins allow <code>ropt</code> to
-utilize various optimization techniques, either built-in or provided by
-third-party packages.</p>
-<p>Backends must derive from the <a class="autorefs autorefs-internal" title="            Backend" href="#ropt.backend.Backend"><code>Backend</code></a> base class
-and implement the required interface to be compatible with <code>ropt</code>. This includes
-methods for initializing the backend, performing optimization steps, and
-handling any specific requirements of the optimization algorithms they support.</p>
-<p><strong>Built-in Backends:</strong></p>
+        <p>Public API for optimizer backend implementations.</p>
+<p>Backends define how <code>ropt</code> runs an optimization algorithm against the problem
+described by an <a class="autorefs autorefs-internal" title="            EnOptContext" href="../context/#ropt.context.EnOptContext"><code>EnOptContext</code></a> object. A backend
+manages the optimizer lifecycle, requests function and gradient evaluations
+through the core callback interface, and advances the optimization from an
+initial variable vector toward a solution.</p>
+<p><strong>Core Interface</strong></p>
+<p>All backend implementations inherit from the
+<a class="autorefs autorefs-internal" title="            Backend" href="#ropt.backend.Backend"><code>Backend</code></a> base class, which defines the backend
+lifecycle (<code>__init__</code>, <code>init</code>, <code>start</code>), validation hook (<code>validate_options</code>),
+and capability flags (<code>allow_nan</code>, <code>is_parallel</code>).</p>
+<p><strong>Integration with Optimization</strong></p>
+<p>Backends are accessed via an
+<a class="autorefs autorefs-internal" title="            EnOptContext" href="../context/#ropt.context.EnOptContext"><code>EnOptContext</code></a> object through its <code>backend</code>
+field. A backend is instantiated either directly as an object or via a
+<a class="autorefs autorefs-internal" title="            BackendConfig" href="../config/#ropt.config.BackendConfig"><code>BackendConfig</code></a> object, which is used by the
+plugin system to create an instance based on the configured backend method
+string.</p>
+<p>During execution, a backend uses the
+<a class="autorefs autorefs-internal" title="            ropt.core.OptimizerCallback" href="../core/#ropt.core.OptimizerCallback"><code>OptimizerCallback</code></a> interface to request
+objective, constraint, and gradient evaluations from the <code>ropt</code> core.</p>
+<p><strong>Built-in and Custom Backends</strong></p>
+<p><code>ropt</code> includes two built-in backends:</p>
 <ul>
-<li><a class="autorefs autorefs-internal" title="            ropt.backend.scipy.SciPyBackend" href="#ropt.backend.scipy.SciPyBackend"><code>SciPyBackend</code></a>: A backend that interfaces
-  with optimization algorithms from the SciPy library, supporting a wide range
-  of methods for unconstrained and constrained optimization.</li>
-<li><a class="autorefs autorefs-internal" title="            ropt.backend.external.ExternalBackend" href="#ropt.backend.external.ExternalBackend"><code>ExternalBackend</code></a>: A backend that
-  allows optimization via an external process, enabling the use of optimization
-  algorithms that may not be directly integrated into <code>ropt</code> but can be executed
-  as separate processes.</li>
+<li><a class="autorefs autorefs-internal" title="            ropt.backend.scipy.SciPyBackend" href="#ropt.backend.scipy.SciPyBackend"><code>SciPyBackend</code></a>: Uses optimization methods
+  provided by SciPy.</li>
+<li><a class="autorefs autorefs-internal" title="            ropt.backend.external.ExternalBackend" href="#ropt.backend.external.ExternalBackend"><code>ExternalBackend</code></a>: Delegates the
+  optimization loop to an external executable or process.</li>
 </ul>
-<p><strong>Utilities:</strong></p>
-<p>The <a class="autorefs autorefs-internal" title="            ropt.backend.utils" href="#ropt.backend.utils"><code>ropt.backend.utils</code></a> module offers helper
-functions for common tasks within optimizer backends, such as validating
-constraint support and handling normalized constraints.</p>
+<p>Users can implement custom backends by subclassing <code>Backend</code>. Those subclasses
+can be instantiated directly and passed into an
+<a class="autorefs autorefs-internal" title="            EnOptContext" href="../context/#ropt.context.EnOptContext"><code>EnOptContext</code></a> object through its <code>backend</code>
+field. Registering a custom backend with the plugin system is optional and
+only required when the backend should be selected and configured via
+<code>BackendConfig</code> objects instead of being instantiated explicitly by the user.</p>
 
 
 
@@ -2296,23 +2308,43 @@ constraint support and handling normalized constraints.</p>
 
 
 
-        <p>Abstract Base Class for Backend Implementations.</p>
-<p>This class defines the fundamental interface for all concrete optimizer
-implementations within the <code>ropt</code> framework. Backend plugins provide
-classes derived from <code>Backend</code> that encapsulate the logic of specific
-optimization algorithms.</p>
-<p>Instances of <code>Backend</code> subclasses must be initialized with an
-<a class="autorefs autorefs-internal" title="            EnOptContext" href="../context/#ropt.context.EnOptContext"><code>EnOptContext</code></a> object detailing the optimization
-setup and an <a class="autorefs autorefs-internal" title="            ropt.core.OptimizerCallback" href="../core/#ropt.core.OptimizerCallback"><code>OptimizerCallback</code></a> function.
-The callback is crucial as it allows the optimizer to request function and
-gradient evaluations from the <code>ropt</code> core during its execution.</p>
-<p>The optimization process itself is initiated by calling the <code>start</code> method,
-which must be implemented by subclasses.</p>
-<p>Subclasses must implement:
-- <code>start</code>: To contain the main optimization loop.</p>
-<p>Subclasses can optionally override:
-- <code>allow_nan</code>:   To indicate if the algorithm can handle NaN function values.
-- <code>is_parallel</code>: To indicate if the algorithm may perform parallel evaluations.</p>
+        <p>Abstract base class for optimizer backend implementations.</p>
+<p>All concrete backend implementations must inherit from this class and
+implement the required lifecycle and validation methods. A backend is
+responsible for configuring a concrete optimization algorithm, interacting
+with the <code>ropt</code> evaluation pipeline through an
+<a class="autorefs autorefs-internal" title="            ropt.core.OptimizerCallback" href="../core/#ropt.core.OptimizerCallback"><code>OptimizerCallback</code></a>, and executing the main
+optimization loop.</p>
+<p>During optimization, the backend receives an
+<a class="autorefs autorefs-internal" title="            EnOptContext" href="../context/#ropt.context.EnOptContext"><code>EnOptContext</code></a> object describing the problem
+setup and uses the callback interface to request objective, constraint, and
+gradient evaluations as needed by the underlying algorithm.</p>
+<p><strong>Lifecycle</strong></p>
+<ol>
+<li>Instantiation via <code>__init__</code>: Called with a backend configuration
+    object.</li>
+<li>Setup via <code>init</code>: Called once per optimization workflow with the
+    <a class="autorefs autorefs-internal" title="            EnOptContext" href="../context/#ropt.context.EnOptContext"><code>EnOptContext</code></a> and an
+    <a class="autorefs autorefs-internal" title="            ropt.core.OptimizerCallback" href="../core/#ropt.core.OptimizerCallback"><code>OptimizerCallback</code></a>.</li>
+<li>Validation via <code>validate_options</code>: Called to verify that the configured
+    backend options are supported.</li>
+<li>Execution via <code>start</code>: Called with the initial variable vector to run
+    the optimization algorithm.</li>
+</ol>
+<p>Subclasses must implement:</p>
+<ul>
+<li><code>__init__</code>: Stores backend configuration and performs lightweight setup.</li>
+<li><code>init</code>: Receives the optimization context and callback interface.</li>
+<li><code>start</code>: Runs the optimization algorithm.</li>
+<li><code>validate_options</code>: Verifies that backend-specific options are valid.</li>
+</ul>
+<p>Subclasses may optionally override:</p>
+<ul>
+<li><code>allow_nan</code>: Indicates whether the backend can continue when evaluations
+               produce <code>NaN</code> values.</li>
+<li><code>is_parallel</code>: Indicates whether the backend may evaluate multiple
+                 candidate variable vectors concurrently.</li>
+</ul>
 
 
 
@@ -2349,7 +2381,11 @@ which must be implemented by subclasses.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Initialize the SciPy optimizer backend.</p>
+        <p>Create a new backend instance.</p>
+<p>Called during instantiation. Subclasses should store the configuration
+and perform any lightweight initialization. Validation and
+context-dependent setup should usually be deferred to <code>validate_options</code>
+and <code>init</code>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2372,8 +2408,8 @@ which must be implemented by subclasses.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The configuration for the backend, containing the
-            method name and options.</p>
+                <p>Configuration object specifying the backend method
+and any method-specific options.</p>
               </div>
             </td>
             <td>
@@ -2413,10 +2449,11 @@ which must be implemented by subclasses.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Initialize the optimizer with the given context and callback.</p>
-<p>This abstract method must be implemented by concrete <code>Backend</code> subclasses
-to set up the optimizer with the provided optimization context and
-callback function.</p>
+        <p>Finalize initialization after the optimization context is known.</p>
+<p>Called once at the start of each optimization workflow, after all
+configuration is finalized. Use this method to store the optimization
+context, retain the callback interface, and perform any setup that
+depends on the full problem definition.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2439,8 +2476,8 @@ callback function.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>An instance of <code>EnOptContext</code> containing details
-                about the optimization problem setup.</p>
+                <p>The full optimization context, containing all
+configuration and state for the current workflow.</p>
               </div>
             </td>
             <td>
@@ -2456,9 +2493,8 @@ callback function.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>An instance of <code>OptimizerCallback</code> that allows
-                the optimizer to request function and gradient
-                evaluations from the <code>ropt</code> core during execution.</p>
+                <p>Callback interface used to request objective,
+constraint, and gradient evaluations from the <code>ropt</code> core.</p>
               </div>
             </td>
             <td>
@@ -2495,14 +2531,12 @@ callback function.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Initiate the optimization process.</p>
-<p>This abstract method must be implemented by concrete <code>Backend</code>
-subclasses to start the optimization process. It takes the initial set
-of variable values as input.</p>
-<p>During execution, the implementation should use the
-<a class="autorefs autorefs-internal" title="            ropt.core.OptimizerCallback" href="../core/#ropt.core.OptimizerCallback"><code>OptimizerCallback</code></a> (provided during
-initialization) to request necessary function and gradient evaluations
-from the <code>ropt</code> core.</p>
+        <p>Run the optimization algorithm from the provided initial values.</p>
+<p>Starts the backend's main optimization loop using the supplied initial
+variable vector. During execution, the implementation is expected to
+use the <a class="autorefs autorefs-internal" title="            ropt.core.OptimizerCallback" href="../core/#ropt.core.OptimizerCallback"><code>OptimizerCallback</code></a> provided in
+<code>init</code> to request any required objective, constraint, or gradient
+evaluations from the <code>ropt</code> core.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2525,8 +2559,8 @@ from the <code>ropt</code> core.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A 1D NumPy array representing the starting variable
-            values for the optimization.</p>
+                <p>A 1D array of shape <code>(n_variables,)</code> containing
+the starting point for the optimization.</p>
               </div>
             </td>
             <td>
@@ -2564,10 +2598,9 @@ from the <code>ropt</code> core.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Indicate whether the optimizer can handle NaN function values.</p>
-<p>If an optimizer algorithm can gracefully handle <code>NaN</code> (Not a Number)
-objective function values, its implementation should override this
-property to return <code>True</code>.</p>
+        <p>Indicate whether the backend can handle <code>NaN</code> evaluation results.</p>
+<p>Backends that can continue after receiving <code>NaN</code> objective or
+constraint values should override this property to return <code>True</code>.</p>
 <p>This is particularly relevant in ensemble-based optimization where
 evaluations might fail for all realizations. When <code>allow_nan</code> is <code>True</code>,
 setting <a class="autorefs autorefs-internal" title="            RealizationsConfig" href="../config/#ropt.config.RealizationsConfig"><code>realization_min_success</code></a> to
@@ -2590,7 +2623,7 @@ error, enabling the optimizer to potentially continue.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p><code>True</code> if the optimizer supports NaN function values.</p>
+                <p><code>True</code> if the backend supports <code>NaN</code> evaluation results.</p>
               </div>
             </td>
           </tr>
@@ -2624,12 +2657,11 @@ error, enabling the optimizer to potentially continue.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Indicate whether the optimizer allows parallel evaluations.</p>
-<p>If an optimizer algorithm is designed to evaluate multiple variable
-vectors concurrently, its implementation should override this property
-to return <code>True</code>.</p>
-<p>This information can be used by <code>ropt</code> or other components to manage
-resources or handle parallel execution appropriately.</p>
+        <p>Indicate whether the backend may issue parallel evaluations.</p>
+<p>Backends that evaluate multiple candidate variable vectors concurrently
+should override this property to return <code>True</code>.</p>
+<p>This information can be used by <code>ropt</code> and related components to manage
+resources or coordinate parallel execution appropriately.</p>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
@@ -2647,7 +2679,7 @@ resources or handle parallel execution appropriately.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p><code>True</code> if the optimizer allows parallel evaluations.</p>
+                <p><code>True</code> if the backend may perform parallel evaluations.</p>
               </div>
             </td>
           </tr>
@@ -2680,36 +2712,36 @@ resources or handle parallel execution appropriately.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Validate the optimizer-specific options.</p>
-<p>This method is intended to validate the <code>options</code> dictionary, passed
-upon creation of the optimizer via the
-<a class="autorefs autorefs-internal" title="            BackendConfig" href="../config/#ropt.config.BackendConfig"><code>BackendConfig</code></a> configuration object. It
-should check if the options contains valid keys and values for the
-specified optimization <code>method</code>.</p>
-<p>Subclasses should override this method to implement validation logic
-specific to the methods they support, potentially using schema
-validation tools like Pydantic.</p>
+        <p>Validate backend-specific options for the configured method.</p>
+<p>Checks that the options supplied through the
+<a class="autorefs autorefs-internal" title="            BackendConfig" href="../config/#ropt.config.BackendConfig"><code>BackendConfig</code></a> object have the expected
+type, contain only supported keys, and satisfy any method-specific
+value constraints.</p>
+<p>Concrete backends should implement validation logic for the methods
+they support, potentially using schema-validation tools such as
+Pydantic.</p>
 <p>The raised exception must be a ValueError, or derive from a ValueError.</p>
 
 
 <details class="note" open>
   <summary>Note</summary>
-  <p>It is expected that the optimizer either receives a dictionary, or a
-list of options. This method should test if the type of the options
-is as expected, and raise a <code>ValueError</code> with an appropriate message
-if this is not the case.</p>
+  <p>Backend options may be represented as a dictionary or list,
+depending on the backend. This method should verify that the type
+matches what the backend expects and raise a <code>ValueError</code> with a
+clear message when it does not.</p>
 </details>
 
 <details class="warning" open>
   <summary>Method name with prefix</summary>
-  <p>The method string may be prefixed in the form "backend/method", take
-this into account when parsing the method name.</p>
+  <p>The method string may be prefixed in the form <code>"backend/method"</code>.
+Implementations should account for this when parsing the method
+name.</p>
 </details>
 
 <details class="warning" open>
   <summary>Handling the default method</summary>
-  <p>The the method string may be set to "default", in which case it should
-be mapped to the correct default method of the backend.</p>
+  <p>The method string may be set to <code>"default"</code>, in which case it
+should be mapped to the backend's actual default method.</p>
 </details>
 
 <p><span class="doc-section-title">Raises:</span></p>
@@ -2786,20 +2818,15 @@ be mapped to the correct default method of the backend.</p>
 
 
 
-        <p>SciPy optimization backend for ropt.</p>
-<p>This class provides an interface to several optimization algorithms from
-SciPy's
+        <p>Backend implementation using SciPy optimization algorithms.</p>
+<p>Implements the <a class="autorefs autorefs-internal" title="            Backend" href="#ropt.backend.Backend"><code>Backend</code></a> interface to expose
+optimization algorithms from
 <a href="https://docs.scipy.org/doc/scipy/reference/optimize.html"><code>scipy.optimize</code></a>
-module, enabling their use within <code>ropt</code>.</p>
-<p>To select an optimizer, set the <code>method</code> field within the
-<a class="autorefs autorefs-internal" title="            BackendConfig" href="../config/#ropt.config.BackendConfig"><code>optimizer</code></a> section of the
-<a class="autorefs autorefs-internal" title="            EnOptContext" href="../context/#ropt.context.EnOptContext"><code>EnOptContext</code></a> configuration object to the desired
-algorithm's name. Most methods support the general options defined in the
-<a class="autorefs autorefs-internal" title="            EnOptContext" href="../context/#ropt.context.EnOptContext"><code>EnOptContext</code></a> object. For algorithm-specific
-options, use the <code>options</code> dictionary within the
-<a class="autorefs autorefs-internal" title="            BackendConfig" href="../config/#ropt.config.BackendConfig"><code>optimizer</code></a> section.</p>
-<p>Below are the supported options. Click on the common options, or on
-the method name to consult the corresponding
+to <code>ropt</code>.</p>
+<p>The algorithm is selected via the <code>method</code> field of the
+<a class="autorefs autorefs-internal" title="            BackendConfig" href="../config/#ropt.config.BackendConfig"><code>BackendConfig</code></a> object. Algorithm-specific
+options are passed through the <code>options</code> dictionary. Click on the common
+options or the method name for the corresponding
 <a href="https://docs.scipy.org/doc/scipy/reference/optimize.html"><code>scipy.optimize</code></a>
 documentation:</p>
 <p><strong>Common Options:</strong></p>
@@ -2908,23 +2935,29 @@ documentation:</p>
 
 
 
-        <p>Plugin class for optimization using an external process.</p>
-<p>This class enables optimization via an external process, which performs the
-optimization independently and communicates with this class to request
-function evaluations, report optimizer states, and handle any errors.</p>
-<p>Typically, the optimizer is specified within an
-<a class="autorefs autorefs-internal" title="            BackendConfig" href="../config/#ropt.config.BackendConfig"><code>BackendConfig</code></a> via the <code>method</code> field,
-which either provides the algorithm name directly or follows the form
-<code>plugin-name/method-name</code>. In the first case, <code>ropt</code> searches among all
-available optimizer plugins to find the specified method. In the second
-case, it checks if the plugin identified by <code>plugin-name</code> contains
-<code>method-name</code> and, if so, uses it. Both of these are not supported by the
-external optimizer class. Instead, it requires that the <code>method</code> field
-includes both the plugin and method names in the format
-<code>external/plugin-name/method-name</code> or <code>external/method-name</code>. This ensures
-the external optimizer can identify and launch the specified optimization
-method <code>method-name</code> and launch it as an external process.</p>
+        <p>Backend implementation that runs an optimizer in a separate process.</p>
+<p>Implements the <a class="autorefs autorefs-internal" title="            Backend" href="#ropt.backend.Backend"><code>Backend</code></a> interface by spawning a
+child process to run a delegate backend. The child process performs the
+optimization independently and communicates back through queues to request
+function evaluations, report optimizer states, and propagate errors.</p>
+<p><strong>Method naming</strong></p>
+<p>Unlike other backends, the <code>method</code> field of
+<a class="autorefs autorefs-internal" title="            BackendConfig" href="../config/#ropt.config.BackendConfig"><code>BackendConfig</code></a> must include both the plugin
+and method name in one of these forms:</p>
+<ul>
+<li><code>external/plugin-name/method-name</code></li>
+<li><code>external/method-name</code></li>
+</ul>
+<p>The <code>external/</code> prefix is stripped before the remainder is forwarded to
+the delegate plugin. Standard <code>plugin-name/method-name</code> resolution without
+the prefix is not supported by this backend.</p>
 
+
+<details class="note" open>
+  <summary>Note</summary>
+  <p>The <code>cloudpickle</code> package must be installed. If it is absent,
+instantiation raises <code>NotImplementedError</code>.</p>
+</details>
 
 
 
@@ -2959,9 +2992,10 @@ method <code>method-name</code> and launch it as an external process.</p>
 
     <div class="doc doc-contents first">
 
-        <p>Utility functions for use by optimizer plugins.</p>
-<p>This module provides utility functions to validate supported constraints, filter
-linear constraints, and to retrieve the list of supported optimizers.</p>
+        <p>Utility functions for use by optimizer backend plugins.</p>
+<p>This module provides helpers for constraint validation, linear constraint
+adjustment based on variable masks, unique output path construction, and
+normalization of non-linear constraints into a standard form.</p>
 
 
 
@@ -3002,23 +3036,14 @@ linear constraints, and to retrieve the list of supported optimizers.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Validate if the configured constraints are supported by the chosen method.</p>
-<p>This function checks if the constraints defined in the <code>context</code> object
-(bounds, linear, non-linear) are compatible with the specified optimization
-<code>method</code>. It uses dictionaries mapping constraint types to sets of methods
-that support or require them.</p>
-<p>Constraint types are identified by keys like <code>"bounds"</code>, <code>"linear:eq"</code>,
-<code>"linear:ineq"</code>, <code>"nonlinear:eq"</code>, and <code>"nonlinear:ineq"</code>.</p>
-<p>Example <code>supported_constraints</code> dictionary:
-<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="p">{</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="s2">&quot;bounds&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;L-BFGS-B&quot;</span><span class="p">,</span> <span class="s2">&quot;TNC&quot;</span><span class="p">,</span> <span class="s2">&quot;SLSQP&quot;</span><span class="p">},</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="s2">&quot;linear:eq&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;SLSQP&quot;</span><span class="p">},</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="s2">&quot;linear:ineq&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;SLSQP&quot;</span><span class="p">},</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="s2">&quot;nonlinear:eq&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;SLSQP&quot;</span><span class="p">},</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="s2">&quot;nonlinear:ineq&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;SLSQP&quot;</span><span class="p">},</span>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">}</span>
-</span></code></pre></div>
-A similar structure is used for <code>required_constraints</code>.</p>
+        <p>Raise if the context's constraints are incompatible with the chosen method.</p>
+<p>Checks bounds, linear, and non-linear constraints in <code>context</code> against the
+sets of method names that support or require each constraint type. Constraint
+types are identified by the keys <code>"bounds"</code>, <code>"linear:eq"</code>, <code>"linear:ineq"</code>,
+<code>"nonlinear:eq"</code>, and <code>"nonlinear:ineq"</code>.</p>
+<p>Raises <code>NotImplementedError</code> if a constraint present in <code>context</code> is not
+supported by the method, or if a constraint required by the method is absent
+from <code>context</code>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3041,7 +3066,7 @@ A similar structure is used for <code>required_constraints</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The optimization context object.</p>
+                <p>The optimization context to inspect.</p>
               </div>
             </td>
             <td>
@@ -3073,8 +3098,7 @@ A similar structure is used for <code>required_constraints</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Dict mapping constraint types to sets of methods
-                   that support them.</p>
+                <p>Maps each constraint type to the supported methods.</p>
               </div>
             </td>
             <td>
@@ -3090,8 +3114,7 @@ A similar structure is used for <code>required_constraints</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Dict mapping constraint types to sets of methods
-                   that require them.</p>
+                <p>Maps each constraint type to  supported methods.</p>
               </div>
             </td>
             <td>
@@ -3130,9 +3153,12 @@ A similar structure is used for <code>required_constraints</code>.</p>
     <div class="doc doc-contents ">
 
         <p>Construct a unique output path, appending an index if necessary.</p>
-<p>This function generates a file or directory path based on the provided
-components. If the resulting path already exists, it automatically appends
-or increments a numerical suffix (e.g., "-001", "-002") to ensure uniqueness.</p>
+<p>Builds a path from the provided components. If the resulting path already
+exists on disk, a three-digit counter suffix (e.g. <code>-001</code>, <code>-002</code>) is
+appended or incremented until a non-existing path is found.</p>
+<p>The path is assembled as:
+<code>&lt;base_dir&gt;/&lt;base_name&gt;[-&lt;name&gt;][-&lt;index&gt;][&lt;suffix&gt;]</code></p>
+<p><code>base_dir</code> is created (including parents) if it does not exist.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3155,7 +3181,7 @@ or increments a numerical suffix (e.g., "-001", "-002") to ensure uniqueness.</p
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The core name for the path.</p>
+                <p>Base file or directory name.</p>
               </div>
             </td>
             <td>
@@ -3171,7 +3197,8 @@ or increments a numerical suffix (e.g., "-001", "-002") to ensure uniqueness.</p
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional parent directory for the path.</p>
+                <p>Parent directory. If <code>None</code>, the path is relative to the
+       current working directory.</p>
               </div>
             </td>
             <td>
@@ -3187,7 +3214,7 @@ or increments a numerical suffix (e.g., "-001", "-002") to ensure uniqueness.</p
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional identifier to include in the path.</p>
+                <p>Optional label appended to <code>base_name</code> with a <code>-</code> separator.</p>
               </div>
             </td>
             <td>
@@ -3203,7 +3230,7 @@ or increments a numerical suffix (e.g., "-001", "-002") to ensure uniqueness.</p
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional file extension or suffix for the path.</p>
+                <p>Optional file extension including the leading dot</p>
               </div>
             </td>
             <td>
@@ -3229,7 +3256,7 @@ or increments a numerical suffix (e.g., "-001", "-002") to ensure uniqueness.</p
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A unique <code>pathlib.Path</code> object.</p>
+                <p>A <code>pathlib.Path</code> that does not currently exist on disk.</p>
               </div>
             </td>
           </tr>
@@ -3261,37 +3288,38 @@ or increments a numerical suffix (e.g., "-001", "-002") to ensure uniqueness.</p
 
 
 
-        <p>Class for handling normalized constraints.</p>
-<p>This class can be used to normalize non-linear constraints into the form
-C(x) = 0, C(x) &lt;= 0, or C(x) &gt;= 0. By default this is done by subtracting
-the right-hand side value, and multiplying with -1, if necessary.</p>
-<p>The right hand sides are provided by the <code>lower_bounds</code> and <code>upper_bound</code>
-values. If corresponding entries in these arrays are equal (within a 1e-15
-tolerance), the corresponding constraint is assumed to be a equality
-constraint. If they are not, they are considered inequality constraints, if
-one or both values are finite. If the lower bounds are finite, the
-constraint is added as is, after subtracting of the lower bound. If the
-upper bound is finite, the same is done, but the constraint is multiplied by
--1. If both are finite, both constraints are added, effectively splitting a
-two-sided constraint into two normalized constraints.</p>
-<p>By default this normalizes inequality constraints to the form C(x) &gt; 0, by
-setting the <code>flip</code> flag, this can be changed to C(x) &lt; 0.</p>
+        <p>Normalizes non-linear constraints into a standard scalar form.</p>
+<p>Transforms raw constraints defined by lower and upper bound pairs into one
+of the forms <code>C(x) = 0</code>, <code>C(x) &gt; 0</code>, or <code>C(x) &lt; 0</code> by subtracting the
+relevant bound and optionally flipping the sign.</p>
+<p><strong>Normalization rules</strong> (applied per constraint row):</p>
+<ul>
+<li>If <code>lower_bound ≈ upper_bound</code> (within 1e-15): equality constraint,
+  normalized as <code>C(x) - lower_bound</code>.</li>
+<li>If only <code>lower_bound</code> is finite: inequality, normalized as
+  <code>C(x) - lower_bound</code>.</li>
+<li>If only <code>upper_bound</code> is finite: inequality, normalized as
+  <code>-(C(x) - upper_bound)</code>.</li>
+<li>If both bounds are finite: the constraint is split into two rows, one
+  for each bound.</li>
+</ul>
+<p>By default inequality constraints are normalized to <code>C(x) &gt; 0</code>. Setting
+<code>flip=True</code> produces <code>C(x) &lt; 0</code> instead.</p>
 <p><strong>Usage:</strong></p>
 <ol>
 <li>Initialize with the lower and upper bounds.</li>
-<li>Before each new function/gradient evaluation with a new variable
-    vector, reset the normalized constraints by calling the <code>reset</code>
-    method.</li>
+<li>Before each new function/gradient evaluation with a new variable vector,
+   reset the normalized constraints by calling the <code>reset</code> method.</li>
 <li>The constraint values are given by the <code>constraints</code> property. Before
-    accessing it, call the <code>set_constraints</code> with the raw constraints. If
-    necessary, this will calculate and cache the normalized values. Since
-    values are cached, calling this method and accessing <code>constraints</code>
-    multiple times is cheap.</li>
-<li>Use the same procedure for gradients, using the <code>gradients</code> property
-    and <code>set_gradients</code>. Raw gradients must be provided as a matrix,
-    where the rows are the gradients of each constraint.</li>
-<li>Use the <code>is_eq</code> property to retrieve a vector of boolean flags to
-    check which constraints are equality constraints.</li>
+   accessing it, call the <code>set_constraints</code> with the raw constraints. If
+   necessary, this will calculate and cache the normalized values. Since
+   values are cached, calling this method and accessing <code>constraints</code>
+   multiple times is cheap.</li>
+<li>Use the same procedure for gradients, using the <code>gradients</code> property and
+   <code>set_gradients</code>. Raw gradients must be provided as a matrix, where the
+   rows are the gradients of each constraint.</li>
+<li>Use the <code>is_eq</code> property to retrieve a vector of boolean flags to check
+   which constraints are equality constraints.</li>
 </ol>
 <p>See the <code>scipy</code> optimization backend in the <code>ropt</code> source code for an
 example of usage.</p>
@@ -3338,7 +3366,7 @@ multiple gradients is not supported.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Initialize the normalization class.</p>
+        <p>Create a new constraint normalizer.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3361,7 +3389,8 @@ multiple gradients is not supported.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Whether to flip the sign of the constraints.</p>
+                <p>Whether to normalize inequality constraints to <code>C(x) &lt; 0</code>
+  instead of the default <code>C(x) &gt; 0</code>.</p>
               </div>
             </td>
             <td>
@@ -3397,7 +3426,9 @@ multiple gradients is not supported.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Set the bounds of the normalization class.</p>
+        <p>Set or update the constraint bounds.</p>
+<p>Computes the internal normalization mapping from the supplied bound
+arrays. If the bounds change between calls, the mapping is rebuilt.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3420,7 +3451,7 @@ multiple gradients is not supported.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The lower bounds on the right hand sides.</p>
+                <p>Lower bound for each raw constraint.</p>
               </div>
             </td>
             <td>
@@ -3436,7 +3467,7 @@ multiple gradients is not supported.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The upper bounds on the right hand sides.</p>
+                <p>Upper bound for each raw constraint.</p>
               </div>
             </td>
             <td>
@@ -3462,7 +3493,9 @@ multiple gradients is not supported.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If the bounds have changed.</p>
+                <p>If the new bounds change which constraints are
+equalities vs. inequalities, since this would invalidate
+cached optimizer state.</p>
               </div>
             </td>
           </tr>
@@ -3497,7 +3530,9 @@ multiple gradients is not supported.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Return flags indicating which constraints are equality constraints.</p>
+        <p>Return flags indicating which normalized rows are equalities.</p>
+<p>The returned list corresponds to the normalized constraint rows after
+any splitting of two-sided bounds into separate lower and upper rows.</p>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
@@ -3515,7 +3550,8 @@ multiple gradients is not supported.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A list of booleans, <code>True</code> for constraints that are equality constraints.</p>
+                <p>A list of booleans where <code>True</code> marks a normalized equality
+constraint row.</p>
               </div>
             </td>
           </tr>
@@ -3544,14 +3580,12 @@ multiple gradients is not supported.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Reset cached normalized constraints and gradients.</p>
-<p>This must be called when the stored constraints and their gradients are
-no longer valid. This is typically done after a new function/gradient
-evaluation. The <code>set_constraints</code> and <code>set_gradients</code> methods can then
-be called to set the new values.</p>
+        <p>Discard cached normalized values and gradients.</p>
+<p>Call this before normalizing results for a new variable vector. After
+reset, the next calls to <code>set_constraints</code> and <code>set_gradients</code> will
+rebuild the cached normalized data.</p>
 <p>After calling this method, the <code>constraints</code> and <code>gradients</code> properties
-will return <code>None</code> until new values are set. This can be utilized to check
-if new values need to be calculated.</p>
+return <code>None</code> until new values are cached.</p>
 
 
     </div>
@@ -3581,14 +3615,13 @@ if new values need to be calculated.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Return the cached normalized constraint values.</p>
-<p>These are the constraint values after applying the normalization logic
-(subtracting RHS, potential sign flipping) based on the bounds provided
-during initialization.</p>
-<p>This property should be accessed after calling
+        <p>Return cached normalized constraint values, if available.</p>
+<p>These values are produced by
 <a class="autorefs autorefs-internal" title="            set_constraints" href="#ropt.backend.utils.NormalizedConstraints.set_constraints"><code>set_constraints</code></a>
-with the raw constraint values for the current variable vector. Returns
-<code>None</code> if <code>set_constraints</code> has not been called since the last <code>reset</code>.</p>
+after subtracting the relevant bound and applying any required sign
+flip.</p>
+<p>Returns <code>None</code> if <code>set_constraints</code> has not been called since the last
+<code>reset</code>.</p>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
@@ -3606,7 +3639,8 @@ with the raw constraint values for the current variable vector. Returns
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A NumPy array containing the normalized constraint values.</p>
+                <p>A 2D NumPy array of shape <code>(n_normalized_constraints, n_points)</code>,
+or <code>None</code> when no normalized values are cached.</p>
               </div>
             </td>
           </tr>
@@ -3640,14 +3674,11 @@ with the raw constraint values for the current variable vector. Returns
 
     <div class="doc doc-contents ">
 
-        <p>Return the cached normalized constraint gradients.</p>
-<p>These are the gradients of the constraints after applying the
-normalization logic (potential sign flipping) based on the bounds
-provided during initialization.</p>
-<p>This property should be accessed after calling
+        <p>Return cached normalized constraint gradients, if available.</p>
+<p>These gradients are produced by
 <a class="autorefs autorefs-internal" title="            set_gradients" href="#ropt.backend.utils.NormalizedConstraints.set_gradients"><code>set_gradients</code></a>
-with the raw constraint gradients for the current variable vector.
-Returns <code>None</code> if <code>set_gradients</code> has not been called since the last
+after applying any required sign flip.</p>
+<p>Returns <code>None</code> if <code>set_gradients</code> has not been called since the last
 <code>reset</code>.</p>
 
 
@@ -3666,7 +3697,8 @@ Returns <code>None</code> if <code>set_gradients</code> has not been called sinc
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A 2D NumPy array containing the normalized constraint gradients.</p>
+                <p>A 2D NumPy array of shape <code>(n_normalized_constraints, n_variables)</code>,
+or <code>None</code> when no normalized gradients are cached.</p>
               </div>
             </td>
           </tr>
@@ -3695,16 +3727,14 @@ Returns <code>None</code> if <code>set_gradients</code> has not been called sinc
 
     <div class="doc doc-contents ">
 
-        <p>Calculate and cache normalized constraint values.</p>
-<p>This method takes the raw constraint values (evaluated at the current
-variable vector) and applies the normalization logic defined during
-initialization (subtracting RHS, potential sign flipping). The results
-are stored internally and made available via the <code>constraints</code> property.</p>
-<p>This supports parallel evaluation: if <code>values</code> is a 2D array, each row
-is treated as the constraint values for a separate variable vector
-evaluation.</p>
-<p>If there are already cached values, this method will not overwrite them,
-the <code>reset</code> method must be called first.</p>
+        <p>Normalize and cache raw constraint values.</p>
+<p>Applies the configured bound subtraction and sign convention to raw
+constraint values, then stores the result in the <code>constraints</code> cache.</p>
+<p>Parallel evaluation is supported: if <code>values</code> is 2D, columns represent
+different evaluation points and rows represent raw constraint indices.
+A 1D input is treated as a single evaluation point.</p>
+<p>If normalized values are already cached, this method returns without
+modifying them; call <code>reset</code> first to recompute.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3727,8 +3757,8 @@ the <code>reset</code> method must be called first.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A 1D or 2D NumPy array of raw constraint values. If 2D,
-    rows represent different evaluations.</p>
+                <p>Raw constraint values with shape <code>(n_constraints,)</code> or
+<code>(n_constraints, n_points)</code>.</p>
               </div>
             </td>
             <td>
@@ -3761,19 +3791,17 @@ the <code>reset</code> method must be called first.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Calculate and cache normalized constraint gradients.</p>
-<p>This method takes the raw constraint gradients (evaluated at the current
-variable vector) and applies the normalization logic defined during
-initialization (potential sign flipping). The results are stored
-internally and made available via the <code>gradients</code> property.</p>
-<p>If there are already cached values, this method will not overwrite them,
-the <code>reset</code> method must be called first.</p>
+        <p>Normalize and cache raw constraint gradients.</p>
+<p>Applies the configured sign convention to raw constraint gradients and
+stores the result in the <code>gradients</code> cache.</p>
+<p>If normalized gradients are already cached, this method returns without
+modifying them; call <code>reset</code> first to recompute.</p>
 
 
 <details class="note" open>
   <summary>Note</summary>
   <p>Unlike <code>set_constraints</code>, this method does <em>not</em> support parallel
-evaluation; it expects gradients corresponding to a single variable vector.</p>
+evaluation; it expects gradients for a single variable vector.</p>
 </details>
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3796,8 +3824,8 @@ evaluation; it expects gradients corresponding to a single variable vector.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A 2D NumPy array of raw constraint gradients (rows are
-    gradients of original constraints, columns are variables).</p>
+                <p>Raw constraint gradients with shape
+<code>(n_constraints, n_variables)</code>.</p>
               </div>
             </td>
             <td>
@@ -3924,7 +3952,9 @@ are removed entirely, as they become trivial constants.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The adjusted coefficients and bounds.</p>
+                <p>A tuple of <code>(coefficients, lower_bounds, upper_bounds)</code> for the active
+variables only, with the contributions of fixed variables already
+subtracted from the bounds.</p>
               </div>
             </td>
           </tr>
