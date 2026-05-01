@@ -102,23 +102,17 @@ _ConstraintType = str | Callable[..., float] | Callable[..., NDArray[np.float64]
 
 
 class SciPyBackend(Backend):
-    """SciPy optimization backend for ropt.
+    """Backend implementation using SciPy optimization algorithms.
 
-    This class provides an interface to several optimization algorithms from
-    SciPy's
+    Implements the [`Backend`][ropt.backend.Backend] interface to expose
+    optimization algorithms from
     [`scipy.optimize`](https://docs.scipy.org/doc/scipy/reference/optimize.html)
-    module, enabling their use within `ropt`.
+    to `ropt`.
 
-    To select an optimizer, set the `method` field within the
-    [`optimizer`][ropt.config.BackendConfig] section of the
-    [`EnOptContext`][ropt.context.EnOptContext] configuration object to the desired
-    algorithm's name. Most methods support the general options defined in the
-    [`EnOptContext`][ropt.context.EnOptContext] object. For algorithm-specific
-    options, use the `options` dictionary within the
-    [`optimizer`][ropt.config.BackendConfig] section.
-
-    Below are the supported options. Click on the common options, or on
-    the method name to consult the corresponding
+    The algorithm is selected via the `method` field of the
+    [`BackendConfig`][ropt.config.BackendConfig] object. Algorithm-specific
+    options are passed through the `options` dictionary. Click on the common
+    options or the method name for the corresponding
     [`scipy.optimize`](https://docs.scipy.org/doc/scipy/reference/optimize.html)
     documentation:
 

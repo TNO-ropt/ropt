@@ -1,7 +1,8 @@
-"""Utility functions for use by optimizer plugins.
+"""Utility functions for use by optimizer backend plugins.
 
-This module provides utility functions to validate supported constraints, filter
-linear constraints, and to retrieve the list of supported optimizers.
+This module provides helpers for constraint validation, linear constraint
+adjustment based on variable masks, unique output path construction, and
+normalization of non-linear constraints into a standard form.
 """
 
 from pathlib import Path
@@ -26,35 +27,22 @@ def validate_supported_constraints(
     supported_constraints: dict[str, set[str]],
     required_constraints: dict[str, set[str]],
 ) -> None:
-    """Validate if the configured constraints are supported by the chosen method.
+    """Raise if the context's constraints are incompatible with the chosen method.
 
-    This function checks if the constraints defined in the `context` object
-    (bounds, linear, non-linear) are compatible with the specified optimization
-    `method`. It uses dictionaries mapping constraint types to sets of methods
-    that support or require them.
+    Checks bounds, linear, and non-linear constraints in `context` against the
+    sets of method names that support or require each constraint type. Constraint
+    types are identified by the keys `"bounds"`, `"linear:eq"`, `"linear:ineq"`,
+    `"nonlinear:eq"`, and `"nonlinear:ineq"`.
 
-    Constraint types are identified by keys like `"bounds"`, `"linear:eq"`,
-    `"linear:ineq"`, `"nonlinear:eq"`, and `"nonlinear:ineq"`.
-
-    Example `supported_constraints` dictionary:
-    ```python
-    {
-        "bounds": {"L-BFGS-B", "TNC", "SLSQP"},
-        "linear:eq": {"SLSQP"},
-        "linear:ineq": {"SLSQP"},
-        "nonlinear:eq": {"SLSQP"},
-        "nonlinear:ineq": {"SLSQP"},
-    }
-    ```
-    A similar structure is used for `required_constraints`.
+    Raises `NotImplementedError` if a constraint present in `context` is not
+    supported by the method, or if a constraint required by the method is absent
+    from `context`.
 
     Args:
-        context:               The optimization context object.
+        context:               The optimization context to inspect.
         method:                The name of the optimization method being used.
-        supported_constraints: Dict mapping constraint types to sets of methods
-                               that support them.
-        required_constraints:  Dict mapping constraint types to sets of methods
-                               that require them.
+        supported_constraints: Maps each constraint type to the supported methods.
+        required_constraints:  Maps each constraint type to  supported methods.
     """
     _validate_bounds(context, method, supported_constraints, required_constraints)
     _validate_linear_constraints(
@@ -195,18 +183,24 @@ def create_output_path(
 ) -> Path:
     """Construct a unique output path, appending an index if necessary.
 
-    This function generates a file or directory path based on the provided
-    components. If the resulting path already exists, it automatically appends
-    or increments a numerical suffix (e.g., "-001", "-002") to ensure uniqueness.
+    Builds a path from the provided components. If the resulting path already
+    exists on disk, a three-digit counter suffix (e.g. `-001`, `-002`) is
+    appended or incremented until a non-existing path is found.
+
+    The path is assembled as:
+    `<base_dir>/<base_name>[-<name>][-<index>][<suffix>]`
+
+    `base_dir` is created (including parents) if it does not exist.
 
     Args:
-        base_name: The core name for the path.
-        base_dir:  Optional parent directory for the path.
-        name:      Optional identifier to include in the path.
-        suffix:    Optional file extension or suffix for the path.
+        base_name: Base file or directory name.
+        base_dir:  Parent directory. If `None`, the path is relative to the
+                   current working directory.
+        name:      Optional label appended to `base_name` with a `-` separator.
+        suffix:    Optional file extension including the leading dot
 
     Returns:
-        A unique `pathlib.Path` object.
+        A `pathlib.Path` that does not currently exist on disk.
     """
     if base_dir is not None:
         base_dir.mkdir(parents=True, exist_ok=True)
@@ -229,41 +223,41 @@ def create_output_path(
 
 
 class NormalizedConstraints:
-    """Class for handling normalized constraints.
+    """Normalizes non-linear constraints into a standard scalar form.
 
-    This class can be used to normalize non-linear constraints into the form
-    C(x) = 0, C(x) <= 0, or C(x) >= 0. By default this is done by subtracting
-    the right-hand side value, and multiplying with -1, if necessary.
+    Transforms raw constraints defined by lower and upper bound pairs into one
+    of the forms `C(x) = 0`, `C(x) > 0`, or `C(x) < 0` by subtracting the
+    relevant bound and optionally flipping the sign.
 
-    The right hand sides are provided by the `lower_bounds` and `upper_bound`
-    values. If corresponding entries in these arrays are equal (within a 1e-15
-    tolerance), the corresponding constraint is assumed to be a equality
-    constraint. If they are not, they are considered inequality constraints, if
-    one or both values are finite. If the lower bounds are finite, the
-    constraint is added as is, after subtracting of the lower bound. If the
-    upper bound is finite, the same is done, but the constraint is multiplied by
-    -1. If both are finite, both constraints are added, effectively splitting a
-    two-sided constraint into two normalized constraints.
+    **Normalization rules** (applied per constraint row):
 
-    By default this normalizes inequality constraints to the form C(x) > 0, by
-    setting the `flip` flag, this can be changed to C(x) < 0.
+    - If `lower_bound ≈ upper_bound` (within 1e-15): equality constraint,
+      normalized as `C(x) - lower_bound`.
+    - If only `lower_bound` is finite: inequality, normalized as
+      `C(x) - lower_bound`.
+    - If only `upper_bound` is finite: inequality, normalized as
+      `-(C(x) - upper_bound)`.
+    - If both bounds are finite: the constraint is split into two rows, one
+      for each bound.
+
+    By default inequality constraints are normalized to `C(x) > 0`. Setting
+    `flip=True` produces `C(x) < 0` instead.
 
     **Usage:**
 
     1. Initialize with the lower and upper bounds.
-    2. Before each new function/gradient evaluation with a new variable
-        vector, reset the normalized constraints by calling the `reset`
-        method.
+    2. Before each new function/gradient evaluation with a new variable vector,
+       reset the normalized constraints by calling the `reset` method.
     3. The constraint values are given by the `constraints` property. Before
-        accessing it, call the `set_constraints` with the raw constraints. If
-        necessary, this will calculate and cache the normalized values. Since
-        values are cached, calling this method and accessing `constraints`
-        multiple times is cheap.
-    4. Use the same procedure for gradients, using the `gradients` property
-        and `set_gradients`. Raw gradients must be provided as a matrix,
-        where the rows are the gradients of each constraint.
-    5. Use the `is_eq` property to retrieve a vector of boolean flags to
-        check which constraints are equality constraints.
+       accessing it, call the `set_constraints` with the raw constraints. If
+       necessary, this will calculate and cache the normalized values. Since
+       values are cached, calling this method and accessing `constraints`
+       multiple times is cheap.
+    4. Use the same procedure for gradients, using the `gradients` property and
+       `set_gradients`. Raw gradients must be provided as a matrix, where the
+       rows are the gradients of each constraint.
+    5. Use the `is_eq` property to retrieve a vector of boolean flags to check
+       which constraints are equality constraints.
 
     See the `scipy` optimization backend in the `ropt` source code for an
     example of usage.
@@ -283,10 +277,11 @@ class NormalizedConstraints:
         *,
         flip: bool = False,
     ) -> None:
-        """Initialize the normalization class.
+        """Create a new constraint normalizer.
 
         Args:
-            flip:         Whether to flip the sign of the constraints.
+            flip: Whether to normalize inequality constraints to `C(x) < 0`
+                  instead of the default `C(x) > 0`.
         """
         self._apply_flip = flip
         self._constraints: NDArray[np.float64] | None = None
@@ -302,14 +297,19 @@ class NormalizedConstraints:
         lower_bounds: NDArray[np.float64],
         upper_bounds: NDArray[np.float64],
     ) -> None:
-        """Set the bounds of the normalization class.
+        """Set or update the constraint bounds.
+
+        Computes the internal normalization mapping from the supplied bound
+        arrays. If the bounds change between calls, the mapping is rebuilt.
 
         Args:
-            lower_bounds: The lower bounds on the right hand sides.
-            upper_bounds: The upper bounds on the right hand sides.
+            lower_bounds: Lower bound for each raw constraint.
+            upper_bounds: Upper bound for each raw constraint.
 
         Raises:
-            ValueError: If the bounds have changed.
+            ValueError: If the new bounds change which constraints are
+                equalities vs. inequalities, since this would invalidate
+                cached optimizer state.
         """
         if (
             self._lower_bounds is None
@@ -347,83 +347,81 @@ class NormalizedConstraints:
 
     @property
     def is_eq(self) -> list[bool]:
-        """Return flags indicating which constraints are equality constraints.
+        """Return flags indicating which normalized rows are equalities.
+
+        The returned list corresponds to the normalized constraint rows after
+        any splitting of two-sided bounds into separate lower and upper rows.
 
         Returns:
-            A list of booleans, `True` for constraints that are equality constraints.
+            A list of booleans where `True` marks a normalized equality
+                constraint row.
         """
         return self._is_eq
 
     def reset(self) -> None:
-        """Reset cached normalized constraints and gradients.
+        """Discard cached normalized values and gradients.
 
-        This must be called when the stored constraints and their gradients are
-        no longer valid. This is typically done after a new function/gradient
-        evaluation. The `set_constraints` and `set_gradients` methods can then
-        be called to set the new values.
+        Call this before normalizing results for a new variable vector. After
+        reset, the next calls to `set_constraints` and `set_gradients` will
+        rebuild the cached normalized data.
 
         After calling this method, the `constraints` and `gradients` properties
-        will return `None` until new values are set. This can be utilized to check
-        if new values need to be calculated.
+        return `None` until new values are cached.
         """
         self._constraints = None
         self._gradients = None
 
     @property
     def constraints(self) -> NDArray[np.float64] | None:
-        """Return the cached normalized constraint values.
+        """Return cached normalized constraint values, if available.
 
-        These are the constraint values after applying the normalization logic
-        (subtracting RHS, potential sign flipping) based on the bounds provided
-        during initialization.
-
-        This property should be accessed after calling
+        These values are produced by
         [`set_constraints`][ropt.backend.utils.NormalizedConstraints.set_constraints]
-        with the raw constraint values for the current variable vector. Returns
-        `None` if `set_constraints` has not been called since the last `reset`.
+        after subtracting the relevant bound and applying any required sign
+        flip.
+
+        Returns `None` if `set_constraints` has not been called since the last
+        `reset`.
 
         Returns:
-            A NumPy array containing the normalized constraint values.
+            A 2D NumPy array of shape `(n_normalized_constraints, n_points)`,
+                or `None` when no normalized values are cached.
         """
         return self._constraints
 
     @property
     def gradients(self) -> NDArray[np.float64] | None:
-        """Return the cached normalized constraint gradients.
+        """Return cached normalized constraint gradients, if available.
 
-        These are the gradients of the constraints after applying the
-        normalization logic (potential sign flipping) based on the bounds
-        provided during initialization.
-
-        This property should be accessed after calling
+        These gradients are produced by
         [`set_gradients`][ropt.backend.utils.NormalizedConstraints.set_gradients]
-        with the raw constraint gradients for the current variable vector.
+        after applying any required sign flip.
+
         Returns `None` if `set_gradients` has not been called since the last
         `reset`.
 
         Returns:
-            A 2D NumPy array containing the normalized constraint gradients.
+            A 2D NumPy array of shape `(n_normalized_constraints, n_variables)`,
+                or `None` when no normalized gradients are cached.
         """
         return self._gradients
 
     def set_constraints(self, values: NDArray[np.float64]) -> None:
-        """Calculate and cache normalized constraint values.
+        """Normalize and cache raw constraint values.
 
-        This method takes the raw constraint values (evaluated at the current
-        variable vector) and applies the normalization logic defined during
-        initialization (subtracting RHS, potential sign flipping). The results
-        are stored internally and made available via the `constraints` property.
+        Applies the configured bound subtraction and sign convention to raw
+        constraint values, then stores the result in the `constraints` cache.
 
-        This supports parallel evaluation: if `values` is a 2D array, each row
-        is treated as the constraint values for a separate variable vector
-        evaluation.
+        Parallel evaluation is supported: if `values` is 2D, columns represent
+        different evaluation points and rows represent raw constraint indices.
+        A 1D input is treated as a single evaluation point.
 
-        If there are already cached values, this method will not overwrite them,
-        the `reset` method must be called first.
+        If normalized values are already cached, this method returns without
+        modifying them; call `reset` first to recompute.
 
         Args:
-            values: A 1D or 2D NumPy array of raw constraint values. If 2D,
-                    rows represent different evaluations.
+            values: Raw constraint values with shape `(n_constraints,)` or
+                `(n_constraints, n_points)`.
         """
         if self._constraints is not None:
             return
@@ -446,23 +444,21 @@ class NormalizedConstraints:
                 self._constraints[idx, :] = -self._constraints[idx, :]
 
     def set_gradients(self, values: NDArray[np.float64]) -> None:
-        """Calculate and cache normalized constraint gradients.
+        """Normalize and cache raw constraint gradients.
 
-        This method takes the raw constraint gradients (evaluated at the current
-        variable vector) and applies the normalization logic defined during
-        initialization (potential sign flipping). The results are stored
-        internally and made available via the `gradients` property.
+        Applies the configured sign convention to raw constraint gradients and
+        stores the result in the `gradients` cache.
 
-        If there are already cached values, this method will not overwrite them,
-        the `reset` method must be called first.
+        If normalized gradients are already cached, this method returns without
+        modifying them; call `reset` first to recompute.
 
         Note:
             Unlike `set_constraints`, this method does *not* support parallel
-            evaluation; it expects gradients corresponding to a single variable vector.
+            evaluation; it expects gradients for a single variable vector.
 
         Args:
-            values: A 2D NumPy array of raw constraint gradients (rows are
-                    gradients of original constraints, columns are variables).
+            values: Raw constraint gradients with shape
+                `(n_constraints, n_variables)`.
         """
         if self._gradients is not None:
             return
@@ -498,12 +494,14 @@ def get_masked_linear_constraints(
     are removed entirely, as they become trivial constants.
 
     Args:
-        context:         The [`EnOptContext`][ropt.context.EnOptContext] object
+        context:        The [`EnOptContext`][ropt.context.EnOptContext] object
                         containing the variable mask and linear constraints.
         initial_values: The initial values to use.
 
     Returns:
-        The adjusted coefficients and bounds.
+        A tuple of `(coefficients, lower_bounds, upper_bounds)` for the active
+            variables only, with the contributions of fixed variables already
+            subtracted from the bounds.
     """
     assert context.linear_constraints is not None
     mask = context.variables.mask

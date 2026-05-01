@@ -32,24 +32,29 @@ _PROCESS_TIMEOUT: Final = 10
 
 
 class ExternalBackend(Backend):
-    """Plugin class for optimization using an external process.
+    """Backend implementation that runs an optimizer in a separate process.
 
-    This class enables optimization via an external process, which performs the
-    optimization independently and communicates with this class to request
-    function evaluations, report optimizer states, and handle any errors.
+    Implements the [`Backend`][ropt.backend.Backend] interface by spawning a
+    child process to run a delegate backend. The child process performs the
+    optimization independently and communicates back through queues to request
+    function evaluations, report optimizer states, and propagate errors.
 
-    Typically, the optimizer is specified within an
-    [`BackendConfig`][ropt.config.BackendConfig] via the `method` field,
-    which either provides the algorithm name directly or follows the form
-    `plugin-name/method-name`. In the first case, `ropt` searches among all
-    available optimizer plugins to find the specified method. In the second
-    case, it checks if the plugin identified by `plugin-name` contains
-    `method-name` and, if so, uses it. Both of these are not supported by the
-    external optimizer class. Instead, it requires that the `method` field
-    includes both the plugin and method names in the format
-    `external/plugin-name/method-name` or `external/method-name`. This ensures
-    the external optimizer can identify and launch the specified optimization
-    method `method-name` and launch it as an external process.
+    **Method naming**
+
+    Unlike other backends, the `method` field of
+    [`BackendConfig`][ropt.config.BackendConfig] must include both the plugin
+    and method name in one of these forms:
+
+    - `external/plugin-name/method-name`
+    - `external/method-name`
+
+    The `external/` prefix is stripped before the remainder is forwarded to
+    the delegate plugin. Standard `plugin-name/method-name` resolution without
+    the prefix is not supported by this backend.
+
+    Note:
+        The `cloudpickle` package must be installed. If it is absent,
+        instantiation raises `NotImplementedError`.
     """
 
     def __init__(self, backend_config: BackendConfig) -> None:  # noqa: D107

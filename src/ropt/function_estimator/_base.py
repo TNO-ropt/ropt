@@ -43,6 +43,8 @@ class FunctionEstimator(ABC):
 
     Subclasses must implement:
 
+    - `__init__`: Stores estimator configuration and performs lightweight setup.
+    - `init`: Receives the optimization context for context-dependent initialization.
     - `calculate_function`: Combines function values from all realizations.
     - `calculate_gradient`: Combines gradients from all realizations.
     """

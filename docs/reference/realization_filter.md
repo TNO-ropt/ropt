@@ -1,3 +1,6 @@
+::: ropt.realization_filter
+    options:
+        members: []
 ::: ropt.realization_filter.RealizationFilter
 ::: ropt.realization_filter.default.DefaultRealizationFilter
 ::: ropt.realization_filter.default.SortObjectiveOptions

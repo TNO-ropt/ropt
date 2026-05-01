@@ -1,4 +1,10 @@
-"""This plugin contains realization filters that are installed by default."""
+"""Default realization filter plugin with sort and CVaR methods.
+
+This module provides the built-in implementation of the
+[`RealizationFilter`][ropt.realization_filter.RealizationFilter] interface,
+offering sorting-based and Conditional Value-at-Risk (CVaR) weighting
+strategies.
+"""
 
 from typing import Annotated
 
@@ -167,48 +173,41 @@ class CVaRConstraintOptions(_ConfigBaseModel):
 
 
 class DefaultRealizationFilter(RealizationFilter):
-    """The default implementation for realization filtering strategies.
+    """Default implementation of realization filters with sort and CVaR methods.
 
-    This class provides several methods for calculating realization weights based
-    on objective or constraint values. The specific method and its parameters
-    are configured via the
-    [`RealizationFilterConfig`][ropt.config.RealizationFilterConfig]
-    in the main [`EnOptContext`][ropt.context.EnOptContext].
+    Implements the
+    [`RealizationFilter`][ropt.realization_filter.RealizationFilter] interface
+    to provide standard strategies for selecting or reweighting realizations
+    based on objective or constraint values.
 
-    **Supported Methods:**
+    The specific method is selected via the `method` field of the
+    [`RealizationFilterConfig`][ropt.config.RealizationFilterConfig], which is
+    passed during initialization.
 
-    - `sort-objective`:
-        Sorts realizations based on a weighted sum of specified objective
-        function values. It then assigns zero weights to realizations outside of
-        a defined index range (`first` to `last`) in the sorted list. Requires
-        options defined by
-        [`SortObjectiveOptions`][ropt.realization_filter.default.SortObjectiveOptions].
+    **Supported Filtering Methods**
 
-    - `sort-constraint`:
-        Sorts realizations based on the value of a single specified constraint
-        function. It assigns zero weights to realizations outside of a defined
-        index range (`first` to `last`) in the sorted list. Requires options
-        defined by
-        [`SortConstraintOptions`][ropt.realization_filter.default.SortConstraintOptions].
+    - **`sort-objective`**:
+        Sorts realizations by a weighted combination of selected objective
+        values, then keeps only the realizations whose rank falls within the
+        configured inclusive range `[first, last]`.
+    - **`sort-constraint`**:
+        Sorts realizations by a selected constraint value, then keeps only the
+        realizations whose rank falls within the configured inclusive range
+        `[first, last]`.
+    - **`cvar-objective`**:
+        Assigns weights to the worst-performing realizations according to a CVaR
+        selection on a weighted combination of selected objective values.
+    - **`cvar-constraint`**:
+        Assigns weights to the worst-performing realizations according to a CVaR
+        selection on a selected constraint value, with the definition of "worst"
+        determined by the constraint type.
 
-    - `cvar-objective`:
-        Calculates realization weights using the Conditional Value-at-Risk (CVaR)
-        method applied to a weighted sum of specified objective function values.
-        Weights are assigned based on a specified `percentile` of the worst-performing
-        realizations (highest objective values for minimization). Interpolation is
-        used if the percentile boundary falls between realizations.
-        Requires options defined by
-        [`CVaRObjectiveOptions`][ropt.realization_filter.default.CVaRObjectiveOptions].
+    Each method validates and uses its corresponding options model:
 
-    - `cvar-constraint`:
-        Calculates realization weights using the CVaR method applied to the
-        value of a single specified constraint function. Weights are assigned
-        based on a specified `percentile` of the worst-performing realizations
-        (definition of "worst" depends on the constraint type: LE, GE, or EQ).
-        Interpolation is used if the percentile boundary falls between
-        realizations.
-        Requires options defined by
-        [`CVaRConstraintOptions`][ropt.realization_filter.default.CVaRConstraintOptions].
+    - [`SortObjectiveOptions`][ropt.realization_filter.default.SortObjectiveOptions]
+    - [`SortConstraintOptions`][ropt.realization_filter.default.SortConstraintOptions]
+    - [`CVaRObjectiveOptions`][ropt.realization_filter.default.CVaRObjectiveOptions]
+    - [`CVaRConstraintOptions`][ropt.realization_filter.default.CVaRConstraintOptions]
     """
 
     def __init__(  # noqa: D107

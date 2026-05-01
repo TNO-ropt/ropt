@@ -32,9 +32,13 @@ class provides two commonly used aggregation strategies:
 - `mean`: Weighted average of realization values/gradients.
 - `stddev`: Weighted standard deviation of values with chain-rule gradients.
 
-Users can implement custom estimators by subclassing `FunctionEstimator` and
-registering them with the plugin system, allowing them to be selected and
-configured via `FunctionEstimatorConfig` objects.
+Users can implement custom estimators by subclassing `FunctionEstimator`. Those
+subclasses can be instantiated directly and passed into an
+[`EnOptContext`][ropt.context.EnOptContext] object through its
+`function_estimators` field. Registering a custom estimator with the plugin
+system is optional and only required when the estimator should be selected and
+configured via `FunctionEstimatorConfig` objects instead of being instantiated
+explicitly by the user.
 """
 
 from ._base import FunctionEstimator

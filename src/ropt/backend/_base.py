@@ -1,4 +1,11 @@
-"""This module defines the base class for optimization plugins."""
+"""Abstract base class for optimizer backend implementations.
+
+Backends are responsible for driving the optimization algorithm used by `ropt`.
+They coordinate the optimizer lifecycle, request objective/constraint and
+gradient evaluations through the core callback interface, and advance the
+optimization from an initial variable vector toward a solution. This module
+defines the interface that all concrete backend implementations must follow.
+"""
 
 from __future__ import annotations
 
@@ -15,82 +22,100 @@ if TYPE_CHECKING:
 
 
 class Backend(ABC):
-    """Abstract Base Class for Backend Implementations.
+    """Abstract base class for optimizer backend implementations.
 
-    This class defines the fundamental interface for all concrete optimizer
-    implementations within the `ropt` framework. Backend plugins provide
-    classes derived from `Backend` that encapsulate the logic of specific
-    optimization algorithms.
+    All concrete backend implementations must inherit from this class and
+    implement the required lifecycle and validation methods. A backend is
+    responsible for configuring a concrete optimization algorithm, interacting
+    with the `ropt` evaluation pipeline through an
+    [`OptimizerCallback`][ropt.core.OptimizerCallback], and executing the main
+    optimization loop.
 
-    Instances of `Backend` subclasses must be initialized with an
-    [`EnOptContext`][ropt.context.EnOptContext] object detailing the optimization
-    setup and an [`OptimizerCallback`][ropt.core.OptimizerCallback] function.
-    The callback is crucial as it allows the optimizer to request function and
-    gradient evaluations from the `ropt` core during its execution.
+    During optimization, the backend receives an
+    [`EnOptContext`][ropt.context.EnOptContext] object describing the problem
+    setup and uses the callback interface to request objective, constraint, and
+    gradient evaluations as needed by the underlying algorithm.
 
-    The optimization process itself is initiated by calling the `start` method,
-    which must be implemented by subclasses.
+    **Lifecycle**
+
+    1. Instantiation via `__init__`: Called with a backend configuration
+        object.
+    2. Setup via `init`: Called once per optimization workflow with the
+        [`EnOptContext`][ropt.context.EnOptContext] and an
+        [`OptimizerCallback`][ropt.core.OptimizerCallback].
+    3. Validation via `validate_options`: Called to verify that the configured
+        backend options are supported.
+    4. Execution via `start`: Called with the initial variable vector to run
+        the optimization algorithm.
 
     Subclasses must implement:
-    - `start`: To contain the main optimization loop.
 
-    Subclasses can optionally override:
-    - `allow_nan`:   To indicate if the algorithm can handle NaN function values.
-    - `is_parallel`: To indicate if the algorithm may perform parallel evaluations.
+    - `__init__`: Stores backend configuration and performs lightweight setup.
+    - `init`: Receives the optimization context and callback interface.
+    - `start`: Runs the optimization algorithm.
+    - `validate_options`: Verifies that backend-specific options are valid.
+
+    Subclasses may optionally override:
+
+    - `allow_nan`: Indicates whether the backend can continue when evaluations
+                   produce `NaN` values.
+    - `is_parallel`: Indicates whether the backend may evaluate multiple
+                     candidate variable vectors concurrently.
     """
 
     @abstractmethod
     def __init__(self, backend_config: BackendConfig) -> None:
-        """Initialize the SciPy optimizer backend.
+        """Create a new backend instance.
+
+        Called during instantiation. Subclasses should store the configuration
+        and perform any lightweight initialization. Validation and
+        context-dependent setup should usually be deferred to `validate_options`
+        and `init`.
 
         Args:
-            backend_config: The configuration for the backend, containing the
-                            method name and options.
+            backend_config: Configuration object specifying the backend method
+                and any method-specific options.
         """
 
     @abstractmethod
     def init(
         self, context: EnOptContext, optimizer_callback: OptimizerCallback
     ) -> None:
-        """Initialize the optimizer with the given context and callback.
+        """Finalize initialization after the optimization context is known.
 
-        This abstract method must be implemented by concrete `Backend` subclasses
-        to set up the optimizer with the provided optimization context and
-        callback function.
+        Called once at the start of each optimization workflow, after all
+        configuration is finalized. Use this method to store the optimization
+        context, retain the callback interface, and perform any setup that
+        depends on the full problem definition.
 
         Args:
-            context:            An instance of `EnOptContext` containing details
-                                about the optimization problem setup.
-            optimizer_callback: An instance of `OptimizerCallback` that allows
-                                the optimizer to request function and gradient
-                                evaluations from the `ropt` core during execution.
+            context: The full optimization context, containing all
+                configuration and state for the current workflow.
+            optimizer_callback: Callback interface used to request objective,
+                constraint, and gradient evaluations from the `ropt` core.
         """
 
     @abstractmethod
     def start(self, initial_values: NDArray[np.float64]) -> None:
-        """Initiate the optimization process.
+        """Run the optimization algorithm from the provided initial values.
 
-        This abstract method must be implemented by concrete `Backend`
-        subclasses to start the optimization process. It takes the initial set
-        of variable values as input.
-
-        During execution, the implementation should use the
-        [`OptimizerCallback`][ropt.core.OptimizerCallback] (provided during
-        initialization) to request necessary function and gradient evaluations
-        from the `ropt` core.
+        Starts the backend's main optimization loop using the supplied initial
+        variable vector. During execution, the implementation is expected to
+        use the [`OptimizerCallback`][ropt.core.OptimizerCallback] provided in
+        `init` to request any required objective, constraint, or gradient
+        evaluations from the `ropt` core.
 
         Args:
-            initial_values: A 1D NumPy array representing the starting variable
-                            values for the optimization.
+            initial_values: A 1D array of shape `(n_variables,)` containing
+                the starting point for the optimization.
         """
 
     @property
     def allow_nan(self) -> bool:
-        """Indicate whether the optimizer can handle NaN function values.
+        """Indicate whether the backend can handle `NaN` evaluation results.
 
-        If an optimizer algorithm can gracefully handle `NaN` (Not a Number)
-        objective function values, its implementation should override this
-        property to return `True`.
+        Backends that can continue after receiving `NaN` objective or
+        constraint values should override this property to return `True`.
 
         This is particularly relevant in ensemble-based optimization where
         evaluations might fail for all realizations. When `allow_nan` is `True`,
@@ -99,55 +124,54 @@ class Backend(ABC):
         error, enabling the optimizer to potentially continue.
 
         Returns:
-            `True` if the optimizer supports NaN function values.
+            `True` if the backend supports `NaN` evaluation results.
         """
         return False
 
     @property
     def is_parallel(self) -> bool:
-        """Indicate whether the optimizer allows parallel evaluations.
+        """Indicate whether the backend may issue parallel evaluations.
 
-        If an optimizer algorithm is designed to evaluate multiple variable
-        vectors concurrently, its implementation should override this property
-        to return `True`.
+        Backends that evaluate multiple candidate variable vectors concurrently
+        should override this property to return `True`.
 
-        This information can be used by `ropt` or other components to manage
-        resources or handle parallel execution appropriately.
+        This information can be used by `ropt` and related components to manage
+        resources or coordinate parallel execution appropriately.
 
         Returns:
-            `True` if the optimizer allows parallel evaluations.
+            `True` if the backend may perform parallel evaluations.
         """
         return False
 
     @abstractmethod
     def validate_options(self) -> None:
-        """Validate the optimizer-specific options.
+        """Validate backend-specific options for the configured method.
 
-        This method is intended to validate the `options` dictionary, passed
-        upon creation of the optimizer via the
-        [`BackendConfig`][ropt.config.BackendConfig] configuration object. It
-        should check if the options contains valid keys and values for the
-        specified optimization `method`.
+        Checks that the options supplied through the
+        [`BackendConfig`][ropt.config.BackendConfig] object have the expected
+        type, contain only supported keys, and satisfy any method-specific
+        value constraints.
 
-        Subclasses should override this method to implement validation logic
-        specific to the methods they support, potentially using schema
-        validation tools like Pydantic.
+        Concrete backends should implement validation logic for the methods
+        they support, potentially using schema-validation tools such as
+        Pydantic.
 
         The raised exception must be a ValueError, or derive from a ValueError.
 
         Note:
-            It is expected that the optimizer either receives a dictionary, or a
-            list of options. This method should test if the type of the options
-            is as expected, and raise a `ValueError` with an appropriate message
-            if this is not the case.
+            Backend options may be represented as a dictionary or list,
+            depending on the backend. This method should verify that the type
+            matches what the backend expects and raise a `ValueError` with a
+            clear message when it does not.
 
         Warning: Method name with prefix
-            The method string may be prefixed in the form "backend/method", take
-            this into account when parsing the method name.
+            The method string may be prefixed in the form `"backend/method"`.
+            Implementations should account for this when parsing the method
+            name.
 
         Warning: Handling the default method
-            The the method string may be set to "default", in which case it should
-            be mapped to the correct default method of the backend.
+            The method string may be set to `"default"`, in which case it
+            should be mapped to the backend's actual default method.
 
         Raises:
             ValueError: If the provided options are invalid.
