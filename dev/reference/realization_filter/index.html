@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#ropt.realization_filter.RealizationFilter" class="md-skip">
+        <a href="#ropt.realization_filter" class="md-skip">
           Skip to content
         </a>
       
@@ -1081,6 +1081,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#ropt.realization_filter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        realization_filter
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#ropt.realization_filter.RealizationFilter" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1756,6 +1767,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#ropt.realization_filter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        realization_filter
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#ropt.realization_filter.RealizationFilter" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1882,6 +1904,69 @@
 
   <h1>Realization Filters</h1>
 
+<div class="doc doc-object doc-module">
+
+
+
+<h2 id="ropt.realization_filter" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-module"></code>            <span class="doc doc-object-name doc-module-name">ropt.realization_filter</span>
+
+
+</h2>
+
+    <div class="doc doc-contents first">
+
+        <p>Public API for realization filter implementations.</p>
+<p>Realization filters define how much each realization contributes to the values
+used by the optimizer. In ensemble-based workflows, the optimizer evaluates
+objective and constraint functions for multiple realizations; filters inspect
+those per-realization results and return a weight for each realization.</p>
+<p><strong>Core Interface</strong></p>
+<p>All filter implementations inherit from the
+<a class="autorefs autorefs-internal" title="            ropt.realization_filter.RealizationFilter" href="#ropt.realization_filter.RealizationFilter"><code>RealizationFilter</code></a> base class,
+which defines the filter lifecycle (<code>__init__</code>, <code>init</code>) and the required
+weighting method (<code>get_realization_weights</code>).</p>
+<p><strong>Integration with Optimization</strong></p>
+<p>Realization filters are accessed via an
+<a class="autorefs autorefs-internal" title="            EnOptContext" href="../context/#ropt.context.EnOptContext"><code>EnOptContext</code></a> object through its
+<code>realization_filters</code> field, a tuple of realization filter instances. Filters
+are instantiated either directly as objects or via
+<a class="autorefs autorefs-internal" title="            RealizationFilterConfig" href="../config/#ropt.config.RealizationFilterConfig"><code>RealizationFilterConfig</code></a> objects, which
+are used by the plugin system to create instances based on the configured
+method string (e.g., <code>"sort"</code> or <code>"cvar"</code>).</p>
+<p><strong>Built-in and Custom Filters</strong></p>
+<p>The
+<a class="autorefs autorefs-internal" title="            ropt.realization_filter.default.DefaultRealizationFilter" href="#ropt.realization_filter.default.DefaultRealizationFilter"><code>DefaultRealizationFilter</code></a>
+class provides commonly used weighting strategies, including:</p>
+<ul>
+<li><code>sort</code>: Assign weights based on ranking objective and constraint values.</li>
+<li><code>cvar</code>: Assign weights based on a Conditional Value-at-Risk selection.</li>
+</ul>
+<p>Users can implement custom filters by subclassing <code>RealizationFilter</code> and
+registering them with the plugin system, allowing them to be selected and
+configured via <code>RealizationFilterConfig</code> objects.</p>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
 <div class="doc doc-object doc-class">
 
 
@@ -1899,7 +1984,29 @@
 
 
 
-        <p>Abstract base class for realization filter classes.</p>
+        <p>Abstract base class for realization filter implementations.</p>
+<p>All concrete realization filter implementations must inherit from this
+class and implement the required weighting method. Filters are responsible
+for examining per-realization objective and constraint values and returning
+a non-negative weight for each realization.</p>
+<p>The weights produced by filters are used by the optimizer to control how
+strongly each realization contributes to aggregated objective and
+constraint values.</p>
+<p><strong>Lifecycle</strong></p>
+<ol>
+<li>Instantiation via <code>__init__</code>: Called by the plugin system with a
+   configuration object.</li>
+<li>Setup via <code>init</code>: Called once per optimization workflow with the
+   <a class="autorefs autorefs-internal" title="            EnOptContext" href="../context/#ropt.context.EnOptContext"><code>EnOptContext</code></a>, allowing final
+   initialization based on the full optimization configuration.</li>
+<li>Evaluation via <code>get_realization_weights</code>: Called repeatedly during
+   optimization as new objective and constraint values become available.</li>
+</ol>
+<p>Subclasses must implement:</p>
+<ul>
+<li><code>get_realization_weights</code>: Returns one weight per realization based on
+  the current objective and constraint values.</li>
+</ul>
 
 
 
@@ -1936,7 +2043,10 @@
 
     <div class="doc doc-contents ">
 
-        <p>Initialize the realization filter plugin.</p>
+        <p>Create a new realization filter instance.</p>
+<p>Called during instantiation. Subclasses should store the configuration
+and perform any lightweight initialization. Validation and
+context-dependent setup should be deferred to the <code>init</code> method.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1996,7 +2106,11 @@
 
     <div class="doc doc-contents ">
 
-        <p>Initialize the realization filter.</p>
+        <p>Finalize initialization after the optimization context is known.</p>
+<p>Called once at the start of each optimization workflow, after all
+configuration is finalized. Use this method to perform context-dependent
+initialization such as validation of filter settings, setup of internal
+state, or precomputation of method-specific data.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2059,14 +2173,14 @@
 
     <div class="doc doc-contents ">
 
-        <p>Return the updated weights of the realizations.</p>
-<p>This method is called by the optimizer with the current values of the
-objectives and constraints. Based on these values it must decide how
-much weight each realization should be given, and return those as a
-vector.</p>
-<p>The objectives and the constraints are passed as matrices, where the
-columns contain the values of the objectives or constraints. The index
-along the row axis corresponds to the number of the realization.</p>
+        <p>Compute one weight per realization from current evaluation results.</p>
+<p>Examines the current per-realization objective and constraint values
+and returns a non-negative weight vector that determines how strongly
+each realization influences subsequent aggregation steps. The exact
+weighting rule is defined by the concrete filter implementation.</p>
+<p>The <code>objectives</code> and <code>constraints</code> inputs are organized with
+realizations along the first axis and objective or constraint indices
+along the second axis.</p>
 
 
 <details class="tip" open>
@@ -2095,7 +2209,8 @@ before use, hence any non-negative weight value is permissible.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The objectives of all realizations.</p>
+                <p>Array of shape <code>(n_realizations, n_objectives)</code>
+containing objective values for each realization.</p>
               </div>
             </td>
             <td>
@@ -2111,7 +2226,9 @@ before use, hence any non-negative weight value is permissible.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The constraints for all realizations.</p>
+                <p>Array of shape <code>(n_realizations, n_constraints)</code>
+containing constraint values for each realization, or <code>None</code>
+when the workflow has no constraints.</p>
               </div>
             </td>
             <td>
@@ -2137,7 +2254,17 @@ before use, hence any non-negative weight value is permissible.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A vector of weights of the realizations.</p>
+                <p>A 1D array of shape <code>(n_realizations,)</code> containing the weight of</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>each realization.</p>
               </div>
             </td>
           </tr>
@@ -2175,51 +2302,38 @@ before use, hence any non-negative weight value is permissible.</p>
 
 
 
-        <p>The default implementation for realization filtering strategies.</p>
-<p>This class provides several methods for calculating realization weights based
-on objective or constraint values. The specific method and its parameters
-are configured via the
-<a class="autorefs autorefs-internal" title="            RealizationFilterConfig" href="../config/#ropt.config.RealizationFilterConfig"><code>RealizationFilterConfig</code></a>
-in the main <a class="autorefs autorefs-internal" title="            EnOptContext" href="../context/#ropt.context.EnOptContext"><code>EnOptContext</code></a>.</p>
-<p><strong>Supported Methods:</strong></p>
+        <p>Default implementation of realization filters with sort and CVaR methods.</p>
+<p>Implements the
+<a class="autorefs autorefs-internal" title="            ropt.realization_filter.RealizationFilter" href="#ropt.realization_filter.RealizationFilter"><code>RealizationFilter</code></a> interface
+to provide standard strategies for selecting or reweighting realizations
+based on objective or constraint values.</p>
+<p>The specific method is selected via the <code>method</code> field of the
+<a class="autorefs autorefs-internal" title="            RealizationFilterConfig" href="../config/#ropt.config.RealizationFilterConfig"><code>RealizationFilterConfig</code></a>, which is
+passed during initialization.</p>
+<p><strong>Supported Filtering Methods</strong></p>
 <ul>
-<li>
-<p><code>sort-objective</code>:
-    Sorts realizations based on a weighted sum of specified objective
-    function values. It then assigns zero weights to realizations outside of
-    a defined index range (<code>first</code> to <code>last</code>) in the sorted list. Requires
-    options defined by
-    <a class="autorefs autorefs-internal" title="            ropt.realization_filter.default.SortObjectiveOptions" href="#ropt.realization_filter.default.SortObjectiveOptions"><code>SortObjectiveOptions</code></a>.</p>
-</li>
-<li>
-<p><code>sort-constraint</code>:
-    Sorts realizations based on the value of a single specified constraint
-    function. It assigns zero weights to realizations outside of a defined
-    index range (<code>first</code> to <code>last</code>) in the sorted list. Requires options
-    defined by
-    <a class="autorefs autorefs-internal" title="            ropt.realization_filter.default.SortConstraintOptions" href="#ropt.realization_filter.default.SortConstraintOptions"><code>SortConstraintOptions</code></a>.</p>
-</li>
-<li>
-<p><code>cvar-objective</code>:
-    Calculates realization weights using the Conditional Value-at-Risk (CVaR)
-    method applied to a weighted sum of specified objective function values.
-    Weights are assigned based on a specified <code>percentile</code> of the worst-performing
-    realizations (highest objective values for minimization). Interpolation is
-    used if the percentile boundary falls between realizations.
-    Requires options defined by
-    <a class="autorefs autorefs-internal" title="            ropt.realization_filter.default.CVaRObjectiveOptions" href="#ropt.realization_filter.default.CVaRObjectiveOptions"><code>CVaRObjectiveOptions</code></a>.</p>
-</li>
-<li>
-<p><code>cvar-constraint</code>:
-    Calculates realization weights using the CVaR method applied to the
-    value of a single specified constraint function. Weights are assigned
-    based on a specified <code>percentile</code> of the worst-performing realizations
-    (definition of "worst" depends on the constraint type: LE, GE, or EQ).
-    Interpolation is used if the percentile boundary falls between
-    realizations.
-    Requires options defined by
-    <a class="autorefs autorefs-internal" title="            ropt.realization_filter.default.CVaRConstraintOptions" href="#ropt.realization_filter.default.CVaRConstraintOptions"><code>CVaRConstraintOptions</code></a>.</p>
-</li>
+<li><strong><code>sort-objective</code></strong>:
+    Sorts realizations by a weighted combination of selected objective
+    values, then keeps only the realizations whose rank falls within the
+    configured inclusive range <code>[first, last]</code>.</li>
+<li><strong><code>sort-constraint</code></strong>:
+    Sorts realizations by a selected constraint value, then keeps only the
+    realizations whose rank falls within the configured inclusive range
+    <code>[first, last]</code>.</li>
+<li><strong><code>cvar-objective</code></strong>:
+    Assigns weights to the worst-performing realizations according to a CVaR
+    selection on a weighted combination of selected objective values.</li>
+<li><strong><code>cvar-constraint</code></strong>:
+    Assigns weights to the worst-performing realizations according to a CVaR
+    selection on a selected constraint value, with the definition of "worst"
+    determined by the constraint type.</li>
+</ul>
+<p>Each method validates and uses its corresponding options model:</p>
+<ul>
+<li><a class="autorefs autorefs-internal" title="            ropt.realization_filter.default.SortObjectiveOptions" href="#ropt.realization_filter.default.SortObjectiveOptions"><code>SortObjectiveOptions</code></a></li>
+<li><a class="autorefs autorefs-internal" title="            ropt.realization_filter.default.SortConstraintOptions" href="#ropt.realization_filter.default.SortConstraintOptions"><code>SortConstraintOptions</code></a></li>
+<li><a class="autorefs autorefs-internal" title="            ropt.realization_filter.default.CVaRObjectiveOptions" href="#ropt.realization_filter.default.CVaRObjectiveOptions"><code>CVaRObjectiveOptions</code></a></li>
+<li><a class="autorefs autorefs-internal" title="            ropt.realization_filter.default.CVaRConstraintOptions" href="#ropt.realization_filter.default.CVaRConstraintOptions"><code>CVaRConstraintOptions</code></a></li>
 </ul>
 
 
