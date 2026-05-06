@@ -284,7 +284,9 @@ class _ResultsTable:
             return True
         return False
 
-    def get_table(self, sep: str) -> pd.DataFrame | None:
+    def get_table(self, sep: str) -> pd.DataFrame:
+        if not self._frames:
+            return pd.DataFrame()
         data = pd.concat(self._frames)
         reordered_columns = [
             name
