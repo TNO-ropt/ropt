@@ -81,6 +81,7 @@ class FunctionEvaluator(Evaluator):
                     variables.shape[0],
                 )
         return EvaluatorResult(
+            batch_id=self._batch_id,
             objectives=results[:, :no],
             constraints=results[:, no:] if nc > 0 else None,
             evaluation_info=evaluation_info,
