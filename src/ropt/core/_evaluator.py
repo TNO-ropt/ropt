@@ -79,7 +79,7 @@ class EnsembleEvaluator:
         self._function_estimators = self._init_function_estimators()
         rng = default_rng(context.variables.seed)
         self._samplers = self._init_samplers(rng)
-        self._cache_for_gradient: FunctionResults | None = None
+        self._cached_results: FunctionResults | None = None
 
     def calculate(
         self,
@@ -112,9 +112,25 @@ class EnsembleEvaluator:
         """
         assert compute_functions or compute_gradients
 
+        # Invalidate the cached results if not usable:
+        if self._cached_results is not None and not np.allclose(
+            self._cached_results.evaluations.variables,
+            variables,
+            rtol=0.0,
+            atol=1e-15,
+        ):
+            self._cached_results = None
+
         # Only functions:
         if compute_functions and not compute_gradients:
-            return self._calculate_functions(variables)
+            if self._cached_results is not None:
+                return (self._cached_results,)
+            functions = self._calculate_functions(variables)
+            # Gradient-based methods are currently not parallelized, and there is
+            # only one function result. That function may be needed in a gradient
+            # calculation, so it is cached here:
+            self._cached_results = functions[0]
+            return functions
 
         # Parallel evaluation is not supported for gradient-based optimizers:
         assert variables.ndim == 1
@@ -123,23 +139,23 @@ class EnsembleEvaluator:
         if (
             compute_gradients
             and not compute_functions
-            and self._cache_for_gradient is not None
-            and np.allclose(
-                self._cache_for_gradient.evaluations.variables,
-                variables,
-                rtol=0.0,
-                atol=1e-15,
-            )
+            and self._cached_results is not None
         ):
-            # This assumes that the cached function value is calculated with the
-            # same parameters as the gradient is to be calculated. This is true
-            # because each optimization step is a single optimizer run and uses
-            # its own copy of an `EnsembleFunctionEvaluation` object.
-            return self._calculate_gradients(variables, self._context.variables.mask)
+            return self._calculate_gradients(
+                variables, self._context.variables.mask, self._cached_results
+            )
 
         # A function + gradient, or a gradient without cached function:
-        self._cache_for_gradient = None
-        return self._calculate_both(variables, self._context.variables.mask)
+        function_results, gradient_results = self._calculate_both(
+            variables, self._context.variables.mask
+        )
+
+        if compute_functions:
+            return function_results, gradient_results
+
+        # Only gradients are requested. Cache the function results:
+        self._cached_results = function_results
+        return (gradient_results,)
 
     def _calculate_functions(
         self, variables: NDArray[np.float64]
@@ -147,7 +163,7 @@ class EnsembleEvaluator:
         if variables.ndim == 1:
             variables = variables[np.newaxis, :]
         active_realizations = _get_active_realizations(self._context)
-        function_results = tuple(
+        return tuple(
             self._calculate_one_set_of_functions(
                 f_eval_results, variables[idx, :], active_realizations
             )
@@ -158,13 +174,6 @@ class EnsembleEvaluator:
                 active_realizations,
             )
         )
-
-        # Gradient-based methods are currently not parallelized, and there is
-        # only one function result. That function may be needed in a gradient
-        # calculation, so it is cached here:
-        self._cache_for_gradient = function_results[0]
-
-        return function_results
 
     def _calculate_one_set_of_functions(
         self,
@@ -228,6 +237,7 @@ class EnsembleEvaluator:
         self,
         variables: NDArray[np.float64],
         mask: NDArray[np.bool_] | None,
+        cached_function: FunctionResults,
     ) -> tuple[GradientResults]:
         perturbed_variables = _perturb_variables(
             self._context, variables, self._samplers
@@ -235,13 +245,12 @@ class EnsembleEvaluator:
 
         # No functions are computed in this case, instead they must have been
         # computed in a previous run, with the results stored in the
-        # cached_result argument. In that case, we can skip any realizations
+        # cached_function argument. In that case, we can skip any realizations
         # that have a weight equal to zero, we we pull those from the cached
         # results.
-        assert self._cache_for_gradient is not None
-        assert self._cache_for_gradient.realizations is not None
-        objective_weights = self._cache_for_gradient.realizations.objective_weights
-        constraint_weights = self._cache_for_gradient.realizations.constraint_weights
+        assert cached_function.realizations is not None
+        objective_weights = cached_function.realizations.objective_weights
+        constraint_weights = cached_function.realizations.constraint_weights
 
         active_realizations = _get_active_realizations(
             self._context,
@@ -257,7 +266,7 @@ class EnsembleEvaluator:
 
         assert self._context.gradient.perturbation_min_success is not None
         failed_realizations = _get_failed_realizations(
-            self._cache_for_gradient.evaluations.objectives,
+            cached_function.evaluations.objectives,
             g_eval_results.perturbed_objectives,
             self._context.gradient.perturbation_min_success,
         )
@@ -270,8 +279,8 @@ class EnsembleEvaluator:
                 variables,
                 mask,
                 perturbed_variables,
-                self._cache_for_gradient.evaluations.objectives,
-                self._cache_for_gradient.evaluations.constraints,
+                cached_function.evaluations.objectives,
+                cached_function.evaluations.constraints,
                 g_eval_results.perturbed_objectives,
                 g_eval_results.perturbed_constraints,
                 objective_weights,
