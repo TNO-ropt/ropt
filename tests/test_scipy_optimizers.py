@@ -39,7 +39,7 @@ def config_fixture() -> dict[str, Any]:
             "perturbation_magnitudes": 0.0001,
         },
         "backend": {
-            "convergence_tolerance": 1e-5,
+            "convergence_tolerance": 1e-6,
             "max_iterations": 25,
         },
         "objectives": {
@@ -190,7 +190,7 @@ def test_scipy_bound_constraints(config: Any, method: str, evaluator: Any) -> No
     config["variables"]["lower_bounds"] = [0.15, 0.0, 0.0]
     config["variables"]["upper_bounds"] = [0.5, 0.5, 0.2]
     optimizer = BasicOptimizer(config, evaluator())
-    optimizer.run([0.2, *initial_values[1:]])
+    optimizer.run([0.2, 0.1, 0.1])
     assert optimizer.results is not None
     assert np.allclose(
         optimizer.results.evaluations.variables, [0.15, 0.0, 0.2], atol=0.02

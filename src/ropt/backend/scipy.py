@@ -226,7 +226,7 @@ class SciPyBackend(Backend):
             upper_bounds = self._context.variables.upper_bounds[
                 self._context.variables.mask
             ]
-            return Bounds(lower_bounds, upper_bounds)
+            return Bounds(lower_bounds, upper_bounds, keep_feasible=self._keep_feasible)
         return None
 
     def _get_constraint_bounds(
@@ -369,7 +369,11 @@ class SciPyBackend(Backend):
             assert lin_coef is not None
             assert lin_lower is not None
             assert lin_upper is not None
-            constraints.append(LinearConstraint(lin_coef, lin_lower, lin_upper))
+            constraints.append(
+                LinearConstraint(
+                    lin_coef, lin_lower, lin_upper, keep_feasible=self._keep_feasible
+                )
+            )
         if self._normalized_constraints is not None:
             ub = np.fromiter(
                 (
@@ -381,12 +385,21 @@ class SciPyBackend(Backend):
             lb = np.zeros_like(ub)
             if self._method in _NO_GRADIENT:
                 constraints.append(
-                    NonlinearConstraint(fun=self._fun_object, lb=lb, ub=ub)
+                    NonlinearConstraint(
+                        fun=self._fun_object,
+                        lb=lb,
+                        ub=ub,
+                        keep_feasible=self._keep_feasible,
+                    )
                 )
             else:
                 constraints.append(
                     NonlinearConstraint(
-                        fun=self._fun_object, jac=self._jac_object, lb=lb, ub=ub
+                        fun=self._fun_object,
+                        jac=self._jac_object,
+                        lb=lb,
+                        ub=ub,
+                        keep_feasible=self._keep_feasible,
                     )
                 )
         return constraints
@@ -536,6 +549,9 @@ class SciPyBackend(Backend):
             if isinstance(self._config.options, dict)
             else {}
         )
+
+        self._keep_feasible = options.pop("keep_feasible", False)
+
         # The maximum number of iterations is passed as an option to ropt.
         # Setting maxiter directly as an entry in the options dict will also
         # work, but iterations will override it.
@@ -558,12 +574,22 @@ class SciPyBackend(Backend):
 
 
 SCIPY_OPTIONS_SCHEMA: dict[str, Any] = {
+    "notes": {
+        "feasible": (
+            "The `keep_feasible` option is used to maintain feasibility with respect to "
+            "bound, linear and non-linear constraints, by passing it to the constraint "
+            "handling code of the underlying SciPy optimizer. Some algorithms may choose "
+            "to ignore this option."
+        ),
+    },
     "common": {
         "options": {
             "disp": bool,
             "maxiter": int,
+            "keep_feasible": bool,
         },
         "url": "https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.minimize.html#scipy.optimize.minimize",
+        "notes": ["feasible"],
     },
     "methods": {
         "Nelder-Mead": {
