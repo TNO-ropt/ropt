@@ -2829,8 +2829,19 @@ options are passed through the <code>options</code> dictionary. Click on the com
 options or the method name for the corresponding
 <a href="https://docs.scipy.org/doc/scipy/reference/optimize.html"><code>scipy.optimize</code></a>
 documentation:</p>
-<p><strong>Common Options<sup>1</sup>:</strong></p>
+<p><strong>Common Options:</strong></p>
 <p><a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.minimize.html#scipy.optimize.minimize">disp, maxiter, keep_feasible</a></p>
+<p>The <code>keep_feasible</code> option is used to maintain feasibility with
+respect to bound, linear and non-linear constraints, by passing
+it to the constraint handling code of the underlying SciPy
+optimizer. Some algorithms may choose to ignore this option.</p>
+<p><strong>Hessian Options:</strong></p>
+<p><a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.minimize.html#scipy.optimize.minimize">hess, exception_strategy, min_curvature, min_denominator, init_scale</a></p>
+<p>These options are used to configure the Hessian approximation
+method for the optimizer. The <code>hess</code> option specifies the type
+of Hessian approximation to use (<code>"BFGS"</code> or <code>"SR1"</code>), while the
+other options provide additional parameters for the chosen
+method.</p>
 <p><strong>Method-specific Options:</strong></p>
 <table>
 <thead>
@@ -2861,11 +2872,11 @@ documentation:</p>
 <td>xtol, eps, c1, c2</td>
 </tr>
 <tr>
-<td><a href="https://docs.scipy.org/doc/scipy/reference/optimize.minimize-lbfgsb.html">L-BFGS-B</a><sup>2</sup></td>
+<td><a href="https://docs.scipy.org/doc/scipy/reference/optimize.minimize-lbfgsb.html">L-BFGS-B</a><sup>1</sup></td>
 <td><em>disp</em>, maxcor, ftol, gtol, eps, maxfun, iprint, maxls, finite_diff_rel_step</td>
 </tr>
 <tr>
-<td><a href="https://docs.scipy.org/doc/scipy/reference/optimize.minimize-tnc.html">TNC</a><sup>3</sup></td>
+<td><a href="https://docs.scipy.org/doc/scipy/reference/optimize.minimize-tnc.html">TNC</a><sup>2</sup></td>
 <td>maxfun, eps, scale, offset, maxCGit, eta, stepmx, accuracy, minfev, ftol, xtol, gtol, rescale, finite_diff_rel_step, <del>maxiter</del></td>
 </tr>
 <tr>
@@ -2892,7 +2903,6 @@ documentation:</p>
 </table>
 <p><strong>Notes:</strong></p>
 <ol>
-<li>The <code>keep_feasible</code> option is used to maintain feasibility with respect to bound, linear and non-linear constraints, by passing it to the constraint handling code of the underlying SciPy optimizer. Some algorithms may choose to ignore this option.</li>
 <li>Options in <em>italics</em> override a common option with a different type or behavior.</li>
 <li>Options with <del>strikethrough</del> indicate a common option that is not supported.</li>
 </ol>
