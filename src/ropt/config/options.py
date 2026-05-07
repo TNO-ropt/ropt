@@ -33,6 +33,10 @@ class OptionsSchemaModel(BaseModel):
 
     Attributes:
         methods: A list of method schemas.
+        common:  An optional method schema that defines common options shared by
+                 all methods.
+        notes:   A dictionary of notes for options, where the key is the option
+                 name and the value is the note text.
 
     **Example**:
     ```py
@@ -58,6 +62,7 @@ class OptionsSchemaModel(BaseModel):
 
     methods: dict[str, MethodSchemaModel[Any]]
     common: MethodSchemaModel[Any] | None = None
+    notes: dict[str, str] = {}
 
     model_config = ConfigDict(extra="forbid", frozen=True)
 
@@ -144,13 +149,45 @@ class MethodSchemaModel(BaseModel, Generic[T]):
         options: A dictionary of option names and their types.
         url:     An optional URL for the plugin.
         exclude: A set of common options to exclude for this method.
+        notes:   Optional notes, keys into the notes dictionary.
     """
 
     options: dict[str, T]
     url: HttpUrl | None = None
     exclude: set[str] = set()
+    notes: list[str] = []
 
     model_config = ConfigDict(extra="forbid", frozen=True)
+
+
+def _get_common_options(
+    options_schema: OptionsSchemaModel, notes: dict[str, str]
+) -> str:
+    common_string = ""
+    if options_schema.common is not None:
+        common_options = ", ".join(key for key in options_schema.common.options)
+        if options_schema.common.url is not None:
+            common_options = f"[{common_options}]({options_schema.common.url})"
+        title = "Common Options"
+        if note_numbers := [
+            _new_note(notes, note, options_schema.notes[note])
+            for note in options_schema.common.notes
+        ]:
+            title += "^" + ",".join(str(num) for num in note_numbers) + "^"
+        common_string = f"**{title}:**\n\n{common_options}\n"
+
+    return common_string + dedent("""
+    **Method-specific Options:**
+
+    | Method | Options |
+    |--------|---------|
+    """)
+
+
+def _new_note(notes: dict[str, str], key: str, note: str) -> int:
+    if key not in notes:
+        notes[key] = note
+    return list(notes).index(key) + 1
 
 
 def gen_options_table(schema: dict[str, Any]) -> str:
@@ -173,58 +210,64 @@ def gen_options_table(schema: dict[str, Any]) -> str:
     """
     options_schema = OptionsSchemaModel.model_validate(schema)
 
-    common_string = ""
-    common_options = set()
-    if options_schema.common is not None:
-        options = ", ".join(key for key in options_schema.common.options)
-        if options_schema.common.url is not None:
-            options = f"[{options}]({options_schema.common.url})"
-        common_string = f"**Common Options:**\n\n{options}\n"
-        common_options = set(options_schema.common.options)
+    notes: dict[str, str] = {}
 
-    docstring = dedent("""
-    **Method-specific Options:**
+    docstring = _get_common_options(options_schema, notes)
 
-    | Method | Options |
-    |--------|---------|
-    """)
+    common_options = (
+        set() if options_schema.common is None else set(options_schema.common.options)
+    )
 
-    override_note: int | None = None
-    exclude_note: int | None = None
-    notes: list[str] = []
     for method, method_schema in options_schema.methods.items():
-        method_string = (
-            method if method_schema.url is None else f"[{method}]({method_schema.url})"
-        )
-        options = ", ".join(
+        method_notes: list[int] = []
+        method_options = [
             f"*{key}*" if key in common_options else key
             for key in method_schema.options
-        )
+        ]
+
         if set(method_schema.options).intersection(common_options):
-            if override_note is None:
-                override_note = len(notes) + 1
-                notes.append(
-                    f"{override_note}. Options in *italics* override a common option "
-                    "with a different type or behavior."
+            method_notes.append(
+                _new_note(
+                    notes,
+                    "__override_note__",
+                    "Options in *italics* override a common option with a different type or behavior.",
                 )
-            method_string += f"^{override_note}^"
+            )
 
         if method_schema.exclude:
             exclude = ", ".join(f"~~{key}~~" for key in method_schema.exclude)
-            if exclude_note is None:
-                exclude_note = len(notes) + 1
-                notes.append(
-                    f"{exclude_note}. Options with ~~strikethrough~~ indicate a common "
-                    "option that is not supported."
+            method_notes.append(
+                _new_note(
+                    notes,
+                    "__exclude_note__",
+                    "Options with ~~strikethrough~~ indicate a common option that is not supported.",
                 )
-            method_string += f"^{exclude_note}^"
-            options_string = f"{options}, {exclude}"
-        else:
-            options_string = options
-        docstring += f"|{method_string}|{options_string}|\n"
+            )
+            method_options.append(exclude)
+
+        method_notes.extend(
+            _new_note(notes, note, options_schema.notes[note])
+            for note in method_schema.notes
+        )
+
+        method_name = (
+            method if method_schema.url is None else f"[{method}]({method_schema.url})"
+        )
+        if method_notes:
+            method_name += (
+                "^" + ",".join(str(note) for note in sorted(method_notes)) + "^"
+            )
+
+        docstring += "|" + method_name + "|" + ", ".join(method_options) + "|\n"
 
     if notes:
         notes_string = "Notes" if len(notes) > 1 else "Note"
-        docstring += f"\n**{notes_string}:**\n\n" + "\n".join(notes) + "\n"
+        docstring += (
+            f"\n**{notes_string}:**\n\n"
+            + "\n".join(
+                f"{num}. {text}" for num, text in enumerate(notes.values(), start=1)
+            )
+            + "\n"
+        )
 
-    return common_string + docstring
+    return docstring
