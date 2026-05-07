@@ -1940,9 +1940,30 @@
 
     <div class="doc doc-contents first">
 
-        <p>Provides functionality for sampler objects.</p>
-<p>Samplers are used by the optimization process to generate perturbed variable
-vectors. This module allows for the extension of <code>ropt</code> with custom samplers.</p>
+        <p>Public API for sampler implementations.</p>
+<p>Samplers generate perturbation values for optimization variables during gradient
+estimation. In ensemble-based workflows, these perturbations are used to
+evaluate objective and constraint functions under variable perturbations.</p>
+<p><strong>Core Interface</strong></p>
+<p>All sampler implementations inherit from the <a class="autorefs autorefs-internal" title="            Sampler" href="#ropt.sampler.Sampler"><code>Sampler</code></a>
+base class, which defines the sampler lifecycle (<code>__init__</code>, <code>init</code>) and the
+required sample generation method (<code>generate_samples</code>).</p>
+<p><strong>Integration with Optimization</strong></p>
+<p>Samplers are accessed via an <a class="autorefs autorefs-internal" title="            EnOptContext" href="../context/#ropt.context.EnOptContext"><code>EnOptContext</code></a> object
+through its <code>samplers</code> field, a tuple of sampler instances. Samplers are
+instantiated either directly as objects or via
+<a class="autorefs autorefs-internal" title="            SamplerConfig" href="../config/#ropt.config.SamplerConfig"><code>SamplerConfig</code></a> objects, which are used by the
+plugin system to create instances based on the configured method string (e.g.,
+<code>"default"</code> or <code>"sobol"</code>).</p>
+<p><strong>Built-in and Custom Samplers</strong></p>
+<p>The <a class="autorefs autorefs-internal" title="            ropt.sampler.scipy.SciPySampler" href="#ropt.sampler.scipy.SciPySampler"><code>SciPySampler</code></a> class provides sampling
+methods backed by <code>scipy.stats</code> and <code>scipy.stats.qmc</code>.</p>
+<p>Users can implement custom samplers by subclassing <code>Sampler</code>. Those subclasses
+can be instantiated directly and passed into an
+<a class="autorefs autorefs-internal" title="            EnOptContext" href="../context/#ropt.context.EnOptContext"><code>EnOptContext</code></a> object through its <code>samplers</code> field.
+Registering a custom sampler with the plugin system is optional and only
+required when the sampler should be selected and configured via <code>SamplerConfig</code>
+objects instead of being instantiated explicitly by the user.</p>
 
 
 
@@ -1978,16 +1999,28 @@ vectors. This module allows for the extension of <code>ropt</code> with custom s
 
 
 
-        <p>Abstract Base Class for Sampler Implementations.</p>
-<p>This class defines the fundamental interface for all concrete sampler
-implementations within the <code>ropt</code> framework. Samplers provide classes
-derived from <code>Sampler</code> that encapsulate the logic of specific sampling
-algorithms or strategies used to generate perturbed variable vectors for the
-optimization process.</p>
-<p>The core functionality, generating samples, is performed by the
-<code>generate_samples</code> method, which must be implemented by subclasses.</p>
-<p>Subclasses must implement a <code>generate_samples</code> that contains the sample
-generation logic.</p>
+        <p>Abstract base class for sampler implementations.</p>
+<p>All concrete sampler implementations must inherit from this class and
+implement the required lifecycle and sample-generation methods. Samplers
+are responsible for generating perturbation values that are applied to
+optimization variables when estimating gradients.</p>
+<p><strong>Lifecycle</strong></p>
+<ol>
+<li>Instantiation via <code>__init__</code>: Called by the plugin system with a
+   configuration object.</li>
+<li>Setup via <code>init</code>: Called once per optimization workflow with the
+   <a class="autorefs autorefs-internal" title="            EnOptContext" href="../context/#ropt.context.EnOptContext"><code>EnOptContext</code></a>, a variable mask, and a
+   random number generator.</li>
+<li>Sampling via <code>generate_samples</code>: Called repeatedly during optimization
+   whenever perturbed variable vectors are needed.</li>
+</ol>
+<p>Subclasses must implement:</p>
+<ul>
+<li><code>__init__</code>: Stores sampler configuration and performs lightweight setup.</li>
+<li><code>init</code>: Receives context-dependent inputs for workflow-specific setup.</li>
+<li><code>generate_samples</code>: Returns perturbation samples with the expected shape
+  and masking semantics.</li>
+</ul>
 
 
 
@@ -2024,7 +2057,10 @@ generation logic.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Initialize the sampler object.</p>
+        <p>Create a new sampler instance.</p>
+<p>Called during instantiation. Subclasses should store the configuration
+and perform any lightweight initialization. Validation and
+context-dependent setup should usually be deferred to <code>init</code>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2047,7 +2083,8 @@ generation logic.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The configuration object containing settings for this sampler.</p>
+                <p>Configuration object specifying the sampler method
+and any method-specific options.</p>
               </div>
             </td>
             <td>
@@ -2088,9 +2125,11 @@ generation logic.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Initialize the sampler object.</p>
-<p>Sets the internal state of the sampler, including the variable mask and
-random number generator.</p>
+        <p>Finalize initialization after the optimization context is known.</p>
+<p>Called once at the start of each optimization workflow, after all
+configuration is finalized. Use this method to store the active
+context, receive the variable subset handled by this sampler, and
+initialize random-state dependent internals.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2129,7 +2168,9 @@ random number generator.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional boolean mask for variable subset sampling.</p>
+                <p>Optional boolean mask selecting the variables handled by this
+sampler. If <code>None</code>, the sampler is responsible for all
+variables.</p>
               </div>
             </td>
             <td>
@@ -2145,7 +2186,8 @@ random number generator.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>NumPy random number generator instance.</p>
+                <p>NumPy random number generator instance for stochastic
+sampling methods.</p>
               </div>
             </td>
             <td>
@@ -2182,9 +2224,8 @@ random number generator.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Generate and return an array of sampled perturbation values.</p>
-<p>This method must return a three-dimensional NumPy array containing the
-generated perturbation samples. The shape of the array should be
+        <p>Generate perturbation samples for optimization variables.</p>
+<p>Returns a three-dimensional NumPy array with shape
 <code>(n_realizations, n_perturbations, n_variables)</code>, where:</p>
 <ul>
 <li><code>n_realizations</code> is the number of realizations in the ensemble.</li>
@@ -2193,8 +2234,9 @@ generated perturbation samples. The shape of the array should be
 </ul>
 <p>If the <code>shared</code> flag is <code>True</code> in the associated
 <a class="autorefs autorefs-internal" title="            SamplerConfig" href="../config/#ropt.config.SamplerConfig"><code>SamplerConfig</code></a>, the first dimension
-(realizations) should have a size of 1. The framework will broadcast
-these shared samples across all realizations.</p>
+still has size <code>n_realizations</code>. Implementations may internally
+generate a single realization of samples and broadcast that internally
+before returning.</p>
 <p>If a boolean <code>mask</code> was provided during initialization, this sampler
 instance is responsible only for a subset of variables (where the mask
 is <code>True</code>). The returned array must still have the full <code>n_variables</code>
@@ -2205,8 +2247,8 @@ size along the last axis. However, values corresponding to variables
 <details class="note" open>
   <summary>Sample Scaling and Perturbation Magnitudes</summary>
   <p>The generated samples represent <em>unscaled</em> perturbations. During the
-gradient estimation process, these samples will be multiplied element-wise
-by the <code>perturbation_magnitudes</code> defined in the
+gradient estimation process, these samples are multiplied
+element-wise by the <code>perturbation_magnitudes</code> defined in the
 <a class="autorefs autorefs-internal" title="            GradientConfig" href="../config/#ropt.config.GradientConfig"><code>GradientConfig</code></a>.</p>
 <p>Therefore, it is generally recommended that sampler implementations
 produce samples with a characteristic scale of approximately one
@@ -2231,7 +2273,7 @@ the perturbations applied to the variables.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A 3D NumPy array of sampled perturbation values.</p>
+                <p>A 3D NumPy array of perturbation values.</p>
               </div>
             </td>
           </tr>
@@ -2282,16 +2324,28 @@ the perturbations applied to the variables.</p>
 
 
 
-        <p>Abstract Base Class for Sampler Implementations.</p>
-<p>This class defines the fundamental interface for all concrete sampler
-implementations within the <code>ropt</code> framework. Samplers provide classes
-derived from <code>Sampler</code> that encapsulate the logic of specific sampling
-algorithms or strategies used to generate perturbed variable vectors for the
-optimization process.</p>
-<p>The core functionality, generating samples, is performed by the
-<code>generate_samples</code> method, which must be implemented by subclasses.</p>
-<p>Subclasses must implement a <code>generate_samples</code> that contains the sample
-generation logic.</p>
+        <p>Abstract base class for sampler implementations.</p>
+<p>All concrete sampler implementations must inherit from this class and
+implement the required lifecycle and sample-generation methods. Samplers
+are responsible for generating perturbation values that are applied to
+optimization variables when estimating gradients.</p>
+<p><strong>Lifecycle</strong></p>
+<ol>
+<li>Instantiation via <code>__init__</code>: Called by the plugin system with a
+   configuration object.</li>
+<li>Setup via <code>init</code>: Called once per optimization workflow with the
+   <a class="autorefs autorefs-internal" title="            EnOptContext" href="../context/#ropt.context.EnOptContext"><code>EnOptContext</code></a>, a variable mask, and a
+   random number generator.</li>
+<li>Sampling via <code>generate_samples</code>: Called repeatedly during optimization
+   whenever perturbed variable vectors are needed.</li>
+</ol>
+<p>Subclasses must implement:</p>
+<ul>
+<li><code>__init__</code>: Stores sampler configuration and performs lightweight setup.</li>
+<li><code>init</code>: Receives context-dependent inputs for workflow-specific setup.</li>
+<li><code>generate_samples</code>: Returns perturbation samples with the expected shape
+  and masking semantics.</li>
+</ul>
 
 
 
@@ -2328,7 +2382,10 @@ generation logic.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Initialize the sampler object.</p>
+        <p>Create a new sampler instance.</p>
+<p>Called during instantiation. Subclasses should store the configuration
+and perform any lightweight initialization. Validation and
+context-dependent setup should usually be deferred to <code>init</code>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2351,7 +2408,8 @@ generation logic.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The configuration object containing settings for this sampler.</p>
+                <p>Configuration object specifying the sampler method
+and any method-specific options.</p>
               </div>
             </td>
             <td>
@@ -2392,9 +2450,11 @@ generation logic.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Initialize the sampler object.</p>
-<p>Sets the internal state of the sampler, including the variable mask and
-random number generator.</p>
+        <p>Finalize initialization after the optimization context is known.</p>
+<p>Called once at the start of each optimization workflow, after all
+configuration is finalized. Use this method to store the active
+context, receive the variable subset handled by this sampler, and
+initialize random-state dependent internals.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2433,7 +2493,9 @@ random number generator.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional boolean mask for variable subset sampling.</p>
+                <p>Optional boolean mask selecting the variables handled by this
+sampler. If <code>None</code>, the sampler is responsible for all
+variables.</p>
               </div>
             </td>
             <td>
@@ -2449,7 +2511,8 @@ random number generator.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>NumPy random number generator instance.</p>
+                <p>NumPy random number generator instance for stochastic
+sampling methods.</p>
               </div>
             </td>
             <td>
@@ -2486,9 +2549,8 @@ random number generator.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Generate and return an array of sampled perturbation values.</p>
-<p>This method must return a three-dimensional NumPy array containing the
-generated perturbation samples. The shape of the array should be
+        <p>Generate perturbation samples for optimization variables.</p>
+<p>Returns a three-dimensional NumPy array with shape
 <code>(n_realizations, n_perturbations, n_variables)</code>, where:</p>
 <ul>
 <li><code>n_realizations</code> is the number of realizations in the ensemble.</li>
@@ -2497,8 +2559,9 @@ generated perturbation samples. The shape of the array should be
 </ul>
 <p>If the <code>shared</code> flag is <code>True</code> in the associated
 <a class="autorefs autorefs-internal" title="            SamplerConfig" href="../config/#ropt.config.SamplerConfig"><code>SamplerConfig</code></a>, the first dimension
-(realizations) should have a size of 1. The framework will broadcast
-these shared samples across all realizations.</p>
+still has size <code>n_realizations</code>. Implementations may internally
+generate a single realization of samples and broadcast that internally
+before returning.</p>
 <p>If a boolean <code>mask</code> was provided during initialization, this sampler
 instance is responsible only for a subset of variables (where the mask
 is <code>True</code>). The returned array must still have the full <code>n_variables</code>
@@ -2509,8 +2572,8 @@ size along the last axis. However, values corresponding to variables
 <details class="note" open>
   <summary>Sample Scaling and Perturbation Magnitudes</summary>
   <p>The generated samples represent <em>unscaled</em> perturbations. During the
-gradient estimation process, these samples will be multiplied element-wise
-by the <code>perturbation_magnitudes</code> defined in the
+gradient estimation process, these samples are multiplied
+element-wise by the <code>perturbation_magnitudes</code> defined in the
 <a class="autorefs autorefs-internal" title="            GradientConfig" href="../config/#ropt.config.GradientConfig"><code>GradientConfig</code></a>.</p>
 <p>Therefore, it is generally recommended that sampler implementations
 produce samples with a characteristic scale of approximately one
@@ -2535,7 +2598,7 @@ the perturbations applied to the variables.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A 3D NumPy array of sampled perturbation values.</p>
+                <p>A 3D NumPy array of perturbation values.</p>
               </div>
             </td>
           </tr>
