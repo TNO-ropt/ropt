@@ -1,4 +1,9 @@
-"""This module defines the abstract base class for samplers."""
+"""Abstract base class for sampler implementations.
+
+Samplers generate perturbation values for optimization variables during
+gradient estimation. This module defines the interface that all concrete
+sampler implementations must follow.
+"""
 
 from __future__ import annotations
 
@@ -15,50 +20,69 @@ if TYPE_CHECKING:
 
 
 class Sampler(ABC):
-    """Abstract Base Class for Sampler Implementations.
+    """Abstract base class for sampler implementations.
 
-    This class defines the fundamental interface for all concrete sampler
-    implementations within the `ropt` framework. Samplers provide classes
-    derived from `Sampler` that encapsulate the logic of specific sampling
-    algorithms or strategies used to generate perturbed variable vectors for the
-    optimization process.
+    All concrete sampler implementations must inherit from this class and
+    implement the required lifecycle and sample-generation methods. Samplers
+    are responsible for generating perturbation values that are applied to
+    optimization variables when estimating gradients.
 
-    The core functionality, generating samples, is performed by the
-    `generate_samples` method, which must be implemented by subclasses.
+    **Lifecycle**
 
-    Subclasses must implement a `generate_samples` that contains the sample
-    generation logic.
+    1. Instantiation via `__init__`: Called by the plugin system with a
+       configuration object.
+    2. Setup via `init`: Called once per optimization workflow with the
+       [`EnOptContext`][ropt.context.EnOptContext], a variable mask, and a
+       random number generator.
+    3. Sampling via `generate_samples`: Called repeatedly during optimization
+       whenever perturbed variable vectors are needed.
+
+    Subclasses must implement:
+
+    - `__init__`: Stores sampler configuration and performs lightweight setup.
+    - `init`: Receives context-dependent inputs for workflow-specific setup.
+    - `generate_samples`: Returns perturbation samples with the expected shape
+      and masking semantics.
     """
 
     @abstractmethod
     def __init__(self, sampler_config: SamplerConfig) -> None:
-        """Initialize the sampler object.
+        """Create a new sampler instance.
+
+        Called during instantiation. Subclasses should store the configuration
+        and perform any lightweight initialization. Validation and
+        context-dependent setup should usually be deferred to `init`.
 
         Args:
-            sampler_config: The configuration object containing settings for this sampler.
+            sampler_config: Configuration object specifying the sampler method
+                and any method-specific options.
         """
 
     @abstractmethod
     def init(
         self, context: EnOptContext, mask: NDArray[np.bool_] | None, rng: Generator
     ) -> None:
-        """Initialize the sampler object.
+        """Finalize initialization after the optimization context is known.
 
-        Sets the internal state of the sampler, including the variable mask and
-        random number generator.
+        Called once at the start of each optimization workflow, after all
+        configuration is finalized. Use this method to store the active
+        context, receive the variable subset handled by this sampler, and
+        initialize random-state dependent internals.
 
         Args:
             context: The main EnOpt context object.
-            mask:    Optional boolean mask for variable subset sampling.
-            rng:     NumPy random number generator instance.
+            mask: Optional boolean mask selecting the variables handled by this
+                sampler. If `None`, the sampler is responsible for all
+                variables.
+            rng: NumPy random number generator instance for stochastic
+                sampling methods.
         """
 
     @abstractmethod
     def generate_samples(self) -> NDArray[np.float64]:
-        """Generate and return an array of sampled perturbation values.
+        """Generate perturbation samples for optimization variables.
 
-        This method must return a three-dimensional NumPy array containing the
-        generated perturbation samples. The shape of the array should be
+        Returns a three-dimensional NumPy array with shape
         `(n_realizations, n_perturbations, n_variables)`, where:
 
         - `n_realizations` is the number of realizations in the ensemble.
@@ -67,8 +91,9 @@ class Sampler(ABC):
 
         If the `shared` flag is `True` in the associated
         [`SamplerConfig`][ropt.config.SamplerConfig], the first dimension
-        (realizations) should have a size of 1. The framework will broadcast
-        these shared samples across all realizations.
+        still has size `n_realizations`. Implementations may internally
+        generate a single realization of samples and broadcast that internally
+        before returning.
 
         If a boolean `mask` was provided during initialization, this sampler
         instance is responsible only for a subset of variables (where the mask
@@ -78,8 +103,8 @@ class Sampler(ABC):
 
         Note: Sample Scaling and Perturbation Magnitudes
             The generated samples represent *unscaled* perturbations. During the
-            gradient estimation process, these samples will be multiplied element-wise
-            by the `perturbation_magnitudes` defined in the
+            gradient estimation process, these samples are multiplied
+            element-wise by the `perturbation_magnitudes` defined in the
             [`GradientConfig`][ropt.config.GradientConfig].
 
             Therefore, it is generally recommended that sampler implementations
@@ -90,5 +115,5 @@ class Sampler(ABC):
             the perturbations applied to the variables.
 
         Returns:
-            A 3D NumPy array of sampled perturbation values.
+            A 3D NumPy array of perturbation values.
         """
