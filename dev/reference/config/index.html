@@ -4034,6 +4034,30 @@ describing a method supported by the plugin.</p>
               </div>
             </td>
           </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.options.OptionsSchemaModel.common">common</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            MethodSchemaModel (ropt.config.options.MethodSchemaModel)" href="#ropt.config.options.MethodSchemaModel">MethodSchemaModel</a>[<a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a>] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>An optional method schema that defines common options shared by
+     all methods.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.options.OptionsSchemaModel.notes">notes</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A dictionary of notes for options, where the key is the option
+     name and the value is the note text.</p>
+              </div>
+            </td>
+          </tr>
       </tbody>
     </table>
         <p><strong>Example</strong>:
@@ -4253,6 +4277,17 @@ this method.</p>
             <td>
               <div class="doc-md-description">
                 <p>A set of common options to exclude for this method.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.options.MethodSchemaModel.note">note</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>An optional note about this method, a key into the notes dictionary.</p>
               </div>
             </td>
           </tr>
