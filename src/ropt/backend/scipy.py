@@ -7,6 +7,7 @@ import warnings
 from collections.abc import Callable
 from functools import partial
 from pathlib import Path
+from textwrap import dedent
 from typing import TYPE_CHECKING, Any, ClassVar, Final, Literal
 
 import numpy as np
@@ -574,23 +575,22 @@ class SciPyBackend(Backend):
 
 
 SCIPY_OPTIONS_SCHEMA: dict[str, Any] = {
-    "notes": {
-        "feasible": (
-            "The `keep_feasible` option is used to maintain feasibility with respect to "
-            "bound, linear and non-linear constraints, by passing it to the constraint "
-            "handling code of the underlying SciPy optimizer. Some algorithms may choose "
-            "to ignore this option."
-        ),
-    },
-    "common": {
-        "options": {
-            "disp": bool,
-            "maxiter": int,
-            "keep_feasible": bool,
+    "common": [
+        {
+            "options": {
+                "disp": bool,
+                "maxiter": int,
+                "keep_feasible": bool,
+            },
+            "url": "https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.minimize.html#scipy.optimize.minimize",
+            "doc": dedent("""\
+                The `keep_feasible` option is used to maintain feasibility with
+                respect to bound, linear and non-linear constraints, by passing
+                it to the constraint handling code of the underlying SciPy
+                optimizer. Some algorithms may choose to ignore this option.
+                """),
         },
-        "url": "https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.minimize.html#scipy.optimize.minimize",
-        "notes": ["feasible"],
-    },
+    ],
     "methods": {
         "Nelder-Mead": {
             "options": {
@@ -753,6 +753,7 @@ SCIPY_OPTIONS_SCHEMA: dict[str, Any] = {
         },
     },
 }
+
 
 if __name__ == "__main__":
     from ropt.config.options import gen_options_table

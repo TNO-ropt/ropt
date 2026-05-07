@@ -33,10 +33,8 @@ class OptionsSchemaModel(BaseModel):
 
     Attributes:
         methods: A list of method schemas.
-        common:  An optional method schema that defines common options shared by
-                 all methods.
-        notes:   A dictionary of notes for options, where the key is the option
-                 name and the value is the note text.
+        common:  An optional list of method schemas that define common options
+                 shared by all methods.
 
     **Example**:
     ```py
@@ -61,22 +59,20 @@ class OptionsSchemaModel(BaseModel):
     """
 
     methods: dict[str, MethodSchemaModel[Any]]
-    common: MethodSchemaModel[Any] | None = None
-    notes: dict[str, str] = {}
+    common: list[MethodSchemaModel[Any]] = []
 
     model_config = ConfigDict(extra="forbid", frozen=True)
 
     @model_validator(mode="after")
     def _check_common_options(self) -> Self:
-        if self.common is not None:
-            common_options = set(self.common.options)
-            for method_name, method_schema in self.methods.items():
-                if method_schema.exclude - common_options:
-                    msg = (
-                        f"Option(s) {method_schema.exclude - common_options} are "
-                        f"excluded from `{method_name}` schema but not defined in `common`."
-                    )
-                    raise ValueError(msg)
+        common_options = {option for item in self.common for option in item.options}
+        for method_name, method_schema in self.methods.items():
+            if method_schema.exclude - common_options:
+                msg = (
+                    f"Option(s) {method_schema.exclude - common_options} are "
+                    f"excluded from `{method_name}` schema but not defined in `common`."
+                )
+                raise ValueError(msg)
         return self
 
     def get_options_model(self, method: str) -> type[BaseModel]:
@@ -110,11 +106,11 @@ class OptionsSchemaModel(BaseModel):
             msg = f"Method `{method}` not found in schema."
             raise ValueError(msg)
 
-        if self.common is not None:
+        for common_options in self.common:
             options.update(
                 {
                     option: (type_ | None, None)
-                    for option, type_ in self.common.options.items()
+                    for option, type_ in common_options.options.items()
                     if option not in method_schema.exclude and option not in options
                 }
             )
@@ -149,32 +145,29 @@ class MethodSchemaModel(BaseModel, Generic[T]):
         options: A dictionary of option names and their types.
         url:     An optional URL for the plugin.
         exclude: A set of common options to exclude for this method.
-        notes:   Optional notes, keys into the notes dictionary.
+        title:   An optional title for common method sections.
+        doc:     An optional description of the common section.
     """
 
     options: dict[str, T]
     url: HttpUrl | None = None
     exclude: set[str] = set()
-    notes: list[str] = []
+    title: str | None = None
+    doc: str | None = None
 
     model_config = ConfigDict(extra="forbid", frozen=True)
 
 
-def _get_common_options(
-    options_schema: OptionsSchemaModel, notes: dict[str, str]
-) -> str:
+def _get_common_options(options_schema: OptionsSchemaModel) -> str:
     common_string = ""
-    if options_schema.common is not None:
-        common_options = ", ".join(key for key in options_schema.common.options)
-        if options_schema.common.url is not None:
-            common_options = f"[{common_options}]({options_schema.common.url})"
-        title = "Common Options"
-        if note_numbers := [
-            _new_note(notes, note, options_schema.notes[note])
-            for note in options_schema.common.notes
-        ]:
-            title += "^" + ",".join(str(num) for num in note_numbers) + "^"
-        common_string = f"**{title}:**\n\n{common_options}\n"
+    for common_schema in options_schema.common:
+        common_options = ", ".join(key for key in common_schema.options)
+        if common_schema.url is not None:
+            common_options = f"[{common_options}]({common_schema.url})"
+        title = common_schema.title or "Common Options"
+        common_string += f"**{title}:**\n\n{common_options}\n\n"
+        if common_schema.doc:
+            common_string += f"{common_schema.doc}\n\n"
 
     return common_string + dedent("""
     **Method-specific Options:**
@@ -212,21 +205,21 @@ def gen_options_table(schema: dict[str, Any]) -> str:
 
     notes: dict[str, str] = {}
 
-    docstring = _get_common_options(options_schema, notes)
+    docstring = _get_common_options(options_schema)
 
-    common_options = (
-        set() if options_schema.common is None else set(options_schema.common.options)
-    )
+    common_options = {
+        option for item in options_schema.common for option in item.options
+    }
 
     for method, method_schema in options_schema.methods.items():
-        method_notes: list[int] = []
+        note_numbers: list[int] = []
         method_options = [
             f"*{key}*" if key in common_options else key
             for key in method_schema.options
         ]
 
         if set(method_schema.options).intersection(common_options):
-            method_notes.append(
+            note_numbers.append(
                 _new_note(
                     notes,
                     "__override_note__",
@@ -236,7 +229,7 @@ def gen_options_table(schema: dict[str, Any]) -> str:
 
         if method_schema.exclude:
             exclude = ", ".join(f"~~{key}~~" for key in method_schema.exclude)
-            method_notes.append(
+            note_numbers.append(
                 _new_note(
                     notes,
                     "__exclude_note__",
@@ -245,17 +238,12 @@ def gen_options_table(schema: dict[str, Any]) -> str:
             )
             method_options.append(exclude)
 
-        method_notes.extend(
-            _new_note(notes, note, options_schema.notes[note])
-            for note in method_schema.notes
-        )
-
         method_name = (
             method if method_schema.url is None else f"[{method}]({method_schema.url})"
         )
-        if method_notes:
+        if note_numbers:
             method_name += (
-                "^" + ",".join(str(note) for note in sorted(method_notes)) + "^"
+                "^" + ",".join(str(note) for note in sorted(note_numbers)) + "^"
             )
 
         docstring += "|" + method_name + "|" + ", ".join(method_options) + "|\n"
