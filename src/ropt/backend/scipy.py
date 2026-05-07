@@ -13,7 +13,10 @@ from typing import TYPE_CHECKING, Any, ClassVar, Final, Literal
 import numpy as np
 from numpy.typing import NDArray
 from scipy.optimize import (
+    BFGS,
+    SR1,
     Bounds,
+    HessianUpdateStrategy,
     LinearConstraint,
     NonlinearConstraint,
     differential_evolution,
@@ -192,6 +195,7 @@ class SciPyBackend(Backend):
                     method=self._method,
                     bounds=self._bounds,
                     jac=(False if self._method in _NO_GRADIENT else self._gradient),
+                    hess=self._hess,
                     constraints=self._constraints,
                     options=self._options or None,
                 )
@@ -551,6 +555,30 @@ class SciPyBackend(Backend):
             else {}
         )
 
+        self._hess: HessianUpdateStrategy | None = None
+        hess = options.pop("hess", None)
+        if hess == "BFGS":
+            hess_options = {
+                key: options.pop(key)
+                for key in (
+                    "exception_strategy",
+                    "min_curvature",
+                    "init_scale",
+                )
+                if key in options
+            }
+            self._hess = BFGS(**hess_options)
+        elif hess == "SR1":
+            hess_options = {
+                key: options.pop(key)
+                for key in (
+                    "min_denominator",
+                    "init_scale",
+                )
+                if key in options
+            }
+            self._hess = SR1(**hess_options)
+
         self._keep_feasible = options.pop("keep_feasible", False)
 
         # The maximum number of iterations is passed as an option to ropt.
@@ -588,6 +616,24 @@ SCIPY_OPTIONS_SCHEMA: dict[str, Any] = {
                 respect to bound, linear and non-linear constraints, by passing
                 it to the constraint handling code of the underlying SciPy
                 optimizer. Some algorithms may choose to ignore this option.
+                """),
+        },
+        {
+            "title": "Hessian Options",
+            "options": {
+                "hess": Literal["BFGS", "SR1"],
+                "exception_strategy": Literal["skip_update", "damp_update"],
+                "min_curvature": float,
+                "min_denominator": float,
+                "init_scale": float | Literal["auto"],
+            },
+            "url": "https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.minimize.html#scipy.optimize.minimize",
+            "doc": dedent("""\
+                These options are used to configure the Hessian approximation
+                method for the optimizer. The `hess` option specifies the type
+                of Hessian approximation to use (`"BFGS"` or `"SR1"`), while the
+                other options provide additional parameters for the chosen
+                method.
                 """),
         },
     ],

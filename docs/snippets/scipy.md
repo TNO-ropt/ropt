@@ -8,6 +8,17 @@ it to the constraint handling code of the underlying SciPy
 optimizer. Some algorithms may choose to ignore this option.
 
 
+**Hessian Options:**
+
+[hess, exception_strategy, min_curvature, min_denominator, init_scale](https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.minimize.html#scipy.optimize.minimize)
+
+These options are used to configure the Hessian approximation
+method for the optimizer. The `hess` option specifies the type
+of Hessian approximation to use (`"BFGS"` or `"SR1"`), while the
+other options provide additional parameters for the chosen
+method.
+
+
 
 **Method-specific Options:**
 
