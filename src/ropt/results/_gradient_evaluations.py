@@ -193,19 +193,7 @@ class GradientEvaluations(ResultField):
             evaluation_info={} if evaluation_info is None else evaluation_info,
         )
 
-    def transform_from_optimizer(self, context: EnOptContext) -> GradientEvaluations:
-        """Transform values from optimizer space to user space.
-
-        Variable, objective, and non-linear constraint values are mapped back
-        to user space using inverse transform chains. Evaluation metadata is
-        passed through unchanged.
-
-        Args:
-            context: The context used by the source of the results.
-
-        Returns:
-            The transformed results.
-        """
+    def _transform_from_optimizer(self, context: EnOptContext) -> GradientEvaluations:
         if (
             not context.variable_transforms
             and not context.objective_transforms

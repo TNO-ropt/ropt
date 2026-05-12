@@ -108,19 +108,7 @@ class Functions(ResultField):
             constraints=constraints,
         )
 
-    def transform_from_optimizer(self, context: EnOptContext) -> Functions:
-        """Transform values from optimizer space to user space.
-
-        The target objective is left unchanged because it is the scalar value
-        optimized by the optimizer. Objective and non-linear constraint arrays
-        are mapped back to user space using the inverse transform chain.
-
-        Args:
-            context: The context used by the source of the results.
-
-        Returns:
-            The transformed results.
-        """
+    def _transform_from_optimizer(self, context: EnOptContext) -> Functions:
         if (
             not context.objective_transforms
             and not context.nonlinear_constraint_transforms

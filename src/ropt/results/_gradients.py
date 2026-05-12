@@ -121,19 +121,7 @@ class Gradients(ResultField):
             constraints=constraints,
         )
 
-    def transform_from_optimizer(self, context: EnOptContext) -> Gradients:
-        """Transform gradients from optimizer space to user space.
-
-        Objective and non-linear constraint gradients are mapped back to user
-        space using the inverse transform chain. The target objective gradient
-        is preserved as-is.
-
-        Args:
-            context: The context used by the source of the results.
-
-        Returns:
-            The transformed results.
-        """
+    def _transform_from_optimizer(self, context: EnOptContext) -> Gradients:
         if (
             not context.objective_transforms
             and not context.nonlinear_constraint_transforms

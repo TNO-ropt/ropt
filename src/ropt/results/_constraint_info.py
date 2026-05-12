@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass, field
+from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
 
 import numpy as np
@@ -174,80 +174,94 @@ class ConstraintInfo(ResultField):
             A newly created `ConstraintInfo` object, or `None` if no bounds
             are available.
         """
-        diffs: dict[str, NDArray[np.float64] | None] = {}
+        bound_lower: NDArray[np.float64] | None = None
+        bound_upper: NDArray[np.float64] | None = None
+        linear_lower: NDArray[np.float64] | None = None
+        linear_upper: NDArray[np.float64] | None = None
+        nonlinear_lower: NDArray[np.float64] | None = None
+        nonlinear_upper: NDArray[np.float64] | None = None
+
+        have_constraint_info = False
 
         if np.all(np.isfinite(context.variables.lower_bounds)) or np.all(
             np.isfinite(context.variables.upper_bounds)
         ):
-            diffs["bound_lower"] = variables - context.variables.lower_bounds
-            diffs["bound_upper"] = variables - context.variables.upper_bounds
+            bound_lower = variables - context.variables.lower_bounds
+            bound_upper = variables - context.variables.upper_bounds
+            have_constraint_info = True
 
         if context.linear_constraints is not None:
             values = np.matmul(context.linear_constraints.coefficients, variables)
-            diffs["linear_lower"] = values - context.linear_constraints.lower_bounds
-            diffs["linear_upper"] = values - context.linear_constraints.upper_bounds
+            linear_lower = values - context.linear_constraints.lower_bounds
+            linear_upper = values - context.linear_constraints.upper_bounds
+            have_constraint_info = True
 
         if constraints is not None:
             assert context.nonlinear_constraints is not None
             lower_bounds, upper_bounds = _get_nonlinear_constraint_bounds(context)
-            diffs["nonlinear_lower"] = constraints - lower_bounds
-            diffs["nonlinear_upper"] = constraints - upper_bounds
+            nonlinear_lower = constraints - lower_bounds
+            nonlinear_upper = constraints - upper_bounds
+            have_constraint_info = True
 
-        if diffs:
-            return ConstraintInfo(**diffs)
+        if have_constraint_info:
+            return ConstraintInfo(
+                bound_lower=bound_lower,
+                bound_upper=bound_upper,
+                linear_lower=linear_lower,
+                linear_upper=linear_upper,
+                nonlinear_lower=nonlinear_lower,
+                nonlinear_upper=nonlinear_upper,
+            )
 
         return None
 
-    def transform_from_optimizer(self, context: EnOptContext) -> ConstraintInfo:
-        """Transform constraint differences from optimizer space to user space.
-
-        Constraint differences (lower and upper bound violations) for variables,
-        linear constraints, and non-linear constraints are mapped back to user
-        space using the inverse transform chain. Violation fields are
-        recalculated after transformation.
-
-        Args:
-            context: The context used by the source of the results.
-
-        Returns:
-            A new `ConstraintInfo` object with all differences transformed to
-            user space.
-        """
+    def _transform_from_optimizer(self, context: EnOptContext) -> ConstraintInfo:
         if (
             not context.variable_transforms
             and not context.nonlinear_constraint_transforms
         ):
             return self
 
-        diffs: dict[str, NDArray[np.float64] | None] = asdict(self)
-
-        for variable_transform in context.variable_transforms:
-            if self.bound_lower is not None:
-                assert self.bound_upper is not None
-                diffs["bound_lower"], diffs["bound_upper"] = (
+        bound_lower: NDArray[np.float64] | None = self.bound_lower
+        bound_upper: NDArray[np.float64] | None = self.bound_upper
+        if bound_lower is not None:
+            assert bound_upper is not None
+            for variable_transform in context.variable_transforms:
+                bound_lower, bound_upper = (
                     variable_transform.bound_constraint_diffs_from_optimizer(
-                        self.bound_lower, self.bound_upper
+                        bound_lower, bound_upper
                     )
                 )
-
-            if self.linear_lower is not None:
-                assert self.linear_upper is not None
-                diffs["linear_lower"], diffs["linear_upper"] = (
+        linear_lower: NDArray[np.float64] | None = self.linear_lower
+        linear_upper: NDArray[np.float64] | None = self.linear_upper
+        if linear_lower is not None:
+            assert linear_upper is not None
+            for variable_transform in context.variable_transforms:
+                linear_lower, linear_upper = (
                     variable_transform.linear_constraints_diffs_from_optimizer(
-                        self.linear_lower, self.linear_upper
+                        linear_lower, linear_upper
                     )
                 )
 
-        for constraint_transform in context.nonlinear_constraint_transforms:
-            if self.nonlinear_lower is not None:
-                assert self.nonlinear_upper is not None
-                diffs["nonlinear_lower"], diffs["nonlinear_upper"] = (
+        nonlinear_lower: NDArray[np.float64] | None = self.nonlinear_lower
+        nonlinear_upper: NDArray[np.float64] | None = self.nonlinear_upper
+        if nonlinear_lower is not None:
+            assert nonlinear_upper is not None
+            for constraint_transform in context.nonlinear_constraint_transforms:
+                nonlinear_lower, nonlinear_upper = (
                     constraint_transform.nonlinear_constraint_diffs_from_optimizer(
-                        self.nonlinear_lower, self.nonlinear_upper
+                        nonlinear_lower, nonlinear_upper
                     )
                 )
 
-        return ConstraintInfo(**diffs)
+        return ConstraintInfo(
+            bound_lower=bound_lower,
+            bound_upper=bound_upper,
+            linear_lower=linear_lower,
+            linear_upper=linear_upper,
+            nonlinear_lower=nonlinear_lower,
+            nonlinear_upper=nonlinear_upper,
+        )
 
 
 def _get_nonlinear_constraint_bounds(

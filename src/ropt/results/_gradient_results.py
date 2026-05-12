@@ -62,11 +62,11 @@ class GradientResults(Results):
             batch_id=self.batch_id,
             metadata=self.metadata,
             names=self.names,
-            evaluations=self.evaluations.transform_from_optimizer(context),
+            evaluations=self.evaluations._transform_from_optimizer(context),  # noqa: SLF001
             realizations=self.realizations,
             gradients=(
                 None
                 if self.gradients is None
-                else self.gradients.transform_from_optimizer(context)
+                else self.gradients._transform_from_optimizer(context)  # noqa: SLF001
             ),
         )

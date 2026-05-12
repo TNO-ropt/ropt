@@ -70,16 +70,16 @@ class FunctionResults(Results):
             batch_id=self.batch_id,
             metadata=self.metadata,
             names=self.names,
-            evaluations=self.evaluations.transform_from_optimizer(context),
+            evaluations=self.evaluations._transform_from_optimizer(context),  # noqa: SLF001
             realizations=self.realizations,
             functions=(
                 None
                 if self.functions is None
-                else self.functions.transform_from_optimizer(context)
+                else self.functions._transform_from_optimizer(context)  # noqa: SLF001
             ),
             constraint_info=(
                 None
                 if self.constraint_info is None
-                else self.constraint_info.transform_from_optimizer(context)
+                else self.constraint_info._transform_from_optimizer(context)  # noqa: SLF001
             ),
         )
