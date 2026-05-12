@@ -1,6 +1,8 @@
-from typing import Any, overload
+from typing import Any, Literal, overload
 
 from numpy.typing import NDArray
+
+DomainType = Literal["optimizer", "user"]
 
 
 @overload

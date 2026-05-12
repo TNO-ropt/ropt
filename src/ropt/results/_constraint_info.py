@@ -215,12 +215,12 @@ class ConstraintInfo(ResultField):
 
         return None
 
-    def _transform_from_optimizer(self, context: EnOptContext) -> ConstraintInfo:
+    def _transform_from_optimizer(self, context: EnOptContext) -> ConstraintInfo | None:
         if (
             not context.variable_transforms
             and not context.nonlinear_constraint_transforms
         ):
-            return self
+            return None
 
         bound_lower: NDArray[np.float64] | None = self.bound_lower
         bound_upper: NDArray[np.float64] | None = self.bound_upper

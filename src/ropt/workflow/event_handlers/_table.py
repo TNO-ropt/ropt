@@ -4,7 +4,7 @@ from importlib.util import find_spec
 from typing import TYPE_CHECKING, Any, Final, Literal
 
 from ropt.enums import EnOptEventType
-from ropt.results import Results, results_to_dataframe
+from ropt.results import DomainType, Results, results_to_dataframe
 
 from .base import EventHandler
 
@@ -71,51 +71,42 @@ class Table(EventHandler):
 
     **Tables**
 
-    The `functions` and `gradients` inputs are dictionaries where each item
-    denotes a table to generate, for
+    Tables can be generated for
     [`FunctionsResults`][ropt.results.FunctionResults] and
     [`GradientsResults`][ropt.results.GradientResults] respectively. Tables are
-    accessed by their name in attributes, i.e. if the `functions` input has an
-    entry `evaluations`, this table can be accessed via
-    `handler["evaluations"]`. Note that the tables are generated on the fly from
-    internal data when accessing them in this way. When multiple access are
-    needed, it is more efficient to first store them in a variable.
+    added via the `add_table` method, which takes a name, a type (either
+    "functions" or "gradients"), a column specification and an optional domain
+    type. The column specification determines which fields of the results are
+    stored in the table and how they are named. The domain type determines
+    whether the results are transformed to the user domain before being stored
+    in the table.
 
-    By default the `functions` and `gradients` are set to `None` directing the handler
-    to generate a set of default tables:
+    Tables are accessed by their name in attributes, for example, as
+    `handler["evaluations"]`.
 
-    - For the `functions` input:
-        - `"functions"`: contains a set of values of the calculated functions.
-        - `"evaluations"`: contains a set of values for all evaluations.
-        - `"constraints"`: contains a set of values for all constraints.
-    - For the `gradients` input:
-        - `"gradients"`: contains a set of values of the calculated gradients.
-        - `"perturbations"`: contains a set of values for all perturbations.
+    Warning:
+        Tables are generated on the fly from internal data when accessing them
+        in this way. When multiple access are needed, it is more efficient to
+        first store them in a variable.
 
-    To change (or disable) the generation of these table, pass an appropriate
-    (or empty) dictionary specifying the desired tables.
+    **Column specification**
 
-    **Table specification**
+    Columns are specified by providing a dictionary that maps field names to
+    column titles. The keys denote the names of the fields, using attribute
+    syntax. For instance a `function.objectives` key indicates the the
+    result should contain a column with objective values that are found in the
+    `objectives` field of the `function` field of the result. The values
+    corresponding to the keys are used to provide the column names.
 
-    Each value of each entry in the `functions` and `gradients` dictionaries is
-    another dictionary that determines which fields in the results should be
-    stored in the corresponding table. The keys denote the names of the fields,
-    using attribute syntax. For instance a `result.function.objectives` key
-    indicates the the result should contain a column with objective values that
-    are found in the `objectives` field of the `function` field of the result.
-    The values corresponding to the keys are used to provide the column names.
-
-    For example, passing this dictionary via the `functions` input generates a
+    For example, passing this dictionary via the `columns` argument generates a
     table containing the batch id, the values of all calculated objectives and
     the vector of variables.
 
     ```python
     {
-        "functions": {
-            "batch_id": "Batch",
-            "functions.objectives": "Objective",
-            "evaluations.variables": "Variables",
-        }
+        "batch_id": "Batch",
+        "functions.objectives": "Objective",
+        "evaluations.variables": "Variables",
     }
     ```
 
@@ -163,29 +154,37 @@ class Table(EventHandler):
         ...
         ```
 
+
+    **Default tables**
+
+    The `set_default_tables` method can be used to add a set of default tables:
+
+    - For functions results it generates these tables:
+        - `"functions"`: contains a set of values of the calculated functions.
+        - `"evaluations"`: contains a set of values for all evaluations.
+        - `"constraints"`: contains a set of values for all constraints.
+    - For gradients results it generates these tables:
+        - `"gradients"`: contains a set of values of the calculated gradients.
+        - `"perturbations"`: contains a set of values for all perturbations.
+
+
     **Callback functionality**
 
     The tables are updated anytime a result is processed. To be able to do
     something with the tables each time they are updated a callback can be
-    provided via the `callback` input. This callback will called anytime the
-    tables are update, passing the handler as its only argument.
+    provided set using `set_callback`. This callback will called anytime the
+    tables are updated, passing the event that caused the tables to be updated.
     """
 
     def __init__(
         self,
         *,
-        functions: dict[str, dict[str, str]] | None = None,
-        gradients: dict[str, dict[str, str]] | None = None,
         sep: str = ",",
-        callback: Callable[[EventHandler], None] | None = None,
     ) -> None:
         """Initialize a default table event handler.
 
         Args:
-            functions: Dictionary of tables with function results.
-            gradients: Dictionary of tables with gradient results.
             sep:       Separator used in column names.
-            callback:  An optional callback that is called when the tables are update.
         """
         if not _HAVE_PANDAS:
             msg = "The pandas module must be installed to use Table"
@@ -193,21 +192,51 @@ class Table(EventHandler):
 
         super().__init__()
         self._sep = sep
+        self._callback: Callable[[EnOptEvent], None] | None = None
+        self._tables: dict[str, _ResultsTable] = {}
+
+    def set_default_tables(self, *, domain: DomainType = "user") -> None:
+        for name, columns in _FUNCTION_TABLES.items():
+            self.add_table(name, "functions", columns, domain=domain)
+        for name, columns in _GRADIENT_TABLES.items():
+            self.add_table(name, "gradients", columns, domain=domain)
+
+    def set_callback(self, callback: Callable[[EnOptEvent], None]) -> None:
+        """Set the callback function.
+
+        This callback will called anytime the tables are updated, passing the
+        event that caused the tables to be updated.
+
+        Args:
+            callback: A function that is called when the tables are updated.
+        """
         self._callback = callback
-        if functions is None:
-            functions = _FUNCTION_TABLES
-        if gradients is None:
-            gradients = _GRADIENT_TABLES
-        self._tables = {
-            table_name: _ResultsTable(functions[table_name], table_type="functions")
-            for table_name in functions
-        }
-        self._tables.update(
-            {
-                table_name: _ResultsTable(gradients[table_name], table_type="gradients")
-                for table_name in gradients
-            }
+
+    def add_table(
+        self,
+        name: str,
+        table_type: Literal["functions", "gradients"],
+        columns: dict[str, str],
+        domain: DomainType = "user",
+    ) -> None:
+        self._tables[name] = _ResultsTable(
+            columns,
+            table_type=table_type,
+            domain=domain,
         )
+
+    def get_tables(self) -> dict[str, pd.DataFrame]:
+        """Return the tables stored in the event handler.
+
+        Returns:
+            A dictionary mapping table names to their corresponding tables.
+
+        Warning:
+            Tables are generated on the fly from internal data. When multiple
+            access is needed, it is more efficient to first store them in a
+            variable.
+        """
+        return {key: table.get_table(self._sep) for key, table in self._tables.items()}
 
     def handle_event(self, event: EnOptEvent) -> None:
         """Handle incoming events.
@@ -215,15 +244,20 @@ class Table(EventHandler):
         Args:
             event: The event object.
         """
-        if not (results := event.results):
-            return
-        results = tuple(
-            item.transform_from_optimizer(event.context) for item in results
-        )
-
-        done = [table.add_results(results) for table in self._tables.values()]
-        if any(done) and self._callback is not None:
-            self._callback(self)
+        if results := event.results:
+            transformed_results = (
+                tuple(item.transform_from_optimizer(event.context) for item in results)
+                if any(table.domain == "user" for table in self._tables.values())
+                else ()
+            )
+            done = [
+                table.add_results(transformed_results)
+                if table.domain == "user"
+                else table.add_results(results)
+                for table in self._tables.values()
+            ]
+            if any(done) and self._callback is not None:
+                self._callback(event)
 
     @property
     def event_types(self) -> set[EnOptEventType]:
@@ -236,6 +270,11 @@ class Table(EventHandler):
 
     def __getitem__(self, key: str) -> Any:  # noqa: ANN401
         """Retrieve a of a table from the event handler.
+
+        Warning:
+            The table is generated on the fly from internal data hen multiple
+            access are needed, it is more efficient to first store them in a
+            variable.
 
         Args:
             key: The string key identifying the table to retrieve.
@@ -267,10 +306,16 @@ class _ResultsTable:
         self,
         columns: dict[str, str],
         table_type: Literal["functions", "gradients"],
+        domain: DomainType = "user",
     ) -> None:
         self._columns = columns
         self._results_type = table_type
+        self._domain = domain
         self._frames: list[pd.DataFrame] = []
+
+    @property
+    def domain(self) -> DomainType:
+        return self._domain
 
     def add_column(self, name: str, title: str) -> None:
         self._columns[name] = title

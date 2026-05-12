@@ -81,9 +81,11 @@ from ._gradients import Gradients
 from ._realizations import Realizations
 from ._result_field import ResultField
 from ._results import Results
+from ._utils import DomainType
 
 __all__ = [
     "ConstraintInfo",
+    "DomainType",
     "FunctionEvaluations",
     "FunctionResults",
     "Functions",

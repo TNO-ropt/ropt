@@ -11,7 +11,7 @@ from .base import EventHandler
 
 if TYPE_CHECKING:
     from ropt.events import EnOptEvent
-    from ropt.results import FunctionResults
+    from ropt.results import DomainType, FunctionResults
 
 
 class Tracker(EventHandler):
@@ -44,6 +44,7 @@ class Tracker(EventHandler):
         *,
         what: Literal["best", "last"] = "best",
         constraint_tolerance: float | None = None,
+        domain: DomainType = "user",
     ) -> None:
         """Initialize a default tracker event handler.
 
@@ -62,13 +63,18 @@ class Tracker(EventHandler):
         that is made accessible via dictionary access (`handler["results"]`) is
         transformed to the user's domain.
 
+        If the domain type is "user", the result is converted from the
+        optimizer domain to the user domain *before* being stored.
+
         Args:
             what:                 Criterion for selecting results ('best' or 'last').
             constraint_tolerance: Optional threshold for filtering constraint violations.
+            domain:               The domain in which to store the results ('user' or 'optimizer').
         """
         super().__init__()
         self._what = what
         self._constraint_tolerance = constraint_tolerance
+        self._domain = domain
         self._tracked_results: FunctionResults | None = None
         self["results"] = None
 
@@ -108,7 +114,12 @@ class Tracker(EventHandler):
 
         if filtered_results is not None:
             self._tracked_results = filtered_results
-            self["results"] = filtered_results.transform_from_optimizer(event.context)
+            if self._domain == "user":
+                self["results"] = filtered_results.transform_from_optimizer(
+                    event.context
+                )
+            else:
+                self["results"] = filtered_results
 
     @property
     def event_types(self) -> set[EnOptEventType]:

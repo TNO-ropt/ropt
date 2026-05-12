@@ -7,16 +7,16 @@
 ::: ropt.results.GradientResults
 ::: ropt.results.Functions
     options:
-        members: [create, transform_from_optimizer]
+        members: [create]
 ::: ropt.results.Gradients
     options:
-        members: [create, transform_from_optimizer]
+        members: [create]
 ::: ropt.results.FunctionEvaluations
     options:
-        members: [create, transform_from_optimizer]
+        members: [create]
 ::: ropt.results.GradientEvaluations
     options:
-        members: [create, transform_from_optimizer]
+        members: [create]
 ::: ropt.results.Realizations
     options:
         members: []

@@ -193,13 +193,15 @@ class GradientEvaluations(ResultField):
             evaluation_info={} if evaluation_info is None else evaluation_info,
         )
 
-    def _transform_from_optimizer(self, context: EnOptContext) -> GradientEvaluations:
+    def _transform_from_optimizer(
+        self, context: EnOptContext
+    ) -> GradientEvaluations | None:
         if (
             not context.variable_transforms
             and not context.objective_transforms
             and not context.nonlinear_constraint_transforms
         ):
-            return self
+            return None
 
         variables = self.variables
         perturbed_variables = self.perturbed_variables

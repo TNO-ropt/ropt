@@ -60,11 +60,12 @@ for:
     method is used to create new `Results` objects with the transformed values.
     For example,
     [`Backend.run`][ropt.workflow.compute_steps.EnsembleOptimizer.run]
-    emits events that include a dictionary with a `"results"` key That contains
-    `Results` objects in the  optimizer domain. To obtain results in the user
+    emits events that include a dictionary with a `"results"` key that contains
+    `Results` objects in the optimizer domain. To obtain results in the user
     domain they must be converted using the
     [`transform_from_optimizer`][ropt.results.Results.transform_from_optimizer]
-    method.
+    method. Note that if there are no transformations that apply, the original
+    `Results` object is returned unchanged.
 """
 
 from .base import NonlinearConstraintTransform, ObjectiveTransform, VariableTransform

@@ -58,15 +58,19 @@ class GradientResults(Results):
         Returns:
             The transformed results.
         """
+        evaluations = self.evaluations._transform_from_optimizer(context)  # noqa: SLF001
+        gradients: Gradients | None = self.gradients
+        if self.gradients is not None:
+            gradients = self.gradients._transform_from_optimizer(context)  # noqa: SLF001
+
+        if evaluations is None and gradients is None:
+            return self
+
         return GradientResults(
             batch_id=self.batch_id,
             metadata=self.metadata,
             names=self.names,
-            evaluations=self.evaluations._transform_from_optimizer(context),  # noqa: SLF001
+            evaluations=self.evaluations if evaluations is None else evaluations,
             realizations=self.realizations,
-            gradients=(
-                None
-                if self.gradients is None
-                else self.gradients._transform_from_optimizer(context)  # noqa: SLF001
-            ),
+            gradients=self.gradients if gradients is None else gradients,
         )

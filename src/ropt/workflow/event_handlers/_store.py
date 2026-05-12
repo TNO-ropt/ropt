@@ -9,7 +9,10 @@ from ropt.enums import EnOptEventType
 from .base import EventHandler
 
 if TYPE_CHECKING:
+    from collections.abc import Generator
+
     from ropt.events import EnOptEvent
+    from ropt.results import DomainType, Results
 
 
 class Store(EventHandler):
@@ -27,7 +30,7 @@ class Store(EventHandler):
     this tuple.
     """
 
-    def __init__(self) -> None:
+    def __init__(self, *, domain: DomainType = "user") -> None:
         """Initialize a default store event handler.
 
         This event handler collects and stores all
@@ -35,13 +38,15 @@ class Store(EventHandler):
         [`FINISHED_EVALUATION`][ropt.enums.EnOptEventType.FINISHED_EVALUATION] events
         and appends the results contained within them to an internal tuple.
 
-        The results are converted from the optimizer domain to the user domain
-        *before* being stored. The accumulated results are stored as a tuple and
-        can be accessed via dictionary access using the key `"results"` (e.g.,
+        If the domain type is "user", the results are converted from the
+        optimizer domain to the user domain *before* being stored. The
+        accumulated results are stored as a tuple and can be accessed via
+        dictionary access using the key `"results"` (e.g.,
         `handler["results"]`). Initially, `handler["results"]` is `None`.
         """
         super().__init__()
         self["results"] = None
+        self._domain = domain
 
     def handle_event(self, event: EnOptEvent) -> None:
         """Handle incoming events.
@@ -56,16 +61,15 @@ class Store(EventHandler):
         Args:
             event: The event object.
         """
-        if not (results := event.results):
-            return
-        transformed_results = (
-            item.transform_from_optimizer(event.context) for item in results
-        )
-        self["results"] = tuple(
-            results
-            if self["results"] is None
-            else (*self["results"], *transformed_results)
-        )
+        results: tuple[Results, ...] | Generator[Results, None, None]
+        if results := event.results:
+            if self._domain == "user":
+                results = (
+                    item.transform_from_optimizer(event.context) for item in results
+                )
+            self["results"] = tuple(
+                results if self["results"] is None else (*self["results"], *results)
+            )
 
     @property
     def event_types(self) -> set[EnOptEventType]:

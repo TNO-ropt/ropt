@@ -66,20 +66,27 @@ class FunctionResults(Results):
         Returns:
             The transformed results.
         """
+        evaluations = self.evaluations._transform_from_optimizer(context)  # noqa: SLF001
+        functions: Functions | None = None
+        if self.functions is not None:
+            functions = self.functions._transform_from_optimizer(context)  # noqa: SLF001
+        constraint_info: ConstraintInfo | None = None
+        if self.constraint_info is not None:
+            constraint_info = self.constraint_info._transform_from_optimizer(  # noqa: SLF001
+                context
+            )
+
+        if evaluations is None and functions is None and constraint_info is None:
+            return self
+
         return FunctionResults(
             batch_id=self.batch_id,
             metadata=self.metadata,
             names=self.names,
-            evaluations=self.evaluations._transform_from_optimizer(context),  # noqa: SLF001
+            evaluations=self.evaluations if evaluations is None else evaluations,
             realizations=self.realizations,
-            functions=(
-                None
-                if self.functions is None
-                else self.functions._transform_from_optimizer(context)  # noqa: SLF001
-            ),
+            functions=self.functions if functions is None else functions,
             constraint_info=(
-                None
-                if self.constraint_info is None
-                else self.constraint_info._transform_from_optimizer(context)  # noqa: SLF001
+                self.constraint_info if constraint_info is None else constraint_info
             ),
         )

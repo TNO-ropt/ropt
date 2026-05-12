@@ -121,12 +121,12 @@ class Gradients(ResultField):
             constraints=constraints,
         )
 
-    def _transform_from_optimizer(self, context: EnOptContext) -> Gradients:
+    def _transform_from_optimizer(self, context: EnOptContext) -> Gradients | None:
         if (
             not context.objective_transforms
             and not context.nonlinear_constraint_transforms
         ):
-            return self
+            return None
 
         objectives = self.objectives
         constraints = self.constraints
