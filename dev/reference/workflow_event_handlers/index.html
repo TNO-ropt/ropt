@@ -1630,6 +1630,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#ropt.workflow.event_handlers.Table.set_callback" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        set_callback
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ropt.workflow.event_handlers.Table.get_tables" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2144,6 +2155,17 @@
     <span class="md-ellipsis">
       
         __init__
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.workflow.event_handlers.Table.set_callback" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        set_callback
       
     </span>
   </a>
@@ -3369,8 +3391,8 @@ display a nicely formatted table using the <code>tabulate</code> package:</p>
 <p><strong>Callback functionality</strong></p>
 <p>The tables are updated anytime a result is processed. To be able to do
 something with the tables each time they are updated a callback can be
-provided via the <code>callback</code> input. This callback will called anytime the
-tables are update, passing the event that caused the tables to be updated.</p>
+provided set using <code>set_callback</code>. This callback will called anytime the
+tables are updated, passing the event that caused the tables to be updated.</p>
 
 
 
@@ -3398,11 +3420,7 @@ tables are update, passing the event that caused the tables to be updated.</p>
 
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">__init__</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="o">*</span><span class="p">,</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">sep</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;,&quot;</span><span class="p">,</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">callback</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">EnOptEvent</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">__init__</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">sep</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;,&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -3437,6 +3455,50 @@ tables are update, passing the event that caused the tables to be updated.</p>
                   <code>&#39;,&#39;</code>
             </td>
           </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.workflow.event_handlers.Table.set_callback" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">set_callback</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">set_callback</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">callback</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">EnOptEvent</span><span class="p">],</span> <span class="kc">None</span><span class="p">],</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Set the callback function.</p>
+<p>This callback will called anytime the tables are updated, passing the
+event that caused the tables to be updated.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
           <tr class="doc-section-item">
             <td>
                 <code>callback</code>
@@ -3447,15 +3509,15 @@ tables are update, passing the event that caused the tables to be updated.</p>
 
   
       dataclass
-   (ropt.events.EnOptEvent)" href="../events/#ropt.events.EnOptEvent">EnOptEvent</a>], None] | None</code>
+   (ropt.events.EnOptEvent)" href="../events/#ropt.events.EnOptEvent">EnOptEvent</a>], None]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>An optional callback that is called when the tables are update.</p>
+                <p>A function that is called when the tables are updated.</p>
               </div>
             </td>
             <td>
-                  <code>None</code>
+                <em>required</em>
             </td>
           </tr>
       </tbody>
