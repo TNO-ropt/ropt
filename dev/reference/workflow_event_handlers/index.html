@@ -1630,6 +1630,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#ropt.workflow.event_handlers.Table.get_tables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        get_tables
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ropt.workflow.event_handlers.Table.handle_event" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2133,6 +2144,17 @@
     <span class="md-ellipsis">
       
         __init__
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.workflow.event_handlers.Table.get_tables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        get_tables
       
     </span>
   </a>
@@ -2765,7 +2787,8 @@ selected result, potentially transformed to the user domain.</p>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="o">*</span><span class="p">,</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">what</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;best&quot;</span><span class="p">,</span> <span class="s2">&quot;last&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;best&quot;</span><span class="p">,</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">constraint_tolerance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">domain</span><span class="p">:</span> <span class="n">DomainType</span> <span class="o">=</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2793,6 +2816,8 @@ specified threshold.</p>
 results in the optimizer's domain. However, the final selected result
 that is made accessible via dictionary access (<code>handler["results"]</code>) is
 transformed to the user's domain.</p>
+<p>If the domain type is "user", the result is converted from the
+optimizer domain to the user domain <em>before</em> being stored.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2836,6 +2861,22 @@ transformed to the user's domain.</p>
             </td>
             <td>
                   <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>domain</code>
+            </td>
+            <td>
+                  <code><span title="ropt.results.DomainType">DomainType</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The domain in which to store the results ('user' or 'optimizer').</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;user&#39;</code>
             </td>
           </tr>
       </tbody>
@@ -3045,7 +3086,7 @@ this tuple.</p>
 
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">__init__</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">__init__</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">domain</span><span class="p">:</span> <span class="n">DomainType</span> <span class="o">=</span> <span class="s1">&#39;user&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -3066,9 +3107,10 @@ this tuple.</p>
       instance-attribute
   " href="../enums/#ropt.enums.EnOptEventType.FINISHED_EVALUATION"><code>FINISHED_EVALUATION</code></a> events
 and appends the results contained within them to an internal tuple.</p>
-<p>The results are converted from the optimizer domain to the user domain
-<em>before</em> being stored. The accumulated results are stored as a tuple and
-can be accessed via dictionary access using the key <code>"results"</code> (e.g.,
+<p>If the domain type is "user", the results are converted from the
+optimizer domain to the user domain <em>before</em> being stored. The
+accumulated results are stored as a tuple and can be accessed via
+dictionary access using the key <code>"results"</code> (e.g.,
 <code>handler["results"]</code>). Initially, <code>handler["results"]</code> is <code>None</code>.</p>
 
 
@@ -3228,8 +3270,7 @@ appends them to the tuple stored in <code>self["results"]</code>.</p>
 
         <p>This event handler tracks results and stores them in pandas DataFrames.</p>
 <p><strong>Tables</strong></p>
-<p>The <code>functions</code> and <code>gradients</code> inputs are dictionaries where each item
-denotes a table to generate, for
+<p>Tables can be generated for
 <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
 
 
@@ -3242,46 +3283,36 @@ denotes a table to generate, for
   
       dataclass
   " href="../results/#ropt.results.GradientResults"><code>GradientsResults</code></a> respectively. Tables are
-accessed by their name in attributes, i.e. if the <code>functions</code> input has an
-entry <code>evaluations</code>, this table can be accessed via
-<code>handler["evaluations"]</code>. Note that the tables are generated on the fly from
-internal data when accessing them in this way. When multiple access are
-needed, it is more efficient to first store them in a variable.</p>
-<p>By default the <code>functions</code> and <code>gradients</code> are set to <code>None</code> directing the handler
-to generate a set of default tables:</p>
-<ul>
-<li>For the <code>functions</code> input:<ul>
-<li><code>"functions"</code>: contains a set of values of the calculated functions.</li>
-<li><code>"evaluations"</code>: contains a set of values for all evaluations.</li>
-<li><code>"constraints"</code>: contains a set of values for all constraints.</li>
-</ul>
-</li>
-<li>For the <code>gradients</code> input:<ul>
-<li><code>"gradients"</code>: contains a set of values of the calculated gradients.</li>
-<li><code>"perturbations"</code>: contains a set of values for all perturbations.</li>
-</ul>
-</li>
-</ul>
-<p>To change (or disable) the generation of these table, pass an appropriate
-(or empty) dictionary specifying the desired tables.</p>
-<p><strong>Table specification</strong></p>
-<p>Each value of each entry in the <code>functions</code> and <code>gradients</code> dictionaries is
-another dictionary that determines which fields in the results should be
-stored in the corresponding table. The keys denote the names of the fields,
-using attribute syntax. For instance a <code>result.function.objectives</code> key
-indicates the the result should contain a column with objective values that
-are found in the <code>objectives</code> field of the <code>function</code> field of the result.
-The values corresponding to the keys are used to provide the column names.</p>
-<p>For example, passing this dictionary via the <code>functions</code> input generates a
+added via the <code>add_table</code> method, which takes a name, a type (either
+"functions" or "gradients"), a column specification and an optional domain
+type. The column specification determines which fields of the results are
+stored in the table and how they are named. The domain type determines
+whether the results are transformed to the user domain before being stored
+in the table.</p>
+<p>Tables are accessed by their name in attributes, for example, as
+<code>handler["evaluations"]</code>.</p>
+
+
+<details class="warning" open>
+  <summary>Warning</summary>
+  <p>Tables are generated on the fly from internal data when accessing them
+in this way. When multiple access are needed, it is more efficient to
+first store them in a variable.</p>
+</details>        <p><strong>Column specification</strong></p>
+<p>Columns are specified by providing a dictionary that maps field names to
+column titles. The keys denote the names of the fields, using attribute
+syntax. For instance a <code>function.objectives</code> key indicates the the
+result should contain a column with objective values that are found in the
+<code>objectives</code> field of the <code>function</code> field of the result. The values
+corresponding to the keys are used to provide the column names.</p>
+<p>For example, passing this dictionary via the <code>columns</code> argument generates a
 table containing the batch id, the values of all calculated objectives and
 the vector of variables.</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="p">{</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="s2">&quot;functions&quot;</span><span class="p">:</span> <span class="p">{</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>        <span class="s2">&quot;batch_id&quot;</span><span class="p">:</span> <span class="s2">&quot;Batch&quot;</span><span class="p">,</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>        <span class="s2">&quot;functions.objectives&quot;</span><span class="p">:</span> <span class="s2">&quot;Objective&quot;</span><span class="p">,</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>        <span class="s2">&quot;evaluations.variables&quot;</span><span class="p">:</span> <span class="s2">&quot;Variables&quot;</span><span class="p">,</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="p">}</span>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">}</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="s2">&quot;batch_id&quot;</span><span class="p">:</span> <span class="s2">&quot;Batch&quot;</span><span class="p">,</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="s2">&quot;functions.objectives&quot;</span><span class="p">:</span> <span class="s2">&quot;Objective&quot;</span><span class="p">,</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="s2">&quot;evaluations.variables&quot;</span><span class="p">:</span> <span class="s2">&quot;Variables&quot;</span><span class="p">,</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="p">}</span>
 </span></code></pre></div>
 <p>Some fields may result in multiple columns in the DataFrame if their values
 are vectors or matrices. For example, <code>evaluations.variables</code> will generate
@@ -3320,11 +3351,27 @@ display a nicely formatted table using the <code>tabulate</code> package:</p>
 </span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>      0           130.983          0.5          0.9           1.3
 </span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>...
 </span></code></pre></div></p>
-</details>        <p><strong>Callback functionality</strong></p>
+</details>        <p><strong>Default tables</strong></p>
+<p>The <code>set_default_tables</code> method can be used to add a set of default tables:</p>
+<ul>
+<li>For functions results it generates these tables:<ul>
+<li><code>"functions"</code>: contains a set of values of the calculated functions.</li>
+<li><code>"evaluations"</code>: contains a set of values for all evaluations.</li>
+<li><code>"constraints"</code>: contains a set of values for all constraints.</li>
+</ul>
+</li>
+<li>For gradients results it generates these tables:<ul>
+<li><code>"gradients"</code>: contains a set of values of the calculated gradients.</li>
+<li><code>"perturbations"</code>: contains a set of values for all perturbations.</li>
+</ul>
+</li>
+</ul>
+<p><strong>Callback functionality</strong></p>
 <p>The tables are updated anytime a result is processed. To be able to do
 something with the tables each time they are updated a callback can be
 provided via the <code>callback</code> input. This callback will called anytime the
-tables are update, passing the handler as its only argument.</p>
+tables are update, passing the handler as its only argument, together with
+the event that caused the tables to be updated.</p>
 
 
 
@@ -3354,11 +3401,10 @@ tables are update, passing the handler as its only argument.</p>
 </h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">__init__</span><span class="p">(</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="o">*</span><span class="p">,</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">functions</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">gradients</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">sep</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;,&quot;</span><span class="p">,</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">callback</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">EventHandler</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">sep</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;,&quot;</span><span class="p">,</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">callback</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">EventHandler</span><span class="p">,</span> <span class="n">EnOptEvent</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -3377,38 +3423,6 @@ tables are update, passing the handler as its only argument.</p>
         </tr>
       </thead>
       <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>functions</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>]] | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Dictionary of tables with function results.</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>gradients</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>]] | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Dictionary of tables with gradient results.</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
           <tr class="doc-section-item">
             <td>
                 <code>sep</code>
@@ -3430,7 +3444,12 @@ tables are update, passing the handler as its only argument.</p>
                 <code>callback</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-external" title="collections.abc.Callable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable">Callable</a>[[<a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.EventHandler (ropt.workflow.event_handlers.base.EventHandler)" href="#ropt.workflow.event_handlers.EventHandler">EventHandler</a>], None] | None</code>
+                  <code><a class="autorefs autorefs-external" title="collections.abc.Callable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable">Callable</a>[[<a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.EventHandler (ropt.workflow.event_handlers.base.EventHandler)" href="#ropt.workflow.event_handlers.EventHandler">EventHandler</a>, <a class="autorefs autorefs-internal" title="            EnOptEvent
+
+
+  
+      dataclass
+   (ropt.events.EnOptEvent)" href="../events/#ropt.events.EnOptEvent">EnOptEvent</a>], None] | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3444,6 +3463,61 @@ tables are update, passing the handler as its only argument.</p>
       </tbody>
     </table>
 
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.workflow.event_handlers.Table.get_tables" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">get_tables</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">get_tables</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">_ResultsTable</span><span class="p">]</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Return the tables stored in the event handler.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <span title="ropt.workflow.event_handlers._table._ResultsTable">_ResultsTable</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A dictionary mapping table names to their corresponding tables.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<details class="warning" open>
+  <summary>Warning</summary>
+  <p>Tables are generated on the fly from internal data. When multiple
+access is needed, it is more efficient to first store them in a
+variable.</p>
+</details>
 
     </div>
 
@@ -3582,6 +3656,13 @@ tables are update, passing the handler as its only argument.</p>
 
         <p>Retrieve a of a table from the event handler.</p>
 
+
+<details class="warning" open>
+  <summary>Warning</summary>
+  <p>The table is generated on the fly from internal data hen multiple
+access are needed, it is more efficient to first store them in a
+variable.</p>
+</details>
 
 <p><span class="doc-section-title">Parameters:</span></p>
     <table>

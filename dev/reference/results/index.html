@@ -1116,17 +1116,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#ropt.results.Functions.transform_from_optimizer" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        transform_from_optimizer
-      
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -1149,17 +1138,6 @@
     <span class="md-ellipsis">
       
         create
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.results.Gradients.transform_from_optimizer" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        transform_from_optimizer
       
     </span>
   </a>
@@ -1194,17 +1172,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#ropt.results.FunctionEvaluations.transform_from_optimizer" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        transform_from_optimizer
-      
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -1227,17 +1194,6 @@
     <span class="md-ellipsis">
       
         create
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.results.GradientEvaluations.transform_from_optimizer" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        transform_from_optimizer
       
     </span>
   </a>
@@ -2147,17 +2103,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#ropt.results.Functions.transform_from_optimizer" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        transform_from_optimizer
-      
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -2180,17 +2125,6 @@
     <span class="md-ellipsis">
       
         create
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.results.Gradients.transform_from_optimizer" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        transform_from_optimizer
       
     </span>
   </a>
@@ -2225,17 +2159,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#ropt.results.FunctionEvaluations.transform_from_optimizer" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        transform_from_optimizer
-      
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -2258,17 +2181,6 @@
     <span class="md-ellipsis">
       
         create
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.results.GradientEvaluations.transform_from_optimizer" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        transform_from_optimizer
       
     </span>
   </a>
@@ -3925,95 +3837,6 @@ one-dimensional array of floating point values:</p>
 
 
 
-
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="ropt.results.Functions.transform_from_optimizer" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">transform_from_optimizer</span>
-
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">transform_from_optimizer</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">context</span><span class="p">:</span> <span class="n">EnOptContext</span><span class="p">,</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Functions</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Transform values from optimizer space to user space.</p>
-<p>The target objective is left unchanged because it is the scalar value
-optimized by the optimizer. Objective and non-linear constraint arrays
-are mapped back to user space using the inverse transform chain.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>context</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            EnOptContext (ropt.context.EnOptContext)" href="../context/#ropt.context.EnOptContext">EnOptContext</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The context used by the source of the results.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.results.Functions
-
-
-  
-      dataclass
-   (ropt.results._functions.Functions)" href="#ropt.results.Functions">Functions</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The transformed results.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
-
-
-
-
   </div>
 
     </div>
@@ -4311,95 +4134,6 @@ floating point values:</p>
             <td>
               <div class="doc-md-description">
                 <p>A new <code>Gradients</code> object.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="ropt.results.Gradients.transform_from_optimizer" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">transform_from_optimizer</span>
-
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">transform_from_optimizer</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">context</span><span class="p">:</span> <span class="n">EnOptContext</span><span class="p">,</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Gradients</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Transform gradients from optimizer space to user space.</p>
-<p>Objective and non-linear constraint gradients are mapped back to user
-space using the inverse transform chain. The target objective gradient
-is preserved as-is.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>context</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            EnOptContext (ropt.context.EnOptContext)" href="../context/#ropt.context.EnOptContext">EnOptContext</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The context used by the source of the results.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.results.Gradients
-
-
-  
-      dataclass
-   (ropt.results._gradients.Gradients)" href="#ropt.results.Gradients">Gradients</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The transformed results.</p>
               </div>
             </td>
           </tr>
@@ -4769,95 +4503,6 @@ even complex objects.</p>
             <td>
               <div class="doc-md-description">
                 <p>A new FunctionEvaluations object.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="ropt.results.FunctionEvaluations.transform_from_optimizer" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">transform_from_optimizer</span>
-
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">transform_from_optimizer</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">context</span><span class="p">:</span> <span class="n">EnOptContext</span><span class="p">,</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FunctionEvaluations</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Transform values from optimizer space to user space.</p>
-<p>Variable, objective, and non-linear constraint values are mapped back
-to user space using inverse transform chains. Evaluation metadata is
-passed through unchanged.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>context</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            EnOptContext (ropt.context.EnOptContext)" href="../context/#ropt.context.EnOptContext">EnOptContext</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The context used by the source of the results.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.results.FunctionEvaluations
-
-
-  
-      dataclass
-   (ropt.results._function_evaluations.FunctionEvaluations)" href="#ropt.results.FunctionEvaluations">FunctionEvaluations</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The transformed results.</p>
               </div>
             </td>
           </tr>
@@ -5319,95 +4964,6 @@ even complex objects.</p>
             <td>
               <div class="doc-md-description">
                 <p>A new <code>GradientEvaluations</code> object.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="ropt.results.GradientEvaluations.transform_from_optimizer" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">transform_from_optimizer</span>
-
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">transform_from_optimizer</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">context</span><span class="p">:</span> <span class="n">EnOptContext</span><span class="p">,</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GradientEvaluations</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Transform values from optimizer space to user space.</p>
-<p>Variable, objective, and non-linear constraint values are mapped back
-to user space using inverse transform chains. Evaluation metadata is
-passed through unchanged.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>context</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            EnOptContext (ropt.context.EnOptContext)" href="../context/#ropt.context.EnOptContext">EnOptContext</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The context used by the source of the results.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.results.GradientEvaluations
-
-
-  
-      dataclass
-   (ropt.results._gradient_evaluations.GradientEvaluations)" href="#ropt.results.GradientEvaluations">GradientEvaluations</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The transformed results.</p>
               </div>
             </td>
           </tr>

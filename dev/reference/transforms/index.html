@@ -3463,8 +3463,8 @@ for:</p>
     method is used to create new <code>Results</code> objects with the transformed values.
     For example,
     <a class="autorefs autorefs-internal" title="            run" href="../workflow_steps/#ropt.workflow.compute_steps.EnsembleOptimizer.run"><code>Backend.run</code></a>
-    emits events that include a dictionary with a <code>"results"</code> key That contains
-    <code>Results</code> objects in the  optimizer domain. To obtain results in the user
+    emits events that include a dictionary with a <code>"results"</code> key that contains
+    <code>Results</code> objects in the optimizer domain. To obtain results in the user
     domain they must be converted using the
     <a class="autorefs autorefs-internal" title="            transform_from_optimizer
 
@@ -3472,7 +3472,8 @@ for:</p>
   
       abstractmethod
   " href="../results/#ropt.results.Results.transform_from_optimizer"><code>transform_from_optimizer</code></a>
-    method.</li>
+    method. Note that if there are no transformations that apply, the original
+    <code>Results</code> object is returned unchanged.</li>
 </ol>
 
 
