@@ -119,35 +119,11 @@ class AsyncEvaluator(Evaluator):
     ) -> None:
         try:
             for eval_idx, realization in enumerate(context.realizations):
-                if not self._server.is_running():
-                    break
-                if context.active is None or context.active[eval_idx]:
-                    perturbation = (
-                        -1
-                        if context.perturbations is None
-                        else int(context.perturbations[eval_idx])
-                    )
-                    task_name = (
-                        None
-                        if self._get_name is None
-                        else self._get_name(
-                            realization=int(realization),
-                            perturbation=perturbation,
-                            batch_id=self._batch_id,
-                            eval_idx=eval_idx,
-                        )
-                    )
-                    task = Task(
-                        results_queue=results_queue,
-                        function=self._function,
-                        args=(variables[eval_idx, :],),
-                        kwargs={
-                            "realization": int(realization),
-                            "perturbation": perturbation,
-                            "batch_id": self._batch_id,
-                            "eval_idx": eval_idx,
-                        },
-                        name=task_name,
+                if self._server.is_running() and (
+                    context.active is None or context.active[eval_idx]
+                ):
+                    task = self._get_task(
+                        variables, context, results_queue, eval_idx, int(realization)
                     )
                     await self._server.task_queue.put(task)
         except Exception:
@@ -157,6 +133,42 @@ class AsyncEvaluator(Evaluator):
 
         if not self._server.is_running():
             raise Abort(ExitCode.ABORT_FROM_ERROR)
+
+    def _get_task(
+        self,
+        variables: NDArray[np.float64],
+        context: EvaluatorContext,
+        results_queue: ResultsQueue,
+        eval_idx: int,
+        realization: int,
+    ) -> Task:
+        perturbation = (
+            -1
+            if context.perturbations is None
+            else int(context.perturbations[eval_idx])
+        )
+        task_name = (
+            None
+            if self._get_name is None
+            else self._get_name(
+                realization=realization,
+                perturbation=perturbation,
+                batch_id=self._batch_id,
+                eval_idx=eval_idx,
+            )
+        )
+        return Task(
+            results_queue=results_queue,
+            function=self._function,
+            args=(variables[eval_idx, :],),
+            kwargs={
+                "realization": realization,
+                "perturbation": perturbation,
+                "batch_id": self._batch_id,
+                "eval_idx": eval_idx,
+            },
+            name=task_name,
+        )
 
 
 def _handle_result(
