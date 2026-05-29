@@ -5,7 +5,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Final
 
 import numpy as np
-from numpy.typing import NDArray
 
 from ropt.results import FunctionResults
 from ropt.workflow.event_handlers import EventHandler
