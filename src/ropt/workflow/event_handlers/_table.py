@@ -196,6 +196,17 @@ class Table(EventHandler):
         self._tables: dict[str, _ResultsTable] = {}
 
     def set_default_tables(self, *, domain: DomainType = "user") -> None:
+        """Register a standard set of result tables.
+
+        Adds the default `functions`, `evaluations`, and `constraints` tables
+        for function results, and the default `gradients` and `perturbations`
+        tables for gradient results.
+
+        Args:
+            domain: Domain (`"user"` or `"optimizer"`) the tables are filled
+                from. The `"user"` domain reports values as seen by the user;
+                `"optimizer"` reports them in the optimizer's transformed space.
+        """
         for name, columns in _FUNCTION_TABLES.items():
             self.add_table(name, "functions", columns, domain=domain)
         for name, columns in _GRADIENT_TABLES.items():
@@ -219,6 +230,17 @@ class Table(EventHandler):
         columns: dict[str, str],
         domain: DomainType = "user",
     ) -> None:
+        """Register a new table to be populated from incoming results.
+
+        Args:
+            name:       Key under which the table is stored and looked up.
+            table_type: Whether this table is filled from function results
+                        (`"functions"`) or gradient results (`"gradients"`).
+            columns:    Mapping from result-field attribute names (using dotted
+                        attribute syntax) to display titles.
+            domain:     Domain (`"user"` or `"optimizer"`) the table is filled
+                        from.
+        """
         self._tables[name] = _ResultsTable(
             columns,
             table_type=table_type,
