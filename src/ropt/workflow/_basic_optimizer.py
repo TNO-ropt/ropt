@@ -15,7 +15,7 @@ import numpy as np
 from ropt.context import EnOptContext
 from ropt.enums import EnOptEventType, ExitCode
 from ropt.exceptions import Abort
-from ropt.workflow.evaluators import Evaluator
+from ropt.workflow.evaluators import CallbackEvaluator, Evaluator
 
 from .compute_steps import EnsembleOptimizer
 from .event_handlers import Observer, Tracker
@@ -23,9 +23,9 @@ from .event_handlers import Observer, Tracker
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
 
-    from numpy.typing import ArrayLike, NDArray
+    from numpy.typing import ArrayLike
 
-    from ropt.evaluator import EvaluatorCallback, EvaluatorContext, EvaluatorResult
+    from ropt.evaluator import EvaluatorCallback
     from ropt.events import EnOptEvent
     from ropt.results import FunctionResults
 
@@ -188,7 +188,7 @@ class BasicOptimizer:
         evaluator = (
             self._evaluator
             if isinstance(self._evaluator, Evaluator)
-            else _Evaluator(callback=self._evaluator)
+            else CallbackEvaluator(callback=self._evaluator)
         )
         tracker = Tracker(constraint_tolerance=self._constraint_tolerance)
         optimizer = EnsembleOptimizer(evaluator=evaluator)
@@ -254,17 +254,6 @@ class BasicOptimizer:
             callback(results)
 
         self._observers.append((EnOptEventType.FINISHED_EVALUATION, _results_callback))
-
-
-class _Evaluator(Evaluator):
-    def __init__(self, *, callback: EvaluatorCallback) -> None:
-        super().__init__()
-        self._evaluator_callback = callback
-
-    def eval(
-        self, variables: NDArray[np.float64], context: EvaluatorContext
-    ) -> EvaluatorResult:
-        return self._evaluator_callback(variables, context)
 
 
 def _custom_event_handlers() -> Iterator[Any]:
