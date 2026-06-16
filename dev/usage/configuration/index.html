@@ -1,0 +1,3321 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../basic/">
+      
+      
+        <link rel="next" href="../evaluator_callback/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Configuration - ropt Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="blue">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#configuration" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="ropt Documentation" class="md-header__button md-logo" aria-label="ropt Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            ropt Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Configuration
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="blue"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="teal" data-md-color-accent="lime"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/TNO-ropt/ropt" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    TNO-ropt/ropt
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  About
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../background/" class="md-tabs__link">
+          
+  
+  
+  Usage
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../reference/config/" class="md-tabs__link">
+          
+  
+  
+  Reference
+
+        </a>
+      </li>
+    
+  
+
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="ropt Documentation" class="md-nav__button md-logo" aria-label="ropt Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    ropt Documentation
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/TNO-ropt/ropt" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    TNO-ropt/ropt
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    About
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Usage
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Usage
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../background/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Background
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../quickstart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quickstart
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../basic/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Basic Optimization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#top-level-layout" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Top-level layout
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rules-that-apply-everywhere" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rules that apply everywhere
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Rules that apply everywhere">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#broadcasting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Broadcasting
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#index-based-sharing-of-component-objects" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Index-based sharing of component objects
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#providing-component-objects" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Providing component objects
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#method-strings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Method strings
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#immutability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Immutability
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#section-reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Section reference
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Section reference">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#variables-variablesconfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        variables — VariablesConfig
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="variables — VariablesConfig">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#variable-perturbations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Variable perturbations
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#objectives-objectivefunctionsconfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        objectives — ObjectiveFunctionsConfig
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#linear_constraints-linearconstraintsconfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        linear_constraints — LinearConstraintsConfig
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#nonlinear_constraints-nonlinearconstraintsconfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        nonlinear_constraints — NonlinearConstraintsConfig
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#realizations-realizationsconfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        realizations — RealizationsConfig
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#optimizer-optimizerconfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        optimizer — OptimizerConfig
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#backend-backendconfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        backend — BackendConfig
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gradient-gradientconfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        gradient — GradientConfig
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#function_estimators-realization_filters-samplers-transforms" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        function_estimators, realization_filters, samplers, transforms
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="function_estimators, realization_filters, samplers, transforms">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#function-estimators-functionestimatorconfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Function estimators — FunctionEstimatorConfig
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#realization-filters-realizationfilterconfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Realization filters — RealizationFilterConfig
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#samplers-samplerconfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Samplers — SamplerConfig
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#transforms" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Transforms
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#names" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        names
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#a-worked-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A worked example
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#full-configuration-schema" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Full configuration schema
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#where-to-next" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Where to next
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../evaluator_callback/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Writing an Evaluator Callback
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../results/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Working with Results
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../realization_filters/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Realization Filters
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../function_estimators/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Function Estimators
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../transforms/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Transforms
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../gradients/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Stochastic Gradients
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../workflows/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Optimization Workflows
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../parallel/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Parallel Evaluation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_1" id="__nav_3_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Configuration
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/config/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration Classes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/context/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Context Class
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/basic_optimizer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Basic Optimizer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Results & Events
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Results & Events
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/results/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evaluation Results
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/events/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Optimization Events
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_4" id="__nav_3_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Optimization Engine
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Optimization Engine
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/core/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Core Classes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/evaluator/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evaluator Classes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_5" id="__nav_3_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Optimization Components
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Optimization Components
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/function_estimator/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Function Estimators
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/realization_filter/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Realization Filters
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/backend/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Optimizer Backends
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/sampler/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Samplers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/transforms/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Transforms
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_6" id="__nav_3_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Workflow System
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Workflow System
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/workflow_steps/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Steps
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/workflow_event_handlers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Event Handlers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/workflow_evaluators/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evaluators
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/workflow_servers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Servers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/workflow_utils/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Workflow Utilities
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_7" id="__nav_3_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plugin System
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Plugin System
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/plugin_bases/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plugin Bases
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/plugin_manager/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plugin Manager
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/default_plugins/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Default Plugins
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/enums/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Enumerations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/exceptions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Exceptions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#top-level-layout" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Top-level layout
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rules-that-apply-everywhere" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rules that apply everywhere
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Rules that apply everywhere">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#broadcasting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Broadcasting
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#index-based-sharing-of-component-objects" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Index-based sharing of component objects
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#providing-component-objects" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Providing component objects
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#method-strings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Method strings
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#immutability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Immutability
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#section-reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Section reference
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Section reference">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#variables-variablesconfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        variables — VariablesConfig
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="variables — VariablesConfig">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#variable-perturbations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Variable perturbations
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#objectives-objectivefunctionsconfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        objectives — ObjectiveFunctionsConfig
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#linear_constraints-linearconstraintsconfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        linear_constraints — LinearConstraintsConfig
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#nonlinear_constraints-nonlinearconstraintsconfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        nonlinear_constraints — NonlinearConstraintsConfig
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#realizations-realizationsconfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        realizations — RealizationsConfig
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#optimizer-optimizerconfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        optimizer — OptimizerConfig
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#backend-backendconfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        backend — BackendConfig
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gradient-gradientconfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        gradient — GradientConfig
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#function_estimators-realization_filters-samplers-transforms" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        function_estimators, realization_filters, samplers, transforms
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="function_estimators, realization_filters, samplers, transforms">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#function-estimators-functionestimatorconfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Function estimators — FunctionEstimatorConfig
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#realization-filters-realizationfilterconfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Realization filters — RealizationFilterConfig
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#samplers-samplerconfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Samplers — SamplerConfig
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#transforms" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Transforms
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#names" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        names
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#a-worked-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A worked example
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#full-configuration-schema" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Full configuration schema
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#where-to-next" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Where to next
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="configuration">Configuration</h1>
+<p>Every <code>ropt</code> optimization run is described by a configuration dictionary that
+is validated into an <a class="autorefs autorefs-internal" title="            EnOptContext" href="../../reference/context/#ropt.context.EnOptContext"><code>EnOptContext</code></a>. This page
+walks through the top-level keys of that dictionary, the rules that apply to
+all of them, and how to compose them for typical problems.</p>
+<p>For the full schema, see the reference page for
+<a class="autorefs autorefs-internal" title="            EnOptContext" href="../../reference/context/#ropt.context.EnOptContext"><code>EnOptContext</code></a> and
+<a href="../../reference/config/">Configuration Classes</a>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><code>EnOptContext</code> objects are immutable after construction. Do not attempt to
+serialize and round-trip them (e.g., to/from JSON): NumPy arrays and plugin
+instances cannot survive a round-trip faithfully. Persist the raw input
+dicts instead.</p>
+</div>
+<h2 id="top-level-layout">Top-level layout</h2>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">CONFIG</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="s2">&quot;variables&quot;</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">},</span>                        <span class="c1"># required</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="s2">&quot;objectives&quot;</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">},</span>                       <span class="c1"># optional</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="s2">&quot;linear_constraints&quot;</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">},</span>               <span class="c1"># optional</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="s2">&quot;nonlinear_constraints&quot;</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">},</span>            <span class="c1"># optional</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="s2">&quot;realizations&quot;</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">},</span>                     <span class="c1"># optional</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="s2">&quot;optimizer&quot;</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">},</span>                        <span class="c1"># optional</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="s2">&quot;backend&quot;</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">},</span>                          <span class="c1"># optional</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="s2">&quot;gradient&quot;</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">},</span>                         <span class="c1"># optional</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    <span class="s2">&quot;realization_filters&quot;</span><span class="p">:</span> <span class="p">[</span><span class="o">...</span><span class="p">],</span>              <span class="c1"># optional, tuple</span>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    <span class="s2">&quot;function_estimators&quot;</span><span class="p">:</span> <span class="p">[</span><span class="o">...</span><span class="p">],</span>              <span class="c1"># optional, tuple</span>
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>    <span class="s2">&quot;samplers&quot;</span><span class="p">:</span> <span class="p">[</span><span class="o">...</span><span class="p">],</span>                         <span class="c1"># optional, tuple</span>
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>    <span class="s2">&quot;variable_transforms&quot;</span><span class="p">:</span> <span class="p">[</span><span class="o">...</span><span class="p">],</span>              <span class="c1"># optional, tuple</span>
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>    <span class="s2">&quot;objective_transforms&quot;</span><span class="p">:</span> <span class="p">[</span><span class="o">...</span><span class="p">],</span>             <span class="c1"># optional, tuple</span>
+</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>    <span class="s2">&quot;nonlinear_constraint_transforms&quot;</span><span class="p">:</span> <span class="p">[</span><span class="o">...</span><span class="p">],</span>  <span class="c1"># optional, tuple</span>
+</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>    <span class="s2">&quot;names&quot;</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">},</span>                            <span class="c1"># optional, for labelled output</span>
+</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="p">}</span>
+</span></code></pre></div>
+<p>Only <code>variables</code> is required. Each value is either a plain dict (which Pydantic
+validates against the corresponding config class) or a list/tuple of such
+dicts for the plugin-bearing fields.</p>
+<h2 id="rules-that-apply-everywhere">Rules that apply everywhere</h2>
+<h3 id="broadcasting">Broadcasting</h3>
+<p>Many per-variable, per-objective, or per-constraint fields are NumPy arrays. A
+size-1 value is broadcast to match the relevant count, e.g.:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="s2">&quot;variables&quot;</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    <span class="s2">&quot;variable_count&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    <span class="s2">&quot;lower_bounds&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>        <span class="c1"># broadcast to [0, 0, 0, 0, 0]</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    <span class="s2">&quot;upper_bounds&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="p">}</span>
+</span></code></pre></div>
+<p>Length-mismatched arrays raise a validation error.</p>
+<h3 id="index-based-sharing-of-component-objects">Index-based sharing of component objects</h3>
+<p>The tuple-typed fields hold <em>objects</em> that implement the corresponding abstract
+base class:</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Base class</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>realization_filters</code></td>
+<td><a class="autorefs autorefs-internal" title="            ropt.realization_filter.RealizationFilter" href="../../reference/realization_filter/#ropt.realization_filter.RealizationFilter"><code>RealizationFilter</code></a></td>
+</tr>
+<tr>
+<td><code>function_estimators</code></td>
+<td><a class="autorefs autorefs-internal" title="            ropt.function_estimator.FunctionEstimator" href="../../reference/function_estimator/#ropt.function_estimator.FunctionEstimator"><code>FunctionEstimator</code></a></td>
+</tr>
+<tr>
+<td><code>samplers</code></td>
+<td><a class="autorefs autorefs-internal" title="            Sampler" href="../../reference/sampler/#ropt.sampler.Sampler"><code>Sampler</code></a></td>
+</tr>
+<tr>
+<td><code>variable_transforms</code></td>
+<td><a class="autorefs autorefs-internal" title="            VariableTransform" href="../../reference/transforms/#ropt.transforms.VariableTransform"><code>VariableTransform</code></a></td>
+</tr>
+<tr>
+<td><code>objective_transforms</code></td>
+<td><a class="autorefs autorefs-internal" title="            ObjectiveTransform" href="../../reference/transforms/#ropt.transforms.ObjectiveTransform"><code>ObjectiveTransform</code></a></td>
+</tr>
+<tr>
+<td><code>nonlinear_constraint_transforms</code></td>
+<td><a class="autorefs autorefs-internal" title="            NonlinearConstraintTransform" href="../../reference/transforms/#ropt.transforms.NonlinearConstraintTransform"><code>NonlinearConstraintTransform</code></a></td>
+</tr>
+</tbody>
+</table>
+<p>Concrete implementations live in their respective sub-packages — for example,
+the SciPy-based samplers are classes defined in <code>ropt.sampler.scipy</code>.</p>
+<p>Other config sections refer to the entries in these tuples by integer index.
+For example, <a class="autorefs autorefs-internal" title="            VariablesConfig" href="../../reference/config/#ropt.config.VariablesConfig"><code>VariablesConfig</code></a> has a <code>samplers</code>
+field that is an integer array indexing into <code>EnOptContext.samplers</code>:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="s2">&quot;samplers&quot;</span><span class="p">:</span> <span class="p">[</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    <span class="n">sampler_a</span><span class="p">,</span>   <span class="c1"># index 0  (a Sampler instance)</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    <span class="n">sampler_b</span><span class="p">,</span>   <span class="c1"># index 1</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="p">],</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="s2">&quot;variables&quot;</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>    <span class="s2">&quot;variable_count&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>    <span class="s2">&quot;samplers&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>   <span class="c1"># variables 0,1 use sampler 0; 2,3 use sampler 1</span>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="p">},</span>
+</span></code></pre></div>
+<p>Use all zeros to share a single instance across all elements;
+thanks to broadcasting, a single <code>0</code> (the default) is sufficient.</p>
+<p>For optional fields like <code>realization_filters</code> and the transform fields, an
+index of <code>-1</code> (the default) or any other out-of-range value leaves the
+corresponding element unfiltered/untransformed.</p>
+<h3 id="providing-component-objects">Providing component objects</h3>
+<p>Although these fields are typed as abstract-base instances, you generally do
+not need to construct them directly. Each tuple element accepts any of three
+equivalent forms, and a Pydantic validator converts it to the required object:</p>
+<ol>
+<li><strong>An already-constructed object</strong> — any instance of an built-in clas (e.g. a
+   <code>SciPySampler</code> from <code>ropt.sampler.scipy</code>), or of your own <code>Sampler</code> subclass.
+   The instance is used as-is.</li>
+<li><strong>A typed config object</strong>, e.g.
+   <a class="autorefs autorefs-internal" title="            SamplerConfig" href="../../reference/config/#ropt.config.SamplerConfig"><code>SamplerConfig</code></a>. The validator looks up a
+   plugin in the <code>ropt.plugins</code> sub-package by the <code>method</code> field
+   (<code>"plugin/method"</code> form, or just <code>"method"</code> for implicit discovery) and
+   calls its <code>create()</code> factory to build the object.</li>
+<li><strong>A plain <code>dict</code></strong>, which is first validated into the matching config object
+   and then handled as in (2).</li>
+</ol>
+<p>So the snippet above can equivalently be written as:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="s2">&quot;samplers&quot;</span><span class="p">:</span> <span class="p">[</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="p">{</span><span class="s2">&quot;method&quot;</span><span class="p">:</span> <span class="s2">&quot;scipy/default&quot;</span><span class="p">},</span>   <span class="c1"># index 0  -&gt; SciPySampler</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    <span class="p">{</span><span class="s2">&quot;method&quot;</span><span class="p">:</span> <span class="s2">&quot;scipy/sobol&quot;</span><span class="p">},</span>     <span class="c1"># index 1  -&gt; SciPySampler</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="p">],</span>
+</span></code></pre></div>
+<p>The same pattern applies to <code>backend</code>, <code>function_estimators</code>,
+<code>realization_filters</code>, and the three transform fields. Mix instances and dicts
+freely — for example, you can register a hand-built <code>Sampler</code> instance alongside
+a dict-configured one in the same tuple. However, note that the second and third
+options require the the corresponding class to be registered with the plugin
+system.</p>
+<h3 id="method-strings">Method strings</h3>
+<p>All <code>method</code> fields use the same naming convention:</p>
+<ul>
+<li><strong><code>"plugin/method"</code></strong> — <em>explicit</em>: use method <code>method</code> from the plugin named
+  <code>plugin</code>. For example, <code>"scipy/default"</code> selects the <code>default</code> method from
+  the <code>scipy</code> plugin.</li>
+<li><strong><code>"method"</code></strong> — <em>implicit</em>: omit the plugin name and let <code>ropt</code> search all
+  registered plugins for one that supports <code>method</code>. This is convenient when
+  only one plugin provides the method, but ambiguous if multiple plugins expose
+  the same name.</li>
+</ul>
+<p>The plugin part corresponds to the name under which the plugin is registered
+(via entry points or direct registration); the method part is any string that
+the plugin's <code>is_supported()</code> classmethod accepts. For example, the built-in
+SciPy backend plugin is named <code>scipy</code> and supports methods like <code>"default"</code>,
+<code>"SLSQP"</code>, and <code>"L-BFGS-B"</code>.</p>
+<p>Both the plugin name and the method name are case-insensitive, so
+<code>"SciPy/SLSQP"</code>, <code>"scipy/slsqp"</code>, and <code>"SCIPY/Slsqp"</code> all resolve to the
+same backend.</p>
+<h3 id="immutability">Immutability</h3>
+<p>Once built, an <a class="autorefs autorefs-internal" title="            EnOptContext" href="../../reference/context/#ropt.context.EnOptContext"><code>EnOptContext</code></a> is frozen. To
+change settings, build a new context from a modified dict.</p>
+<h2 id="section-reference">Section reference</h2>
+<h3 id="variables-variablesconfig"><code>variables</code> — <a class="autorefs autorefs-internal" title="            VariablesConfig" href="../../reference/config/#ropt.config.VariablesConfig"><code>VariablesConfig</code></a></h3>
+<p>Defines the decision variables for the optimization problem.</p>
+<p>The <code>variable_count</code> field is required and determines the total number of
+variables, including both free and fixed variables.</p>
+<p>The <code>lower_bounds</code> and <code>upper_bounds</code> fields define the bounds for each
+variable. They are broadcasted to match the number of variables and default to
+<span class="arithmatex">\(-\infty\)</span> and <span class="arithmatex">\(+\infty\)</span>, respectively. <code>numpy.nan</code> values in these arrays
+indicate unbounded variables and are converted to <code>numpy.inf</code> with the
+appropriate sign.</p>
+<p>The optional <code>types</code> field allows assigning a
+<a class="autorefs autorefs-internal" title="            VariableType" href="../../reference/enums/#ropt.enums.VariableType"><code>VariableType</code></a> to each variable (continuous or
+integer). If not provided, all variables default to continuous
+(<a class="autorefs autorefs-internal" title="            REAL
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../../reference/enums/#ropt.enums.VariableType.REAL"><code>VariableType.REAL</code></a>).</p>
+<p>The optional <code>mask</code> field is a boolean array that indicates which variables are
+free to change during optimization (default: all <code>True</code>, i.e. all variables are
+free). <code>True</code> means the variable is free; <code>False</code> means it is fixed.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="s2">&quot;variables&quot;</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>    <span class="s2">&quot;variable_count&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    <span class="s2">&quot;lower_bounds&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>    <span class="s2">&quot;upper_bounds&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>    <span class="s2">&quot;types&quot;</span><span class="p">:</span> <span class="s2">&quot;real&quot;</span><span class="p">,</span>              <span class="c1"># default; or &quot;integer&quot; for discrete variables</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>    <span class="s2">&quot;mask&quot;</span><span class="p">:</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">],</span>  <span class="c1"># third variable is fixed</span>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>    <span class="s2">&quot;perturbation_magnitudes&quot;</span><span class="p">:</span> <span class="mf">1e-5</span><span class="p">,</span>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="p">}</span>
+</span></code></pre></div>
+<h4 id="variable-perturbations">Variable perturbations</h4>
+<p>The <code>variables</code> section also stores information needed to generate perturbed
+variables for stochastic gradient estimation (see <a href="../gradients/">Stochastic
+Gradients</a>).</p>
+<p>Perturbations are generated by <a class="autorefs autorefs-internal" title="            Sampler" href="../../reference/sampler/#ropt.sampler.Sampler"><code>Sampler</code></a> instances
+configured in the
+<a href="#function_estimators-realization_filters-samplers-transforms"><code>samplers</code></a>
+tuple. The <code>samplers</code> field of <code>variables</code> assigns each variable to a sampler by
+its index into that tuple (default: <code>0</code>, i.e. the first sampler). Unless
+explicitly configured otherwise, the default sampler method is
+<code>"scipy/default"</code>, which draws perturbations from a standard normal distribution
+<span class="arithmatex">\(N(0, 1)\)</span>.</p>
+<p>The generated perturbation values are scaled by <code>perturbation_magnitudes</code>
+(default: <code>0.005</code>) and can be modified based on <code>perturbation_types</code> (see
+<a class="autorefs autorefs-internal" title="            PerturbationType" href="../../reference/enums/#ropt.enums.PerturbationType"><code>PerturbationType</code></a>):</p>
+<ul>
+<li><a class="autorefs autorefs-internal" title="            ABSOLUTE
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../../reference/enums/#ropt.enums.PerturbationType.ABSOLUTE"><code>ABSOLUTE</code></a> (default): the
+  perturbation magnitude is added directly to the variable value.</li>
+<li><a class="autorefs autorefs-internal" title="            RELATIVE
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../../reference/enums/#ropt.enums.PerturbationType.RELATIVE"><code>RELATIVE</code></a>: the magnitude is scaled
+  based on the variable's bounds.</li>
+</ul>
+<p>Perturbed variables may violate the defined bounds. The <code>boundary_types</code> field
+specifies how to handle such violations (see
+<a class="autorefs autorefs-internal" title="            BoundaryType" href="../../reference/enums/#ropt.enums.BoundaryType"><code>BoundaryType</code></a>). The default,
+<a class="autorefs autorefs-internal" title="            MIRROR_BOTH
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../../reference/enums/#ropt.enums.BoundaryType.MIRROR_BOTH"><code>MIRROR_BOTH</code></a>, mirrors perturbations
+back into the valid range.</p>
+<p>The <code>seed</code> value (default: <code>1</code>) ensures consistent results across repeated runs.
+To obtain unique results for each optimization run, modify the seed. A common
+approach is to use a tuple with a unique ID as the first
+element, ensuring reproducibility across nested and parallel evaluations.</p>
+<p>The optional <code>transforms</code> field is an integer array that assigns each variable
+to a <a href="../transforms/">variable transform</a> by index. An out-of-range index
+(default <code>-1</code>) means no transform is applied.</p>
+<div class="admonition tip">
+<p class="admonition-title">Named constants</p>
+<p>The defaults above are defined as named constants in
+<a class="autorefs autorefs-internal" title="            ropt.config.constants" href="../../reference/config/#ropt.config.constants"><code>ropt.config.constants</code></a>:
+<a class="autorefs autorefs-internal" title="            DEFAULT_SEED
+
+
+  
+      module-attribute
+  " href="../../reference/config/#ropt.config.constants.DEFAULT_SEED"><code>DEFAULT_SEED</code></a>,
+<a class="autorefs autorefs-internal" title="            DEFAULT_PERTURBATION_MAGNITUDE
+
+
+  
+      module-attribute
+  " href="../../reference/config/#ropt.config.constants.DEFAULT_PERTURBATION_MAGNITUDE"><code>DEFAULT_PERTURBATION_MAGNITUDE</code></a>,
+<a class="autorefs autorefs-internal" title="            DEFAULT_PERTURBATION_TYPE
+
+
+  
+      module-attribute
+  " href="../../reference/config/#ropt.config.constants.DEFAULT_PERTURBATION_TYPE"><code>DEFAULT_PERTURBATION_TYPE</code></a>, and
+<a class="autorefs autorefs-internal" title="            DEFAULT_PERTURBATION_BOUNDARY_TYPE
+
+
+  
+      module-attribute
+  " href="../../reference/config/#ropt.config.constants.DEFAULT_PERTURBATION_BOUNDARY_TYPE"><code>DEFAULT_PERTURBATION_BOUNDARY_TYPE</code></a>.</p>
+</div>
+<h3 id="objectives-objectivefunctionsconfig"><code>objectives</code> — <a class="autorefs autorefs-internal" title="            ObjectiveFunctionsConfig" href="../../reference/config/#ropt.config.ObjectiveFunctionsConfig"><code>ObjectiveFunctionsConfig</code></a></h3>
+<p><code>ropt</code> supports multi-objective optimization. Multiple objectives are combined
+into a single value by summing them after weighting. The <code>weights</code> field
+determines the weight of each objective function, and its length defines the
+number of objectives (default: <code>[1.0]</code>, i.e. a single objective). The weights
+are automatically normalized to sum to 1 (e.g., <code>[1, 1]</code> becomes <code>[0.5, 0.5]</code>).</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="s2">&quot;objectives&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;weights&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.6</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">]}</span>
+</span></code></pre></div>
+<p>Objective functions can optionally be processed using
+<a href="../realization_filters/">realization filters</a>,
+<a href="../function_estimators/">function estimators</a>, and
+<a href="../transforms/">transforms</a>. The <code>realization_filters</code>,
+<code>function_estimators</code>, and <code>transforms</code> fields are integer index arrays: each
+entry selects an object by its position in the corresponding tuple defined in
+<a class="autorefs autorefs-internal" title="            EnOptContext" href="../../reference/context/#ropt.context.EnOptContext"><code>EnOptContext</code></a>.</p>
+<ul>
+<li><code>realization_filters</code>: default <code>-1</code> (no filter applied).</li>
+<li><code>function_estimators</code>: default <code>0</code> (the first function estimator). Unless
+  explicitly configured otherwise, the default function estimator method is
+  <code>"default/default"</code>, which computes a weighted average of the per-realization
+  values.</li>
+<li><code>transforms</code>: default <code>-1</code> (no transform applied).</li>
+</ul>
+<p>An out-of-range index means no object is applied to that objective.</p>
+<h3 id="linear_constraints-linearconstraintsconfig"><code>linear_constraints</code> — <a class="autorefs autorefs-internal" title="            LinearConstraintsConfig" href="../../reference/config/#ropt.config.LinearConstraintsConfig"><code>LinearConstraintsConfig</code></a></h3>
+<p>Linear constraints are defined by a set of linear equations involving the
+optimization variables. The <code>coefficients</code> field is a 2D array where each row
+represents a constraint and each column corresponds to a variable. The number of
+rows determines the number of constraints.</p>
+<p>The <code>lower_bounds</code> and <code>upper_bounds</code> fields specify the bounds on the
+right-hand side of each constraint equation. They are broadcasted to match the
+number of constraints.</p>
+<ul>
+<li>Less-than inequalities: set <code>lower_bounds</code> to <span class="arithmatex">\(-\infty\)</span>.</li>
+<li>Greater-than inequalities: set <code>upper_bounds</code> to <span class="arithmatex">\(+\infty\)</span>.</li>
+<li>Equality constraints: set <code>lower_bounds</code> equal to <code>upper_bounds</code>.</li>
+</ul>
+<p>All three fields (<code>coefficients</code>, <code>lower_bounds</code>, <code>upper_bounds</code>) are required;
+there are no defaults.</p>
+<div class="admonition note">
+<p class="admonition-title">Linear transformation of variables</p>
+<p>The constraints can be represented as <span class="arithmatex">\(\mathbf{A} \mathbf{x} = \mathbf{b}\)</span>.
+When linearly transforming variables to the optimizer domain via
+<span class="arithmatex">\(\hat{\mathbf{x}} = \mathbf{S} \mathbf{x} + \mathbf{o}\)</span>, the coefficients
+and right-hand-side values must be transformed as:</p>
+<div class="arithmatex">\[ \hat{\mathbf{A}} = \mathbf{A} \mathbf{S}^{-1}, \quad
+   \hat{\mathbf{b}} = \mathbf{b} + \mathbf{A}\mathbf{S}^{-1}\mathbf{o} \]</div>
+</div>
+<h3 id="nonlinear_constraints-nonlinearconstraintsconfig"><code>nonlinear_constraints</code> — <a class="autorefs autorefs-internal" title="            NonlinearConstraintsConfig" href="../../reference/config/#ropt.config.NonlinearConstraintsConfig"><code>NonlinearConstraintsConfig</code></a></h3>
+<p>Nonlinear constraints are defined by comparing a constraint function to
+right-hand-side bounds. The <code>lower_bounds</code> and <code>upper_bounds</code> fields specify
+these bounds, and their length determines the number of constraint functions.
+Both fields are required; there are no defaults.</p>
+<p>The same bound conventions apply as for linear constraints: use <span class="arithmatex">\(-\infty\)</span> or
+<span class="arithmatex">\(+\infty\)</span> for one-sided inequalities, and equal bounds for equality
+constraints.</p>
+<p>The constraint function values are returned by the evaluator in the same array
+as the objectives (appended after them).</p>
+<p>Like objectives, nonlinear constraints can optionally be processed using
+<a href="../realization_filters/">realization filters</a>,
+<a href="../function_estimators/">function estimators</a>, and
+<a href="../transforms/">transforms</a> via index arrays:</p>
+<ul>
+<li><code>realization_filters</code>: default <code>-1</code> (no filter applied).</li>
+<li><code>function_estimators</code>: default <code>0</code> (the first function estimator, which by
+  default computes a weighted average of per-realization values).</li>
+<li><code>transforms</code>: default <code>-1</code> (no transform applied).</li>
+</ul>
+<h3 id="realizations-realizationsconfig"><code>realizations</code> — <a class="autorefs autorefs-internal" title="            RealizationsConfig" href="../../reference/config/#ropt.config.RealizationsConfig"><code>RealizationsConfig</code></a></h3>
+<p>To optimize an ensemble of functions, a set of realizations is defined. When the
+optimizer requests a function value or a gradient, these are calculated for each
+realization and then combined into a single value. Typically, this combination is
+a weighted sum, but other methods are possible (see
+<a href="../function_estimators/">function estimators</a>).</p>
+<p>The <code>weights</code> field determines the weight of each realization, and its length
+defines the ensemble size (default: <code>[1.0]</code>, i.e. a single realization). The
+weights are automatically normalized to sum to 1 (e.g., <code>[1, 1]</code> becomes
+<code>[0.5, 0.5]</code>).</p>
+<p>If function evaluations for some realizations fail (e.g., due to a simulation
+error), the total function and gradient values can still be calculated by
+excluding the missing values. The <code>realization_min_success</code> field specifies the
+minimum number of successful realizations required (default: equal to the number
+of realizations, meaning no failures are allowed).</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Setting <code>realization_min_success</code> to zero allows the optimization to proceed
+even if all realizations fail. While some optimizers can handle this, most
+will treat it as if the value were one, requiring at least one successful
+realization.</p>
+</div>
+<h3 id="optimizer-optimizerconfig"><code>optimizer</code> — <a class="autorefs autorefs-internal" title="            OptimizerConfig" href="../../reference/config/#ropt.config.OptimizerConfig"><code>OptimizerConfig</code></a></h3>
+<p>Workflow-level settings that control how the optimization run is managed. All
+fields are optional and default to <code>None</code> (no limit) or <code>None</code> (no
+redirection):</p>
+<ul>
+<li>
+<p><strong><code>max_batches</code></strong>: Limits the total number of <em>calls</em> made to the evaluation
+  function. An optimizer might request a batch containing multiple function
+  and/or gradient evaluations within a single call. This is particularly useful
+  for managing resource usage when batches are evaluated in parallel (e.g., on
+  an HPC cluster), as it controls the number of sequential submission steps. The
+  number of batches does not necessarily correspond directly to the number of
+  optimizer iterations.</p>
+</li>
+<li>
+<p><strong><code>max_functions</code></strong>: Imposes a hard limit on the total <em>number</em> of individual
+  objective function evaluations performed across all batches. Since a single
+  batch can involve multiple function evaluations, this provides more granular
+  control over total computational effort. Note that exceeding this limit might
+  cause the optimization to terminate mid-batch.</p>
+</li>
+<li>
+<p><strong><code>output_dir</code></strong> (default: <code>None</code>): An optional output directory where the
+  optimizer can store files. When <code>None</code>, no output directory is used.</p>
+</li>
+<li><strong><code>stdout</code></strong> (default: <code>None</code>): Redirect optimizer standard output to the
+  given file. When <code>None</code>, standard output is discarded.</li>
+<li><strong><code>stderr</code></strong> (default: <code>None</code>): Redirect optimizer standard error to the given
+  file. When <code>None</code>, standard error is discarded.</li>
+</ul>
+<h3 id="backend-backendconfig"><code>backend</code> — <a class="autorefs autorefs-internal" title="            BackendConfig" href="../../reference/config/#ropt.config.BackendConfig"><code>BackendConfig</code></a></h3>
+<p>Selects the optimizer algorithm and provides a standardized set of common
+settings that are forwarded to the backend:</p>
+<ul>
+<li><strong><code>method</code></strong> (default: <code>"scipy/default"</code>): Selects the algorithm using a
+  <code>"plugin/method"</code> string. The default uses SciPy's SLSQP optimizer.</li>
+<li><strong><code>max_iterations</code></strong> (default: <code>None</code>): Maximum number of iterations. The
+  exact definition depends on the optimizer backend, and not all backends
+  support this setting.</li>
+<li><strong><code>convergence_tolerance</code></strong> (default: <code>None</code>): Convergence tolerance used as a
+  stopping criterion. The exact definition depends on the optimizer, and not all
+  backends support this setting.</li>
+<li><strong><code>parallel</code></strong> (default: <code>False</code>): If <code>True</code>, allows the optimizer to use
+  parallelized function evaluations. Typically applies to gradient-free methods;
+  not all backends support this setting.</li>
+<li><strong><code>options</code></strong> (default: <code>None</code>): A dictionary or list of strings for generic
+  optimizer options. The format and interpretation depend on the specific
+  optimization method. These are passed straight to the backend.</li>
+</ul>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="s2">&quot;backend&quot;</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>    <span class="s2">&quot;method&quot;</span><span class="p">:</span> <span class="s2">&quot;scipy/default&quot;</span><span class="p">,</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>    <span class="s2">&quot;max_iterations&quot;</span><span class="p">:</span> <span class="mi">200</span><span class="p">,</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>    <span class="s2">&quot;options&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;maxiter&quot;</span><span class="p">:</span> <span class="mi">200</span><span class="p">},</span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="p">}</span>
+</span></code></pre></div>
+<h3 id="gradient-gradientconfig"><code>gradient</code> — <a class="autorefs autorefs-internal" title="            GradientConfig" href="../../reference/config/#ropt.config.GradientConfig"><code>GradientConfig</code></a></h3>
+<p>Controls how stochastic gradients are estimated (see also <a href="../gradients/">Stochastic
+Gradients</a> for a deeper discussion).</p>
+<p>Gradients are estimated using function values calculated from perturbed and
+unperturbed variables. The <code>number_of_perturbations</code> field determines how many
+perturbed variable sets are used (default:
+<a class="autorefs autorefs-internal" title="            DEFAULT_NUMBER_OF_PERTURBATIONS
+
+
+  
+      module-attribute
+  " href="../../reference/config/#ropt.config.constants.DEFAULT_NUMBER_OF_PERTURBATIONS"><code>DEFAULT_NUMBER_OF_PERTURBATIONS</code></a>
+= <code>5</code>, must be at least 1).</p>
+<p>If function evaluations for some perturbations fail, the gradient can still be
+estimated as long as a minimum number succeed. The <code>perturbation_min_success</code>
+field specifies this minimum (default: equal to <code>number_of_perturbations</code>).</p>
+<p>Gradients are calculated for each realization individually and then combined. If
+<code>number_of_perturbations</code> is low (or just 1), individual gradient calculations
+may be unreliable. Setting <code>merge_realizations</code> to <code>True</code> (default: <code>False</code>)
+directs the optimizer to combine the results of all realizations directly into a
+single gradient estimate.</p>
+<p>The <code>evaluation_policy</code> option (default: <code>"auto"</code>) controls how and when
+objective functions and gradients are calculated:</p>
+<ul>
+<li><strong><code>"auto"</code></strong>: Evaluate functions and/or gradients strictly according to the
+  optimizer's requests.</li>
+<li><strong><code>"speculative"</code></strong>: Evaluate the gradient whenever the objective function is
+  requested, even if the optimizer hasn't explicitly asked for it. This can
+  improve load balancing on HPC clusters by initiating gradient work earlier.</li>
+<li><strong><code>"separate"</code></strong>: Always launch function and gradient evaluations as distinct
+  operations, even if the optimizer requests both simultaneously. Useful when
+  employing <a href="../realization_filters/">realization filters</a> that might disable
+  certain realizations, as it can reduce the number of gradient evaluations
+  needed based on information obtained from the function evaluations.</li>
+</ul>
+<h3 id="function_estimators-realization_filters-samplers-transforms"><code>function_estimators</code>, <code>realization_filters</code>, <code>samplers</code>, <code>transforms</code></h3>
+<p>These are lists of component object configurations (see <a href="#index-based-sharing-of-component-objects">Index-based sharing of
+component objects</a> above for how
+objects are referenced by index). Each entry configures a plugin instance via a
+<code>method</code> field and an optional <code>options</code> dict.</p>
+<h4 id="function-estimators-functionestimatorconfig">Function estimators — <a class="autorefs autorefs-internal" title="            FunctionEstimatorConfig" href="../../reference/config/#ropt.config.FunctionEstimatorConfig"><code>FunctionEstimatorConfig</code></a></h4>
+<p><a href="../function_estimators/">Function estimators</a> control how objective and
+constraint function values (and their gradients) are combined across
+realizations. By default, a weighted average over realizations is used; function
+estimators allow replacing that with a different combination method (e.g.,
+standard deviation).</p>
+<p>Fields:</p>
+<ul>
+<li><code>method</code> (default: <code>"default/default"</code>): Selects the estimator plugin.</li>
+<li><code>options</code> (default: <code>{}</code>): Plugin-specific options.</li>
+</ul>
+<h4 id="realization-filters-realizationfilterconfig">Realization filters — <a class="autorefs autorefs-internal" title="            RealizationFilterConfig" href="../../reference/config/#ropt.config.RealizationFilterConfig"><code>RealizationFilterConfig</code></a></h4>
+<p><a href="../realization_filters/">Realization filters</a> modify the weights of individual
+realizations. For example, they can select a subset of realizations by setting
+the weights of the others to zero — useful for constructing risk-aware
+objectives.</p>
+<p>Fields:</p>
+<ul>
+<li><code>method</code> (required, no default): Selects the filter plugin.</li>
+<li><code>options</code> (default: <code>{}</code>): Plugin-specific options.</li>
+</ul>
+<h4 id="samplers-samplerconfig">Samplers — <a class="autorefs autorefs-internal" title="            SamplerConfig" href="../../reference/config/#ropt.config.SamplerConfig"><code>SamplerConfig</code></a></h4>
+<p><a href="../gradients/">Samplers</a> generate perturbations added to variables for gradient
+calculations. These perturbations can be deterministic or stochastic.</p>
+<p>Fields:</p>
+<ul>
+<li><code>method</code> (default: <code>"scipy/default"</code>): Selects the sampler plugin. The default
+  draws perturbations from a standard normal distribution <span class="arithmatex">\(N(0, 1)\)</span>.</li>
+<li><code>options</code> (default: <code>{}</code>): Plugin-specific options.</li>
+<li><code>shared</code> (default: <code>False</code>): If <code>True</code>, the same set of perturbed values is
+  used for all realizations.</li>
+</ul>
+<h4 id="transforms">Transforms</h4>
+<p><a href="../transforms/">Transforms</a> modify values as they pass between the user's
+domain and the optimizer's domain. Three types exist:</p>
+<ul>
+<li><a class="autorefs autorefs-internal" title="            VariableTransformConfig" href="../../reference/config/#ropt.config.VariableTransformConfig"><code>VariableTransformConfig</code></a>: transforms
+  variables to the optimizer's domain (default method: <code>"default/default"</code>).</li>
+<li><a class="autorefs autorefs-internal" title="            ObjectiveTransformConfig" href="../../reference/config/#ropt.config.ObjectiveTransformConfig"><code>ObjectiveTransformConfig</code></a>: transforms
+  objective values (default method: <code>"default/default"</code>).</li>
+<li><a class="autorefs autorefs-internal" title="            NonlinearConstraintTransformConfig" href="../../reference/config/#ropt.config.NonlinearConstraintTransformConfig"><code>NonlinearConstraintTransformConfig</code></a>:
+  transforms constraint values (default method: <code>"default/default"</code>).</li>
+</ul>
+<p>Each has a <code>method</code> field and an <code>options</code> dict (default: <code>{}</code>).</p>
+<h3 id="names"><code>names</code></h3>
+<p>Optional mapping from an <a class="autorefs autorefs-internal" title="            AxisName" href="../../reference/enums/#ropt.enums.AxisName"><code>AxisName</code></a> (e.g.
+<code>"variable"</code>, <code>"objective"</code>) to a tuple of labels. Used to produce labelled
+multi-index data frames when results are exported.</p>
+<h2 id="a-worked-example">A worked example</h2>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">CONFIG</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>    <span class="s2">&quot;variables&quot;</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>        <span class="s2">&quot;variable_count&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>        <span class="s2">&quot;lower_bounds&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">5.0</span><span class="p">,</span>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>        <span class="s2">&quot;upper_bounds&quot;</span><span class="p">:</span>  <span class="mf">5.0</span><span class="p">,</span>
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>        <span class="s2">&quot;perturbation_magnitudes&quot;</span><span class="p">:</span> <span class="mf">1e-5</span><span class="p">,</span>
+</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>    <span class="p">},</span>
+</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>    <span class="s2">&quot;objectives&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;weights&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">]},</span>
+</span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>    <span class="s2">&quot;realizations&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;weights&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">]</span> <span class="o">*</span> <span class="mi">10</span><span class="p">},</span>
+</span><span id="__span-7-10"><a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a>    <span class="s2">&quot;gradient&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;number_of_perturbations&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">},</span>
+</span><span id="__span-7-11"><a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a>    <span class="s2">&quot;optimizer&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;max_batches&quot;</span><span class="p">:</span> <span class="mi">50</span><span class="p">},</span>
+</span><span id="__span-7-12"><a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a>    <span class="s2">&quot;backend&quot;</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="__span-7-13"><a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a>        <span class="s2">&quot;method&quot;</span><span class="p">:</span> <span class="s2">&quot;scipy/default&quot;</span><span class="p">,</span>
+</span><span id="__span-7-14"><a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a>        <span class="s2">&quot;options&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;maxiter&quot;</span><span class="p">:</span> <span class="mi">200</span><span class="p">},</span>
+</span><span id="__span-7-15"><a id="__codelineno-7-15" name="__codelineno-7-15" href="#__codelineno-7-15"></a>    <span class="p">},</span>
+</span><span id="__span-7-16"><a id="__codelineno-7-16" name="__codelineno-7-16" href="#__codelineno-7-16"></a><span class="p">}</span>
+</span></code></pre></div>
+<p>This configures a 5-variable problem with bounded variables, an ensemble of
+10 equally-weighted realizations, 5 perturbations per gradient estimate,
+SciPy's default optimizer, and a 50-batch cap.</p>
+<h2 id="full-configuration-schema">Full configuration schema</h2>
+<p>Expand the block below to see every field and its default value.</p>
+<details class="example">
+<summary>Fully expanded configuration (all defaults shown)</summary>
+<p>The example below shows every top-level section of the
+<a class="autorefs autorefs-internal" title="            EnOptContext" href="../../reference/context/#ropt.context.EnOptContext"><code>EnOptContext</code></a> configuration with all fields
+set to their default values. In practice you only need to specify the
+fields you want to override — everything else is filled in automatically.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.enums</span><span class="w"> </span><span class="kn">import</span> <span class="n">BoundaryType</span><span class="p">,</span> <span class="n">PerturbationType</span><span class="p">,</span> <span class="n">VariableType</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="n">CONFIG</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>    <span class="s2">&quot;variables&quot;</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>        <span class="s2">&quot;variable_count&quot;</span><span class="p">:</span> <span class="o">...</span><span class="p">,</span>                            <span class="c1"># required, no default</span>
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>        <span class="s2">&quot;lower_bounds&quot;</span><span class="p">:</span> <span class="o">-</span><span class="nb">float</span><span class="p">(</span><span class="s2">&quot;inf&quot;</span><span class="p">),</span>                    <span class="c1"># default: -inf</span>
+</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>        <span class="s2">&quot;upper_bounds&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;inf&quot;</span><span class="p">),</span>                     <span class="c1"># default: +inf</span>
+</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>        <span class="s2">&quot;types&quot;</span><span class="p">:</span> <span class="n">VariableType</span><span class="o">.</span><span class="n">REAL</span><span class="p">,</span>                       <span class="c1"># default: &quot;real&quot; (continuous)</span>
+</span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>        <span class="s2">&quot;mask&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>                                     <span class="c1"># default: all free</span>
+</span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a>        <span class="s2">&quot;perturbation_magnitudes&quot;</span><span class="p">:</span> <span class="mf">0.005</span><span class="p">,</span>
+</span><span id="__span-8-11"><a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a>        <span class="s2">&quot;perturbation_types&quot;</span><span class="p">:</span> <span class="n">PerturbationType</span><span class="o">.</span><span class="n">ABSOLUTE</span><span class="p">,</span>
+</span><span id="__span-8-12"><a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a>        <span class="s2">&quot;boundary_types&quot;</span><span class="p">:</span> <span class="n">BoundaryType</span><span class="o">.</span><span class="n">MIRROR_BOTH</span><span class="p">,</span>
+</span><span id="__span-8-13"><a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a>        <span class="s2">&quot;samplers&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>                                    <span class="c1"># default: use first sampler for all</span>
+</span><span id="__span-8-14"><a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a>        <span class="s2">&quot;seed&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+</span><span id="__span-8-15"><a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a>        <span class="s2">&quot;transforms&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>                                 <span class="c1"># default: no transform</span>
+</span><span id="__span-8-16"><a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a>    <span class="p">},</span>
+</span><span id="__span-8-17"><a id="__codelineno-8-17" name="__codelineno-8-17" href="#__codelineno-8-17"></a>    <span class="s2">&quot;objectives&quot;</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="__span-8-18"><a id="__codelineno-8-18" name="__codelineno-8-18" href="#__codelineno-8-18"></a>        <span class="s2">&quot;weights&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">],</span>                                 <span class="c1"># default: single objective, weight 1.0</span>
+</span><span id="__span-8-19"><a id="__codelineno-8-19" name="__codelineno-8-19" href="#__codelineno-8-19"></a>        <span class="s2">&quot;realization_filters&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>                        <span class="c1"># default: no filter</span>
+</span><span id="__span-8-20"><a id="__codelineno-8-20" name="__codelineno-8-20" href="#__codelineno-8-20"></a>        <span class="s2">&quot;function_estimators&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>                         <span class="c1"># default: use first estimator for all</span>
+</span><span id="__span-8-21"><a id="__codelineno-8-21" name="__codelineno-8-21" href="#__codelineno-8-21"></a>        <span class="s2">&quot;transforms&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>                                 <span class="c1"># default: no transform</span>
+</span><span id="__span-8-22"><a id="__codelineno-8-22" name="__codelineno-8-22" href="#__codelineno-8-22"></a>    <span class="p">},</span>
+</span><span id="__span-8-23"><a id="__codelineno-8-23" name="__codelineno-8-23" href="#__codelineno-8-23"></a>    <span class="s2">&quot;linear_constraints&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>                           <span class="c1"># No linear constraints</span>
+</span><span id="__span-8-24"><a id="__codelineno-8-24" name="__codelineno-8-24" href="#__codelineno-8-24"></a>    <span class="s2">&quot;nonlinear_constraints&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>                        <span class="c1"># No non-linear constraints</span>
+</span><span id="__span-8-25"><a id="__codelineno-8-25" name="__codelineno-8-25" href="#__codelineno-8-25"></a>    <span class="s2">&quot;realizations&quot;</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="__span-8-26"><a id="__codelineno-8-26" name="__codelineno-8-26" href="#__codelineno-8-26"></a>        <span class="s2">&quot;weights&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">],</span>                                 <span class="c1"># default: single realization, weight 1.0</span>
+</span><span id="__span-8-27"><a id="__codelineno-8-27" name="__codelineno-8-27" href="#__codelineno-8-27"></a>        <span class="s2">&quot;realization_min_success&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>                  <span class="c1"># default: equal to number of realizations</span>
+</span><span id="__span-8-28"><a id="__codelineno-8-28" name="__codelineno-8-28" href="#__codelineno-8-28"></a>    <span class="p">},</span>
+</span><span id="__span-8-29"><a id="__codelineno-8-29" name="__codelineno-8-29" href="#__codelineno-8-29"></a>    <span class="s2">&quot;optimizer&quot;</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="__span-8-30"><a id="__codelineno-8-30" name="__codelineno-8-30" href="#__codelineno-8-30"></a>        <span class="s2">&quot;max_batches&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>                              <span class="c1"># default: no limit</span>
+</span><span id="__span-8-31"><a id="__codelineno-8-31" name="__codelineno-8-31" href="#__codelineno-8-31"></a>        <span class="s2">&quot;max_functions&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>                            <span class="c1"># default: no limit</span>
+</span><span id="__span-8-32"><a id="__codelineno-8-32" name="__codelineno-8-32" href="#__codelineno-8-32"></a>        <span class="s2">&quot;output_dir&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>                               <span class="c1"># default: no output directory</span>
+</span><span id="__span-8-33"><a id="__codelineno-8-33" name="__codelineno-8-33" href="#__codelineno-8-33"></a>        <span class="s2">&quot;stdout&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>                                   <span class="c1"># default: discard</span>
+</span><span id="__span-8-34"><a id="__codelineno-8-34" name="__codelineno-8-34" href="#__codelineno-8-34"></a>        <span class="s2">&quot;stderr&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>                                   <span class="c1"># default: discard</span>
+</span><span id="__span-8-35"><a id="__codelineno-8-35" name="__codelineno-8-35" href="#__codelineno-8-35"></a>    <span class="p">},</span>
+</span><span id="__span-8-36"><a id="__codelineno-8-36" name="__codelineno-8-36" href="#__codelineno-8-36"></a>    <span class="s2">&quot;backend&quot;</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="__span-8-37"><a id="__codelineno-8-37" name="__codelineno-8-37" href="#__codelineno-8-37"></a>        <span class="s2">&quot;method&quot;</span><span class="p">:</span> <span class="s2">&quot;scipy/default&quot;</span><span class="p">,</span>                        <span class="c1"># default: SciPy SLSQP</span>
+</span><span id="__span-8-38"><a id="__codelineno-8-38" name="__codelineno-8-38" href="#__codelineno-8-38"></a>        <span class="s2">&quot;max_iterations&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>                           <span class="c1"># default: backend-specific</span>
+</span><span id="__span-8-39"><a id="__codelineno-8-39" name="__codelineno-8-39" href="#__codelineno-8-39"></a>        <span class="s2">&quot;convergence_tolerance&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>                    <span class="c1"># default: backend-specific</span>
+</span><span id="__span-8-40"><a id="__codelineno-8-40" name="__codelineno-8-40" href="#__codelineno-8-40"></a>        <span class="s2">&quot;parallel&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>                                <span class="c1"># default: Do not evaluate in parallel</span>
+</span><span id="__span-8-41"><a id="__codelineno-8-41" name="__codelineno-8-41" href="#__codelineno-8-41"></a>        <span class="s2">&quot;options&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>                                  <span class="c1"># default: no extra options</span>
+</span><span id="__span-8-42"><a id="__codelineno-8-42" name="__codelineno-8-42" href="#__codelineno-8-42"></a>    <span class="p">},</span>
+</span><span id="__span-8-43"><a id="__codelineno-8-43" name="__codelineno-8-43" href="#__codelineno-8-43"></a>    <span class="s2">&quot;gradient&quot;</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="__span-8-44"><a id="__codelineno-8-44" name="__codelineno-8-44" href="#__codelineno-8-44"></a>        <span class="s2">&quot;number_of_perturbations&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+</span><span id="__span-8-45"><a id="__codelineno-8-45" name="__codelineno-8-45" href="#__codelineno-8-45"></a>        <span class="s2">&quot;perturbation_min_success&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>                 <span class="c1"># default: equal to number_of_perturbations</span>
+</span><span id="__span-8-46"><a id="__codelineno-8-46" name="__codelineno-8-46" href="#__codelineno-8-46"></a>        <span class="s2">&quot;merge_realizations&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>                      <span class="c1"># default: estimate and average gradients</span>
+</span><span id="__span-8-47"><a id="__codelineno-8-47" name="__codelineno-8-47" href="#__codelineno-8-47"></a>        <span class="s2">&quot;evaluation_policy&quot;</span><span class="p">:</span> <span class="s2">&quot;auto&quot;</span><span class="p">,</span>                      <span class="c1"># default: evaluate functions and perturbations</span>
+</span><span id="__span-8-48"><a id="__codelineno-8-48" name="__codelineno-8-48" href="#__codelineno-8-48"></a>    <span class="p">},</span>                                                    <span class="c1">#          as needed</span>
+</span><span id="__span-8-49"><a id="__codelineno-8-49" name="__codelineno-8-49" href="#__codelineno-8-49"></a>    <span class="s2">&quot;samplers&quot;</span><span class="p">:</span> <span class="p">[</span>
+</span><span id="__span-8-50"><a id="__codelineno-8-50" name="__codelineno-8-50" href="#__codelineno-8-50"></a>        <span class="p">{</span>
+</span><span id="__span-8-51"><a id="__codelineno-8-51" name="__codelineno-8-51" href="#__codelineno-8-51"></a>            <span class="s2">&quot;method&quot;</span><span class="p">:</span> <span class="s2">&quot;scipy/default&quot;</span><span class="p">,</span>                    <span class="c1"># default: standard normal N(0,1)</span>
+</span><span id="__span-8-52"><a id="__codelineno-8-52" name="__codelineno-8-52" href="#__codelineno-8-52"></a>            <span class="s2">&quot;options&quot;</span><span class="p">:</span> <span class="p">{},</span>
+</span><span id="__span-8-53"><a id="__codelineno-8-53" name="__codelineno-8-53" href="#__codelineno-8-53"></a>            <span class="s2">&quot;shared&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>                              <span class="c1"># default: Each realizations has its own</span>
+</span><span id="__span-8-54"><a id="__codelineno-8-54" name="__codelineno-8-54" href="#__codelineno-8-54"></a>                                                          <span class="c1">#          set of perturbations</span>
+</span><span id="__span-8-55"><a id="__codelineno-8-55" name="__codelineno-8-55" href="#__codelineno-8-55"></a>        <span class="p">},</span>
+</span><span id="__span-8-56"><a id="__codelineno-8-56" name="__codelineno-8-56" href="#__codelineno-8-56"></a>    <span class="p">],</span>
+</span><span id="__span-8-57"><a id="__codelineno-8-57" name="__codelineno-8-57" href="#__codelineno-8-57"></a>    <span class="s2">&quot;function_estimators&quot;</span><span class="p">:</span> <span class="p">[</span>
+</span><span id="__span-8-58"><a id="__codelineno-8-58" name="__codelineno-8-58" href="#__codelineno-8-58"></a>        <span class="p">{</span>
+</span><span id="__span-8-59"><a id="__codelineno-8-59" name="__codelineno-8-59" href="#__codelineno-8-59"></a>            <span class="s2">&quot;method&quot;</span><span class="p">:</span> <span class="s2">&quot;default/default&quot;</span><span class="p">,</span>                  <span class="c1"># default: weighted average</span>
+</span><span id="__span-8-60"><a id="__codelineno-8-60" name="__codelineno-8-60" href="#__codelineno-8-60"></a>            <span class="s2">&quot;options&quot;</span><span class="p">:</span> <span class="p">{},</span>
+</span><span id="__span-8-61"><a id="__codelineno-8-61" name="__codelineno-8-61" href="#__codelineno-8-61"></a>        <span class="p">},</span>
+</span><span id="__span-8-62"><a id="__codelineno-8-62" name="__codelineno-8-62" href="#__codelineno-8-62"></a>    <span class="p">],</span>
+</span><span id="__span-8-63"><a id="__codelineno-8-63" name="__codelineno-8-63" href="#__codelineno-8-63"></a>    <span class="s2">&quot;realization_filters&quot;</span><span class="p">:</span> <span class="p">[],</span>                            <span class="c1"># default: none configured</span>
+</span><span id="__span-8-64"><a id="__codelineno-8-64" name="__codelineno-8-64" href="#__codelineno-8-64"></a>    <span class="s2">&quot;variable_transforms&quot;</span><span class="p">:</span> <span class="p">[],</span>                            <span class="c1"># default: none configured</span>
+</span><span id="__span-8-65"><a id="__codelineno-8-65" name="__codelineno-8-65" href="#__codelineno-8-65"></a>    <span class="s2">&quot;objective_transforms&quot;</span><span class="p">:</span> <span class="p">[],</span>                           <span class="c1"># default: none configured</span>
+</span><span id="__span-8-66"><a id="__codelineno-8-66" name="__codelineno-8-66" href="#__codelineno-8-66"></a>    <span class="s2">&quot;nonlinear_constraint_transforms&quot;</span><span class="p">:</span> <span class="p">[],</span>                <span class="c1"># default: none configured</span>
+</span><span id="__span-8-67"><a id="__codelineno-8-67" name="__codelineno-8-67" href="#__codelineno-8-67"></a><span class="p">}</span>
+</span></code></pre></div>
+<p>Some sections above are set to <code>None</code> or <code>[]</code> because they are optional
+and problem-specific. When configured, their internal structure is as
+follows:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="c1"># linear_constraints (all fields required, no defaults):</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="s2">&quot;linear_constraints&quot;</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>    <span class="s2">&quot;coefficients&quot;</span><span class="p">:</span> <span class="o">...</span><span class="p">,</span>                      <span class="c1"># required: 2D array (constraints × variables)</span>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>    <span class="s2">&quot;lower_bounds&quot;</span><span class="p">:</span> <span class="o">...</span><span class="p">,</span>                      <span class="c1"># required: 1D array (one per constraint)</span>
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>    <span class="s2">&quot;upper_bounds&quot;</span><span class="p">:</span> <span class="o">...</span><span class="p">,</span>                      <span class="c1"># required: 1D array (one per constraint)</span>
+</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="p">}</span>
+</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a>
+</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="c1"># nonlinear_constraints (bounds are required, the rest has defaults):</span>
+</span><span id="__span-9-9"><a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="s2">&quot;nonlinear_constraints&quot;</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="__span-9-10"><a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a>    <span class="s2">&quot;lower_bounds&quot;</span><span class="p">:</span> <span class="o">...</span><span class="p">,</span>                      <span class="c1"># required: 1D array (one per constraint)</span>
+</span><span id="__span-9-11"><a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a>    <span class="s2">&quot;upper_bounds&quot;</span><span class="p">:</span> <span class="o">...</span><span class="p">,</span>                      <span class="c1"># required: 1D array (one per constraint)</span>
+</span><span id="__span-9-12"><a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a>    <span class="s2">&quot;realization_filters&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>                <span class="c1"># default: no filter</span>
+</span><span id="__span-9-13"><a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a>    <span class="s2">&quot;function_estimators&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>                 <span class="c1"># default: use first estimator</span>
+</span><span id="__span-9-14"><a id="__codelineno-9-14" name="__codelineno-9-14" href="#__codelineno-9-14"></a>    <span class="s2">&quot;transforms&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>                         <span class="c1"># default: no transform</span>
+</span><span id="__span-9-15"><a id="__codelineno-9-15" name="__codelineno-9-15" href="#__codelineno-9-15"></a><span class="p">}</span>
+</span><span id="__span-9-16"><a id="__codelineno-9-16" name="__codelineno-9-16" href="#__codelineno-9-16"></a>
+</span><span id="__span-9-17"><a id="__codelineno-9-17" name="__codelineno-9-17" href="#__codelineno-9-17"></a><span class="c1"># realization_filters entries (method is required):</span>
+</span><span id="__span-9-18"><a id="__codelineno-9-18" name="__codelineno-9-18" href="#__codelineno-9-18"></a><span class="s2">&quot;realization_filters&quot;</span><span class="p">:</span> <span class="p">[</span>
+</span><span id="__span-9-19"><a id="__codelineno-9-19" name="__codelineno-9-19" href="#__codelineno-9-19"></a>    <span class="p">{</span>
+</span><span id="__span-9-20"><a id="__codelineno-9-20" name="__codelineno-9-20" href="#__codelineno-9-20"></a>        <span class="s2">&quot;method&quot;</span><span class="p">:</span> <span class="o">...</span><span class="p">,</span>                        <span class="c1"># required: str (&quot;plugin/method&quot;)</span>
+</span><span id="__span-9-21"><a id="__codelineno-9-21" name="__codelineno-9-21" href="#__codelineno-9-21"></a>        <span class="s2">&quot;options&quot;</span><span class="p">:</span> <span class="p">{},</span>
+</span><span id="__span-9-22"><a id="__codelineno-9-22" name="__codelineno-9-22" href="#__codelineno-9-22"></a>    <span class="p">},</span>
+</span><span id="__span-9-23"><a id="__codelineno-9-23" name="__codelineno-9-23" href="#__codelineno-9-23"></a><span class="p">]</span>
+</span><span id="__span-9-24"><a id="__codelineno-9-24" name="__codelineno-9-24" href="#__codelineno-9-24"></a>
+</span><span id="__span-9-25"><a id="__codelineno-9-25" name="__codelineno-9-25" href="#__codelineno-9-25"></a><span class="c1"># variable_transforms entries:</span>
+</span><span id="__span-9-26"><a id="__codelineno-9-26" name="__codelineno-9-26" href="#__codelineno-9-26"></a><span class="s2">&quot;variable_transforms&quot;</span><span class="p">:</span> <span class="p">[</span>
+</span><span id="__span-9-27"><a id="__codelineno-9-27" name="__codelineno-9-27" href="#__codelineno-9-27"></a>    <span class="p">{</span>
+</span><span id="__span-9-28"><a id="__codelineno-9-28" name="__codelineno-9-28" href="#__codelineno-9-28"></a>        <span class="s2">&quot;method&quot;</span><span class="p">:</span> <span class="s2">&quot;default/default&quot;</span><span class="p">,</span>
+</span><span id="__span-9-29"><a id="__codelineno-9-29" name="__codelineno-9-29" href="#__codelineno-9-29"></a>        <span class="s2">&quot;options&quot;</span><span class="p">:</span> <span class="p">{},</span>
+</span><span id="__span-9-30"><a id="__codelineno-9-30" name="__codelineno-9-30" href="#__codelineno-9-30"></a>    <span class="p">},</span>
+</span><span id="__span-9-31"><a id="__codelineno-9-31" name="__codelineno-9-31" href="#__codelineno-9-31"></a><span class="p">]</span>
+</span><span id="__span-9-32"><a id="__codelineno-9-32" name="__codelineno-9-32" href="#__codelineno-9-32"></a>
+</span><span id="__span-9-33"><a id="__codelineno-9-33" name="__codelineno-9-33" href="#__codelineno-9-33"></a><span class="c1"># objective_transforms entries:</span>
+</span><span id="__span-9-34"><a id="__codelineno-9-34" name="__codelineno-9-34" href="#__codelineno-9-34"></a><span class="s2">&quot;objective_transforms&quot;</span><span class="p">:</span> <span class="p">[</span>
+</span><span id="__span-9-35"><a id="__codelineno-9-35" name="__codelineno-9-35" href="#__codelineno-9-35"></a>    <span class="p">{</span>
+</span><span id="__span-9-36"><a id="__codelineno-9-36" name="__codelineno-9-36" href="#__codelineno-9-36"></a>        <span class="s2">&quot;method&quot;</span><span class="p">:</span> <span class="s2">&quot;default/default&quot;</span><span class="p">,</span>
+</span><span id="__span-9-37"><a id="__codelineno-9-37" name="__codelineno-9-37" href="#__codelineno-9-37"></a>        <span class="s2">&quot;options&quot;</span><span class="p">:</span> <span class="p">{},</span>
+</span><span id="__span-9-38"><a id="__codelineno-9-38" name="__codelineno-9-38" href="#__codelineno-9-38"></a>    <span class="p">},</span>
+</span><span id="__span-9-39"><a id="__codelineno-9-39" name="__codelineno-9-39" href="#__codelineno-9-39"></a><span class="p">]</span>
+</span><span id="__span-9-40"><a id="__codelineno-9-40" name="__codelineno-9-40" href="#__codelineno-9-40"></a>
+</span><span id="__span-9-41"><a id="__codelineno-9-41" name="__codelineno-9-41" href="#__codelineno-9-41"></a><span class="c1"># nonlinear_constraint_transforms entries:</span>
+</span><span id="__span-9-42"><a id="__codelineno-9-42" name="__codelineno-9-42" href="#__codelineno-9-42"></a><span class="s2">&quot;nonlinear_constraint_transforms&quot;</span><span class="p">:</span> <span class="p">[</span>
+</span><span id="__span-9-43"><a id="__codelineno-9-43" name="__codelineno-9-43" href="#__codelineno-9-43"></a>    <span class="p">{</span>
+</span><span id="__span-9-44"><a id="__codelineno-9-44" name="__codelineno-9-44" href="#__codelineno-9-44"></a>        <span class="s2">&quot;method&quot;</span><span class="p">:</span> <span class="s2">&quot;default/default&quot;</span><span class="p">,</span>
+</span><span id="__span-9-45"><a id="__codelineno-9-45" name="__codelineno-9-45" href="#__codelineno-9-45"></a>        <span class="s2">&quot;options&quot;</span><span class="p">:</span> <span class="p">{},</span>
+</span><span id="__span-9-46"><a id="__codelineno-9-46" name="__codelineno-9-46" href="#__codelineno-9-46"></a>    <span class="p">},</span>
+</span><span id="__span-9-47"><a id="__codelineno-9-47" name="__codelineno-9-47" href="#__codelineno-9-47"></a><span class="p">]</span>
+</span></code></pre></div>
+</details>
+<h2 id="where-to-next">Where to next</h2>
+<ul>
+<li><a href="../evaluator_callback/">Writing an Evaluator</a> — produce the values that <code>ropt</code>
+  consumes.</li>
+<li><a href="../results/">Working with Results</a> — read the optimization output.</li>
+<li><a href="../workflows/">Optimization Workflows</a> — go beyond a single <code>BasicOptimizer</code>
+  run.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../basic/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Basic Optimization">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Basic Optimization
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../evaluator_callback/" class="md-footer__link md-footer__link--next" aria-label="Next: Writing an Evaluator Callback">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Writing an Evaluator Callback
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.expand", "navigation.footer", "navigation.sections", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="../../javascripts/mathjax.js"></script>
+      
+        <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>

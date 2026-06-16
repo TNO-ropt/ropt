@@ -9,10 +9,10 @@
       
       
       
-        <link rel="prev" href="../config/">
+        <link rel="prev" href="../workflows/">
       
       
-        <link rel="next" href="../basic_optimizer/">
+        <link rel="next" href="../../reference/config/">
       
       
         
@@ -23,7 +23,7 @@
     
     
       
-        <title>Context Class - ropt Documentation</title>
+        <title>Parallel Evaluation - ropt Documentation</title>
       
     
     
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#context-class" class="md-skip">
+        <a href="#parallel-evaluation" class="md-skip">
           Skip to content
         </a>
       
@@ -118,7 +118,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Context Class
+              Parallel Evaluation
             
           </span>
         </div>
@@ -240,11 +240,13 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="../../usage/background/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../background/" class="md-tabs__link">
           
   
   
@@ -260,8 +262,6 @@
   
   
   
-    
-  
   
     
     
@@ -269,13 +269,11 @@
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="../config/" class="md-tabs__link">
+      <li class="md-tabs__item">
+        <a href="../../reference/config/" class="md-tabs__link">
           
   
   
@@ -372,28 +370,31 @@
       
   
   
+    
   
   
+  
     
     
     
     
+      
+        
+        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
         
           
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
-        
-          
-          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
             
   
   
@@ -411,7 +412,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_2">
             <span class="md-nav__icon md-icon"></span>
             
@@ -429,7 +430,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../usage/background/" class="md-nav__link">
+      <a href="../background/" class="md-nav__link">
         
   
   
@@ -457,7 +458,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../usage/installation/" class="md-nav__link">
+      <a href="../installation/" class="md-nav__link">
         
   
   
@@ -485,7 +486,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../usage/quickstart/" class="md-nav__link">
+      <a href="../quickstart/" class="md-nav__link">
         
   
   
@@ -513,7 +514,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../usage/basic/" class="md-nav__link">
+      <a href="../basic/" class="md-nav__link">
         
   
   
@@ -541,7 +542,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../usage/configuration/" class="md-nav__link">
+      <a href="../configuration/" class="md-nav__link">
         
   
   
@@ -569,7 +570,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../usage/evaluator_callback/" class="md-nav__link">
+      <a href="../evaluator_callback/" class="md-nav__link">
         
   
   
@@ -597,7 +598,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../usage/results/" class="md-nav__link">
+      <a href="../results/" class="md-nav__link">
         
   
   
@@ -625,7 +626,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../usage/realization_filters/" class="md-nav__link">
+      <a href="../realization_filters/" class="md-nav__link">
         
   
   
@@ -653,7 +654,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../usage/function_estimators/" class="md-nav__link">
+      <a href="../function_estimators/" class="md-nav__link">
         
   
   
@@ -661,834 +662,6 @@
     
   
     Function Estimators
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../usage/transforms/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Transforms
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../usage/gradients/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Stochastic Gradients
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../usage/workflows/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Optimization Workflows
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../usage/parallel/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Parallel Evaluation
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-    
-      
-      
-  
-  
-    
-  
-  
-  
-    
-    
-    
-    
-      
-        
-        
-      
-      
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
-        
-          
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Reference
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_3">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Reference
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-    
-  
-  
-  
-    
-    
-    
-    
-      
-      
-        
-          
-          
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_1" checked>
-        
-          
-          <label class="md-nav__link" for="__nav_3_1" id="__nav_3_1_label" tabindex="">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Configuration
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_1_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_3_1">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Configuration
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../config/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Configuration Classes
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-    
-  
-  
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Context Class
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Context Class
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#ropt.context" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        context
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="context">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.context.EnOptContext" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        EnOptContext
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="EnOptContext">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.context.EnOptContext.lock" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        lock
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../basic_optimizer/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Basic Optimizer
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    
-    
-    
-    
-      
-      
-        
-          
-          
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_3" >
-        
-          
-          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Results & Events
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_3">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Results & Events
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../results/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Evaluation Results
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../events/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Optimization Events
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    
-    
-    
-    
-      
-      
-        
-          
-          
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_4" >
-        
-          
-          <label class="md-nav__link" for="__nav_3_4" id="__nav_3_4_label" tabindex="">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Optimization Engine
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_4_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_4">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Optimization Engine
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../core/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Core Classes
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../evaluator/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Evaluator Classes
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    
-    
-    
-    
-      
-      
-        
-          
-          
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_5" >
-        
-          
-          <label class="md-nav__link" for="__nav_3_5" id="__nav_3_5_label" tabindex="">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Optimization Components
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_5_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_5">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Optimization Components
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../function_estimator/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Function Estimators
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../realization_filter/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Realization Filters
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../backend/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Optimizer Backends
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../sampler/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Samplers
   
 
     
@@ -1530,6 +703,548 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../gradients/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Stochastic Gradients
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../workflows/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Optimization Workflows
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Parallel Evaluation
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Parallel Evaluation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#why-asyncio" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why asyncio?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#asyncevaluator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AsyncEvaluator
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#servers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Servers
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Servers">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#threadingserver" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ThreadingServer
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#multiprocessingserver" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MultiprocessingServer
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hpcserver" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HPCServer
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dispatching-arbitrary-tasks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dispatching arbitrary tasks
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#where-to-next" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Where to next
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_1" id="__nav_3_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Configuration
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/config/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration Classes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/context/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Context Class
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/basic_optimizer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Basic Optimizer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Results & Events
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Results & Events
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/results/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evaluation Results
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/events/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Optimization Events
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1551,13 +1266,330 @@
       
       
         
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
           
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_4" >
+        
           
+          <label class="md-nav__link" for="__nav_3_4" id="__nav_3_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Optimization Engine
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Optimization Engine
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/core/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Core Classes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/evaluator/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evaluator Classes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
         
       
     
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_5" id="__nav_3_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Optimization Components
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Optimization Components
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/function_estimator/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Function Estimators
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/realization_filter/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Realization Filters
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/backend/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Optimizer Backends
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/sampler/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Samplers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/transforms/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Transforms
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
@@ -1566,7 +1598,7 @@
         <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_6" >
         
           
-          <label class="md-nav__link" for="__nav_3_6" id="__nav_3_6_label" tabindex="">
+          <label class="md-nav__link" for="__nav_3_6" id="__nav_3_6_label" tabindex="0">
             
   
   
@@ -1602,7 +1634,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../workflow_steps/" class="md-nav__link">
+      <a href="../../reference/workflow_steps/" class="md-nav__link">
         
   
   
@@ -1630,7 +1662,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../workflow_event_handlers/" class="md-nav__link">
+      <a href="../../reference/workflow_event_handlers/" class="md-nav__link">
         
   
   
@@ -1658,7 +1690,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../workflow_evaluators/" class="md-nav__link">
+      <a href="../../reference/workflow_evaluators/" class="md-nav__link">
         
   
   
@@ -1686,7 +1718,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../workflow_servers/" class="md-nav__link">
+      <a href="../../reference/workflow_servers/" class="md-nav__link">
         
   
   
@@ -1714,7 +1746,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../workflow_utils/" class="md-nav__link">
+      <a href="../../reference/workflow_utils/" class="md-nav__link">
         
   
   
@@ -1756,13 +1788,10 @@
       
       
         
-          
-          
-        
       
     
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
@@ -1771,7 +1800,7 @@
         <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_7" >
         
           
-          <label class="md-nav__link" for="__nav_3_7" id="__nav_3_7_label" tabindex="">
+          <label class="md-nav__link" for="__nav_3_7" id="__nav_3_7_label" tabindex="0">
             
   
   
@@ -1807,7 +1836,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../plugin_bases/" class="md-nav__link">
+      <a href="../../reference/plugin_bases/" class="md-nav__link">
         
   
   
@@ -1835,7 +1864,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../plugin_manager/" class="md-nav__link">
+      <a href="../../reference/plugin_manager/" class="md-nav__link">
         
   
   
@@ -1863,7 +1892,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../default_plugins/" class="md-nav__link">
+      <a href="../../reference/default_plugins/" class="md-nav__link">
         
   
   
@@ -1899,7 +1928,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../enums/" class="md-nav__link">
+      <a href="../../reference/enums/" class="md-nav__link">
         
   
   
@@ -1927,7 +1956,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../exceptions/" class="md-nav__link">
+      <a href="../../reference/exceptions/" class="md-nav__link">
         
   
   
@@ -1982,34 +2011,66 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#ropt.context" class="md-nav__link">
+  <a href="#why-asyncio" class="md-nav__link">
     <span class="md-ellipsis">
       
-        context
+        Why asyncio?
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="context">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.context.EnOptContext" class="md-nav__link">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#asyncevaluator" class="md-nav__link">
     <span class="md-ellipsis">
       
-        EnOptContext
+        AsyncEvaluator
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="EnOptContext">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#servers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Servers
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Servers">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.context.EnOptContext.lock" class="md-nav__link">
+  <a href="#threadingserver" class="md-nav__link">
     <span class="md-ellipsis">
       
-        lock
+        ThreadingServer
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#multiprocessingserver" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MultiprocessingServer
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hpcserver" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HPCServer
       
     </span>
   </a>
@@ -2020,9 +2081,26 @@
     </nav>
   
 </li>
-        
-      </ul>
-    </nav>
+      
+        <li class="md-nav__item">
+  <a href="#dispatching-arbitrary-tasks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dispatching arbitrary tasks
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#where-to-next" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Where to next
+      
+    </span>
+  </a>
   
 </li>
       
@@ -2046,338 +2124,289 @@
   
 
 
-<h1 id="context-class">Context Class</h1>
-<p><a class="autorefs autorefs-internal" title="            EnOptContext" href="#ropt.context.EnOptContext"><code>EnOptContext</code></a> is the validated, frozen container
-that holds every setting needed to execute a single optimization run. It is
-typically built from a plain dict (<code>EnOptContext.model_validate(CONFIG)</code>).</p>
-<p>For a narrative overview of all fields — including broadcasting rules,
-index-based sharing of plugin instances, defaults, and worked examples — see
-the <a href="../../usage/configuration/">Configuration</a> user-manual page.</p>
+<h1 id="parallel-evaluation">Parallel Evaluation</h1>
+<p>For non-trivial problems, function evaluations dominate runtime and are often
+best run in parallel, either on a single machine or on a cluster. <code>ropt</code> uses
+Python's <code>asyncio</code> framework to enable this.</p>
+<p>This page assumes familiarity with <a href="../workflows/">Optimization Workflows</a>.</p>
+<h2 id="why-asyncio">Why asyncio?</h2>
+<p>A single compute step could in principle run its evaluations in parallel
+without an event loop — for example by spawning threads directly. However,
+the real power of an asynchronous approach emerges when <strong>multiple compute
+steps run concurrently</strong>. With <code>asyncio</code>, several optimizations can share the
+same pool of workers, the event loop dispatches evaluation tasks as they
+arrive, and results flow back without blocking other work.</p>
+<p>The <a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.AsyncEvaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.AsyncEvaluator"><code>AsyncEvaluator</code></a> is the
+evaluator that bridges the synchronous compute-step <code>run()</code> call and the
+asynchronous world. It submits individual evaluation tasks (one per row in
+the variable batch) to a <a class="autorefs autorefs-internal" title="            ropt.workflow.servers.Server" href="../../reference/workflow_servers/#ropt.workflow.servers.Server"><code>Server</code></a> via an
+<code>asyncio.Queue</code>. The server picks tasks from the queue, executes them using
+its backend, and places results into a results queue that the evaluator
+collects.</p>
+<p>Because compute steps call <code>run()</code> synchronously, the step itself is
+typically dispatched with <code>asyncio.to_thread</code> so the event loop remains free
+to service the server's workers and other concurrent steps.</p>
+<h2 id="asyncevaluator">AsyncEvaluator</h2>
+<p><a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.AsyncEvaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.AsyncEvaluator"><code>AsyncEvaluator</code></a> wraps a
+per-realization function — the same kind of callable used by
+<a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.FunctionEvaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.FunctionEvaluator"><code>FunctionEvaluator</code></a> — and
+submits each row of the evaluation batch as a separate
+<a class="autorefs autorefs-internal" title="            ropt.workflow.servers.Task
 
 
-<div class="doc doc-object doc-module">
+  
+      dataclass
+  " href="../../reference/workflow_servers/#ropt.workflow.servers.Task"><code>Task</code></a> to the server's task queue. It then
+waits for results to arrive on a results queue.</p>
+<p>Constructor parameters:</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>function</code></td>
+<td>Per-realization callable (same interface as <code>FunctionEvaluator</code>).</td>
+</tr>
+<tr>
+<td><code>server</code></td>
+<td>The <a class="autorefs autorefs-internal" title="            ropt.workflow.servers.Server" href="../../reference/workflow_servers/#ropt.workflow.servers.Server"><code>Server</code></a> to dispatch tasks to.</td>
+</tr>
+<tr>
+<td><code>queue_size</code></td>
+<td>Maximum size of the results queue (0 = unlimited).</td>
+</tr>
+<tr>
+<td><code>get_name</code></td>
+<td>Optional callable to generate a name for each task.</td>
+</tr>
+</tbody>
+</table>
+<p>The <code>get_name</code> callable, if provided, is called with keyword arguments
+<code>realization</code>, <code>perturbation</code>, <code>batch_id</code>, and <code>eval_idx</code>, and should return
+a string. When using the <code>HPCServer</code>, names also serve as task identifiers
+and must be unique within a batch.</p>
+<p>If the server is not running when <code>eval()</code> is called, the evaluator raises
+an <code>Abort</code> exception.</p>
+<h2 id="servers">Servers</h2>
+<p>A <a class="autorefs autorefs-internal" title="            ropt.workflow.servers.Server" href="../../reference/workflow_servers/#ropt.workflow.servers.Server"><code>Server</code></a> manages an <code>asyncio.Queue</code> of
+<a class="autorefs autorefs-internal" title="            ropt.workflow.servers.Task
 
 
-
-<h2 id="ropt.context" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-module"></code>            <span class="doc doc-object-name doc-module-name">ropt.context</span>
-
-
-</h2>
-
-    <div class="doc doc-contents first">
-
-        <p>The <code>ropt.context</code> module provides the context class used by optimization workflows.</p>
-
-
-
-
-
-
-
-
-
-
-<div class="doc doc-children">
-
-
-
-
-
-
-
-<div class="doc doc-object doc-class">
-
-
-
-<h3 id="ropt.context.EnOptContext" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">EnOptContext</span>
-
-
-</h3>
-
-
-    <div class="doc doc-contents ">
-            <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-external" title="pydantic.BaseModel" href="https://docs.pydantic.dev/latest/api/pydantic/base_model/#pydantic.BaseModel">BaseModel</a></code></p>
-
-
-
-        <p>The primary context object for a single optimization run.</p>
-<p><code>EnOptContext</code> holds all information needed to run an ensemble-based
-optimization: variables, objectives, constraints, realizations, gradient
-settings, samplers, filters, and the optimizer/backend. It is constructed
-from plain Python dicts or config objects and validated on creation.</p>
-<p>See the <a href="../../usage/configuration/">Configuration guide</a> for an in-depth
-description of broadcasting rules, index-based sharing of plugin
-instances, the <code>names</code> attribute, and how dicts are resolved into plugin
-instances.</p>
-
-
-<details class="warning" open>
-  <summary>Warning</summary>
-  <p><code>EnOptContext</code> objects are immutable after construction. Do not attempt
-to serialize and round-trip them (e.g., to/from JSON): <code>numpy</code> arrays
-and plugin instances cannot survive a round-trip faithfully. Persist the
-raw input dicts instead.</p>
-</details>
-
-<p><span class="doc-section-title">Attributes:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.context.EnOptContext.variables">variables</span></code></td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            VariablesConfig (ropt.config.VariablesConfig)" href="../config/#ropt.config.VariablesConfig">VariablesConfig</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Variable settings.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.context.EnOptContext.objectives">objectives</span></code></td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            ObjectiveFunctionsConfig (ropt.config.ObjectiveFunctionsConfig)" href="../config/#ropt.config.ObjectiveFunctionsConfig">ObjectiveFunctionsConfig</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Objective function settings.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.context.EnOptContext.linear_constraints">linear_constraints</span></code></td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            LinearConstraintsConfig (ropt.config.LinearConstraintsConfig)" href="../config/#ropt.config.LinearConstraintsConfig">LinearConstraintsConfig</a> | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional linear constraint settings.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.context.EnOptContext.nonlinear_constraints">nonlinear_constraints</span></code></td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            NonlinearConstraintsConfig (ropt.config.NonlinearConstraintsConfig)" href="../config/#ropt.config.NonlinearConstraintsConfig">NonlinearConstraintsConfig</a> | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional nonlinear constraint settings.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.context.EnOptContext.realizations">realizations</span></code></td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            RealizationsConfig (ropt.config.RealizationsConfig)" href="../config/#ropt.config.RealizationsConfig">RealizationsConfig</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Ensemble realization settings.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.context.EnOptContext.optimizer">optimizer</span></code></td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            OptimizerConfig (ropt.config.OptimizerConfig)" href="../config/#ropt.config.OptimizerConfig">OptimizerConfig</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optimizer settings.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.context.EnOptContext.backend">backend</span></code></td>
-            <td>
-                  <code><span title="ropt.context._validated_types.BackendInstance">BackendInstance</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Backend plugin instance used for function evaluations.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.context.EnOptContext.gradient">gradient</span></code></td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            GradientConfig (ropt.config.GradientConfig)" href="../config/#ropt.config.GradientConfig">GradientConfig</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Gradient estimation settings.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.context.EnOptContext.realization_filters">realization_filters</span></code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a>[<span title="ropt.context._validated_types.RealizationFilterInstance">RealizationFilterInstance</span>, ...]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Tuple of realization filter plugin instances.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.context.EnOptContext.function_estimators">function_estimators</span></code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a>[<span title="ropt.context._validated_types.FunctionEstimatorInstance">FunctionEstimatorInstance</span>, ...]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Tuple of function estimator plugin instances.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.context.EnOptContext.samplers">samplers</span></code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a>[<span title="ropt.context._validated_types.SamplerInstance">SamplerInstance</span>, ...]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Tuple of sampler plugin instances.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.context.EnOptContext.variable_transforms">variable_transforms</span></code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a>[<span title="ropt.context._validated_types.VariableTransformInstance">VariableTransformInstance</span>, ...]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Tuple of variable transform plugin instances.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.context.EnOptContext.objective_transforms">objective_transforms</span></code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a>[<span title="ropt.context._validated_types.ObjectiveTransformInstance">ObjectiveTransformInstance</span>, ...]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Tuple of objective transform plugin instances.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.context.EnOptContext.nonlinear_constraint_transforms">nonlinear_constraint_transforms</span></code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a>[<span title="ropt.context._validated_types.NonlinearConstraintTransformInstance">NonlinearConstraintTransformInstance</span>, ...]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Tuple of nonlinear constraint transform plugin instances.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.context.EnOptContext.names">names</span></code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a> | <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a>, ...]]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional mapping of axis names to label sequences.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-
-
-
-
-
-
-
-
-
-<div class="doc doc-children">
-
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="ropt.context.EnOptContext.lock" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">lock</span>
-
-
-</h4>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">lock</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+  
+      dataclass
+  " href="../../reference/workflow_servers/#ropt.workflow.servers.Task"><code>Task</code></a> objects and dispatches them to a pool of
+workers. All servers share the same lifecycle:</p>
+<ol>
+<li>Create the server instance.</li>
+<li>Start it inside an <code>asyncio.TaskGroup</code> with <code>await server.start(tg)</code>.</li>
+<li>Use it (via <code>AsyncEvaluator</code> or <code>dispatch_tasks</code>).</li>
+<li>Shut it down with <code>server.cancel()</code>.</li>
+</ol>
+<p>Three implementations are provided:</p>
+<h3 id="threadingserver">ThreadingServer</h3>
+<p><a class="autorefs autorefs-internal" title="            ropt.workflow.servers.ThreadingServer" href="../../reference/workflow_servers/#ropt.workflow.servers.ThreadingServer"><code>ThreadingServer</code></a> dispatches tasks to
+worker threads via <code>asyncio.to_thread</code>. Use this for I/O-bound evaluations or
+when the evaluation function releases the GIL (e.g. calls into C/Fortran).</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>workers</code></td>
+<td>Number of concurrent worker threads (default: 1).</td>
+</tr>
+<tr>
+<td><code>queue_size</code></td>
+<td>Maximum task queue size (0 = unlimited).</td>
+</tr>
+</tbody>
+</table>
+<h3 id="multiprocessingserver">MultiprocessingServer</h3>
+<p><a class="autorefs autorefs-internal" title="            ropt.workflow.servers.MultiprocessingServer" href="../../reference/workflow_servers/#ropt.workflow.servers.MultiprocessingServer"><code>MultiprocessingServer</code></a> uses a
+<code>ProcessPoolExecutor</code> with a <code>"spawn"</code> context. Use this for CPU-bound
+evaluations where true parallelism is needed.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>workers</code></td>
+<td>Number of worker processes (default: 1).</td>
+</tr>
+<tr>
+<td><code>queue_size</code></td>
+<td>Maximum task queue size (0 = unlimited).</td>
+</tr>
+<tr>
+<td><code>max_tasks_per_child</code></td>
+<td>Restart workers after this many tasks (default: <code>None</code> = never). Useful if evaluations leak memory, but adds significant overhead.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="hpcserver">HPCServer</h3>
+<p><a class="autorefs autorefs-internal" title="            ropt.workflow.servers.HPCServer" href="../../reference/workflow_servers/#ropt.workflow.servers.HPCServer"><code>HPCServer</code></a> submits tasks as jobs to an HPC
+scheduler (e.g. Slurm) via the <code>pysqa</code> library. Each task is serialized to
+disk, submitted to the queue, polled for completion, and its result is
+deserialized back. Requires <code>ropt[hpc]</code> to be installed.</p>
+<p>The server manages the full remote task lifecycle:</p>
+<ul>
+<li>Serializing the task (function and arguments) to a shared filesystem.</li>
+<li>Submitting the task as a job to the HPC queue.</li>
+<li>Polling the queue for the job's status.</li>
+<li>Retrieving results (or exceptions) once the job completes.</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>workdir</code></td>
+<td>Shared filesystem directory for temporary I/O files.</td>
+</tr>
+<tr>
+<td><code>workers</code></td>
+<td>Maximum concurrent HPC jobs (default: 1).</td>
+</tr>
+<tr>
+<td><code>queue_size</code></td>
+<td>Maximum task queue size (0 = unlimited).</td>
+</tr>
+<tr>
+<td><code>interval</code></td>
+<td>Polling interval in seconds (default: 1).</td>
+</tr>
+<tr>
+<td><code>queue_type</code></td>
+<td>Queueing system type, e.g. <code>"slurm"</code> (default).</td>
+</tr>
+<tr>
+<td><code>template</code></td>
+<td>Optional submission script template string.</td>
+</tr>
+<tr>
+<td><code>config_path</code></td>
+<td>Optional path to <code>pysqa</code> cluster configuration directory.</td>
+</tr>
+<tr>
+<td><code>cluster</code></td>
+<td>Optional cluster name (for multi-cluster installations).</td>
+</tr>
+<tr>
+<td><code>queue</code></td>
+<td>Optional queue/partition name.</td>
+</tr>
+<tr>
+<td><code>cores</code></td>
+<td>CPUs per task (default: 1).</td>
+</tr>
+</tbody>
+</table>
+<p>Configuration can be provided either via a <code>template</code> string or a
+<code>config_path</code> directory containing <code>pysqa</code> configuration files. If neither
+is given, the server looks for a default configuration at:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>&lt;prefix&gt;/share/ropt/pysqa/&lt;queue_type&gt;/
 </span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Lock the object to prevent sharing and re-use.</p>
-
-
-<p><span class="doc-section-title">Raises:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError">RuntimeError</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>If the object is already locked.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
+<p>where <code>&lt;prefix&gt;</code> is the Python installation prefix (or system data prefix).
+Find it with:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">sysconfig</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_paths</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="nb">print</span><span class="p">(</span><span class="n">get_paths</span><span class="p">()[</span><span class="s2">&quot;data&quot;</span><span class="p">])</span>
+</span></code></pre></div>
+<p>This allows deployments to ship pre-configured cluster definitions by
+installing them into <code>share/ropt/pysqa/</code> — no explicit <code>config_path</code>
+argument is needed at runtime.</p>
+<h2 id="dispatching-arbitrary-tasks">Dispatching arbitrary tasks</h2>
+<p><a class="autorefs autorefs-internal" title="            dispatch_tasks
 
 
-    </div>
-
+  
+      async
+  " href="../../reference/workflow_utils/#ropt.workflow.dispatch_tasks"><code>dispatch_tasks</code></a> is a utility function built
+on top of the server infrastructure. It runs an arbitrary collection of
+Python callables in parallel — not necessarily as part of an optimization
+workflow. Use it for one-off parallel work such as post-processing, ensemble
+replay, or any batch computation that benefits from threading,
+multiprocessing, or HPC submission.</p>
+<p>It creates a server internally based on the <code>server</code> argument
+(<code>"threading"</code>, <code>"multiprocessing"</code>, or <code>"hpc"</code>), submits all functions, and
+returns the collected results.</p>
+<p><code>dispatch_tasks</code> is an <code>async</code> function — call it with <code>await</code> from an
+asyncio context, or use <code>asyncio.run(dispatch_tasks(...))</code>.</p>
+<p>The <code>functions</code> argument can be either a sequence of callables or a mapping
+from name to callable. When a mapping is used, the keys serve as task names
+(useful for identifying jobs on the HPC cluster).</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>functions</code></td>
+<td>Sequence or mapping of callables to execute.</td>
+</tr>
+<tr>
+<td><code>server</code></td>
+<td>Server type: <code>"threading"</code>, <code>"multiprocessing"</code>, or <code>"hpc"</code>.</td>
+</tr>
+<tr>
+<td><code>report</code></td>
+<td>Optional callback invoked with each task result as it completes.</td>
+</tr>
+<tr>
+<td><code>workers</code></td>
+<td>Number of parallel workers (default: 4).</td>
+</tr>
+<tr>
+<td><code>workdir</code></td>
+<td>Working directory for the HPC server.</td>
+</tr>
+<tr>
+<td><code>cluster</code></td>
+<td>Optional HPC cluster name.</td>
+</tr>
+<tr>
+<td><code>queue</code></td>
+<td>Optional HPC queue/partition name.</td>
+</tr>
+<tr>
+<td><code>cores</code></td>
+<td>CPUs per task for HPC (default: 1).</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">Working directory</p>
+<p>The dispatched functions cannot rely on the current directory being set
+consistently. Use absolute paths to read or write files. Setting the
+current directory in a <code>"threading"</code> server affects all threads; in
+<code>"multiprocessing"</code> and <code>"hpc"</code> servers it can be changed safely per
+task.</p>
 </div>
-
-
-
-
-  </div>
-
-    </div>
-
-</div>
-
-
-
-
-  </div>
-
-    </div>
-
-</div>
+<h2 id="where-to-next">Where to next</h2>
+<ul>
+<li>Wire a parallel evaluator into a workflow:
+  <a href="../workflows/">Optimization Workflows</a>.</li>
+<li>Reference: <a href="../../reference/workflow_servers/">Servers</a>,
+  <a href="../../reference/workflow_evaluators/">Evaluators</a>.</li>
+</ul>
 
 
 
@@ -2413,7 +2442,7 @@ raw input dicts instead.</p>
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../config/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Configuration Classes">
+          <a href="../workflows/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Optimization Workflows">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -2423,20 +2452,20 @@ raw input dicts instead.</p>
                 Previous
               </span>
               <div class="md-ellipsis">
-                Configuration Classes
+                Optimization Workflows
               </div>
             </div>
           </a>
         
         
           
-          <a href="../basic_optimizer/" class="md-footer__link md-footer__link--next" aria-label="Next: Basic Optimizer">
+          <a href="../../reference/config/" class="md-footer__link md-footer__link--next" aria-label="Next: Configuration Classes">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Basic Optimizer
+                Configuration Classes
               </div>
             </div>
             <div class="md-footer__button md-icon">
