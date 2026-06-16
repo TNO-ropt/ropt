@@ -1,4 +1,4 @@
-"""This module implements the default asynchronous evaluator server."""
+"""This module implements the thread-based evaluator server."""
 
 from __future__ import annotations
 
@@ -7,8 +7,8 @@ import asyncio
 from .base import Server, ServerBase, Task
 
 
-class AsyncServer(ServerBase):
-    """An evaluator server that employs asynchronous workers."""
+class ThreadingServer(ServerBase):
+    """An evaluator server that dispatches tasks to worker threads."""
 
     def __init__(self, *, workers: int = 1, queue_size: int = 0) -> None:
         """Initialize the server.

@@ -4,12 +4,12 @@ from dataclasses import dataclass
 from typing import Any, Literal
 
 from ropt.workflow.servers import (
-    AsyncServer,
     HPCServer,
     MultiprocessingServer,
     ResultsQueue,
     Server,
     Task,
+    ThreadingServer,
 )
 
 
@@ -39,7 +39,7 @@ def _collect_results(
 
 async def dispatch_tasks(  # noqa: PLR0913
     functions: Sequence[Callable[[], None]] | Mapping[str, Callable[[], None]],
-    server: Literal["async", "multiprocessing", "hpc"],
+    server: Literal["threading", "multiprocessing", "hpc"],
     *,
     report: Callable[[Any], None] | None = None,
     workers: int = 4,
@@ -75,9 +75,9 @@ async def dispatch_tasks(  # noqa: PLR0913
         absolute paths to read or write files.
 
         ALso, note that setting the current directory may not have the desired
-        effect when using the `thread` server, since changing it in one thread
-        affects all threads. In case of the `multiprocessing` and `hpc` servers,
-        the current directory can be changed safely if needed.
+        effect when using the `threading` server, since changing it in one
+        thread affects all threads. In case of the `multiprocessing` and `hpc`
+        servers, the current directory can be changed safely if needed.
     """
     results: dict[int, Any] = {}
     results_queue = ResultsQueue()
@@ -91,7 +91,7 @@ async def dispatch_tasks(  # noqa: PLR0913
             _Task(function=function, results_queue=results_queue, id=idx)
             for idx, function in enumerate(functions)
         ]
-    eval_server: HPCServer | AsyncServer | MultiprocessingServer
+    eval_server: HPCServer | ThreadingServer | MultiprocessingServer
     match server:
         case "hpc":
             eval_server = HPCServer(
@@ -101,8 +101,8 @@ async def dispatch_tasks(  # noqa: PLR0913
                 queue=queue,
                 cores=cores,
             )
-        case "thread":
-            eval_server = AsyncServer(workers=workers)
+        case "threading":
+            eval_server = ThreadingServer(workers=workers)
         case "multiprocessing":
             eval_server = MultiprocessingServer(workers=workers)
         case _:

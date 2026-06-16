@@ -13,11 +13,11 @@ from ropt.workflow.compute_steps import EnsembleOptimizer
 from ropt.workflow.evaluators import AsyncEvaluator
 from ropt.workflow.event_handlers import Tracker
 from ropt.workflow.servers import (
-    AsyncServer,
     HPCServer,
     MultiprocessingServer,
     ResultsQueue,
     Task,
+    ThreadingServer,
 )
 
 if TYPE_CHECKING:
@@ -101,7 +101,7 @@ async def test_server_ok(server_name: str, tmp_path: Path, monkeypatch: Any) -> 
                 workdir=tmp_path, workers=2, interval=0, template=""
             )
         case "async_server":
-            server = AsyncServer(workers=2)
+            server = ThreadingServer(workers=2)
         case "multiprocessing_server":
             server = MultiprocessingServer(workers=2)
     assert not server.is_running()
@@ -164,7 +164,7 @@ async def test_server_error(server_name: str, tmp_path: Path, monkeypatch: Any) 
                 workdir=tmp_path, workers=2, interval=0, template=""
             )
         case "async_server":
-            server = AsyncServer(workers=2)
+            server = ThreadingServer(workers=2)
         case "multiprocessing_server":
             server = MultiprocessingServer(workers=2)
     assert not server.is_running()
@@ -305,7 +305,7 @@ async def test_server_evaluator_ok(
                 workdir=tmp_path, workers=2, interval=0, template=""
             )
         case "async_server":
-            server = AsyncServer(workers=2)
+            server = ThreadingServer(workers=2)
         case "multiprocessing_server":
             server = MultiprocessingServer(workers=2)
     assert not server.is_running()
@@ -359,7 +359,7 @@ async def test_server_evaluator_error(
                 workdir=tmp_path, workers=2, interval=0, template=""
             )
         case "async_server":
-            server = AsyncServer(workers=2)
+            server = ThreadingServer(workers=2)
         case "multiprocessing_server":
             server = MultiprocessingServer(workers=2)
     assert not server.is_running()
@@ -414,7 +414,7 @@ async def test_server_evaluator_two_optimizations(
                 workdir=tmp_path, workers=2, interval=0, template=""
             )
         case "async_server":
-            server = AsyncServer(workers=2)
+            server = ThreadingServer(workers=2)
         case "multiprocessing_server":
             server = MultiprocessingServer(workers=2)
     assert not server.is_running()

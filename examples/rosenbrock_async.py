@@ -41,7 +41,7 @@ from ropt.results import FunctionResults
 from ropt.workflow.compute_steps import EnsembleOptimizer
 from ropt.workflow.evaluators import AsyncEvaluator
 from ropt.workflow.event_handlers import Tracker
-from ropt.workflow.servers import AsyncServer, MultiprocessingServer, Server
+from ropt.workflow.servers import MultiprocessingServer, Server, ThreadingServer
 
 DIM = 5
 UNCERTAINTY = 0.1
@@ -134,7 +134,7 @@ async def async_run(  # noqa: PLR0913
     async_server = (
         MultiprocessingServer(workers=workers)
         if multiprocessing
-        else AsyncServer(workers=workers)
+        else ThreadingServer(workers=workers)
     )
     assert isinstance(async_server, Server)
     async with asyncio.TaskGroup() as tg:
