@@ -29,19 +29,13 @@ if _HAVE_HPC:
 
 
 class HPCServer(ServerBase):
-    """A server for submitting tasks to a High-Performance Computing (HPC) cluster.
+    """A server for submitting tasks to an HPC cluster.
 
-    This server interfaces with an HPC queueing system (like Slurm) via the `pysqa`
-    library. It manages the entire lifecycle of a remote task, including:
+    Interfaces with an HPC queueing system (e.g. Slurm) via `pysqa`.
+    Requires `ropt[hpc]` to be installed.
 
-    - Serializing the task (function and arguments) and writing it to a shared
-      filesystem.
-    - Submitting the task as a job to the HPC queue.
-    - Polling the queue for the job's status.
-    - Retrieving the results (or any exceptions) once the job is complete.
-
-    Configuration of the cluster connection is handled either through a submission
-    script template or a `pysqa` configuration directory.
+    See [Parallel Evaluation](../usage/parallel.md#hpcserver) for full
+    details on configuration and lifecycle.
     """
 
     def __init__(  # noqa: PLR0913
@@ -60,42 +54,20 @@ class HPCServer(ServerBase):
     ) -> None:
         """Initialize the HPC server.
 
-        This sets up the server for communication with an HPC cluster. The
-        connection can be configured in two ways:
-
-        1.  By providing a `template` string for the job submission script.
-        2.  By providing a `config_path` to a directory containing `pysqa`
-            cluster configurations.
-
-        If `config_path` is not given, the server will look for a default
-        configuration at `<sysconfig_data>/share/ropt/pysqa`. One of these
-        configuration methods is required.
+        See [Parallel Evaluation](../usage/parallel.md#hpcserver) for
+        configuration details.
 
         Args:
-            workdir:     Working directory on a shared filesystem accessible by
-                         both the client and the HPC nodes. Used for temporary
-                         input/output files.
-            workers:     The maximum number of concurrent jobs to run on the HPC
-                         cluster.
-            queue_size:  The maximum number of tasks to hold in the internal
-                         queue before submission. A value of 0 means an
-                         unlimited size.
-            interval:    The interval in seconds at which to poll the HPC queue
-                         for job status updates.
-            queue_type:  The type of the queueing system (e.g., "slurm"). This is
-                         passed to `pysqa` and is also used to find the
-                         correct subdirectory within `config_path`.
-            template:    An optional submission script template. If provided, it
-                         will be used by `pysqa` to generate the job submission
-                         script.
-            config_path: An optional path to a directory containing `pysqa`
-                         cluster configuration files. This is used if `template`
-                         is not provided.
-            cluster:     Optional name of the cluster to use. If supported by the
-                         installation, this makes it possible to switch between
-                         clusters.
-            queue:       Optional queue to use on the cluster.
-            cores:       The number of cpu's per task.
+            workdir:     Shared filesystem directory for temporary I/O files.
+            workers:     Maximum concurrent HPC jobs.
+            queue_size:  Maximum task queue size (0 = unlimited).
+            interval:    Polling interval in seconds.
+            queue_type:  Queueing system type (e.g. `"slurm"`).
+            template:    Optional submission script template string.
+            config_path: Optional path to `pysqa` configuration directory.
+            cluster:     Optional cluster name.
+            queue:       Optional queue/partition name.
+            cores:       CPUs per task.
 
         Raises:
             RuntimeError: If neither a `template` is provided nor a valid
@@ -157,12 +129,7 @@ class HPCServer(ServerBase):
             await asyncio.sleep(self._interval)
 
     def cleanup(self) -> None:
-        """Clean up the server resources.
-
-        This method cancels the background worker task that polls the HPC queue
-        and ensures that any clients waiting for results are notified of the
-        shutdown.
-        """
+        """Clean up the server resources."""
         if self._worker_task is not None and not self._worker_task.done():
             self._worker_task.cancel()
         self._worker_task = None

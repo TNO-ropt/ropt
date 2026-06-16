@@ -12,22 +12,11 @@ class RealizationFilterConfig(BaseModel):
 
     `RealizationFilterConfig` configures a
     [`RealizationFilter`][ropt.realization_filter.RealizationFilter] plugin that
-    adjusts per-realization weights. Realization filters are configured as a
-    tuple in the `realization_filters` field of
-    [`EnOptContext`][ropt.context.EnOptContext]. Objectives and constraints
-    reference a specific filter by its index in that tuple.
+    adjusts per-realization weights.
 
-    By default, objective and constraint functions, as well as their gradients,
-    are calculated as a weighted function of all realizations. Realization
-    filters provide a way to modify the weights of individual realizations. For
-    example, they can be used to select a subset of realizations for calculating
-    the final objective and constraint functions and their gradients by setting
-    the weights of the other realizations to zero.
-
-    The `method` field specifies the realization filter method to use for
-    adjusting the weights. The `options` field allows passing a dictionary of
-    key-value pairs to further configure the chosen method. The interpretation
-    of these options depends on the selected method.
+    See the [Configuration
+    guide](../usage/configuration.md#realization-filters) for detailed
+    descriptions and usage examples.
 
     Attributes:
         method:  Name of the realization filter method.

@@ -155,40 +155,29 @@ def results_to_dataframe(
     fields: set[str],
     result_type: Literal["functions", "gradients"],
 ) -> pd.DataFrame:
-    """Convert a sequence of Results objects into one pandas DataFrame.
+    """Aggregate multiple results into a single pandas DataFrame.
 
-    Aggregate results from multiple
+    Concatenates the specified fields from a sequence of
     [`FunctionResults`][ropt.results.FunctionResults] or
-    [`GradientResults`][ropt.results.GradientResults] objects into a single
-    `pandas` DataFrame.
+    [`GradientResults`][ropt.results.GradientResults] objects. Fields are
+    selected using dot notation (e.g., `evaluations.variables`); nested
+    `evaluation_info` entries are accessed as
+    `evaluations.evaluation_info.key`. Multi-dimensional fields are
+    automatically unstacked into tuple-named columns.
 
-    The `fields` argument specifies which fields to include, using dot notation
-    for nested fields (e.g., `evaluations.variables` for the variables field
-    within evaluations). Nested `evaluation_info` dictionaries are accessed
-    using the format `evaluations.evaluation_info.key`.
-
-    Multi-dimensional result fields are unstacked into multiple DataFrame
-    columns. Column names include available axis labels (e.g., variable names,
-    objective indices). Multi-dimensional columns are represented as tuples of
-    names.
-
-    The `result_type` argument specifies whether to process function or gradient
-    results.
+    See [Working with Results](../usage/results.md#exporting-to-pandas) for
+    further details and examples.
 
     Args:
-        results:     A sequence of [`Results`][ropt.results.Results] objects
-                     to aggregate.
-        fields:      Set of field names to include in the output (using dot
-                     notation for nested fields).
-        result_type: The type of results to process ("functions" or
-                     "gradients").
+        results:     A sequence of [`Results`][ropt.results.Results] objects.
+        fields:      Field names to include (dot notation for nested fields).
+        result_type: `"functions"` or `"gradients"`.
 
     Returns:
-        A `pandas` DataFrame combining all provided results.
+        A DataFrame with one row per result and requested fields as columns.
 
     Raises:
-        TypeError: If `result_type` is not "functions" or "gradients", or if
-            any result is not a FunctionResults or GradientResults object.
+        TypeError: If `result_type` is invalid or results contain unexpected types.
     """
     if result_type not in {"functions", "gradients"}:
         msg = f"Invalid frame output type: {result_type}"

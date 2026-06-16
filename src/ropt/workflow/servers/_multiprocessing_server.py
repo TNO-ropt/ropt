@@ -28,17 +28,10 @@ class MultiprocessingServer(ServerBase):
     ) -> None:
         """Initialize the server.
 
-        Note: `max_tasks_per_child`
-            The `max_tasks_per_child` is passed to the process executor pool. It
-            forces the pool tasks to be restarted after the set numbers of tasks
-            is executed. This adds to the overhead which can be significant. It
-            is therefore set to `None` be default. Adjust memory or resource
-            leaks are suspected.
-
         Args:
-            workers:             The number of workers to use.
-            queue_size:          Maximum size of the tasks queue.
-            max_tasks_per_child: Number of tasks to execute before refreshing workers.
+            workers:             Number of worker processes.
+            queue_size:          Maximum task queue size (0 = unlimited).
+            max_tasks_per_child: Restart workers after this many tasks (`None` = never).
         """
         super().__init__(queue_size=queue_size)
         self._workers = workers

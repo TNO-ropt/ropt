@@ -22,26 +22,9 @@ class NonlinearConstraintsConfig(BaseModel):
     `nonlinear_constraints` field of an
     [`EnOptContext`][ropt.context.EnOptContext] object.
 
-    Nonlinear constraints are defined by comparing a constraint function to a
-    right-hand-side value, allowing for equality or inequality constraints. The
-    `lower_bounds` and `upper_bounds` fields, which are `numpy` arrays, specify
-    the bounds on these right-hand-side values. The length of these arrays
-    determines the number of constraint functions.
-
-    Less-than and greater-than inequality constraints can be specified by
-    setting the lower bounds to $-\infty$, or the upper bounds to $+\infty$,
-    respectively. Equality constraints are specified by setting the lower bounds
-    equal to the upper bounds.
-
-    Constraint functions can optionally be processed using [`realization
-    filters`][ropt.realization_filter.RealizationFilter] and [`function
-    estimators`][ropt.function_estimator.FunctionEstimator] objects. The
-    `realization_filters` and `function_estimators` fields are integer index
-    arrays: each entry selects a filter or estimator by its position in the
-    corresponding tuple defined in [`EnOptContext`][ropt.context.EnOptContext].
-    An out-of-range index means no filter or estimator is applied to that
-    constraint. If a field uses its default value of `-1`, no filter or
-    estimator is applied at all.
+    See the [Configuration
+    guide](../usage/configuration.md#nonlinear_constraints) for detailed
+    descriptions and usage examples.
 
     Attributes:
         lower_bounds:        Lower bounds for the right-hand-side values.

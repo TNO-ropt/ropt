@@ -17,10 +17,9 @@ if TYPE_CHECKING:
 
 @dataclass(slots=True)
 class FunctionEvaluations(ResultField):
-    """Store the results of function evaluations.
+    """Per-realization objective and constraint values for an evaluation batch.
 
-    The `FunctionEvaluations` class stores the results of evaluating the
-    objective and constraint functions for a set of variables.
+    See [Working with Results](../usage/results.md) for usage details.
 
     **Result descriptions**
 

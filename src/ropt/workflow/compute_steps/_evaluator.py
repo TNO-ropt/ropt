@@ -23,26 +23,16 @@ if TYPE_CHECKING:
 
 
 class EnsembleEvaluator(ComputeStep):
-    """The default ensemble evaluator compute step for optimization workflows.
+    """The default ensemble evaluator compute step.
 
-    This compute step performs one or more ensemble evaluations based on the
-    provided `variables`. It yields a tuple of
-    [`FunctionResults`][ropt.results.FunctionResults] objects, one for each
-    input variable vector evaluated.
+    Evaluates a batch of variable vectors (a single vector or a 2-D matrix
+    where each row is a variable vector) and yields
+    [`FunctionResults`][ropt.results.FunctionResults] objects. Emits
+    `START_ENSEMBLE_EVALUATOR`, `START_EVALUATION`, `FINISHED_EVALUATION`,
+    and `FINISHED_ENSEMBLE_EVALUATOR` events.
 
-    The compute step emits the following events:
-
-    - [`START_ENSEMBLE_EVALUATOR`][ropt.enums.EnOptEventType.START_ENSEMBLE_EVALUATOR]:
-      Emitted before the evaluation process begins.
-    - [`START_EVALUATION`][ropt.enums.EnOptEventType.START_EVALUATION]: Emitted
-      just before the underlying ensemble evaluation is called.
-    - [`FINISHED_EVALUATION`][ropt.enums.EnOptEventType.FINISHED_EVALUATION]:
-      Emitted after the evaluation completes, carrying the generated
-      `FunctionResults` in its `data` dictionary under the key `"results"`.
-      Event handlers typically listen for this event.
-    - [`FINISHED_ENSEMBLE_EVALUATOR`][ropt.enums.EnOptEventType.FINISHED_ENSEMBLE_EVALUATOR]:
-      Emitted after the entire compute step, including result emission, is
-      finished.
+    See [Optimization Workflows](../usage/workflows.md#events-emitted-by-ensembleevaluator)
+    for the full event lifecycle description.
     """
 
     def __init__(self, *, evaluator: Evaluator) -> None:
@@ -61,21 +51,14 @@ class EnsembleEvaluator(ComputeStep):
         *,
         metadata: dict[str, Any] | None = None,
     ) -> ExitCode:
-        """Run the ensemble evaluator.
-
-        This method executes the core logic of the ensemble evaluator. It
-        requires an optimizer context
-        ([`EnOptContext`][ropt.context.EnOptContext]) and optionally accepts
-        specific variable vectors to evaluate.
-
-        If `metadata` is provided, it is attached to the
-        [`Results`][ropt.results.Results] objects emitted via the
-        `FINISHED_EVALUATION` event.
+        """Run the ensemble evaluation.
 
         Args:
             context:    Optimizer context.
             variables:  Variable vector(s) to evaluate.
-            metadata:   Optional dictionary to attach to emitted `FunctionResults`.
+            metadata:   Optional dictionary attached to emitted
+                [`FunctionResults`][ropt.results.FunctionResults] via the
+                `FINISHED_EVALUATION` event.
 
         Returns:
             An [`ExitCode`][ropt.enums.ExitCode] indicating the outcome.

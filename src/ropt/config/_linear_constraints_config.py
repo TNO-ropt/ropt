@@ -18,44 +18,14 @@ class LinearConstraintsConfig(BaseModel):
     `linear_constraints` field of an
     [`EnOptContext`][ropt.context.EnOptContext] object.
 
-    Linear constraints are defined by a set of linear equations involving the
-    optimization variables. These equations can represent equality or inequality
-    constraints. The `coefficients` field is a 2D `numpy` array where each row
-    represents a constraint, and each column corresponds to a variable.
-
-    The `lower_bounds` and `upper_bounds` fields specify the bounds on the
-    right-hand side of each constraint equation. These fields are converted and
-    broadcasted to `numpy` arrays with a length equal to the number of
-    constraint equations.
-
-    Less-than and greater-than inequality constraints can be specified by
-    setting the lower bounds to $-\infty$, or the upper bounds to $+\infty$,
-    respectively. Equality constraints are specified by setting the lower bounds
-    equal to the upper bounds.
+    See the [Configuration
+    guide](../usage/configuration.md#linear_constraints) for detailed
+    descriptions and usage examples.
 
     Attributes:
         coefficients: Matrix of coefficients for the linear constraints.
         lower_bounds: Lower bounds for the right-hand side of the constraint equations.
         upper_bounds: Upper bounds for the right-hand side of the constraint equations.
-
-    Note: Linear transformation of variables.
-        The set of linear constraints can be represented by a matrix equation:
-        $\mathbf{A} \mathbf{x} = \mathbf{b}$.
-
-        When linearly transforming variables to the optimizer domain, the
-        coefficients ($\mathbf{A}$) and right-hand-side values ($\mathbf{b}$)
-        must be converted to remain valid. If the linear transformation of the
-        variables to the optimizer domain is given by:
-
-        $$ \hat{\mathbf{x}} = \mathbf{S} \mathbf{x} + \mathbf{o}$$
-
-        then the coefficients and right-hand-side values must be transformed as
-        follows:
-
-        $$ \begin{align}
-            \hat{\mathbf{A}} &= \mathbf{A} \mathbf{S}^{-1} \\ \hat{\mathbf{b}}
-            &= \mathbf{b} + \mathbf{A}\mathbf{S}^{-1}\mathbf{o}
-        \end{align}$$
     """
 
     coefficients: Array2D

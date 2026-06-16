@@ -15,10 +15,9 @@ if TYPE_CHECKING:
 
 @dataclass(slots=True)
 class Realizations(ResultField):
-    """Store information about realizations.
+    """Per-realization activity, success, and weight information.
 
-    The `Realizations` class stores data related to the individual realizations
-    used in the optimization process.
+    See [Working with Results](../usage/results.md) for usage details.
 
     **Result descriptions**
 

@@ -44,45 +44,10 @@ class EnOptContext(BaseModel):
     settings, samplers, filters, and the optimizer/backend. It is constructed
     from plain Python dicts or config objects and validated on creation.
 
-    **Index-based sharing**
-
-    All tuple-based plugin fields (`realization_filters`, `function_estimators`,
-    `samplers`, `variable_transforms`, `objective_transforms`, and
-    `nonlinear_constraint_transforms`) are referenced by index from other config
-    fields. For example, the `samplers` field of
-    [`VariablesConfig`][ropt.config.VariablesConfig] is an integer array whose
-    values index into the `samplers` tuple — use all zeros when a single sampler
-    is shared across all variables, or distinct indices when different samplers
-    are needed per variable. The same pattern applies to transform indices in
-    [`VariablesConfig`][ropt.config.VariablesConfig],
-    [`ObjectiveFunctionsConfig`][ropt.config.ObjectiveFunctionsConfig], and
-    [`NonlinearConstraintsConfig`][ropt.config.NonlinearConstraintsConfig].
-
-    **Optional names**
-
-    The `names` attribute maps axis types (see [`AxisName`][ropt.enums.AxisName])
-    to ordered sequences of labels for variables, objectives, and constraints.
-    It is not required for the optimization itself, but when present it is used
-    to produce labelled multi-index results in exported data frames.
-
-    **Plugin instances**
-
-    The `backend` field and all tuple-based plugin fields (`realization_filters`,
-    `function_estimators`, `samplers`, `variable_transforms`,
-    `objective_transforms`, and `nonlinear_constraint_transforms`) store plugin
-    instances. Instead of constructing instances manually, these fields can be
-    initialized with a configuration object or a plain dict of settings — Pydantic
-    will resolve and instantiate the appropriate plugin automatically. Each config
-    class has a `method` field that selects the plugin implementation. The
-    configuration classes are defined in the [`ropt.config`][ropt.config]
-    sub-package.
-
-    **Broadcasting**
-
-    Many nested config classes represent per-variable or per-objective
-    properties (e.g., bounds, perturbation magnitudes) as `numpy` arrays. A
-    size-1 array is broadcast to all elements; otherwise the array length must
-    match the count of the corresponding entities.
+    See the [Configuration guide](../usage/configuration.md) for an in-depth
+    description of broadcasting rules, index-based sharing of plugin
+    instances, the `names` attribute, and how dicts are resolved into plugin
+    instances.
 
     Warning:
         `EnOptContext` objects are immutable after construction. Do not attempt

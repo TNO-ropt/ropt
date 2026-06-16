@@ -76,18 +76,10 @@ class PerturbationType(IntEnum):
 
 
 class EnOptEventType(IntEnum):
-    """Enumerates the types of events emitted during optimization workflow execution.
+    """Enumerates the types of events emitted during optimization workflows.
 
-    Events signal significant occurrences within the optimization process, such
-    as the start or end of an optimization or an evaluation. Callbacks can be
-    registered to listen for specific event types.
-
-    When an event occurs, registered callbacks receive an
-    [`EnOptEvent`][ropt.events.EnOptEvent] object containing:
-
-    - `event_type`: The type of the event (a value from this enumeration).
-    - `data`: A dictionary containing event-specific data, such as
-      [`Results`][ropt.results.Results] objects.
+    See [Optimization Workflows](../usage/workflows.md#event-types) for a
+    description of when each event type fires and what data it carries.
     """
 
     START_EVALUATION = 1

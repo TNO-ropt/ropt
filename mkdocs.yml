@@ -97,35 +97,45 @@ nav:
   - "About": index.md
   - "Usage":
       - "Background": usage/background.md
+      - "Installation": usage/installation.md
+      - "Quickstart": usage/quickstart.md
       - "Basic Optimization": usage/basic.md
-      - "Optimization workflows": usage/workflows.md
+      - "Configuration": usage/configuration.md
+      - "Writing an Evaluator Callback": usage/evaluator_callback.md
+      - "Working with Results": usage/results.md
+      - "Realization Filters": usage/realization_filters.md
+      - "Function Estimators": usage/function_estimators.md
+      - "Transforms": usage/transforms.md
+      - "Stochastic Gradients": usage/gradients.md
+      - "Optimization Workflows": usage/workflows.md
+      - "Parallel Evaluation": usage/parallel.md
   - "Reference":
       - "Configuration":
-        - "Configuration Classes": reference/config.md
         - "Context Class": reference/context.md
-      - "Ensemble Optimization":
+        - "Configuration Classes": reference/config.md
+      - "Basic Optimizer": reference/basic_optimizer.md
+      - "Results & Events":
+        - "Evaluation Results": reference/results.md
+        - "Optimization Events": reference/events.md
+      - "Optimization Engine":
         - "Core Classes": reference/core.md
         - "Evaluator Classes": reference/evaluator.md
-      - "Result Handling":
-        - "Optimization   Events": reference/events.md
-        - "Evaluation Results": reference/results.md
       - "Optimization Components":
         - "Function Estimators": reference/function_estimator.md
         - "Realization Filters": reference/realization_filter.md
         - "Optimizer Backends": reference/backend.md
         - "Samplers": reference/sampler.md
         - "Transforms": reference/transforms.md
-      - "Plugins":
-        - "Default Plugins": reference/default_plugins.md
-        - "Plugin Manager": reference/plugin_manager.md
-        - "Plugin Bases": reference/plugin_bases.md
-      - "Workflows":
+      - "Workflow System":
         - "Steps": reference/workflow_steps.md
         - "Event Handlers": reference/workflow_event_handlers.md
-        - "Servers": reference/workflow_servers.md
         - "Evaluators": reference/workflow_evaluators.md
-        - "Basic Optimization Workflow": reference/basic_optimizer.md
+        - "Servers": reference/workflow_servers.md
         - "Workflow Utilities": reference/workflow_utils.md
+      - "Plugin System":
+        - "Plugin Bases": reference/plugin_bases.md
+        - "Plugin Manager": reference/plugin_manager.md
+        - "Default Plugins": reference/default_plugins.md
       - "Enumerations": reference/enums.md
       - "Exceptions": reference/exceptions.md
 

@@ -67,113 +67,22 @@ _GRADIENT_TABLES: Final[dict[str, dict[str, str]]] = {
 
 
 class Table(EventHandler):
-    """This event handler tracks results and stores them in pandas DataFrames.
+    """Build pandas DataFrames from optimization results.
 
-    **Tables**
+    Collects [`FunctionResults`][ropt.results.FunctionResults] and
+    [`GradientResults`][ropt.results.GradientResults] into named tables.
+    Tables are defined via `add_table` with a column specification, or
+    registered in bulk with `set_default_tables`.
 
-    Tables can be generated for
-    [`FunctionsResults`][ropt.results.FunctionResults] and
-    [`GradientsResults`][ropt.results.GradientResults] respectively. Tables are
-    added via the `add_table` method, which takes a name, a type (either
-    "functions" or "gradients"), a column specification and an optional domain
-    type. The column specification determines which fields of the results are
-    stored in the table and how they are named. The domain type determines
-    whether the results are transformed to the user domain before being stored
-    in the table.
-
-    Tables are accessed by their name in attributes, for example, as
-    `handler["evaluations"]`.
+    Access tables via dictionary syntax: `handler["functions"]`.
 
     Warning:
         Tables are generated on the fly from internal data when accessing them
-        in this way. When multiple access are needed, it is more efficient to
+        in this way. When multiple accesses are needed, it is more efficient to
         first store them in a variable.
 
-    **Column specification**
-
-    Columns are specified by providing a dictionary that maps field names to
-    column titles. The keys denote the names of the fields, using attribute
-    syntax. For instance a `function.objectives` key indicates the the
-    result should contain a column with objective values that are found in the
-    `objectives` field of the `function` field of the result. The values
-    corresponding to the keys are used to provide the column names.
-
-    For example, passing this dictionary via the `columns` argument generates a
-    table containing the batch id, the values of all calculated objectives and
-    the vector of variables.
-
-    ```python
-    {
-        "batch_id": "Batch",
-        "functions.objectives": "Objective",
-        "evaluations.variables": "Variables",
-    }
-    ```
-
-    Some fields may result in multiple columns in the DataFrame if their values
-    are vectors or matrices. For example, `evaluations.variables` will generate
-    a separate column for each variable. The table specification above may
-    generate a pandas dataframe looking something like this:
-
-    ```
-        Batch   Objective,0  Variables,v0  Variables,v1  Variables,v2
-    0       0  1.309826e+02      0.500000      0.900000      1.300000
-    1       0  4.362553e+12    120.900265     20.698539    -90.578972
-    ...
-    ```
-
-    Here, because the variables are vectors of length 2, there are two variable
-    columns generated. The corresponding column names consist of the column
-    title and the name of the variable vector, separated by a comma. Note that
-    the `function.objectives` column also contains a comma followed by a 0
-    value. This is because the `functions.objectives` is also a vector of
-    values, there just happens to be only one objective. Its index is used
-    instead of a name, because no name was provided in the configuration of the
-    optimization. Fields may even have matrix values, in which case the column
-    names may be contain two item names or indices separated by commas.
-
-    Tip: Changing the column name separator.
-        By default a comma is used to separate fields in the column names if
-        needed. The `sep` input can be used to provide an alternative separator.
-
-        You can exploit this by specifying a newline as the separator and
-        display a nicely formatted table using the `tabulate` package:
-
-        ```python
-        from tabulate import tabulate
-
-        print(tabulate(table["functions"], headers="keys", showindex=False))
-        ```
-
-        which will show something like this using multi-line headers:
-        ```
-          Batch         Objective    Variables    Variables     Variables
-                                0           v0           v1            v2
-        -------  ----------------  -----------  -----------  ------------
-              0           130.983          0.5          0.9           1.3
-        ...
-        ```
-
-
-    **Default tables**
-
-    The `set_default_tables` method can be used to add a set of default tables:
-
-    - For functions results it generates these tables:
-        - `"functions"`: contains a set of values of the calculated functions.
-        - `"evaluations"`: contains a set of values for all evaluations.
-        - `"constraints"`: contains a set of values for all constraints.
-    - For gradients results it generates these tables:
-        - `"gradients"`: contains a set of values of the calculated gradients.
-        - `"perturbations"`: contains a set of values for all perturbations.
-
-
-    **Callback functionality**
-
-    The tables are updated anytime a result is processed. To be able to do
-    something with the tables each time they are updated a callback can be
-    provided set using `set_callback`. This callback will called anytime the
-    tables are updated, passing the event that caused the tables to be updated.
+    See [Optimization Workflows](../usage/workflows.md#table) for full details
+    on column specification format, default tables, and callback functionality.
     """
 
     def __init__(

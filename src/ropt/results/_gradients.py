@@ -18,16 +18,9 @@ if TYPE_CHECKING:
 
 @dataclass(slots=True)
 class Gradients(ResultField):
-    """Store calculated objective and constraint gradients.
+    """Aggregated objective and constraint gradients.
 
-    The `Gradients` class stores the calculated gradients of the objective and
-    constraint functions. These gradients are typically derived from function
-    evaluations across all realizations, often through an aggregation process
-    like averaging. The optimizer may handle multiple objectives and
-    constraints. Multiple objective gradients are combined into a single vector,
-    which is stored in the `target_objective` field. This is the gradient used
-    by the optimizer. Multiple constraint gradients are handled individually by
-    the optimizer.
+    See [Working with Results](../usage/results.md) for usage details.
 
     **Result descriptions**
 

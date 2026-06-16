@@ -15,28 +15,14 @@ if TYPE_CHECKING:
 
 
 class Tracker(EventHandler):
-    """The default event handler for tracking optimization results.
+    """Track a single optimization result based on selection criteria.
 
-    This event handler listens for
-    [`FINISHED_EVALUATION`][ropt.enums.EnOptEventType.FINISHED_EVALUATION] events
-    emitted from within an optimization workflow. It processes the
-    [`Results`][ropt.results.Results] objects contained within these events and
-    selects a single [`FunctionResults`][ropt.results.FunctionResults] object to
-    retain based on defined criteria.
+    Listens for `FINISHED_EVALUATION` events and retains either the best
+    (lowest weighted objective) or most recent valid result. Optionally
+    filters by constraint tolerance.
 
-    The criteria for selection are:
-
-    - **`what='best'` (default):** Tracks the result with the lowest weighted
-      objective value encountered so far.
-    - **`what='last'`:** Tracks the most recently received valid result.
-
-    Optionally, results can be filtered based on constraint violations using the
-    `constraint_tolerance` parameter. If provided, any result violating
-    constraints beyond this tolerance is ignored.
-
-    The selected result (in the optimizer domain) is stored internally. The
-    result accessible via dictionary access (`handler["results"]`) is the
-    selected result, potentially transformed to the user domain.
+    See [Optimization Workflows](../usage/workflows.md#tracker) for full
+    details on selection criteria and domain handling.
     """
 
     def __init__(
@@ -46,30 +32,12 @@ class Tracker(EventHandler):
         constraint_tolerance: float | None = None,
         domain: DomainType = "user",
     ) -> None:
-        """Initialize a default tracker event handler.
-
-        This event handler monitors [`Results`][ropt.results.Results] objects
-        and selects a single [`FunctionResults`][ropt.results.FunctionResults]
-        object to retain based on the `what` criterion ('best' or 'last').
-
-        The 'best' result is the one with the lowest weighted objective value
-        encountered so far. The 'last' result is the most recently received
-        valid result. Results can optionally be filtered by
-        `constraint_tolerance` to ignore those violating constraints beyond the
-        specified threshold.
-
-        Tracking logic (comparing 'best' or selecting 'last') operates on the
-        results in the optimizer's domain. However, the final selected result
-        that is made accessible via dictionary access (`handler["results"]`) is
-        transformed to the user's domain.
-
-        If the domain type is "user", the result is converted from the
-        optimizer domain to the user domain *before* being stored.
+        """Initialize the Tracker.
 
         Args:
             what:                 Criterion for selecting results ('best' or 'last').
             constraint_tolerance: Optional threshold for filtering constraint violations.
-            domain:               The domain in which to store the results ('user' or 'optimizer').
+            domain:               Domain in which to store the results ('user' or 'optimizer').
         """
         super().__init__()
         self._what = what
@@ -81,13 +49,8 @@ class Tracker(EventHandler):
     def handle_event(self, event: EnOptEvent) -> None:
         """Handle incoming events.
 
-        This method processes incoming
-        [`FINISHED_EVALUATION`][ropt.enums.EnOptEventType.FINISHED_EVALUATION]
-        events.
-
-        If a relevant event containing results is received, this method updates
-        the tracked result (`self["results"]`) based on the `what` criterion
-        ('best' or 'last') and the optional `constraint_tolerance`.
+        Processes `FINISHED_EVALUATION` events and updates the tracked result
+        based on the configured criterion and constraint tolerance.
 
         Args:
             event: The event object.

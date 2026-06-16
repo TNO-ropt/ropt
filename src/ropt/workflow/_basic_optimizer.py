@@ -31,103 +31,13 @@ if TYPE_CHECKING:
 
 
 class BasicOptimizer:
-    r"""A class for executing single optimization runs.
+    r"""A simple interface for single optimization runs.
 
-    The `BasicOptimizer` is designed to simplify the process of setting up and
-    executing optimization workflows that consist primarily of a single
-    optimization run.
+    Wraps the workflow framework into a run-once interface with built-in
+    result tracking.
 
-    This class provides a user-friendly interface for common optimization
-    operations, including:
-
-    - **Initiating a Single Optimization:**  Easily start an optimization
-      process with a provided configuration and evaluator.
-    - **Observing Optimization Events:** Register observer functions to monitor
-      and react to various events that occur during the optimization, such as
-      the start of an evaluation or the availability of new results.
-    - **Abort Conditions:** Define a callback function that can be used to check
-      for abort conditions during the optimization.
-    - **Result Reporting:** Define a callback function that will be called
-      whenever new results become available.
-    - **Accessing Results:** After the optimization is complete, the optimal
-      results, corresponding variables, and the optimization's exit code are
-      readily accessible.
-
-    By encapsulating the core elements of an optimization run, the
-    `BasicOptimizer` reduces the boilerplate code required for simple
-    optimization tasks, allowing users to focus on defining the optimization
-    problem and analyzing the results.
-
-    The following example demonstrates how to find the optimum of the Rosenbrock
-    function using a `BasicOptimizer` object, combining it with a `tracker` to
-    store the best result.
-
-    Example:
-        ````python
-        import numpy as np
-        from numpy.typing import NDArray
-
-        from ropt.evaluator import EvaluatorContext, EvaluatorResult
-        from ropt.workflow import BasicOptimizer
-
-        DIM = 5
-        CONFIG = {
-            "variables": {
-                "variable_count": DIM,
-                "perturbation_magnitudes": 1e-6,
-            },
-        }
-        initial_values = 2 * np.arange(DIM) / DIM + 0.5
-
-
-        def rosenbrock(variables: NDArray[np.float64], _: EvaluatorContext) -> EvaluatorResult:
-            objectives = np.zeros((variables.shape[0], 1), dtype=np.float64)
-            for v_idx in range(variables.shape[0]):
-                for d_idx in range(DIM - 1):
-                    x, y = variables[v_idx, d_idx : d_idx + 2]
-                    objectives[v_idx, 0] += (1.0 - x) ** 2 + 100 * (y - x * x) ** 2
-            return EvaluatorResult(objectives=objectives)
-
-
-        optimizer = BasicOptimizer(CONFIG, rosenbrock)
-        optimizer.run(initial_values)
-
-        print(f"Optimal variables: {optimizer.results.evaluations.variables}")
-        print(f"Optimal objective: {optimizer.results.functions.target_objective}")
-        ````
-
-    Note: Customization
-        The optimization workflow executed by `BasicOptimizer` can be tailored
-        by adding default event handlers. This allows for custom processing of
-        events emitted by the *default* optimization workflow, without replacing
-        the workflow itself. This is useful for tasks like custom logging or
-        data processing.
-
-        Default event handlers can be specified using a JSON configuration file
-        is found at `<prefix>/share/ropt/options.json`, where `<prefix>` is the
-        Python installation prefix or a system-wide data prefix.[^1]. This JSON
-        file should contain a `basic_optimizer` item, containing an
-        `event_handlers` item that provides a list of strings of the form
-        `"module_name.handler_name"`. The `module_name` denotes a module
-        containing an event handler class with the name `module_name`.
-
-        Example `shared/ropt/options.json`:
-
-        ```json
-        {
-            "basic_optimizer": {
-                "event_handlers": ["mylogger.Logger"]
-            }
-        }
-        ```
-
-        [^1]:
-            The exact path to Python installation prefix, or the system's
-            data prefix can be found using the Python `sysconfig` module:
-            ```python
-            from sysconfig import get_paths
-            print(get_paths()["data"])
-            ```
+    See [Basic Optimization](../usage/basic.md) for a walkthrough and full
+    example.
     """
 
     def __init__(

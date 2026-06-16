@@ -17,11 +17,9 @@ if TYPE_CHECKING:
 
 @dataclass(slots=True)
 class GradientEvaluations(ResultField):
-    """Store results of evaluations used for gradient calculations.
+    """Per-realization evaluation data for perturbed variables.
 
-    The `GradientEvaluations` class stores the results of evaluating the
-    objective and constraint functions for perturbed variables, which is
-    necessary for gradient calculations.
+    See [Working with Results](../usage/results.md) for usage details.
 
     **Result descriptions**
 

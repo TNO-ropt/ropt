@@ -19,44 +19,20 @@ if TYPE_CHECKING:
 class VariableTransform(ABC):
     """Abstract base class for variable transformations.
 
-    This class defines the interface for transforming variables between the
-    user-defined domain and the optimizer's internal domain. Concrete
-    implementations of this class handle the specific logic for each type of
-    transformation.
+    Subclasses must implement methods to transform variables and related
+    quantities between user and optimizer domains:
 
-    When implementing a variable transformation, the following aspects must be
-    considered:
+    - `to_optimizer` / `from_optimizer`: map variable values.
+    - `magnitudes_to_optimizer`: map perturbation magnitudes.
+    - `bound_constraint_diffs_from_optimizer`: map bound-violation differences.
+    - `init`: apply a mask selecting which variables this transform affects.
 
-    - **Variable Value Transformation:** Mapping variable values between the
-      user and optimizer domains. This is achieved by overriding the
-      [`to_optimizer`][ropt.transforms.VariableTransform.to_optimizer]
-      and
-      [`from_optimizer`][ropt.transforms.VariableTransform.from_optimizer]
-      methods.
-    - **Perturbation Magnitude Transformation:** Stochastic gradient-based
-      algorithms use perturbations with specified magnitudes (see
-      [`perturbation_magnitudes`][ropt.config.GradientConfig]). These magnitudes
-      are typically defined in the user domain and must be transformed to the
-      optimizer domain using the
-      [`magnitudes_to_optimizer`][ropt.transforms.VariableTransform.magnitudes_to_optimizer]
-      method.
-    - **Bound Constraint Difference Transformation:** To report violations of
-      variable bounds, the differences between variable values and their
-      lower/upper bounds must be transformed from the optimizer domain back
-      to the user domain. This is done using the
-      [`bound_constraint_diffs_from_optimizer`][ropt.transforms.VariableTransform.bound_constraint_diffs_from_optimizer]
-      method.
-    - **Linear Constraint Transformation:** Linear constraints are generally
-      defined by coefficients and right-hand-side values in the user domain.
-      These must be transformed to the optimizer domain using the
-      [`linear_constraints_to_optimizer`][ropt.transforms.VariableTransform.linear_constraints_to_optimizer]
-      method.
-    - **Linear Constraint Difference Transformation:** To report violations of
-      linear constraints, the differences between the linear constraint
-      values and their right-hand-side values must be transformed back to the
-      user domain. This is done using the
-      [`linear_constraints_diffs_from_optimizer`][ropt.transforms.VariableTransform.linear_constraints_diffs_from_optimizer]
-      method.
+    Override `linear_constraints_to_optimizer` and
+    `linear_constraints_diffs_from_optimizer` if linear constraints are used.
+
+    All arrays use the last axis for the variable dimension.
+
+    See [Transforms](../usage/transforms.md) for lifecycle and guidance.
     """
 
     @abstractmethod
@@ -67,64 +43,46 @@ class VariableTransform(ABC):
         """Initialize the variable transform.
 
         Args:
-            transform_config: The configuration object containing settings for this
-                variable transform.
+            transform_config: The transform configuration.
         """
 
     @abstractmethod
     def init(self, mask: NDArray[np.bool_]) -> None:
-        """Set the mask for the variable transform.
+        """Apply a mask selecting which variables this transform affects.
 
-        This method allows setting a mask that indicates which variables are
-        affected by this transform. The mask is a boolean array where `True`
-        values indicate the variables that should be transformed, and `False`
-        values indicate the variables that should remain unchanged.
+        The mask combines the free-variable mask with the per-transform
+        assignment. Unmasked positions must pass through unchanged.
 
         Args:
-            mask: A boolean array indicating which variables are affected by this
-                transform.
+            mask: Boolean array (`True` = this transform applies).
         """
 
     @abstractmethod
     def to_optimizer(self, values: NDArray[np.float64]) -> NDArray[np.float64]:
-        """Transform values from the user domain to the optimizer domain.
+        """Transform variable values from user domain to optimizer domain.
 
-        This method maps variable values from the user-defined domain to the
-        optimizer's internal domain. This transformation might involve scaling,
-        shifting, or other operations to improve the optimizer's performance.
-
-        The input `values` may be a multi-dimensional array. It is assumed that
-        the last axis of the array represents the variable values. If this is
-        not the case, you must adjust the order of the axes before and after
-        calling this method.
+        The last axis represents variables. Multi-dimensional arrays are
+        supported.
 
         Args:
-            values: The variable values in the user domain to be transformed.
+            values: Variable values in the user domain.
 
         Returns:
-            The transformed variable values in the optimizer domain.
+            Transformed values in the optimizer domain.
         """
 
     @abstractmethod
     def from_optimizer(self, values: NDArray[np.float64]) -> NDArray[np.float64]:
-        """Transform values from the optimizer domain to the user domain.
+        """Transform variable values from optimizer domain to user domain.
 
-        This method maps variable values from the optimizer's internal domain
-        back to the user-defined domain. This transformation reverses any
-        scaling, shifting, or other operations that were applied to improve
-        the optimizer's performance.
-
-        The input `values` may be a multi-dimensional array. It is assumed that
-        the last axis of the array represents the variable values. If this is
-        not the case, you must adjust the order of the axes before and after
-        calling this method.
+        The last axis represents variables. Multi-dimensional arrays are
+        supported.
 
         Args:
-            values: The variable values in the optimizer domain to be
-                transformed.
+            values: Variable values in the optimizer domain.
 
         Returns:
-            The transformed variable values in the user domain.
+            Transformed values in the user domain.
         """
 
     @abstractmethod
@@ -133,46 +91,30 @@ class VariableTransform(ABC):
     ) -> NDArray[np.float64]:
         """Transform perturbation magnitudes to the optimizer domain.
 
-        This method transforms perturbation magnitudes, typically used in
-        stochastic gradient-based algorithms, from the user-defined domain to
-        the optimizer's internal domain. The transformation ensures that the
-        perturbations are applied correctly in the optimizer's space, which may
-        have different scaling or units than the user domain.
-
-        For example, if variables are scaled down in the optimizer domain, the
-        perturbation magnitudes should also be scaled down proportionally.
+        Must be consistent with the variable transform (e.g., if variables
+        are divided by scale, magnitudes should be too).
 
         Args:
-            values: The perturbation magnitudes in the user domain to be transformed.
+            values: Perturbation magnitudes in the user domain.
 
         Returns:
-            The transformed perturbation magnitudes in the optimizer domain.
+            Magnitudes in the optimizer domain.
         """
 
     @abstractmethod
     def bound_constraint_diffs_from_optimizer(
         self, lower_diffs: NDArray[np.float64], upper_diffs: NDArray[np.float64]
     ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
-        """Transform bound constraint differences to the user domain.
+        """Transform bound-violation differences to the user domain.
 
-        This method transforms the differences between variable values and their
-        lower/upper bounds from the optimizer's internal domain back to the
-        user-defined domain. These differences are used to report constraint
-        violations.
-
-        For example, if variables are scaled in the optimizer domain, the
-        differences between the variables and their bounds must be scaled back
-        to the user domain to accurately reflect the constraint violations in
-        the user's original units.
+        Used for reporting constraint violations in user-domain units.
 
         Args:
-            lower_diffs: The differences between the variable values and their
-                lower bounds in the optimizer domain.
-            upper_diffs: The differences between the variable values and their
-                upper bounds in the optimizer domain.
+            lower_diffs: Variable value minus lower bound (optimizer domain).
+            upper_diffs: Variable value minus upper bound (optimizer domain).
 
         Returns:
-            A tuple containing the transformed differences.
+            Tuple of (lower_diffs, upper_diffs) in user domain.
         """
 
     def linear_constraints_to_optimizer(
@@ -181,28 +123,18 @@ class VariableTransform(ABC):
         lower_bounds: NDArray[np.float64],
         upper_bounds: NDArray[np.float64],
     ) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]]:
-        """Transform linear constraints from the user domain to the optimizer domain.
+        """Transform linear constraint coefficients and bounds to optimizer domain.
 
-        This method transforms linear constraints, defined by their coefficients
-        and right-hand-side bounds, from the user-defined domain to the
-        optimizer's internal domain. This is essential to maintain the
-        validity of the constraints after variable transformations.
-
-        For instance, if variables are scaled or shifted in the optimizer
-        domain, the coefficients and bounds of the linear constraints must be
-        adjusted accordingly to ensure the constraints remain consistent.
-
-        The linear constraints are defined by the equation `A * x = b`, where `A`
-        is the coefficient matrix, `x` is the variable vector, and `b` represents
-        the right-hand-side bounds.
+        Adjusts the coefficient matrix and RHS bounds so that linear constraints
+        remain valid after the variable transformation.
 
         Args:
-            coefficients: The coefficient matrix.
-            lower_bounds: The lower bounds on the right-hand-side values.
-            upper_bounds: The upper bounds on the right-hand-side values.
+            coefficients: Coefficient matrix `A`.
+            lower_bounds: Lower RHS bounds.
+            upper_bounds: Upper RHS bounds.
 
         Returns:
-            A tuple containing the transformed coefficient matrix and bounds.
+            Tuple of (coefficients, lower_bounds, upper_bounds) in optimizer domain.
         """  # noqa: DOC202
         msg = "This transformer does not support linear constraints."
         raise NotImplementedError(msg)
@@ -210,55 +142,40 @@ class VariableTransform(ABC):
     def linear_constraints_diffs_from_optimizer(
         self, lower_diffs: NDArray[np.float64], upper_diffs: NDArray[np.float64]
     ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
-        """Transform linear constraint differences to the user domain.
+        """Transform linear-constraint-violation differences to user domain.
 
-        This method transforms the differences between linear constraint values
-        and their lower/upper bounds from the optimizer's internal domain back
-        to the user-defined domain. These differences are used to report
-        constraint violations.
-
-        For example, if linear constraints are scaled in the optimizer domain,
-        the differences between the constraint values and their bounds must be
-        scaled back to the user domain to accurately reflect the constraint
-        violations in the user's original units.
+        Used for reporting constraint violations in user-domain units.
 
         Args:
-            lower_diffs: The differences between the linear constraint values and
-                their lower bounds.
-            upper_diffs: The differences between the linear constraint values and
-                their upper bounds.
+            lower_diffs: Constraint value minus lower bound.
+            upper_diffs: Constraint value minus upper bound.
 
         Returns:
-            A tuple containing the transformed lower and upper differences.
+            Tuple of (lower_diffs, upper_diffs) in user domain.
         """  # noqa: DOC202
         msg = "This transformer does not support linear constraints."
         raise NotImplementedError(msg)
 
     def update(self, *args: Any, **kwargs: Any) -> None:  # noqa: ANN401, B027
-        """Update the variables transform.
+        """Update internal state mid-run (optional).
 
-        This method allows updating the internal state of the transform after it
-        has been initialized. This can be useful in cases where relevant
-        parameters are not known at initialization time and need to be
-        determined based on information obtained during the optimization
-        process.
+        Override to support runtime parameter changes when values are not
+        known at initialization.
 
         Args:
-            args:   Positional arguments for the update.
-            kwargs: Keyword arguments for the update.
+            args:   Positional arguments.
+            kwargs: Keyword arguments.
         """
 
 
 class ObjectiveTransform(ABC):
     """Abstract base class for objective transformations.
 
-    This class defines the interface for transforming objective values between
-    the user-defined domain and the optimizer's internal domain. Concrete
-    implementations of this class handle the specific logic for each type of
-    objective transformation. This is achieved by overriding the
-    [`to_optimizer`][ropt.transforms.ObjectiveTransform.to_optimizer] and
-    [`from_optimizer`][ropt.transforms.ObjectiveTransform.from_optimizer]
-    methods.
+    Subclasses must implement `to_optimizer` and `from_optimizer` to map
+    objective values between user and optimizer domains, plus `init` to
+    apply a mask selecting which objectives this transform affects.
+
+    All arrays use the last axis for the objective dimension.
     """
 
     @abstractmethod
@@ -269,108 +186,67 @@ class ObjectiveTransform(ABC):
         """Initialize the objective transform.
 
         Args:
-            transform_config: The configuration object containing settings for this
-                objective transform.
+            transform_config: The transform configuration.
         """
 
     @abstractmethod
     def init(self, mask: NDArray[np.bool_]) -> None:
-        """Set the mask for the objective transform.
+        """Apply a mask selecting which objectives this transform affects.
 
-        This method allows setting a mask that indicates which objectives are
-        affected by this transform. The mask is a boolean array where `True`
-        values indicate the objectives that should be transformed, and `False`
-        values indicate the objectives that should remain unchanged.
+        Unmasked positions must pass through unchanged.
 
         Args:
-            mask: A boolean array indicating which objectives are affected by this
-                transform.
+            mask: Boolean array (`True` = this transform applies).
         """
 
     @abstractmethod
     def to_optimizer(self, objectives: NDArray[np.float64]) -> NDArray[np.float64]:
-        """Transform objective values to the optimizer domain.
+        """Transform objective values from user domain to optimizer domain.
 
-        This method maps objective values from the user-defined domain to the
-        optimizer's internal domain. This transformation might involve scaling,
-        shifting, or other operations to improve the optimizer's performance.
-
-        The input `objectives` may be a multi-dimensional array. It is assumed
-        that the last axis of the array represents the objective values. If
-        this is not the case, you must adjust the order of the axes before and
-        after calling this method.
+        The last axis represents objectives. Multi-dimensional arrays are
+        supported.
 
         Args:
-            objectives: The objective values in the user domain to be transformed.
+            objectives: Objective values in the user domain.
 
         Returns:
-            The transformed objective values in the optimizer domain.
+            Transformed values in the optimizer domain.
         """
 
     @abstractmethod
     def from_optimizer(self, objectives: NDArray[np.float64]) -> NDArray[np.float64]:
-        """Transform objective values to the user domain.
+        """Transform objective values from optimizer domain to user domain.
 
-        This method maps objective values from the optimizer's internal domain
-        back to the user-defined domain. This transformation reverses any
-        scaling, shifting, or other operations that were applied to improve
-        the optimizer's performance.
-
-        The input `objectives` may be a multi-dimensional array. It is assumed
-        that the last axis of the array represents the objective values. If
-        this is not the case, you must adjust the order of the axes before and
-        after calling this method.
+        The last axis represents objectives. Multi-dimensional arrays are
+        supported.
 
         Args:
-            objectives: The objective values in the optimizer domain to be transformed.
+            objectives: Objective values in the optimizer domain.
 
         Returns:
-            The transformed objective values in the user domain.
+            Transformed values in the user domain.
         """
 
     def update(self, *args: Any, **kwargs: Any) -> None:  # noqa: ANN401, B027
-        """Update the objective transform.
-
-        This method allows updating the internal state of the transform after it
-        has been initialized. This can be useful in cases where relevant
-        parameters are not known at initialization time and need to be
-        determined based on information obtained during the optimization
-        process.
+        """Update internal state mid-run (optional).
 
         Args:
-            args:   Positional arguments for the update.
-            kwargs: Keyword arguments for the update.
+            args:   Positional arguments.
+            kwargs: Keyword arguments.
         """
 
 
 class NonlinearConstraintTransform(ABC):
     """Abstract base class for nonlinear constraint transformations.
 
-    This class defines the interface for transforming nonlinear constraint
-    values between the user-defined domain and the optimizer's internal
-    domain. Concrete implementations of this class handle the specific logic
-    for each type of nonlinear constraint transformation.
+    Subclasses must implement:
 
-    When implementing a nonlinear constraint transformation, the following
-    aspects must be considered:
+    - `to_optimizer` / `from_optimizer`: map constraint values.
+    - `bounds_to_optimizer`: map constraint RHS bounds.
+    - `nonlinear_constraint_diffs_from_optimizer`: map violation differences.
+    - `init`: apply a mask selecting which constraints this transform affects.
 
-    - **Constraint Value Transformation:** Mapping constraint values between the
-      user and optimizer domains. This is achieved by overriding the
-      [`to_optimizer`][ropt.transforms.NonlinearConstraintTransform.to_optimizer]
-      and
-      [`from_optimizer`][ropt.transforms.NonlinearConstraintTransform.from_optimizer]
-      methods.
-    - **Right-Hand-Side Bound Transformation:** Mapping the right-hand-side
-      bounds of the constraints between the user and optimizer domains. This is
-      achieved by overriding the
-      [`bounds_to_optimizer`][ropt.transforms.NonlinearConstraintTransform.bounds_to_optimizer]
-      method.
-    - **Constraint Difference Transformation:** To report violations of
-      nonlinear constraints, the differences between constraint values and their
-      lower/upper bounds must be transformed from the optimizer domain back to
-      the user domain. This is done using the
-      [`nonlinear_constraint_diffs_from_optimizer`][ropt.transforms.NonlinearConstraintTransform.nonlinear_constraint_diffs_from_optimizer]
-      method.
+    All arrays use the last axis for the constraint dimension.
     """
 
     @abstractmethod
@@ -381,128 +257,83 @@ class NonlinearConstraintTransform(ABC):
         """Initialize the constraint transform.
 
         Args:
-            transform_config: The configuration object containing settings for this
-                constraint transform.
+            transform_config: The transform configuration.
         """
 
     @abstractmethod
     def init(self, mask: NDArray[np.bool_]) -> None:
-        """Set the mask for the constraint transform.
+        """Apply a mask selecting which constraints this transform affects.
 
-        This method allows setting a mask that indicates which constraints are
-        affected by this transform. The mask is a boolean array where `True`
-        values indicate the constraints that should be transformed, and `False`
-        values indicate the constraints that should remain unchanged.
+        Unmasked positions must pass through unchanged.
 
         Args:
-            mask: A boolean array indicating which objectives are affected by this
-                transform.
+            mask: Boolean array (`True` = this transform applies).
         """
 
     @abstractmethod
     def to_optimizer(self, constraints: NDArray[np.float64]) -> NDArray[np.float64]:
-        """Transform constraint values to the optimizer domain.
+        """Transform constraint values from user domain to optimizer domain.
 
-        This method maps nonlinear constraint values from the user-defined
-        domain to the optimizer's internal domain. This transformation might
-        involve scaling, shifting, or other operations to improve the
-        optimizer's performance.
-
-        The input `constraints` may be a multi-dimensional array. It is assumed
-        that the last axis of the array represents the constraint values. If
-        this is not the case, you must adjust the order of the axes before and
-        after calling this method.
+        The last axis represents constraints. Multi-dimensional arrays are
+        supported.
 
         Args:
-            constraints: The nonlinear constraint values in the user domain to
-                be transformed.
+            constraints: Constraint values in the user domain.
 
         Returns:
-            The transformed nonlinear constraint values in the optimizer domain.
+            Transformed values in the optimizer domain.
         """
 
     @abstractmethod
     def from_optimizer(self, constraints: NDArray[np.float64]) -> NDArray[np.float64]:
-        """Transform constraint values to the user domain.
+        """Transform constraint values from optimizer domain to user domain.
 
-        This method maps nonlinear constraint values from the optimizer's
-        internal domain back to the user-defined domain. This transformation
-        reverses any scaling, shifting, or other operations that were applied
-        to improve the optimizer's performance.
-
-        The input `constraints` may be a multi-dimensional array. It is assumed
-        that the last axis of the array represents the constraint values. If
-        this is not the case, you must adjust the order of the axes before and
-        after calling this method.
+        The last axis represents constraints. Multi-dimensional arrays are
+        supported.
 
         Args:
-            constraints: The nonlinear constraint values in the optimizer domain
-                to be transformed.
+            constraints: Constraint values in the optimizer domain.
 
         Returns:
-            The transformed nonlinear constraint values in the user domain.
+            Transformed values in the user domain.
         """
 
     @abstractmethod
     def bounds_to_optimizer(
         self, lower_bounds: NDArray[np.float64], upper_bounds: NDArray[np.float64]
     ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
-        """Transform the right-hand-side bounds to the optimizer domain.
+        """Transform constraint RHS bounds to the optimizer domain.
 
-        This method transforms the lower and upper bounds of the nonlinear
-        constraints from the user-defined domain to the optimizer's internal
-        domain. This transformation is necessary to ensure that the
-        constraints remain valid after the variables have been transformed.
-
-        For example, if constraint values are scaled or shifted in the
-        optimizer domain, the bounds must be adjusted accordingly.
+        Adjusts bounds to remain consistent with the constraint transform.
 
         Args:
-            lower_bounds: The lower bounds on the right-hand-side values in the
-                user domain.
-            upper_bounds: The upper bounds on the right-hand-side values in the
-                user domain.
+            lower_bounds: Lower RHS bounds in user domain.
+            upper_bounds: Upper RHS bounds in user domain.
 
         Returns:
-            A tuple containing the transformed bounds.
+            Tuple of (lower_bounds, upper_bounds) in optimizer domain.
         """
 
     @abstractmethod
     def nonlinear_constraint_diffs_from_optimizer(
         self, lower_diffs: NDArray[np.float64], upper_diffs: NDArray[np.float64]
     ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
-        """Transform nonlinear constraint differences to the user domain.
+        """Transform constraint-violation differences to user domain.
 
-        This method transforms the differences between nonlinear constraint
-        values and their lower/upper bounds from the optimizer's internal
-        domain back to the user-defined domain. These differences are used to
-        report constraint violations.
-
-        For example, if constraint values are scaled in the optimizer domain,
-        the differences between the constraint values and their bounds must be
-        scaled back to the user domain to accurately reflect the constraint
-        violations in the user's original units.
+        Used for reporting constraint violations in user-domain units.
 
         Args:
-            lower_diffs: The differences between the nonlinear constraint values
-                and their lower bounds.
-            upper_diffs: The differences between the nonlinear constraint values
-                and their upper bounds.
+            lower_diffs: Constraint value minus lower bound.
+            upper_diffs: Constraint value minus upper bound.
 
         Returns:
-            A tuple containing the transformed lower and upper differences.
+            Tuple of (lower_diffs, upper_diffs) in user domain.
         """
 
     def update(self, *args: Any, **kwargs: Any) -> None:  # noqa: ANN401, B027
-        """Update the constraint transform.
-
-        This method allows updating the internal state of the transform after it
-        has been initialized. This can be useful in cases where relevant
-        parameters are not known at initialization time and need to be
-        determined based on information obtained during the optimization
-        process.
+        """Update internal state mid-run (optional).
 
         Args:
-            args:   Positional arguments for the update.
-            kwargs: Keyword arguments for the update.
+            args:   Positional arguments.
+            kwargs: Keyword arguments.
         """

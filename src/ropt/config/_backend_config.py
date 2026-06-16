@@ -17,24 +17,10 @@ class BackendConfig(BaseModel):
     """Configuration class for the optimization backend.
 
     `BackendConfig` defines the configuration for the optimization algorithm
-    used by an optimization backend plugin. The `method` field selects the
-    algorithm using a `"plugin/method"` string (e.g. `"scipy/default"`).
+    used by an optimization backend plugin.
 
-    While optimization methods can have diverse parameters, this class provides
-    a standardized set of settings that are commonly used and forwarded to the
-    backend:
-
-    - **`max_iterations`**: The maximum number of iterations allowed. The exact
-      definition depends on the optimizer backend, and it may be ignored.
-    - **`convergence_tolerance`**: The convergence tolerance used as a stopping
-      criterion. The exact definition depends on the optimizer, and it may be
-      ignored.
-    - **`parallel`**: If `True`, allows the optimizer to use parallelized
-      function evaluations. This typically applies to gradient-free methods and
-      may be ignored.
-    - **`options`**: A dictionary or list of strings for generic optimizer
-      options. The required format and interpretation depend on the specific
-      optimization method.
+    See the [Configuration guide](../usage/configuration.md#backend) for
+    detailed descriptions and usage examples.
 
     Attributes:
         method:                Name of the optimization method.

@@ -28,31 +28,12 @@ MetaDataType = dict[str, int | float | bool | str]
 class EnsembleOptimizer(ComputeStep):
     """The default optimizer compute step.
 
-    This compute step executes an optimization algorithm based on a provided
-    configuration ([`EnOptContext`][ropt.context.EnOptContext] or a compatible
-    dictionary). It iteratively performs function and potentially gradient
-    evaluations, yielding a sequence of
-    [`FunctionResults`][ropt.results.FunctionResults] and
-    [`GradientResults`][ropt.results.GradientResults] objects.
+    Executes an optimization algorithm, iteratively performing function and
+    gradient evaluations. Emits `START_OPTIMIZER`, `START_EVALUATION`,
+    `FINISHED_EVALUATION`, and `FINISHED_OPTIMIZER` events.
 
-    While initial variable values are typically specified in the configuration,
-    they can be overridden by passing them directly to the `run` method.
-
-    The following events are emitted during execution:
-
-    - [`START_OPTIMIZER`][ropt.enums.EnOptEventType.START_OPTIMIZER]:
-      Emitted just before the optimization process begins.
-    - [`START_EVALUATION`][ropt.enums.EnOptEventType.START_EVALUATION]: Emitted
-      immediately before an ensemble evaluation (for functions or gradients)
-      is requested from the underlying optimizer.
-    - [`FINISHED_EVALUATION`][ropt.enums.EnOptEventType.FINISHED_EVALUATION]: Emitted
-      after an evaluation completes. This event carries the generated
-      [`Results`][ropt.results.Results] object(s) in its `data` dictionary
-      under the key `"results"`. Event handlers typically listen for this event
-      to process or track optimization progress.
-    - [`FINISHED_OPTIMIZER`][ropt.enums.EnOptEventType.FINISHED_OPTIMIZER]:
-      Emitted after the entire optimization process concludes (successfully,
-      or due to termination conditions or errors).
+    See [Optimization Workflows](../usage/workflows.md#events-emitted-by-ensembleoptimizer)
+    for the full event lifecycle description.
     """
 
     def __init__(self, *, evaluator: Evaluator) -> None:
@@ -71,27 +52,20 @@ class EnsembleOptimizer(ComputeStep):
         *,
         metadata: dict[str, Any] | None = None,
     ) -> ExitCode:
-        """Run the compute step to perform an optimization.
-
-        This method executes the core logic of the optimizer compute step. It
-        requires an optimizer context
-        ([`EnOptContext`][ropt.context.EnOptContext]) and optionally accepts
-        specific initial variable vectors and metadata.
-
-        If `metadata` is provided, it is attached to the
-        [`Results`][ropt.results.Results] objects emitted via the
-        `FINISHED_EVALUATION` event.
+        """Run the optimization.
 
         Args:
             context:    The optimizer context.
-            variables:  Optional initial variable vector(s) to start from.
-            metadata:   Optional dictionary to attach to emitted `Results`.
+            variables:  Initial variable vector(s).
+            metadata:   Optional dictionary attached to emitted
+                [`Results`][ropt.results.Results] via the `FINISHED_EVALUATION`
+                event.
 
         Returns:
             An exit code indicating the outcome of the optimization.
 
         Raises:
-            ValueError:   If the input variables have the wrong shape.
+            ValueError: If the input variables have the wrong shape.
         """
         context.lock()
 

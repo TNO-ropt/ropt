@@ -1,71 +1,14 @@
-"""Domain Transformation Framework.
+"""Public API for domain transforms.
 
-This module provides a flexible framework for transforming optimization
-variables, objectives, and constraints between user-defined domains and the
-domains used internally by the optimizer. These transformations are essential
-for:
+Provides base classes for transforming variables, objectives, and constraints
+between user-defined domains and the optimizer's internal domain:
 
-- **Improving Backend Performance:** Scaling, shifting, and other
-  transformations can significantly enhance the efficiency, stability, and
-  convergence of optimization algorithms.
-- **Implementing Custom Mappings:**  Beyond simple scaling, this framework
-  supports complex, user-defined mappings between domains, allowing for
-  tailored problem representations.
-- **Handling Diverse Units and Scales:** Transformations enable the optimizer
-  to work with variables and functions that may have vastly different units
-  or scales, improving numerical stability.
+- [`VariableTransform`][ropt.transforms.VariableTransform]
+- [`ObjectiveTransform`][ropt.transforms.ObjectiveTransform]
+- [`NonlinearConstraintTransform`][ropt.transforms.NonlinearConstraintTransform]
 
-**Key Components:**
-
-- **Abstract Base Classes:** Transform classes derive from abstract base classes
-  that define the specific mapping logic between domains.
-    - **[`VariableTransform`][ropt.transforms.VariableTransform]:**
-      Defines the interface for transforming variables between user and
-      optimizer domains.
-    - **[`ObjectiveTransform`][ropt.transforms.ObjectiveTransform]:**
-      Defines the interface for transforming objective values between user
-      and optimizer domains.
-    - **[`NonlinearConstraintTransform`][ropt.transforms.NonlinearConstraintTransform]:**
-      Defines the interface for transforming non-linear constraint values
-      between user and optimizer domains.
-
-**Workflow and Integration:**
-
-1.  **Configuration:** Transformation objects are passed to the
-    [`EnOptContext`][ropt.context.EnOptContext] during configuration validation.
-    instance. This ensures that the entire optimization process is aware of and
-    configured for the transformed space. The transformation objects are stored
-    in the configuration object.
-2.  **Optimization Workflow:** The same transformation objects are passed to the
-    relevant optimization steps via the configuration object. (See, for example,
-    the default implementation of an optimizer compute step in
-    [`Backend.run`][ropt.workflow.compute_steps.EnsembleOptimizer.run]).
-3.  **Evaluation:** When the optimizer requests an evaluation of a variable
-    vector, the following occurs:
-      -  **Transformation to the User Domain:** The variable vector is
-         transformed from the optimizer
-          domain back to the user domain using the `from_optimizer` method of
-          the `VariableTransform`.
-      -  **Function Evaluation:** Objective and constraint values are calculated
-          in the user domain.
-      -  **Transformation to the Backend Domain:** The resulting objective and
-         constraint values are
-          transformed to the optimizer domain using the `to_optimizer` methods
-          of the `ObjectiveTransform` and `NonlinearConstraintTransform`.
-4.  **Optimization:** The optimizer proceeds using the transformed values.
-5.  **Results:** The [`Results`][ropt.results.Results] objects produced during
-    optimization hold values in the optimizer domain. To obtain results in the
-    user domain, the
-    [`transform_from_optimizer`][ropt.results.Results.transform_from_optimizer]
-    method is used to create new `Results` objects with the transformed values.
-    For example,
-    [`Backend.run`][ropt.workflow.compute_steps.EnsembleOptimizer.run]
-    emits events that include a dictionary with a `"results"` key that contains
-    `Results` objects in the optimizer domain. To obtain results in the user
-    domain they must be converted using the
-    [`transform_from_optimizer`][ropt.results.Results.transform_from_optimizer]
-    method. Note that if there are no transformations that apply, the original
-    `Results` object is returned unchanged.
+See [Transforms](../usage/transforms.md) for usage, configuration, and
+implementation guidance.
 """
 
 from .base import NonlinearConstraintTransform, ObjectiveTransform, VariableTransform

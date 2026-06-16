@@ -11,43 +11,24 @@ TypeResultField = TypeVar("TypeResultField", bound="ResultField")
 
 @dataclass(slots=True)
 class ResultField:
-    """Base class for field containers within `Results` objects.
+    """Base class for result field containers that carry axis metadata.
 
-    The `ResultField` class serves as a foundation for defining the various data
-    fields that can be stored within [`Results`][ropt.results.Results] objects.
-    These fields typically hold multi-dimensional numerical data, such as
-    objective values, constraint values, or gradients.
-
-    This class provides a standardized way to:
-
-    - Store metadata about the axes of multi-dimensional arrays.
-    - Retrieve the axes associated with a specific field.
-
-    Derived classes, such as
-    [`FunctionEvaluations`][ropt.results.FunctionEvaluations] and
-    [`Gradients`][ropt.results.Gradients], extend this base class to define
-    specific data structures for different types of optimization results.
+    See [Working with Results](../usage/results.md#axes-and-dimensionality) for
+    how axis metadata is used.
     """
 
     @classmethod
     def get_axes(cls, name: str) -> tuple[AxisName, ...]:
-        """Return the axes metadata associated with a specific field.
-
-        Fields within a `ResultField` class that store multi-dimensional `numpy`
-        arrays include metadata that describes the meaning of each dimension in
-        the array. This method retrieves the axes metadata for a field and
-        returns it as a tuple of [`AxisName`][ropt.enums.AxisName] values.
+        """Return the axis metadata for a named field.
 
         Args:
-            name: The name of the field (sub-field) within the `ResultField`
-                dataclass.
+            name: The name of the field within this dataclass.
 
         Returns:
-            A tuple of [`AxisName`][ropt.enums.AxisName] values representing
-                the axes of the field.
+            A tuple of [`AxisName`][ropt.enums.AxisName] values.
 
         Raises:
-            ValueError: If the provided field name is not recognized.
+            ValueError: If the field name is not recognized.
         """
         metadata = next(
             (item.metadata for item in fields(cls) if item.name == name), None

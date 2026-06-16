@@ -18,28 +18,8 @@ class RealizationsConfig(BaseModel):
     `RealizationsConfig` defines realization ensemble settings for an
     [`EnOptContext`][ropt.context.EnOptContext] object.
 
-    To optimize an ensemble of functions, a set of realizations is defined. When
-    the optimizer requests a function value or a gradient, these are calculated for
-    each realization and then combined into a single value. Typically, this
-    combination is a weighted sum, but other methods are possible.
-
-    The `weights` field, a `numpy` array, determines the weight of each
-    realization. The length of this array defines the number of realizations. The
-    weights are automatically normalized to sum to 1 (e.g., `[1, 1]` becomes
-    `[0.5, 0.5]`).
-
-    If function value calculations for some realizations fail (e.g., due to a
-    simulation error), the total function and gradient values can still be
-    calculated by excluding the missing values. However, a minimum number of
-    successful realizations may be required. The `realization_min_success` field
-    specifies this minimum. By default, it is set equal to the number of
-    realizations, meaning no missing values are allowed.
-
-    Note:
-        Setting `realization_min_success` to zero allows the optimization to
-        proceed even if all realizations fail. While some optimizers can handle
-        this, most will treat it as if the value were one, requiring at least
-        one successful realization.
+    See the [Configuration guide](../usage/configuration.md#realizations) for
+    detailed descriptions and usage examples.
 
     Attributes:
         weights:                 Weights for the realizations (default: 1.0).

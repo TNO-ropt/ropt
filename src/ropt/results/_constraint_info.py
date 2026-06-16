@@ -18,33 +18,19 @@ if TYPE_CHECKING:
 
 @dataclass(slots=True)
 class ConstraintInfo(ResultField):
-    """Store information about constraint differences and violations.
+    """Constraint differences and violations.
 
-    The `ConstraintInfo` class stores the differences between variable or
-    constraint values and their respective bounds. It also calculates and stores
-    constraint violations. This information is useful for assessing how well the
-    optimization process is satisfying the imposed constraints.
+    Stores the difference between variable/constraint values and their bounds,
+    and the magnitude of any violations.
 
+    - _Lower bounds:_ a negative difference means the value is below the bound
+      (violated).
+    - _Upper bounds:_ a positive difference means the value is above the bound
+      (violated).
+    - _Violations:_ the absolute value of the difference when a bound is
+      violated, zero otherwise.
 
-    **Constraint differences**
-
-    These represent the difference between a variable or constraint value and
-    its corresponding bound. Whether this difference signifies a violation
-    depends on the bound type:
-
-    - _Lower Bounds:_ A negative difference means the value is below the lower
-      bound, thus violating the constraint.
-    - _Upper Bounds:_ A positive difference means the value is above the upper
-      bound, thus violating the constraint.
-
-    The class stores the following information on the differences:
-
-
-    **Constraint Violations**
-
-    Constraint violations are calculated based on the constraint differences. If
-    a bound is violated, the violation value is the absolute value of the
-    difference. If the bound is not violated, the violation value is zero.
+    See [Working with Results](../usage/results.md) for usage details.
 
 
     **Result descriptions**

@@ -21,22 +21,8 @@ class ObjectiveFunctionsConfig(BaseModel):
     `ObjectiveFunctionsConfig` defines objective function settings for an
     [`EnOptContext`][ropt.context.EnOptContext] object.
 
-    `ropt` supports multi-objective optimization. Multiple objectives are
-    combined into a single value by summing them after weighting. The `weights`
-    field, a `numpy` array, determines the weight of each objective function.
-    The length of this array defines the number of objective functions. The
-    weights are automatically normalized to sum to 1 (e.g., `[1, 1]` becomes
-    `[0.5, 0.5]`).
-
-    Objective functions can optionally be processed using [`realization
-    filters`][ropt.realization_filter.RealizationFilter], [`function
-    estimators`][ropt.function_estimator.FunctionEstimator], and
-    [`transforms`][ropt.transforms.ObjectiveTransform] objects. The
-    `realization_filters`, `function_estimators`, and `transforms` fields are
-    integer index arrays: each entry selects an object by its position in the
-    corresponding tuple defined in [`EnOptContext`][ropt.context.EnOptContext].
-    An out-of-range index means no object is applied to that objective. If a
-    field uses its default value of `-1`, no object is applied at all.
+    See the [Configuration guide](../usage/configuration.md#objectives) for
+    detailed descriptions and usage examples.
 
     Attributes:
         weights:             Weights for the objective functions (default: 1.0).

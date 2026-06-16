@@ -1,3 +1,15 @@
+# Evaluation Results
+
+Every batch evaluation produces a tuple of [`Results`][ropt.results.Results]
+objects: a [`FunctionResults`][ropt.results.FunctionResults] for objective and
+constraint values, and/or a [`GradientResults`][ropt.results.GradientResults]
+for gradient estimates. Each is a frozen container of
+[`ResultField`][ropt.results.ResultField] sub-objects holding NumPy arrays
+with axis-name metadata.
+
+See [Working with Results](../usage/results.md) for a tour of the access
+patterns.
+
 ::: ropt.results
     options:
         members: []
@@ -24,3 +36,4 @@
     options:
         members: [create]
 ::: ropt.results.results_to_dataframe
+

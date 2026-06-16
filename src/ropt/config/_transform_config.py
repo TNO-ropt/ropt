@@ -12,15 +12,10 @@ class VariableTransformConfig(BaseModel):
 
     `VariableTransformConfig` configures a
     [`VariableTransform`][ropt.transforms.VariableTransform] plugin that
-    transforms variables to the optimizer's domain. Variable transforms are
-    configured as a tuple in the `variable_transforms` field of
-    [`EnOptContext`][ropt.context.EnOptContext]. Variables reference a specific
-    transform by its index in that tuple.
+    transforms variables to the optimizer's domain.
 
-    The `method` field specifies the transform method to use for the variables.
-    The `options` field allows passing a dictionary of key-value pairs to
-    further configure the chosen method. The interpretation of these options
-    depends on the selected method.
+    See the [Configuration guide](../usage/configuration.md#transforms) for
+    detailed descriptions and usage examples.
 
     Attributes:
         method:  Name of the variable transform method.
@@ -44,15 +39,10 @@ class ObjectiveTransformConfig(BaseModel):
 
     `ObjectiveTransformConfig` configures an
     [`ObjectiveTransform`][ropt.transforms.ObjectiveTransform] plugin that
-    transforms objective values. Objective transforms are configured as a tuple
-    in the `objective_transforms` field of
-    [`EnOptContext`][ropt.context.EnOptContext]. Objectives reference a specific
-    transform by its index in that tuple.
+    transforms objective values.
 
-    The `method` field specifies the transform method to use for the objectives.
-    The `options` field allows passing a dictionary of key-value pairs to
-    further configure the chosen method. The interpretation of these options
-    depends on the selected method.
+    See the [Configuration guide](../usage/configuration.md#transforms) for
+    detailed descriptions and usage examples.
 
     Attributes:
         method:  Name of the objective transform method.
@@ -76,15 +66,10 @@ class NonlinearConstraintTransformConfig(BaseModel):
 
     `NonlinearConstraintTransformConfig` configures a
     [`NonlinearConstraintTransform`][ropt.transforms.NonlinearConstraintTransform]
-    plugin that transforms constraint values. Nonlinear constraint transforms are
-    configured as a tuple in the `nonlinear_constraint_transforms` field of
-    [`EnOptContext`][ropt.context.EnOptContext]. Constraints reference a specific
-    transform by its index in that tuple.
+    plugin that transforms constraint values.
 
-    The `method` field specifies the transform method to use for the nonlinear
-    constraints. The `options` field allows passing a dictionary of key-value
-    pairs to further configure the chosen method. The interpretation of these
-    options depends on the selected method.
+    See the [Configuration guide](../usage/configuration.md#transforms) for
+    detailed descriptions and usage examples.
 
     Attributes:
         method:  Name of the nonlinear constraint transform method.

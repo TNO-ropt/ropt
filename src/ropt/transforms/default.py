@@ -43,11 +43,8 @@ class DefaultVariableTransform(VariableTransform):
     ) -> None:
         """Initialize the variable scaler.
 
-        This scaler applies a linear transformation to variables, defined by
-        scaling factors and offset values, defined in the transform configuration.
-
-        If both `scales` and `offsets` are provided, they are broadcasted to
-        ensure they have the same length.
+        Reads `scales` and `offsets` from the transform configuration options.
+        If both are provided, they are broadcasted to the same length.
 
         Args:
             transform_config: The transform configuration.
@@ -61,24 +58,13 @@ class DefaultVariableTransform(VariableTransform):
         self._equation_scaling: NDArray[np.float64] | None = None
 
     def to_optimizer(self, values: NDArray[np.float64]) -> NDArray[np.float64]:
-        """Transform variable values to the optimizer domain.
-
-        This method applies the linear scaling and offset transformation to
-        variable values, mapping them from the user-defined domain to the
-        optimizer's internal domain.
-
-        The transformation is defined as: `x_opt = (x_user - offset) / scale`.
-
-        The input `values` may be a multi-dimensional array. It is assumed that
-        the last axis of the array represents the variable values. If this is
-        not the case, you must adjust the order of the axes before and after
-        calling this method.
+        """Apply `(values - offset) / scale`.
 
         Args:
-            values: The variable values in the user domain to be transformed.
+            values: Variable values in the user domain.
 
         Returns:
-            The transformed variable values in the optimizer domain.
+            Transformed values in the optimizer domain.
         """
         if self._offsets is not None:
             values = values.copy() - self._offsets
@@ -87,25 +73,13 @@ class DefaultVariableTransform(VariableTransform):
         return values
 
     def from_optimizer(self, values: NDArray[np.float64]) -> NDArray[np.float64]:
-        """Transform variable values to the user domain.
-
-        This method applies the inverse linear scaling and offset transformation
-        to variable values, mapping them from the optimizer's internal domain
-        back to the user-defined domain.
-
-        The transformation is defined as: `x_user = x_opt * scale + offset`.
-
-        The input `values` may be a multi-dimensional array. It is assumed that
-        the last axis of the array represents the variable values. If this is
-        not the case, you must adjust the order of the axes before and after
-        calling this method.
+        """Apply `values * scale + offset`.
 
         Args:
-            values: The variable values in the optimizer domain to be
-                transformed.
+            values: Variable values in the optimizer domain.
 
         Returns:
-            The transformed variable values in the user domain.
+            Transformed values in the user domain.
         """
         if self._scales is not None:
             values = values.copy() * self._scales
@@ -116,21 +90,13 @@ class DefaultVariableTransform(VariableTransform):
     def magnitudes_to_optimizer(
         self, values: NDArray[np.float64]
     ) -> NDArray[np.float64]:
-        """Transform perturbation magnitudes to the optimizer domain.
-
-        This method transforms perturbation magnitudes, typically used in
-        stochastic gradient-based algorithms, from the user-defined domain to
-        the optimizer's internal domain. The transformation ensures that the
-        perturbations are applied correctly in the optimizer's space, which may
-        have different scaling or units than the user domain.
-
-        The transformation is defined as: `x_opt = x_user / scale`.
+        """Apply `values / scale`.
 
         Args:
-            values: The perturbation magnitudes in the user domain.
+            values: Perturbation magnitudes in the user domain.
 
         Returns:
-            The transformed perturbation magnitudes in the optimizer domain.
+            Magnitudes in the optimizer domain.
         """
         if self._scales is not None:
             return values / self._scales
@@ -144,37 +110,24 @@ class DefaultVariableTransform(VariableTransform):
     ) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]]:
         r"""Transform linear constraints to the optimizer domain.
 
-        This method transforms linear constraints, defined by their coefficients
-        and right-hand-side bounds, from the user-defined domain to the
-        optimizer's internal domain. This transformation accounts for the
-        scaling and shifting applied to the variables and ensures that the
-        constraints remain valid in the optimizer's space.
-
         The set of linear constraints can be represented by a matrix equation:
         $\mathbf{A} \mathbf{x} = \mathbf{b}$.
 
-        When linearly transforming variables to the optimizer domain, the
-        coefficients ($\mathbf{A}$) and right-hand-side values ($\mathbf{b}$)
-        must be converted to remain valid (see also the configuration for
-        [linear constraints][ropt.config.LinearConstraintsConfig]). If the
-        linear transformation of the variables to the optimizer domain is given
-        by:
+        If the linear transformation of variables to the optimizer domain is:
 
         $$ \hat{\mathbf{x}} = \mathbf{S} \mathbf{x} + \mathbf{o}$$
 
-        then the coefficients and right-hand-side values must be transformed as
-        follows:
+        then the coefficients and right-hand-side values become:
 
         $$ \begin{align}
             \hat{\mathbf{A}} &= \mathbf{A} \mathbf{S}^{-1} \\ \hat{\mathbf{b}}
             &= \mathbf{b} + \mathbf{A}\mathbf{S}^{-1}\mathbf{o}
         \end{align}$$
 
-        where $S$ is a diagonal matrix with scaling factors on the diagonal and
-        $o$ are the offsets.
+        where $S$ is a diagonal matrix with scaling factors and $o$ are offsets.
 
-        The resulting equations are further scaled by dividing them by maximum
-        of the absolute values of the coefficients in each equation.
+        The resulting equations are further scaled by dividing by the maximum
+        absolute coefficient in each equation.
 
         Args:
             coefficients: The coefficient matrix of the linear constraints.
@@ -201,28 +154,14 @@ class DefaultVariableTransform(VariableTransform):
     def bound_constraint_diffs_from_optimizer(
         self, lower_diffs: NDArray[np.float64], upper_diffs: NDArray[np.float64]
     ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
-        """Transform bound constraint differences to the user domain.
-
-        This method transforms the differences between variable values and their
-        lower/upper bounds from the optimizer's internal domain back to the
-        user-defined domain. These differences are used to report constraint
-        violations.
-
-        For example, if variables are scaled in the optimizer domain, the
-        differences between the variables and their bounds must be scaled back
-        to the user domain to accurately reflect the constraint violations in
-        the user's original units.
-
-        The transformation is defined as: `x_user = x_opt * scale`.
+        """Scale differences back by `* scale`.
 
         Args:
-            lower_diffs: The differences between the variable values and their
-                lower bounds.
-            upper_diffs: The differences between the variable values and their
-                upper bounds.
+            lower_diffs: Variable value minus lower bound (optimizer domain).
+            upper_diffs: Variable value minus upper bound (optimizer domain).
 
         Returns:
-            A tuple containing the transformed lower and upper differences.
+            A tuple of (lower_diffs, upper_diffs) in user domain.
         """
         if self._scales is not None:
             lower_diffs = lower_diffs.copy() * self._scales
@@ -232,26 +171,14 @@ class DefaultVariableTransform(VariableTransform):
     def linear_constraints_diffs_from_optimizer(
         self, lower_diffs: NDArray[np.float64], upper_diffs: NDArray[np.float64]
     ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
-        """Transform linear constraint differences to the user domain.
-
-        This method transforms the differences between linear constraint values
-        and their lower/upper bounds from the optimizer's internal domain back
-        to the user-defined domain. These differences are used to report
-        constraint violations.
-
-        This is implemented by re-scaling the equations with the weights that
-        were determined and stored by the
-        [`linear_constraints_to_optimizer`][ropt.transforms.VariableTransform.linear_constraints_to_optimizer]
-        method.
+        """Re-scale by the equation weights stored during `linear_constraints_to_optimizer`.
 
         Args:
-            lower_diffs: The differences between the linear constraint values and
-                their lower bounds.
-            upper_diffs: The differences between the linear constraint values and
-                their upper bounds.
+            lower_diffs: Linear constraint value minus lower bound.
+            upper_diffs: Linear constraint value minus upper bound.
 
         Returns:
-            A tuple containing the transformed lower and upper differences.
+            A tuple of (lower_diffs, upper_diffs) in user domain.
         """
         if self._equation_scaling is not None:
             lower_diffs = lower_diffs.copy() * self._equation_scaling
@@ -259,16 +186,10 @@ class DefaultVariableTransform(VariableTransform):
         return lower_diffs, upper_diffs
 
     def init(self, mask: NDArray[np.bool_]) -> None:
-        """Set the mask for the variable transform.
-
-        This method allows setting a mask that indicates which variables are
-        affected by this transform. The mask is a boolean array where `True`
-        values indicate the variables that should be transformed, and `False`
-        values indicate the variables that should remain unchanged.
+        """Apply mask: set scales to 1 and offsets to 0 for unmasked variables.
 
         Args:
-            mask: A boolean array indicating which variables are affected by this
-                transform.
+            mask: Boolean array (`True` = this transform applies).
         """
         if self._scales is not None:
             self._scales = np.where(mask, self._scales, 1.0)
@@ -279,8 +200,8 @@ class DefaultVariableTransform(VariableTransform):
 class DefaultObjectiveTransform(ObjectiveTransform):
     r"""Linearly scales objectives between domains.
 
-    This class implements a linear transformation for objectives, allowing for
-    scaling between the user-defined domain and the optimizer's internal domain.
+    Divides by `scales` when going to the optimizer domain, multiplies when
+    returning to the user domain.
     """
 
     def __init__(
@@ -289,8 +210,7 @@ class DefaultObjectiveTransform(ObjectiveTransform):
     ) -> None:
         """Initialize the objective scaler.
 
-        This scaler applies a linear scaling to objectives, defined in the
-        transform configuration.
+        Reads `scales` from the transform configuration options.
 
         Args:
             transform_config: The transform configuration.
@@ -301,73 +221,46 @@ class DefaultObjectiveTransform(ObjectiveTransform):
         self._mask: NDArray[np.bool_] | None = None
 
     def to_optimizer(self, objectives: NDArray[np.float64]) -> NDArray[np.float64]:
-        """Transform objective values to the optimizer domain.
-
-        This method linearly scales objective values from the user-defined
-        domain to the optimizer's internal domain.
-
-        The input `objectives` may be a multi-dimensional array. It is assumed
-        that the last axis of the array represents the objective values. If
-        this is not the case, you must adjust the order of the axes before and
-        after calling this method.
+        """Apply `objectives / scales`.
 
         Args:
-            objectives: The objective values in the user domain to be transformed.
+            objectives: Objective values in the user domain.
 
         Returns:
-            The transformed objective values in the optimizer domain.
+            Transformed objectives in the optimizer domain.
         """
         if self._scales is not None:
             return objectives / self._scales
         return objectives
 
     def from_optimizer(self, objectives: NDArray[np.float64]) -> NDArray[np.float64]:
-        """Transform objective values to the user domain.
-
-        This method scales objective values from the optimizer's internal domain
-        back to the user-defined domain.
-
-        The input `objectives` may be a multi-dimensional array. It is assumed
-        that the last axis of the array represents the objective values. If
-        this is not the case, you must adjust the order of the axes before and
-        after calling this method.
+        """Apply `objectives * scales`.
 
         Args:
-            objectives: The objective values in the optimizer domain to be transformed.
+            objectives: Objective values in the optimizer domain.
 
         Returns:
-            The transformed objective values in the user domain.
+            Transformed objectives in the user domain.
         """
         if self._scales is not None:
             return objectives * self._scales
         return objectives
 
     def update(self, scales: ArrayLike) -> None:
-        """Set the scaling factors for the objective transform.
-
-        This method allows updating the scaling factors after the transform has
-        been initialized. This can be useful in cases where the appropriate
-        scaling factors are not known at initialization time and need to be
-        determined based on information obtained during the optimization process.
+        """Set new scaling factors (applies mask if previously initialized).
 
         Args:
-            scales: The new scaling factors to be applied to the objectives.
+            scales: The new scaling factors.
         """
         self._scales = np.asarray(scales, dtype=np.float64)
         if self._mask is not None:
             self._scales = np.where(self._mask, self._scales, 1.0)
 
     def init(self, mask: NDArray[np.bool_]) -> None:
-        """Set the mask for the objective transform.
-
-        This method allows setting a mask that indicates which objectives are
-        affected by this transform. The mask is a boolean array where `True`
-        values indicate the objectives that should be transformed, and `False`
-        values indicate the objectives that should remain unchanged.
+        """Apply mask: set scales to 1 for unmasked objectives.
 
         Args:
-            mask: A boolean array indicating which objectives are affected by this
-                transform.
+            mask: Boolean array (`True` = this transform applies).
         """
         if self._scales is not None:
             self._scales = np.where(mask, self._scales, 1.0)
@@ -377,8 +270,8 @@ class DefaultObjectiveTransform(ObjectiveTransform):
 class DefaultNonlinearConstraintTransform(NonlinearConstraintTransform):
     r"""Linearly scales constraints between domains.
 
-    This class implements a linear transformation for constraints, allowing for
-    scaling between the user-defined domain and the optimizer's internal domain.
+    Divides by `scales` when going to the optimizer domain, multiplies when
+    returning to the user domain. Also scales RHS bounds consistently.
     """
 
     def __init__(
@@ -387,8 +280,7 @@ class DefaultNonlinearConstraintTransform(NonlinearConstraintTransform):
     ) -> None:
         """Initialize the constraint scaler.
 
-        This scaler applies a linear scaling to objectives, defined in the
-        transform configuration.
+        Reads `scales` from the transform configuration options.
 
         Args:
             transform_config: The transform configuration.
@@ -399,44 +291,26 @@ class DefaultNonlinearConstraintTransform(NonlinearConstraintTransform):
         self._mask: NDArray[np.bool_] | None = None
 
     def to_optimizer(self, constraints: NDArray[np.float64]) -> NDArray[np.float64]:
-        """Scales constraint values to the optimizer domain.
-
-        This method maps nonlinear constraint values from the user-defined
-        domain to the optimizer's internal domain.
-
-        The input `constraints` may be a multi-dimensional array. It is assumed
-        that the last axis of the array represents the constraint values. If
-        this is not the case, you must adjust the order of the axes before and
-        after calling this method.
+        """Apply `constraints / scales`.
 
         Args:
-            constraints: The nonlinear constraint values in the user domain to
-                be transformed.
+            constraints: Constraint values in the user domain.
 
         Returns:
-            The transformed nonlinear constraint values in the optimizer domain.
+            Transformed constraint values in the optimizer domain.
         """
         if self._scales is not None:
             return constraints / self._scales
         return constraints
 
     def from_optimizer(self, constraints: NDArray[np.float64]) -> NDArray[np.float64]:
-        """Scale constraint values to the user domain.
-
-        This method scales nonlinear constraint values from the optimizer's
-        internal domain back to the user-defined domain.
-
-        The input `constraints` may be a multi-dimensional array. It is assumed
-        that the last axis of the array represents the constraint values. If
-        this is not the case, you must adjust the order of the axes before and
-        after calling this method.
+        """Apply `constraints * scales`.
 
         Args:
-            constraints: The nonlinear constraint values in the optimizer domain
-                to be transformed.
+            constraints: Constraint values in the optimizer domain.
 
         Returns:
-            The transformed nonlinear constraint values in the user domain.
+            Transformed constraint values in the user domain.
         """
         if self._scales is not None:
             return constraints * self._scales
@@ -445,21 +319,14 @@ class DefaultNonlinearConstraintTransform(NonlinearConstraintTransform):
     def bounds_to_optimizer(
         self, lower_bounds: NDArray[np.float64], upper_bounds: NDArray[np.float64]
     ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
-        """Scale the right-hand-side bounds to the optimizer domain.
-
-        This method scales the lower and upper bounds of the nonlinear
-        constraints from the user-defined domain to the optimizer's internal
-        domain. This scaling is necessary to ensure that the constraints remain
-        valid after the variables have been transformed.
+        """Apply `bounds / scales`.
 
         Args:
-            lower_bounds: The lower bounds on the right-hand-side values in the
-                user domain.
-            upper_bounds: The upper bounds on the right-hand-side values in the
-                user domain.
+            lower_bounds: Lower RHS bounds in user domain.
+            upper_bounds: Upper RHS bounds in user domain.
 
         Returns:
-            A tuple containing the transformed bounds.
+            Tuple of (lower_bounds, upper_bounds) in optimizer domain.
         """
         if self._scales is not None:
             return lower_bounds / self._scales, upper_bounds / self._scales
@@ -468,52 +335,34 @@ class DefaultNonlinearConstraintTransform(NonlinearConstraintTransform):
     def nonlinear_constraint_diffs_from_optimizer(
         self, lower_diffs: NDArray[np.float64], upper_diffs: NDArray[np.float64]
     ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
-        """Scale nonlinear constraint differences to the user domain.
-
-        This method scales the differences between nonlinear constraint
-        values and their lower/upper bounds from the optimizer's internal
-        domain back to the user-defined domain. These differences are used to
-        report constraint violations.
+        """Apply `diffs * scales`.
 
         Args:
-            lower_diffs: The differences between the nonlinear constraint values
-                and their lower bounds.
-            upper_diffs: The differences between the nonlinear constraint values
-                and their upper bounds.
+            lower_diffs: Constraint value minus lower bound (optimizer domain).
+            upper_diffs: Constraint value minus upper bound (optimizer domain).
 
         Returns:
-            A tuple containing the transformed lower and upper differences.
+            Tuple of (lower_diffs, upper_diffs) in user domain.
         """
         if self._scales is not None:
             return lower_diffs * self._scales, upper_diffs * self._scales
         return lower_diffs, upper_diffs
 
     def update(self, scales: ArrayLike) -> None:
-        """Set the scaling factors for the objective transform.
-
-        This method allows updating the scaling factors after the transform has
-        been initialized. This can be useful in cases where the appropriate
-        scaling factors are not known at initialization time and need to be
-        determined based on information obtained during the optimization process.
+        """Set new scaling factors (applies mask if previously initialized).
 
         Args:
-            scales: The new scaling factors to be applied to the objectives.
+            scales: The new scaling factors.
         """
         self._scales = np.asarray(scales, dtype=np.float64)
         if self._mask is not None:
             self._scales = np.where(self._mask, self._scales, 1.0)
 
     def init(self, mask: NDArray[np.bool_]) -> None:
-        """Set the mask for the constraint transform.
-
-        This method allows setting a mask that indicates which constraints are
-        affected by this transform. The mask is a boolean array where `True`
-        values indicate the constraints that should be transformed, and `False`
-        values indicate the constraints that should remain unchanged.
+        """Apply mask: set scales to 1 for unmasked constraints.
 
         Args:
-            mask: A boolean array indicating which objectives are affected by this
-                transform.
+            mask: Boolean array (`True` = this transform applies).
         """
         if self._scales is not None:
             self._scales = np.where(mask, self._scales, 1.0)

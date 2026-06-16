@@ -1,5 +1,14 @@
 # `ropt`: A Python module for robust optimization
 
+## Getting started
+
+- New to `ropt`? Read the [Background](usage/background.md), then jump to
+  [Installation](usage/installation.md) and the [Quickstart](usage/quickstart.md).
+- Looking for the configuration vocabulary?
+  See [Configuration](usage/configuration.md).
+- Building more complex pipelines?
+  See [Optimization Workflows](usage/workflows.md).
+
 ## Overview
 
 `ropt` is a module designed for implementing and executing robust optimization
@@ -10,15 +19,16 @@ a stochastic nature and is represented by an ensemble of functions
 parameters. The optimal solution is then determined by optimizing the value of a
 statistic, such as the mean, over the ensemble.
 
-`ropt` can be employed to construct optimization workflows directly in Python or
-as a building block in optimization applications. At a minimum, the user needs
-to provide additional code to calculate the values for each function realization
-in the ensemble. This can range from simply calling a Python function that
-returns the objective values to initiating a long-running simulation on an HPC
-cluster and reading the results. Furthermore, `ropt` exposes all intermediate
-results of the optimization, such as objective and gradient values, but
-functionality to report or store any of these values must be added by the user.
-Optional functionality to assist with this is included with `ropt`.
+`ropt` can be employed to construct optimization workflows directly in Python
+scripts or as a building block in optimization applications. At a minimum, the
+user needs to provide additional code to calculate the values for each function
+realization in the ensemble. This can range from simply calling a Python
+function that returns the objective values to initiating a long-running
+simulation on an HPC cluster and reading the results. Furthermore, `ropt`
+exposes all intermediate results of the optimization, such as objective and
+gradient values, but functionality to report or store any of these values must
+be added by the user. Optional functionality to assist with this is included
+with `ropt`.
 
 `ropt` provides several features for efficiently solving complex robust
 optimization problems:

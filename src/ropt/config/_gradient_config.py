@@ -21,40 +21,8 @@ class GradientConfig(BaseModel):
     optimizers. It is used as the `gradient` field of
     [`EnOptContext`][ropt.context.EnOptContext].
 
-    Gradients are estimated using function values calculated from perturbed
-    variables and the unperturbed variables. The `number_of_perturbations` field
-    determines the number of perturbed variables used, which must be at least
-    one.
-
-    If function evaluations for some perturbed variables fail, the gradient may
-    still be estimated as long as a minimum number of evaluations succeed. The
-    `perturbation_min_success` field specifies this minimum. By default, it
-    equals `number_of_perturbations`.
-
-    Gradients are calculated for each realization individually and then combined
-    into a total gradient. If `number_of_perturbations` is low, or even just
-    one, individual gradient calculations may be unreliable. In this case,
-    setting `merge_realizations` to `True` directs the optimizer to combine the
-    results of all realizations directly into a single gradient estimate.
-
-    The `evaluation_policy` option controls how and when objective functions and
-    gradients are calculated. It accepts one of three string values:
-
-    - `"speculative"`: Evaluate the gradient whenever the objective function
-        is requested, even if the optimizer hasn't explicitly asked for the
-        gradient at that point. This approach can potentially improve load
-        balancing on HPC clusters by initiating gradient work earlier, though
-        its effectiveness depends on whether the optimizer can utilize these
-        speculatively computed gradients.
-    - `"separate"`: Always launch function and gradient evaluations as
-        distinct operations, even if the optimizer requests both simultaneously.
-        This is particularly useful when employing realization filters (see
-        [`RealizationFilterConfig`][ropt.config.RealizationFilterConfig]) that
-        might disable certain realizations, as it can potentially reduce the
-        number of gradient evaluations needed.
-    - `"auto"`: Evaluate functions and/or gradients strictly according to the
-        optimizer's requests. Calculations are performed only when the
-        optimization algorithm explicitly requires them.
+    See the [Configuration guide](../usage/configuration.md#gradient) for
+    detailed descriptions and usage examples.
 
     Attributes:
         number_of_perturbations:  Number of perturbations (default:

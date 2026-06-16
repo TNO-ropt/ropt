@@ -16,8 +16,8 @@ if TYPE_CHECKING:
 class Observer(EventHandler):
     """The default event handler for observing events.
 
-    This event handler listens for events and forwards them to one or more
-    callback functions.
+    This event handler listens for events of matching types and forwards them
+    to a callback function.
     """
 
     def __init__(
@@ -26,14 +26,11 @@ class Observer(EventHandler):
         event_types: set[EnOptEventType],
         callback: Callable[[EnOptEvent], None],
     ) -> None:
-        """Initialize a default event handler.
-
-        This event handler responds to events by calling `callback` if the event
-        type matches `event_types`.
+        """Initialize the Observer.
 
         Args:
-            event_types: The set of event types  to respond to.
-            callback:    The callable to call.
+            event_types: The set of event types to respond to.
+            callback:    The callable to invoke for matching events.
         """
         super().__init__()
         self._event_types = event_types
@@ -42,13 +39,8 @@ class Observer(EventHandler):
     def handle_event(self, event: EnOptEvent) -> None:
         """Handle incoming events.
 
-        This method processes events emitted from within the workflow.
-
-        If a event containing results is received, and its type equals the
-        stored event type, the stored callback is called.
-
         Args:
-            event: The event object emitted from the workflow.
+            event: The event object.
         """
         if event.event_type in self._event_types:
             self._callback(event)

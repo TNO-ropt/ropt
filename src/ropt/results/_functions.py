@@ -17,15 +17,9 @@ if TYPE_CHECKING:
 
 @dataclass(slots=True)
 class Functions(ResultField):
-    """Store calculated objective and constraint function values.
+    """Aggregated objective and constraint function values.
 
-    The `Functions` class stores the calculated values of the objective and
-    constraint functions. These values are typically derived from the
-    evaluations performed across realizations, often through aggregation. The
-    optimizer may handle multiple objectives and constraints. Multiple
-    objectives are combined into a single target objective stored in
-    `target_objective`. Multiple constraints are handled individually.
-
+    See [Working with Results](../usage/results.md) for usage details.
 
     **Result descriptions**
 

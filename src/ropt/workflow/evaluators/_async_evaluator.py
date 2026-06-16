@@ -22,10 +22,13 @@ if TYPE_CHECKING:
 
 
 class AsyncEvaluator(Evaluator):
-    """An evaluator that calls a function in a asyncio loop.
+    """An evaluator that dispatches tasks to a server via asyncio.
 
-    This Evaluator stores a single awaitable function that returns a value for
-    each objective and constraint.
+    Submits each row of the evaluation batch as a separate task to the
+    server's task queue and collects results from a results queue.
+
+    See [Parallel Evaluation](../usage/parallel.md#asyncevaluator) for
+    details on how this integrates with the asyncio event loop.
     """
 
     def __init__(

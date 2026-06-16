@@ -12,13 +12,11 @@ class FunctionEstimatorConfig(BaseModel):
 
     `FunctionEstimatorConfig` configures a function estimator plugin, which
     controls how objective and constraint function values (and their gradients)
-    are combined across realizations. By default, a weighted sum over
-    realizations is used; function estimators allow replacing that with a
-    different combination method.
+    are combined across realizations.
 
-    The `method` field selects the estimator using a `"plugin/method"` string
-    (e.g. `"default/default"`). The `options` field passes additional
-    configuration to the selected method.
+    See the [Configuration
+    guide](../usage/configuration.md#function-estimators) for detailed
+    descriptions and usage examples.
 
     Attributes:
         method:  Name of the function estimator method.

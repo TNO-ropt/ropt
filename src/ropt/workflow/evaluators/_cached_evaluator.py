@@ -22,26 +22,12 @@ if TYPE_CHECKING:
 class CachedEvaluator(Evaluator):
     """An evaluator that caches results to avoid redundant computations.
 
-    This evaluator attempts to retrieve previously computed function results
-    from a cache before delegating to another evaluator. The cache is populated
-    from `FunctionResults` objects stored by `EventHandler` instances specified
-    as `sources`.
+    Wraps another evaluator, retrieving previously computed results from
+    `EventHandler` sources before delegating uncached evaluations.
 
-    When an evaluation is requested, for each variable vector and its
-    corresponding realization, this evaluator searches through the `results`
-    attribute of its `sources`. If a `FunctionResults` object is found where the
-    `variables` match the input (within a small tolerance) and the `realization`
-    also matches, the cached `objectives` and `constraints` from that
-    `FunctionResults` object are used.
-
-    If some, but not all, requested evaluations are found in the cache, this
-    evaluator will mark the cached ones as inactive for the next evaluator in
-    the chain and then call that evaluator to compute only the missing results.
-    The final combined results (cached and newly computed) are then returned.
-
-    This is particularly useful in scenarios where the same variable sets might
-    be evaluated multiple times, for example, in iterative optimization
-    algorithms or when restarting optimizations.
+    See [Optimization Workflows](../usage/workflows.md#evaluators) for full
+    details on cache matching, realization name handling, and source
+    management.
     """
 
     def __init__(
@@ -67,41 +53,22 @@ class CachedEvaluator(Evaluator):
     def eval_cached(
         self, variables: NDArray[np.float64], evaluator_context: EvaluatorContext
     ) -> tuple[EvaluatorResult, dict[int, tuple[int, FunctionResults]]]:
-        """Evaluate objective and constraint functions, utilizing a cache.
+        """Evaluate using cache, returning both results and cache-hit info.
 
-        This method implements the core evaluation logic. It returns not only
-        the evaluation results but also the function results that were retrieved
-        from cache. The `eval` method in this class does not utilize these
-        indices. However, derived classes can overload `eval` and use this
-        information to add further details to the results, such as populating
-        the `evaluation_info` attribute of an `EvaluatorResult`.
+        Returns the evaluation results together with a dictionary of cache
+        hits. The dictionary keys are evaluation indices found in cache;
+        values are tuples of (realization index, cached FunctionResults).
 
-        The cache hits that are returned consists of a dictionary where the keys
-        are the indices of the variable vectors that were found in the cache,
-        and the values are tuples containing the realization index of the cached
-        vectors and the corresponding `FunctionResults` object. This allows the
-        caller to know which evaluations were retrieved from cache and which
-        were computed anew. The cached evaluations can then be retrieved from
-        the `FunctionResults` object, using the realization index.
+        Derived classes can override `eval` and call this method to access
+        cache-hit information for populating `evaluation_info`.
 
         Note:
-            If the optimization was initialized with realization names in the
-            configuration, these are used to match the realizations of the
-            requested evaluations, with those in the cached results. This means
-            that the results may originate from a different optimization run, as
-            long as the realization names are still valid. However, in this case
-            the results used for finding cached values must also store the
-            realization names, otherwise the cached results will not be found.
-
-            If the configuration does not contain realization names, the
-            realization indices are used to match the realizations of the
-            requested evaluations. In this case the indices of the realizations
-            in the cached results must match those of the requested evaluations,
-            i.e. they must have been specified in the same order in the
-            respective configurations.
+            If realization names are configured, they are used for matching
+            (allowing cache hits across runs). Otherwise realization indices
+            are used.
 
         Args:
-            variables:         Matrix of variables to evaluate (each row is a vector).
+            variables:         Matrix of variables to evaluate.
             evaluator_context: The evaluation context.
 
         Returns:
@@ -140,20 +107,10 @@ class CachedEvaluator(Evaluator):
     def eval(
         self, variables: NDArray[np.float64], context: EvaluatorContext
     ) -> EvaluatorResult:
-        """Evaluate objective and constraint functions, utilizing a cache.
-
-        For each input variable vector and its realization, this method first
-        attempts to find a matching result in the cache provided by its
-        `sources`.
-
-        If a result is found in the cache, it's used directly. If not, the
-        evaluation is delegated to the stored evaluator. The `context.active`
-        array is updated to indicate to the subsequent evaluator which
-        evaluations are still pending; evaluations found in the cache are marked
-        as inactive.
+        """Evaluate using cache, delegating uncached evaluations.
 
         Args:
-            variables: Matrix of variables to evaluate (each row is a vector).
+            variables: Matrix of variables to evaluate.
             context:   The evaluation context.
 
         Returns:
@@ -163,11 +120,7 @@ class CachedEvaluator(Evaluator):
         return result
 
     def add_sources(self, sources: EventHandler | Sequence[EventHandler]) -> None:
-        """Add one or more `EventHandler` sources to the evaluator.
-
-        This method allows adding additional sources of cached results to the
-        evaluator. The sources are expected to be `EventHandler` instances that
-        store `FunctionResults`.
+        """Add one or more `EventHandler` sources.
 
         Args:
             sources: `EventHandler` instances to add as a source.
@@ -177,10 +130,7 @@ class CachedEvaluator(Evaluator):
         self._sources.extend(sources)
 
     def remove_sources(self, sources: EventHandler | Sequence[EventHandler]) -> None:
-        """Remove one or more `EventHandler` sources from the evaluator.
-
-        This method allows removing previously added sources of cached results
-        from the evaluator.
+        """Remove one or more `EventHandler` sources.
 
         Args:
             sources: `EventHandler` instances to remove as a source.

@@ -1,11 +1,4 @@
-"""Default function estimator plugin with mean and standard deviation methods.
-
-This module provides the built-in implementation of the
-[`FunctionEstimator`][ropt.function_estimator.FunctionEstimator] interface,
-offering two aggregation strategies: weighted mean (the default) and weighted
-standard deviation. These are the primary aggregation methods used in most
-ensemble-based optimization workflows.
-"""
+"""Default function estimator plugin with mean and standard deviation methods."""
 
 from typing import Final
 
@@ -24,32 +17,11 @@ DEFAULT_FUNCTION_ESTIMATOR_METHODS = {"default", "mean", "stddev"}
 
 
 class DefaultFunctionEstimator(FunctionEstimator):
-    """Default implementation of function estimator with mean and stddev methods.
+    """Default estimator providing `mean` and `stddev` methods.
 
-    Implements the [`FunctionEstimator`][ropt.function_estimator.FunctionEstimator]
-    interface to provide two standard aggregation strategies for combining
-    objective/constraint function values and gradients from multiple realizations.
-
-    The specific method is selected via the `method` field of the
-    [`FunctionEstimatorConfig`][ropt.config.FunctionEstimatorConfig], which is
-    passed to the parent class during initialization.
-
-    **Supported Aggregation Methods**
-
-    - **`mean` (or `default`)**:
-       Computes the weighted average of realization function values and
-       gradients. For functions, returns: `sum(functions[i] * weights[i])`. For
-       gradients, returns the weighted average of per-realization gradients, or
-       the pre-merged gradient if `merge_realizations=True` in the gradient
-       configuration.
-    - **`stddev`**:
-       Computes the weighted standard deviation of realization function values.
-       For functions, returns the sample standard deviation weighted by
-       realization weights. For gradients, applies the chain rule to combine
-       function values and per-realization gradients.
-        - Requires at least two realizations with non-zero weights.
-        - Incompatible with `merge_realizations=True`; raises `ValueError` during
-          `init` if this setting is detected.
+    The method is selected via the `method` field of
+    [`FunctionEstimatorConfig`][ropt.config.FunctionEstimatorConfig].
+    See [Function Estimators](../usage/function_estimators.md) for usage.
     """
 
     def __init__(self, estimator_config: FunctionEstimatorConfig) -> None:  # noqa: D107

@@ -28,10 +28,6 @@ class Evaluator(ABC):
     ) -> EvaluatorResult:
         """Evaluate objective and constraint functions for given variables.
 
-        This method defines function evaluator callback, which calculates
-        objective and constraint functions for a set of variable vectors,
-        potentially for a subset of realizations and perturbations.
-
         Args:
             variables: The matrix of variables to evaluate. Each row represents
                        a variable vector.
@@ -40,17 +36,4 @@ class Evaluator(ABC):
 
         Returns:
             An evaluation results object containing the calculated values.
-
-        Tip: Reusing Objectives and Constraints
-            When defining multiple objectives, there may be a need to reuse the
-            same objective or constraint value multiple times. For instance, a
-            total objective could consist of the mean of the objectives for each
-            realization, plus the standard deviation of the same values. This
-            can be implemented by defining two objectives: the first calculated
-            as the mean of the realizations, and the second using a function
-            estimator to compute the standard deviations. The optimizer is
-            unaware that both objectives use the same set of realizations. To
-            prevent redundant calculations, the evaluator should compute the
-            results of the realizations once and return them for both
-            objectives.
         """

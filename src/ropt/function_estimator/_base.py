@@ -1,10 +1,4 @@
-"""Abstract base class for function estimator implementations.
-
-Function estimators are core components that determine how per-realization
-objective/constraint function values and gradients are combined into the single
-representative values used by the optimizer. This module provides the interface
-that all concrete estimator implementations must follow.
-"""
+"""Abstract base class for function estimator implementations."""
 
 from __future__ import annotations
 
@@ -22,80 +16,52 @@ if TYPE_CHECKING:
 class FunctionEstimator(ABC):
     """Abstract base class for function estimator implementations.
 
-    All concrete function estimator implementations must inherit from this class
-    and implement the required aggregation methods. Estimators are responsible
-    for combining per-realization objective/constraint function values and
-    gradients into single representative values using realization weights.
+    Subclasses must implement four methods:
 
-    The aggregated values produced by estimators are used directly by the
-    optimizer during each iteration.
+    1. `__init__` — store configuration; defer heavy work to `init`.
+    2. `init` — called once with the full optimization context; validate
+       settings and pre-compute state here.
+    3. `calculate_function` — aggregate per-realization function values.
+    4. `calculate_gradient` — aggregate per-realization gradients.
 
-    **Lifecycle**
-
-    1. Instantiation via `__init__`: Called by the plugin system with a
-       configuration object.
-    2. Setup via `init`: Called once per optimization workflow with the
-       [`EnOptContext`][ropt.context.EnOptContext], allowing final initialization
-       based on the full optimization configuration.
-    3. Evaluation via `calculate_function` and `calculate_gradient`: Called
-       repeatedly during optimization as new function/gradient values become
-       available.
-
-    Subclasses must implement:
-
-    - `__init__`: Stores estimator configuration and performs lightweight setup.
-    - `init`: Receives the optimization context for context-dependent initialization.
-    - `calculate_function`: Combines function values from all realizations.
-    - `calculate_gradient`: Combines gradients from all realizations.
+    See [Function Estimators](../usage/function_estimators.md) for examples
+    and further guidance.
     """
 
     @abstractmethod
     def __init__(self, estimator_config: FunctionEstimatorConfig) -> None:
         """Create a new function estimator instance.
 
-        Called by the plugin system during instantiation. Subclasses should
-        store the configuration and perform any lightweight initialization.
-        Validation and context-dependent setup should be deferred to the
-        `init` method.
+        Store the configuration; keep initialization lightweight.
+        Context-dependent setup belongs in `init`.
 
         Args:
-            estimator_config: Configuration object specifying the estimator
-                method and any method-specific options.
+            estimator_config: The estimator configuration.
         """
 
     @abstractmethod
     def init(self, context: EnOptContext) -> None:
-        """Finalize initialization after the optimization context is known.
+        """Finalize initialization with the optimization context.
 
-        Called once at the start of each optimization workflow, after all
-        configuration is finalized. Use this method to perform context-dependent
-        initialization such as validation of gradient settings, setup of
-        internal state, or computation of method-specific parameters.
+        Called once after configuration is finalized. Use for validation
+        (e.g., compatibility with `merge_realizations`) and precomputation.
 
         Args:
-            context: The full optimization context, containing all configuration
-                and state for the current workflow.
+            context: The optimization context.
         """
 
     @abstractmethod
     def calculate_function(
         self, functions: NDArray[np.float64], weights: NDArray[np.float64]
     ) -> NDArray[np.float64]:
-        """Aggregate function values across realizations into a single value.
-
-        Combines per-realization objective or constraint function values into
-        one representative value using the provided realization weights. The
-        aggregation method is defined by the concrete estimator implementation.
+        """Aggregate function values across realizations.
 
         Args:
-            functions: Array of shape `(n_realizations,)` containing function
-                values from each realization.
-            weights: Array of shape `(n_realizations,)` containing the weight
-                for each realization. Typically represents the probability mass
-                or importance of each realization.
+            functions: Shape `(n_realizations,)` — per-realization values.
+            weights:   Shape `(n_realizations,)` — realization weights.
 
         Returns:
-            Aggregated function value as a scalar or 1D array.
+            Aggregated value (scalar or 1-D array).
         """
 
     @abstractmethod
@@ -105,50 +71,20 @@ class FunctionEstimator(ABC):
         gradient: NDArray[np.float64],
         weights: NDArray[np.float64],
     ) -> NDArray[np.float64]:
-        """Aggregate gradients across realizations into a single gradient.
+        """Aggregate gradients across realizations.
 
-        Combines per-realization gradients into one representative gradient
-        vector using the provided realization weights and potentially the
-        function values themselves. The aggregation method is defined by the
-        concrete estimator implementation.
-
-        This method is called after function values have been evaluated for all
-        realizations. Some estimators (e.g., standard deviation) require the
-        function values to correctly compute gradients via the chain rule.
+        When `merge_realizations` is `False` (default), `gradient` has shape
+        `(n_realizations, n_variables)` and must be combined using `weights`.
+        When `True`, a single pre-merged gradient of shape `(n_variables,)` is
+        passed. Incompatible estimators should raise `ValueError` from `init`.
 
         Args:
-            functions: Array of shape `(n_realizations,)` containing function
-                values from each realization. Used by some estimators to compute
-                gradients correctly (e.g., chain rule for standard deviation).
-            gradient: Array of shape `(n_realizations, n_variables)` containing
-                gradient estimates for each realization. Depending on the
-                [`GradientConfig.merge_realizations`][ropt.config.GradientConfig]
-                setting, this may be either per-realization or pre-merged estimates
-                (see note below).
-            weights: Array of shape `(n_realizations,)` containing the weight
-                for each realization.
+            functions: Shape `(n_realizations,)` — needed for chain-rule
+                estimators (e.g., standard deviation).
+            gradient:  Shape `(n_realizations, n_variables)` or
+                `(n_variables,)` if merged.
+            weights:   Shape `(n_realizations,)` — realization weights.
 
         Returns:
-            Aggregated gradient as a 1D array of shape `(n_variables,)`.
-
-        Note: `merge_realizations` setting
-            The [`GradientConfig.merge_realizations`][ropt.config.GradientConfig]
-            flag determines how gradient inputs are prepared:
-
-            - If `False` (default): `ropt` estimates a separate gradient for each
-              realization with non-zero weight. The implementation must combine
-              these per-realization gradients using `weights` (e.g., weighted
-              average or chain-rule-adjusted aggregation).
-            - If `True`: `ropt` estimates a single merged gradient by treating
-              all perturbations across all realizations collectively, then passes
-              that single estimate. The implementation should handle this
-              appropriately (e.g., return it unchanged for averaging-like
-              operations).
-
-            The `merge_realizations=True` option is useful for workflows with
-            few perturbations (even just one) but is only suitable for estimators
-            performing simple averaging. Implementations should validate
-            compatibility during `init` and raise `ValueError` if the configured
-            setting is incompatible with the estimator's logic (e.g., standard
-            deviation).
+            1-D array of shape `(n_variables,)`.
         """

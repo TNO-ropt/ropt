@@ -15,14 +15,13 @@ if TYPE_CHECKING:
 class EnOptEvent:
     """Container for data emitted with optimization workflow events.
 
-    Events are raised during optimization to signal lifecycle milestones and
-    intermediate outcomes. Registered callbacks receive an EnOptEvent instance
-    with event metadata, the current context, and any associated results.
-
     Attributes:
         event_type:  Type of event that occurred.
         context:     Optimizer context associated with the event.
         results:     Tuple of result objects associated with the event.
+
+    See [Optimization Workflows](../usage/workflows.md#the-enoptevent-object)
+    for a detailed description of events and their lifecycle.
     """
 
     event_type: EnOptEventType

@@ -13,32 +13,16 @@ T = TypeVar("T", bound=np.generic)
 
 @dataclass(slots=True)
 class EvaluatorContext:
-    """Capture additional details for the function evaluator.
+    """Per-batch metadata passed to evaluator functions.
 
-    Function evaluators (see [`Evaluator`][ropt.workflow.evaluators.Evaluator])
-    primarily receive variable vectors to evaluate objective and constraint
-    functions. However, they may also benefit from additional information to
-    optimize their calculations. This `EvaluatorContext` object provides that
-    supplementary information.
-
-    Specifically, it provides:
-
-    - The context object for the current optimization run.
-    - A boolean vector (`active`) indicating which variable rows require
-      evaluation.
-    - The realization index for each variable vector. This can be used to
-      determine the correct function from an ensemble to use with each variable
-      vector.
-    - The perturbation index for each variable vector (if applicable). A value
-      less than 0 indicates that the vector is not a perturbation.
+    See [Writing an Evaluator Callback](../usage/evaluator_callback.md) for
+    usage details and examples.
 
     Attributes:
-        context:       Context of the optimizer.
-        active:        Indicates which variable rows require evaluation.
-        realizations:  Realization numbers for each requested evaluation.
-        perturbations: Perturbation numbers for each requested evaluation.
-                       A value less than 0 indicates that the vector is not a
-                       perturbation.
+        context:       The [`EnOptContext`][ropt.context.EnOptContext] for the run.
+        active:        Boolean array indicating which rows require evaluation.
+        realizations:  Realization index for each row.
+        perturbations: Perturbation index for each row (< 0 means unperturbed).
     """
 
     context: EnOptContext
@@ -47,51 +31,30 @@ class EvaluatorContext:
     perturbations: NDArray[np.intc] | None = None
 
     def get_active_evaluations(self, array: NDArray[T]) -> NDArray[T]:
-        """Filter an array based on the active property.
-
-        This is a utility method, which can be used if the active property is
-        used to exclude variable rows that are inactive, i.e. where none of the
-        objects or constraints are needed.
-
-        This method filters a one- or two-dimensional array by retaining only
-        those entries or rows that correspond to active. The activity of
-        realizations is determined by the `self.active` boolean array (where
-        `True` indicates active).
-
-        If `self.active` is `None` (indicating that all variable rows are to be
-        considered active), no filtering is applied, and the original input is
-        returned.
+        """Return only the rows of `array` where `active` is `True`.
 
         Args:
-            array: The array to filter.
+            array: A 1-D or 2-D array with one entry/row per variable vector.
 
         Returns:
-            The filtered results.
+            The subset of rows corresponding to active evaluations.
         """
         return array[self.active, ...]
 
     def insert_inactive_results(
         self, array: NDArray[T], *, fill_value: float = 0.0
     ) -> NDArray[T]:
-        """Expand an array by inserting fill values for inactive variables.
+        """Expand a filtered array back to full size, filling inactive rows.
 
-        This is a utility method, which can be used if the active property is
-        used to exclude variable rows that are fully inactive.
-
-        This method takes an array and expands it to its original dimensions by
-        inserting a specified `fill_value` at positions corresponding to
-        inactive rows. If the array is one-dimensional, zero entries are
-        inserted, if it is two-dimensional rows of zero values are inserted.
-
-        If `self.active` is `None` (implying all rows were considered active or
-        no filtering was applied), the input `array` is returned unchanged.
+        Inserts `fill_value` at positions where `active` is `False`, restoring
+        the array to its original number of rows.
 
         Args:
-            array:      The array to expand.
+            array:      The filtered array (output of `get_active_evaluations`).
             fill_value: The value to insert for inactive entries.
 
         Returns:
-            An expanded array matching the original number of variables.
+            An expanded array matching the original number of rows.
         """
         expanded_array = np.full(
             (self.realizations.shape[0], *array.shape[1:]),
@@ -104,34 +67,20 @@ class EvaluatorContext:
 
 @dataclass
 class EvaluatorResult:
-    """Store the results of a function evaluation.
+    """Results of a function evaluation batch.
 
-    This class stores the results of evaluating objective and constraint
-    functions for a set of variable vectors.
+    Stores objective values (and optional constraint values) for a set of
+    variable vectors. Inactive rows should be set to zero; failed active rows
+    should be set to `numpy.nan`.
 
-    The `objectives` and `constraints` are stored as matrices. Each column in
-    these matrices corresponds to a specific objective or constraint, and each
-    row corresponds to a variable vector.
-
-    When the evaluator is asked to evaluate functions, some variable vectors may
-    be marked as inactive. The results for these inactive vectors should be set
-    to zero. All active variable vectors should be evaluated. If an evaluation
-    fails for any reason, the corresponding values should be set to `numpy.nan`.
-
-    A `batch_id` can be set to identify this specific set of evaluation results.
-
-    The `evaluation_info` dictionary can store additional metadata for each
-    evaluation. This information is not used internally by `ropt` and can have
-    an arbitrary structure, to be interpreted by the application. This can be
-    used, for example, to uniquely identify the results calculated for each
-    variable vector, allowing them to be linked back to their corresponding
-    input vectors.
+    See [Writing an Evaluator Callback](../usage/evaluator_callback.md) for
+    detailed conventions and examples.
 
     Args:
-        objectives:      The calculated objective values.
-        constraints:     Optional calculated constraint values.
-        batch_id:        Optional batch ID to identify this set of results.
-        evaluation_info: Optional info for each evaluation.
+        objectives:      Objective values, shape `(n_rows, n_objectives)`.
+        constraints:     Optional constraint values, shape `(n_rows, n_constraints)`.
+        batch_id:        Optional integer identifying this evaluation batch.
+        evaluation_info: Optional dict of per-row metadata (not used internally by `ropt`).
     """
 
     objectives: NDArray[np.float64]
