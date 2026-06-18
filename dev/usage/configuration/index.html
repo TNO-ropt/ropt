@@ -2567,9 +2567,10 @@ all of them, and how to compose them for typical problems.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p><code>EnOptContext</code> objects are immutable after construction. Do not attempt to
-serialize and round-trip them (e.g., to/from JSON): NumPy arrays and plugin
-instances cannot survive a round-trip faithfully. Persist the raw input
-dicts instead.</p>
+serialize and round-trip them (e.g., to/from JSON). Some parameters are
+transformed during construction in an irreversible manner. Moreover, NumPy
+arrays and plugin instances may not survive a round-trip faithfully. Persist
+the raw input dicts instead.</p>
 </div>
 <h2 id="top-level-layout">Top-level layout</h2>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">CONFIG</span> <span class="o">=</span> <span class="p">{</span>
@@ -2665,7 +2666,7 @@ corresponding element unfiltered/untransformed.</p>
 not need to construct them directly. Each tuple element accepts any of three
 equivalent forms, and a Pydantic validator converts it to the required object:</p>
 <ol>
-<li><strong>An already-constructed object</strong> — any instance of an built-in clas (e.g. a
+<li><strong>An already-constructed object</strong> — any instance of a built-in clas (e.g. a
    <code>SciPySampler</code> from <code>ropt.sampler.scipy</code>), or of your own <code>Sampler</code> subclass.
    The instance is used as-is.</li>
 <li><strong>A typed config object</strong>, e.g.
@@ -2686,8 +2687,7 @@ equivalent forms, and a Pydantic validator converts it to the required object:</
 <code>realization_filters</code>, and the three transform fields. Mix instances and dicts
 freely — for example, you can register a hand-built <code>Sampler</code> instance alongside
 a dict-configured one in the same tuple. However, note that the second and third
-options require the the corresponding class to be registered with the plugin
-system.</p>
+options require the corresponding class to be registered with the plugin system.</p>
 <h3 id="method-strings">Method strings</h3>
 <p>All <code>method</code> fields use the same naming convention:</p>
 <ul>
