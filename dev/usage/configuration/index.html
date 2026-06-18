@@ -625,6 +625,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#pydantic-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pydantic validation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#broadcasting" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2250,6 +2261,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#pydantic-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pydantic validation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#broadcasting" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2568,9 +2590,11 @@ all of them, and how to compose them for typical problems.</p>
 <p class="admonition-title">Warning</p>
 <p><code>EnOptContext</code> objects are immutable after construction. Do not attempt to
 serialize and round-trip them (e.g., to/from JSON). Some parameters are
-transformed during construction in an irreversible manner. Moreover, NumPy
-arrays and plugin instances may not survive a round-trip faithfully. Persist
-the raw input dicts instead.</p>
+transformed during construction in an irreversible manner. Constructing a
+<code>EnOptContext</code> object from serialized values may incorrectly transform those
+parameters again. Moreover, NumPy arrays and plugin instances may not survive a
+round-trip faithfully. Persist the raw input dicts instead if you intent to
+modify the values.</p>
 </div>
 <h2 id="top-level-layout">Top-level layout</h2>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">CONFIG</span> <span class="o">=</span> <span class="p">{</span>
@@ -2595,14 +2619,24 @@ the raw input dicts instead.</p>
 validates against the corresponding config class) or a list/tuple of such
 dicts for the plugin-bearing fields.</p>
 <h2 id="rules-that-apply-everywhere">Rules that apply everywhere</h2>
+<h3 id="pydantic-validation">Pydantic validation</h3>
+<p>All configuration dictionaries are validated using
+<a href="https://docs.pydantic.dev/">Pydantic</a>. This means inputs are automatically
+coerced to the expected types when possible. For example, you can pass a <code>list</code>
+wherever a <code>tuple</code> is expected, or a plain <code>list</code> of numbers wherever a NumPy
+array is required — Pydantic will handle the conversion during validation.</p>
+<p>Some values are also adjusted during validation. For instance, the <code>weights</code>
+fields in <code>objectives</code> and <code>realizations</code> are normalized to sum to 1:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="s2">&quot;realizations&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;weights&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]}</span>  <span class="c1"># stored as [0.333, 0.333, 0.333]</span>
+</span></code></pre></div>
 <h3 id="broadcasting">Broadcasting</h3>
 <p>Many per-variable, per-objective, or per-constraint fields are NumPy arrays. A
 size-1 value is broadcast to match the relevant count, e.g.:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="s2">&quot;variables&quot;</span><span class="p">:</span> <span class="p">{</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    <span class="s2">&quot;variable_count&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    <span class="s2">&quot;lower_bounds&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>        <span class="c1"># broadcast to [0, 0, 0, 0, 0]</span>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    <span class="s2">&quot;upper_bounds&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="p">}</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="s2">&quot;variables&quot;</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    <span class="s2">&quot;variable_count&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    <span class="s2">&quot;lower_bounds&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>        <span class="c1"># broadcast to [0, 0, 0, 0, 0]</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    <span class="s2">&quot;upper_bounds&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="p">}</span>
 </span></code></pre></div>
 <p>Length-mismatched arrays raise a validation error.</p>
 <h3 id="index-based-sharing-of-component-objects">Index-based sharing of component objects</h3>
@@ -2647,14 +2681,14 @@ the SciPy-based samplers are classes defined in <code>ropt.sampler.scipy</code>.
 <p>Other config sections refer to the entries in these tuples by integer index.
 For example, <a class="autorefs autorefs-internal" title="            VariablesConfig" href="../../reference/config/#ropt.config.VariablesConfig"><code>VariablesConfig</code></a> has a <code>samplers</code>
 field that is an integer array indexing into <code>EnOptContext.samplers</code>:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="s2">&quot;samplers&quot;</span><span class="p">:</span> <span class="p">[</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    <span class="n">sampler_a</span><span class="p">,</span>   <span class="c1"># index 0  (a Sampler instance)</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    <span class="n">sampler_b</span><span class="p">,</span>   <span class="c1"># index 1</span>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="p">],</span>
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="s2">&quot;variables&quot;</span><span class="p">:</span> <span class="p">{</span>
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>    <span class="s2">&quot;variable_count&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
-</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>    <span class="s2">&quot;samplers&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>   <span class="c1"># variables 0,1 use sampler 0; 2,3 use sampler 1</span>
-</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="p">},</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="s2">&quot;samplers&quot;</span><span class="p">:</span> <span class="p">[</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="n">sampler_a</span><span class="p">,</span>   <span class="c1"># index 0  (a Sampler instance)</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    <span class="n">sampler_b</span><span class="p">,</span>   <span class="c1"># index 1</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="p">],</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="s2">&quot;variables&quot;</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    <span class="s2">&quot;variable_count&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>    <span class="s2">&quot;samplers&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>   <span class="c1"># variables 0,1 use sampler 0; 2,3 use sampler 1</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="p">},</span>
 </span></code></pre></div>
 <p>Use all zeros to share a single instance across all elements;
 thanks to broadcasting, a single <code>0</code> (the default) is sufficient.</p>
@@ -2666,7 +2700,7 @@ corresponding element unfiltered/untransformed.</p>
 not need to construct them directly. Each tuple element accepts any of three
 equivalent forms, and a Pydantic validator converts it to the required object:</p>
 <ol>
-<li><strong>An already-constructed object</strong> — any instance of a built-in clas (e.g. a
+<li><strong>An already-constructed object</strong> — any instance of a built-in class (e.g. a
    <code>SciPySampler</code> from <code>ropt.sampler.scipy</code>), or of your own <code>Sampler</code> subclass.
    The instance is used as-is.</li>
 <li><strong>A typed config object</strong>, e.g.
@@ -2678,10 +2712,10 @@ equivalent forms, and a Pydantic validator converts it to the required object:</
    and then handled as in (2).</li>
 </ol>
 <p>So the snippet above can equivalently be written as:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="s2">&quot;samplers&quot;</span><span class="p">:</span> <span class="p">[</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="p">{</span><span class="s2">&quot;method&quot;</span><span class="p">:</span> <span class="s2">&quot;scipy/default&quot;</span><span class="p">},</span>   <span class="c1"># index 0  -&gt; SciPySampler</span>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    <span class="p">{</span><span class="s2">&quot;method&quot;</span><span class="p">:</span> <span class="s2">&quot;scipy/sobol&quot;</span><span class="p">},</span>     <span class="c1"># index 1  -&gt; SciPySampler</span>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="p">],</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="s2">&quot;samplers&quot;</span><span class="p">:</span> <span class="p">[</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>    <span class="p">{</span><span class="s2">&quot;method&quot;</span><span class="p">:</span> <span class="s2">&quot;scipy/default&quot;</span><span class="p">},</span>   <span class="c1"># index 0  -&gt; SciPySampler</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    <span class="p">{</span><span class="s2">&quot;method&quot;</span><span class="p">:</span> <span class="s2">&quot;scipy/sobol&quot;</span><span class="p">},</span>     <span class="c1"># index 1  -&gt; SciPySampler</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="p">],</span>
 </span></code></pre></div>
 <p>The same pattern applies to <code>backend</code>, <code>function_estimators</code>,
 <code>realization_filters</code>, and the three transform fields. Mix instances and dicts
@@ -2733,14 +2767,14 @@ integer). If not provided, all variables default to continuous
 <p>The optional <code>mask</code> field is a boolean array that indicates which variables are
 free to change during optimization (default: all <code>True</code>, i.e. all variables are
 free). <code>True</code> means the variable is free; <code>False</code> means it is fixed.</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="s2">&quot;variables&quot;</span><span class="p">:</span> <span class="p">{</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>    <span class="s2">&quot;variable_count&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    <span class="s2">&quot;lower_bounds&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>    <span class="s2">&quot;upper_bounds&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span>
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>    <span class="s2">&quot;types&quot;</span><span class="p">:</span> <span class="s2">&quot;real&quot;</span><span class="p">,</span>              <span class="c1"># default; or &quot;integer&quot; for discrete variables</span>
-</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>    <span class="s2">&quot;mask&quot;</span><span class="p">:</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">],</span>  <span class="c1"># third variable is fixed</span>
-</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>    <span class="s2">&quot;perturbation_magnitudes&quot;</span><span class="p">:</span> <span class="mf">1e-5</span><span class="p">,</span>
-</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="p">}</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="s2">&quot;variables&quot;</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>    <span class="s2">&quot;variable_count&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>    <span class="s2">&quot;lower_bounds&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>    <span class="s2">&quot;upper_bounds&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>    <span class="s2">&quot;types&quot;</span><span class="p">:</span> <span class="s2">&quot;real&quot;</span><span class="p">,</span>              <span class="c1"># default; or &quot;integer&quot; for discrete variables</span>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>    <span class="s2">&quot;mask&quot;</span><span class="p">:</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">],</span>  <span class="c1"># third variable is fixed</span>
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>    <span class="s2">&quot;perturbation_magnitudes&quot;</span><span class="p">:</span> <span class="mf">1e-5</span><span class="p">,</span>
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="p">}</span>
 </span></code></pre></div>
 <h4 id="variable-perturbations">Variable perturbations</h4>
 <p>The <code>variables</code> section also stores information needed to generate perturbed
@@ -2828,7 +2862,7 @@ into a single value by summing them after weighting. The <code>weights</code> fi
 determines the weight of each objective function, and its length defines the
 number of objectives (default: <code>[1.0]</code>, i.e. a single objective). The weights
 are automatically normalized to sum to 1 (e.g., <code>[1, 1]</code> becomes <code>[0.5, 0.5]</code>).</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="s2">&quot;objectives&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;weights&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.6</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">]}</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="s2">&quot;objectives&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;weights&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.6</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">]}</span>
 </span></code></pre></div>
 <p>Objective functions can optionally be processed using
 <a href="../realization_filters/">realization filters</a>,
@@ -2961,11 +2995,11 @@ settings that are forwarded to the backend:</p>
   optimizer options. The format and interpretation depend on the specific
   optimization method. These are passed straight to the backend.</li>
 </ul>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="s2">&quot;backend&quot;</span><span class="p">:</span> <span class="p">{</span>
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>    <span class="s2">&quot;method&quot;</span><span class="p">:</span> <span class="s2">&quot;scipy/default&quot;</span><span class="p">,</span>
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>    <span class="s2">&quot;max_iterations&quot;</span><span class="p">:</span> <span class="mi">200</span><span class="p">,</span>
-</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>    <span class="s2">&quot;options&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;maxiter&quot;</span><span class="p">:</span> <span class="mi">200</span><span class="p">},</span>
-</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="p">}</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="s2">&quot;backend&quot;</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>    <span class="s2">&quot;method&quot;</span><span class="p">:</span> <span class="s2">&quot;scipy/default&quot;</span><span class="p">,</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>    <span class="s2">&quot;max_iterations&quot;</span><span class="p">:</span> <span class="mi">200</span><span class="p">,</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>    <span class="s2">&quot;options&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;maxiter&quot;</span><span class="p">:</span> <span class="mi">200</span><span class="p">},</span>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="p">}</span>
 </span></code></pre></div>
 <h3 id="gradient-gradientconfig"><code>gradient</code> — <a class="autorefs autorefs-internal" title="            GradientConfig" href="../../reference/config/#ropt.config.GradientConfig"><code>GradientConfig</code></a></h3>
 <p>Controls how stochastic gradients are estimated (see also <a href="../gradients/">Stochastic
@@ -3056,22 +3090,22 @@ domain and the optimizer's domain. Three types exist:</p>
 <code>"variable"</code>, <code>"objective"</code>) to a tuple of labels. Used to produce labelled
 multi-index data frames when results are exported.</p>
 <h2 id="a-worked-example">A worked example</h2>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">CONFIG</span> <span class="o">=</span> <span class="p">{</span>
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>    <span class="s2">&quot;variables&quot;</span><span class="p">:</span> <span class="p">{</span>
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>        <span class="s2">&quot;variable_count&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
-</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>        <span class="s2">&quot;lower_bounds&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">5.0</span><span class="p">,</span>
-</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>        <span class="s2">&quot;upper_bounds&quot;</span><span class="p">:</span>  <span class="mf">5.0</span><span class="p">,</span>
-</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>        <span class="s2">&quot;perturbation_magnitudes&quot;</span><span class="p">:</span> <span class="mf">1e-5</span><span class="p">,</span>
-</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>    <span class="p">},</span>
-</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>    <span class="s2">&quot;objectives&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;weights&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">]},</span>
-</span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>    <span class="s2">&quot;realizations&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;weights&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">]</span> <span class="o">*</span> <span class="mi">10</span><span class="p">},</span>
-</span><span id="__span-7-10"><a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a>    <span class="s2">&quot;gradient&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;number_of_perturbations&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">},</span>
-</span><span id="__span-7-11"><a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a>    <span class="s2">&quot;optimizer&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;max_batches&quot;</span><span class="p">:</span> <span class="mi">50</span><span class="p">},</span>
-</span><span id="__span-7-12"><a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a>    <span class="s2">&quot;backend&quot;</span><span class="p">:</span> <span class="p">{</span>
-</span><span id="__span-7-13"><a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a>        <span class="s2">&quot;method&quot;</span><span class="p">:</span> <span class="s2">&quot;scipy/default&quot;</span><span class="p">,</span>
-</span><span id="__span-7-14"><a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a>        <span class="s2">&quot;options&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;maxiter&quot;</span><span class="p">:</span> <span class="mi">200</span><span class="p">},</span>
-</span><span id="__span-7-15"><a id="__codelineno-7-15" name="__codelineno-7-15" href="#__codelineno-7-15"></a>    <span class="p">},</span>
-</span><span id="__span-7-16"><a id="__codelineno-7-16" name="__codelineno-7-16" href="#__codelineno-7-16"></a><span class="p">}</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">CONFIG</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>    <span class="s2">&quot;variables&quot;</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>        <span class="s2">&quot;variable_count&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>        <span class="s2">&quot;lower_bounds&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">5.0</span><span class="p">,</span>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>        <span class="s2">&quot;upper_bounds&quot;</span><span class="p">:</span>  <span class="mf">5.0</span><span class="p">,</span>
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>        <span class="s2">&quot;perturbation_magnitudes&quot;</span><span class="p">:</span> <span class="mf">1e-5</span><span class="p">,</span>
+</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>    <span class="p">},</span>
+</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>    <span class="s2">&quot;objectives&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;weights&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">]},</span>
+</span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>    <span class="s2">&quot;realizations&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;weights&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">]</span> <span class="o">*</span> <span class="mi">10</span><span class="p">},</span>
+</span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a>    <span class="s2">&quot;gradient&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;number_of_perturbations&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">},</span>
+</span><span id="__span-8-11"><a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a>    <span class="s2">&quot;optimizer&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;max_batches&quot;</span><span class="p">:</span> <span class="mi">50</span><span class="p">},</span>
+</span><span id="__span-8-12"><a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a>    <span class="s2">&quot;backend&quot;</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="__span-8-13"><a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a>        <span class="s2">&quot;method&quot;</span><span class="p">:</span> <span class="s2">&quot;scipy/default&quot;</span><span class="p">,</span>
+</span><span id="__span-8-14"><a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a>        <span class="s2">&quot;options&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;maxiter&quot;</span><span class="p">:</span> <span class="mi">200</span><span class="p">},</span>
+</span><span id="__span-8-15"><a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a>    <span class="p">},</span>
+</span><span id="__span-8-16"><a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a><span class="p">}</span>
 </span></code></pre></div>
 <p>This configures a 5-variable problem with bounded variables, an ensemble of
 10 equally-weighted realizations, 5 perturbations per gradient estimate,
@@ -3084,124 +3118,124 @@ SciPy's default optimizer, and a 50-batch cap.</p>
 <a class="autorefs autorefs-internal" title="            EnOptContext" href="../../reference/context/#ropt.context.EnOptContext"><code>EnOptContext</code></a> configuration with all fields
 set to their default values. In practice you only need to specify the
 fields you want to override — everything else is filled in automatically.</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.enums</span><span class="w"> </span><span class="kn">import</span> <span class="n">BoundaryType</span><span class="p">,</span> <span class="n">PerturbationType</span><span class="p">,</span> <span class="n">VariableType</span>
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>
-</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="n">CONFIG</span> <span class="o">=</span> <span class="p">{</span>
-</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>    <span class="s2">&quot;variables&quot;</span><span class="p">:</span> <span class="p">{</span>
-</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>        <span class="s2">&quot;variable_count&quot;</span><span class="p">:</span> <span class="o">...</span><span class="p">,</span>                            <span class="c1"># required, no default</span>
-</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>        <span class="s2">&quot;lower_bounds&quot;</span><span class="p">:</span> <span class="o">-</span><span class="nb">float</span><span class="p">(</span><span class="s2">&quot;inf&quot;</span><span class="p">),</span>                    <span class="c1"># default: -inf</span>
-</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>        <span class="s2">&quot;upper_bounds&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;inf&quot;</span><span class="p">),</span>                     <span class="c1"># default: +inf</span>
-</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>        <span class="s2">&quot;types&quot;</span><span class="p">:</span> <span class="n">VariableType</span><span class="o">.</span><span class="n">REAL</span><span class="p">,</span>                       <span class="c1"># default: &quot;real&quot; (continuous)</span>
-</span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>        <span class="s2">&quot;mask&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>                                     <span class="c1"># default: all free</span>
-</span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a>        <span class="s2">&quot;perturbation_magnitudes&quot;</span><span class="p">:</span> <span class="mf">0.005</span><span class="p">,</span>
-</span><span id="__span-8-11"><a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a>        <span class="s2">&quot;perturbation_types&quot;</span><span class="p">:</span> <span class="n">PerturbationType</span><span class="o">.</span><span class="n">ABSOLUTE</span><span class="p">,</span>
-</span><span id="__span-8-12"><a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a>        <span class="s2">&quot;boundary_types&quot;</span><span class="p">:</span> <span class="n">BoundaryType</span><span class="o">.</span><span class="n">MIRROR_BOTH</span><span class="p">,</span>
-</span><span id="__span-8-13"><a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a>        <span class="s2">&quot;samplers&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>                                    <span class="c1"># default: use first sampler for all</span>
-</span><span id="__span-8-14"><a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a>        <span class="s2">&quot;seed&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-</span><span id="__span-8-15"><a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a>        <span class="s2">&quot;transforms&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>                                 <span class="c1"># default: no transform</span>
-</span><span id="__span-8-16"><a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a>    <span class="p">},</span>
-</span><span id="__span-8-17"><a id="__codelineno-8-17" name="__codelineno-8-17" href="#__codelineno-8-17"></a>    <span class="s2">&quot;objectives&quot;</span><span class="p">:</span> <span class="p">{</span>
-</span><span id="__span-8-18"><a id="__codelineno-8-18" name="__codelineno-8-18" href="#__codelineno-8-18"></a>        <span class="s2">&quot;weights&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">],</span>                                 <span class="c1"># default: single objective, weight 1.0</span>
-</span><span id="__span-8-19"><a id="__codelineno-8-19" name="__codelineno-8-19" href="#__codelineno-8-19"></a>        <span class="s2">&quot;realization_filters&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>                        <span class="c1"># default: no filter</span>
-</span><span id="__span-8-20"><a id="__codelineno-8-20" name="__codelineno-8-20" href="#__codelineno-8-20"></a>        <span class="s2">&quot;function_estimators&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>                         <span class="c1"># default: use first estimator for all</span>
-</span><span id="__span-8-21"><a id="__codelineno-8-21" name="__codelineno-8-21" href="#__codelineno-8-21"></a>        <span class="s2">&quot;transforms&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>                                 <span class="c1"># default: no transform</span>
-</span><span id="__span-8-22"><a id="__codelineno-8-22" name="__codelineno-8-22" href="#__codelineno-8-22"></a>    <span class="p">},</span>
-</span><span id="__span-8-23"><a id="__codelineno-8-23" name="__codelineno-8-23" href="#__codelineno-8-23"></a>    <span class="s2">&quot;linear_constraints&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>                           <span class="c1"># No linear constraints</span>
-</span><span id="__span-8-24"><a id="__codelineno-8-24" name="__codelineno-8-24" href="#__codelineno-8-24"></a>    <span class="s2">&quot;nonlinear_constraints&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>                        <span class="c1"># No non-linear constraints</span>
-</span><span id="__span-8-25"><a id="__codelineno-8-25" name="__codelineno-8-25" href="#__codelineno-8-25"></a>    <span class="s2">&quot;realizations&quot;</span><span class="p">:</span> <span class="p">{</span>
-</span><span id="__span-8-26"><a id="__codelineno-8-26" name="__codelineno-8-26" href="#__codelineno-8-26"></a>        <span class="s2">&quot;weights&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">],</span>                                 <span class="c1"># default: single realization, weight 1.0</span>
-</span><span id="__span-8-27"><a id="__codelineno-8-27" name="__codelineno-8-27" href="#__codelineno-8-27"></a>        <span class="s2">&quot;realization_min_success&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>                  <span class="c1"># default: equal to number of realizations</span>
-</span><span id="__span-8-28"><a id="__codelineno-8-28" name="__codelineno-8-28" href="#__codelineno-8-28"></a>    <span class="p">},</span>
-</span><span id="__span-8-29"><a id="__codelineno-8-29" name="__codelineno-8-29" href="#__codelineno-8-29"></a>    <span class="s2">&quot;optimizer&quot;</span><span class="p">:</span> <span class="p">{</span>
-</span><span id="__span-8-30"><a id="__codelineno-8-30" name="__codelineno-8-30" href="#__codelineno-8-30"></a>        <span class="s2">&quot;max_batches&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>                              <span class="c1"># default: no limit</span>
-</span><span id="__span-8-31"><a id="__codelineno-8-31" name="__codelineno-8-31" href="#__codelineno-8-31"></a>        <span class="s2">&quot;max_functions&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>                            <span class="c1"># default: no limit</span>
-</span><span id="__span-8-32"><a id="__codelineno-8-32" name="__codelineno-8-32" href="#__codelineno-8-32"></a>        <span class="s2">&quot;output_dir&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>                               <span class="c1"># default: no output directory</span>
-</span><span id="__span-8-33"><a id="__codelineno-8-33" name="__codelineno-8-33" href="#__codelineno-8-33"></a>        <span class="s2">&quot;stdout&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>                                   <span class="c1"># default: discard</span>
-</span><span id="__span-8-34"><a id="__codelineno-8-34" name="__codelineno-8-34" href="#__codelineno-8-34"></a>        <span class="s2">&quot;stderr&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>                                   <span class="c1"># default: discard</span>
-</span><span id="__span-8-35"><a id="__codelineno-8-35" name="__codelineno-8-35" href="#__codelineno-8-35"></a>    <span class="p">},</span>
-</span><span id="__span-8-36"><a id="__codelineno-8-36" name="__codelineno-8-36" href="#__codelineno-8-36"></a>    <span class="s2">&quot;backend&quot;</span><span class="p">:</span> <span class="p">{</span>
-</span><span id="__span-8-37"><a id="__codelineno-8-37" name="__codelineno-8-37" href="#__codelineno-8-37"></a>        <span class="s2">&quot;method&quot;</span><span class="p">:</span> <span class="s2">&quot;scipy/default&quot;</span><span class="p">,</span>                        <span class="c1"># default: SciPy SLSQP</span>
-</span><span id="__span-8-38"><a id="__codelineno-8-38" name="__codelineno-8-38" href="#__codelineno-8-38"></a>        <span class="s2">&quot;max_iterations&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>                           <span class="c1"># default: backend-specific</span>
-</span><span id="__span-8-39"><a id="__codelineno-8-39" name="__codelineno-8-39" href="#__codelineno-8-39"></a>        <span class="s2">&quot;convergence_tolerance&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>                    <span class="c1"># default: backend-specific</span>
-</span><span id="__span-8-40"><a id="__codelineno-8-40" name="__codelineno-8-40" href="#__codelineno-8-40"></a>        <span class="s2">&quot;parallel&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>                                <span class="c1"># default: Do not evaluate in parallel</span>
-</span><span id="__span-8-41"><a id="__codelineno-8-41" name="__codelineno-8-41" href="#__codelineno-8-41"></a>        <span class="s2">&quot;options&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>                                  <span class="c1"># default: no extra options</span>
-</span><span id="__span-8-42"><a id="__codelineno-8-42" name="__codelineno-8-42" href="#__codelineno-8-42"></a>    <span class="p">},</span>
-</span><span id="__span-8-43"><a id="__codelineno-8-43" name="__codelineno-8-43" href="#__codelineno-8-43"></a>    <span class="s2">&quot;gradient&quot;</span><span class="p">:</span> <span class="p">{</span>
-</span><span id="__span-8-44"><a id="__codelineno-8-44" name="__codelineno-8-44" href="#__codelineno-8-44"></a>        <span class="s2">&quot;number_of_perturbations&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
-</span><span id="__span-8-45"><a id="__codelineno-8-45" name="__codelineno-8-45" href="#__codelineno-8-45"></a>        <span class="s2">&quot;perturbation_min_success&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>                 <span class="c1"># default: equal to number_of_perturbations</span>
-</span><span id="__span-8-46"><a id="__codelineno-8-46" name="__codelineno-8-46" href="#__codelineno-8-46"></a>        <span class="s2">&quot;merge_realizations&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>                      <span class="c1"># default: estimate and average gradients</span>
-</span><span id="__span-8-47"><a id="__codelineno-8-47" name="__codelineno-8-47" href="#__codelineno-8-47"></a>        <span class="s2">&quot;evaluation_policy&quot;</span><span class="p">:</span> <span class="s2">&quot;auto&quot;</span><span class="p">,</span>                      <span class="c1"># default: evaluate functions and perturbations</span>
-</span><span id="__span-8-48"><a id="__codelineno-8-48" name="__codelineno-8-48" href="#__codelineno-8-48"></a>    <span class="p">},</span>                                                    <span class="c1">#          as needed</span>
-</span><span id="__span-8-49"><a id="__codelineno-8-49" name="__codelineno-8-49" href="#__codelineno-8-49"></a>    <span class="s2">&quot;samplers&quot;</span><span class="p">:</span> <span class="p">[</span>
-</span><span id="__span-8-50"><a id="__codelineno-8-50" name="__codelineno-8-50" href="#__codelineno-8-50"></a>        <span class="p">{</span>
-</span><span id="__span-8-51"><a id="__codelineno-8-51" name="__codelineno-8-51" href="#__codelineno-8-51"></a>            <span class="s2">&quot;method&quot;</span><span class="p">:</span> <span class="s2">&quot;scipy/default&quot;</span><span class="p">,</span>                    <span class="c1"># default: standard normal N(0,1)</span>
-</span><span id="__span-8-52"><a id="__codelineno-8-52" name="__codelineno-8-52" href="#__codelineno-8-52"></a>            <span class="s2">&quot;options&quot;</span><span class="p">:</span> <span class="p">{},</span>
-</span><span id="__span-8-53"><a id="__codelineno-8-53" name="__codelineno-8-53" href="#__codelineno-8-53"></a>            <span class="s2">&quot;shared&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>                              <span class="c1"># default: Each realizations has its own</span>
-</span><span id="__span-8-54"><a id="__codelineno-8-54" name="__codelineno-8-54" href="#__codelineno-8-54"></a>                                                          <span class="c1">#          set of perturbations</span>
-</span><span id="__span-8-55"><a id="__codelineno-8-55" name="__codelineno-8-55" href="#__codelineno-8-55"></a>        <span class="p">},</span>
-</span><span id="__span-8-56"><a id="__codelineno-8-56" name="__codelineno-8-56" href="#__codelineno-8-56"></a>    <span class="p">],</span>
-</span><span id="__span-8-57"><a id="__codelineno-8-57" name="__codelineno-8-57" href="#__codelineno-8-57"></a>    <span class="s2">&quot;function_estimators&quot;</span><span class="p">:</span> <span class="p">[</span>
-</span><span id="__span-8-58"><a id="__codelineno-8-58" name="__codelineno-8-58" href="#__codelineno-8-58"></a>        <span class="p">{</span>
-</span><span id="__span-8-59"><a id="__codelineno-8-59" name="__codelineno-8-59" href="#__codelineno-8-59"></a>            <span class="s2">&quot;method&quot;</span><span class="p">:</span> <span class="s2">&quot;default/default&quot;</span><span class="p">,</span>                  <span class="c1"># default: weighted average</span>
-</span><span id="__span-8-60"><a id="__codelineno-8-60" name="__codelineno-8-60" href="#__codelineno-8-60"></a>            <span class="s2">&quot;options&quot;</span><span class="p">:</span> <span class="p">{},</span>
-</span><span id="__span-8-61"><a id="__codelineno-8-61" name="__codelineno-8-61" href="#__codelineno-8-61"></a>        <span class="p">},</span>
-</span><span id="__span-8-62"><a id="__codelineno-8-62" name="__codelineno-8-62" href="#__codelineno-8-62"></a>    <span class="p">],</span>
-</span><span id="__span-8-63"><a id="__codelineno-8-63" name="__codelineno-8-63" href="#__codelineno-8-63"></a>    <span class="s2">&quot;realization_filters&quot;</span><span class="p">:</span> <span class="p">[],</span>                            <span class="c1"># default: none configured</span>
-</span><span id="__span-8-64"><a id="__codelineno-8-64" name="__codelineno-8-64" href="#__codelineno-8-64"></a>    <span class="s2">&quot;variable_transforms&quot;</span><span class="p">:</span> <span class="p">[],</span>                            <span class="c1"># default: none configured</span>
-</span><span id="__span-8-65"><a id="__codelineno-8-65" name="__codelineno-8-65" href="#__codelineno-8-65"></a>    <span class="s2">&quot;objective_transforms&quot;</span><span class="p">:</span> <span class="p">[],</span>                           <span class="c1"># default: none configured</span>
-</span><span id="__span-8-66"><a id="__codelineno-8-66" name="__codelineno-8-66" href="#__codelineno-8-66"></a>    <span class="s2">&quot;nonlinear_constraint_transforms&quot;</span><span class="p">:</span> <span class="p">[],</span>                <span class="c1"># default: none configured</span>
-</span><span id="__span-8-67"><a id="__codelineno-8-67" name="__codelineno-8-67" href="#__codelineno-8-67"></a><span class="p">}</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.enums</span><span class="w"> </span><span class="kn">import</span> <span class="n">BoundaryType</span><span class="p">,</span> <span class="n">PerturbationType</span><span class="p">,</span> <span class="n">VariableType</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="n">CONFIG</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>    <span class="s2">&quot;variables&quot;</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>        <span class="s2">&quot;variable_count&quot;</span><span class="p">:</span> <span class="o">...</span><span class="p">,</span>                            <span class="c1"># required, no default</span>
+</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>        <span class="s2">&quot;lower_bounds&quot;</span><span class="p">:</span> <span class="o">-</span><span class="nb">float</span><span class="p">(</span><span class="s2">&quot;inf&quot;</span><span class="p">),</span>                    <span class="c1"># default: -inf</span>
+</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a>        <span class="s2">&quot;upper_bounds&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;inf&quot;</span><span class="p">),</span>                     <span class="c1"># default: +inf</span>
+</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a>        <span class="s2">&quot;types&quot;</span><span class="p">:</span> <span class="n">VariableType</span><span class="o">.</span><span class="n">REAL</span><span class="p">,</span>                       <span class="c1"># default: &quot;real&quot; (continuous)</span>
+</span><span id="__span-9-9"><a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a>        <span class="s2">&quot;mask&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>                                     <span class="c1"># default: all free</span>
+</span><span id="__span-9-10"><a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a>        <span class="s2">&quot;perturbation_magnitudes&quot;</span><span class="p">:</span> <span class="mf">0.005</span><span class="p">,</span>
+</span><span id="__span-9-11"><a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a>        <span class="s2">&quot;perturbation_types&quot;</span><span class="p">:</span> <span class="n">PerturbationType</span><span class="o">.</span><span class="n">ABSOLUTE</span><span class="p">,</span>
+</span><span id="__span-9-12"><a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a>        <span class="s2">&quot;boundary_types&quot;</span><span class="p">:</span> <span class="n">BoundaryType</span><span class="o">.</span><span class="n">MIRROR_BOTH</span><span class="p">,</span>
+</span><span id="__span-9-13"><a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a>        <span class="s2">&quot;samplers&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>                                    <span class="c1"># default: use first sampler for all</span>
+</span><span id="__span-9-14"><a id="__codelineno-9-14" name="__codelineno-9-14" href="#__codelineno-9-14"></a>        <span class="s2">&quot;seed&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+</span><span id="__span-9-15"><a id="__codelineno-9-15" name="__codelineno-9-15" href="#__codelineno-9-15"></a>        <span class="s2">&quot;transforms&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>                                 <span class="c1"># default: no transform</span>
+</span><span id="__span-9-16"><a id="__codelineno-9-16" name="__codelineno-9-16" href="#__codelineno-9-16"></a>    <span class="p">},</span>
+</span><span id="__span-9-17"><a id="__codelineno-9-17" name="__codelineno-9-17" href="#__codelineno-9-17"></a>    <span class="s2">&quot;objectives&quot;</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="__span-9-18"><a id="__codelineno-9-18" name="__codelineno-9-18" href="#__codelineno-9-18"></a>        <span class="s2">&quot;weights&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">],</span>                                 <span class="c1"># default: single objective, weight 1.0</span>
+</span><span id="__span-9-19"><a id="__codelineno-9-19" name="__codelineno-9-19" href="#__codelineno-9-19"></a>        <span class="s2">&quot;realization_filters&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>                        <span class="c1"># default: no filter</span>
+</span><span id="__span-9-20"><a id="__codelineno-9-20" name="__codelineno-9-20" href="#__codelineno-9-20"></a>        <span class="s2">&quot;function_estimators&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>                         <span class="c1"># default: use first estimator for all</span>
+</span><span id="__span-9-21"><a id="__codelineno-9-21" name="__codelineno-9-21" href="#__codelineno-9-21"></a>        <span class="s2">&quot;transforms&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>                                 <span class="c1"># default: no transform</span>
+</span><span id="__span-9-22"><a id="__codelineno-9-22" name="__codelineno-9-22" href="#__codelineno-9-22"></a>    <span class="p">},</span>
+</span><span id="__span-9-23"><a id="__codelineno-9-23" name="__codelineno-9-23" href="#__codelineno-9-23"></a>    <span class="s2">&quot;linear_constraints&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>                           <span class="c1"># No linear constraints</span>
+</span><span id="__span-9-24"><a id="__codelineno-9-24" name="__codelineno-9-24" href="#__codelineno-9-24"></a>    <span class="s2">&quot;nonlinear_constraints&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>                        <span class="c1"># No non-linear constraints</span>
+</span><span id="__span-9-25"><a id="__codelineno-9-25" name="__codelineno-9-25" href="#__codelineno-9-25"></a>    <span class="s2">&quot;realizations&quot;</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="__span-9-26"><a id="__codelineno-9-26" name="__codelineno-9-26" href="#__codelineno-9-26"></a>        <span class="s2">&quot;weights&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">],</span>                                 <span class="c1"># default: single realization, weight 1.0</span>
+</span><span id="__span-9-27"><a id="__codelineno-9-27" name="__codelineno-9-27" href="#__codelineno-9-27"></a>        <span class="s2">&quot;realization_min_success&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>                  <span class="c1"># default: equal to number of realizations</span>
+</span><span id="__span-9-28"><a id="__codelineno-9-28" name="__codelineno-9-28" href="#__codelineno-9-28"></a>    <span class="p">},</span>
+</span><span id="__span-9-29"><a id="__codelineno-9-29" name="__codelineno-9-29" href="#__codelineno-9-29"></a>    <span class="s2">&quot;optimizer&quot;</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="__span-9-30"><a id="__codelineno-9-30" name="__codelineno-9-30" href="#__codelineno-9-30"></a>        <span class="s2">&quot;max_batches&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>                              <span class="c1"># default: no limit</span>
+</span><span id="__span-9-31"><a id="__codelineno-9-31" name="__codelineno-9-31" href="#__codelineno-9-31"></a>        <span class="s2">&quot;max_functions&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>                            <span class="c1"># default: no limit</span>
+</span><span id="__span-9-32"><a id="__codelineno-9-32" name="__codelineno-9-32" href="#__codelineno-9-32"></a>        <span class="s2">&quot;output_dir&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>                               <span class="c1"># default: no output directory</span>
+</span><span id="__span-9-33"><a id="__codelineno-9-33" name="__codelineno-9-33" href="#__codelineno-9-33"></a>        <span class="s2">&quot;stdout&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>                                   <span class="c1"># default: discard</span>
+</span><span id="__span-9-34"><a id="__codelineno-9-34" name="__codelineno-9-34" href="#__codelineno-9-34"></a>        <span class="s2">&quot;stderr&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>                                   <span class="c1"># default: discard</span>
+</span><span id="__span-9-35"><a id="__codelineno-9-35" name="__codelineno-9-35" href="#__codelineno-9-35"></a>    <span class="p">},</span>
+</span><span id="__span-9-36"><a id="__codelineno-9-36" name="__codelineno-9-36" href="#__codelineno-9-36"></a>    <span class="s2">&quot;backend&quot;</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="__span-9-37"><a id="__codelineno-9-37" name="__codelineno-9-37" href="#__codelineno-9-37"></a>        <span class="s2">&quot;method&quot;</span><span class="p">:</span> <span class="s2">&quot;scipy/default&quot;</span><span class="p">,</span>                        <span class="c1"># default: SciPy SLSQP</span>
+</span><span id="__span-9-38"><a id="__codelineno-9-38" name="__codelineno-9-38" href="#__codelineno-9-38"></a>        <span class="s2">&quot;max_iterations&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>                           <span class="c1"># default: backend-specific</span>
+</span><span id="__span-9-39"><a id="__codelineno-9-39" name="__codelineno-9-39" href="#__codelineno-9-39"></a>        <span class="s2">&quot;convergence_tolerance&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>                    <span class="c1"># default: backend-specific</span>
+</span><span id="__span-9-40"><a id="__codelineno-9-40" name="__codelineno-9-40" href="#__codelineno-9-40"></a>        <span class="s2">&quot;parallel&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>                                <span class="c1"># default: Do not evaluate in parallel</span>
+</span><span id="__span-9-41"><a id="__codelineno-9-41" name="__codelineno-9-41" href="#__codelineno-9-41"></a>        <span class="s2">&quot;options&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>                                  <span class="c1"># default: no extra options</span>
+</span><span id="__span-9-42"><a id="__codelineno-9-42" name="__codelineno-9-42" href="#__codelineno-9-42"></a>    <span class="p">},</span>
+</span><span id="__span-9-43"><a id="__codelineno-9-43" name="__codelineno-9-43" href="#__codelineno-9-43"></a>    <span class="s2">&quot;gradient&quot;</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="__span-9-44"><a id="__codelineno-9-44" name="__codelineno-9-44" href="#__codelineno-9-44"></a>        <span class="s2">&quot;number_of_perturbations&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+</span><span id="__span-9-45"><a id="__codelineno-9-45" name="__codelineno-9-45" href="#__codelineno-9-45"></a>        <span class="s2">&quot;perturbation_min_success&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>                 <span class="c1"># default: equal to number_of_perturbations</span>
+</span><span id="__span-9-46"><a id="__codelineno-9-46" name="__codelineno-9-46" href="#__codelineno-9-46"></a>        <span class="s2">&quot;merge_realizations&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>                      <span class="c1"># default: estimate and average gradients</span>
+</span><span id="__span-9-47"><a id="__codelineno-9-47" name="__codelineno-9-47" href="#__codelineno-9-47"></a>        <span class="s2">&quot;evaluation_policy&quot;</span><span class="p">:</span> <span class="s2">&quot;auto&quot;</span><span class="p">,</span>                      <span class="c1"># default: evaluate functions and perturbations</span>
+</span><span id="__span-9-48"><a id="__codelineno-9-48" name="__codelineno-9-48" href="#__codelineno-9-48"></a>    <span class="p">},</span>                                                    <span class="c1">#          as needed</span>
+</span><span id="__span-9-49"><a id="__codelineno-9-49" name="__codelineno-9-49" href="#__codelineno-9-49"></a>    <span class="s2">&quot;samplers&quot;</span><span class="p">:</span> <span class="p">[</span>
+</span><span id="__span-9-50"><a id="__codelineno-9-50" name="__codelineno-9-50" href="#__codelineno-9-50"></a>        <span class="p">{</span>
+</span><span id="__span-9-51"><a id="__codelineno-9-51" name="__codelineno-9-51" href="#__codelineno-9-51"></a>            <span class="s2">&quot;method&quot;</span><span class="p">:</span> <span class="s2">&quot;scipy/default&quot;</span><span class="p">,</span>                    <span class="c1"># default: standard normal N(0,1)</span>
+</span><span id="__span-9-52"><a id="__codelineno-9-52" name="__codelineno-9-52" href="#__codelineno-9-52"></a>            <span class="s2">&quot;options&quot;</span><span class="p">:</span> <span class="p">{},</span>
+</span><span id="__span-9-53"><a id="__codelineno-9-53" name="__codelineno-9-53" href="#__codelineno-9-53"></a>            <span class="s2">&quot;shared&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>                              <span class="c1"># default: Each realizations has its own</span>
+</span><span id="__span-9-54"><a id="__codelineno-9-54" name="__codelineno-9-54" href="#__codelineno-9-54"></a>                                                          <span class="c1">#          set of perturbations</span>
+</span><span id="__span-9-55"><a id="__codelineno-9-55" name="__codelineno-9-55" href="#__codelineno-9-55"></a>        <span class="p">},</span>
+</span><span id="__span-9-56"><a id="__codelineno-9-56" name="__codelineno-9-56" href="#__codelineno-9-56"></a>    <span class="p">],</span>
+</span><span id="__span-9-57"><a id="__codelineno-9-57" name="__codelineno-9-57" href="#__codelineno-9-57"></a>    <span class="s2">&quot;function_estimators&quot;</span><span class="p">:</span> <span class="p">[</span>
+</span><span id="__span-9-58"><a id="__codelineno-9-58" name="__codelineno-9-58" href="#__codelineno-9-58"></a>        <span class="p">{</span>
+</span><span id="__span-9-59"><a id="__codelineno-9-59" name="__codelineno-9-59" href="#__codelineno-9-59"></a>            <span class="s2">&quot;method&quot;</span><span class="p">:</span> <span class="s2">&quot;default/default&quot;</span><span class="p">,</span>                  <span class="c1"># default: weighted average</span>
+</span><span id="__span-9-60"><a id="__codelineno-9-60" name="__codelineno-9-60" href="#__codelineno-9-60"></a>            <span class="s2">&quot;options&quot;</span><span class="p">:</span> <span class="p">{},</span>
+</span><span id="__span-9-61"><a id="__codelineno-9-61" name="__codelineno-9-61" href="#__codelineno-9-61"></a>        <span class="p">},</span>
+</span><span id="__span-9-62"><a id="__codelineno-9-62" name="__codelineno-9-62" href="#__codelineno-9-62"></a>    <span class="p">],</span>
+</span><span id="__span-9-63"><a id="__codelineno-9-63" name="__codelineno-9-63" href="#__codelineno-9-63"></a>    <span class="s2">&quot;realization_filters&quot;</span><span class="p">:</span> <span class="p">[],</span>                            <span class="c1"># default: none configured</span>
+</span><span id="__span-9-64"><a id="__codelineno-9-64" name="__codelineno-9-64" href="#__codelineno-9-64"></a>    <span class="s2">&quot;variable_transforms&quot;</span><span class="p">:</span> <span class="p">[],</span>                            <span class="c1"># default: none configured</span>
+</span><span id="__span-9-65"><a id="__codelineno-9-65" name="__codelineno-9-65" href="#__codelineno-9-65"></a>    <span class="s2">&quot;objective_transforms&quot;</span><span class="p">:</span> <span class="p">[],</span>                           <span class="c1"># default: none configured</span>
+</span><span id="__span-9-66"><a id="__codelineno-9-66" name="__codelineno-9-66" href="#__codelineno-9-66"></a>    <span class="s2">&quot;nonlinear_constraint_transforms&quot;</span><span class="p">:</span> <span class="p">[],</span>                <span class="c1"># default: none configured</span>
+</span><span id="__span-9-67"><a id="__codelineno-9-67" name="__codelineno-9-67" href="#__codelineno-9-67"></a><span class="p">}</span>
 </span></code></pre></div>
 <p>Some sections above are set to <code>None</code> or <code>[]</code> because they are optional
 and problem-specific. When configured, their internal structure is as
 follows:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="c1"># linear_constraints (all fields required, no defaults):</span>
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="s2">&quot;linear_constraints&quot;</span><span class="p">:</span> <span class="p">{</span>
-</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>    <span class="s2">&quot;coefficients&quot;</span><span class="p">:</span> <span class="o">...</span><span class="p">,</span>                      <span class="c1"># required: 2D array (constraints × variables)</span>
-</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>    <span class="s2">&quot;lower_bounds&quot;</span><span class="p">:</span> <span class="o">...</span><span class="p">,</span>                      <span class="c1"># required: 1D array (one per constraint)</span>
-</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>    <span class="s2">&quot;upper_bounds&quot;</span><span class="p">:</span> <span class="o">...</span><span class="p">,</span>                      <span class="c1"># required: 1D array (one per constraint)</span>
-</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="p">}</span>
-</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a>
-</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="c1"># nonlinear_constraints (bounds are required, the rest has defaults):</span>
-</span><span id="__span-9-9"><a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="s2">&quot;nonlinear_constraints&quot;</span><span class="p">:</span> <span class="p">{</span>
-</span><span id="__span-9-10"><a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a>    <span class="s2">&quot;lower_bounds&quot;</span><span class="p">:</span> <span class="o">...</span><span class="p">,</span>                      <span class="c1"># required: 1D array (one per constraint)</span>
-</span><span id="__span-9-11"><a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a>    <span class="s2">&quot;upper_bounds&quot;</span><span class="p">:</span> <span class="o">...</span><span class="p">,</span>                      <span class="c1"># required: 1D array (one per constraint)</span>
-</span><span id="__span-9-12"><a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a>    <span class="s2">&quot;realization_filters&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>                <span class="c1"># default: no filter</span>
-</span><span id="__span-9-13"><a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a>    <span class="s2">&quot;function_estimators&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>                 <span class="c1"># default: use first estimator</span>
-</span><span id="__span-9-14"><a id="__codelineno-9-14" name="__codelineno-9-14" href="#__codelineno-9-14"></a>    <span class="s2">&quot;transforms&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>                         <span class="c1"># default: no transform</span>
-</span><span id="__span-9-15"><a id="__codelineno-9-15" name="__codelineno-9-15" href="#__codelineno-9-15"></a><span class="p">}</span>
-</span><span id="__span-9-16"><a id="__codelineno-9-16" name="__codelineno-9-16" href="#__codelineno-9-16"></a>
-</span><span id="__span-9-17"><a id="__codelineno-9-17" name="__codelineno-9-17" href="#__codelineno-9-17"></a><span class="c1"># realization_filters entries (method is required):</span>
-</span><span id="__span-9-18"><a id="__codelineno-9-18" name="__codelineno-9-18" href="#__codelineno-9-18"></a><span class="s2">&quot;realization_filters&quot;</span><span class="p">:</span> <span class="p">[</span>
-</span><span id="__span-9-19"><a id="__codelineno-9-19" name="__codelineno-9-19" href="#__codelineno-9-19"></a>    <span class="p">{</span>
-</span><span id="__span-9-20"><a id="__codelineno-9-20" name="__codelineno-9-20" href="#__codelineno-9-20"></a>        <span class="s2">&quot;method&quot;</span><span class="p">:</span> <span class="o">...</span><span class="p">,</span>                        <span class="c1"># required: str (&quot;plugin/method&quot;)</span>
-</span><span id="__span-9-21"><a id="__codelineno-9-21" name="__codelineno-9-21" href="#__codelineno-9-21"></a>        <span class="s2">&quot;options&quot;</span><span class="p">:</span> <span class="p">{},</span>
-</span><span id="__span-9-22"><a id="__codelineno-9-22" name="__codelineno-9-22" href="#__codelineno-9-22"></a>    <span class="p">},</span>
-</span><span id="__span-9-23"><a id="__codelineno-9-23" name="__codelineno-9-23" href="#__codelineno-9-23"></a><span class="p">]</span>
-</span><span id="__span-9-24"><a id="__codelineno-9-24" name="__codelineno-9-24" href="#__codelineno-9-24"></a>
-</span><span id="__span-9-25"><a id="__codelineno-9-25" name="__codelineno-9-25" href="#__codelineno-9-25"></a><span class="c1"># variable_transforms entries:</span>
-</span><span id="__span-9-26"><a id="__codelineno-9-26" name="__codelineno-9-26" href="#__codelineno-9-26"></a><span class="s2">&quot;variable_transforms&quot;</span><span class="p">:</span> <span class="p">[</span>
-</span><span id="__span-9-27"><a id="__codelineno-9-27" name="__codelineno-9-27" href="#__codelineno-9-27"></a>    <span class="p">{</span>
-</span><span id="__span-9-28"><a id="__codelineno-9-28" name="__codelineno-9-28" href="#__codelineno-9-28"></a>        <span class="s2">&quot;method&quot;</span><span class="p">:</span> <span class="s2">&quot;default/default&quot;</span><span class="p">,</span>
-</span><span id="__span-9-29"><a id="__codelineno-9-29" name="__codelineno-9-29" href="#__codelineno-9-29"></a>        <span class="s2">&quot;options&quot;</span><span class="p">:</span> <span class="p">{},</span>
-</span><span id="__span-9-30"><a id="__codelineno-9-30" name="__codelineno-9-30" href="#__codelineno-9-30"></a>    <span class="p">},</span>
-</span><span id="__span-9-31"><a id="__codelineno-9-31" name="__codelineno-9-31" href="#__codelineno-9-31"></a><span class="p">]</span>
-</span><span id="__span-9-32"><a id="__codelineno-9-32" name="__codelineno-9-32" href="#__codelineno-9-32"></a>
-</span><span id="__span-9-33"><a id="__codelineno-9-33" name="__codelineno-9-33" href="#__codelineno-9-33"></a><span class="c1"># objective_transforms entries:</span>
-</span><span id="__span-9-34"><a id="__codelineno-9-34" name="__codelineno-9-34" href="#__codelineno-9-34"></a><span class="s2">&quot;objective_transforms&quot;</span><span class="p">:</span> <span class="p">[</span>
-</span><span id="__span-9-35"><a id="__codelineno-9-35" name="__codelineno-9-35" href="#__codelineno-9-35"></a>    <span class="p">{</span>
-</span><span id="__span-9-36"><a id="__codelineno-9-36" name="__codelineno-9-36" href="#__codelineno-9-36"></a>        <span class="s2">&quot;method&quot;</span><span class="p">:</span> <span class="s2">&quot;default/default&quot;</span><span class="p">,</span>
-</span><span id="__span-9-37"><a id="__codelineno-9-37" name="__codelineno-9-37" href="#__codelineno-9-37"></a>        <span class="s2">&quot;options&quot;</span><span class="p">:</span> <span class="p">{},</span>
-</span><span id="__span-9-38"><a id="__codelineno-9-38" name="__codelineno-9-38" href="#__codelineno-9-38"></a>    <span class="p">},</span>
-</span><span id="__span-9-39"><a id="__codelineno-9-39" name="__codelineno-9-39" href="#__codelineno-9-39"></a><span class="p">]</span>
-</span><span id="__span-9-40"><a id="__codelineno-9-40" name="__codelineno-9-40" href="#__codelineno-9-40"></a>
-</span><span id="__span-9-41"><a id="__codelineno-9-41" name="__codelineno-9-41" href="#__codelineno-9-41"></a><span class="c1"># nonlinear_constraint_transforms entries:</span>
-</span><span id="__span-9-42"><a id="__codelineno-9-42" name="__codelineno-9-42" href="#__codelineno-9-42"></a><span class="s2">&quot;nonlinear_constraint_transforms&quot;</span><span class="p">:</span> <span class="p">[</span>
-</span><span id="__span-9-43"><a id="__codelineno-9-43" name="__codelineno-9-43" href="#__codelineno-9-43"></a>    <span class="p">{</span>
-</span><span id="__span-9-44"><a id="__codelineno-9-44" name="__codelineno-9-44" href="#__codelineno-9-44"></a>        <span class="s2">&quot;method&quot;</span><span class="p">:</span> <span class="s2">&quot;default/default&quot;</span><span class="p">,</span>
-</span><span id="__span-9-45"><a id="__codelineno-9-45" name="__codelineno-9-45" href="#__codelineno-9-45"></a>        <span class="s2">&quot;options&quot;</span><span class="p">:</span> <span class="p">{},</span>
-</span><span id="__span-9-46"><a id="__codelineno-9-46" name="__codelineno-9-46" href="#__codelineno-9-46"></a>    <span class="p">},</span>
-</span><span id="__span-9-47"><a id="__codelineno-9-47" name="__codelineno-9-47" href="#__codelineno-9-47"></a><span class="p">]</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="c1"># linear_constraints (all fields required, no defaults):</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="s2">&quot;linear_constraints&quot;</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>    <span class="s2">&quot;coefficients&quot;</span><span class="p">:</span> <span class="o">...</span><span class="p">,</span>                      <span class="c1"># required: 2D array (constraints × variables)</span>
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>    <span class="s2">&quot;lower_bounds&quot;</span><span class="p">:</span> <span class="o">...</span><span class="p">,</span>                      <span class="c1"># required: 1D array (one per constraint)</span>
+</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>    <span class="s2">&quot;upper_bounds&quot;</span><span class="p">:</span> <span class="o">...</span><span class="p">,</span>                      <span class="c1"># required: 1D array (one per constraint)</span>
+</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="p">}</span>
+</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>
+</span><span id="__span-10-8"><a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="c1"># nonlinear_constraints (bounds are required, the rest has defaults):</span>
+</span><span id="__span-10-9"><a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a><span class="s2">&quot;nonlinear_constraints&quot;</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="__span-10-10"><a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a>    <span class="s2">&quot;lower_bounds&quot;</span><span class="p">:</span> <span class="o">...</span><span class="p">,</span>                      <span class="c1"># required: 1D array (one per constraint)</span>
+</span><span id="__span-10-11"><a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a>    <span class="s2">&quot;upper_bounds&quot;</span><span class="p">:</span> <span class="o">...</span><span class="p">,</span>                      <span class="c1"># required: 1D array (one per constraint)</span>
+</span><span id="__span-10-12"><a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a>    <span class="s2">&quot;realization_filters&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>                <span class="c1"># default: no filter</span>
+</span><span id="__span-10-13"><a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a>    <span class="s2">&quot;function_estimators&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>                 <span class="c1"># default: use first estimator</span>
+</span><span id="__span-10-14"><a id="__codelineno-10-14" name="__codelineno-10-14" href="#__codelineno-10-14"></a>    <span class="s2">&quot;transforms&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>                         <span class="c1"># default: no transform</span>
+</span><span id="__span-10-15"><a id="__codelineno-10-15" name="__codelineno-10-15" href="#__codelineno-10-15"></a><span class="p">}</span>
+</span><span id="__span-10-16"><a id="__codelineno-10-16" name="__codelineno-10-16" href="#__codelineno-10-16"></a>
+</span><span id="__span-10-17"><a id="__codelineno-10-17" name="__codelineno-10-17" href="#__codelineno-10-17"></a><span class="c1"># realization_filters entries (method is required):</span>
+</span><span id="__span-10-18"><a id="__codelineno-10-18" name="__codelineno-10-18" href="#__codelineno-10-18"></a><span class="s2">&quot;realization_filters&quot;</span><span class="p">:</span> <span class="p">[</span>
+</span><span id="__span-10-19"><a id="__codelineno-10-19" name="__codelineno-10-19" href="#__codelineno-10-19"></a>    <span class="p">{</span>
+</span><span id="__span-10-20"><a id="__codelineno-10-20" name="__codelineno-10-20" href="#__codelineno-10-20"></a>        <span class="s2">&quot;method&quot;</span><span class="p">:</span> <span class="o">...</span><span class="p">,</span>                        <span class="c1"># required: str (&quot;plugin/method&quot;)</span>
+</span><span id="__span-10-21"><a id="__codelineno-10-21" name="__codelineno-10-21" href="#__codelineno-10-21"></a>        <span class="s2">&quot;options&quot;</span><span class="p">:</span> <span class="p">{},</span>
+</span><span id="__span-10-22"><a id="__codelineno-10-22" name="__codelineno-10-22" href="#__codelineno-10-22"></a>    <span class="p">},</span>
+</span><span id="__span-10-23"><a id="__codelineno-10-23" name="__codelineno-10-23" href="#__codelineno-10-23"></a><span class="p">]</span>
+</span><span id="__span-10-24"><a id="__codelineno-10-24" name="__codelineno-10-24" href="#__codelineno-10-24"></a>
+</span><span id="__span-10-25"><a id="__codelineno-10-25" name="__codelineno-10-25" href="#__codelineno-10-25"></a><span class="c1"># variable_transforms entries:</span>
+</span><span id="__span-10-26"><a id="__codelineno-10-26" name="__codelineno-10-26" href="#__codelineno-10-26"></a><span class="s2">&quot;variable_transforms&quot;</span><span class="p">:</span> <span class="p">[</span>
+</span><span id="__span-10-27"><a id="__codelineno-10-27" name="__codelineno-10-27" href="#__codelineno-10-27"></a>    <span class="p">{</span>
+</span><span id="__span-10-28"><a id="__codelineno-10-28" name="__codelineno-10-28" href="#__codelineno-10-28"></a>        <span class="s2">&quot;method&quot;</span><span class="p">:</span> <span class="s2">&quot;default/default&quot;</span><span class="p">,</span>
+</span><span id="__span-10-29"><a id="__codelineno-10-29" name="__codelineno-10-29" href="#__codelineno-10-29"></a>        <span class="s2">&quot;options&quot;</span><span class="p">:</span> <span class="p">{},</span>
+</span><span id="__span-10-30"><a id="__codelineno-10-30" name="__codelineno-10-30" href="#__codelineno-10-30"></a>    <span class="p">},</span>
+</span><span id="__span-10-31"><a id="__codelineno-10-31" name="__codelineno-10-31" href="#__codelineno-10-31"></a><span class="p">]</span>
+</span><span id="__span-10-32"><a id="__codelineno-10-32" name="__codelineno-10-32" href="#__codelineno-10-32"></a>
+</span><span id="__span-10-33"><a id="__codelineno-10-33" name="__codelineno-10-33" href="#__codelineno-10-33"></a><span class="c1"># objective_transforms entries:</span>
+</span><span id="__span-10-34"><a id="__codelineno-10-34" name="__codelineno-10-34" href="#__codelineno-10-34"></a><span class="s2">&quot;objective_transforms&quot;</span><span class="p">:</span> <span class="p">[</span>
+</span><span id="__span-10-35"><a id="__codelineno-10-35" name="__codelineno-10-35" href="#__codelineno-10-35"></a>    <span class="p">{</span>
+</span><span id="__span-10-36"><a id="__codelineno-10-36" name="__codelineno-10-36" href="#__codelineno-10-36"></a>        <span class="s2">&quot;method&quot;</span><span class="p">:</span> <span class="s2">&quot;default/default&quot;</span><span class="p">,</span>
+</span><span id="__span-10-37"><a id="__codelineno-10-37" name="__codelineno-10-37" href="#__codelineno-10-37"></a>        <span class="s2">&quot;options&quot;</span><span class="p">:</span> <span class="p">{},</span>
+</span><span id="__span-10-38"><a id="__codelineno-10-38" name="__codelineno-10-38" href="#__codelineno-10-38"></a>    <span class="p">},</span>
+</span><span id="__span-10-39"><a id="__codelineno-10-39" name="__codelineno-10-39" href="#__codelineno-10-39"></a><span class="p">]</span>
+</span><span id="__span-10-40"><a id="__codelineno-10-40" name="__codelineno-10-40" href="#__codelineno-10-40"></a>
+</span><span id="__span-10-41"><a id="__codelineno-10-41" name="__codelineno-10-41" href="#__codelineno-10-41"></a><span class="c1"># nonlinear_constraint_transforms entries:</span>
+</span><span id="__span-10-42"><a id="__codelineno-10-42" name="__codelineno-10-42" href="#__codelineno-10-42"></a><span class="s2">&quot;nonlinear_constraint_transforms&quot;</span><span class="p">:</span> <span class="p">[</span>
+</span><span id="__span-10-43"><a id="__codelineno-10-43" name="__codelineno-10-43" href="#__codelineno-10-43"></a>    <span class="p">{</span>
+</span><span id="__span-10-44"><a id="__codelineno-10-44" name="__codelineno-10-44" href="#__codelineno-10-44"></a>        <span class="s2">&quot;method&quot;</span><span class="p">:</span> <span class="s2">&quot;default/default&quot;</span><span class="p">,</span>
+</span><span id="__span-10-45"><a id="__codelineno-10-45" name="__codelineno-10-45" href="#__codelineno-10-45"></a>        <span class="s2">&quot;options&quot;</span><span class="p">:</span> <span class="p">{},</span>
+</span><span id="__span-10-46"><a id="__codelineno-10-46" name="__codelineno-10-46" href="#__codelineno-10-46"></a>    <span class="p">},</span>
+</span><span id="__span-10-47"><a id="__codelineno-10-47" name="__codelineno-10-47" href="#__codelineno-10-47"></a><span class="p">]</span>
 </span></code></pre></div>
 </details>
 <h2 id="where-to-next">Where to next</h2>
