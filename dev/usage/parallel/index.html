@@ -2346,7 +2346,19 @@ multiprocessing, or HPC submission.</p>
 (<code>"threading"</code>, <code>"multiprocessing"</code>, or <code>"hpc"</code>), submits all functions, and
 returns the collected results.</p>
 <p><code>dispatch_tasks</code> is an <code>async</code> function — call it with <code>await</code> from an
-asyncio context, or use <code>asyncio.run(dispatch_tasks(...))</code>.</p>
+asyncio context, or use <code>asyncio.run(dispatch_tasks(...))</code>:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.workflow</span><span class="w"> </span><span class="kn">import</span> <span class="n">dispatch_tasks</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="k">def</span><span class="w"> </span><span class="nf">task_a</span><span class="p">():</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    <span class="k">return</span> <span class="s2">&quot;result_a&quot;</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="k">def</span><span class="w"> </span><span class="nf">task_b</span><span class="p">():</span>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>    <span class="k">return</span> <span class="s2">&quot;result_b&quot;</span>
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>
+</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="n">results</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">dispatch_tasks</span><span class="p">([</span><span class="n">task_a</span><span class="p">,</span> <span class="n">task_b</span><span class="p">],</span> <span class="n">server</span><span class="o">=</span><span class="s2">&quot;threading&quot;</span><span class="p">))</span>
+</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="nb">print</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>  <span class="c1"># [&quot;result_a&quot;, &quot;result_b&quot;]</span>
+</span></code></pre></div>
 <p>The <code>functions</code> argument can be either a sequence of callables or a mapping
 from name to callable. When a mapping is used, the keys serve as task names
 (useful for identifying jobs on the HPC cluster).</p>

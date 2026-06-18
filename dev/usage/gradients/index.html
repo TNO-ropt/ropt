@@ -844,6 +844,34 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Samplers">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#sample-scaling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sample scaling
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#shared-perturbations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Shared perturbations
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -2090,6 +2118,34 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Samplers">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#sample-scaling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sample scaling
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#shared-perturbations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Shared perturbations
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -2268,11 +2324,26 @@ to also tolerate failed realizations.</p>
   realizations and reduce gradient work.</li>
 </ul>
 <h2 id="samplers">Samplers</h2>
-<p>A sampler draws the unit-magnitude perturbation samples. The default
-<a class="autorefs autorefs-internal" title="            ropt.sampler.scipy.SciPySampler" href="../../reference/sampler/#ropt.sampler.scipy.SciPySampler"><code>SciPySampler</code></a> uses a normal distribution; other
-samplers can be added through the plugin system. Configure the <code>samplers</code>
-tuple at the top level of the config and reference them by index from
-<code>variables.samplers</code> (see <a href="../configuration/">Configuration</a> on index sharing).</p>
+<p>A sampler draws the perturbation samples used for gradient estimation. The
+default <a class="autorefs autorefs-internal" title="            ropt.sampler.scipy.SciPySampler" href="../../reference/sampler/#ropt.sampler.scipy.SciPySampler"><code>SciPySampler</code></a> draws from a standard
+normal distribution <span class="arithmatex">\(N(0, 1)\)</span>; other samplers can be added through the plugin
+system. Configure the <code>samplers</code> tuple at the top level of the config and
+reference them by index from <code>variables.samplers</code> (see
+<a href="../configuration/">Configuration</a> on index sharing).</p>
+<h3 id="sample-scaling">Sample scaling</h3>
+<p>Samplers produce <strong>unscaled</strong> perturbations — values with a characteristic
+magnitude of approximately one. During gradient estimation, these samples are
+multiplied element-wise by the <code>perturbation_magnitudes</code> defined in
+<a class="autorefs autorefs-internal" title="            VariablesConfig" href="../../reference/config/#ropt.config.VariablesConfig"><code>VariablesConfig</code></a>. This separation means that
+<code>perturbation_magnitudes</code> directly controls the effective size of the
+perturbations, regardless of which sampler is used.</p>
+<h3 id="shared-perturbations">Shared perturbations</h3>
+<p>By default, each realization receives its own independently drawn set of
+perturbations. Setting the <code>shared</code> flag to <code>True</code> in
+<a class="autorefs autorefs-internal" title="            SamplerConfig" href="../../reference/config/#ropt.config.SamplerConfig"><code>SamplerConfig</code></a> causes the same perturbation
+values to be reused across all realizations. This can reduce noise in the
+gradient estimate when the objective function varies smoothly across
+realizations.</p>
 <h2 id="function-estimators">Function estimators</h2>
 <p>A function estimator decides how the gradient samples (and the function
 samples for non-default estimators) are combined into the final estimate.
