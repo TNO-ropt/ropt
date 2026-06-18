@@ -23,19 +23,21 @@ from ropt.workflow.event_handlers import Observer, Tracker
 
 DIM = 5
 UNCERTAINTY = 0.1
+REALIZATIONS = 10
+
 CONFIG: dict[str, Any] = {
     "variables": {
         "variable_count": DIM,
         "perturbation_magnitudes": 1e-6,
     },
     "realizations": {
-        "weights": [1.0] * 10,
+        "weights": [1.0] * REALIZATIONS,
     },
     "gradient": {
         "number_of_perturbations": 5,
     },
 }
-initial_values = 2 * np.arange(DIM) / DIM + 0.5
+INITIAL_VALUES = 2 * np.arange(DIM) / DIM + 0.5
 
 
 def rosenbrock(
@@ -76,20 +78,11 @@ def report(event: EnOptEvent) -> None:
             print(f"  objective: {item.functions.target_objective}\n")
 
 
-def run_optimization(config: dict[str, Any]) -> FunctionResults:
-    """Run the optimization.
-
-    Args:
-        config:    The configuration of the optimizer.
-
-    Returns:
-        The optimal results.
-    """
+def main() -> None:
+    """Run the example and check the result."""
     rng = default_rng(seed=123)
-
-    realizations = len(config["realizations"]["weights"])
-    a = rng.normal(loc=1.0, scale=UNCERTAINTY, size=realizations)
-    b = rng.normal(loc=100.0, scale=100 * UNCERTAINTY, size=realizations)
+    a = rng.normal(loc=1.0, scale=UNCERTAINTY, size=REALIZATIONS)
+    b = rng.normal(loc=100.0, scale=100 * UNCERTAINTY, size=REALIZATIONS)
 
     evaluator = FunctionEvaluator(function=partial(rosenbrock, a=a, b=b))
     step = EnsembleOptimizer(evaluator=evaluator)
@@ -102,7 +95,7 @@ def run_optimization(config: dict[str, Any]) -> FunctionResults:
     )
     step.add_event_handler(reporter)
 
-    step.run(variables=initial_values, context=EnOptContext.model_validate(config))
+    step.run(variables=INITIAL_VALUES, context=EnOptContext.model_validate(CONFIG))
 
     optimal_result: FunctionResults = tracker["results"]
     assert optimal_result is not None
@@ -111,14 +104,6 @@ def run_optimization(config: dict[str, Any]) -> FunctionResults:
     print(f"Optimal variables: {optimal_result.evaluations.variables}")
     print(f"Optimal objective: {optimal_result.functions.target_objective}\n")
 
-    return optimal_result
-
-
-def main() -> None:
-    """Run the example and check the result."""
-    optimal_result = run_optimization(CONFIG)
-    assert optimal_result is not None
-    assert optimal_result.functions is not None
     assert np.allclose(optimal_result.functions.target_objective, 0, atol=1e-1)
     assert np.allclose(optimal_result.evaluations.variables, 1, atol=1e-1)
 

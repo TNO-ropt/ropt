@@ -45,19 +45,21 @@ from ropt.workflow.servers import MultiprocessingServer, Server, ThreadingServer
 
 DIM = 5
 UNCERTAINTY = 0.1
+REALIZATIONS = 10
+
 CONFIG: dict[str, Any] = {
     "variables": {
         "variable_count": DIM,
         "perturbation_magnitudes": 1e-6,
     },
     "realizations": {
-        "weights": [1.0] * 10,
+        "weights": [1.0] * REALIZATIONS,
     },
     "gradient": {
         "number_of_perturbations": 5,
     },
 }
-initial_values = 2 * np.arange(DIM) / DIM + 0.5
+INITIAL_VALUES = 2 * np.arange(DIM) / DIM + 0.5
 
 
 def rosenbrock(
@@ -104,7 +106,7 @@ def run_optimization(
     step = EnsembleOptimizer(evaluator=evaluator)
     tracker = Tracker()
     step.add_event_handler(tracker)
-    step.run(variables=initial_values, context=context)
+    step.run(variables=INITIAL_VALUES, context=context)
     results: FunctionResults = tracker["results"]
     return results
 
@@ -164,13 +166,12 @@ async def main(
     """Run the optimization."""
     rng = default_rng(seed=1234)
 
-    realizations = len(CONFIG["realizations"]["weights"])
     a = [
-        rng.normal(loc=1.0, scale=UNCERTAINTY, size=realizations)
+        rng.normal(loc=1.0, scale=UNCERTAINTY, size=REALIZATIONS)
         for _ in range(optimizations)
     ]
     b = [
-        rng.normal(loc=100.0, scale=100 * UNCERTAINTY, size=realizations)
+        rng.normal(loc=100.0, scale=100 * UNCERTAINTY, size=REALIZATIONS)
         for _ in range(optimizations)
     ]
 

@@ -21,20 +21,17 @@ CONFIG: dict[str, Any] = {
         "perturbation_magnitudes": 1e-6,
     },
 }
-initial_values = 2 * np.arange(DIM) / DIM + 0.5
+INITIAL_VALUES = 2 * np.arange(DIM) / DIM + 0.5
 
 
 def rosenbrock(variables: NDArray[np.float64], _: EvaluatorContext) -> EvaluatorResult:
     """Function evaluator for the multi-dimensional rosenbrock function.
 
-    This function returns a tuple containing the calculated objectives and
-    `None`, the latter because no constraints are calculated.
-
     Args:
         variables: The variables to evaluate.
 
     Returns:
-        The calculated objective, and `None`
+        An `EvaluatorResult` object containing the calculated objectives.
     """
     objectives = np.zeros((variables.shape[0], 1), dtype=np.float64)
     for v_idx in range(variables.shape[0]):
@@ -56,34 +53,19 @@ def report(results: tuple[Results, ...]) -> None:
             print(f"  objective: {item.functions.target_objective}\n")
 
 
-def run_optimization(config: dict[str, Any]) -> FunctionResults:
-    """Run the optimization.
-
-    Args:
-        config: The configuration of the optimizer.
-
-    Returns:
-        The optimal results.
-    """
-    optimizer = BasicOptimizer(config, rosenbrock)
+def main() -> None:
+    """Run the example and check the result."""
+    optimizer = BasicOptimizer(CONFIG, rosenbrock)
     optimizer.set_results_callback(report)
-    optimizer.run(initial_values)
+    optimizer.run(INITIAL_VALUES)
     assert optimizer.results is not None
     assert optimizer.results.functions is not None
 
     print(f"Optimal variables: {optimizer.results.evaluations.variables}")
     print(f"Optimal objective: {optimizer.results.functions.target_objective}\n")
 
-    return optimizer.results
-
-
-def main() -> None:
-    """Run the example and check the result."""
-    optimal_result = run_optimization(CONFIG)
-    assert optimal_result is not None
-    assert optimal_result.functions is not None
-    assert np.allclose(optimal_result.functions.target_objective, 0, atol=1e-4)
-    assert np.allclose(optimal_result.evaluations.variables, 1, atol=1e-2)
+    assert np.allclose(optimizer.results.functions.target_objective, 0, atol=1e-4)
+    assert np.allclose(optimizer.results.evaluations.variables, 1, atol=1e-2)
 
 
 if __name__ == "__main__":

@@ -14,10 +14,10 @@ from ropt.evaluator import EvaluatorContext, EvaluatorResult
 from ropt.results import FunctionResults, Results
 from ropt.workflow import BasicOptimizer
 
-initial_values = 2 * [0.0]
+INITIAL_VALUES = 2 * [0.0]
 CONFIG: dict[str, Any] = {
     "variables": {
-        "variable_count": len(initial_values),
+        "variable_count": len(INITIAL_VALUES),
         "types": VariableType.INTEGER,
         "lower_bounds": [0.0, 0.0],
         "upper_bounds": [10.0, 10.0],
@@ -41,7 +41,7 @@ def function(variables: NDArray[np.float64], _: EvaluatorContext) -> EvaluatorRe
         variables: The variables to evaluate.
 
     Returns:
-        Calculated objectives and constraints.
+        An `EvaluatorResult` object containing the calculated objectives and constraints.
     """
     x = variables[:, 0]
     y = variables[:, 1]
@@ -62,21 +62,16 @@ def report(results: tuple[Results, ...]) -> None:
             print(f"  objective: {item.functions.target_objective}\n")
 
 
-def run_optimization() -> None:
-    """Run the optimization."""
+def main() -> None:
+    """Main function."""
     optimizer = BasicOptimizer(CONFIG, function)
     optimizer.set_results_callback(report)
-    optimizer.run(initial_values)
+    optimizer.run(INITIAL_VALUES)
     assert optimizer.results is not None
     assert optimizer.results.functions is not None
     assert np.all(optimizer.results.evaluations.variables == [3, 7])
     print(f"Optimal variables: {optimizer.results.evaluations.variables}")
     print(f"Optimal objective: {optimizer.results.functions.target_objective}\n")
-
-
-def main() -> None:
-    """Main function."""
-    run_optimization()
 
 
 if __name__ == "__main__":
