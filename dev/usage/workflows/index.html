@@ -843,10 +843,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#events-emitted-by-ensembleoptimizer" class="md-nav__link">
+  <a href="#events-emitted-by-optimizationstep" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Events emitted by EnsembleOptimizer
+        Events emitted by OptimizationStep
       
     </span>
   </a>
@@ -854,10 +854,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#events-emitted-by-ensembleevaluator" class="md-nav__link">
+  <a href="#events-emitted-by-evaluationstep" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Events emitted by EnsembleEvaluator
+        Events emitted by EvaluationStep
       
     </span>
   </a>
@@ -2189,10 +2189,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#events-emitted-by-ensembleoptimizer" class="md-nav__link">
+  <a href="#events-emitted-by-optimizationstep" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Events emitted by EnsembleOptimizer
+        Events emitted by OptimizationStep
       
     </span>
   </a>
@@ -2200,10 +2200,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#events-emitted-by-ensembleevaluator" class="md-nav__link">
+  <a href="#events-emitted-by-evaluationstep" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Events emitted by EnsembleEvaluator
+        Events emitted by EvaluationStep
       
     </span>
   </a>
@@ -2517,11 +2517,11 @@ following event types:</p>
 </tr>
 <tr>
 <td><code>START_ENSEMBLE_EVALUATOR</code></td>
-<td>Before an <code>EnsembleEvaluator</code> compute step begins.</td>
+<td>Before an <code>EvaluationStep</code> compute step begins.</td>
 </tr>
 <tr>
 <td><code>FINISHED_ENSEMBLE_EVALUATOR</code></td>
-<td>After an <code>EnsembleEvaluator</code> compute step finishes.</td>
+<td>After an <code>EvaluationStep</code> compute step finishes.</td>
 </tr>
 </tbody>
 </table>
@@ -2532,7 +2532,7 @@ types are useful for logging, progress bars, or custom lifecycle hooks.</p>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">numpy.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">NDArray</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.context</span><span class="w"> </span><span class="kn">import</span> <span class="n">EnOptContext</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.workflow.compute_steps</span><span class="w"> </span><span class="kn">import</span> <span class="n">EnsembleOptimizer</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.workflow.compute_steps</span><span class="w"> </span><span class="kn">import</span> <span class="n">OptimizationStep</span>
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.workflow.evaluators</span><span class="w"> </span><span class="kn">import</span> <span class="n">FunctionEvaluator</span>
 </span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.workflow.event_handlers</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tracker</span>
 </span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>
@@ -2551,7 +2551,7 @@ types are useful for logging, progress bars, or custom lifecycle hooks.</p>
 </span><span id="__span-0-21"><a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a><span class="n">evaluator</span> <span class="o">=</span> <span class="n">FunctionEvaluator</span><span class="p">(</span><span class="n">function</span><span class="o">=</span><span class="n">my_function</span><span class="p">)</span>
 </span><span id="__span-0-22"><a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a>
 </span><span id="__span-0-23"><a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a><span class="c1"># 4. Build the compute step.</span>
-</span><span id="__span-0-24"><a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a><span class="n">step</span> <span class="o">=</span> <span class="n">EnsembleOptimizer</span><span class="p">(</span><span class="n">evaluator</span><span class="o">=</span><span class="n">evaluator</span><span class="p">)</span>
+</span><span id="__span-0-24"><a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a><span class="n">step</span> <span class="o">=</span> <span class="n">OptimizationStep</span><span class="p">(</span><span class="n">evaluator</span><span class="o">=</span><span class="n">evaluator</span><span class="p">)</span>
 </span><span id="__span-0-25"><a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a>
 </span><span id="__span-0-26"><a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a><span class="c1"># 5. Attach event handlers.</span>
 </span><span id="__span-0-27"><a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a><span class="n">tracker</span> <span class="o">=</span> <span class="n">Tracker</span><span class="p">()</span>  <span class="c1"># remember the best</span>
@@ -2573,16 +2573,16 @@ parameters can be found here:
 <h2 id="compute-steps">Compute steps</h2>
 <p>Two compute steps ship with <code>ropt</code>:</p>
 <ul>
-<li><a class="autorefs autorefs-internal" title="            ropt.workflow.compute_steps.EnsembleOptimizer" href="../../reference/workflow_steps/#ropt.workflow.compute_steps.EnsembleOptimizer"><code>EnsembleOptimizer</code></a> — runs
+<li><a class="autorefs autorefs-internal" title="            ropt.workflow.compute_steps.OptimizationStep" href="../../reference/workflow_steps/#ropt.workflow.compute_steps.OptimizationStep"><code>OptimizationStep</code></a> — runs
   an optimization algorithm.</li>
-<li><a class="autorefs autorefs-internal" title="            ropt.workflow.compute_steps.EnsembleEvaluator" href="../../reference/workflow_steps/#ropt.workflow.compute_steps.EnsembleEvaluator"><code>EnsembleEvaluator</code></a> — runs
+<li><a class="autorefs autorefs-internal" title="            ropt.workflow.compute_steps.EvaluationStep" href="../../reference/workflow_steps/#ropt.workflow.compute_steps.EvaluationStep"><code>EvaluationStep</code></a> — runs
   a single ensemble evaluation (no optimizer). For example, useful for evaluating an
   optimum on a different ensemble, or on a sub-set of realizations.</li>
 </ul>
 <p>Both compute steps require an
 <a class="autorefs autorefs-internal" title="            EnOptContext" href="../../reference/context/#ropt.context.EnOptContext"><code>EnOptContext</code></a> and a <code>variables</code> argument
-passed to their <code>run(...)</code> method. For <code>EnsembleOptimizer</code>, this is a
-single 1-D variable vector (the starting point). For <code>EnsembleEvaluator</code>,
+passed to their <code>run(...)</code> method. For <code>OptimizationStep</code>, this is a
+single 1-D variable vector (the starting point). For <code>EvaluationStep</code>,
 it may be a single vector or a 2-D matrix where each row is a variable
 vector to evaluate. An optional <code>metadata</code> dictionary can be attached; if
 provided, it is included in the <a class="autorefs autorefs-internal" title="            ropt.results.Results
@@ -2592,8 +2592,8 @@ provided, it is included in the <a class="autorefs autorefs-internal" title="   
       dataclass
   " href="../../reference/results/#ropt.results.Results"><code>Results</code></a> objects
 emitted via the <code>FINISHED_EVALUATION</code> event.</p>
-<h3 id="events-emitted-by-ensembleoptimizer">Events emitted by EnsembleOptimizer</h3>
-<p>The <a class="autorefs autorefs-internal" title="            ropt.workflow.compute_steps.EnsembleOptimizer" href="../../reference/workflow_steps/#ropt.workflow.compute_steps.EnsembleOptimizer"><code>EnsembleOptimizer</code></a>
+<h3 id="events-emitted-by-optimizationstep">Events emitted by OptimizationStep</h3>
+<p><a class="autorefs autorefs-internal" title="            ropt.workflow.compute_steps.OptimizationStep" href="../../reference/workflow_steps/#ropt.workflow.compute_steps.OptimizationStep"><code>OptimizationStep</code></a>
 executes an optimization algorithm based on the provided context. It
 iteratively performs function and potentially gradient evaluations, yielding a
 sequence of <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
@@ -2652,8 +2652,8 @@ sequence of <a class="autorefs autorefs-internal" title="            ropt.result
   Emitted after the entire optimization process concludes (successfully,
   or due to termination conditions or errors).</li>
 </ul>
-<h3 id="events-emitted-by-ensembleevaluator">Events emitted by EnsembleEvaluator</h3>
-<p>The <a class="autorefs autorefs-internal" title="            ropt.workflow.compute_steps.EnsembleEvaluator" href="../../reference/workflow_steps/#ropt.workflow.compute_steps.EnsembleEvaluator"><code>EnsembleEvaluator</code></a>
+<h3 id="events-emitted-by-evaluationstep">Events emitted by EvaluationStep</h3>
+<p><a class="autorefs autorefs-internal" title="            ropt.workflow.compute_steps.EvaluationStep" href="../../reference/workflow_steps/#ropt.workflow.compute_steps.EvaluationStep"><code>EvaluationStep</code></a>
 evaluates a batch of variable vectors. The <code>variables</code> argument can be a
 single 1-D vector (treated as one row) or a 2-D matrix where each row is a
 variable vector. The evaluator performs a function evaluation for the full

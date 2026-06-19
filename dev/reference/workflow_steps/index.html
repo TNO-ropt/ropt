@@ -1631,19 +1631,19 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.workflow.compute_steps.EnsembleEvaluator" class="md-nav__link">
+  <a href="#ropt.workflow.compute_steps.EvaluationStep" class="md-nav__link">
     <span class="md-ellipsis">
       
-        EnsembleEvaluator
+        EvaluationStep
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="EnsembleEvaluator">
+    <nav class="md-nav" aria-label="EvaluationStep">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.workflow.compute_steps.EnsembleEvaluator.__init__" class="md-nav__link">
+  <a href="#ropt.workflow.compute_steps.EvaluationStep.__init__" class="md-nav__link">
     <span class="md-ellipsis">
       
         __init__
@@ -1654,7 +1654,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.workflow.compute_steps.EnsembleEvaluator.run" class="md-nav__link">
+  <a href="#ropt.workflow.compute_steps.EvaluationStep.run" class="md-nav__link">
     <span class="md-ellipsis">
       
         run
@@ -1670,19 +1670,19 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.workflow.compute_steps.EnsembleOptimizer" class="md-nav__link">
+  <a href="#ropt.workflow.compute_steps.OptimizationStep" class="md-nav__link">
     <span class="md-ellipsis">
       
-        EnsembleOptimizer
+        OptimizationStep
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="EnsembleOptimizer">
+    <nav class="md-nav" aria-label="OptimizationStep">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.workflow.compute_steps.EnsembleOptimizer.__init__" class="md-nav__link">
+  <a href="#ropt.workflow.compute_steps.OptimizationStep.__init__" class="md-nav__link">
     <span class="md-ellipsis">
       
         __init__
@@ -1693,7 +1693,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.workflow.compute_steps.EnsembleOptimizer.run" class="md-nav__link">
+  <a href="#ropt.workflow.compute_steps.OptimizationStep.run" class="md-nav__link">
     <span class="md-ellipsis">
       
         run
@@ -2137,19 +2137,19 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.workflow.compute_steps.EnsembleEvaluator" class="md-nav__link">
+  <a href="#ropt.workflow.compute_steps.EvaluationStep" class="md-nav__link">
     <span class="md-ellipsis">
       
-        EnsembleEvaluator
+        EvaluationStep
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="EnsembleEvaluator">
+    <nav class="md-nav" aria-label="EvaluationStep">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.workflow.compute_steps.EnsembleEvaluator.__init__" class="md-nav__link">
+  <a href="#ropt.workflow.compute_steps.EvaluationStep.__init__" class="md-nav__link">
     <span class="md-ellipsis">
       
         __init__
@@ -2160,7 +2160,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.workflow.compute_steps.EnsembleEvaluator.run" class="md-nav__link">
+  <a href="#ropt.workflow.compute_steps.EvaluationStep.run" class="md-nav__link">
     <span class="md-ellipsis">
       
         run
@@ -2176,19 +2176,19 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.workflow.compute_steps.EnsembleOptimizer" class="md-nav__link">
+  <a href="#ropt.workflow.compute_steps.OptimizationStep" class="md-nav__link">
     <span class="md-ellipsis">
       
-        EnsembleOptimizer
+        OptimizationStep
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="EnsembleOptimizer">
+    <nav class="md-nav" aria-label="OptimizationStep">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.workflow.compute_steps.EnsembleOptimizer.__init__" class="md-nav__link">
+  <a href="#ropt.workflow.compute_steps.OptimizationStep.__init__" class="md-nav__link">
     <span class="md-ellipsis">
       
         __init__
@@ -2199,7 +2199,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.workflow.compute_steps.EnsembleOptimizer.run" class="md-nav__link">
+  <a href="#ropt.workflow.compute_steps.OptimizationStep.run" class="md-nav__link">
     <span class="md-ellipsis">
       
         run
@@ -2237,9 +2237,9 @@
 <h1 id="compute-steps">Compute Steps</h1>
 <p>A <a class="autorefs autorefs-internal" title="            ropt.workflow.compute_steps.ComputeStep" href="#ropt.workflow.compute_steps.ComputeStep"><code>ComputeStep</code></a> is an executable
 unit of work in the workflow framework. Two implementations ship with <code>ropt</code>:
-<a class="autorefs autorefs-internal" title="            ropt.workflow.compute_steps.EnsembleOptimizer" href="#ropt.workflow.compute_steps.EnsembleOptimizer"><code>EnsembleOptimizer</code></a> runs an
+<a class="autorefs autorefs-internal" title="            ropt.workflow.compute_steps.OptimizationStep" href="#ropt.workflow.compute_steps.OptimizationStep"><code>OptimizationStep</code></a> runs an
 optimization algorithm, and
-<a class="autorefs autorefs-internal" title="            ropt.workflow.compute_steps.EnsembleEvaluator" href="#ropt.workflow.compute_steps.EnsembleEvaluator"><code>EnsembleEvaluator</code></a> runs a
+<a class="autorefs autorefs-internal" title="            ropt.workflow.compute_steps.EvaluationStep" href="#ropt.workflow.compute_steps.EvaluationStep"><code>EvaluationStep</code></a> runs a
 single ensemble evaluation.</p>
 <p>See <a href="../../usage/workflows/">Optimization Workflows</a> for usage.</p>
 
@@ -2540,8 +2540,8 @@ implementation.</p>
 
 
 
-<h2 id="ropt.workflow.compute_steps.EnsembleEvaluator" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.workflow.compute_steps.EnsembleEvaluator</span>
+<h2 id="ropt.workflow.compute_steps.EvaluationStep" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.workflow.compute_steps.EvaluationStep</span>
 
 
 </h2>
@@ -2553,7 +2553,7 @@ implementation.</p>
 
 
 
-        <p>The default ensemble evaluator compute step.</p>
+        <p>The default evaluation step compute step.</p>
 <p>Evaluates a batch of variable vectors (a single vector or a 2-D matrix
 where each row is a variable vector) and yields
 <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
@@ -2564,7 +2564,7 @@ where each row is a variable vector) and yields
   " href="../results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> objects. Emits
 <code>START_ENSEMBLE_EVALUATOR</code>, <code>START_EVALUATION</code>, <code>FINISHED_EVALUATION</code>,
 and <code>FINISHED_ENSEMBLE_EVALUATOR</code> events.</p>
-<p>See <a href="../../usage/workflows/#events-emitted-by-ensembleevaluator">Optimization Workflows</a>
+<p>See <a href="../../usage/workflows/#events-emitted-by-evualuationstep">Optimization Workflows</a>
 for the full event lifecycle description.</p>
 
 
@@ -2588,7 +2588,7 @@ for the full event lifecycle description.</p>
 <div class="doc doc-object doc-function">
 
 
-<h3 id="ropt.workflow.compute_steps.EnsembleEvaluator.__init__" class="doc doc-heading">
+<h3 id="ropt.workflow.compute_steps.EvaluationStep.__init__" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">__init__</span>
 
 
@@ -2644,7 +2644,7 @@ for the full event lifecycle description.</p>
 <div class="doc doc-object doc-function">
 
 
-<h3 id="ropt.workflow.compute_steps.EnsembleEvaluator.run" class="doc doc-heading">
+<h3 id="ropt.workflow.compute_steps.EvaluationStep.run" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">run</span>
 
 
@@ -2795,8 +2795,8 @@ for the full event lifecycle description.</p>
 
 
 
-<h2 id="ropt.workflow.compute_steps.EnsembleOptimizer" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.workflow.compute_steps.EnsembleOptimizer</span>
+<h2 id="ropt.workflow.compute_steps.OptimizationStep" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.workflow.compute_steps.OptimizationStep</span>
 
 
 </h2>
@@ -2812,7 +2812,7 @@ for the full event lifecycle description.</p>
 <p>Executes an optimization algorithm, iteratively performing function and
 gradient evaluations. Emits <code>START_OPTIMIZER</code>, <code>START_EVALUATION</code>,
 <code>FINISHED_EVALUATION</code>, and <code>FINISHED_OPTIMIZER</code> events.</p>
-<p>See <a href="../../usage/workflows/#events-emitted-by-ensembleoptimizer">Optimization Workflows</a>
+<p>See <a href="../../usage/workflows/#events-emitted-by-optimizationstep">Optimization Workflows</a>
 for the full event lifecycle description.</p>
 
 
@@ -2836,7 +2836,7 @@ for the full event lifecycle description.</p>
 <div class="doc doc-object doc-function">
 
 
-<h3 id="ropt.workflow.compute_steps.EnsembleOptimizer.__init__" class="doc doc-heading">
+<h3 id="ropt.workflow.compute_steps.OptimizationStep.__init__" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">__init__</span>
 
 
@@ -2892,7 +2892,7 @@ for the full event lifecycle description.</p>
 <div class="doc doc-object doc-function">
 
 
-<h3 id="ropt.workflow.compute_steps.EnsembleOptimizer.run" class="doc doc-heading">
+<h3 id="ropt.workflow.compute_steps.OptimizationStep.run" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">run</span>
 
 
