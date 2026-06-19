@@ -12,7 +12,7 @@
         <link rel="prev" href="../events/">
       
       
-        <link rel="next" href="../evaluator/">
+        <link rel="next" href="../evaluation/">
       
       
         
@@ -569,14 +569,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../usage/evaluator_callback/" class="md-nav__link">
+      <a href="../../usage/evaluation_callbacks/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Writing an Evaluator Callback
+    Writing Evaluation Callbacks
   
 
     
@@ -1415,14 +1415,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../evaluator/" class="md-nav__link">
+      <a href="../evaluation/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Evaluator Classes
+    Evaluation Classes
   
 
     
@@ -2332,8 +2332,9 @@ provides the raw function values, which are then processed by the
 
 </h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">__init__</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">context</span><span class="p">:</span> <span class="n">EnOptContext</span><span class="p">,</span> <span class="n">evaluator</span><span class="p">:</span> <span class="n">EvaluatorCallback</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">context</span><span class="p">:</span> <span class="n">EnOptContext</span><span class="p">,</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">evaluator</span><span class="p">:</span> <span class="n">EvaluationBatchCallback</span><span class="p">,</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2379,7 +2380,7 @@ by a <a class="autorefs autorefs-internal" title="            ropt.workflow.eval
                 <code>evaluator</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.evaluator.EvaluatorCallback" href="../evaluator/#ropt.evaluator.EvaluatorCallback">EvaluatorCallback</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.evaluation.EvaluationBatchCallback" href="../evaluation/#ropt.evaluation.EvaluationBatchCallback">EvaluationBatchCallback</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3328,13 +3329,13 @@ to a row in the input <code>variables</code>, with the same structure:</p>
         
         
           
-          <a href="../evaluator/" class="md-footer__link md-footer__link--next" aria-label="Next: Evaluator Classes">
+          <a href="../evaluation/" class="md-footer__link md-footer__link--next" aria-label="Next: Evaluation Classes">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Evaluator Classes
+                Evaluation Classes
               </div>
             </div>
             <div class="md-footer__button md-icon">

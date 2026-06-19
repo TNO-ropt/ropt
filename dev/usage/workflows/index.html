@@ -570,14 +570,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../evaluator_callback/" class="md-nav__link">
+      <a href="../evaluation_callbacks/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Writing an Evaluator Callback
+    Writing Evaluation Callbacks
   
 
     
@@ -1475,14 +1475,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/evaluator/" class="md-nav__link">
+      <a href="../../reference/evaluation/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Evaluator Classes
+    Evaluation Classes
   
 
     
@@ -2981,7 +2981,7 @@ the <a href="../parallel/">next section</a>:</p>
 <tbody>
 <tr>
 <td><a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.BatchEvaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.BatchEvaluator"><code>BatchEvaluator</code></a></td>
-<td>Batch: <code>f(variables_2d, context)</code> → <code>EvaluatorResult</code>.</td>
+<td>Batch: <code>f(variables_2d, context)</code> → <code>EvaluationBatchResult</code>.</td>
 </tr>
 <tr>
 <td><a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.FunctionEvaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.FunctionEvaluator"><code>FunctionEvaluator</code></a></td>
@@ -2999,21 +2999,21 @@ the <a href="../parallel/">next section</a>:</p>
 </table>
 <p><a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.BatchEvaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.BatchEvaluator"><code>BatchEvaluator</code></a> defers to a callable
 callback that receives the full 2-D variable matrix and an
-<a class="autorefs autorefs-internal" title="            ropt.evaluator.EvaluatorContext
+<a class="autorefs autorefs-internal" title="            ropt.evaluation.EvaluationBatchContext
 
 
   
       dataclass
-  " href="../../reference/evaluator/#ropt.evaluator.EvaluatorContext"><code>EvaluatorContext</code></a>, and returns an
-<a class="autorefs autorefs-internal" title="            ropt.evaluator.EvaluatorResult
+  " href="../../reference/evaluation/#ropt.evaluation.EvaluationBatchContext"><code>EvaluationBatchContext</code></a>, and returns
+an <a class="autorefs autorefs-internal" title="            ropt.evaluation.EvaluationBatchResult
 
 
   
       dataclass
-  " href="../../reference/evaluator/#ropt.evaluator.EvaluatorResult"><code>EvaluatorResult</code></a>. Use this when you need the
-full batch (e.g. vectorized computation, or an external simulator that accepts
-all rows at once). The callback has the same signature as the callable accepted
-by <code>BasicOptimizer</code>.</p>
+  " href="../../reference/evaluation/#ropt.evaluation.EvaluationBatchResult"><code>EvaluationBatchResult</code></a>. Use this
+when you need the full batch (e.g. vectorized computation, or an external
+simulator that accepts all rows at once). The callback has the same signature as
+the callable accepted by <code>BasicOptimizer</code>.</p>
 <p><a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.FunctionEvaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.FunctionEvaluator"><code>FunctionEvaluator</code></a> stores a
 single function that returns a value for each objective and constraint. The
 function is called once per row of the evaluation batch with the variable
@@ -3026,12 +3026,12 @@ either:</p>
   followed by constraints), or</li>
 <li>A dictionary with a <code>"result"</code> key containing that array; any additional
   keys are stored as <code>evaluation_info</code> entries in the returned
-  <a class="autorefs autorefs-internal" title="            ropt.evaluator.EvaluatorResult
+  <a class="autorefs autorefs-internal" title="            ropt.evaluation.EvaluationBatchResult
 
 
   
       dataclass
-  " href="../../reference/evaluator/#ropt.evaluator.EvaluatorResult"><code>EvaluatorResult</code></a>.</li>
+  " href="../../reference/evaluation/#ropt.evaluation.EvaluationBatchResult"><code>EvaluationBatchResult</code></a>.</li>
 </ul>
 <p><a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.CachedEvaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.CachedEvaluator"><code>CachedEvaluator</code></a> wraps another
 evaluator with result caching. It retrieves previously computed function
@@ -3052,15 +3052,15 @@ wrapped evaluator. The final combined result contains both cached and newly
 computed values.</p>
 <p>Sources can be managed dynamically with <code>add_sources()</code> and
 <code>remove_sources()</code>.</p>
-<p>The <code>eval_cached()</code> method is available for derived classes that need access
-to which evaluations were cache hits — it returns both the
-<a class="autorefs autorefs-internal" title="            ropt.evaluator.EvaluatorResult
+<p>The <code>eval_cached()</code> method is available for derived classes that need access to
+which evaluations were cache hits — it returns both the
+<a class="autorefs autorefs-internal" title="            ropt.evaluation.EvaluationBatchResult
 
 
   
       dataclass
-  " href="../../reference/evaluator/#ropt.evaluator.EvaluatorResult"><code>EvaluatorResult</code></a> and a dictionary mapping
-evaluation indices to their cached
+  " href="../../reference/evaluation/#ropt.evaluation.EvaluationBatchResult"><code>EvaluationBatchResult</code></a> and a
+dictionary mapping evaluation indices to their cached
 <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
 
 

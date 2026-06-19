@@ -569,14 +569,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../usage/evaluator_callback/" class="md-nav__link">
+      <a href="../../usage/evaluation_callbacks/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Writing an Evaluator Callback
+    Writing Evaluation Callbacks
   
 
     
@@ -1342,14 +1342,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../evaluator/" class="md-nav__link">
+      <a href="../evaluation/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Evaluator Classes
+    Evaluation Classes
   
 
     
@@ -2212,7 +2212,7 @@ example.</p>
 </h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">__init__</span><span class="p">(</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">evaluator</span><span class="p">:</span> <span class="n">EvaluatorCallback</span> <span class="o">|</span> <span class="n">Evaluator</span><span class="p">,</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">evaluator</span><span class="p">:</span> <span class="n">EvaluationBatchCallback</span> <span class="o">|</span> <span class="n">Evaluator</span><span class="p">,</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="o">*</span><span class="p">,</span>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">constraint_tolerance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-10</span><span class="p">,</span>
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
@@ -2261,7 +2261,7 @@ constraint value is within this tolerance, it is considered satisfied.</p>
                 <code>evaluator</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.evaluator.EvaluatorCallback" href="../evaluator/#ropt.evaluator.EvaluatorCallback">EvaluatorCallback</a> | <a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.Evaluator" href="../workflow_evaluators/#ropt.workflow.evaluators.Evaluator">Evaluator</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.evaluation.EvaluationBatchCallback" href="../evaluation/#ropt.evaluation.EvaluationBatchCallback">EvaluationBatchCallback</a> | <a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.Evaluator" href="../workflow_evaluators/#ropt.workflow.evaluators.Evaluator">Evaluator</a></code>
             </td>
             <td>
               <div class="doc-md-description">

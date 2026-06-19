@@ -569,14 +569,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../usage/evaluator_callback/" class="md-nav__link">
+      <a href="../../usage/evaluation_callbacks/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Writing an Evaluator Callback
+    Writing Evaluation Callbacks
   
 
     
@@ -1212,14 +1212,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../evaluator/" class="md-nav__link">
+      <a href="../evaluation/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Evaluator Classes
+    Evaluation Classes
   
 
     
@@ -2506,8 +2506,8 @@
 <p>These are the <a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.Evaluator" href="#ropt.workflow.evaluators.Evaluator"><code>Evaluator</code></a> subclasses
 used by the workflow framework's compute steps. For the simple callable
 protocol used by <a class="autorefs autorefs-internal" title="            ropt.workflow.BasicOptimizer" href="../basic_optimizer/#ropt.workflow.BasicOptimizer"><code>BasicOptimizer</code></a>, see
-<a href="../evaluator/">Evaluator Classes</a>.</p>
-<p>See <a href="../../usage/evaluator_callback/">Writing an Evaluator</a> and
+<a href="../evaluation/">Evaluation Classes</a>.</p>
+<p>See <a href="../../usage/evaluation_callbacks/">Writing an Evaluator</a> and
 <a href="../../usage/parallel/">Parallel Evaluation</a> for usage.</p>
 
 
@@ -2535,20 +2535,21 @@ protocol used by <a class="autorefs autorefs-internal" title="            ropt.w
 
   
       abstractmethod
-  " href="#ropt.workflow.evaluators.Evaluator.eval"><code>eval</code></a> method, which is responsible
-for performing the actual evaluation of variables using an
-<a class="autorefs autorefs-internal" title="            ropt.evaluator.EvaluatorContext
+  " href="#ropt.workflow.evaluators.Evaluator.eval"><code>eval</code></a> method, which is
+responsible for performing the actual evaluation of variables using an
+<a class="autorefs autorefs-internal" title="            ropt.evaluation.EvaluationBatchContext
 
 
   
       dataclass
-  " href="../evaluator/#ropt.evaluator.EvaluatorContext"><code>EvaluatorContext</code></a> and returning an
-<a class="autorefs autorefs-internal" title="            ropt.evaluator.EvaluatorResult
+  " href="../evaluation/#ropt.evaluation.EvaluationBatchContext"><code>EvaluationBatchContext</code></a> and
+returning an
+<a class="autorefs autorefs-internal" title="            ropt.evaluation.EvaluationBatchResult
 
 
   
       dataclass
-  " href="../evaluator/#ropt.evaluator.EvaluatorResult"><code>EvaluatorResult</code></a>.</p>
+  " href="../evaluation/#ropt.evaluation.EvaluationBatchResult"><code>EvaluationBatchResult</code></a>.</p>
 
 
 
@@ -2581,14 +2582,15 @@ for performing the actual evaluation of variables using an
 
 </h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">eval</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">variables</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span> <span class="n">context</span><span class="p">:</span> <span class="n">EvaluatorContext</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EvaluatorResult</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">variables</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">context</span><span class="p">:</span> <span class="n">EvaluationBatchContext</span><span class="p">,</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EvaluationBatchResult</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
 
         <p>Evaluate objective and constraint functions for given variables.</p>
-<p>This follows the <a class="autorefs autorefs-internal" title="            ropt.evaluator.EvaluatorCallback" href="../evaluator/#ropt.evaluator.EvaluatorCallback"><code>EvaluatorCallback</code></a> protocol.</p>
+<p>This follows the <a class="autorefs autorefs-internal" title="            ropt.evaluation.EvaluationBatchCallback" href="../evaluation/#ropt.evaluation.EvaluationBatchCallback"><code>EvaluationBatchCallback</code></a> protocol.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2624,12 +2626,12 @@ for performing the actual evaluation of variables using an
                 <code>context</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.evaluator.EvaluatorContext
+                  <code><a class="autorefs autorefs-internal" title="            ropt.evaluation.EvaluationBatchContext
 
 
   
       dataclass
-  " href="../evaluator/#ropt.evaluator.EvaluatorContext">EvaluatorContext</a></code>
+  " href="../evaluation/#ropt.evaluation.EvaluationBatchContext">EvaluationBatchContext</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2656,12 +2658,12 @@ for performing the actual evaluation of variables using an
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.evaluator.EvaluatorResult
+                  <code><a class="autorefs autorefs-internal" title="            ropt.evaluation.EvaluationBatchResult
 
 
   
       dataclass
-  " href="../evaluator/#ropt.evaluator.EvaluatorResult">EvaluatorResult</a></code>
+  " href="../evaluation/#ropt.evaluation.EvaluationBatchResult">EvaluationBatchResult</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2731,14 +2733,14 @@ for performing the actual evaluation of variables using an
 
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">__init__</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">callback</span><span class="p">:</span> <span class="n">EvaluatorCallback</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">__init__</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">callback</span><span class="p">:</span> <span class="n">EvaluationBatchCallback</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
 
         <p>Initialize the BatchEvaluator.</p>
 <p>Forwards the evaluation to the provided callback, which should implement
-the <a class="autorefs autorefs-internal" title="            ropt.evaluator.EvaluatorCallback" href="../evaluator/#ropt.evaluator.EvaluatorCallback"><code>EvaluatorCallback</code></a> protocol.</p>
+the <a class="autorefs autorefs-internal" title="            ropt.evaluation.EvaluationBatchCallback" href="../evaluation/#ropt.evaluation.EvaluationBatchCallback"><code>EvaluationBatchCallback</code></a> protocol.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2757,7 +2759,7 @@ the <a class="autorefs autorefs-internal" title="            ropt.evaluator.Eval
                 <code>callback</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.evaluator.EvaluatorCallback" href="../evaluator/#ropt.evaluator.EvaluatorCallback">EvaluatorCallback</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.evaluation.EvaluationBatchCallback" href="../evaluation/#ropt.evaluation.EvaluationBatchCallback">EvaluationBatchCallback</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2790,8 +2792,9 @@ the <a class="autorefs autorefs-internal" title="            ropt.evaluator.Eval
 
 </h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">eval</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">variables</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span> <span class="n">context</span><span class="p">:</span> <span class="n">EvaluatorContext</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EvaluatorResult</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">variables</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">context</span><span class="p">:</span> <span class="n">EvaluationBatchContext</span><span class="p">,</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EvaluationBatchResult</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2831,12 +2834,12 @@ the <a class="autorefs autorefs-internal" title="            ropt.evaluator.Eval
                 <code>context</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.evaluator.EvaluatorContext
+                  <code><a class="autorefs autorefs-internal" title="            ropt.evaluation.EvaluationBatchContext
 
 
   
       dataclass
-  " href="../evaluator/#ropt.evaluator.EvaluatorContext">EvaluatorContext</a></code>
+  " href="../evaluation/#ropt.evaluation.EvaluationBatchContext">EvaluationBatchContext</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2862,16 +2865,16 @@ the <a class="autorefs autorefs-internal" title="            ropt.evaluator.Eval
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.evaluator.EvaluatorResult
+                  <code><a class="autorefs autorefs-internal" title="            ropt.evaluation.EvaluationBatchResult
 
 
   
       dataclass
-  " href="../evaluator/#ropt.evaluator.EvaluatorResult">EvaluatorResult</a></code>
+  " href="../evaluation/#ropt.evaluation.EvaluationBatchResult">EvaluationBatchResult</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>An <code>EvaluatorResult</code> with the evaluation results.</p>
+                <p>An <code>EvaluationBatchResult</code> with the evaluation results.</p>
               </div>
             </td>
           </tr>
@@ -2997,8 +3000,8 @@ objective and constraint.</p>
 </h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">eval</span><span class="p">(</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">variables</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">evaluator_context</span><span class="p">:</span> <span class="n">EvaluatorContext</span><span class="p">,</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EvaluatorResult</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">evaluator_context</span><span class="p">:</span> <span class="n">EvaluationBatchContext</span><span class="p">,</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EvaluationBatchResult</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -3038,12 +3041,12 @@ objective and constraint.</p>
                 <code>evaluator_context</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.evaluator.EvaluatorContext
+                  <code><a class="autorefs autorefs-internal" title="            ropt.evaluation.EvaluationBatchContext
 
 
   
       dataclass
-  " href="../evaluator/#ropt.evaluator.EvaluatorContext">EvaluatorContext</a></code>
+  " href="../evaluation/#ropt.evaluation.EvaluationBatchContext">EvaluationBatchContext</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3069,12 +3072,12 @@ objective and constraint.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.evaluator.EvaluatorResult
+                  <code><a class="autorefs autorefs-internal" title="            ropt.evaluation.EvaluationBatchResult
 
 
   
       dataclass
-  " href="../evaluator/#ropt.evaluator.EvaluatorResult">EvaluatorResult</a></code>
+  " href="../evaluation/#ropt.evaluation.EvaluationBatchResult">EvaluationBatchResult</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3260,8 +3263,8 @@ details on how this integrates with the asyncio event loop.</p>
 </h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">eval</span><span class="p">(</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">variables</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">evaluator_context</span><span class="p">:</span> <span class="n">EvaluatorContext</span><span class="p">,</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EvaluatorResult</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">evaluator_context</span><span class="p">:</span> <span class="n">EvaluationBatchContext</span><span class="p">,</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EvaluationBatchResult</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -3301,12 +3304,12 @@ details on how this integrates with the asyncio event loop.</p>
                 <code>evaluator_context</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.evaluator.EvaluatorContext
+                  <code><a class="autorefs autorefs-internal" title="            ropt.evaluation.EvaluationBatchContext
 
 
   
       dataclass
-  " href="../evaluator/#ropt.evaluator.EvaluatorContext">EvaluatorContext</a></code>
+  " href="../evaluation/#ropt.evaluation.EvaluationBatchContext">EvaluationBatchContext</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3332,12 +3335,12 @@ details on how this integrates with the asyncio event loop.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.evaluator.EvaluatorResult
+                  <code><a class="autorefs autorefs-internal" title="            ropt.evaluation.EvaluationBatchResult
 
 
   
       dataclass
-  " href="../evaluator/#ropt.evaluator.EvaluatorResult">EvaluatorResult</a></code>
+  " href="../evaluation/#ropt.evaluation.EvaluationBatchResult">EvaluationBatchResult</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3518,10 +3521,11 @@ These handlers are expected to store <code>FunctionResults</code> in their
 </h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">eval_cached</span><span class="p">(</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">variables</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">evaluator_context</span><span class="p">:</span> <span class="n">EvaluatorContext</span><span class="p">,</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">evaluator_context</span><span class="p">:</span> <span class="n">EvaluationBatchContext</span><span class="p">,</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">EvaluatorResult</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">FunctionResults</span><span class="p">]]</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="p">]</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">EvaluationBatchResult</span><span class="p">,</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">FunctionResults</span><span class="p">]],</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">]</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -3573,12 +3577,12 @@ are used.</p>
                 <code>evaluator_context</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.evaluator.EvaluatorContext
+                  <code><a class="autorefs autorefs-internal" title="            ropt.evaluation.EvaluationBatchContext
 
 
   
       dataclass
-  " href="../evaluator/#ropt.evaluator.EvaluatorContext">EvaluatorContext</a></code>
+  " href="../evaluation/#ropt.evaluation.EvaluationBatchContext">EvaluationBatchContext</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3604,12 +3608,12 @@ are used.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a>[<a class="autorefs autorefs-internal" title="            ropt.evaluator.EvaluatorResult
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a>[<a class="autorefs autorefs-internal" title="            ropt.evaluation.EvaluationBatchResult
 
 
   
       dataclass
-  " href="../evaluator/#ropt.evaluator.EvaluatorResult">EvaluatorResult</a>, <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a>, <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a>, <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+  " href="../evaluation/#ropt.evaluation.EvaluationBatchResult">EvaluationBatchResult</a>, <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a>, <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a>, <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
 
 
   
@@ -3618,7 +3622,7 @@ are used.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>An <code>EvaluatorResult</code> and the cache hits.</p>
+                <p>An <code>EvaluationBatchResult</code> and the cache hits.</p>
               </div>
             </td>
           </tr>
@@ -3644,8 +3648,9 @@ are used.</p>
 
 </h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">eval</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">variables</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span> <span class="n">context</span><span class="p">:</span> <span class="n">EvaluatorContext</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EvaluatorResult</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">variables</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">context</span><span class="p">:</span> <span class="n">EvaluationBatchContext</span><span class="p">,</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EvaluationBatchResult</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -3685,12 +3690,12 @@ are used.</p>
                 <code>context</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.evaluator.EvaluatorContext
+                  <code><a class="autorefs autorefs-internal" title="            ropt.evaluation.EvaluationBatchContext
 
 
   
       dataclass
-  " href="../evaluator/#ropt.evaluator.EvaluatorContext">EvaluatorContext</a></code>
+  " href="../evaluation/#ropt.evaluation.EvaluationBatchContext">EvaluationBatchContext</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3716,16 +3721,16 @@ are used.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.evaluator.EvaluatorResult
+                  <code><a class="autorefs autorefs-internal" title="            ropt.evaluation.EvaluationBatchResult
 
 
   
       dataclass
-  " href="../evaluator/#ropt.evaluator.EvaluatorResult">EvaluatorResult</a></code>
+  " href="../evaluation/#ropt.evaluation.EvaluationBatchResult">EvaluationBatchResult</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>An <code>EvaluatorResult</code> with calculated or cached values.</p>
+                <p>An <code>EvaluationBatchResult</code> with calculated or cached values.</p>
               </div>
             </td>
           </tr>
@@ -3879,7 +3884,7 @@ are used.</p>
 
 
 
-        <p>Defines the call signature for function evaluator callbacks.</p>
+        <p>Defines the call signature for function callbacks.</p>
 <p>A function following this protocol is called once per active row of the
 evaluation batch, receiving the variable vector for that row together with
 keyword arguments that identify the evaluation.</p>

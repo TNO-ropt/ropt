@@ -733,14 +733,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../evaluator_callback/" class="md-nav__link">
+      <a href="../evaluation_callbacks/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Writing an Evaluator Callback
+    Writing Evaluation Callbacks
   
 
     
@@ -1364,14 +1364,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/evaluator/" class="md-nav__link">
+      <a href="../../reference/evaluation/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Evaluator Classes
+    Evaluation Classes
   
 
     
@@ -2185,7 +2185,7 @@ of the script in the following sections.</p>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="kn">from</span><span class="w"> </span><span class="nn">numpy.random</span><span class="w"> </span><span class="kn">import</span> <span class="n">default_rng</span>
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="kn">from</span><span class="w"> </span><span class="nn">numpy.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">NDArray</span>
 </span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.evaluator</span><span class="w"> </span><span class="kn">import</span> <span class="n">EvaluatorContext</span><span class="p">,</span> <span class="n">EvaluatorResult</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.evaluation</span><span class="w"> </span><span class="kn">import</span> <span class="n">EvaluationBatchContext</span><span class="p">,</span> <span class="n">EvaluationBatchResult</span>
 </span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.results</span><span class="w"> </span><span class="kn">import</span> <span class="n">FunctionResults</span><span class="p">,</span> <span class="n">Results</span>
 </span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.workflow</span><span class="w"> </span><span class="kn">import</span> <span class="n">BasicOptimizer</span>
 </span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>
@@ -2195,16 +2195,16 @@ of the script in the following sections.</p>
 </span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>
 </span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="k">def</span><span class="w"> </span><span class="nf">rosenbrock</span><span class="p">(</span>
 </span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>    <span class="n">variables</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>    <span class="n">context</span><span class="p">:</span> <span class="n">EvaluatorContext</span><span class="p">,</span>
+</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>    <span class="n">context</span><span class="p">:</span> <span class="n">EvaluationBatchContext</span><span class="p">,</span>
 </span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>    <span class="n">a</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
 </span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>    <span class="n">b</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-</span><span id="__span-0-21"><a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EvaluatorResult</span><span class="p">:</span>
+</span><span id="__span-0-21"><a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EvaluationBatchResult</span><span class="p">:</span>
 </span><span id="__span-0-22"><a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a>    <span class="n">objectives</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">variables</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
 </span><span id="__span-0-23"><a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a>    <span class="k">for</span> <span class="n">r_idx</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">realizations</span><span class="p">):</span>
 </span><span id="__span-0-24"><a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a>        <span class="k">for</span> <span class="n">d_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">DIM</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
 </span><span id="__span-0-25"><a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a>            <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">variables</span><span class="p">[</span><span class="n">r_idx</span><span class="p">,</span> <span class="n">d_idx</span> <span class="p">:</span> <span class="n">d_idx</span> <span class="o">+</span> <span class="mi">2</span><span class="p">]</span>
 </span><span id="__span-0-26"><a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a>            <span class="n">objectives</span><span class="p">[</span><span class="n">r_idx</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="n">r</span><span class="p">]</span> <span class="o">-</span> <span class="n">x</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">b</span><span class="p">[</span><span class="n">r</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">x</span> <span class="o">*</span> <span class="n">x</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
-</span><span id="__span-0-27"><a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a>    <span class="k">return</span> <span class="n">EvaluatorResult</span><span class="p">(</span><span class="n">objectives</span><span class="o">=</span><span class="n">objectives</span><span class="p">)</span>
+</span><span id="__span-0-27"><a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a>    <span class="k">return</span> <span class="n">EvaluationBatchResult</span><span class="p">(</span><span class="n">objectives</span><span class="o">=</span><span class="n">objectives</span><span class="p">)</span>
 </span><span id="__span-0-28"><a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a>
 </span><span id="__span-0-29"><a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a><span class="k">def</span><span class="w"> </span><span class="nf">report</span><span class="p">(</span><span class="n">results</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Results</span><span class="p">,</span> <span class="o">...</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 </span><span id="__span-0-30"><a id="__codelineno-0-30" name="__codelineno-0-30" href="#__codelineno-0-30"></a>    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
@@ -2238,20 +2238,20 @@ of the script in the following sections.</p>
 <p>You must provide a Python function (<code>rosenbrock()</code> in our example) that <code>ropt</code>
 can call to evaluate your objective function for a given set of variables. The
 evaluator function receives the <code>variables</code> to be evaluated and an
-<a class="autorefs autorefs-internal" title="            ropt.evaluator.EvaluatorContext
+<a class="autorefs autorefs-internal" title="            ropt.evaluation.EvaluationBatchContext
 
 
   
       dataclass
-  " href="../../reference/evaluator/#ropt.evaluator.EvaluatorContext"><code>EvaluatorContext</code></a> object. The context
-provides information such as which realizations to compute. The function must
-return an <a class="autorefs autorefs-internal" title="            ropt.evaluator.EvaluatorResult
+  " href="../../reference/evaluation/#ropt.evaluation.EvaluationBatchContext"><code>EvaluationBatchContext</code></a> object. The
+context provides information such as which realizations to compute. The function
+must return an <a class="autorefs autorefs-internal" title="            ropt.evaluation.EvaluationBatchResult
 
 
   
       dataclass
-  " href="../../reference/evaluator/#ropt.evaluator.EvaluatorResult"><code>EvaluatorResult</code></a> containing the
-calculated objective values.</p>
+  " href="../../reference/evaluation/#ropt.evaluation.EvaluationBatchResult"><code>EvaluationBatchResult</code></a>
+containing the calculated objective values.</p>
 <p>The <code>variables</code> input is a matrix, where each row is a variable vector. We
 iterate over the rows and calculate the Rosenbrock function for each variable
 vector. The context object has a <code>realizations</code> field that maps the row index to
@@ -2362,7 +2362,7 @@ into a simple, single-run interface. The table below summarizes its API:</p>
 <tbody>
 <tr>
 <td><code>__init__(config, evaluator, *, constraint_tolerance=1e-10)</code></td>
-<td>Create the optimizer from a config dict and an evaluator (a <a class="autorefs autorefs-internal" title="            ropt.evaluator.EvaluatorCallback" href="../../reference/evaluator/#ropt.evaluator.EvaluatorCallback"><code>EvaluatorCallback</code></a> callable or an <a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.Evaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.Evaluator"><code>Evaluator</code></a> object).</td>
+<td>Create the optimizer from a config dict and a <a class="autorefs autorefs-internal" title="            ropt.evaluation.EvaluationBatchCallback" href="../../reference/evaluation/#ropt.evaluation.EvaluationBatchCallback"><code>EvaluationBatchCallback</code></a> callable or an <a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.Evaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.Evaluator"><code>Evaluator</code></a> object.</td>
 </tr>
 <tr>
 <td><code>run(initial_values)</code></td>
@@ -2389,14 +2389,14 @@ into a simple, single-run interface. The table below summarizes its API:</p>
 </table>
 <h3 id="evaluator-signature">Evaluator signature</h3>
 <p>When you pass a plain Python callable as the evaluator, it must have the
-<a class="autorefs autorefs-internal" title="            ropt.evaluator.EvaluatorCallback" href="../../reference/evaluator/#ropt.evaluator.EvaluatorCallback"><code>EvaluatorCallback</code></a> signature:
+<a class="autorefs autorefs-internal" title="            ropt.evaluation.EvaluationBatchCallback" href="../../reference/evaluation/#ropt.evaluation.EvaluationBatchCallback"><code>EvaluationBatchCallback</code></a> signature:
 <div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">evaluator</span><span class="p">(</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    <span class="n">variables</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    <span class="n">context</span><span class="p">:</span> <span class="n">EvaluatorContext</span><span class="p">,</span>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EvaluatorResult</span><span class="p">:</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    <span class="n">context</span><span class="p">:</span> <span class="n">EvaluationBatchContext</span><span class="p">,</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EvaluationBatchResult</span><span class="p">:</span>
 </span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    <span class="o">...</span>
 </span></code></pre></div></p>
-<p>See <a href="../evaluator_callback/">Writing an Evaluator</a> for details.</p>
+<p>See <a href="../evaluation_callbacks/">Writing an Evaluator</a> for details.</p>
 <h3 id="under-the-hood">Under the hood</h3>
 <p>Internally, <code>BasicOptimizer</code> creates an optimization workflow that does the following:</p>
 <ol>
@@ -2440,7 +2440,7 @@ required constructor arguments.</p>
 <ul>
 <li>Look up any configuration key: <a href="../configuration/">Configuration</a>.</li>
 <li>Add per-realization logic or handle simulator failures:
-  <a href="../evaluator_callback/">Writing an Evaluator Callback</a>.</li>
+  <a href="../evaluation_callbacks/">Writing Evaluation Callbacks</a>.</li>
 <li>Process or export the result objects:
   <a href="../results/">Working with Results</a>.</li>
 <li>Move beyond a single optimization run:
