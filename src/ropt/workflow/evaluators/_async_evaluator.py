@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 
 from ropt.enums import ExitCode
-from ropt.evaluator import EvaluatorContext, EvaluatorResult
+from ropt.evaluation import EvaluationBatchContext, EvaluationBatchResult
 from ropt.exceptions import Abort, ServerFailure
 from ropt.workflow.servers import ResultsQueue, Server, Task
 
@@ -53,8 +53,8 @@ class AsyncEvaluator(Evaluator):
         self._get_name = get_name
 
     def eval(
-        self, variables: NDArray[np.float64], evaluator_context: EvaluatorContext
-    ) -> EvaluatorResult:
+        self, variables: NDArray[np.float64], evaluator_context: EvaluationBatchContext
+    ) -> EvaluationBatchResult:
         """Evaluate all objective and constraints.
 
         Args:
@@ -105,7 +105,7 @@ class AsyncEvaluator(Evaluator):
             if not self._server.is_running():
                 raise Abort(ExitCode.ABORT_FROM_ERROR)
 
-        return EvaluatorResult(
+        return EvaluationBatchResult(
             batch_id=self._batch_id,
             objectives=results[:, :no],
             constraints=results[:, no:] if nc > 0 else None,
@@ -115,7 +115,7 @@ class AsyncEvaluator(Evaluator):
     async def _put_tasks(
         self,
         variables: NDArray[np.float64],
-        context: EvaluatorContext,
+        context: EvaluationBatchContext,
         results_queue: ResultsQueue,
     ) -> None:
         try:
@@ -138,7 +138,7 @@ class AsyncEvaluator(Evaluator):
     def _get_task(
         self,
         variables: NDArray[np.float64],
-        context: EvaluatorContext,
+        context: EvaluationBatchContext,
         results_queue: ResultsQueue,
         eval_idx: int,
         realization: int,

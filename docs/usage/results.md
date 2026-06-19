@@ -116,7 +116,6 @@ result.evaluations.variables       # variable vector(s) evaluated
 result.functions.target_objective  # weighted scalar objective
 result.functions.objectives        # per-objective values (after weighting)
 result.functions.constraints       # per-constraint values
-result.realizations.objectives     # per-realization objective values
 ```
 
 If `functions` is `None`, the result represents a request that produced no

@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from ropt.evaluator import EvaluatorContext, EvaluatorResult
+from ropt.evaluation import EvaluationBatchContext, EvaluationBatchResult
 
 from .base import Evaluator, FunctionCallback
 
@@ -37,8 +37,8 @@ class FunctionEvaluator(Evaluator):
         self._batch_id = -1
 
     def eval(
-        self, variables: NDArray[np.float64], evaluator_context: EvaluatorContext
-    ) -> EvaluatorResult:
+        self, variables: NDArray[np.float64], evaluator_context: EvaluationBatchContext
+    ) -> EvaluationBatchResult:
         """Evaluate all objective and constraints.
 
         Args:
@@ -78,7 +78,7 @@ class FunctionEvaluator(Evaluator):
                     evaluation_info,
                     variables.shape[0],
                 )
-        return EvaluatorResult(
+        return EvaluationBatchResult(
             batch_id=self._batch_id,
             objectives=results[:, :no],
             constraints=results[:, no:] if nc > 0 else None,

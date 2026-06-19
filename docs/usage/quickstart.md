@@ -18,7 +18,7 @@ pip install ropt
 import numpy as np
 from numpy.typing import NDArray
 
-from ropt.evaluator import EvaluatorContext, EvaluatorResult
+from ropt.evaluation import EvaluationBatchContext, EvaluationBatchResult
 from ropt.workflow import BasicOptimizer
 
 DIM = 5
@@ -29,13 +29,13 @@ CONFIG = {
     },
 }
 
-def rosenbrock(variables: NDArray[np.float64], _: EvaluatorContext) -> EvaluatorResult:
+def rosenbrock(variables: NDArray[np.float64], _: EvaluationBatchContext) -> EvaluationBatchResult:
     objectives = np.zeros((variables.shape[0], 1), dtype=np.float64)
     for v_idx in range(variables.shape[0]):
         for d_idx in range(DIM - 1):
             x, y = variables[v_idx, d_idx : d_idx + 2]
             objectives[v_idx, 0] += (1.0 - x) ** 2 + 100 * (y - x * x) ** 2
-    return EvaluatorResult(objectives=objectives)
+    return EvaluationBatchResult(objectives=objectives)
 
 initial_values = 2 * np.arange(DIM) / DIM + 0.5
 optimizer = BasicOptimizer(CONFIG, rosenbrock)
@@ -58,11 +58,12 @@ Three pieces of information drive every `ropt` optimization:
    only the minimum: how many variables there are, and a small
    `perturbation_magnitudes` value used to estimate gradients numerically.
 2. **An evaluator** — a Python callable that takes a matrix of variable vectors
-   plus an [`EvaluatorContext`][ropt.evaluator.EvaluatorContext] and returns an
-   [`EvaluatorResult`][ropt.evaluator.EvaluatorResult] with the objective values
-   for each row. The variable matrix has one row per requested evaluation.
-  `ropt` may request several rows in a single call so that an evaluator can
-  compute them in parallel.
+   plus an [`EvaluationBatchContext`][ropt.evaluation.EvaluationBatchContext]
+   and returns an
+   [`EvaluationBatchResult`][ropt.evaluation.EvaluationBatchResult] with the
+  objective values for each row. The variable matrix has one row per requested
+  evaluation. `ropt` may request several rows in a single call so that an
+  evaluator can compute them in parallel.
 3. **A driver** — here, [`BasicOptimizer`][ropt.workflow.BasicOptimizer]. It
    wires the configuration and evaluator together, executes the optimization,
    and exposes the best result through its `results` property.
@@ -74,7 +75,7 @@ Three pieces of information drive every `ropt` optimization:
   [Running a basic optimization task](basic.md).
 - The full configuration vocabulary, section by section:
   [Configuration](configuration.md).
-- Writing more advanced evaluator callbacks (per-realization data, partial failures):
-  [Writing an Evaluator Callback](evaluator_callback.md).
+- Writing more advanced evaluation callbacks (per-realization data, partial failures):
+  [Writing Evaluation Callbacks](evaluation_callbacks.md).
 - Full runnable example:
   [examples/rosenbrock_deterministic.py](https://github.com/TNO-ropt/ropt/blob/main/examples/rosenbrock_deterministic.py).

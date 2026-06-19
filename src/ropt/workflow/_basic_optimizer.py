@@ -25,7 +25,7 @@ if TYPE_CHECKING:
 
     from numpy.typing import ArrayLike
 
-    from ropt.evaluator import EvaluatorCallback
+    from ropt.evaluation import EvaluationBatchCallback
     from ropt.events import EnOptEvent
     from ropt.results import FunctionResults
 
@@ -43,7 +43,7 @@ class BasicOptimizer:
     def __init__(
         self,
         config: dict[str, Any],
-        evaluator: EvaluatorCallback | Evaluator,
+        evaluator: EvaluationBatchCallback | Evaluator,
         *,
         constraint_tolerance: float = 1e-10,
     ) -> None:

@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 
     from numpy.typing import NDArray
 
-    from ropt.evaluator import EvaluatorContext, EvaluatorResult
+    from ropt.evaluation import EvaluationBatchContext, EvaluationBatchResult
 
 
 class CachedEvaluator(Evaluator):
@@ -51,8 +51,8 @@ class CachedEvaluator(Evaluator):
         self._sources: list[EventHandler] = [] if sources is None else list(sources)
 
     def eval_cached(
-        self, variables: NDArray[np.float64], evaluator_context: EvaluatorContext
-    ) -> tuple[EvaluatorResult, dict[int, tuple[int, FunctionResults]]]:
+        self, variables: NDArray[np.float64], evaluator_context: EvaluationBatchContext
+    ) -> tuple[EvaluationBatchResult, dict[int, tuple[int, FunctionResults]]]:
         """Evaluate using cache, returning both results and cache-hit info.
 
         Returns the evaluation results together with a dictionary of cache
@@ -72,7 +72,7 @@ class CachedEvaluator(Evaluator):
             evaluator_context: The evaluation context.
 
         Returns:
-            An `EvaluatorResult` and the cache hits.
+            An `EvaluationBatchResult` and the cache hits.
         """
         cached: dict[int, tuple[int, FunctionResults]] = {}
 
@@ -105,8 +105,8 @@ class CachedEvaluator(Evaluator):
         return evaluator_result, cached
 
     def eval(
-        self, variables: NDArray[np.float64], context: EvaluatorContext
-    ) -> EvaluatorResult:
+        self, variables: NDArray[np.float64], context: EvaluationBatchContext
+    ) -> EvaluationBatchResult:
         """Evaluate using cache, delegating uncached evaluations.
 
         Args:
@@ -114,7 +114,7 @@ class CachedEvaluator(Evaluator):
             context:   The evaluation context.
 
         Returns:
-            An `EvaluatorResult` with calculated or cached values.
+            An `EvaluationBatchResult` with calculated or cached values.
         """
         result, _ = self.eval_cached(variables, context)
         return result

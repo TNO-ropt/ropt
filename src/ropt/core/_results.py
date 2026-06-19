@@ -7,7 +7,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from ropt.context import EnOptContext
-from ropt.evaluator import EvaluatorCallback, EvaluatorContext
+from ropt.evaluation import EvaluationBatchCallback, EvaluationBatchContext
 
 
 @dataclass(slots=True)
@@ -101,7 +101,7 @@ def _get_active_realizations(
 
 def _get_function_results(
     context: EnOptContext,
-    evaluator: EvaluatorCallback,
+    evaluator: EvaluationBatchCallback,
     variables: NDArray[np.float64],
     active_realizations: NDArray[np.bool_],
 ) -> Generator[tuple[int, _FunctionEvaluatorResults], None, None]:
@@ -109,7 +109,7 @@ def _get_function_results(
     realizations = np.tile(
         np.arange(realization_num, dtype=np.intc), variables.shape[0]
     )
-    evaluator_context = EvaluatorContext(
+    evaluator_context = EvaluationBatchContext(
         context=context,
         realizations=realizations,
         active=active_realizations[realizations],
@@ -150,7 +150,7 @@ def _get_function_results(
 
 def _get_gradient_results(
     context: EnOptContext,
-    evaluator: EvaluatorCallback,
+    evaluator: EvaluationBatchCallback,
     perturbed_variables: NDArray[np.float64],
     active_realizations: NDArray[np.bool_],
 ) -> _GradientEvaluatorResults:
@@ -159,7 +159,7 @@ def _get_gradient_results(
     realizations = np.repeat(
         np.arange(realization_num, dtype=np.intc), perturbation_num
     )
-    evaluator_context = EvaluatorContext(
+    evaluator_context = EvaluationBatchContext(
         context=context,
         realizations=realizations,
         perturbations=np.tile(np.arange(perturbation_num), realization_num),
@@ -190,7 +190,7 @@ def _get_gradient_results(
 
 def _get_function_and_gradient_results(
     context: EnOptContext,
-    evaluator: EvaluatorCallback,
+    evaluator: EvaluationBatchCallback,
     variables: NDArray[np.float64],
     perturbed_variables: NDArray[np.float64],
     active_realizations: NDArray[np.bool_],
@@ -204,7 +204,7 @@ def _get_function_and_gradient_results(
             np.repeat(realizations, perturbation_num),
         ),
     )
-    evaluator_context = EvaluatorContext(
+    evaluator_context = EvaluationBatchContext(
         context=context,
         realizations=realizations,
         perturbations=np.hstack(

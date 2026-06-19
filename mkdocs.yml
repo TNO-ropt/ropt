@@ -101,7 +101,7 @@ nav:
       - "Quickstart": usage/quickstart.md
       - "Basic Optimization": usage/basic.md
       - "Configuration": usage/configuration.md
-      - "Writing an Evaluator Callback": usage/evaluator_callback.md
+      - "Writing Evaluation Callbacks": usage/evaluation_callbacks.md
       - "Working with Results": usage/results.md
       - "Realization Filters": usage/realization_filters.md
       - "Function Estimators": usage/function_estimators.md
@@ -119,7 +119,7 @@ nav:
         - "Optimization Events": reference/events.md
       - "Optimization Engine":
         - "Core Classes": reference/core.md
-        - "Evaluator Classes": reference/evaluator.md
+        - "Evaluation Classes": reference/evaluation.md
       - "Optimization Components":
         - "Function Estimators": reference/function_estimator.md
         - "Realization Filters": reference/realization_filter.md

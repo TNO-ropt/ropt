@@ -33,7 +33,7 @@ if TYPE_CHECKING:
     from numpy.typing import NDArray
 
     from ropt.context import EnOptContext
-    from ropt.evaluator import EvaluatorCallback
+    from ropt.evaluation import EvaluationBatchCallback
     from ropt.function_estimator import FunctionEstimator
     from ropt.realization_filter import RealizationFilter
     from ropt.sampler import Sampler
@@ -57,7 +57,7 @@ class EnsembleEvaluator:
     def __init__(
         self,
         context: EnOptContext,
-        evaluator: EvaluatorCallback,
+        evaluator: EvaluationBatchCallback,
     ) -> None:
         """Initialize the EnsembleEvaluator.
 

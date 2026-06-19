@@ -9,26 +9,27 @@ if TYPE_CHECKING:
     import numpy as np
     from numpy.typing import NDArray
 
-    from ropt.evaluator import EvaluatorContext, EvaluatorResult
+    from ropt.evaluation import EvaluationBatchContext, EvaluationBatchResult
 
 
 class Evaluator(ABC):
     """Abstract base class for evaluator components within an optimization workflow.
 
     Subclasses must implement the abstract
-    [`eval`][ropt.workflow.evaluators.Evaluator.eval] method, which is responsible
-    for performing the actual evaluation of variables using an
-    [`EvaluatorContext`][ropt.evaluator.EvaluatorContext] and returning an
-    [`EvaluatorResult`][ropt.evaluator.EvaluatorResult].
+    [`eval`][ropt.workflow.evaluators.Evaluator.eval] method, which is
+    responsible for performing the actual evaluation of variables using an
+    [`EvaluationBatchContext`][ropt.evaluation.EvaluationBatchContext] and
+    returning an
+    [`EvaluationBatchResult`][ropt.evaluation.EvaluationBatchResult].
     """
 
     @abstractmethod
     def eval(
-        self, variables: NDArray[np.float64], context: EvaluatorContext
-    ) -> EvaluatorResult:
+        self, variables: NDArray[np.float64], context: EvaluationBatchContext
+    ) -> EvaluationBatchResult:
         """Evaluate objective and constraint functions for given variables.
 
-        This follows the [`EvaluatorCallback`][ropt.evaluator.EvaluatorCallback] protocol.
+        This follows the [`EvaluationBatchCallback`][ropt.evaluation.EvaluationBatchCallback] protocol.
 
         Args:
             variables: The matrix of variables to evaluate. Each row represents
@@ -42,7 +43,7 @@ class Evaluator(ABC):
 
 
 class FunctionCallback(Protocol):
-    """Defines the call signature for function evaluator callbacks.
+    """Defines the call signature for function callbacks.
 
     A function following this protocol is called once per active row of the
     evaluation batch, receiving the variable vector for that row together with

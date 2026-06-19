@@ -6,7 +6,7 @@ write a minimal configuration and how to run and monitor the optimization.
 
 This script demonstrate different ways to run the optimization:
    1. Use multiple perturbations or only one with the `merge_realizations` option.
-   2. Use a function callback or an evaluator callback.
+   2. Use a function callback or an batch evaluation callback.
    3. Use a basic optimizer a workflow.
 
 You can select each of these options independently using the command line arguments:
@@ -16,7 +16,7 @@ You can select each of these options independently using the command line argume
     options:
     -h, --help  show this help message and exit
     --merge     Merge the realizations in gradient calculation
-    --function  Use a function callback instead of an evaluator callback
+    --function  Use a function callback instead of an batch evaluation callback
     --workflow  Use a workflow instead of basic optimizer
 """
 
@@ -30,7 +30,11 @@ from numpy.typing import NDArray
 
 from ropt.context import EnOptContext
 from ropt.enums import EnOptEventType
-from ropt.evaluator import EvaluatorCallback, EvaluatorContext, EvaluatorResult
+from ropt.evaluation import (
+    EvaluationBatchCallback,
+    EvaluationBatchContext,
+    EvaluationBatchResult,
+)
 from ropt.events import EnOptEvent
 from ropt.results import FunctionResults, Results
 from ropt.workflow import BasicOptimizer
@@ -51,14 +55,14 @@ UNCERTAINTY = 0.1
 
 def rosenbrock_evaluator_callback(
     variables: NDArray[np.float64],
-    context: EvaluatorContext,
+    context: EvaluationBatchContext,
     a: NDArray[np.float64],
     b: NDArray[np.float64],
-) -> EvaluatorResult:
-    """Evaluator callback for the multi-dimensional rosenbrock function.
+) -> EvaluationBatchResult:
+    """Batch evaluation callback for the multi-dimensional rosenbrock function.
 
-    This evaluator callback should handle multiple variable vectors, since it is
-    internally used by the `BasicOptimizer` in combination with a
+    This batch evaluation callback should handle multiple variable vectors,
+    since it is internally used by the `BasicOptimizer` in combination with a
     `BatchEvaluator` to handle all variable vectors in a batch.
 
     Args:
@@ -68,14 +72,14 @@ def rosenbrock_evaluator_callback(
         b:         The 'b' parameters.
 
     Returns:
-        An `EvaluatorResult` object containing the calculated objectives.
+        An `EvaluationBatchResult` object containing the calculated objectives.
     """
     objectives = np.zeros((variables.shape[0], 1), dtype=np.float64)
     for v_idx, r in enumerate(context.realizations):
         for d_idx in range(DIM - 1):
             x, y = variables[v_idx, d_idx : d_idx + 2]
             objectives[v_idx, 0] += (a[r] - x) ** 2 + b[r] * (y - x * x) ** 2
-    return EvaluatorResult(objectives=objectives)
+    return EvaluationBatchResult(objectives=objectives)
 
 
 def rosenbrock_function_callback(  # noqa: PLR0913, PLR0917
@@ -89,7 +93,7 @@ def rosenbrock_function_callback(  # noqa: PLR0913, PLR0917
 ) -> NDArray[np.float64] | dict[str, Any]:
     """Function callback for the multi-dimensional rosenbrock function.
 
-    This evaluator callback should handle a single variable vector, since it is
+    This function callback should handle a single variable vector, since it is
     used in combination with a `FunctionEvaluator` that calls this function for
     each variable vector in a batch.
 
@@ -135,7 +139,7 @@ def report(event_or_results: EnOptEvent | tuple[Results, ...]) -> None:
 
 def run_optimization(
     config: dict[str, Any],
-    evaluator: Evaluator | EvaluatorCallback,
+    evaluator: Evaluator | EvaluationBatchCallback,
     *,
     workflow: bool = False,
 ) -> FunctionResults:
@@ -219,7 +223,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--function",
         action="store_true",
-        help="use a function callback instead of an evaluator callback",
+        help="use a function callback instead of a batch evaluation callback",
     )
     parser.add_argument(
         "--workflow",

@@ -12,10 +12,10 @@ T = TypeVar("T", bound=np.generic)
 
 
 @dataclass(slots=True)
-class EvaluatorContext:
+class EvaluationBatchContext:
     """Per-batch metadata passed to evaluator functions.
 
-    See [Writing an Evaluator Callback](../usage/evaluator_callback.md) for
+    See [Writing Evaluation Callbacks](../usage/evaluation_callbacks.md) for
     usage details and examples.
 
     Attributes:
@@ -66,14 +66,14 @@ class EvaluatorContext:
 
 
 @dataclass
-class EvaluatorResult:
+class EvaluationBatchResult:
     """Results of a function evaluation batch.
 
-    Stores objective values (and optional constraint values) for a set of
+    Stores objective values (and optional constraint values) for a batch of
     variable vectors. Inactive rows should be set to zero; failed active rows
     should be set to `numpy.nan`.
 
-    See [Writing an Evaluator Callback](../usage/evaluator_callback.md) for
+    See [Writing Evaluation Callbacks](../usage/evaluation_callbacks.md) for
     detailed conventions and examples.
 
     Args:
@@ -89,12 +89,12 @@ class EvaluatorResult:
     evaluation_info: dict[str, NDArray[Any]] = field(default_factory=dict)
 
 
-class EvaluatorCallback(Protocol):
-    """Defines the call signature for evaluator callbacks."""
+class EvaluationBatchCallback(Protocol):
+    """Defines the call signature for batch evaluation callbacks."""
 
     def __call__(
-        self, variables: NDArray[np.float64], context: EvaluatorContext, /
-    ) -> EvaluatorResult:
+        self, variables: NDArray[np.float64], context: EvaluationBatchContext, /
+    ) -> EvaluationBatchResult:
         """Evaluate the given variables within the provided context.
 
         Args:

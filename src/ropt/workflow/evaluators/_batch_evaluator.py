@@ -10,17 +10,21 @@ if TYPE_CHECKING:
     import numpy as np
     from numpy.typing import NDArray
 
-    from ropt.evaluator import EvaluatorCallback, EvaluatorContext, EvaluatorResult
+    from ropt.evaluation import (
+        EvaluationBatchCallback,
+        EvaluationBatchContext,
+        EvaluationBatchResult,
+    )
 
 
 class BatchEvaluator(Evaluator):
     """An evaluator that defers to a callable callback."""
 
-    def __init__(self, *, callback: EvaluatorCallback) -> None:
+    def __init__(self, *, callback: EvaluationBatchCallback) -> None:
         """Initialize the BatchEvaluator.
 
         Forwards the evaluation to the provided callback, which should implement
-        the [`EvaluatorCallback`][ropt.evaluator.EvaluatorCallback] protocol.
+        the [`EvaluationBatchCallback`][ropt.evaluation.EvaluationBatchCallback] protocol.
 
         Args:
             callback: The callback to defer evaluation to.
@@ -29,8 +33,8 @@ class BatchEvaluator(Evaluator):
         self._callback = callback
 
     def eval(
-        self, variables: NDArray[np.float64], context: EvaluatorContext
-    ) -> EvaluatorResult:
+        self, variables: NDArray[np.float64], context: EvaluationBatchContext
+    ) -> EvaluationBatchResult:
         """Call the stored callback with the given variables and context.
 
         Args:
@@ -38,6 +42,6 @@ class BatchEvaluator(Evaluator):
             context:   The evaluation context.
 
         Returns:
-            An `EvaluatorResult` with the evaluation results.
+            An `EvaluationBatchResult` with the evaluation results.
         """
         return self._callback(variables, context)

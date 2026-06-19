@@ -22,7 +22,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from ropt.enums import VariableType
-from ropt.evaluator import EvaluatorContext, EvaluatorResult
+from ropt.evaluation import EvaluationBatchContext, EvaluationBatchResult
 from ropt.results import FunctionResults, Results
 from ropt.workflow import BasicOptimizer
 
@@ -46,8 +46,8 @@ CONFIG: dict[str, Any] = {
 
 
 def function(
-    variables: NDArray[np.float64], _: EvaluatorContext, *, linear: bool = False
-) -> EvaluatorResult:
+    variables: NDArray[np.float64], _: EvaluationBatchContext, *, linear: bool = False
+) -> EvaluationBatchResult:
     """Evaluate the function.
 
     Args:
@@ -55,13 +55,13 @@ def function(
         linear:    Whether to use a linear constraint or a nonlinear constraint.
 
     Returns:
-        An `EvaluatorResult` object containing the calculated objectives and constraints.
+        An `EvaluationBatchResult` object containing the calculated objectives and constraints.
     """
     x = variables[:, 0]
     y = variables[:, 1]
     objectives = -np.array(np.minimum(3 * x, y), ndmin=2).T
     constraints = None if linear else np.array(x + y, ndmin=2).T
-    return EvaluatorResult(objectives=objectives, constraints=constraints)
+    return EvaluationBatchResult(objectives=objectives, constraints=constraints)
 
 
 def report(results: tuple[Results, ...]) -> None:

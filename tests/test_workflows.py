@@ -21,7 +21,7 @@ if TYPE_CHECKING:
 
     from numpy.typing import NDArray
 
-    from ropt.evaluator import EvaluatorContext, EvaluatorResult
+    from ropt.evaluation import EvaluationBatchContext, EvaluationBatchResult
     from ropt.events import EnOptEvent
 
 
@@ -582,8 +582,8 @@ def test_optimization_abort(config: Any, evaluator: Any) -> None:
 def _cached_eval(
     obj: CachedEvaluator,
     variables: NDArray[np.float64],
-    evaluator_context: EvaluatorContext,
-) -> EvaluatorResult:
+    evaluator_context: EvaluationBatchContext,
+) -> EvaluationBatchResult:
     results, cached = obj.eval_cached(variables, evaluator_context)
     cached_indices = list(cached.keys())
     info = np.zeros(variables.shape[0], dtype=np.bool_)

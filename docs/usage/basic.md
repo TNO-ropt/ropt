@@ -21,7 +21,7 @@ import numpy as np
 from numpy.random import default_rng
 from numpy.typing import NDArray
 
-from ropt.evaluator import EvaluatorContext, EvaluatorResult
+from ropt.evaluation import EvaluationBatchContext, EvaluationBatchResult
 from ropt.results import FunctionResults, Results
 from ropt.workflow import BasicOptimizer
 
@@ -31,16 +31,16 @@ REALIZATIONS = 10
 
 def rosenbrock(
     variables: NDArray[np.float64],
-    context: EvaluatorContext,
+    context: EvaluationBatchContext,
     a: NDArray[np.float64],
     b: NDArray[np.float64],
-) -> EvaluatorResult:
+) -> EvaluationBatchResult:
     objectives = np.zeros((variables.shape[0], 1), dtype=np.float64)
     for r_idx, r in enumerate(context.realizations):
         for d_idx in range(DIM - 1):
             x, y = variables[r_idx, d_idx : d_idx + 2]
             objectives[r_idx, 0] += (a[r] - x) ** 2 + b[r] * (y - x * x) ** 2
-    return EvaluatorResult(objectives=objectives)
+    return EvaluationBatchResult(objectives=objectives)
 
 def report(results: tuple[Results, ...]) -> None:
     for item in results:
@@ -76,10 +76,10 @@ print(f"Optimal objective: {optimizer.results.functions.target_objective}\n")
 You must provide a Python function (`rosenbrock()` in our example) that `ropt`
 can call to evaluate your objective function for a given set of variables. The
 evaluator function receives the `variables` to be evaluated and an
-[`EvaluatorContext`][ropt.evaluator.EvaluatorContext] object. The context
-provides information such as which realizations to compute. The function must
-return an [`EvaluatorResult`][ropt.evaluator.EvaluatorResult] containing the
-calculated objective values.
+[`EvaluationBatchContext`][ropt.evaluation.EvaluationBatchContext] object. The
+context provides information such as which realizations to compute. The function
+must return an [`EvaluationBatchResult`][ropt.evaluation.EvaluationBatchResult]
+containing the calculated objective values.
 
 The `variables` input is a matrix, where each row is a variable vector. We
 iterate over the rows and calculate the Rosenbrock function for each variable
@@ -164,7 +164,7 @@ into a simple, single-run interface. The table below summarizes its API:
 
 | Member                    | Description
 | ------------------------- | ---------------------------------------------------------------------------------------------------
-| `__init__(config, evaluator, *, constraint_tolerance=1e-10)` | Create the optimizer from a config dict and an evaluator (a [`EvaluatorCallback`][ropt.evaluator.EvaluatorCallback] callable or an [`Evaluator`][ropt.workflow.evaluators.Evaluator] object).
+| `__init__(config, evaluator, *, constraint_tolerance=1e-10)` | Create the optimizer from a config dict and a [`EvaluationBatchCallback`][ropt.evaluation.EvaluationBatchCallback] callable or an [`Evaluator`][ropt.workflow.evaluators.Evaluator] object.
 | `run(initial_values)`     | Execute the optimization starting from `initial_values`. Returns an [`ExitCode`][ropt.enums.ExitCode].
 | `results`                 | Property returning the best [`FunctionResults`][ropt.results.FunctionResults] found, or `None`.
 | `set_results_callback(cb)`| Register a callback `cb(results: tuple[FunctionResults, ...]) -> None` invoked after each evaluation batch.
@@ -173,16 +173,16 @@ into a simple, single-run interface. The table below summarizes its API:
 ### Evaluator signature
 
 When you pass a plain Python callable as the evaluator, it must have the
-[`EvaluatorCallback`][ropt.evaluator.EvaluatorCallback] signature:
+[`EvaluationBatchCallback`][ropt.evaluation.EvaluationBatchCallback] signature:
 ```python
 def evaluator(
     variables: NDArray[np.float64],
-    context: EvaluatorContext,
-) -> EvaluatorResult:
+    context: EvaluationBatchContext,
+) -> EvaluationBatchResult:
     ...
 ```
 
-See [Writing an Evaluator](evaluator_callback.md) for details.
+See [Writing an Evaluator](evaluation_callbacks.md) for details.
 
 ### Under the hood
 
@@ -240,7 +240,7 @@ required constructor arguments.
 
 - Look up any configuration key: [Configuration](configuration.md).
 - Add per-realization logic or handle simulator failures:
-  [Writing an Evaluator Callback](evaluator_callback.md).
+  [Writing Evaluation Callbacks](evaluation_callbacks.md).
 - Process or export the result objects:
   [Working with Results](results.md).
 - Move beyond a single optimization run:

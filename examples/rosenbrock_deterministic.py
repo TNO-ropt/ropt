@@ -10,7 +10,7 @@ from typing import Any
 import numpy as np
 from numpy.typing import NDArray
 
-from ropt.evaluator import EvaluatorContext, EvaluatorResult
+from ropt.evaluation import EvaluationBatchContext, EvaluationBatchResult
 from ropt.results import FunctionResults, Results
 from ropt.workflow import BasicOptimizer
 
@@ -24,21 +24,23 @@ CONFIG: dict[str, Any] = {
 INITIAL_VALUES = 2 * np.arange(DIM) / DIM + 0.5
 
 
-def rosenbrock(variables: NDArray[np.float64], _: EvaluatorContext) -> EvaluatorResult:
+def rosenbrock(
+    variables: NDArray[np.float64], _: EvaluationBatchContext
+) -> EvaluationBatchResult:
     """Function evaluator for the multi-dimensional rosenbrock function.
 
     Args:
         variables: The variables to evaluate.
 
     Returns:
-        An `EvaluatorResult` object containing the calculated objectives.
+        An `EvaluationBatchResult` object containing the calculated objectives.
     """
     objectives = np.zeros((variables.shape[0], 1), dtype=np.float64)
     for v_idx in range(variables.shape[0]):
         for d_idx in range(DIM - 1):
             x, y = variables[v_idx, d_idx : d_idx + 2]
             objectives[v_idx, 0] += (1.0 - x) ** 2 + 100 * (y - x * x) ** 2
-    return EvaluatorResult(objectives=objectives)
+    return EvaluationBatchResult(objectives=objectives)
 
 
 def report(results: tuple[Results, ...]) -> None:
