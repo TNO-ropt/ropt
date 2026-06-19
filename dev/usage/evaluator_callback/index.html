@@ -685,6 +685,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#using-functionevaluator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Using FunctionEvaluator
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#where-to-next" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2038,6 +2049,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#using-functionevaluator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Using FunctionEvaluator
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#where-to-next" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2114,6 +2136,10 @@ evaluator function should look like this:</p>
   objective values (and optional constraint values, evaluation info, and per-row
   error indicators).</li>
 </ul>
+<p>One advantage of this approach is that the callback receives all variable
+vectors at once as a 2-D NumPy array. This makes it possible to exploit NumPy's
+vectorized operations to evaluate all rows in a single pass, avoiding explicit
+Python loops and achieving better performance.</p>
 <h2 id="whats-in-evaluatorcontext">What's in <code>EvaluatorContext</code></h2>
 <p>The <a class="autorefs autorefs-internal" title="            ropt.evaluator.EvaluatorContext
 
@@ -2218,6 +2244,61 @@ whether the optimization can recover. For example:</p>
 <p>Combined with the <code>realization_min_success</code> field of
 <a class="autorefs autorefs-internal" title="            RealizationsConfig" href="../../reference/config/#ropt.config.RealizationsConfig"><code>RealizationsConfig</code></a>, this allows the
 optimization to continue as long as enough realizations succeed.</p>
+<h2 id="using-functionevaluator">Using <code>FunctionEvaluator</code></h2>
+<p>When your evaluation function naturally works on a single variable vector at a
+time — for instance when it calls an external simulator once per realization —
+the <a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.FunctionEvaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.FunctionEvaluator"><code>FunctionEvaluator</code></a> offers a
+simpler alternative. Instead of receiving the full 2-D batch and managing the
+loop yourself, you write a function that takes a single 1-D variable vector and
+returns the objective (and optional constraint) values for that row. The
+<code>FunctionEvaluator</code> handles the batching, the active-row filtering, and the
+assembly of the final
+<a class="autorefs autorefs-internal" title="            ropt.evaluator.EvaluatorResult
+
+
+  
+      dataclass
+  " href="../../reference/evaluator/#ropt.evaluator.EvaluatorResult"><code>EvaluatorResult</code></a>.</p>
+<p>A function passed to <code>FunctionEvaluator</code> must follow the
+<a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.FunctionCallback" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.FunctionCallback"><code>FunctionCallback</code></a> protocol:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">numpy.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">NDArray</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="k">def</span><span class="w"> </span><span class="nf">my_function</span><span class="p">(</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>    <span class="n">variables</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>    <span class="o">/</span><span class="p">,</span>
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>    <span class="o">*</span><span class="p">,</span>
+</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>    <span class="n">realization</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>    <span class="n">perturbation</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>    <span class="n">batch_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>    <span class="n">eval_idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+</span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a>    <span class="o">...</span>
+</span></code></pre></div>
+<ul>
+<li><code>variables</code> is a 1-D array for a single evaluation row.</li>
+<li><code>realization</code>, <code>perturbation</code>, <code>batch_id</code>, and <code>eval_idx</code> identify the
+  evaluation. <code>perturbation</code> is <code>-1</code> when the evaluation is unperturbed.</li>
+<li>The return value is either a 1-D NumPy array of length
+  <code>n_objectives + n_constraints</code>, or a dictionary with a <code>"result"</code> key
+  containing that array (any additional keys are stored as <code>evaluation_info</code>
+  entries).</li>
+</ul>
+<p>To use it with
+<a class="autorefs autorefs-internal" title="            ropt.workflow.BasicOptimizer" href="../../reference/basic_optimizer/#ropt.workflow.BasicOptimizer"><code>BasicOptimizer</code></a>, wrap the function in a
+<a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.FunctionEvaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.FunctionEvaluator"><code>FunctionEvaluator</code></a> and pass it as
+the evaluator argument:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.workflow</span><span class="w"> </span><span class="kn">import</span> <span class="n">BasicOptimizer</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.workflow.evaluators</span><span class="w"> </span><span class="kn">import</span> <span class="n">FunctionEvaluator</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="n">optimizer</span> <span class="o">=</span> <span class="n">BasicOptimizer</span><span class="p">(</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>    <span class="n">config</span><span class="p">,</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>    <span class="n">FunctionEvaluator</span><span class="p">(</span><span class="n">function</span><span class="o">=</span><span class="n">my_function</span><span class="p">),</span>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="p">)</span>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="n">optimizer</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">initial_values</span><span class="p">)</span>
+</span></code></pre></div>
 <h2 id="where-to-next">Where to next</h2>
 <ul>
 <li>Read the results: <a href="../results/">Working with Results</a>.</li>
