@@ -51,13 +51,8 @@ async def test_rosenbrock_multiprocessing(tmp_path: Path, monkeypatch: Any) -> N
     await rosenbrock_async.main(multiprocessing=True)
 
 
-def test_differential_evolution_linear(tmp_path: Path, monkeypatch: Any) -> None:
+@pytest.mark.parametrize("linear", [True, False])
+def test_differential_evolution(tmp_path: Path, monkeypatch: Any, linear: Any) -> None:
     monkeypatch.chdir(tmp_path)
-    module = _load_from_file("de_linear")
-    module.main()
-
-
-def test_differential_evolution_nonlinear(tmp_path: Path, monkeypatch: Any) -> None:
-    monkeypatch.chdir(tmp_path)
-    module = _load_from_file("de_nonlinear")
-    module.main()
+    module = _load_from_file("differential_evolution")
+    module.main(linear=linear)
