@@ -8,10 +8,8 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 import pytest
 
-from ropt.context import EnOptContext
-from ropt.workflow.compute_steps import EnsembleOptimizer
+from ropt.workflow._basic_optimizer import BasicOptimizer
 from ropt.workflow.evaluators import AsyncEvaluator
-from ropt.workflow.event_handlers import Tracker
 from ropt.workflow.servers import (
     HPCServer,
     MultiprocessingServer,
@@ -237,14 +235,11 @@ def _opt_workflow(
     server: Server,
     config: dict[str, Any],
     test_function: Callable[[NDArray[np.float64], int], NDArray[np.float64]],
-) -> FunctionResults:
+) -> FunctionResults | None:
     evaluator = AsyncEvaluator(function=test_function, server=server)
-    step = EnsembleOptimizer(evaluator=evaluator)
-    tracker = Tracker()
-    step.add_event_handler(tracker)
-    step.run(variables=initial_values, context=EnOptContext.model_validate(config))
-    results: FunctionResults = tracker["results"]
-    return results
+    optimizer = BasicOptimizer(config=config, evaluator=evaluator)
+    optimizer.run(initial_values)
+    return optimizer.results
 
 
 if _TEST_HPC:
