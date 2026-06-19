@@ -347,7 +347,7 @@ class NormalizedConstraints:
 
     @property
     def is_eq(self) -> list[bool]:
-        """Return flags indicating which normalized rows are equalities.
+        """Flags indicating which normalized rows are equalities.
 
         The returned list corresponds to the normalized constraint rows after
         any splitting of two-sided bounds into separate lower and upper rows.
@@ -373,7 +373,7 @@ class NormalizedConstraints:
 
     @property
     def constraints(self) -> NDArray[np.float64] | None:
-        """Return cached normalized constraint values, if available.
+        """Cached normalized constraint values, if available.
 
         These values are produced by
         [`set_constraints`][ropt.backend.utils.NormalizedConstraints.set_constraints]
@@ -391,7 +391,7 @@ class NormalizedConstraints:
 
     @property
     def gradients(self) -> NDArray[np.float64] | None:
-        """Return cached normalized constraint gradients, if available.
+        """Cached normalized constraint gradients, if available.
 
         These gradients are produced by
         [`set_gradients`][ropt.backend.utils.NormalizedConstraints.set_gradients]

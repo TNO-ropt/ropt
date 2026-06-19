@@ -39,7 +39,7 @@ class EventHandler(ABC):
     @property
     @abstractmethod
     def event_types(self) -> set[EnOptEventType]:
-        """Return the event types that are handled.
+        """The event types that are handled.
 
         Returns:
             A set of event types that are handled.

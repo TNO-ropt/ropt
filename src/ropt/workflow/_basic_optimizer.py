@@ -70,7 +70,7 @@ class BasicOptimizer:
 
     @property
     def results(self) -> FunctionResults | None:
-        """Return the optimal result found during the optimization.
+        """The optimal result found during the optimization.
 
         This property provides access to the best
         [`FunctionResults`][ropt.results.FunctionResults] object discovered

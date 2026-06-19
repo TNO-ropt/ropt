@@ -4,24 +4,28 @@ An evaluator is the bridge between `ropt` and your model. `ropt` decides which
 variable vectors need values; the evaluator computes the objective (and
 optional nonlinear-constraint) values for each.
 
-There are two ways to provide an evaluator:
+There are two ways to provide an evaluator to
+[`BasicOptimizer`][ropt.workflow.BasicOptimizer]:
+
 
 1. **A plain callable** — A callable adhering to the
-   [`EvaluatorCallback`][ropt.evaluator.EvaluatorCallback] protocol is the
-   simplest option, used by [`BasicOptimizer`][ropt.workflow.BasicOptimizer].
-2. **An [`Evaluator`][ropt.workflow.evaluators.Evaluator] subclass** —
-   required by the [workflow framework](workflows.md), and useful when you need
-   state, caching, async execution, or HPC dispatch.
-
-This page focuses on the usage of callables together with
-[`BasicOptimizer`][ropt.workflow.BasicOptimizer] objects. For advanced usage of
-evaluators within workflows, see [Optimization Workflows](workflows.md).
+   [`EvaluatorCallback`][ropt.evaluator.EvaluatorCallback] protocol that
+   receives all variable vectors at once as a 2-D array.
+2. **An [`Evaluator`][ropt.workflow.evaluators.Evaluator] subclass** — Classes
+    that support advanced features such as caching, parallel execution, or HPC
+    dispatch. Here we only discuss
+   [`FunctionEvaluator`][ropt.workflow.evaluators.FunctionEvaluator], a
+   convenience wrapper around a simpler per-row function following the
+   [`FunctionCallback`][ropt.workflow.evaluators.FunctionCallback] protocol.
+   [`Evaluator`][ropt.workflow.evaluators.Evaluator] classes are discussed
+   in more detail in
+   [Optimization Workflows](workflows.md) and [Parallel Evaluation](parallel.md).
 
 ## The callable signature
 
 Evaluator callbacks must adhere to the
-[`EvaluatorCallback`][ropt.evaluator.EvaluatorCallback] protocol. For instance an
-evaluator function should look like this:
+[`EvaluatorCallback`][ropt.evaluator.EvaluatorCallback] protocol. For instance
+an evaluator function should look like this:
 
 ```python
 from numpy.typing import NDArray
@@ -44,6 +48,11 @@ def my_evaluator(
   [`EvaluatorResult`][ropt.evaluator.EvaluatorResult] object that packages
   objective values (and optional constraint values, evaluation info, and per-row
   error indicators).
+
+One advantage of this approach is that the callback receives all variable
+vectors at once as a 2-D NumPy array. This makes it possible to exploit NumPy's
+vectorized operations to evaluate all rows in a single pass, avoiding explicit
+Python loops and achieving better performance.
 
 ## What's in `EvaluatorContext`
 
@@ -114,6 +123,63 @@ def evaluator(variables, context):
 Combined with the `realization_min_success` field of
 [`RealizationsConfig`][ropt.config.RealizationsConfig], this allows the
 optimization to continue as long as enough realizations succeed.
+
+## Using `FunctionEvaluator`
+
+When your evaluation function naturally works on a single variable vector at a
+time — for instance when it calls an external simulator once per realization —
+the [`FunctionEvaluator`][ropt.workflow.evaluators.FunctionEvaluator] offers a
+simpler alternative. Instead of receiving the full 2-D batch and managing the
+loop yourself, you write a function that takes a single 1-D variable vector and
+returns the objective (and optional constraint) values for that row. The
+`FunctionEvaluator` handles the batching, the active-row filtering, and the
+assembly of the final
+[`EvaluatorResult`][ropt.evaluator.EvaluatorResult].
+
+A function passed to `FunctionEvaluator` must follow the
+[`FunctionCallback`][ropt.workflow.evaluators.FunctionCallback] protocol:
+
+```python
+from typing import Any
+from numpy.typing import NDArray
+import numpy as np
+
+
+def my_function(
+    variables: NDArray[np.float64],
+    /,
+    *,
+    realization: int,
+    perturbation: int,
+    batch_id: int,
+    eval_idx: int,
+) -> NDArray[np.float64] | dict[str, Any]:
+    ...
+```
+
+- `variables` is a 1-D array for a single evaluation row.
+- `realization`, `perturbation`, `batch_id`, and `eval_idx` identify the
+  evaluation. `perturbation` is `-1` when the evaluation is unperturbed.
+- The return value is either a 1-D NumPy array of length
+  `n_objectives + n_constraints`, or a dictionary with a `"result"` key
+  containing that array (any additional keys are stored as `evaluation_info`
+  entries).
+
+To use it with
+[`BasicOptimizer`][ropt.workflow.BasicOptimizer], wrap the function in a
+[`FunctionEvaluator`][ropt.workflow.evaluators.FunctionEvaluator] and pass it as
+the evaluator argument:
+
+```python
+from ropt.workflow import BasicOptimizer
+from ropt.workflow.evaluators import FunctionEvaluator
+
+optimizer = BasicOptimizer(
+    config,
+    FunctionEvaluator(function=my_function),
+)
+optimizer.run(initial_values)
+```
 
 ## Where to next
 

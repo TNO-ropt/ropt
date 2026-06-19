@@ -33,17 +33,17 @@ class Server(ABC):
     @property
     @abstractmethod
     def task_queue(self) -> asyncio.Queue[Any]:
-        """Get the task queue."""
+        """The task queue."""
 
     @property
     @abstractmethod
     def loop(self) -> asyncio.AbstractEventLoop | None:
-        """Get the asyncio loop used by this server."""
+        """The asyncio loop used by this server."""
 
     @property
     @abstractmethod
     def task_group(self) -> asyncio.TaskGroup | None:
-        """Get the task group used by this server."""
+        """The task group used by this server."""
 
     @abstractmethod
     async def start(self, task_group: asyncio.TaskGroup) -> None:
@@ -90,17 +90,17 @@ class ServerBase(Server):
 
     @property
     def loop(self) -> asyncio.AbstractEventLoop | None:
-        """Get the asyncio loop used by this server."""
+        """The asyncio loop used by this server."""
         return self._loop
 
     @property
     def task_group(self) -> asyncio.TaskGroup | None:
-        """Get the task group used by this server."""
+        """The task group used by this server."""
         return self._task_group
 
     @property
     def task_queue(self) -> asyncio.Queue[Task]:
-        """Get the task queue."""
+        """The task queue."""
         return self._task_queue
 
     async def _finish_start(self, task_group: asyncio.TaskGroup) -> None:

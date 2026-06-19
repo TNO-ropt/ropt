@@ -38,7 +38,7 @@ class ComputeStep(ABC):
 
     @property
     def event_handlers(self) -> list[EventHandler]:
-        """Get the event handlers attached to this compute step.
+        """The event handlers attached to this compute step.
 
         Returns:
             A list of handlers.
