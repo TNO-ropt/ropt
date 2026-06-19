@@ -1654,19 +1654,19 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.workflow.evaluators.CallbackEvaluator" class="md-nav__link">
+  <a href="#ropt.workflow.evaluators.BatchEvaluator" class="md-nav__link">
     <span class="md-ellipsis">
       
-        CallbackEvaluator
+        BatchEvaluator
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="CallbackEvaluator">
+    <nav class="md-nav" aria-label="BatchEvaluator">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.workflow.evaluators.CallbackEvaluator.__init__" class="md-nav__link">
+  <a href="#ropt.workflow.evaluators.BatchEvaluator.__init__" class="md-nav__link">
     <span class="md-ellipsis">
       
         __init__
@@ -1677,7 +1677,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.workflow.evaluators.CallbackEvaluator.eval" class="md-nav__link">
+  <a href="#ropt.workflow.evaluators.BatchEvaluator.eval" class="md-nav__link">
     <span class="md-ellipsis">
       
         eval
@@ -2238,19 +2238,19 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.workflow.evaluators.CallbackEvaluator" class="md-nav__link">
+  <a href="#ropt.workflow.evaluators.BatchEvaluator" class="md-nav__link">
     <span class="md-ellipsis">
       
-        CallbackEvaluator
+        BatchEvaluator
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="CallbackEvaluator">
+    <nav class="md-nav" aria-label="BatchEvaluator">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.workflow.evaluators.CallbackEvaluator.__init__" class="md-nav__link">
+  <a href="#ropt.workflow.evaluators.BatchEvaluator.__init__" class="md-nav__link">
     <span class="md-ellipsis">
       
         __init__
@@ -2261,7 +2261,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.workflow.evaluators.CallbackEvaluator.eval" class="md-nav__link">
+  <a href="#ropt.workflow.evaluators.BatchEvaluator.eval" class="md-nav__link">
     <span class="md-ellipsis">
       
         eval
@@ -2588,6 +2588,7 @@ for performing the actual evaluation of variables using an
     <div class="doc doc-contents ">
 
         <p>Evaluate objective and constraint functions for given variables.</p>
+<p>This follows the <a class="autorefs autorefs-internal" title="            ropt.evaluator.EvaluatorCallback" href="../evaluator/#ropt.evaluator.EvaluatorCallback"><code>EvaluatorCallback</code></a> protocol.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2689,8 +2690,8 @@ for performing the actual evaluation of variables using an
 
 
 
-<h2 id="ropt.workflow.evaluators.CallbackEvaluator" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.workflow.evaluators.CallbackEvaluator</span>
+<h2 id="ropt.workflow.evaluators.BatchEvaluator" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.workflow.evaluators.BatchEvaluator</span>
 
 
 </h2>
@@ -2725,7 +2726,7 @@ for performing the actual evaluation of variables using an
 <div class="doc doc-object doc-function">
 
 
-<h3 id="ropt.workflow.evaluators.CallbackEvaluator.__init__" class="doc doc-heading">
+<h3 id="ropt.workflow.evaluators.BatchEvaluator.__init__" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">__init__</span>
 
 
@@ -2735,7 +2736,9 @@ for performing the actual evaluation of variables using an
 
     <div class="doc doc-contents ">
 
-        <p>Initialize the CallbackEvaluator.</p>
+        <p>Initialize the BatchEvaluator.</p>
+<p>Forwards the evaluation to the provided callback, which should implement
+the <a class="autorefs autorefs-internal" title="            ropt.evaluator.EvaluatorCallback" href="../evaluator/#ropt.evaluator.EvaluatorCallback"><code>EvaluatorCallback</code></a> protocol.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2781,7 +2784,7 @@ for performing the actual evaluation of variables using an
 <div class="doc doc-object doc-function">
 
 
-<h3 id="ropt.workflow.evaluators.CallbackEvaluator.eval" class="doc doc-heading">
+<h3 id="ropt.workflow.evaluators.BatchEvaluator.eval" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">eval</span>
 
 

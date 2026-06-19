@@ -2980,12 +2980,12 @@ the <a href="../parallel/">next section</a>:</p>
 </thead>
 <tbody>
 <tr>
-<td><a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.FunctionEvaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.FunctionEvaluator"><code>FunctionEvaluator</code></a></td>
-<td>Per-row: <code>f(variables_1d, realization=..., ...)</code> → array or dict.</td>
+<td><a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.BatchEvaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.BatchEvaluator"><code>BatchEvaluator</code></a></td>
+<td>Batch: <code>f(variables_2d, context)</code> → <code>EvaluatorResult</code>.</td>
 </tr>
 <tr>
-<td><a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.CallbackEvaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.CallbackEvaluator"><code>CallbackEvaluator</code></a></td>
-<td>Batch: <code>f(variables_2d, context)</code> → <code>EvaluatorResult</code>.</td>
+<td><a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.FunctionEvaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.FunctionEvaluator"><code>FunctionEvaluator</code></a></td>
+<td>Per-row: <code>f(variables_1d, realization=..., ...)</code> → array or dict.</td>
 </tr>
 <tr>
 <td><a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.CachedEvaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.CachedEvaluator"><code>CachedEvaluator</code></a></td>
@@ -2997,6 +2997,23 @@ the <a href="../parallel/">next section</a>:</p>
 </tr>
 </tbody>
 </table>
+<p><a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.BatchEvaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.BatchEvaluator"><code>BatchEvaluator</code></a> defers to a callable
+callback that receives the full 2-D variable matrix and an
+<a class="autorefs autorefs-internal" title="            ropt.evaluator.EvaluatorContext
+
+
+  
+      dataclass
+  " href="../../reference/evaluator/#ropt.evaluator.EvaluatorContext"><code>EvaluatorContext</code></a>, and returns an
+<a class="autorefs autorefs-internal" title="            ropt.evaluator.EvaluatorResult
+
+
+  
+      dataclass
+  " href="../../reference/evaluator/#ropt.evaluator.EvaluatorResult"><code>EvaluatorResult</code></a>. Use this when you need the
+full batch (e.g. vectorized computation, or an external simulator that accepts
+all rows at once). The callback has the same signature as the callable accepted
+by <code>BasicOptimizer</code>.</p>
 <p><a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.FunctionEvaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.FunctionEvaluator"><code>FunctionEvaluator</code></a> stores a
 single function that returns a value for each objective and constraint. The
 function is called once per row of the evaluation batch with the variable
@@ -3016,23 +3033,6 @@ either:</p>
       dataclass
   " href="../../reference/evaluator/#ropt.evaluator.EvaluatorResult"><code>EvaluatorResult</code></a>.</li>
 </ul>
-<p><a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.CallbackEvaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.CallbackEvaluator"><code>CallbackEvaluator</code></a> defers to a
-callable callback that receives the full 2-D variable matrix and an
-<a class="autorefs autorefs-internal" title="            ropt.evaluator.EvaluatorContext
-
-
-  
-      dataclass
-  " href="../../reference/evaluator/#ropt.evaluator.EvaluatorContext"><code>EvaluatorContext</code></a>, and returns an
-<a class="autorefs autorefs-internal" title="            ropt.evaluator.EvaluatorResult
-
-
-  
-      dataclass
-  " href="../../reference/evaluator/#ropt.evaluator.EvaluatorResult"><code>EvaluatorResult</code></a>. Use this when you need
-the full batch (e.g. vectorized computation, or an external simulator that
-accepts all rows at once). The callback has the same signature as the
-callable accepted by <code>BasicOptimizer</code>.</p>
 <p><a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.CachedEvaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.CachedEvaluator"><code>CachedEvaluator</code></a> wraps another
 evaluator with result caching. It retrieves previously computed function
 results from <code>EventHandler</code> instances specified as <code>sources</code> — typically a
