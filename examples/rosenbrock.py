@@ -38,7 +38,7 @@ from ropt.evaluation import (
 from ropt.events import EnOptEvent
 from ropt.results import FunctionResults, Results
 from ropt.workflow import BasicOptimizer
-from ropt.workflow.compute_steps import EnsembleOptimizer
+from ropt.workflow.compute_steps import OptimizationStep
 from ropt.workflow.evaluators import BatchEvaluator, Evaluator, FunctionEvaluator
 from ropt.workflow.event_handlers import Observer, Tracker
 
@@ -157,7 +157,7 @@ def run_optimization(
     if workflow:
         if not isinstance(evaluator, Evaluator):
             evaluator = BatchEvaluator(callback=evaluator)
-        step = EnsembleOptimizer(evaluator=evaluator)
+        step = OptimizationStep(evaluator=evaluator)
         tracker = Tracker()
         step.add_event_handler(tracker)
         reporter = Observer(

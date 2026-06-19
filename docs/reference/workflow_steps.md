@@ -2,14 +2,14 @@
 
 A [`ComputeStep`][ropt.workflow.compute_steps.ComputeStep] is an executable
 unit of work in the workflow framework. Two implementations ship with `ropt`:
-[`EnsembleOptimizer`][ropt.workflow.compute_steps.EnsembleOptimizer] runs an
+[`OptimizationStep`][ropt.workflow.compute_steps.OptimizationStep] runs an
 optimization algorithm, and
-[`EnsembleEvaluator`][ropt.workflow.compute_steps.EnsembleEvaluator] runs a
+[`EvaluationStep`][ropt.workflow.compute_steps.EvaluationStep] runs a
 single ensemble evaluation.
 
 See [Optimization Workflows](../usage/workflows.md) for usage.
 
 ::: ropt.workflow.compute_steps.ComputeStep
-::: ropt.workflow.compute_steps.EnsembleEvaluator
-::: ropt.workflow.compute_steps.EnsembleOptimizer
+::: ropt.workflow.compute_steps.EvaluationStep
+::: ropt.workflow.compute_steps.OptimizationStep
 

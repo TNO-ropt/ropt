@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-from ._evaluator import EnsembleEvaluator
-from ._optimizer import EnsembleOptimizer
+from ._evaluator import EvaluationStep
+from ._optimizer import OptimizationStep
 from .base import ComputeStep
 
 __all__ = [
     "ComputeStep",
-    "EnsembleEvaluator",
-    "EnsembleOptimizer",
+    "EvaluationStep",
+    "OptimizationStep",
 ]

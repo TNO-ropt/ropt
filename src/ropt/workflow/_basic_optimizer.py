@@ -17,7 +17,7 @@ from ropt.enums import EnOptEventType, ExitCode
 from ropt.exceptions import Abort
 from ropt.workflow.evaluators import BatchEvaluator, Evaluator
 
-from .compute_steps import EnsembleOptimizer
+from .compute_steps import OptimizationStep
 from .event_handlers import Observer, Tracker
 
 if TYPE_CHECKING:
@@ -101,7 +101,7 @@ class BasicOptimizer:
             else BatchEvaluator(callback=self._evaluator)
         )
         tracker = Tracker(constraint_tolerance=self._constraint_tolerance)
-        optimizer = EnsembleOptimizer(evaluator=evaluator)
+        optimizer = OptimizationStep(evaluator=evaluator)
         optimizer.add_event_handler(tracker)
         for event_type, function in self._observers:
             optimizer.add_event_handler(

@@ -192,7 +192,7 @@ Internally, `BasicOptimizer` creates an optimization workflow that does the foll
 2. Instantiates a
    [`BatchEvaluator`][ropt.workflow.evaluators.BatchEvaluator] object that
    calls your callable when needed.
-3. Creates an [`EnsembleOptimizer`][ropt.workflow.compute_steps.EnsembleOptimizer]
+3. Creates an [`OptimizationStep`][ropt.workflow.compute_steps.OptimizationStep]
    compute step.
 4. Attaches a [`Tracker`][ropt.workflow.event_handlers.Tracker] to remember the
    best result.

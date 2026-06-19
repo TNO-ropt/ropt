@@ -49,8 +49,8 @@ following event types:
 | `FINISHED_OPTIMIZER`          | Immediately after the optimizer finishes (success or error).  |
 | `START_EVALUATION`            | Before evaluating functions (or gradients).                   |
 | `FINISHED_EVALUATION`         | After evaluation completes — carries `results`.               |
-| `START_ENSEMBLE_EVALUATOR`    | Before an `EnsembleEvaluator` compute step begins.            |
-| `FINISHED_ENSEMBLE_EVALUATOR` | After an `EnsembleEvaluator` compute step finishes.           |
+| `START_ENSEMBLE_EVALUATOR`    | Before an `EvaluationStep` compute step begins.               |
+| `FINISHED_ENSEMBLE_EVALUATOR` | After an `EvaluationStep` compute step finishes.              |
 
 Most event handlers only need to listen for `FINISHED_EVALUATION`; the other
 types are useful for logging, progress bars, or custom lifecycle hooks.
@@ -62,7 +62,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from ropt.context import EnOptContext
-from ropt.workflow.compute_steps import EnsembleOptimizer
+from ropt.workflow.compute_steps import OptimizationStep
 from ropt.workflow.evaluators import FunctionEvaluator
 from ropt.workflow.event_handlers import Tracker
 
@@ -81,7 +81,7 @@ def my_function(variables: NDArray[np.float64], **kwargs) -> NDArray[np.float64]
 evaluator = FunctionEvaluator(function=my_function)
 
 # 4. Build the compute step.
-step = EnsembleOptimizer(evaluator=evaluator)
+step = OptimizationStep(evaluator=evaluator)
 
 # 5. Attach event handlers.
 tracker = Tracker()  # remember the best
@@ -106,24 +106,24 @@ parameters can be found here:
 
 Two compute steps ship with `ropt`:
 
-- [`EnsembleOptimizer`][ropt.workflow.compute_steps.EnsembleOptimizer] — runs
+- [`OptimizationStep`][ropt.workflow.compute_steps.OptimizationStep] — runs
   an optimization algorithm.
-- [`EnsembleEvaluator`][ropt.workflow.compute_steps.EnsembleEvaluator] — runs
+- [`EvaluationStep`][ropt.workflow.compute_steps.EvaluationStep] — runs
   a single ensemble evaluation (no optimizer). For example, useful for evaluating an
   optimum on a different ensemble, or on a sub-set of realizations.
 
 Both compute steps require an
 [`EnOptContext`][ropt.context.EnOptContext] and a `variables` argument
-passed to their `run(...)` method. For `EnsembleOptimizer`, this is a
-single 1-D variable vector (the starting point). For `EnsembleEvaluator`,
+passed to their `run(...)` method. For `OptimizationStep`, this is a
+single 1-D variable vector (the starting point). For `EvaluationStep`,
 it may be a single vector or a 2-D matrix where each row is a variable
 vector to evaluate. An optional `metadata` dictionary can be attached; if
 provided, it is included in the [`Results`][ropt.results.Results] objects
 emitted via the `FINISHED_EVALUATION` event.
 
-### Events emitted by EnsembleOptimizer
+### Events emitted by OptimizationStep
 
-The [`EnsembleOptimizer`][ropt.workflow.compute_steps.EnsembleOptimizer]
+[`OptimizationStep`][ropt.workflow.compute_steps.OptimizationStep]
 executes an optimization algorithm based on the provided context. It
 iteratively performs function and potentially gradient evaluations, yielding a
 sequence of [`FunctionResults`][ropt.results.FunctionResults] and
@@ -144,9 +144,9 @@ The following events are emitted during execution:
   Emitted after the entire optimization process concludes (successfully,
   or due to termination conditions or errors).
 
-### Events emitted by EnsembleEvaluator
+### Events emitted by EvaluationStep
 
-The [`EnsembleEvaluator`][ropt.workflow.compute_steps.EnsembleEvaluator]
+[`EvaluationStep`][ropt.workflow.compute_steps.EvaluationStep]
 evaluates a batch of variable vectors. The `variables` argument can be a
 single 1-D vector (treated as one row) or a 2-D matrix where each row is a
 variable vector. The evaluator performs a function evaluation for the full

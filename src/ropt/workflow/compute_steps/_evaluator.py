@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from ropt.core import EnsembleEvaluator as CoreEnsembleEvaluator
+from ropt.core import EnsembleEvaluator
 from ropt.enums import EnOptEventType, ExitCode
 from ropt.events import EnOptEvent
 from ropt.exceptions import Abort
@@ -22,8 +22,8 @@ if TYPE_CHECKING:
     from ropt.workflow.evaluators import Evaluator
 
 
-class EnsembleEvaluator(ComputeStep):
-    """The default ensemble evaluator compute step.
+class EvaluationStep(ComputeStep):
+    """The default evaluation step compute step.
 
     Evaluates a batch of variable vectors (a single vector or a 2-D matrix
     where each row is a variable vector) and yields
@@ -31,7 +31,7 @@ class EnsembleEvaluator(ComputeStep):
     `START_ENSEMBLE_EVALUATOR`, `START_EVALUATION`, `FINISHED_EVALUATION`,
     and `FINISHED_ENSEMBLE_EVALUATOR` events.
 
-    See [Optimization Workflows](../usage/workflows.md#events-emitted-by-ensembleevaluator)
+    See [Optimization Workflows](../usage/workflows.md#events-emitted-by-evualuationstep)
     for the full event lifecycle description.
     """
 
@@ -81,7 +81,7 @@ class EnsembleEvaluator(ComputeStep):
         for transform in context.variable_transforms:
             variables = transform.to_optimizer(variables)
 
-        ensemble_evaluator = CoreEnsembleEvaluator(context, self._evaluator.eval)
+        ensemble_evaluator = EnsembleEvaluator(context, self._evaluator.eval)
 
         exit_code = ExitCode.ENSEMBLE_EVALUATOR_FINISHED
 

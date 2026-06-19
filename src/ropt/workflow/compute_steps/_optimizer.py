@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from ropt.core import EnsembleEvaluator as CoreEnsembleEvaluator
+from ropt.core import EnsembleEvaluator
 from ropt.core import EnsembleOptimizer as CoreEnsembleOptimizer
 from ropt.enums import EnOptEventType, ExitCode
 from ropt.events import EnOptEvent
@@ -25,14 +25,14 @@ if TYPE_CHECKING:
 MetaDataType = dict[str, int | float | bool | str]
 
 
-class EnsembleOptimizer(ComputeStep):
+class OptimizationStep(ComputeStep):
     """The default optimizer compute step.
 
     Executes an optimization algorithm, iteratively performing function and
     gradient evaluations. Emits `START_OPTIMIZER`, `START_EVALUATION`,
     `FINISHED_EVALUATION`, and `FINISHED_OPTIMIZER` events.
 
-    See [Optimization Workflows](../usage/workflows.md#events-emitted-by-ensembleoptimizer)
+    See [Optimization Workflows](../usage/workflows.md#events-emitted-by-optimizationstep)
     for the full event lifecycle description.
     """
 
@@ -83,7 +83,7 @@ class EnsembleOptimizer(ComputeStep):
         for transform in context.variable_transforms:
             variables = transform.to_optimizer(variables)
 
-        ensemble_evaluator = CoreEnsembleEvaluator(
+        ensemble_evaluator = EnsembleEvaluator(
             self._context,
             self._evaluator.eval,
         )
