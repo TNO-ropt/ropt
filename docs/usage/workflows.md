@@ -386,12 +386,20 @@ instance — *not* the plain callable accepted by `BasicOptimizer`. Three
 synchronous evaluators are provided, plus an asynchronous one described in
 the [next section](parallel.md):
 
-| Evaluator                                                                      | Interface                                                              |
-| ------------------------------------------------------------------------------ | ---------------------------------------------------------------------- |
-| [`FunctionEvaluator`][ropt.workflow.evaluators.FunctionEvaluator]              | Per-row: `f(variables_1d, realization=..., ...)` → array or dict.      |
-| [`CallbackEvaluator`][ropt.workflow.evaluators.CallbackEvaluator]              | Batch: `f(variables_2d, context)` → `EvaluatorResult`.                 |
-| [`CachedEvaluator`][ropt.workflow.evaluators.CachedEvaluator]                  | Wraps another evaluator, caching results by variable vector.           |
-| [`AsyncEvaluator`][ropt.workflow.evaluators.AsyncEvaluator]                    | Parallel evaluation via a [`Server`][ropt.workflow.servers.Server] — see [Parallel Evaluation](parallel.md). |
+| Evaluator                                                                      | Interface                                                                                                                     |
+| ------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------- |
+| [`BatchEvaluator`][ropt.workflow.evaluators.BatchEvaluator]                    | Batch: `f(variables_2d, context)` → `EvaluatorResult`.                                                                        |
+| [`FunctionEvaluator`][ropt.workflow.evaluators.FunctionEvaluator]              | Per-row: `f(variables_1d, realization=..., ...)` → array or dict.                                                             |
+| [`CachedEvaluator`][ropt.workflow.evaluators.CachedEvaluator]                  | Wraps another evaluator, caching results by variable vector.                                                                  |
+| [`AsyncEvaluator`][ropt.workflow.evaluators.AsyncEvaluator]                    | Parallel evaluation via a [`Server`][ropt.workflow.servers.Server] — see [Parallel Evaluation](parallel.md).                  |
+
+[`BatchEvaluator`][ropt.workflow.evaluators.BatchEvaluator] defers to a callable
+callback that receives the full 2-D variable matrix and an
+[`EvaluatorContext`][ropt.evaluator.EvaluatorContext], and returns an
+[`EvaluatorResult`][ropt.evaluator.EvaluatorResult]. Use this when you need the
+full batch (e.g. vectorized computation, or an external simulator that accepts
+all rows at once). The callback has the same signature as the callable accepted
+by `BasicOptimizer`.
 
 [`FunctionEvaluator`][ropt.workflow.evaluators.FunctionEvaluator] stores a
 single function that returns a value for each objective and constraint. The
@@ -406,14 +414,6 @@ either:
 - A dictionary with a `"result"` key containing that array; any additional
   keys are stored as `evaluation_info` entries in the returned
   [`EvaluatorResult`][ropt.evaluator.EvaluatorResult].
-
-[`CallbackEvaluator`][ropt.workflow.evaluators.CallbackEvaluator] defers to a
-callable callback that receives the full 2-D variable matrix and an
-[`EvaluatorContext`][ropt.evaluator.EvaluatorContext], and returns an
-[`EvaluatorResult`][ropt.evaluator.EvaluatorResult]. Use this when you need
-the full batch (e.g. vectorized computation, or an external simulator that
-accepts all rows at once). The callback has the same signature as the
-callable accepted by `BasicOptimizer`.
 
 [`CachedEvaluator`][ropt.workflow.evaluators.CachedEvaluator] wraps another
 evaluator with result caching. It retrieves previously computed function

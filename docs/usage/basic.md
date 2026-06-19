@@ -190,7 +190,7 @@ Internally, `BasicOptimizer` creates an optimization workflow that does the foll
 
 1. Validates `config` into an [`EnOptContext`][ropt.context.EnOptContext].
 2. Instantiates a
-   [`CallbackEvaluator`][ropt.workflow.evaluators.CallbackEvaluator] object that
+   [`BatchEvaluator`][ropt.workflow.evaluators.BatchEvaluator] object that
    calls your callable when needed.
 3. Creates an [`EnsembleOptimizer`][ropt.workflow.compute_steps.EnsembleOptimizer]
    compute step.

@@ -35,7 +35,7 @@ from ropt.events import EnOptEvent
 from ropt.results import FunctionResults, Results
 from ropt.workflow import BasicOptimizer
 from ropt.workflow.compute_steps import EnsembleOptimizer
-from ropt.workflow.evaluators import CallbackEvaluator, Evaluator, FunctionEvaluator
+from ropt.workflow.evaluators import BatchEvaluator, Evaluator, FunctionEvaluator
 from ropt.workflow.event_handlers import Observer, Tracker
 
 DIM = 5
@@ -59,7 +59,7 @@ def rosenbrock_evaluator_callback(
 
     This evaluator callback should handle multiple variable vectors, since it is
     internally used by the `BasicOptimizer` in combination with a
-    `CallbackEvaluator` to handle all variable vectors in a batch.
+    `BatchEvaluator` to handle all variable vectors in a batch.
 
     Args:
         variables: The variables to evaluate.
@@ -152,7 +152,7 @@ def run_optimization(
     optimal_result: FunctionResults | None
     if workflow:
         if not isinstance(evaluator, Evaluator):
-            evaluator = CallbackEvaluator(callback=evaluator)
+            evaluator = BatchEvaluator(callback=evaluator)
         step = EnsembleOptimizer(evaluator=evaluator)
         tracker = Tracker()
         step.add_event_handler(tracker)

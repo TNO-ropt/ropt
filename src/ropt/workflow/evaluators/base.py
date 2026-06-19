@@ -28,6 +28,8 @@ class Evaluator(ABC):
     ) -> EvaluatorResult:
         """Evaluate objective and constraint functions for given variables.
 
+        This follows the [`EvaluatorCallback`][ropt.evaluator.EvaluatorCallback] protocol.
+
         Args:
             variables: The matrix of variables to evaluate. Each row represents
                        a variable vector.

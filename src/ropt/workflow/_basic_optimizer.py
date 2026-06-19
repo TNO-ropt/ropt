@@ -15,7 +15,7 @@ import numpy as np
 from ropt.context import EnOptContext
 from ropt.enums import EnOptEventType, ExitCode
 from ropt.exceptions import Abort
-from ropt.workflow.evaluators import CallbackEvaluator, Evaluator
+from ropt.workflow.evaluators import BatchEvaluator, Evaluator
 
 from .compute_steps import EnsembleOptimizer
 from .event_handlers import Observer, Tracker
@@ -98,7 +98,7 @@ class BasicOptimizer:
         evaluator = (
             self._evaluator
             if isinstance(self._evaluator, Evaluator)
-            else CallbackEvaluator(callback=self._evaluator)
+            else BatchEvaluator(callback=self._evaluator)
         )
         tracker = Tracker(constraint_tolerance=self._constraint_tolerance)
         optimizer = EnsembleOptimizer(evaluator=evaluator)

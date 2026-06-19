@@ -13,11 +13,14 @@ if TYPE_CHECKING:
     from ropt.evaluator import EvaluatorCallback, EvaluatorContext, EvaluatorResult
 
 
-class CallbackEvaluator(Evaluator):
+class BatchEvaluator(Evaluator):
     """An evaluator that defers to a callable callback."""
 
     def __init__(self, *, callback: EvaluatorCallback) -> None:
-        """Initialize the CallbackEvaluator.
+        """Initialize the BatchEvaluator.
+
+        Forwards the evaluation to the provided callback, which should implement
+        the [`EvaluatorCallback`][ropt.evaluator.EvaluatorCallback] protocol.
 
         Args:
             callback: The callback to defer evaluation to.
