@@ -2094,22 +2094,26 @@
 <p>An evaluator is the bridge between <code>ropt</code> and your model. <code>ropt</code> decides which
 variable vectors need values; the evaluator computes the objective (and
 optional nonlinear-constraint) values for each.</p>
-<p>There are two ways to provide an evaluator:</p>
+<p>There are two ways to provide an evaluator to
+<a class="autorefs autorefs-internal" title="            ropt.workflow.BasicOptimizer" href="../../reference/basic_optimizer/#ropt.workflow.BasicOptimizer"><code>BasicOptimizer</code></a>:</p>
 <ol>
 <li><strong>A plain callable</strong> — A callable adhering to the
-   <a class="autorefs autorefs-internal" title="            ropt.evaluator.EvaluatorCallback" href="../../reference/evaluator/#ropt.evaluator.EvaluatorCallback"><code>EvaluatorCallback</code></a> protocol is the
-   simplest option, used by <a class="autorefs autorefs-internal" title="            ropt.workflow.BasicOptimizer" href="../../reference/basic_optimizer/#ropt.workflow.BasicOptimizer"><code>BasicOptimizer</code></a>.</li>
-<li><strong>An <a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.Evaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.Evaluator"><code>Evaluator</code></a> subclass</strong> —
-   required by the <a href="../workflows/">workflow framework</a>, and useful when you need
-   state, caching, async execution, or HPC dispatch.</li>
+   <a class="autorefs autorefs-internal" title="            ropt.evaluator.EvaluatorCallback" href="../../reference/evaluator/#ropt.evaluator.EvaluatorCallback"><code>EvaluatorCallback</code></a> protocol that
+   receives all variable vectors at once as a 2-D array.</li>
+<li><strong>An <a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.Evaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.Evaluator"><code>Evaluator</code></a> subclass</strong> — Classes
+    that support advanced features such as caching, parallel execution, or HPC
+    dispatch. Here we only discuss
+   <a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.FunctionEvaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.FunctionEvaluator"><code>FunctionEvaluator</code></a>, a
+   convenience wrapper around a simpler per-row function following the
+   <a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.FunctionCallback" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.FunctionCallback"><code>FunctionCallback</code></a> protocol.
+   <a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.Evaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.Evaluator"><code>Evaluator</code></a> classes are discussed
+   in more detail in
+   <a href="../workflows/">Optimization Workflows</a> and <a href="../parallel/">Parallel Evaluation</a>.</li>
 </ol>
-<p>This page focuses on the usage of callables together with
-<a class="autorefs autorefs-internal" title="            ropt.workflow.BasicOptimizer" href="../../reference/basic_optimizer/#ropt.workflow.BasicOptimizer"><code>BasicOptimizer</code></a> objects. For advanced usage of
-evaluators within workflows, see <a href="../workflows/">Optimization Workflows</a>.</p>
 <h2 id="the-callable-signature">The callable signature</h2>
 <p>Evaluator callbacks must adhere to the
-<a class="autorefs autorefs-internal" title="            ropt.evaluator.EvaluatorCallback" href="../../reference/evaluator/#ropt.evaluator.EvaluatorCallback"><code>EvaluatorCallback</code></a> protocol. For instance an
-evaluator function should look like this:</p>
+<a class="autorefs autorefs-internal" title="            ropt.evaluator.EvaluatorCallback" href="../../reference/evaluator/#ropt.evaluator.EvaluatorCallback"><code>EvaluatorCallback</code></a> protocol. For instance
+an evaluator function should look like this:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">numpy.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">NDArray</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.evaluator</span><span class="w"> </span><span class="kn">import</span> <span class="n">EvaluatorContext</span><span class="p">,</span> <span class="n">EvaluatorResult</span>
