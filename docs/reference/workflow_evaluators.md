@@ -10,6 +10,7 @@ See [Writing an Evaluator](../usage/evaluator_callback.md) and
 
 ::: ropt.workflow.evaluators.Evaluator
 ::: ropt.workflow.evaluators.CallbackEvaluator
+::: ropt.workflow.evaluators.FunctionCallback
 ::: ropt.workflow.evaluators.FunctionEvaluator
 ::: ropt.workflow.evaluators.AsyncEvaluator
 ::: ropt.workflow.evaluators.CachedEvaluator
