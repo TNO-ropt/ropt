@@ -3832,7 +3832,7 @@ cached optimizer state.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Return flags indicating which normalized rows are equalities.</p>
+        <p>Flags indicating which normalized rows are equalities.</p>
 <p>The returned list corresponds to the normalized constraint rows after
 any splitting of two-sided bounds into separate lower and upper rows.</p>
 
@@ -3917,7 +3917,7 @@ return <code>None</code> until new values are cached.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Return cached normalized constraint values, if available.</p>
+        <p>Cached normalized constraint values, if available.</p>
 <p>These values are produced by
 <a class="autorefs autorefs-internal" title="            set_constraints" href="#ropt.backend.utils.NormalizedConstraints.set_constraints"><code>set_constraints</code></a>
 after subtracting the relevant bound and applying any required sign
@@ -3976,7 +3976,7 @@ or <code>None</code> when no normalized values are cached.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Return cached normalized constraint gradients, if available.</p>
+        <p>Cached normalized constraint gradients, if available.</p>
 <p>These gradients are produced by
 <a class="autorefs autorefs-internal" title="            set_gradients" href="#ropt.backend.utils.NormalizedConstraints.set_gradients"><code>set_gradients</code></a>
 after applying any required sign flip.</p>
