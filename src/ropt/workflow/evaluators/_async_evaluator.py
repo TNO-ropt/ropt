@@ -13,11 +13,9 @@ from ropt.evaluator import EvaluatorContext, EvaluatorResult
 from ropt.exceptions import Abort, ServerFailure
 from ropt.workflow.servers import ResultsQueue, Server, Task
 
-from .base import Evaluator
+from .base import Evaluator, FunctionCallback, NameCallback
 
 if TYPE_CHECKING:
-    from collections.abc import Callable
-
     from numpy.typing import NDArray
 
 
@@ -34,10 +32,10 @@ class AsyncEvaluator(Evaluator):
     def __init__(
         self,
         *,
-        function: Callable[..., NDArray[np.float64] | dict[str, Any]],
+        function: FunctionCallback,
         server: Server,
         queue_size: int = 0,
-        get_name: Callable[..., str] | None = None,
+        get_name: NameCallback | None = None,
     ) -> None:
         """Initialize the FunctionEvaluator.
 
@@ -153,12 +151,7 @@ class AsyncEvaluator(Evaluator):
         task_name = (
             None
             if self._get_name is None
-            else self._get_name(
-                realization=realization,
-                perturbation=perturbation,
-                batch_id=self._batch_id,
-                eval_idx=eval_idx,
-            )
+            else self._get_name(realization, perturbation, self._batch_id, eval_idx)
         )
         return Task(
             results_queue=results_queue,

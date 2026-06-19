@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Protocol
 
 if TYPE_CHECKING:
     import numpy as np
@@ -36,4 +36,65 @@ class Evaluator(ABC):
 
         Returns:
             An evaluation results object containing the calculated values.
+        """
+
+
+class FunctionCallback(Protocol):
+    """Defines the call signature for function evaluator callbacks.
+
+    A function following this protocol is called once per active row of the
+    evaluation batch, receiving the variable vector for that row together with
+    keyword arguments that identify the evaluation.
+
+    The function should return either:
+
+    - A 1-D NumPy array of length `n_objectives + n_constraints`.
+    - A dictionary with a `"result"` key containing that array; any
+      additional keys are stored as `evaluation_info` entries.
+    """
+
+    def __call__(
+        self,
+        variables: NDArray[np.float64],
+        /,
+        *,
+        realization: int,
+        perturbation: int,
+        batch_id: int,
+        eval_idx: int,
+    ) -> NDArray[np.float64] | dict[str, Any]:
+        """Evaluate objectives and constraints for a single variable vector.
+
+        Args:
+            variables:    1-D variable vector for this evaluation.
+            realization:  The realization index.
+            perturbation: The perturbation index (`-1` when unperturbed).
+            batch_id:     Integer identifying the current evaluation batch.
+            eval_idx:     Row index within the batch.
+
+        Returns:
+            The evaluation result as an array or a dictionary.
+        """
+
+
+class NameCallback(Protocol):
+    """Defines the call signature for callbacks to get the name of an evaluation."""
+
+    def __call__(
+        self,
+        realization: int,
+        perturbation: int,
+        batch_id: int,
+        eval_idx: int,
+    ) -> str:
+        """Get the name for a single evaluation.
+
+        Args:
+            realization:  The realization index.
+            perturbation: The perturbation index (`-1` when unperturbed).
+            batch_id:     Integer identifying the current evaluation batch.
+            eval_idx:     Row index within the batch.
+
+        Returns:
+            The name of the evaluation.
         """

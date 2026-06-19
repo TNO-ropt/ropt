@@ -9,7 +9,7 @@ import numpy as np
 import pytest
 
 from ropt.workflow._basic_optimizer import BasicOptimizer
-from ropt.workflow.evaluators import AsyncEvaluator
+from ropt.workflow.evaluators import AsyncEvaluator, FunctionCallback
 from ropt.workflow.servers import (
     HPCServer,
     MultiprocessingServer,
@@ -234,7 +234,7 @@ def _opt_function(
 def _opt_workflow(
     server: Server,
     config: dict[str, Any],
-    test_function: Callable[[NDArray[np.float64], int], NDArray[np.float64]],
+    test_function: FunctionCallback,
 ) -> FunctionResults | None:
     evaluator = AsyncEvaluator(function=test_function, server=server)
     optimizer = BasicOptimizer(config=config, evaluator=evaluator)
