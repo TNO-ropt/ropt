@@ -245,7 +245,4 @@ required constructor arguments.
   [Working with Results](results.md).
 - Move beyond a single optimization run:
   [Optimization Workflows](workflows.md).
-- Full runnable variants of this example:
-    - Optimize the deterministic Rosenbrock function: [examples/rosenbrock_deterministic.py](https://github.com/TNO-ropt/ropt/blob/main/examples/rosenbrock_deterministic.py)
-    - Optimize an ensemble of Rosenbrock functions: [examples/rosenbrock_ensemble.py](https://github.com/TNO-ropt/ropt/blob/main/examples/rosenbrock_ensemble_merged.py)
-    - Using only a single perturbation per realization: [examples/rosenbrock_ensemble_merged.py](https://github.com/TNO-ropt/ropt/blob/main/examples/rosenbrock_ensemble_merged.py)
+- Full runnable variants of this example: [examples/rosenbrock.py](https://github.com/TNO-ropt/ropt/blob/main/examples/rosenbrock.py)

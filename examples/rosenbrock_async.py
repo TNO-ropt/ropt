@@ -28,7 +28,6 @@ options:
 import argparse
 import asyncio
 import time
-from collections.abc import Callable
 from functools import partial
 from typing import Any
 
@@ -38,7 +37,7 @@ from numpy.typing import NDArray
 
 from ropt.results import FunctionResults
 from ropt.workflow import BasicOptimizer
-from ropt.workflow.evaluators import AsyncEvaluator
+from ropt.workflow.evaluators import AsyncEvaluator, FunctionCallback
 from ropt.workflow.servers import MultiprocessingServer, Server, ThreadingServer
 
 DIM = 5
@@ -92,7 +91,7 @@ def rosenbrock(
 
 def run_optimization(
     server: Server,
-    function: Callable[[NDArray[np.float64], int], NDArray[np.float64]],
+    function: FunctionCallback,
     config: dict[str, Any],
 ) -> FunctionResults:
     """Run the optimization.
