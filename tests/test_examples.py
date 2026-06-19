@@ -36,19 +36,17 @@ def test_rosenbrock_ensemble(
 
 
 @pytest.mark.asyncio
-async def test_rosenbrock_async(tmp_path: Path, monkeypatch: Any) -> None:
+@pytest.mark.parametrize("multiprocessing", [True, False])
+async def test_rosenbrock_async(
+    tmp_path: Path, monkeypatch: Any, multiprocessing: Any
+) -> None:
     monkeypatch.chdir(tmp_path)
-    module = _load_from_file("rosenbrock_async")
-    await module.main()
 
-
-@pytest.mark.asyncio
-async def test_rosenbrock_multiprocessing(tmp_path: Path, monkeypatch: Any) -> None:
-    monkeypatch.chdir(tmp_path)
+    # We need to do an explicit import, otherwise we get pickling errors:
     monkeypatch.syspath_prepend(Path(__file__).parent.parent / "examples")
     import rosenbrock_async  # type: ignore[import-not-found] # noqa: PLC0415
 
-    await rosenbrock_async.main(multiprocessing=True)
+    await rosenbrock_async.main(multiprocessing=multiprocessing)
 
 
 @pytest.mark.parametrize("linear", [True, False])
