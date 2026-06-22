@@ -1767,14 +1767,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/workflow_steps/" class="md-nav__link">
+      <a href="../../reference/workflow_compute_steps/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Steps
+    Compute Steps
   
 
     
@@ -2406,7 +2406,7 @@ execution — drop down to the workflow framework.</p>
 </thead>
 <tbody>
 <tr>
-<td><a class="autorefs autorefs-internal" title="            ropt.workflow.compute_steps.ComputeStep" href="../../reference/workflow_steps/#ropt.workflow.compute_steps.ComputeStep"><code>ComputeStep</code></a></td>
+<td><a class="autorefs autorefs-internal" title="            ropt.workflow.compute_steps.ComputeStep" href="../../reference/workflow_compute_steps/#ropt.workflow.compute_steps.ComputeStep"><code>ComputeStep</code></a></td>
 <td>An executable unit of work (run an optimizer, run a single ensemble evaluation, etc.).</td>
 </tr>
 <tr>
@@ -2573,9 +2573,9 @@ parameters can be found here:
 <h2 id="compute-steps">Compute steps</h2>
 <p>Two compute steps ship with <code>ropt</code>:</p>
 <ul>
-<li><a class="autorefs autorefs-internal" title="            ropt.workflow.compute_steps.OptimizationStep" href="../../reference/workflow_steps/#ropt.workflow.compute_steps.OptimizationStep"><code>OptimizationStep</code></a> — runs
+<li><a class="autorefs autorefs-internal" title="            ropt.workflow.compute_steps.OptimizationStep" href="../../reference/workflow_compute_steps/#ropt.workflow.compute_steps.OptimizationStep"><code>OptimizationStep</code></a> — runs
   an optimization algorithm.</li>
-<li><a class="autorefs autorefs-internal" title="            ropt.workflow.compute_steps.EvaluationStep" href="../../reference/workflow_steps/#ropt.workflow.compute_steps.EvaluationStep"><code>EvaluationStep</code></a> — runs
+<li><a class="autorefs autorefs-internal" title="            ropt.workflow.compute_steps.EvaluationStep" href="../../reference/workflow_compute_steps/#ropt.workflow.compute_steps.EvaluationStep"><code>EvaluationStep</code></a> — runs
   a single ensemble evaluation (no optimizer). For example, useful for evaluating an
   optimum on a different ensemble, or on a sub-set of realizations.</li>
 </ul>
@@ -2593,7 +2593,7 @@ provided, it is included in the <a class="autorefs autorefs-internal" title="   
   " href="../../reference/results/#ropt.results.Results"><code>Results</code></a> objects
 emitted via the <code>FINISHED_EVALUATION</code> event.</p>
 <h3 id="events-emitted-by-optimizationstep">Events emitted by OptimizationStep</h3>
-<p><a class="autorefs autorefs-internal" title="            ropt.workflow.compute_steps.OptimizationStep" href="../../reference/workflow_steps/#ropt.workflow.compute_steps.OptimizationStep"><code>OptimizationStep</code></a>
+<p><a class="autorefs autorefs-internal" title="            ropt.workflow.compute_steps.OptimizationStep" href="../../reference/workflow_compute_steps/#ropt.workflow.compute_steps.OptimizationStep"><code>OptimizationStep</code></a>
 executes an optimization algorithm based on the provided context. It
 iteratively performs function and potentially gradient evaluations, yielding a
 sequence of <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
@@ -2653,7 +2653,7 @@ sequence of <a class="autorefs autorefs-internal" title="            ropt.result
   or due to termination conditions or errors).</li>
 </ul>
 <h3 id="events-emitted-by-evaluationstep">Events emitted by EvaluationStep</h3>
-<p><a class="autorefs autorefs-internal" title="            ropt.workflow.compute_steps.EvaluationStep" href="../../reference/workflow_steps/#ropt.workflow.compute_steps.EvaluationStep"><code>EvaluationStep</code></a>
+<p><a class="autorefs autorefs-internal" title="            ropt.workflow.compute_steps.EvaluationStep" href="../../reference/workflow_compute_steps/#ropt.workflow.compute_steps.EvaluationStep"><code>EvaluationStep</code></a>
 evaluates a batch of variable vectors. The <code>variables</code> argument can be a
 single 1-D vector (treated as one row) or a 2-D matrix where each row is a
 variable vector. The evaluator performs a function evaluation for the full

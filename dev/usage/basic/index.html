@@ -1656,14 +1656,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/workflow_steps/" class="md-nav__link">
+      <a href="../../reference/workflow_compute_steps/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Steps
+    Compute Steps
   
 
     
@@ -2396,7 +2396,7 @@ into a simple, single-run interface. The table below summarizes its API:</p>
 </span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EvaluationBatchResult</span><span class="p">:</span>
 </span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    <span class="o">...</span>
 </span></code></pre></div></p>
-<p>See <a href="../evaluation_callbacks/">Writing an Evaluator</a> for details.</p>
+<p>See <a href="../evaluation_callbacks/">Writing Evaluation Callbacks</a> for details.</p>
 <h3 id="under-the-hood">Under the hood</h3>
 <p>Internally, <code>BasicOptimizer</code> creates an optimization workflow that does the following:</p>
 <ol>
@@ -2404,7 +2404,7 @@ into a simple, single-run interface. The table below summarizes its API:</p>
 <li>Instantiates a
    <a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.BatchEvaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.BatchEvaluator"><code>BatchEvaluator</code></a> object that
    calls your callable when needed.</li>
-<li>Creates an <a class="autorefs autorefs-internal" title="            ropt.workflow.compute_steps.OptimizationStep" href="../../reference/workflow_steps/#ropt.workflow.compute_steps.OptimizationStep"><code>OptimizationStep</code></a>
+<li>Creates an <a class="autorefs autorefs-internal" title="            ropt.workflow.compute_steps.OptimizationStep" href="../../reference/workflow_compute_steps/#ropt.workflow.compute_steps.OptimizationStep"><code>OptimizationStep</code></a>
    compute step.</li>
 <li>Attaches a <a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.ResultHandler" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.ResultHandler"><code>ResultHandler</code></a> to
    remember the best result.</li>

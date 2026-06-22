@@ -9,7 +9,7 @@
       
       
       
-        <link rel="prev" href="../workflow_steps/">
+        <link rel="prev" href="../workflow_compute_steps/">
       
       
         <link rel="next" href="../workflow_evaluators/">
@@ -1510,14 +1510,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../workflow_steps/" class="md-nav__link">
+      <a href="../workflow_compute_steps/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Steps
+    Compute Steps
   
 
     
@@ -2634,7 +2634,7 @@
 
 <h1 id="event-handlers">Event Handlers</h1>
 <p>Event handlers attach to a
-<a class="autorefs autorefs-internal" title="            ropt.workflow.compute_steps.ComputeStep" href="../workflow_steps/#ropt.workflow.compute_steps.ComputeStep"><code>ComputeStep</code></a> and react to the events
+<a class="autorefs autorefs-internal" title="            ropt.workflow.compute_steps.ComputeStep" href="../workflow_compute_steps/#ropt.workflow.compute_steps.ComputeStep"><code>ComputeStep</code></a> and react to the events
 it emits. <a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.ResultHandler" href="#ropt.workflow.event_handlers.ResultHandler"><code>ResultHandler</code></a> keeps
 the best (or last) result,
 <a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.HistoryHandler" href="#ropt.workflow.event_handlers.HistoryHandler"><code>HistoryHandler</code></a> keeps
@@ -2679,8 +2679,8 @@ an optimization workflow.</p>
   " href="#ropt.workflow.event_handlers.EventHandler.handle_event"><code>handle_event</code></a>
 method to define their specific event processing logic.</p>
 <p>Event handlers are attached to a
-<a class="autorefs autorefs-internal" title="            ropt.workflow.compute_steps.ComputeStep" href="../workflow_steps/#ropt.workflow.compute_steps.ComputeStep"><code>ComputeStep</code></a> using its
-<a class="autorefs autorefs-internal" title="            add_event_handler" href="../workflow_steps/#ropt.workflow.compute_steps.ComputeStep.add_event_handler"><code>add_event_handler</code></a>
+<a class="autorefs autorefs-internal" title="            ropt.workflow.compute_steps.ComputeStep" href="../workflow_compute_steps/#ropt.workflow.compute_steps.ComputeStep"><code>ComputeStep</code></a> using its
+<a class="autorefs autorefs-internal" title="            add_event_handler" href="../workflow_compute_steps/#ropt.workflow.compute_steps.ComputeStep.add_event_handler"><code>add_event_handler</code></a>
 method. When the compute step emits an event, the <code>handle_event</code> method of
 each attached handler is invoked, allowing it to process the event.</p>
 
@@ -4539,7 +4539,7 @@ to a callback function.</p>
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../workflow_steps/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Steps">
+          <a href="../workflow_compute_steps/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Compute Steps">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -4549,7 +4549,7 @@ to a callback function.</p>
                 Previous
               </span>
               <div class="md-ellipsis">
-                Steps
+                Compute Steps
               </div>
             </div>
           </a>
