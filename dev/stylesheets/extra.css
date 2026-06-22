@@ -10,3 +10,27 @@
     padding-left: 1rem;
     padding-right: 1rem;
 }
+
+/* Make Python comments stand out more */
+:root > * {
+    --md-code-hl-comment-color: #c62828;
+}
+
+[data-md-color-scheme="slate"] {
+    --md-code-hl-comment-color: #ff8a80;
+}
+
+/* Docstrings use string color (green) and italic */
+.highlight .sd {
+    color: var(--md-code-hl-string-color);
+    font-style: italic;
+}
+
+/* Make comments italic */
+.highlight .c,
+.highlight .c1,
+.highlight .cm,
+.highlight .cp,
+.highlight .cs {
+    font-style: italic;
+}
