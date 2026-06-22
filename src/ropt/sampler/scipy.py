@@ -104,13 +104,13 @@ class SciPySampler(Sampler):
             samples = self._generate_stats_samples(
                 1 if self._sampler_config.shared else realization_count,
                 perturbation_count,
-                sample_dim,
+                int(sample_dim),
             )
         else:
             samples = self._generate_qmc_samples(
                 1 if self._sampler_config.shared else realization_count,
                 perturbation_count,
-                sample_dim,
+                int(sample_dim),
             )
 
         if self._sampler_config.shared:
