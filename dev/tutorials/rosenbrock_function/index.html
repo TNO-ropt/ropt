@@ -2450,6 +2450,7 @@ instead of the batch evaluation types.</p>
 </span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  variables: </span><span class="si">{</span><span class="n">item</span><span class="o">.</span><span class="n">evaluations</span><span class="o">.</span><span class="n">variables</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  objective: </span><span class="si">{</span><span class="n">item</span><span class="o">.</span><span class="n">functions</span><span class="o">.</span><span class="n">target_objective</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
 </span></code></pre></div>
+<p>This callback filters for FunctionResults and prints the current best variables and objective value.</p>
 <h2 id="running-the-optimization">Running the Optimization</h2>
 <p>The main difference is creating a <a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.FunctionEvaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.FunctionEvaluator"><code>FunctionEvaluator</code></a>
 to wrap the function callback:</p>

@@ -2466,7 +2466,8 @@ control and flexibility compared to
 </span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  variables: </span><span class="si">{</span><span class="n">item</span><span class="o">.</span><span class="n">evaluations</span><span class="o">.</span><span class="n">variables</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  objective: </span><span class="si">{</span><span class="n">item</span><span class="o">.</span><span class="n">functions</span><span class="o">.</span><span class="n">target_objective</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
 </span></code></pre></div>
-<p>The event object provides access to:</p>
+<p>This callback filters for FunctionResults and prints the current best variables
+and objective value. The event object provides access to:</p>
 <ul>
 <li><code>event.results</code> — The results tuple</li>
 <li><code>event.event_type</code> — The type of event (<a class="autorefs autorefs-internal" title="            EnOptEventType" href="../../reference/enums/#ropt.enums.EnOptEventType"><code>EnOptEventType</code></a>)</li>

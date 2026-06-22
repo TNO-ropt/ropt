@@ -2406,6 +2406,7 @@ perform well across all realizations, not just for a single set of parameters.</
 <ul>
 <li><code>variable_count</code>: We optimize 5 variables</li>
 <li><code>perturbation_magnitudes</code>: Small perturbations for numerical gradient estimation</li>
+<li>We set a relative uncertainty of 0.1</li>
 </ul>
 <h2 id="the-batch-evaluation-callback">The Batch Evaluation Callback</h2>
 <p>A <strong>batch evaluation callback</strong> receives all variable vectors that need
@@ -2439,6 +2440,8 @@ dispatch all evaluations in parallel:</p>
 <ul>
 <li><code>variables</code> is a 2-D array with shape <code>(n_evaluations, n_variables)</code></li>
 <li><code>context.realizations</code> maps each row to a realization index</li>
+<li>The realization index is used to pick a value for <code>a</code> and <code>b</code>, which creates
+  variation in the ensemble of functions</li>
 <li>Returns an <a class="autorefs autorefs-internal" title="            ropt.evaluation.EvaluationBatchResult
 
 
