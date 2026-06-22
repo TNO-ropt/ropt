@@ -127,7 +127,7 @@ nav:
         - "Samplers": reference/sampler.md
         - "Transforms": reference/transforms.md
       - "Workflow System":
-        - "Steps": reference/workflow_steps.md
+        - "Compute Steps": reference/workflow_compute_steps.md
         - "Event Handlers": reference/workflow_event_handlers.md
         - "Evaluators": reference/workflow_evaluators.md
         - "Servers": reference/workflow_servers.md

@@ -729,7 +729,7 @@ Expand the block below to see every field and its default value.
 
 ## Where to next
 
-- [Writing an Evaluator](evaluation_callbacks.md) — produce the values that `ropt`
+- [Writing Evaluation Callbacks](evaluation_callbacks.md) — produce the values that `ropt`
   consumes.
 - [Working with Results](results.md) — read the optimization output.
 - [Optimization Workflows](workflows.md) — go beyond a single `BasicOptimizer`

@@ -56,7 +56,7 @@ optimization problems:
 - Support for linear and non-linear constraints, if supported by the chosen
   optimizer.
 - Flexible configuration of the optimization process using
-  [`pydantic`](https://pydantic-docs.helpmanual.io/).
+  [`pydantic`](https://docs.pydantic.dev/).
 - Support for tracking and processing optimization results generated during the
   optimization process.
 - Optional support for exporting results as

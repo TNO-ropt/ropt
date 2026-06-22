@@ -182,7 +182,7 @@ def evaluator(
     ...
 ```
 
-See [Writing an Evaluator](evaluation_callbacks.md) for details.
+See [Writing Evaluation Callbacks](evaluation_callbacks.md) for details.
 
 ### Under the hood
 
