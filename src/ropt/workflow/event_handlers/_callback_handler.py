@@ -1,4 +1,4 @@
-"""This module implements the default tracker event handler."""
+"""This module implements the default result_handler event handler."""
 
 from __future__ import annotations
 
@@ -13,7 +13,7 @@ if TYPE_CHECKING:
     from ropt.events import EnOptEvent
 
 
-class Observer(EventHandler):
+class CallbackHandler(EventHandler):
     """The default event handler for observing events.
 
     This event handler listens for events of matching types and forwards them
@@ -26,7 +26,7 @@ class Observer(EventHandler):
         event_types: set[EnOptEventType],
         callback: Callable[[EnOptEvent], None],
     ) -> None:
-        """Initialize the Observer.
+        """Initialize the CallbackHandler.
 
         Args:
             event_types: The set of event types to respond to.

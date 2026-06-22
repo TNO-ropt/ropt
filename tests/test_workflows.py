@@ -14,7 +14,7 @@ from ropt.results import FunctionResults
 from ropt.workflow import BasicOptimizer
 from ropt.workflow.compute_steps import EvaluationStep, OptimizationStep
 from ropt.workflow.evaluators import CachedEvaluator, FunctionEvaluator
-from ropt.workflow.event_handlers import Observer, Store, Tracker
+from ropt.workflow.event_handlers import CallbackHandler, HistoryHandler, ResultHandler
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -48,13 +48,13 @@ def config_fixture() -> dict[str, Any]:
 
 
 def test_run_basic(config: dict[str, Any], evaluator: Any) -> None:
-    tracker = Tracker()
+    result_handler = ResultHandler()
     step = OptimizationStep(evaluator=evaluator())
-    step.add_event_handler(tracker)
+    step.add_event_handler(result_handler)
     step.run(variables=initial_values, context=EnOptContext.model_validate(config))
-    assert tracker["results"] is not None
+    assert result_handler["results"] is not None
     assert np.allclose(
-        tracker["results"].evaluations.variables, [0.0, 0.0, 0.5], atol=0.02
+        result_handler["results"].evaluations.variables, [0.0, 0.0, 0.5], atol=0.02
     )
 
     optimizer = BasicOptimizer(config, evaluator())
@@ -87,15 +87,15 @@ def test_function_evaluator_with_info(
     evaluator = FunctionEvaluator(
         function=partial(_function_dict, test_functions=test_functions)
     )
-    tracker = Tracker()
+    result_handler = ResultHandler()
     step = OptimizationStep(evaluator=evaluator)
-    step.add_event_handler(tracker)
+    step.add_event_handler(result_handler)
     step.run(variables=initial_values, context=EnOptContext.model_validate(config))
-    assert tracker["results"] is not None
+    assert result_handler["results"] is not None
     assert np.allclose(
-        tracker["results"].evaluations.variables, [0.0, 0.0, 0.5], atol=0.02
+        result_handler["results"].evaluations.variables, [0.0, 0.0, 0.5], atol=0.02
     )
-    assert tracker["results"].evaluations.evaluation_info["foo"] == "bar"
+    assert result_handler["results"].evaluations.evaluation_info["foo"] == "bar"
 
 
 def test_rng(config: dict[str, Any], evaluator: Any) -> None:
@@ -103,40 +103,40 @@ def test_rng(config: dict[str, Any], evaluator: Any) -> None:
     config2 = deepcopy(config)
     config2["variables"]["seed"] = 2
 
-    tracker = Tracker()
+    result_handler = ResultHandler()
     step = OptimizationStep(evaluator=evaluator())
-    step.add_event_handler(tracker)
+    step.add_event_handler(result_handler)
 
     step.run(variables=initial_values, context=EnOptContext.model_validate(config))
-    assert tracker["results"] is not None
-    variables1 = tracker["results"].evaluations.variables
-    tracker["results"] = None
+    assert result_handler["results"] is not None
+    variables1 = result_handler["results"].evaluations.variables
+    result_handler["results"] = None
     step.run(variables=initial_values, context=EnOptContext.model_validate(config))
-    assert tracker["results"] is not None
-    variables2 = tracker["results"].evaluations.variables
-    tracker["results"] = None
+    assert result_handler["results"] is not None
+    variables2 = result_handler["results"].evaluations.variables
+    result_handler["results"] = None
     step.run(variables=initial_values, context=EnOptContext.model_validate(config2))
-    assert tracker["results"] is not None
-    variables3 = tracker["results"].evaluations.variables
+    assert result_handler["results"] is not None
+    variables3 = result_handler["results"].evaluations.variables
 
     assert np.all(variables1 == variables2)
     assert not np.all(variables2 == variables3)
 
 
 def test_set_initial_values(config: dict[str, Any], evaluator: Any) -> None:
-    tracker = Tracker()
+    result_handler = ResultHandler()
     step = OptimizationStep(evaluator=evaluator())
-    step.add_event_handler(tracker)
+    step.add_event_handler(result_handler)
     step.run(variables=initial_values, context=EnOptContext.model_validate(config))
-    assert tracker["results"] is not None
-    variables1 = tracker["results"].evaluations.variables
-    tracker["variables"] = None
+    assert result_handler["results"] is not None
+    variables1 = result_handler["results"].evaluations.variables
+    result_handler["variables"] = None
     step.run(
         context=EnOptContext.model_validate(config),
         variables=[0, 0, 0],
     )
-    assert tracker["results"] is not None
-    variables2 = tracker["results"].evaluations.variables
+    assert result_handler["results"] is not None
+    variables2 = result_handler["results"].evaluations.variables
 
     assert variables1 is not None
     assert variables2 is not None
@@ -148,12 +148,12 @@ def test_set_initial_values(config: dict[str, Any], evaluator: Any) -> None:
 
 
 def test_reset_results(config: dict[str, Any], evaluator: Any) -> None:
-    tracker = Tracker()
+    result_handler = ResultHandler()
     step = OptimizationStep(evaluator=evaluator())
-    step.add_event_handler(tracker)
+    step.add_event_handler(result_handler)
     step.run(variables=initial_values, context=EnOptContext.model_validate(config))
-    saved_results = deepcopy(tracker["results"])
-    tracker["results"] = None
+    saved_results = deepcopy(result_handler["results"])
+    result_handler["results"] = None
     assert saved_results is not None
     assert np.allclose(saved_results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02)
 
@@ -178,38 +178,38 @@ def test_two_optimizers_alternating(config: dict[str, Any], evaluator: Any) -> N
     config2["variables"]["mask"] = [False, True, False]
     config2["optimizer"]["max_functions"] = 3
 
-    tracker1 = Tracker()
-    tracker2 = Tracker(what="last")
+    result_handler1 = ResultHandler()
+    result_handler2 = ResultHandler(what="last")
 
     step = OptimizationStep(evaluator=evaluator())
-    step.add_event_handler(tracker1)
-    step.add_event_handler(tracker2)
+    step.add_event_handler(result_handler1)
+    step.add_event_handler(result_handler2)
     step.add_event_handler(
-        Observer(
+        CallbackHandler(
             event_types={EnOptEventType.FINISHED_EVALUATION},
             callback=_track_evaluations,
         )
     )
     step.run(variables=[0.0, 0.2, 0.1], context=EnOptContext.model_validate(config1))
-    assert tracker2["results"] is not None
+    assert result_handler2["results"] is not None
     step.run(
         context=EnOptContext.model_validate(config2),
-        variables=tracker2["results"].evaluations.variables,
+        variables=result_handler2["results"].evaluations.variables,
     )
-    assert tracker2["results"] is not None
+    assert result_handler2["results"] is not None
     step.run(
         context=EnOptContext.model_validate(config1),
-        variables=tracker2["results"].evaluations.variables,
+        variables=result_handler2["results"].evaluations.variables,
     )
-    assert tracker2["results"] is not None
+    assert result_handler2["results"] is not None
     step.run(
         context=EnOptContext.model_validate(config2),
-        variables=tracker2["results"].evaluations.variables,
+        variables=result_handler2["results"].evaluations.variables,
     )
     assert completed_functions == 14
-    assert tracker1["results"] is not None
+    assert result_handler1["results"] is not None
     assert np.allclose(
-        tracker1["results"].evaluations.variables, [0.0, 0.0, 0.5], atol=0.02
+        result_handler1["results"].evaluations.variables, [0.0, 0.0, 0.5], atol=0.02
     )
 
 
@@ -229,18 +229,18 @@ def test_optimization_sequential(config: dict[str, Any], evaluator: Any) -> None
     config2 = deepcopy(config)
     config2["optimizer"]["max_functions"] = 3
 
-    tracker = Tracker(what="last")
-    observer = Observer(
+    result_handler = ResultHandler(what="last")
+    observer = CallbackHandler(
         event_types={EnOptEventType.FINISHED_EVALUATION}, callback=_track_evaluations
     )
     step = OptimizationStep(evaluator=evaluator())
-    step.add_event_handler(tracker)
+    step.add_event_handler(result_handler)
     step.add_event_handler(observer)
     step.run(variables=initial_values, context=EnOptContext.model_validate(config))
-    assert tracker["results"] is not None
+    assert result_handler["results"] is not None
     step.run(
         context=EnOptContext.model_validate(config2),
-        variables=tracker["results"].evaluations.variables,
+        variables=result_handler["results"].evaluations.variables,
     )
 
     assert not np.allclose(
@@ -266,7 +266,7 @@ def test_restart_initial(config: dict[str, Any], evaluator: Any) -> None:
     config["optimizer"]["max_functions"] = 3
 
     step = OptimizationStep(evaluator=evaluator())
-    observer = Observer(
+    observer = CallbackHandler(
         event_types={EnOptEventType.FINISHED_EVALUATION}, callback=_track_evaluations
     )
     step.add_event_handler(observer)
@@ -292,17 +292,17 @@ def test_restart_last(config: dict[str, Any], evaluator: Any) -> None:
     config["optimizer"]["max_functions"] = 3
 
     step = OptimizationStep(evaluator=evaluator())
-    observer = Observer(
+    observer = CallbackHandler(
         event_types={EnOptEventType.FINISHED_EVALUATION}, callback=_track_evaluations
     )
-    tracker = Tracker(what="last")
+    result_handler = ResultHandler(what="last")
     step.add_event_handler(observer)
-    step.add_event_handler(tracker)
+    step.add_event_handler(result_handler)
     for _ in range(2):
         variables = (
             initial_values
-            if tracker["results"] is None
-            else tracker["results"].evaluations.variables
+            if result_handler["results"] is None
+            else result_handler["results"].evaluations.variables
         )
         step.run(
             context=EnOptContext.model_validate(config),
@@ -329,18 +329,18 @@ def test_restart_optimum(config: dict[str, Any], evaluator: Any) -> None:
 
     step = OptimizationStep(evaluator=evaluator())
     step.add_event_handler(
-        Observer(
+        CallbackHandler(
             event_types={EnOptEventType.FINISHED_EVALUATION},
             callback=_track_evaluations,
         )
     )
-    tracker = Tracker()
-    step.add_event_handler(tracker)
+    result_handler = ResultHandler()
+    step.add_event_handler(result_handler)
     for _ in range(2):
         variables = (
             initial_values
-            if tracker["results"] is None
-            else tracker["results"].evaluations.variables
+            if result_handler["results"] is None
+            else result_handler["results"].evaluations.variables
         )
         step.run(
             context=EnOptContext.model_validate(config),
@@ -386,20 +386,20 @@ def test_restart_optimum_with_reset(
 
     step = OptimizationStep(evaluator=evaluator(new_functions))
     step.add_event_handler(
-        Observer(
+        CallbackHandler(
             event_types={EnOptEventType.FINISHED_EVALUATION},
             callback=_track_evaluations,
         )
     )
-    tracker = Tracker()
-    step.add_event_handler(tracker)
+    result_handler = ResultHandler()
+    step.add_event_handler(result_handler)
     for _ in range(3):
         variables = (
             initial_values
-            if tracker["results"] is None
-            else tracker["results"].evaluations.variables
+            if result_handler["results"] is None
+            else result_handler["results"].evaluations.variables
         )
-        tracker["results"] = None
+        result_handler["results"] = None
         step.run(
             context=EnOptContext.model_validate(config),
             variables=variables,
@@ -435,7 +435,7 @@ def test_repeat_metadata(config: dict[str, Any], evaluator: Any) -> None:
 
     step = OptimizationStep(evaluator=evaluator())
     step.add_event_handler(
-        Observer(
+        CallbackHandler(
             event_types={EnOptEventType.FINISHED_EVALUATION}, callback=_track_results
         )
     )
@@ -450,34 +450,37 @@ def test_repeat_metadata(config: dict[str, Any], evaluator: Any) -> None:
 
 
 def test_evaluator(config: dict[str, Any], evaluator: Any) -> None:
-    tracker = Tracker()
+    result_handler = ResultHandler()
     step = EvaluationStep(evaluator=evaluator())
-    step.add_event_handler(tracker)
+    step.add_event_handler(result_handler)
     step.run(context=EnOptContext.model_validate(config), variables=[0.0, 0.0, 0.1])
-    assert tracker["results"].functions is not None
-    assert np.allclose(tracker["results"].functions.target_objective, 1.66)
+    assert result_handler["results"].functions is not None
+    assert np.allclose(result_handler["results"].functions.target_objective, 1.66)
 
-    tracker["results"] = None
+    result_handler["results"] = None
     step.run(
         context=EnOptContext.model_validate(config),
         variables=[0, 0, 0],
     )
-    assert tracker["results"].functions is not None
-    assert np.allclose(tracker["results"].functions.target_objective, 1.75)
+    assert result_handler["results"].functions is not None
+    assert np.allclose(result_handler["results"].functions.target_objective, 1.75)
 
 
 def test_evaluator_multi(config: dict[str, Any], evaluator: Any) -> None:
     config["gradient"] = {"evaluation_policy": "speculative"}
     config["optimizer"]["max_functions"] = 4
 
-    store = Store()
+    history_handler = HistoryHandler()
     step = EvaluationStep(evaluator=evaluator())
-    step.add_event_handler(store)
+    step.add_event_handler(history_handler)
     step.run(
         context=EnOptContext.model_validate(config),
         variables=np.array([[0, 0, 0.1], [0, 0, 0]]),
     )
-    values = [results.functions.target_objective.item() for results in store["results"]]
+    values = [
+        results.functions.target_objective.item()
+        for results in history_handler["results"]
+    ]
     assert np.allclose(values, [1.66, 1.75])
 
 
@@ -518,7 +521,7 @@ def test_nested_optimization(
     nested_config["variables"]["mask"] = [False, True, False]
 
     initial = np.array([0.0, 0.2, 0.1])
-    result_tracker = Tracker()
+    result_result_handler = ResultHandler()
 
     def _outer_function(
         variables: NDArray[np.float64],
@@ -529,20 +532,20 @@ def test_nested_optimization(
         if perturbation < 0:
             new_variables[1] = (
                 initial[1]
-                if result_tracker["results"] is None
-                else result_tracker["results"].evaluations.variables[1]
+                if result_result_handler["results"] is None
+                else result_result_handler["results"].evaluations.variables[1]
             )
-            tracker = Tracker()
+            result_handler = ResultHandler()
             step = OptimizationStep(evaluator=evaluator())
-            step.add_event_handler(tracker)
-            step.add_event_handler(result_tracker)
+            step.add_event_handler(result_handler)
+            step.add_event_handler(result_result_handler)
             step.run(
                 variables=new_variables,
                 context=EnOptContext.model_validate(nested_config),
             )
-            return tracker["results"].functions.objectives
+            return result_handler["results"].functions.objectives
 
-        new_variables[1] = result_tracker["results"].evaluations.variables[1]
+        new_variables[1] = result_result_handler["results"].evaluations.variables[1]
         return np.fromiter(
             (func(new_variables, 0) for func in test_functions), dtype=np.float64
         )
@@ -551,7 +554,9 @@ def test_nested_optimization(
     step = OptimizationStep(evaluator=outer_evaluator)
     step.run(variables=initial, context=EnOptContext.model_validate(config))
     assert np.allclose(
-        result_tracker["results"].evaluations.variables, [0.0, 0.0, 0.5], atol=0.02
+        result_result_handler["results"].evaluations.variables,
+        [0.0, 0.0, 0.5],
+        atol=0.02,
     )
 
 
@@ -565,16 +570,18 @@ def test_optimization_abort(config: Any, evaluator: Any) -> None:
         if last_evaluation == 1:
             raise Abort(exit_code=ExitCode.USER_ABORT)
 
-    tracker = Tracker()
+    result_handler = ResultHandler()
     step = OptimizationStep(evaluator=evaluator())
-    step.add_event_handler(tracker)
+    step.add_event_handler(result_handler)
     step.add_event_handler(
-        Observer(event_types={EnOptEventType.FINISHED_EVALUATION}, callback=_observer)
+        CallbackHandler(
+            event_types={EnOptEventType.FINISHED_EVALUATION}, callback=_observer
+        )
     )
     exit_code = step.run(
         variables=initial_values, context=EnOptContext.model_validate(config)
     )
-    assert tracker["results"] is not None
+    assert result_handler["results"] is not None
     assert exit_code == ExitCode.USER_ABORT
     assert last_evaluation == 1
 
@@ -644,10 +651,12 @@ def test_evaluator_cache(
     config["gradient"]["number_of_perturbations"] = "1"
     config["optimizer"]["max_functions"] = 2
 
-    tracker = Tracker(what="last")
+    result_handler = ResultHandler(what="last")
 
     function_evaluator = evaluator((_test_function1, test_functions[1]))
-    cached_evaluator = CachedEvaluator(evaluator=function_evaluator, sources={tracker})
+    cached_evaluator = CachedEvaluator(
+        evaluator=function_evaluator, sources={result_handler}
+    )
     assert isinstance(cached_evaluator, CachedEvaluator)
     monkeypatch.setattr(
         cached_evaluator, "eval", partial(_cached_eval, cached_evaluator)
@@ -655,19 +664,19 @@ def test_evaluator_cache(
 
     step = OptimizationStep(evaluator=cached_evaluator)
     step.add_event_handler(
-        Observer(
+        CallbackHandler(
             event_types={EnOptEventType.FINISHED_EVALUATION},
             callback=_track_evaluations,
         )
     )
-    step.add_event_handler(tracker)
+    step.add_event_handler(result_handler)
     step.run(variables=initial_values, context=EnOptContext.model_validate(config))
     assert completed_test_functions == 8
 
     completed_test_functions = 0
     step.run(
         context=EnOptContext.model_validate(config),
-        variables=tracker["results"].evaluations.variables,
+        variables=result_handler["results"].evaluations.variables,
     )
     assert completed_test_functions == 6  # Two evaluations were cached
 
@@ -694,11 +703,13 @@ def test_evaluator_cache_with_store(
     }
     config["optimizer"]["max_functions"] = 2
 
-    store = Store()
+    history_handler = HistoryHandler()
     function_evaluator = evaluator((_test_function1, test_functions[1]))
-    cached_evaluator = CachedEvaluator(evaluator=function_evaluator, sources={store})
+    cached_evaluator = CachedEvaluator(
+        evaluator=function_evaluator, sources={history_handler}
+    )
     step = OptimizationStep(evaluator=cached_evaluator)
-    step.add_event_handler(store)
+    step.add_event_handler(history_handler)
 
     assert isinstance(cached_evaluator, CachedEvaluator)
     monkeypatch.setattr(

@@ -15,19 +15,19 @@ if TYPE_CHECKING:
     from ropt.results import DomainType, Results
 
 
-class Store(EventHandler):
+class HistoryHandler(EventHandler):
     """Collect all optimization results into a tuple.
 
     Listens for `FINISHED_EVALUATION` events and appends every
     [`Results`][ropt.results.Results] object to a growing tuple accessible
     via `handler["results"]`.
 
-    See [Optimization Workflows](../usage/workflows.md#store) for full
+    See [Optimization Workflows](../usage/workflows.md#history) for full
     details on domain handling and accumulation behavior.
     """
 
     def __init__(self, *, domain: DomainType = "user") -> None:
-        """Initialize the Store.
+        """Initialize the HistoryHandler.
 
         Args:
             domain: Domain in which to store results ('user' or 'optimizer').

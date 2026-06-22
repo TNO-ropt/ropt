@@ -2,16 +2,16 @@
 
 from __future__ import annotations
 
-from ._observer import Observer
-from ._store import Store
-from ._table import Table
-from ._tracker import Tracker
+from ._callback_handler import CallbackHandler
+from ._history_handler import HistoryHandler
+from ._result_handler import ResultHandler
+from ._table_handler import TableHandler
 from .base import EventHandler
 
 __all__ = [
+    "CallbackHandler",
     "EventHandler",
-    "Observer",
-    "Store",
-    "Table",
-    "Tracker",
+    "HistoryHandler",
+    "ResultHandler",
+    "TableHandler",
 ]

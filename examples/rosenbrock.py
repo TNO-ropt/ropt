@@ -40,7 +40,7 @@ from ropt.results import FunctionResults, Results
 from ropt.workflow import BasicOptimizer
 from ropt.workflow.compute_steps import OptimizationStep
 from ropt.workflow.evaluators import BatchEvaluator, Evaluator, FunctionEvaluator
-from ropt.workflow.event_handlers import Observer, Tracker
+from ropt.workflow.event_handlers import CallbackHandler, ResultHandler
 
 DIM = 5
 CONFIG: dict[str, Any] = {
@@ -158,14 +158,14 @@ def run_optimization(
         if not isinstance(evaluator, Evaluator):
             evaluator = BatchEvaluator(callback=evaluator)
         step = OptimizationStep(evaluator=evaluator)
-        tracker = Tracker()
-        step.add_event_handler(tracker)
-        reporter = Observer(
+        result_handler = ResultHandler()
+        step.add_event_handler(result_handler)
+        reporter = CallbackHandler(
             callback=report, event_types={EnOptEventType.FINISHED_EVALUATION}
         )
         step.add_event_handler(reporter)
         step.run(variables=INITIAL_VALUES, context=EnOptContext.model_validate(CONFIG))
-        optimal_result = tracker["results"]
+        optimal_result = result_handler["results"]
     else:
         optimizer = BasicOptimizer(config=config, evaluator=evaluator)
         optimizer.set_results_callback(report)

@@ -18,7 +18,7 @@ from ropt.exceptions import Abort
 from ropt.workflow.evaluators import BatchEvaluator, Evaluator
 
 from .compute_steps import OptimizationStep
-from .event_handlers import Observer, Tracker
+from .event_handlers import CallbackHandler, ResultHandler
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
@@ -100,12 +100,12 @@ class BasicOptimizer:
             if isinstance(self._evaluator, Evaluator)
             else BatchEvaluator(callback=self._evaluator)
         )
-        tracker = Tracker(constraint_tolerance=self._constraint_tolerance)
+        result_handler = ResultHandler(constraint_tolerance=self._constraint_tolerance)
         optimizer = OptimizationStep(evaluator=evaluator)
-        optimizer.add_event_handler(tracker)
+        optimizer.add_event_handler(result_handler)
         for event_type, function in self._observers:
             optimizer.add_event_handler(
-                Observer(event_types={event_type}, callback=function)
+                CallbackHandler(event_types={event_type}, callback=function)
             )
         for handler in _custom_event_handlers():
             optimizer.add_event_handler(handler())
@@ -114,7 +114,7 @@ class BasicOptimizer:
             variables=np.asarray(initial_values, dtype=np.float64),
             context=self._context,
         )
-        self._results = tracker["results"]
+        self._results = result_handler["results"]
 
         return exit_code if isinstance(exit_code, ExitCode) else ExitCode.UNKNOWN
 

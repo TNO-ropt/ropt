@@ -158,9 +158,9 @@ Higher-level helpers handle this automatically:
 
 - [`BasicOptimizer`][ropt.workflow.BasicOptimizer] returns user-domain results.
 - Event handlers may or may not perform the conversion automatically. For
-  example, [`Tracker`][ropt.workflow.event_handlers.Tracker] accepts a `domain`
-  argument (`"user"` or `"optimizer"`) to control which domain its stored
-  result lives in.
+  example, [`ResultHandler`][ropt.workflow.event_handlers.ResultHandler] accepts
+  a `domain` argument (`"user"` or `"optimizer"`) to control which domain its
+  stored result lives in.
 
 ## Writing a custom transform
 

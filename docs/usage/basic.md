@@ -194,8 +194,8 @@ Internally, `BasicOptimizer` creates an optimization workflow that does the foll
    calls your callable when needed.
 3. Creates an [`OptimizationStep`][ropt.workflow.compute_steps.OptimizationStep]
    compute step.
-4. Attaches a [`Tracker`][ropt.workflow.event_handlers.Tracker] to remember the
-   best result.
+4. Attaches a [`ResultHandler`][ropt.workflow.event_handlers.ResultHandler] to
+   remember the best result.
 5. Runs the step and exposes the best result via the `results` property.
 
 If you need more control (multiple runs, custom handlers, async evaluation),

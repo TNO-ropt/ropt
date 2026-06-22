@@ -64,7 +64,7 @@ from numpy.typing import NDArray
 from ropt.context import EnOptContext
 from ropt.workflow.compute_steps import OptimizationStep
 from ropt.workflow.evaluators import FunctionEvaluator
-from ropt.workflow.event_handlers import Tracker
+from ropt.workflow.event_handlers import ResultHandler
 
 # 1. Build the configuration.
 CONFIG = {
@@ -84,8 +84,8 @@ evaluator = FunctionEvaluator(function=my_function)
 step = OptimizationStep(evaluator=evaluator)
 
 # 5. Attach event handlers.
-tracker = Tracker()  # remember the best
-step.add_event_handler(tracker)
+result_handler = ResultHandler()  # remember the best
+step.add_event_handler(result_handler)
 
 # 6. Run the step.
 step.run(
@@ -94,7 +94,7 @@ step.run(
 )
 
 # 7. Read best results from the handlers.
-print(f"Optimal variables: {tracker['results'].evaluations.variables}")
+print(f"Optimal variables: {result_handler['results'].evaluations.variables}")
 ```
 
 This is a minimal example of optimizing a simple deterministic function. A full
@@ -191,19 +191,19 @@ The framework ships four reusable handlers:
 
 | Handler                                                                  | Purpose                                                                |
 | ------------------------------------------------------------------------ | ---------------------------------------------------------------------- |
-| [`Tracker`][ropt.workflow.event_handlers.Tracker]                        | Keep the best (or last) result. Backs `BasicOptimizer.results`.        |
-| [`Store`][ropt.workflow.event_handlers.Store]                            | Keep every result.                                                     |
-| [`Observer`][ropt.workflow.event_handlers.Observer]                      | Forward selected event types to a user callback.                       |
-| [`Table`][ropt.workflow.event_handlers.Table]                            | Append rows to a structured table per result.                          |
+| [`ResultHandler`][ropt.workflow.event_handlers.ResultHandler]            | Keep the best (or last) result. Backs `BasicOptimizer.results`.        |
+| [`HistoryHandler`][ropt.workflow.event_handlers.HistoryHandler]          | Keep every result.                                                     |
+| [`CallbackHandler`][ropt.workflow.event_handlers.CallbackHandler]        | Forward selected event types to a user callback.                       |
+| [`TableHandler`][ropt.workflow.event_handlers.TableHandler]              | Append rows to a structured table per result.                          |
 
-Handlers expose their state through dictionary access (`handler[key]`).
-By convention, `Tracker` and `Store` both use the key `"results"` — e.g.
-`tracker["results"]` or `store["results"]`. `Table` uses the table name as
-key — e.g. `table["functions"]`.
+Handlers expose their state through dictionary access (`handler[key]`). By
+convention, `ResultHandler` and `HistoryHandler` both use the key `"results"` —
+e.g. `result_handler["results"]` or `history_handler["results"]`. `TableHandler`
+uses the table name as key — e.g. `table["functions"]`.
 
-### Tracker
+### ResultHandler
 
-[`Tracker`][ropt.workflow.event_handlers.Tracker] listens for
+[`ResultHandler`][ropt.workflow.event_handlers.ResultHandler] listens for
 [`FINISHED_EVALUATION`][ropt.enums.EnOptEventType.FINISHED_EVALUATION] events
 emitted from within an optimization workflow. It processes the
 [`Results`][ropt.results.Results] objects contained within these events and
@@ -222,40 +222,40 @@ constraints beyond this tolerance is ignored.
 
 Tracking logic (comparing 'best' or selecting 'last') operates on the
 results in the optimizer's domain. However, the final selected result
-that is made accessible via dictionary access (`tracker["results"]`) is
+that is made accessible via dictionary access (`result_handler["results"]`) is
 transformed to the user's domain (when `domain="user"`, the default).
 
 If the domain type is `"user"`, the result is converted from the optimizer
 domain to the user domain before being stored.
 
-### Store
+### HistoryHandler
 
-[`Store`][ropt.workflow.event_handlers.Store] listens for
+[`HistoryHandler`][ropt.workflow.event_handlers.HistoryHandler] listens for
 [`FINISHED_EVALUATION`][ropt.enums.EnOptEventType.FINISHED_EVALUATION] events
-emitted by compute steps from within an optimization workflow. It collects
-all [`Results`][ropt.results.Results] objects contained within these events
-and stores them sequentially in memory.
+emitted by compute steps from within an optimization workflow. It collects all
+[`Results`][ropt.results.Results] objects contained within these events and
+stores them sequentially in memory.
 
-The accumulated results are stored as a tuple and can be accessed via
-dictionary access using the key `"results"` (e.g., `store["results"]`).
-Each time new results are received from a valid source, they are appended to
-this tuple. Initially, `store["results"]` is `None`.
+The accumulated results are stored as a tuple and can be accessed via dictionary
+access using the key `"results"` (e.g., `history_handler["results"]`). Each time
+new results are received from a valid source, they are appended to this tuple.
+Initially, `history_handler["results"]` is `None`.
 
 If the domain type is `"user"`, the results are converted from the optimizer
 domain to the user domain before being stored.
 
-### Observer
+### CallbackHandler
 
-[`Observer`][ropt.workflow.event_handlers.Observer] listens for events and
-forwards them to a callback function. It is constructed with a set of
+[`CallbackHandler`][ropt.workflow.event_handlers.CallbackHandler] listens for
+events and forwards them to a callback function. It is constructed with a set of
 `event_types` to respond to and a single `callback`. When an event with a
 matching type arrives, the callback is called with the
 [`EnOptEvent`][ropt.events.EnOptEvent].
 
-### Table
+### TableHandler
 
-[`Table`][ropt.workflow.event_handlers.Table] tracks results and stores them
-in pandas DataFrames.
+[`TableHandler`][ropt.workflow.event_handlers.TableHandler] tracks results and
+stores them in pandas DataFrames.
 
 #### Tables
 
@@ -416,11 +416,11 @@ either:
   [`EvaluationBatchResult`][ropt.evaluation.EvaluationBatchResult].
 
 [`CachedEvaluator`][ropt.workflow.evaluators.CachedEvaluator] wraps another
-evaluator with result caching. It retrieves previously computed function
-results from `EventHandler` instances specified as `sources` — typically a
-`Store` or `Tracker`. For each variable vector and realization, if a matching
-cached result is found, the cached objectives and constraints are reused
-without calling the wrapped evaluator. Only uncached evaluations are
+evaluator with result caching. It retrieves previously computed function results
+from `EventHandler` instances specified as `sources` — typically a
+`HistoryHandler` or `ResultHandler`. For each variable vector and realization,
+if a matching cached result is found, the cached objectives and constraints are
+reused without calling the wrapped evaluator. Only uncached evaluations are
 forwarded to the underlying evaluator.
 
 Cache matching works as follows: for each requested variable vector and

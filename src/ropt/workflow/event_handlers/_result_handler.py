@@ -1,4 +1,4 @@
-"""This module implements the default tracker event handler."""
+"""This module implements the default result_handler event handler."""
 
 from __future__ import annotations
 
@@ -14,14 +14,14 @@ if TYPE_CHECKING:
     from ropt.results import DomainType, FunctionResults
 
 
-class Tracker(EventHandler):
+class ResultHandler(EventHandler):
     """Track a single optimization result based on selection criteria.
 
     Listens for `FINISHED_EVALUATION` events and retains either the best
     (lowest weighted objective) or most recent valid result. Optionally
     filters by constraint tolerance.
 
-    See [Optimization Workflows](../usage/workflows.md#tracker) for full
+    See [Optimization Workflows](../usage/workflows.md#result_handler) for full
     details on selection criteria and domain handling.
     """
 
@@ -32,7 +32,7 @@ class Tracker(EventHandler):
         constraint_tolerance: float | None = None,
         domain: DomainType = "user",
     ) -> None:
-        """Initialize the Tracker.
+        """Initialize the ResultHandler.
 
         Args:
             what:                 Criterion for selecting results ('best' or 'last').

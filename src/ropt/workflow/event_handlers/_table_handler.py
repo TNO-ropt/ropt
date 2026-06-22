@@ -66,7 +66,7 @@ _GRADIENT_TABLES: Final[dict[str, dict[str, str]]] = {
 }
 
 
-class Table(EventHandler):
+class TableHandler(EventHandler):
     """Build pandas DataFrames from optimization results.
 
     Collects [`FunctionResults`][ropt.results.FunctionResults] and
@@ -96,7 +96,7 @@ class Table(EventHandler):
             sep:       Separator used in column names.
         """
         if not _HAVE_PANDAS:
-            msg = "The pandas module must be installed to use Table"
+            msg = "The pandas module must be installed to use TableHandler"
             raise NotImplementedError(msg)
 
         super().__init__()
