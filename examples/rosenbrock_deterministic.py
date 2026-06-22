@@ -57,15 +57,20 @@ def report(results: tuple[Results, ...]) -> None:
 
 def main() -> None:
     """Run the example and check the result."""
+    # Create the basic optimizer
     optimizer = BasicOptimizer(CONFIG, rosenbrock)
+
+    # Set the reporter callback
     optimizer.set_results_callback(report)
+
+    # Run the optimization
     optimizer.run(INITIAL_VALUES)
+
+    # Check the results
     assert optimizer.results is not None
     assert optimizer.results.functions is not None
-
     print(f"Optimal variables: {optimizer.results.evaluations.variables}")
     print(f"Optimal objective: {optimizer.results.functions.target_objective}\n")
-
     assert np.allclose(optimizer.results.functions.target_objective, 0, atol=1e-4)
     assert np.allclose(optimizer.results.evaluations.variables, 1, atol=1e-2)
 

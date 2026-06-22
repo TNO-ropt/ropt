@@ -24,15 +24,25 @@ def test_rosenbrock_deterministic(tmp_path: Path, monkeypatch: Any) -> None:
     module.main()
 
 
-@pytest.mark.parametrize("workflow", [True, False])
 @pytest.mark.parametrize("merge", [True, False])
-@pytest.mark.parametrize("function", [True, False])
-def test_rosenbrock_ensemble(
-    tmp_path: Path, monkeypatch: Any, workflow: Any, merge: Any, function: Any
-) -> None:
+def test_rosenbrock_basic(tmp_path: Path, monkeypatch: Any, merge: Any) -> None:
     monkeypatch.chdir(tmp_path)
-    module = _load_from_file("rosenbrock")
-    module.main(workflow=workflow, merge=merge, function=function)
+    module = _load_from_file("rosenbrock_basic")
+    module.main(merge=merge)
+
+
+@pytest.mark.parametrize("merge", [True, False])
+def test_rosenbrock_function(tmp_path: Path, monkeypatch: Any, merge: Any) -> None:
+    monkeypatch.chdir(tmp_path)
+    module = _load_from_file("rosenbrock_function")
+    module.main(merge=merge)
+
+
+@pytest.mark.parametrize("merge", [True, False])
+def test_rosenbrock_workflow(tmp_path: Path, monkeypatch: Any, merge: Any) -> None:
+    monkeypatch.chdir(tmp_path)
+    module = _load_from_file("rosenbrock_workflow")
+    module.main(merge=merge)
 
 
 @pytest.mark.parametrize("linear", [True, False])
