@@ -893,10 +893,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#tracker" class="md-nav__link">
+  <a href="#resulthandler" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Tracker
+        ResultHandler
       
     </span>
   </a>
@@ -904,10 +904,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#store" class="md-nav__link">
+  <a href="#historyhandler" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Store
+        HistoryHandler
       
     </span>
   </a>
@@ -915,10 +915,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#observer" class="md-nav__link">
+  <a href="#callbackhandler" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Observer
+        CallbackHandler
       
     </span>
   </a>
@@ -926,15 +926,15 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#table" class="md-nav__link">
+  <a href="#tablehandler" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Table
+        TableHandler
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Table">
+    <nav class="md-nav" aria-label="TableHandler">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -2239,10 +2239,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#tracker" class="md-nav__link">
+  <a href="#resulthandler" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Tracker
+        ResultHandler
       
     </span>
   </a>
@@ -2250,10 +2250,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#store" class="md-nav__link">
+  <a href="#historyhandler" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Store
+        HistoryHandler
       
     </span>
   </a>
@@ -2261,10 +2261,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#observer" class="md-nav__link">
+  <a href="#callbackhandler" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Observer
+        CallbackHandler
       
     </span>
   </a>
@@ -2272,15 +2272,15 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#table" class="md-nav__link">
+  <a href="#tablehandler" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Table
+        TableHandler
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Table">
+    <nav class="md-nav" aria-label="TableHandler">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -2534,7 +2534,7 @@ types are useful for logging, progress bars, or custom lifecycle hooks.</p>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.context</span><span class="w"> </span><span class="kn">import</span> <span class="n">EnOptContext</span>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.workflow.compute_steps</span><span class="w"> </span><span class="kn">import</span> <span class="n">OptimizationStep</span>
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.workflow.evaluators</span><span class="w"> </span><span class="kn">import</span> <span class="n">FunctionEvaluator</span>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.workflow.event_handlers</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tracker</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.workflow.event_handlers</span><span class="w"> </span><span class="kn">import</span> <span class="n">ResultHandler</span>
 </span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>
 </span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="c1"># 1. Build the configuration.</span>
 </span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="n">CONFIG</span> <span class="o">=</span> <span class="p">{</span>
@@ -2554,8 +2554,8 @@ types are useful for logging, progress bars, or custom lifecycle hooks.</p>
 </span><span id="__span-0-24"><a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a><span class="n">step</span> <span class="o">=</span> <span class="n">OptimizationStep</span><span class="p">(</span><span class="n">evaluator</span><span class="o">=</span><span class="n">evaluator</span><span class="p">)</span>
 </span><span id="__span-0-25"><a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a>
 </span><span id="__span-0-26"><a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a><span class="c1"># 5. Attach event handlers.</span>
-</span><span id="__span-0-27"><a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a><span class="n">tracker</span> <span class="o">=</span> <span class="n">Tracker</span><span class="p">()</span>  <span class="c1"># remember the best</span>
-</span><span id="__span-0-28"><a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a><span class="n">step</span><span class="o">.</span><span class="n">add_event_handler</span><span class="p">(</span><span class="n">tracker</span><span class="p">)</span>
+</span><span id="__span-0-27"><a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a><span class="n">result_handler</span> <span class="o">=</span> <span class="n">ResultHandler</span><span class="p">()</span>  <span class="c1"># remember the best</span>
+</span><span id="__span-0-28"><a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a><span class="n">step</span><span class="o">.</span><span class="n">add_event_handler</span><span class="p">(</span><span class="n">result_handler</span><span class="p">)</span>
 </span><span id="__span-0-29"><a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a>
 </span><span id="__span-0-30"><a id="__codelineno-0-30" name="__codelineno-0-30" href="#__codelineno-0-30"></a><span class="c1"># 6. Run the step.</span>
 </span><span id="__span-0-31"><a id="__codelineno-0-31" name="__codelineno-0-31" href="#__codelineno-0-31"></a><span class="n">step</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
@@ -2564,7 +2564,7 @@ types are useful for logging, progress bars, or custom lifecycle hooks.</p>
 </span><span id="__span-0-34"><a id="__codelineno-0-34" name="__codelineno-0-34" href="#__codelineno-0-34"></a><span class="p">)</span>
 </span><span id="__span-0-35"><a id="__codelineno-0-35" name="__codelineno-0-35" href="#__codelineno-0-35"></a>
 </span><span id="__span-0-36"><a id="__codelineno-0-36" name="__codelineno-0-36" href="#__codelineno-0-36"></a><span class="c1"># 7. Read best results from the handlers.</span>
-</span><span id="__span-0-37"><a id="__codelineno-0-37" name="__codelineno-0-37" href="#__codelineno-0-37"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Optimal variables: </span><span class="si">{</span><span class="n">tracker</span><span class="p">[</span><span class="s1">&#39;results&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">evaluations</span><span class="o">.</span><span class="n">variables</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="__span-0-37"><a id="__codelineno-0-37" name="__codelineno-0-37" href="#__codelineno-0-37"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Optimal variables: </span><span class="si">{</span><span class="n">result_handler</span><span class="p">[</span><span class="s1">&#39;results&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">evaluations</span><span class="o">.</span><span class="n">variables</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </span></code></pre></div>
 <p>This is a minimal example of optimizing a simple deterministic function. A full
 runnable example for optimizing the Rosenbrock function with uncertain
@@ -2756,29 +2756,29 @@ method. Once attached, the handler receives every event the step emits.</p>
 </thead>
 <tbody>
 <tr>
-<td><a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.Tracker" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.Tracker"><code>Tracker</code></a></td>
+<td><a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.ResultHandler" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.ResultHandler"><code>ResultHandler</code></a></td>
 <td>Keep the best (or last) result. Backs <code>BasicOptimizer.results</code>.</td>
 </tr>
 <tr>
-<td><a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.Store" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.Store"><code>Store</code></a></td>
+<td><a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.HistoryHandler" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.HistoryHandler"><code>HistoryHandler</code></a></td>
 <td>Keep every result.</td>
 </tr>
 <tr>
-<td><a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.Observer" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.Observer"><code>Observer</code></a></td>
+<td><a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.CallbackHandler" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.CallbackHandler"><code>CallbackHandler</code></a></td>
 <td>Forward selected event types to a user callback.</td>
 </tr>
 <tr>
-<td><a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.Table" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.Table"><code>Table</code></a></td>
+<td><a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.TableHandler" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.TableHandler"><code>TableHandler</code></a></td>
 <td>Append rows to a structured table per result.</td>
 </tr>
 </tbody>
 </table>
-<p>Handlers expose their state through dictionary access (<code>handler[key]</code>).
-By convention, <code>Tracker</code> and <code>Store</code> both use the key <code>"results"</code> — e.g.
-<code>tracker["results"]</code> or <code>store["results"]</code>. <code>Table</code> uses the table name as
-key — e.g. <code>table["functions"]</code>.</p>
-<h3 id="tracker">Tracker</h3>
-<p><a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.Tracker" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.Tracker"><code>Tracker</code></a> listens for
+<p>Handlers expose their state through dictionary access (<code>handler[key]</code>). By
+convention, <code>ResultHandler</code> and <code>HistoryHandler</code> both use the key <code>"results"</code> —
+e.g. <code>result_handler["results"]</code> or <code>history_handler["results"]</code>. <code>TableHandler</code>
+uses the table name as key — e.g. <code>table["functions"]</code>.</p>
+<h3 id="resulthandler">ResultHandler</h3>
+<p><a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.ResultHandler" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.ResultHandler"><code>ResultHandler</code></a> listens for
 <a class="autorefs autorefs-internal" title="            FINISHED_EVALUATION
 
 
@@ -2811,12 +2811,12 @@ retain based on defined criteria.</p>
 constraints beyond this tolerance is ignored.</p>
 <p>Tracking logic (comparing 'best' or selecting 'last') operates on the
 results in the optimizer's domain. However, the final selected result
-that is made accessible via dictionary access (<code>tracker["results"]</code>) is
+that is made accessible via dictionary access (<code>result_handler["results"]</code>) is
 transformed to the user's domain (when <code>domain="user"</code>, the default).</p>
 <p>If the domain type is <code>"user"</code>, the result is converted from the optimizer
 domain to the user domain before being stored.</p>
-<h3 id="store">Store</h3>
-<p><a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.Store" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.Store"><code>Store</code></a> listens for
+<h3 id="historyhandler">HistoryHandler</h3>
+<p><a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.HistoryHandler" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.HistoryHandler"><code>HistoryHandler</code></a> listens for
 <a class="autorefs autorefs-internal" title="            FINISHED_EVALUATION
 
 
@@ -2824,23 +2824,23 @@ domain to the user domain before being stored.</p>
       class-attribute
       instance-attribute
   " href="../../reference/enums/#ropt.enums.EnOptEventType.FINISHED_EVALUATION"><code>FINISHED_EVALUATION</code></a> events
-emitted by compute steps from within an optimization workflow. It collects
-all <a class="autorefs autorefs-internal" title="            ropt.results.Results
+emitted by compute steps from within an optimization workflow. It collects all
+<a class="autorefs autorefs-internal" title="            ropt.results.Results
 
 
   
       dataclass
-  " href="../../reference/results/#ropt.results.Results"><code>Results</code></a> objects contained within these events
-and stores them sequentially in memory.</p>
-<p>The accumulated results are stored as a tuple and can be accessed via
-dictionary access using the key <code>"results"</code> (e.g., <code>store["results"]</code>).
-Each time new results are received from a valid source, they are appended to
-this tuple. Initially, <code>store["results"]</code> is <code>None</code>.</p>
+  " href="../../reference/results/#ropt.results.Results"><code>Results</code></a> objects contained within these events and
+stores them sequentially in memory.</p>
+<p>The accumulated results are stored as a tuple and can be accessed via dictionary
+access using the key <code>"results"</code> (e.g., <code>history_handler["results"]</code>). Each time
+new results are received from a valid source, they are appended to this tuple.
+Initially, <code>history_handler["results"]</code> is <code>None</code>.</p>
 <p>If the domain type is <code>"user"</code>, the results are converted from the optimizer
 domain to the user domain before being stored.</p>
-<h3 id="observer">Observer</h3>
-<p><a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.Observer" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.Observer"><code>Observer</code></a> listens for events and
-forwards them to a callback function. It is constructed with a set of
+<h3 id="callbackhandler">CallbackHandler</h3>
+<p><a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.CallbackHandler" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.CallbackHandler"><code>CallbackHandler</code></a> listens for
+events and forwards them to a callback function. It is constructed with a set of
 <code>event_types</code> to respond to and a single <code>callback</code>. When an event with a
 matching type arrives, the callback is called with the
 <a class="autorefs autorefs-internal" title="            EnOptEvent
@@ -2849,9 +2849,9 @@ matching type arrives, the callback is called with the
   
       dataclass
   " href="../../reference/events/#ropt.events.EnOptEvent"><code>EnOptEvent</code></a>.</p>
-<h3 id="table">Table</h3>
-<p><a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.Table" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.Table"><code>Table</code></a> tracks results and stores them
-in pandas DataFrames.</p>
+<h3 id="tablehandler">TableHandler</h3>
+<p><a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.TableHandler" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.TableHandler"><code>TableHandler</code></a> tracks results and
+stores them in pandas DataFrames.</p>
 <h4 id="tables">Tables</h4>
 <p>Tables can be generated for
 <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
@@ -3034,11 +3034,11 @@ either:</p>
   " href="../../reference/evaluation/#ropt.evaluation.EvaluationBatchResult"><code>EvaluationBatchResult</code></a>.</li>
 </ul>
 <p><a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.CachedEvaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.CachedEvaluator"><code>CachedEvaluator</code></a> wraps another
-evaluator with result caching. It retrieves previously computed function
-results from <code>EventHandler</code> instances specified as <code>sources</code> — typically a
-<code>Store</code> or <code>Tracker</code>. For each variable vector and realization, if a matching
-cached result is found, the cached objectives and constraints are reused
-without calling the wrapped evaluator. Only uncached evaluations are
+evaluator with result caching. It retrieves previously computed function results
+from <code>EventHandler</code> instances specified as <code>sources</code> — typically a
+<code>HistoryHandler</code> or <code>ResultHandler</code>. For each variable vector and realization,
+if a matching cached result is found, the cached objectives and constraints are
+reused without calling the wrapped evaluator. Only uncached evaluations are
 forwarded to the underlying evaluator.</p>
 <p>Cache matching works as follows: for each requested variable vector and
 realization, the evaluator searches through the <code>"results"</code> stored by its

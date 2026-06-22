@@ -2406,8 +2406,8 @@ into a simple, single-run interface. The table below summarizes its API:</p>
    calls your callable when needed.</li>
 <li>Creates an <a class="autorefs autorefs-internal" title="            ropt.workflow.compute_steps.OptimizationStep" href="../../reference/workflow_steps/#ropt.workflow.compute_steps.OptimizationStep"><code>OptimizationStep</code></a>
    compute step.</li>
-<li>Attaches a <a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.Tracker" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.Tracker"><code>Tracker</code></a> to remember the
-   best result.</li>
+<li>Attaches a <a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.ResultHandler" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.ResultHandler"><code>ResultHandler</code></a> to
+   remember the best result.</li>
 <li>Runs the step and exposes the best result via the <code>results</code> property.</li>
 </ol>
 <p>If you need more control (multiple runs, custom handlers, async evaluation),
