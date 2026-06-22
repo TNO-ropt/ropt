@@ -35,6 +35,13 @@ def test_rosenbrock_ensemble(
     module.main(workflow=workflow, merge=merge, function=function)
 
 
+@pytest.mark.parametrize("linear", [True, False])
+def test_rosenbrock_constrained(tmp_path: Path, monkeypatch: Any, linear: Any) -> None:
+    monkeypatch.chdir(tmp_path)
+    module = _load_from_file("rosenbrock_constrained")
+    module.main(linear=linear)
+
+
 @pytest.mark.asyncio
 @pytest.mark.parametrize("multiprocessing", [True, False])
 async def test_rosenbrock_async(
