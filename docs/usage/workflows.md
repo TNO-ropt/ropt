@@ -74,7 +74,6 @@ CONFIG = {
 
 # 2. Define a per-realization evaluation function.
 def my_function(variables: NDArray[np.float64], **kwargs) -> NDArray[np.float64]:
-    """Quadratic objective: sum of squared deviations from 1.0."""
     return np.array([(variables - 1.0) @ (variables - 1.0)])
 
 # 3. Construct an evaluator that calls a per-realization Python function.

@@ -109,6 +109,13 @@ nav:
       - "Stochastic Gradients": usage/gradients.md
       - "Optimization Workflows": usage/workflows.md
       - "Parallel Evaluation": usage/parallel.md
+  - "Tutorials":
+      - "Overview": tutorials/index.md
+      - "Deterministic Optimization": tutorials/rosenbrock_deterministic.md
+      - "Stochastic Optimization": tutorials/rosenbrock_basic.md
+      - "Function Evaluator": tutorials/rosenbrock_function.md
+      - "Workflow Framework": tutorials/rosenbrock_workflow.md
+      - "Constrained Optimization": tutorials/rosenbrock_constrained.md
   - "Reference":
       - "Configuration":
         - "Context Class": reference/context.md

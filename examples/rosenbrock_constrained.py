@@ -32,13 +32,15 @@ CONFIG: dict[str, Any] = {
     "variables": {
         "variable_count": DIM,
         "perturbation_magnitudes": 1e-6,
+        "lower_bounds": -5.0,
+        "upper_bounds": 5.0,
     },
     "realizations": {
         "weights": [1.0] * REALIZATIONS,
     },
     "nonlinear_constraints": {
-        "lower_bounds": [-np.inf],
-        "upper_bounds": [-1.0],
+        "lower_bounds": -np.inf,
+        "upper_bounds": -1.0,
     },
 }
 INITIAL_VALUES = 2 * np.arange(DIM) / DIM + 0.5
@@ -68,11 +70,12 @@ def rosenbrock(
         for d_idx in range(DIM - 1):
             x, y = variables[v_idx, d_idx : d_idx + 2]
             objectives[v_idx, 0] += (a[r] - x) ** 2 + b[r] * (y - x * x) ** 2
-        constraints[v_idx, 0] += (variables[v_idx, 0] - a[r]) ** 3 - variables[v_idx, 1]
+        x, y = variables[v_idx, :2]
+        constraints[v_idx, 0] += (x - a[r]) ** 3 - y
     return EvaluationBatchResult(objectives=objectives, constraints=constraints)
 
 
-def report(results: tuple[Results, ...]) -> None:
+def report_violations(results: tuple[Results, ...]) -> None:
     """Report results of an evaluation.
 
     Args:
@@ -80,17 +83,25 @@ def report(results: tuple[Results, ...]) -> None:
     """
     for item in results:
         if isinstance(item, FunctionResults) and item.functions is not None:
-            print(f"  variables:  {item.evaluations.variables}")
-            print(f"  objective:  {item.functions.target_objective}")
-            print(f"  constraint: {item.functions.constraints}\n")
+            assert item.constraint_info is not None
+            assert item.constraint_info.nonlinear_violation is not None
+            violated = np.any(item.constraint_info.nonlinear_violation > 0)
+            if violated:
+                print("Constraint violation detected:")
+                print(f"  variables:  {item.evaluations.variables}")
+                print(f"  objective:  {item.functions.target_objective}")
+                print(f"  constraint: {item.functions.constraints}")
+                print(f"  violation:  {item.constraint_info.nonlinear_violation}\n")
 
 
 def main(*, linear: bool = False) -> None:
     """Run the example and check the result."""
+    # Generate random parameters for the Rosenbrock function
     rng = default_rng(seed=123)
     a = rng.normal(loc=1.0, scale=UNCERTAINTY, size=REALIZATIONS)
     b = rng.normal(loc=100.0, scale=100 * UNCERTAINTY, size=REALIZATIONS)
 
+    # If desired, add a linear constraint to the configuration
     if linear:
         CONFIG.update(
             {
@@ -102,19 +113,26 @@ def main(*, linear: bool = False) -> None:
             }
         )
 
+    # Create the basic optimizer, set the constraint tolerance
     optimizer = BasicOptimizer(
-        CONFIG, partial(rosenbrock, a=a, b=b), constraint_tolerance=1e-6
+        CONFIG,
+        partial(rosenbrock, a=a, b=b),
+        constraint_tolerance=1e-6,
     )
-    optimizer.set_results_callback(report)
+
+    # Set the reporter callback
+    optimizer.set_results_callback(report_violations)
+
+    # Run the optimization
     optimizer.run(INITIAL_VALUES)
+
+    # Check the results
     assert optimizer.results is not None
     assert optimizer.results.functions is not None
     assert optimizer.results.functions.constraints is not None
-
     print(f"Optimal variables:  {optimizer.results.evaluations.variables}")
     print(f"Optimal objective:  {optimizer.results.functions.target_objective}")
     print(f"Optimal constraint: {optimizer.results.functions.constraints}\n")
-
     assert np.allclose(optimizer.results.functions.target_objective, 0, atol=1e-1)
     assert np.allclose(optimizer.results.evaluations.variables, 1, atol=1e-1)
 

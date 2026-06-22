@@ -64,9 +64,21 @@ Each carries nested [`ResultField`][ropt.results.ResultField] objects:
     - `constraint_weights`: per-realization constraint weights, shape
       $(n_c, n_r)$ (if constraints are configured).
 - **`constraint_info`** ([`ConstraintInfo`][ropt.results.ConstraintInfo]) —
-  differences between variable/constraint values and their bounds, and the
-  magnitude of any violations. Only present when bounds or constraints are
-  defined.
+  constraint bound information. Present when bounds or constraints are defined.
+  Contains two kinds of data for each constraint type (bound, linear, and
+  nonlinear):
+
+    - **Differences**: the signed distance between the current value and each
+      bound. For lower bounds, a negative difference means the value is below
+      the bound (violated). For upper bounds, a positive difference means the
+      value is above the bound (violated).
+    - **Violations**: the absolute magnitude of any bound exceedance, or zero
+      when the constraint is satisfied. For example, if a constraint requires
+      $g(\mathbf{x}) \leq 0$ and the actual value is $0.5$, the violation is
+      $0.5$.
+
+    See the [`ConstraintInfo`][ropt.results.ConstraintInfo] reference for
+    the full list of fields.
 
 #### `GradientResults` fields
 

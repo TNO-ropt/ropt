@@ -4,6 +4,7 @@
 
 - New to `ropt`? Read the [Background](usage/background.md), then jump to
   [Installation](usage/installation.md) and the [Quickstart](usage/quickstart.md).
+- Want to learn by example? Work through the [Tutorials](tutorials/index.md).
 - Looking for the configuration vocabulary?
   See [Configuration](usage/configuration.md).
 - Building more complex pipelines?
