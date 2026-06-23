@@ -71,6 +71,12 @@ print(f"Optimal variables: {optimizer.results.evaluations.variables}")
 print(f"Optimal objective: {optimizer.results.functions.target_objective}\n")
 ```
 
+!!! tip "Tutorials"
+    For step-by-step examples using `BasicOptimizer`, see the
+    [Stochastic Optimization](../tutorials/rosenbrock_basic.md) and
+    [Constrained Optimization](../tutorials/rosenbrock_constrained.md)
+    tutorials.
+
 ## The objective function
 
 You must provide a Python function (`rosenbrock()` in our example) that `ropt`
@@ -118,7 +124,8 @@ tuple may be a [FunctionResults][ropt.results.FunctionResults] (containing
 objective and constraint evaluations) or a
 [GradientResults][ropt.results.GradientResults] (containing gradient
 information). In this example, we filter for `FunctionResults` and print the
-current variables and objective value.
+current variables and objective value. See
+[Working with Results](results.md) for details on result objects.
 
 ## Running the optimization
 

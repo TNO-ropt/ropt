@@ -231,5 +231,6 @@ python rosenbrock_workflow.py --merge
   simpler setup
 - [Function Evaluator Tutorial](rosenbrock_function.md) — Use per-evaluation
   callbacks
-- [Optimization Workflows](../usage/workflows.md) — More details on the workflow
-  framework
+- [Optimization Workflows](../usage/workflows.md) — Full reference on the
+  workflow framework, event handlers, and evaluators
+- [Working with Results](../usage/results.md) — Understanding result objects

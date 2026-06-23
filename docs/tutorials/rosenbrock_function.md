@@ -192,3 +192,5 @@ python rosenbrock_function.py --merge
   better performance
 - [Workflow Tutorial](rosenbrock_workflow.md) — Use the workflow framework for
   more control
+- [Writing Evaluation Callbacks](../usage/evaluation_callbacks.md) — Detailed
+  reference on evaluation callbacks and `FunctionEvaluator`

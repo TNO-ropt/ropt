@@ -209,3 +209,9 @@ value near $0$.
   per-evaluation callback
 - [Workflow Tutorial](rosenbrock_workflow.md) — Use the workflow framework for
   more control
+- [Basic Optimization](../usage/basic.md) — Detailed explanation of
+  `BasicOptimizer` and its API
+- [Writing Evaluation Callbacks](../usage/evaluation_callbacks.md) — More on
+  batch callbacks and the `FunctionEvaluator` alternative
+- [Working with Results](../usage/results.md) — Understanding result objects
+  and how to inspect them

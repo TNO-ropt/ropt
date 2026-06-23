@@ -462,5 +462,7 @@ servers.
 
 - [Parallel Evaluation](parallel.md) — run evaluations off-process
   or on a cluster.
+- [Workflow Tutorial](../tutorials/rosenbrock_workflow.md) — step-by-step
+  example building a workflow from scratch.
 - Full example:
   [examples/rosenbrock.py](https://github.com/TNO-ropt/ropt/blob/main/examples/rosenbrock.py).

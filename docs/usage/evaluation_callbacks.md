@@ -186,3 +186,7 @@ optimizer.run(initial_values)
 - Read the results: [Working with Results](results.md).
 - Use evaluator subclasses for caching, async, or HPC dispatch:
   [Optimization Workflows](workflows.md).
+- See it in action: [Stochastic Optimization Tutorial](../tutorials/rosenbrock_basic.md)
+  (batch callback) and
+  [FunctionEvaluator Tutorial](../tutorials/rosenbrock_function.md)
+  (per-evaluation callback).
