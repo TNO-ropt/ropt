@@ -219,6 +219,12 @@ Optionally, results can be filtered based on constraint violations using the
 `constraint_tolerance` parameter. If provided, any result violating
 constraints beyond this tolerance is ignored.
 
+Additionally, a `filter` callable can be supplied to apply custom filtering
+logic. It receives a [`Results`][ropt.results.Results] object and should return
+`True` to keep the result or `False` to discard it. Only results that pass both
+the constraint tolerance check and the custom filter (if provided) are
+considered for selection.
+
 Tracking logic (comparing 'best' or selecting 'last') operates on the
 results in the optimizer's domain. However, the final selected result
 that is made accessible via dictionary access (`result_handler["results"]`) is

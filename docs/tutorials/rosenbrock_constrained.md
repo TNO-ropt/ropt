@@ -184,8 +184,10 @@ differences and violations.
     `constraint_tolerance` parameter that applies uniformly to all constraint
     types. This mirrors the behavior of
     [`ResultHandler`][ropt.workflow.event_handlers.ResultHandler]. For more
-    fine-grained control, you can build a custom workflow that tracks violations
-    for each constraint type individually.
+    fine-grained control, `ResultHandler` also accepts a `filter` callable that
+    receives a [`Results`][ropt.results.Results] object and returns `True` to
+    keep or `False` to discard. This allows custom per-constraint-type logic or
+    any other filtering criterion when building a workflow.
 
 ## Running the Optimization
 

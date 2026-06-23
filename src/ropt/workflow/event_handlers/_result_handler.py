@@ -4,14 +4,18 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Literal, assert_never
 
-from ropt.enums import EnOptEventType
+import numpy as np
 
-from ._utils import _get_last_result, _update_optimal_result
+from ropt.enums import EnOptEventType
+from ropt.results import FunctionResults
+
 from .base import EventHandler
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+
     from ropt.events import EnOptEvent
-    from ropt.results import DomainType, FunctionResults
+    from ropt.results import DomainType, Results
 
 
 class ResultHandler(EventHandler):
@@ -31,6 +35,7 @@ class ResultHandler(EventHandler):
         what: Literal["best", "last"] = "best",
         constraint_tolerance: float | None = None,
         domain: DomainType = "user",
+        filter: Callable[[Results], bool] | None = None,  # noqa: A002
     ) -> None:
         """Initialize the ResultHandler.
 
@@ -38,11 +43,13 @@ class ResultHandler(EventHandler):
             what:                 Criterion for selecting results ('best' or 'last').
             constraint_tolerance: Optional threshold for filtering constraint violations.
             domain:               Domain in which to store the results ('user' or 'optimizer').
+            filter:               Optional callable to filter results based on custom logic.
         """
         super().__init__()
         self._what = what
         self._constraint_tolerance = constraint_tolerance
         self._domain = domain
+        self._filter = filter
         self._tracked_results: FunctionResults | None = None
         self["results"] = None
 
@@ -55,34 +62,41 @@ class ResultHandler(EventHandler):
         Args:
             event: The event object.
         """
-        if not (results := event.results):
+        results: tuple[FunctionResults, ...] = tuple(
+            item
+            for item in event.results
+            if isinstance(item, FunctionResults)
+            and item.functions is not None
+            and (self._filter(item) if self._filter else True)
+            and not _violates_constraint(item, self._constraint_tolerance)
+        )
+        if not results:
             return
+
         if self["results"] is None:
             self._tracked_results = None
-        filtered_results: FunctionResults | None = None
+
+        def _get_target_objective(result: FunctionResults) -> float:
+            assert result.functions is not None
+            return result.functions.target_objective.item()
+
         match self._what:
             case "best":
-                filtered_results = _update_optimal_result(
-                    self._tracked_results,
-                    results,
-                    self._constraint_tolerance,
-                )
+                if self._tracked_results is not None:
+                    results = (self._tracked_results, *results)
+                new_results = min(results, key=_get_target_objective)
             case "last":
-                filtered_results = _get_last_result(
-                    results,
-                    self._constraint_tolerance,
-                )
+                new_results = results[-1]
             case _ as unreachable:
                 assert_never(unreachable)
 
-        if filtered_results is not None:
-            self._tracked_results = filtered_results
-            if self._domain == "user":
-                self["results"] = filtered_results.transform_from_optimizer(
-                    event.context
-                )
-            else:
-                self["results"] = filtered_results
+        if new_results is not self._tracked_results:
+            self._tracked_results = new_results
+            self["results"] = (
+                new_results.transform_from_optimizer(event.context)
+                if self._domain == "user"
+                else new_results
+            )
 
     @property
     def event_types(self) -> set[EnOptEventType]:
@@ -92,3 +106,22 @@ class ResultHandler(EventHandler):
             A set of event types that are handled.
         """
         return {EnOptEventType.FINISHED_EVALUATION}
+
+
+def _violates_constraint(results: Results, tolerance: float | None) -> bool:
+    if tolerance is None:
+        return False
+
+    assert isinstance(results, FunctionResults)
+    if results.constraint_info is None:
+        return False
+
+    for violations in (
+        results.constraint_info.bound_violation,
+        results.constraint_info.linear_violation,
+        results.constraint_info.nonlinear_violation,
+    ):
+        if violations is not None and np.any(violations > tolerance):
+            return True
+
+    return False
