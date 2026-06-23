@@ -2623,8 +2623,15 @@ differences and violations.</p>
 <code>constraint_tolerance</code> parameter that applies uniformly to all constraint
 types. This mirrors the behavior of
 <a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.ResultHandler" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.ResultHandler"><code>ResultHandler</code></a>. For more
-fine-grained control, you can build a custom workflow that tracks violations
-for each constraint type individually.</p>
+fine-grained control, <code>ResultHandler</code> also accepts a <code>filter</code> callable that
+receives a <a class="autorefs autorefs-internal" title="            ropt.results.Results
+
+
+  
+      dataclass
+  " href="../../reference/results/#ropt.results.Results"><code>Results</code></a> object and returns <code>True</code> to
+keep or <code>False</code> to discard. This allows custom per-constraint-type logic or
+any other filtering criterion when building a workflow.</p>
 </div>
 <h2 id="running-the-optimization">Running the Optimization</h2>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">linear</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>

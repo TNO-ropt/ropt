@@ -3057,6 +3057,16 @@ retain based on defined criteria.</p>
 <p>Optionally, results can be filtered based on constraint violations using the
 <code>constraint_tolerance</code> parameter. If provided, any result violating
 constraints beyond this tolerance is ignored.</p>
+<p>Additionally, a <code>filter</code> callable can be supplied to apply custom filtering
+logic. It receives a <a class="autorefs autorefs-internal" title="            ropt.results.Results
+
+
+  
+      dataclass
+  " href="../../reference/results/#ropt.results.Results"><code>Results</code></a> object and should return
+<code>True</code> to keep the result or <code>False</code> to discard it. Only results that pass both
+the constraint tolerance check and the custom filter (if provided) are
+considered for selection.</p>
 <p>Tracking logic (comparing 'best' or selecting 'last') operates on the
 results in the optimizer's domain. However, the final selected result
 that is made accessible via dictionary access (<code>result_handler["results"]</code>) is
