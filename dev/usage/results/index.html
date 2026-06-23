@@ -2659,15 +2659,34 @@ variable vector evaluated in that batch.</p>
   <span class="arithmatex">\((n_c, n_r)\)</span> (if constraints are configured).</li>
 </ul>
 </li>
-<li><strong><code>constraint_info</code></strong> (<a class="autorefs autorefs-internal" title="            ropt.results.ConstraintInfo
+<li>
+<p><strong><code>constraint_info</code></strong> (<a class="autorefs autorefs-internal" title="            ropt.results.ConstraintInfo
 
 
   
       dataclass
   " href="../../reference/results/#ropt.results.ConstraintInfo"><code>ConstraintInfo</code></a>) —
-  differences between variable/constraint values and their bounds, and the
-  magnitude of any violations. Only present when bounds or constraints are
-  defined.</li>
+  constraint bound information. Present when bounds or constraints are defined.
+  Contains two kinds of data for each constraint type (bound, linear, and
+  nonlinear):</p>
+<ul>
+<li><strong>Differences</strong>: the signed distance between the current value and each
+  bound. For lower bounds, a negative difference means the value is below
+  the bound (violated). For upper bounds, a positive difference means the
+  value is above the bound (violated).</li>
+<li><strong>Violations</strong>: the absolute magnitude of any bound exceedance, or zero
+  when the constraint is satisfied. For example, if a constraint requires
+  <span class="arithmatex">\(g(\mathbf{x}) \leq 0\)</span> and the actual value is <span class="arithmatex">\(0.5\)</span>, the violation is
+  <span class="arithmatex">\(0.5\)</span>.</li>
+</ul>
+<p>See the <a class="autorefs autorefs-internal" title="            ropt.results.ConstraintInfo
+
+
+  
+      dataclass
+  " href="../../reference/results/#ropt.results.ConstraintInfo"><code>ConstraintInfo</code></a> reference for
+the full list of fields.</p>
+</li>
 </ul>
 <h4 id="gradientresults-fields"><code>GradientResults</code> fields</h4>
 <ul>

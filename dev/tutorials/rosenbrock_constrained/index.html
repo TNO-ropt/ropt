@@ -1119,10 +1119,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#progress-reporting" class="md-nav__link">
+  <a href="#reporting-constraint-violations" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Progress Reporting
+        Reporting Constraint Violations
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#understanding-constraint-violations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Understanding Constraint Violations
       
     </span>
   </a>
@@ -2331,10 +2342,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#progress-reporting" class="md-nav__link">
+  <a href="#reporting-constraint-violations" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Progress Reporting
+        Reporting Constraint Violations
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#understanding-constraint-violations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Understanding Constraint Violations
       
     </span>
   </a>
@@ -2429,16 +2451,20 @@
 
 <h1 id="constrained-optimization">Constrained Optimization</h1>
 <p>This tutorial demonstrates optimization of the Rosenbrock function with
-<strong>constraints</strong>. It shows how to specify both nonlinear constraints (evaluated
-by your callback) and linear constraints (specified in the configuration).</p>
+<strong>constraints</strong>. It shows how to specify bound constraints, nonlinear
+constraints and linear constraints.</p>
 <div class="admonition tip">
 <p class="admonition-title">Source Code</p>
 <p>The complete source code for this tutorial is available at
 <a href="https://github.com/TNO-ropt/ropt/blob/main/examples/rosenbrock_constrained.py">examples/rosenbrock_constrained.py</a>.</p>
 </div>
 <h2 id="types-of-constraints">Types of Constraints</h2>
-<p><code>ropt</code> supports two types of constraints:</p>
+<p><code>ropt</code> supports three types of constraints:</p>
 <ul>
+<li>
+<p><strong>Bound constraints</strong>: The value of each variable of the solution can be
+  limited by specifying bounds in the configuration.</p>
+</li>
 <li>
 <p><strong>Nonlinear constraints</strong>: Evaluated by your callback function alongside the
   objective. Like objectives, they can be stochastic (varying across
@@ -2450,6 +2476,13 @@ by your callback) and linear constraints (specified in the configuration).</p>
   optimizer.</p>
 </li>
 </ul>
+<div class="admonition note">
+<p class="admonition-title">Constraint violations</p>
+<p>Specifying constraints does not guarantee that all intermediate evaluations
+will satisfy them. Nonlinear constraints in particular may be violated
+during optimization, depending on the backend used. Always verify constraint
+satisfaction when inspecting results.</p>
+</div>
 <h2 id="the-constrained-rosenbrock-function">The constrained Rosenbrock function</h2>
 <p>This tutorial extends the <a href="../rosenbrock_basic/">stochastic Rosenbrock example</a> by adding non-linear and linear constraints. The non-linear constraint is a function of the first two variables:</p>
 <div class="arithmatex">\[
@@ -2482,25 +2515,41 @@ x_4 = x_5
 </span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>    <span class="s2">&quot;variables&quot;</span><span class="p">:</span> <span class="p">{</span>
 </span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>        <span class="s2">&quot;variable_count&quot;</span><span class="p">:</span> <span class="n">DIM</span><span class="p">,</span>
 </span><span id="__span-0-21"><a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>        <span class="s2">&quot;perturbation_magnitudes&quot;</span><span class="p">:</span> <span class="mf">1e-6</span><span class="p">,</span>
-</span><span id="__span-0-22"><a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a>    <span class="p">},</span>
-</span><span id="__span-0-23"><a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a>    <span class="s2">&quot;realizations&quot;</span><span class="p">:</span> <span class="p">{</span>
-</span><span id="__span-0-24"><a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a>        <span class="s2">&quot;weights&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">]</span> <span class="o">*</span> <span class="n">REALIZATIONS</span><span class="p">,</span>
-</span><span id="__span-0-25"><a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a>    <span class="p">},</span>
-</span><span id="__span-0-26"><a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a>    <span class="s2">&quot;nonlinear_constraints&quot;</span><span class="p">:</span> <span class="p">{</span>
-</span><span id="__span-0-27"><a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a>        <span class="s2">&quot;lower_bounds&quot;</span><span class="p">:</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span>
-</span><span id="__span-0-28"><a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a>        <span class="s2">&quot;upper_bounds&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
-</span><span id="__span-0-29"><a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a>    <span class="p">},</span>
-</span><span id="__span-0-30"><a id="__codelineno-0-30" name="__codelineno-0-30" href="#__codelineno-0-30"></a><span class="p">}</span>
-</span><span id="__span-0-31"><a id="__codelineno-0-31" name="__codelineno-0-31" href="#__codelineno-0-31"></a><span class="n">INITIAL_VALUES</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">DIM</span><span class="p">)</span> <span class="o">/</span> <span class="n">DIM</span> <span class="o">+</span> <span class="mf">0.5</span>
-</span><span id="__span-0-32"><a id="__codelineno-0-32" name="__codelineno-0-32" href="#__codelineno-0-32"></a><span class="n">UNCERTAINTY</span> <span class="o">=</span> <span class="mf">0.1</span>
+</span><span id="__span-0-22"><a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a>        <span class="s2">&quot;lower_bounds&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">5.0</span><span class="p">,</span>
+</span><span id="__span-0-23"><a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a>        <span class="s2">&quot;upper_bounds&quot;</span><span class="p">:</span> <span class="mf">5.0</span><span class="p">,</span>
+</span><span id="__span-0-24"><a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a>    <span class="p">},</span>
+</span><span id="__span-0-25"><a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a>    <span class="s2">&quot;realizations&quot;</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="__span-0-26"><a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a>        <span class="s2">&quot;weights&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">]</span> <span class="o">*</span> <span class="n">REALIZATIONS</span><span class="p">,</span>
+</span><span id="__span-0-27"><a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a>    <span class="p">},</span>
+</span><span id="__span-0-28"><a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a>    <span class="s2">&quot;nonlinear_constraints&quot;</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="__span-0-29"><a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a>        <span class="s2">&quot;lower_bounds&quot;</span><span class="p">:</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span>
+</span><span id="__span-0-30"><a id="__codelineno-0-30" name="__codelineno-0-30" href="#__codelineno-0-30"></a>        <span class="s2">&quot;upper_bounds&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span>
+</span><span id="__span-0-31"><a id="__codelineno-0-31" name="__codelineno-0-31" href="#__codelineno-0-31"></a>    <span class="p">},</span>
+</span><span id="__span-0-32"><a id="__codelineno-0-32" name="__codelineno-0-32" href="#__codelineno-0-32"></a><span class="p">}</span>
+</span><span id="__span-0-33"><a id="__codelineno-0-33" name="__codelineno-0-33" href="#__codelineno-0-33"></a><span class="n">INITIAL_VALUES</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">DIM</span><span class="p">)</span> <span class="o">/</span> <span class="n">DIM</span> <span class="o">+</span> <span class="mf">0.5</span>
+</span><span id="__span-0-34"><a id="__codelineno-0-34" name="__codelineno-0-34" href="#__codelineno-0-34"></a><span class="n">UNCERTAINTY</span> <span class="o">=</span> <span class="mf">0.1</span>
 </span></code></pre></div>
-<p>The key addition is the <code>nonlinear_constraints</code> section:</p>
+<p>The key addition is the in <code>variables</code> and <code>nonlinear_constraints</code> sections. In
+both we set lower and upper boundaries, for bound and non-linear constraints,
+respectively:</p>
 <ul>
 <li><code>lower_bounds</code>: Lower bounds (<span class="arithmatex">\(b_l\)</span>) for each constraint (use <code>-np.inf</code> for no lower bound)</li>
 <li><code>upper_bounds</code>: Upper bounds (<span class="arithmatex">\(b_u\)</span>) for each constraint</li>
 </ul>
-<p>A constraint <span class="arithmatex">\(g(\mathbf{x})\)</span> is satisfied when <span class="arithmatex">\(b_l \leq g(\mathbf{x}) \leq b_u\)</span>.</p>
-<p>The linear constraint is not defined yet, because it is optional, it will be
+<p>The lower bounds must be smaller than the upper bounds: <span class="arithmatex">\(b_l \le b_u\)</span>, but they
+may be equal to each other. In that case, they specify an equality constraint:
+the constraint function is expected to have the exact value <span class="arithmatex">\(b_l = b_u\)</span> .</p>
+<p>The bound constraints defined in the <code>variables</code> section define bounds on the
+solution variables: <span class="arithmatex">\(b_l \le \mathbf{x} \le b_u\)</span>. Note that the bounds in this
+example are optional: the solution for the Rosenbrock will also be found without
+these bounds. However, intermediate solutions may differ and the final solution
+might slightly different.</p>
+<p>The bounds in the <code>nonlinear-constraints</code> section define the limits on the value
+of the constraint function <span class="arithmatex">\(g(\mathbf{x})\)</span>: <span class="arithmatex">\(b_l \leq g(\mathbf{x}) \leq b_u\)</span>,
+in this case we implement the single constraint <span class="arithmatex">\(g(\mathbf{x}) \le -1\)</span>. Note
+that this sets the right-hand-side of the inequality to -1, so the constraint
+function that we implement below becomes: <span class="arithmatex">\(g(\mathbf{x}) = (x_1 - a)^3 - x_2\)</span></p>
+<p>The linear constraint is not defined yet, because it is optional; it will be
 added later.</p>
 <h2 id="evaluation-callback-with-constraints">Evaluation Callback with Constraints</h2>
 <p>The callback now calculates both objectives and constraints:</p>
@@ -2510,25 +2559,15 @@ added later.</p>
 </span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    <span class="n">a</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
 </span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    <span class="n">b</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
 </span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EvaluationBatchResult</span><span class="p">:</span>
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Batch evaluation callback for the multi-dimensional rosenbrock function.</span>
-</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>
-</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="sd">    Args:</span>
-</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="sd">        variables: The variables to evaluate.</span>
-</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="sd">        context:   Evaluator context.</span>
-</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="sd">        a:         The &#39;a&#39; parameters.</span>
-</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="sd">        b:         The &#39;b&#39; parameters.</span>
-</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>
-</span><span id="__span-1-15"><a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a><span class="sd">    Returns:</span>
-</span><span id="__span-1-16"><a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a><span class="sd">        An `EvaluationBatchResult` object containing the calculated objectives.</span>
-</span><span id="__span-1-17"><a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="__span-1-18"><a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a>    <span class="n">objectives</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">variables</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
-</span><span id="__span-1-19"><a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a>    <span class="n">constraints</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">variables</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
-</span><span id="__span-1-20"><a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a>    <span class="k">for</span> <span class="n">v_idx</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">realizations</span><span class="p">):</span>
-</span><span id="__span-1-21"><a id="__codelineno-1-21" name="__codelineno-1-21" href="#__codelineno-1-21"></a>        <span class="k">for</span> <span class="n">d_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">DIM</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
-</span><span id="__span-1-22"><a id="__codelineno-1-22" name="__codelineno-1-22" href="#__codelineno-1-22"></a>            <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">variables</span><span class="p">[</span><span class="n">v_idx</span><span class="p">,</span> <span class="n">d_idx</span> <span class="p">:</span> <span class="n">d_idx</span> <span class="o">+</span> <span class="mi">2</span><span class="p">]</span>
-</span><span id="__span-1-23"><a id="__codelineno-1-23" name="__codelineno-1-23" href="#__codelineno-1-23"></a>            <span class="n">objectives</span><span class="p">[</span><span class="n">v_idx</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="n">r</span><span class="p">]</span> <span class="o">-</span> <span class="n">x</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">b</span><span class="p">[</span><span class="n">r</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">x</span> <span class="o">*</span> <span class="n">x</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
-</span><span id="__span-1-24"><a id="__codelineno-1-24" name="__codelineno-1-24" href="#__codelineno-1-24"></a>        <span class="n">constraints</span><span class="p">[</span><span class="n">v_idx</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="p">(</span><span class="n">variables</span><span class="p">[</span><span class="n">v_idx</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">a</span><span class="p">[</span><span class="n">r</span><span class="p">])</span> <span class="o">**</span> <span class="mi">3</span> <span class="o">-</span> <span class="n">variables</span><span class="p">[</span><span class="n">v_idx</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
-</span><span id="__span-1-25"><a id="__codelineno-1-25" name="__codelineno-1-25" href="#__codelineno-1-25"></a>    <span class="k">return</span> <span class="n">EvaluationBatchResult</span><span class="p">(</span><span class="n">objectives</span><span class="o">=</span><span class="n">objectives</span><span class="p">,</span> <span class="n">constraints</span><span class="o">=</span><span class="n">constraints</span><span class="p">)</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>    <span class="n">objectives</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">variables</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>    <span class="n">constraints</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">variables</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>    <span class="k">for</span> <span class="n">v_idx</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">realizations</span><span class="p">):</span>
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>        <span class="k">for</span> <span class="n">d_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">DIM</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>            <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">variables</span><span class="p">[</span><span class="n">v_idx</span><span class="p">,</span> <span class="n">d_idx</span> <span class="p">:</span> <span class="n">d_idx</span> <span class="o">+</span> <span class="mi">2</span><span class="p">]</span>
+</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>            <span class="n">objectives</span><span class="p">[</span><span class="n">v_idx</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="n">r</span><span class="p">]</span> <span class="o">-</span> <span class="n">x</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">b</span><span class="p">[</span><span class="n">r</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">x</span> <span class="o">*</span> <span class="n">x</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
+</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>        <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">variables</span><span class="p">[</span><span class="n">v_idx</span><span class="p">,</span> <span class="p">:</span><span class="mi">2</span><span class="p">]</span>
+</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>        <span class="n">constraints</span><span class="p">[</span><span class="n">v_idx</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">a</span><span class="p">[</span><span class="n">r</span><span class="p">])</span> <span class="o">**</span> <span class="mi">3</span> <span class="o">-</span> <span class="n">y</span>
+</span><span id="__span-1-15"><a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>    <span class="k">return</span> <span class="n">EvaluationBatchResult</span><span class="p">(</span><span class="n">objectives</span><span class="o">=</span><span class="n">objectives</span><span class="p">,</span> <span class="n">constraints</span><span class="o">=</span><span class="n">constraints</span><span class="p">)</span>
 </span></code></pre></div>
 <p>Key points:</p>
 <ul>
@@ -2542,68 +2581,87 @@ added later.</p>
       dataclass
   " href="../../reference/evaluation/#ropt.evaluation.EvaluationBatchResult"><code>EvaluationBatchResult</code></a></li>
 </ul>
-<h2 id="progress-reporting">Progress Reporting</h2>
-<p>The report callback now includes constraint values:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">report</span><span class="p">(</span><span class="n">results</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Results</span><span class="p">,</span> <span class="o">...</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Report results of an evaluation.</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="sd">    Args:</span>
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="sd">        results: The results to process.</span>
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
-</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">FunctionResults</span><span class="p">)</span> <span class="ow">and</span> <span class="n">item</span><span class="o">.</span><span class="n">functions</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  variables:  </span><span class="si">{</span><span class="n">item</span><span class="o">.</span><span class="n">evaluations</span><span class="o">.</span><span class="n">variables</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  objective:  </span><span class="si">{</span><span class="n">item</span><span class="o">.</span><span class="n">functions</span><span class="o">.</span><span class="n">target_objective</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  constraint: </span><span class="si">{</span><span class="n">item</span><span class="o">.</span><span class="n">functions</span><span class="o">.</span><span class="n">constraints</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+<h2 id="reporting-constraint-violations">Reporting Constraint Violations</h2>
+<p>The report callback monitors for constraint violations during optimization:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">report_violations</span><span class="p">(</span><span class="n">results</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Results</span><span class="p">,</span> <span class="o">...</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">FunctionResults</span><span class="p">)</span> <span class="ow">and</span> <span class="n">item</span><span class="o">.</span><span class="n">functions</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>            <span class="n">violated</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">constraint_info</span><span class="o">.</span><span class="n">nonlinear_violation</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>            <span class="k">if</span> <span class="n">violated</span><span class="p">:</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Constraint violation detected:&quot;</span><span class="p">)</span>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  variables:  </span><span class="si">{</span><span class="n">item</span><span class="o">.</span><span class="n">evaluations</span><span class="o">.</span><span class="n">variables</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  objective:  </span><span class="si">{</span><span class="n">item</span><span class="o">.</span><span class="n">functions</span><span class="o">.</span><span class="n">target_objective</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  constraint: </span><span class="si">{</span><span class="n">item</span><span class="o">.</span><span class="n">functions</span><span class="o">.</span><span class="n">constraints</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  violation:  </span><span class="si">{</span><span class="n">item</span><span class="o">.</span><span class="n">constraint_info</span><span class="o">.</span><span class="n">nonlinear_violation</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
 </span></code></pre></div>
-<p>This callback filters for <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+<p>This callback accesses the <code>constraint_info</code> attribute, which returns a
+<a class="autorefs autorefs-internal" title="            ropt.results.ConstraintInfo
 
 
   
       dataclass
-  " href="../../reference/results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> and
-prints the current best variables, the objective value and the non-linear
-constraint value.</p>
+  " href="../../reference/results/#ropt.results.ConstraintInfo"><code>ConstraintInfo</code></a> object containing violation data
+for all constraint types.</p>
+<h2 id="understanding-constraint-violations">Understanding Constraint Violations</h2>
+<p>A <strong>violation</strong> represents the absolute value of the amount by which a constraint
+bound is exceeded, or zero if the constraint is satisfied. For example, if a
+constraint requires <span class="arithmatex">\(g(\mathbf{x}) \ge 0\)</span> and the actual value is <span class="arithmatex">\(-0.5\)</span>, the
+violation is <span class="arithmatex">\(0.5\)</span>.</p>
+<p>The <a class="autorefs autorefs-internal" title="            ropt.results.ConstraintInfo
+
+
+  
+      dataclass
+  " href="../../reference/results/#ropt.results.ConstraintInfo"><code>ConstraintInfo</code></a> class provides violation
+data for all three constraint types (bound, linear, and nonlinear). This example
+only checks nonlinear violations, but the same approach applies to all types.
+See <a href="../../usage/results/">Working with Results</a> for full details on constraint
+differences and violations.</p>
+<div class="admonition tip">
+<p class="admonition-title">Constraint tolerance</p>
+<p>The <a class="autorefs autorefs-internal" title="            ropt.workflow.BasicOptimizer" href="../../reference/basic_optimizer/#ropt.workflow.BasicOptimizer"><code>BasicOptimizer</code></a> accepts a single
+<code>constraint_tolerance</code> parameter that applies uniformly to all constraint
+types. This mirrors the behavior of
+<a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.ResultHandler" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.ResultHandler"><code>ResultHandler</code></a>. For more
+fine-grained control, you can build a custom workflow that tracks violations
+for each constraint type individually.</p>
+</div>
 <h2 id="running-the-optimization">Running the Optimization</h2>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">linear</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Run the example and check the result.&quot;&quot;&quot;</span>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    <span class="c1"># Generate random parameters for the Rosenbrock function</span>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="n">rng</span> <span class="o">=</span> <span class="n">default_rng</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="mi">123</span><span class="p">)</span>
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="n">a</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="n">UNCERTAINTY</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">REALIZATIONS</span><span class="p">)</span>
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    <span class="n">b</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mf">100.0</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">100</span> <span class="o">*</span> <span class="n">UNCERTAINTY</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">REALIZATIONS</span><span class="p">)</span>
-</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>
-</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>    <span class="c1"># If desired, add a linear constraint to the configuration</span>
-</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>    <span class="k">if</span> <span class="n">linear</span><span class="p">:</span>
-</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>        <span class="n">CONFIG</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
-</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>            <span class="p">{</span>
-</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>                <span class="s2">&quot;linear_constraints&quot;</span><span class="p">:</span> <span class="p">{</span>
-</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>                    <span class="s2">&quot;coefficients&quot;</span><span class="p">:</span> <span class="p">[[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">]],</span>
-</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a>                    <span class="s2">&quot;lower_bounds&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
-</span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a>                    <span class="s2">&quot;upper_bounds&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
-</span><span id="__span-3-16"><a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a>                <span class="p">}</span>
-</span><span id="__span-3-17"><a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a>            <span class="p">}</span>
-</span><span id="__span-3-18"><a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a>        <span class="p">)</span>
-</span><span id="__span-3-19"><a id="__codelineno-3-19" name="__codelineno-3-19" href="#__codelineno-3-19"></a>
-</span><span id="__span-3-20"><a id="__codelineno-3-20" name="__codelineno-3-20" href="#__codelineno-3-20"></a>    <span class="c1"># Create the basic optimizer, set the constraint tolerance</span>
-</span><span id="__span-3-21"><a id="__codelineno-3-21" name="__codelineno-3-21" href="#__codelineno-3-21"></a>    <span class="n">optimizer</span> <span class="o">=</span> <span class="n">BasicOptimizer</span><span class="p">(</span>
-</span><span id="__span-3-22"><a id="__codelineno-3-22" name="__codelineno-3-22" href="#__codelineno-3-22"></a>        <span class="n">CONFIG</span><span class="p">,</span> <span class="n">partial</span><span class="p">(</span><span class="n">rosenbrock</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">b</span><span class="p">),</span> <span class="n">constraint_tolerance</span><span class="o">=</span><span class="mf">1e-6</span>
-</span><span id="__span-3-23"><a id="__codelineno-3-23" name="__codelineno-3-23" href="#__codelineno-3-23"></a>    <span class="p">)</span>
-</span><span id="__span-3-24"><a id="__codelineno-3-24" name="__codelineno-3-24" href="#__codelineno-3-24"></a>
-</span><span id="__span-3-25"><a id="__codelineno-3-25" name="__codelineno-3-25" href="#__codelineno-3-25"></a>    <span class="c1"># Set the reporter callback</span>
-</span><span id="__span-3-26"><a id="__codelineno-3-26" name="__codelineno-3-26" href="#__codelineno-3-26"></a>    <span class="n">optimizer</span><span class="o">.</span><span class="n">set_results_callback</span><span class="p">(</span><span class="n">report</span><span class="p">)</span>
-</span><span id="__span-3-27"><a id="__codelineno-3-27" name="__codelineno-3-27" href="#__codelineno-3-27"></a>
-</span><span id="__span-3-28"><a id="__codelineno-3-28" name="__codelineno-3-28" href="#__codelineno-3-28"></a>    <span class="c1"># Run the optimization</span>
-</span><span id="__span-3-29"><a id="__codelineno-3-29" name="__codelineno-3-29" href="#__codelineno-3-29"></a>    <span class="n">optimizer</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">INITIAL_VALUES</span><span class="p">)</span>
-</span><span id="__span-3-30"><a id="__codelineno-3-30" name="__codelineno-3-30" href="#__codelineno-3-30"></a>
-</span><span id="__span-3-31"><a id="__codelineno-3-31" name="__codelineno-3-31" href="#__codelineno-3-31"></a>    <span class="c1"># Check the results</span>
-</span><span id="__span-3-32"><a id="__codelineno-3-32" name="__codelineno-3-32" href="#__codelineno-3-32"></a>    <span class="k">assert</span> <span class="n">optimizer</span><span class="o">.</span><span class="n">results</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-</span><span id="__span-3-33"><a id="__codelineno-3-33" name="__codelineno-3-33" href="#__codelineno-3-33"></a>    <span class="k">assert</span> <span class="n">optimizer</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">functions</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-</span><span id="__span-3-34"><a id="__codelineno-3-34" name="__codelineno-3-34" href="#__codelineno-3-34"></a>    <span class="k">assert</span> <span class="n">optimizer</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">functions</span><span class="o">.</span><span class="n">constraints</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-</span><span id="__span-3-35"><a id="__codelineno-3-35" name="__codelineno-3-35" href="#__codelineno-3-35"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Optimal variables:  </span><span class="si">{</span><span class="n">optimizer</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">evaluations</span><span class="o">.</span><span class="n">variables</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-</span><span id="__span-3-36"><a id="__codelineno-3-36" name="__codelineno-3-36" href="#__codelineno-3-36"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Optimal objective:  </span><span class="si">{</span><span class="n">optimizer</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">functions</span><span class="o">.</span><span class="n">target_objective</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-</span><span id="__span-3-37"><a id="__codelineno-3-37" name="__codelineno-3-37" href="#__codelineno-3-37"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Optimal constraint: </span><span class="si">{</span><span class="n">optimizer</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">functions</span><span class="o">.</span><span class="n">constraints</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
-</span><span id="__span-3-38"><a id="__codelineno-3-38" name="__codelineno-3-38" href="#__codelineno-3-38"></a>    <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">optimizer</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">functions</span><span class="o">.</span><span class="n">target_objective</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-1</span><span class="p">)</span>
-</span><span id="__span-3-39"><a id="__codelineno-3-39" name="__codelineno-3-39" href="#__codelineno-3-39"></a>    <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">optimizer</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">evaluations</span><span class="o">.</span><span class="n">variables</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-1</span><span class="p">)</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="c1"># Generate random parameters for the Rosenbrock function</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    <span class="n">rng</span> <span class="o">=</span> <span class="n">default_rng</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="mi">123</span><span class="p">)</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="n">a</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="n">UNCERTAINTY</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">REALIZATIONS</span><span class="p">)</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="n">b</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mf">100.0</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">100</span> <span class="o">*</span> <span class="n">UNCERTAINTY</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">REALIZATIONS</span><span class="p">)</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>    <span class="c1"># If desired, add a linear constraint to the configuration</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>    <span class="k">if</span> <span class="n">linear</span><span class="p">:</span>
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>        <span class="n">CONFIG</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>            <span class="p">{</span>
+</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>                <span class="s2">&quot;linear_constraints&quot;</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>                    <span class="s2">&quot;coefficients&quot;</span><span class="p">:</span> <span class="p">[[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">]],</span>
+</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>                    <span class="s2">&quot;lower_bounds&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a>                    <span class="s2">&quot;upper_bounds&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+</span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a>                <span class="p">}</span>
+</span><span id="__span-3-16"><a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a>            <span class="p">}</span>
+</span><span id="__span-3-17"><a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a>        <span class="p">)</span>
+</span><span id="__span-3-18"><a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a>
+</span><span id="__span-3-19"><a id="__codelineno-3-19" name="__codelineno-3-19" href="#__codelineno-3-19"></a>    <span class="c1"># Create the basic optimizer, set the constraint tolerance</span>
+</span><span id="__span-3-20"><a id="__codelineno-3-20" name="__codelineno-3-20" href="#__codelineno-3-20"></a>    <span class="n">optimizer</span> <span class="o">=</span> <span class="n">BasicOptimizer</span><span class="p">(</span>
+</span><span id="__span-3-21"><a id="__codelineno-3-21" name="__codelineno-3-21" href="#__codelineno-3-21"></a>        <span class="n">CONFIG</span><span class="p">,</span>
+</span><span id="__span-3-22"><a id="__codelineno-3-22" name="__codelineno-3-22" href="#__codelineno-3-22"></a>        <span class="n">partial</span><span class="p">(</span><span class="n">rosenbrock</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">b</span><span class="p">),</span>
+</span><span id="__span-3-23"><a id="__codelineno-3-23" name="__codelineno-3-23" href="#__codelineno-3-23"></a>        <span class="n">constraint_tolerance</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span>
+</span><span id="__span-3-24"><a id="__codelineno-3-24" name="__codelineno-3-24" href="#__codelineno-3-24"></a>    <span class="p">)</span>
+</span><span id="__span-3-25"><a id="__codelineno-3-25" name="__codelineno-3-25" href="#__codelineno-3-25"></a>
+</span><span id="__span-3-26"><a id="__codelineno-3-26" name="__codelineno-3-26" href="#__codelineno-3-26"></a>    <span class="c1"># Set the reporter callback</span>
+</span><span id="__span-3-27"><a id="__codelineno-3-27" name="__codelineno-3-27" href="#__codelineno-3-27"></a>    <span class="n">optimizer</span><span class="o">.</span><span class="n">set_results_callback</span><span class="p">(</span><span class="n">report_violations</span><span class="p">)</span>
+</span><span id="__span-3-28"><a id="__codelineno-3-28" name="__codelineno-3-28" href="#__codelineno-3-28"></a>
+</span><span id="__span-3-29"><a id="__codelineno-3-29" name="__codelineno-3-29" href="#__codelineno-3-29"></a>    <span class="c1"># Run the optimization</span>
+</span><span id="__span-3-30"><a id="__codelineno-3-30" name="__codelineno-3-30" href="#__codelineno-3-30"></a>    <span class="n">optimizer</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">INITIAL_VALUES</span><span class="p">)</span>
+</span><span id="__span-3-31"><a id="__codelineno-3-31" name="__codelineno-3-31" href="#__codelineno-3-31"></a>
+</span><span id="__span-3-32"><a id="__codelineno-3-32" name="__codelineno-3-32" href="#__codelineno-3-32"></a>    <span class="c1"># Check the results</span>
+</span><span id="__span-3-33"><a id="__codelineno-3-33" name="__codelineno-3-33" href="#__codelineno-3-33"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Optimal variables:  </span><span class="si">{</span><span class="n">optimizer</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">evaluations</span><span class="o">.</span><span class="n">variables</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="__span-3-34"><a id="__codelineno-3-34" name="__codelineno-3-34" href="#__codelineno-3-34"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Optimal objective:  </span><span class="si">{</span><span class="n">optimizer</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">functions</span><span class="o">.</span><span class="n">target_objective</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="__span-3-35"><a id="__codelineno-3-35" name="__codelineno-3-35" href="#__codelineno-3-35"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Optimal constraint: </span><span class="si">{</span><span class="n">optimizer</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">functions</span><span class="o">.</span><span class="n">constraints</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
 </span></code></pre></div>
 <p>Notable additions:</p>
 <ul>
@@ -2613,16 +2671,17 @@ constraint value.</p>
 </li>
 <li>
 <p><strong>Constraint tolerance</strong>: The <code>constraint_tolerance</code> parameter controls how
-  strictly constraints must be satisfied. A smaller value means stricter
-  enforcement.</p>
+  strictly constraints must be satisfied while tracking the optimal result. A
+  smaller value means stricter enforcement.</p>
 </li>
 </ul>
 <h2 id="linear-constraints">Linear Constraints</h2>
-<p>Linear constraints are specified as:</p>
+<p>Linear constraints are entirely specified in the configuration, there is no need to modify 
+the function that calculates objectives and nonlinear constraints:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="s2">&quot;linear_constraints&quot;</span><span class="p">:</span> <span class="p">{</span>
 </span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>    <span class="s2">&quot;coefficients&quot;</span><span class="p">:</span> <span class="p">[[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">]],</span>  <span class="c1"># coefficients for each variable</span>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    <span class="s2">&quot;lower_bounds&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>   <span class="c1"># lower bound(s)</span>
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>    <span class="s2">&quot;upper_bounds&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>   <span class="c1"># upper bound(s)</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    <span class="s2">&quot;lower_bounds&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>                           <span class="c1"># lower bound(s)</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>    <span class="s2">&quot;upper_bounds&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>                           <span class="c1"># upper bound(s)</span>
 </span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="p">}</span>
 </span></code></pre></div>
 <p>The constraints are defined as a linear equation <span class="arithmatex">\(b_l\leq \mathbf{C} \cdot
@@ -2657,6 +2716,7 @@ and <span class="arithmatex">\(b_u\)</span> are vectors of length one: <span cla
 <li><strong>Linear constraints</strong>: Specified in configuration, deterministic</li>
 <li><strong>Constraint bounds</strong>: Using <code>-np.inf</code> for one-sided constraints</li>
 <li><strong>Constraint tolerance</strong>: Controlling how strictly constraints are enforced</li>
+<li><strong>Constraint violations</strong>: Monitoring if constraints are violated</li>
 </ol>
 <h2 id="next-steps">Next Steps</h2>
 <ul>
