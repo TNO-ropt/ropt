@@ -1182,34 +1182,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../exploring_results/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Exploring Results
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -2450,7 +2422,7 @@ control and flexibility compared to
 </span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.results</span><span class="w"> </span><span class="kn">import</span> <span class="n">FunctionResults</span>
 </span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.workflow.compute_steps</span><span class="w"> </span><span class="kn">import</span> <span class="n">OptimizationStep</span>
 </span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.workflow.evaluators</span><span class="w"> </span><span class="kn">import</span> <span class="n">BatchEvaluator</span>
-</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.workflow.event_handlers</span><span class="w"> </span><span class="kn">import</span> <span class="n">CallbackHandler</span><span class="p">,</span> <span class="n">ResultHandler</span>
+</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.workflow.event_handlers</span><span class="w"> </span><span class="kn">import</span> <span class="n">CallbackHandler</span><span class="p">,</span> <span class="n">ResultsHandler</span>
 </span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>
 </span><span id="__span-0-21"><a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a><span class="n">DIM</span> <span class="o">=</span> <span class="mi">5</span>
 </span><span id="__span-0-22"><a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a><span class="n">CONFIG</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
@@ -2475,7 +2447,7 @@ control and flexibility compared to
 <li><a class="autorefs autorefs-internal" title="            ropt.workflow.compute_steps.OptimizationStep" href="../../reference/workflow_compute_steps/#ropt.workflow.compute_steps.OptimizationStep"><code>OptimizationStep</code></a> — The compute step</li>
 <li><a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.BatchEvaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.BatchEvaluator"><code>BatchEvaluator</code></a> — Wraps a batch callback</li>
 <li><a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.CallbackHandler" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.CallbackHandler"><code>CallbackHandler</code></a>,
-  <a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.ResultHandler" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.ResultHandler"><code>ResultHandler</code></a> — Event handlers</li>
+  <a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.ResultsHandler" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.ResultsHandler"><code>ResultsHandler</code></a> — Event handlers</li>
 </ul>
 <h2 id="the-batch-evaluation-callback">The Batch Evaluation Callback</h2>
 <p>The evaluation callback is the same as in the basic tutorial:</p>
@@ -2542,7 +2514,7 @@ and objective value. The event object provides access to:</p>
 </span><span id="__span-3-25"><a id="__codelineno-3-25" name="__codelineno-3-25" href="#__codelineno-3-25"></a>    <span class="n">step</span> <span class="o">=</span> <span class="n">OptimizationStep</span><span class="p">(</span><span class="n">evaluator</span><span class="o">=</span><span class="n">evaluator</span><span class="p">)</span>
 </span><span id="__span-3-26"><a id="__codelineno-3-26" name="__codelineno-3-26" href="#__codelineno-3-26"></a>
 </span><span id="__span-3-27"><a id="__codelineno-3-27" name="__codelineno-3-27" href="#__codelineno-3-27"></a>    <span class="c1"># Add a result handler to track the best result</span>
-</span><span id="__span-3-28"><a id="__codelineno-3-28" name="__codelineno-3-28" href="#__codelineno-3-28"></a>    <span class="n">result_handler</span> <span class="o">=</span> <span class="n">ResultHandler</span><span class="p">()</span>
+</span><span id="__span-3-28"><a id="__codelineno-3-28" name="__codelineno-3-28" href="#__codelineno-3-28"></a>    <span class="n">result_handler</span> <span class="o">=</span> <span class="n">ResultsHandler</span><span class="p">()</span>
 </span><span id="__span-3-29"><a id="__codelineno-3-29" name="__codelineno-3-29" href="#__codelineno-3-29"></a>    <span class="n">step</span><span class="o">.</span><span class="n">add_event_handler</span><span class="p">(</span><span class="n">result_handler</span><span class="p">)</span>
 </span><span id="__span-3-30"><a id="__codelineno-3-30" name="__codelineno-3-30" href="#__codelineno-3-30"></a>
 </span><span id="__span-3-31"><a id="__codelineno-3-31" name="__codelineno-3-31" href="#__codelineno-3-31"></a>    <span class="c1"># Add an event handler to report results after each evaluation</span>
@@ -2577,7 +2549,7 @@ and objective value. The event object provides access to:</p>
 </li>
 <li>
 <p><strong>Add a result handler</strong>: The
-   <a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.ResultHandler" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.ResultHandler"><code>ResultHandler</code></a> stores the
+   <a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.ResultsHandler" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.ResultsHandler"><code>ResultsHandler</code></a> stores the
    best result found</p>
 </li>
 <li>
@@ -2636,7 +2608,7 @@ and objective value. The event object provides access to:</p>
 <tr>
 <td>Result access</td>
 <td><code>optimizer.results</code></td>
-<td>Via <code>ResultHandler</code></td>
+<td>Via <code>ResultsHandler</code></td>
 </tr>
 <tr>
 <td>Flexibility</td>
