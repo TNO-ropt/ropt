@@ -20,9 +20,9 @@ class OptimizerConfig(BaseModel):
     Attributes:
         max_batches:    Maximum number of batch evaluations (optional).
         max_functions:  Maximum number of function evaluations (optional).
-        output_dir:            Output directory for the optimizer (optional).
-        stdout:                File to redirect optimizer standard output (optional).
-        stderr:                File to redirect optimizer standard error (optional).
+        output_dir:     Output directory for the optimizer (optional).
+        stdout:         File to redirect optimizer standard output (optional).
+        stderr:         File to redirect optimizer standard error (optional).
     """
 
     max_batches: PositiveInt | None = None
