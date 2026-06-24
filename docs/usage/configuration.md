@@ -377,9 +377,9 @@ redirection):
 - **`output_dir`** (default: `None`): An optional output directory where the
   optimizer can store files. When `None`, no output directory is used.
 - **`stdout`** (default: `None`): Redirect optimizer standard output to the
-  given file. When `None`, standard output is discarded.
+  given file. When `None`, standard output is not redirected.
 - **`stderr`** (default: `None`): Redirect optimizer standard error to the given
-  file. When `None`, standard error is discarded.
+  file. When `None`, standard error is not redirected.
 
 ### `backend` — [`BackendConfig`][ropt.config.BackendConfig]
 
