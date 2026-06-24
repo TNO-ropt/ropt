@@ -398,6 +398,8 @@ the [next section](parallel.md):
 | [`CachedEvaluator`][ropt.workflow.evaluators.CachedEvaluator]                  | Wraps another evaluator, caching results by variable vector.                                                                  |
 | [`AsyncEvaluator`][ropt.workflow.evaluators.AsyncEvaluator]                    | Parallel evaluation via a [`Server`][ropt.workflow.servers.Server] — see [Parallel Evaluation](parallel.md).                  |
 
+### BatchEvaluator
+
 [`BatchEvaluator`][ropt.workflow.evaluators.BatchEvaluator] defers to a callable
 callback that receives the full 2-D variable matrix and an
 [`EvaluationBatchContext`][ropt.evaluation.EvaluationBatchContext], and returns
@@ -405,6 +407,8 @@ an [`EvaluationBatchResult`][ropt.evaluation.EvaluationBatchResult]. Use this
 when you need the full batch (e.g. vectorized computation, or an external
 simulator that accepts all rows at once). The callback has the same signature as
 the callable accepted by `BasicOptimizer`.
+
+### FunctionEvaluator
 
 [`FunctionEvaluator`][ropt.workflow.evaluators.FunctionEvaluator] stores a
 single function that returns a value for each objective and constraint. The
@@ -419,6 +423,8 @@ either:
 - A dictionary with a `"result"` key containing that array; any additional
   keys are stored as `evaluation_info` entries in the returned
   [`EvaluationBatchResult`][ropt.evaluation.EvaluationBatchResult].
+
+### CachedEvaluator
 
 [`CachedEvaluator`][ropt.workflow.evaluators.CachedEvaluator] wraps another
 evaluator with result caching. It retrieves previously computed function results
@@ -440,14 +446,22 @@ marked as inactive and only the missing evaluations are delegated to the
 wrapped evaluator. The final combined result contains both cached and newly
 computed values.
 
-Sources can be managed dynamically with `add_sources()` and
-`remove_sources()`.
+Sources can be added dynamically with `add_sources()`.
+
+To record which evaluations were served from cache, pass a `hits_key` string
+at construction time. When set, the returned
+[`EvaluationBatchResult`][ropt.evaluation.EvaluationBatchResult] will contain
+a boolean NumPy array in its `evaluation_info` dictionary under that key —
+`True` for evaluations that came from the cache, `False` for those that were
+freshly computed.
 
 The `eval_cached()` method is available for derived classes that need access to
 which evaluations were cache hits — it returns both the
 [`EvaluationBatchResult`][ropt.evaluation.EvaluationBatchResult] and a
 dictionary mapping evaluation indices to their cached
 [`FunctionResults`][ropt.results.FunctionResults].
+
+### AsyncEvaluator
 
 The evaluators above run each function call sequentially in the current
 thread. For parallel evaluation — whether via worker threads, separate

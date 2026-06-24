@@ -594,10 +594,6 @@ def _cached_eval(
 ) -> EvaluationBatchResult:
     results, cached = obj.eval_cached(variables, evaluator_context)
     cached_indices = list(cached.keys())
-    info = np.zeros(variables.shape[0], dtype=np.bool_)
-    info[cached_indices] = True
-    results.evaluation_info = {"cached": info}
-
     realizations = evaluator_context.realizations.copy()
     realizations[cached_indices] = [item[0] for item in cached.values()]
     names = (
@@ -656,7 +652,7 @@ def test_evaluator_cache(
 
     function_evaluator = evaluator((_test_function1, test_functions[1]))
     cached_evaluator = CachedEvaluator(
-        evaluator=function_evaluator, sources={result_handler}
+        evaluator=function_evaluator, sources={result_handler}, hits_key="cached"
     )
     assert isinstance(cached_evaluator, CachedEvaluator)
     monkeypatch.setattr(

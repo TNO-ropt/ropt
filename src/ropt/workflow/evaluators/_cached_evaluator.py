@@ -35,6 +35,7 @@ class CachedEvaluator(Evaluator):
         *,
         evaluator: Evaluator,
         sources: Sequence[EventHandler] | set[EventHandler] | None = None,
+        hits_key: str | None = None,
     ) -> None:
         """Initialize the CachedEvaluator.
 
@@ -45,10 +46,12 @@ class CachedEvaluator(Evaluator):
         Args:
             evaluator: The evaluator to cache.
             sources:   `EventHandler` instances for retrieving cached results.
+            hits_key:   Optional key for storing cache-hits in `evaluation_info`.
         """
         super().__init__()
         self._evaluator = evaluator
         self._sources: list[EventHandler] = [] if sources is None else list(sources)
+        self._hits_key = hits_key
 
     def eval_cached(
         self, variables: NDArray[np.float64], evaluator_context: EvaluationBatchContext
@@ -94,6 +97,11 @@ class CachedEvaluator(Evaluator):
 
         evaluator_result = self._evaluator.eval(variables, evaluator_context)
 
+        if self._hits_key is not None:
+            hits = np.zeros(variables.shape[0], dtype=np.bool_)
+            hits[list(cached.keys())] = True
+            evaluator_result.evaluation_info[self._hits_key] = hits
+
         for idx, (realization, item) in cached.items():
             objectives = item.evaluations.objectives
             constraints = item.evaluations.constraints
@@ -124,16 +132,6 @@ class CachedEvaluator(Evaluator):
 
         Args:
             sources: `EventHandler` instances to add as a source.
-        """
-        if isinstance(sources, EventHandler):
-            sources = [sources]
-        self._sources.extend(sources)
-
-    def remove_sources(self, sources: EventHandler | Sequence[EventHandler]) -> None:
-        """Remove one or more `EventHandler` sources.
-
-        Args:
-            sources: `EventHandler` instances to remove as a source.
         """
         if isinstance(sources, EventHandler):
             sources = [sources]
