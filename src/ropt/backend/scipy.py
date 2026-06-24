@@ -596,7 +596,8 @@ class SciPyBackend(Backend):
 
         if self._method == "differential_evolution" and "integrality" not in options:
             options["integrality"] = (
-                self._context.variables.types == VariableType.INTEGER
+                self._context.variables.types[self._context.variables.mask]
+                == VariableType.INTEGER
             )
 
         return options
