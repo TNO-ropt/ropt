@@ -183,8 +183,8 @@ differences and violations.
     The [`BasicOptimizer`][ropt.workflow.BasicOptimizer] accepts a single
     `constraint_tolerance` parameter that applies uniformly to all constraint
     types. This mirrors the behavior of
-    [`ResultHandler`][ropt.workflow.event_handlers.ResultHandler]. For more
-    fine-grained control, `ResultHandler` also accepts a `filter` callable that
+    [`ResultsHandler`][ropt.workflow.event_handlers.ResultsHandler]. For more
+    fine-grained control, `ResultsHandler` also accepts a `filter` callable that
     receives a [`Results`][ropt.results.Results] object and returns `True` to
     keep or `False` to discard. This allows custom per-constraint-type logic or
     any other filtering criterion when building a workflow.

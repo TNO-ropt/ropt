@@ -18,7 +18,7 @@ from ropt.exceptions import Abort
 from ropt.workflow.evaluators import BatchEvaluator, Evaluator
 
 from .compute_steps import OptimizationStep
-from .event_handlers import CallbackHandler, ResultHandler
+from .event_handlers import CallbackHandler, ResultsHandler
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
@@ -100,7 +100,7 @@ class BasicOptimizer:
             if isinstance(self._evaluator, Evaluator)
             else BatchEvaluator(callback=self._evaluator)
         )
-        result_handler = ResultHandler(constraint_tolerance=self._constraint_tolerance)
+        result_handler = ResultsHandler(constraint_tolerance=self._constraint_tolerance)
         optimizer = OptimizationStep(evaluator=evaluator)
         optimizer.add_event_handler(result_handler)
         for event_type, function in self._observers:

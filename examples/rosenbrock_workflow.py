@@ -36,7 +36,7 @@ from ropt.events import EnOptEvent
 from ropt.results import FunctionResults
 from ropt.workflow.compute_steps import OptimizationStep
 from ropt.workflow.evaluators import BatchEvaluator
-from ropt.workflow.event_handlers import CallbackHandler, ResultHandler
+from ropt.workflow.event_handlers import CallbackHandler, ResultsHandler
 
 DIM = 5
 CONFIG: dict[str, Any] = {
@@ -114,7 +114,7 @@ def main(*, merge: bool = False) -> None:
     step = OptimizationStep(evaluator=evaluator)
 
     # Add a result handler to track the best result
-    result_handler = ResultHandler()
+    result_handler = ResultsHandler()
     step.add_event_handler(result_handler)
 
     # Add an event handler to report results after each evaluation

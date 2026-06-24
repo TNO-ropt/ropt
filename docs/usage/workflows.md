@@ -64,7 +64,7 @@ from numpy.typing import NDArray
 from ropt.context import EnOptContext
 from ropt.workflow.compute_steps import OptimizationStep
 from ropt.workflow.evaluators import FunctionEvaluator
-from ropt.workflow.event_handlers import ResultHandler
+from ropt.workflow.event_handlers import ResultsHandler
 
 # 1. Build the configuration.
 CONFIG = {
@@ -83,7 +83,7 @@ evaluator = FunctionEvaluator(function=my_function)
 step = OptimizationStep(evaluator=evaluator)
 
 # 5. Attach event handlers.
-result_handler = ResultHandler()  # remember the best
+result_handler = ResultsHandler()  # remember the best
 step.add_event_handler(result_handler)
 
 # 6. Run the step.
@@ -190,19 +190,19 @@ The framework ships four reusable handlers:
 
 | Handler                                                                  | Purpose                                                                |
 | ------------------------------------------------------------------------ | ---------------------------------------------------------------------- |
-| [`ResultHandler`][ropt.workflow.event_handlers.ResultHandler]            | Keep the best (or last) result. Backs `BasicOptimizer.results`.        |
+| [`ResultsHandler`][ropt.workflow.event_handlers.ResultsHandler]          | Keep the best (or last) result. Backs `BasicOptimizer.results`.        |
 | [`HistoryHandler`][ropt.workflow.event_handlers.HistoryHandler]          | Keep every result.                                                     |
 | [`CallbackHandler`][ropt.workflow.event_handlers.CallbackHandler]        | Forward selected event types to a user callback.                       |
 | [`TableHandler`][ropt.workflow.event_handlers.TableHandler]              | Append rows to a structured table per result.                          |
 
 Handlers expose their state through dictionary access (`handler[key]`). By
-convention, `ResultHandler` and `HistoryHandler` both use the key `"results"` —
+convention, `ResultsHandler` and `HistoryHandler` both use the key `"results"` —
 e.g. `result_handler["results"]` or `history_handler["results"]`. `TableHandler`
 uses the table name as key — e.g. `table["functions"]`.
 
-### ResultHandler
+### ResultsHandler
 
-[`ResultHandler`][ropt.workflow.event_handlers.ResultHandler] listens for
+[`ResultsHandler`][ropt.workflow.event_handlers.ResultsHandler] listens for
 [`FINISHED_EVALUATION`][ropt.enums.EnOptEventType.FINISHED_EVALUATION] events
 emitted from within an optimization workflow. It processes the
 [`Results`][ropt.results.Results] objects contained within these events and
@@ -423,7 +423,7 @@ either:
 [`CachedEvaluator`][ropt.workflow.evaluators.CachedEvaluator] wraps another
 evaluator with result caching. It retrieves previously computed function results
 from `EventHandler` instances specified as `sources` — typically a
-`HistoryHandler` or `ResultHandler`. For each variable vector and realization,
+`HistoryHandler` or `ResultsHandler`. For each variable vector and realization,
 if a matching cached result is found, the cached objectives and constraints are
 reused without calling the wrapped evaluator. Only uncached evaluations are
 forwarded to the underlying evaluator.

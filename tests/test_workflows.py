@@ -14,7 +14,7 @@ from ropt.results import FunctionResults
 from ropt.workflow import BasicOptimizer
 from ropt.workflow.compute_steps import EvaluationStep, OptimizationStep
 from ropt.workflow.evaluators import CachedEvaluator, FunctionEvaluator
-from ropt.workflow.event_handlers import CallbackHandler, HistoryHandler, ResultHandler
+from ropt.workflow.event_handlers import CallbackHandler, HistoryHandler, ResultsHandler
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -48,7 +48,7 @@ def config_fixture() -> dict[str, Any]:
 
 
 def test_run_basic(config: dict[str, Any], evaluator: Any) -> None:
-    result_handler = ResultHandler()
+    result_handler = ResultsHandler()
     step = OptimizationStep(evaluator=evaluator())
     step.add_event_handler(result_handler)
     step.run(variables=initial_values, context=EnOptContext.model_validate(config))
@@ -87,7 +87,7 @@ def test_function_evaluator_with_info(
     evaluator = FunctionEvaluator(
         function=partial(_function_dict, test_functions=test_functions)
     )
-    result_handler = ResultHandler()
+    result_handler = ResultsHandler()
     step = OptimizationStep(evaluator=evaluator)
     step.add_event_handler(result_handler)
     step.run(variables=initial_values, context=EnOptContext.model_validate(config))
@@ -103,7 +103,7 @@ def test_rng(config: dict[str, Any], evaluator: Any) -> None:
     config2 = deepcopy(config)
     config2["variables"]["seed"] = 2
 
-    result_handler = ResultHandler()
+    result_handler = ResultsHandler()
     step = OptimizationStep(evaluator=evaluator())
     step.add_event_handler(result_handler)
 
@@ -124,7 +124,7 @@ def test_rng(config: dict[str, Any], evaluator: Any) -> None:
 
 
 def test_set_initial_values(config: dict[str, Any], evaluator: Any) -> None:
-    result_handler = ResultHandler()
+    result_handler = ResultsHandler()
     step = OptimizationStep(evaluator=evaluator())
     step.add_event_handler(result_handler)
     step.run(variables=initial_values, context=EnOptContext.model_validate(config))
@@ -148,7 +148,7 @@ def test_set_initial_values(config: dict[str, Any], evaluator: Any) -> None:
 
 
 def test_reset_results(config: dict[str, Any], evaluator: Any) -> None:
-    result_handler = ResultHandler()
+    result_handler = ResultsHandler()
     step = OptimizationStep(evaluator=evaluator())
     step.add_event_handler(result_handler)
     step.run(variables=initial_values, context=EnOptContext.model_validate(config))
@@ -178,8 +178,8 @@ def test_two_optimizers_alternating(config: dict[str, Any], evaluator: Any) -> N
     config2["variables"]["mask"] = [False, True, False]
     config2["optimizer"]["max_functions"] = 3
 
-    result_handler1 = ResultHandler()
-    result_handler2 = ResultHandler(what="last")
+    result_handler1 = ResultsHandler()
+    result_handler2 = ResultsHandler(what="last")
 
     step = OptimizationStep(evaluator=evaluator())
     step.add_event_handler(result_handler1)
@@ -229,7 +229,7 @@ def test_optimization_sequential(config: dict[str, Any], evaluator: Any) -> None
     config2 = deepcopy(config)
     config2["optimizer"]["max_functions"] = 3
 
-    result_handler = ResultHandler(what="last")
+    result_handler = ResultsHandler(what="last")
     observer = CallbackHandler(
         event_types={EnOptEventType.FINISHED_EVALUATION}, callback=_track_evaluations
     )
@@ -295,7 +295,7 @@ def test_restart_last(config: dict[str, Any], evaluator: Any) -> None:
     observer = CallbackHandler(
         event_types={EnOptEventType.FINISHED_EVALUATION}, callback=_track_evaluations
     )
-    result_handler = ResultHandler(what="last")
+    result_handler = ResultsHandler(what="last")
     step.add_event_handler(observer)
     step.add_event_handler(result_handler)
     for _ in range(2):
@@ -334,7 +334,7 @@ def test_restart_optimum(config: dict[str, Any], evaluator: Any) -> None:
             callback=_track_evaluations,
         )
     )
-    result_handler = ResultHandler()
+    result_handler = ResultsHandler()
     step.add_event_handler(result_handler)
     for _ in range(2):
         variables = (
@@ -391,7 +391,7 @@ def test_restart_optimum_with_reset(
             callback=_track_evaluations,
         )
     )
-    result_handler = ResultHandler()
+    result_handler = ResultsHandler()
     step.add_event_handler(result_handler)
     for _ in range(3):
         variables = (
@@ -450,7 +450,7 @@ def test_repeat_metadata(config: dict[str, Any], evaluator: Any) -> None:
 
 
 def test_evaluator(config: dict[str, Any], evaluator: Any) -> None:
-    result_handler = ResultHandler()
+    result_handler = ResultsHandler()
     step = EvaluationStep(evaluator=evaluator())
     step.add_event_handler(result_handler)
     step.run(context=EnOptContext.model_validate(config), variables=[0.0, 0.0, 0.1])
@@ -521,7 +521,7 @@ def test_nested_optimization(
     nested_config["variables"]["mask"] = [False, True, False]
 
     initial = np.array([0.0, 0.2, 0.1])
-    result_result_handler = ResultHandler()
+    result_result_handler = ResultsHandler()
 
     def _outer_function(
         variables: NDArray[np.float64],
@@ -535,7 +535,7 @@ def test_nested_optimization(
                 if result_result_handler["results"] is None
                 else result_result_handler["results"].evaluations.variables[1]
             )
-            result_handler = ResultHandler()
+            result_handler = ResultsHandler()
             step = OptimizationStep(evaluator=evaluator())
             step.add_event_handler(result_handler)
             step.add_event_handler(result_result_handler)
@@ -570,7 +570,7 @@ def test_optimization_abort(config: Any, evaluator: Any) -> None:
         if last_evaluation == 1:
             raise Abort(exit_code=ExitCode.USER_ABORT)
 
-    result_handler = ResultHandler()
+    result_handler = ResultsHandler()
     step = OptimizationStep(evaluator=evaluator())
     step.add_event_handler(result_handler)
     step.add_event_handler(
@@ -651,7 +651,7 @@ def test_evaluator_cache(
     config["gradient"]["number_of_perturbations"] = "1"
     config["optimizer"]["max_functions"] = 2
 
-    result_handler = ResultHandler(what="last")
+    result_handler = ResultsHandler(what="last")
 
     function_evaluator = evaluator((_test_function1, test_functions[1]))
     cached_evaluator = CachedEvaluator(

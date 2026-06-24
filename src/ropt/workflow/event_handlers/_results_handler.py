@@ -18,7 +18,7 @@ if TYPE_CHECKING:
     from ropt.results import DomainType, Results
 
 
-class ResultHandler(EventHandler):
+class ResultsHandler(EventHandler):
     """Track a single optimization result based on selection criteria.
 
     Listens for `FINISHED_EVALUATION` events and retains either the best
@@ -37,7 +37,7 @@ class ResultHandler(EventHandler):
         domain: DomainType = "user",
         filter: Callable[[Results], bool] | None = None,  # noqa: A002
     ) -> None:
-        """Initialize the ResultHandler.
+        """Initialize the ResultsHandler.
 
         Args:
             what:                 Criterion for selecting results ('best' or 'last').
@@ -50,7 +50,7 @@ class ResultHandler(EventHandler):
         self._constraint_tolerance = constraint_tolerance
         self._domain = domain
         self._filter = filter
-        self._tracked_results: FunctionResults | None = None
+        self._best_results: FunctionResults | None = None
         self["results"] = None
 
     def handle_event(self, event: EnOptEvent) -> None:
@@ -74,29 +74,31 @@ class ResultHandler(EventHandler):
             return
 
         if self["results"] is None:
-            self._tracked_results = None
+            self._best_results = None
 
         def _get_target_objective(result: FunctionResults) -> float:
             assert result.functions is not None
             return result.functions.target_objective.item()
 
+        def _transform(result: FunctionResults) -> FunctionResults:
+            return (
+                result.transform_from_optimizer(event.context)
+                if self._domain == "user"
+                else result
+            )
+
         match self._what:
             case "best":
-                if self._tracked_results is not None:
-                    results = (self._tracked_results, *results)
-                new_results = min(results, key=_get_target_objective)
+                if self._best_results is not None:
+                    results = (self._best_results, *results)
+                best = min(results, key=_get_target_objective)
+                if best is not self._best_results:
+                    self._best_results = best
+                    self["results"] = _transform(best)
             case "last":
-                new_results = results[-1]
+                self["results"] = _transform(results[-1])
             case _ as unreachable:
                 assert_never(unreachable)
-
-        if new_results is not self._tracked_results:
-            self._tracked_results = new_results
-            self["results"] = (
-                new_results.transform_from_optimizer(event.context)
-                if self._domain == "user"
-                else new_results
-            )
 
     @property
     def event_types(self) -> set[EnOptEventType]:
