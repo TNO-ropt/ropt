@@ -1031,6 +1031,56 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Evaluators">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#batchevaluator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BatchEvaluator
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#functionevaluator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FunctionEvaluator
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cachedevaluator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CachedEvaluator
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#asyncevaluator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AsyncEvaluator
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -2606,6 +2656,56 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Evaluators">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#batchevaluator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BatchEvaluator
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#functionevaluator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FunctionEvaluator
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cachedevaluator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CachedEvaluator
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#asyncevaluator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AsyncEvaluator
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -3255,6 +3355,7 @@ the <a href="../parallel/">next section</a>:</p>
 </tr>
 </tbody>
 </table>
+<h3 id="batchevaluator">BatchEvaluator</h3>
 <p><a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.BatchEvaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.BatchEvaluator"><code>BatchEvaluator</code></a> defers to a callable
 callback that receives the full 2-D variable matrix and an
 <a class="autorefs autorefs-internal" title="            ropt.evaluation.EvaluationBatchContext
@@ -3272,6 +3373,7 @@ an <a class="autorefs autorefs-internal" title="            ropt.evaluation.Eval
 when you need the full batch (e.g. vectorized computation, or an external
 simulator that accepts all rows at once). The callback has the same signature as
 the callable accepted by <code>BasicOptimizer</code>.</p>
+<h3 id="functionevaluator">FunctionEvaluator</h3>
 <p><a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.FunctionEvaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.FunctionEvaluator"><code>FunctionEvaluator</code></a> stores a
 single function that returns a value for each objective and constraint. The
 function is called once per row of the evaluation batch with the variable
@@ -3291,6 +3393,7 @@ either:</p>
       dataclass
   " href="../../reference/evaluation/#ropt.evaluation.EvaluationBatchResult"><code>EvaluationBatchResult</code></a>.</li>
 </ul>
+<h3 id="cachedevaluator">CachedEvaluator</h3>
 <p><a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.CachedEvaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.CachedEvaluator"><code>CachedEvaluator</code></a> wraps another
 evaluator with result caching. It retrieves previously computed function results
 from <code>EventHandler</code> instances specified as <code>sources</code> — typically a
@@ -3310,6 +3413,17 @@ wrapped evaluator. The final combined result contains both cached and newly
 computed values.</p>
 <p>Sources can be managed dynamically with <code>add_sources()</code> and
 <code>remove_sources()</code>.</p>
+<p>To record which evaluations were served from cache, pass a <code>hits_key</code> string
+at construction time. When set, the returned
+<a class="autorefs autorefs-internal" title="            ropt.evaluation.EvaluationBatchResult
+
+
+  
+      dataclass
+  " href="../../reference/evaluation/#ropt.evaluation.EvaluationBatchResult"><code>EvaluationBatchResult</code></a> will contain
+a boolean NumPy array in its <code>evaluation_info</code> dictionary under that key —
+<code>True</code> for evaluations that came from the cache, <code>False</code> for those that were
+freshly computed.</p>
 <p>The <code>eval_cached()</code> method is available for derived classes that need access to
 which evaluations were cache hits — it returns both the
 <a class="autorefs autorefs-internal" title="            ropt.evaluation.EvaluationBatchResult
@@ -3325,6 +3439,7 @@ dictionary mapping evaluation indices to their cached
   
       dataclass
   " href="../../reference/results/#ropt.results.FunctionResults"><code>FunctionResults</code></a>.</p>
+<h3 id="asyncevaluator">AsyncEvaluator</h3>
 <p>The evaluators above run each function call sequentially in the current
 thread. For parallel evaluation — whether via worker threads, separate
 processes, or an HPC cluster — an asynchronous evaluator is needed. See
