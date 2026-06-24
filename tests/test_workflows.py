@@ -521,10 +521,11 @@ def test_nested_optimization(
     nested_config["variables"]["mask"] = [False, True, False]
 
     initial = np.array([0.0, 0.2, 0.1])
-    result_result_handler = ResultsHandler()
+    outer_result_handler = ResultsHandler()
 
-    def _outer_function(
+    def _optimizer(
         variables: NDArray[np.float64],
+        realization: int,  # noqa: ARG001
         perturbation: int,
         **kwargs: Any,  # noqa: ARG001
     ) -> Any:
@@ -532,29 +533,29 @@ def test_nested_optimization(
         if perturbation < 0:
             new_variables[1] = (
                 initial[1]
-                if result_result_handler["results"] is None
-                else result_result_handler["results"].evaluations.variables[1]
+                if outer_result_handler["results"] is None
+                else outer_result_handler["results"].evaluations.variables[1]
             )
             result_handler = ResultsHandler()
             step = OptimizationStep(evaluator=evaluator())
             step.add_event_handler(result_handler)
-            step.add_event_handler(result_result_handler)
+            step.add_event_handler(outer_result_handler)
             step.run(
                 variables=new_variables,
                 context=EnOptContext.model_validate(nested_config),
             )
             return result_handler["results"].functions.objectives
 
-        new_variables[1] = result_result_handler["results"].evaluations.variables[1]
+        new_variables[1] = outer_result_handler["results"].evaluations.variables[1]
         return np.fromiter(
             (func(new_variables, 0) for func in test_functions), dtype=np.float64
         )
 
-    outer_evaluator = FunctionEvaluator(function=_outer_function)
+    outer_evaluator = FunctionEvaluator(function=_optimizer)
     step = OptimizationStep(evaluator=outer_evaluator)
     step.run(variables=initial, context=EnOptContext.model_validate(config))
     assert np.allclose(
-        result_result_handler["results"].evaluations.variables,
+        outer_result_handler["results"].evaluations.variables,
         [0.0, 0.0, 0.5],
         atol=0.02,
     )
