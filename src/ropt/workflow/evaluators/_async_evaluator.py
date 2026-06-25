@@ -182,18 +182,17 @@ class AsyncEvaluator(Evaluator):
             if context.perturbations is None
             else int(context.perturbations[eval_idx])
         )
-        task_name = (
-            None
-            if self._get_name is None
-            else self._get_name(realization, perturbation, batch_id, eval_idx)
+        function_context = EvaluatorFunctionContext(
+            realization=realization,
+            perturbation=perturbation,
+            batch_id=batch_id,
+            eval_idx=eval_idx,
         )
+        task_name = None if self._get_name is None else self._get_name(function_context)
         return Task(
             results_queue=results_queue,
             function=self._function,
-            args=(
-                variables[eval_idx, :],
-                EvaluatorFunctionContext(realization, perturbation, batch_id, eval_idx),
-            ),
+            args=(variables[eval_idx, :], function_context),
             name=task_name,
         )
 

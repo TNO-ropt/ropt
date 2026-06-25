@@ -45,10 +45,10 @@ Constructor parameters:
 | `queue_size` | Maximum size of the results queue (0 = unlimited).                   |
 | `get_name`   | Optional callable to generate a name for each task.                  |
 
-The `get_name` callable, if provided, is called with keyword arguments
-`realization`, `perturbation`, `batch_id`, and `eval_idx`, and should return
-a string. When using the `HPCServer`, names also serve as task identifiers
-and must be unique within a batch.
+The `get_name` callable, if provided, is called with an
+[`EvaluatorFunctionContext`][ropt.workflow.evaluators.EvaluatorFunctionContext]
+object and should return a string. When using the `HPCServer`, names also
+serve as task identifiers and must be unique within a batch.
 
 If the server is not running when `eval()` is called, the evaluator raises
 an `Abort` exception.

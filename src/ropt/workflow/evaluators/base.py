@@ -106,20 +106,11 @@ class EvaluatorFunctionCallback(Protocol):
 class NameCallback(Protocol):
     """Defines the call signature for callbacks to get the name of an evaluation."""
 
-    def __call__(
-        self,
-        realization: int,
-        perturbation: int,
-        batch_id: int,
-        eval_idx: int,
-    ) -> str:
+    def __call__(self, context: EvaluatorFunctionContext) -> str:
         """Get the name for a single evaluation.
 
         Args:
-            realization:  The realization index.
-            perturbation: The perturbation index (`-1` when unperturbed).
-            batch_id:     Integer identifying the current evaluation batch.
-            eval_idx:     Row index within the batch.
+            context: The `EvaluatorFunctionContext` object identifying the evaluation.
 
         Returns:
             The name of the evaluation.
