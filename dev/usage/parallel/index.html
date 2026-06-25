@@ -2435,12 +2435,12 @@ waits for results to arrive on a results queue.</p>
 </tbody>
 </table>
 <p>The <code>get_name</code> callable, if provided, is called with an
-<a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.EvaluatorFunctionContext
+<a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.EvaluationFunctionContext
 
 
   
       dataclass
-  " href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.EvaluatorFunctionContext"><code>EvaluatorFunctionContext</code></a>
+  " href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.EvaluationFunctionContext"><code>EvaluationFunctionContext</code></a>
 object and should return a string. When using the <code>HPCServer</code>, names also
 serve as task identifiers and must be unique within a batch.</p>
 <p>If the server is not running when <code>eval()</code> is called, the evaluator raises
