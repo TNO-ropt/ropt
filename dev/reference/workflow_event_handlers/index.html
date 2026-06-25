@@ -3342,6 +3342,22 @@ filters by constraint tolerance.</p>
 details on selection criteria and domain handling.</p>
 
 
+<details class="thread-safety" open>
+  <summary>Thread safety</summary>
+  <p><code>handle_event</code> is serialized by an internal lock, so the same
+instance may be attached to compute steps that run concurrently in
+different threads. The stored value (<code>handler["results"]</code>) is always
+an immutable <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="../results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> (or
+<code>None</code>); callers must not mutate it. When <code>what="last"</code> is used
+across concurrent steps, "last" means "last to acquire the lock,"
+which is non-deterministic.</p>
+</details>
+
 
 
 
@@ -3623,6 +3639,17 @@ via <code>handler["results"]</code>.</p>
 details on domain handling and accumulation behavior.</p>
 
 
+<details class="thread-safety" open>
+  <summary>Thread safety</summary>
+  <p><code>handle_event</code> is serialized by an internal lock, so the same
+instance may be attached to compute steps that run concurrently in
+different threads. The stored value (<code>handler["results"]</code>) is always
+an immutable tuple (or <code>None</code>); callers must not mutate it. When the
+handler is shared across concurrent steps the relative order of
+results from different steps is non-deterministic, but no result is
+lost.</p>
+</details>
+
 
 
 
@@ -3858,6 +3885,16 @@ first store them in a variable.</p>
 </details>        <p>See <a href="../../usage/workflows/#table">Optimization Workflows</a> for full details
 on column specification format, default tables, and callback functionality.</p>
 
+
+<details class="thread-safety" open>
+  <summary>Thread safety</summary>
+  <p><code>handle_event</code>, <code>get_tables</code>, <code>__getitem__</code>, <code>add_table</code>,
+<code>add_column</code>, and <code>set_callback</code> are serialized by an internal lock,
+so the same instance may be attached to compute steps that run
+concurrently in different threads. When the handler is shared across
+concurrent steps the relative row order from different steps is
+non-deterministic, but no row is lost.</p>
+</details>
 
 
 
