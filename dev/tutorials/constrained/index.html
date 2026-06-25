@@ -9,7 +9,7 @@
       
       
       
-        <link rel="prev" href="../rosenbrock_workflow/">
+        <link rel="prev" href="../workflow/">
       
       
         <link rel="next" href="../../reference/context/">
@@ -903,7 +903,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../rosenbrock_deterministic/" class="md-nav__link">
+      <a href="../deterministic/" class="md-nav__link">
         
   
   
@@ -931,14 +931,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../rosenbrock_basic/" class="md-nav__link">
+      <a href="../ensemble/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Stochastic Optimization
+    Ensemble-based Optimization
   
 
     
@@ -959,14 +959,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../rosenbrock_function/" class="md-nav__link">
+      <a href="../function_evaluator/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Function Evaluator
+    Using FunctionEvaluator
   
 
     
@@ -987,14 +987,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../rosenbrock_workflow/" class="md-nav__link">
+      <a href="../workflow/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Workflow Framework
+    Using the Workflow Framework
   
 
     
@@ -2456,7 +2456,7 @@ constraints and linear constraints.</p>
 <div class="admonition tip">
 <p class="admonition-title">Source Code</p>
 <p>The complete source code for this tutorial is available at
-<a href="https://github.com/TNO-ropt/ropt/blob/main/examples/rosenbrock_constrained.py">examples/rosenbrock_constrained.py</a>.</p>
+<a href="https://github.com/TNO-ropt/ropt/blob/main/examples/constrained.py">examples/constrained.py</a>.</p>
 </div>
 <h2 id="types-of-constraints">Types of Constraints</h2>
 <p><code>ropt</code> supports three types of constraints:</p>
@@ -2484,7 +2484,7 @@ during optimization, depending on the backend used. Always verify constraint
 satisfaction when inspecting results.</p>
 </div>
 <h2 id="the-constrained-rosenbrock-function">The constrained Rosenbrock function</h2>
-<p>This tutorial extends the <a href="../rosenbrock_basic/">stochastic Rosenbrock example</a> by adding non-linear and linear constraints. The non-linear constraint is a function of the first two variables:</p>
+<p>This tutorial extends the <a href="../ensemble/">stochastic Rosenbrock example</a> by adding non-linear and linear constraints. The non-linear constraint is a function of the first two variables:</p>
 <div class="arithmatex">\[
 (x_1 - a)^3 - x_2 + 1 \le 0
 \]</div>
@@ -2700,7 +2700,7 @@ and <span class="arithmatex">\(b_u\)</span> are vectors of length one: <span cla
 = x_5\)</span>.</p>
 <h2 id="command-line-interface">Command-Line Interface</h2>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="s2">&quot;python rosenbrock_constrained.py&quot;</span><span class="p">)</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="s2">&quot;python constrained.py&quot;</span><span class="p">)</span>
 </span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
 </span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>        <span class="s2">&quot;--linear&quot;</span><span class="p">,</span>
 </span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>        <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>
@@ -2711,10 +2711,10 @@ and <span class="arithmatex">\(b_u\)</span> are vectors of length one: <span cla
 </span></code></pre></div>
 <h2 id="running-the-example">Running the Example</h2>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1"># With nonlinear constraint only</span>
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>python<span class="w"> </span>rosenbrock_constrained.py
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>python<span class="w"> </span>constrained.py
 </span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>
 </span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="c1"># With both nonlinear and linear constraints</span>
-</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>python<span class="w"> </span>rosenbrock_constrained.py<span class="w"> </span>--linear
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>python<span class="w"> </span>constrained.py<span class="w"> </span>--linear
 </span></code></pre></div>
 <h2 id="summary">Summary</h2>
 <p>This tutorial demonstrated:</p>
@@ -2767,7 +2767,7 @@ and <span class="arithmatex">\(b_u\)</span> are vectors of length one: <span cla
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../rosenbrock_workflow/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Workflow Framework">
+          <a href="../workflow/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Using the Workflow Framework">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -2777,7 +2777,7 @@ and <span class="arithmatex">\(b_u\)</span> are vectors of length one: <span cla
                 Previous
               </span>
               <div class="md-ellipsis">
-                Workflow Framework
+                Using the Workflow Framework
               </div>
             </div>
           </a>

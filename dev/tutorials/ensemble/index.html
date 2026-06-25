@@ -9,10 +9,10 @@
       
       
       
-        <link rel="prev" href="../rosenbrock_deterministic/">
+        <link rel="prev" href="../deterministic/">
       
       
-        <link rel="next" href="../rosenbrock_function/">
+        <link rel="next" href="../function_evaluator/">
       
       
         
@@ -23,7 +23,7 @@
     
     
       
-        <title>Stochastic Optimization - ropt Documentation</title>
+        <title>Ensemble-based Optimization - ropt Documentation</title>
       
     
     
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#stochastic-rosenbrock-optimization" class="md-skip">
+        <a href="#ensemble-based-optimization" class="md-skip">
           Skip to content
         </a>
       
@@ -118,7 +118,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Stochastic Optimization
+              Ensemble-based Optimization
             
           </span>
         </div>
@@ -903,7 +903,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../rosenbrock_deterministic/" class="md-nav__link">
+      <a href="../deterministic/" class="md-nav__link">
         
   
   
@@ -947,7 +947,7 @@
   <span class="md-ellipsis">
     
   
-    Stochastic Optimization
+    Ensemble-based Optimization
   
 
     
@@ -965,7 +965,7 @@
   <span class="md-ellipsis">
     
   
-    Stochastic Optimization
+    Ensemble-based Optimization
   
 
     
@@ -1105,14 +1105,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../rosenbrock_function/" class="md-nav__link">
+      <a href="../function_evaluator/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Function Evaluator
+    Using FunctionEvaluator
   
 
     
@@ -1133,14 +1133,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../rosenbrock_workflow/" class="md-nav__link">
+      <a href="../workflow/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Workflow Framework
+    Using the Workflow Framework
   
 
     
@@ -1161,7 +1161,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../rosenbrock_constrained/" class="md-nav__link">
+      <a href="../constrained/" class="md-nav__link">
         
   
   
@@ -2383,18 +2383,18 @@
   
 
 
-<h1 id="stochastic-rosenbrock-optimization">Stochastic Rosenbrock Optimization</h1>
-<p>This tutorial extends the <a href="../rosenbrock_deterministic/">deterministic Rosenbrock example</a>
+<h1 id="ensemble-based-optimization">Ensemble-based Optimization</h1>
+<p>This tutorial extends the <a href="../deterministic/">deterministic example</a>
 by introducing <strong>uncertainty</strong> in the function parameters. It demonstrates
 ensemble-based optimization using <a class="autorefs autorefs-internal" title="            ropt.workflow.BasicOptimizer" href="../../reference/basic_optimizer/#ropt.workflow.BasicOptimizer"><code>BasicOptimizer</code></a>
 with a batch evaluation callback.</p>
 <div class="admonition tip">
 <p class="admonition-title">Source Code</p>
 <p>The complete source code for this tutorial is available at
-<a href="https://github.com/TNO-ropt/ropt/blob/main/examples/rosenbrock_basic.py">examples/rosenbrock_basic.py</a>.</p>
+<a href="https://github.com/TNO-ropt/ropt/blob/main/examples/ensemble.py">examples/ensemble.py</a>.</p>
 </div>
 <h2 id="adding-uncertainty">Adding Uncertainty</h2>
-<p>In the <a href="../rosenbrock_deterministic/">deterministic tutorial</a>, we used fixed
+<p>In the <a href="../deterministic/">deterministic tutorial</a>, we used fixed
 parameters <span class="arithmatex">\(a = 1\)</span> and <span class="arithmatex">\(b = 100\)</span>. Here, we introduce <strong>uncertainty</strong> by sampling
 these parameters from normal distributions for each realization:</p>
 <ul>
@@ -2552,18 +2552,18 @@ information extracted from each perturbation. See
 </span></code></pre></div>
 <h2 id="running-the-example">Running the Example</h2>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># Default: 10 realizations with 5 perturbations</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>python<span class="w"> </span>rosenbrock_basic.py
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>python<span class="w"> </span>ensemble.py
 </span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>
 </span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="c1"># Use merged realizations: 50 realizations with 1 perturbation</span>
-</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>python<span class="w"> </span>rosenbrock_basic.py<span class="w"> </span>--merge
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>python<span class="w"> </span>ensemble.py<span class="w"> </span>--merge
 </span></code></pre></div>
 <p>Both variants produce optimal variables near <span class="arithmatex">\((1, 1, 1, 1, 1)\)</span> with an objective
 value near <span class="arithmatex">\(0\)</span>.</p>
 <h2 id="next-steps">Next Steps</h2>
 <ul>
-<li><a href="../rosenbrock_function/">Function Evaluator Tutorial</a> — Use a simpler
+<li><a href="../function_evaluator/">Function Evaluator Tutorial</a> — Use a simpler
   per-evaluation callback</li>
-<li><a href="../rosenbrock_workflow/">Workflow Tutorial</a> — Use the workflow framework for
+<li><a href="../workflow/">Workflow Tutorial</a> — Use the workflow framework for
   more control</li>
 <li><a href="../../usage/basic/">Basic Optimization</a> — Detailed explanation of
   <code>BasicOptimizer</code> and its API</li>
@@ -2607,7 +2607,7 @@ value near <span class="arithmatex">\(0\)</span>.</p>
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../rosenbrock_deterministic/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Deterministic Optimization">
+          <a href="../deterministic/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Deterministic Optimization">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -2624,13 +2624,13 @@ value near <span class="arithmatex">\(0\)</span>.</p>
         
         
           
-          <a href="../rosenbrock_function/" class="md-footer__link md-footer__link--next" aria-label="Next: Function Evaluator">
+          <a href="../function_evaluator/" class="md-footer__link md-footer__link--next" aria-label="Next: Using FunctionEvaluator">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Function Evaluator
+                Using FunctionEvaluator
               </div>
             </div>
             <div class="md-footer__button md-icon">

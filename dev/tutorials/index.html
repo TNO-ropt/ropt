@@ -12,7 +12,7 @@
         <link rel="prev" href="../usage/parallel/">
       
       
-        <link rel="next" href="rosenbrock_deterministic/">
+        <link rel="next" href="deterministic/">
       
       
         
@@ -972,7 +972,7 @@
   
   
     <li class="md-nav__item">
-      <a href="rosenbrock_deterministic/" class="md-nav__link">
+      <a href="deterministic/" class="md-nav__link">
         
   
   
@@ -1000,14 +1000,14 @@
   
   
     <li class="md-nav__item">
-      <a href="rosenbrock_basic/" class="md-nav__link">
+      <a href="ensemble/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Stochastic Optimization
+    Ensemble-based Optimization
   
 
     
@@ -1028,14 +1028,14 @@
   
   
     <li class="md-nav__item">
-      <a href="rosenbrock_function/" class="md-nav__link">
+      <a href="function_evaluator/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Function Evaluator
+    Using FunctionEvaluator
   
 
     
@@ -1056,14 +1056,14 @@
   
   
     <li class="md-nav__item">
-      <a href="rosenbrock_workflow/" class="md-nav__link">
+      <a href="workflow/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Workflow Framework
+    Using the Workflow Framework
   
 
     
@@ -1084,7 +1084,7 @@
   
   
     <li class="md-nav__item">
-      <a href="rosenbrock_constrained/" class="md-nav__link">
+      <a href="constrained/" class="md-nav__link">
         
   
   
@@ -2239,30 +2239,30 @@ function, progressing from a simple deterministic case to stochastic
 optimization with different implementation approaches:</p>
 <ul>
 <li>
-<p><strong><a href="rosenbrock_deterministic/">Deterministic Optimization</a></strong> — The simplest
+<p><strong><a href="deterministic/">Deterministic Optimization</a></strong> — The simplest
   example: optimizing the classic Rosenbrock function with fixed parameters.
   Start here to understand the basics.</p>
 </li>
 <li>
-<p><strong><a href="rosenbrock_basic/">Stochastic Optimization</a></strong> — Introduces uncertainty
+<p><strong><a href="ensemble/">Ensemble-based Optimization</a></strong> — Introduces uncertainty
   by sampling parameters across multiple realizations. Uses
   <a class="autorefs autorefs-internal" title="            ropt.workflow.BasicOptimizer" href="../reference/basic_optimizer/#ropt.workflow.BasicOptimizer"><code>BasicOptimizer</code></a> with a batch evaluation
   callback.</p>
 </li>
 <li>
-<p><strong><a href="rosenbrock_function/">Function Evaluator</a></strong> — Using
+<p><strong><a href="function_evaluator/">Using FunctionEvaluator</a></strong> — Using
   <a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.FunctionEvaluator" href="../reference/workflow_evaluators/#ropt.workflow.evaluators.FunctionEvaluator"><code>FunctionEvaluator</code></a> with a
   per-evaluation function callback. This approach is simpler to write when you
   don't need to handle batches.</p>
 </li>
 <li>
-<p><strong><a href="rosenbrock_workflow/">Workflow Framework</a></strong> — Using the workflow
+<p><strong><a href="workflow/">Using the Workflow Framework</a></strong> — Using the workflow
   framework directly with
   <a class="autorefs autorefs-internal" title="            ropt.workflow.compute_steps.OptimizationStep" href="../reference/workflow_compute_steps/#ropt.workflow.compute_steps.OptimizationStep"><code>OptimizationStep</code></a>. This
   approach offers more control and flexibility for complex workflows.</p>
 </li>
 <li>
-<p><strong><a href="rosenbrock_constrained/">Constrained Optimization</a></strong> — Adding linear
+<p><strong><a href="constrained/">Constrained Optimization</a></strong> — Adding linear
   and nonlinear constraints to the optimization problem.</p>
 </li>
 </ul>
@@ -2329,7 +2329,7 @@ repository.</p>
         
         
           
-          <a href="rosenbrock_deterministic/" class="md-footer__link md-footer__link--next" aria-label="Next: Deterministic Optimization">
+          <a href="deterministic/" class="md-footer__link md-footer__link--next" aria-label="Next: Deterministic Optimization">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
