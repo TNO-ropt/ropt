@@ -9,6 +9,7 @@ from ropt.config._function_estimator_config import FunctionEstimatorConfig
 from ropt.context import EnOptContext
 from ropt.function_estimator import FunctionEstimator
 from ropt.workflow import BasicOptimizer
+from ropt.workflow.evaluators import EvaluatorFunctionContext
 
 initial_values = 3 * [0]
 
@@ -74,7 +75,9 @@ def test_mean_stddev_function_estimator(
 
 
 def _compute_distance_squared_stddev(
-    variables: NDArray[np.float64], realization: int, target: NDArray[np.float64]
+    variables: NDArray[np.float64],
+    context: EvaluatorFunctionContext,
+    target: NDArray[np.float64],
 ) -> float:
     # To test the stddev estimator, abuse it to minimize our standard test
     # function, the squared distance between variables and targets. Do the
@@ -86,9 +89,9 @@ def _compute_distance_squared_stddev(
     # is equal to the squared distance. Hence, using the standard deviation
     # objective function will optimize the squared distance.
     result: float = ((variables - target) ** 2).sum()
-    if realization in {0, 1}:
+    if context.realization in {0, 1}:
         result = -result
-    elif realization == 2:
+    elif context.realization == 2:
         result = 0.0
     return result
 

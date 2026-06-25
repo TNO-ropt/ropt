@@ -38,7 +38,7 @@ pytestmark = [
     )
 ]
 
-initial_values = [0.0, 0.0, 0.1]
+initial_values = np.array([0.0, 0.0, 0.1])
 
 
 @pytest.fixture(name="config")
@@ -53,7 +53,7 @@ def config_fixture() -> dict[str, Any]:
             "convergence_tolerance": 1e-5,
         },
         "variables": {
-            "variable_count": len(initial_values),
+            "variable_count": initial_values.size,
             "perturbation_magnitudes": 0.01,
         },
         "objectives": {
@@ -166,9 +166,9 @@ def test_failed_realizations_constraints(
         "upper_bounds": 0.4,
     }
 
-    functions = (*test_functions, lambda _0, _1: np.array(np.nan))
-
-    optimizer = BasicOptimizer(config, evaluator(functions))
+    optimizer = BasicOptimizer(
+        config, evaluator(test_functions, [lambda _0, _1: np.nan])
+    )
     optimizer.set_results_callback(_observer)
     exit_code = optimizer.run(initial_values)
     assert exit_code == ExitCode.TOO_FEW_REALIZATIONS
@@ -181,7 +181,7 @@ def test_all_failed_realizations_not_supported(
 
     config["backend"]["method"] = f"{external}{_SLSQP}"
 
-    functions = [lambda _0, _1: np.array(1.0), lambda _0, _1: np.array(np.nan)]
+    functions = [lambda _0, _1: 1.0, lambda _0, _1: np.nan]
     optimizer = BasicOptimizer(config, evaluator(functions))
     exit_code = optimizer.run(initial_values)
     assert exit_code == ExitCode.TOO_FEW_REALIZATIONS
@@ -378,18 +378,20 @@ def test_nonlinear_constraint_with_scaler(
 ) -> None:
     config["backend"]["method"] = f"{external}{_SLSQP}"
 
-    functions = (
-        *test_functions,
-        lambda variables, _: variables[0] + variables[2],
-    )
-    scales = np.array(functions[-1](initial_values, None), ndmin=1)
+    def constraint_function(variables: NDArray[np.float64], _: Any) -> float:
+        return float(variables[0] + variables[2])
+
+    scales = np.array(constraint_function(initial_values, None), ndmin=1)
 
     config["nonlinear_constraints"] = {
         "lower_bounds": 0.0,
         "upper_bounds": 0.4,
     }
 
-    optimizer1 = BasicOptimizer(config, evaluator(functions))
+    optimizer1 = BasicOptimizer(
+        config,
+        evaluator(test_functions, [constraint_function]),
+    )
     optimizer1.run(initial_values)
     assert optimizer1.results is not None
     assert optimizer1.results.evaluations.variables[[0, 2]].sum() > 0.0 - 1e-5
@@ -431,7 +433,9 @@ def test_nonlinear_constraint_with_scaler(
                 assert transformed.functions.constraints is not None
                 assert np.allclose(transformed.functions.constraints, scales)
 
-    optimizer2 = BasicOptimizer(config, evaluator(functions))
+    optimizer2 = BasicOptimizer(
+        config, evaluator(test_functions, [constraint_function])
+    )
     optimizer2._observers.append(  # noqa: SLF001
         (EnOptEventType.FINISHED_EVALUATION, check_constraints)
     )
@@ -466,13 +470,14 @@ def test_nonlinear_constraint_with_lazy_scaler(
         "upper_bounds": 0.4,
     }
 
-    functions = (
-        *test_functions,
-        lambda variables, _: variables[0] + variables[2],
-    )
-    scales = np.array(functions[-1](initial_values, None), ndmin=1)
+    def constraint_function(variables: NDArray[np.float64], _: Any) -> float:
+        return float(variables[0] + variables[2])
 
-    optimizer1 = BasicOptimizer(config, evaluator(functions))
+    scales = np.array(constraint_function(initial_values, None), ndmin=1)
+
+    optimizer1 = BasicOptimizer(
+        config, evaluator(test_functions, [constraint_function])
+    )
     optimizer1.run(initial_values)
     assert optimizer1.results is not None
     assert optimizer1.results.evaluations.variables[[0, 2]].sum() > 0.0 - 1e-5
@@ -495,11 +500,6 @@ def test_nonlinear_constraint_with_lazy_scaler(
         context.nonlinear_constraints.upper_bounds,
     )
     assert bounds[1] == 0.4
-
-    def constraint_function(variables: NDArray[np.float64], _: Any) -> float:
-        return float(variables[0] + variables[2])
-
-    functions = (*test_functions, constraint_function)
 
     check = True
 
@@ -530,7 +530,9 @@ def test_nonlinear_constraint_with_lazy_scaler(
                 assert transformed.functions.constraints is not None
                 assert np.allclose(transformed.functions.constraints, scales)
 
-    optimizer2 = BasicOptimizer(config, evaluator(functions))
+    optimizer2 = BasicOptimizer(
+        config, evaluator(test_functions, [constraint_function])
+    )
     optimizer2._observers.append(  # noqa: SLF001
         (EnOptEventType.FINISHED_EVALUATION, check_constraints)
     )
@@ -693,14 +695,13 @@ def test_check_nonlinear_constraints(
         "upper_bounds": [0.0, 0.0, np.inf],
     }
 
-    test_functions = (
-        *test_functions,
+    constraint_functions = (
         lambda variables, _: variables[0],
         lambda variables, _: variables[0],
         lambda variables, _: variables[0],
     )
 
-    optimizer1 = BasicOptimizer(config, evaluator(test_functions))
+    optimizer1 = BasicOptimizer(config, evaluator(test_functions, constraint_functions))
     optimizer1.run(initial_values)
     assert optimizer1.results is not None
 
@@ -718,7 +719,7 @@ def test_check_nonlinear_constraints(
     config["nonlinear_constraints"]["lower_bounds"] = [1.0, -np.inf, 1.0]
     config["nonlinear_constraints"]["upper_bounds"] = [1.0, -1.0, np.inf]
 
-    optimizer3 = BasicOptimizer(config, evaluator(test_functions))
+    optimizer3 = BasicOptimizer(config, evaluator(test_functions, constraint_functions))
     optimizer3.run(initial_values)
     assert optimizer3.results is None
 

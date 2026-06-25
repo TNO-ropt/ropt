@@ -35,7 +35,11 @@ from numpy.typing import NDArray
 
 from ropt.results import FunctionResults, Results
 from ropt.workflow import BasicOptimizer
-from ropt.workflow.evaluators import FunctionEvaluator
+from ropt.workflow.evaluators import (
+    EvaluatorFunctionContext,
+    EvaluatorFunctionResult,
+    FunctionEvaluator,
+)
 
 DIM = 5
 CONFIG: dict[str, Any] = {
@@ -49,6 +53,10 @@ UNCERTAINTY = 0.1
 ```
 
 Note that we import [`FunctionEvaluator`][ropt.workflow.evaluators.FunctionEvaluator]
+together with the helper types
+[`EvaluatorFunctionContext`][ropt.workflow.evaluators.EvaluatorFunctionContext]
+and
+[`EvaluatorFunctionResult`][ropt.workflow.evaluators.EvaluatorFunctionResult]
 instead of the batch evaluation types.
 
 
@@ -59,26 +67,28 @@ A **function callback** handles a single evaluation at a time:
 ```python
 def rosenbrock(
     variables: NDArray[np.float64],
-    realization: int,
-    perturbation: int,
-    batch_id: int,
-    eval_idx: int,
+    context: EvaluatorFunctionContext,
     a: NDArray[np.float64],
     b: NDArray[np.float64],
-) -> NDArray[np.float64] | dict[str, Any]:
+) -> EvaluatorFunctionResult:
     objective = 0.0
     for idx in range(DIM - 1):
         x, y = variables[idx : idx + 2]
-        objective += (a[realization] - x) ** 2 + b[realization] * (y - x * x) ** 2
-    return np.array(objective, dtype=np.float64)
+        r = context.realization
+        objective += (a[r] - x) ** 2 + b[r] * (y - x * x) ** 2
+    return EvaluatorFunctionResult(objectives=objective)
 ```
 
 Key differences from the batch callback:
 
 - `variables` is a **1-D array** (single variable vector)
-- The `realization` index is passed directly as an argument
-- Additional metadata (`perturbation`, `batch_id`, `eval_idx`) is available
-- Returns a scalar or 1-D array for this single evaluation
+- The realization index is accessed via `context.realization`
+- Additional metadata is available on `context`: `perturbation`, `batch_id`,
+  and `eval_idx`
+- Returns an
+  [`EvaluatorFunctionResult`][ropt.workflow.evaluators.EvaluatorFunctionResult]
+  carrying the objective values (and optional constraints and
+  `evaluation_info`) for this single evaluation
 
 
 ## Progress Reporting
@@ -180,7 +190,8 @@ python rosenbrock_function.py --merge
 | Aspect | Batch Callback | Function Callback |
 |--------|---------------|-------------------|
 | Input | 2-D array (all evaluations) | 1-D array (single evaluation) |
-| Realization | Via `context.realizations` | Direct argument |
+| Realization | Via `context.realizations` | Via `context.realization` |
+| Return type | `EvaluationBatchResult` | `EvaluatorFunctionResult` |
 | Vectorization | Possible | Not applicable |
 | Simplicity | More complex | Simpler |
 | Best for | Performance-critical code | Prototyping, simple logic |

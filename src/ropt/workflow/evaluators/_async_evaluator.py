@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import queue
-from collections.abc import Mapping
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
@@ -13,7 +12,13 @@ from ropt.evaluation import EvaluationBatchContext, EvaluationBatchResult
 from ropt.exceptions import Abort, ServerFailure
 from ropt.workflow.servers import ResultsQueue, Server, Task
 
-from .base import Evaluator, FunctionCallback, NameCallback
+from .base import (
+    Evaluator,
+    EvaluatorFunctionCallback,
+    EvaluatorFunctionContext,
+    EvaluatorFunctionResult,
+    NameCallback,
+)
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray
@@ -32,7 +37,7 @@ class AsyncEvaluator(Evaluator):
     def __init__(
         self,
         *,
-        function: FunctionCallback,
+        function: EvaluatorFunctionCallback,
         server: Server,
         queue_size: int = 0,
         get_name: NameCallback | None = None,
@@ -98,7 +103,9 @@ class AsyncEvaluator(Evaluator):
                 try:
                     if (task := results_queue.get(timeout=1)) is None:
                         raise Abort(ExitCode.ABORT_FROM_ERROR)
-                    _handle_result(task, results, evaluation_info, variables.shape[0])
+                    _handle_result(
+                        task, results, evaluation_info, no, variables.shape[0]
+                    )
                     break
                 except queue.Empty:
                     continue
@@ -156,13 +163,12 @@ class AsyncEvaluator(Evaluator):
         return Task(
             results_queue=results_queue,
             function=self._function,
-            args=(variables[eval_idx, :],),
-            kwargs={
-                "realization": realization,
-                "perturbation": perturbation,
-                "batch_id": self._batch_id,
-                "eval_idx": eval_idx,
-            },
+            args=(
+                variables[eval_idx, :],
+                EvaluatorFunctionContext(
+                    realization, perturbation, self._batch_id, eval_idx
+                ),
+            ),
             name=task_name,
         )
 
@@ -171,26 +177,26 @@ def _handle_result(
     task: Task,
     results: NDArray[np.float64],
     evaluation_info: dict[str, NDArray[Any]],
+    objective_count: int,
     eval_count: int,
 ) -> None:
-    eval_idx = task.kwargs["eval_idx"]
-    match task.result:
-        case np.ndarray():
-            results[eval_idx, :] = task.result
-        case Mapping():
-            for key, value in task.result.items():
-                if key == "result":
-                    results[eval_idx, :] = value
-                else:
-                    if key not in evaluation_info:
-                        evaluation_info[key] = np.zeros(
-                            eval_count,
-                            dtype=(
-                                np.array(value).dtype
-                                if isinstance(value, (int, float, complex, np.number))
-                                else object
-                            ),
-                        )
-                    evaluation_info[key][eval_idx] = value
-        case ServerFailure():
-            results[eval_idx, :] = np.nan
+    eval_idx = task.args[1].eval_idx
+    if isinstance(task.result, ServerFailure):
+        results[eval_idx, :] = np.nan
+    else:
+        assert isinstance(task.result, EvaluatorFunctionResult)
+        results[eval_idx, :objective_count] = task.result.objectives
+        if task.result.constraints is not None:
+            results[eval_idx, objective_count:] = task.result.constraints
+        if task.result.evaluation_info is not None:
+            for key, value in task.result.evaluation_info.items():
+                if key not in evaluation_info:
+                    evaluation_info[key] = np.zeros(
+                        eval_count,
+                        dtype=(
+                            np.array(value).dtype
+                            if isinstance(value, (int, float, complex, np.number))
+                            else object
+                        ),
+                    )
+                evaluation_info[key][eval_idx] = value

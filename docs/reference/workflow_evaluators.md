@@ -13,5 +13,7 @@ See [Writing Evaluation Callbacks](../usage/evaluation_callbacks.md) and
 ::: ropt.workflow.evaluators.FunctionEvaluator
 ::: ropt.workflow.evaluators.AsyncEvaluator
 ::: ropt.workflow.evaluators.CachedEvaluator
-::: ropt.workflow.evaluators.FunctionCallback
+::: ropt.workflow.evaluators.EvaluatorFunctionCallback
+::: ropt.workflow.evaluators.EvaluatorFunctionContext
+::: ropt.workflow.evaluators.EvaluatorFunctionResult
 ::: ropt.workflow.evaluators.NameCallback

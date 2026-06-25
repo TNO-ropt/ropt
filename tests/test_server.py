@@ -9,7 +9,12 @@ import numpy as np
 import pytest
 
 from ropt.workflow._basic_optimizer import BasicOptimizer
-from ropt.workflow.evaluators import AsyncEvaluator, FunctionCallback
+from ropt.workflow.evaluators import (
+    AsyncEvaluator,
+    EvaluatorFunctionCallback,
+    EvaluatorFunctionContext,
+    EvaluatorFunctionResult,
+)
 from ropt.workflow.servers import (
     HPCServer,
     MultiprocessingServer,
@@ -217,24 +222,25 @@ def config_fixture() -> dict[str, Any]:
 
 def _opt_function(
     variables: NDArray[np.float64],
-    realization: int,
-    test_functions: Sequence[Callable[[NDArray[np.float64], int], float]],
+    context: EvaluatorFunctionContext,
+    test_functions: Any,
     *,
     raise_error: bool = False,
-    **kwargs: Any,  # noqa: ARG001
-) -> NDArray[np.float64]:
+) -> EvaluatorFunctionResult:
     if raise_error:
         msg = "Test error in function"
         raise ValueError(msg)
-    return np.fromiter(
-        (func(variables, realization) for func in test_functions), dtype=np.float64
+    return EvaluatorFunctionResult(
+        objectives=np.fromiter(
+            (func(variables, context) for func in test_functions), dtype=np.float64
+        )
     )
 
 
 def _opt_workflow(
     server: Server,
     config: dict[str, Any],
-    test_function: FunctionCallback,
+    test_function: EvaluatorFunctionCallback,
 ) -> FunctionResults | None:
     evaluator = AsyncEvaluator(function=test_function, server=server)
     optimizer = BasicOptimizer(config=config, evaluator=evaluator)
@@ -285,7 +291,7 @@ if _TEST_HPC:
 )
 async def test_server_evaluator_ok(
     config: dict[str, Any],
-    test_functions: Sequence[Callable[[NDArray[np.float64], int], float]],
+    test_functions: Any,
     server_name: str,
     monkeypatch: Any,
     tmp_path: Path,

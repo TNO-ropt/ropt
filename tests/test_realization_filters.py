@@ -16,6 +16,7 @@ from ropt.realization_filter.default import (
 )
 from ropt.results import FunctionResults, GradientResults, Results
 from ropt.workflow import BasicOptimizer
+from ropt.workflow.evaluators import EvaluatorFunctionContext
 
 initial_values = 3 * [0]
 
@@ -88,25 +89,27 @@ def test__get_cvar_weights_from_percentile(
 
 def _objective_function(
     variables: NDArray[np.float64],
-    realization: int,
+    context: EvaluatorFunctionContext,
     target: NDArray[np.float64],
 ) -> float:
     diff: NDArray[np.float64] = variables - target
     # Make sure that some realizations yield a different result:
-    if realization % 2 == 0:
+    if context.realization % 2 == 0:
         diff += 1.0
     result = np.sum(diff**2)
     # Make sure the other realizations have a worse result:
-    if realization % 2 == 1:
+    if context.realization % 2 == 1:
         result += 10.0
-    return float(result)
+    return result
 
 
-def _constraint_function(variables: NDArray[np.float64], realization: int) -> float:
+def _constraint_function(
+    variables: NDArray[np.float64], context: EvaluatorFunctionContext
+) -> float:
     # Track how often this function is called.
     result = variables[0] + variables[2]
     # Break some realizations, same as in the distance function:
-    if realization % 2 == 0:
+    if context.realization % 2 == 0:
         result = variables[0] + variables[2] - 10.0
     return float(result)
 
@@ -178,9 +181,11 @@ def test_sort_filter_on_objectives_with_constraints(
     evaluator: Any,
     evaluation_policy: Literal["speculative", "separate", "auto"],
 ) -> None:
-    functions = [
+    objective_functions = [
         partial(_objective_function, target=np.array([0.5, 0.5, 0.5])),
         partial(_objective_function, target=np.array([-1.5, -1.5, 0.5])),
+    ]
+    constraint_functions = [
         partial(_constraint_function),
     ]
 
@@ -203,7 +208,9 @@ def test_sort_filter_on_objectives_with_constraints(
     config["objectives"]["realization_filters"] = [0, 0]
     config["nonlinear_constraints"]["realization_filters"] = [0]
     result_list: list[Results] = []
-    optimizer = BasicOptimizer(config, evaluator(functions))
+    optimizer = BasicOptimizer(
+        config, evaluator(objective_functions, constraint_functions)
+    )
     optimizer.set_results_callback(partial(_track_results, result_list=result_list))
     optimizer.run(initial_values)
     assert optimizer.results is not None
@@ -240,9 +247,11 @@ def test_sort_filter_on_constraints(
     evaluator: Any,
     evaluation_policy: Literal["speculative", "separate", "auto"],
 ) -> None:
-    functions = [
+    objective_functions = [
         partial(_objective_function, target=np.array([0.5, 0.5, 0.5])),
         partial(_objective_function, target=np.array([-1.5, -1.5, 0.5])),
+    ]
+    constraint_functions = [
         partial(_constraint_function),
     ]
 
@@ -264,7 +273,9 @@ def test_sort_filter_on_constraints(
     config["objectives"]["realization_filters"] = [0, 0]
     config["nonlinear_constraints"]["realization_filters"] = [0]
     result_list: list[Results] = []
-    optimizer = BasicOptimizer(config, evaluator(functions))
+    optimizer = BasicOptimizer(
+        config, evaluator(objective_functions, constraint_functions)
+    )
     optimizer.set_results_callback(partial(_track_results, result_list=result_list))
     optimizer.run(initial_values)
     assert optimizer.results is not None
@@ -301,7 +312,7 @@ def test_sort_filter_mixed(  # noqa: C901
     evaluator: Any,
     evaluation_policy: Literal["speculative", "separate", "auto"],
 ) -> None:
-    functions = [
+    objective_functions = [
         partial(_objective_function, target=np.array([0.5, 0.5, 0.5])),
         partial(_objective_function, target=np.array([-1.5, -1.5, 0.5])),
         partial(_objective_function, target=np.array([0.5, 0.5, 0.5])),
@@ -335,7 +346,7 @@ def test_sort_filter_mixed(  # noqa: C901
     config["objectives"]["realization_filters"] = [0, 0, 0, 0]
 
     result_list: list[Results] = []
-    optimizer = BasicOptimizer(config, evaluator(functions))
+    optimizer = BasicOptimizer(config, evaluator(objective_functions))
     optimizer.set_results_callback(_add_objective)
     optimizer.run(initial_values)
     assert optimizer.results is not None
@@ -372,7 +383,7 @@ def test_sort_filter_mixed(  # noqa: C901
     config["objectives"]["realization_filters"] = [0, 0, -1, -1]
 
     result_list = []
-    optimizer = BasicOptimizer(config, evaluator(functions))
+    optimizer = BasicOptimizer(config, evaluator(objective_functions))
     optimizer.set_results_callback(_add_objective)
     optimizer.run(initial_values)
     assert optimizer.results is not None
@@ -396,14 +407,14 @@ def test_cvar_filter_on_objectives(
     evaluator: Any,
     evaluation_policy: Literal["speculative", "separate", "auto"],
 ) -> None:
-    functions = [
+    objective_functions = [
         partial(_objective_function, target=np.array([0.5, 0.5, 0.5])),
         partial(_objective_function, target=np.array([-1.5, -1.5, 0.5])),
     ]
 
     config["gradient"]["evaluation_policy"] = evaluation_policy
 
-    optimizer = BasicOptimizer(config, evaluator(functions))
+    optimizer = BasicOptimizer(config, evaluator(objective_functions))
     optimizer.run(initial_values)
     assert optimizer.results is not None
     assert not np.allclose(
@@ -422,7 +433,7 @@ def test_cvar_filter_on_objectives(
     config["objectives"]["realization_filters"] = [0, 0]
     result_list: list[Results] = []
 
-    optimizer = BasicOptimizer(config, evaluator(functions))
+    optimizer = BasicOptimizer(config, evaluator(objective_functions))
     optimizer.set_results_callback(partial(_track_results, result_list=result_list))
     optimizer.run(initial_values)
     assert optimizer.results is not None
@@ -452,9 +463,11 @@ def test_cvar_filter_on_objectives_with_constraints(
     evaluator: Any,
     evaluation_policy: Literal["speculative", "separate", "auto"],
 ) -> None:
-    functions = [
+    objective_functions = [
         partial(_objective_function, target=np.array([0.5, 0.5, 0.5])),
         partial(_objective_function, target=np.array([-1.5, -1.5, 0.5])),
+    ]
+    constraint_functions = [
         partial(_constraint_function),
     ]
 
@@ -476,7 +489,9 @@ def test_cvar_filter_on_objectives_with_constraints(
     config["objectives"]["realization_filters"] = [0, 0]
     config["nonlinear_constraints"]["realization_filters"] = [0]
     result_list: list[Results] = []
-    optimizer = BasicOptimizer(config, evaluator(functions))
+    optimizer = BasicOptimizer(
+        config, evaluator(objective_functions, constraint_functions)
+    )
     optimizer.set_results_callback(partial(_track_results, result_list=result_list))
     optimizer.run(initial_values)
     assert optimizer.results is not None
@@ -513,9 +528,11 @@ def test_cvar_filter_on_constraints(
     evaluator: Any,
     evaluation_policy: Literal["speculative", "separate", "auto"],
 ) -> None:
-    functions = [
+    objective_functions = [
         partial(_objective_function, target=np.array([0.5, 0.5, 0.5])),
         partial(_objective_function, target=np.array([-1.5, -1.5, 0.5])),
+    ]
+    constraint_functions = [
         partial(_constraint_function),
     ]
 
@@ -537,7 +554,9 @@ def test_cvar_filter_on_constraints(
     config["objectives"]["realization_filters"] = [0, 0]
     config["nonlinear_constraints"]["realization_filters"] = [0]
     result_list: list[Results] = []
-    optimizer = BasicOptimizer(config, evaluator(functions))
+    optimizer = BasicOptimizer(
+        config, evaluator(objective_functions, constraint_functions)
+    )
     optimizer.set_results_callback(partial(_track_results, result_list=result_list))
     optimizer.run(initial_values)
     assert optimizer.results is not None
@@ -574,7 +593,7 @@ def test_cvar_filter_mixed(
     evaluator: Any,
     evaluation_policy: Literal["speculative", "separate", "auto"],
 ) -> None:
-    functions = [
+    objective_functions = [
         partial(_objective_function, target=np.array([0.5, 0.5, 0.5])),
         partial(_objective_function, target=np.array([-1.5, -1.5, 0.5])),
         partial(_objective_function, target=np.array([0.5, 0.5, 0.5])),
@@ -606,7 +625,7 @@ def test_cvar_filter_mixed(
     config["objectives"]["realization_filters"] = [0, 0, 0, 0]
 
     result_list: list[Results] = []
-    optimizer = BasicOptimizer(config, evaluator(functions))
+    optimizer = BasicOptimizer(config, evaluator(objective_functions))
     optimizer.set_results_callback(_add_objective)
     optimizer.run(initial_values)
     assert optimizer.results is not None
@@ -642,7 +661,7 @@ def test_cvar_filter_mixed(
     config["objectives"]["realization_filters"] = [0, 0, -1, -1]
 
     result_list = []
-    optimizer = BasicOptimizer(config, evaluator(functions))
+    optimizer = BasicOptimizer(config, evaluator(objective_functions))
     optimizer.set_results_callback(_add_objective)
     optimizer.run(initial_values)
     assert optimizer.results is not None

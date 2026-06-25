@@ -16,7 +16,7 @@ There are two ways to provide such evaluation code to
     dispatch. Here we only discuss
    [`FunctionEvaluator`][ropt.workflow.evaluators.FunctionEvaluator], a
    convenience wrapper around a simpler per-row function following the
-   [`FunctionCallback`][ropt.workflow.evaluators.FunctionCallback] protocol.
+   [`EvaluatorFunctionCallback`][ropt.workflow.evaluators.EvaluatorFunctionCallback] protocol.
    [`Evaluator`][ropt.workflow.evaluators.Evaluator] classes are discussed
    in more detail in
    [Optimization Workflows](workflows.md) and [Parallel Evaluation](parallel.md).
@@ -137,33 +137,46 @@ assembly of the final
 [`EvaluationBatchResult`][ropt.evaluation.EvaluationBatchResult].
 
 A function passed to `FunctionEvaluator` must follow the
-[`FunctionCallback`][ropt.workflow.evaluators.FunctionCallback] protocol:
+[`EvaluatorFunctionCallback`][ropt.workflow.evaluators.EvaluatorFunctionCallback] protocol:
 
 ```python
-from typing import Any
 from numpy.typing import NDArray
 import numpy as np
+
+from ropt.workflow.evaluators import (
+    EvaluatorFunctionContext,
+    EvaluatorFunctionResult,
+)
 
 
 def my_function(
     variables: NDArray[np.float64],
-    /,
-    *,
-    realization: int,
-    perturbation: int,
-    batch_id: int,
-    eval_idx: int,
-) -> NDArray[np.float64] | dict[str, Any]:
+    context: EvaluatorFunctionContext,
+) -> EvaluatorFunctionResult:
     ...
 ```
 
 - `variables` is a 1-D array for a single evaluation row.
-- `realization`, `perturbation`, `batch_id`, and `eval_idx` identify the
-  evaluation. `perturbation` is `-1` when the evaluation is unperturbed.
-- The return value is either a 1-D NumPy array of length
-  `n_objectives + n_constraints`, or a dictionary with a `"result"` key
-  containing that array (any additional keys are stored as `evaluation_info`
-  entries).
+- `context` is an
+  [`EvaluatorFunctionContext`][ropt.workflow.evaluators.EvaluatorFunctionContext]
+  dataclass identifying the evaluation. It exposes:
+
+    | Field          | Meaning
+    | -------------- | -----------------------------------------------------------------------------------
+    | `realization`  | Integer realization index for this row.
+    | `perturbation` | Integer perturbation index, or `-1` when the evaluation is unperturbed.
+    | `batch_id`     | Integer identifying the current evaluation batch.
+    | `eval_idx`     | Row index within the batch.
+
+- The return value is an
+  [`EvaluatorFunctionResult`][ropt.workflow.evaluators.EvaluatorFunctionResult]
+  dataclass with the following fields:
+
+    | Field             | Meaning
+    | ----------------- | -----------------------------------------------------------------------------------
+    | `objectives`      | The objective values as a scalar or 1-D array of length `n_objectives`.
+    | `constraints`     | Optional constraint values as a scalar or 1-D array of length `n_nonlinear_constraints`.
+    | `evaluation_info` | Optional `dict[str, Any]`; each entry is stored verbatim in the resulting [`EvaluationBatchResult.evaluation_info`][ropt.evaluation.EvaluationBatchResult] for this row.
 
 To use it with
 [`BasicOptimizer`][ropt.workflow.BasicOptimizer], wrap the function in a

@@ -2,14 +2,18 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
 from ropt.evaluation import EvaluationBatchContext, EvaluationBatchResult
 
-from .base import Evaluator, FunctionCallback
+from .base import (
+    Evaluator,
+    EvaluatorFunctionCallback,
+    EvaluatorFunctionContext,
+    EvaluatorFunctionResult,
+)
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray
@@ -25,7 +29,7 @@ class FunctionEvaluator(Evaluator):
     def __init__(
         self,
         *,
-        function: FunctionCallback,
+        function: EvaluatorFunctionCallback,
     ) -> None:
         """Initialize the FunctionEvaluator.
 
@@ -69,13 +73,16 @@ class FunctionEvaluator(Evaluator):
                     eval_idx,
                     self._function(
                         variables[eval_idx, :],
-                        realization=int(realization),
-                        perturbation=perturbation,
-                        batch_id=self._batch_id,
-                        eval_idx=eval_idx,
+                        EvaluatorFunctionContext(
+                            realization=int(realization),
+                            perturbation=perturbation,
+                            batch_id=self._batch_id,
+                            eval_idx=eval_idx,
+                        ),
                     ),
                     results,
                     evaluation_info,
+                    no,
                     variables.shape[0],
                 )
         return EvaluationBatchResult(
@@ -86,29 +93,26 @@ class FunctionEvaluator(Evaluator):
         )
 
 
-def _handle_result(
+def _handle_result(  # noqa: PLR0913, PLR0917
     eval_idx: int,
-    result: NDArray[np.float64] | dict[str, Any],
+    result: EvaluatorFunctionResult,
     results: NDArray[np.float64],
     evaluation_info: dict[str, NDArray[Any]],
+    objective_count: int,
     eval_count: int,
 ) -> None:
-    if isinstance(result, np.ndarray):
-        results[eval_idx, :] = result
-    else:
-        assert isinstance(result, Mapping)
-        assert "result" in result
-        for key, value in result.items():
-            if key == "result":
-                results[eval_idx, :] = value
-            else:
-                if key not in evaluation_info:
-                    evaluation_info[key] = np.zeros(
-                        eval_count,
-                        dtype=(
-                            np.array(value).dtype
-                            if isinstance(value, (int, float, complex, np.number))
-                            else object
-                        ),
-                    )
-                evaluation_info[key][eval_idx] = value
+    results[eval_idx, :objective_count] = result.objectives
+    if result.constraints is not None:
+        results[eval_idx, objective_count:] = result.constraints
+    if result.evaluation_info is not None:
+        for key, value in result.evaluation_info.items():
+            if key not in evaluation_info:
+                evaluation_info[key] = np.zeros(
+                    eval_count,
+                    dtype=(
+                        np.array(value).dtype
+                        if isinstance(value, (int, float, complex, np.number))
+                        else object
+                    ),
+                )
+            evaluation_info[key][eval_idx] = value

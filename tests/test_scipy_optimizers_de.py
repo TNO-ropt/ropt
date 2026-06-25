@@ -208,12 +208,10 @@ def test_scipy_eq_nonlinear_constraints_de(
         "upper_bounds": 1.0,
     }
 
-    test_functions = (
-        *test_functions,
-        lambda variables, _: variables[0] + variables[2],
-    )
+    def constraint_function(variables: Any, _: Any) -> Any:
+        return variables[0] + variables[2]
 
-    optimizer = BasicOptimizer(config, evaluator(test_functions))
+    optimizer = BasicOptimizer(config, evaluator(test_functions, [constraint_function]))
     optimizer.run(initial_values)
     assert optimizer.results is not None
     assert np.allclose(
@@ -240,12 +238,11 @@ def test_scipy_ineq_nonlinear_constraints_de(
     }
 
     weight = 1.0 if upper_bounds == 0.4 else -1.0
-    test_functions = (
-        *test_functions,
-        lambda variables, _: weight * variables[0] + weight * variables[2],
-    )
 
-    optimizer = BasicOptimizer(config, evaluator(test_functions))
+    def constraint_function(variables: Any, _: Any) -> Any:
+        return weight * variables[0] + weight * variables[2]
+
+    optimizer = BasicOptimizer(config, evaluator(test_functions, [constraint_function]))
     optimizer.run(initial_values)
     assert optimizer.results is not None
     assert np.allclose(
@@ -264,12 +261,11 @@ def test_scipy_ineq_nonlinear_constraints_two_sided_de(
         "lower_bounds": [0.0],
         "upper_bounds": [0.3],
     }
-    test_functions = (
-        *test_functions,
-        lambda variables, _: variables[0] + variables[2],
-    )
 
-    optimizer = BasicOptimizer(config, evaluator(test_functions))
+    def constraint_function(variables: Any, _: Any) -> Any:
+        return variables[0] + variables[2]
+
+    optimizer = BasicOptimizer(config, evaluator(test_functions, [constraint_function]))
     optimizer.run(initial_values)
     assert optimizer.results is not None
     assert np.allclose(

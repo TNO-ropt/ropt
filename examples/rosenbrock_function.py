@@ -28,7 +28,11 @@ from numpy.typing import NDArray
 
 from ropt.results import FunctionResults, Results
 from ropt.workflow import BasicOptimizer
-from ropt.workflow.evaluators import FunctionEvaluator
+from ropt.workflow.evaluators import (
+    EvaluatorFunctionContext,
+    EvaluatorFunctionResult,
+    FunctionEvaluator,
+)
 
 DIM = 5
 CONFIG: dict[str, Any] = {
@@ -41,34 +45,31 @@ INITIAL_VALUES = 2 * np.arange(DIM) / DIM + 0.5
 UNCERTAINTY = 0.1
 
 
-def rosenbrock(  # noqa: PLR0913, PLR0917
+def rosenbrock(
     variables: NDArray[np.float64],
-    realization: int,
-    perturbation: int,  # noqa: ARG001
-    batch_id: int,  # noqa: ARG001
-    eval_idx: int,  # noqa: ARG001
+    context: EvaluatorFunctionContext,
+    *,
     a: NDArray[np.float64],
     b: NDArray[np.float64],
-) -> NDArray[np.float64] | dict[str, Any]:
+) -> EvaluatorFunctionResult:
     """Function callback for the multi-dimensional rosenbrock function.
 
     Args:
         variables:    1-D variable vector for this evaluation.
-        realization:  The realization index.
-        perturbation: The perturbation index (`-1` when unperturbed).
-        batch_id:     Integer identifying the current evaluation batch.
-        eval_idx:     Row index within the batch.
+        context:      The function context.
         a:            The 'a' parameters.
         b:            The 'b' parameters.
 
     Returns:
-        The evaluation result as an array or a dictionary.
+        The evaluation result.
     """
     objective = 0.0
     for idx in range(DIM - 1):
         x, y = variables[idx : idx + 2]
-        objective += (a[realization] - x) ** 2 + b[realization] * (y - x * x) ** 2
-    return np.array(objective, dtype=np.float64)
+        objective += (a[context.realization] - x) ** 2 + b[context.realization] * (
+            y - x * x
+        ) ** 2
+    return EvaluatorFunctionResult(objective)
 
 
 def report(results: tuple[Results, ...]) -> None:

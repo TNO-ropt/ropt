@@ -13,7 +13,12 @@ from ropt.exceptions import Abort
 from ropt.results import FunctionResults
 from ropt.workflow import BasicOptimizer
 from ropt.workflow.compute_steps import EvaluationStep, OptimizationStep
-from ropt.workflow.evaluators import CachedEvaluator, FunctionEvaluator
+from ropt.workflow.evaluators import (
+    CachedEvaluator,
+    EvaluatorFunctionContext,
+    EvaluatorFunctionResult,
+    FunctionEvaluator,
+)
 from ropt.workflow.event_handlers import CallbackHandler, HistoryHandler, ResultsHandler
 
 if TYPE_CHECKING:
@@ -69,23 +74,24 @@ def test_function_evaluator_with_info(
     config: dict[str, Any], evaluator: Any, test_functions: Any
 ) -> None:
 
-    def _function_dict(
+    def _function(
         variables: NDArray[np.float64],
+        context: EvaluatorFunctionContext,
         *,
-        realization: int,
-        test_functions: list[Callable[[NDArray[np.float64], int], float]],
-        **kwargs: Any,  # noqa: ARG001
-    ) -> dict[str, Any]:
-        return {
-            "result": np.fromiter(
-                (func(variables, realization) for func in test_functions),
+        test_functions: list[
+            Callable[[NDArray[np.float64], EvaluatorFunctionContext], float]
+        ],
+    ) -> EvaluatorFunctionResult:
+        return EvaluatorFunctionResult(
+            objectives=np.fromiter(
+                (func(variables, context) for func in test_functions),
                 dtype=np.float64,
             ),
-            "foo": "bar",
-        }
+            evaluation_info={"foo": "bar"},
+        )
 
     evaluator = FunctionEvaluator(
-        function=partial(_function_dict, test_functions=test_functions)
+        function=partial(_function, test_functions=test_functions)
     )
     result_handler = ResultsHandler()
     step = OptimizationStep(evaluator=evaluator)
@@ -524,13 +530,10 @@ def test_nested_optimization(
     outer_result_handler = ResultsHandler()
 
     def _optimizer(
-        variables: NDArray[np.float64],
-        realization: int,  # noqa: ARG001
-        perturbation: int,
-        **kwargs: Any,  # noqa: ARG001
+        variables: NDArray[np.float64], context: EvaluatorFunctionContext
     ) -> Any:
         new_variables = variables.copy()
-        if perturbation < 0:
+        if context.perturbation < 0:
             new_variables[1] = (
                 initial[1]
                 if outer_result_handler["results"] is None
@@ -544,11 +547,16 @@ def test_nested_optimization(
                 variables=new_variables,
                 context=EnOptContext.model_validate(nested_config),
             )
-            return result_handler["results"].functions.objectives
+            return EvaluatorFunctionResult(
+                objectives=result_handler["results"].functions.objectives
+            )
 
         new_variables[1] = outer_result_handler["results"].evaluations.variables[1]
-        return np.fromiter(
-            (func(new_variables, 0) for func in test_functions), dtype=np.float64
+        return EvaluatorFunctionResult(
+            objectives=np.fromiter(
+                (func(new_variables, context) for func in test_functions),
+                dtype=np.float64,
+            )
         )
 
     outer_evaluator = FunctionEvaluator(function=_optimizer)

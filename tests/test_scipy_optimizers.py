@@ -4,6 +4,7 @@ from typing import Any, Literal
 
 import numpy as np
 import pytest
+from numpy.typing import NDArray
 from pydantic import ValidationError
 
 from ropt.backend.scipy import (
@@ -17,6 +18,7 @@ from ropt.backend.scipy import (
 )
 from ropt.results import Results
 from ropt.workflow import BasicOptimizer, validate_backend_options
+from ropt.workflow.evaluators import EvaluatorFunctionContext
 
 _REQUIRES_BOUNDS = _CONSTRAINT_REQUIRES_BOUNDS - {"differential_evolution"}
 _SUPPORTS_BOUNDS = _CONSTRAINT_SUPPORT_BOUNDS - {"differential_evolution"}
@@ -325,12 +327,12 @@ def test_scipy_eq_nonlinear_constraints(
         "upper_bounds": 1.0,
     }
 
-    test_functions = (
-        *test_functions,
-        lambda variables, _: variables[0] + variables[2],
-    )
+    def constraint_function(
+        variables: NDArray[np.float64], _: EvaluatorFunctionContext
+    ) -> float:
+        return float(variables[0] + variables[2])
 
-    optimizer = BasicOptimizer(config, evaluator(test_functions))
+    optimizer = BasicOptimizer(config, evaluator(test_functions, [constraint_function]))
     optimizer.run(initial_values)
     assert optimizer.results is not None
     assert np.allclose(
@@ -359,12 +361,13 @@ def test_scipy_ineq_nonlinear_constraints(  # noqa: PLR0917
         "upper_bounds": upper_bounds,
     }
     weight = 1.0 if upper_bounds == 0.4 else -1.0
-    test_functions = (
-        *test_functions,
-        lambda variables, _: weight * variables[0] + weight * variables[2],
-    )
 
-    optimizer = BasicOptimizer(config, evaluator(test_functions))
+    def constraint_function(
+        variables: NDArray[np.float64], _: EvaluatorFunctionContext
+    ) -> float:
+        return float(weight * (variables[0] + variables[2]))
+
+    optimizer = BasicOptimizer(config, evaluator(test_functions, [constraint_function]))
     optimizer.run(initial_values)
     assert optimizer.results is not None
     assert np.allclose(
@@ -387,12 +390,13 @@ def test_scipy_ineq_nonlinear_constraints_two_sided(
         "lower_bounds": [0.0],
         "upper_bounds": [0.3],
     }
-    test_functions = (
-        *test_functions,
-        lambda variables, _: variables[0] + variables[2],
-    )
 
-    optimizer = BasicOptimizer(config, evaluator(test_functions))
+    def constraint_function(
+        variables: NDArray[np.float64], _: EvaluatorFunctionContext
+    ) -> float:
+        return float(variables[0] + variables[2])
+
+    optimizer = BasicOptimizer(config, evaluator(test_functions, [constraint_function]))
     optimizer.run(initial_values)
     assert optimizer.results is not None
     assert np.allclose(

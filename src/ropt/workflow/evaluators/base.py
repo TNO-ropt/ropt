@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Protocol
 
 if TYPE_CHECKING:
@@ -42,41 +43,63 @@ class Evaluator(ABC):
         """
 
 
-class FunctionCallback(Protocol):
+@dataclass(slots=True)
+class EvaluatorFunctionContext:
+    """Context for a single function evaluation.
+
+    Attributes:
+        realization:  The realization index.
+        perturbation: The perturbation index (`-1` when unperturbed).
+        batch_id:     Integer identifying the current evaluation batch.
+        eval_idx:     Row index within the batch.
+    """
+
+    realization: int
+    perturbation: int
+    batch_id: int
+    eval_idx: int
+
+
+@dataclass(slots=True)
+class EvaluatorFunctionResult:
+    """Result of a single function evaluation.
+
+    Attributes:
+        objectives:      The objective values as an array.
+        constraints:     Optional constraint values as an array.
+        evaluation_info: Optional dictionary containing additional information
+                         about the evaluation.
+    """
+
+    objectives: NDArray[np.float64] | float
+    constraints: NDArray[np.float64] | float | None = None
+    evaluation_info: dict[str, Any] | None = None
+
+
+class EvaluatorFunctionCallback(Protocol):
     """Defines the call signature for function callbacks.
 
     A function following this protocol is called once per active row of the
     evaluation batch, receiving the variable vector for that row together with
-    keyword arguments that identify the evaluation.
+    a `EvaluatorFunctionContext` object that identifies the evaluation.
 
-    The function should return either:
-
-    - A 1-D NumPy array of length `n_objectives + n_constraints`.
-    - A dictionary with a `"result"` key containing that array; any
-      additional keys are stored as `evaluation_info` entries.
+    The function should return a `EvaluatorFunctionResult` object containing the
+    evaluation results.
     """
 
     def __call__(
         self,
         variables: NDArray[np.float64],
-        /,
-        *,
-        realization: int,
-        perturbation: int,
-        batch_id: int,
-        eval_idx: int,
-    ) -> NDArray[np.float64] | dict[str, Any]:
+        context: EvaluatorFunctionContext,
+    ) -> EvaluatorFunctionResult:
         """Evaluate objectives and constraints for a single variable vector.
 
         Args:
             variables:    1-D variable vector for this evaluation.
-            realization:  The realization index.
-            perturbation: The perturbation index (`-1` when unperturbed).
-            batch_id:     Integer identifying the current evaluation batch.
-            eval_idx:     Row index within the batch.
+            context:      The `EvaluatorFunctionContext` object identifying the evaluation.
 
         Returns:
-            The evaluation result as an array or a dictionary.
+            The evaluation result as a `EvaluatorFunctionResult` object.
         """
 
 
