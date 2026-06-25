@@ -29,8 +29,8 @@ from numpy.typing import NDArray
 from ropt.results import FunctionResults, Results
 from ropt.workflow import BasicOptimizer
 from ropt.workflow.evaluators import (
-    EvaluatorFunctionContext,
-    EvaluatorFunctionResult,
+    EvaluationFunctionContext,
+    EvaluationFunctionResult,
     FunctionEvaluator,
 )
 
@@ -47,11 +47,11 @@ UNCERTAINTY = 0.1
 
 def rosenbrock(
     variables: NDArray[np.float64],
-    context: EvaluatorFunctionContext,
+    context: EvaluationFunctionContext,
     *,
     a: NDArray[np.float64],
     b: NDArray[np.float64],
-) -> EvaluatorFunctionResult:
+) -> EvaluationFunctionResult:
     """Function callback for the multi-dimensional rosenbrock function.
 
     Args:
@@ -69,7 +69,7 @@ def rosenbrock(
         objective += (a[context.realization] - x) ** 2 + b[context.realization] * (
             y - x * x
         ) ** 2
-    return EvaluatorFunctionResult(objective)
+    return EvaluationFunctionResult(objective)
 
 
 def report(results: tuple[Results, ...]) -> None:

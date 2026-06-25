@@ -16,7 +16,7 @@ from ropt.realization_filter.default import (
 )
 from ropt.results import FunctionResults, GradientResults, Results
 from ropt.workflow import BasicOptimizer
-from ropt.workflow.evaluators import EvaluatorFunctionContext
+from ropt.workflow.evaluators import EvaluationFunctionContext
 
 initial_values = 3 * [0]
 
@@ -89,7 +89,7 @@ def test__get_cvar_weights_from_percentile(
 
 def _objective_function(
     variables: NDArray[np.float64],
-    context: EvaluatorFunctionContext,
+    context: EvaluationFunctionContext,
     target: NDArray[np.float64],
 ) -> float:
     diff: NDArray[np.float64] = variables - target
@@ -104,7 +104,7 @@ def _objective_function(
 
 
 def _constraint_function(
-    variables: NDArray[np.float64], context: EvaluatorFunctionContext
+    variables: NDArray[np.float64], context: EvaluationFunctionContext
 ) -> float:
     # Track how often this function is called.
     result = variables[0] + variables[2]

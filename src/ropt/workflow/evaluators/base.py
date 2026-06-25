@@ -44,7 +44,7 @@ class Evaluator(ABC):
 
 
 @dataclass(slots=True)
-class EvaluatorFunctionContext:
+class EvaluationFunctionContext:
     """Context for a single function evaluation.
 
     Attributes:
@@ -61,7 +61,7 @@ class EvaluatorFunctionContext:
 
 
 @dataclass(slots=True)
-class EvaluatorFunctionResult:
+class EvaluationFunctionResult:
     """Result of a single function evaluation.
 
     Attributes:
@@ -76,41 +76,41 @@ class EvaluatorFunctionResult:
     evaluation_info: dict[str, Any] | None = None
 
 
-class EvaluatorFunctionCallback(Protocol):
+class EvaluationFunctionCallback(Protocol):
     """Defines the call signature for function callbacks.
 
     A function following this protocol is called once per active row of the
     evaluation batch, receiving the variable vector for that row together with
-    a `EvaluatorFunctionContext` object that identifies the evaluation.
+    a `EvaluationFunctionContext` object that identifies the evaluation.
 
-    The function should return a `EvaluatorFunctionResult` object containing the
+    The function should return a `EvaluationFunctionResult` object containing the
     evaluation results.
     """
 
     def __call__(
         self,
         variables: NDArray[np.float64],
-        context: EvaluatorFunctionContext,
-    ) -> EvaluatorFunctionResult:
+        context: EvaluationFunctionContext,
+    ) -> EvaluationFunctionResult:
         """Evaluate objectives and constraints for a single variable vector.
 
         Args:
             variables:    1-D variable vector for this evaluation.
-            context:      The `EvaluatorFunctionContext` object identifying the evaluation.
+            context:      The `EvaluationFunctionContext` object identifying the evaluation.
 
         Returns:
-            The evaluation result as a `EvaluatorFunctionResult` object.
+            The evaluation result as a `EvaluationFunctionResult` object.
         """
 
 
 class NameCallback(Protocol):
     """Defines the call signature for callbacks to get the name of an evaluation."""
 
-    def __call__(self, context: EvaluatorFunctionContext) -> str:
+    def __call__(self, context: EvaluationFunctionContext) -> str:
         """Get the name for a single evaluation.
 
         Args:
-            context: The `EvaluatorFunctionContext` object identifying the evaluation.
+            context: The `EvaluationFunctionContext` object identifying the evaluation.
 
         Returns:
             The name of the evaluation.

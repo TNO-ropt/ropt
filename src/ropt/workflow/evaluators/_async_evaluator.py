@@ -14,10 +14,10 @@ from ropt.exceptions import Abort, ServerFailure
 from ropt.workflow.servers import ResultsQueue, Server, Task
 
 from .base import (
+    EvaluationFunctionCallback,
+    EvaluationFunctionContext,
+    EvaluationFunctionResult,
     Evaluator,
-    EvaluatorFunctionCallback,
-    EvaluatorFunctionContext,
-    EvaluatorFunctionResult,
     NameCallback,
 )
 
@@ -44,7 +44,7 @@ class AsyncEvaluator(Evaluator):
     def __init__(
         self,
         *,
-        function: EvaluatorFunctionCallback,
+        function: EvaluationFunctionCallback,
         server: Server,
         queue_size: int = 0,
         get_name: NameCallback | None = None,
@@ -182,7 +182,7 @@ class AsyncEvaluator(Evaluator):
             if context.perturbations is None
             else int(context.perturbations[eval_idx])
         )
-        function_context = EvaluatorFunctionContext(
+        function_context = EvaluationFunctionContext(
             realization=realization,
             perturbation=perturbation,
             batch_id=batch_id,
@@ -208,7 +208,7 @@ def _handle_result(
     if isinstance(task.result, ServerFailure):
         results[eval_idx, :] = np.nan
     else:
-        assert isinstance(task.result, EvaluatorFunctionResult)
+        assert isinstance(task.result, EvaluationFunctionResult)
         results[eval_idx, :objective_count] = task.result.objectives
         if task.result.constraints is not None:
             results[eval_idx, objective_count:] = task.result.constraints

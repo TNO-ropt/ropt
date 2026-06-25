@@ -7,10 +7,10 @@ from ._batch_evaluator import BatchEvaluator
 from ._cached_evaluator import CachedEvaluator
 from ._function_evaluator import FunctionEvaluator
 from .base import (
+    EvaluationFunctionCallback,
+    EvaluationFunctionContext,
+    EvaluationFunctionResult,
     Evaluator,
-    EvaluatorFunctionCallback,
-    EvaluatorFunctionContext,
-    EvaluatorFunctionResult,
     NameCallback,
 )
 
@@ -18,10 +18,10 @@ __all__ = [
     "AsyncEvaluator",
     "BatchEvaluator",
     "CachedEvaluator",
+    "EvaluationFunctionCallback",
+    "EvaluationFunctionContext",
+    "EvaluationFunctionResult",
     "Evaluator",
-    "EvaluatorFunctionCallback",
-    "EvaluatorFunctionContext",
-    "EvaluatorFunctionResult",
     "FunctionEvaluator",
     "NameCallback",
 ]

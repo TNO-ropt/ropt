@@ -23,8 +23,8 @@ from ropt.events import EnOptEvent
 from ropt.results import FunctionResults
 from ropt.workflow.compute_steps import OptimizationStep
 from ropt.workflow.evaluators import (
-    EvaluatorFunctionContext,
-    EvaluatorFunctionResult,
+    EvaluationFunctionContext,
+    EvaluationFunctionResult,
     FunctionEvaluator,
 )
 from ropt.workflow.event_handlers import CallbackHandler, ResultsHandler
@@ -60,10 +60,10 @@ UNCERTAINTY = 0.1
 
 def rosenbrock(
     variables: NDArray[np.float64],
-    context: EvaluatorFunctionContext,
+    context: EvaluationFunctionContext,
     a: NDArray[np.float64],
     b: NDArray[np.float64],
-) -> EvaluatorFunctionResult:
+) -> EvaluationFunctionResult:
     """Function callback for the multi-dimensional rosenbrock function.
 
     Args:
@@ -81,7 +81,7 @@ def rosenbrock(
         x, y = scaled[idx : idx + 2]
         r = context.realization
         objective += (a[r] - x) ** 2 + b[r] * (y - x * x) ** 2
-    return EvaluatorFunctionResult(objectives=objective)
+    return EvaluationFunctionResult(objectives=objective)
 
 
 def report(event: EnOptEvent) -> None:

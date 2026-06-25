@@ -64,8 +64,8 @@ from numpy.typing import NDArray
 from ropt.context import EnOptContext
 from ropt.workflow.compute_steps import OptimizationStep
 from ropt.workflow.evaluators import (
-    EvaluatorFunctionContext,
-    EvaluatorFunctionResult,
+    EvaluationFunctionContext,
+    EvaluationFunctionResult,
     FunctionEvaluator,
 )
 from ropt.workflow.event_handlers import ResultsHandler
@@ -79,9 +79,9 @@ CONFIG = {
 # 2. Define a per-realization evaluation function.
 def my_function(
     variables: NDArray[np.float64],
-    context: EvaluatorFunctionContext,
-) -> EvaluatorFunctionResult:
-    return EvaluatorFunctionResult(
+    context: EvaluationFunctionContext,
+) -> EvaluationFunctionResult:
+    return EvaluationFunctionResult(
         objectives=np.array([(variables - 1.0) @ (variables - 1.0)]),
     )
 
@@ -403,7 +403,7 @@ the [next section](parallel.md):
 | Evaluator                                                                      | Interface                                                                                                                     |
 | ------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------- |
 | [`BatchEvaluator`][ropt.workflow.evaluators.BatchEvaluator]                    | Batch: `f(variables_2d, context)` → `EvaluationBatchResult`.                                                                        |
-| [`FunctionEvaluator`][ropt.workflow.evaluators.FunctionEvaluator]              | Per-row: `f(variables_1d, context)` → `EvaluatorFunctionResult`.                                                              |
+| [`FunctionEvaluator`][ropt.workflow.evaluators.FunctionEvaluator]              | Per-row: `f(variables_1d, context)` → `EvaluationFunctionResult`.                                                              |
 | [`CachedEvaluator`][ropt.workflow.evaluators.CachedEvaluator]                  | Wraps another evaluator, caching results by variable vector.                                                                  |
 | [`AsyncEvaluator`][ropt.workflow.evaluators.AsyncEvaluator]                    | Parallel evaluation via a [`Server`][ropt.workflow.servers.Server] — see [Parallel Evaluation](parallel.md).                  |
 
@@ -423,12 +423,12 @@ the callable accepted by `BasicOptimizer`.
 single function that returns a value for each objective and constraint. The
 function is called once per row of the evaluation batch with the variable
 vector and an
-[`EvaluatorFunctionContext`][ropt.workflow.evaluators.EvaluatorFunctionContext]
+[`EvaluationFunctionContext`][ropt.workflow.evaluators.EvaluationFunctionContext]
 dataclass exposing `realization`, `perturbation`, `batch_id`, and
 `eval_idx`. The `perturbation` value is `-1` when the evaluation is not a
 perturbation (i.e. the unperturbed function evaluation). The function must
 return an
-[`EvaluatorFunctionResult`][ropt.workflow.evaluators.EvaluatorFunctionResult]
+[`EvaluationFunctionResult`][ropt.workflow.evaluators.EvaluationFunctionResult]
 dataclass with:
 
 - `objectives`: a scalar or 1-D NumPy array of length *n_objectives*.

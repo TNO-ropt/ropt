@@ -39,9 +39,9 @@ from ropt.results import FunctionResults
 from ropt.workflow import BasicOptimizer
 from ropt.workflow.evaluators import (
     AsyncEvaluator,
-    EvaluatorFunctionCallback,
-    EvaluatorFunctionContext,
-    EvaluatorFunctionResult,
+    EvaluationFunctionCallback,
+    EvaluationFunctionContext,
+    EvaluationFunctionResult,
 )
 from ropt.workflow.servers import MultiprocessingServer, Server, ThreadingServer
 
@@ -66,17 +66,17 @@ INITIAL_VALUES = 2 * np.arange(DIM) / DIM + 0.5
 
 def rosenbrock(
     variables: NDArray[np.float64],
-    context: EvaluatorFunctionContext,
+    context: EvaluationFunctionContext,
     *,
     a: NDArray[np.float64],
     b: NDArray[np.float64],
     delay: float,
-) -> EvaluatorFunctionResult:
+) -> EvaluationFunctionResult:
     """Function evaluator for the multi-dimensional rosenbrock function.
 
     Args:
         variables:    The variables to evaluate.
-        context:      The `EvaluatorFunctionContext` object identifying the evaluation.
+        context:      The `EvaluationFunctionContext` object identifying the evaluation.
         a:            The 'a' parameters.
         b:            The 'b' parameters.
         delay:        The delay before starting the evaluation.
@@ -91,12 +91,12 @@ def rosenbrock(
         objective += (a[context.realization] - x) ** 2 + b[context.realization] * (
             y - x * x
         ) ** 2
-    return EvaluatorFunctionResult(objectives=np.asarray([objective]))
+    return EvaluationFunctionResult(objectives=np.asarray([objective]))
 
 
 def run_optimization(
     server: Server,
-    function: EvaluatorFunctionCallback,
+    function: EvaluationFunctionCallback,
     config: dict[str, Any],
 ) -> FunctionResults:
     """Run the optimization.

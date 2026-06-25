@@ -16,7 +16,7 @@ There are two ways to provide such evaluation code to
     dispatch. Here we only discuss
    [`FunctionEvaluator`][ropt.workflow.evaluators.FunctionEvaluator], a
    convenience wrapper around a simpler per-row function following the
-   [`EvaluatorFunctionCallback`][ropt.workflow.evaluators.EvaluatorFunctionCallback] protocol.
+   [`EvaluationFunctionCallback`][ropt.workflow.evaluators.EvaluationFunctionCallback] protocol.
    [`Evaluator`][ropt.workflow.evaluators.Evaluator] classes are discussed
    in more detail in
    [Optimization Workflows](workflows.md) and [Parallel Evaluation](parallel.md).
@@ -137,28 +137,28 @@ assembly of the final
 [`EvaluationBatchResult`][ropt.evaluation.EvaluationBatchResult].
 
 A function passed to `FunctionEvaluator` must follow the
-[`EvaluatorFunctionCallback`][ropt.workflow.evaluators.EvaluatorFunctionCallback] protocol:
+[`EvaluationFunctionCallback`][ropt.workflow.evaluators.EvaluationFunctionCallback] protocol:
 
 ```python
 from numpy.typing import NDArray
 import numpy as np
 
 from ropt.workflow.evaluators import (
-    EvaluatorFunctionContext,
-    EvaluatorFunctionResult,
+    EvaluationFunctionContext,
+    EvaluationFunctionResult,
 )
 
 
 def my_function(
     variables: NDArray[np.float64],
-    context: EvaluatorFunctionContext,
-) -> EvaluatorFunctionResult:
+    context: EvaluationFunctionContext,
+) -> EvaluationFunctionResult:
     ...
 ```
 
 - `variables` is a 1-D array for a single evaluation row.
 - `context` is an
-  [`EvaluatorFunctionContext`][ropt.workflow.evaluators.EvaluatorFunctionContext]
+  [`EvaluationFunctionContext`][ropt.workflow.evaluators.EvaluationFunctionContext]
   dataclass identifying the evaluation. It exposes:
 
     | Field          | Meaning
@@ -169,7 +169,7 @@ def my_function(
     | `eval_idx`     | Row index within the batch.
 
 - The return value is an
-  [`EvaluatorFunctionResult`][ropt.workflow.evaluators.EvaluatorFunctionResult]
+  [`EvaluationFunctionResult`][ropt.workflow.evaluators.EvaluationFunctionResult]
   dataclass with the following fields:
 
     | Field             | Meaning

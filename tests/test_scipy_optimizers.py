@@ -18,7 +18,7 @@ from ropt.backend.scipy import (
 )
 from ropt.results import Results
 from ropt.workflow import BasicOptimizer, validate_backend_options
-from ropt.workflow.evaluators import EvaluatorFunctionContext
+from ropt.workflow.evaluators import EvaluationFunctionContext
 
 _REQUIRES_BOUNDS = _CONSTRAINT_REQUIRES_BOUNDS - {"differential_evolution"}
 _SUPPORTS_BOUNDS = _CONSTRAINT_SUPPORT_BOUNDS - {"differential_evolution"}
@@ -328,7 +328,7 @@ def test_scipy_eq_nonlinear_constraints(
     }
 
     def constraint_function(
-        variables: NDArray[np.float64], _: EvaluatorFunctionContext
+        variables: NDArray[np.float64], _: EvaluationFunctionContext
     ) -> float:
         return float(variables[0] + variables[2])
 
@@ -363,7 +363,7 @@ def test_scipy_ineq_nonlinear_constraints(  # noqa: PLR0917
     weight = 1.0 if upper_bounds == 0.4 else -1.0
 
     def constraint_function(
-        variables: NDArray[np.float64], _: EvaluatorFunctionContext
+        variables: NDArray[np.float64], _: EvaluationFunctionContext
     ) -> float:
         return float(weight * (variables[0] + variables[2]))
 
@@ -392,7 +392,7 @@ def test_scipy_ineq_nonlinear_constraints_two_sided(
     }
 
     def constraint_function(
-        variables: NDArray[np.float64], _: EvaluatorFunctionContext
+        variables: NDArray[np.float64], _: EvaluationFunctionContext
     ) -> float:
         return float(variables[0] + variables[2])
 

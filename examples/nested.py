@@ -27,8 +27,8 @@ from ropt.results import FunctionResults
 from ropt.workflow.compute_steps import OptimizationStep
 from ropt.workflow.evaluators import (
     CachedEvaluator,
-    EvaluatorFunctionContext,
-    EvaluatorFunctionResult,
+    EvaluationFunctionContext,
+    EvaluationFunctionResult,
     FunctionEvaluator,
 )
 from ropt.workflow.event_handlers import CallbackHandler, HistoryHandler, ResultsHandler
@@ -70,10 +70,10 @@ UNCERTAINTY = 0.1
 
 def rosenbrock(
     variables: NDArray[np.float64],
-    context: EvaluatorFunctionContext,
+    context: EvaluationFunctionContext,
     a: NDArray[np.float64],
     b: NDArray[np.float64],
-) -> EvaluatorFunctionResult:
+) -> EvaluationFunctionResult:
     """Function callback for the multi-dimensional rosenbrock function.
 
     Args:
@@ -91,7 +91,7 @@ def rosenbrock(
         x, y = scaled[idx : idx + 2]
         r = context.realization
         objective += (a[r] - x) ** 2 + b[r] * (y - x * x) ** 2
-    return EvaluatorFunctionResult(
+    return EvaluationFunctionResult(
         objectives=objective,
         evaluation_info={"worker": str(os.getpid())},
     )
@@ -120,8 +120,8 @@ def main() -> None:
 
     def _optimize(
         variables: NDArray[np.float64],
-        context: EvaluatorFunctionContext,  # noqa: ARG001
-    ) -> EvaluatorFunctionResult:
+        context: EvaluationFunctionContext,  # noqa: ARG001
+    ) -> EvaluationFunctionResult:
         new_variables = np.where(MASK, INITIAL_VALUES, variables)
 
         step = OptimizationStep(evaluator=inner_evaluator)
@@ -143,7 +143,7 @@ def main() -> None:
         inner_result = result_handler["results"]
         assert inner_result is not None
         assert inner_result.functions is not None
-        return EvaluatorFunctionResult(
+        return EvaluationFunctionResult(
             objectives=np.array(inner_result.functions.target_objective)
         )
 

@@ -7,12 +7,12 @@ import pytest
 from numpy.typing import NDArray
 
 from ropt.workflow.evaluators import (
-    EvaluatorFunctionContext,
-    EvaluatorFunctionResult,
+    EvaluationFunctionContext,
+    EvaluationFunctionResult,
     FunctionEvaluator,
 )
 
-_Function = Callable[[NDArray[np.float64], EvaluatorFunctionContext], float]
+_Function = Callable[[NDArray[np.float64], EvaluationFunctionContext], float]
 
 
 def pytest_addoption(parser: Any) -> Any:
@@ -43,7 +43,7 @@ def pytest_collection_modifyitems(config: Any, items: Sequence[Any]) -> None:
 
 def _compute_distance_squared(
     variables: NDArray[np.float64],
-    _: EvaluatorFunctionContext,
+    _: EvaluationFunctionContext,
     target: NDArray[np.float64],
 ) -> float:
     return float(((variables - target) ** 2).sum())
@@ -59,12 +59,12 @@ def fixture_test_functions() -> tuple[_Function, _Function]:
 
 def _function(
     variables: NDArray[np.float64],
-    context: EvaluatorFunctionContext,
+    context: EvaluationFunctionContext,
     *,
     objective_functions: list[_Function],
     constraint_functions: list[_Function] | None = None,
-) -> EvaluatorFunctionResult:
-    return EvaluatorFunctionResult(
+) -> EvaluationFunctionResult:
+    return EvaluationFunctionResult(
         objectives=np.fromiter(
             (func(variables, context) for func in objective_functions), dtype=np.float64
         ),

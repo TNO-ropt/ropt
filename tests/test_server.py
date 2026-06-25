@@ -11,9 +11,9 @@ import pytest
 from ropt.workflow._basic_optimizer import BasicOptimizer
 from ropt.workflow.evaluators import (
     AsyncEvaluator,
-    EvaluatorFunctionCallback,
-    EvaluatorFunctionContext,
-    EvaluatorFunctionResult,
+    EvaluationFunctionCallback,
+    EvaluationFunctionContext,
+    EvaluationFunctionResult,
 )
 from ropt.workflow.servers import (
     HPCServer,
@@ -222,15 +222,15 @@ def config_fixture() -> dict[str, Any]:
 
 def _opt_function(
     variables: NDArray[np.float64],
-    context: EvaluatorFunctionContext,
+    context: EvaluationFunctionContext,
     test_functions: Any,
     *,
     raise_error: bool = False,
-) -> EvaluatorFunctionResult:
+) -> EvaluationFunctionResult:
     if raise_error:
         msg = "Test error in function"
         raise ValueError(msg)
-    return EvaluatorFunctionResult(
+    return EvaluationFunctionResult(
         objectives=np.fromiter(
             (func(variables, context) for func in test_functions), dtype=np.float64
         )
@@ -240,7 +240,7 @@ def _opt_function(
 def _opt_workflow(
     server: Server,
     config: dict[str, Any],
-    test_function: EvaluatorFunctionCallback,
+    test_function: EvaluationFunctionCallback,
 ) -> FunctionResults | None:
     evaluator = AsyncEvaluator(function=test_function, server=server)
     optimizer = BasicOptimizer(config=config, evaluator=evaluator)

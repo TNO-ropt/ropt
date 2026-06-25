@@ -15,8 +15,8 @@ from ropt.workflow import BasicOptimizer
 from ropt.workflow.compute_steps import EvaluationStep, OptimizationStep
 from ropt.workflow.evaluators import (
     CachedEvaluator,
-    EvaluatorFunctionContext,
-    EvaluatorFunctionResult,
+    EvaluationFunctionContext,
+    EvaluationFunctionResult,
     FunctionEvaluator,
 )
 from ropt.workflow.event_handlers import CallbackHandler, HistoryHandler, ResultsHandler
@@ -76,13 +76,13 @@ def test_function_evaluator_with_info(
 
     def _function(
         variables: NDArray[np.float64],
-        context: EvaluatorFunctionContext,
+        context: EvaluationFunctionContext,
         *,
         test_functions: list[
-            Callable[[NDArray[np.float64], EvaluatorFunctionContext], float]
+            Callable[[NDArray[np.float64], EvaluationFunctionContext], float]
         ],
-    ) -> EvaluatorFunctionResult:
-        return EvaluatorFunctionResult(
+    ) -> EvaluationFunctionResult:
+        return EvaluationFunctionResult(
             objectives=np.fromiter(
                 (func(variables, context) for func in test_functions),
                 dtype=np.float64,
@@ -530,7 +530,7 @@ def test_nested_optimization(
     outer_result_handler = ResultsHandler()
 
     def _optimizer(
-        variables: NDArray[np.float64], context: EvaluatorFunctionContext
+        variables: NDArray[np.float64], context: EvaluationFunctionContext
     ) -> Any:
         new_variables = variables.copy()
         if context.perturbation < 0:
@@ -547,12 +547,12 @@ def test_nested_optimization(
                 variables=new_variables,
                 context=EnOptContext.model_validate(nested_config),
             )
-            return EvaluatorFunctionResult(
+            return EvaluationFunctionResult(
                 objectives=result_handler["results"].functions.objectives
             )
 
         new_variables[1] = outer_result_handler["results"].evaluations.variables[1]
-        return EvaluatorFunctionResult(
+        return EvaluationFunctionResult(
             objectives=np.fromiter(
                 (func(new_variables, context) for func in test_functions),
                 dtype=np.float64,

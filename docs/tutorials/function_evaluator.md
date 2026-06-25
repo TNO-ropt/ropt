@@ -36,8 +36,8 @@ from numpy.typing import NDArray
 from ropt.results import FunctionResults, Results
 from ropt.workflow import BasicOptimizer
 from ropt.workflow.evaluators import (
-    EvaluatorFunctionContext,
-    EvaluatorFunctionResult,
+    EvaluationFunctionContext,
+    EvaluationFunctionResult,
     FunctionEvaluator,
 )
 
@@ -54,9 +54,9 @@ UNCERTAINTY = 0.1
 
 Note that we import [`FunctionEvaluator`][ropt.workflow.evaluators.FunctionEvaluator]
 together with the helper types
-[`EvaluatorFunctionContext`][ropt.workflow.evaluators.EvaluatorFunctionContext]
+[`EvaluationFunctionContext`][ropt.workflow.evaluators.EvaluationFunctionContext]
 and
-[`EvaluatorFunctionResult`][ropt.workflow.evaluators.EvaluatorFunctionResult]
+[`EvaluationFunctionResult`][ropt.workflow.evaluators.EvaluationFunctionResult]
 instead of the batch evaluation types.
 
 
@@ -67,16 +67,16 @@ A **function callback** handles a single evaluation at a time:
 ```python
 def rosenbrock(
     variables: NDArray[np.float64],
-    context: EvaluatorFunctionContext,
+    context: EvaluationFunctionContext,
     a: NDArray[np.float64],
     b: NDArray[np.float64],
-) -> EvaluatorFunctionResult:
+) -> EvaluationFunctionResult:
     objective = 0.0
     for idx in range(DIM - 1):
         x, y = variables[idx : idx + 2]
         r = context.realization
         objective += (a[r] - x) ** 2 + b[r] * (y - x * x) ** 2
-    return EvaluatorFunctionResult(objectives=objective)
+    return EvaluationFunctionResult(objectives=objective)
 ```
 
 Key differences from the batch callback:
@@ -86,7 +86,7 @@ Key differences from the batch callback:
 - Additional metadata is available on `context`: `perturbation`, `batch_id`,
   and `eval_idx`
 - Returns an
-  [`EvaluatorFunctionResult`][ropt.workflow.evaluators.EvaluatorFunctionResult]
+  [`EvaluationFunctionResult`][ropt.workflow.evaluators.EvaluationFunctionResult]
   carrying the objective values (and optional constraints and
   `evaluation_info`) for this single evaluation
 
@@ -191,7 +191,7 @@ python function_evaluator.py --merge
 |--------|---------------|-------------------|
 | Input | 2-D array (all evaluations) | 1-D array (single evaluation) |
 | Realization | Via `context.realizations` | Via `context.realization` |
-| Return type | `EvaluationBatchResult` | `EvaluatorFunctionResult` |
+| Return type | `EvaluationBatchResult` | `EvaluationFunctionResult` |
 | Vectorization | Possible | Not applicable |
 | Simplicity | More complex | Simpler |
 | Best for | Performance-critical code | Prototyping, simple logic |

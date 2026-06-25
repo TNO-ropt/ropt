@@ -10,10 +10,10 @@ import numpy as np
 from ropt.evaluation import EvaluationBatchContext, EvaluationBatchResult
 
 from .base import (
+    EvaluationFunctionCallback,
+    EvaluationFunctionContext,
+    EvaluationFunctionResult,
     Evaluator,
-    EvaluatorFunctionCallback,
-    EvaluatorFunctionContext,
-    EvaluatorFunctionResult,
 )
 
 if TYPE_CHECKING:
@@ -34,7 +34,7 @@ class FunctionEvaluator(Evaluator):
     def __init__(
         self,
         *,
-        function: EvaluatorFunctionCallback,
+        function: EvaluationFunctionCallback,
     ) -> None:
         """Initialize the FunctionEvaluator.
 
@@ -91,7 +91,7 @@ class FunctionEvaluator(Evaluator):
                     eval_idx,
                     self._function(
                         variables[eval_idx, :],
-                        EvaluatorFunctionContext(
+                        EvaluationFunctionContext(
                             realization=int(realization),
                             perturbation=perturbation,
                             batch_id=batch_id,
@@ -113,7 +113,7 @@ class FunctionEvaluator(Evaluator):
 
 def _handle_result(  # noqa: PLR0913, PLR0917
     eval_idx: int,
-    result: EvaluatorFunctionResult,
+    result: EvaluationFunctionResult,
     results: NDArray[np.float64],
     evaluation_info: dict[str, NDArray[Any]],
     objective_count: int,

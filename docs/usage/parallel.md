@@ -46,7 +46,7 @@ Constructor parameters:
 | `get_name`   | Optional callable to generate a name for each task.                  |
 
 The `get_name` callable, if provided, is called with an
-[`EvaluatorFunctionContext`][ropt.workflow.evaluators.EvaluatorFunctionContext]
+[`EvaluationFunctionContext`][ropt.workflow.evaluators.EvaluationFunctionContext]
 object and should return a string. When using the `HPCServer`, names also
 serve as task identifiers and must be unique within a batch.
 

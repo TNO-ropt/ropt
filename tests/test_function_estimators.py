@@ -9,7 +9,7 @@ from ropt.config._function_estimator_config import FunctionEstimatorConfig
 from ropt.context import EnOptContext
 from ropt.function_estimator import FunctionEstimator
 from ropt.workflow import BasicOptimizer
-from ropt.workflow.evaluators import EvaluatorFunctionContext
+from ropt.workflow.evaluators import EvaluationFunctionContext
 
 initial_values = 3 * [0]
 
@@ -76,7 +76,7 @@ def test_mean_stddev_function_estimator(
 
 def _compute_distance_squared_stddev(
     variables: NDArray[np.float64],
-    context: EvaluatorFunctionContext,
+    context: EvaluationFunctionContext,
     target: NDArray[np.float64],
 ) -> float:
     # To test the stddev estimator, abuse it to minimize our standard test
