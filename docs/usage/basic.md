@@ -73,8 +73,8 @@ print(f"Optimal objective: {optimizer.results.functions.target_objective}\n")
 
 !!! tip "Tutorials"
     For step-by-step examples using `BasicOptimizer`, see the
-    [Stochastic Optimization](../tutorials/rosenbrock_basic.md) and
-    [Constrained Optimization](../tutorials/rosenbrock_constrained.md)
+    [Ensemble-based Optimization](../tutorials/ensemble.md) and
+    [Constrained Optimization](../tutorials/constrained.md)
     tutorials.
 
 ## The objective function
@@ -252,4 +252,4 @@ required constructor arguments.
   [Working with Results](results.md).
 - Move beyond a single optimization run:
   [Optimization Workflows](workflows.md).
-- Full runnable variants of this example: [examples/rosenbrock.py](https://github.com/TNO-ropt/ropt/blob/main/examples/rosenbrock.py)
+- Full runnable variants of this example: [examples/ensemble.py](https://github.com/TNO-ropt/ropt/blob/main/examples/ensemble.py)

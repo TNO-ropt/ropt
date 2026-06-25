@@ -9,7 +9,7 @@ threading or multiprocessing.
 This script has the following options:
 
 ```
-usage: rosenbrock_async.py [-h] [-m] [-d DELAY] [-w WORKERS] [-o OPTIMIZATIONS]
+usage: async_evaluator.py [-h] [-m] [-d DELAY] [-w WORKERS] [-o OPTIMIZATIONS]
 
 options:
   -h, --help            show this help message and exit

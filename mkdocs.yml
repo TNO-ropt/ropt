@@ -111,11 +111,11 @@ nav:
       - "Parallel Evaluation": usage/parallel.md
   - "Tutorials":
       - "Overview": tutorials/index.md
-      - "Deterministic Optimization": tutorials/rosenbrock_deterministic.md
-      - "Stochastic Optimization": tutorials/rosenbrock_basic.md
-      - "Function Evaluator": tutorials/rosenbrock_function.md
-      - "Workflow Framework": tutorials/rosenbrock_workflow.md
-      - "Constrained Optimization": tutorials/rosenbrock_constrained.md
+      - "Deterministic Optimization": tutorials/deterministic.md
+      - "Ensemble-based Optimization": tutorials/ensemble.md
+      - "Using FunctionEvaluator": tutorials/function_evaluator.md
+      - "Using the Workflow Framework": tutorials/workflow.md
+      - "Constrained Optimization": tutorials/constrained.md
   - "Reference":
       - "Configuration":
         - "Context Class": reference/context.md

@@ -7,7 +7,7 @@ directly.
 
 !!! tip "Source Code"
     The complete source code for this tutorial is available at
-    [examples/rosenbrock_function.py](https://github.com/TNO-ropt/ropt/blob/main/examples/rosenbrock_function.py).
+    [examples/function_evaluator.py](https://github.com/TNO-ropt/ropt/blob/main/examples/function_evaluator.py).
 
 
 ## When to Use FunctionEvaluator
@@ -178,10 +178,10 @@ if __name__ == "__main__":
 
 ```bash
 # Default: 10 realizations with 5 perturbations
-python rosenbrock_function.py
+python function_evaluator.py
 
 # Use merged realizations
-python rosenbrock_function.py --merge
+python function_evaluator.py --merge
 ```
 
 
@@ -199,9 +199,9 @@ python rosenbrock_function.py --merge
 
 ## Next Steps
 
-- [Basic Optimization Tutorial](rosenbrock_basic.md) — Use batch callbacks for
+- [Ensemble-based Optimization](ensemble.md) — Use batch callbacks for
   better performance
-- [Workflow Tutorial](rosenbrock_workflow.md) — Use the workflow framework for
+- [Using the Workflow Framework](workflow.md) — Use the workflow framework for
   more control
 - [Writing Evaluation Callbacks](../usage/evaluation_callbacks.md) — Detailed
   reference on evaluation callbacks and `FunctionEvaluator`

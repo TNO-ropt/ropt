@@ -7,7 +7,7 @@ control and flexibility compared to
 
 !!! tip "Source Code"
     The complete source code for this tutorial is available at
-    [examples/rosenbrock_workflow.py](https://github.com/TNO-ropt/ropt/blob/main/examples/rosenbrock_workflow.py).
+    [examples/workflow.py](https://github.com/TNO-ropt/ropt/blob/main/examples/workflow.py).
 
 
 ## When to Use the Workflow Framework
@@ -207,10 +207,10 @@ if __name__ == "__main__":
 
 ```bash
 # Default: 10 realizations with 5 perturbations
-python rosenbrock_workflow.py
+python workflow.py
 
 # Use merged realizations
-python rosenbrock_workflow.py --merge
+python workflow.py --merge
 ```
 
 
@@ -227,9 +227,9 @@ python rosenbrock_workflow.py --merge
 
 ## Next Steps
 
-- [Basic Optimization Tutorial](rosenbrock_basic.md) — Use BasicOptimizer for
+- [Ensemble-based Optimization](ensemble.md) — Use BasicOptimizer for
   simpler setup
-- [Function Evaluator Tutorial](rosenbrock_function.md) — Use per-evaluation
+- [Using FunctionEvaluator](function_evaluator.md) — Use per-evaluation
   callbacks
 - [Optimization Workflows](../usage/workflows.md) — Full reference on the
   workflow framework, event handlers, and evaluators

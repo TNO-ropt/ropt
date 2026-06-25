@@ -6,7 +6,7 @@ constraints and linear constraints.
 
 !!! tip "Source Code"
     The complete source code for this tutorial is available at
-    [examples/rosenbrock_constrained.py](https://github.com/TNO-ropt/ropt/blob/main/examples/rosenbrock_constrained.py).
+    [examples/constrained.py](https://github.com/TNO-ropt/ropt/blob/main/examples/constrained.py).
 
 
 ## Types of Constraints
@@ -32,7 +32,7 @@ constraints and linear constraints.
 
 ## The constrained Rosenbrock function
 
-This tutorial extends the [stochastic Rosenbrock example](rosenbrock_basic.md) by adding non-linear and linear constraints. The non-linear constraint is a function of the first two variables:
+This tutorial extends the [stochastic Rosenbrock example](ensemble.md) by adding non-linear and linear constraints. The non-linear constraint is a function of the first two variables:
 
 $$
 (x_1 - a)^3 - x_2 + 1 \le 0
@@ -265,7 +265,7 @@ and $b_u$ are vectors of length one: $0 \leq x_4 - x_5 \leq 0$, equivalent to $x
 
 ```python
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser("python rosenbrock_constrained.py")
+    parser = argparse.ArgumentParser("python constrained.py")
     parser.add_argument(
         "--linear",
         action="store_true",
@@ -280,10 +280,10 @@ if __name__ == "__main__":
 
 ```bash
 # With nonlinear constraint only
-python rosenbrock_constrained.py
+python constrained.py
 
 # With both nonlinear and linear constraints
-python rosenbrock_constrained.py --linear
+python constrained.py --linear
 ```
 
 ## Summary

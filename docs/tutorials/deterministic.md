@@ -1,4 +1,4 @@
-# Deterministic Rosenbrock Optimization
+# Deterministic Optimization
 
 This tutorial demonstrates optimization of the classic multi-dimensional
 Rosenbrock function using [`BasicOptimizer`][ropt.workflow.BasicOptimizer]. This
@@ -6,7 +6,7 @@ is the simplest possible optimization example in `ropt`.
 
 !!! tip "Source Code"
     The complete source code for this tutorial is available at
-    [examples/rosenbrock_deterministic.py](https://github.com/TNO-ropt/ropt/blob/main/examples/rosenbrock_deterministic.py).
+    [examples/deterministic.py](https://github.com/TNO-ropt/ropt/blob/main/examples/deterministic.py).
 
 
 ## The Rosenbrock Function
@@ -134,7 +134,7 @@ if __name__ == "__main__":
 ## Running the Example
 
 ```bash
-python rosenbrock_deterministic.py
+python deterministic.py
 ```
 
 The optimizer finds variables near $(1, 1, 1, 1, 1)$ with an objective value
@@ -143,8 +143,8 @@ near $0$.
 
 ## Next Steps
 
-- [Stochastic Optimization](rosenbrock_basic.md) — Add uncertainty to the
+- [Ensemble-based Optimization](ensemble.md) — Add uncertainty to the
   problem with multiple realizations
-- [Function Evaluator](rosenbrock_function.md) — Use per-evaluation callbacks
-- [Workflow Framework](rosenbrock_workflow.md) — Use the workflow framework for
+- [Using FunctionEvaluator](function_evaluator.md) — Use per-evaluation callbacks
+- [Using the Workflow Framework](workflow.md) — Use the workflow framework for
   more control

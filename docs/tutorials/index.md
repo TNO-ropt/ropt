@@ -10,26 +10,26 @@ These tutorials demonstrate optimization of the multi-dimensional Rosenbrock
 function, progressing from a simple deterministic case to stochastic
 optimization with different implementation approaches:
 
-- **[Deterministic Optimization](rosenbrock_deterministic.md)** — The simplest
+- **[Deterministic Optimization](deterministic.md)** — The simplest
   example: optimizing the classic Rosenbrock function with fixed parameters.
   Start here to understand the basics.
 
-- **[Stochastic Optimization](rosenbrock_basic.md)** — Introduces uncertainty
+- **[Ensemble-based Optimization](ensemble.md)** — Introduces uncertainty
   by sampling parameters across multiple realizations. Uses
   [`BasicOptimizer`][ropt.workflow.BasicOptimizer] with a batch evaluation
   callback.
 
-- **[Function Evaluator](rosenbrock_function.md)** — Using
+- **[Using FunctionEvaluator](function_evaluator.md)** — Using
   [`FunctionEvaluator`][ropt.workflow.evaluators.FunctionEvaluator] with a
   per-evaluation function callback. This approach is simpler to write when you
   don't need to handle batches.
 
-- **[Workflow Framework](rosenbrock_workflow.md)** — Using the workflow
+- **[Using the Workflow Framework](workflow.md)** — Using the workflow
   framework directly with
   [`OptimizationStep`][ropt.workflow.compute_steps.OptimizationStep]. This
   approach offers more control and flexibility for complex workflows.
 
-- **[Constrained Optimization](rosenbrock_constrained.md)** — Adding linear
+- **[Constrained Optimization](constrained.md)** — Adding linear
   and nonlinear constraints to the optimization problem.
 
 ## Prerequisites

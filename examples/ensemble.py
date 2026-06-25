@@ -1,4 +1,4 @@
-"""Example of optimization of a multi-dimensional Rosenbrock test function.
+"""Ensemble optimization of a multi-dimensional Rosenbrock test function.
 
 This example demonstrates optimization of the a modified multi-dimensional
 Rosenbrock function that exhibits uncertainty in its parameters. It shows how to

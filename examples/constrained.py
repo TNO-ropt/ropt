@@ -138,7 +138,7 @@ def main(*, linear: bool = False) -> None:
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser("python rosenbrock_constrained.py")
+    parser = argparse.ArgumentParser("python constrained.py")
     parser.add_argument(
         "--linear",
         action="store_true",

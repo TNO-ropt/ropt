@@ -78,4 +78,4 @@ Three pieces of information drive every `ropt` optimization:
 - Writing more advanced evaluation callbacks (per-realization data, partial failures):
   [Writing Evaluation Callbacks](evaluation_callbacks.md).
 - Full runnable example:
-  [examples/rosenbrock_deterministic.py](https://github.com/TNO-ropt/ropt/blob/main/examples/rosenbrock_deterministic.py).
+  [examples/deterministic.py](https://github.com/TNO-ropt/ropt/blob/main/examples/deterministic.py).

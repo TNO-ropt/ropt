@@ -18,57 +18,86 @@ def _load_from_file(name: str, sub_path: str | None = None) -> Any:
     return module
 
 
-def test_rosenbrock_deterministic(tmp_path: Path, monkeypatch: Any) -> None:
+def test_example_deterministic(tmp_path: Path, monkeypatch: Any) -> None:
     monkeypatch.chdir(tmp_path)
-    module = _load_from_file("rosenbrock_deterministic")
+    module = _load_from_file("deterministic")
     module.main()
 
 
 @pytest.mark.parametrize("merge", [True, False])
-def test_rosenbrock_basic(tmp_path: Path, monkeypatch: Any, merge: Any) -> None:
+def test_example_ensemble(tmp_path: Path, monkeypatch: Any, merge: Any) -> None:
     monkeypatch.chdir(tmp_path)
-    module = _load_from_file("rosenbrock_basic")
+    module = _load_from_file("ensemble")
     module.main(merge=merge)
 
 
 @pytest.mark.parametrize("merge", [True, False])
-def test_rosenbrock_function(tmp_path: Path, monkeypatch: Any, merge: Any) -> None:
+def test_example_function_evaluator(
+    tmp_path: Path, monkeypatch: Any, merge: Any
+) -> None:
     monkeypatch.chdir(tmp_path)
-    module = _load_from_file("rosenbrock_function")
+    module = _load_from_file("function_evaluator")
     module.main(merge=merge)
 
 
 @pytest.mark.parametrize("merge", [True, False])
-def test_rosenbrock_workflow(tmp_path: Path, monkeypatch: Any, merge: Any) -> None:
+def test_example_workflow(tmp_path: Path, monkeypatch: Any, merge: Any) -> None:
     monkeypatch.chdir(tmp_path)
-    module = _load_from_file("rosenbrock_workflow")
+    module = _load_from_file("workflow")
     module.main(merge=merge)
 
 
 @pytest.mark.parametrize("linear", [True, False])
-def test_rosenbrock_constrained(tmp_path: Path, monkeypatch: Any, linear: Any) -> None:
+def test_example_constrained(tmp_path: Path, monkeypatch: Any, linear: Any) -> None:
     monkeypatch.chdir(tmp_path)
-    module = _load_from_file("rosenbrock_constrained")
+    module = _load_from_file("constrained")
     module.main(linear=linear)
 
 
 @pytest.mark.slow
 @pytest.mark.asyncio
 @pytest.mark.parametrize("multiprocessing", [True, False])
-async def test_rosenbrock_async(
+async def test_example_async_evaluator(
     tmp_path: Path, monkeypatch: Any, multiprocessing: Any
 ) -> None:
     monkeypatch.chdir(tmp_path)
 
     # We need to do an explicit import, otherwise we get pickling errors:
     monkeypatch.syspath_prepend(Path(__file__).parent.parent / "examples")
-    import rosenbrock_async  # type: ignore[import-not-found] # noqa: PLC0415
+    import async_evaluator  # type: ignore[import-not-found] # noqa: PLC0415
 
-    await rosenbrock_async.main(multiprocessing=multiprocessing)
+    await async_evaluator.main(multiprocessing=multiprocessing)
+
+
+@pytest.mark.slow
+def test_example_discrete(tmp_path: Path, monkeypatch: Any) -> None:
+    monkeypatch.chdir(tmp_path)
+    module = _load_from_file("discrete")
+    module.main()
+
+
+@pytest.mark.slow
+def test_example_nested(tmp_path: Path, monkeypatch: Any) -> None:
+    monkeypatch.chdir(tmp_path)
+    module = _load_from_file("nested")
+    module.main()
+
+
+@pytest.mark.slow
+def test_example_nested_multiprocess(tmp_path: Path, monkeypatch: Any) -> None:
+    monkeypatch.chdir(tmp_path)
+
+    # We need to do an explicit import, otherwise we get pickling errors:
+    monkeypatch.syspath_prepend(Path(__file__).parent.parent / "examples")
+    import nested_multiprocess  # type: ignore[import-not-found] # noqa: PLC0415
+
+    nested_multiprocess.main()
 
 
 @pytest.mark.parametrize("linear", [True, False])
-def test_differential_evolution(tmp_path: Path, monkeypatch: Any, linear: Any) -> None:
+def test_example_differential_evolution(
+    tmp_path: Path, monkeypatch: Any, linear: Any
+) -> None:
     monkeypatch.chdir(tmp_path)
     module = _load_from_file("differential_evolution")
     module.main(linear=linear)

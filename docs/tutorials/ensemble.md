@@ -1,18 +1,18 @@
-# Stochastic Rosenbrock Optimization
+# Ensemble-based Optimization
 
-This tutorial extends the [deterministic Rosenbrock example](rosenbrock_deterministic.md)
+This tutorial extends the [deterministic example](deterministic.md)
 by introducing **uncertainty** in the function parameters. It demonstrates
 ensemble-based optimization using [`BasicOptimizer`][ropt.workflow.BasicOptimizer]
 with a batch evaluation callback.
 
 !!! tip "Source Code"
     The complete source code for this tutorial is available at
-    [examples/rosenbrock_basic.py](https://github.com/TNO-ropt/ropt/blob/main/examples/rosenbrock_basic.py).
+    [examples/ensemble.py](https://github.com/TNO-ropt/ropt/blob/main/examples/ensemble.py).
 
 
 ## Adding Uncertainty
 
-In the [deterministic tutorial](rosenbrock_deterministic.md), we used fixed
+In the [deterministic tutorial](deterministic.md), we used fixed
 parameters $a = 1$ and $b = 100$. Here, we introduce **uncertainty** by sampling
 these parameters from normal distributions for each realization:
 
@@ -193,10 +193,10 @@ if __name__ == "__main__":
 
 ```bash
 # Default: 10 realizations with 5 perturbations
-python rosenbrock_basic.py
+python ensemble.py
 
 # Use merged realizations: 50 realizations with 1 perturbation
-python rosenbrock_basic.py --merge
+python ensemble.py --merge
 ```
 
 Both variants produce optimal variables near $(1, 1, 1, 1, 1)$ with an objective
@@ -205,9 +205,9 @@ value near $0$.
 
 ## Next Steps
 
-- [Function Evaluator Tutorial](rosenbrock_function.md) — Use a simpler
+- [Function Evaluator Tutorial](function_evaluator.md) — Use a simpler
   per-evaluation callback
-- [Workflow Tutorial](rosenbrock_workflow.md) — Use the workflow framework for
+- [Workflow Tutorial](workflow.md) — Use the workflow framework for
   more control
 - [Basic Optimization](../usage/basic.md) — Detailed explanation of
   `BasicOptimizer` and its API
