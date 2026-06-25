@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from dataclasses import replace
 from typing import TYPE_CHECKING, Final
 
 import numpy as np
@@ -29,6 +30,12 @@ class CachedEvaluator(Evaluator):
     details on cache matching, realization name handling, and source
     management.
     """
+
+    # NOTE: A single instance of this class may be used from different threads.
+    # `eval_cached` takes a snapshot of `self._sources` at entry so concurrent
+    # `add_sources` calls cannot perturb the iteration. The wrapped evaluator
+    # and the `EventHandler` sources must themselves be safe to share across
+    # threads for this class to be thread-safe end-to-end.
 
     def __init__(
         self,
@@ -79,12 +86,13 @@ class CachedEvaluator(Evaluator):
         """
         cached: dict[int, tuple[int, FunctionResults]] = {}
 
+        sources = tuple(self._sources)
         names = evaluator_context.context.names.get("realization")
         for idx in range(variables.shape[0]):
             realization_index = evaluator_context.realizations[idx]
             realization_name = names[realization_index] if names is not None else None
             results, cached_realization_index = _get_from_cache(
-                self._sources,
+                sources,
                 variables[idx, :],
                 realization_index,
                 realization_name,
@@ -92,8 +100,10 @@ class CachedEvaluator(Evaluator):
             if results is not None:
                 cached[idx] = (cached_realization_index, results)
 
-        if cached:
-            evaluator_context.active[list(cached.keys())] = False
+        if cached:  # Modify `active` in a thread-safe manner
+            active = evaluator_context.active.copy()
+            active[list(cached.keys())] = False
+            evaluator_context = replace(evaluator_context, active=active)
 
         evaluator_result = self._evaluator.eval(variables, evaluator_context)
 

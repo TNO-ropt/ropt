@@ -52,6 +52,7 @@ def test_rosenbrock_constrained(tmp_path: Path, monkeypatch: Any, linear: Any) -
     module.main(linear=linear)
 
 
+@pytest.mark.slow
 @pytest.mark.asyncio
 @pytest.mark.parametrize("multiprocessing", [True, False])
 async def test_rosenbrock_async(

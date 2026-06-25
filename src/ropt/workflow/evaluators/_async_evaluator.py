@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import queue
+import threading
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
@@ -34,6 +35,12 @@ class AsyncEvaluator(Evaluator):
     details on how this integrates with the asyncio event loop.
     """
 
+    # NOTE: A single instance of this class might be used from different
+    # threads, if it is shared by different optimizers running in different
+    # threads. The server is expected to be thread-safe, and the results queue
+    # is thread-safe, so this should be safe. The batch ID is protected by a
+    # lock.
+
     def __init__(
         self,
         *,
@@ -54,8 +61,19 @@ class AsyncEvaluator(Evaluator):
         self._function = function
         self._server = server
         self._queue_size = queue_size
-        self._batch_id = -1
+        self._batch_id = 0
+        self._batch_lock = threading.Lock()
         self._get_name = get_name
+
+    def __getstate__(self) -> dict[str, Any]:
+        # threading.Lock is not picklable; drop it and recreate in __setstate__.
+        state = self.__dict__.copy()
+        state.pop("_batch_lock", None)
+        return state
+
+    def __setstate__(self, state: dict[str, Any]) -> None:
+        self.__dict__.update(state)
+        self._batch_lock = threading.Lock()
 
     def eval(
         self, variables: NDArray[np.float64], evaluator_context: EvaluationBatchContext
@@ -75,7 +93,9 @@ class AsyncEvaluator(Evaluator):
         if not self._server.is_running():
             raise Abort(ExitCode.ABORT_FROM_ERROR)
 
-        self._batch_id += 1
+        with self._batch_lock:
+            batch_id = self._batch_id
+            self._batch_id += 1
 
         no = evaluator_context.context.objectives.weights.size
         nc = (
@@ -88,7 +108,7 @@ class AsyncEvaluator(Evaluator):
         if self._server.loop is not None and self._server.task_group is not None:
             self._server.loop.call_soon_threadsafe(
                 self._server.task_group.create_task,
-                self._put_tasks(variables, evaluator_context, results_queue),
+                self._put_tasks(variables, evaluator_context, results_queue, batch_id),
             )
 
         results = np.zeros((variables.shape[0], no + nc), dtype=np.float64)
@@ -113,7 +133,7 @@ class AsyncEvaluator(Evaluator):
                 raise Abort(ExitCode.ABORT_FROM_ERROR)
 
         return EvaluationBatchResult(
-            batch_id=self._batch_id,
+            batch_id=batch_id,
             objectives=results[:, :no],
             constraints=results[:, no:] if nc > 0 else None,
             evaluation_info=evaluation_info,
@@ -124,6 +144,7 @@ class AsyncEvaluator(Evaluator):
         variables: NDArray[np.float64],
         context: EvaluationBatchContext,
         results_queue: ResultsQueue,
+        batch_id: int,
     ) -> None:
         try:
             for eval_idx, realization in enumerate(context.realizations):
@@ -131,7 +152,12 @@ class AsyncEvaluator(Evaluator):
                     context.active is None or context.active[eval_idx]
                 ):
                     task = self._get_task(
-                        variables, context, results_queue, eval_idx, int(realization)
+                        variables,
+                        context,
+                        results_queue,
+                        eval_idx,
+                        int(realization),
+                        batch_id,
                     )
                     await self._server.task_queue.put(task)
         except Exception:
@@ -142,13 +168,14 @@ class AsyncEvaluator(Evaluator):
         if not self._server.is_running():
             raise Abort(ExitCode.ABORT_FROM_ERROR)
 
-    def _get_task(
+    def _get_task(  # noqa: PLR0913, PLR0917
         self,
         variables: NDArray[np.float64],
         context: EvaluationBatchContext,
         results_queue: ResultsQueue,
         eval_idx: int,
         realization: int,
+        batch_id: int,
     ) -> Task:
         perturbation = (
             -1
@@ -158,16 +185,14 @@ class AsyncEvaluator(Evaluator):
         task_name = (
             None
             if self._get_name is None
-            else self._get_name(realization, perturbation, self._batch_id, eval_idx)
+            else self._get_name(realization, perturbation, batch_id, eval_idx)
         )
         return Task(
             results_queue=results_queue,
             function=self._function,
             args=(
                 variables[eval_idx, :],
-                EvaluatorFunctionContext(
-                    realization, perturbation, self._batch_id, eval_idx
-                ),
+                EvaluatorFunctionContext(realization, perturbation, batch_id, eval_idx),
             ),
             name=task_name,
         )

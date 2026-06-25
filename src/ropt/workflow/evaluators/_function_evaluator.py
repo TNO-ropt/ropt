@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import threading
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
@@ -26,6 +27,10 @@ class FunctionEvaluator(Evaluator):
     objective and constraint.
     """
 
+    # NOTE: A single instance of this class may be used from different threads,
+    # e.g. if it is shared by optimizers running in different threads. The
+    # batch ID is protected by a lock.
+
     def __init__(
         self,
         *,
@@ -38,7 +43,18 @@ class FunctionEvaluator(Evaluator):
         """
         super().__init__()
         self._function = function
-        self._batch_id = -1
+        self._batch_id = 0
+        self._batch_lock = threading.Lock()
+
+    def __getstate__(self) -> dict[str, Any]:
+        # threading.Lock is not picklable; drop it and recreate in __setstate__.
+        state = self.__dict__.copy()
+        state.pop("_batch_lock", None)
+        return state
+
+    def __setstate__(self, state: dict[str, Any]) -> None:
+        self.__dict__.update(state)
+        self._batch_lock = threading.Lock()
 
     def eval(
         self, variables: NDArray[np.float64], evaluator_context: EvaluationBatchContext
@@ -52,7 +68,9 @@ class FunctionEvaluator(Evaluator):
         Returns:
             The result of calling the wrapped evaluator function.
         """
-        self._batch_id += 1
+        with self._batch_lock:
+            batch_id = self._batch_id
+            self._batch_id += 1
         no = evaluator_context.context.objectives.weights.size
         nc = (
             0
@@ -76,7 +94,7 @@ class FunctionEvaluator(Evaluator):
                         EvaluatorFunctionContext(
                             realization=int(realization),
                             perturbation=perturbation,
-                            batch_id=self._batch_id,
+                            batch_id=batch_id,
                             eval_idx=eval_idx,
                         ),
                     ),
@@ -86,7 +104,7 @@ class FunctionEvaluator(Evaluator):
                     variables.shape[0],
                 )
         return EvaluationBatchResult(
-            batch_id=self._batch_id,
+            batch_id=batch_id,
             objectives=results[:, :no],
             constraints=results[:, no:] if nc > 0 else None,
             evaluation_info=evaluation_info,

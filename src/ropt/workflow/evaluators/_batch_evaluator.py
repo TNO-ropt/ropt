@@ -20,6 +20,11 @@ if TYPE_CHECKING:
 class BatchEvaluator(Evaluator):
     """An evaluator that defers to a callable callback."""
 
+    # NOTE: This class is a thin pass-through to `callback`. A single instance
+    # may be used from multiple threads, but the wrapped callback must itself
+    # be safe to call concurrently for this class to be thread-safe
+    # end-to-end.
+
     def __init__(self, *, callback: EvaluationBatchCallback) -> None:
         """Initialize the BatchEvaluator.
 
