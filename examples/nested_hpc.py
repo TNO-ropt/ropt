@@ -64,6 +64,9 @@ OUTER_CONFIG: dict[str, Any] = {
 INITIAL_VALUES = [1.0, 1.0, 1.0, 1.0]
 UNCERTAINTY = 0.1
 
+THREAD_WORKERS = 2
+HPC_WORKERS = 2
+
 
 def _task_name(context: EvaluationFunctionContext) -> str:
     return f"inner-b{context.batch_id}-r{context.realization}-p{context.perturbation}"
@@ -106,9 +109,13 @@ def report(event: EnOptEvent) -> None:
                 str(w) for w in item.evaluations.evaluation_info.get("worker", [])
             }
             thread = item.metadata.get("thread")
-            print(f"batch: {item.batch_id}  thread: {thread}  jobs: {workers}")
-            print(f"  variables: {item.evaluations.variables}")
-            print(f"  objective: {item.functions.target_objective}\n")
+            msg = (
+                f"batch: {item.batch_id}  thread: {thread}  jobs: {workers}\n"
+                f"  variables: {item.evaluations.variables}\n"
+                f"  objective: {item.functions.target_objective}\n\n"
+            )
+            # Single msg with flush to prevent interleaving from threads:
+            print(msg, end="", flush=True)
 
 
 def main(*, hpc_workdir: Path) -> None:
@@ -127,7 +134,7 @@ def main(*, hpc_workdir: Path) -> None:
     # Inner evaluator: each task becomes a queued HPC job named via
     # `_task_name`. The same name is recovered inside `rosenbrock` from the
     # evaluation context, so identifiers always line up with the queue.
-    inner_server = HPCServer(workdir=hpc_workdir, workers=2)
+    inner_server = HPCServer(workdir=hpc_workdir, workers=HPC_WORKERS)
     inner_evaluator = AsyncEvaluator(
         function=partial(rosenbrock, a=a, b=b),
         server=inner_server,
@@ -169,7 +176,7 @@ def main(*, hpc_workdir: Path) -> None:
     # Outer evaluator: thread pool so multiple inner optimizations are in
     # flight at once. Cached so repeated discrete-variable combinations are
     # not re-submitted to the queue.
-    outer_server = ThreadingServer(workers=2)
+    outer_server = ThreadingServer(workers=THREAD_WORKERS)
     outer_evaluator = AsyncEvaluator(function=_optimize, server=outer_server)
     history = HistoryHandler()
     cache = CachedEvaluator(
@@ -194,20 +201,19 @@ def main(*, hpc_workdir: Path) -> None:
     optimal_result = global_results["results"]
     assert optimal_result is not None
     assert optimal_result.functions is not None
-    print(f"Optimal batch: {optimal_result.batch_id}")
-    print(f"Optimal variables: {optimal_result.evaluations.variables}")
-    print(f"Optimal objective: {optimal_result.functions.target_objective}\n")
+    print(f"Optimal batch: {optimal_result.batch_id}", flush=True)
+    print(f"Optimal variables: {optimal_result.evaluations.variables}", flush=True)
+    print(
+        f"Optimal objective: {optimal_result.functions.target_objective}\n", flush=True
+    )
     assert np.allclose(optimal_result.functions.target_objective, 0, atol=1e-1)
     assert np.allclose(optimal_result.evaluations.variables, [1, 2, 3, 4], atol=1e-1)
 
 
 if __name__ == "__main__":
 
-    def _existing_absolute_dir(value: str) -> Path:
-        path = Path(value).expanduser()
-        if not path.is_absolute():
-            msg = f"path must be absolute: {value}"
-            raise argparse.ArgumentTypeError(msg)
+    def _existing_dir_dir(value: str) -> Path:
+        path = Path(value).expanduser().resolve()
         if not path.is_dir():
             msg = f"directory does not exist: {value}"
             raise argparse.ArgumentTypeError(msg)
@@ -216,7 +222,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser("python nested_hpc.py")
     parser.add_argument(
         "workdir",
-        type=_existing_absolute_dir,
+        type=_existing_dir_dir,
         help="shared-filesystem directory for HPCServer I/O (must exist)",
     )
     args = parser.parse_args()

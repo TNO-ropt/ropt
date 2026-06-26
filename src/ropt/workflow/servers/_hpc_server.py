@@ -3,7 +3,10 @@
 from __future__ import annotations
 
 import asyncio
+import contextlib
+import os
 import sysconfig
+import tempfile
 from collections import ChainMap
 from importlib.util import find_spec
 from pathlib import Path
@@ -51,6 +54,8 @@ class HPCServer(ServerBase):
         cluster: str | None = None,
         queue: str | None = None,
         cores: int = 1,
+        retries: int = 30,
+        cleanup: bool = True,
     ) -> None:
         """Initialize the HPC server.
 
@@ -68,6 +73,8 @@ class HPCServer(ServerBase):
             cluster:     Optional cluster name.
             queue:       Optional queue/partition name.
             cores:       CPUs per task.
+            retries:     Number of polling retries before declaring a task failed.
+            cleanup:     Whether to remove task files after result retrieval.
 
         Raises:
             RuntimeError: If neither a `template` is provided nor a valid
@@ -85,6 +92,8 @@ class HPCServer(ServerBase):
         self._interval = interval
         self._queue = queue
         self._cores = cores
+        self._retries_limit = retries
+        self._cleanup = cleanup
         self._worker_task: asyncio.Task[None] | None = None
 
         self._template = template
@@ -151,8 +160,17 @@ class HPCServer(ServerBase):
         self._tasks[task_id] = task
         input_file = self._workdir / f"{task_id}.in"
         output_file = self._workdir / f"{task_id}.out"
-        with input_file.open("wb") as fp:
-            cloudpickle.dump((task.function, task.args, task.kwargs), fp)
+        tmp_fd, tmp_path_str = tempfile.mkstemp(dir=self._workdir)
+        tmp_path = Path(tmp_path_str)
+        try:
+            with os.fdopen(tmp_fd, "wb") as fp:
+                cloudpickle.dump((task.function, task.args, task.kwargs), fp)
+                fp.flush()
+                os.fsync(fp.fileno())
+            tmp_path.rename(input_file)
+        except BaseException:
+            tmp_path.unlink(missing_ok=True)
+            raise
         self._jobs[task_id] = self._queue_adapter.submit_job(
             job_name=task_id,
             output=f"{task_id}.txt",
@@ -163,25 +181,35 @@ class HPCServer(ServerBase):
             cores=self._cores,
         )
 
-    def _poll(self, retries: int = 2) -> None:
-        jobs = self._queue_adapter.get_status_of_my_jobs()["jobid"].values
-        for task_id in self._tasks:
-            if self._jobs[task_id] in jobs:
+    def _poll(self) -> None:
+        try:
+            jobs = self._queue_adapter.get_status_of_my_jobs()["jobid"].values
+        except Exception:  # noqa: BLE001
+            return
+        for task_id in list(self._tasks):
+            if self._jobs.get(task_id) is None or self._jobs[task_id] in jobs:
                 continue
             output_file = self._workdir / f"{task_id}.out"
             try:
-                if output_file.stat().st_size > 0:
-                    with output_file.open("rb") as fp:
-                        self._results[task_id] = cloudpickle.load(fp)
-                    self._retries.pop(task_id, None)
-                    del self._jobs[task_id]
-            except (OSError, EOFError, UnpicklingError):
-                if self._retries.get(task_id, 0) >= retries:
-                    self._retries.pop(task_id, None)
-                    del self._jobs[task_id]
-                    msg = f"No result found for task {task_id}, it did not run"
-                    self._results[task_id] = ServerFailure(msg)
+                with output_file.open("rb") as fp:
+                    self._results[task_id] = cloudpickle.load(fp)
+                self._retries.pop(task_id, None)
+                del self._jobs[task_id]
+            except FileNotFoundError:
                 self._retries[task_id] = self._retries.get(task_id, 0) + 1
+                if self._retries[task_id] >= self._retries_limit:
+                    self._retries.pop(task_id, None)
+                    del self._jobs[task_id]
+                    msg = f"Output file for task {task_id} never appeared"
+                    self._results[task_id] = ServerFailure(msg)
+            except (OSError, EOFError, UnpicklingError):
+                retry_count = self._retries.get(task_id, 0) + 1
+                self._retries[task_id] = retry_count
+                if retry_count >= self._retries_limit:
+                    self._retries.pop(task_id, None)
+                    del self._jobs[task_id]
+                    msg = f"No valid result for task {task_id} after {self._retries_limit} retries"
+                    self._results[task_id] = ServerFailure(msg)
 
     def _get_results(self) -> None:
         remove = []
@@ -197,6 +225,14 @@ class HPCServer(ServerBase):
                 remove.append(task_id)
         for task_id in remove:
             self._tasks.pop(task_id)
+            if self._cleanup:
+                self._cleanup_files(task_id)
+
+    def _cleanup_files(self, task_id: str | UUID) -> None:
+        for suffix in (".in", ".out", ".txt"):
+            path = self._workdir / f"{task_id}{suffix}"
+            with contextlib.suppress(OSError):
+                path.unlink(missing_ok=True)
 
 
 def _get_config_path(config_path: Path | str | None) -> Path | None:

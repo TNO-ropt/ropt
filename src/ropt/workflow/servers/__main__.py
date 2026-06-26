@@ -1,6 +1,8 @@
 """Script for running functions with pickled arguments and return values."""
 
+import os
 import sys
+import tempfile
 from pathlib import Path
 
 import cloudpickle
@@ -17,8 +19,18 @@ def main() -> int:
         result = exc
         exit_code = 1
     finally:
-        with Path(sys.argv[2]).open("wb") as fp:
-            cloudpickle.dump(result, fp)
+        output_path = Path(sys.argv[2])
+        tmp_fd, tmp_path_str = tempfile.mkstemp(dir=output_path.parent)
+        tmp_path = Path(tmp_path_str)
+        try:
+            with os.fdopen(tmp_fd, "wb") as fp:
+                cloudpickle.dump(result, fp)
+                fp.flush()
+                os.fsync(fp.fileno())
+            tmp_path.rename(output_path)
+        except BaseException:
+            tmp_path.unlink(missing_ok=True)
+            raise
     sys.exit(exit_code)
 
 
