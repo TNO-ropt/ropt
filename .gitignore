@@ -1,5 +1,4 @@
 **/__pycache__/**
 src/**egg-info/**
 src/**/ropt/version.py
-uv.lock
 
