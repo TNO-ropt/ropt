@@ -119,11 +119,11 @@ def main() -> None:
 
     global_results = ResultsHandler()
 
-    # Inner evaluator: subprocess pool, shared across all outer evaluations.
+    # Subprocess pool, shared across all outer evaluations.
     inner_server = MultiprocessingServer(workers=2)
+    # Evaluator for the inner optimization, bundling all evaluations in a batch.
     inner_evaluator = AsyncEvaluator(
-        function=partial(rosenbrock, a=a, b=b),
-        server=inner_server,
+        function=partial(rosenbrock, a=a, b=b), server=inner_server, bundle_size=0
     )
 
     def _optimize(

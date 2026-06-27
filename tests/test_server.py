@@ -440,3 +440,65 @@ async def test_server_evaluator_two_optimizations(
     for results in results_list:
         assert results is not None
         assert np.allclose(results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02)
+
+
+@pytest.mark.parametrize("bundle_size", [1, 2, 4, 0])
+@pytest.mark.parametrize(
+    "server_name",
+    [
+        "async_server",
+        "multiprocessing_server",
+    ],
+)
+async def test_groups_tasks(
+    config: dict[str, Any],
+    test_functions: Sequence[Callable[[NDArray[np.float64], int], float]],
+    server_name: str,
+    bundle_size: int,
+) -> None:
+    match server_name:
+        case "async_server":
+            server: Server = ThreadingServer(workers=2)
+        case "multiprocessing_server":
+            server = MultiprocessingServer(workers=2)
+
+    task_sizes: list[int] = []
+    original_put = server.task_queue.put
+
+    async def _counting_put(task: Task) -> None:
+        task_sizes.append(len(task.args[1]))
+        await original_put(task)
+
+    server.task_queue.put = _counting_put  # type: ignore[assignment]
+
+    async with asyncio.TaskGroup() as tg:
+        await server.start(tg)
+        evaluator = AsyncEvaluator(
+            function=partial(_opt_function, test_functions=test_functions),
+            server=server,
+            bundle_size=bundle_size,
+        )
+        optimizer = BasicOptimizer(config=config, evaluator=evaluator)
+        await asyncio.to_thread(optimizer.run, initial_values)
+        server.cancel()
+
+    assert optimizer.results is not None
+    assert np.allclose(
+        optimizer.results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02
+    )
+    assert task_sizes, "No tasks were submitted"
+    expected_max = max(task_sizes) if bundle_size == 0 else bundle_size
+    for size in task_sizes:
+        assert 1 <= size <= expected_max
+
+
+async def test_invalid_bundle_size() -> None:  # noqa: RUF029
+    server = ThreadingServer(workers=1)
+    with pytest.raises(ValueError, match="bundle_size"):
+        AsyncEvaluator(
+            function=lambda variables, context: EvaluationFunctionResult(  # noqa: ARG005
+                objectives=0.0
+            ),
+            server=server,
+            bundle_size=-1,
+        )

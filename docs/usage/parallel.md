@@ -32,23 +32,33 @@ to service the server's workers and other concurrent steps.
 [`AsyncEvaluator`][ropt.workflow.evaluators.AsyncEvaluator] wraps a
 per-realization function — the same kind of callable used by
 [`FunctionEvaluator`][ropt.workflow.evaluators.FunctionEvaluator] — and
-submits each row of the evaluation batch as a separate
-[`Task`][ropt.workflow.servers.Task] to the server's task queue. It then
-waits for results to arrive on a results queue.
+submits the rows of the evaluation batch as
+[`Task`][ropt.workflow.servers.Task] objects to the server's task queue. It
+then waits for results to arrive on a results queue.
 
 Constructor parameters:
 
-| Parameter    | Description                                                          |
-| ------------ | -------------------------------------------------------------------- |
-| `function`   | Per-realization callable (same interface as `FunctionEvaluator`).    |
-| `server`     | The [`Server`][ropt.workflow.servers.Server] to dispatch tasks to.   |
-| `queue_size` | Maximum size of the results queue (0 = unlimited).                   |
-| `get_name`   | Optional callable to generate a name for each task.                  |
+| Parameter     | Description                                                          |
+| ------------- | -------------------------------------------------------------------- |
+| `function`    | Per-realization callable (same interface as `FunctionEvaluator`).    |
+| `server`      | The [`Server`][ropt.workflow.servers.Server] to dispatch tasks to.   |
+| `bundle_size` | Number of active evaluations to group into a single task (default: `1`). Use an integer `> 1` for a fixed maximum bundle size, or `0` to bundle all active evaluations of a batch into one task. |
+| `queue_size`  | Maximum size of the results queue (0 = unlimited).                   |
+| `get_name`    | Optional callable to generate a name for each task.                  |
 
-The `get_name` callable, if provided, is called with an
+By default each row of the variable batch is submitted as its own task. The
+`bundle_size` parameter allows several active evaluations to be grouped into
+a single task that the worker executes sequentially. This is useful when
+per-task overhead (thread/process startup, HPC job submission) dominates the
+cost of an individual evaluation, or when the total number of active
+evaluations in a batch is much larger than the number of available workers.
+
+The `get_name` callable, if provided, is called with the sequence of
 [`EvaluationFunctionContext`][ropt.workflow.evaluators.EvaluationFunctionContext]
-object and should return a string. When using the `HPCServer`, names also
-serve as task identifiers and must be unique within a batch.
+objects for every evaluation packed into the task (a single-element
+sequence when `bundle_size=1`) and should return a single task name. When
+using the `HPCServer`, names also serve as task identifiers and must be
+unique within a batch.
 
 If the server is not running when `eval()` is called, the evaluator raises
 an `Abort` exception.

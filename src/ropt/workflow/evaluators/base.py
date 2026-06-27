@@ -7,6 +7,8 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Protocol
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     import numpy as np
     from numpy.typing import NDArray
 
@@ -104,14 +106,20 @@ class EvaluationFunctionCallback(Protocol):
 
 
 class NameCallback(Protocol):
-    """Defines the call signature for callbacks to get the name of an evaluation."""
+    """Defines the call signature for callbacks to get the name of a task."""
 
-    def __call__(self, context: EvaluationFunctionContext) -> str:
-        """Get the name for a single evaluation.
+    def __call__(self, contexts: Sequence[EvaluationFunctionContext]) -> str:
+        """Get the name for a task.
+
+        The task may contain a single evaluation or a bundle of several
+        evaluations that the worker runs sequentially. The callback receives
+        the `EvaluationFunctionContext` objects for every evaluation in the
+        task, in submission order, and should return a single string used as
+        the task name.
 
         Args:
-            context: The `EvaluationFunctionContext` object identifying the evaluation.
+            contexts: The contexts for every evaluation in the task.
 
         Returns:
-            The name of the evaluation.
+            The name of the task.
         """

@@ -68,10 +68,6 @@ THREAD_WORKERS = 2
 HPC_WORKERS = 2
 
 
-def _task_name(context: EvaluationFunctionContext) -> str:
-    return f"inner-b{context.batch_id}-r{context.realization}-p{context.perturbation}"
-
-
 def rosenbrock(
     variables: NDArray[np.float64],
     context: EvaluationFunctionContext,
@@ -96,7 +92,7 @@ def rosenbrock(
         r = context.realization
         objective += (a[r] - x) ** 2 + b[r] * (y - x * x) ** 2
     return EvaluationFunctionResult(
-        objectives=objective, metadata={"worker": _task_name(context)}
+        objectives=objective, metadata={"worker": f"batch{context.batch_id:04d}"}
     )
 
 
@@ -128,14 +124,14 @@ def main(*, hpc_workdir: Path) -> None:
 
     global_results = ResultsHandler()
 
-    # Inner evaluator: each task becomes a queued HPC job named via
-    # `_task_name`. The same name is recovered inside `rosenbrock` from the
-    # evaluation context, so identifiers always line up with the queue.
+    # HPC server for the inner evaluations
     inner_server = HPCServer(workdir=hpc_workdir, workers=HPC_WORKERS)
+    # Evaluator for the inner optimization, bundling all evaluations in a batch.
     inner_evaluator = AsyncEvaluator(
         function=partial(rosenbrock, a=a, b=b),
         server=inner_server,
-        get_name=_task_name,
+        get_name=lambda contexts: f"batch{contexts[0].batch_id:04d}",
+        bundle_size=0,
     )
 
     def _optimize(

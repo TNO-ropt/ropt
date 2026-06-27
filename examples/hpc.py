@@ -107,8 +107,9 @@ def main(*, hpc_workdir: Path | None) -> None:
     evaluator = AsyncEvaluator(
         function=partial(rosenbrock, a=a, b=b),
         server=server,
-        get_name=lambda context: (
-            f"b{context.batch_id}-r{context.realization}-p{context.perturbation}"
+        get_name=lambda contexts: (
+            f"b{contexts[0].batch_id}-r{contexts[0].realization}"
+            f"-p{contexts[0].perturbation}"
         ),
     )
 
