@@ -424,10 +424,12 @@ single function that returns a value for each objective and constraint. The
 function is called once per row of the evaluation batch with the variable
 vector and an
 [`EvaluationFunctionContext`][ropt.workflow.evaluators.EvaluationFunctionContext]
-dataclass exposing `realization`, `perturbation`, `batch_id`, and
-`eval_idx`. The `perturbation` value is `-1` when the evaluation is not a
-perturbation (i.e. the unperturbed function evaluation). The function must
-return an
+dataclass exposing `realization`, `perturbation`, `batch_id`, `eval_idx`,
+and `name`. The `perturbation` value is `-1` when the evaluation is not a
+perturbation (i.e. the unperturbed function evaluation). The `name` value
+is the optional task name set by the evaluator (e.g. via `AsyncEvaluator`'s
+`get_name` callback) and is `None` when no name was assigned. The function
+must return an
 [`EvaluationFunctionResult`][ropt.workflow.evaluators.EvaluationFunctionResult]
 dataclass with:
 

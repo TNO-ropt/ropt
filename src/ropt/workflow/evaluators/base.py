@@ -54,12 +54,14 @@ class EvaluationFunctionContext:
         perturbation: The perturbation index (`-1` when unperturbed).
         batch_id:     Integer identifying the current evaluation batch.
         eval_idx:     Row index within the batch.
+        name:         Optional task name set by the evaluator.
     """
 
     realization: int
     perturbation: int
     batch_id: int
     eval_idx: int
+    name: str | None = None
 
 
 @dataclass(slots=True)

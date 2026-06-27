@@ -225,6 +225,8 @@ class AsyncEvaluator(Evaluator):
             if self._get_name is None
             else self._get_name([function_context for _, function_context in bundle])
         )
+        for _, function_context in bundle:
+            function_context.name = task_name
         return Task(
             results_queue=results_queue,
             function=_run_bundle,

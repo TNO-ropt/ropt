@@ -167,6 +167,7 @@ def my_function(
     | `perturbation` | Integer perturbation index, or `-1` when the evaluation is unperturbed.
     | `batch_id`     | Integer identifying the current evaluation batch.
     | `eval_idx`     | Row index within the batch.
+    | `name`         | Optional task name set by the evaluator (e.g. via `AsyncEvaluator`'s `get_name` callback); `None` when no name was assigned.
 
 - The return value is an
   [`EvaluationFunctionResult`][ropt.workflow.evaluators.EvaluationFunctionResult]

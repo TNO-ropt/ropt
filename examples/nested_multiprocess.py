@@ -13,8 +13,8 @@ different threads.
 """
 
 import asyncio
-import os
 import threading
+from collections.abc import Sequence
 from functools import partial
 from typing import Any
 
@@ -95,20 +95,30 @@ def rosenbrock(
         r = context.realization
         objective += (a[r] - x) ** 2 + b[r] * (y - x * x) ** 2
     return EvaluationFunctionResult(
-        objectives=objective,
-        metadata={"worker": str(os.getpid())},
+        objectives=objective, metadata={"task": context.name}
     )
 
 
 def report(event: EnOptEvent) -> None:
-    """Print each inner result with its outer thread and inner pid."""
+    """Print each inner result with its outer thread and inner task names."""
     for item in event.results:
         if isinstance(item, FunctionResults) and item.functions is not None:
-            workers = {str(w) for w in item.evaluations.metadata.get("worker", [])}
+            tasks = {str(w) for w in item.evaluations.metadata.get("task", [])}
             thread = item.metadata.get("thread")
-            print(f"batch: {item.batch_id}  thread: {thread}  pids: {workers}")
+            print(f"batch: {item.batch_id}  thread: {thread}  tasks: {tasks}")
             print(f"  variables: {item.evaluations.variables}")
             print(f"  objective: {item.functions.target_objective}\n")
+
+
+def _task_name(contexts: Sequence[EvaluationFunctionContext]) -> str:
+    evals = [item.eval_idx for item in contexts]
+    min_eval, max_eval = min(evals), max(evals)
+    suffix = (
+        f"eval{min_eval:0d}"
+        if min_eval == max_eval
+        else f"evals{min_eval:02d}-{max_eval:02d}"
+    )
+    return f"batch{contexts[0].batch_id:04d}-{suffix}"
 
 
 def main() -> None:
@@ -123,7 +133,10 @@ def main() -> None:
     inner_server = MultiprocessingServer(workers=2)
     # Evaluator for the inner optimization, bundling all evaluations in a batch.
     inner_evaluator = AsyncEvaluator(
-        function=partial(rosenbrock, a=a, b=b), server=inner_server, bundle_size=0
+        function=partial(rosenbrock, a=a, b=b),
+        server=inner_server,
+        bundle_size=0,
+        get_name=_task_name,
     )
 
     def _optimize(

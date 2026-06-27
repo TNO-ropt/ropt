@@ -84,7 +84,7 @@ Key differences from the batch callback:
 - `variables` is a **1-D array** (single variable vector)
 - The realization index is accessed via `context.realization`
 - Additional metadata is available on `context`: `perturbation`, `batch_id`,
-  and `eval_idx`
+  `eval_idx`, and `name` (the optional task name set by the evaluator)
 - Returns an
   [`EvaluationFunctionResult`][ropt.workflow.evaluators.EvaluationFunctionResult]
   carrying the objective values (and optional constraints and metadata) for this

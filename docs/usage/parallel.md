@@ -58,7 +58,9 @@ The `get_name` callable, if provided, is called with the sequence of
 objects for every evaluation packed into the task (a single-element
 sequence when `bundle_size=1`) and should return a single task name. When
 using the `HPCServer`, names also serve as task identifiers and must be
-unique within a batch.
+unique within a batch. The returned name is stamped onto the `name` field
+of every `EvaluationFunctionContext` in the task, so the user function can
+read `context.name` to recover it.
 
 If the server is not running when `eval()` is called, the evaluator raises
 an `Abort` exception.
