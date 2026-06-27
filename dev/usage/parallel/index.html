@@ -2454,7 +2454,9 @@ evaluations in a batch is much larger than the number of available workers.</p>
 objects for every evaluation packed into the task (a single-element
 sequence when <code>bundle_size=1</code>) and should return a single task name. When
 using the <code>HPCServer</code>, names also serve as task identifiers and must be
-unique within a batch.</p>
+unique within a batch. The returned name is stamped onto the <code>name</code> field
+of every <code>EvaluationFunctionContext</code> in the task, so the user function can
+read <code>context.name</code> to recover it.</p>
 <p>If the server is not running when <code>eval()</code> is called, the evaluator raises
 an <code>Abort</code> exception.</p>
 <h2 id="servers">Servers</h2>

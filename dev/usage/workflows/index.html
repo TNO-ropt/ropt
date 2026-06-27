@@ -3393,10 +3393,12 @@ vector and an
   
       dataclass
   " href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.EvaluationFunctionContext"><code>EvaluationFunctionContext</code></a>
-dataclass exposing <code>realization</code>, <code>perturbation</code>, <code>batch_id</code>, and
-<code>eval_idx</code>. The <code>perturbation</code> value is <code>-1</code> when the evaluation is not a
-perturbation (i.e. the unperturbed function evaluation). The function must
-return an
+dataclass exposing <code>realization</code>, <code>perturbation</code>, <code>batch_id</code>, <code>eval_idx</code>,
+and <code>name</code>. The <code>perturbation</code> value is <code>-1</code> when the evaluation is not a
+perturbation (i.e. the unperturbed function evaluation). The <code>name</code> value
+is the optional task name set by the evaluator (e.g. via <code>AsyncEvaluator</code>'s
+<code>get_name</code> callback) and is <code>None</code> when no name was assigned. The function
+must return an
 <a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.EvaluationFunctionResult
 
 
