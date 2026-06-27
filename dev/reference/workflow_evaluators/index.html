@@ -3391,8 +3391,11 @@ objective and constraint.</p>
 
 
         <p>An evaluator that dispatches tasks to a server via asyncio.</p>
-<p>Submits each row of the evaluation batch as a separate task to the
-server's task queue and collects results from a results queue.</p>
+<p>Submits the rows of the evaluation batch as tasks to the server's task
+queue and collects results from a results queue. By default each row is
+submitted as its own task; the <code>bundle_size</code> constructor argument can be
+used to group several active evaluations into a single task that the
+worker executes sequentially.</p>
 <p>See <a href="../../usage/parallel/#asyncevaluator">Parallel Evaluation</a> for
 details on how this integrates with the asyncio event loop.</p>
 
@@ -3426,14 +3429,24 @@ details on how this integrates with the asyncio event loop.</p>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="o">*</span><span class="p">,</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">function</span><span class="p">:</span> <span class="n">EvaluationFunctionCallback</span><span class="p">,</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">server</span><span class="p">:</span> <span class="n">Server</span><span class="p">,</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">queue_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">get_name</span><span class="p">:</span> <span class="n">NameCallback</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">bundle_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">queue_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">get_name</span><span class="p">:</span> <span class="n">NameCallback</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
 
         <p>Initialize the FunctionEvaluator.</p>
+<p>With <code>bundle_size=1</code> (the default) every active evaluation is sent
+as its own server task. Setting <code>bundle_size</code> to an integer <code>&gt; 1</code>
+groups up to that many active evaluations into one task that the
+worker runs sequentially; <code>None</code> packs all active evaluations of a
+batch into a single task.</p>
+<p>The <code>get_name</code> callback receives the
+<code>EvaluationFunctionContext</code> objects for every evaluation in a task
+(a one-element sequence when <code>bundle_size=1</code>) and must return a
+single task name.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3481,6 +3494,22 @@ details on how this integrates with the asyncio event loop.</p>
           </tr>
           <tr class="doc-section-item">
             <td>
+                <code>bundle_size</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Number of active evaluations per server task.</p>
+              </div>
+            </td>
+            <td>
+                  <code>1</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
                 <code>queue_size</code>
             </td>
             <td>
@@ -3509,6 +3538,29 @@ details on how this integrates with the asyncio event loop.</p>
             </td>
             <td>
                   <code>None</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#ValueError">ValueError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If <code>bundle_size</code> is an integer less than 1.</p>
+              </div>
             </td>
           </tr>
       </tbody>
@@ -4460,7 +4512,7 @@ evaluation results.</p>
 
 
 
-        <p>Defines the call signature for callbacks to get the name of an evaluation.</p>
+        <p>Defines the call signature for callbacks to get the name of a task.</p>
 
 
 
@@ -4488,12 +4540,19 @@ evaluation results.</p>
 
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">__call__</span><span class="p">(</span><span class="n">context</span><span class="p">:</span> <span class="n">EvaluationFunctionContext</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">__call__</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">contexts</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">EvaluationFunctionContext</span><span class="p">],</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
 
-        <p>Get the name for a single evaluation.</p>
+        <p>Get the name for a task.</p>
+<p>The task may contain a single evaluation or a bundle of several
+evaluations that the worker runs sequentially. The callback receives
+the <code>EvaluationFunctionContext</code> objects for every evaluation in the
+task, in submission order, and should return a single string used as
+the task name.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -4509,19 +4568,19 @@ evaluation results.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                <code>context</code>
+                <code>contexts</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.EvaluationFunctionContext
+                  <code><a class="autorefs autorefs-external" title="collections.abc.Sequence" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence">Sequence</a>[<a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.EvaluationFunctionContext
 
 
   
       dataclass
-   (ropt.workflow.evaluators.base.EvaluationFunctionContext)" href="#ropt.workflow.evaluators.EvaluationFunctionContext">EvaluationFunctionContext</a></code>
+   (ropt.workflow.evaluators.base.EvaluationFunctionContext)" href="#ropt.workflow.evaluators.EvaluationFunctionContext">EvaluationFunctionContext</a>]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The <code>EvaluationFunctionContext</code> object identifying the evaluation.</p>
+                <p>The contexts for every evaluation in the task.</p>
               </div>
             </td>
             <td>
@@ -4547,7 +4606,7 @@ evaluation results.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The name of the evaluation.</p>
+                <p>The name of the task.</p>
               </div>
             </td>
           </tr>

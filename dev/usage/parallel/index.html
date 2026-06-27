@@ -2399,14 +2399,14 @@ to service the server's workers and other concurrent steps.</p>
 <p><a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.AsyncEvaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.AsyncEvaluator"><code>AsyncEvaluator</code></a> wraps a
 per-realization function — the same kind of callable used by
 <a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.FunctionEvaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.FunctionEvaluator"><code>FunctionEvaluator</code></a> — and
-submits each row of the evaluation batch as a separate
+submits the rows of the evaluation batch as
 <a class="autorefs autorefs-internal" title="            ropt.workflow.servers.Task
 
 
   
       dataclass
-  " href="../../reference/workflow_servers/#ropt.workflow.servers.Task"><code>Task</code></a> to the server's task queue. It then
-waits for results to arrive on a results queue.</p>
+  " href="../../reference/workflow_servers/#ropt.workflow.servers.Task"><code>Task</code></a> objects to the server's task queue. It
+then waits for results to arrive on a results queue.</p>
 <p>Constructor parameters:</p>
 <table>
 <thead>
@@ -2425,6 +2425,10 @@ waits for results to arrive on a results queue.</p>
 <td>The <a class="autorefs autorefs-internal" title="            ropt.workflow.servers.Server" href="../../reference/workflow_servers/#ropt.workflow.servers.Server"><code>Server</code></a> to dispatch tasks to.</td>
 </tr>
 <tr>
+<td><code>bundle_size</code></td>
+<td>Number of active evaluations to group into a single task (default: <code>1</code>). Use an integer <code>&gt; 1</code> for a fixed maximum bundle size, or <code>None</code> to bundle all active evaluations of a batch into one task.</td>
+</tr>
+<tr>
 <td><code>queue_size</code></td>
 <td>Maximum size of the results queue (0 = unlimited).</td>
 </tr>
@@ -2434,15 +2438,23 @@ waits for results to arrive on a results queue.</p>
 </tr>
 </tbody>
 </table>
-<p>The <code>get_name</code> callable, if provided, is called with an
+<p>By default each row of the variable batch is submitted as its own task. The
+<code>bundle_size</code> parameter allows several active evaluations to be grouped into
+a single task that the worker executes sequentially. This is useful when
+per-task overhead (thread/process startup, HPC job submission) dominates the
+cost of an individual evaluation, or when the total number of active
+evaluations in a batch is much larger than the number of available workers.</p>
+<p>The <code>get_name</code> callable, if provided, is called with the sequence of
 <a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.EvaluationFunctionContext
 
 
   
       dataclass
   " href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.EvaluationFunctionContext"><code>EvaluationFunctionContext</code></a>
-object and should return a string. When using the <code>HPCServer</code>, names also
-serve as task identifiers and must be unique within a batch.</p>
+objects for every evaluation packed into the task (a single-element
+sequence when <code>bundle_size=1</code>) and should return a single task name. When
+using the <code>HPCServer</code>, names also serve as task identifiers and must be
+unique within a batch.</p>
 <p>If the server is not running when <code>eval()</code> is called, the evaluator raises
 an <code>Abort</code> exception.</p>
 <h2 id="servers">Servers</h2>
