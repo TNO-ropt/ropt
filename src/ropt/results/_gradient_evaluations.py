@@ -76,11 +76,11 @@ class GradientEvaluations(ResultField):
             - [`AxisName.PERTURBATION`][ropt.enums.AxisName.PERTURBATION]
             - [`AxisName.NONLINEAR_CONSTRAINT`][ropt.enums.AxisName.NONLINEAR_CONSTRAINT]
 
-    === "Evaluation Info"
+    === "Metadata"
 
-        `evaluation_info`: Optional metadata associated with each realization,
+        `metadata`: Optional metadata associated with each realization,
         potentially provided by the evaluator. If provided, each value in the
-        info dictionary must be a two-dimensional array of arbitrary type
+        metadata dictionary must be a two-dimensional array of arbitrary type
         supported by `numpy` (including objects):
 
         - Shape: $(n_r, n_p)$, where:
@@ -90,13 +90,13 @@ class GradientEvaluations(ResultField):
             - [`AxisName.REALIZATION`][ropt.enums.AxisName.REALIZATION]
             - [`AxisName.PERTURBATION`][ropt.enums.AxisName.PERTURBATION]
 
-    Note: Evaluation info data type.
-        The data type of the evaluation info fields is not fixed. Each field in
-        the `evaluation_info` dictionary can have its own data type, which must
-        be a two-dimensional array of any type supported by `numpy`, including
-        object arrays. This allows for maximum flexibility in the kind of
-        metadata that can be included, such as strings, integers, floats, or
-        even complex objects.
+    Note: Metadata data type.
+        The data type of the metadata fields is not fixed. Each field in the
+        `metadata` dictionary can have its own data type, which must be a
+        two-dimensional array of any type supported by `numpy`, including object
+        arrays. This allows for maximum flexibility in the kind of metadata that
+        can be included, such as strings, integers, floats, or even complex
+        objects.
 
     Attributes:
         variables:             The unperturbed variable vector.
@@ -106,7 +106,7 @@ class GradientEvaluations(ResultField):
                                realization and perturbation.
         perturbed_constraints: The constraint function values for each
                                realization and perturbation.
-        evaluation_info:       Optional metadata for each evaluated
+        metadata:              Optional metadata for each evaluated
                                realization and perturbation.
     """
 
@@ -143,7 +143,7 @@ class GradientEvaluations(ResultField):
             ),
         },
     )
-    evaluation_info: dict[str, NDArray[Any]] = field(
+    metadata: dict[str, NDArray[Any]] = field(
         default_factory=dict,
         metadata={
             "__axes__": (
@@ -166,7 +166,7 @@ class GradientEvaluations(ResultField):
         perturbed_variables: NDArray[np.float64],
         perturbed_objectives: NDArray[np.float64],
         perturbed_constraints: NDArray[np.float64] | None = None,
-        evaluation_info: dict[str, NDArray[Any]] | None = None,
+        metadata: dict[str, NDArray[Any]] | None = None,
     ) -> GradientEvaluations:
         """Create a `GradientEvaluations` object with the given data.
 
@@ -178,7 +178,7 @@ class GradientEvaluations(ResultField):
                                    realization and perturbation.
             perturbed_constraints: Constraint function values for each
                                    realization and perturbation.
-            evaluation_info:       Optional info for each evaluation.
+            metadata:              Optional info for each evaluation.
 
         Returns:
             A new `GradientEvaluations` object.
@@ -188,7 +188,7 @@ class GradientEvaluations(ResultField):
             perturbed_variables=perturbed_variables,
             perturbed_objectives=perturbed_objectives,
             perturbed_constraints=perturbed_constraints,
-            evaluation_info={} if evaluation_info is None else evaluation_info,
+            metadata={} if metadata is None else metadata,
         )
 
     def _transform_from_optimizer(
@@ -224,5 +224,5 @@ class GradientEvaluations(ResultField):
             perturbed_variables=perturbed_variables,
             perturbed_objectives=perturbed_objectives,
             perturbed_constraints=perturbed_constraints,
-            evaluation_info=self.evaluation_info,
+            metadata=self.metadata,
         )

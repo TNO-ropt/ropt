@@ -112,7 +112,7 @@ class AsyncEvaluator(Evaluator):
             )
 
         results = np.zeros((variables.shape[0], no + nc), dtype=np.float64)
-        evaluation_info: dict[str, NDArray[Any]] = {}
+        metadata: dict[str, NDArray[Any]] = {}
 
         for _ in range(
             variables.shape[0]
@@ -123,9 +123,7 @@ class AsyncEvaluator(Evaluator):
                 try:
                     if (task := results_queue.get(timeout=1)) is None:
                         raise Abort(ExitCode.ABORT_FROM_ERROR)
-                    _handle_result(
-                        task, results, evaluation_info, no, variables.shape[0]
-                    )
+                    _handle_result(task, results, metadata, no, variables.shape[0])
                     break
                 except queue.Empty:
                     continue
@@ -136,7 +134,7 @@ class AsyncEvaluator(Evaluator):
             batch_id=batch_id,
             objectives=results[:, :no],
             constraints=results[:, no:] if nc > 0 else None,
-            evaluation_info=evaluation_info,
+            metadata=metadata,
         )
 
     async def _put_tasks(
@@ -200,7 +198,7 @@ class AsyncEvaluator(Evaluator):
 def _handle_result(
     task: Task,
     results: NDArray[np.float64],
-    evaluation_info: dict[str, NDArray[Any]],
+    metadata: dict[str, NDArray[Any]],
     objective_count: int,
     eval_count: int,
 ) -> None:
@@ -212,10 +210,10 @@ def _handle_result(
         results[eval_idx, :objective_count] = task.result.objectives
         if task.result.constraints is not None:
             results[eval_idx, objective_count:] = task.result.constraints
-        if task.result.evaluation_info is not None:
-            for key, value in task.result.evaluation_info.items():
-                if key not in evaluation_info:
-                    evaluation_info[key] = np.zeros(
+        if task.result.metadata is not None:
+            for key, value in task.result.metadata.items():
+                if key not in metadata:
+                    metadata[key] = np.zeros(
                         eval_count,
                         dtype=(
                             np.array(value).dtype
@@ -223,4 +221,4 @@ def _handle_result(
                             else object
                         ),
                     )
-                evaluation_info[key][eval_idx] = value
+                metadata[key][eval_idx] = value

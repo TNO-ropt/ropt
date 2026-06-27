@@ -15,15 +15,15 @@ class _FunctionEvaluatorResults:
     batch_id: int | None
     objectives: NDArray[np.float64]
     constraints: NDArray[np.float64] | None
-    evaluation_info: dict[str, NDArray[Any]]
+    metadata: dict[str, NDArray[Any]]
 
     def __post_init__(self) -> None:
         self.objectives, self.constraints = _propagate_nan_values(
             self.objectives, self.constraints
         )
-        for key, value in self.evaluation_info.items():
+        for key, value in self.metadata.items():
             if value.ndim != 1 and value.size != self.objectives.shape[1]:
-                msg = f"Evaluation info has incorrect size: {key}"
+                msg = f"Metadata has incorrect size: {key}"
                 raise ValueError(msg)
 
 
@@ -32,7 +32,7 @@ class _GradientEvaluatorResults:
     batch_id: int | None
     perturbed_objectives: NDArray[np.float64]
     perturbed_constraints: NDArray[np.float64] | None
-    evaluation_info: dict[str, NDArray[Any]]
+    metadata: dict[str, NDArray[Any]]
     realization_count: InitVar[int]
     perturbation_count: InitVar[int]
 
@@ -48,12 +48,12 @@ class _GradientEvaluatorResults:
             if self.perturbed_constraints is None
             else self.perturbed_constraints.reshape(shape)
         )
-        for key, value in self.evaluation_info.items():
+        for key, value in self.metadata.items():
             if value.ndim != 1 and value.size != realization_count * perturbation_count:
-                msg = f"Evaluation info has incorrect size: {key}"
+                msg = f"Metadata has incorrect size: {key}"
                 raise ValueError(msg)
-        self.evaluation_info = {
-            key: value.reshape(shape[:2]) for key, value in self.evaluation_info.items()
+        self.metadata = {
+            key: value.reshape(shape[:2]) for key, value in self.metadata.items()
         }
 
 
@@ -132,7 +132,7 @@ def _get_function_results(
     )
     split_infos = {
         key: np.split(value, variables.shape[0])
-        for key, value in evaluator_result.evaluation_info.items()
+        for key, value in evaluator_result.metadata.items()
     }
     for idx, (objectives, constraints) in enumerate(
         zip_longest(split_objectives, split_constraints)
@@ -143,7 +143,7 @@ def _get_function_results(
                 batch_id=evaluator_result.batch_id,
                 objectives=objectives,
                 constraints=constraints,
-                evaluation_info={key: value[idx] for key, value in split_infos.items()},
+                metadata={key: value[idx] for key, value in split_infos.items()},
             ),
         )
 
@@ -182,7 +182,7 @@ def _get_gradient_results(
         batch_id=evaluator_result.batch_id,
         perturbed_objectives=objectives,
         perturbed_constraints=constraints,
-        evaluation_info=evaluator_result.evaluation_info,
+        metadata=evaluator_result.metadata,
         realization_count=context.realizations.weights.size,
         perturbation_count=context.gradient.number_of_perturbations,
     )
@@ -236,9 +236,9 @@ def _get_function_and_gradient_results(
             batch_id=evaluator_result.batch_id,
             objectives=objectives[:realization_num],
             constraints=None if constraints is None else constraints[:realization_num],
-            evaluation_info={
+            metadata={
                 key: value[:realization_num]
-                for key, value in evaluator_result.evaluation_info.items()
+                for key, value in evaluator_result.metadata.items()
             },
         ),
         _GradientEvaluatorResults(
@@ -247,9 +247,9 @@ def _get_function_and_gradient_results(
             perturbed_constraints=(
                 None if constraints is None else constraints[realization_num:, :]
             ),
-            evaluation_info={
+            metadata={
                 key: value[realization_num:]
-                for key, value in evaluator_result.evaluation_info.items()
+                for key, value in evaluator_result.metadata.items()
             },
             realization_count=context.realizations.weights.size,
             perturbation_count=context.gradient.number_of_perturbations,

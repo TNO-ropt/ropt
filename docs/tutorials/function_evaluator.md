@@ -87,8 +87,8 @@ Key differences from the batch callback:
   and `eval_idx`
 - Returns an
   [`EvaluationFunctionResult`][ropt.workflow.evaluators.EvaluationFunctionResult]
-  carrying the objective values (and optional constraints and
-  `evaluation_info`) for this single evaluation
+  carrying the objective values (and optional constraints and metadata) for this
+  single evaluation
 
 
 ## Progress Reporting

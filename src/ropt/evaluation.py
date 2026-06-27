@@ -77,16 +77,16 @@ class EvaluationBatchResult:
     detailed conventions and examples.
 
     Args:
-        objectives:      Objective values, shape `(n_rows, n_objectives)`.
-        constraints:     Optional constraint values, shape `(n_rows, n_constraints)`.
-        batch_id:        Optional integer identifying this evaluation batch.
-        evaluation_info: Optional dict of per-row metadata (not used internally by `ropt`).
+        objectives:  Objective values, shape `(n_rows, n_objectives)`.
+        constraints: Optional constraint values, shape `(n_rows, n_constraints)`.
+        batch_id:    Optional integer identifying this evaluation batch.
+        metadata:    Optional dict of per-row metadata (not used internally by `ropt`).
     """
 
     objectives: NDArray[np.float64]
     constraints: NDArray[np.float64] | None = None
     batch_id: int | None = None
-    evaluation_info: dict[str, NDArray[Any]] = field(default_factory=dict)
+    metadata: dict[str, NDArray[Any]] = field(default_factory=dict)
 
 
 class EvaluationBatchCallback(Protocol):

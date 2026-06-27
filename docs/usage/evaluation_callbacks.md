@@ -46,7 +46,7 @@ def my_evaluator(
   [`EnOptContext`][ropt.context.EnOptContext] for the run.
 - The return value should be an
   [`EvaluationBatchResult`][ropt.evaluation.EvaluationBatchResult] object that
-  packages objective values (and optional constraint values, evaluation info,
+  packages objective values (and optional constraint values, metadata,
   and per-row error indicators).
 
 One advantage of this approach is that the callback receives all variable
@@ -77,12 +77,12 @@ help filter the input and re-expand the output.
 
 [`EvaluationBatchResult`][ropt.evaluation.EvaluationBatchResult] stores:
 
-| Field              | Meaning
-| ------------------ | --------------------------------------------------------------------------------------------------------------------
-| `objectives`       | An array of shape `(n_rows, n_objectives)`.
-| `constraints`      | An optional array of shape `(n_rows, n_nonlinear_constraints)`, required when `nonlinear_constraints` is configured.
-| `evaluation_info`  | A dict of arrays carrying user metadata for each row. Not used internally by `ropt`; stored verbatim on results for application use (e.g., to link results back to input vectors).
-| `batch_id`         | Optional integer identifying this set of evaluation results.
+| Field          | Meaning
+| -------------- | --------------------------------------------------------------------------------------------------------------------
+| `objectives`   | An array of shape `(n_rows, n_objectives)`.
+| `constraints`  | An optional array of shape `(n_rows, n_nonlinear_constraints)`, required when `nonlinear_constraints` is configured.
+| `metadata`     | A dict of arrays carrying user metadata for each row. Not used internally by `ropt`; stored verbatim on results for application use (e.g., to link results back to input vectors).
+| `batch_id`     | Optional integer identifying this set of evaluation results.
 
 Inactive rows (where `active` is `False`) should have their result values set
 to zero. Rows where an evaluation failed should be set to `np.nan` (see
@@ -172,11 +172,11 @@ def my_function(
   [`EvaluationFunctionResult`][ropt.workflow.evaluators.EvaluationFunctionResult]
   dataclass with the following fields:
 
-    | Field             | Meaning
-    | ----------------- | -----------------------------------------------------------------------------------
-    | `objectives`      | The objective values as a scalar or 1-D array of length `n_objectives`.
-    | `constraints`     | Optional constraint values as a scalar or 1-D array of length `n_nonlinear_constraints`.
-    | `evaluation_info` | Optional `dict[str, Any]`; each entry is stored verbatim in the resulting [`EvaluationBatchResult.evaluation_info`][ropt.evaluation.EvaluationBatchResult] for this row.
+    | Field          | Meaning
+    | -------------- | -----------------------------------------------------------------------------------
+    | `objectives`   | The objective values as a scalar or 1-D array of length `n_objectives`.
+    | `constraints`  | Optional constraint values as a scalar or 1-D array of length `n_nonlinear_constraints`.
+    | `metadata`     | Optional `dict[str, Any]`; each entry is stored verbatim in the resulting [`EvaluationBatchResult.metadata`][ropt.evaluation.EvaluationBatchResult] for this row.
 
 To use it with
 [`BasicOptimizer`][ropt.workflow.BasicOptimizer], wrap the function in a

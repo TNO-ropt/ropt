@@ -87,7 +87,7 @@ def test_function_evaluator_with_info(
                 (func(variables, context) for func in test_functions),
                 dtype=np.float64,
             ),
-            evaluation_info={"foo": "bar"},
+            metadata={"foo": "bar"},
         )
 
     evaluator = FunctionEvaluator(
@@ -101,7 +101,7 @@ def test_function_evaluator_with_info(
     assert np.allclose(
         result_handler["results"].evaluations.variables, [0.0, 0.0, 0.5], atol=0.02
     )
-    assert result_handler["results"].evaluations.evaluation_info["foo"] == "bar"
+    assert result_handler["results"].evaluations.metadata["foo"] == "bar"
 
 
 def test_rng(config: dict[str, Any], evaluator: Any) -> None:
@@ -611,7 +611,7 @@ def _cached_eval(
     )
     if names is not None:
         realizations = np.fromiter((names[idx] for idx in realizations), dtype="U1")
-    results.evaluation_info["realizations"] = realizations
+    results.metadata["realizations"] = realizations
 
     return results
 
@@ -644,12 +644,12 @@ def test_evaluator_cache(
             if isinstance(item, FunctionResults):
                 completed_functions += 1
                 if completed_functions == 3:
-                    assert np.all(item.evaluations.evaluation_info["cached"])
+                    assert np.all(item.evaluations.metadata["cached"])
                 else:
-                    assert not np.all(item.evaluations.evaluation_info["cached"])
+                    assert not np.all(item.evaluations.metadata["cached"])
                 if names is not None:
                     assert np.all(
-                        item.evaluations.evaluation_info["realizations"] == ["a", "b"]
+                        item.evaluations.metadata["realizations"] == ["a", "b"]
                     )
 
     config["gradient"] = {"evaluation_policy": "speculative"}

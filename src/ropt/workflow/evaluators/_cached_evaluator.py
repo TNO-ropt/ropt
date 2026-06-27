@@ -53,7 +53,7 @@ class CachedEvaluator(Evaluator):
         Args:
             evaluator: The evaluator to cache.
             sources:   `EventHandler` instances for retrieving cached results.
-            hits_key:   Optional key for storing cache-hits in `evaluation_info`.
+            hits_key:   Optional key for storing cache-hits in `metadata`.
         """
         super().__init__()
         self._evaluator = evaluator
@@ -70,7 +70,7 @@ class CachedEvaluator(Evaluator):
         values are tuples of (realization index, cached FunctionResults).
 
         Derived classes can override `eval` and call this method to access
-        cache-hit information for populating `evaluation_info`.
+        cache-hit information for populating `metadata`.
 
         Note:
             If realization names are configured, they are used for matching
@@ -110,7 +110,7 @@ class CachedEvaluator(Evaluator):
         if self._hits_key is not None:
             hits = np.zeros(variables.shape[0], dtype=np.bool_)
             hits[list(cached.keys())] = True
-            evaluator_result.evaluation_info[self._hits_key] = hits
+            evaluator_result.metadata[self._hits_key] = hits
 
         for idx, (realization, item) in cached.items():
             objectives = item.evaluations.objectives

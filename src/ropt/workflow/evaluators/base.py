@@ -65,15 +65,15 @@ class EvaluationFunctionResult:
     """Result of a single function evaluation.
 
     Attributes:
-        objectives:      The objective values as an array.
-        constraints:     Optional constraint values as an array.
-        evaluation_info: Optional dictionary containing additional information
-                         about the evaluation.
+        objectives:  The objective values as an array.
+        constraints: Optional constraint values as an array.
+        metadata:    Optional dictionary containing additional information
+                     about the evaluation.
     """
 
     objectives: NDArray[np.float64] | float
     constraints: NDArray[np.float64] | float | None = None
-    evaluation_info: dict[str, Any] | None = None
+    metadata: dict[str, Any] | None = None
 
 
 class EvaluationFunctionCallback(Protocol):

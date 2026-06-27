@@ -96,8 +96,7 @@ def rosenbrock(
         r = context.realization
         objective += (a[r] - x) ** 2 + b[r] * (y - x * x) ** 2
     return EvaluationFunctionResult(
-        objectives=objective,
-        evaluation_info={"worker": _task_name(context)},
+        objectives=objective, metadata={"worker": _task_name(context)}
     )
 
 
@@ -105,9 +104,7 @@ def report(event: EnOptEvent) -> None:
     """Print each inner result with its outer thread and inner job names."""
     for item in event.results:
         if isinstance(item, FunctionResults) and item.functions is not None:
-            workers = {
-                str(w) for w in item.evaluations.evaluation_info.get("worker", [])
-            }
+            workers = {str(w) for w in item.evaluations.metadata.get("worker", [])}
             thread = item.metadata.get("thread")
             msg = (
                 f"batch: {item.batch_id}  thread: {thread}  jobs: {workers}\n"

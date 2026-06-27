@@ -211,7 +211,7 @@ class EnsembleEvaluator:
             variables=variables,
             objectives=f_eval_results.objectives,
             constraints=f_eval_results.constraints,
-            evaluation_info=f_eval_results.evaluation_info,
+            metadata=f_eval_results.metadata,
         )
 
         return FunctionResults(
@@ -301,7 +301,7 @@ class EnsembleEvaluator:
                     perturbed_variables=perturbed_variables,
                     perturbed_objectives=g_eval_results.perturbed_objectives,
                     perturbed_constraints=g_eval_results.perturbed_constraints,
-                    evaluation_info=g_eval_results.evaluation_info,
+                    metadata=g_eval_results.metadata,
                 ),
                 realizations=Realizations(
                     active_realizations=active_realizations,
@@ -334,7 +334,7 @@ class EnsembleEvaluator:
             variables=variables,
             objectives=f_eval_results.objectives,
             constraints=f_eval_results.constraints,
-            evaluation_info=f_eval_results.evaluation_info,
+            metadata=f_eval_results.metadata,
         )
 
         objective_weights, constraint_weights = (
@@ -416,7 +416,7 @@ class EnsembleEvaluator:
                 perturbed_variables=perturbed_variables,
                 perturbed_objectives=g_eval_results.perturbed_objectives,
                 perturbed_constraints=g_eval_results.perturbed_constraints,
-                evaluation_info=g_eval_results.evaluation_info,
+                metadata=g_eval_results.metadata,
             ),
             realizations=Realizations(
                 active_realizations=active_realizations,

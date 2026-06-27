@@ -161,9 +161,9 @@ def results_to_dataframe(
     [`FunctionResults`][ropt.results.FunctionResults] or
     [`GradientResults`][ropt.results.GradientResults] objects. Fields are
     selected using dot notation (e.g., `evaluations.variables`); nested
-    `evaluation_info` entries are accessed as
-    `evaluations.evaluation_info.key`. Multi-dimensional fields are
-    automatically unstacked into tuple-named columns.
+    `metadata` entries are accessed as `evaluations.metadata.key`.
+    Multi-dimensional fields are automatically unstacked into tuple-named
+    columns.
 
     See [Working with Results](../usage/results.md#exporting-to-pandas) for
     further details and examples.

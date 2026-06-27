@@ -75,7 +75,7 @@ def gradient_result_fixture(config: dict[str, Any]) -> GradientResults:
         variables=np.array([1.0, 2.0]),
         perturbed_variables=np.arange(30, dtype=np.float64).reshape((3, 5, 2)),
         perturbed_objectives=np.arange(30, dtype=np.float64).reshape((3, 5, 2)),
-        evaluation_info={"foo": np.arange(15, dtype=np.float64).reshape((3, 5))},
+        metadata={"foo": np.arange(15, dtype=np.float64).reshape((3, 5))},
     )
     gradients = Gradients(
         target_objective=np.array([1.0, 2.0]),
@@ -117,15 +117,15 @@ def test__to_series(gradient_result: GradientResults) -> None:
                 )
 
 
-def test__to_series_evaluation_info(gradient_result: GradientResults) -> None:
+def test__to_series_metadata(gradient_result: GradientResults) -> None:
     series = _to_series(
         gradient_result.evaluations,
-        "evaluation_info",
+        "metadata",
         "foo",
         gradient_result.names,
     )
     assert series is not None
-    info = np.array(gradient_result.evaluations.evaluation_info["foo"])
+    info = np.array(gradient_result.evaluations.metadata["foo"])
     assert len(series) == info.size
     assert series.index.names == [
         "realization",
@@ -157,7 +157,7 @@ def test_to_dataframe_gradient(gradient_result: GradientResults) -> None:
             "variables",
             "perturbed_variables",
             "perturbed_objectives",
-            "evaluation_info.foo",
+            "metadata.foo",
         ],
     )
     assert len(frame) == gradient_result.evaluations.perturbed_variables.size * 2

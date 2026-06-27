@@ -92,8 +92,7 @@ def rosenbrock(
         r = context.realization
         objective += (a[r] - x) ** 2 + b[r] * (y - x * x) ** 2
     return EvaluationFunctionResult(
-        objectives=objective,
-        evaluation_info={"worker": str(os.getpid())},
+        objectives=objective, metadata={"worker": str(os.getpid())}
     )
 
 

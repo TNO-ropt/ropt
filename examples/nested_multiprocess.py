@@ -6,7 +6,7 @@ a `ThreadingServer` (one worker thread per concurrent outer evaluation). Both
 are driven through `AsyncEvaluator`.
 
 Each `FunctionResults` is tagged with the OS pid of the worker that computed it
-(via `evaluation_info["worker"]`) and the name of the outer worker thread (via
+(via `metadata["worker"]`) and the name of the outer worker thread (via
 `metadata["thread"]`), so the report can show that inner evaluations are really
 running in different subprocesses and that the outer step dispatches them from
 different threads.
@@ -96,7 +96,7 @@ def rosenbrock(
         objective += (a[r] - x) ** 2 + b[r] * (y - x * x) ** 2
     return EvaluationFunctionResult(
         objectives=objective,
-        evaluation_info={"worker": str(os.getpid())},
+        metadata={"worker": str(os.getpid())},
     )
 
 
@@ -104,9 +104,7 @@ def report(event: EnOptEvent) -> None:
     """Print each inner result with its outer thread and inner pid."""
     for item in event.results:
         if isinstance(item, FunctionResults) and item.functions is not None:
-            workers = {
-                str(w) for w in item.evaluations.evaluation_info.get("worker", [])
-            }
+            workers = {str(w) for w in item.evaluations.metadata.get("worker", [])}
             thread = item.metadata.get("thread")
             print(f"batch: {item.batch_id}  thread: {thread}  pids: {workers}")
             print(f"  variables: {item.evaluations.variables}")

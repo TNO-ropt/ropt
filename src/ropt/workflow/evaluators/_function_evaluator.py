@@ -78,7 +78,7 @@ class FunctionEvaluator(Evaluator):
             else evaluator_context.context.nonlinear_constraints.lower_bounds.size
         )
         results = np.zeros((variables.shape[0], no + nc), dtype=np.float64)
-        evaluation_info: dict[str, NDArray[Any]] = {}
+        metadata: dict[str, NDArray[Any]] = {}
 
         for eval_idx, realization in enumerate(evaluator_context.realizations):
             perturbation = (
@@ -99,7 +99,7 @@ class FunctionEvaluator(Evaluator):
                         ),
                     ),
                     results,
-                    evaluation_info,
+                    metadata,
                     no,
                     variables.shape[0],
                 )
@@ -107,7 +107,7 @@ class FunctionEvaluator(Evaluator):
             batch_id=batch_id,
             objectives=results[:, :no],
             constraints=results[:, no:] if nc > 0 else None,
-            evaluation_info=evaluation_info,
+            metadata=metadata,
         )
 
 
@@ -115,17 +115,17 @@ def _handle_result(  # noqa: PLR0913, PLR0917
     eval_idx: int,
     result: EvaluationFunctionResult,
     results: NDArray[np.float64],
-    evaluation_info: dict[str, NDArray[Any]],
+    metadata: dict[str, NDArray[Any]],
     objective_count: int,
     eval_count: int,
 ) -> None:
     results[eval_idx, :objective_count] = result.objectives
     if result.constraints is not None:
         results[eval_idx, objective_count:] = result.constraints
-    if result.evaluation_info is not None:
-        for key, value in result.evaluation_info.items():
-            if key not in evaluation_info:
-                evaluation_info[key] = np.zeros(
+    if result.metadata is not None:
+        for key, value in result.metadata.items():
+            if key not in metadata:
+                metadata[key] = np.zeros(
                     eval_count,
                     dtype=(
                         np.array(value).dtype
@@ -133,4 +133,4 @@ def _handle_result(  # noqa: PLR0913, PLR0917
                         else object
                     ),
                 )
-            evaluation_info[key][eval_idx] = value
+            metadata[key][eval_idx] = value

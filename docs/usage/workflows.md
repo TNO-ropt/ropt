@@ -434,8 +434,8 @@ dataclass with:
 - `objectives`: a scalar or 1-D NumPy array of length *n_objectives*.
 - `constraints` (optional): a scalar or 1-D NumPy array of length
   *n_nonlinear_constraints*.
-- `evaluation_info` (optional): a `dict[str, Any]` whose entries are stored
-  in the `evaluation_info` field of the returned
+- `metadata` (optional): a `dict[str, Any]` whose entries are stored in the
+  `metadata` field of the returned
   [`EvaluationBatchResult`][ropt.evaluation.EvaluationBatchResult].
 
 See [Writing Evaluation Callbacks](evaluation_callbacks.md#using-functionevaluator)
@@ -468,7 +468,7 @@ Sources can be added dynamically with `add_sources()`.
 To record which evaluations were served from cache, pass a `hits_key` string
 at construction time. When set, the returned
 [`EvaluationBatchResult`][ropt.evaluation.EvaluationBatchResult] will contain
-a boolean NumPy array in its `evaluation_info` dictionary under that key —
+a boolean NumPy array in its `metadata` dictionary under that key —
 `True` for evaluations that came from the cache, `False` for those that were
 freshly computed.
 

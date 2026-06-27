@@ -43,8 +43,8 @@ Each carries nested [`ResultField`][ropt.results.ResultField] objects:
     - `objectives`: objective values per realization, shape $(n_r, n_o)$.
     - `constraints`: constraint values per realization, shape $(n_r, n_c)$
       (only present when nonlinear constraints are configured).
-    - `evaluation_info`: optional dict of per-realization metadata arrays,
-      each of shape $(n_r,)$.
+    - `metadata`: optional dict of per-realization metadata arrays, each of
+      shape $(n_r,)$.
 - **`functions`** ([`Functions`][ropt.results.Functions]) — aggregated values
   derived from the per-realization evaluations (or `None` if all realizations
   failed):
@@ -91,7 +91,7 @@ Each carries nested [`ResultField`][ropt.results.ResultField] objects:
       $(n_r, n_p, n_o)$.
     - `perturbed_constraints`: constraint values for each perturbation, shape
       $(n_r, n_p, n_c)$ (if configured).
-    - `evaluation_info`: optional dict of per-realization/perturbation metadata
+    - `metadata`: optional dict of per-realization/perturbation metadata
       arrays, each of shape $(n_r, n_p)$.
 - **`gradients`** ([`Gradients`][ropt.results.Gradients]) — aggregated gradient
   values (or `None` if estimation failed):
@@ -254,8 +254,8 @@ df = results_to_dataframe(
 ```
 
 Field names use dot notation for nested sub-fields (e.g.,
-`evaluations.variables`, `functions.target_objective`). For `evaluation_info`
-dictionaries, use a second dot: `evaluations.evaluation_info.my_key`.
+`evaluations.variables`, `functions.target_objective`). For `metadata`
+dictionaries, use a second dot: `evaluations.metadata.my_key`.
 
 The `result_type` argument selects which result objects to process:
 `"functions"` includes only

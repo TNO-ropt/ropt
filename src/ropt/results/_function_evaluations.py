@@ -62,11 +62,11 @@ class FunctionEvaluations(ResultField):
             - [`AxisName.REALIZATION`][ropt.enums.AxisName.REALIZATION]
             - [`AxisName.NONLINEAR_CONSTRAINT`][ropt.enums.AxisName.NONLINEAR_CONSTRAINT]
 
-    === "Evaluation Info"
+    === "Metadata"
 
-        `evaluation_info`: Optional metadata associated with each realization,
-        potentially provided by the evaluator.If provided, each value in the
-        info dictionary must be a one-dimensional array of arbitrary type
+        `metadata`: Optional metadata associated with each realization,
+        potentially provided by the evaluator. If provided, each value in the
+        metadata dictionary must be a one-dimensional array of arbitrary type
         supported by `numpy` (including objects):
 
         - Shape: $(n_r,)$, where:
@@ -74,19 +74,19 @@ class FunctionEvaluations(ResultField):
         - Axis type:
             - [`AxisName.REALIZATION`][ropt.enums.AxisName.REALIZATION]
 
-    Note: Evaluation info data type.
-        The data type of the evaluation info fields is not fixed. Each field in
-        the `evaluation_info` dictionary can have its own data type, which must
-        be a one-dimensional array of any type supported by `numpy`, including
-        object arrays. This allows for maximum flexibility in the kind of
-        metadata that can be included, such as strings, integers, floats, or
-        even complex objects.
+    Note: Metadata data type.
+        The data type of the metadata fields is not fixed. Each field in the
+        `metadata` dictionary can have its own data type, which must be a
+        one-dimensional array of any type supported by `numpy`, including object
+        arrays. This allows for maximum flexibility in the kind of metadata that
+        can be included, such as strings, integers, floats, or even complex
+        objects.
 
     Attributes:
-        variables:       The variable vector.
-        objectives:      The objective function values for each realization.
-        constraints:     The constraint function values for each realization.
-        evaluation_info: Optional metadata for each evaluated realization.
+        variables:   The variable vector.
+        objectives:  The objective function values for each realization.
+        constraints: The constraint function values for each realization.
+        metadata:    Optional metadata for each evaluated realization.
     """
 
     variables: NDArray[np.float64] = field(
@@ -111,7 +111,7 @@ class FunctionEvaluations(ResultField):
             ),
         },
     )
-    evaluation_info: dict[str, NDArray[Any]] = field(
+    metadata: dict[str, NDArray[Any]] = field(
         default_factory=dict,
         metadata={
             "__axes__": (AxisName.REALIZATION,),
@@ -129,7 +129,7 @@ class FunctionEvaluations(ResultField):
         variables: NDArray[np.float64],
         objectives: NDArray[np.float64],
         constraints: NDArray[np.float64] | None = None,
-        evaluation_info: dict[str, NDArray[Any]] | None = None,
+        metadata: dict[str, NDArray[Any]] | None = None,
     ) -> FunctionEvaluations:
         """Create a `FunctionEvaluations` object with the given data.
 
@@ -137,7 +137,7 @@ class FunctionEvaluations(ResultField):
             variables:       The unperturbed variable vector.
             objectives:      The objective functions for each realization.
             constraints:     The constraint functions for each realization.
-            evaluation_info: Optional info for each evaluation.
+            metadata: Optional info for each evaluation.
 
         Returns:
             A new FunctionEvaluations object.
@@ -146,7 +146,7 @@ class FunctionEvaluations(ResultField):
             variables=variables,
             objectives=objectives,
             constraints=constraints,
-            evaluation_info={} if evaluation_info is None else evaluation_info,
+            metadata={} if metadata is None else metadata,
         )
 
     def _transform_from_optimizer(self, context: EnOptContext) -> FunctionEvaluations:
@@ -173,5 +173,5 @@ class FunctionEvaluations(ResultField):
             variables=variables,
             objectives=objectives,
             constraints=constraints,
-            evaluation_info=self.evaluation_info,
+            metadata=self.metadata,
         )
