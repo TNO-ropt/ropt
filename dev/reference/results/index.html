@@ -4399,7 +4399,7 @@ floating point values:</p>
         <p>Per-realization objective and constraint values for an evaluation batch.</p>
 <p>See <a href="../../usage/results/">Working with Results</a> for usage details.</p>
 <p><strong>Result descriptions</strong></p>
-<div class="tabbed-set tabbed-alternate" data-tabs="1:4"><input checked="checked" id="ropt.results.FunctionEvaluations--__tabbed_1_1" name="ropt.results.FunctionEvaluations--__tabbed_1" type="radio" /><input id="ropt.results.FunctionEvaluations--__tabbed_1_2" name="ropt.results.FunctionEvaluations--__tabbed_1" type="radio" /><input id="ropt.results.FunctionEvaluations--__tabbed_1_3" name="ropt.results.FunctionEvaluations--__tabbed_1" type="radio" /><input id="ropt.results.FunctionEvaluations--__tabbed_1_4" name="ropt.results.FunctionEvaluations--__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="ropt.results.FunctionEvaluations--__tabbed_1_1">Variables</label><label for="ropt.results.FunctionEvaluations--__tabbed_1_2">Objectives</label><label for="ropt.results.FunctionEvaluations--__tabbed_1_3">Constraints</label><label for="ropt.results.FunctionEvaluations--__tabbed_1_4">Evaluation Info</label></div>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:4"><input checked="checked" id="ropt.results.FunctionEvaluations--__tabbed_1_1" name="ropt.results.FunctionEvaluations--__tabbed_1" type="radio" /><input id="ropt.results.FunctionEvaluations--__tabbed_1_2" name="ropt.results.FunctionEvaluations--__tabbed_1" type="radio" /><input id="ropt.results.FunctionEvaluations--__tabbed_1_3" name="ropt.results.FunctionEvaluations--__tabbed_1" type="radio" /><input id="ropt.results.FunctionEvaluations--__tabbed_1_4" name="ropt.results.FunctionEvaluations--__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="ropt.results.FunctionEvaluations--__tabbed_1_1">Variables</label><label for="ropt.results.FunctionEvaluations--__tabbed_1_2">Objectives</label><label for="ropt.results.FunctionEvaluations--__tabbed_1_3">Constraints</label><label for="ropt.results.FunctionEvaluations--__tabbed_1_4">Metadata</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
 <p><code>variables</code>: The vector of variable values at which the functions
@@ -4483,9 +4483,9 @@ constraint:</p>
 </ul>
 </div>
 <div class="tabbed-block">
-<p><code>evaluation_info</code>: Optional metadata associated with each realization,
-potentially provided by the evaluator.If provided, each value in the
-info dictionary must be a one-dimensional array of arbitrary type
+<p><code>metadata</code>: Optional metadata associated with each realization,
+potentially provided by the evaluator. If provided, each value in the
+metadata dictionary must be a one-dimensional array of arbitrary type
 supported by <code>numpy</code> (including objects):</p>
 <ul>
 <li>Shape: <span class="arithmatex">\((n_r,)\)</span>, where:<ul>
@@ -4509,13 +4509,13 @@ supported by <code>numpy</code> (including objects):</p>
 
 
 <details class="note" open>
-  <summary>Evaluation info data type.</summary>
-  <p>The data type of the evaluation info fields is not fixed. Each field in
-the <code>evaluation_info</code> dictionary can have its own data type, which must
-be a one-dimensional array of any type supported by <code>numpy</code>, including
-object arrays. This allows for maximum flexibility in the kind of
-metadata that can be included, such as strings, integers, floats, or
-even complex objects.</p>
+  <summary>Metadata data type.</summary>
+  <p>The data type of the metadata fields is not fixed. Each field in the
+<code>metadata</code> dictionary can have its own data type, which must be a
+one-dimensional array of any type supported by <code>numpy</code>, including object
+arrays. This allows for maximum flexibility in the kind of metadata that
+can be included, such as strings, integers, floats, or even complex
+objects.</p>
 </details>
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -4562,7 +4562,7 @@ even complex objects.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.results.FunctionEvaluations.evaluation_info">evaluation_info</span></code></td>
+            <td><code><span title="ropt.results.FunctionEvaluations.metadata">metadata</span></code></td>
             <td>
                   <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <span title="numpy.typing.NDArray">NDArray</span>[<a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a>]]</code>
             </td>
@@ -4609,7 +4609,7 @@ even complex objects.</p>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">variables</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">objectives</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">constraints</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">evaluation_info</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FunctionEvaluations</span>
 </span></code></pre></div>
 
@@ -4679,7 +4679,7 @@ even complex objects.</p>
           </tr>
           <tr class="doc-section-item">
             <td>
-                <code>evaluation_info</code>
+                <code>metadata</code>
             </td>
             <td>
                   <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <span title="numpy.typing.NDArray">NDArray</span>[<a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a>]] | None</code>
@@ -4767,7 +4767,7 @@ even complex objects.</p>
         <p>Per-realization evaluation data for perturbed variables.</p>
 <p>See <a href="../../usage/results/">Working with Results</a> for usage details.</p>
 <p><strong>Result descriptions</strong></p>
-<div class="tabbed-set tabbed-alternate" data-tabs="1:5"><input checked="checked" id="ropt.results.GradientEvaluations--__tabbed_1_1" name="ropt.results.GradientEvaluations--__tabbed_1" type="radio" /><input id="ropt.results.GradientEvaluations--__tabbed_1_2" name="ropt.results.GradientEvaluations--__tabbed_1" type="radio" /><input id="ropt.results.GradientEvaluations--__tabbed_1_3" name="ropt.results.GradientEvaluations--__tabbed_1" type="radio" /><input id="ropt.results.GradientEvaluations--__tabbed_1_4" name="ropt.results.GradientEvaluations--__tabbed_1" type="radio" /><input id="ropt.results.GradientEvaluations--__tabbed_1_5" name="ropt.results.GradientEvaluations--__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="ropt.results.GradientEvaluations--__tabbed_1_1">Variables</label><label for="ropt.results.GradientEvaluations--__tabbed_1_2">Perturbed Variables</label><label for="ropt.results.GradientEvaluations--__tabbed_1_3">Perturbed Objectives</label><label for="ropt.results.GradientEvaluations--__tabbed_1_4">Perturbed Constraints</label><label for="ropt.results.GradientEvaluations--__tabbed_1_5">Evaluation Info</label></div>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:5"><input checked="checked" id="ropt.results.GradientEvaluations--__tabbed_1_1" name="ropt.results.GradientEvaluations--__tabbed_1" type="radio" /><input id="ropt.results.GradientEvaluations--__tabbed_1_2" name="ropt.results.GradientEvaluations--__tabbed_1" type="radio" /><input id="ropt.results.GradientEvaluations--__tabbed_1_3" name="ropt.results.GradientEvaluations--__tabbed_1" type="radio" /><input id="ropt.results.GradientEvaluations--__tabbed_1_4" name="ropt.results.GradientEvaluations--__tabbed_1" type="radio" /><input id="ropt.results.GradientEvaluations--__tabbed_1_5" name="ropt.results.GradientEvaluations--__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="ropt.results.GradientEvaluations--__tabbed_1_1">Variables</label><label for="ropt.results.GradientEvaluations--__tabbed_1_2">Perturbed Variables</label><label for="ropt.results.GradientEvaluations--__tabbed_1_3">Perturbed Objectives</label><label for="ropt.results.GradientEvaluations--__tabbed_1_4">Perturbed Constraints</label><label for="ropt.results.GradientEvaluations--__tabbed_1_5">Metadata</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
 <p><code>variables</code>: The vector of unperturbed variable values:</p>
@@ -4899,9 +4899,9 @@ perturbation:</p>
 </ul>
 </div>
 <div class="tabbed-block">
-<p><code>evaluation_info</code>: Optional metadata associated with each realization,
+<p><code>metadata</code>: Optional metadata associated with each realization,
 potentially provided by the evaluator. If provided, each value in the
-info dictionary must be a two-dimensional array of arbitrary type
+metadata dictionary must be a two-dimensional array of arbitrary type
 supported by <code>numpy</code> (including objects):</p>
 <ul>
 <li>Shape: <span class="arithmatex">\((n_r, n_p)\)</span>, where:<ul>
@@ -4933,13 +4933,13 @@ supported by <code>numpy</code> (including objects):</p>
 
 
 <details class="note" open>
-  <summary>Evaluation info data type.</summary>
-  <p>The data type of the evaluation info fields is not fixed. Each field in
-the <code>evaluation_info</code> dictionary can have its own data type, which must
-be a two-dimensional array of any type supported by <code>numpy</code>, including
-object arrays. This allows for maximum flexibility in the kind of
-metadata that can be included, such as strings, integers, floats, or
-even complex objects.</p>
+  <summary>Metadata data type.</summary>
+  <p>The data type of the metadata fields is not fixed. Each field in the
+<code>metadata</code> dictionary can have its own data type, which must be a
+two-dimensional array of any type supported by <code>numpy</code>, including object
+arrays. This allows for maximum flexibility in the kind of metadata that
+can be included, such as strings, integers, floats, or even complex
+objects.</p>
 </details>
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -5000,7 +5000,7 @@ even complex objects.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.results.GradientEvaluations.evaluation_info">evaluation_info</span></code></td>
+            <td><code><span title="ropt.results.GradientEvaluations.metadata">metadata</span></code></td>
             <td>
                   <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <span title="numpy.typing.NDArray">NDArray</span>[<a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a>]]</code>
             </td>
@@ -5049,7 +5049,7 @@ even complex objects.</p>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">perturbed_variables</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">perturbed_objectives</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">perturbed_constraints</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">evaluation_info</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GradientEvaluations</span>
 </span></code></pre></div>
 
@@ -5138,7 +5138,7 @@ even complex objects.</p>
           </tr>
           <tr class="doc-section-item">
             <td>
-                <code>evaluation_info</code>
+                <code>metadata</code>
             </td>
             <td>
                   <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <span title="numpy.typing.NDArray">NDArray</span>[<a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a>]] | None</code>
@@ -5833,9 +5833,9 @@ default to <code>None</code> and are only populated if bounds are present and fi
       dataclass
   " href="#ropt.results.GradientResults"><code>GradientResults</code></a> objects. Fields are
 selected using dot notation (e.g., <code>evaluations.variables</code>); nested
-<code>evaluation_info</code> entries are accessed as
-<code>evaluations.evaluation_info.key</code>. Multi-dimensional fields are
-automatically unstacked into tuple-named columns.</p>
+<code>metadata</code> entries are accessed as <code>evaluations.metadata.key</code>.
+Multi-dimensional fields are automatically unstacked into tuple-named
+columns.</p>
 <p>See <a href="../../usage/results/#exporting-to-pandas">Working with Results</a> for
 further details and examples.</p>
 

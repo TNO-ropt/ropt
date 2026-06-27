@@ -3408,8 +3408,8 @@ dataclass with:</p>
 <li><code>objectives</code>: a scalar or 1-D NumPy array of length <em>n_objectives</em>.</li>
 <li><code>constraints</code> (optional): a scalar or 1-D NumPy array of length
   <em>n_nonlinear_constraints</em>.</li>
-<li><code>evaluation_info</code> (optional): a <code>dict[str, Any]</code> whose entries are stored
-  in the <code>evaluation_info</code> field of the returned
+<li><code>metadata</code> (optional): a <code>dict[str, Any]</code> whose entries are stored in the
+  <code>metadata</code> field of the returned
   <a class="autorefs autorefs-internal" title="            ropt.evaluation.EvaluationBatchResult
 
 
@@ -3446,7 +3446,7 @@ at construction time. When set, the returned
   
       dataclass
   " href="../../reference/evaluation/#ropt.evaluation.EvaluationBatchResult"><code>EvaluationBatchResult</code></a> will contain
-a boolean NumPy array in its <code>evaluation_info</code> dictionary under that key —
+a boolean NumPy array in its <code>metadata</code> dictionary under that key —
 <code>True</code> for evaluations that came from the cache, <code>False</code> for those that were
 freshly computed.</p>
 <p>The <code>eval_cached()</code> method is available for derived classes that need access to

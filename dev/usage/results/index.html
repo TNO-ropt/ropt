@@ -2623,8 +2623,8 @@ variable vector evaluated in that batch.</p>
 <li><code>objectives</code>: objective values per realization, shape <span class="arithmatex">\((n_r, n_o)\)</span>.</li>
 <li><code>constraints</code>: constraint values per realization, shape <span class="arithmatex">\((n_r, n_c)\)</span>
   (only present when nonlinear constraints are configured).</li>
-<li><code>evaluation_info</code>: optional dict of per-realization metadata arrays,
-  each of shape <span class="arithmatex">\((n_r,)\)</span>.</li>
+<li><code>metadata</code>: optional dict of per-realization metadata arrays, each of
+  shape <span class="arithmatex">\((n_r,)\)</span>.</li>
 </ul>
 </li>
 <li><strong><code>functions</code></strong> (<a class="autorefs autorefs-internal" title="            ropt.results.Functions
@@ -2704,7 +2704,7 @@ the full list of fields.</p>
   <span class="arithmatex">\((n_r, n_p, n_o)\)</span>.</li>
 <li><code>perturbed_constraints</code>: constraint values for each perturbation, shape
   <span class="arithmatex">\((n_r, n_p, n_c)\)</span> (if configured).</li>
-<li><code>evaluation_info</code>: optional dict of per-realization/perturbation metadata
+<li><code>metadata</code>: optional dict of per-realization/perturbation metadata
   arrays, each of shape <span class="arithmatex">\((n_r, n_p)\)</span>.</li>
 </ul>
 </li>
@@ -2906,8 +2906,8 @@ columns (e.g., <code>VARIABLE</code>, <code>OBJECTIVE</code>, <code>NONLINEAR_CO
 </span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="p">)</span>
 </span></code></pre></div>
 <p>Field names use dot notation for nested sub-fields (e.g.,
-<code>evaluations.variables</code>, <code>functions.target_objective</code>). For <code>evaluation_info</code>
-dictionaries, use a second dot: <code>evaluations.evaluation_info.my_key</code>.</p>
+<code>evaluations.variables</code>, <code>functions.target_objective</code>). For <code>metadata</code>
+dictionaries, use a second dot: <code>evaluations.metadata.my_key</code>.</p>
 <p>The <code>result_type</code> argument selects which result objects to process:
 <code>"functions"</code> includes only
 <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults

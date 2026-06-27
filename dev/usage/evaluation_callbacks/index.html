@@ -2386,7 +2386,7 @@ For instance an evaluator function should look like this:</p>
   
       dataclass
   " href="../../reference/evaluation/#ropt.evaluation.EvaluationBatchResult"><code>EvaluationBatchResult</code></a> object that
-  packages objective values (and optional constraint values, evaluation info,
+  packages objective values (and optional constraint values, metadata,
   and per-row error indicators).</li>
 </ul>
 <p>One advantage of this approach is that the callback receives all variable
@@ -2457,7 +2457,7 @@ help filter the input and re-expand the output.</p>
 <td>An optional array of shape <code>(n_rows, n_nonlinear_constraints)</code>, required when <code>nonlinear_constraints</code> is configured.</td>
 </tr>
 <tr>
-<td><code>evaluation_info</code></td>
+<td><code>metadata</code></td>
 <td>A dict of arrays carrying user metadata for each row. Not used internally by <code>ropt</code>; stored verbatim on results for application use (e.g., to link results back to input vectors).</td>
 </tr>
 <tr>
@@ -2593,13 +2593,13 @@ assembly of the final
 <td>Optional constraint values as a scalar or 1-D array of length <code>n_nonlinear_constraints</code>.</td>
 </tr>
 <tr>
-<td><code>evaluation_info</code></td>
+<td><code>metadata</code></td>
 <td>Optional <code>dict[str, Any]</code>; each entry is stored verbatim in the resulting <a class="autorefs autorefs-internal" title="            ropt.evaluation.EvaluationBatchResult
 
 
   
       dataclass
-  " href="../../reference/evaluation/#ropt.evaluation.EvaluationBatchResult"><code>EvaluationBatchResult.evaluation_info</code></a> for this row.</td>
+  " href="../../reference/evaluation/#ropt.evaluation.EvaluationBatchResult"><code>EvaluationBatchResult.metadata</code></a> for this row.</td>
 </tr>
 </tbody>
 </table>

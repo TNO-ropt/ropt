@@ -3779,7 +3779,7 @@ These handlers are expected to store <code>FunctionResults</code> in their
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional key for storing cache-hits in <code>evaluation_info</code>.</p>
+                <p>Optional key for storing cache-hits in <code>metadata</code>.</p>
               </div>
             </td>
             <td>
@@ -3823,7 +3823,7 @@ These handlers are expected to store <code>FunctionResults</code> in their
 hits. The dictionary keys are evaluation indices found in cache;
 values are tuples of (realization index, cached FunctionResults).</p>
 <p>Derived classes can override <code>eval</code> and call this method to access
-cache-hit information for populating <code>evaluation_info</code>.</p>
+cache-hit information for populating <code>metadata</code>.</p>
 
 
 <details class="note" open>
@@ -4407,14 +4407,14 @@ evaluation results.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.workflow.evaluators.EvaluationFunctionResult.evaluation_info">evaluation_info</span></code></td>
+            <td><code><span title="ropt.workflow.evaluators.EvaluationFunctionResult.metadata">metadata</span></code></td>
             <td>
                   <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a>] | None</code>
             </td>
             <td>
               <div class="doc-md-description">
                 <p>Optional dictionary containing additional information
-             about the evaluation.</p>
+         about the evaluation.</p>
               </div>
             </td>
           </tr>
