@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import threading
 from typing import TYPE_CHECKING, Literal, assert_never
 
 import numpy as np
@@ -61,18 +60,7 @@ class ResultsHandler(EventHandler):
         self._domain = domain
         self._filter = filter
         self._best_results: FunctionResults | None = None
-        self._lock = threading.Lock()
         self["results"] = None
-
-    def __getstate__(self) -> dict[str, object]:
-        # threading.Lock is not picklable; drop it and recreate in __setstate__.
-        state = self.__dict__.copy()
-        state.pop("_lock", None)
-        return state
-
-    def __setstate__(self, state: dict[str, object]) -> None:
-        self.__dict__.update(state)
-        self._lock = threading.Lock()
 
     def handle_event(self, event: EnOptEvent) -> None:
         """Handle incoming events.
@@ -83,7 +71,7 @@ class ResultsHandler(EventHandler):
         Args:
             event: The event object.
         """
-        with self._lock:
+        with self.locked():
             self._handle_event(event)
 
     def _handle_event(self, event: EnOptEvent) -> None:

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import threading
 from importlib.util import find_spec
 from typing import TYPE_CHECKING, Any, Final, Literal
 
@@ -112,17 +111,6 @@ class TableHandler(EventHandler):
         self._sep = sep
         self._callback: Callable[[EnOptEvent], None] | None = None
         self._tables: dict[str, _ResultsTable] = {}
-        self._lock = threading.Lock()
-
-    def __getstate__(self) -> dict[str, object]:
-        # threading.Lock is not picklable; drop it and recreate in __setstate__.
-        state = self.__dict__.copy()
-        state.pop("_lock", None)
-        return state
-
-    def __setstate__(self, state: dict[str, object]) -> None:
-        self.__dict__.update(state)
-        self._lock = threading.Lock()
 
     def set_default_tables(self, *, domain: DomainType = "user") -> None:
         """Register a standard set of result tables.
@@ -150,7 +138,7 @@ class TableHandler(EventHandler):
         Args:
             callback: A function that is called when the tables are updated.
         """
-        with self._lock:
+        with self.locked():
             self._callback = callback
 
     def add_table(
@@ -171,7 +159,7 @@ class TableHandler(EventHandler):
             domain:     Domain (`"user"` or `"optimizer"`) the table is filled
                         from.
         """
-        with self._lock:
+        with self.locked():
             self._tables[name] = _ResultsTable(
                 columns,
                 table_type=table_type,
@@ -189,7 +177,7 @@ class TableHandler(EventHandler):
             access is needed, it is more efficient to first store them in a
             variable.
         """
-        with self._lock:
+        with self.locked():
             return {
                 key: table.get_table(self._sep) for key, table in self._tables.items()
             }
@@ -200,7 +188,7 @@ class TableHandler(EventHandler):
         Args:
             event: The event object.
         """
-        with self._lock:
+        with self.locked():
             if results := event.results:
                 transformed_results = (
                     tuple(
@@ -244,7 +232,7 @@ class TableHandler(EventHandler):
         Raises:
             AttributeError: If the requested table does not exist.
         """
-        with self._lock:
+        with self.locked():
             if key not in self._tables:
                 msg = f"Unknown table: `{key}`"
                 raise AttributeError(msg)
@@ -258,7 +246,7 @@ class TableHandler(EventHandler):
             name:  The name of the field to add as a column, using attribute syntax.
             title: The title of the column to add.
         """
-        with self._lock:
+        with self.locked():
             self._tables[table].add_column(name, title)
 
 

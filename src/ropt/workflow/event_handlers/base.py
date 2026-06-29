@@ -2,10 +2,15 @@
 
 from __future__ import annotations
 
+import threading
 from abc import ABC, abstractmethod
+from contextlib import contextmanager
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
+    from collections.abc import Iterator
+    from contextlib import AbstractContextManager
+
     from ropt.enums import EnOptEventType
     from ropt.events import EnOptEvent
 
@@ -30,11 +35,73 @@ class EventHandler(ABC):
     [`add_event_handler`][ropt.workflow.compute_steps.ComputeStep.add_event_handler]
     method. When the compute step emits an event, the `handle_event` method of
     each attached handler is invoked, allowing it to process the event.
+
+    Thread safety:
+        Every handler owns a re-entrant lock created at construction. The
+        base-class `__getitem__` and `__setitem__` acquire it, so
+        dictionary-style access is safe across threads. Subclasses (and
+        external callers that need atomic compound operations) should wrap
+        critical sections with
+        [`locked()`][ropt.workflow.event_handlers.EventHandler.locked]:
+
+            with handler.locked():
+                snapshot = handler["results"]
+                count = len(snapshot)
+
+        The lock is re-entrant, so user callbacks invoked from within a
+        locked region may safely call back into the handler on the same
+        thread.
     """
 
     def __init__(self) -> None:
         """Initialize the EventHandler."""
         self.__stored_values: dict[str, Any] = {}
+        # Re-entrant: subclasses commonly invoke user callbacks while holding
+        # the lock, and those callbacks may call back into the handler (e.g.
+        # `handler[key]`) on the same thread.
+        self.__lock = threading.RLock()
+
+    def __getstate__(self) -> dict[str, object]:
+        """Return picklable state, omitting the non-picklable lock."""
+        # threading.RLock is not picklable; drop it and recreate in __setstate__.
+        state = self.__dict__.copy()
+        state.pop("_EventHandler__lock", None)
+        return state
+
+    def __setstate__(self, state: dict[str, object]) -> None:
+        """Restore state and recreate the lock dropped by `__getstate__`."""
+        self.__dict__.update(state)
+        self.__lock = threading.RLock()
+
+    def locked(self) -> AbstractContextManager[None]:
+        """Return a context manager that holds the handler's internal lock.
+
+        Use this to wrap any compound operation that must observe a
+        consistent view of the handler's state:
+
+            with handler.locked():
+                snapshot = handler["results"]
+                count = len(snapshot)
+
+        Individual `handler[key]` reads and `handler[key] = value` writes
+        are already serialized internally, so explicit locking is only
+        needed when multiple accesses must be atomic with respect to each
+        other.
+
+        The lock is re-entrant: entering it from a thread that already
+        holds it (e.g. from a user callback dispatched from within
+        `handle_event`) is safe and will not deadlock.
+
+        Returns:
+            A context manager that acquires the lock on entry and releases
+            it on exit.
+        """
+        return self.__locked_cm()
+
+    @contextmanager
+    def __locked_cm(self) -> Iterator[None]:
+        with self.__lock:
+            yield
 
     @property
     @abstractmethod
@@ -80,10 +147,11 @@ class EventHandler(ABC):
             AttributeError: If the provided `key` does not exist in the
                             event handler's stored values.
         """
-        if key in self.__stored_values:
-            return self.__stored_values[key]
-        msg = f"Unknown event handler data key: `{key}`"
-        raise AttributeError(msg)
+        with self.__lock:
+            if key in self.__stored_values:
+                return self.__stored_values[key]
+            msg = f"Unknown event handler data key: `{key}`"
+            raise AttributeError(msg)
 
     def __setitem__(self, key: str, value: Any) -> None:  # noqa: ANN401
         """Store or update a value in the event handler's internal state.
@@ -105,4 +173,5 @@ class EventHandler(ABC):
         if not key.isidentifier():
             msg = f"Not a valid key: `{key}`"
             raise AttributeError(msg)
-        self.__stored_values[key] = value
+        with self.__lock:
+            self.__stored_values[key] = value
