@@ -2651,7 +2651,6 @@ variable vector evaluated in that batch.</p>
   metadata:<ul>
 <li><code>active_realizations</code>: boolean array indicating which realizations were
   evaluated, shape <span class="arithmatex">\((n_r,)\)</span>.</li>
-<li><code>failed_realizations</code>: boolean array indicating failures, shape <span class="arithmatex">\((n_r,)\)</span>.</li>
 <li><code>objective_weights</code>: per-realization objective weights, shape
   <span class="arithmatex">\((n_o, n_r)\)</span>. May change during optimization (e.g., when realization
   filters are active).</li>
@@ -2700,8 +2699,20 @@ the full list of fields.</p>
 <li><code>variables</code>: the unperturbed variable vector, shape <span class="arithmatex">\((n_v,)\)</span>.</li>
 <li><code>perturbed_variables</code>: perturbed variable values, shape
   <span class="arithmatex">\((n_r, n_p, n_v)\)</span>.</li>
+<li><code>objectives</code>: the unperturbed objective values per realization, shape
+  <span class="arithmatex">\((n_r, n_o)\)</span>. Duplicated from the companion
+  <a class="autorefs autorefs-internal" title="            ropt.results.FunctionEvaluations
+
+
+  
+      dataclass
+  " href="../../reference/results/#ropt.results.FunctionEvaluations"><code>FunctionResults.evaluations.objectives</code></a>
+  so a <code>GradientResults</code> is self-contained for reproducing the gradient
+  computation.</li>
 <li><code>perturbed_objectives</code>: objective values for each perturbation, shape
   <span class="arithmatex">\((n_r, n_p, n_o)\)</span>.</li>
+<li><code>constraints</code>: the unperturbed constraint values per realization, shape
+  <span class="arithmatex">\((n_r, n_c)\)</span> (if configured). Same duplication caveat as <code>objectives</code>.</li>
 <li><code>perturbed_constraints</code>: constraint values for each perturbation, shape
   <span class="arithmatex">\((n_r, n_p, n_c)\)</span> (if configured).</li>
 <li><code>metadata</code>: optional dict of per-realization/perturbation metadata
