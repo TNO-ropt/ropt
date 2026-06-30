@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import multiprocessing
+import queue
 import traceback
 from functools import partial
 from importlib.util import find_spec
@@ -29,6 +30,7 @@ if _HAVE_CLOUDPICKLE:
 
 
 _PROCESS_TIMEOUT: Final = 10
+_QUEUE_POLL_INTERVAL: Final = 1.0
 
 
 class ExternalBackend(Backend):
@@ -79,7 +81,9 @@ class ExternalBackend(Backend):
         self._allow_nan: bool = backend.allow_nan
         self._is_parallel: bool = backend.is_parallel
 
-    def start(self, initial_values: NDArray[np.float64]) -> None:  # noqa: D102
+    def start(  # noqa: C901, D102
+        self, initial_values: NDArray[np.float64]
+    ) -> None:
         context = multiprocessing.get_context("spawn")
         request_queue = context.Queue()
         result_queue = context.Queue()
@@ -104,21 +108,27 @@ class ExternalBackend(Backend):
 
         process.start()
         while exception is None:
-            if (request := request_queue.get()) is None:
+            try:
+                request = request_queue.get(timeout=_QUEUE_POLL_INTERVAL)
+            except queue.Empty:
+                if not process.is_alive():
+                    exception = RuntimeError(
+                        "External backend subprocess died unexpectedly "
+                        f"(exit code {process.exitcode})"
+                    )
+                    break
+                continue
+            if request is None:
                 break
-            if "error" in request:
-                error_type = request["error"]
-                message = request["message"]
-                tb_str = request["traceback"]
-                exception = RuntimeError(
-                    f"External optimizer error: {error_type}\nmessage:{message}\nstacktrace: {tb_str}"
-                )
+            outcome = _handle_request(request)
+            if isinstance(outcome, Exception):
+                exception = outcome
                 break
             try:
                 result = self._optimizer_callback(
-                    request["variables"],
-                    return_functions=request["return_functions"],
-                    return_gradients=request["return_gradients"],
+                    outcome["variables"],
+                    return_functions=outcome["return_functions"],
+                    return_gradients=outcome["return_gradients"],
                 )
             except Exception as exc:  # noqa: BLE001
                 result = ExitCode.ABORT_FROM_ERROR
@@ -173,13 +183,10 @@ def _run(
 
     try:
         backend.start(np.asarray(initial_values, dtype=np.float64))
-    except Abort:
-        pass
+    except Abort as exc:
+        request_queue.put({"abort": True, "exit_code": int(exc.exit_code)})
     except Exception as exc:  # noqa: BLE001
-        tb_str = traceback.format_exc()
-        request_queue.put(
-            {"error": type(exc).__name__, "message": str(exc), "traceback": tb_str}
-        )
+        request_queue.put(_encode_child_exception(exc))
     finally:
         request_queue.put(None)
 
@@ -204,3 +211,58 @@ def _callback(
         return result
     assert isinstance(result, ExitCode)
     raise Abort(exit_code=result)
+
+
+def _handle_request(
+    request: dict[str, Any],
+) -> Exception | dict[str, Any]:
+    if "abort" in request:
+        return Abort(exit_code=ExitCode(request["exit_code"]))
+    if "exception" in request:
+        return _decode_child_exception(request)
+    if "error" in request:
+        return _wrap_with_traceback(
+            f"External backend subprocess raised {request['error']}: {request['message']}",
+            request["traceback"],
+        )
+    return request
+
+
+def _encode_child_exception(exc: BaseException) -> dict[str, Any]:
+    tb_str = traceback.format_exc()
+    try:
+        pickled = cloudpickle.dumps(exc)
+    except Exception:  # noqa: BLE001
+        return {
+            "error": type(exc).__name__,
+            "message": str(exc),
+            "traceback": tb_str,
+        }
+    return {"exception": pickled, "traceback": tb_str}
+
+
+def _decode_child_exception(request: dict[str, Any]) -> Exception:
+    tb_str = request.get("traceback", "")
+    try:
+        original = cloudpickle.loads(request["exception"])
+    except Exception:  # noqa: BLE001
+        return _wrap_with_traceback(
+            "External backend exception could not be deserialized", tb_str
+        )
+
+    if not isinstance(original, Exception):
+        return _wrap_with_traceback(
+            f"External backend subprocess raised {type(original).__name__}: {original!r}",
+            tb_str,
+        )
+
+    if tb_str:
+        original.add_note(f"External backend child traceback:\n{tb_str}")
+    return original
+
+
+def _wrap_with_traceback(message: str, tb_str: str) -> RuntimeError:
+    err = RuntimeError(message)
+    if tb_str:
+        err.add_note(f"Child traceback:\n{tb_str}")
+    return err
