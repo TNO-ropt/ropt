@@ -2253,6 +2253,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#ropt.exit_info.TooFewRealizationsInfo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TooFewRealizationsInfo
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2350,6 +2361,17 @@
     <span class="md-ellipsis">
       
         AbortFromErrorInfo
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.exit_info.TooFewRealizationsInfo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TooFewRealizationsInfo
       
     </span>
   </a>
@@ -2753,6 +2775,112 @@ on the exit code.</p>
               <div class="doc-md-description">
                 <p>Description of the underlying error that caused the
        abort. Typically the string form of the exception.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="ropt.exit_info.TooFewRealizationsInfo" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">TooFewRealizationsInfo</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="            ExitInfo
+
+
+  
+      dataclass
+   (ropt.exit_info.ExitInfo)" href="#ropt.exit_info.ExitInfo">ExitInfo</a></code></p>
+
+
+
+        <p>Exit info for <a class="autorefs autorefs-internal" title="            ExitCode" href="../enums/#ropt.enums.ExitCode"><code>ExitCode.TOO_FEW_REALIZATIONS</code></a>.</p>
+
+
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.exit_info.TooFewRealizationsInfo.exit_code">exit_code</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ExitCode (ropt.enums.ExitCode)" href="../enums/#ropt.enums.ExitCode">ExitCode</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Always
+                  <a class="autorefs autorefs-internal" title="            ExitCode" href="../enums/#ropt.enums.ExitCode"><code>ExitCode.TOO_FEW_REALIZATIONS</code></a>.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.exit_info.TooFewRealizationsInfo.n_failed">n_failed</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Number of active realizations that failed in the
+                  offending batch.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.exit_info.TooFewRealizationsInfo.failed_perturbations">failed_perturbations</span></code></td>
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.intp">intp</span>] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>For gradient batches, per-realization count of
+                  perturbations that produced a <code>NaN</code> objective.
+                  <code>None</code> for function batches.</p>
               </div>
             </td>
           </tr>
