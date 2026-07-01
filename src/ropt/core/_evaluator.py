@@ -26,7 +26,6 @@ from ._results import (
     _get_gradient_results,
     _get_realizations_to_evaluate,
 )
-from ._utils import _get_failed_realizations
 
 if TYPE_CHECKING:
     from numpy.random import Generator
@@ -185,13 +184,9 @@ class EnsembleEvaluator:
             self._calculate_filtered_realization_weights(f_eval_results)
         )
 
-        assert self._context.gradient.perturbation_min_success is not None
-        failed_realizations = _get_failed_realizations(
-            f_eval_results.objectives,
-            None,
-            self._context.gradient.perturbation_min_success,
+        failed_realizations = _get_failed_function_realizations(
+            f_eval_results.objectives
         )
-
         assert self._context.realizations.realization_min_success is not None
         if (
             np.count_nonzero(~failed_realizations)
@@ -264,7 +259,7 @@ class EnsembleEvaluator:
         )
 
         assert self._context.gradient.perturbation_min_success is not None
-        failed_realizations = _get_failed_realizations(
+        failed_realizations = _get_failed_gradient_realizations(
             cached_function.evaluations.objectives,
             g_eval_results.perturbed_objectives,
             self._context.gradient.perturbation_min_success,
@@ -339,11 +334,8 @@ class EnsembleEvaluator:
             self._calculate_filtered_realization_weights(f_eval_results)
         )
 
-        assert self._context.gradient.perturbation_min_success is not None
-        failed_realizations = _get_failed_realizations(
-            f_eval_results.objectives,
-            None,
-            self._context.gradient.perturbation_min_success,
+        failed_realizations = _get_failed_function_realizations(
+            f_eval_results.objectives
         )
         assert self._context.realizations.realization_min_success is not None
         if (
@@ -379,7 +371,7 @@ class EnsembleEvaluator:
         )
 
         assert self._context.gradient.perturbation_min_success is not None
-        failed_realizations = _get_failed_realizations(
+        failed_realizations = _get_failed_gradient_realizations(
             f_eval_results.objectives,
             g_eval_results.perturbed_objectives,
             self._context.gradient.perturbation_min_success,
@@ -641,3 +633,21 @@ class EnsembleEvaluator:
             )
             item.init(self._context, mask, rng)
         return self._context.samplers
+
+
+def _get_failed_function_realizations(
+    objectives: NDArray[np.float64],
+) -> NDArray[np.bool_]:
+    return np.isnan(objectives[..., 0])
+
+
+def _get_failed_gradient_realizations(
+    objectives: NDArray[np.float64],
+    perturbed_objectives: NDArray[np.float64],
+    perturbation_min_success: int,
+) -> NDArray[np.bool_]:
+    failed_realizations = np.isnan(objectives[..., 0])
+    failed_pertubations = np.isnan(perturbed_objectives[..., 0])
+    success_count = np.count_nonzero(~failed_pertubations, axis=-1)
+    failed_realizations |= success_count < perturbation_min_success
+    return np.array(failed_realizations)

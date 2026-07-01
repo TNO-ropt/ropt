@@ -1,22 +1,25 @@
 import numpy as np
 
-from ropt.core._utils import _get_failed_realizations
+from ropt.core._evaluator import (
+    _get_failed_function_realizations,
+    _get_failed_gradient_realizations,
+)
 
 
 def test_failed_realizations01() -> None:
-    failed_realizations = _get_failed_realizations(np.array([[np.nan, 1.0]]), None, 0)
+    failed_realizations = _get_failed_function_realizations(np.array([[np.nan, 1.0]]))
     assert np.all(failed_realizations == [True])
 
 
 def test_failed_realizations02() -> None:
-    failed_realizations = _get_failed_realizations(
+    failed_realizations = _get_failed_gradient_realizations(
         np.array([[1.0, 1.0]]), np.array([[5 * [np.nan, 1.0]]]), 1
     )
     assert np.all(failed_realizations == [True])
 
 
 def test_failed_realizations03() -> None:
-    failed_realizations = _get_failed_realizations(
+    failed_realizations = _get_failed_gradient_realizations(
         np.array([[1.0, 1.0]]),
         np.array(
             [[[1.0, 1.0], [1.0, 1.0], [np.nan, 1.0], [np.nan, 1.0], [np.nan, np.nan]]]
@@ -27,7 +30,7 @@ def test_failed_realizations03() -> None:
 
 
 def test_failed_realizations04() -> None:
-    failed_realizations = _get_failed_realizations(
+    failed_realizations = _get_failed_gradient_realizations(
         np.array([[1.0, 1.0]]),
         np.array(
             [[[1.0, 1.0], [1.0, 1.0], [1.0, 1.0], [1.0, 1.0], [np.nan, 1.0]]],
@@ -38,7 +41,7 @@ def test_failed_realizations04() -> None:
 
 
 def test_failed_realizations05() -> None:
-    failed_realizations = _get_failed_realizations(
+    failed_realizations = _get_failed_gradient_realizations(
         np.array([[1.0, 1.0], [1.0, 1.0]]),
         np.array([[[1.0, 1.0]], [[np.nan, 1.0]]]),
         1,
@@ -47,7 +50,7 @@ def test_failed_realizations05() -> None:
 
 
 def test_failed_realizations06() -> None:
-    failed_realizations = _get_failed_realizations(
+    failed_realizations = _get_failed_gradient_realizations(
         np.array([[1.0, 1.0], [np.nan, 1.0]]),
         np.array([[[1.0], [1.0]], [[1.0], [1.0]]]),
         1,
@@ -56,7 +59,7 @@ def test_failed_realizations06() -> None:
 
 
 def test_failed_realizations07() -> None:
-    failed_realizations = _get_failed_realizations(
+    failed_realizations = _get_failed_gradient_realizations(
         np.array([[1.0, 1.0], [np.nan, np.nan]]),
         np.array([[[1.0], [1.0]], [[1.0], [1.0]]]),
         1,
@@ -65,7 +68,7 @@ def test_failed_realizations07() -> None:
 
 
 def test_failed_realizations08() -> None:
-    failed_realizations = _get_failed_realizations(
+    failed_realizations = _get_failed_gradient_realizations(
         np.array([[1.0, 1.0], [1.0, 1.0]]),
         np.array([[[1.0, 1.0], [1.0, 1.0]], [[np.nan, np.nan], [1.0, 1.0]]]),
         1,
