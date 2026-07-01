@@ -10,6 +10,7 @@ import pytest
 from ropt.context import EnOptContext
 from ropt.enums import EnOptEventType, ExitCode
 from ropt.exceptions import Abort
+from ropt.exit_info import ExitInfo
 from ropt.results import FunctionResults
 from ropt.workflow import BasicOptimizer
 from ropt.workflow.compute_steps import EvaluationStep, OptimizationStep
@@ -514,7 +515,7 @@ def test_exit_code(
     exit_code = step.run(
         variables=initial_values, context=EnOptContext.model_validate(config)
     )
-    assert exit_code == max_enum
+    assert exit_code.exit_code == max_enum
 
 
 def test_nested_optimization(
@@ -577,7 +578,7 @@ def test_optimization_abort(config: Any, evaluator: Any) -> None:
 
         last_evaluation += 1
         if last_evaluation == 1:
-            raise Abort(exit_code=ExitCode.USER_ABORT)
+            raise Abort(ExitInfo(exit_code=ExitCode.USER_ABORT))
 
     result_handler = ResultsHandler()
     step = OptimizationStep(evaluator=evaluator())
@@ -591,7 +592,7 @@ def test_optimization_abort(config: Any, evaluator: Any) -> None:
         variables=initial_values, context=EnOptContext.model_validate(config)
     )
     assert result_handler["results"] is not None
-    assert exit_code == ExitCode.USER_ABORT
+    assert exit_code.exit_code == ExitCode.USER_ABORT
     assert last_evaluation == 1
 
 

@@ -12,6 +12,7 @@ import numpy as np
 from ropt.enums import ExitCode
 from ropt.evaluation import EvaluationBatchContext, EvaluationBatchResult
 from ropt.exceptions import Abort, ServerFailure
+from ropt.exit_info import ExitInfo
 from ropt.workflow.servers import ResultsQueue, Server, Task
 
 from .base import (
@@ -115,7 +116,12 @@ class AsyncEvaluator(Evaluator):
             Abort: raise if the server is not running.
         """
         if not self._server.is_running():
-            raise Abort(ExitCode.ABORT_FROM_ERROR)
+            raise Abort(
+                ExitInfo(
+                    exit_code=ExitCode.ABORT_FROM_ERROR,
+                    message="Evaluation server is not running",
+                )
+            )
 
         with self._batch_lock:
             batch_id = self._batch_id
@@ -148,7 +154,12 @@ class AsyncEvaluator(Evaluator):
             while self._server.is_running():
                 try:
                     if (task := results_queue.get(timeout=1)) is None:
-                        raise Abort(ExitCode.ABORT_FROM_ERROR)
+                        raise Abort(
+                            ExitInfo(
+                                exit_code=ExitCode.ABORT_FROM_ERROR,
+                                message="Evaluation server is not running",
+                            )
+                        )
                     received += _handle_result(
                         task, results, metadata, no, variables.shape[0]
                     )
@@ -156,7 +167,12 @@ class AsyncEvaluator(Evaluator):
                 except queue.Empty:
                     continue
             if not self._server.is_running():
-                raise Abort(ExitCode.ABORT_FROM_ERROR)
+                raise Abort(
+                    ExitInfo(
+                        exit_code=ExitCode.ABORT_FROM_ERROR,
+                        message="Evaluation server is not running",
+                    )
+                )
 
         return EvaluationBatchResult(
             batch_id=batch_id,
@@ -180,7 +196,12 @@ class AsyncEvaluator(Evaluator):
             raise
 
         if not self._server.is_running():
-            raise Abort(ExitCode.ABORT_FROM_ERROR)
+            raise Abort(
+                ExitInfo(
+                    exit_code=ExitCode.ABORT_FROM_ERROR,
+                    message="Evaluation server is not running",
+                )
+            )
 
     async def _submit_bundles(
         self,

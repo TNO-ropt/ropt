@@ -13,8 +13,8 @@ import numpy as np
 
 from ropt.backend import Backend
 from ropt.core import OptimizerCallback, OptimizerCallbackResult
-from ropt.enums import ExitCode
 from ropt.exceptions import Abort
+from ropt.exit_info import AbortFromErrorInfo, ExitInfo
 from ropt.plugins.manager import get_plugin
 
 if TYPE_CHECKING:
@@ -102,7 +102,7 @@ class ExternalBackend(Backend):
             ),
         )
 
-        result: OptimizerCallbackResult | ExitCode
+        result: OptimizerCallbackResult | ExitInfo
         exception: Exception | None = None
 
         process.start()
@@ -130,7 +130,7 @@ class ExternalBackend(Backend):
                     return_gradients=outcome["return_gradients"],
                 )
             except Exception as exc:  # noqa: BLE001
-                result = ExitCode.ABORT_FROM_ERROR
+                result = AbortFromErrorInfo(error=str(exc))
                 exception = exc
             result_queue.put(result)
         process.join(_PROCESS_TIMEOUT)
@@ -161,7 +161,7 @@ class ExternalBackend(Backend):
 def _run(
     data: bytes,
     request_queue: multiprocessing.Queue[dict[str, Any] | None],
-    result_queue: multiprocessing.Queue[OptimizerCallbackResult | ExitCode],
+    result_queue: multiprocessing.Queue[OptimizerCallbackResult | ExitInfo],
 ) -> None:
     data_dict = cloudpickle.loads(data)
     config = data_dict["config"]
@@ -179,7 +179,7 @@ def _run(
     try:
         backend.start(np.asarray(initial_values, dtype=np.float64))
     except Abort as exc:
-        request_queue.put({"abort": True, "exit_code": int(exc.exit_code)})
+        request_queue.put({"abort": True, "info": exc.info})
     except Exception as exc:  # noqa: BLE001
         request_queue.put(_encode_child_exception(exc))
     finally:
@@ -192,7 +192,7 @@ def _callback(
     return_functions: bool,
     return_gradients: bool,
     request_queue: multiprocessing.Queue[dict[str, Any] | None],
-    result_queue: multiprocessing.Queue[OptimizerCallbackResult | ExitCode],
+    result_queue: multiprocessing.Queue[OptimizerCallbackResult | ExitInfo],
 ) -> OptimizerCallbackResult:
     request_queue.put(
         {
@@ -204,15 +204,15 @@ def _callback(
     result = result_queue.get()
     if isinstance(result, OptimizerCallbackResult):
         return result
-    assert isinstance(result, ExitCode)
-    raise Abort(exit_code=result)
+    assert isinstance(result, ExitInfo)
+    raise Abort(result)
 
 
 def _handle_request(
     request: dict[str, Any],
 ) -> Exception | dict[str, Any]:
     if "abort" in request:
-        return Abort(exit_code=ExitCode(request["exit_code"]))
+        return Abort(request["info"])
     if "exception" in request:
         return _decode_child_exception(request)
     if "error" in request:

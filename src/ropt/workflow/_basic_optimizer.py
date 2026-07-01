@@ -15,6 +15,7 @@ import numpy as np
 from ropt.context import EnOptContext
 from ropt.enums import EnOptEventType, ExitCode
 from ropt.exceptions import Abort
+from ropt.exit_info import ExitInfo
 from ropt.workflow.evaluators import BatchEvaluator, Evaluator
 
 from .compute_steps import OptimizationStep
@@ -83,7 +84,7 @@ class BasicOptimizer:
         """
         return self._results
 
-    def run(self, initial_values: ArrayLike) -> ExitCode:
+    def run(self, initial_values: ArrayLike) -> ExitInfo:
         """Run the optimization process.
 
         This method initiates and executes the optimization workflow defined by
@@ -110,13 +111,17 @@ class BasicOptimizer:
         for handler in _custom_event_handlers():
             optimizer.add_event_handler(handler())
 
-        exit_code = optimizer.run(
+        exit_info = optimizer.run(
             variables=np.asarray(initial_values, dtype=np.float64),
             context=self._context,
         )
         self._results = result_handler["results"]
 
-        return exit_code if isinstance(exit_code, ExitCode) else ExitCode.UNKNOWN
+        return (
+            exit_info
+            if isinstance(exit_info, ExitInfo)
+            else ExitInfo(exit_code=ExitCode.UNKNOWN)
+        )
 
     def set_abort_callback(self, callback: Callable[[], bool]) -> None:
         """Set a callback to check for abort conditions.
@@ -135,7 +140,7 @@ class BasicOptimizer:
 
         def _check_abort_callback(event: EnOptEvent) -> None:  # noqa: ARG001
             if callback():
-                raise Abort(exit_code=ExitCode.USER_ABORT)
+                raise Abort(ExitInfo(exit_code=ExitCode.USER_ABORT))
 
         self._observers.append((EnOptEventType.START_EVALUATION, _check_abort_callback))
 

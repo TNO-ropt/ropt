@@ -10,6 +10,7 @@ from ropt.config import RealizationFilterConfig
 from ropt.context import EnOptContext
 from ropt.enums import ExitCode
 from ropt.exceptions import Abort
+from ropt.exit_info import ExitInfo
 from ropt.realization_filter import RealizationFilter
 
 DEFAULT_REALIZATION_FILTER_METHODS = {
@@ -167,7 +168,15 @@ class DefaultRealizationFilter(RealizationFilter):
                 raise ValueError(msg)
 
         if not np.any(weights > 0):
-            raise Abort(exit_code=ExitCode.TOO_FEW_REALIZATIONS)
+            raise Abort(
+                ExitInfo(
+                    exit_code=ExitCode.TOO_FEW_REALIZATIONS,
+                    message=(
+                        "Realization filter produced no realizations with"
+                        " non-zero weight"
+                    ),
+                )
+            )
 
         return weights
 

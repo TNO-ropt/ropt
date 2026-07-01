@@ -11,6 +11,7 @@ from ropt.core import EnsembleEvaluator
 from ropt.enums import EnOptEventType, ExitCode
 from ropt.events import EnOptEvent
 from ropt.exceptions import Abort
+from ropt.exit_info import ExitInfo
 from ropt.results import FunctionResults
 
 from .base import ComputeStep
@@ -50,18 +51,18 @@ class EvaluationStep(ComputeStep):
         variables: ArrayLike,
         *,
         metadata: dict[str, Any] | None = None,
-    ) -> ExitCode:
+    ) -> ExitInfo:
         """Run the ensemble evaluation.
 
         Args:
             context:    Optimizer context.
             variables:  Variable vector(s) to evaluate.
             metadata:   Optional dictionary attached to emitted
-                [`FunctionResults`][ropt.results.FunctionResults] via the
-                `FINISHED_EVALUATION` event.
+                        [`FunctionResults`][ropt.results.FunctionResults] via the
+                       `FINISHED_EVALUATION` event.
 
         Returns:
-            An [`ExitCode`][ropt.enums.ExitCode] indicating the outcome.
+            An [`ExitInfo`][ropt.exit_info.ExitInfo] describing the outcome.
 
         Raises:
             ValueError: If the input variables have the wrong shape.
@@ -83,7 +84,7 @@ class EvaluationStep(ComputeStep):
 
         ensemble_evaluator = EnsembleEvaluator(context, self._evaluator.eval)
 
-        exit_code = ExitCode.ENSEMBLE_EVALUATOR_FINISHED
+        exit_info = ExitInfo(exit_code=ExitCode.ENSEMBLE_EVALUATOR_FINISHED)
 
         self._emit_event(
             EnOptEvent(event_type=EnOptEventType.START_EVALUATION, context=context)
@@ -93,12 +94,12 @@ class EvaluationStep(ComputeStep):
                 variables, compute_functions=True, compute_gradients=False
             )
         except Abort as exc:
-            exit_code = exc.exit_code
+            exit_info = exc.info
 
         assert results
         assert isinstance(results[0], FunctionResults)
         if results[0].functions is None:
-            exit_code = ExitCode.TOO_FEW_REALIZATIONS
+            exit_info = ExitInfo(exit_code=ExitCode.TOO_FEW_REALIZATIONS)
 
         if metadata is not None:
             for item in results:
@@ -120,7 +121,7 @@ class EvaluationStep(ComputeStep):
             )
         )
 
-        return exit_code
+        return exit_info
 
     def _emit_event(self, event: EnOptEvent) -> None:
         for handler in self.event_handlers:

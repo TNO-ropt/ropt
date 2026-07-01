@@ -11,6 +11,11 @@ import numpy as np
 
 from ropt.enums import ExitCode
 from ropt.exceptions import Abort
+from ropt.exit_info import (
+    ExitInfo,
+    MaxBatchesReachedInfo,
+    MaxFunctionsReachedInfo,
+)
 from ropt.results import FunctionResults, GradientResults
 
 from ._callback import OptimizerCallbackResult
@@ -118,7 +123,7 @@ class EnsembleOptimizer:
         """
         return self._backend.is_parallel
 
-    def start(self, variables: NDArray[np.float64]) -> ExitCode:
+    def start(self, variables: NDArray[np.float64]) -> ExitInfo:
         """Start the optimization process.
 
         This method initiates the optimization process using the provided
@@ -129,17 +134,17 @@ class EnsembleOptimizer:
             variables: The initial variables for the optimization.
 
         Returns:
-            An [`ExitCode`][ropt.enums.ExitCode] indicating the reason for
+            An [`ExitInfo`][ropt.exit_info.ExitInfo] describing the reason for
                 termination.
         """
         self._initial_variables = variables.copy()
-        exit_code = ExitCode.OPTIMIZER_FINISHED
+        info = ExitInfo(exit_code=ExitCode.OPTIMIZER_FINISHED)
         try:
             with self._redirector.start():
                 self._backend.start(variables)
         except Abort as exc:
-            exit_code = exc.exit_code
-        return exit_code
+            info = exc.info
+        return info
 
     def _optimizer_callback(
         self,
@@ -211,10 +216,10 @@ class EnsembleOptimizer:
     def _check_stopping_criteria(self) -> None:
         max_functions = self._context.optimizer.max_functions
         if max_functions is not None and self._completed_functions >= max_functions:
-            raise Abort(exit_code=ExitCode.MAX_FUNCTIONS_REACHED)
+            raise Abort(MaxFunctionsReachedInfo(limit=max_functions))
         max_batches = self._context.optimizer.max_batches
         if max_batches is not None and self._completed_batches >= max_batches:
-            raise Abort(exit_code=ExitCode.MAX_BATCHES_REACHED)
+            raise Abort(MaxBatchesReachedInfo(limit=max_batches))
 
     def _run_evaluations(
         self,
@@ -233,20 +238,20 @@ class EnsembleOptimizer:
                 compute_gradients=compute_gradients,
             )
 
-            exit_code: ExitCode | None = None
+            failed: FunctionResults | GradientResults | None = None
             for result in results:
                 assert isinstance(result, FunctionResults | GradientResults)
                 if (
                     isinstance(result, FunctionResults) and result.functions is None
                 ) or (isinstance(result, GradientResults) and result.gradients is None):
-                    exit_code = ExitCode.TOO_FEW_REALIZATIONS
+                    failed = result
                     break
 
             if self._signal_evaluation:
                 self._signal_evaluation(results)
 
-            if exit_code is not None:
-                raise Abort(exit_code=exit_code)
+            if failed is not None:
+                raise Abort(ExitInfo(exit_code=ExitCode.TOO_FEW_REALIZATIONS))
 
         return results
 
