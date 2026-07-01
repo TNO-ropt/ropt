@@ -31,17 +31,6 @@ class Realizations(ResultField):
         - Axis type:
             - [`AxisName.REALIZATION`][ropt.enums.AxisName.REALIZATION]
 
-    === "Failed Realizations"
-
-        `failed_realizations`: A boolean array indicating whether each
-        realization's evaluation was successful. `True` indicates a failed
-        realization, while `False` indicates a successful one:
-
-        - Shape $(n_r,)$, where:
-            - $n_r$ is the number of realizations.
-        - Axis type:
-            - [`AxisName.REALIZATION`][ropt.enums.AxisName.REALIZATION]
-
     === "Objective Weights"
 
         `objective_weights`: A two-dimensional array of weights used for each
@@ -86,11 +75,6 @@ class Realizations(ResultField):
             "__axes__": (AxisName.REALIZATION,),
         },
     )
-    failed_realizations: NDArray[np.bool_] = field(
-        metadata={
-            "__axes__": (AxisName.REALIZATION,),
-        },
-    )
     objective_weights: NDArray[np.float64] | None = field(
         default=None,
         metadata={
@@ -112,6 +96,5 @@ class Realizations(ResultField):
 
     def __post_init__(self) -> None:
         self.active_realizations = _immutable_copy(self.active_realizations)
-        self.failed_realizations = _immutable_copy(self.failed_realizations)
         self.objective_weights = _immutable_copy(self.objective_weights)
         self.constraint_weights = _immutable_copy(self.constraint_weights)

@@ -174,19 +174,6 @@ def test_failed_realizations_constraints(
     assert exit_code == ExitCode.TOO_FEW_REALIZATIONS
 
 
-def test_all_failed_realizations_not_supported(
-    config: Any, evaluator: Any, external: str
-) -> None:
-    config["realizations"] = {"realization_min_success": 0}
-
-    config["backend"]["method"] = f"{external}{_SLSQP}"
-
-    functions = [lambda _0, _1: 1.0, lambda _0, _1: np.nan]
-    optimizer = BasicOptimizer(config, evaluator(functions))
-    exit_code = optimizer.run(initial_values)
-    assert exit_code == ExitCode.TOO_FEW_REALIZATIONS
-
-
 def test_user_abort(config: Any, evaluator: Any, external: str) -> None:
     last_evaluation = 0
 

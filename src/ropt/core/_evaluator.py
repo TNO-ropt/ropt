@@ -221,7 +221,6 @@ class EnsembleEvaluator:
             evaluations=evaluations,
             realizations=Realizations(
                 active_realizations=active_realizations,
-                failed_realizations=failed_realizations,
                 objective_weights=objective_weights,
                 constraint_weights=constraint_weights,
             ),
@@ -305,7 +304,6 @@ class EnsembleEvaluator:
                 ),
                 realizations=Realizations(
                     active_realizations=active_realizations,
-                    failed_realizations=failed_realizations,
                     objective_weights=objective_weights,
                     constraint_weights=constraint_weights,
                 ),
@@ -369,7 +367,6 @@ class EnsembleEvaluator:
             evaluations=evaluations,
             realizations=Realizations(
                 active_realizations=active_realizations,
-                failed_realizations=failed_realizations,
                 objective_weights=objective_weights,
                 constraint_weights=constraint_weights,
             ),
@@ -420,7 +417,6 @@ class EnsembleEvaluator:
             ),
             realizations=Realizations(
                 active_realizations=active_realizations,
-                failed_realizations=failed_realizations,
                 objective_weights=objective_weights,
                 constraint_weights=constraint_weights,
             ),
