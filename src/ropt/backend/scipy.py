@@ -201,10 +201,6 @@ class SciPyBackend(Backend):
                 )
 
     @property
-    def allow_nan(self) -> bool:  # noqa: D102
-        return self._method == "differential_evolution"
-
-    @property
     def is_parallel(self) -> bool:  # noqa: D102
         return self._parallel
 
@@ -544,8 +540,6 @@ class SciPyBackend(Backend):
             assert bounds is not None
             self._normalized_constraints.set_bounds(*bounds)
 
-        if self.allow_nan and new_function is not None:
-            new_function = np.where(np.isnan(new_function), np.inf, new_function)
         return new_function, new_gradient
 
     def _parse_options(self) -> dict[str, Any]:

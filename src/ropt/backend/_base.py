@@ -57,8 +57,6 @@ class Backend(ABC):
 
     Subclasses may optionally override:
 
-    - `allow_nan`: Indicates whether the backend can continue when evaluations
-                   produce `NaN` values.
     - `is_parallel`: Indicates whether the backend may evaluate multiple
                      candidate variable vectors concurrently.
     """
@@ -109,24 +107,6 @@ class Backend(ABC):
             initial_values: A 1D array of shape `(n_variables,)` containing
                 the starting point for the optimization.
         """
-
-    @property
-    def allow_nan(self) -> bool:
-        """Indicate whether the backend can handle `NaN` evaluation results.
-
-        Backends that can continue after receiving `NaN` objective or
-        constraint values should override this property to return `True`.
-
-        This is particularly relevant in ensemble-based optimization where
-        evaluations might fail for all realizations. When `allow_nan` is `True`,
-        setting [`realization_min_success`][ropt.config.RealizationsConfig] to
-        zero allows the evaluation process to return `NaN` instead of raising an
-        error, enabling the optimizer to potentially continue.
-
-        Returns:
-            `True` if the backend supports `NaN` evaluation results.
-        """
-        return False
 
     @property
     def is_parallel(self) -> bool:

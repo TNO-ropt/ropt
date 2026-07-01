@@ -97,12 +97,8 @@ class EnsembleOptimizer:
         self._completed_functions = 0
         self._completed_batches = 0
 
-        # Whether NaN values are allowed:
-        self._allow_nan = False
-
         self._backend = self._context.backend
         self._backend.init(self._context, self._optimizer_callback)
-        self._allow_nan = self._backend.allow_nan
 
         # Optional redirection of standard output:
         self._redirector = _Redirector(self._context)
@@ -237,28 +233,12 @@ class EnsembleOptimizer:
                 compute_gradients=compute_gradients,
             )
 
-            # If the configuration allows for zero successful realizations, there
-            # will always be results. However, they may all be equal to `np.nan`. If
-            # the optimizer does not set the allow_nan flag, it cannot handle such a
-            # case, and we need to check for it:
-            assert self._context.realizations.realization_min_success is not None
-            check_failures = (
-                self._context.realizations.realization_min_success < 1
-                and not self._allow_nan
-            )
             exit_code: ExitCode | None = None
             for result in results:
                 assert isinstance(result, FunctionResults | GradientResults)
-                no_functions = (
+                if (
                     isinstance(result, FunctionResults) and result.functions is None
-                )
-                no_gradient = (
-                    isinstance(result, GradientResults) and result.gradients is None
-                )
-                all_failures = check_failures and np.all(
-                    result.realizations.failed_realizations
-                )
-                if no_functions or no_gradient or all_failures:
+                ) or (isinstance(result, GradientResults) and result.gradients is None):
                     exit_code = ExitCode.TOO_FEW_REALIZATIONS
                     break
 

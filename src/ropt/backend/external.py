@@ -78,7 +78,6 @@ class ExternalBackend(Backend):
         backend.init(
             context.model_copy(update={"backend": backend}), optimizer_callback
         )
-        self._allow_nan: bool = backend.allow_nan
         self._is_parallel: bool = backend.is_parallel
 
     def start(  # noqa: C901, D102
@@ -153,10 +152,6 @@ class ExternalBackend(Backend):
         self,
     ) -> None:
         self._backend_plugin.create(self._backend_config).validate_options()
-
-    @property
-    def allow_nan(self) -> bool:  # noqa: D102
-        return self._allow_nan
 
     @property
     def is_parallel(self) -> bool:  # noqa: D102

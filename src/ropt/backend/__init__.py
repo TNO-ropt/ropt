@@ -11,7 +11,7 @@ initial variable vector toward a solution.
 All backend implementations inherit from the
 [`Backend`][ropt.backend.Backend] base class, which defines the backend
 lifecycle (`__init__`, `init`, `start`), validation hook (`validate_options`),
-and capability flags (`allow_nan`, `is_parallel`).
+and capability flags (`is_parallel`).
 
 **Integration with Optimization**
 
