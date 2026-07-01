@@ -163,7 +163,9 @@ def _get_from_cache(
             realization_index = list(names).index(realization_name)
             if realization_index < 0:
                 continue
-        if results.realizations.active_realizations[realization_index] and np.allclose(
+        if results.realizations.evaluated_realizations[
+            realization_index
+        ] and np.allclose(
             results.evaluations.variables, variables, rtol=0.0, atol=_EPS
         ):
             return results, realization_index

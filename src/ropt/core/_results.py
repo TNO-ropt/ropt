@@ -81,7 +81,7 @@ def _propagate_nan_values(
     return objective_results, constraint_results
 
 
-def _get_active_realizations(
+def _get_realizations_to_evaluate(
     context: EnOptContext,
     *,
     objective_weights: NDArray[np.float64] | None = None,
@@ -89,13 +89,13 @@ def _get_active_realizations(
 ) -> NDArray[np.bool_]:
     if objective_weights is None:
         return np.abs(context.realizations.weights) > 0
-    active_realizations: NDArray[np.bool_] = np.any(
+    realizations_to_evaluate: NDArray[np.bool_] = np.any(
         np.abs(objective_weights) > 0, axis=0
     )
     if constraint_weights is None:
-        return active_realizations
+        return realizations_to_evaluate
     return np.logical_or(
-        active_realizations, np.any(np.abs(constraint_weights) > 0, axis=0)
+        realizations_to_evaluate, np.any(np.abs(constraint_weights) > 0, axis=0)
     )
 
 
@@ -103,7 +103,7 @@ def _get_function_results(
     context: EnOptContext,
     evaluator: EvaluationBatchCallback,
     variables: NDArray[np.float64],
-    active_realizations: NDArray[np.bool_],
+    realizations_to_evaluate: NDArray[np.bool_],
 ) -> Generator[tuple[int, _FunctionEvaluatorResults], None, None]:
     realization_num = context.realizations.weights.size
     realizations = np.tile(
@@ -112,7 +112,7 @@ def _get_function_results(
     evaluator_context = EvaluationBatchContext(
         context=context,
         realizations=realizations,
-        active=active_realizations[realizations],
+        active=realizations_to_evaluate[realizations],
     )
     for variable_transform in context.variable_transforms:
         variables = variable_transform.from_optimizer(variables)
@@ -152,7 +152,7 @@ def _get_gradient_results(
     context: EnOptContext,
     evaluator: EvaluationBatchCallback,
     perturbed_variables: NDArray[np.float64],
-    active_realizations: NDArray[np.bool_],
+    realizations_to_evaluate: NDArray[np.bool_],
 ) -> _GradientEvaluatorResults:
     realization_num = context.realizations.weights.size
     perturbation_num = context.gradient.number_of_perturbations
@@ -163,7 +163,7 @@ def _get_gradient_results(
         context=context,
         realizations=realizations,
         perturbations=np.tile(np.arange(perturbation_num), realization_num),
-        active=active_realizations[realizations],
+        active=realizations_to_evaluate[realizations],
     )
     variables: NDArray[np.float64] = perturbed_variables.reshape(
         -1, perturbed_variables.shape[-1]
@@ -193,7 +193,7 @@ def _get_function_and_gradient_results(
     evaluator: EvaluationBatchCallback,
     variables: NDArray[np.float64],
     perturbed_variables: NDArray[np.float64],
-    active_realizations: NDArray[np.bool_],
+    realizations_to_evaluate: NDArray[np.bool_],
 ) -> tuple[_FunctionEvaluatorResults, _GradientEvaluatorResults]:
     realization_num = context.realizations.weights.size
     perturbation_num = context.gradient.number_of_perturbations
@@ -213,7 +213,7 @@ def _get_function_and_gradient_results(
                 np.tile(np.arange(perturbation_num), realization_num),
             )
         ),
-        active=active_realizations[realizations],
+        active=realizations_to_evaluate[realizations],
     )
     all_variables = np.vstack(
         (

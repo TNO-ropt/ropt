@@ -95,15 +95,15 @@ def _estimate_gradients(
     delta_functions: NDArray[np.float64],
     weights: NDArray[np.float64],
 ) -> NDArray[np.float64]:
-    active_realizations = np.abs(weights) > 0
-    realization_count = active_realizations.size
+    realizations_mask = np.abs(weights) > 0
+    realization_count = realizations_mask.size
     gradients: NDArray[np.float64] = np.zeros(
         (delta_variables.shape[-1], realization_count), dtype=np.float64
     )
     all_successes = np.logical_not(np.isnan(delta_functions))
     for idx in range(realization_count):
         success = all_successes[idx]
-        if active_realizations[idx] and np.any(success):
+        if realizations_mask[idx] and np.any(success):
             ensemble_matrix = delta_variables[idx, success, :]
             gradients[:, idx] = _invert_linear_equations(
                 ensemble_matrix, delta_functions[idx, success]
@@ -117,8 +117,8 @@ def _estimate_merged_gradient(
     weights: NDArray[np.float64],
 ) -> NDArray[np.float64]:
     delta_functions = delta_functions.copy() * np.expand_dims(weights, axis=-1)
-    active_realizations = np.abs(weights) > 0
-    active_perturbations = np.repeat(active_realizations, delta_variables.shape[1])
+    realizations_mask = np.abs(weights) > 0
+    active_perturbations = np.repeat(realizations_mask, delta_variables.shape[1])
     delta_variables = delta_variables.reshape(-1, delta_variables.shape[-1])
     delta_functions = delta_functions.flatten()
     active_perturbations &= np.logical_not(np.isnan(delta_functions))

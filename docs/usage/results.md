@@ -55,9 +55,8 @@ Each carries nested [`ResultField`][ropt.results.ResultField] objects:
       configured).
 - **`realizations`** ([`Realizations`][ropt.results.Realizations]) — ensemble
   metadata:
-    - `active_realizations`: boolean array indicating which realizations were
+    - `evaluated_realizations`: boolean array indicating which realizations were
       evaluated, shape $(n_r,)$.
-    - `failed_realizations`: boolean array indicating failures, shape $(n_r,)$.
     - `objective_weights`: per-realization objective weights, shape
       $(n_o, n_r)$. May change during optimization (e.g., when realization
       filters are active).

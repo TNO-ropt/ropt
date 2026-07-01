@@ -21,10 +21,10 @@ from ._function import _calculate_estimated_functions
 from ._gradient import _calculate_estimated_gradients, _perturb_variables
 from ._results import (
     _FunctionEvaluatorResults,
-    _get_active_realizations,
     _get_function_and_gradient_results,
     _get_function_results,
     _get_gradient_results,
+    _get_realizations_to_evaluate,
 )
 from ._utils import _get_failed_realizations
 
@@ -162,16 +162,16 @@ class EnsembleEvaluator:
     ) -> tuple[FunctionResults, ...]:
         if variables.ndim == 1:
             variables = variables[np.newaxis, :]
-        active_realizations = _get_active_realizations(self._context)
+        realizations_to_evaluate = _get_realizations_to_evaluate(self._context)
         return tuple(
             self._calculate_one_set_of_functions(
-                f_eval_results, variables[idx, :], active_realizations
+                f_eval_results, variables[idx, :], realizations_to_evaluate
             )
             for idx, f_eval_results in _get_function_results(
                 self._context,
                 self._evaluator,
                 variables,
-                active_realizations,
+                realizations_to_evaluate,
             )
         )
 
@@ -179,7 +179,7 @@ class EnsembleEvaluator:
         self,
         f_eval_results: _FunctionEvaluatorResults,
         variables: NDArray[np.float64],
-        active_realizations: NDArray[np.bool_],
+        realizations_to_evaluate: NDArray[np.bool_],
     ) -> FunctionResults:
         objective_weights, constraint_weights = (
             self._calculate_filtered_realization_weights(f_eval_results)
@@ -220,7 +220,7 @@ class EnsembleEvaluator:
             names=self._context.names,
             evaluations=evaluations,
             realizations=Realizations(
-                active_realizations=active_realizations,
+                evaluated_realizations=realizations_to_evaluate,
                 objective_weights=objective_weights,
                 constraint_weights=constraint_weights,
             ),
@@ -251,7 +251,7 @@ class EnsembleEvaluator:
         objective_weights = cached_function.realizations.objective_weights
         constraint_weights = cached_function.realizations.constraint_weights
 
-        active_realizations = _get_active_realizations(
+        realizations_to_evaluate = _get_realizations_to_evaluate(
             self._context,
             objective_weights=objective_weights,
             constraint_weights=constraint_weights,
@@ -260,7 +260,7 @@ class EnsembleEvaluator:
             self._context,
             self._evaluator,
             perturbed_variables,
-            active_realizations,
+            realizations_to_evaluate,
         )
 
         assert self._context.gradient.perturbation_min_success is not None
@@ -303,7 +303,7 @@ class EnsembleEvaluator:
                     metadata=g_eval_results.metadata,
                 ),
                 realizations=Realizations(
-                    active_realizations=active_realizations,
+                    evaluated_realizations=realizations_to_evaluate,
                     objective_weights=objective_weights,
                     constraint_weights=constraint_weights,
                 ),
@@ -319,13 +319,13 @@ class EnsembleEvaluator:
         perturbed_variables = _perturb_variables(
             self._context, variables, self._samplers
         )
-        active_realizations = _get_active_realizations(self._context)
+        realizations_to_evaluate = _get_realizations_to_evaluate(self._context)
         f_eval_results, g_eval_results = _get_function_and_gradient_results(
             self._context,
             self._evaluator,
             variables,
             perturbed_variables,
-            active_realizations,
+            realizations_to_evaluate,
         )
 
         evaluations = FunctionEvaluations.create(
@@ -366,7 +366,7 @@ class EnsembleEvaluator:
             names=self._context.names,
             evaluations=evaluations,
             realizations=Realizations(
-                active_realizations=active_realizations,
+                evaluated_realizations=realizations_to_evaluate,
                 objective_weights=objective_weights,
                 constraint_weights=constraint_weights,
             ),
@@ -416,7 +416,7 @@ class EnsembleEvaluator:
                 metadata=g_eval_results.metadata,
             ),
             realizations=Realizations(
-                active_realizations=active_realizations,
+                evaluated_realizations=realizations_to_evaluate,
                 objective_weights=objective_weights,
                 constraint_weights=constraint_weights,
             ),

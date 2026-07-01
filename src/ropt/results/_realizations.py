@@ -23,7 +23,7 @@ class Realizations(ResultField):
 
     === "Active Realizations"
 
-        `active_realizations`: A boolean array indicating which realizations
+        `evaluated_realizations`: A boolean array indicating which realizations
         were evaluated. `True` indicates that a realization was evaluated:
 
         - Shape $(n_r,)$, where:
@@ -62,15 +62,15 @@ class Realizations(ResultField):
         constraint calculation.
 
     Attributes:
-        active_realizations: Boolean array indicating active realizations.
-        failed_realizations: Boolean array indicating failed realizations.
-        objective_weights:   Weights for each objective in each realization,
-                             if available.
-        constraint_weights:  Weights for each constraint in each realization,
-                             if available.
+        evaluated_realizations: Boolean array indicating active realizations.
+        failed_realizations:    Boolean array indicating failed realizations.
+        objective_weights:      Weights for each objective in each realization,
+                                if available.
+        constraint_weights:     Weights for each constraint in each realization,
+                                if available.
     """
 
-    active_realizations: NDArray[np.bool_] = field(
+    evaluated_realizations: NDArray[np.bool_] = field(
         metadata={
             "__axes__": (AxisName.REALIZATION,),
         },
@@ -95,6 +95,6 @@ class Realizations(ResultField):
     )
 
     def __post_init__(self) -> None:
-        self.active_realizations = _immutable_copy(self.active_realizations)
+        self.evaluated_realizations = _immutable_copy(self.evaluated_realizations)
         self.objective_weights = _immutable_copy(self.objective_weights)
         self.constraint_weights = _immutable_copy(self.constraint_weights)
