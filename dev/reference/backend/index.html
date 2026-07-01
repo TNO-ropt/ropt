@@ -1755,17 +1755,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.backend.Backend.allow_nan" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        allow_nan
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ropt.backend.Backend.is_parallel" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2576,17 +2565,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.backend.Backend.allow_nan" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        allow_nan
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ropt.backend.Backend.is_parallel" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2844,7 +2822,7 @@ initial variable vector toward a solution.</p>
 <p>All backend implementations inherit from the
 <a class="autorefs autorefs-internal" title="            Backend" href="#ropt.backend.Backend"><code>Backend</code></a> base class, which defines the backend
 lifecycle (<code>__init__</code>, <code>init</code>, <code>start</code>), validation hook (<code>validate_options</code>),
-and capability flags (<code>allow_nan</code>, <code>is_parallel</code>).</p>
+and capability flags (<code>is_parallel</code>).</p>
 <p><strong>Integration with Optimization</strong></p>
 <p>Backends are accessed via an
 <a class="autorefs autorefs-internal" title="            EnOptContext" href="../context/#ropt.context.EnOptContext"><code>EnOptContext</code></a> object through its <code>backend</code>
@@ -2936,8 +2914,6 @@ gradient evaluations as needed by the underlying algorithm.</p>
 </ul>
 <p>Subclasses may optionally override:</p>
 <ul>
-<li><code>allow_nan</code>: Indicates whether the backend can continue when evaluations
-               produce <code>NaN</code> values.</li>
 <li><code>is_parallel</code>: Indicates whether the backend may evaluate multiple
                  candidate variable vectors concurrently.</li>
 </ul>
@@ -3166,65 +3142,6 @@ the starting point for the optimization.</p>
       </tbody>
     </table>
 
-
-    </div>
-
-</div>
-
-
-
-
-
-
-<div class="doc doc-object doc-attribute">
-
-
-
-<h4 id="ropt.backend.Backend.allow_nan" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">allow_nan</span>
-
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-property"><code>property</code></small>
-  </span>
-
-</h4>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">allow_nan</span><span class="p">:</span> <span class="nb">bool</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Indicate whether the backend can handle <code>NaN</code> evaluation results.</p>
-<p>Backends that can continue after receiving <code>NaN</code> objective or
-constraint values should override this property to return <code>True</code>.</p>
-<p>This is particularly relevant in ensemble-based optimization where
-evaluations might fail for all realizations. When <code>allow_nan</code> is <code>True</code>,
-setting <a class="autorefs autorefs-internal" title="            RealizationsConfig" href="../config/#ropt.config.RealizationsConfig"><code>realization_min_success</code></a> to
-zero allows the evaluation process to return <code>NaN</code> instead of raising an
-error, enabling the optimizer to potentially continue.</p>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p><code>True</code> if the backend supports <code>NaN</code> evaluation results.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
 
     </div>
 

@@ -4823,7 +4823,7 @@ objects.</p>
         <p>Per-realization evaluation data for perturbed variables.</p>
 <p>See <a href="../../usage/results/">Working with Results</a> for usage details.</p>
 <p><strong>Result descriptions</strong></p>
-<div class="tabbed-set tabbed-alternate" data-tabs="1:7"><input checked="checked" id="ropt.results.GradientEvaluations--__tabbed_1_1" name="ropt.results.GradientEvaluations--__tabbed_1" type="radio" /><input id="ropt.results.GradientEvaluations--__tabbed_1_2" name="ropt.results.GradientEvaluations--__tabbed_1" type="radio" /><input id="ropt.results.GradientEvaluations--__tabbed_1_3" name="ropt.results.GradientEvaluations--__tabbed_1" type="radio" /><input id="ropt.results.GradientEvaluations--__tabbed_1_4" name="ropt.results.GradientEvaluations--__tabbed_1" type="radio" /><input id="ropt.results.GradientEvaluations--__tabbed_1_5" name="ropt.results.GradientEvaluations--__tabbed_1" type="radio" /><input id="ropt.results.GradientEvaluations--__tabbed_1_6" name="ropt.results.GradientEvaluations--__tabbed_1" type="radio" /><input id="ropt.results.GradientEvaluations--__tabbed_1_7" name="ropt.results.GradientEvaluations--__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="ropt.results.GradientEvaluations--__tabbed_1_1">Variables</label><label for="ropt.results.GradientEvaluations--__tabbed_1_2">Perturbed Variables</label><label for="ropt.results.GradientEvaluations--__tabbed_1_3">Objectives</label><label for="ropt.results.GradientEvaluations--__tabbed_1_4">Perturbed Objectives</label><label for="ropt.results.GradientEvaluations--__tabbed_1_5">Perturbed Constraints</label><label for="ropt.results.GradientEvaluations--__tabbed_1_6">Constraints</label><label for="ropt.results.GradientEvaluations--__tabbed_1_7">Metadata</label></div>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:5"><input checked="checked" id="ropt.results.GradientEvaluations--__tabbed_1_1" name="ropt.results.GradientEvaluations--__tabbed_1" type="radio" /><input id="ropt.results.GradientEvaluations--__tabbed_1_2" name="ropt.results.GradientEvaluations--__tabbed_1" type="radio" /><input id="ropt.results.GradientEvaluations--__tabbed_1_3" name="ropt.results.GradientEvaluations--__tabbed_1" type="radio" /><input id="ropt.results.GradientEvaluations--__tabbed_1_4" name="ropt.results.GradientEvaluations--__tabbed_1" type="radio" /><input id="ropt.results.GradientEvaluations--__tabbed_1_5" name="ropt.results.GradientEvaluations--__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="ropt.results.GradientEvaluations--__tabbed_1_1">Variables</label><label for="ropt.results.GradientEvaluations--__tabbed_1_2">Perturbed Variables</label><label for="ropt.results.GradientEvaluations--__tabbed_1_3">Perturbed Objectives</label><label for="ropt.results.GradientEvaluations--__tabbed_1_4">Perturbed Constraints</label><label for="ropt.results.GradientEvaluations--__tabbed_1_5">Metadata</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
 <p><code>variables</code>: The vector of unperturbed variable values:</p>
@@ -4876,37 +4876,6 @@ values for each realization and perturbation:</p>
       class-attribute
       instance-attribute
   " href="../enums/#ropt.enums.AxisName.VARIABLE"><code>AxisName.VARIABLE</code></a></li>
-</ul>
-</li>
-</ul>
-</div>
-<div class="tabbed-block">
-<p><code>objectives</code>: The unperturbed objective values per realization, taken
-from the function evaluation associated with this gradient batch (either
-computed jointly or pulled from a cached <code>FunctionResults</code>). Duplicated
-here so the gradient computation can be reproduced from a
-<code>GradientResults</code> alone:</p>
-<ul>
-<li>Shape <span class="arithmatex">\((n_r, n_o)\)</span>, where:<ul>
-<li><span class="arithmatex">\(n_r\)</span> is the number of realizations.</li>
-<li><span class="arithmatex">\(n_o\)</span> is the number of objectives.</li>
-</ul>
-</li>
-<li>Axis types:<ul>
-<li><a class="autorefs autorefs-internal" title="            REALIZATION
-
-
-  
-      class-attribute
-      instance-attribute
-  " href="../enums/#ropt.enums.AxisName.REALIZATION"><code>AxisName.REALIZATION</code></a></li>
-<li><a class="autorefs autorefs-internal" title="            OBJECTIVE
-
-
-  
-      class-attribute
-      instance-attribute
-  " href="../enums/#ropt.enums.AxisName.OBJECTIVE"><code>AxisName.OBJECTIVE</code></a></li>
 </ul>
 </li>
 </ul>
@@ -4974,37 +4943,6 @@ perturbation:</p>
       class-attribute
       instance-attribute
   " href="../enums/#ropt.enums.AxisName.PERTURBATION"><code>AxisName.PERTURBATION</code></a></li>
-<li><a class="autorefs autorefs-internal" title="            NONLINEAR_CONSTRAINT
-
-
-  
-      class-attribute
-      instance-attribute
-  " href="../enums/#ropt.enums.AxisName.NONLINEAR_CONSTRAINT"><code>AxisName.NONLINEAR_CONSTRAINT</code></a></li>
-</ul>
-</li>
-</ul>
-</div>
-<div class="tabbed-block">
-<p><code>constraints</code>: The unperturbed constraint values per realization, taken
-from the function evaluation associated with this gradient batch.
-Only provided if non-linear constraints are defined. Duplicated here so
-the gradient computation can be reproduced from a <code>GradientResults</code>
-alone:</p>
-<ul>
-<li>Shape <span class="arithmatex">\((n_r, n_c)\)</span>, where:<ul>
-<li><span class="arithmatex">\(n_r\)</span> is the number of realizations.</li>
-<li><span class="arithmatex">\(n_c\)</span> is the number of constraints.</li>
-</ul>
-</li>
-<li>Axis types:<ul>
-<li><a class="autorefs autorefs-internal" title="            REALIZATION
-
-
-  
-      class-attribute
-      instance-attribute
-  " href="../enums/#ropt.enums.AxisName.REALIZATION"><code>AxisName.REALIZATION</code></a></li>
 <li><a class="autorefs autorefs-internal" title="            NONLINEAR_CONSTRAINT
 
 
@@ -5094,19 +5032,6 @@ objects.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.results.GradientEvaluations.objectives">objectives</span></code></td>
-            <td>
-                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The unperturbed objective values per
-                   realization, duplicated from the companion
-                   function evaluation.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
             <td><code><span title="ropt.results.GradientEvaluations.perturbed_objectives">perturbed_objectives</span></code></td>
             <td>
                   <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
@@ -5115,19 +5040,6 @@ objects.</p>
               <div class="doc-md-description">
                 <p>The objective function values for each
                    realization and perturbation.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.results.GradientEvaluations.constraints">constraints</span></code></td>
-            <td>
-                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>] | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The unperturbed constraint values per
-                   realization, duplicated from the companion
-                   function evaluation. May be <code>None</code>.</p>
               </div>
             </td>
           </tr>
@@ -5191,12 +5103,10 @@ objects.</p>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">create</span><span class="p">(</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">variables</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">perturbed_variables</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">objectives</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">perturbed_objectives</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">constraints</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">perturbed_constraints</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GradientEvaluations</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">perturbed_objectives</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">perturbed_constraints</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GradientEvaluations</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -5250,24 +5160,6 @@ objects.</p>
           </tr>
           <tr class="doc-section-item">
             <td>
-                <code>objectives</code>
-            </td>
-            <td>
-                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Unperturbed objective values per
-                   realization (duplicated from the companion
-                   function evaluation).</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
                 <code>perturbed_objectives</code>
             </td>
             <td>
@@ -5281,24 +5173,6 @@ objects.</p>
             </td>
             <td>
                 <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>constraints</code>
-            </td>
-            <td>
-                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>] | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Unperturbed constraint values per
-                   realization (duplicated from the companion
-                   function evaluation).</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
             </td>
           </tr>
           <tr class="doc-section-item">
@@ -5411,7 +5285,7 @@ objects.</p>
 <div class="tabbed-set tabbed-alternate" data-tabs="1:3"><input checked="checked" id="ropt.results.Realizations--__tabbed_1_1" name="ropt.results.Realizations--__tabbed_1" type="radio" /><input id="ropt.results.Realizations--__tabbed_1_2" name="ropt.results.Realizations--__tabbed_1" type="radio" /><input id="ropt.results.Realizations--__tabbed_1_3" name="ropt.results.Realizations--__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="ropt.results.Realizations--__tabbed_1_1">Active Realizations</label><label for="ropt.results.Realizations--__tabbed_1_2">Objective Weights</label><label for="ropt.results.Realizations--__tabbed_1_3">Constraint Weights</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
-<p><code>active_realizations</code>: A boolean array indicating which realizations
+<p><code>evaluated_realizations</code>: A boolean array indicating which realizations
 were evaluated. <code>True</code> indicates that a realization was evaluated:</p>
 <ul>
 <li>Shape <span class="arithmatex">\((n_r,)\)</span>, where:<ul>
@@ -5505,13 +5379,24 @@ constraint calculation.</p>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.results.Realizations.active_realizations">active_realizations</span></code></td>
+            <td><code><span title="ropt.results.Realizations.evaluated_realizations">evaluated_realizations</span></code></td>
             <td>
                   <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.bool_">bool_</span>]</code>
             </td>
             <td>
               <div class="doc-md-description">
                 <p>Boolean array indicating active realizations.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.results.Realizations.failed_realizations">failed_realizations</span></code></td>
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.bool_">bool_</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Boolean array indicating failed realizations.</p>
               </div>
             </td>
           </tr>
@@ -5523,7 +5408,7 @@ constraint calculation.</p>
             <td>
               <div class="doc-md-description">
                 <p>Weights for each objective in each realization,
-                 if available.</p>
+                    if available.</p>
               </div>
             </td>
           </tr>
@@ -5535,7 +5420,7 @@ constraint calculation.</p>
             <td>
               <div class="doc-md-description">
                 <p>Weights for each constraint in each realization,
-                 if available.</p>
+                    if available.</p>
               </div>
             </td>
           </tr>
