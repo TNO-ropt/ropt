@@ -55,10 +55,10 @@ class EvaluationStep(ComputeStep):
         """Run the ensemble evaluation.
 
         Args:
-            context:    Optimizer context.
-            variables:  Variable vector(s) to evaluate.
-            metadata:   Optional dictionary attached to emitted
-                        [`FunctionResults`][ropt.results.FunctionResults] via the
+            context:   Optimizer context.
+            variables: Variable vector(s) to evaluate.
+            metadata:  Optional dictionary attached to emitted
+                       [`FunctionResults`][ropt.results.FunctionResults] via the
                        `FINISHED_EVALUATION` event.
 
         Returns:

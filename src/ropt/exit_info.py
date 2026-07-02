@@ -37,7 +37,11 @@ class ExitInfo:
 
     def __post_init__(self) -> None:  # noqa: D105
         if not self.message:
-            object.__setattr__(self, "message", _DEFAULT_MESSAGES[self.exit_code])
+            object.__setattr__(
+                self,
+                "message",
+                _DEFAULT_MESSAGES.get(self.exit_code, self.exit_code.name),
+            )
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)

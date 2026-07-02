@@ -42,7 +42,7 @@ def _make_child_args() -> bytes:
     )
 
 
-def test_child_abort_forwards_exit_code(
+def test_child_abort_forwards_exit_info(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     def _raise_abort(_self: SciPyBackend, _initial_values: np.ndarray) -> None:
@@ -59,10 +59,9 @@ def test_child_abort_forwards_exit_code(
     abort_msg = request_queue.get(timeout=5)
     sentinel = request_queue.get(timeout=5)
 
-    assert abort_msg == {
-        "abort": True,
-        "info": ExitInfo(exit_code=ExitCode.MAX_FUNCTIONS_REACHED),
-    }
+    assert abort_msg["abort"] is True
+    assert isinstance(abort_msg["info"], ExitInfo)
+    assert abort_msg["info"].exit_code == ExitCode.MAX_FUNCTIONS_REACHED
     assert sentinel is None
 
 

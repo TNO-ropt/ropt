@@ -647,7 +647,7 @@ def _get_failed_gradient_realizations(
     perturbation_min_success: int,
 ) -> NDArray[np.bool_]:
     failed_realizations = np.isnan(objectives[..., 0])
-    failed_pertubations = np.isnan(perturbed_objectives[..., 0])
-    success_count = np.count_nonzero(~failed_pertubations, axis=-1)
+    failed_perturbations = np.isnan(perturbed_objectives[..., 0])
+    success_count = np.count_nonzero(~failed_perturbations, axis=-1)
     failed_realizations |= success_count < perturbation_min_success
     return np.array(failed_realizations)

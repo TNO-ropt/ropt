@@ -172,7 +172,7 @@ into a simple, single-run interface. The table below summarizes its API:
 | Member                    | Description
 | ------------------------- | ---------------------------------------------------------------------------------------------------
 | `__init__(config, evaluator, *, constraint_tolerance=1e-10)` | Create the optimizer from a config dict and a [`EvaluationBatchCallback`][ropt.evaluation.EvaluationBatchCallback] callable or an [`Evaluator`][ropt.workflow.evaluators.Evaluator] object.
-| `run(initial_values)`     | Execute the optimization starting from `initial_values`. Returns an [`ExitCode`][ropt.enums.ExitCode].
+| `run(initial_values)`     | Execute the optimization starting from `initial_values`. Returns an [`ExitInfo`][ropt.exit_info.ExitInfo].
 | `results`                 | Property returning the best [`FunctionResults`][ropt.results.FunctionResults] found, or `None`.
 | `set_results_callback(cb)`| Register a callback `cb(results: tuple[FunctionResults, ...]) -> None` invoked after each evaluation batch.
 | `set_abort_callback(cb)`  | Register a callback `cb() -> bool`; returning `True` aborts the run with [`ExitCode.USER_ABORT`][ropt.enums.ExitCode].

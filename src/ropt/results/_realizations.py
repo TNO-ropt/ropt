@@ -21,7 +21,7 @@ class Realizations(ResultField):
 
     **Result descriptions**
 
-    === "Active Realizations"
+    === "Evaluated Realizations"
 
         `evaluated_realizations`: A boolean array indicating which realizations
         were evaluated. `True` indicates that a realization was evaluated:
@@ -62,8 +62,7 @@ class Realizations(ResultField):
         constraint calculation.
 
     Attributes:
-        evaluated_realizations: Boolean array indicating active realizations.
-        failed_realizations:    Boolean array indicating failed realizations.
+        evaluated_realizations: Boolean array indicating evaluated realizations.
         objective_weights:      Weights for each objective in each realization,
                                 if available.
         constraint_weights:     Weights for each constraint in each realization,
