@@ -116,12 +116,7 @@ class BasicOptimizer:
             context=self._context,
         )
         self._results = result_handler["results"]
-
-        return (
-            exit_info
-            if isinstance(exit_info, ExitInfo)
-            else ExitInfo(exit_code=ExitCode.UNKNOWN)
-        )
+        return exit_info
 
     def set_abort_callback(self, callback: Callable[[], bool]) -> None:
         """Set a callback to check for abort conditions.
