@@ -2679,7 +2679,12 @@ into a simple, single-run interface. The table below summarizes its API:</p>
 </tr>
 <tr>
 <td><code>run(initial_values)</code></td>
-<td>Execute the optimization starting from <code>initial_values</code>. Returns an <a class="autorefs autorefs-internal" title="            ExitCode" href="../../reference/enums/#ropt.enums.ExitCode"><code>ExitCode</code></a>.</td>
+<td>Execute the optimization starting from <code>initial_values</code>. Returns an <a class="autorefs autorefs-internal" title="            ExitInfo
+
+
+  
+      dataclass
+  " href="../../reference/exit_info/#ropt.exit_info.ExitInfo"><code>ExitInfo</code></a>.</td>
 </tr>
 <tr>
 <td><code>results</code></td>

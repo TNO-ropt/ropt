@@ -3116,7 +3116,13 @@ batch and produces a tuple of
   finished.</li>
 </ul>
 <h3 id="exit-codes">Exit codes</h3>
-<p>Both <code>run()</code> methods return an <a class="autorefs autorefs-internal" title="            ExitCode" href="../../reference/enums/#ropt.enums.ExitCode"><code>ExitCode</code></a> indicating
+<p>Both <code>run()</code> methods return an <a class="autorefs autorefs-internal" title="            ExitInfo
+
+
+  
+      dataclass
+  " href="../../reference/exit_info/#ropt.exit_info.ExitInfo"><code>ExitInfo</code></a> whose
+<code>exit_code</code> attribute is an <a class="autorefs autorefs-internal" title="            ExitCode" href="../../reference/enums/#ropt.enums.ExitCode"><code>ExitCode</code></a> indicating
 why the step finished:</p>
 <table>
 <thead>

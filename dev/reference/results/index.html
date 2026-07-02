@@ -5282,7 +5282,7 @@ objects.</p>
         <p>Per-realization activity, success, and weight information.</p>
 <p>See <a href="../../usage/results/">Working with Results</a> for usage details.</p>
 <p><strong>Result descriptions</strong></p>
-<div class="tabbed-set tabbed-alternate" data-tabs="1:3"><input checked="checked" id="ropt.results.Realizations--__tabbed_1_1" name="ropt.results.Realizations--__tabbed_1" type="radio" /><input id="ropt.results.Realizations--__tabbed_1_2" name="ropt.results.Realizations--__tabbed_1" type="radio" /><input id="ropt.results.Realizations--__tabbed_1_3" name="ropt.results.Realizations--__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="ropt.results.Realizations--__tabbed_1_1">Active Realizations</label><label for="ropt.results.Realizations--__tabbed_1_2">Objective Weights</label><label for="ropt.results.Realizations--__tabbed_1_3">Constraint Weights</label></div>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:3"><input checked="checked" id="ropt.results.Realizations--__tabbed_1_1" name="ropt.results.Realizations--__tabbed_1" type="radio" /><input id="ropt.results.Realizations--__tabbed_1_2" name="ropt.results.Realizations--__tabbed_1" type="radio" /><input id="ropt.results.Realizations--__tabbed_1_3" name="ropt.results.Realizations--__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="ropt.results.Realizations--__tabbed_1_1">Evaluated Realizations</label><label for="ropt.results.Realizations--__tabbed_1_2">Objective Weights</label><label for="ropt.results.Realizations--__tabbed_1_3">Constraint Weights</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
 <p><code>evaluated_realizations</code>: A boolean array indicating which realizations
@@ -5385,18 +5385,7 @@ constraint calculation.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Boolean array indicating active realizations.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.results.Realizations.failed_realizations">failed_realizations</span></code></td>
-            <td>
-                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.bool_">bool_</span>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Boolean array indicating failed realizations.</p>
+                <p>Boolean array indicating evaluated realizations.</p>
               </div>
             </td>
           </tr>
