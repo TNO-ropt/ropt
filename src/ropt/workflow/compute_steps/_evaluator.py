@@ -8,10 +8,11 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 
 from ropt.core import EnsembleEvaluator
+from ropt.core._evaluator import _get_too_few_realizations_info
 from ropt.enums import EnOptEventType, ExitCode
 from ropt.events import EnOptEvent
 from ropt.exceptions import Abort
-from ropt.exit_info import ExitInfo
+from ropt.exit_info import ExitInfo, TooFewRealizationsInfo
 from ropt.results import FunctionResults
 
 from .base import ComputeStep
@@ -98,8 +99,9 @@ class EvaluationStep(ComputeStep):
 
         assert results
         assert isinstance(results[0], FunctionResults)
-        if results[0].functions is None:
-            exit_info = ExitInfo(exit_code=ExitCode.TOO_FEW_REALIZATIONS)
+        info = _get_too_few_realizations_info(results, context)
+        if info is not None:
+            exit_info = TooFewRealizationsInfo(**info)
 
         if metadata is not None:
             for item in results:

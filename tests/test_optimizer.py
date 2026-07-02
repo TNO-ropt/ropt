@@ -16,6 +16,7 @@ from ropt.config import (
 from ropt.config.constants import DEFAULT_SEED
 from ropt.context import EnOptContext
 from ropt.enums import EnOptEventType, ExitCode
+from ropt.exit_info import TooFewRealizationsInfo
 from ropt.results import FunctionResults, GradientResults, Results
 from ropt.transforms.default import (
     DefaultNonlinearConstraintTransform,
@@ -151,6 +152,11 @@ def test_failed_realizations(config: Any, evaluator: Any, external: str) -> None
     optimizer.set_results_callback(_observer)
     exit_code = optimizer.run(initial_values)
     assert exit_code.exit_code == ExitCode.TOO_FEW_REALIZATIONS
+    assert isinstance(exit_code, TooFewRealizationsInfo)
+    assert exit_code.failed_functions == 1
+    assert exit_code.failed_gradients == 0
+    assert exit_code.failed_perturbations == 0
+    assert "1 function result(s)" in exit_code.message
 
 
 def test_failed_realizations_constraints(

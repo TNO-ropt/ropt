@@ -77,11 +77,12 @@ reached, and `ABORT_FROM_ERROR` may carry the underlying error text. For
 those, `ropt` uses dedicated
 [`ExitInfo`][ropt.exit_info.ExitInfo] subclasses:
 
-| Subclass                     | Exit code                | Extra field |
-| ---------------------------- | ------------------------ | ----------- |
-| `MaxFunctionsReachedInfo`    | `MAX_FUNCTIONS_REACHED`  | `limit`     |
-| `MaxBatchesReachedInfo`      | `MAX_BATCHES_REACHED`    | `limit`     |
-| `AbortFromErrorInfo`         | `ABORT_FROM_ERROR`       | `error`     |
+| Subclass                     | Exit code                | Extra fields                                                                                        |
+| ---------------------------- | ------------------------ | --------------------------------------------------------------------------------------------------- |
+| `MaxFunctionsReachedInfo`    | `MAX_FUNCTIONS_REACHED`  | `limit`                                                                                             |
+| `MaxBatchesReachedInfo`      | `MAX_BATCHES_REACHED`    | `limit`                                                                                             |
+| `AbortFromErrorInfo`         | `ABORT_FROM_ERROR`       | `error`                                                                                             |
+| `TooFewRealizationsInfo`     | `TOO_FEW_REALIZATIONS`   | `failed_functions`, `failed_gradients`, `failed_perturbations`, `realization_min_success`, `perturbation_min_success` |
 
 Each subclass:
 
@@ -97,6 +98,7 @@ from ropt.exit_info import (
     ExitInfo,
     MaxBatchesReachedInfo,
     MaxFunctionsReachedInfo,
+    TooFewRealizationsInfo,
 )
 
 info: ExitInfo = optimizer.run(initial_values)
@@ -108,9 +110,45 @@ match info:
         print(f"stopped after {n} batches")
     case AbortFromErrorInfo(error=err):
         print(f"failed: {err}")
+    case TooFewRealizationsInfo(
+        failed_functions=fn, failed_gradients=fg, failed_perturbations=fp
+    ):
+        print(
+            f"aborted: {fn} function and {fg} gradient result(s) failed the"
+            f" realization threshold; {fp} gradient result(s) also failed"
+            " the perturbation threshold"
+        )
     case _:
         print(info.message)
 ```
+
+### `TooFewRealizationsInfo`
+
+When an evaluation batch cannot meet the configured
+[`realization_min_success`][ropt.config.RealizationsConfig] threshold,
+`ropt` raises an [`Abort`][ropt.exceptions.Abort] carrying a
+[`TooFewRealizationsInfo`][ropt.exit_info.TooFewRealizationsInfo]. Its
+fields summarize the whole failing batch:
+
+- `failed_functions` — number of function results in the batch that fell below
+  `realization_min_success`.
+- `failed_gradients` — number of gradient results in the batch that fell below
+  `realization_min_success`.
+- `failed_perturbations` — number of the failed gradient results that had at
+  least one realization failing the per-realization
+  [`perturbation_min_success`][ropt.config.GradientConfig] check.
+- `realization_min_success` — the threshold for the number of successful
+  realizations.
+- `perturbation_min_success` — the threshold for the number of successful
+  perturbations.
+
+The default `message` combines these counts into a human-readable
+summary, for example:
+
+> Too few realizations succeeded: 1 function result(s) and 2 gradient
+> result(s) failed to meet the minimum of 3 successful realization(s).
+> 1 of the failed gradient result(s) had realization(s) that fell below
+> the minimum of 5 successful perturbation(s).
 
 The base `ExitInfo` is still valid for the exit codes that have no extra
 structured information (e.g. `OPTIMIZER_FINISHED`, `USER_ABORT`).

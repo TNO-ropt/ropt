@@ -9,6 +9,7 @@ from ropt.exit_info import (
     ExitInfo,
     MaxBatchesReachedInfo,
     MaxFunctionsReachedInfo,
+    TooFewRealizationsInfo,
 )
 
 
@@ -70,3 +71,74 @@ def test_abort_from_error_info() -> None:
 def test_abort_from_error_info_message_includes_error() -> None:
     info = AbortFromErrorInfo(error="disk full")
     assert "disk full" in info.message
+
+
+def test_too_few_realizations_info_function_only() -> None:
+    info = TooFewRealizationsInfo(
+        failed_functions=2,
+        failed_gradients=0,
+        failed_perturbations=0,
+        realization_min_success=3,
+    )
+    assert info.exit_code == ExitCode.TOO_FEW_REALIZATIONS
+    assert info.failed_functions == 2
+    assert info.failed_gradients == 0
+    assert info.failed_perturbations == 0
+    assert info.realization_min_success == 3
+    assert info.perturbation_min_success is None
+    assert "2 function result(s)" in info.message
+    assert "gradient" not in info.message
+    assert "3 successful realization(s)" in info.message
+    assert "perturbation" not in info.message
+
+
+def test_too_few_realizations_info_gradient_only() -> None:
+    info = TooFewRealizationsInfo(
+        failed_functions=0,
+        failed_gradients=1,
+        failed_perturbations=0,
+        realization_min_success=2,
+        perturbation_min_success=4,
+    )
+    assert "1 gradient result(s)" in info.message
+    assert "function" not in info.message
+    assert "perturbation" not in info.message
+
+
+def test_too_few_realizations_info_mixed_batch() -> None:
+    info = TooFewRealizationsInfo(
+        failed_functions=1,
+        failed_gradients=2,
+        failed_perturbations=0,
+        realization_min_success=2,
+        perturbation_min_success=1,
+    )
+    assert "1 function result(s)" in info.message
+    assert "2 gradient result(s)" in info.message
+    assert "and" in info.message
+
+
+def test_too_few_realizations_info_perturbation_addendum() -> None:
+    info = TooFewRealizationsInfo(
+        failed_functions=0,
+        failed_gradients=2,
+        failed_perturbations=1,
+        realization_min_success=3,
+        perturbation_min_success=5,
+    )
+    assert "2 gradient result(s)" in info.message
+    assert (
+        "1 of the failed gradient result(s) had realization(s) that"
+        " fell below the minimum of 5 successful perturbation(s)."
+    ) in info.message
+
+
+def test_too_few_realizations_info_explicit_message() -> None:
+    info = TooFewRealizationsInfo(
+        failed_functions=1,
+        failed_gradients=0,
+        failed_perturbations=0,
+        realization_min_success=2,
+        message="custom",
+    )
+    assert info.message == "custom"

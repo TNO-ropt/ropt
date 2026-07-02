@@ -15,10 +15,12 @@ from ropt.exit_info import (
     ExitInfo,
     MaxBatchesReachedInfo,
     MaxFunctionsReachedInfo,
+    TooFewRealizationsInfo,
 )
 from ropt.results import FunctionResults, GradientResults
 
 from ._callback import OptimizerCallbackResult
+from ._evaluator import _get_too_few_realizations_info
 
 if TYPE_CHECKING:
     from collections.abc import Generator
@@ -238,20 +240,12 @@ class EnsembleOptimizer:
                 compute_gradients=compute_gradients,
             )
 
-            failed: FunctionResults | GradientResults | None = None
-            for result in results:
-                assert isinstance(result, FunctionResults | GradientResults)
-                if (
-                    isinstance(result, FunctionResults) and result.functions is None
-                ) or (isinstance(result, GradientResults) and result.gradients is None):
-                    failed = result
-                    break
-
             if self._signal_evaluation:
                 self._signal_evaluation(results)
 
-            if failed is not None:
-                raise Abort(ExitInfo(exit_code=ExitCode.TOO_FEW_REALIZATIONS))
+            info = _get_too_few_realizations_info(results, self._context)
+            if info is not None:
+                raise Abort(TooFewRealizationsInfo(**info))
 
         return results
 
