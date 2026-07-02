@@ -904,6 +904,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Structured info subclasses">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#toofewrealizationsinfo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TooFewRealizationsInfo
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
     </ul>
@@ -2285,6 +2302,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Structured info subclasses">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#toofewrealizationsinfo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TooFewRealizationsInfo
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
     </ul>
@@ -2391,7 +2425,7 @@ those, <code>ropt</code> uses dedicated
 <tr>
 <th>Subclass</th>
 <th>Exit code</th>
-<th>Extra field</th>
+<th>Extra fields</th>
 </tr>
 </thead>
 <tbody>
@@ -2410,6 +2444,11 @@ those, <code>ropt</code> uses dedicated
 <td><code>ABORT_FROM_ERROR</code></td>
 <td><code>error</code></td>
 </tr>
+<tr>
+<td><code>TooFewRealizationsInfo</code></td>
+<td><code>TOO_FEW_REALIZATIONS</code></td>
+<td><code>failed_functions</code>, <code>failed_gradients</code>, <code>failed_perturbations</code>, <code>realization_min_success</code>, <code>perturbation_min_success</code></td>
+</tr>
 </tbody>
 </table>
 <p>Each subclass:</p>
@@ -2424,20 +2463,61 @@ those, <code>ropt</code> uses dedicated
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    <span class="n">ExitInfo</span><span class="p">,</span>
 </span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="n">MaxBatchesReachedInfo</span><span class="p">,</span>
 </span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="n">MaxFunctionsReachedInfo</span><span class="p">,</span>
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="p">)</span>
-</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>
-</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="n">info</span><span class="p">:</span> <span class="n">ExitInfo</span> <span class="o">=</span> <span class="n">optimizer</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">initial_values</span><span class="p">)</span>
-</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>
-</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="k">match</span> <span class="n">info</span><span class="p">:</span>
-</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>    <span class="k">case</span> <span class="n">MaxFunctionsReachedInfo</span><span class="p">(</span><span class="n">limit</span><span class="o">=</span><span class="n">n</span><span class="p">):</span>
-</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;stopped after </span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2"> function evaluations&quot;</span><span class="p">)</span>
-</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>    <span class="k">case</span> <span class="n">MaxBatchesReachedInfo</span><span class="p">(</span><span class="n">limit</span><span class="o">=</span><span class="n">n</span><span class="p">):</span>
-</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;stopped after </span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2"> batches&quot;</span><span class="p">)</span>
-</span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a>    <span class="k">case</span> <span class="n">AbortFromErrorInfo</span><span class="p">(</span><span class="n">error</span><span class="o">=</span><span class="n">err</span><span class="p">):</span>
-</span><span id="__span-3-16"><a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;failed: </span><span class="si">{</span><span class="n">err</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-</span><span id="__span-3-17"><a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a>    <span class="k">case</span><span class="w"> </span><span class="k">_</span><span class="p">:</span>
-</span><span id="__span-3-18"><a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a>        <span class="nb">print</span><span class="p">(</span><span class="n">info</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    <span class="n">TooFewRealizationsInfo</span><span class="p">,</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="p">)</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="n">info</span><span class="p">:</span> <span class="n">ExitInfo</span> <span class="o">=</span> <span class="n">optimizer</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">initial_values</span><span class="p">)</span>
+</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>
+</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="k">match</span> <span class="n">info</span><span class="p">:</span>
+</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>    <span class="k">case</span> <span class="n">MaxFunctionsReachedInfo</span><span class="p">(</span><span class="n">limit</span><span class="o">=</span><span class="n">n</span><span class="p">):</span>
+</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;stopped after </span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2"> function evaluations&quot;</span><span class="p">)</span>
+</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a>    <span class="k">case</span> <span class="n">MaxBatchesReachedInfo</span><span class="p">(</span><span class="n">limit</span><span class="o">=</span><span class="n">n</span><span class="p">):</span>
+</span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;stopped after </span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2"> batches&quot;</span><span class="p">)</span>
+</span><span id="__span-3-16"><a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a>    <span class="k">case</span> <span class="n">AbortFromErrorInfo</span><span class="p">(</span><span class="n">error</span><span class="o">=</span><span class="n">err</span><span class="p">):</span>
+</span><span id="__span-3-17"><a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;failed: </span><span class="si">{</span><span class="n">err</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="__span-3-18"><a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a>    <span class="k">case</span> <span class="n">TooFewRealizationsInfo</span><span class="p">(</span>
+</span><span id="__span-3-19"><a id="__codelineno-3-19" name="__codelineno-3-19" href="#__codelineno-3-19"></a>        <span class="n">failed_functions</span><span class="o">=</span><span class="n">fn</span><span class="p">,</span> <span class="n">failed_gradients</span><span class="o">=</span><span class="n">fg</span><span class="p">,</span> <span class="n">failed_perturbations</span><span class="o">=</span><span class="n">fp</span>
+</span><span id="__span-3-20"><a id="__codelineno-3-20" name="__codelineno-3-20" href="#__codelineno-3-20"></a>    <span class="p">):</span>
+</span><span id="__span-3-21"><a id="__codelineno-3-21" name="__codelineno-3-21" href="#__codelineno-3-21"></a>        <span class="nb">print</span><span class="p">(</span>
+</span><span id="__span-3-22"><a id="__codelineno-3-22" name="__codelineno-3-22" href="#__codelineno-3-22"></a>            <span class="sa">f</span><span class="s2">&quot;aborted: </span><span class="si">{</span><span class="n">fn</span><span class="si">}</span><span class="s2"> function and </span><span class="si">{</span><span class="n">fg</span><span class="si">}</span><span class="s2"> gradient result(s) failed the&quot;</span>
+</span><span id="__span-3-23"><a id="__codelineno-3-23" name="__codelineno-3-23" href="#__codelineno-3-23"></a>            <span class="sa">f</span><span class="s2">&quot; realization threshold; </span><span class="si">{</span><span class="n">fp</span><span class="si">}</span><span class="s2"> gradient result(s) also failed&quot;</span>
+</span><span id="__span-3-24"><a id="__codelineno-3-24" name="__codelineno-3-24" href="#__codelineno-3-24"></a>            <span class="s2">&quot; the perturbation threshold&quot;</span>
+</span><span id="__span-3-25"><a id="__codelineno-3-25" name="__codelineno-3-25" href="#__codelineno-3-25"></a>        <span class="p">)</span>
+</span><span id="__span-3-26"><a id="__codelineno-3-26" name="__codelineno-3-26" href="#__codelineno-3-26"></a>    <span class="k">case</span><span class="w"> </span><span class="k">_</span><span class="p">:</span>
+</span><span id="__span-3-27"><a id="__codelineno-3-27" name="__codelineno-3-27" href="#__codelineno-3-27"></a>        <span class="nb">print</span><span class="p">(</span><span class="n">info</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
 </span></code></pre></div>
+<h3 id="toofewrealizationsinfo"><code>TooFewRealizationsInfo</code></h3>
+<p>When an evaluation batch cannot meet the configured
+<a class="autorefs autorefs-internal" title="            RealizationsConfig" href="../../reference/config/#ropt.config.RealizationsConfig"><code>realization_min_success</code></a> threshold,
+<code>ropt</code> raises an <a class="autorefs autorefs-internal" title="            Abort" href="../../reference/exceptions/#ropt.exceptions.Abort"><code>Abort</code></a> carrying a
+<a class="autorefs autorefs-internal" title="            TooFewRealizationsInfo
+
+
+  
+      dataclass
+  " href="../../reference/exit_info/#ropt.exit_info.TooFewRealizationsInfo"><code>TooFewRealizationsInfo</code></a>. Its
+fields summarize the whole failing batch:</p>
+<ul>
+<li><code>failed_functions</code> — number of function results in the batch that fell below
+  <code>realization_min_success</code>.</li>
+<li><code>failed_gradients</code> — number of gradient results in the batch that fell below
+  <code>realization_min_success</code>.</li>
+<li><code>failed_perturbations</code> — number of the failed gradient results that had at
+  least one realization failing the per-realization
+  <a class="autorefs autorefs-internal" title="            GradientConfig" href="../../reference/config/#ropt.config.GradientConfig"><code>perturbation_min_success</code></a> check.</li>
+<li><code>realization_min_success</code> — the threshold for the number of successful
+  realizations.</li>
+<li><code>perturbation_min_success</code> — the threshold for the number of successful
+  perturbations.</li>
+</ul>
+<p>The default <code>message</code> combines these counts into a human-readable
+summary, for example:</p>
+<blockquote>
+<p>Too few realizations succeeded: 1 function result(s) and 2 gradient
+result(s) failed to meet the minimum of 3 successful realization(s).
+1 of the failed gradient result(s) had realization(s) that fell below
+the minimum of 5 successful perturbation(s).</p>
+</blockquote>
 <p>The base <code>ExitInfo</code> is still valid for the exit codes that have no extra
 structured information (e.g. <code>OPTIMIZER_FINISHED</code>, <code>USER_ABORT</code>).</p>
 

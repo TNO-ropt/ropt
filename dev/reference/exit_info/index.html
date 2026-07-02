@@ -2253,6 +2253,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#ropt.exit_info.TooFewRealizationsInfo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TooFewRealizationsInfo
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2350,6 +2361,17 @@
     <span class="md-ellipsis">
       
         AbortFromErrorInfo
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.exit_info.TooFewRealizationsInfo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TooFewRealizationsInfo
       
     </span>
   </a>
@@ -2753,6 +2775,156 @@ on the exit code.</p>
               <div class="doc-md-description">
                 <p>Description of the underlying error that caused the
        abort. Typically the string form of the exception.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="ropt.exit_info.TooFewRealizationsInfo" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">TooFewRealizationsInfo</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="            ExitInfo
+
+
+  
+      dataclass
+   (ropt.exit_info.ExitInfo)" href="#ropt.exit_info.ExitInfo">ExitInfo</a></code></p>
+
+
+
+        <p>Exit info for <a class="autorefs autorefs-internal" title="            ExitCode" href="../enums/#ropt.enums.ExitCode"><code>ExitCode.TOO_FEW_REALIZATIONS</code></a>.</p>
+<p>Carries a batch-level summary of how many results in the failing batch
+could not meet the configured
+<a class="autorefs autorefs-internal" title="            RealizationsConfig" href="../config/#ropt.config.RealizationsConfig"><code>realization_min_success</code></a> threshold, and
+(for gradient results) how many of those failures were caused by too few
+successful perturbations relative to the
+<a class="autorefs autorefs-internal" title="            GradientConfig" href="../config/#ropt.config.GradientConfig"><code>perturbation_min_success</code></a> threshold.</p>
+
+
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.exit_info.TooFewRealizationsInfo.exit_code">exit_code</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ExitCode (ropt.enums.ExitCode)" href="../enums/#ropt.enums.ExitCode">ExitCode</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Always
+                      <a class="autorefs autorefs-internal" title="            ExitCode" href="../enums/#ropt.enums.ExitCode"><code>ExitCode.TOO_FEW_REALIZATIONS</code></a>.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.exit_info.TooFewRealizationsInfo.failed_functions">failed_functions</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Number of function results in the batch that
+                      failed the realization threshold.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.exit_info.TooFewRealizationsInfo.failed_gradients">failed_gradients</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Number of gradient results in the batch that
+                      failed the realization threshold.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.exit_info.TooFewRealizationsInfo.failed_perturbations">failed_perturbations</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Number of failed gradient results that had at
+                      least one realization failing the perturbation
+                      threshold.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.exit_info.TooFewRealizationsInfo.realization_min_success">realization_min_success</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The minimum number of successful realizations
+                      that was required for a result to be accepted.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.exit_info.TooFewRealizationsInfo.perturbation_min_success">perturbation_min_success</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The minimum number of successful perturbations
+                      per realization that was required for a
+                      gradient result to be accepted. <code>None</code> when
+                      the batch contained no gradient results.</p>
               </div>
             </td>
           </tr>
