@@ -1898,39 +1898,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.workflow.event_handlers.EventHandler.__getstate__" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        __getstate__
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.workflow.event_handlers.EventHandler.__setstate__" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        __setstate__
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.workflow.event_handlers.EventHandler.locked" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        locked
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ropt.workflow.event_handlers.EventHandler.event_types" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2686,39 +2653,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.workflow.event_handlers.EventHandler.__getstate__" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        __getstate__
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.workflow.event_handlers.EventHandler.__setstate__" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        __setstate__
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.workflow.event_handlers.EventHandler.locked" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        locked
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ropt.workflow.event_handlers.EventHandler.event_types" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3159,23 +3093,6 @@ method. When the compute step emits an event, the <code>handle_event</code> meth
 each attached handler is invoked, allowing it to process the event.</p>
 
 
-<details class="thread-safety" open>
-  <summary>Thread safety</summary>
-  <p>Every handler owns a re-entrant lock created at construction. The
-base-class <code>__getitem__</code> and <code>__setitem__</code> acquire it, so
-dictionary-style access is safe across threads. Subclasses (and
-external callers that need atomic compound operations) should wrap
-critical sections with
-<a class="autorefs autorefs-internal" title="            locked" href="#ropt.workflow.event_handlers.EventHandler.locked"><code>locked()</code></a>:</p>
-<div class="language-text highlight"><pre><span></span><code>with handler.locked():
-    snapshot = handler[&quot;results&quot;]
-    count = len(snapshot)
-</code></pre></div>
-<p>The lock is re-entrant, so user callbacks invoked from within a
-locked region may safely call back into the handler on the same
-thread.</p>
-</details>
-
 
 
 
@@ -3207,127 +3124,6 @@ thread.</p>
     <div class="doc doc-contents ">
 
         <p>Initialize the EventHandler.</p>
-
-
-    </div>
-
-</div>
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="ropt.workflow.event_handlers.EventHandler.__getstate__" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">__getstate__</span>
-
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">__getstate__</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">]</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Return picklable state, omitting the non-picklable lock.</p>
-
-
-    </div>
-
-</div>
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="ropt.workflow.event_handlers.EventHandler.__setstate__" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">__setstate__</span>
-
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">__setstate__</span><span class="p">(</span><span class="n">state</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Restore state and recreate the lock dropped by <code>__getstate__</code>.</p>
-
-
-    </div>
-
-</div>
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="ropt.workflow.event_handlers.EventHandler.locked" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">locked</span>
-
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">locked</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">AbstractContextManager</span><span class="p">[</span><span class="kc">None</span><span class="p">]</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Return a context manager that holds the handler's internal lock.</p>
-<p>Use this to wrap any compound operation that must observe a
-consistent view of the handler's state:</p>
-<div class="language-text highlight"><pre><span></span><code>with handler.locked():
-    snapshot = handler[&quot;results&quot;]
-    count = len(snapshot)
-</code></pre></div>
-<p>Individual <code>handler[key]</code> reads and <code>handler[key] = value</code> writes
-are already serialized internally, so explicit locking is only
-needed when multiple accesses must be atomic with respect to each
-other.</p>
-<p>The lock is re-entrant: entering it from a thread that already
-holds it (e.g. from a user callback dispatched from within
-<code>handle_event</code>) is safe and will not deadlock.</p>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-external" title="contextlib.AbstractContextManager" href="https://docs.python.org/3/library/contextlib.html#contextlib.AbstractContextManager">AbstractContextManager</a>[None]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>A context manager that acquires the lock on entry and releases</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-external" title="contextlib.AbstractContextManager" href="https://docs.python.org/3/library/contextlib.html#contextlib.AbstractContextManager">AbstractContextManager</a>[None]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>it on exit.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
 
 
     </div>
@@ -3705,22 +3501,6 @@ filters by constraint tolerance.</p>
 details on selection criteria and domain handling.</p>
 
 
-<details class="thread-safety" open>
-  <summary>Thread safety</summary>
-  <p><code>handle_event</code> is serialized by an internal lock, so the same
-instance may be attached to compute steps that run concurrently in
-different threads. The stored value (<code>handler["results"]</code>) is always
-an immutable <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
-
-
-  
-      dataclass
-  " href="../results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> (or
-<code>None</code>); callers must not mutate it. When <code>what="last"</code> is used
-across concurrent steps, "last" means "last to acquire the lock,"
-which is non-deterministic.</p>
-</details>
-
 
 
 
@@ -4002,17 +3782,6 @@ via <code>handler["results"]</code>.</p>
 details on domain handling and accumulation behavior.</p>
 
 
-<details class="thread-safety" open>
-  <summary>Thread safety</summary>
-  <p><code>handle_event</code> is serialized by an internal lock, so the same
-instance may be attached to compute steps that run concurrently in
-different threads. The stored value (<code>handler["results"]</code>) is always
-an immutable tuple (or <code>None</code>); callers must not mutate it. When the
-handler is shared across concurrent steps the relative order of
-results from different steps is non-deterministic, but no result is
-lost.</p>
-</details>
-
 
 
 
@@ -4248,16 +4017,6 @@ first store them in a variable.</p>
 </details>        <p>See <a href="../../usage/workflows/#table">Optimization Workflows</a> for full details
 on column specification format, default tables, and callback functionality.</p>
 
-
-<details class="thread-safety" open>
-  <summary>Thread safety</summary>
-  <p><code>handle_event</code>, <code>get_tables</code>, <code>__getitem__</code>, <code>add_table</code>,
-<code>add_column</code>, and <code>set_callback</code> are serialized by an internal lock,
-so the same instance may be attached to compute steps that run
-concurrently in different threads. When the handler is shared across
-concurrent steps the relative row order from different steps is
-non-deterministic, but no row is lost.</p>
-</details>
 
 
 

@@ -2759,13 +2759,15 @@ current directory in a <code>"threading"</code> server affects all threads; in
 task.</p>
 </div>
 <h2 id="event-server">Event server</h2>
-<p>When multiple compute steps run concurrently, their event handlers are called
-from multiple threads. The built-in handlers protect their state with an
-internal lock for exactly this reason.</p>
-<p><a class="autorefs autorefs-internal" title="            ropt.workflow.servers.EventServer" href="../../reference/workflow_servers/#ropt.workflow.servers.EventServer"><code>EventServer</code></a> provides a lock-free
-alternative: it receives events on a queue and dispatches them to its own
-handlers from the asyncio event loop's thread. Because all handler calls happen
-on a single thread, <strong>handlers attached to an <code>EventServer</code> need no locking</strong>.</p>
+<p>When multiple compute steps run concurrently in worker threads, their event
+handlers are called from multiple threads simultaneously. <strong>Event handlers are
+not thread-safe</strong>: sharing one across concurrent compute steps will cause race
+conditions.</p>
+<p><a class="autorefs autorefs-internal" title="            ropt.workflow.servers.EventServer" href="../../reference/workflow_servers/#ropt.workflow.servers.EventServer"><code>EventServer</code></a> is the required solution:
+it receives events on a queue and dispatches them to its own handlers from the
+asyncio event loop's thread. Because all handler calls happen on a single
+thread, handlers registered on the server are safe even when events arrive
+from multiple concurrent steps.</p>
 <p>This is especially useful when one set of handlers needs to aggregate results
 from multiple concurrent compute steps.</p>
 <p><code>EventServer</code> follows the same lifecycle as evaluation servers:</p>

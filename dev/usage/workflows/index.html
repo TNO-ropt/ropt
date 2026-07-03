@@ -3187,6 +3187,15 @@ why the step finished:</p>
 <h2 id="event-handlers">Event handlers</h2>
 <p>Event handlers are attached to a compute step via its <code>add_event_handler</code>
 method. Once attached, the handler receives every event the step emits.</p>
+<div class="admonition warning">
+<p class="admonition-title">Thread safety in parallel workflows</p>
+<p>Event handlers are <strong>not thread-safe</strong>. When compute steps run concurrently
+in worker threads (e.g. when using <code>AsyncEvaluator</code> with a <code>ThreadingServer</code>
+that has multiple workers), any handler shared across steps must be
+registered on an <a class="autorefs autorefs-internal" title="            ropt.workflow.servers.EventServer" href="../../reference/workflow_servers/#ropt.workflow.servers.EventServer"><code>EventServer</code></a> rather
+than attached directly to the compute steps. See
+<a href="../parallel/#event-server">Event Server</a> for the required pattern.</p>
+</div>
 <p>The framework ships four reusable handlers:</p>
 <table>
 <thead>
