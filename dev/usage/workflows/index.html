@@ -946,6 +946,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#eventforwardhandler" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EventForwardHandler
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#tablehandler" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2627,6 +2638,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#eventforwardhandler" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EventForwardHandler
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#tablehandler" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3190,6 +3212,10 @@ method. Once attached, the handler receives every event the step emits.</p>
 <td><a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.TableHandler" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.TableHandler"><code>TableHandler</code></a></td>
 <td>Append rows to a structured table per result.</td>
 </tr>
+<tr>
+<td><a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.EventForwardHandler" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.EventForwardHandler"><code>EventForwardHandler</code></a></td>
+<td>Forward events to an <a class="autorefs autorefs-internal" title="            ropt.workflow.servers.EventServer" href="../../reference/workflow_servers/#ropt.workflow.servers.EventServer"><code>EventServer</code></a> for lock-free dispatch.</td>
+</tr>
 </tbody>
 </table>
 <p>Handlers expose their state through dictionary access (<code>handler[key]</code>). By
@@ -3278,6 +3304,13 @@ matching type arrives, the callback is called with the
   
       dataclass
   " href="../../reference/events/#ropt.events.EnOptEvent"><code>EnOptEvent</code></a>.</p>
+<h3 id="eventforwardhandler">EventForwardHandler</h3>
+<p><a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.EventForwardHandler" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.EventForwardHandler"><code>EventForwardHandler</code></a> is
+attached to a compute step and forwards matching events to an
+<a class="autorefs autorefs-internal" title="            ropt.workflow.servers.EventServer" href="../../reference/workflow_servers/#ropt.workflow.servers.EventServer"><code>EventServer</code></a>. The server dispatches them
+from the asyncio event loop's thread, so handlers registered on the server
+require no locking.</p>
+<p>See <a href="../parallel/#event-server">Event Server</a> for the full pattern.</p>
 <h3 id="tablehandler">TableHandler</h3>
 <p><a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.TableHandler" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.TableHandler"><code>TableHandler</code></a> tracks results and
 stores them in pandas DataFrames.</p>

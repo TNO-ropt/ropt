@@ -2245,6 +2245,56 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#ropt.workflow.event_handlers.EventForwardHandler" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EventForwardHandler
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="EventForwardHandler">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.workflow.event_handlers.EventForwardHandler.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        __init__
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.workflow.event_handlers.EventForwardHandler.handle_event" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        handle_event
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.workflow.event_handlers.EventForwardHandler.event_types" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        event_types
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -2983,6 +3033,56 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#ropt.workflow.event_handlers.EventForwardHandler" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EventForwardHandler
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="EventForwardHandler">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.workflow.event_handlers.EventForwardHandler.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        __init__
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.workflow.event_handlers.EventForwardHandler.handle_event" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        handle_event
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.workflow.event_handlers.EventForwardHandler.event_types" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        event_types
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -3010,9 +3110,12 @@ it emits. <a class="autorefs autorefs-internal" title="            ropt.workflow
 the best (or last) result,
 <a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.HistoryHandler" href="#ropt.workflow.event_handlers.HistoryHandler"><code>HistoryHandler</code></a> keeps
 everything, <a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.TableHandler" href="#ropt.workflow.event_handlers.TableHandler"><code>TableHandler</code></a> writes a
-structured table, and
+structured table,
 <a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.CallbackHandler" href="#ropt.workflow.event_handlers.CallbackHandler"><code>CallbackHandler</code></a> forwards
-selected events to a user callback.</p>
+selected events to a user callback, and
+<a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.EventForwardHandler" href="#ropt.workflow.event_handlers.EventForwardHandler"><code>EventForwardHandler</code></a>
+forwards events to an <a class="autorefs autorefs-internal" title="            ropt.workflow.servers.EventServer" href="../workflow_servers/#ropt.workflow.servers.EventServer"><code>EventServer</code></a> for
+lock-free dispatch.</p>
 <p>See <a href="../../usage/workflows/">Optimization Workflows</a> and
 <a href="../../usage/results/">Working with Results</a> for usage.</p>
 
@@ -5059,6 +5162,212 @@ to a callback function.</p>
           </tr>
       </tbody>
     </table>
+
+    </div>
+
+</div>
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="ropt.workflow.event_handlers.EventForwardHandler" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.workflow.event_handlers.EventForwardHandler</span>
+
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.EventHandler (ropt.workflow.event_handlers.base.EventHandler)" href="#ropt.workflow.event_handlers.EventHandler">EventHandler</a></code></p>
+
+
+
+        <p>Forwards events from a compute step to an <code>EventServer</code>.</p>
+<p>See <a href="../../usage/workflows/#eventforwardhandler">Optimization Workflows</a> for usage.</p>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.workflow.event_handlers.EventForwardHandler.__init__" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">__init__</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">__init__</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">server</span><span class="p">:</span> <span class="n">EventServer</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">event_types</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">EnOptEventType</span><span class="p">]</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Initialize the EventForwardHandler.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>server</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.workflow.servers.EventServer (ropt.workflow.servers._event_server.EventServer)" href="../workflow_servers/#ropt.workflow.servers.EventServer">EventServer</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The EventServer to forward events to.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>event_types</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#set">set</a>[<a class="autorefs autorefs-internal" title="            EnOptEventType (ropt.enums.EnOptEventType)" href="../enums/#ropt.enums.EnOptEventType">EnOptEventType</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The set of event types to forward.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.workflow.event_handlers.EventForwardHandler.handle_event" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">handle_event</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">handle_event</span><span class="p">(</span><span class="n">event</span><span class="p">:</span> <span class="n">EnOptEvent</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Forward the event to the EventServer.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>event</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            EnOptEvent
+
+
+  
+      dataclass
+   (ropt.events.EnOptEvent)" href="../events/#ropt.events.EnOptEvent">EnOptEvent</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The event to forward.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="ropt.workflow.event_handlers.EventForwardHandler.event_types" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">event_types</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">event_types</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">EnOptEventType</span><span class="p">]</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>The event types that are handled.</p>
 
     </div>
 
