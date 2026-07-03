@@ -27,15 +27,6 @@ class ResultsHandler(EventHandler):
 
     See [Optimization Workflows](../usage/workflows.md#result_handler) for full
     details on selection criteria and domain handling.
-
-    Thread safety:
-        `handle_event` is serialized by an internal lock, so the same
-        instance may be attached to compute steps that run concurrently in
-        different threads. The stored value (`handler["results"]`) is always
-        an immutable [`FunctionResults`][ropt.results.FunctionResults] (or
-        `None`); callers must not mutate it. When `what="last"` is used
-        across concurrent steps, "last" means "last to acquire the lock,"
-        which is non-deterministic.
     """
 
     def __init__(
@@ -71,8 +62,7 @@ class ResultsHandler(EventHandler):
         Args:
             event: The event object.
         """
-        with self.locked():
-            self._handle_event(event)
+        self._handle_event(event)
 
     def _handle_event(self, event: EnOptEvent) -> None:
         results: tuple[FunctionResults, ...] = tuple(

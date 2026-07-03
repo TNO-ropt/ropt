@@ -203,14 +203,16 @@ from name to callable. When a mapping is used, the keys serve as task names
 
 ## Event server
 
-When multiple compute steps run concurrently, their event handlers are called
-from multiple threads. The built-in handlers protect their state with an
-internal lock for exactly this reason.
+When multiple compute steps run concurrently in worker threads, their event
+handlers are called from multiple threads simultaneously. **Event handlers are
+not thread-safe**: sharing one across concurrent compute steps will cause race
+conditions.
 
-[`EventServer`][ropt.workflow.servers.EventServer] provides a lock-free
-alternative: it receives events on a queue and dispatches them to its own
-handlers from the asyncio event loop's thread. Because all handler calls happen
-on a single thread, **handlers attached to an `EventServer` need no locking**.
+[`EventServer`][ropt.workflow.servers.EventServer] is the required solution:
+it receives events on a queue and dispatches them to its own handlers from the
+asyncio event loop's thread. Because all handler calls happen on a single
+thread, handlers registered on the server are safe even when events arrive
+from multiple concurrent steps.
 
 This is especially useful when one set of handlers needs to aggregate results
 from multiple concurrent compute steps.

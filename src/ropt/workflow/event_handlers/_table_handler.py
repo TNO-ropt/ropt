@@ -83,14 +83,6 @@ class TableHandler(EventHandler):
 
     See [Optimization Workflows](../usage/workflows.md#table) for full details
     on column specification format, default tables, and callback functionality.
-
-    Thread safety:
-        `handle_event`, `get_tables`, `__getitem__`, `add_table`,
-        `add_column`, and `set_callback` are serialized by an internal lock,
-        so the same instance may be attached to compute steps that run
-        concurrently in different threads. When the handler is shared across
-        concurrent steps the relative row order from different steps is
-        non-deterministic, but no row is lost.
     """
 
     def __init__(
@@ -138,8 +130,7 @@ class TableHandler(EventHandler):
         Args:
             callback: A function that is called when the tables are updated.
         """
-        with self.locked():
-            self._callback = callback
+        self._callback = callback
 
     def add_table(
         self,
@@ -159,12 +150,11 @@ class TableHandler(EventHandler):
             domain:     Domain (`"user"` or `"optimizer"`) the table is filled
                         from.
         """
-        with self.locked():
-            self._tables[name] = _ResultsTable(
-                columns,
-                table_type=table_type,
-                domain=domain,
-            )
+        self._tables[name] = _ResultsTable(
+            columns,
+            table_type=table_type,
+            domain=domain,
+        )
 
     def get_tables(self) -> dict[str, pd.DataFrame]:
         """Return the tables stored in the event handler.
@@ -177,10 +167,7 @@ class TableHandler(EventHandler):
             access is needed, it is more efficient to first store them in a
             variable.
         """
-        with self.locked():
-            return {
-                key: table.get_table(self._sep) for key, table in self._tables.items()
-            }
+        return {key: table.get_table(self._sep) for key, table in self._tables.items()}
 
     def handle_event(self, event: EnOptEvent) -> None:
         """Handle incoming events.
@@ -188,23 +175,20 @@ class TableHandler(EventHandler):
         Args:
             event: The event object.
         """
-        with self.locked():
-            if results := event.results:
-                transformed_results = (
-                    tuple(
-                        item.transform_from_optimizer(event.context) for item in results
-                    )
-                    if any(table.domain == "user" for table in self._tables.values())
-                    else ()
-                )
-                done = [
-                    table.add_results(transformed_results)
-                    if table.domain == "user"
-                    else table.add_results(results)
-                    for table in self._tables.values()
-                ]
-                if any(done) and self._callback is not None:
-                    self._callback(event)
+        if results := event.results:
+            transformed_results = (
+                tuple(item.transform_from_optimizer(event.context) for item in results)
+                if any(table.domain == "user" for table in self._tables.values())
+                else ()
+            )
+            done = [
+                table.add_results(transformed_results)
+                if table.domain == "user"
+                else table.add_results(results)
+                for table in self._tables.values()
+            ]
+            if any(done) and self._callback is not None:
+                self._callback(event)
 
     @property
     def event_types(self) -> set[EnOptEventType]:
@@ -232,11 +216,10 @@ class TableHandler(EventHandler):
         Raises:
             AttributeError: If the requested table does not exist.
         """
-        with self.locked():
-            if key not in self._tables:
-                msg = f"Unknown table: `{key}`"
-                raise AttributeError(msg)
-            return self._tables[key].get_table(self._sep)
+        if key not in self._tables:
+            msg = f"Unknown table: `{key}`"
+            raise AttributeError(msg)
+        return self._tables[key].get_table(self._sep)
 
     def add_column(self, table: str, name: str, title: str) -> None:
         """Add a column to a given table.
@@ -246,8 +229,7 @@ class TableHandler(EventHandler):
             name:  The name of the field to add as a column, using attribute syntax.
             title: The title of the column to add.
         """
-        with self.locked():
-            self._tables[table].add_column(name, title)
+        self._tables[table].add_column(name, title)
 
 
 class _ResultsTable:

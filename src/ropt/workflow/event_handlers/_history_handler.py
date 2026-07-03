@@ -24,15 +24,6 @@ class HistoryHandler(EventHandler):
 
     See [Optimization Workflows](../usage/workflows.md#history) for full
     details on domain handling and accumulation behavior.
-
-    Thread safety:
-        `handle_event` is serialized by an internal lock, so the same
-        instance may be attached to compute steps that run concurrently in
-        different threads. The stored value (`handler["results"]`) is always
-        an immutable tuple (or `None`); callers must not mutate it. When the
-        handler is shared across concurrent steps the relative order of
-        results from different steps is non-deterministic, but no result is
-        lost.
     """
 
     def __init__(self, *, domain: DomainType = "user") -> None:
@@ -54,16 +45,15 @@ class HistoryHandler(EventHandler):
         Args:
             event: The event object.
         """
-        with self.locked():
-            results: tuple[Results, ...] | Generator[Results, None, None]
-            if results := event.results:
-                if self._domain == "user":
-                    results = (
-                        item.transform_from_optimizer(event.context) for item in results
-                    )
-                self["results"] = tuple(
-                    results if self["results"] is None else (*self["results"], *results)
+        results: tuple[Results, ...] | Generator[Results, None, None]
+        if results := event.results:
+            if self._domain == "user":
+                results = (
+                    item.transform_from_optimizer(event.context) for item in results
                 )
+            self["results"] = tuple(
+                results if self["results"] is None else (*self["results"], *results)
+            )
 
     @property
     def event_types(self) -> set[EnOptEventType]:

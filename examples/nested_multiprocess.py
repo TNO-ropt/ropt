@@ -33,8 +33,13 @@ from ropt.workflow.evaluators import (
     EvaluationFunctionContext,
     EvaluationFunctionResult,
 )
-from ropt.workflow.event_handlers import CallbackHandler, HistoryHandler, ResultsHandler
-from ropt.workflow.servers import MultiprocessingServer, ThreadingServer
+from ropt.workflow.event_handlers import (
+    CallbackHandler,
+    EventForwardHandler,
+    HistoryHandler,
+    ResultsHandler,
+)
+from ropt.workflow.servers import EventServer, MultiprocessingServer, ThreadingServer
 
 DIM = 4
 REALIZATIONS = 10
@@ -127,7 +132,18 @@ def main() -> None:
     a = rng.normal(loc=1.0, scale=UNCERTAINTY, size=REALIZATIONS)
     b = rng.normal(loc=100.0, scale=100 * UNCERTAINTY, size=REALIZATIONS)
 
+    # Create a global results handler and event server to collect all inner
+    # results. It runs in a separate thread so that the inner jobs can submit
+    # events to it from any thread.
     global_results = ResultsHandler()
+    event_server = EventServer()
+    event_server.add_event_handler(global_results)
+    event_server.add_event_handler(
+        CallbackHandler(
+            callback=report,
+            event_types={EnOptEventType.FINISHED_EVALUATION},
+        )
+    )
 
     # Subprocess pool, shared across all outer evaluations.
     inner_server = MultiprocessingServer(workers=2)
@@ -148,10 +164,9 @@ def main() -> None:
         step = OptimizationStep(evaluator=inner_evaluator)
         result_handler = ResultsHandler()
         step.add_event_handler(result_handler)
-        step.add_event_handler(global_results)
         step.add_event_handler(
-            CallbackHandler(
-                callback=report,
+            EventForwardHandler(
+                event_server,
                 event_types={EnOptEventType.FINISHED_EVALUATION},
             )
         )
@@ -190,9 +205,11 @@ def main() -> None:
         async with asyncio.TaskGroup() as tg:
             await inner_server.start(tg)
             await outer_server.start(tg)
+            await event_server.start(tg)
             await asyncio.to_thread(outer_step.run, outer_context, INITIAL_VALUES)
             outer_server.cancel()
             inner_server.cancel()
+            event_server.cancel()
 
     asyncio.run(_run())
 
