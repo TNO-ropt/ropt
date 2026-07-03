@@ -201,6 +201,54 @@ from name to callable. When a mapping is used, the keys serve as task names
     `"multiprocessing"` and `"hpc"` servers it can be changed safely per
     task.
 
+## Event server
+
+When multiple compute steps run concurrently, their event handlers are called
+from multiple threads. The built-in handlers protect their state with an
+internal lock for exactly this reason.
+
+[`EventServer`][ropt.workflow.servers.EventServer] provides a lock-free
+alternative: it receives events on a queue and dispatches them to its own
+handlers from the asyncio event loop's thread. Because all handler calls happen
+on a single thread, **handlers attached to an `EventServer` need no locking**.
+
+This is especially useful when one set of handlers needs to aggregate results
+from multiple concurrent compute steps.
+
+`EventServer` follows the same lifecycle as evaluation servers:
+
+```python
+async with asyncio.TaskGroup() as tg:
+    eval_server = ThreadingServer(workers=4)
+    await eval_server.start(tg)
+
+    event_server = EventServer()
+    await event_server.start(tg)
+
+    # Attach an EventForwardHandler to the compute step.
+    step.add_event_handler(
+        EventForwardHandler(
+            event_server,
+            event_types={EnOptEventType.FINISHED_EVALUATION},
+        )
+    )
+
+    # Handlers registered on the server need no locking.
+    result_handler = ResultsHandler()
+    event_server.add_event_handler(result_handler)
+
+    await asyncio.to_thread(step.run, variables=..., context=...)
+
+    event_server.cancel()
+    eval_server.cancel()
+```
+
+[`EventForwardHandler`][ropt.workflow.event_handlers.EventForwardHandler] is a
+regular event handler that can be attached to a compute step. When invoked from
+the worker thread it puts the event on the server's queue via a thread-safe
+call. The server's processing loop then dispatches it to the registered
+handlers.
+
 ## Where to next
 
 - Wire a parallel evaluator into a workflow:

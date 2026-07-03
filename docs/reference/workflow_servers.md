@@ -3,6 +3,8 @@
 Servers dispatch [`Task`][ropt.workflow.servers.Task] objects produced by an
 [`AsyncEvaluator`][ropt.workflow.evaluators.AsyncEvaluator] to a concrete
 execution backend (asyncio, multiprocessing, or HPC).
+[`EventServer`][ropt.workflow.servers.EventServer] dispatches events from
+worker threads to handlers running in the asyncio event loop.
 
 See [Parallel Evaluation](../usage/parallel.md) for usage.
 
@@ -11,4 +13,5 @@ See [Parallel Evaluation](../usage/parallel.md) for usage.
 ::: ropt.workflow.servers.ThreadingServer
 ::: ropt.workflow.servers.MultiprocessingServer
 ::: ropt.workflow.servers.HPCServer
+::: ropt.workflow.servers.EventServer
 

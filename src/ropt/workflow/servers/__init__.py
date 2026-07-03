@@ -2,12 +2,14 @@
 
 from __future__ import annotations
 
+from ._event_server import EventServer
 from ._hpc_server import HPCServer
 from ._multiprocessing_server import MultiprocessingServer
 from ._threading_server import ThreadingServer
 from .base import ResultsQueue, Server, Task
 
 __all__ = [
+    "EventServer",
     "HPCServer",
     "MultiprocessingServer",
     "ResultsQueue",
