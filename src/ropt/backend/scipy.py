@@ -23,6 +23,7 @@ from scipy.optimize import (
     minimize,
 )
 
+from ropt._logging import get_logger
 from ropt.backend._base import Backend
 from ropt.backend.utils import (
     NormalizedConstraints,
@@ -36,6 +37,8 @@ if TYPE_CHECKING:
     from ropt.config import BackendConfig
     from ropt.context import EnOptContext
     from ropt.core import OptimizerCallback
+
+_logger = get_logger(__name__)
 
 SUPPORTED_SCIPY_METHODS: Final[set[str]] = {
     name.lower()
@@ -162,6 +165,7 @@ class SciPyBackend(Backend):
         self._cached_variables: NDArray[np.float64] | None = None
         self._cached_function: NDArray[np.float64] | None = None
         self._cached_gradient: NDArray[np.float64] | None = None
+        _logger.debug("Using SciPy optimizer: %s", self._method)
 
     def start(self, initial_values: NDArray[np.float64]) -> None:  # noqa: D102
         self._cached_variables = None

@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 from numpy.random import default_rng
 
+from ropt._logging import get_logger
 from ropt.results import (
     ConstraintInfo,
     FunctionEvaluations,
@@ -38,6 +39,9 @@ if TYPE_CHECKING:
     from ropt.function_estimator import FunctionEstimator
     from ropt.realization_filter import RealizationFilter
     from ropt.sampler import Sampler
+
+
+_logger = get_logger(__name__)
 
 
 class EnsembleEvaluator:
@@ -125,6 +129,7 @@ class EnsembleEvaluator:
         # Only functions:
         if compute_functions and not compute_gradients:
             if self._cached_results is not None:
+                _logger.debug("Function evaluation: returning cached results")
                 return (self._cached_results,)
             functions = self._calculate_functions(variables)
             # Gradient-based methods are currently not parallelized, and there is
@@ -142,6 +147,7 @@ class EnsembleEvaluator:
             and not compute_functions
             and self._cached_results is not None
         ):
+            _logger.debug("Gradient evaluation: using cached function results")
             return self._calculate_gradients(
                 variables, self._context.variables.mask, self._cached_results
             )
@@ -188,6 +194,11 @@ class EnsembleEvaluator:
 
         failed_realizations = _get_failed_function_realizations(
             f_eval_results.objectives
+        )
+        _logger.info(
+            "Function evaluation: %d/%d realizations succeeded",
+            int(np.count_nonzero(~failed_realizations)),
+            int(failed_realizations.size),
         )
         assert self._context.realizations.realization_min_success is not None
         if (
@@ -266,6 +277,11 @@ class EnsembleEvaluator:
             g_eval_results.perturbed_objectives,
             self._context.gradient.perturbation_min_success,
         )
+        _logger.info(
+            "Gradient evaluation: %d/%d realizations succeeded",
+            int(np.count_nonzero(~failed_realizations)),
+            int(failed_realizations.size),
+        )
         assert self._context.realizations.realization_min_success is not None
         if (
             np.count_nonzero(~failed_realizations)
@@ -339,6 +355,11 @@ class EnsembleEvaluator:
         failed_realizations = _get_failed_function_realizations(
             f_eval_results.objectives
         )
+        _logger.info(
+            "Function evaluation: %d/%d realizations succeeded",
+            int(np.count_nonzero(~failed_realizations)),
+            int(failed_realizations.size),
+        )
         assert self._context.realizations.realization_min_success is not None
         if (
             np.count_nonzero(~failed_realizations)
@@ -377,6 +398,11 @@ class EnsembleEvaluator:
             f_eval_results.objectives,
             g_eval_results.perturbed_objectives,
             self._context.gradient.perturbation_min_success,
+        )
+        _logger.info(
+            "Gradient evaluation: %d/%d realizations succeeded",
+            int(np.count_nonzero(~failed_realizations)),
+            int(failed_realizations.size),
         )
         assert self._context.realizations.realization_min_success is not None
         if (

@@ -11,6 +11,7 @@ from typing import TYPE_CHECKING, Any, Final
 
 import numpy as np
 
+from ropt._logging import get_logger
 from ropt.backend import Backend
 from ropt.core import OptimizerCallback, OptimizerCallbackResult
 from ropt.exceptions import Abort
@@ -22,6 +23,8 @@ if TYPE_CHECKING:
 
     from ropt.config import BackendConfig
     from ropt.context import EnOptContext
+
+_logger = get_logger(__name__)
 
 _HAVE_CLOUDPICKLE: Final = find_spec("cloudpickle") is not None
 
@@ -105,12 +108,17 @@ class ExternalBackend(Backend):
         result: OptimizerCallbackResult | ExitInfo
         exception: Exception | None = None
 
+        _logger.info("Starting external optimization in subprocess")
         process.start()
         while exception is None:
             try:
                 request = request_queue.get(timeout=_QUEUE_POLL_INTERVAL)
             except queue.Empty:
                 if not process.is_alive():
+                    _logger.warning(
+                        "External backend subprocess died unexpectedly (exit code %s)",
+                        process.exitcode,
+                    )
                     exception = RuntimeError(
                         "External backend subprocess died unexpectedly "
                         f"(exit code {process.exitcode})"

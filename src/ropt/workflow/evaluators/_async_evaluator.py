@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from ropt._logging import get_logger
 from ropt.enums import ExitCode
 from ropt.evaluation import EvaluationBatchContext, EvaluationBatchResult
 from ropt.exceptions import Abort, ServerFailure
@@ -25,6 +26,8 @@ from .base import (
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray
+
+_logger = get_logger(__name__)
 
 
 class AsyncEvaluator(Evaluator):
@@ -149,6 +152,7 @@ class AsyncEvaluator(Evaluator):
             if evaluator_context.active is None
             else int(evaluator_context.active.sum())
         )
+        _logger.debug("Dispatching %d active evaluations to server", active_count)
         received = 0
         while received < active_count:
             while self._server.is_running():

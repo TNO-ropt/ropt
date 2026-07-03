@@ -4,7 +4,11 @@ from __future__ import annotations
 
 import asyncio
 
+from ropt._logging import get_logger
+
 from .base import Server, ServerBase, Task
+
+_logger = get_logger(__name__)
 
 
 class ThreadingServer(ServerBase):
@@ -28,6 +32,7 @@ class ThreadingServer(ServerBase):
             task_group: The task group to use.
         """
         workers = [_Worker(self._task_queue, server=self) for _ in range(self._workers)]
+        _logger.debug("Starting threading server with %d worker(s)", self._workers)
         self._worker_tasks = [
             task_group.create_task(worker.run()) for worker in workers
         ]

@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING, Protocol
 
 import numpy as np
 
+from ropt._logging import get_logger
 from ropt.enums import ExitCode
 from ropt.exceptions import Abort
 from ropt.exit_info import (
@@ -31,6 +32,9 @@ if TYPE_CHECKING:
     from ropt.results import Functions, Gradients, Results
 
     from ._evaluator import EnsembleEvaluator
+
+
+_logger = get_logger(__name__)
 
 
 class SignalEvaluationCallback(Protocol):
@@ -157,6 +161,13 @@ class EnsembleOptimizer:
     ) -> OptimizerCallbackResult:
         assert return_functions or return_gradients
 
+        if return_functions and return_gradients:
+            _logger.debug("Optimizer callback: requesting functions and gradients")
+        elif return_functions:
+            _logger.debug("Optimizer callback: requesting functions")
+        else:
+            _logger.debug("Optimizer callback: requesting gradients")
+
         self._check_stopping_criteria()
 
         variables = self._get_completed_variables(variables)
@@ -218,10 +229,14 @@ class EnsembleOptimizer:
     def _check_stopping_criteria(self) -> None:
         max_functions = self._context.optimizer.max_functions
         if max_functions is not None and self._completed_functions >= max_functions:
-            raise Abort(MaxFunctionsReachedInfo(limit=max_functions))
+            functions_info = MaxFunctionsReachedInfo(limit=max_functions)
+            _logger.info("Stopping: %s", functions_info.message)
+            raise Abort(functions_info)
         max_batches = self._context.optimizer.max_batches
         if max_batches is not None and self._completed_batches >= max_batches:
-            raise Abort(MaxBatchesReachedInfo(limit=max_batches))
+            batches_info = MaxBatchesReachedInfo(limit=max_batches)
+            _logger.info("Stopping: %s", batches_info.message)
+            raise Abort(batches_info)
 
     def _run_evaluations(
         self,
@@ -245,7 +260,9 @@ class EnsembleOptimizer:
 
             info = _get_too_few_realizations_info(results, self._context)
             if info is not None:
-                raise Abort(TooFewRealizationsInfo(**info))
+                abort_info = TooFewRealizationsInfo(**info)
+                _logger.info("Stopping: %s", abort_info.message)
+                raise Abort(abort_info)
 
         return results
 

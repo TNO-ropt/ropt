@@ -110,6 +110,7 @@ nav:
       - "Optimization Workflows": usage/workflows.md
       - "Parallel Evaluation": usage/parallel.md
       - "Exit Information": usage/exit_info.md
+      - "Logging": usage/logging.md
   - "Tutorials":
       - "Overview": tutorials/index.md
       - "Deterministic Optimization": tutorials/deterministic.md

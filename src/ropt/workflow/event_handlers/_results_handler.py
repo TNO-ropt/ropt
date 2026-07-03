@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Literal, assert_never
 
 import numpy as np
 
+from ropt._logging import get_logger
 from ropt.enums import EnOptEventType
 from ropt.results import FunctionResults
 
@@ -16,6 +17,8 @@ if TYPE_CHECKING:
 
     from ropt.events import EnOptEvent
     from ropt.results import DomainType, Results
+
+_logger = get_logger(__name__)
 
 
 class ResultsHandler(EventHandler):
@@ -97,6 +100,7 @@ class ResultsHandler(EventHandler):
                 best = min(results, key=_get_target_objective)
                 if best is not self._best_results:
                     self._best_results = best
+                    _logger.info("New best objective: %g", _get_target_objective(best))
                     self["results"] = _transform(best)
             case "last":
                 self["results"] = _transform(results[-1])

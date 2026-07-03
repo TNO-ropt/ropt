@@ -3,6 +3,7 @@ from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from typing import Any, Literal
 
+from ropt._logging import get_logger
 from ropt.workflow.servers import (
     HPCServer,
     MultiprocessingServer,
@@ -11,6 +12,8 @@ from ropt.workflow.servers import (
     Task,
     ThreadingServer,
 )
+
+_logger = get_logger(__name__)
 
 
 @dataclass(kw_only=True)
@@ -109,6 +112,12 @@ async def dispatch_tasks(  # noqa: PLR0913
             msg = f"Invalid server: {server}"
             raise ValueError(msg)
     assert isinstance(eval_server, Server)
+    _logger.debug(
+        "Dispatching %d task(s) via %s server (%d worker(s))",
+        len(tasks),
+        server,
+        workers,
+    )
     all_processed = asyncio.Event()
     async with asyncio.TaskGroup() as tg:
         await eval_server.start(tg)

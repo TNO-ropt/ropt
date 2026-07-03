@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from ropt._logging import get_logger
 from ropt.core import EnsembleEvaluator
 from ropt.core._evaluator import _get_too_few_realizations_info
 from ropt.enums import EnOptEventType, ExitCode
@@ -22,6 +23,9 @@ if TYPE_CHECKING:
 
     from ropt.context import EnOptContext
     from ropt.workflow.evaluators import Evaluator
+
+
+_logger = get_logger(__name__)
 
 
 class EvaluationStep(ComputeStep):
@@ -70,6 +74,7 @@ class EvaluationStep(ComputeStep):
         """
         context.lock()
 
+        _logger.info("Starting evaluation")
         self._emit_event(
             EnOptEvent(
                 event_type=EnOptEventType.START_ENSEMBLE_EVALUATOR, context=context
@@ -115,6 +120,7 @@ class EvaluationStep(ComputeStep):
             )
         )
 
+        _logger.info("Evaluation finished: %s", exit_info.message)
         self._emit_event(
             EnOptEvent(
                 event_type=EnOptEventType.FINISHED_ENSEMBLE_EVALUATOR,

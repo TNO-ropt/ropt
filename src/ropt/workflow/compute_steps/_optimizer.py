@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from ropt._logging import get_logger
 from ropt.core import EnsembleEvaluator
 from ropt.core import EnsembleOptimizer as CoreEnsembleOptimizer
 from ropt.enums import EnOptEventType
@@ -22,6 +23,8 @@ if TYPE_CHECKING:
     from ropt.results import Results
     from ropt.workflow.evaluators import Evaluator
 
+
+_logger = get_logger(__name__)
 
 MetaDataType = dict[str, int | float | bool | str]
 
@@ -73,6 +76,13 @@ class OptimizationStep(ComputeStep):
         self._context = context
         self._metadata = metadata
 
+        _logger.debug(
+            "Configuration: %d variable(s), %d realization(s), %d objective(s)",
+            context.variables.variable_count,
+            context.realizations.weights.size,
+            context.objectives.weights.size,
+        )
+        _logger.info("Starting optimization")
         self._emit_event(
             EnOptEvent(event_type=EnOptEventType.START_OPTIMIZER, context=context)
         )
@@ -95,6 +105,7 @@ class OptimizationStep(ComputeStep):
         )
         exit_info = ensemble_optimizer.start(variables)
 
+        _logger.info("Optimization finished: %s", exit_info.message)
         self._emit_event(
             EnOptEvent(event_type=EnOptEventType.FINISHED_OPTIMIZER, context=context)
         )

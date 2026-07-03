@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Final
 
 import numpy as np
 
+from ropt._logging import get_logger
 from ropt.results import FunctionResults
 from ropt.workflow.event_handlers import EventHandler
 
@@ -18,6 +19,8 @@ if TYPE_CHECKING:
     from numpy.typing import NDArray
 
     from ropt.evaluation import EvaluationBatchContext, EvaluationBatchResult
+
+_logger = get_logger(__name__)
 
 
 class CachedEvaluator(Evaluator):
@@ -100,7 +103,12 @@ class CachedEvaluator(Evaluator):
             if results is not None:
                 cached[idx] = (cached_realization_index, results)
 
-        if cached:  # Modify `active` in a thread-safe manner
+        if cached:
+            _logger.debug(
+                "Cache: %d/%d evaluations served from cache",
+                len(cached),
+                variables.shape[0],
+            )
             active = evaluator_context.active.copy()
             active[list(cached.keys())] = False
             evaluator_context = replace(evaluator_context, active=active)

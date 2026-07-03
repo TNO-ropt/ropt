@@ -14,12 +14,15 @@ from pickle import UnpicklingError  # noqa: S403
 from typing import TYPE_CHECKING, Any, Final
 from uuid import uuid4
 
+from ropt._logging import get_logger
 from ropt.exceptions import ServerFailure
 
 from .base import ServerBase, Task
 
 if TYPE_CHECKING:
     from uuid import UUID
+
+_logger = get_logger(__name__)
 
 
 _HAVE_HPC: Final = (
@@ -123,6 +126,11 @@ class HPCServer(ServerBase):
             task_group: The task group to use.
         """
         self._worker_task = task_group.create_task(self._worker())
+        _logger.info(
+            "Starting HPC server (%d max workers, %.1fs poll interval)",
+            self._workers,
+            self._interval,
+        )
         await self._finish_start(task_group)
 
     async def _worker(self) -> None:
@@ -180,6 +188,7 @@ class HPCServer(ServerBase):
             queue=self._queue,
             cores=self._cores,
         )
+        _logger.debug("Submitted HPC job %s (job id: %s)", task_id, self._jobs[task_id])
 
     def _poll(self) -> None:
         try:
@@ -201,6 +210,9 @@ class HPCServer(ServerBase):
                     self._retries.pop(task_id, None)
                     del self._jobs[task_id]
                     msg = f"Output file for task {task_id} never appeared"
+                    _logger.warning(
+                        "HPC task %s failed: output file never appeared", task_id
+                    )
                     self._results[task_id] = ServerFailure(msg)
             except (OSError, EOFError, UnpicklingError):
                 retry_count = self._retries.get(task_id, 0) + 1
@@ -209,6 +221,11 @@ class HPCServer(ServerBase):
                     self._retries.pop(task_id, None)
                     del self._jobs[task_id]
                     msg = f"No valid result for task {task_id} after {self._retries_limit} retries"
+                    _logger.warning(
+                        "HPC task %s failed: no valid result after %d retries",
+                        task_id,
+                        self._retries_limit,
+                    )
                     self._results[task_id] = ServerFailure(msg)
 
     def _get_results(self) -> None:

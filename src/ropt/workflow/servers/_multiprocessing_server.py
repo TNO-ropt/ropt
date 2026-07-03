@@ -8,12 +8,15 @@ from concurrent.futures import ProcessPoolExecutor
 from concurrent.futures.process import BrokenProcessPool
 from typing import TYPE_CHECKING, Any
 
+from ropt._logging import get_logger
 from ropt.exceptions import ServerFailure
 
 from .base import Server, ServerBase, Task
 
 if TYPE_CHECKING:
     from collections.abc import Callable
+
+_logger = get_logger(__name__)
 
 
 class MultiprocessingServer(ServerBase):
@@ -49,6 +52,9 @@ class MultiprocessingServer(ServerBase):
             max_workers=self._workers,
             mp_context=multiprocessing.get_context("spawn"),
             max_tasks_per_child=self._max_tasks_per_child,
+        )
+        _logger.debug(
+            "Starting multiprocessing server with %d worker(s)", self._workers
         )
         workers = [
             _Worker(self._task_queue, self, self._executor)
@@ -92,6 +98,7 @@ class _Worker:
                 )
                 await asyncio.to_thread(task.put_result, result)
             except BrokenProcessPool:
+                _logger.warning("Worker process pool broken; task result lost")
                 await asyncio.to_thread(
                     task.put_result, ServerFailure("Background process was killed")
                 )

@@ -5,6 +5,8 @@ from __future__ import annotations
 from importlib.metadata import entry_points
 from typing import TYPE_CHECKING, Any, Final, Literal, cast
 
+from ropt._logging import get_logger
+
 if TYPE_CHECKING:
     from ropt.plugins.base import Plugin
 
@@ -34,6 +36,8 @@ _DEFAULT_PLUGINS: Final = {
     "objective_transform": "default",
     "nonlinear_constraint_transform": "default",
 }
+
+_logger = get_logger(__name__)
 
 
 class PluginManager:
@@ -155,6 +159,7 @@ class PluginManager:
         if name_lower in self._plugins[plugin_type]:
             msg = f"Duplicate plugin name: {name_lower}"
             raise ValueError(msg)
+        _logger.debug("Registering plugin: %s/%s", plugin_type, name_lower)
         self._plugins[plugin_type][name_lower] = plugin
 
     def _get_plugin(
