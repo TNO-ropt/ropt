@@ -937,6 +937,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Event server">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#thread-based-dispatch" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Thread-based dispatch
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -2446,6 +2463,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Event server">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#thread-based-dispatch" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Thread-based dispatch
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -2828,6 +2862,19 @@ regular event handler that can be attached to a compute step. When invoked from
 the worker thread it puts the event on the server's queue via a thread-safe
 call. The server's processing loop then dispatches it to the registered
 handlers.</p>
+<h3 id="thread-based-dispatch">Thread-based dispatch</h3>
+<p>By default, handlers registered with <code>EventServer</code> are called directly in the
+asyncio event loop's thread. This is efficient for handlers that only do
+in-memory work, such as <code>ResultsHandler</code> or <code>HistoryHandler</code>.</p>
+<p>If a handler performs blocking operations — writing results to a file, pushing
+data to a database, sending over a network — pass <code>run_in_thread=True</code> when
+registering it:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">event_server</span><span class="o">.</span><span class="n">add_event_handler</span><span class="p">(</span><span class="n">my_handler</span><span class="p">,</span> <span class="n">run_in_thread</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span></code></pre></div>
+<p><code>CallbackHandler</code> and <code>TableHandler</code> (when a slow callback is set via
+<code>set_callback</code>) are common cases where this is needed. When multiple handlers
+with <code>run_in_thread=True</code> match the same event they are dispatched <strong>in
+parallel</strong> via <code>asyncio.gather</code> — they do not block each other.</p>
 <h2 id="where-to-next">Where to next</h2>
 <ul>
 <li>Wire a parallel evaluator into a workflow:

@@ -4196,8 +4196,13 @@ from. The <code>"user"</code> domain reports values as seen by the user;
     <div class="doc doc-contents ">
 
         <p>Set the callback function.</p>
-<p>This callback will called anytime the tables are updated, passing the
-event that caused the tables to be updated.</p>
+<p>The callback is invoked from <code>handle_event</code> after the tables are
+updated, receiving the event that triggered the update. If the callback
+performs blocking operations (e.g. writing tables to disk), register
+this handler with <code>run_in_thread=True</code> on the
+<a class="autorefs autorefs-internal" title="            ropt.workflow.servers.EventServer" href="../workflow_servers/#ropt.workflow.servers.EventServer"><code>EventServer</code></a>:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">event_server</span><span class="o">.</span><span class="n">add_event_handler</span><span class="p">(</span><span class="n">table_handler</span><span class="p">,</span> <span class="n">run_in_thread</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span></code></pre></div>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -4746,6 +4751,11 @@ variable.</p>
         <p>The default event handler for observing events.</p>
 <p>This event handler listens for events of matching types and forwards them
 to a callback function.</p>
+<p>If the callback performs blocking operations (file I/O, network calls,
+etc.), register this handler with <code>run_in_thread=True</code> on the
+<a class="autorefs autorefs-internal" title="            ropt.workflow.servers.EventServer" href="../workflow_servers/#ropt.workflow.servers.EventServer"><code>EventServer</code></a>:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">event_server</span><span class="o">.</span><span class="n">add_event_handler</span><span class="p">(</span><span class="n">handler</span><span class="p">,</span> <span class="n">run_in_thread</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span></code></pre></div>
 
 
 
