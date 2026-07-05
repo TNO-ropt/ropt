@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import threading
 from typing import Any
 
 import numpy as np
@@ -188,6 +189,47 @@ async def test_event_forward_handler_forwards_to_server(config: dict[str, Any]) 
         forward.handle_event(event)
         server.cancel()
     assert received == [event]
+
+
+@pytest.mark.asyncio
+async def test_event_server_run_in_thread_dispatches(config: dict[str, Any]) -> None:
+    context = EnOptContext.model_validate(config)
+
+    # Use a barrier to prove the two thread handlers run concurrently: if they
+    # ran sequentially the barrier would never be reached by both threads and
+    # the test would hang (caught by the timeout mark).
+    barrier = threading.Barrier(2)
+    received_a: list[EnOptEvent] = []
+    received_b: list[EnOptEvent] = []
+
+    def _handler_a(event: EnOptEvent) -> None:
+        barrier.wait()
+        received_a.append(event)
+
+    def _handler_b(event: EnOptEvent) -> None:
+        barrier.wait()
+        received_b.append(event)
+
+    server = EventServer()
+    server.add_event_handler(
+        CallbackHandler(
+            event_types={EnOptEventType.FINISHED_EVALUATION}, callback=_handler_a
+        ),
+        run_in_thread=True,
+    )
+    server.add_event_handler(
+        CallbackHandler(
+            event_types={EnOptEventType.FINISHED_EVALUATION}, callback=_handler_b
+        ),
+        run_in_thread=True,
+    )
+    event = EnOptEvent(event_type=EnOptEventType.FINISHED_EVALUATION, context=context)
+    async with asyncio.TaskGroup() as tg:
+        await server.start(tg)
+        server.put_event(event)
+        server.cancel()
+    assert received_a == [event]
+    assert received_b == [event]
 
 
 @pytest.mark.asyncio

@@ -251,6 +251,25 @@ the worker thread it puts the event on the server's queue via a thread-safe
 call. The server's processing loop then dispatches it to the registered
 handlers.
 
+### Thread-based dispatch
+
+By default, handlers registered with `EventServer` are called directly in the
+asyncio event loop's thread. This is efficient for handlers that only do
+in-memory work, such as `ResultsHandler` or `HistoryHandler`.
+
+If a handler performs blocking operations — writing results to a file, pushing
+data to a database, sending over a network — pass `run_in_thread=True` when
+registering it:
+
+```python
+event_server.add_event_handler(my_handler, run_in_thread=True)
+```
+
+`CallbackHandler` and `TableHandler` (when a slow callback is set via
+`set_callback`) are common cases where this is needed. When multiple handlers
+with `run_in_thread=True` match the same event they are dispatched **in
+parallel** via `asyncio.gather` — they do not block each other.
+
 ## Where to next
 
 - Wire a parallel evaluator into a workflow:

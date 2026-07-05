@@ -124,8 +124,15 @@ class TableHandler(EventHandler):
     def set_callback(self, callback: Callable[[EnOptEvent], None]) -> None:
         """Set the callback function.
 
-        This callback will called anytime the tables are updated, passing the
-        event that caused the tables to be updated.
+        The callback is invoked from `handle_event` after the tables are
+        updated, receiving the event that triggered the update. If the callback
+        performs blocking operations (e.g. writing tables to disk), register
+        this handler with `run_in_thread=True` on the
+        [`EventServer`][ropt.workflow.servers.EventServer]:
+
+        ```python
+        event_server.add_event_handler(table_handler, run_in_thread=True)
+        ```
 
         Args:
             callback: A function that is called when the tables are updated.

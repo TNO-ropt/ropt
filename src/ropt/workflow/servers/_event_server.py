@@ -11,6 +11,10 @@ if TYPE_CHECKING:
     from ropt.workflow.event_handlers import EventHandler
 
 
+async def _call(handler: EventHandler, event: EnOptEvent) -> None:  # noqa: RUF029
+    handler.handle_event(event)
+
+
 class EventServer:
     """An event server that dispatches events to handlers from the asyncio event loop.
 
@@ -18,18 +22,29 @@ class EventServer:
     """
 
     def __init__(self) -> None:
-        self._handlers: list[EventHandler] = []
+        self._handlers: list[tuple[EventHandler, bool]] = []
         self._queue: asyncio.Queue[EnOptEvent | None] | None = None
         self._loop: asyncio.AbstractEventLoop | None = None
         self._running = threading.Event()
 
-    def add_event_handler(self, handler: EventHandler) -> None:
+    def add_event_handler(
+        self, handler: EventHandler, *, run_in_thread: bool = False
+    ) -> None:
         """Add an event handler.
 
+        By default the handler is called directly in the event loop's thread,
+        which is efficient for handlers that only do in-memory work. Pass
+        `run_in_thread=True` for handlers that perform blocking operations such
+        as file I/O, database writes, or network calls. Multiple handlers with
+        `run_in_thread=True` that match the same event are dispatched in
+        parallel via `asyncio.gather`.
+
         Args:
-            handler: The handler to add.
+            handler:       The handler to add.
+            run_in_thread: If True, dispatch via the thread pool instead of
+                           the event loop.
         """
-        self._handlers.append(handler)
+        self._handlers.append((handler, run_in_thread))
 
     def put_event(self, event: EnOptEvent) -> None:
         """Submit an event from any thread.
@@ -70,18 +85,24 @@ class EventServer:
         if self._loop is not None and self._queue is not None:
             self._loop.call_soon_threadsafe(self._queue.put_nowait, None)
 
-    def _dispatch(self, event: EnOptEvent) -> None:
-        for handler in self._handlers:
-            if event.event_type in handler.event_types:
-                handler.handle_event(event)
+    async def _dispatch(self, event: EnOptEvent) -> None:
+        await asyncio.gather(
+            *(
+                asyncio.to_thread(handler.handle_event, event)
+                if run_in_thread
+                else _call(handler, event)
+                for handler, run_in_thread in self._handlers
+                if event.event_type in handler.event_types
+            )
+        )
 
-    def _drain(self) -> None:
+    async def _drain(self) -> None:
         assert self._queue is not None
         while not self._queue.empty():
             remaining = self._queue.get_nowait()
             self._queue.task_done()
             if remaining is not None:
-                self._dispatch(remaining)
+                await self._dispatch(remaining)
 
     async def _process(self) -> None:
         assert self._queue is not None
@@ -90,8 +111,8 @@ class EventServer:
                 event = await self._queue.get()
                 self._queue.task_done()
                 if event is None:
-                    self._drain()
+                    await self._drain()
                     break
-                self._dispatch(event)
+                await self._dispatch(event)
         finally:
             self._running.clear()
