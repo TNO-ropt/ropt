@@ -78,11 +78,24 @@ help filter the input and re-expand the output.
 [`EvaluationBatchResult`][ropt.evaluation.EvaluationBatchResult] stores:
 
 | Field          | Meaning
-| -------------- | --------------------------------------------------------------------------------------------------------------------
-| `objectives`   | An array of shape `(n_rows, n_objectives)`.
-| `constraints`  | An optional array of shape `(n_rows, n_nonlinear_constraints)`, required when `nonlinear_constraints` is configured.
-| `metadata`     | A dict of arrays carrying user metadata for each row. Not used internally by `ropt`; stored verbatim on results for application use (e.g., to link results back to input vectors).
-| `batch_id`     | Optional integer identifying this set of evaluation results.
+| -------------- | ----------------------------------------------------------
+| `objectives`   | Objective values, shape `(n_rows, n_objectives)`.
+| `constraints`  | Optional constraint values, shape `(n_rows, n_nonlinear_constraints)`.
+| `metadata`     | Optional per-row metadata dict; not used by `ropt`.
+| `batch_id`     | Batch label (default `0`).
+
+`constraints` is required when `nonlinear_constraints` is configured in the
+problem. `metadata` is stored verbatim on the resulting
+[`Results`][ropt.results.Results] object and is useful for linking results back
+to the input vectors that produced them. `batch_id` defaults to `0`; all
+results will carry this label unless you set it yourself. For
+auto-incrementing IDs pass a
+[`BatchIdCounter`][ropt.workflow.evaluators.BatchIdCounter] (or any
+`Callable[[], int]`) to the `batch_id_callback` argument of
+[`FunctionEvaluator`][ropt.workflow.evaluators.FunctionEvaluator] or
+[`AsyncEvaluator`][ropt.workflow.evaluators.AsyncEvaluator]; for raw
+[`BatchEvaluator`][ropt.workflow.evaluators.BatchEvaluator] callbacks set it
+yourself.
 
 Inactive rows (where `active` is `False`) should have their result values set
 to zero. Rows where an evaluation failed should be set to `np.nan` (see
@@ -162,22 +175,29 @@ def my_function(
   dataclass identifying the evaluation. It exposes:
 
     | Field          | Meaning
-    | -------------- | -----------------------------------------------------------------------------------
+    | -------------- | ----------------------------------------------------------
     | `realization`  | Integer realization index for this row.
-    | `perturbation` | Integer perturbation index, or `-1` when the evaluation is unperturbed.
+    | `perturbation` | Perturbation index, or `-1` when unperturbed.
     | `batch_id`     | Integer identifying the current evaluation batch.
     | `eval_idx`     | Row index within the batch.
-    | `name`         | Optional task name set by the evaluator (e.g. via `AsyncEvaluator`'s `get_name` callback); `None` when no name was assigned.
+    | `name`         | Optional task name; `None` if unset.
+
+    `name` is set by the evaluator (e.g. via `AsyncEvaluator`'s `get_name`
+    callback) and can be used to associate results with named tasks.
 
 - The return value is an
   [`EvaluationFunctionResult`][ropt.workflow.evaluators.EvaluationFunctionResult]
   dataclass with the following fields:
 
     | Field          | Meaning
-    | -------------- | -----------------------------------------------------------------------------------
-    | `objectives`   | The objective values as a scalar or 1-D array of length `n_objectives`.
-    | `constraints`  | Optional constraint values as a scalar or 1-D array of length `n_nonlinear_constraints`.
-    | `metadata`     | Optional `dict[str, Any]`; each entry is stored verbatim in the resulting [`EvaluationBatchResult.metadata`][ropt.evaluation.EvaluationBatchResult] for this row.
+    | -------------- | ----------------------------------------------------------
+    | `objectives`   | Scalar or 1-D array of length `n_objectives`.
+    | `constraints`  | Optional scalar or 1-D array of length `n_nonlinear_constraints`.
+    | `metadata`     | Optional `dict[str, Any]`; stored verbatim in the batch result.
+
+    Each `metadata` entry is forwarded into
+    [`EvaluationBatchResult.metadata`][ropt.evaluation.EvaluationBatchResult]
+    for the corresponding row.
 
 To use it with
 [`BasicOptimizer`][ropt.workflow.BasicOptimizer], wrap the function in a

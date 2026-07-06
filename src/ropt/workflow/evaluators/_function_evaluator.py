@@ -2,13 +2,13 @@
 
 from __future__ import annotations
 
-import threading
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
 from ropt.evaluation import EvaluationBatchContext, EvaluationBatchResult
 
+from ._counter import BatchIdCounter
 from .base import (
     EvaluationFunctionCallback,
     EvaluationFunctionContext,
@@ -17,6 +17,8 @@ from .base import (
 )
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+
     from numpy.typing import NDArray
 
 
@@ -35,26 +37,19 @@ class FunctionEvaluator(Evaluator):
         self,
         *,
         function: EvaluationFunctionCallback,
+        batch_id_callback: Callable[[], int] | None = None,
     ) -> None:
         """Initialize the FunctionEvaluator.
 
         Args:
-            function: The function used for objectives and constraints.
+            function:          The function used for objectives and constraints.
+            batch_id_callback: Callable that returns the next batch ID each time it is called.
         """
         super().__init__()
         self._function = function
-        self._batch_id = 0
-        self._batch_lock = threading.Lock()
-
-    def __getstate__(self) -> dict[str, Any]:
-        # threading.Lock is not picklable; drop it and recreate in __setstate__.
-        state = self.__dict__.copy()
-        state.pop("_batch_lock", None)
-        return state
-
-    def __setstate__(self, state: dict[str, Any]) -> None:
-        self.__dict__.update(state)
-        self._batch_lock = threading.Lock()
+        self._batch_id_callback = (
+            batch_id_callback if batch_id_callback is not None else BatchIdCounter()
+        )
 
     def eval(
         self, variables: NDArray[np.float64], evaluator_context: EvaluationBatchContext
@@ -68,9 +63,7 @@ class FunctionEvaluator(Evaluator):
         Returns:
             The result of calling the wrapped evaluator function.
         """
-        with self._batch_lock:
-            batch_id = self._batch_id
-            self._batch_id += 1
+        batch_id = self._batch_id_callback()
         no = evaluator_context.context.objectives.weights.size
         nc = (
             0

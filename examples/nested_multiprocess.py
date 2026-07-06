@@ -29,6 +29,7 @@ from ropt.results import FunctionResults
 from ropt.workflow.compute_steps import OptimizationStep
 from ropt.workflow.evaluators import (
     AsyncEvaluator,
+    BatchIdCounter,
     CachedEvaluator,
     EvaluationFunctionContext,
     EvaluationFunctionResult,
@@ -147,13 +148,8 @@ def main() -> None:
 
     # Subprocess pool, shared across all outer evaluations.
     inner_server = MultiprocessingServer(workers=2)
-    # Evaluator for the inner optimization, bundling all evaluations in a batch.
-    inner_evaluator = AsyncEvaluator(
-        function=partial(rosenbrock, a=a, b=b),
-        server=inner_server,
-        bundle_size=0,
-        get_name=_task_name,
-    )
+    # Shared counter keeps batch IDs unique across all concurrent inner runs.
+    inner_batch_id_counter = BatchIdCounter()
 
     def _optimize(
         variables: NDArray[np.float64],
@@ -161,6 +157,14 @@ def main() -> None:
     ) -> EvaluationFunctionResult:
         new_variables = np.where(MASK, INITIAL_VALUES, variables)
 
+        # Create a fresh evaluator per call; share only the server and counter.
+        inner_evaluator = AsyncEvaluator(
+            function=partial(rosenbrock, a=a, b=b),
+            server=inner_server,
+            bundle_size=0,
+            get_name=_task_name,
+            batch_id_callback=inner_batch_id_counter,
+        )
         step = OptimizationStep(evaluator=inner_evaluator)
         result_handler = ResultsHandler()
         step.add_event_handler(result_handler)

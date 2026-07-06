@@ -32,13 +32,13 @@ class Results(ABC):
     See [Working with Results](../usage/results.md) for a narrative overview.
 
     Attributes:
-        batch_id: Optional identifier for the evaluation batch.
+        batch_id: Identifier for the evaluation batch.
         metadata: Dictionary of additional information (not used internally).
         names:    Mapping from [`AxisName`][ropt.enums.AxisName] to label tuples
                   for DataFrame export.
     """
 
-    batch_id: int | None
+    batch_id: int
     metadata: dict[str, Any]
     names: dict[str, tuple[str | int, ...]]
 
@@ -53,8 +53,8 @@ class Results(ABC):
         Exports the sub-fields of `field_name` as columns, named after the
         sub-field. Multi-dimensional sub-fields are stacked into rows indexed
         by a multi-index derived from the field's axis metadata; index levels
-        are labeled using the `names` mapping (numeric indices if absent). If
-        `batch_id` is set, it is prepended to the index. The `unstack`
+        are labeled using the `names` mapping (numeric indices if absent).
+        `batch_id` is always prepended to the index. The `unstack`
         argument pivots selected axes into columns, producing tuple column
         names of the form `(sub-field, label, ...)`.
 

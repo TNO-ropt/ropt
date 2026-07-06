@@ -24,6 +24,7 @@ from ropt.results import FunctionResults
 from ropt.workflow.compute_steps import OptimizationStep
 from ropt.workflow.evaluators import (
     AsyncEvaluator,
+    BatchIdCounter,
     CachedEvaluator,
     EvaluationFunctionContext,
     EvaluationFunctionResult,
@@ -156,12 +157,8 @@ def main(*, hpc_workdir: Path) -> None:
     # `_task_name`. The same name is recovered inside `rosenbrock` from the
     # evaluation context, so identifiers always line up with the queue.
     inner_server = HPCServer(workdir=hpc_workdir, workers=HPC_WORKERS)
-    inner_evaluator = AsyncEvaluator(
-        function=partial(rosenbrock, a=a, b=b),
-        server=inner_server,
-        bundle_size=0,
-        get_name=_task_name,
-    )
+    # Shared counter keeps batch IDs unique across all concurrent inner runs.
+    inner_batch_id_counter = BatchIdCounter()
 
     def _optimize(
         variables: NDArray[np.float64],
@@ -169,6 +166,14 @@ def main(*, hpc_workdir: Path) -> None:
     ) -> EvaluationFunctionResult:
         new_variables = np.where(MASK, INITIAL_VALUES, variables)
 
+        # Create a fresh evaluator per call; share only the server and counter.
+        inner_evaluator = AsyncEvaluator(
+            function=partial(rosenbrock, a=a, b=b),
+            server=inner_server,
+            bundle_size=0,
+            get_name=_task_name,
+            batch_id_callback=inner_batch_id_counter,
+        )
         step = OptimizationStep(evaluator=inner_evaluator)
         result_handler = ResultsHandler()
         step.add_event_handler(result_handler)

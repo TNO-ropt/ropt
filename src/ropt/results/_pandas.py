@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 
 def _to_dataframe(
     result_field: ResultField,
-    batch_id: int | None,
+    batch_id: int,
     select: Iterable[str],
     unstack: Iterable[AxisName] | None,
     names: dict[str, tuple[str | int, ...]],
@@ -29,9 +29,7 @@ def _to_dataframe(
             raise ValueError(msg)
         series = _to_series(result_field, split_field if key else field, key, names)
         if series is not None:
-            frame = pd.concat(
-                {(0 if batch_id is None else batch_id): series}, names=["batch_id"]
-            ).to_frame()
+            frame = pd.concat({batch_id: series}, names=["batch_id"]).to_frame()
             levels = [axis.value for axis in unstack if axis.value in frame.index.names]
             if levels:
                 frame = frame.reset_index().pivot_table(

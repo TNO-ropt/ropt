@@ -57,17 +57,6 @@ class ResultsHandler(EventHandler):
         self["results"] = None
 
     def handle_event(self, event: EnOptEvent) -> None:
-        """Handle incoming events.
-
-        Processes `FINISHED_EVALUATION` events and updates the tracked result
-        based on the configured criterion and constraint tolerance.
-
-        Args:
-            event: The event object.
-        """
-        self._handle_event(event)
-
-    def _handle_event(self, event: EnOptEvent) -> None:
         results: tuple[FunctionResults, ...] = tuple(
             item
             for item in event.results

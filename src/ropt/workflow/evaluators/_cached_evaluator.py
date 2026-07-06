@@ -34,12 +34,6 @@ class CachedEvaluator(Evaluator):
     management.
     """
 
-    # NOTE: A single instance of this class may be used from different threads.
-    # `eval_cached` takes a snapshot of `self._sources` at entry so concurrent
-    # `add_sources` calls cannot perturb the iteration. The wrapped evaluator
-    # and the `EventHandler` sources must themselves be safe to share across
-    # threads for this class to be thread-safe end-to-end.
-
     def __init__(
         self,
         *,

@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import queue
-import threading
 from itertools import starmap
 from typing import TYPE_CHECKING, Any
 
@@ -16,6 +15,7 @@ from ropt.exceptions import Abort, ServerFailure
 from ropt.exit_info import ExitInfo
 from ropt.workflow.servers import ResultsQueue, Server, Task
 
+from ._counter import BatchIdCounter
 from .base import (
     EvaluationFunctionCallback,
     EvaluationFunctionContext,
@@ -25,6 +25,8 @@ from .base import (
 )
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+
     from numpy.typing import NDArray
 
 _logger = get_logger(__name__)
@@ -43,13 +45,7 @@ class AsyncEvaluator(Evaluator):
     details on how this integrates with the asyncio event loop.
     """
 
-    # NOTE: A single instance of this class might be used from different
-    # threads, if it is shared by different optimizers running in different
-    # threads. The server is expected to be thread-safe, and the results queue
-    # is thread-safe, so this should be safe. The batch ID is protected by a
-    # lock.
-
-    def __init__(
+    def __init__(  # noqa: PLR0913
         self,
         *,
         function: EvaluationFunctionCallback,
@@ -57,6 +53,7 @@ class AsyncEvaluator(Evaluator):
         bundle_size: int = 1,
         queue_size: int = 0,
         get_name: NameCallback | None = None,
+        batch_id_callback: Callable[[], int] | None = None,
     ) -> None:
         """Initialize the FunctionEvaluator.
 
@@ -72,11 +69,12 @@ class AsyncEvaluator(Evaluator):
         single task name.
 
         Args:
-            function:    The function used for objectives and constraints.
-            server:      Optional evaluator server to use.
-            bundle_size: Number of active evaluations per server task.
-            queue_size:  Maximum size of the result queue.
-            get_name:    Optional callable to generate names for tasks.
+            function:          The function used for objectives and constraints.
+            server:            Optional evaluator server to use.
+            bundle_size:       Number of active evaluations per server task.
+            queue_size:        Maximum size of the result queue.
+            get_name:          Optional callable to generate names for tasks.
+            batch_id_callback: Callable that returns the next batch ID each time it is called.
 
         Raises:
             ValueError: If `bundle_size` is negative.
@@ -89,19 +87,10 @@ class AsyncEvaluator(Evaluator):
         self._server = server
         self._bundle_size = bundle_size
         self._queue_size = queue_size
-        self._batch_id = 0
-        self._batch_lock = threading.Lock()
+        self._batch_id_callback = (
+            batch_id_callback if batch_id_callback is not None else BatchIdCounter()
+        )
         self._get_name = get_name
-
-    def __getstate__(self) -> dict[str, Any]:
-        # threading.Lock is not picklable; drop it and recreate in __setstate__.
-        state = self.__dict__.copy()
-        state.pop("_batch_lock", None)
-        return state
-
-    def __setstate__(self, state: dict[str, Any]) -> None:
-        self.__dict__.update(state)
-        self._batch_lock = threading.Lock()
 
     def eval(
         self, variables: NDArray[np.float64], evaluator_context: EvaluationBatchContext
@@ -126,9 +115,7 @@ class AsyncEvaluator(Evaluator):
                 )
             )
 
-        with self._batch_lock:
-            batch_id = self._batch_id
-            self._batch_id += 1
+        batch_id = self._batch_id_callback()
 
         no = evaluator_context.context.objectives.weights.size
         nc = (

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import threading
 from copy import deepcopy
 from functools import partial
 from typing import TYPE_CHECKING, Any
@@ -9,6 +10,7 @@ import pytest
 
 from ropt.context import EnOptContext
 from ropt.enums import EnOptEventType, ExitCode
+from ropt.evaluation import EvaluationBatchResult
 from ropt.exceptions import Abort
 from ropt.exit_info import ExitInfo
 from ropt.results import FunctionResults
@@ -18,16 +20,22 @@ from ropt.workflow.evaluators import (
     CachedEvaluator,
     EvaluationFunctionContext,
     EvaluationFunctionResult,
+    Evaluator,
     FunctionEvaluator,
 )
-from ropt.workflow.event_handlers import CallbackHandler, HistoryHandler, ResultsHandler
+from ropt.workflow.event_handlers import (
+    CallbackHandler,
+    EventHandler,
+    HistoryHandler,
+    ResultsHandler,
+)
 
 if TYPE_CHECKING:
     from collections.abc import Callable
 
     from numpy.typing import NDArray
 
-    from ropt.evaluation import EvaluationBatchContext, EvaluationBatchResult
+    from ropt.evaluation import EvaluationBatchContext
     from ropt.events import EnOptEvent
 
 
@@ -728,3 +736,77 @@ def test_evaluator_cache_with_store(
     completed_test_functions = 0
     step.run(variables=initial_values, context=EnOptContext.model_validate(config))
     assert completed_test_functions == 2
+
+
+def test_evaluator_raises_on_concurrent_use() -> None:
+    in_eval = threading.Event()
+    can_finish = threading.Event()
+    thread2_error: list[BaseException | None] = [None]
+
+    class _BlockingEvaluator(Evaluator):
+        def eval(self, _variables: Any, _context: Any) -> EvaluationBatchResult:  # noqa: PLR6301
+            in_eval.set()
+            can_finish.wait()
+            return EvaluationBatchResult(objectives=np.zeros((1, 1), dtype=np.float64))
+
+    ev = _BlockingEvaluator()
+
+    def _thread1() -> None:
+        ev.eval(None, None)
+
+    def _thread2() -> None:
+        in_eval.wait()
+        try:
+            ev.eval(None, None)
+        except RuntimeError as exc:
+            thread2_error[0] = exc
+
+    t1 = threading.Thread(target=_thread1)
+    t2 = threading.Thread(target=_thread2)
+    t1.start()
+    t2.start()
+    t2.join(timeout=5.0)
+    can_finish.set()
+    t1.join(timeout=5.0)
+
+    assert isinstance(thread2_error[0], RuntimeError)
+    assert "concurrent" in str(thread2_error[0])
+
+
+def test_event_handler_raises_on_concurrent_use() -> None:
+    in_handle = threading.Event()
+    can_finish = threading.Event()
+    thread2_error: list[BaseException | None] = [None]
+
+    class _BlockingHandler(EventHandler):
+        @property
+        def event_types(self) -> set[EnOptEventType]:
+            return {EnOptEventType.FINISHED_EVALUATION}
+
+        def handle_event(self, _event: EnOptEvent) -> None:  # noqa: PLR6301
+            in_handle.set()
+            can_finish.wait()
+
+    handler = _BlockingHandler()
+    mock_event = object()
+
+    def _thread1() -> None:
+        handler.handle_event(mock_event)  # type: ignore[arg-type]
+
+    def _thread2() -> None:
+        in_handle.wait()
+        try:
+            handler.handle_event(mock_event)  # type: ignore[arg-type]
+        except RuntimeError as exc:
+            thread2_error[0] = exc
+
+    t1 = threading.Thread(target=_thread1)
+    t2 = threading.Thread(target=_thread2)
+    t1.start()
+    t2.start()
+    t2.join(timeout=5.0)
+    can_finish.set()
+    t1.join(timeout=5.0)
+
+    assert isinstance(thread2_error[0], RuntimeError)
+    assert "concurrent" in str(thread2_error[0])

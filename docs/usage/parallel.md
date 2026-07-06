@@ -204,9 +204,8 @@ from name to callable. When a mapping is used, the keys serve as task names
 ## Event server
 
 When multiple compute steps run concurrently in worker threads, their event
-handlers are called from multiple threads simultaneously. **Event handlers are
-not thread-safe**: sharing one across concurrent compute steps will cause race
-conditions.
+handlers are called from multiple threads simultaneously. **Event handlers must
+not be shared across concurrent compute steps**: doing so raises a `RuntimeError`.
 
 [`EventServer`][ropt.workflow.servers.EventServer] is the required solution:
 it receives events on a queue and dispatches them to its own handlers from the

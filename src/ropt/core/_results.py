@@ -12,7 +12,7 @@ from ropt.evaluation import EvaluationBatchCallback, EvaluationBatchContext
 
 @dataclass(slots=True)
 class _FunctionEvaluatorResults:
-    batch_id: int | None
+    batch_id: int
     objectives: NDArray[np.float64]
     constraints: NDArray[np.float64] | None
     metadata: dict[str, NDArray[Any]]
@@ -29,7 +29,7 @@ class _FunctionEvaluatorResults:
 
 @dataclass(slots=True)
 class _GradientEvaluatorResults:
-    batch_id: int | None
+    batch_id: int
     perturbed_objectives: NDArray[np.float64]
     perturbed_constraints: NDArray[np.float64] | None
     metadata: dict[str, NDArray[Any]]

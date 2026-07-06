@@ -23,12 +23,14 @@ class EvaluationBatchContext:
         active:        Boolean array indicating which rows require evaluation.
         realizations:  Realization index for each row.
         perturbations: Perturbation index for each row (< 0 means unperturbed).
+        batch_id:      Integer identifying the current evaluation batch.
     """
 
     context: EnOptContext
     active: NDArray[np.bool_]
     realizations: NDArray[np.intc]
     perturbations: NDArray[np.intc] | None = None
+    batch_id: int = 0
 
     def get_active_evaluations(self, array: NDArray[T]) -> NDArray[T]:
         """Return only the rows of `array` where `active` is `True`.
@@ -73,19 +75,29 @@ class EvaluationBatchResult:
     variable vectors. Inactive rows should be set to zero; failed active rows
     should be set to `numpy.nan`.
 
+    The `batch_id` field defaults to `0`. If you do not need to distinguish
+    between batches, leave it unset — all results will be labelled batch `0`.
+    To get auto-incrementing IDs managed by the framework, pass a
+    [`BatchIdCounter`][ropt.workflow.evaluators.BatchIdCounter] (or any
+    `Callable[[], int]`) to the `batch_id_callback` argument of
+    [`FunctionEvaluator`][ropt.workflow.evaluators.FunctionEvaluator] or
+    [`AsyncEvaluator`][ropt.workflow.evaluators.AsyncEvaluator]. For raw
+    [`BatchEvaluator`][ropt.workflow.evaluators.BatchEvaluator] callbacks,
+    set `batch_id` yourself.
+
     See [Writing Evaluation Callbacks](../usage/evaluation_callbacks.md) for
     detailed conventions and examples.
 
     Args:
         objectives:  Objective values, shape `(n_rows, n_objectives)`.
         constraints: Optional constraint values, shape `(n_rows, n_constraints)`.
-        batch_id:    Optional integer identifying this evaluation batch.
+        batch_id:    Integer identifying this evaluation batch.
         metadata:    Optional dict of per-row metadata (not used internally by `ropt`).
     """
 
     objectives: NDArray[np.float64]
     constraints: NDArray[np.float64] | None = None
-    batch_id: int | None = None
+    batch_id: int = 0
     metadata: dict[str, NDArray[Any]] = field(default_factory=dict)
 
 

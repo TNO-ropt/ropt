@@ -198,11 +198,13 @@ method. Once attached, the handler receives every event the step emits.
 
 !!! warning "Thread safety in parallel workflows"
 
-    Event handlers are **not thread-safe**. When compute steps run concurrently
-    in worker threads (e.g. when using `AsyncEvaluator` with a `ThreadingServer`
-    that has multiple workers), any handler shared across steps must be
-    registered on an [`EventServer`][ropt.workflow.servers.EventServer] rather
-    than attached directly to the compute steps. See
+    Event handlers are **not thread-safe** and must not be shared across
+    concurrent compute steps — doing so raises a `RuntimeError`. When compute
+    steps run concurrently in worker threads (e.g. when using `AsyncEvaluator`
+    with a `ThreadingServer` that has multiple workers), any handler shared
+    across steps must be registered on an
+    [`EventServer`][ropt.workflow.servers.EventServer] rather than attached
+    directly to the compute steps. See
     [Event Server](parallel.md#event-server) for the required pattern.
 
 The framework ships four reusable handlers:
