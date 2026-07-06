@@ -2999,11 +2999,11 @@ the result hierarchy, axis metadata, domain transforms, and pandas export.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.results.Results.batch_id">batch_id</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a> | None</code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional identifier for the evaluation batch.</p>
+                <p>Identifier for the evaluation batch.</p>
               </div>
             </td>
           </tr>
@@ -3072,8 +3072,8 @@ the result hierarchy, axis metadata, domain transforms, and pandas export.</p>
 <p>Exports the sub-fields of <code>field_name</code> as columns, named after the
 sub-field. Multi-dimensional sub-fields are stacked into rows indexed
 by a multi-index derived from the field's axis metadata; index levels
-are labeled using the <code>names</code> mapping (numeric indices if absent). If
-<code>batch_id</code> is set, it is prepended to the index. The <code>unstack</code>
+are labeled using the <code>names</code> mapping (numeric indices if absent).
+<code>batch_id</code> is always prepended to the index. The <code>unstack</code>
 argument pivots selected axes into columns, producing tuple column
 names of the form <code>(sub-field, label, ...)</code>.</p>
 <p>See <a href="../../usage/results/#exporting-to-pandas">Working with Results</a> for

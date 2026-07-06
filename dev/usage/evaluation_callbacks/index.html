@@ -2534,22 +2534,39 @@ help filter the input and re-expand the output.</p>
 <tbody>
 <tr>
 <td><code>objectives</code></td>
-<td>An array of shape <code>(n_rows, n_objectives)</code>.</td>
+<td>Objective values, shape <code>(n_rows, n_objectives)</code>.</td>
 </tr>
 <tr>
 <td><code>constraints</code></td>
-<td>An optional array of shape <code>(n_rows, n_nonlinear_constraints)</code>, required when <code>nonlinear_constraints</code> is configured.</td>
+<td>Optional constraint values, shape <code>(n_rows, n_nonlinear_constraints)</code>.</td>
 </tr>
 <tr>
 <td><code>metadata</code></td>
-<td>A dict of arrays carrying user metadata for each row. Not used internally by <code>ropt</code>; stored verbatim on results for application use (e.g., to link results back to input vectors).</td>
+<td>Optional per-row metadata dict; not used by <code>ropt</code>.</td>
 </tr>
 <tr>
 <td><code>batch_id</code></td>
-<td>Optional integer identifying this set of evaluation results.</td>
+<td>Batch label (default <code>0</code>).</td>
 </tr>
 </tbody>
 </table>
+<p><code>constraints</code> is required when <code>nonlinear_constraints</code> is configured in the
+problem. <code>metadata</code> is stored verbatim on the resulting
+<a class="autorefs autorefs-internal" title="            ropt.results.Results
+
+
+  
+      dataclass
+  " href="../../reference/results/#ropt.results.Results"><code>Results</code></a> object and is useful for linking results back
+to the input vectors that produced them. <code>batch_id</code> defaults to <code>0</code>; all
+results will carry this label unless you set it yourself. For
+auto-incrementing IDs pass a
+<a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.BatchIdCounter" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.BatchIdCounter"><code>BatchIdCounter</code></a> (or any
+<code>Callable[[], int]</code>) to the <code>batch_id_callback</code> argument of
+<a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.FunctionEvaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.FunctionEvaluator"><code>FunctionEvaluator</code></a> or
+<a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.AsyncEvaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.AsyncEvaluator"><code>AsyncEvaluator</code></a>; for raw
+<a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.BatchEvaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.BatchEvaluator"><code>BatchEvaluator</code></a> callbacks set it
+yourself.</p>
 <p>Inactive rows (where <code>active</code> is <code>False</code>) should have their result values set
 to zero. Rows where an evaluation failed should be set to <code>np.nan</code> (see
 <a href="#handling-partial-failures">Handling partial failures</a> below).</p>
@@ -2638,7 +2655,7 @@ assembly of the final
 </tr>
 <tr>
 <td><code>perturbation</code></td>
-<td>Integer perturbation index, or <code>-1</code> when the evaluation is unperturbed.</td>
+<td>Perturbation index, or <code>-1</code> when unperturbed.</td>
 </tr>
 <tr>
 <td><code>batch_id</code></td>
@@ -2650,10 +2667,12 @@ assembly of the final
 </tr>
 <tr>
 <td><code>name</code></td>
-<td>Optional task name set by the evaluator (e.g. via <code>AsyncEvaluator</code>'s <code>get_name</code> callback); <code>None</code> when no name was assigned.</td>
+<td>Optional task name; <code>None</code> if unset.</td>
 </tr>
 </tbody>
 </table>
+<p><code>name</code> is set by the evaluator (e.g. via <code>AsyncEvaluator</code>'s <code>get_name</code>
+callback) and can be used to associate results with named tasks.</p>
 </li>
 <li>
 <p>The return value is an
@@ -2674,23 +2693,26 @@ assembly of the final
 <tbody>
 <tr>
 <td><code>objectives</code></td>
-<td>The objective values as a scalar or 1-D array of length <code>n_objectives</code>.</td>
+<td>Scalar or 1-D array of length <code>n_objectives</code>.</td>
 </tr>
 <tr>
 <td><code>constraints</code></td>
-<td>Optional constraint values as a scalar or 1-D array of length <code>n_nonlinear_constraints</code>.</td>
+<td>Optional scalar or 1-D array of length <code>n_nonlinear_constraints</code>.</td>
 </tr>
 <tr>
 <td><code>metadata</code></td>
-<td>Optional <code>dict[str, Any]</code>; each entry is stored verbatim in the resulting <a class="autorefs autorefs-internal" title="            ropt.evaluation.EvaluationBatchResult
+<td>Optional <code>dict[str, Any]</code>; stored verbatim in the batch result.</td>
+</tr>
+</tbody>
+</table>
+<p>Each <code>metadata</code> entry is forwarded into
+<a class="autorefs autorefs-internal" title="            ropt.evaluation.EvaluationBatchResult
 
 
   
       dataclass
-  " href="../../reference/evaluation/#ropt.evaluation.EvaluationBatchResult"><code>EvaluationBatchResult.metadata</code></a> for this row.</td>
-</tr>
-</tbody>
-</table>
+  " href="../../reference/evaluation/#ropt.evaluation.EvaluationBatchResult"><code>EvaluationBatchResult.metadata</code></a>
+for the corresponding row.</p>
 </li>
 </ul>
 <p>To use it with

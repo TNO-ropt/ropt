@@ -1998,17 +1998,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.workflow.event_handlers.ResultsHandler.handle_event" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        handle_event
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ropt.workflow.event_handlers.ResultsHandler.event_types" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2753,17 +2742,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.workflow.event_handlers.ResultsHandler.handle_event" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        handle_event
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ropt.workflow.event_handlers.ResultsHandler.event_types" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3120,6 +3098,13 @@ method to define their specific event processing logic.</p>
 method. When the compute step emits an event, the <code>handle_event</code> method of
 each attached handler is invoked, allowing it to process the event.</p>
 
+
+<details class="warning" open>
+  <summary>Warning</summary>
+  <p>Event handler instances must not be called concurrently from multiple
+threads. Do not attach the same handler instance to compute steps that
+run in parallel.</p>
+</details>
 
 
 
@@ -3646,69 +3631,6 @@ details on selection criteria and domain handling.</p>
             </td>
             <td>
                   <code>None</code>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="ropt.workflow.event_handlers.ResultsHandler.handle_event" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">handle_event</span>
-
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">handle_event</span><span class="p">(</span><span class="n">event</span><span class="p">:</span> <span class="n">EnOptEvent</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Handle incoming events.</p>
-<p>Processes <code>FINISHED_EVALUATION</code> events and updates the tracked result
-based on the configured criterion and constraint tolerance.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>event</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            EnOptEvent
-
-
-  
-      dataclass
-   (ropt.events.EnOptEvent)" href="../events/#ropt.events.EnOptEvent">EnOptEvent</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The event object.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
             </td>
           </tr>
       </tbody>

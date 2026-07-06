@@ -2822,9 +2822,8 @@ task.</p>
 </div>
 <h2 id="event-server">Event server</h2>
 <p>When multiple compute steps run concurrently in worker threads, their event
-handlers are called from multiple threads simultaneously. <strong>Event handlers are
-not thread-safe</strong>: sharing one across concurrent compute steps will cause race
-conditions.</p>
+handlers are called from multiple threads simultaneously. <strong>Event handlers must
+not be shared across concurrent compute steps</strong>: doing so raises a <code>RuntimeError</code>.</p>
 <p><a class="autorefs autorefs-internal" title="            ropt.workflow.servers.EventServer" href="../../reference/workflow_servers/#ropt.workflow.servers.EventServer"><code>EventServer</code></a> is the required solution:
 it receives events on a queue and dispatches them to its own handlers from the
 asyncio event loop's thread. Because all handler calls happen on a single
