@@ -270,7 +270,7 @@ class _ResultsTable:
     def get_table(self, sep: str) -> pd.DataFrame:
         if not self._frames:
             return pd.DataFrame()
-        data = pd.concat(self._frames)
+        data = pd.concat(self._frames).reset_index()
         reordered_columns = [
             name
             for key in self._columns
@@ -288,4 +288,4 @@ class _ResultsTable:
             sep.join(item) if isinstance(item, tuple) else item
             for item in renamed_columns
         ]
-        return data.reset_index()
+        return data
