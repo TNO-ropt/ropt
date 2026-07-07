@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools", "setuptools-scm"]
+requires = ["setuptools", "setuptools-scm>=8.1"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -38,11 +38,9 @@ where = ["src"]
 [tool.setuptools.package-data]
 ropt = ["py.typed"]
 
-[tool.setuptools.dynamic]
-version = { attr = "ropt.version.__version__" }
-
 [tool.setuptools_scm]
-write_to = "src/ropt/version.py"
+version_file = "src/ropt/version.py"
+fallback_version = "0.0.0.dev0"
 
 [tool.pytest.ini_options]
 markers = ["slow: slow test marker", "external: external optimizer marker"]
@@ -84,7 +82,7 @@ strict = true
 plugins = ["pydantic.mypy"]
 
 [[tool.mypy.overrides]]
-module = ["scipy.*", "cloudpickle.*", "pysqa.*"]
+module = ["cloudpickle.*", "pysqa.*"]
 ignore_missing_imports = true
 
 [dependency-groups]
