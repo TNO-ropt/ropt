@@ -177,8 +177,7 @@ The following events are emitted during execution:
 
 ### Exit codes
 
-Both `run()` methods return an [`ExitInfo`][ropt.exit_info.ExitInfo] whose
-`exit_code` attribute is an [`ExitCode`][ropt.enums.ExitCode] indicating
+Both `run()` methods return an [`ExitCode`][ropt.enums.ExitCode] indicating
 why the step finished:
 
 | Exit code                    | Meaning                                                       |

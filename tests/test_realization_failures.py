@@ -5,11 +5,9 @@ from typing import Any
 import numpy as np
 import pytest
 
-from ropt.context import EnOptContext
 from ropt.core._evaluator import (
     _get_failed_function_realizations,
     _get_failed_gradient_realizations,
-    _get_too_few_realizations_info,
 )
 from ropt.results import (
     FunctionEvaluations,
@@ -18,7 +16,6 @@ from ropt.results import (
     GradientEvaluations,
     GradientResults,
     Realizations,
-    Results,
 )
 
 
@@ -165,74 +162,3 @@ def _make_gradient_results(
         ),
         gradients=None if failed else object(),  # type: ignore[arg-type]
     )
-
-
-@pytest.mark.parametrize(
-    ("results", "expected"),
-    [
-        pytest.param(
-            [_make_function_results(failed=False)],
-            None,
-            id="no_failures",
-        ),
-        pytest.param(
-            [
-                _make_function_results(failed=True),
-                _make_function_results(failed=False),
-                _make_function_results(failed=True),
-            ],
-            {
-                "failed_functions": 2,
-                "failed_gradients": 0,
-                "failed_perturbations": 0,
-            },
-            id="failed_functions",
-        ),
-        pytest.param(
-            [_make_gradient_results(failed=True, perturbation_failures=True)],
-            {
-                "failed_functions": 0,
-                "failed_gradients": 1,
-                "failed_perturbations": 1,
-            },
-            id="gradient_perturbation_failure",
-        ),
-        pytest.param(
-            [_make_gradient_results(failed=True, perturbation_failures=False)],
-            {
-                "failed_functions": 0,
-                "failed_gradients": 1,
-                "failed_perturbations": 0,
-            },
-            id="gradient_without_perturbation_failure",
-        ),
-        pytest.param(
-            [
-                _make_function_results(failed=True),
-                _make_gradient_results(failed=True, perturbation_failures=True),
-                _make_function_results(failed=False),
-            ],
-            {
-                "failed_functions": 1,
-                "failed_gradients": 1,
-                "failed_perturbations": 1,
-            },
-            id="mixed_batch",
-        ),
-    ],
-)
-def test_get_too_few_realizations_info(
-    results: list[Results],
-    expected: dict[str, int] | None,
-    config: dict[str, Any],
-) -> None:
-    context = EnOptContext.model_validate(config)
-    info = _get_too_few_realizations_info(results, context)
-    if expected is None:
-        assert info is None
-        return
-    assert info is not None
-    for key, value in expected.items():
-        assert info[key] == value
-    assert info["realization_min_success"] == 2
-    assert info["perturbation_min_success"] == 3

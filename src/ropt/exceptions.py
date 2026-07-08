@@ -1,6 +1,6 @@
 """Exceptions raised within the `ropt` library."""
 
-from .exit_info import ExitInfo
+from ropt.enums import ExitCode
 
 
 class Abort(Exception):  # noqa: N818
@@ -10,20 +10,20 @@ class Abort(Exception):  # noqa: N818
     not complete its intended task due to a specific condition (e.g.,
     insufficient valid realizations, user request).
 
-    It must be initialized with an [`ExitInfo`][ropt.exit_info.ExitInfo]
-    describing the reason for the abortion.
+    It must be initialized with an [`ExitCode`][ropt.enums.ExitCode] describing
+    the reason for the abortion.
     """
 
-    def __init__(self, info: ExitInfo) -> None:
+    def __init__(self, exit_code: ExitCode) -> None:
         """Initialize the Abort exception.
 
-        Stores the reason for the abortion, accessible via the `info`
+        Stores the reason for the abortion, accessible via the `exit_code`
         attribute.
 
         Args:
-            info: The exit info describing why the compute step was aborted.
+            exit_code: The exit code describing why the compute step was aborted.
         """
-        self.info = info
+        self.exit_code = exit_code
         super().__init__()
 
 

@@ -12,16 +12,9 @@ import numpy as np
 from ropt._logging import get_logger
 from ropt.enums import ExitCode
 from ropt.exceptions import Abort
-from ropt.exit_info import (
-    ExitInfo,
-    MaxBatchesReachedInfo,
-    MaxFunctionsReachedInfo,
-    TooFewRealizationsInfo,
-)
 from ropt.results import FunctionResults, GradientResults
 
 from ._callback import OptimizerCallbackResult
-from ._evaluator import _get_too_few_realizations_info
 
 if TYPE_CHECKING:
     from collections.abc import Generator
@@ -129,7 +122,7 @@ class EnsembleOptimizer:
         """
         return self._backend.is_parallel
 
-    def start(self, variables: NDArray[np.float64]) -> ExitInfo:
+    def start(self, variables: NDArray[np.float64]) -> ExitCode:
         """Start the optimization process.
 
         This method initiates the optimization process using the provided
@@ -140,17 +133,16 @@ class EnsembleOptimizer:
             variables: The initial variables for the optimization.
 
         Returns:
-            An [`ExitInfo`][ropt.exit_info.ExitInfo] describing the reason for
-                termination.
+            An [`ExitCode`][ropt.enums.ExitCode] describing the reason for termination.
         """
         self._initial_variables = variables.copy()
-        info = ExitInfo(exit_code=ExitCode.OPTIMIZER_FINISHED)
+        exit_code = ExitCode.OPTIMIZER_FINISHED
         try:
             with self._redirector.start():
                 self._backend.start(variables)
         except Abort as exc:
-            info = exc.info
-        return info
+            exit_code = exc.exit_code
+        return exit_code
 
     def _optimizer_callback(
         self,
@@ -229,14 +221,18 @@ class EnsembleOptimizer:
     def _check_stopping_criteria(self) -> None:
         max_functions = self._context.optimizer.max_functions
         if max_functions is not None and self._completed_functions >= max_functions:
-            functions_info = MaxFunctionsReachedInfo(limit=max_functions)
-            _logger.info("Stopping: %s", functions_info.message)
-            raise Abort(functions_info)
+            _logger.info(
+                "Stopping: Maximum number of function evaluations reached (%d)",
+                max_functions,
+            )
+            raise Abort(ExitCode.MAX_FUNCTIONS_REACHED)
         max_batches = self._context.optimizer.max_batches
         if max_batches is not None and self._completed_batches >= max_batches:
-            batches_info = MaxBatchesReachedInfo(limit=max_batches)
-            _logger.info("Stopping: %s", batches_info.message)
-            raise Abort(batches_info)
+            _logger.info(
+                "Stopping: Maximum number of evaluation batches reached (%d)",
+                max_batches,
+            )
+            raise Abort(ExitCode.MAX_BATCHES_REACHED)
 
     def _run_evaluations(
         self,
@@ -255,14 +251,20 @@ class EnsembleOptimizer:
                 compute_gradients=compute_gradients,
             )
 
+            exit_code: ExitCode | None = None
+            for result in results:
+                assert isinstance(result, FunctionResults | GradientResults)
+                if (
+                    isinstance(result, FunctionResults) and result.functions is None
+                ) or (isinstance(result, GradientResults) and result.gradients is None):
+                    exit_code = ExitCode.TOO_FEW_REALIZATIONS
+                    break
+
             if self._signal_evaluation:
                 self._signal_evaluation(results)
 
-            info = _get_too_few_realizations_info(results, self._context)
-            if info is not None:
-                abort_info = TooFewRealizationsInfo(**info)
-                _logger.info("Stopping: %s", abort_info.message)
-                raise Abort(abort_info)
+            if exit_code is not None:
+                raise Abort(exit_code=exit_code)
 
         return results
 

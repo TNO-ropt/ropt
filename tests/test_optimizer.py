@@ -16,7 +16,6 @@ from ropt.config import (
 from ropt.config.constants import DEFAULT_SEED
 from ropt.context import EnOptContext
 from ropt.enums import EnOptEventType, ExitCode
-from ropt.exit_info import TooFewRealizationsInfo
 from ropt.results import FunctionResults, GradientResults, Results
 from ropt.transforms.default import (
     DefaultNonlinearConstraintTransform,
@@ -102,7 +101,7 @@ def test_max_functions_exceeded(config: Any, evaluator: Any, external: str) -> N
     optimizer.set_results_callback(track_results)
     exit_code = optimizer.run(initial_values)
     assert last_evaluation == max_functions + 1
-    assert exit_code.exit_code == ExitCode.MAX_FUNCTIONS_REACHED
+    assert exit_code == ExitCode.MAX_FUNCTIONS_REACHED
 
 
 def test_max_batches_exceeded(config: Any, evaluator: Any, external: str) -> None:
@@ -119,7 +118,7 @@ def test_max_batches_exceeded(config: Any, evaluator: Any, external: str) -> Non
     optimizer.set_results_callback(track_results)
     exit_code = optimizer.run(initial_values)
     assert last_evaluation == max_batches
-    assert exit_code.exit_code == ExitCode.MAX_BATCHES_REACHED
+    assert exit_code == ExitCode.MAX_BATCHES_REACHED
 
 
 def test_max_functions_not_exceeded(config: Any, evaluator: Any, external: str) -> None:
@@ -137,7 +136,7 @@ def test_max_functions_not_exceeded(config: Any, evaluator: Any, external: str) 
     optimizer.set_results_callback(track_results)
     exit_code = optimizer.run(initial_values)
     assert last_evaluation + 1 < 2 * max_functions
-    assert exit_code.exit_code == ExitCode.OPTIMIZER_FINISHED
+    assert exit_code == ExitCode.OPTIMIZER_FINISHED
 
 
 def test_failed_realizations(config: Any, evaluator: Any, external: str) -> None:
@@ -151,12 +150,7 @@ def test_failed_realizations(config: Any, evaluator: Any, external: str) -> None
     optimizer = BasicOptimizer(config, evaluator(functions))
     optimizer.set_results_callback(_observer)
     exit_code = optimizer.run(initial_values)
-    assert exit_code.exit_code == ExitCode.TOO_FEW_REALIZATIONS
-    assert isinstance(exit_code, TooFewRealizationsInfo)
-    assert exit_code.failed_functions == 1
-    assert exit_code.failed_gradients == 0
-    assert exit_code.failed_perturbations == 0
-    assert "1 function result(s)" in exit_code.message
+    assert exit_code == ExitCode.TOO_FEW_REALIZATIONS
 
 
 def test_failed_realizations_constraints(
@@ -177,7 +171,7 @@ def test_failed_realizations_constraints(
     )
     optimizer.set_results_callback(_observer)
     exit_code = optimizer.run(initial_values)
-    assert exit_code.exit_code == ExitCode.TOO_FEW_REALIZATIONS
+    assert exit_code == ExitCode.TOO_FEW_REALIZATIONS
 
 
 def test_user_abort(config: Any, evaluator: Any, external: str) -> None:
@@ -198,7 +192,7 @@ def test_user_abort(config: Any, evaluator: Any, external: str) -> None:
     exit_code = optimizer.run(initial_values)
     assert optimizer.results is not None
     assert last_evaluation == 1
-    assert exit_code.exit_code == ExitCode.USER_ABORT
+    assert exit_code == ExitCode.USER_ABORT
 
 
 def test_single_perturbation(config: Any, evaluator: Any, external: str) -> None:

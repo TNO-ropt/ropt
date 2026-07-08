@@ -9,7 +9,6 @@ from ropt.config import FunctionEstimatorConfig
 from ropt.context import EnOptContext
 from ropt.enums import ExitCode
 from ropt.exceptions import Abort
-from ropt.exit_info import ExitInfo
 from ropt.function_estimator import FunctionEstimator
 
 _MIN_STDDEV_REALIZATIONS: Final = 2
@@ -102,15 +101,7 @@ def _calculate_function_stddev(
     functions: NDArray[np.float64], weights: NDArray[np.float64]
 ) -> NDArray[np.float64]:
     if np.count_nonzero(weights) < _MIN_STDDEV_REALIZATIONS:
-        raise Abort(
-            ExitInfo(
-                exit_code=ExitCode.TOO_FEW_REALIZATIONS,
-                message=(
-                    "Too few realizations to compute the standard deviation"
-                    " of the objective functions"
-                ),
-            )
-        )
+        raise Abort(ExitCode.TOO_FEW_REALIZATIONS)
     functions = np.nan_to_num(functions)
     *_, stddev = _mean_stddev(functions, weights)
     return stddev
@@ -122,15 +113,7 @@ def _calculate_gradient_stddev(
     weights: NDArray[np.float64],
 ) -> NDArray[np.float64]:
     if np.count_nonzero(weights) < _MIN_STDDEV_REALIZATIONS:
-        raise Abort(
-            ExitInfo(
-                exit_code=ExitCode.TOO_FEW_REALIZATIONS,
-                message=(
-                    "Too few realizations to compute the standard deviation"
-                    " of the gradient"
-                ),
-            )
-        )
+        raise Abort(ExitCode.TOO_FEW_REALIZATIONS)
     functions = np.nan_to_num(functions)
     norm, mean, stddev = _mean_stddev(functions, weights)
     mean_gradient = np.dot(gradient, weights)

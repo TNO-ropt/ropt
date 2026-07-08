@@ -10,7 +10,7 @@ import numpy as np
 from ropt._logging import get_logger
 from ropt.core import EnsembleEvaluator
 from ropt.core import EnsembleOptimizer as CoreEnsembleOptimizer
-from ropt.enums import EnOptEventType
+from ropt.enums import EnOptEventType, ExitCode
 from ropt.events import EnOptEvent
 
 from .base import ComputeStep
@@ -19,7 +19,6 @@ if TYPE_CHECKING:
     from numpy.typing import ArrayLike
 
     from ropt.context import EnOptContext
-    from ropt.exit_info import ExitInfo
     from ropt.results import Results
     from ropt.workflow.evaluators import Evaluator
 
@@ -55,7 +54,7 @@ class OptimizationStep(ComputeStep):
         variables: ArrayLike,
         *,
         metadata: dict[str, Any] | None = None,
-    ) -> ExitInfo:
+    ) -> ExitCode:
         """Run the optimization.
 
         Args:
@@ -66,7 +65,7 @@ class OptimizationStep(ComputeStep):
                 event.
 
         Returns:
-            An exit info object describing the outcome of the optimization.
+            An exit code describing the outcome of the optimization.
 
         Raises:
             ValueError: If the input variables have the wrong shape.
@@ -103,14 +102,14 @@ class OptimizationStep(ComputeStep):
             ensemble_evaluator=ensemble_evaluator,
             signal_evaluation=self._signal_evaluation,
         )
-        exit_info = ensemble_optimizer.start(variables)
+        exit_code = ensemble_optimizer.start(variables)
 
-        _logger.info("Optimization finished: %s", exit_info.message)
+        _logger.info("Optimization finished: %s", exit_code.name)
         self._emit_event(
             EnOptEvent(event_type=EnOptEventType.FINISHED_OPTIMIZER, context=context)
         )
 
-        return exit_info
+        return exit_code
 
     def _emit_event(self, event: EnOptEvent) -> None:
         for handler in self.event_handlers:

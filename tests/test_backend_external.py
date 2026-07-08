@@ -12,7 +12,6 @@ from ropt.config import BackendConfig
 from ropt.context import EnOptContext
 from ropt.enums import ExitCode
 from ropt.exceptions import Abort
-from ropt.exit_info import ExitInfo
 
 cloudpickle = pytest.importorskip("cloudpickle")
 
@@ -42,11 +41,11 @@ def _make_child_args() -> bytes:
     )
 
 
-def test_child_abort_forwards_exit_info(
+def test_child_abort_forwards_exit_code(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     def _raise_abort(_self: SciPyBackend, _initial_values: np.ndarray) -> None:
-        raise Abort(ExitInfo(exit_code=ExitCode.MAX_FUNCTIONS_REACHED))
+        raise Abort(ExitCode.MAX_FUNCTIONS_REACHED)
 
     monkeypatch.setattr(SciPyBackend, "start", _raise_abort)
 
@@ -60,8 +59,7 @@ def test_child_abort_forwards_exit_info(
     sentinel = request_queue.get(timeout=5)
 
     assert abort_msg["abort"] is True
-    assert isinstance(abort_msg["info"], ExitInfo)
-    assert abort_msg["info"].exit_code == ExitCode.MAX_FUNCTIONS_REACHED
+    assert abort_msg["exit_code"] == ExitCode.MAX_FUNCTIONS_REACHED
     assert sentinel is None
 
 

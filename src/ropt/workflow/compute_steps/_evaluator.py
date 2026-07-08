@@ -9,11 +9,9 @@ import numpy as np
 
 from ropt._logging import get_logger
 from ropt.core import EnsembleEvaluator
-from ropt.core._evaluator import _get_too_few_realizations_info
 from ropt.enums import EnOptEventType, ExitCode
 from ropt.events import EnOptEvent
 from ropt.exceptions import Abort
-from ropt.exit_info import ExitInfo, TooFewRealizationsInfo
 from ropt.results import FunctionResults
 
 from .base import ComputeStep
@@ -56,7 +54,7 @@ class EvaluationStep(ComputeStep):
         variables: ArrayLike,
         *,
         metadata: dict[str, Any] | None = None,
-    ) -> ExitInfo:
+    ) -> ExitCode:
         """Run the ensemble evaluation.
 
         Args:
@@ -67,7 +65,7 @@ class EvaluationStep(ComputeStep):
                        `FINISHED_EVALUATION` event.
 
         Returns:
-            An [`ExitInfo`][ropt.exit_info.ExitInfo] describing the outcome.
+            An [`ExitCode`][ropt.enums.ExitCode] describing the outcome.
 
         Raises:
             ValueError: If the input variables have the wrong shape.
@@ -90,7 +88,7 @@ class EvaluationStep(ComputeStep):
 
         ensemble_evaluator = EnsembleEvaluator(context, self._evaluator.eval)
 
-        exit_info = ExitInfo(exit_code=ExitCode.ENSEMBLE_EVALUATOR_FINISHED)
+        exit_code = ExitCode.ENSEMBLE_EVALUATOR_FINISHED
 
         self._emit_event(
             EnOptEvent(event_type=EnOptEventType.START_EVALUATION, context=context)
@@ -100,13 +98,12 @@ class EvaluationStep(ComputeStep):
                 variables, compute_functions=True, compute_gradients=False
             )
         except Abort as exc:
-            exit_info = exc.info
+            exit_code = exc.exit_code
 
         assert results
         assert isinstance(results[0], FunctionResults)
-        info = _get_too_few_realizations_info(results, context)
-        if info is not None:
-            exit_info = TooFewRealizationsInfo(**info)
+        if results[0].functions is None:
+            exit_code = ExitCode.TOO_FEW_REALIZATIONS
 
         if metadata is not None:
             for item in results:
@@ -120,7 +117,7 @@ class EvaluationStep(ComputeStep):
             )
         )
 
-        _logger.info("Evaluation finished: %s", exit_info.message)
+        _logger.info("Evaluation finished: %s", exit_code.name)
         self._emit_event(
             EnOptEvent(
                 event_type=EnOptEventType.FINISHED_ENSEMBLE_EVALUATOR,
@@ -129,7 +126,7 @@ class EvaluationStep(ComputeStep):
             )
         )
 
-        return exit_info
+        return exit_code
 
     def _emit_event(self, event: EnOptEvent) -> None:
         for handler in self.event_handlers:

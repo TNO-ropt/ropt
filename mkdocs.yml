@@ -109,7 +109,6 @@ nav:
       - "Stochastic Gradients": usage/gradients.md
       - "Optimization Workflows": usage/workflows.md
       - "Parallel Evaluation": usage/parallel.md
-      - "Exit Information": usage/exit_info.md
       - "Logging": usage/logging.md
   - "Tutorials":
       - "Overview": tutorials/index.md
@@ -147,7 +146,6 @@ nav:
         - "Default Plugins": reference/default_plugins.md
       - "Enumerations": reference/enums.md
       - "Exceptions": reference/exceptions.md
-      - "Exit Information": reference/exit_info.md
 
 exclude_docs: |
   /snippets/

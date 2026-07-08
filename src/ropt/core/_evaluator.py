@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 import numpy as np
 from numpy.random import default_rng
@@ -29,8 +29,6 @@ from ._results import (
 )
 
 if TYPE_CHECKING:
-    from collections.abc import Iterable
-
     from numpy.random import Generator
     from numpy.typing import NDArray
 
@@ -679,35 +677,3 @@ def _get_failed_gradient_realizations(
     success_count = np.count_nonzero(~failed_perturbations, axis=-1)
     failed_realizations |= success_count < perturbation_min_success
     return np.array(failed_realizations)
-
-
-def _get_too_few_realizations_info(
-    results: Iterable[Results],
-    context: EnOptContext,
-) -> dict[str, Any] | None:
-    assert context.realizations.realization_min_success is not None
-    perturbation_min_success = context.gradient.perturbation_min_success
-    failed_functions = 0
-    failed_gradients = 0
-    failed_perturbations = 0
-    for result in results:
-        if isinstance(result, FunctionResults) and result.functions is None:
-            failed_functions += 1
-        elif isinstance(result, GradientResults) and result.gradients is None:
-            failed_gradients += 1
-            assert perturbation_min_success is not None
-            perturbation_mask = np.isnan(
-                result.evaluations.perturbed_objectives[..., 0]
-            )
-            success_count = np.count_nonzero(~perturbation_mask, axis=-1)
-            if bool(np.any(success_count < perturbation_min_success)):
-                failed_perturbations += 1
-    if failed_functions == 0 and failed_gradients == 0:
-        return None
-    return {
-        "failed_functions": failed_functions,
-        "failed_gradients": failed_gradients,
-        "failed_perturbations": failed_perturbations,
-        "realization_min_success": context.realizations.realization_min_success,
-        "perturbation_min_success": perturbation_min_success,
-    }
