@@ -12,8 +12,6 @@
         <link rel="prev" href="../enums/">
       
       
-        <link rel="next" href="../exit_info/">
-      
       
         
       
@@ -793,34 +791,6 @@
     
   
     Parallel Evaluation
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../usage/exit_info/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Exit Information
   
 
     
@@ -2264,34 +2234,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../exit_info/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Exit Information
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -2461,13 +2403,8 @@
 <p>This exception signals that an optimization or another compute step could
 not complete its intended task due to a specific condition (e.g.,
 insufficient valid realizations, user request).</p>
-<p>It must be initialized with an <a class="autorefs autorefs-internal" title="            ExitInfo
-
-
-  
-      dataclass
-  " href="../exit_info/#ropt.exit_info.ExitInfo"><code>ExitInfo</code></a>
-describing the reason for the abortion.</p>
+<p>It must be initialized with an <a class="autorefs autorefs-internal" title="            ExitCode" href="../enums/#ropt.enums.ExitCode"><code>ExitCode</code></a> describing
+the reason for the abortion.</p>
 
 
 
@@ -2495,13 +2432,13 @@ describing the reason for the abortion.</p>
 
 
 </h4>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">__init__</span><span class="p">(</span><span class="n">info</span><span class="p">:</span> <span class="n">ExitInfo</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">__init__</span><span class="p">(</span><span class="n">exit_code</span><span class="p">:</span> <span class="n">ExitCode</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
 
         <p>Initialize the Abort exception.</p>
-<p>Stores the reason for the abortion, accessible via the <code>info</code>
+<p>Stores the reason for the abortion, accessible via the <code>exit_code</code>
 attribute.</p>
 
 
@@ -2518,19 +2455,14 @@ attribute.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                <code>info</code>
+                <code>exit_code</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ExitInfo
-
-
-  
-      dataclass
-   (ropt.exit_info.ExitInfo)" href="../exit_info/#ropt.exit_info.ExitInfo">ExitInfo</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            ExitCode (ropt.enums.ExitCode)" href="../enums/#ropt.enums.ExitCode">ExitCode</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The exit info describing why the compute step was aborted.</p>
+                <p>The exit code describing why the compute step was aborted.</p>
               </div>
             </td>
             <td>
@@ -2648,22 +2580,6 @@ attribute.</p>
             </div>
           </a>
         
-        
-          
-          <a href="../exit_info/" class="md-footer__link md-footer__link--next" aria-label="Next: Exit Information">
-            <div class="md-footer__title">
-              <span class="md-footer__direction">
-                Next
-              </span>
-              <div class="md-ellipsis">
-                Exit Information
-              </div>
-            </div>
-            <div class="md-footer__button md-icon">
-              
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
-            </div>
-          </a>
         
       </nav>
     
