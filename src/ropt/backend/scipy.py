@@ -231,7 +231,7 @@ class SciPyBackend(Backend):
             upper_bounds = self._context.variables.upper_bounds[
                 self._context.variables.mask
             ]
-            return Bounds(lower_bounds, upper_bounds, keep_feasible=self._keep_feasible)
+            return Bounds(lower_bounds, upper_bounds, keep_feasible=True)
         return None
 
     def _get_constraint_bounds(
