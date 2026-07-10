@@ -3159,9 +3159,9 @@ concurrent compute steps — doing so raises a <code>RuntimeError</code>. When c
 steps run concurrently in worker threads (e.g. when using <code>ParallelEvaluator</code>
 with a <code>ThreadingExecutor</code> that has multiple workers), any handler shared
 across steps must be registered on an
-<a class="autorefs autorefs-internal" title="            ropt.workflow.executors.EventServer" href="../../reference/workflow_executors/#ropt.workflow.executors.EventServer"><code>EventServer</code></a> rather than attached
+<a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.EventDispatcher" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.EventDispatcher"><code>EventDispatcher</code></a> rather than attached
 directly to the compute steps. See
-<a href="../parallel/#event-server">Event Server</a> for the required pattern.</p>
+<a href="../parallel/#event-dispatcher">Event Dispatcher</a> for the required pattern.</p>
 </div>
 <p>The framework ships four reusable handlers:</p>
 <table>
@@ -3190,7 +3190,7 @@ directly to the compute steps. See
 </tr>
 <tr>
 <td><a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.EventForwardHandler" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.EventForwardHandler"><code>EventForwardHandler</code></a></td>
-<td>Forward events to an <a class="autorefs autorefs-internal" title="            ropt.workflow.executors.EventServer" href="../../reference/workflow_executors/#ropt.workflow.executors.EventServer"><code>EventServer</code></a> for lock-free dispatch.</td>
+<td>Forward events to an <a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.EventDispatcher" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.EventDispatcher"><code>EventDispatcher</code></a> for lock-free dispatch.</td>
 </tr>
 </tbody>
 </table>
@@ -3283,10 +3283,10 @@ matching type arrives, the callback is called with the
 <h3 id="eventforwardhandler">EventForwardHandler</h3>
 <p><a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.EventForwardHandler" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.EventForwardHandler"><code>EventForwardHandler</code></a> is
 attached to a compute step and forwards matching events to an
-<a class="autorefs autorefs-internal" title="            ropt.workflow.executors.EventServer" href="../../reference/workflow_executors/#ropt.workflow.executors.EventServer"><code>EventServer</code></a>. The server dispatches them
-from the asyncio event loop's thread, so handlers registered on the server
-require no locking.</p>
-<p>See <a href="../parallel/#event-server">Event Server</a> for the full pattern.</p>
+<a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.EventDispatcher" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.EventDispatcher"><code>EventDispatcher</code></a>. The dispatcher
+dispatches them from the asyncio event loop's thread, so handlers registered on
+the dispatcher require no locking.</p>
+<p>See <a href="../parallel/#event-dispatcher">Event Dispatcher</a> for the full pattern.</p>
 <h3 id="tablehandler">TableHandler</h3>
 <p><a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.TableHandler" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.TableHandler"><code>TableHandler</code></a> tracks results and
 stores them in pandas DataFrames.</p>
