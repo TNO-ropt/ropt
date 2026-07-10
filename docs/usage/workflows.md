@@ -13,11 +13,10 @@ The framework has four concepts:
 | [`ComputeStep`][ropt.workflow.compute_steps.ComputeStep]                    | An executable unit of work (run an optimizer, run a single ensemble evaluation, etc.).          |
 | [`EventHandler`][ropt.workflow.event_handlers.EventHandler]                 | A reactive object that observes events emitted by a compute step.                               |
 | [`Evaluator`][ropt.workflow.evaluators.Evaluator]                           | The object a compute step uses to actually evaluate the model.                                  |
-| [`Server`][ropt.workflow.servers.Server]                                    | Dispatches evaluation tasks to threads, processes, or an HPC cluster.                           |
+| [`Executor`][ropt.workflow.executors.Executor]                              | Dispatches evaluation tasks to threads, processes, or an HPC cluster.                           |
 
-The first three are covered below. Servers are only relevant for asynchronous
-and parallel execution and are discussed in
-[Parallel Evaluation](parallel.md).
+The first three are covered below. Executors are only relevant for asynchronous
+and parallel execution and are discussed in [Parallel Evaluation](parallel.md).
 
 Compute steps emit [`EnOptEvent`][ropt.events.EnOptEvent] objects at key
 points during execution — for instance when an evaluation starts or finishes.
@@ -199,10 +198,10 @@ method. Once attached, the handler receives every event the step emits.
 
     Event handlers are **not thread-safe** and must not be shared across
     concurrent compute steps — doing so raises a `RuntimeError`. When compute
-    steps run concurrently in worker threads (e.g. when using `AsyncEvaluator`
-    with a `ThreadingServer` that has multiple workers), any handler shared
+    steps run concurrently in worker threads (e.g. when using `ParallelEvaluator`
+    with a `ThreadingExecutor` that has multiple workers), any handler shared
     across steps must be registered on an
-    [`EventServer`][ropt.workflow.servers.EventServer] rather than attached
+    [`EventServer`][ropt.workflow.executors.EventServer] rather than attached
     directly to the compute steps. See
     [Event Server](parallel.md#event-server) for the required pattern.
 
@@ -214,7 +213,7 @@ The framework ships four reusable handlers:
 | [`HistoryHandler`][ropt.workflow.event_handlers.HistoryHandler]          | Keep every result.                                                     |
 | [`CallbackHandler`][ropt.workflow.event_handlers.CallbackHandler]        | Forward selected event types to a user callback.                       |
 | [`TableHandler`][ropt.workflow.event_handlers.TableHandler]              | Append rows to a structured table per result.                          |
-| [`EventForwardHandler`][ropt.workflow.event_handlers.EventForwardHandler]| Forward events to an [`EventServer`][ropt.workflow.servers.EventServer] for lock-free dispatch. |
+| [`EventForwardHandler`][ropt.workflow.event_handlers.EventForwardHandler]| Forward events to an [`EventServer`][ropt.workflow.executors.EventServer] for lock-free dispatch. |
 
 Handlers expose their state through dictionary access (`handler[key]`). By
 convention, `ResultsHandler` and `HistoryHandler` both use the key `"results"` —
@@ -282,7 +281,7 @@ matching type arrives, the callback is called with the
 
 [`EventForwardHandler`][ropt.workflow.event_handlers.EventForwardHandler] is
 attached to a compute step and forwards matching events to an
-[`EventServer`][ropt.workflow.servers.EventServer]. The server dispatches them
+[`EventServer`][ropt.workflow.executors.EventServer]. The server dispatches them
 from the asyncio event loop's thread, so handlers registered on the server
 require no locking.
 
@@ -424,10 +423,10 @@ the [next section](parallel.md):
 
 | Evaluator                                                                      | Interface                                                                                                                     |
 | ------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------- |
-| [`BatchEvaluator`][ropt.workflow.evaluators.BatchEvaluator]                    | Batch: `f(variables_2d, context)` → `EvaluationBatchResult`.                                                                        |
-| [`FunctionEvaluator`][ropt.workflow.evaluators.FunctionEvaluator]              | Per-row: `f(variables_1d, context)` → `EvaluationFunctionResult`.                                                              |
+| [`BatchEvaluator`][ropt.workflow.evaluators.BatchEvaluator]                    | Batch: `f(variables_2d, context)` → `EvaluationBatchResult`.                                                                  |
+| [`FunctionEvaluator`][ropt.workflow.evaluators.FunctionEvaluator]              | Per-row: `f(variables_1d, context)` → `EvaluationFunctionResult`.                                                             |
 | [`CachedEvaluator`][ropt.workflow.evaluators.CachedEvaluator]                  | Wraps another evaluator, caching results by variable vector.                                                                  |
-| [`AsyncEvaluator`][ropt.workflow.evaluators.AsyncEvaluator]                    | Parallel evaluation via a [`Server`][ropt.workflow.servers.Server] — see [Parallel Evaluation](parallel.md).                  |
+| [`ParallelEvaluator`][ropt.workflow.evaluators.ParallelEvaluator]              | Parallel evaluation via an [`Executor`][ropt.workflow.executors.Executor] — see [Parallel Evaluation](parallel.md).           |
 
 ### BatchEvaluator
 
@@ -446,12 +445,12 @@ single function that returns a value for each objective and constraint. The
 function is called once per row of the evaluation batch with the variable
 vector and an
 [`EvaluationFunctionContext`][ropt.workflow.evaluators.EvaluationFunctionContext]
-dataclass exposing `realization`, `perturbation`, `batch_id`, `eval_idx`,
-and `name`. The `perturbation` value is `-1` when the evaluation is not a
-perturbation (i.e. the unperturbed function evaluation). The `name` value
-is the optional task name set by the evaluator (e.g. via `AsyncEvaluator`'s
-`get_name` callback) and is `None` when no name was assigned. The function
-must return an
+dataclass exposing `realization`, `perturbation`, `batch_id`, `eval_idx`, and
+`name`. The `perturbation` value is `-1` when the evaluation is not a
+perturbation (i.e. the unperturbed function evaluation). The `name` value is the
+optional task name set by the evaluator (e.g. via `ParallelEvaluator`'s
+`get_name` callback) and is `None` when no name was assigned. The function must
+return an
 [`EvaluationFunctionResult`][ropt.workflow.evaluators.EvaluationFunctionResult]
 dataclass with:
 
@@ -502,14 +501,14 @@ which evaluations were cache hits — it returns both the
 dictionary mapping evaluation indices to their cached
 [`FunctionResults`][ropt.results.FunctionResults].
 
-### AsyncEvaluator
+### ParallelEvaluator
 
-The evaluators above run each function call sequentially in the current
-thread. For parallel evaluation — whether via worker threads, separate
-processes, or an HPC cluster — an asynchronous evaluator is needed. See
-[Parallel Evaluation](parallel.md) for details on
-[`AsyncEvaluator`][ropt.workflow.evaluators.AsyncEvaluator] and the available
-servers.
+The evaluators above run each function call sequentially in the current thread.
+For parallel evaluation — whether via worker threads, separate processes, or an
+HPC cluster — a parallel evaluator is needed. See [Parallel
+Evaluation](parallel.md) for details on
+[`ParallelEvaluator`][ropt.workflow.evaluators.ParallelEvaluator] and the
+available executors.
 
 !!! tip "Reusing objectives and constraints"
 

@@ -57,16 +57,16 @@ def test_example_constrained(tmp_path: Path, monkeypatch: Any, linear: Any) -> N
 @pytest.mark.slow
 @pytest.mark.asyncio
 @pytest.mark.parametrize("multiprocessing", [True, False])
-async def test_example_async_evaluator(
+async def test_example_parallel_evaluator(
     tmp_path: Path, monkeypatch: Any, multiprocessing: Any
 ) -> None:
     monkeypatch.chdir(tmp_path)
 
     # We need to do an explicit import, otherwise we get pickling errors:
     monkeypatch.syspath_prepend(Path(__file__).parent.parent / "examples")
-    import async_evaluator  # type: ignore[import-not-found] # noqa: PLC0415
+    import parallel_evaluator  # type: ignore[import-not-found] # noqa: PLC0415
 
-    await async_evaluator.main(multiprocessing=multiprocessing)
+    await parallel_evaluator.main(multiprocessing=multiprocessing)
 
 
 @pytest.mark.slow

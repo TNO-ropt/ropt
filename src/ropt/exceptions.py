@@ -27,5 +27,5 @@ class Abort(Exception):  # noqa: N818
         super().__init__()
 
 
-class ServerFailure(Exception):  # noqa: N818
-    """Raised when an evaluator server fails to execute a task."""
+class ExecutorFailure(Exception):  # noqa: N818
+    """Raised when an executor fails to execute a task."""

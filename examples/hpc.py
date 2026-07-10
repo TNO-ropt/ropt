@@ -2,10 +2,10 @@
 
 This example demonstrates optimization of the a Rosenbrock function that
 exhibits uncertainty in its parameters. Evaluations are submitted to an HPC
-queue (e.g. Slurm) via `HPCServer`. For demonstration purposes, the problem and
+queue (e.g. Slurm) via `HPCExecutor`. For demonstration purposes, the problem and
 its parameters have been tuned to make the optimization converge quickly.
 
-Use the `--multiprocessing` flag to run with `MultiprocessingServer` instead,
+Use the `--multiprocessing` flag to run with `MultiprocessingExecutor` instead,
 allowing the example to be tested without access to an HPC cluster.
 """
 
@@ -22,11 +22,11 @@ from numpy.typing import NDArray
 from ropt.results import FunctionResults, Results
 from ropt.workflow import BasicOptimizer
 from ropt.workflow.evaluators import (
-    AsyncEvaluator,
     EvaluationFunctionContext,
     EvaluationFunctionResult,
+    ParallelEvaluator,
 )
-from ropt.workflow.servers import HPCServer, MultiprocessingServer, Server
+from ropt.workflow.executors import Executor, HPCExecutor, MultiprocessingExecutor
 
 DIM = 2
 UNCERTAINTY = 0.01
@@ -98,15 +98,15 @@ def main(*, hpc_workdir: Path | None) -> None:
     a = rng.normal(loc=1.0, scale=UNCERTAINTY, size=REALIZATIONS)
     b = rng.normal(loc=100.0, scale=100 * UNCERTAINTY, size=REALIZATIONS)
 
-    # Create the evaluator and server
-    server: Server
+    # Create the evaluator and executor
+    executor: Executor
     if hpc_workdir is not None:
-        server = HPCServer(workdir=hpc_workdir, workers=HPC_WORKERS)
+        executor = HPCExecutor(workdir=hpc_workdir, workers=HPC_WORKERS)
     else:
-        server = MultiprocessingServer(workers=HPC_WORKERS)
-    evaluator = AsyncEvaluator(
+        executor = MultiprocessingExecutor(workers=HPC_WORKERS)
+    evaluator = ParallelEvaluator(
         function=partial(rosenbrock, a=a, b=b),
-        server=server,
+        executor=executor,
         get_name=lambda contexts: (
             f"b{contexts[0].batch_id}-r{contexts[0].realization}"
             f"-p{contexts[0].perturbation}"
@@ -122,9 +122,9 @@ def main(*, hpc_workdir: Path | None) -> None:
     # Run the optimization in an asyncio event loop
     async def _run() -> None:
         async with asyncio.TaskGroup() as tg:
-            await server.start(tg)
+            await executor.start(tg)
             await asyncio.to_thread(optimizer.run, INITIAL_VALUES)
-            server.cancel()
+            executor.cancel()
 
     asyncio.run(_run())
 
@@ -153,12 +153,12 @@ if __name__ == "__main__":
         nargs="?",
         type=_existing_dir_dir,
         default=None,
-        help="shared-filesystem directory for HPCServer I/O (must exist)",
+        help="shared-filesystem directory for HPCExecutor I/O (must exist)",
     )
     parser.add_argument(
         "--multiprocessing",
         action="store_true",
-        help="use MultiprocessingServer instead of HPCServer",
+        help="use MultiprocessingExecutor instead of HPCExecutor",
     )
     args = parser.parse_args()
     if args.multiprocessing:

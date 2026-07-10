@@ -1,4 +1,4 @@
-"""This module implements the default multiprocessing evaluator server."""
+"""This module implements the default multiprocessing executor."""
 
 from __future__ import annotations
 
@@ -9,9 +9,9 @@ from concurrent.futures.process import BrokenProcessPool
 from typing import TYPE_CHECKING, Any
 
 from ropt._logging import get_logger
-from ropt.exceptions import ServerFailure
+from ropt.exceptions import ExecutorFailure
 
-from .base import Server, ServerBase, Task
+from .base import Executor, ExecutorBase, Task
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -19,8 +19,8 @@ if TYPE_CHECKING:
 _logger = get_logger(__name__)
 
 
-class MultiprocessingServer(ServerBase):
-    """An evaluator server that employs a pool of multiprocessing workers."""
+class MultiprocessingExecutor(ExecutorBase):
+    """An executor that employs a pool of multiprocessing workers."""
 
     def __init__(
         self,
@@ -29,7 +29,7 @@ class MultiprocessingServer(ServerBase):
         queue_size: int = 0,
         max_tasks_per_child: int | None = None,
     ) -> None:
-        """Initialize the server.
+        """Initialize the executor.
 
         Args:
             workers:             Number of worker processes.
@@ -43,7 +43,7 @@ class MultiprocessingServer(ServerBase):
         self._executor: ProcessPoolExecutor | None = None
 
     async def start(self, task_group: asyncio.TaskGroup) -> None:
-        """Start the server.
+        """Start the executor.
 
         Args:
             task_group:          The task group to use.
@@ -54,7 +54,7 @@ class MultiprocessingServer(ServerBase):
             max_tasks_per_child=self._max_tasks_per_child,
         )
         _logger.debug(
-            "Starting multiprocessing server with %d worker(s)", self._workers
+            "Starting multiprocessing executor with %d worker(s)", self._workers
         )
         workers = [
             _Worker(self._task_queue, self, self._executor)
@@ -66,7 +66,7 @@ class MultiprocessingServer(ServerBase):
         await self._finish_start(task_group)
 
     def cleanup(self) -> None:
-        """Cleanup the server."""
+        """Clean up the executor."""
         if self._executor is not None:
             self._executor.shutdown(wait=False)
             self._executor = None
@@ -81,11 +81,11 @@ class _Worker:
     def __init__(
         self,
         task_queue: asyncio.Queue[Task],
-        server: Server,
+        parent: Executor,
         executor: ProcessPoolExecutor,
     ) -> None:
         self._task_queue = task_queue
-        self._server = server
+        self._parent = parent
         self._executor = executor
 
     async def run(self) -> None:
@@ -100,11 +100,11 @@ class _Worker:
             except BrokenProcessPool:
                 _logger.warning("Worker process pool broken; task result lost")
                 await asyncio.to_thread(
-                    task.put_result, ServerFailure("Background process was killed")
+                    task.put_result, ExecutorFailure("Background process was killed")
                 )
             except Exception:
                 task.cancel_all()
-                self._server.cancel()
+                self._parent.cancel()
                 raise
             finally:
                 self._task_queue.task_done()

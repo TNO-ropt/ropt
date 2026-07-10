@@ -1,7 +1,7 @@
 """Nested Rosenbrock example using an HPC queue for the inner evaluations.
 
 Variant of [nested.py][] that submits each inner evaluation to an HPC queue
-(e.g. Slurm) via `HPCServer`. The outer step still runs on a `ThreadingServer`
+(e.g. Slurm) via `HPCExecutor`. The outer step still runs on a `ThreadingExecutor`
 so multiple inner jobs can be in flight at once.
 """
 
@@ -23,11 +23,11 @@ from ropt.events import EnOptEvent
 from ropt.results import FunctionResults
 from ropt.workflow.compute_steps import OptimizationStep
 from ropt.workflow.evaluators import (
-    AsyncEvaluator,
     BatchIdCounter,
     CachedEvaluator,
     EvaluationFunctionContext,
     EvaluationFunctionResult,
+    ParallelEvaluator,
 )
 from ropt.workflow.event_handlers import (
     CallbackHandler,
@@ -35,7 +35,7 @@ from ropt.workflow.event_handlers import (
     HistoryHandler,
     ResultsHandler,
 )
-from ropt.workflow.servers import EventServer, HPCServer, ThreadingServer
+from ropt.workflow.executors import EventServer, HPCExecutor, ThreadingExecutor
 
 DIM = 4
 REALIZATIONS = 10
@@ -134,7 +134,7 @@ def main(*, hpc_workdir: Path) -> None:
 
     Args:
         hpc_workdir: Existing shared-filesystem directory used by
-                     `HPCServer` for temporary I/O files.
+                     `HPCExecutor` for temporary I/O files.
     """
     rng = default_rng(seed=123)
     a = rng.normal(loc=1.0, scale=UNCERTAINTY, size=REALIZATIONS)
@@ -156,7 +156,7 @@ def main(*, hpc_workdir: Path) -> None:
     # Inner evaluator: each task becomes a queued HPC job named via
     # `_task_name`. The same name is recovered inside `rosenbrock` from the
     # evaluation context, so identifiers always line up with the queue.
-    inner_server = HPCServer(workdir=hpc_workdir, workers=HPC_WORKERS)
+    inner_executor = HPCExecutor(workdir=hpc_workdir, workers=HPC_WORKERS)
     # Shared counter keeps batch IDs unique across all concurrent inner runs.
     inner_batch_id_counter = BatchIdCounter()
 
@@ -166,10 +166,10 @@ def main(*, hpc_workdir: Path) -> None:
     ) -> EvaluationFunctionResult:
         new_variables = np.where(MASK, INITIAL_VALUES, variables)
 
-        # Create a fresh evaluator per call; share only the server and counter.
-        inner_evaluator = AsyncEvaluator(
+        # Create a fresh evaluator per call; share only the executor and counter.
+        inner_evaluator = ParallelEvaluator(
             function=partial(rosenbrock, a=a, b=b),
-            server=inner_server,
+            executor=inner_executor,
             bundle_size=0,
             get_name=_task_name,
             batch_id_callback=inner_batch_id_counter,
@@ -202,8 +202,8 @@ def main(*, hpc_workdir: Path) -> None:
     # Outer evaluator: thread pool so multiple inner optimizations are in
     # flight at once. Cached so repeated discrete-variable combinations are
     # not re-submitted to the queue.
-    outer_server = ThreadingServer(workers=THREAD_WORKERS)
-    outer_evaluator = AsyncEvaluator(function=_optimize, server=outer_server)
+    outer_executor = ThreadingExecutor(workers=THREAD_WORKERS)
+    outer_evaluator = ParallelEvaluator(function=_optimize, executor=outer_executor)
     history = HistoryHandler()
     cache = CachedEvaluator(
         evaluator=outer_evaluator, hits_key="cached", sources={history}
@@ -216,12 +216,12 @@ def main(*, hpc_workdir: Path) -> None:
 
     async def _run() -> None:
         async with asyncio.TaskGroup() as tg:
-            await inner_server.start(tg)
-            await outer_server.start(tg)
+            await inner_executor.start(tg)
+            await outer_executor.start(tg)
             await event_server.start(tg)
             await asyncio.to_thread(outer_step.run, outer_context, INITIAL_VALUES)
-            outer_server.cancel()
-            inner_server.cancel()
+            outer_executor.cancel()
+            inner_executor.cancel()
             event_server.cancel()
 
     asyncio.run(_run())
@@ -251,7 +251,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "workdir",
         type=_existing_dir_dir,
-        help="shared-filesystem directory for HPCServer I/O (must exist)",
+        help="shared-filesystem directory for HPCExecutor I/O (must exist)",
     )
     args = parser.parse_args()
     main(hpc_workdir=args.workdir)

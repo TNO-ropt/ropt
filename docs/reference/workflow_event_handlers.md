@@ -10,7 +10,7 @@ structured table,
 [`CallbackHandler`][ropt.workflow.event_handlers.CallbackHandler] forwards
 selected events to a user callback, and
 [`EventForwardHandler`][ropt.workflow.event_handlers.EventForwardHandler]
-forwards events to an [`EventServer`][ropt.workflow.servers.EventServer] for
+forwards events to an [`EventServer`][ropt.workflow.executors.EventServer] for
 lock-free dispatch.
 
 See [Optimization Workflows](../usage/workflows.md) and

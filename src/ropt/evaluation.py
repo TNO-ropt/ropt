@@ -81,7 +81,7 @@ class EvaluationBatchResult:
     [`BatchIdCounter`][ropt.workflow.evaluators.BatchIdCounter] (or any
     `Callable[[], int]`) to the `batch_id_callback` argument of
     [`FunctionEvaluator`][ropt.workflow.evaluators.FunctionEvaluator] or
-    [`AsyncEvaluator`][ropt.workflow.evaluators.AsyncEvaluator]. For raw
+    [`ParallelEvaluator`][ropt.workflow.evaluators.ParallelEvaluator]. For raw
     [`BatchEvaluator`][ropt.workflow.evaluators.BatchEvaluator] callbacks,
     set `batch_id` yourself.
 

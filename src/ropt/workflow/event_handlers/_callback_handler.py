@@ -21,7 +21,7 @@ class CallbackHandler(EventHandler):
 
     If the callback performs blocking operations (file I/O, network calls,
     etc.), register this handler with `run_in_thread=True` on the
-    [`EventServer`][ropt.workflow.servers.EventServer]:
+    [`EventServer`][ropt.workflow.executors.EventServer]:
 
     ```python
     event_server.add_event_handler(handler, run_in_thread=True)

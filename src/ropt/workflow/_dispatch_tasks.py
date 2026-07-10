@@ -4,13 +4,13 @@ from dataclasses import dataclass
 from typing import Any, Literal
 
 from ropt._logging import get_logger
-from ropt.workflow.servers import (
-    HPCServer,
-    MultiprocessingServer,
+from ropt.workflow.executors import (
+    Executor,
+    HPCExecutor,
+    MultiprocessingExecutor,
     ResultsQueue,
-    Server,
     Task,
-    ThreadingServer,
+    ThreadingExecutor,
 )
 
 _logger = get_logger(__name__)
@@ -42,7 +42,7 @@ def _collect_results(
 
 async def dispatch_tasks(  # noqa: PLR0913
     functions: Sequence[Callable[[], None]] | Mapping[str, Callable[[], None]],
-    server: Literal["threading", "multiprocessing", "hpc"],
+    executor: Literal["threading", "multiprocessing", "hpc"],
     *,
     report: Callable[[Any], None] | None = None,
     workers: int = 4,
@@ -54,14 +54,14 @@ async def dispatch_tasks(  # noqa: PLR0913
     """Dispatch a list of functions to run in parallel.
 
     The dispatched functions will run either in threads, in a multiprocessing pool,
-    or on a HPC server.
+    or on an HPC executor.
 
     Args:
         functions: The functions to run.
-        server:    The type of server to run the functions.
+        executor:  The type of executor to run the functions.
         report:    Optional report function.
         workers:   The number of workers to run in parallel.
-        workdir:   Working directory used by the HPC server.
+        workdir:   Working directory used by the HPC executor.
         cluster:   The name of the HPC cluster to use.
         queue:     Optional queue to use on the cluster.
         cores:     Optional number of cores per task.
@@ -70,7 +70,7 @@ async def dispatch_tasks(  # noqa: PLR0913
         A list of function results.
 
     Raises:
-        ValueError: If `server` has an invalid value.
+        ValueError: If `executor` has an invalid value.
 
     Note: Current working directory.
         The functions to run cannot rely on the current directory to be set
@@ -78,9 +78,9 @@ async def dispatch_tasks(  # noqa: PLR0913
         absolute paths to read or write files.
 
         ALso, note that setting the current directory may not have the desired
-        effect when using the `threading` server, since changing it in one
+        effect when using the `threading` executor, since changing it in one
         thread affects all threads. In case of the `multiprocessing` and `hpc`
-        servers, the current directory can be changed safely if needed.
+        executors, the current directory can be changed safely if needed.
     """
     results: dict[int, Any] = {}
     results_queue = ResultsQueue()
@@ -94,10 +94,10 @@ async def dispatch_tasks(  # noqa: PLR0913
             _Task(function=function, results_queue=results_queue, id=idx)
             for idx, function in enumerate(functions)
         ]
-    eval_server: HPCServer | ThreadingServer | MultiprocessingServer
-    match server:
+    executor_instance: HPCExecutor | ThreadingExecutor | MultiprocessingExecutor
+    match executor:
         case "hpc":
-            eval_server = HPCServer(
+            executor_instance = HPCExecutor(
                 workdir=workdir,
                 workers=workers,
                 cluster=cluster,
@@ -105,22 +105,22 @@ async def dispatch_tasks(  # noqa: PLR0913
                 cores=cores,
             )
         case "threading":
-            eval_server = ThreadingServer(workers=workers)
+            executor_instance = ThreadingExecutor(workers=workers)
         case "multiprocessing":
-            eval_server = MultiprocessingServer(workers=workers)
+            executor_instance = MultiprocessingExecutor(workers=workers)
         case _:
-            msg = f"Invalid server: {server}"
+            msg = f"Invalid executor: {executor}"
             raise ValueError(msg)
-    assert isinstance(eval_server, Server)
+    assert isinstance(executor_instance, Executor)
     _logger.debug(
-        "Dispatching %d task(s) via %s server (%d worker(s))",
+        "Dispatching %d task(s) via %s executor (%d worker(s))",
         len(tasks),
-        server,
+        executor,
         workers,
     )
     all_processed = asyncio.Event()
     async with asyncio.TaskGroup() as tg:
-        await eval_server.start(tg)
+        await executor_instance.start(tg)
         tg.create_task(
             asyncio.to_thread(
                 _collect_results,
@@ -132,7 +132,7 @@ async def dispatch_tasks(  # noqa: PLR0913
             ),
         )
         for task in tasks:
-            await eval_server.task_queue.put(task)
+            await executor_instance.task_queue.put(task)
         await all_processed.wait()
-        eval_server.cancel()
+        executor_instance.cancel()
     return [results[idx] for idx in range(len(results))]

@@ -1,4 +1,4 @@
-"""Defines base classes for asynchronous servers."""
+"""Defines base classes for asynchronous executors."""
 
 from __future__ import annotations
 
@@ -13,21 +13,21 @@ if TYPE_CHECKING:
     from collections.abc import Callable
 
 
-class Server(ABC):
-    """Abstract base class for server components within an optimization workflow.
+class Executor(ABC):
+    """Abstract base class for executor components within an optimization workflow.
 
     Subclasses must implement the following abstract methods and properties:
 
-    - [`start`][ropt.workflow.servers.Server.start]: Starts the server.
-    - [`cancel`][ropt.workflow.servers.Server.cancel]: Stops the server.
-    - [`task_queue`][ropt.workflow.servers.Server.task_queue]: Retrieves the
-      servers task queue.
-    - [`loop`][ropt.workflow.servers.Server.loop]: Retrieves the
+    - [`start`][ropt.workflow.executors.Executor.start]: Starts the executor.
+    - [`cancel`][ropt.workflow.executors.Executor.cancel]: Stops the executor.
+    - [`task_queue`][ropt.workflow.executors.Executor.task_queue]: Retrieves the
+      executor's task queue.
+    - [`loop`][ropt.workflow.executors.Executor.loop]: Retrieves the
       currently running asyncio loop.
-    - [`task_group`][ropt.workflow.servers.Server.task_group]: The asyncio.Taskgroup
-      used by this server.
-    - [`is_running`][ropt.workflow.servers.Server.is_running]: Checks if the
-      server is running.
+    - [`task_group`][ropt.workflow.executors.Executor.task_group]: The asyncio.Taskgroup
+      used by this executor.
+    - [`is_running`][ropt.workflow.executors.Executor.is_running]: Checks if the
+      executor is running.
     """
 
     @property
@@ -38,43 +38,43 @@ class Server(ABC):
     @property
     @abstractmethod
     def loop(self) -> asyncio.AbstractEventLoop | None:
-        """The asyncio loop used by this server."""
+        """The asyncio loop used by this executor."""
 
     @property
     @abstractmethod
     def task_group(self) -> asyncio.TaskGroup | None:
-        """The task group used by this server."""
+        """The task group used by this executor."""
 
     @abstractmethod
     async def start(self, task_group: asyncio.TaskGroup) -> None:
-        """Start the evaluation server.
+        """Start the executor.
 
         Args:
             task_group: The task group to use.
 
         Raises:
-            RuntimeError: If the evaluator is already running or using an
+            RuntimeError: If the executor is already running or using an
                           external queue.
         """
 
     @abstractmethod
     def cancel(self) -> None:
-        """Stop the evaluation server."""
+        """Stop the executor."""
 
     @abstractmethod
     def is_running(self) -> bool:
-        """Check if the server is not running.
+        """Check if the executor is running.
 
         Returns:
-            True if the server is not running.
+            True if the executor is running.
         """
 
 
-class ServerBase(Server):
-    """An base class for asynchronous servers."""
+class ExecutorBase(Executor):
+    """A base class for asynchronous executors."""
 
     def __init__(self, queue_size: int = 0) -> None:
-        """Initialize the server.
+        """Initialize the executor.
 
         Arguments:
             queue_size: Maximum size of the task queue.
@@ -90,12 +90,12 @@ class ServerBase(Server):
 
     @property
     def loop(self) -> asyncio.AbstractEventLoop | None:
-        """The asyncio loop used by this server."""
+        """The asyncio loop used by this executor."""
         return self._loop
 
     @property
     def task_group(self) -> asyncio.TaskGroup | None:
-        """The task group used by this server."""
+        """The task group used by this executor."""
         return self._task_group
 
     @property
@@ -105,7 +105,7 @@ class ServerBase(Server):
 
     async def _finish_start(self, task_group: asyncio.TaskGroup) -> None:
         if self._running.is_set():
-            msg = "Server is already running."
+            msg = "Executor is already running."
             raise RuntimeError(msg)
         self._running.set()
         self._loop = asyncio.get_running_loop()
@@ -125,20 +125,20 @@ class ServerBase(Server):
                 self.cleanup()
 
     def cancel(self) -> None:
-        """Stop the evaluation server."""
+        """Stop the executor."""
         if self._wait_task is not None:
             self._wait_task.cancel()
             self._wait_task = None
 
     @abstractmethod
     def cleanup(self) -> None:
-        """Cleanup the server."""
+        """Clean up the executor."""
 
     def is_running(self) -> bool:
-        """Check if the server is not running.
+        """Check if the executor is running.
 
         Returns:
-            True if the server is running.
+            True if the executor is running.
         """
         return self._running.is_set()
 

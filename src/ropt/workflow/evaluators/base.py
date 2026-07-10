@@ -31,8 +31,8 @@ class Evaluator(ABC):
 
     Warning:
         Evaluator instances must not be called concurrently from multiple
-        threads. For parallel workflows use a server-based evaluator such as
-        [`AsyncEvaluator`][ropt.workflow.evaluators.AsyncEvaluator].
+        threads. For parallel workflows use a dispatching evaluator such as
+        [`ParallelEvaluator`][ropt.workflow.evaluators.ParallelEvaluator].
     """
 
     def __init_subclass__(cls, **kwargs: object) -> None:  # noqa: D105
@@ -53,7 +53,7 @@ class Evaluator(ABC):
                 if not self._in_use.acquire(blocking=False):
                     msg = (
                         "Evaluator does not support concurrent use across threads; "
-                        "use a server-based evaluator (e.g. AsyncEvaluator) for parallel workflows."
+                        "use a dispatching evaluator (e.g. ParallelEvaluator) for parallel workflows."
                     )
                     raise RuntimeError(msg)
                 try:

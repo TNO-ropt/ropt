@@ -11,7 +11,7 @@ See [Writing Evaluation Callbacks](../usage/evaluation_callbacks.md) and
 ::: ropt.workflow.evaluators.Evaluator
 ::: ropt.workflow.evaluators.BatchEvaluator
 ::: ropt.workflow.evaluators.FunctionEvaluator
-::: ropt.workflow.evaluators.AsyncEvaluator
+::: ropt.workflow.evaluators.ParallelEvaluator
 ::: ropt.workflow.evaluators.CachedEvaluator
 ::: ropt.workflow.evaluators.BatchIdCounter
 ::: ropt.workflow.evaluators.EvaluationFunctionCallback

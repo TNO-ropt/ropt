@@ -11,8 +11,8 @@ import numpy as np
 from ropt._logging import get_logger
 from ropt.enums import ExitCode
 from ropt.evaluation import EvaluationBatchContext, EvaluationBatchResult
-from ropt.exceptions import Abort, ServerFailure
-from ropt.workflow.servers import ResultsQueue, Server, Task
+from ropt.exceptions import Abort, ExecutorFailure
+from ropt.workflow.executors import Executor, ResultsQueue, Task
 
 from ._counter import BatchIdCounter
 from .base import (
@@ -31,16 +31,16 @@ if TYPE_CHECKING:
 _logger = get_logger(__name__)
 
 
-class AsyncEvaluator(Evaluator):
-    """An evaluator that dispatches tasks to a server via asyncio.
+class ParallelEvaluator(Evaluator):
+    """An evaluator that dispatches tasks to an executor via asyncio.
 
-    Submits the rows of the evaluation batch as tasks to the server's task
+    Submits the rows of the evaluation batch as tasks to the executor's task
     queue and collects results from a results queue. By default each row is
     submitted as its own task; the `bundle_size` constructor argument can be
-    used to group several active evaluations into a single task that the
-    worker executes sequentially.
+    used to group several active evaluations into a single task that the worker
+    executes sequentially.
 
-    See [Parallel Evaluation](../usage/parallel.md#asyncevaluator) for
+    See [Parallel Evaluation](../usage/parallel.md#parallelevaluator) for
     details on how this integrates with the asyncio event loop.
     """
 
@@ -48,29 +48,28 @@ class AsyncEvaluator(Evaluator):
         self,
         *,
         function: EvaluationFunctionCallback,
-        server: Server,
+        executor: Executor,
         bundle_size: int = 1,
         queue_size: int = 0,
         get_name: NameCallback | None = None,
         batch_id_callback: Callable[[], int] | None = None,
     ) -> None:
-        """Initialize the FunctionEvaluator.
+        """Initialize the ParallelEvaluator.
 
-        With `bundle_size=1` (the default) every active evaluation is sent
-        as its own server task. Setting `bundle_size` to an integer `> 1`
-        groups up to that many active evaluations into one task that the
-        worker runs sequentially; `0` packs all active evaluations of a
-        batch into a single task.
+        With `bundle_size=1` (the default) every active evaluation is sent as
+        its own executor task. Setting `bundle_size` to an integer `> 1` groups
+        up to that many active evaluations into one task that the worker runs
+        sequentially; `0` packs all active evaluations of a batch into a single
+        task.
 
-        The `get_name` callback receives the
-        `EvaluationFunctionContext` objects for every evaluation in a task
-        (a one-element sequence when `bundle_size=1`) and must return a
-        single task name.
+        The `get_name` callback receives the `EvaluationFunctionContext` objects
+        for every evaluation in a task (a one-element sequence when
+        `bundle_size=1`) and must return a single task name.
 
         Args:
             function:          The function used for objectives and constraints.
-            server:            Optional evaluator server to use.
-            bundle_size:       Number of active evaluations per server task.
+            executor:          The executor to dispatch tasks to.
+            bundle_size:       Number of active evaluations per executor task.
             queue_size:        Maximum size of the result queue.
             get_name:          Optional callable to generate names for tasks.
             batch_id_callback: Callable that returns the next batch ID each time it is called.
@@ -83,7 +82,7 @@ class AsyncEvaluator(Evaluator):
             msg = f"bundle_size must be >= 0, got {bundle_size}"
             raise ValueError(msg)
         self._function = function
-        self._server = server
+        self._executor = executor
         self._bundle_size = bundle_size
         self._queue_size = queue_size
         self._batch_id_callback = (
@@ -104,9 +103,9 @@ class AsyncEvaluator(Evaluator):
             The result of calling the wrapped evaluator function.
 
         Raises:
-            Abort: raise if the server is not running.
+            Abort: raise if the executor is not running.
         """
-        if not self._server.is_running():
+        if not self._executor.is_running():
             raise Abort(ExitCode.ABORT_FROM_ERROR)
 
         batch_id = self._batch_id_callback()
@@ -119,9 +118,9 @@ class AsyncEvaluator(Evaluator):
         )
 
         results_queue = ResultsQueue(self._queue_size)
-        if self._server.loop is not None and self._server.task_group is not None:
-            self._server.loop.call_soon_threadsafe(
-                self._server.task_group.create_task,
+        if self._executor.loop is not None and self._executor.task_group is not None:
+            self._executor.loop.call_soon_threadsafe(
+                self._executor.task_group.create_task,
                 self._put_tasks(variables, evaluator_context, results_queue, batch_id),
             )
 
@@ -133,10 +132,10 @@ class AsyncEvaluator(Evaluator):
             if evaluator_context.active is None
             else int(evaluator_context.active.sum())
         )
-        _logger.debug("Dispatching %d active evaluations to server", active_count)
+        _logger.debug("Dispatching %d active evaluations to executor", active_count)
         received = 0
         while received < active_count:
-            while self._server.is_running():
+            while self._executor.is_running():
                 try:
                     if (task := results_queue.get(timeout=1)) is None:
                         raise Abort(ExitCode.ABORT_FROM_ERROR)
@@ -146,7 +145,7 @@ class AsyncEvaluator(Evaluator):
                     break
                 except queue.Empty:
                     continue
-            if not self._server.is_running():
+            if not self._executor.is_running():
                 raise Abort(ExitCode.ABORT_FROM_ERROR)
 
         return EvaluationBatchResult(
@@ -170,7 +169,7 @@ class AsyncEvaluator(Evaluator):
             results_queue.close()
             raise
 
-        if not self._server.is_running():
+        if not self._executor.is_running():
             raise Abort(ExitCode.ABORT_FROM_ERROR)
 
     async def _submit_bundles(
@@ -182,7 +181,7 @@ class AsyncEvaluator(Evaluator):
     ) -> None:
         bundle: list[tuple[NDArray[np.float64], EvaluationFunctionContext]] = []
         for eval_idx, realization in enumerate(context.realizations):
-            if not self._server.is_running():
+            if not self._executor.is_running():
                 break
             if context.active is not None and not context.active[eval_idx]:
                 continue
@@ -199,12 +198,12 @@ class AsyncEvaluator(Evaluator):
             )
             bundle.append((variables[eval_idx, :], function_context))
             if self._bundle_size and len(bundle) >= self._bundle_size:
-                await self._server.task_queue.put(
+                await self._executor.task_queue.put(
                     self._make_task(bundle, results_queue)
                 )
                 bundle = []
         if bundle:
-            await self._server.task_queue.put(self._make_task(bundle, results_queue))
+            await self._executor.task_queue.put(self._make_task(bundle, results_queue))
 
     def _make_task(
         self,
@@ -241,7 +240,7 @@ def _handle_result(
     eval_count: int,
 ) -> int:
     bundle: list[tuple[NDArray[np.float64], EvaluationFunctionContext]] = task.args[1]
-    if isinstance(task.result, ServerFailure):
+    if isinstance(task.result, ExecutorFailure):
         for _, function_context in bundle:
             results[function_context.eval_idx, :] = np.nan
         return len(bundle)

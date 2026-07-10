@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
-from ._async_evaluator import AsyncEvaluator
 from ._batch_evaluator import BatchEvaluator
 from ._cached_evaluator import CachedEvaluator
 from ._counter import BatchIdCounter
 from ._function_evaluator import FunctionEvaluator
+from ._parallel_evaluator import ParallelEvaluator
 from .base import (
     EvaluationFunctionCallback,
     EvaluationFunctionContext,
@@ -16,7 +16,6 @@ from .base import (
 )
 
 __all__ = [
-    "AsyncEvaluator",
     "BatchEvaluator",
     "BatchIdCounter",
     "CachedEvaluator",
@@ -26,4 +25,5 @@ __all__ = [
     "Evaluator",
     "FunctionEvaluator",
     "NameCallback",
+    "ParallelEvaluator",
 ]

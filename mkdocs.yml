@@ -138,7 +138,7 @@ nav:
         - "Compute Steps": reference/workflow_compute_steps.md
         - "Event Handlers": reference/workflow_event_handlers.md
         - "Evaluators": reference/workflow_evaluators.md
-        - "Servers": reference/workflow_servers.md
+        - "Executors": reference/workflow_executors.md
         - "Workflow Utilities": reference/workflow_utils.md
       - "Plugin System":
         - "Plugin Bases": reference/plugin_bases.md

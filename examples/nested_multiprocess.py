@@ -1,9 +1,9 @@
 """Nested Rosenbrock example using async multiprocessing.
 
 Variant of [nested.py][] that runs the inner evaluations on a
-`MultiprocessingServer` (one subprocess per worker) and the outer evaluations on
-a `ThreadingServer` (one worker thread per concurrent outer evaluation). Both
-are driven through `AsyncEvaluator`.
+`MultiprocessingExecutor` (one subprocess per worker) and the outer evaluations on
+a `ThreadingExecutor` (one worker thread per concurrent outer evaluation). Both
+are driven through `ParallelEvaluator`.
 
 Each `FunctionResults` is tagged with the OS pid of the worker that computed it
 (via `metadata["worker"]`) and the name of the outer worker thread (via
@@ -28,11 +28,11 @@ from ropt.events import EnOptEvent
 from ropt.results import FunctionResults
 from ropt.workflow.compute_steps import OptimizationStep
 from ropt.workflow.evaluators import (
-    AsyncEvaluator,
     BatchIdCounter,
     CachedEvaluator,
     EvaluationFunctionContext,
     EvaluationFunctionResult,
+    ParallelEvaluator,
 )
 from ropt.workflow.event_handlers import (
     CallbackHandler,
@@ -40,7 +40,11 @@ from ropt.workflow.event_handlers import (
     HistoryHandler,
     ResultsHandler,
 )
-from ropt.workflow.servers import EventServer, MultiprocessingServer, ThreadingServer
+from ropt.workflow.executors import (
+    EventServer,
+    MultiprocessingExecutor,
+    ThreadingExecutor,
+)
 
 DIM = 4
 REALIZATIONS = 10
@@ -147,7 +151,7 @@ def main() -> None:
     )
 
     # Subprocess pool, shared across all outer evaluations.
-    inner_server = MultiprocessingServer(workers=2)
+    inner_executor = MultiprocessingExecutor(workers=2)
     # Shared counter keeps batch IDs unique across all concurrent inner runs.
     inner_batch_id_counter = BatchIdCounter()
 
@@ -157,10 +161,10 @@ def main() -> None:
     ) -> EvaluationFunctionResult:
         new_variables = np.where(MASK, INITIAL_VALUES, variables)
 
-        # Create a fresh evaluator per call; share only the server and counter.
-        inner_evaluator = AsyncEvaluator(
+        # Create a fresh evaluator per call; share only the executor and counter.
+        inner_evaluator = ParallelEvaluator(
             function=partial(rosenbrock, a=a, b=b),
-            server=inner_server,
+            executor=inner_executor,
             bundle_size=0,
             get_name=_task_name,
             batch_id_callback=inner_batch_id_counter,
@@ -193,8 +197,8 @@ def main() -> None:
     # Outer evaluator: thread pool so multiple inner optimizations are in
     # flight at once. Cached so the discrete-variable combinations seen by the
     # differential evolution optimizer are not re-evaluated.
-    outer_server = ThreadingServer(workers=2)
-    outer_evaluator = AsyncEvaluator(function=_optimize, server=outer_server)
+    outer_executor = ThreadingExecutor(workers=2)
+    outer_evaluator = ParallelEvaluator(function=_optimize, executor=outer_executor)
     history = HistoryHandler()
     cache = CachedEvaluator(
         evaluator=outer_evaluator, hits_key="cached", sources={history}
@@ -207,12 +211,12 @@ def main() -> None:
 
     async def _run() -> None:
         async with asyncio.TaskGroup() as tg:
-            await inner_server.start(tg)
-            await outer_server.start(tg)
+            await inner_executor.start(tg)
+            await outer_executor.start(tg)
             await event_server.start(tg)
             await asyncio.to_thread(outer_step.run, outer_context, INITIAL_VALUES)
-            outer_server.cancel()
-            inner_server.cancel()
+            outer_executor.cancel()
+            inner_executor.cancel()
             event_server.cancel()
 
     asyncio.run(_run())

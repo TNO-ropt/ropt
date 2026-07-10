@@ -93,7 +93,7 @@ auto-incrementing IDs pass a
 [`BatchIdCounter`][ropt.workflow.evaluators.BatchIdCounter] (or any
 `Callable[[], int]`) to the `batch_id_callback` argument of
 [`FunctionEvaluator`][ropt.workflow.evaluators.FunctionEvaluator] or
-[`AsyncEvaluator`][ropt.workflow.evaluators.AsyncEvaluator]; for raw
+[`ParallelEvaluator`][ropt.workflow.evaluators.ParallelEvaluator]; for raw
 [`BatchEvaluator`][ropt.workflow.evaluators.BatchEvaluator] callbacks set it
 yourself.
 
@@ -182,7 +182,7 @@ def my_function(
     | `eval_idx`     | Row index within the batch.
     | `name`         | Optional task name; `None` if unset.
 
-    `name` is set by the evaluator (e.g. via `AsyncEvaluator`'s `get_name`
+    `name` is set by the evaluator (e.g. via `ParallelEvaluator`'s `get_name`
     callback) and can be used to associate results with named tasks.
 
 - The return value is an

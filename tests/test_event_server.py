@@ -16,7 +16,7 @@ from ropt.workflow.event_handlers import (
     EventForwardHandler,
     ResultsHandler,
 )
-from ropt.workflow.servers import EventServer
+from ropt.workflow.executors import EventServer
 
 pytestmark = pytest.mark.timeout(5)
 

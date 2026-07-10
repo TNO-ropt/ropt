@@ -23,7 +23,7 @@ functionality:
 | Extra        | Pulls in                | Enables                                                                                              |
 | ------------ | ----------------------- | ---------------------------------------------------------------------------------------------------- |
 | `pandas`     | `pandas`                | Exporting [`Results`][ropt.results.Results] to data frames via [`results_to_dataframe`][ropt.results.results_to_dataframe]. |
-| `hpc`        | `pysqa`, `cloudpickle`  | Running evaluations on HPC clusters via [`HPCServer`][ropt.workflow.servers.HPCServer].              |
+| `hpc`        | `pysqa`, `cloudpickle`  | Running evaluations on HPC clusters via [`HPCExecutor`][ropt.workflow.executors.HPCExecutor].        |
 | `external`   | `cloudpickle`           | Running evaluations in an external Python process via the `external` backend.                        |
 
 Install with:

@@ -10,17 +10,17 @@ import pytest
 
 from ropt.workflow._basic_optimizer import BasicOptimizer
 from ropt.workflow.evaluators import (
-    AsyncEvaluator,
     EvaluationFunctionCallback,
     EvaluationFunctionContext,
     EvaluationFunctionResult,
+    ParallelEvaluator,
 )
-from ropt.workflow.servers import (
-    HPCServer,
-    MultiprocessingServer,
+from ropt.workflow.executors import (
+    HPCExecutor,
+    MultiprocessingExecutor,
     ResultsQueue,
     Task,
-    ThreadingServer,
+    ThreadingExecutor,
 )
 
 if TYPE_CHECKING:
@@ -30,7 +30,7 @@ if TYPE_CHECKING:
     from numpy.typing import NDArray
 
     from ropt.results import FunctionResults
-    from ropt.workflow.servers import Server
+    from ropt.workflow.executors import Executor
 
 try:
     import cloudpickle  # noqa: F401
@@ -72,12 +72,12 @@ def _function(input_value: int, *, raise_error: bool = False) -> int:
 
 
 @pytest.mark.parametrize(
-    "server_name",
+    "executor_name",
     [
-        "async_server",
-        "multiprocessing_server",
+        "threading",
+        "multiprocessing",
         pytest.param(
-            "hpc_server",
+            "hpc",
             marks=[
                 pytest.mark.slow,
                 pytest.mark.timeout(30),
@@ -88,30 +88,32 @@ def _function(input_value: int, *, raise_error: bool = False) -> int:
         ),
     ],
 )
-async def test_server_ok(server_name: str, tmp_path: Path, monkeypatch: Any) -> None:
+async def test_executor_ok(
+    executor_name: str, tmp_path: Path, monkeypatch: Any
+) -> None:
     result_queue: ResultsQueue = ResultsQueue()
     tasks = [
         Task(function=_function, args=(idx,), results_queue=result_queue)
         for idx in range(2)
     ]
-    match server_name:
-        case "hpc_server":
+    match executor_name:
+        case "hpc":
             monkeypatch.setattr(
-                "ropt.workflow.servers._hpc_server.pysqa.QueueAdapter",
+                "ropt.workflow.executors._hpc_executor.pysqa.QueueAdapter",
                 lambda *args, **kwargs: MockedHPCAdapter(tmp_path),  # noqa: ARG005
             )
-            server: Server = HPCServer(
+            executor: Executor = HPCExecutor(
                 workdir=tmp_path, workers=2, interval=0, template=""
             )
-        case "async_server":
-            server = ThreadingServer(workers=2)
-        case "multiprocessing_server":
-            server = MultiprocessingServer(workers=2)
-    assert not server.is_running()
+        case "threading":
+            executor = ThreadingExecutor(workers=2)
+        case "multiprocessing":
+            executor = MultiprocessingExecutor(workers=2)
+    assert not executor.is_running()
     all_processed = asyncio.Event()
     result_processor = _ResultProcessor()
     async with asyncio.TaskGroup() as tg:
-        await server.start(tg)
+        await executor.start(tg)
         tg.create_task(
             asyncio.to_thread(
                 result_processor.process_results,
@@ -120,22 +122,22 @@ async def test_server_ok(server_name: str, tmp_path: Path, monkeypatch: Any) -> 
                 all_processed,
             )
         )
-        assert server.is_running()
+        assert executor.is_running()
         for task in tasks:
-            await server.task_queue.put(task)
+            await executor.task_queue.put(task)
         await all_processed.wait()
-        server.cancel()
+        executor.cancel()
     assert result_processor.results == {1, 2}
-    assert not server.is_running()
+    assert not executor.is_running()
 
 
 @pytest.mark.parametrize(
-    "server_name",
+    "executor_name",
     [
-        "async_server",
-        "multiprocessing_server",
+        "threading",
+        "multiprocessing",
         pytest.param(
-            "hpc_server",
+            "hpc",
             marks=[
                 pytest.mark.slow,
                 pytest.mark.timeout(30),
@@ -146,7 +148,9 @@ async def test_server_ok(server_name: str, tmp_path: Path, monkeypatch: Any) -> 
         ),
     ],
 )
-async def test_server_error(server_name: str, tmp_path: Path, monkeypatch: Any) -> None:
+async def test_executor_error(
+    executor_name: str, tmp_path: Path, monkeypatch: Any
+) -> None:
     result_queue: ResultsQueue = ResultsQueue()
     tasks = [
         Task(
@@ -157,25 +161,25 @@ async def test_server_error(server_name: str, tmp_path: Path, monkeypatch: Any) 
         )
         for idx in range(2)
     ]
-    match server_name:
-        case "hpc_server":
+    match executor_name:
+        case "hpc":
             monkeypatch.setattr(
-                "ropt.workflow.servers._hpc_server.pysqa.QueueAdapter",
+                "ropt.workflow.executors._hpc_executor.pysqa.QueueAdapter",
                 lambda *args, **kwargs: MockedHPCAdapter(tmp_path),  # noqa: ARG005
             )
-            server: Server = HPCServer(
+            executor: Executor = HPCExecutor(
                 workdir=tmp_path, workers=2, interval=0, template=""
             )
-        case "async_server":
-            server = ThreadingServer(workers=2)
-        case "multiprocessing_server":
-            server = MultiprocessingServer(workers=2)
-    assert not server.is_running()
+        case "threading":
+            executor = ThreadingExecutor(workers=2)
+        case "multiprocessing":
+            executor = MultiprocessingExecutor(workers=2)
+    assert not executor.is_running()
     all_processed = asyncio.Event()
     result_processor = _ResultProcessor()
     with pytest.raises(ExceptionGroup) as excinfo:  # noqa: PT012
         async with asyncio.TaskGroup() as tg:
-            await server.start(tg)
+            await executor.start(tg)
             tg.create_task(
                 asyncio.to_thread(
                     result_processor.process_results,
@@ -184,15 +188,15 @@ async def test_server_error(server_name: str, tmp_path: Path, monkeypatch: Any) 
                     all_processed,
                 )
             )
-            assert server.is_running()
+            assert executor.is_running()
             for task in tasks:
-                await server.task_queue.put(task)
+                await executor.task_queue.put(task)
             await all_processed.wait()
-            server.cancel()
+            executor.cancel()
     for err in excinfo.value.exceptions:
         assert isinstance(err, ValueError)
         assert "Test error in function" in str(err)
-    assert not server.is_running()
+    assert not executor.is_running()
 
 
 initial_values = np.array([0.0, 0.0, 0.1])
@@ -238,11 +242,11 @@ def _opt_function(
 
 
 def _opt_workflow(
-    server: Server,
+    executor: Executor,
     config: dict[str, Any],
     test_function: EvaluationFunctionCallback,
 ) -> FunctionResults | None:
-    evaluator = AsyncEvaluator(function=test_function, server=server)
+    evaluator = ParallelEvaluator(function=test_function, executor=executor)
     optimizer = BasicOptimizer(config=config, evaluator=evaluator)
     optimizer.run(initial_values)
     return optimizer.results
@@ -273,12 +277,12 @@ if _TEST_HPC:
 
 
 @pytest.mark.parametrize(
-    "server_name",
+    "executor_name",
     [
-        "async_server",
-        "multiprocessing_server",
+        "threading",
+        "multiprocessing",
         pytest.param(
-            "hpc_server",
+            "hpc",
             marks=[
                 pytest.mark.slow,
                 pytest.mark.timeout(30),
@@ -289,50 +293,50 @@ if _TEST_HPC:
         ),
     ],
 )
-async def test_server_evaluator_ok(
+async def test_executor_evaluator_ok(
     config: dict[str, Any],
     test_functions: Any,
-    server_name: str,
+    executor_name: str,
     monkeypatch: Any,
     tmp_path: Path,
 ) -> None:
-    match server_name:
-        case "hpc_server":
+    match executor_name:
+        case "hpc":
             monkeypatch.setattr(
-                "ropt.workflow.servers._hpc_server.pysqa.QueueAdapter",
+                "ropt.workflow.executors._hpc_executor.pysqa.QueueAdapter",
                 lambda *args, **kwargs: MockedHPCAdapter(tmp_path),  # noqa: ARG005
             )
-            server: Server = HPCServer(
+            executor: Executor = HPCExecutor(
                 workdir=tmp_path, workers=2, interval=0, template=""
             )
-        case "async_server":
-            server = ThreadingServer(workers=2)
-        case "multiprocessing_server":
-            server = MultiprocessingServer(workers=2)
-    assert not server.is_running()
+        case "threading":
+            executor = ThreadingExecutor(workers=2)
+        case "multiprocessing":
+            executor = MultiprocessingExecutor(workers=2)
+    assert not executor.is_running()
     async with asyncio.TaskGroup() as tg:
-        await server.start(tg)
-        assert server.is_running()
+        await executor.start(tg)
+        assert executor.is_running()
         results = await asyncio.to_thread(
             _opt_workflow,
-            server,
+            executor,
             config,
             partial(_opt_function, test_functions=test_functions),
         )
-        server.cancel()
-    assert not server.is_running()
+        executor.cancel()
+    assert not executor.is_running()
 
     assert results is not None
     assert np.allclose(results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02)
 
 
 @pytest.mark.parametrize(
-    "server_name",
+    "executor_name",
     [
-        "async_server",
-        "multiprocessing_server",
+        "threading",
+        "multiprocessing",
         pytest.param(
-            "hpc_server",
+            "hpc",
             marks=[
                 pytest.mark.slow,
                 pytest.mark.timeout(30),
@@ -343,51 +347,51 @@ async def test_server_evaluator_ok(
         ),
     ],
 )
-async def test_server_evaluator_error(
+async def test_executor_evaluator_error(
     config: dict[str, Any],
     test_functions: Sequence[Callable[[NDArray[np.float64], int], float]],
-    server_name: str,
+    executor_name: str,
     monkeypatch: Any,
     tmp_path: Path,
 ) -> None:
-    match server_name:
-        case "hpc_server":
+    match executor_name:
+        case "hpc":
             monkeypatch.setattr(
-                "ropt.workflow.servers._hpc_server.pysqa.QueueAdapter",
+                "ropt.workflow.executors._hpc_executor.pysqa.QueueAdapter",
                 lambda *args, **kwargs: MockedHPCAdapter(tmp_path),  # noqa: ARG005
             )
-            server: Server = HPCServer(
+            executor: Executor = HPCExecutor(
                 workdir=tmp_path, workers=2, interval=0, template=""
             )
-        case "async_server":
-            server = ThreadingServer(workers=2)
-        case "multiprocessing_server":
-            server = MultiprocessingServer(workers=2)
-    assert not server.is_running()
+        case "threading":
+            executor = ThreadingExecutor(workers=2)
+        case "multiprocessing":
+            executor = MultiprocessingExecutor(workers=2)
+    assert not executor.is_running()
     with pytest.raises(ExceptionGroup) as excinfo:  # noqa: PT012
         async with asyncio.TaskGroup() as tg:
-            await server.start(tg)
-            assert server.is_running()
+            await executor.start(tg)
+            assert executor.is_running()
             await asyncio.to_thread(
                 _opt_workflow,
-                server,
+                executor,
                 config,
                 partial(_opt_function, test_functions=test_functions, raise_error=True),
             )
-            server.cancel()
+            executor.cancel()
     for err in excinfo.value.exceptions:
         assert isinstance(err, ValueError)
         assert "Test error in function" in str(err)
-    assert not server.is_running()
+    assert not executor.is_running()
 
 
 @pytest.mark.parametrize(
-    "server_name",
+    "executor_name",
     [
-        "async_server",
-        "multiprocessing_server",
+        "threading",
+        "multiprocessing",
         pytest.param(
-            "hpc_server",
+            "hpc",
             marks=[
                 pytest.mark.slow,
                 pytest.mark.timeout(30),
@@ -398,43 +402,43 @@ async def test_server_evaluator_error(
         ),
     ],
 )
-async def test_server_evaluator_two_optimizations(
+async def test_executor_evaluator_two_optimizations(
     config: dict[str, Any],
     test_functions: Sequence[Callable[[NDArray[np.float64], int], float]],
-    server_name: str,
+    executor_name: str,
     monkeypatch: Any,
     tmp_path: Path,
 ) -> None:
-    match server_name:
-        case "hpc_server":
+    match executor_name:
+        case "hpc":
             monkeypatch.setattr(
-                "ropt.workflow.servers._hpc_server.pysqa.QueueAdapter",
+                "ropt.workflow.executors._hpc_executor.pysqa.QueueAdapter",
                 lambda *args, **kwargs: MockedHPCAdapter(tmp_path),  # noqa: ARG005
             )
-            server: Server = HPCServer(
+            executor: Executor = HPCExecutor(
                 workdir=tmp_path, workers=2, interval=0, template=""
             )
-        case "async_server":
-            server = ThreadingServer(workers=2)
-        case "multiprocessing_server":
-            server = MultiprocessingServer(workers=2)
-    assert not server.is_running()
+        case "threading":
+            executor = ThreadingExecutor(workers=2)
+        case "multiprocessing":
+            executor = MultiprocessingExecutor(workers=2)
+    assert not executor.is_running()
     async with asyncio.TaskGroup() as tg:
-        await server.start(tg)
-        assert server.is_running()
+        await executor.start(tg)
+        assert executor.is_running()
         results_list = await asyncio.gather(
             *(
                 asyncio.to_thread(
                     _opt_workflow,
-                    server,
+                    executor,
                     config,
                     partial(_opt_function, test_functions=test_functions),
                 )
                 for _ in range(2)
             )
         )
-        server.cancel()
-    assert not server.is_running()
+        executor.cancel()
+    assert not executor.is_running()
 
     assert len(results_list) == 2
     for results in results_list:
@@ -444,43 +448,43 @@ async def test_server_evaluator_two_optimizations(
 
 @pytest.mark.parametrize("bundle_size", [1, 2, 4, 0])
 @pytest.mark.parametrize(
-    "server_name",
+    "executor_name",
     [
-        "async_server",
-        "multiprocessing_server",
+        "threading",
+        "multiprocessing",
     ],
 )
 async def test_groups_tasks(
     config: dict[str, Any],
     test_functions: Sequence[Callable[[NDArray[np.float64], int], float]],
-    server_name: str,
+    executor_name: str,
     bundle_size: int,
 ) -> None:
-    match server_name:
-        case "async_server":
-            server: Server = ThreadingServer(workers=2)
-        case "multiprocessing_server":
-            server = MultiprocessingServer(workers=2)
+    match executor_name:
+        case "threading":
+            executor: Executor = ThreadingExecutor(workers=2)
+        case "multiprocessing":
+            executor = MultiprocessingExecutor(workers=2)
 
     task_sizes: list[int] = []
-    original_put = server.task_queue.put
+    original_put = executor.task_queue.put
 
     async def _counting_put(task: Task) -> None:
         task_sizes.append(len(task.args[1]))
         await original_put(task)
 
-    server.task_queue.put = _counting_put  # type: ignore[assignment]
+    executor.task_queue.put = _counting_put  # type: ignore[assignment]
 
     async with asyncio.TaskGroup() as tg:
-        await server.start(tg)
-        evaluator = AsyncEvaluator(
+        await executor.start(tg)
+        evaluator = ParallelEvaluator(
             function=partial(_opt_function, test_functions=test_functions),
-            server=server,
+            executor=executor,
             bundle_size=bundle_size,
         )
         optimizer = BasicOptimizer(config=config, evaluator=evaluator)
         await asyncio.to_thread(optimizer.run, initial_values)
-        server.cancel()
+        executor.cancel()
 
     assert optimizer.results is not None
     assert np.allclose(
@@ -493,12 +497,12 @@ async def test_groups_tasks(
 
 
 async def test_invalid_bundle_size() -> None:  # noqa: RUF029
-    server = ThreadingServer(workers=1)
+    executor = ThreadingExecutor(workers=1)
     with pytest.raises(ValueError, match="bundle_size"):
-        AsyncEvaluator(
+        ParallelEvaluator(
             function=lambda variables, context: EvaluationFunctionResult(  # noqa: ARG005
                 objectives=0.0
             ),
-            server=server,
+            executor=executor,
             bundle_size=-1,
         )

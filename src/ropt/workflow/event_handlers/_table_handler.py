@@ -128,7 +128,7 @@ class TableHandler(EventHandler):
         updated, receiving the event that triggered the update. If the callback
         performs blocking operations (e.g. writing tables to disk), register
         this handler with `run_in_thread=True` on the
-        [`EventServer`][ropt.workflow.servers.EventServer]:
+        [`EventServer`][ropt.workflow.executors.EventServer]:
 
         ```python
         event_server.add_event_handler(table_handler, run_in_thread=True)

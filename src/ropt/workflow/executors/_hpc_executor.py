@@ -15,9 +15,9 @@ from typing import TYPE_CHECKING, Any, Final
 from uuid import uuid4
 
 from ropt._logging import get_logger
-from ropt.exceptions import ServerFailure
+from ropt.exceptions import ExecutorFailure
 
-from .base import ServerBase, Task
+from .base import ExecutorBase, Task
 
 if TYPE_CHECKING:
     from uuid import UUID
@@ -34,13 +34,13 @@ if _HAVE_HPC:
     import pysqa
 
 
-class HPCServer(ServerBase):
-    """A server for submitting tasks to an HPC cluster.
+class HPCExecutor(ExecutorBase):
+    """An executor for submitting tasks to an HPC cluster.
 
     Interfaces with an HPC queueing system (e.g. Slurm) via `pysqa`.
     Requires `ropt[hpc]` to be installed.
 
-    See [Parallel Evaluation](../usage/parallel.md#hpcserver) for full
+    See [Parallel Evaluation](../usage/parallel.md#hpcexecutor) for full
     details on configuration and lifecycle.
     """
 
@@ -60,9 +60,9 @@ class HPCServer(ServerBase):
         retries: int = 30,
         cleanup: bool = True,
     ) -> None:
-        """Initialize the HPC server.
+        """Initialize the HPC executor.
 
-        See [Parallel Evaluation](../usage/parallel.md#hpcserver) for
+        See [Parallel Evaluation](../usage/parallel.md#hpcexecutor) for
         configuration details.
 
         Args:
@@ -120,14 +120,14 @@ class HPCServer(ServerBase):
         self._retries: dict[str | UUID, int] = {}
 
     async def start(self, task_group: asyncio.TaskGroup) -> None:
-        """Start the server.
+        """Start the executor.
 
         Args:
             task_group: The task group to use.
         """
         self._worker_task = task_group.create_task(self._worker())
         _logger.info(
-            "Starting HPC server (%d max workers, %.1fs poll interval)",
+            "Starting HPC executor (%d max workers, %.1fs poll interval)",
             self._workers,
             self._interval,
         )
@@ -146,7 +146,7 @@ class HPCServer(ServerBase):
             await asyncio.sleep(self._interval)
 
     def cleanup(self) -> None:
-        """Clean up the server resources."""
+        """Clean up the executor resources."""
         if self._worker_task is not None and not self._worker_task.done():
             self._worker_task.cancel()
         self._worker_task = None
@@ -183,7 +183,7 @@ class HPCServer(ServerBase):
             job_name=task_id,
             output=f"{task_id}.txt",
             working_directory=str(self._workdir),
-            command=f"python -m ropt.workflow.servers {input_file} {output_file}",
+            command=f"python -m ropt.workflow.executors {input_file} {output_file}",
             submission_template=self._template,
             queue=self._queue,
             cores=self._cores,
@@ -213,7 +213,7 @@ class HPCServer(ServerBase):
                     _logger.warning(
                         "HPC task %s failed: output file never appeared", task_id
                     )
-                    self._results[task_id] = ServerFailure(msg)
+                    self._results[task_id] = ExecutorFailure(msg)
             except (OSError, EOFError, UnpicklingError):
                 retry_count = self._retries.get(task_id, 0) + 1
                 self._retries[task_id] = retry_count
@@ -226,7 +226,7 @@ class HPCServer(ServerBase):
                         task_id,
                         self._retries_limit,
                     )
-                    self._results[task_id] = ServerFailure(msg)
+                    self._results[task_id] = ExecutorFailure(msg)
 
     def _get_results(self) -> None:
         remove = []
@@ -234,7 +234,7 @@ class HPCServer(ServerBase):
             if task_id in self._results:
                 result = self._results.pop(task_id)
                 if isinstance(result, Exception) and not isinstance(
-                    result, ServerFailure
+                    result, ExecutorFailure
                 ):
                     task.cancel_all()
                     raise result

@@ -9,7 +9,7 @@ from .base import EventHandler
 if TYPE_CHECKING:
     from ropt.enums import EnOptEventType
     from ropt.events import EnOptEvent
-    from ropt.workflow.servers._event_server import EventServer
+    from ropt.workflow.executors._event_server import EventServer
 
 
 class EventForwardHandler(EventHandler):

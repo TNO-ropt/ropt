@@ -9,7 +9,7 @@ threading or multiprocessing.
 This script has the following options:
 
 ```
-usage: async_evaluator.py [-h] [-m] [-d DELAY] [-w WORKERS] [-o OPTIMIZATIONS]
+usage: parallel_evaluator.py [-h] [-m] [-d DELAY] [-w WORKERS] [-o OPTIMIZATIONS]
 
 options:
   -h, --help            show this help message and exit
@@ -38,12 +38,16 @@ from numpy.typing import NDArray
 from ropt.results import FunctionResults
 from ropt.workflow import BasicOptimizer
 from ropt.workflow.evaluators import (
-    AsyncEvaluator,
     EvaluationFunctionCallback,
     EvaluationFunctionContext,
     EvaluationFunctionResult,
+    ParallelEvaluator,
 )
-from ropt.workflow.servers import MultiprocessingServer, Server, ThreadingServer
+from ropt.workflow.executors import (
+    Executor,
+    MultiprocessingExecutor,
+    ThreadingExecutor,
+)
 
 DIM = 5
 UNCERTAINTY = 0.1
@@ -95,7 +99,7 @@ def rosenbrock(
 
 
 def run_optimization(
-    server: Server,
+    executor: Executor,
     function: EvaluationFunctionCallback,
     config: dict[str, Any],
 ) -> FunctionResults:
@@ -104,7 +108,7 @@ def run_optimization(
     Returns:
         The optimal results.
     """
-    evaluator = AsyncEvaluator(function=function, server=server)
+    evaluator = ParallelEvaluator(function=function, executor=executor)
     optimizer = BasicOptimizer(config=config, evaluator=evaluator)
     optimizer.run(INITIAL_VALUES)
     assert optimizer.results is not None
@@ -133,26 +137,26 @@ async def async_run(  # noqa: PLR0913
     Returns:
         The optimal results.
     """
-    async_server = (
-        MultiprocessingServer(workers=workers)
+    executor = (
+        MultiprocessingExecutor(workers=workers)
         if multiprocessing
-        else ThreadingServer(workers=workers)
+        else ThreadingExecutor(workers=workers)
     )
-    assert isinstance(async_server, Server)
+    assert isinstance(executor, Executor)
     async with asyncio.TaskGroup() as tg:
-        await async_server.start(tg)
+        await executor.start(tg)
         results = await asyncio.gather(
             *(
                 asyncio.to_thread(
                     run_optimization,
-                    async_server,
+                    executor,
                     partial(rosenbrock, a=a, b=b, delay=delay),
                     config,
                 )
                 for a, b in zip(a_list, b_list, strict=True)
             ),
         )
-        async_server.cancel()
+        executor.cancel()
     return results
 
 
