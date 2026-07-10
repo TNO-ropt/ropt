@@ -857,10 +857,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#asyncevaluator" class="md-nav__link">
+  <a href="#parallelevaluator" class="md-nav__link">
     <span class="md-ellipsis">
       
-        AsyncEvaluator
+        ParallelEvaluator
       
     </span>
   </a>
@@ -868,22 +868,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#servers" class="md-nav__link">
+  <a href="#executors" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Servers
+        Executors
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Servers">
+    <nav class="md-nav" aria-label="Executors">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#threadingserver" class="md-nav__link">
+  <a href="#threadingexecutor" class="md-nav__link">
     <span class="md-ellipsis">
       
-        ThreadingServer
+        ThreadingExecutor
       
     </span>
   </a>
@@ -891,10 +891,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#multiprocessingserver" class="md-nav__link">
+  <a href="#multiprocessingexecutor" class="md-nav__link">
     <span class="md-ellipsis">
       
-        MultiprocessingServer
+        MultiprocessingExecutor
       
     </span>
   </a>
@@ -902,10 +902,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#hpcserver" class="md-nav__link">
+  <a href="#hpcexecutor" class="md-nav__link">
     <span class="md-ellipsis">
       
-        HPCServer
+        HPCExecutor
       
     </span>
   </a>
@@ -2023,14 +2023,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/workflow_servers/" class="md-nav__link">
+      <a href="../../reference/workflow_executors/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Servers
+    Executors
   
 
     
@@ -2327,10 +2327,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#asyncevaluator" class="md-nav__link">
+  <a href="#parallelevaluator" class="md-nav__link">
     <span class="md-ellipsis">
       
-        AsyncEvaluator
+        ParallelEvaluator
       
     </span>
   </a>
@@ -2338,22 +2338,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#servers" class="md-nav__link">
+  <a href="#executors" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Servers
+        Executors
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Servers">
+    <nav class="md-nav" aria-label="Executors">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#threadingserver" class="md-nav__link">
+  <a href="#threadingexecutor" class="md-nav__link">
     <span class="md-ellipsis">
       
-        ThreadingServer
+        ThreadingExecutor
       
     </span>
   </a>
@@ -2361,10 +2361,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#multiprocessingserver" class="md-nav__link">
+  <a href="#multiprocessingexecutor" class="md-nav__link">
     <span class="md-ellipsis">
       
-        MultiprocessingServer
+        MultiprocessingExecutor
       
     </span>
   </a>
@@ -2372,10 +2372,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#hpcserver" class="md-nav__link">
+  <a href="#hpcexecutor" class="md-nav__link">
     <span class="md-ellipsis">
       
-        HPCServer
+        HPCExecutor
       
     </span>
   </a>
@@ -2469,28 +2469,27 @@ the real power of an asynchronous approach emerges when <strong>multiple compute
 steps run concurrently</strong>. With <code>asyncio</code>, several optimizations can share the
 same pool of workers, the event loop dispatches evaluation tasks as they
 arrive, and results flow back without blocking other work.</p>
-<p>The <a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.AsyncEvaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.AsyncEvaluator"><code>AsyncEvaluator</code></a> is the
+<p>The <a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.ParallelEvaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.ParallelEvaluator"><code>ParallelEvaluator</code></a> is the
 evaluator that bridges the synchronous compute-step <code>run()</code> call and the
-asynchronous world. It submits individual evaluation tasks (one per row in
-the variable batch) to a <a class="autorefs autorefs-internal" title="            ropt.workflow.servers.Server" href="../../reference/workflow_servers/#ropt.workflow.servers.Server"><code>Server</code></a> via an
-<code>asyncio.Queue</code>. The server picks tasks from the queue, executes them using
-its backend, and places results into a results queue that the evaluator
-collects.</p>
-<p>Because compute steps call <code>run()</code> synchronously, the step itself is
-typically dispatched with <code>asyncio.to_thread</code> so the event loop remains free
-to service the server's workers and other concurrent steps.</p>
-<h2 id="asyncevaluator">AsyncEvaluator</h2>
-<p><a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.AsyncEvaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.AsyncEvaluator"><code>AsyncEvaluator</code></a> wraps a
+asynchronous world. It submits individual evaluation tasks (one per row in the
+variable batch) to an <a class="autorefs autorefs-internal" title="            ropt.workflow.executors.Executor" href="../../reference/workflow_executors/#ropt.workflow.executors.Executor"><code>Executor</code></a> via an
+<code>asyncio.Queue</code>. The executor picks tasks from the queue, runs them on its
+workers, and places results into a results queue that the evaluator collects.</p>
+<p>Because compute steps call <code>run()</code> synchronously, the step itself is typically
+dispatched with <code>asyncio.to_thread</code> so the event loop remains free to service
+the executor's workers and other concurrent steps.</p>
+<h2 id="parallelevaluator">ParallelEvaluator</h2>
+<p><a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.ParallelEvaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.ParallelEvaluator"><code>ParallelEvaluator</code></a> wraps a
 per-realization function — the same kind of callable used by
-<a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.FunctionEvaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.FunctionEvaluator"><code>FunctionEvaluator</code></a> — and
-submits the rows of the evaluation batch as
-<a class="autorefs autorefs-internal" title="            ropt.workflow.servers.Task
+<a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.FunctionEvaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.FunctionEvaluator"><code>FunctionEvaluator</code></a> — and submits
+the rows of the evaluation batch as <a class="autorefs autorefs-internal" title="            ropt.workflow.executors.Task
 
 
   
       dataclass
-  " href="../../reference/workflow_servers/#ropt.workflow.servers.Task"><code>Task</code></a> objects to the server's task queue. It
-then waits for results to arrive on a results queue.</p>
+  " href="../../reference/workflow_executors/#ropt.workflow.executors.Task"><code>Task</code></a>
+objects to the executor's task queue. It then waits for results to arrive on a
+results queue.</p>
 <p>Constructor parameters:</p>
 <table>
 <thead>
@@ -2505,8 +2504,8 @@ then waits for results to arrive on a results queue.</p>
 <td>Per-realization callable (same interface as <code>FunctionEvaluator</code>).</td>
 </tr>
 <tr>
-<td><code>server</code></td>
-<td>The <a class="autorefs autorefs-internal" title="            ropt.workflow.servers.Server" href="../../reference/workflow_servers/#ropt.workflow.servers.Server"><code>Server</code></a> to dispatch tasks to.</td>
+<td><code>executor</code></td>
+<td>The <a class="autorefs autorefs-internal" title="            ropt.workflow.executors.Executor" href="../../reference/workflow_executors/#ropt.workflow.executors.Executor"><code>Executor</code></a> to dispatch tasks to.</td>
 </tr>
 <tr>
 <td><code>bundle_size</code></td>
@@ -2523,11 +2522,11 @@ then waits for results to arrive on a results queue.</p>
 </tbody>
 </table>
 <p>By default each row of the variable batch is submitted as its own task. The
-<code>bundle_size</code> parameter allows several active evaluations to be grouped into
-a single task that the worker executes sequentially. This is useful when
-per-task overhead (thread/process startup, HPC job submission) dominates the
-cost of an individual evaluation, or when the total number of active
-evaluations in a batch is much larger than the number of available workers.</p>
+<code>bundle_size</code> parameter allows several active evaluations to be grouped into a
+single task that the worker executes sequentially. This is useful when per-task
+overhead (thread/process startup, HPC job submission) dominates the cost of an
+individual evaluation, or when the total number of active evaluations in a batch
+is much larger than the number of available workers.</p>
 <p>The <code>get_name</code> callable, if provided, is called with the sequence of
 <a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.EvaluationFunctionContext
 
@@ -2535,34 +2534,35 @@ evaluations in a batch is much larger than the number of available workers.</p>
   
       dataclass
   " href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.EvaluationFunctionContext"><code>EvaluationFunctionContext</code></a>
-objects for every evaluation packed into the task (a single-element
-sequence when <code>bundle_size=1</code>) and should return a single task name. When
-using the <code>HPCServer</code>, names also serve as task identifiers and must be
-unique within a batch. The returned name is stamped onto the <code>name</code> field
-of every <code>EvaluationFunctionContext</code> in the task, so the user function can
-read <code>context.name</code> to recover it.</p>
-<p>If the server is not running when <code>eval()</code> is called, the evaluator raises
-an <code>Abort</code> exception.</p>
-<h2 id="servers">Servers</h2>
-<p>A <a class="autorefs autorefs-internal" title="            ropt.workflow.servers.Server" href="../../reference/workflow_servers/#ropt.workflow.servers.Server"><code>Server</code></a> manages an <code>asyncio.Queue</code> of
-<a class="autorefs autorefs-internal" title="            ropt.workflow.servers.Task
+objects for every evaluation packed into the task (a single-element sequence
+when <code>bundle_size=1</code>) and should return a single task name. When using the
+<code>HPCExecutor</code>, names also serve as task identifiers and must be unique within a
+batch. The returned name is stamped onto the <code>name</code> field of every
+<code>EvaluationFunctionContext</code> in the task, so the user function can read
+<code>context.name</code> to recover it.</p>
+<p>If the executor is not running when <code>eval()</code> is called, the evaluator raises an
+<code>Abort</code> exception.</p>
+<h2 id="executors">Executors</h2>
+<p>An <a class="autorefs autorefs-internal" title="            ropt.workflow.executors.Executor" href="../../reference/workflow_executors/#ropt.workflow.executors.Executor"><code>Executor</code></a> manages an <code>asyncio.Queue</code> of
+<a class="autorefs autorefs-internal" title="            ropt.workflow.executors.Task
 
 
   
       dataclass
-  " href="../../reference/workflow_servers/#ropt.workflow.servers.Task"><code>Task</code></a> objects and dispatches them to a pool of
-workers. All servers share the same lifecycle:</p>
+  " href="../../reference/workflow_executors/#ropt.workflow.executors.Task"><code>Task</code></a> objects and dispatches them to a pool of
+workers. All executors share the same lifecycle:</p>
 <ol>
-<li>Create the server instance.</li>
-<li>Start it inside an <code>asyncio.TaskGroup</code> with <code>await server.start(tg)</code>.</li>
-<li>Use it (via <code>AsyncEvaluator</code> or <code>dispatch_tasks</code>).</li>
-<li>Shut it down with <code>server.cancel()</code>.</li>
+<li>Create the executor instance.</li>
+<li>Start it inside an <code>asyncio.TaskGroup</code> with <code>await executor.start(tg)</code>.</li>
+<li>Use it (via <code>ParallelEvaluator</code> or <code>dispatch_tasks</code>).</li>
+<li>Shut it down with <code>executor.cancel()</code>.</li>
 </ol>
 <p>Three implementations are provided:</p>
-<h3 id="threadingserver">ThreadingServer</h3>
-<p><a class="autorefs autorefs-internal" title="            ropt.workflow.servers.ThreadingServer" href="../../reference/workflow_servers/#ropt.workflow.servers.ThreadingServer"><code>ThreadingServer</code></a> dispatches tasks to
-worker threads via <code>asyncio.to_thread</code>. Use this for I/O-bound evaluations or
-when the evaluation function releases the GIL (e.g. calls into C/Fortran).</p>
+<h3 id="threadingexecutor">ThreadingExecutor</h3>
+<p><a class="autorefs autorefs-internal" title="            ropt.workflow.executors.ThreadingExecutor" href="../../reference/workflow_executors/#ropt.workflow.executors.ThreadingExecutor"><code>ThreadingExecutor</code></a> dispatches
+tasks to worker threads via <code>asyncio.to_thread</code>. Use this for I/O-bound
+evaluations or when the evaluation function releases the GIL (e.g. calls into
+C/Fortran).</p>
 <table>
 <thead>
 <tr>
@@ -2581,9 +2581,9 @@ when the evaluation function releases the GIL (e.g. calls into C/Fortran).</p>
 </tr>
 </tbody>
 </table>
-<h3 id="multiprocessingserver">MultiprocessingServer</h3>
-<p><a class="autorefs autorefs-internal" title="            ropt.workflow.servers.MultiprocessingServer" href="../../reference/workflow_servers/#ropt.workflow.servers.MultiprocessingServer"><code>MultiprocessingServer</code></a> uses a
-<code>ProcessPoolExecutor</code> with a <code>"spawn"</code> context. Use this for CPU-bound
+<h3 id="multiprocessingexecutor">MultiprocessingExecutor</h3>
+<p><a class="autorefs autorefs-internal" title="            ropt.workflow.executors.MultiprocessingExecutor" href="../../reference/workflow_executors/#ropt.workflow.executors.MultiprocessingExecutor"><code>MultiprocessingExecutor</code></a>
+uses a <code>ProcessPoolExecutor</code> with a <code>"spawn"</code> context. Use this for CPU-bound
 evaluations where true parallelism is needed.</p>
 <table>
 <thead>
@@ -2607,12 +2607,12 @@ evaluations where true parallelism is needed.</p>
 </tr>
 </tbody>
 </table>
-<h3 id="hpcserver">HPCServer</h3>
-<p><a class="autorefs autorefs-internal" title="            ropt.workflow.servers.HPCServer" href="../../reference/workflow_servers/#ropt.workflow.servers.HPCServer"><code>HPCServer</code></a> submits tasks as jobs to an HPC
-scheduler (e.g. Slurm) via the <code>pysqa</code> library. Each task is serialized to
+<h3 id="hpcexecutor">HPCExecutor</h3>
+<p><a class="autorefs autorefs-internal" title="            ropt.workflow.executors.HPCExecutor" href="../../reference/workflow_executors/#ropt.workflow.executors.HPCExecutor"><code>HPCExecutor</code></a> submits tasks as jobs to an
+HPC scheduler (e.g. Slurm) via the <code>pysqa</code> library. Each task is serialized to
 disk, submitted to the queue, polled for completion, and its result is
 deserialized back. Requires <code>ropt[hpc]</code> to be installed.</p>
-<p>The server manages the full remote task lifecycle:</p>
+<p>The executor manages the full remote task lifecycle:</p>
 <ul>
 <li>Serializing the task (function and arguments) to a shared filesystem.</li>
 <li>Submitting the task as a job to the HPC queue.</li>
@@ -2669,9 +2669,9 @@ deserialized back. Requires <code>ropt[hpc]</code> to be installed.</p>
 </tr>
 </tbody>
 </table>
-<p>Configuration can be provided either via a <code>template</code> string or a
-<code>config_path</code> directory containing <code>pysqa</code> configuration files. If neither
-is given, the server looks for a default configuration at:</p>
+<p>Configuration can be provided either via a <code>template</code> string or a <code>config_path</code>
+directory containing <code>pysqa</code> configuration files. If neither is given, the
+executor looks for a default configuration at:</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>&lt;prefix&gt;/share/ropt/pysqa/&lt;queue_type&gt;/
 </span></code></pre></div>
 <p>where <code>&lt;prefix&gt;</code> is the Python installation prefix (or system data prefix).
@@ -2688,13 +2688,13 @@ argument is needed at runtime.</p>
 
   
       async
-  " href="../../reference/workflow_utils/#ropt.workflow.dispatch_tasks"><code>dispatch_tasks</code></a> is a utility function built
-on top of the server infrastructure. It runs an arbitrary collection of
-Python callables in parallel — not necessarily as part of an optimization
-workflow. Use it for one-off parallel work such as post-processing, ensemble
-replay, or any batch computation that benefits from threading,
-multiprocessing, or HPC submission.</p>
-<p>It creates a server internally based on the <code>server</code> argument
+  " href="../../reference/workflow_utils/#ropt.workflow.dispatch_tasks"><code>dispatch_tasks</code></a> is a utility function built on
+top of the executor infrastructure. It runs an arbitrary collection of Python
+callables in parallel — not necessarily as part of an optimization workflow. Use
+it for one-off parallel work such as post-processing, ensemble replay, or any
+batch computation that benefits from threading, multiprocessing, or HPC
+submission.</p>
+<p>It creates an executor internally based on the <code>executor</code> argument
 (<code>"threading"</code>, <code>"multiprocessing"</code>, or <code>"hpc"</code>), submits all functions, and
 returns the collected results.</p>
 <p><code>dispatch_tasks</code> is an <code>async</code> function — call it with <code>await</code> from an
@@ -2708,7 +2708,7 @@ asyncio context, or use <code>asyncio.run(dispatch_tasks(...))</code>:</p>
 </span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="k">def</span><span class="w"> </span><span class="nf">task_b</span><span class="p">():</span>
 </span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>    <span class="k">return</span> <span class="s2">&quot;result_b&quot;</span>
 </span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>
-</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="n">results</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">dispatch_tasks</span><span class="p">([</span><span class="n">task_a</span><span class="p">,</span> <span class="n">task_b</span><span class="p">],</span> <span class="n">server</span><span class="o">=</span><span class="s2">&quot;threading&quot;</span><span class="p">))</span>
+</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="n">results</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">dispatch_tasks</span><span class="p">([</span><span class="n">task_a</span><span class="p">,</span> <span class="n">task_b</span><span class="p">],</span> <span class="n">executor</span><span class="o">=</span><span class="s2">&quot;threading&quot;</span><span class="p">))</span>
 </span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="nb">print</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>  <span class="c1"># [&quot;result_a&quot;, &quot;result_b&quot;]</span>
 </span></code></pre></div>
 <p>The <code>functions</code> argument can be either a sequence of callables or a mapping
@@ -2727,8 +2727,8 @@ from name to callable. When a mapping is used, the keys serve as task names
 <td>Sequence or mapping of callables to execute.</td>
 </tr>
 <tr>
-<td><code>server</code></td>
-<td>Server type: <code>"threading"</code>, <code>"multiprocessing"</code>, or <code>"hpc"</code>.</td>
+<td><code>executor</code></td>
+<td>Executor type: <code>"threading"</code>, <code>"multiprocessing"</code>, or <code>"hpc"</code>.</td>
 </tr>
 <tr>
 <td><code>report</code></td>
@@ -2740,7 +2740,7 @@ from name to callable. When a mapping is used, the keys serve as task names
 </tr>
 <tr>
 <td><code>workdir</code></td>
-<td>Working directory for the HPC server.</td>
+<td>Working directory for the HPC executor.</td>
 </tr>
 <tr>
 <td><code>cluster</code></td>
@@ -2760,25 +2760,25 @@ from name to callable. When a mapping is used, the keys serve as task names
 <p class="admonition-title">Working directory</p>
 <p>The dispatched functions cannot rely on the current directory being set
 consistently. Use absolute paths to read or write files. Setting the
-current directory in a <code>"threading"</code> server affects all threads; in
-<code>"multiprocessing"</code> and <code>"hpc"</code> servers it can be changed safely per
+current directory in a <code>"threading"</code> executor affects all threads; in
+<code>"multiprocessing"</code> and <code>"hpc"</code> executors it can be changed safely per
 task.</p>
 </div>
 <h2 id="event-server">Event server</h2>
 <p>When multiple compute steps run concurrently in worker threads, their event
 handlers are called from multiple threads simultaneously. <strong>Event handlers must
 not be shared across concurrent compute steps</strong>: doing so raises a <code>RuntimeError</code>.</p>
-<p><a class="autorefs autorefs-internal" title="            ropt.workflow.servers.EventServer" href="../../reference/workflow_servers/#ropt.workflow.servers.EventServer"><code>EventServer</code></a> is the required solution:
+<p><a class="autorefs autorefs-internal" title="            ropt.workflow.executors.EventServer" href="../../reference/workflow_executors/#ropt.workflow.executors.EventServer"><code>EventServer</code></a> is the required solution:
 it receives events on a queue and dispatches them to its own handlers from the
 asyncio event loop's thread. Because all handler calls happen on a single
-thread, handlers registered on the server are safe even when events arrive
-from multiple concurrent steps.</p>
+thread, handlers registered on the server are safe even when events arrive from
+multiple concurrent steps.</p>
 <p>This is especially useful when one set of handlers needs to aggregate results
 from multiple concurrent compute steps.</p>
-<p><code>EventServer</code> follows the same lifecycle as evaluation servers:</p>
+<p><code>EventServer</code> follows the same lifecycle as evaluation executors:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">async</span> <span class="k">with</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">TaskGroup</span><span class="p">()</span> <span class="k">as</span> <span class="n">tg</span><span class="p">:</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="n">eval_server</span> <span class="o">=</span> <span class="n">ThreadingServer</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    <span class="k">await</span> <span class="n">eval_server</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="n">tg</span><span class="p">)</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="n">executor</span> <span class="o">=</span> <span class="n">ThreadingExecutor</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    <span class="k">await</span> <span class="n">executor</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="n">tg</span><span class="p">)</span>
 </span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>
 </span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="n">event_server</span> <span class="o">=</span> <span class="n">EventServer</span><span class="p">()</span>
 </span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    <span class="k">await</span> <span class="n">event_server</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="n">tg</span><span class="p">)</span>
@@ -2798,7 +2798,7 @@ from multiple concurrent compute steps.</p>
 </span><span id="__span-3-20"><a id="__codelineno-3-20" name="__codelineno-3-20" href="#__codelineno-3-20"></a>    <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">to_thread</span><span class="p">(</span><span class="n">step</span><span class="o">.</span><span class="n">run</span><span class="p">,</span> <span class="n">variables</span><span class="o">=...</span><span class="p">,</span> <span class="n">context</span><span class="o">=...</span><span class="p">)</span>
 </span><span id="__span-3-21"><a id="__codelineno-3-21" name="__codelineno-3-21" href="#__codelineno-3-21"></a>
 </span><span id="__span-3-22"><a id="__codelineno-3-22" name="__codelineno-3-22" href="#__codelineno-3-22"></a>    <span class="n">event_server</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
-</span><span id="__span-3-23"><a id="__codelineno-3-23" name="__codelineno-3-23" href="#__codelineno-3-23"></a>    <span class="n">eval_server</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
+</span><span id="__span-3-23"><a id="__codelineno-3-23" name="__codelineno-3-23" href="#__codelineno-3-23"></a>    <span class="n">executor</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
 </span></code></pre></div>
 <p><a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.EventForwardHandler" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.EventForwardHandler"><code>EventForwardHandler</code></a> is a
 regular event handler that can be attached to a compute step. When invoked from
@@ -2822,7 +2822,7 @@ parallel</strong> via <code>asyncio.gather</code> — they do not block each oth
 <ul>
 <li>Wire a parallel evaluator into a workflow:
   <a href="../workflows/">Optimization Workflows</a>.</li>
-<li>Reference: <a href="../../reference/workflow_servers/">Servers</a>,
+<li>Reference: <a href="../../reference/workflow_executors/">Executors</a>,
   <a href="../../reference/workflow_evaluators/">Evaluators</a>.</li>
 </ul>
 

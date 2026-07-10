@@ -1978,14 +1978,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/workflow_servers/" class="md-nav__link">
+      <a href="../../reference/workflow_executors/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Servers
+    Executors
   
 
     
@@ -2508,7 +2508,7 @@ auto-incrementing IDs pass a
 <a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.BatchIdCounter" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.BatchIdCounter"><code>BatchIdCounter</code></a> (or any
 <code>Callable[[], int]</code>) to the <code>batch_id_callback</code> argument of
 <a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.FunctionEvaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.FunctionEvaluator"><code>FunctionEvaluator</code></a> or
-<a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.AsyncEvaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.AsyncEvaluator"><code>AsyncEvaluator</code></a>; for raw
+<a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.ParallelEvaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.ParallelEvaluator"><code>ParallelEvaluator</code></a>; for raw
 <a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.BatchEvaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.BatchEvaluator"><code>BatchEvaluator</code></a> callbacks set it
 yourself.</p>
 <p>Inactive rows (where <code>active</code> is <code>False</code>) should have their result values set
@@ -2615,7 +2615,7 @@ assembly of the final
 </tr>
 </tbody>
 </table>
-<p><code>name</code> is set by the evaluator (e.g. via <code>AsyncEvaluator</code>'s <code>get_name</code>
+<p><code>name</code> is set by the evaluator (e.g. via <code>ParallelEvaluator</code>'s <code>get_name</code>
 callback) and can be used to associate results with named tasks.</p>
 </li>
 <li>

@@ -12,7 +12,7 @@
         <link rel="prev" href="../workflow_event_handlers/">
       
       
-        <link rel="next" href="../workflow_servers/">
+        <link rel="next" href="../workflow_executors/">
       
       
         
@@ -2020,19 +2020,19 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.workflow.evaluators.AsyncEvaluator" class="md-nav__link">
+  <a href="#ropt.workflow.evaluators.ParallelEvaluator" class="md-nav__link">
     <span class="md-ellipsis">
       
-        AsyncEvaluator
+        ParallelEvaluator
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="AsyncEvaluator">
+    <nav class="md-nav" aria-label="ParallelEvaluator">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.workflow.evaluators.AsyncEvaluator.__init__" class="md-nav__link">
+  <a href="#ropt.workflow.evaluators.ParallelEvaluator.__init__" class="md-nav__link">
     <span class="md-ellipsis">
       
         __init__
@@ -2043,7 +2043,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.workflow.evaluators.AsyncEvaluator.eval" class="md-nav__link">
+  <a href="#ropt.workflow.evaluators.ParallelEvaluator.eval" class="md-nav__link">
     <span class="md-ellipsis">
       
         eval
@@ -2252,14 +2252,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../workflow_servers/" class="md-nav__link">
+      <a href="../workflow_executors/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Servers
+    Executors
   
 
     
@@ -2665,19 +2665,19 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.workflow.evaluators.AsyncEvaluator" class="md-nav__link">
+  <a href="#ropt.workflow.evaluators.ParallelEvaluator" class="md-nav__link">
     <span class="md-ellipsis">
       
-        AsyncEvaluator
+        ParallelEvaluator
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="AsyncEvaluator">
+    <nav class="md-nav" aria-label="ParallelEvaluator">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.workflow.evaluators.AsyncEvaluator.__init__" class="md-nav__link">
+  <a href="#ropt.workflow.evaluators.ParallelEvaluator.__init__" class="md-nav__link">
     <span class="md-ellipsis">
       
         __init__
@@ -2688,7 +2688,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.workflow.evaluators.AsyncEvaluator.eval" class="md-nav__link">
+  <a href="#ropt.workflow.evaluators.ParallelEvaluator.eval" class="md-nav__link">
     <span class="md-ellipsis">
       
         eval
@@ -2954,8 +2954,8 @@ returning an
 <details class="warning" open>
   <summary>Warning</summary>
   <p>Evaluator instances must not be called concurrently from multiple
-threads. For parallel workflows use a server-based evaluator such as
-<a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.AsyncEvaluator" href="#ropt.workflow.evaluators.AsyncEvaluator"><code>AsyncEvaluator</code></a>.</p>
+threads. For parallel workflows use a dispatching evaluator such as
+<a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.ParallelEvaluator" href="#ropt.workflow.evaluators.ParallelEvaluator"><code>ParallelEvaluator</code></a>.</p>
 </details>
 
 
@@ -3580,8 +3580,8 @@ objective and constraint.</p>
 
 
 
-<h2 id="ropt.workflow.evaluators.AsyncEvaluator" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.workflow.evaluators.AsyncEvaluator</span>
+<h2 id="ropt.workflow.evaluators.ParallelEvaluator" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.workflow.evaluators.ParallelEvaluator</span>
 
 
 </h2>
@@ -3593,13 +3593,13 @@ objective and constraint.</p>
 
 
 
-        <p>An evaluator that dispatches tasks to a server via asyncio.</p>
-<p>Submits the rows of the evaluation batch as tasks to the server's task
+        <p>An evaluator that dispatches tasks to an executor via asyncio.</p>
+<p>Submits the rows of the evaluation batch as tasks to the executor's task
 queue and collects results from a results queue. By default each row is
 submitted as its own task; the <code>bundle_size</code> constructor argument can be
-used to group several active evaluations into a single task that the
-worker executes sequentially.</p>
-<p>See <a href="../../usage/parallel/#asyncevaluator">Parallel Evaluation</a> for
+used to group several active evaluations into a single task that the worker
+executes sequentially.</p>
+<p>See <a href="../../usage/parallel/#parallelevaluator">Parallel Evaluation</a> for
 details on how this integrates with the asyncio event loop.</p>
 
 
@@ -3623,7 +3623,7 @@ details on how this integrates with the asyncio event loop.</p>
 <div class="doc doc-object doc-function">
 
 
-<h3 id="ropt.workflow.evaluators.AsyncEvaluator.__init__" class="doc doc-heading">
+<h3 id="ropt.workflow.evaluators.ParallelEvaluator.__init__" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">__init__</span>
 
 
@@ -3631,7 +3631,7 @@ details on how this integrates with the asyncio event loop.</p>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">__init__</span><span class="p">(</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="o">*</span><span class="p">,</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">function</span><span class="p">:</span> <span class="n">EvaluationFunctionCallback</span><span class="p">,</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">server</span><span class="p">:</span> <span class="n">Server</span><span class="p">,</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">executor</span><span class="p">:</span> <span class="n">Executor</span><span class="p">,</span>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">bundle_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">queue_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
 </span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">get_name</span><span class="p">:</span> <span class="n">NameCallback</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -3641,16 +3641,15 @@ details on how this integrates with the asyncio event loop.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Initialize the FunctionEvaluator.</p>
-<p>With <code>bundle_size=1</code> (the default) every active evaluation is sent
-as its own server task. Setting <code>bundle_size</code> to an integer <code>&gt; 1</code>
-groups up to that many active evaluations into one task that the
-worker runs sequentially; <code>0</code> packs all active evaluations of a
-batch into a single task.</p>
-<p>The <code>get_name</code> callback receives the
-<code>EvaluationFunctionContext</code> objects for every evaluation in a task
-(a one-element sequence when <code>bundle_size=1</code>) and must return a
-single task name.</p>
+        <p>Initialize the ParallelEvaluator.</p>
+<p>With <code>bundle_size=1</code> (the default) every active evaluation is sent as
+its own executor task. Setting <code>bundle_size</code> to an integer <code>&gt; 1</code> groups
+up to that many active evaluations into one task that the worker runs
+sequentially; <code>0</code> packs all active evaluations of a batch into a single
+task.</p>
+<p>The <code>get_name</code> callback receives the <code>EvaluationFunctionContext</code> objects
+for every evaluation in a task (a one-element sequence when
+<code>bundle_size=1</code>) and must return a single task name.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3682,14 +3681,14 @@ single task name.</p>
           </tr>
           <tr class="doc-section-item">
             <td>
-                <code>server</code>
+                <code>executor</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.workflow.servers.Server" href="../workflow_servers/#ropt.workflow.servers.Server">Server</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.workflow.executors.Executor" href="../workflow_executors/#ropt.workflow.executors.Executor">Executor</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional evaluator server to use.</p>
+                <p>The executor to dispatch tasks to.</p>
               </div>
             </td>
             <td>
@@ -3705,7 +3704,7 @@ single task name.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Number of active evaluations per server task.</p>
+                <p>Number of active evaluations per executor task.</p>
               </div>
             </td>
             <td>
@@ -3799,7 +3798,7 @@ single task name.</p>
 <div class="doc doc-object doc-function">
 
 
-<h3 id="ropt.workflow.evaluators.AsyncEvaluator.eval" class="doc doc-heading">
+<h3 id="ropt.workflow.evaluators.ParallelEvaluator.eval" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">eval</span>
 
 
@@ -3910,7 +3909,7 @@ single task name.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>raise if the server is not running.</p>
+                <p>raise if the executor is not running.</p>
               </div>
             </td>
           </tr>
@@ -5005,13 +5004,13 @@ the task name.</p>
         
         
           
-          <a href="../workflow_servers/" class="md-footer__link md-footer__link--next" aria-label="Next: Servers">
+          <a href="../workflow_executors/" class="md-footer__link md-footer__link--next" aria-label="Next: Executors">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Servers
+                Executors
               </div>
             </div>
             <div class="md-footer__button md-icon">

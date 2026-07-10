@@ -2295,14 +2295,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../workflow_servers/" class="md-nav__link">
+      <a href="../workflow_executors/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Servers
+    Executors
   
 
     
@@ -2998,7 +2998,7 @@ structured table,
 <a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.CallbackHandler" href="#ropt.workflow.event_handlers.CallbackHandler"><code>CallbackHandler</code></a> forwards
 selected events to a user callback, and
 <a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.EventForwardHandler" href="#ropt.workflow.event_handlers.EventForwardHandler"><code>EventForwardHandler</code></a>
-forwards events to an <a class="autorefs autorefs-internal" title="            ropt.workflow.servers.EventServer" href="../workflow_servers/#ropt.workflow.servers.EventServer"><code>EventServer</code></a> for
+forwards events to an <a class="autorefs autorefs-internal" title="            ropt.workflow.executors.EventServer" href="../workflow_executors/#ropt.workflow.executors.EventServer"><code>EventServer</code></a> for
 lock-free dispatch.</p>
 <p>See <a href="../../usage/workflows/">Optimization Workflows</a> and
 <a href="../../usage/results/">Working with Results</a> for usage.</p>
@@ -4066,7 +4066,7 @@ from. The <code>"user"</code> domain reports values as seen by the user;
 updated, receiving the event that triggered the update. If the callback
 performs blocking operations (e.g. writing tables to disk), register
 this handler with <code>run_in_thread=True</code> on the
-<a class="autorefs autorefs-internal" title="            ropt.workflow.servers.EventServer" href="../workflow_servers/#ropt.workflow.servers.EventServer"><code>EventServer</code></a>:</p>
+<a class="autorefs autorefs-internal" title="            ropt.workflow.executors.EventServer" href="../workflow_executors/#ropt.workflow.executors.EventServer"><code>EventServer</code></a>:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">event_server</span><span class="o">.</span><span class="n">add_event_handler</span><span class="p">(</span><span class="n">table_handler</span><span class="p">,</span> <span class="n">run_in_thread</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </span></code></pre></div>
 
@@ -4619,7 +4619,7 @@ variable.</p>
 to a callback function.</p>
 <p>If the callback performs blocking operations (file I/O, network calls,
 etc.), register this handler with <code>run_in_thread=True</code> on the
-<a class="autorefs autorefs-internal" title="            ropt.workflow.servers.EventServer" href="../workflow_servers/#ropt.workflow.servers.EventServer"><code>EventServer</code></a>:</p>
+<a class="autorefs autorefs-internal" title="            ropt.workflow.executors.EventServer" href="../workflow_executors/#ropt.workflow.executors.EventServer"><code>EventServer</code></a>:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">event_server</span><span class="o">.</span><span class="n">add_event_handler</span><span class="p">(</span><span class="n">handler</span><span class="p">,</span> <span class="n">run_in_thread</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </span></code></pre></div>
 
@@ -4911,7 +4911,7 @@ etc.), register this handler with <code>run_in_thread=True</code> on the
                 <code>server</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.workflow.servers.EventServer (ropt.workflow.servers._event_server.EventServer)" href="../workflow_servers/#ropt.workflow.servers.EventServer">EventServer</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.workflow.executors.EventServer (ropt.workflow.executors._event_server.EventServer)" href="../workflow_executors/#ropt.workflow.executors.EventServer">EventServer</a></code>
             </td>
             <td>
               <div class="doc-md-description">
