@@ -31,11 +31,12 @@ from ropt.workflow.evaluators import (
 )
 from ropt.workflow.event_handlers import (
     CallbackHandler,
+    EventDispatcher,
     EventForwardHandler,
     HistoryHandler,
     ResultsHandler,
 )
-from ropt.workflow.executors import EventServer, HPCExecutor, ThreadingExecutor
+from ropt.workflow.executors import HPCExecutor, ThreadingExecutor
 
 DIM = 4
 REALIZATIONS = 10
@@ -140,13 +141,13 @@ def main(*, hpc_workdir: Path) -> None:
     a = rng.normal(loc=1.0, scale=UNCERTAINTY, size=REALIZATIONS)
     b = rng.normal(loc=100.0, scale=100 * UNCERTAINTY, size=REALIZATIONS)
 
-    # Create a global results handler and event server to collect all inner
+    # Create a global results handler and event dispatcher to collect all inner
     # results. It runs in a separate thread so that the inner jobs can submit
     # events to it from any thread.
     global_results = ResultsHandler()
-    event_server = EventServer()
-    event_server.add_event_handler(global_results)
-    event_server.add_event_handler(
+    event_dispatcher = EventDispatcher()
+    event_dispatcher.add_event_handler(global_results)
+    event_dispatcher.add_event_handler(
         CallbackHandler(
             callback=report,
             event_types={EnOptEventType.FINISHED_EVALUATION},
@@ -179,7 +180,7 @@ def main(*, hpc_workdir: Path) -> None:
         step.add_event_handler(result_handler)
         step.add_event_handler(
             EventForwardHandler(
-                event_server,
+                event_dispatcher,
                 event_types={EnOptEventType.FINISHED_EVALUATION},
             )
         )
@@ -218,11 +219,11 @@ def main(*, hpc_workdir: Path) -> None:
         async with asyncio.TaskGroup() as tg:
             await inner_executor.start(tg)
             await outer_executor.start(tg)
-            await event_server.start(tg)
+            await event_dispatcher.start(tg)
             await asyncio.to_thread(outer_step.run, outer_context, INITIAL_VALUES)
             outer_executor.cancel()
             inner_executor.cancel()
-            event_server.cancel()
+            event_dispatcher.cancel()
 
     asyncio.run(_run())
 

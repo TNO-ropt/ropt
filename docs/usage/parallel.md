@@ -201,59 +201,59 @@ from name to callable. When a mapping is used, the keys serve as task names
     `"multiprocessing"` and `"hpc"` executors it can be changed safely per
     task.
 
-## Event server
+## Event dispatcher
 
 When multiple compute steps run concurrently in worker threads, their event
 handlers are called from multiple threads simultaneously. **Event handlers must
 not be shared across concurrent compute steps**: doing so raises a `RuntimeError`.
 
-[`EventServer`][ropt.workflow.executors.EventServer] is the required solution:
-it receives events on a queue and dispatches them to its own handlers from the
-asyncio event loop's thread. Because all handler calls happen on a single
-thread, handlers registered on the server are safe even when events arrive from
-multiple concurrent steps.
+[`EventDispatcher`][ropt.workflow.event_handlers.EventDispatcher] is the
+required solution: it receives events on a queue and dispatches them to its own
+handlers from the asyncio event loop's thread. Because all handler calls happen
+on a single thread, handlers registered on the dispatcher are safe even when
+events arrive from multiple concurrent steps.
 
 This is especially useful when one set of handlers needs to aggregate results
 from multiple concurrent compute steps.
 
-`EventServer` follows the same lifecycle as evaluation executors:
+`EventDispatcher` follows the same lifecycle as executors:
 
 ```python
 async with asyncio.TaskGroup() as tg:
     executor = ThreadingExecutor(workers=4)
     await executor.start(tg)
 
-    event_server = EventServer()
-    await event_server.start(tg)
+    event_dispatcher = EventDispatcher()
+    await event_dispatcher.start(tg)
 
     # Attach an EventForwardHandler to the compute step.
     step.add_event_handler(
         EventForwardHandler(
-            event_server,
+            event_dispatcher,
             event_types={EnOptEventType.FINISHED_EVALUATION},
         )
     )
 
-    # Handlers registered on the server need no locking.
+    # Handlers registered on the dispatcher need no locking.
     result_handler = ResultsHandler()
-    event_server.add_event_handler(result_handler)
+    event_dispatcher.add_event_handler(result_handler)
 
     await asyncio.to_thread(step.run, variables=..., context=...)
 
-    event_server.cancel()
+    event_dispatcher.cancel()
     executor.cancel()
 ```
 
 [`EventForwardHandler`][ropt.workflow.event_handlers.EventForwardHandler] is a
 regular event handler that can be attached to a compute step. When invoked from
-the worker thread it puts the event on the server's queue via a thread-safe
-call. The server's processing loop then dispatches it to the registered
+the worker thread it puts the event on the dispatcher's queue via a thread-safe
+call. The dispatcher's processing loop then dispatches it to the registered
 handlers.
 
 ### Thread-based dispatch
 
-By default, handlers registered with `EventServer` are called directly in the
-asyncio event loop's thread. This is efficient for handlers that only do
+By default, handlers registered with `EventDispatcher` are called directly in
+the asyncio event loop's thread. This is efficient for handlers that only do
 in-memory work, such as `ResultsHandler` or `HistoryHandler`.
 
 If a handler performs blocking operations — writing results to a file, pushing
@@ -261,7 +261,7 @@ data to a database, sending over a network — pass `run_in_thread=True` when
 registering it:
 
 ```python
-event_server.add_event_handler(my_handler, run_in_thread=True)
+event_dispatcher.add_event_handler(my_handler, run_in_thread=True)
 ```
 
 `CallbackHandler` and `TableHandler` (when a slow callback is set via

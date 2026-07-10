@@ -1,4 +1,4 @@
-"""This module implements the event server."""
+"""This module implements the event dispatcher."""
 
 from __future__ import annotations
 
@@ -8,17 +8,18 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from ropt.events import EnOptEvent
-    from ropt.workflow.event_handlers import EventHandler
+
+    from .base import EventHandler
 
 
 async def _call(handler: EventHandler, event: EnOptEvent) -> None:  # noqa: RUF029
     handler.handle_event(event)
 
 
-class EventServer:
-    """An event server that dispatches events to handlers from the asyncio event loop.
+class EventDispatcher:
+    """Dispatches events to handlers from the asyncio event loop's thread.
 
-    See [Parallel Evaluation](../usage/parallel.md#event-server) for usage.
+    See [Parallel Evaluation](../usage/parallel.md#event-dispatcher) for usage.
     """
 
     def __init__(self) -> None:
@@ -56,24 +57,24 @@ class EventServer:
             self._loop.call_soon_threadsafe(self._queue.put_nowait, event)
 
     def is_running(self) -> bool:
-        """Check if the server is running.
+        """Check if the dispatcher is running.
 
         Returns:
-            True if the server is running.
+            True if the dispatcher is running.
         """
         return self._running.is_set()
 
     async def start(self, task_group: asyncio.TaskGroup) -> None:
-        """Start the event server.
+        """Start the dispatcher.
 
         Args:
             task_group: The task group to use.
 
         Raises:
-            RuntimeError: If the server is already running.
+            RuntimeError: If the dispatcher is already running.
         """
         if self._running.is_set():
-            msg = "EventServer is already running."
+            msg = "EventDispatcher is already running."
             raise RuntimeError(msg)
         self._queue = asyncio.Queue()
         self._loop = asyncio.get_running_loop()
@@ -81,7 +82,7 @@ class EventServer:
         task_group.create_task(self._process())
 
     def cancel(self) -> None:
-        """Stop the event server."""
+        """Stop the dispatcher."""
         if self._loop is not None and self._queue is not None:
             self._loop.call_soon_threadsafe(self._queue.put_nowait, None)
 

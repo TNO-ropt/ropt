@@ -201,9 +201,9 @@ method. Once attached, the handler receives every event the step emits.
     steps run concurrently in worker threads (e.g. when using `ParallelEvaluator`
     with a `ThreadingExecutor` that has multiple workers), any handler shared
     across steps must be registered on an
-    [`EventServer`][ropt.workflow.executors.EventServer] rather than attached
+    [`EventDispatcher`][ropt.workflow.event_handlers.EventDispatcher] rather than attached
     directly to the compute steps. See
-    [Event Server](parallel.md#event-server) for the required pattern.
+    [Event Dispatcher](parallel.md#event-dispatcher) for the required pattern.
 
 The framework ships four reusable handlers:
 
@@ -213,7 +213,7 @@ The framework ships four reusable handlers:
 | [`HistoryHandler`][ropt.workflow.event_handlers.HistoryHandler]          | Keep every result.                                                     |
 | [`CallbackHandler`][ropt.workflow.event_handlers.CallbackHandler]        | Forward selected event types to a user callback.                       |
 | [`TableHandler`][ropt.workflow.event_handlers.TableHandler]              | Append rows to a structured table per result.                          |
-| [`EventForwardHandler`][ropt.workflow.event_handlers.EventForwardHandler]| Forward events to an [`EventServer`][ropt.workflow.executors.EventServer] for lock-free dispatch. |
+| [`EventForwardHandler`][ropt.workflow.event_handlers.EventForwardHandler]| Forward events to an [`EventDispatcher`][ropt.workflow.event_handlers.EventDispatcher] for lock-free dispatch. |
 
 Handlers expose their state through dictionary access (`handler[key]`). By
 convention, `ResultsHandler` and `HistoryHandler` both use the key `"results"` —
@@ -281,11 +281,11 @@ matching type arrives, the callback is called with the
 
 [`EventForwardHandler`][ropt.workflow.event_handlers.EventForwardHandler] is
 attached to a compute step and forwards matching events to an
-[`EventServer`][ropt.workflow.executors.EventServer]. The server dispatches them
-from the asyncio event loop's thread, so handlers registered on the server
-require no locking.
+[`EventDispatcher`][ropt.workflow.event_handlers.EventDispatcher]. The dispatcher
+dispatches them from the asyncio event loop's thread, so handlers registered on
+the dispatcher require no locking.
 
-See [Event Server](parallel.md#event-server) for the full pattern.
+See [Event Dispatcher](parallel.md#event-dispatcher) for the full pattern.
 
 ### TableHandler
 

@@ -9,38 +9,39 @@ from .base import EventHandler
 if TYPE_CHECKING:
     from ropt.enums import EnOptEventType
     from ropt.events import EnOptEvent
-    from ropt.workflow.executors._event_server import EventServer
+
+    from ._event_dispatcher import EventDispatcher
 
 
 class EventForwardHandler(EventHandler):
-    """Forwards events from a compute step to an `EventServer`.
+    """Forwards events from a compute step to an `EventDispatcher`.
 
     See [Optimization Workflows](../usage/workflows.md#eventforwardhandler) for usage.
     """
 
     def __init__(
         self,
-        server: EventServer,
+        dispatcher: EventDispatcher,
         *,
         event_types: set[EnOptEventType],
     ) -> None:
         """Initialize the EventForwardHandler.
 
         Args:
-            server:      The EventServer to forward events to.
+            dispatcher:  The EventDispatcher to forward events to.
             event_types: The set of event types to forward.
         """
         super().__init__()
-        self._server = server
+        self._dispatcher = dispatcher
         self._event_types = event_types
 
     def handle_event(self, event: EnOptEvent) -> None:
-        """Forward the event to the EventServer.
+        """Forward the event to the EventDispatcher.
 
         Args:
             event: The event to forward.
         """
-        self._server.put_event(event)
+        self._dispatcher.put_event(event)
 
     @property
     def event_types(self) -> set[EnOptEventType]:
