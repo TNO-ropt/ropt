@@ -3215,6 +3215,22 @@ when the two uses do not actually overlap.</p>
 compute step is shipped to a worker process. A handler that has already
 processed an event cannot be pickled and raises a <code>RuntimeError</code>.</p>
 </div>
+<div class="admonition note">
+<p class="admonition-title">Reading results is not thread-guarded</p>
+<p>Handler state exposed through <code>handler[key]</code> is deliberately <em>not</em> bound to
+a thread, so results can be read after a run from any thread. Read a
+handler's stored values only <strong>after its producer has finished</strong>: after
+<code>step.run()</code> returns for a directly-attached handler, or after the
+<a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.EventDispatcher" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.EventDispatcher"><code>EventDispatcher</code></a> has been
+cancelled and its task group has exited for a handler registered with a
+dispatcher. Both are synchronization points that make the latest values
+visible.</p>
+<p>Reading a handler's state <em>while it is still processing events on another
+thread</em> returns a valid object, but possibly a stale one — do not rely on it
+for the latest result. For live progress during a parallel run, use a
+<a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.CallbackHandler" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.CallbackHandler"><code>CallbackHandler</code></a> (which is
+pushed each event) rather than polling another handler's state.</p>
+</div>
 <p>The framework ships four reusable handlers:</p>
 <table>
 <thead>
