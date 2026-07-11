@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import pickle  # noqa: S403
 import threading
 from copy import deepcopy
 from functools import partial
@@ -24,6 +25,7 @@ from ropt.workflow.evaluators import (
 )
 from ropt.workflow.event_handlers import (
     CallbackHandler,
+    EventDispatcher,
     EventHandler,
     HistoryHandler,
     ResultsHandler,
@@ -808,4 +810,131 @@ def test_event_handler_raises_on_concurrent_use() -> None:
     t1.join(timeout=5.0)
 
     assert isinstance(thread2_error[0], RuntimeError)
-    assert "concurrent" in str(thread2_error[0])
+    assert "thread" in str(thread2_error[0])
+
+
+class _RecordingHandler(EventHandler):
+    def __init__(self) -> None:
+        super().__init__()
+        self.threads: list[int] = []
+
+    @property
+    def event_types(self) -> set[EnOptEventType]:
+        return {EnOptEventType.FINISHED_EVALUATION}
+
+    def handle_event(self, _event: EnOptEvent) -> None:
+        self.threads.append(threading.get_ident())
+
+
+def _run_in_thread(target: Callable[[], None]) -> None:
+    thread = threading.Thread(target=target)
+    thread.start()
+    thread.join(timeout=5.0)
+
+
+def test_event_handler_pins_to_first_thread_when_staggered() -> None:
+    handler = _RecordingHandler()
+    event = object()
+
+    # First use happens on a worker thread and finishes completely.
+    _run_in_thread(lambda: handler.handle_event(event))  # type: ignore[arg-type]
+
+    # A later, non-overlapping call from a different thread is still rejected.
+    with pytest.raises(RuntimeError, match="thread"):
+        handler.handle_event(event)  # type: ignore[arg-type]
+
+
+def test_event_handler_allows_repeated_use_on_same_thread() -> None:
+    handler = _RecordingHandler()
+    event = object()
+
+    handler.handle_event(event)  # type: ignore[arg-type]
+    handler.handle_event(event)  # type: ignore[arg-type]
+
+    assert len(handler.threads) == 2
+
+
+def test_dispatcher_handler_is_not_thread_pinned() -> None:
+    handler = _RecordingHandler()
+    handler.register_dispatcher()
+    event = object()
+    errors: list[BaseException] = []
+
+    def _use() -> None:
+        try:
+            handler.handle_event(event)  # type: ignore[arg-type]
+        except RuntimeError as exc:  # pragma: no cover - should not happen
+            errors.append(exc)
+
+    _run_in_thread(_use)
+    _run_in_thread(_use)
+
+    assert errors == []
+    assert len(handler.threads) == 2
+
+
+def test_register_dispatcher_twice_raises() -> None:
+    handler = _RecordingHandler()
+    handler.register_dispatcher()
+    with pytest.raises(RuntimeError, match="already registered with a dispatcher"):
+        handler.register_dispatcher()
+
+
+def test_register_dispatcher_via_add_event_handler_twice_raises() -> None:
+    handler = _RecordingHandler()
+    dispatcher = EventDispatcher()
+    dispatcher.add_event_handler(handler)
+    with pytest.raises(RuntimeError, match="already registered with a dispatcher"):
+        dispatcher.add_event_handler(handler)
+
+
+def test_dispatcher_then_compute_step_raises() -> None:
+    handler = _RecordingHandler()
+    handler.register_dispatcher()
+    with pytest.raises(RuntimeError, match="registered with a dispatcher"):
+        handler.register_compute_step()
+
+
+def test_compute_step_then_dispatcher_raises() -> None:
+    handler = _RecordingHandler()
+    handler.register_compute_step()
+    with pytest.raises(RuntimeError, match="compute step"):
+        handler.register_dispatcher()
+
+
+def test_handler_may_be_attached_to_multiple_compute_steps() -> None:
+    handler = _RecordingHandler()
+    handler.register_compute_step()
+    handler.register_compute_step()  # allowed, no error
+
+
+def test_pickle_before_use_succeeds_and_resets_owner() -> None:
+    handler = _RecordingHandler()
+
+    restored = pickle.loads(pickle.dumps(handler))  # noqa: S301
+
+    # Usable after unpickling (its lock was recreated) and pins to the first
+    # thread that uses it -- here the main thread, which stays alive.
+    restored.handle_event(object())
+    assert len(restored.threads) == 1
+
+    # A different, concurrently-live thread is rejected.
+    errors: list[BaseException] = []
+
+    def _use() -> None:
+        try:
+            restored.handle_event(object())
+        except RuntimeError as exc:
+            errors.append(exc)
+
+    _run_in_thread(_use)
+
+    assert len(errors) == 1
+    assert "thread" in str(errors[0])
+
+
+def test_pickle_after_use_raises() -> None:
+    handler = _RecordingHandler()
+    handler.handle_event(object())  # type: ignore[arg-type]
+    with pytest.raises(RuntimeError, match="after it has been used"):
+        pickle.dumps(handler)

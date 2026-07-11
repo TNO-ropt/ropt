@@ -34,6 +34,7 @@ class ComputeStep(ABC):
             handler: The handler to add.
         """
         if isinstance(handler, EventHandler):
+            handler.register_compute_step()
             self._event_handlers.append(handler)
 
     @property

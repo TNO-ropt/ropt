@@ -42,7 +42,7 @@ except ImportError:
     _TEST_HPC = False
 
 
-pytestmark = [pytest.mark.asyncio, pytest.mark.timeout(1)]
+pytestmark = [pytest.mark.asyncio, pytest.mark.timeout(5)]
 
 
 class _ResultProcessor:

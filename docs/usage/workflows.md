@@ -194,16 +194,46 @@ why the step finished:
 Event handlers are attached to a compute step via its `add_event_handler`
 method. Once attached, the handler receives every event the step emits.
 
-!!! warning "Thread safety in parallel workflows"
+### Using handlers safely
 
-    Event handlers are **not thread-safe** and must not be shared across
-    concurrent compute steps — doing so raises a `RuntimeError`. When compute
-    steps run concurrently in worker threads (e.g. when using `ParallelEvaluator`
-    with a `ThreadingExecutor` that has multiple workers), any handler shared
-    across steps must be registered on an
-    [`EventDispatcher`][ropt.workflow.event_handlers.EventDispatcher] rather than attached
-    directly to the compute steps. See
-    [Event Dispatcher](parallel.md#event-dispatcher) for the required pattern.
+An event handler is a stateful, **single-thread** object. There are two ways to
+drive one, and they are mutually exclusive:
+
+- **Attached directly to compute steps.** A handler may be attached to several
+  compute steps, and a single instance can accumulate state across them — as
+  long as those steps run one after another on the same thread. The first time
+  the handler processes an event it binds to the thread it ran on; a later call
+  from a *different* thread raises a `RuntimeError`.
+
+- **Registered with an
+  [`EventDispatcher`][ropt.workflow.event_handlers.EventDispatcher].** When work
+  runs on several threads at once (for example, `ParallelEvaluator` with a
+  multi-worker `ThreadingExecutor`), route events through a dispatcher. It
+  receives events from any thread and delivers them to its handlers one at a
+  time, so a single handler can safely aggregate results produced on many
+  threads. See [Event Dispatcher](parallel.md#event-dispatcher) for the pattern.
+
+A handler is owned by **either** one dispatcher **or** one-or-more compute
+steps — never both — and may be registered with **at most one** dispatcher.
+Mixing the two, or registering with a second dispatcher, raises a
+`RuntimeError`.
+
+!!! warning "Do not share a handler across parallel steps"
+
+    Never attach the same handler instance to compute steps that may run at the
+    same time on different threads; the moment the second thread uses it, a
+    `RuntimeError` is raised. Give each parallel step its own handler, or route
+    events through an `EventDispatcher`.
+
+    Note that this is enforced by binding the handler to its first thread, so it
+    also rejects a handler that is reused on a *different* thread later, even
+    when the two uses do not actually overlap.
+
+!!! note "Pickling"
+
+    A handler can be pickled before it is first used — for example, when a
+    compute step is shipped to a worker process. A handler that has already
+    processed an event cannot be pickled and raises a `RuntimeError`.
 
 The framework ships four reusable handlers:
 

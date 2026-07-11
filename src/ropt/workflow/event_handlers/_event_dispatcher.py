@@ -45,6 +45,7 @@ class EventDispatcher:
             run_in_thread: If True, dispatch via the thread pool instead of
                            the event loop.
         """
+        handler.register_dispatcher()
         self._handlers.append((handler, run_in_thread))
 
     def put_event(self, event: EnOptEvent) -> None:
