@@ -771,7 +771,67 @@ def test_evaluator_raises_on_concurrent_use() -> None:
     t1.join(timeout=5.0)
 
     assert isinstance(thread2_error[0], RuntimeError)
-    assert "concurrent" in str(thread2_error[0])
+    assert "thread" in str(thread2_error[0])
+
+
+class _RecordingEvaluator(Evaluator):
+    def __init__(self) -> None:
+        super().__init__()
+        self.threads: list[int] = []
+
+    def eval(self, _variables: Any, _context: Any) -> EvaluationBatchResult:
+        self.threads.append(threading.get_ident())
+        return EvaluationBatchResult(objectives=np.zeros((1, 1), dtype=np.float64))
+
+
+def test_evaluator_pins_to_first_thread_when_staggered() -> None:
+    evaluator = _RecordingEvaluator()
+
+    # First use finishes on a worker thread; a later call from a different
+    # thread is rejected even though the two calls do not overlap.
+    _run_in_thread(lambda: evaluator.eval(None, None))
+    with pytest.raises(RuntimeError, match="thread"):
+        evaluator.eval(None, None)
+
+
+def test_evaluator_allows_repeated_use_on_same_thread() -> None:
+    evaluator = _RecordingEvaluator()
+
+    evaluator.eval(None, None)
+    evaluator.eval(None, None)
+
+    assert len(evaluator.threads) == 2
+
+
+def test_evaluator_pickle_before_use_succeeds_and_resets_owner() -> None:
+    evaluator = _RecordingEvaluator()
+
+    restored = pickle.loads(pickle.dumps(evaluator))  # noqa: S301
+
+    # Usable after unpickling (its lock was recreated) and pins to the first
+    # thread that uses it -- here the main thread, which stays alive.
+    restored.eval(None, None)
+    assert len(restored.threads) == 1
+
+    errors: list[BaseException] = []
+
+    def _use() -> None:
+        try:
+            restored.eval(None, None)
+        except RuntimeError as exc:
+            errors.append(exc)
+
+    _run_in_thread(_use)
+
+    assert len(errors) == 1
+    assert "thread" in str(errors[0])
+
+
+def test_evaluator_pickle_after_use_raises() -> None:
+    evaluator = _RecordingEvaluator()
+    evaluator.eval(None, None)
+    with pytest.raises(RuntimeError, match="after it has been used"):
+        pickle.dumps(evaluator)
 
 
 def test_event_handler_raises_on_concurrent_use() -> None:
@@ -826,7 +886,7 @@ class _RecordingHandler(EventHandler):
         self.threads.append(threading.get_ident())
 
 
-def _run_in_thread(target: Callable[[], None]) -> None:
+def _run_in_thread(target: Callable[[], object]) -> None:
     thread = threading.Thread(target=target)
     thread.start()
     thread.join(timeout=5.0)

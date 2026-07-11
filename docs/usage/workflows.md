@@ -458,6 +458,24 @@ the [next section](parallel.md):
 | [`CachedEvaluator`][ropt.workflow.evaluators.CachedEvaluator]                  | Wraps another evaluator, caching results by variable vector.                                                                  |
 | [`ParallelEvaluator`][ropt.workflow.evaluators.ParallelEvaluator]              | Parallel evaluation via an [`Executor`][ropt.workflow.executors.Executor] — see [Parallel Evaluation](parallel.md).           |
 
+!!! warning "Evaluators are single-thread objects"
+
+    Like event handlers, an evaluator binds to the thread that first calls its
+    `eval` method and raises a `RuntimeError` if used from another thread —
+    even for a later, non-overlapping call. A single evaluator instance may be
+    shared by several compute steps as long as they run one after another on
+    the same thread (for example, reusing one `FunctionEvaluator` across nested
+    inner optimizations to keep batch ids counting). Do **not** share one
+    evaluator across steps that run in parallel on different threads; give each
+    parallel step its own evaluator. Note that the parallelism of
+    [`ParallelEvaluator`][ropt.workflow.evaluators.ParallelEvaluator] happens
+    *below* `eval` — it dispatches tasks to an executor, so its own `eval` is
+    still called on a single thread.
+
+    An evaluator can be pickled before it is first used (e.g. when shipped to a
+    worker process), but pickling one that has already run raises a
+    `RuntimeError`.
+
 ### BatchEvaluator
 
 [`BatchEvaluator`][ropt.workflow.evaluators.BatchEvaluator] defers to a callable
