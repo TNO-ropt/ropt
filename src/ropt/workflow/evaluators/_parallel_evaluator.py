@@ -14,6 +14,7 @@ from ropt.evaluation import EvaluationBatchContext, EvaluationBatchResult
 from ropt.exceptions import Abort, ExecutorFailure
 from ropt.workflow.executors import Executor, ResultsQueue, Task
 
+from ._common import _active_evaluations, _scatter_result
 from ._counter import BatchIdCounter
 from .base import (
     EvaluationFunctionCallback,
@@ -180,22 +181,9 @@ class ParallelEvaluator(Evaluator):
         batch_id: int,
     ) -> None:
         bundle: list[tuple[NDArray[np.float64], EvaluationFunctionContext]] = []
-        for eval_idx, realization in enumerate(context.realizations):
+        for eval_idx, function_context in _active_evaluations(context, batch_id):
             if not self._executor.is_running():
                 break
-            if context.active is not None and not context.active[eval_idx]:
-                continue
-            perturbation = (
-                -1
-                if context.perturbations is None
-                else int(context.perturbations[eval_idx])
-            )
-            function_context = EvaluationFunctionContext(
-                realization=int(realization),
-                perturbation=perturbation,
-                batch_id=batch_id,
-                eval_idx=eval_idx,
-            )
             bundle.append((variables[eval_idx, :], function_context))
             if self._bundle_size and len(bundle) >= self._bundle_size:
                 await self._executor.task_queue.put(
@@ -247,21 +235,13 @@ def _handle_result(
     assert isinstance(task.result, list)
     assert len(task.result) == len(bundle)
     for (_, function_context), result in zip(bundle, task.result, strict=True):
-        eval_idx = function_context.eval_idx
         assert isinstance(result, EvaluationFunctionResult)
-        results[eval_idx, :objective_count] = result.objectives
-        if result.constraints is not None:
-            results[eval_idx, objective_count:] = result.constraints
-        if result.metadata is not None:
-            for key, value in result.metadata.items():
-                if key not in metadata:
-                    metadata[key] = np.zeros(
-                        eval_count,
-                        dtype=(
-                            np.array(value).dtype
-                            if isinstance(value, (int, float, complex, np.number))
-                            else object
-                        ),
-                    )
-                metadata[key][eval_idx] = value
+        _scatter_result(
+            function_context.eval_idx,
+            result,
+            results,
+            metadata,
+            objective_count,
+            eval_count,
+        )
     return len(bundle)
