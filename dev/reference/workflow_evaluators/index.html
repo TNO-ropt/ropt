@@ -2951,11 +2951,17 @@ returning an
   " href="../evaluation/#ropt.evaluation.EvaluationBatchResult"><code>EvaluationBatchResult</code></a>.</p>
 
 
-<details class="warning" open>
-  <summary>Warning</summary>
-  <p>Evaluator instances must not be called concurrently from multiple
-threads. For parallel workflows use a dispatching evaluator such as
-<a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.ParallelEvaluator" href="#ropt.workflow.evaluators.ParallelEvaluator"><code>ParallelEvaluator</code></a>.</p>
+<details class="note" open>
+  <summary>Note</summary>
+  <p>Evaluators are single-thread objects. An evaluator binds to the thread
+that first calls <code>eval</code> and raises a <code>RuntimeError</code> if called from
+another thread. The same instance may be reused by several compute
+steps, as long as they run one after another on that thread. For
+parallel workflows use a dispatching evaluator such as
+<a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.ParallelEvaluator" href="#ropt.workflow.evaluators.ParallelEvaluator"><code>ParallelEvaluator</code></a>, which
+dispatches tasks to an executor rather than sharing an evaluator across
+threads. See <a href="../../usage/workflows/#evaluators">Optimization Workflows</a>
+for usage and pitfalls.</p>
 </details>
 
 
@@ -3121,7 +3127,8 @@ threads. For parallel workflows use a dispatching evaluator such as
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If this evaluator is already in use by another thread.</p>
+                <p>If called from a thread other than the one that first
+          used this evaluator.</p>
               </div>
             </td>
           </tr>

@@ -3487,6 +3487,23 @@ the <a href="../parallel/">next section</a>:</p>
 </tr>
 </tbody>
 </table>
+<div class="admonition warning">
+<p class="admonition-title">Evaluators are single-thread objects</p>
+<p>Like event handlers, an evaluator binds to the thread that first calls its
+<code>eval</code> method and raises a <code>RuntimeError</code> if used from another thread —
+even for a later, non-overlapping call. A single evaluator instance may be
+shared by several compute steps as long as they run one after another on
+the same thread (for example, reusing one <code>FunctionEvaluator</code> across nested
+inner optimizations to keep batch ids counting). Do <strong>not</strong> share one
+evaluator across steps that run in parallel on different threads; give each
+parallel step its own evaluator. Note that the parallelism of
+<a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.ParallelEvaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.ParallelEvaluator"><code>ParallelEvaluator</code></a> happens
+<em>below</em> <code>eval</code> — it dispatches tasks to an executor, so its own <code>eval</code> is
+still called on a single thread.</p>
+<p>An evaluator can be pickled before it is first used (e.g. when shipped to a
+worker process), but pickling one that has already run raises a
+<code>RuntimeError</code>.</p>
+</div>
 <h3 id="batchevaluator">BatchEvaluator</h3>
 <p><a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.BatchEvaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.BatchEvaluator"><code>BatchEvaluator</code></a> defers to a callable
 callback that receives the full 2-D variable matrix and an
