@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import threading
 from importlib.util import find_spec
 from typing import TYPE_CHECKING, Any, Final, Literal
 
@@ -250,38 +251,53 @@ class _ResultsTable:
         self._results_type = table_type
         self._domain = domain
         self._frames: list[pd.DataFrame] = []
+        self._lock = threading.Lock()
+
+    def __getstate__(self) -> dict[str, Any]:
+        state = self.__dict__.copy()
+        state.pop("_lock", None)
+        return state
+
+    def __setstate__(self, state: dict[str, Any]) -> None:
+        self.__dict__.update(state)
+        self._lock = threading.Lock()
 
     @property
     def domain(self) -> DomainType:
         return self._domain
 
     def add_column(self, name: str, title: str) -> None:
-        self._columns[name] = title
+        with self._lock:
+            self._columns[name] = title
 
     def add_results(self, results: Sequence[Results]) -> bool:
-        frame = results_to_dataframe(
-            results, set(self._columns), result_type=self._results_type
-        )
-        if not frame.empty:
+        with self._lock:
+            columns = set(self._columns)
+        frame = results_to_dataframe(results, columns, result_type=self._results_type)
+        if frame.empty:
+            return False
+        with self._lock:
             self._frames.append(frame)
-            return True
-        return False
+        return True
 
     def get_table(self, sep: str) -> pd.DataFrame:
-        if not self._frames:
+        with self._lock:
+            frames = list(self._frames)
+            columns = dict(self._columns)
+        if not frames:
             return pd.DataFrame()
-        data = pd.concat(self._frames).reset_index()
+        data = pd.concat(frames).reset_index()
         reordered_columns = [
             name
-            for key in self._columns
+            for key in columns
             for name in data.columns.to_numpy()
             if name == key or (isinstance(name, tuple) and name[0] == key)
         ]
         data = data.reindex(columns=reordered_columns)
         renamed_columns = [
-            (str(self._columns[name[0]]), *(str(item) for item in name[1:]))
+            (str(columns[name[0]]), *(str(item) for item in name[1:]))
             if isinstance(name, tuple)
-            else self._columns[name]
+            else columns[name]
             for name in data.columns.to_numpy()
         ]
         data.columns = [

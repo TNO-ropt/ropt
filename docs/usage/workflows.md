@@ -235,6 +235,23 @@ Mixing the two, or registering with a second dispatcher, raises a
     compute step is shipped to a worker process. A handler that has already
     processed an event cannot be pickled and raises a `RuntimeError`.
 
+!!! note "Reading results is not thread-guarded"
+
+    Handler state exposed through `handler[key]` is deliberately *not* bound to
+    a thread, so results can be read after a run from any thread. Read a
+    handler's stored values only **after its producer has finished**: after
+    `step.run()` returns for a directly-attached handler, or after the
+    [`EventDispatcher`][ropt.workflow.event_handlers.EventDispatcher] has been
+    cancelled and its task group has exited for a handler registered with a
+    dispatcher. Both are synchronization points that make the latest values
+    visible.
+
+    Reading a handler's state *while it is still processing events on another
+    thread* returns a valid object, but possibly a stale one — do not rely on it
+    for the latest result. For live progress during a parallel run, use a
+    [`CallbackHandler`][ropt.workflow.event_handlers.CallbackHandler] (which is
+    pushed each event) rather than polling another handler's state.
+
 The framework ships four reusable handlers:
 
 | Handler                                                                  | Purpose                                                                |
