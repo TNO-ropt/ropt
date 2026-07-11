@@ -913,6 +913,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#using-handlers-safely" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Using handlers safely
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#resultshandler" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2577,6 +2588,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#using-handlers-safely" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Using handlers safely
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#resultshandler" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3152,16 +3174,46 @@ why the step finished:</p>
 <h2 id="event-handlers">Event handlers</h2>
 <p>Event handlers are attached to a compute step via its <code>add_event_handler</code>
 method. Once attached, the handler receives every event the step emits.</p>
+<h3 id="using-handlers-safely">Using handlers safely</h3>
+<p>An event handler is a stateful, <strong>single-thread</strong> object. There are two ways to
+drive one, and they are mutually exclusive:</p>
+<ul>
+<li>
+<p><strong>Attached directly to compute steps.</strong> A handler may be attached to several
+  compute steps, and a single instance can accumulate state across them — as
+  long as those steps run one after another on the same thread. The first time
+  the handler processes an event it binds to the thread it ran on; a later call
+  from a <em>different</em> thread raises a <code>RuntimeError</code>.</p>
+</li>
+<li>
+<p><strong>Registered with an
+  <a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.EventDispatcher" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.EventDispatcher"><code>EventDispatcher</code></a>.</strong> When work
+  runs on several threads at once (for example, <code>ParallelEvaluator</code> with a
+  multi-worker <code>ThreadingExecutor</code>), route events through a dispatcher. It
+  receives events from any thread and delivers them to its handlers one at a
+  time, so a single handler can safely aggregate results produced on many
+  threads. See <a href="../parallel/#event-dispatcher">Event Dispatcher</a> for the pattern.</p>
+</li>
+</ul>
+<p>A handler is owned by <strong>either</strong> one dispatcher <strong>or</strong> one-or-more compute
+steps — never both — and may be registered with <strong>at most one</strong> dispatcher.
+Mixing the two, or registering with a second dispatcher, raises a
+<code>RuntimeError</code>.</p>
 <div class="admonition warning">
-<p class="admonition-title">Thread safety in parallel workflows</p>
-<p>Event handlers are <strong>not thread-safe</strong> and must not be shared across
-concurrent compute steps — doing so raises a <code>RuntimeError</code>. When compute
-steps run concurrently in worker threads (e.g. when using <code>ParallelEvaluator</code>
-with a <code>ThreadingExecutor</code> that has multiple workers), any handler shared
-across steps must be registered on an
-<a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.EventDispatcher" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.EventDispatcher"><code>EventDispatcher</code></a> rather than attached
-directly to the compute steps. See
-<a href="../parallel/#event-dispatcher">Event Dispatcher</a> for the required pattern.</p>
+<p class="admonition-title">Do not share a handler across parallel steps</p>
+<p>Never attach the same handler instance to compute steps that may run at the
+same time on different threads; the moment the second thread uses it, a
+<code>RuntimeError</code> is raised. Give each parallel step its own handler, or route
+events through an <code>EventDispatcher</code>.</p>
+<p>Note that this is enforced by binding the handler to its first thread, so it
+also rejects a handler that is reused on a <em>different</em> thread later, even
+when the two uses do not actually overlap.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Pickling</p>
+<p>A handler can be pickled before it is first used — for example, when a
+compute step is shipped to a worker process. A handler that has already
+processed an event cannot be pickled and raises a <code>RuntimeError</code>.</p>
 </div>
 <p>The framework ships four reusable handlers:</p>
 <table>

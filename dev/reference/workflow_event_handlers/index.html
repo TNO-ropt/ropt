@@ -1898,6 +1898,28 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#ropt.workflow.event_handlers.EventHandler.register_dispatcher" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        register_dispatcher
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.workflow.event_handlers.EventHandler.register_compute_step" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        register_compute_step
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ropt.workflow.event_handlers.EventHandler.event_types" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2686,6 +2708,28 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#ropt.workflow.event_handlers.EventHandler.register_dispatcher" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        register_dispatcher
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.workflow.event_handlers.EventHandler.register_compute_step" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        register_compute_step
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ropt.workflow.event_handlers.EventHandler.event_types" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3191,11 +3235,17 @@ method. When the compute step emits an event, the <code>handle_event</code> meth
 each attached handler is invoked, allowing it to process the event.</p>
 
 
-<details class="warning" open>
-  <summary>Warning</summary>
-  <p>Event handler instances must not be called concurrently from multiple
-threads. Do not attach the same handler instance to compute steps that
-run in parallel.</p>
+<details class="note" open>
+  <summary>Note</summary>
+  <p>Event handlers are single-thread objects. A handler attached to compute
+steps binds to the thread that first calls <code>handle_event</code> and raises a
+<code>RuntimeError</code> if called from another thread. To receive events from
+multiple threads, register it with an
+<a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.EventDispatcher" href="#ropt.workflow.event_handlers.EventDispatcher"><code>EventDispatcher</code></a>, which
+serializes the calls. A handler may be owned by at most one dispatcher,
+or by one or more compute steps, but not both. See
+<a href="../../usage/workflows/#event-handlers">Optimization Workflows</a> for usage
+and pitfalls.</p>
 </details>
 
 
@@ -3229,6 +3279,103 @@ run in parallel.</p>
     <div class="doc doc-contents ">
 
         <p>Initialize the EventHandler.</p>
+
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.workflow.event_handlers.EventHandler.register_dispatcher" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">register_dispatcher</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">register_dispatcher</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Mark this handler as owned by an event dispatcher.</p>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError">RuntimeError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the handler is already registered with a dispatcher
+          or attached to a compute step.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.workflow.event_handlers.EventHandler.register_compute_step" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">register_compute_step</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">register_compute_step</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Mark this handler as owned by one or more compute steps.</p>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError">RuntimeError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the handler is registered with a dispatcher.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
     </div>
