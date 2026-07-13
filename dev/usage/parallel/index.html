@@ -957,6 +957,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#nested-workflows-and-process-boundaries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Nested workflows and process boundaries
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#where-to-next" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2427,6 +2438,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#nested-workflows-and-process-boundaries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Nested workflows and process boundaries
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#where-to-next" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2764,6 +2786,14 @@ current directory in a <code>"threading"</code> executor affects all threads; in
 <code>"multiprocessing"</code> and <code>"hpc"</code> executors it can be changed safely per
 task.</p>
 </div>
+<div class="admonition note">
+<p class="admonition-title">No event handling across process boundaries</p>
+<p>Functions dispatched to a <code>"multiprocessing"</code> or <code>"hpc"</code> executor run in a
+separate process. If such a function runs a compute step, that step's event
+handlers stay in the worker process and cannot deliver events to a
+dispatcher or handler in the host process — return results as data instead.
+See <a href="#event-dispatcher">Event handling is a single-process mechanism</a>.</p>
+</div>
 <h2 id="event-dispatcher">Event dispatcher</h2>
 <p>When multiple compute steps run concurrently in worker threads, their event
 handlers are called from multiple threads simultaneously. <strong>Event handlers must
@@ -2805,6 +2835,31 @@ regular event handler that can be attached to a compute step. When invoked from
 the worker thread it puts the event on the dispatcher's queue via a thread-safe
 call. The dispatcher's processing loop then dispatches it to the registered
 handlers.</p>
+<div class="admonition warning">
+<p class="admonition-title">Event handling is a single-process mechanism</p>
+<p>An <a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.EventDispatcher" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.EventDispatcher"><code>EventDispatcher</code></a> and
+every <a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.EventHandler" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.EventHandler"><code>EventHandler</code></a> live in
+the process that created them. <code>EventForwardHandler</code> delivers events by
+calling the dispatcher's <code>put_event</code>, which schedules them onto its event
+loop with <code>call_soon_threadsafe</code> — a <em>thread</em>-safe call, not a
+<em>process</em>-safe one. A dispatcher reached from another process has no live
+loop, so the forwarded event is <strong>silently dropped</strong>.</p>
+<p>Event handlers can therefore only observe events emitted <strong>within their own
+process</strong>. Any compute step executed out-of-process — for example a whole
+optimization sent to a
+<a class="autorefs autorefs-internal" title="            ropt.workflow.executors.MultiprocessingExecutor" href="../../reference/workflow_executors/#ropt.workflow.executors.MultiprocessingExecutor"><code>MultiprocessingExecutor</code></a>
+or <a class="autorefs autorefs-internal" title="            ropt.workflow.executors.HPCExecutor" href="../../reference/workflow_executors/#ropt.workflow.executors.HPCExecutor"><code>HPCExecutor</code></a>, whether via
+<a href="#dispatching-arbitrary-tasks"><code>dispatch_tasks</code></a> or as the enclosing layer
+of a nested workflow — may attach handlers local to that worker process,
+but those handlers cannot deliver events to a dispatcher or handler in the
+host process. To collect information from out-of-process steps, return it as
+data (the task's return value, or result metadata) rather than through
+shared handlers.</p>
+<p>This is why process- and HPC-based parallelism belongs at the innermost
+(leaf) evaluations — which return data and emit no events — while any layer
+that drives event-producing compute steps must run in-process. See
+<a href="#nested-workflows-and-process-boundaries">Nested workflows and process boundaries</a>.</p>
+</div>
 <h3 id="thread-based-dispatch">Thread-based dispatch</h3>
 <p>By default, handlers registered with <code>EventDispatcher</code> are called directly in
 the asyncio event loop's thread. This is efficient for handlers that only do
@@ -2818,6 +2873,45 @@ registering it:</p>
 <code>set_callback</code>) are common cases where this is needed. When multiple handlers
 with <code>run_in_thread=True</code> match the same event they are dispatched <strong>in
 parallel</strong> via <code>asyncio.gather</code> — they do not block each other.</p>
+<h2 id="nested-workflows-and-process-boundaries">Nested workflows and process boundaries</h2>
+<p>A <em>nested</em> workflow is a compute step whose evaluation function itself runs
+another compute step — for example an outer optimizer whose objective is the
+outcome of an inner optimization. As noted in <a href="#why-asyncio">Why asyncio?</a>,
+several concurrent steps can share one asyncio event loop, and usually shared
+<a class="autorefs autorefs-internal" title="            ropt.workflow.executors.Executor" href="../../reference/workflow_executors/#ropt.workflow.executors.Executor"><code>Executor</code></a>s and an
+<a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.EventDispatcher" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.EventDispatcher"><code>EventDispatcher</code></a> as well. All
+of these live <strong>in a single process</strong>.</p>
+<p>This is a consequence of the general rule that
+<a href="#event-dispatcher">event handling is a single-process mechanism</a>: it places a
+hard constraint on where each layer of a nested workflow may run:</p>
+<div class="admonition warning">
+<p class="admonition-title">The enclosing layer of a nested workflow must run in-process</p>
+<p>The step that <em>runs</em> an inner workflow must execute in the same process as
+the shared event loop — dispatch it via a
+<a class="autorefs autorefs-internal" title="            ropt.workflow.executors.ThreadingExecutor" href="../../reference/workflow_executors/#ropt.workflow.executors.ThreadingExecutor"><code>ThreadingExecutor</code></a>, or run it
+synchronously. It cannot run inside a
+<a class="autorefs autorefs-internal" title="            ropt.workflow.executors.MultiprocessingExecutor" href="../../reference/workflow_executors/#ropt.workflow.executors.MultiprocessingExecutor"><code>MultiprocessingExecutor</code></a>
+or <a class="autorefs autorefs-internal" title="            ropt.workflow.executors.HPCExecutor" href="../../reference/workflow_executors/#ropt.workflow.executors.HPCExecutor"><code>HPCExecutor</code></a> worker, because a
+subprocess or HPC job has no access to the live loop, executors, or
+dispatcher. An inner
+<a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.ParallelEvaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.ParallelEvaluator"><code>ParallelEvaluator</code></a> running
+there would find <code>executor.loop is None</code> and raise <code>Abort</code>, and any events
+it emits would never reach the main-process dispatcher.</p>
+</div>
+<p>Process- and HPC-based parallelism therefore belongs at the <strong>innermost (leaf)
+evaluations</strong>, where the actual model runs — not at a layer that itself drives a
+nested workflow. The nested examples follow exactly this shape:</p>
+<ul>
+<li><a href="https://github.com/TNO-ropt/ropt/blob/main/examples/nested.py"><code>examples/nested.py</code></a>
+  — outer and inner optimizations run sequentially in the main process via
+  <code>FunctionEvaluator</code>.</li>
+<li><a href="https://github.com/TNO-ropt/ropt/blob/main/examples/nested_multiprocess.py"><code>examples/nested_multiprocess.py</code></a>
+  — outer optimizations run on a <code>ThreadingExecutor</code> (in-process); only the
+  inner leaf evaluations run on a <code>MultiprocessingExecutor</code>.</li>
+<li><a href="https://github.com/TNO-ropt/ropt/blob/main/examples/nested_hpc.py"><code>examples/nested_hpc.py</code></a>
+  — same pattern, with the inner leaf evaluations submitted to the cluster via
+  <code>HPCExecutor</code>.</li>
+</ul>
 <h2 id="where-to-next">Where to next</h2>
 <ul>
 <li>Wire a parallel evaluator into a workflow:

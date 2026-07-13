@@ -3512,7 +3512,10 @@ shared by several compute steps as long as they run one after another on
 the same thread (for example, reusing one <code>FunctionEvaluator</code> across nested
 inner optimizations to keep batch ids counting). Do <strong>not</strong> share one
 evaluator across steps that run in parallel on different threads; give each
-parallel step its own evaluator. Note that the parallelism of
+parallel step its own evaluator. For the constraints on where each layer of
+a nested workflow may run, see
+<a href="../parallel/#nested-workflows-and-process-boundaries">Nested workflows and process boundaries</a>.
+Note that the parallelism of
 <a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.ParallelEvaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.ParallelEvaluator"><code>ParallelEvaluator</code></a> happens
 <em>below</em> <code>eval</code> — it dispatches tasks to an executor, so its own <code>eval</code> is
 still called on a single thread.</p>
