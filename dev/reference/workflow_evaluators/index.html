@@ -2953,11 +2953,12 @@ returning an
 
 <details class="note" open>
   <summary>Note</summary>
-  <p>Evaluators are single-thread objects. An evaluator binds to the thread
-that first calls <code>eval</code> and raises a <code>RuntimeError</code> if called from
-another thread. The same instance may be reused by several compute
-steps, as long as they run one after another on that thread. For
-parallel workflows use a dispatching evaluator such as
+  <p>Evaluators are not safe for concurrent use. An evaluator raises a
+<code>RuntimeError</code> if two threads execute its <code>eval</code> method at the same
+time. Serial reuse is allowed: the same instance may be reused by
+several compute steps, including on different threads, as long as each
+call fully completes before the next begins. For parallel workflows use
+a dispatching evaluator such as
 <a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.ParallelEvaluator" href="#ropt.workflow.evaluators.ParallelEvaluator"><code>ParallelEvaluator</code></a>, which
 dispatches tasks to an executor rather than sharing an evaluator across
 threads. See <a href="../../usage/workflows/#evaluators">Optimization Workflows</a>
@@ -3127,8 +3128,8 @@ for usage and pitfalls.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If called from a thread other than the one that first
-          used this evaluator.</p>
+                <p>If another thread is executing this evaluator's <code>eval</code>
+          method at the same time.</p>
               </div>
             </td>
           </tr>

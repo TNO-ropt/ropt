@@ -3237,10 +3237,13 @@ each attached handler is invoked, allowing it to process the event.</p>
 
 <details class="note" open>
   <summary>Note</summary>
-  <p>Event handlers are single-thread objects. A handler attached to compute
-steps binds to the thread that first calls <code>handle_event</code> and raises a
-<code>RuntimeError</code> if called from another thread. To receive events from
-multiple threads, register it with an
+  <p>Event handlers are not safe for concurrent use. A handler attached to
+compute steps raises a <code>RuntimeError</code> if two threads execute its
+<code>handle_event</code> method at the same time. Serial reuse across threads is
+allowed, as long as each call completes before the next begins. A
+handler must not run a compute step or otherwise cause new events to be
+emitted while processing an event: <code>handle_event</code> is not re-entrant. To
+receive events from multiple threads concurrently, register it with an
 <a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.EventDispatcher" href="#ropt.workflow.event_handlers.EventDispatcher"><code>EventDispatcher</code></a>, which
 serializes the calls. A handler may be owned by at most one dispatcher,
 or by one or more compute steps, but not both. See
