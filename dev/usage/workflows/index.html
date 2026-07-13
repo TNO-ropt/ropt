@@ -3175,15 +3175,16 @@ why the step finished:</p>
 <p>Event handlers are attached to a compute step via its <code>add_event_handler</code>
 method. Once attached, the handler receives every event the step emits.</p>
 <h3 id="using-handlers-safely">Using handlers safely</h3>
-<p>An event handler is a stateful, <strong>single-thread</strong> object. There are two ways to
-drive one, and they are mutually exclusive:</p>
+<p>An event handler is a stateful object that is <strong>not safe for concurrent use</strong>.
+There are two ways to drive one, and they are mutually exclusive:</p>
 <ul>
 <li>
 <p><strong>Attached directly to compute steps.</strong> A handler may be attached to several
   compute steps, and a single instance can accumulate state across them — as
-  long as those steps run one after another on the same thread. The first time
-  the handler processes an event it binds to the thread it ran on; a later call
-  from a <em>different</em> thread raises a <code>RuntimeError</code>.</p>
+  long as those steps do not run it concurrently. Serial reuse is fine, even
+  across different threads: each <code>handle_event</code> call must fully complete before
+  the next begins. If two threads execute <code>handle_event</code> at the same time, a
+  <code>RuntimeError</code> is raised.</p>
 </li>
 <li>
 <p><strong>Registered with an
@@ -3202,12 +3203,13 @@ Mixing the two, or registering with a second dispatcher, raises a
 <div class="admonition warning">
 <p class="admonition-title">Do not share a handler across parallel steps</p>
 <p>Never attach the same handler instance to compute steps that may run at the
-same time on different threads; the moment the second thread uses it, a
-<code>RuntimeError</code> is raised. Give each parallel step its own handler, or route
-events through an <code>EventDispatcher</code>.</p>
-<p>Note that this is enforced by binding the handler to its first thread, so it
-also rejects a handler that is reused on a <em>different</em> thread later, even
-when the two uses do not actually overlap.</p>
+same time on different threads; the moment a second thread executes it while
+the first is still inside <code>handle_event</code>, a <code>RuntimeError</code> is raised. Give
+each parallel step its own handler, or route events through an
+<code>EventDispatcher</code>.</p>
+<p>Serial reuse is allowed: the same handler may be reused across steps that
+run one after another, even on different threads, as long as their calls
+never overlap.</p>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Pickling</p>
@@ -3504,16 +3506,15 @@ the <a href="../parallel/">next section</a>:</p>
 </tbody>
 </table>
 <div class="admonition warning">
-<p class="admonition-title">Evaluators are single-thread objects</p>
-<p>Like event handlers, an evaluator binds to the thread that first calls its
-<code>eval</code> method and raises a <code>RuntimeError</code> if used from another thread —
-even for a later, non-overlapping call. A single evaluator instance may be
-shared by several compute steps as long as they run one after another on
-the same thread (for example, reusing one <code>FunctionEvaluator</code> across nested
-inner optimizations to keep batch ids counting). Do <strong>not</strong> share one
-evaluator across steps that run in parallel on different threads; give each
-parallel step its own evaluator. For the constraints on where each layer of
-a nested workflow may run, see
+<p class="admonition-title">Evaluators are not safe for concurrent use</p>
+<p>Like event handlers, an evaluator raises a <code>RuntimeError</code> if two threads
+execute its <code>eval</code> method at the same time. Serial reuse is allowed: a
+single evaluator instance may be shared by several compute steps that run
+one after another, even on different threads (for example, reusing one
+<code>FunctionEvaluator</code> across nested inner optimizations to keep batch ids
+counting). Do <strong>not</strong> share one evaluator across steps that run in parallel;
+give each parallel step its own evaluator. For the constraints on where each
+layer of a nested workflow may run, see
 <a href="../parallel/#nested-workflows-and-process-boundaries">Nested workflows and process boundaries</a>.
 Note that the parallelism of
 <a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.ParallelEvaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.ParallelEvaluator"><code>ParallelEvaluator</code></a> happens
