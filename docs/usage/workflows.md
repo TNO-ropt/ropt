@@ -196,14 +196,15 @@ method. Once attached, the handler receives every event the step emits.
 
 ### Using handlers safely
 
-An event handler is a stateful, **single-thread** object. There are two ways to
-drive one, and they are mutually exclusive:
+An event handler is a stateful object that is **not safe for concurrent use**.
+There are two ways to drive one, and they are mutually exclusive:
 
 - **Attached directly to compute steps.** A handler may be attached to several
   compute steps, and a single instance can accumulate state across them — as
-  long as those steps run one after another on the same thread. The first time
-  the handler processes an event it binds to the thread it ran on; a later call
-  from a *different* thread raises a `RuntimeError`.
+  long as those steps do not run it concurrently. Serial reuse is fine, even
+  across different threads: each `handle_event` call must fully complete before
+  the next begins. If two threads execute `handle_event` at the same time, a
+  `RuntimeError` is raised.
 
 - **Registered with an
   [`EventDispatcher`][ropt.workflow.event_handlers.EventDispatcher].** When work
@@ -221,13 +222,14 @@ Mixing the two, or registering with a second dispatcher, raises a
 !!! warning "Do not share a handler across parallel steps"
 
     Never attach the same handler instance to compute steps that may run at the
-    same time on different threads; the moment the second thread uses it, a
-    `RuntimeError` is raised. Give each parallel step its own handler, or route
-    events through an `EventDispatcher`.
+    same time on different threads; the moment a second thread executes it while
+    the first is still inside `handle_event`, a `RuntimeError` is raised. Give
+    each parallel step its own handler, or route events through an
+    `EventDispatcher`.
 
-    Note that this is enforced by binding the handler to its first thread, so it
-    also rejects a handler that is reused on a *different* thread later, even
-    when the two uses do not actually overlap.
+    Serial reuse is allowed: the same handler may be reused across steps that
+    run one after another, even on different threads, as long as their calls
+    never overlap.
 
 !!! note "Pickling"
 
@@ -475,17 +477,16 @@ the [next section](parallel.md):
 | [`CachedEvaluator`][ropt.workflow.evaluators.CachedEvaluator]                  | Wraps another evaluator, caching results by variable vector.                                                                  |
 | [`ParallelEvaluator`][ropt.workflow.evaluators.ParallelEvaluator]              | Parallel evaluation via an [`Executor`][ropt.workflow.executors.Executor] — see [Parallel Evaluation](parallel.md).           |
 
-!!! warning "Evaluators are single-thread objects"
+!!! warning "Evaluators are not safe for concurrent use"
 
-    Like event handlers, an evaluator binds to the thread that first calls its
-    `eval` method and raises a `RuntimeError` if used from another thread —
-    even for a later, non-overlapping call. A single evaluator instance may be
-    shared by several compute steps as long as they run one after another on
-    the same thread (for example, reusing one `FunctionEvaluator` across nested
-    inner optimizations to keep batch ids counting). Do **not** share one
-    evaluator across steps that run in parallel on different threads; give each
-    parallel step its own evaluator. For the constraints on where each layer of
-    a nested workflow may run, see
+    Like event handlers, an evaluator raises a `RuntimeError` if two threads
+    execute its `eval` method at the same time. Serial reuse is allowed: a
+    single evaluator instance may be shared by several compute steps that run
+    one after another, even on different threads (for example, reusing one
+    `FunctionEvaluator` across nested inner optimizations to keep batch ids
+    counting). Do **not** share one evaluator across steps that run in parallel;
+    give each parallel step its own evaluator. For the constraints on where each
+    layer of a nested workflow may run, see
     [Nested workflows and process boundaries](parallel.md#nested-workflows-and-process-boundaries).
     Note that the parallelism of
     [`ParallelEvaluator`][ropt.workflow.evaluators.ParallelEvaluator] happens

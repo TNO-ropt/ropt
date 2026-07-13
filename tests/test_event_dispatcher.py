@@ -40,6 +40,30 @@ def test_event_dispatcher_not_running_before_start() -> None:
     assert not EventDispatcher().is_running()
 
 
+def test_event_dispatcher_put_event_before_start_raises(
+    config: dict[str, Any],
+) -> None:
+    context = EnOptContext.model_validate(config)
+    event = EnOptEvent(event_type=EnOptEventType.FINISHED_EVALUATION, context=context)
+    with pytest.raises(RuntimeError, match="not running"):
+        EventDispatcher().put_event(event)
+
+
+@pytest.mark.asyncio
+async def test_event_dispatcher_put_event_after_stop_raises(
+    config: dict[str, Any],
+) -> None:
+    context = EnOptContext.model_validate(config)
+    event = EnOptEvent(event_type=EnOptEventType.FINISHED_EVALUATION, context=context)
+    dispatcher = EventDispatcher()
+    async with asyncio.TaskGroup() as tg:
+        await dispatcher.start(tg)
+        dispatcher.cancel()
+    assert not dispatcher.is_running()
+    with pytest.raises(RuntimeError, match="not running"):
+        dispatcher.put_event(event)
+
+
 @pytest.mark.asyncio
 async def test_event_dispatcher_running_after_start() -> None:
     dispatcher = EventDispatcher()

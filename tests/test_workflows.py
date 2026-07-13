@@ -784,14 +784,15 @@ class _RecordingEvaluator(Evaluator):
         return EvaluationBatchResult(objectives=np.zeros((1, 1), dtype=np.float64))
 
 
-def test_evaluator_pins_to_first_thread_when_staggered() -> None:
+def test_evaluator_allows_staggered_use_on_different_threads() -> None:
     evaluator = _RecordingEvaluator()
 
-    # First use finishes on a worker thread; a later call from a different
-    # thread is rejected even though the two calls do not overlap.
+    # First use finishes on a worker thread; a later, non-overlapping call from
+    # a different thread is allowed because the two calls never overlap.
     _run_in_thread(lambda: evaluator.eval(None, None))
-    with pytest.raises(RuntimeError, match="thread"):
-        evaluator.eval(None, None)
+    evaluator.eval(None, None)
+
+    assert len(evaluator.threads) == 2
 
 
 def test_evaluator_allows_repeated_use_on_same_thread() -> None:
@@ -803,28 +804,28 @@ def test_evaluator_allows_repeated_use_on_same_thread() -> None:
     assert len(evaluator.threads) == 2
 
 
-def test_evaluator_pickle_before_use_succeeds_and_resets_owner() -> None:
+def test_evaluator_pickle_before_use_succeeds_and_resets_state() -> None:
     evaluator = _RecordingEvaluator()
 
     restored = pickle.loads(pickle.dumps(evaluator))  # noqa: S301
 
-    # Usable after unpickling (its lock was recreated) and pins to the first
-    # thread that uses it -- here the main thread, which stays alive.
+    # Usable after unpickling (its lock was recreated).
     restored.eval(None, None)
     assert len(restored.threads) == 1
 
+    # A later, non-overlapping call from a different thread is allowed.
     errors: list[BaseException] = []
 
     def _use() -> None:
         try:
             restored.eval(None, None)
-        except RuntimeError as exc:
+        except RuntimeError as exc:  # pragma: no cover - should not happen
             errors.append(exc)
 
     _run_in_thread(_use)
 
-    assert len(errors) == 1
-    assert "thread" in str(errors[0])
+    assert errors == []
+    assert len(restored.threads) == 2
 
 
 def test_evaluator_pickle_after_use_raises() -> None:
@@ -892,16 +893,17 @@ def _run_in_thread(target: Callable[[], object]) -> None:
     thread.join(timeout=5.0)
 
 
-def test_event_handler_pins_to_first_thread_when_staggered() -> None:
+def test_event_handler_allows_staggered_use_on_different_threads() -> None:
     handler = _RecordingHandler()
     event = object()
 
     # First use happens on a worker thread and finishes completely.
     _run_in_thread(lambda: handler.handle_event(event))  # type: ignore[arg-type]
 
-    # A later, non-overlapping call from a different thread is still rejected.
-    with pytest.raises(RuntimeError, match="thread"):
-        handler.handle_event(event)  # type: ignore[arg-type]
+    # A later, non-overlapping call from a different thread is allowed.
+    handler.handle_event(event)  # type: ignore[arg-type]
+
+    assert len(handler.threads) == 2
 
 
 def test_event_handler_allows_repeated_use_on_same_thread() -> None:
@@ -968,29 +970,28 @@ def test_handler_may_be_attached_to_multiple_compute_steps() -> None:
     handler.register_compute_step()  # allowed, no error
 
 
-def test_pickle_before_use_succeeds_and_resets_owner() -> None:
+def test_pickle_before_use_succeeds_and_resets_state() -> None:
     handler = _RecordingHandler()
 
     restored = pickle.loads(pickle.dumps(handler))  # noqa: S301
 
-    # Usable after unpickling (its lock was recreated) and pins to the first
-    # thread that uses it -- here the main thread, which stays alive.
+    # Usable after unpickling (its lock was recreated).
     restored.handle_event(object())
     assert len(restored.threads) == 1
 
-    # A different, concurrently-live thread is rejected.
+    # A later, non-overlapping call from a different thread is allowed.
     errors: list[BaseException] = []
 
     def _use() -> None:
         try:
             restored.handle_event(object())
-        except RuntimeError as exc:
+        except RuntimeError as exc:  # pragma: no cover - should not happen
             errors.append(exc)
 
     _run_in_thread(_use)
 
-    assert len(errors) == 1
-    assert "thread" in str(errors[0])
+    assert errors == []
+    assert len(restored.threads) == 2
 
 
 def test_pickle_after_use_raises() -> None:

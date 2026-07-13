@@ -53,9 +53,16 @@ class EventDispatcher:
 
         Args:
             event: The event to submit.
+
+        Raises:
+            RuntimeError: If the dispatcher is not running.
         """
-        if self._loop is not None and self._queue is not None:
-            self._loop.call_soon_threadsafe(self._queue.put_nowait, event)
+        if not self._running.is_set():
+            msg = "Cannot submit an event to an EventDispatcher that is not running."
+            raise RuntimeError(msg)
+        assert self._loop is not None
+        assert self._queue is not None
+        self._loop.call_soon_threadsafe(self._queue.put_nowait, event)
 
     def is_running(self) -> bool:
         """Check if the dispatcher is running.

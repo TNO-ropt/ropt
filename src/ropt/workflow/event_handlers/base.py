@@ -43,10 +43,13 @@ class EventHandler(ABC):
     each attached handler is invoked, allowing it to process the event.
 
     Note:
-        Event handlers are single-thread objects. A handler attached to compute
-        steps binds to the thread that first calls `handle_event` and raises a
-        `RuntimeError` if called from another thread. To receive events from
-        multiple threads, register it with an
+        Event handlers are not safe for concurrent use. A handler attached to
+        compute steps raises a `RuntimeError` if two threads execute its
+        `handle_event` method at the same time. Serial reuse across threads is
+        allowed, as long as each call completes before the next begins. A
+        handler must not run a compute step or otherwise cause new events to be
+        emitted while processing an event: `handle_event` is not re-entrant. To
+        receive events from multiple threads concurrently, register it with an
         [`EventDispatcher`][ropt.workflow.event_handlers.EventDispatcher], which
         serializes the calls. A handler may be owned by at most one dispatcher,
         or by one or more compute steps, but not both. See
@@ -68,15 +71,20 @@ class EventHandler(ABC):
                 *,
                 _orig: Any = original,  # noqa: ANN401
             ) -> None:
-                if self._attached_to is not _Attachment.DISPATCHER:
-                    current = threading.get_ident()
+                if self._attached_to is _Attachment.DISPATCHER:
+                    _orig(self, event)
+                    return
+                with self._owner_lock:
+                    if self._in_use:
+                        msg = "The event handler is already running on another thread."
+                        raise RuntimeError(msg)
+                    self._in_use = True
+                    self._used = True
+                try:
+                    _orig(self, event)
+                finally:
                     with self._owner_lock:
-                        if self._owner_thread is None:
-                            self._owner_thread = current
-                        elif self._owner_thread != current:
-                            msg = "This event handler cannot be used from more than one thread."
-                            raise RuntimeError(msg)
-                _orig(self, event)
+                        self._in_use = False
 
             cls.handle_event = _guarded  # type: ignore[method-assign]
 
@@ -84,21 +92,20 @@ class EventHandler(ABC):
         """Initialize the EventHandler."""
         self.__stored_values: dict[str, Any] = {}
         self._attached_to: _Attachment = _Attachment.NONE
-        self._owner_thread: int | None = None
+        self._in_use = False
+        self._used = False
         self._owner_lock = threading.Lock()
 
     def __getstate__(self) -> dict[str, Any]:  # noqa: D105
-        if self._owner_thread is not None:
+        if self._used:
             msg = "Cannot pickle an event handler after it has been used."
             raise RuntimeError(msg)
         state = self.__dict__.copy()
         state.pop("_owner_lock", None)
-        state.pop("_owner_thread", None)
         return state
 
     def __setstate__(self, state: dict[str, Any]) -> None:  # noqa: D105
         self.__dict__.update(state)
-        self._owner_thread = None
         self._owner_lock = threading.Lock()
 
     def register_dispatcher(self) -> None:

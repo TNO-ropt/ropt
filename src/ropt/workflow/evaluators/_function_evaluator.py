@@ -28,9 +28,10 @@ class FunctionEvaluator(Evaluator):
     objective and constraint.
     """
 
-    # NOTE: A single instance of this class may be used from different threads,
-    # e.g. if it is shared by optimizers running in different threads. The
-    # batch ID is protected by a lock.
+    # NOTE: A single instance may be reused serially across threads, e.g. by
+    # optimizers that run one after another on different threads. It must not be
+    # used concurrently: the base class raises if two threads call `eval` at the
+    # same time. The batch ID is protected by a lock.
 
     def __init__(
         self,

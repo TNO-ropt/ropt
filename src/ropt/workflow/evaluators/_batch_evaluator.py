@@ -21,9 +21,10 @@ class BatchEvaluator(Evaluator):
     """An evaluator that defers to a callable callback."""
 
     # NOTE: This class is a thin pass-through to `callback`. A single instance
-    # may be used from multiple threads, but the wrapped callback must itself
-    # be safe to call concurrently for this class to be thread-safe
-    # end-to-end.
+    # may be reused serially across threads, but must not be used concurrently
+    # (the base class raises if two threads call `eval` at the same time). For
+    # concurrent use the wrapped callback must itself be safe to call
+    # concurrently.
 
     def __init__(self, *, callback: EvaluationBatchCallback) -> None:
         """Initialize the BatchEvaluator.

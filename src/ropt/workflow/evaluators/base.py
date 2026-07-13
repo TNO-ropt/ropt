@@ -30,11 +30,12 @@ class Evaluator(ABC):
     [`EvaluationBatchResult`][ropt.evaluation.EvaluationBatchResult].
 
     Note:
-        Evaluators are single-thread objects. An evaluator binds to the thread
-        that first calls `eval` and raises a `RuntimeError` if called from
-        another thread. The same instance may be reused by several compute
-        steps, as long as they run one after another on that thread. For
-        parallel workflows use a dispatching evaluator such as
+        Evaluators are not safe for concurrent use. An evaluator raises a
+        `RuntimeError` if two threads execute its `eval` method at the same
+        time. Serial reuse is allowed: the same instance may be reused by
+        several compute steps, including on different threads, as long as each
+        call fully completes before the next begins. For parallel workflows use
+        a dispatching evaluator such as
         [`ParallelEvaluator`][ropt.workflow.evaluators.ParallelEvaluator], which
         dispatches tasks to an executor rather than sharing an evaluator across
         threads. See [Optimization Workflows](../usage/workflows.md#evaluators)
@@ -56,14 +57,17 @@ class Evaluator(ABC):
                 *,
                 _orig: Any = original,  # noqa: ANN401
             ) -> EvaluationBatchResult:
-                current = threading.get_ident()
                 with self._owner_lock:
-                    if self._owner_thread is None:
-                        self._owner_thread = current
-                    elif self._owner_thread != current:
-                        msg = "This evaluator cannot be used from more than one thread."
+                    if self._in_use:
+                        msg = "The evaluator is already running on another thread."
                         raise RuntimeError(msg)
-                result = _orig(self, variables, context)
+                    self._in_use = True
+                    self._used = True
+                try:
+                    result = _orig(self, variables, context)
+                finally:
+                    with self._owner_lock:
+                        self._in_use = False
                 assert isinstance(result, EvaluationBatchResult)
                 return result
 
@@ -71,21 +75,20 @@ class Evaluator(ABC):
 
     def __init__(self) -> None:
         """Initialize the Evaluator."""
-        self._owner_thread: int | None = None
+        self._in_use = False
+        self._used = False
         self._owner_lock = threading.Lock()
 
     def __getstate__(self) -> dict[str, Any]:  # noqa: D105
-        if self._owner_thread is not None:
+        if self._used:
             msg = "Cannot pickle an evaluator after it has been used."
             raise RuntimeError(msg)
         state = self.__dict__.copy()
         state.pop("_owner_lock", None)
-        state.pop("_owner_thread", None)
         return state
 
     def __setstate__(self, state: dict[str, Any]) -> None:  # noqa: D105
         self.__dict__.update(state)
-        self._owner_thread = None
         self._owner_lock = threading.Lock()
 
     @abstractmethod
@@ -106,8 +109,8 @@ class Evaluator(ABC):
             An evaluation results object containing the calculated values.
 
         Raises:
-            RuntimeError: If called from a thread other than the one that first
-                          used this evaluator.
+            RuntimeError: If another thread is executing this evaluator's `eval`
+                          method at the same time.
         """
 
 
