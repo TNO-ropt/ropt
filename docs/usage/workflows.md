@@ -484,7 +484,10 @@ the [next section](parallel.md):
     the same thread (for example, reusing one `FunctionEvaluator` across nested
     inner optimizations to keep batch ids counting). Do **not** share one
     evaluator across steps that run in parallel on different threads; give each
-    parallel step its own evaluator. Note that the parallelism of
+    parallel step its own evaluator. For the constraints on where each layer of
+    a nested workflow may run, see
+    [Nested workflows and process boundaries](parallel.md#nested-workflows-and-process-boundaries).
+    Note that the parallelism of
     [`ParallelEvaluator`][ropt.workflow.evaluators.ParallelEvaluator] happens
     *below* `eval` — it dispatches tasks to an executor, so its own `eval` is
     still called on a single thread.
