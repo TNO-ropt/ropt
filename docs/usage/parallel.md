@@ -306,7 +306,7 @@ registering it:
 event_dispatcher.add_event_handler(my_handler, run_in_thread=True)
 ```
 
-`CallbackHandler` and `TableHandler` (when a slow callback is set via
+`CallbackHandler` and `DataFrameHandler` (when a slow callback is set via
 `set_callback`) are common cases where this is needed. When multiple handlers
 with `run_in_thread=True` match the same event they are dispatched **in
 parallel** via `asyncio.gather` — they do not block each other.

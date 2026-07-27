@@ -5,8 +5,8 @@ Event handlers attach to a
 it emits. [`ResultsHandler`][ropt.workflow.event_handlers.ResultsHandler] keeps
 the best (or last) result,
 [`HistoryHandler`][ropt.workflow.event_handlers.HistoryHandler] keeps
-everything, [`TableHandler`][ropt.workflow.event_handlers.TableHandler] writes a
-structured table,
+everything, [`DataFrameHandler`][ropt.workflow.event_handlers.DataFrameHandler]
+writes a structured table,
 [`CallbackHandler`][ropt.workflow.event_handlers.CallbackHandler] forwards
 selected events to a user callback, and
 [`EventForwardHandler`][ropt.workflow.event_handlers.EventForwardHandler]
@@ -24,7 +24,7 @@ See [Optimization Workflows](../usage/workflows.md) and
 ::: ropt.workflow.event_handlers.EventHandler
 ::: ropt.workflow.event_handlers.ResultsHandler
 ::: ropt.workflow.event_handlers.HistoryHandler
-::: ropt.workflow.event_handlers.TableHandler
+::: ropt.workflow.event_handlers.DataFrameHandler
 ::: ropt.workflow.event_handlers.CallbackHandler
 ::: ropt.workflow.event_handlers.EventForwardHandler
 ::: ropt.workflow.event_handlers.EventDispatcher

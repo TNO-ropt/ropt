@@ -261,12 +261,12 @@ The framework ships four reusable handlers:
 | [`ResultsHandler`][ropt.workflow.event_handlers.ResultsHandler]          | Keep the best (or last) result. Backs `BasicOptimizer.results`.        |
 | [`HistoryHandler`][ropt.workflow.event_handlers.HistoryHandler]          | Keep every result.                                                     |
 | [`CallbackHandler`][ropt.workflow.event_handlers.CallbackHandler]        | Forward selected event types to a user callback.                       |
-| [`TableHandler`][ropt.workflow.event_handlers.TableHandler]              | Append rows to a structured table per result.                          |
+| [`DataFrameHandler`][ropt.workflow.event_handlers.DataFrameHandler]              | Append rows to a structured table per result.                          |
 | [`EventForwardHandler`][ropt.workflow.event_handlers.EventForwardHandler]| Forward events to an [`EventDispatcher`][ropt.workflow.event_handlers.EventDispatcher] for lock-free dispatch. |
 
 Handlers expose their state through dictionary access (`handler[key]`). By
 convention, `ResultsHandler` and `HistoryHandler` both use the key `"results"` —
-e.g. `result_handler["results"]` or `history_handler["results"]`. `TableHandler`
+e.g. `result_handler["results"]` or `history_handler["results"]`. `DataFrameHandler`
 uses the table name as key — e.g. `table["functions"]`.
 
 ### ResultsHandler
@@ -336,9 +336,9 @@ the dispatcher require no locking.
 
 See [Event Dispatcher](parallel.md#event-dispatcher) for the full pattern.
 
-### TableHandler
+### DataFrameHandler
 
-[`TableHandler`][ropt.workflow.event_handlers.TableHandler] tracks results and
+[`DataFrameHandler`][ropt.workflow.event_handlers.DataFrameHandler] tracks results and
 stores them in pandas DataFrames.
 
 #### Tables

@@ -1,4 +1,4 @@
-"""Tests for TableHandler: column population, ordering, and renaming."""
+"""Tests for DataFrameHandler: column population, ordering, and renaming."""
 
 from __future__ import annotations
 
@@ -19,7 +19,7 @@ from ropt.results import (
 pytest.importorskip("pandas")
 
 from ropt.context import EnOptContext
-from ropt.workflow.event_handlers import TableHandler
+from ropt.workflow.event_handlers import DataFrameHandler
 
 _CONFIG: dict[str, Any] = {
     "variables": {"variable_count": 2},
@@ -99,7 +99,7 @@ def _make_event_two_realizations(batch_id: int) -> EnOptEvent:
 
 
 def test_table_handler_populates_table_from_events() -> None:
-    handler = TableHandler()
+    handler = DataFrameHandler()
     handler.add_table("t", "functions", {"functions.target_objective": "Obj"})
     handler.handle_event(_make_event(1))
     df = handler["t"]
@@ -108,13 +108,13 @@ def test_table_handler_populates_table_from_events() -> None:
 
 
 def test_table_handler_returns_empty_dataframe_before_any_event() -> None:
-    handler = TableHandler()
+    handler = DataFrameHandler()
     handler.add_table("t", "functions", {"functions.target_objective": "Obj"})
     assert handler["t"].empty
 
 
 def test_table_handler_accumulates_multiple_events() -> None:
-    handler = TableHandler()
+    handler = DataFrameHandler()
     handler.add_table("t", "functions", {"functions.target_objective": "Obj"})
     handler.handle_event(_make_event(1, objective=1.0))
     handler.handle_event(_make_event(2, objective=2.0))
@@ -124,7 +124,7 @@ def test_table_handler_accumulates_multiple_events() -> None:
 
 
 def test_table_handler_uses_display_title_not_field_name() -> None:
-    handler = TableHandler()
+    handler = DataFrameHandler()
     handler.add_table(
         "t",
         "functions",
@@ -137,7 +137,7 @@ def test_table_handler_uses_display_title_not_field_name() -> None:
 
 
 def test_table_handler_renames_batch_id_column() -> None:
-    handler = TableHandler()
+    handler = DataFrameHandler()
     handler.add_table(
         "t",
         "functions",
@@ -153,7 +153,7 @@ def test_table_handler_renames_batch_id_column() -> None:
 
 
 def test_table_handler_batch_id_value() -> None:
-    handler = TableHandler()
+    handler = DataFrameHandler()
     handler.add_table(
         "t",
         "functions",
@@ -168,7 +168,7 @@ def test_table_handler_batch_id_value() -> None:
 
 
 def test_table_handler_column_order_objective_before_batch() -> None:
-    handler = TableHandler()
+    handler = DataFrameHandler()
     handler.add_table(
         "t",
         "functions",
@@ -183,7 +183,7 @@ def test_table_handler_column_order_objective_before_batch() -> None:
 
 
 def test_table_handler_column_order_batch_before_objective() -> None:
-    handler = TableHandler()
+    handler = DataFrameHandler()
     handler.add_table(
         "t",
         "functions",
@@ -198,7 +198,7 @@ def test_table_handler_column_order_batch_before_objective() -> None:
 
 
 def test_table_handler_omits_batch_id_when_not_in_columns() -> None:
-    handler = TableHandler()
+    handler = DataFrameHandler()
     handler.add_table(
         "t",
         "functions",
@@ -211,7 +211,7 @@ def test_table_handler_omits_batch_id_when_not_in_columns() -> None:
 
 
 def test_table_handler_includes_realization_when_requested() -> None:
-    handler = TableHandler()
+    handler = DataFrameHandler()
     handler.add_table(
         "t",
         "functions",
@@ -226,7 +226,7 @@ def test_table_handler_includes_realization_when_requested() -> None:
 
 
 def test_table_handler_renames_realization_column() -> None:
-    handler = TableHandler()
+    handler = DataFrameHandler()
     handler.add_table(
         "t",
         "functions",
@@ -242,7 +242,7 @@ def test_table_handler_renames_realization_column() -> None:
 
 
 def test_table_handler_omits_realization_when_not_in_columns() -> None:
-    handler = TableHandler()
+    handler = DataFrameHandler()
     handler.add_table(
         "t",
         "functions",
@@ -255,7 +255,7 @@ def test_table_handler_omits_realization_when_not_in_columns() -> None:
 
 
 def test_table_handler_realization_column_order() -> None:
-    handler = TableHandler()
+    handler = DataFrameHandler()
     handler.add_table(
         "t",
         "functions",
@@ -270,7 +270,7 @@ def test_table_handler_realization_column_order() -> None:
 
 
 def test_table_handler_realization_column_order_first() -> None:
-    handler = TableHandler()
+    handler = DataFrameHandler()
     handler.add_table(
         "t",
         "functions",
