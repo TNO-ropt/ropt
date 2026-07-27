@@ -16,9 +16,9 @@ class SciPyBackendPlugin(BackendPlugin):
     """The SciPy backend plugin class."""
 
     @classmethod
-    def create(cls, backend_config: BackendConfig) -> SciPyBackend:  # noqa: D102
+    def create(cls, backend_config: BackendConfig) -> SciPyBackend:  # ruff: ignore[undocumented-public-method]
         return SciPyBackend(backend_config)
 
     @classmethod
-    def is_supported(cls, method: str) -> bool:  # noqa: D102
+    def is_supported(cls, method: str) -> bool:  # ruff: ignore[undocumented-public-method]
         return method.lower() in (SUPPORTED_SCIPY_METHODS | {"default"})

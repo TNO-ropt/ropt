@@ -44,10 +44,10 @@ class GradientResults(Results):
         Returns:
             The transformed results.
         """
-        evaluations = self.evaluations._transform_from_optimizer(context)  # noqa: SLF001
+        evaluations = self.evaluations._transform_from_optimizer(context)  # ruff: ignore[private-member-access]
         gradients: Gradients | None = self.gradients
         if self.gradients is not None:
-            gradients = self.gradients._transform_from_optimizer(context)  # noqa: SLF001
+            gradients = self.gradients._transform_from_optimizer(context)  # ruff: ignore[private-member-access]
 
         if evaluations is None and gradients is None:
             return self

@@ -173,7 +173,7 @@ class Task(ABC):
     result: Any | None = None
     name: str | None = None
 
-    def put_result(self, result: Any) -> None:  # noqa: ANN401
+    def put_result(self, result: Any) -> None:  # ruff: ignore[any-type]
         """Put the result in the result queue."""
         self.result = result
         self.results_queue.put(self)
@@ -187,7 +187,7 @@ class Task(ABC):
 class ResultsQueue(queue.Queue[Task | None]):
     """A queue that can be closed."""
 
-    def __init__(self, *args: Any, **kwargs: Any) -> None:  # noqa: ANN401
+    def __init__(self, *args: Any, **kwargs: Any) -> None:  # ruff: ignore[any-type]
         """Initialize the queue."""
         super().__init__(*args, **kwargs)
         self.closed = False
@@ -196,7 +196,7 @@ class ResultsQueue(queue.Queue[Task | None]):
         """Close the queue."""
         self.closed = True
 
-    def put(self, item: Task | None, *args: Any, **kwargs: Any) -> None:  # noqa: ANN401
+    def put(self, item: Task | None, *args: Any, **kwargs: Any) -> None:  # ruff: ignore[any-type]
         """Put an item in the queue."""
         if not self.closed:
             super().put(item, *args, **kwargs)

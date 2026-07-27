@@ -13,9 +13,9 @@ class DefaultRealizationFilterPlugin(RealizationFilterPlugin):
     """Default realization filter plugin class."""
 
     @classmethod
-    def create(cls, filter_config: RealizationFilterConfig) -> DefaultRealizationFilter:  # noqa: D102
+    def create(cls, filter_config: RealizationFilterConfig) -> DefaultRealizationFilter:  # ruff: ignore[undocumented-public-method]
         return DefaultRealizationFilter(filter_config)
 
     @classmethod
-    def is_supported(cls, method: str) -> bool:  # noqa: D102
+    def is_supported(cls, method: str) -> bool:  # ruff: ignore[undocumented-public-method]
         return method.lower() in DEFAULT_REALIZATION_FILTER_METHODS

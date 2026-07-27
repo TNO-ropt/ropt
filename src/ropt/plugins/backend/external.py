@@ -17,13 +17,13 @@ class ExternalBackendPlugin(BackendPlugin):
     """The external optimizer plugin class."""
 
     @classmethod
-    def create(cls, backend_config: BackendConfig) -> ExternalBackend:  # noqa: D102
+    def create(cls, backend_config: BackendConfig) -> ExternalBackend:  # ruff: ignore[undocumented-public-method]
         return ExternalBackend(backend_config)
 
     @classmethod
-    def is_supported(cls, method: str) -> bool:  # noqa: D102
+    def is_supported(cls, method: str) -> bool:  # ruff: ignore[undocumented-public-method]
         return get_plugin_name("backend", method) is not None
 
     @classmethod
-    def allows_discovery(cls) -> bool:  # noqa: D102
+    def allows_discovery(cls) -> bool:  # ruff: ignore[undocumented-public-method]
         return False

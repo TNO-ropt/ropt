@@ -112,5 +112,5 @@ class _Worker:
 
 def _run_function(
     function: Callable[..., Any], args: tuple[Any, ...], kwargs: dict[str, Any]
-) -> Any:  # noqa: ANN401
+) -> Any:  # ruff: ignore[any-type]
     return function(*args, **kwargs)

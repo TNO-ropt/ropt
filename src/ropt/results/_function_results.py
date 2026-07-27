@@ -48,13 +48,13 @@ class FunctionResults(Results):
         Returns:
             The transformed results.
         """
-        evaluations = self.evaluations._transform_from_optimizer(context)  # noqa: SLF001
+        evaluations = self.evaluations._transform_from_optimizer(context)  # ruff: ignore[private-member-access]
         functions: Functions | None = None
         if self.functions is not None:
-            functions = self.functions._transform_from_optimizer(context)  # noqa: SLF001
+            functions = self.functions._transform_from_optimizer(context)  # ruff: ignore[private-member-access]
         constraint_info: ConstraintInfo | None = None
         if self.constraint_info is not None:
-            constraint_info = self.constraint_info._transform_from_optimizer(  # noqa: SLF001
+            constraint_info = self.constraint_info._transform_from_optimizer(  # ruff: ignore[private-member-access]
                 context
             )
 

@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from ropt.plugins.manager import PluginManager
 from ropt.workflow import BasicOptimizer
 from ropt.workflow.evaluators import (
     EvaluationFunctionContext,
@@ -89,7 +90,6 @@ def test_debug_optimizer_callback_messages(caplog: pytest.LogCaptureFixture) -> 
 
 
 def test_plugin_registration_messages(caplog: pytest.LogCaptureFixture) -> None:
-    from ropt.plugins.manager import PluginManager  # noqa: PLC0415
 
     with caplog.at_level(logging.DEBUG, logger="ropt.plugins"):
         PluginManager()

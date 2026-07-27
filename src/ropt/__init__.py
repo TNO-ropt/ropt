@@ -2,4 +2,4 @@
 
 import logging
 
-logging.getLogger(__name__).addHandler(logging.NullHandler())  # noqa: RUF067
+logging.getLogger(__name__).addHandler(logging.NullHandler())  # ruff: ignore[non-empty-init-module]

@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from .base import EventHandler
 
 
-async def _call(handler: EventHandler, event: EnOptEvent) -> None:  # noqa: RUF029
+async def _call(handler: EventHandler, event: EnOptEvent) -> None:  # ruff: ignore[unused-async]
     handler.handle_event(event)
 
 

@@ -1,4 +1,4 @@
-# ruff: noqa: RUF069
+# ruff: file-ignore[float-equality-comparison]
 
 from __future__ import annotations
 
@@ -274,7 +274,7 @@ def test_objective_with_scaler(
                 assert np.allclose(transformed.functions.objectives[-1], init1)
 
     optimizer2 = BasicOptimizer(config, evaluator([function1, function2]))
-    optimizer2._observers.append(  # noqa: SLF001
+    optimizer2._observers.append(  # ruff: ignore[private-member-access]
         (EnOptEventType.FINISHED_EVALUATION, check_value)
     )
     optimizer2.run(initial_values)
@@ -342,10 +342,10 @@ def test_objective_with_lazy_scaler(
                 assert np.allclose(transformed.functions.objectives[-1], init1)
 
     optimizer2 = BasicOptimizer(config, evaluator([function1, function2]))
-    optimizer2._observers.append(  # noqa: SLF001
+    optimizer2._observers.append(  # ruff: ignore[private-member-access]
         (EnOptEventType.FINISHED_EVALUATION, check_value)
     )
-    optimizer2._observers.append(  # noqa: SLF001
+    optimizer2._observers.append(  # ruff: ignore[private-member-access]
         (EnOptEventType.START_EVALUATION, set_scales)
     )
     optimizer2.run(initial_values)
@@ -423,7 +423,7 @@ def test_nonlinear_constraint_with_scaler(
     optimizer2 = BasicOptimizer(
         config, evaluator(test_functions, [constraint_function])
     )
-    optimizer2._observers.append(  # noqa: SLF001
+    optimizer2._observers.append(  # ruff: ignore[private-member-access]
         (EnOptEventType.FINISHED_EVALUATION, check_constraints)
     )
     optimizer2.run(initial_values)
@@ -520,10 +520,10 @@ def test_nonlinear_constraint_with_lazy_scaler(
     optimizer2 = BasicOptimizer(
         config, evaluator(test_functions, [constraint_function])
     )
-    optimizer2._observers.append(  # noqa: SLF001
+    optimizer2._observers.append(  # ruff: ignore[private-member-access]
         (EnOptEventType.FINISHED_EVALUATION, check_constraints)
     )
-    optimizer2._observers.append(  # noqa: SLF001
+    optimizer2._observers.append(  # ruff: ignore[private-member-access]
         (EnOptEventType.START_EVALUATION, set_scales)
     )
     optimizer2.run(initial_values)
@@ -545,7 +545,7 @@ def test_nonlinear_constraint_with_lazy_scaler(
 @pytest.mark.parametrize("use_plugin", [False, True])
 @pytest.mark.parametrize("offsets", [None, np.array([1.0, 1.1, 1.2])])
 @pytest.mark.parametrize("scales", [None, np.array([2.0, 2.1, 2.2])])
-def test_variables_scale_with_scaler(  # noqa: PLR0917
+def test_variables_scale_with_scaler(  # ruff: ignore[too-many-positional-arguments]
     config: Any,
     evaluator: Any,
     use_plugin: Any,

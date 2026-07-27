@@ -23,7 +23,7 @@ from ropt.config import (
 from ropt.enums import PerturbationType
 from ropt.plugins.manager import get_plugin
 
-from ._validated_types import (  # noqa: TC001
+from ._validated_types import (  # ruff: ignore[typing-only-first-party-import]
     BackendInstance,
     FunctionEstimatorInstance,
     NonlinearConstraintTransformInstance,
@@ -159,7 +159,7 @@ class EnOptContext(BaseModel):
                     ),
                 }
             )
-            object.__setattr__(self, "variables", updated_variables)  # noqa: PLC2801
+            object.__setattr__(self, "variables", updated_variables)  # ruff: ignore[unnecessary-dunder-call]
 
             if self.linear_constraints is not None:
                 coefficients = self.linear_constraints.coefficients
@@ -180,7 +180,7 @@ class EnOptContext(BaseModel):
                     }
                 )
 
-                object.__setattr__(  # noqa: PLC2801
+                object.__setattr__(  # ruff: ignore[unnecessary-dunder-call]
                     self, "linear_constraints", updated_linear_constraints
                 )
 
@@ -202,7 +202,7 @@ class EnOptContext(BaseModel):
         return self
 
     @model_validator(mode="wrap")  # type: ignore[arg-type]
-    def _pass_context_unchanged(self, handler: Any) -> Any:  # noqa: ANN401
+    def _pass_context_unchanged(self, handler: Any) -> Any:  # ruff: ignore[any-type]
         if isinstance(self, EnOptContext):
             return self
         return handler(self)
@@ -217,4 +217,4 @@ class EnOptContext(BaseModel):
             if self._locked:
                 msg = "The EnOptContext object has already been used."
                 raise RuntimeError(msg)
-            object.__setattr__(self, "_locked", True)  # noqa: PLC2801
+            object.__setattr__(self, "_locked", True)  # ruff: ignore[unnecessary-dunder-call]

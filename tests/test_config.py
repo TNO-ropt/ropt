@@ -31,9 +31,9 @@ def test_check_linear_constraints() -> None:
     }
     linear_constraints = LinearConstraintsConfig.model_validate(config)
     assert linear_constraints.coefficients is not None
-    with pytest.raises(ValueError):  # noqa: PT011
+    with pytest.raises(ValueError):  # ruff: ignore[pytest-raises-too-broad]
         linear_constraints.coefficients[0, 0] = 0
-    with pytest.raises(ValueError):  # noqa: PT011
+    with pytest.raises(ValueError):  # ruff: ignore[pytest-raises-too-broad]
         linear_constraints.upper_bounds[0] = 1
 
 

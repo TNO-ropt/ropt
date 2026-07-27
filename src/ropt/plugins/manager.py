@@ -79,7 +79,7 @@ class PluginManager:
 
     def __init__(self) -> None:
         """Initialize the plugin manager."""
-        # ruff: disable[PLC0415]
+        # ruff: disable[import-outside-top-level]
         from .backend import BackendPlugin
         from .function_estimator import FunctionEstimatorPlugin
         from .realization_filter import RealizationFilterPlugin
@@ -89,7 +89,7 @@ class PluginManager:
             ObjectiveTransformPlugin,
             VariableTransformPlugin,
         )
-        # ruff: enable[PLC0415]
+        # ruff: enable[import-outside-top-level]
 
         self._PLUGIN_TYPES: Final = {
             "function_estimator": FunctionEstimatorPlugin,
@@ -105,7 +105,7 @@ class PluginManager:
         self._init()
 
     def _init(self) -> None:
-        # ruff: disable[I001,PLC0415]
+        # ruff: disable[unsorted-imports,import-outside-top-level]
         if self._plugins:
             return
 
@@ -145,7 +145,7 @@ class PluginManager:
             for name, plugin in self._from_entry_points(plugin_type).items():
                 assert plugin_type in self._PLUGIN_TYPES
                 self._add_plugin(cast("PluginType", plugin_type), name, plugin)
-        # ruff: enable[I001,PLC0415]
+        # ruff: enable[unsorted-imports,import-outside-top-level]
 
     def _add_plugin(
         self,
@@ -191,7 +191,7 @@ class PluginManager:
                 return plugins.popitem()
         return None
 
-    def get_plugin(self, plugin_type: PluginType, method: str) -> Any:  # noqa: ANN401
+    def get_plugin(self, plugin_type: PluginType, method: str) -> Any:  # ruff: ignore[any-type]
         """Retrieve a plugin class by its type and a supported method name.
 
         This method finds and returns the class of a plugin that matches the
@@ -279,7 +279,7 @@ class PluginManager:
 _plugin_manager = None
 
 
-def get_plugin(plugin_type: PluginType, method: str) -> Any:  # noqa: ANN401
+def get_plugin(plugin_type: PluginType, method: str) -> Any:  # ruff: ignore[any-type]
     """Retrieve a plugin class by its type and a supported method name.
 
     This method finds and returns the class of a plugin that matches the
@@ -306,7 +306,7 @@ def get_plugin(plugin_type: PluginType, method: str) -> Any:  # noqa: ANN401
     Returns:
         The plugin class that matches the criteria.
     """
-    global _plugin_manager  # noqa: PLW0603
+    global _plugin_manager  # ruff: ignore[global-statement]
     if _plugin_manager is None:
         _plugin_manager = PluginManager()
     return _plugin_manager.get_plugin(plugin_type, method)
@@ -338,7 +338,7 @@ def get_plugin_name(plugin_type: PluginType, method: str) -> str | None:
     Returns:
         The name of a matching plugin supporting the specified method, or `None`.
     """
-    global _plugin_manager  # noqa: PLW0603
+    global _plugin_manager  # ruff: ignore[global-statement]
 
     if _plugin_manager is None:
         _plugin_manager = PluginManager()

@@ -8,7 +8,10 @@ import numpy as np
 from pydantic import BaseModel, ConfigDict, model_validator
 
 from ropt._utils import broadcast_1d_array
-from ropt.config._validated_types import Array1D, Array2D  # noqa: TC001
+from ropt.config._validated_types import (  # ruff: ignore[typing-only-first-party-import]
+    Array1D,
+    Array2D,
+)
 
 
 class LinearConstraintsConfig(BaseModel):

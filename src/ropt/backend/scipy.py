@@ -137,7 +137,7 @@ class SciPyBackend(Backend):
         "bounds": _CONSTRAINT_REQUIRES_BOUNDS,
     }
 
-    def __init__(self, backend_config: BackendConfig) -> None:  # noqa: D107
+    def __init__(self, backend_config: BackendConfig) -> None:  # ruff: ignore[undocumented-public-init]
         self._config = backend_config
         _, _, self._method = backend_config.method.lower().rpartition("/")
         if self._method == "default":
@@ -146,7 +146,7 @@ class SciPyBackend(Backend):
             msg = f"SciPy optimizer algorithm {self._method} is not supported"
             raise NotImplementedError(msg)
 
-    def init(  # noqa: D102
+    def init(  # ruff: ignore[undocumented-public-method]
         self, context: EnOptContext, optimizer_callback: OptimizerCallback
     ) -> None:
         self._optimizer_callback = optimizer_callback
@@ -167,7 +167,7 @@ class SciPyBackend(Backend):
         self._cached_gradient: NDArray[np.float64] | None = None
         _logger.debug("Using SciPy optimizer: %s", self._method)
 
-    def start(self, initial_values: NDArray[np.float64]) -> None:  # noqa: D102
+    def start(self, initial_values: NDArray[np.float64]) -> None:  # ruff: ignore[undocumented-public-method]
         self._cached_variables = None
         self._cached_function = None
         self._cached_gradient = None
@@ -205,10 +205,10 @@ class SciPyBackend(Backend):
                 )
 
     @property
-    def is_parallel(self) -> bool:  # noqa: D102
+    def is_parallel(self) -> bool:  # ruff: ignore[undocumented-public-method]
         return self._parallel
 
-    def validate_options(  # noqa: D102
+    def validate_options(  # ruff: ignore[undocumented-public-method]
         self,
     ) -> None:
         if self._config.options is not None:
@@ -556,7 +556,7 @@ class SciPyBackend(Backend):
         self._hess: HessianUpdateStrategy | None = None
         hess = options.pop("hess", None)
         if hess == "BFGS":
-            hess_options = {
+            bfgs_options = {
                 key: options.pop(key)
                 for key in (
                     "exception_strategy",
@@ -565,9 +565,9 @@ class SciPyBackend(Backend):
                 )
                 if key in options
             }
-            self._hess = BFGS(**hess_options)
+            self._hess = BFGS(**bfgs_options)
         elif hess == "SR1":
-            hess_options = {
+            sr1_options = {
                 key: options.pop(key)
                 for key in (
                     "min_denominator",
@@ -575,7 +575,7 @@ class SciPyBackend(Backend):
                 )
                 if key in options
             }
-            self._hess = SR1(**hess_options)
+            self._hess = SR1(**sr1_options)
 
         self._keep_feasible = options.pop("keep_feasible", False)
 

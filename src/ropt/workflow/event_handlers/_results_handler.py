@@ -38,7 +38,7 @@ class ResultsHandler(EventHandler):
         what: Literal["best", "last"] = "best",
         constraint_tolerance: float | None = None,
         domain: DomainType = "user",
-        filter: Callable[[Results], bool] | None = None,  # noqa: A002
+        filter: Callable[[Results], bool] | None = None,  # ruff: ignore[builtin-argument-shadowing]
     ) -> None:
         """Initialize the ResultsHandler.
 

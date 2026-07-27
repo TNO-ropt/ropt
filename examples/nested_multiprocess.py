@@ -154,7 +154,7 @@ def main() -> None:
 
     def _optimize(
         variables: NDArray[np.float64],
-        context: EvaluationFunctionContext,  # noqa: ARG001
+        context: EvaluationFunctionContext,  # ruff: ignore[unused-function-argument]
     ) -> EvaluationFunctionResult:
         new_variables = np.where(MASK, INITIAL_VALUES, variables)
 

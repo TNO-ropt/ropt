@@ -47,7 +47,7 @@ class ComputeStep(ABC):
         return self._event_handlers
 
     @abstractmethod
-    def run(self, *args: Any, **kwargs: Any) -> Any:  # noqa: ANN401
+    def run(self, *args: Any, **kwargs: Any) -> Any:  # ruff: ignore[any-type]
         """Execute the logic defined by this compute step.
 
         This abstract method must be implemented by concrete `ComputeStep`

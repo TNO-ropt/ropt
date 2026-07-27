@@ -1,4 +1,4 @@
-# ruff: noqa: RUF069
+# ruff: file-ignore[float-equality-comparison]
 
 from typing import Any, Literal
 
@@ -344,7 +344,7 @@ def test_scipy_eq_nonlinear_constraints(
 @pytest.mark.parametrize(
     ("lower_bounds", "upper_bounds"), [(-np.inf, 0.4), (-0.4, np.inf)]
 )
-def test_scipy_ineq_nonlinear_constraints(  # noqa: PLR0917
+def test_scipy_ineq_nonlinear_constraints(  # ruff: ignore[too-many-positional-arguments]
     config: Any,
     method: str,
     lower_bounds: Any,

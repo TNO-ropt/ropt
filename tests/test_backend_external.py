@@ -15,13 +15,15 @@ from ropt.exceptions import Abort
 
 cloudpickle = pytest.importorskip("cloudpickle")
 
-from ropt.backend.external import (  # noqa: E402
+from ropt.backend.external import (  # ruff: ignore[module-import-not-at-top-of-file]
     _decode_child_exception,
     _encode_child_exception,
     _run,
     _wrap_with_traceback,
 )
-from ropt.backend.scipy import SciPyBackend  # noqa: E402
+from ropt.backend.scipy import (  # ruff: ignore[module-import-not-at-top-of-file]
+    SciPyBackend,
+)
 
 
 def _make_child_args() -> bytes:
@@ -156,7 +158,7 @@ def test_decode_falls_back_for_non_exception_payload() -> None:
 def test_encode_decode_round_trip() -> None:
     try:
         msg = "inner failure"
-        raise RuntimeError(msg)  # noqa: TRY301
+        raise RuntimeError(msg)  # ruff: ignore[raise-within-try]
     except RuntimeError as exc:
         payload = _encode_child_exception(exc)
 

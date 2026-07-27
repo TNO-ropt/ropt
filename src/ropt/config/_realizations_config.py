@@ -9,7 +9,7 @@ from pydantic import BaseModel, ConfigDict, NonNegativeInt, model_validator
 
 from ropt._utils import normalize
 
-from ._validated_types import Array1D  # noqa: TC001
+from ._validated_types import Array1D  # ruff: ignore[typing-only-first-party-import]
 
 
 class RealizationsConfig(BaseModel):

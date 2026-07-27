@@ -207,7 +207,7 @@ class TableHandler(EventHandler):
         """
         return {EnOptEventType.FINISHED_EVALUATION}
 
-    def __getitem__(self, key: str) -> Any:  # noqa: ANN401
+    def __getitem__(self, key: str) -> Any:  # ruff: ignore[any-type]
         """Retrieve a of a table from the event handler.
 
         Warning:

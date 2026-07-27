@@ -115,7 +115,7 @@ class OptionsSchemaModel(BaseModel):
                 }
             )
 
-        def _extra_validator(self: Any) -> Any:  # noqa: ANN401
+        def _extra_validator(self: Any) -> Any:  # ruff: ignore[any-type]
             if self.__pydantic_extra__:
                 unknown_options = ", ".join(
                     f"`{option}`" for option in self.__pydantic_extra__
