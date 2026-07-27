@@ -2876,7 +2876,7 @@ data to a database, sending over a network — pass <code>run_in_thread=True</co
 registering it:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">event_dispatcher</span><span class="o">.</span><span class="n">add_event_handler</span><span class="p">(</span><span class="n">my_handler</span><span class="p">,</span> <span class="n">run_in_thread</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </span></code></pre></div>
-<p><code>CallbackHandler</code> and <code>TableHandler</code> (when a slow callback is set via
+<p><code>CallbackHandler</code> and <code>DataFrameHandler</code> (when a slow callback is set via
 <code>set_callback</code>) are common cases where this is needed. When multiple handlers
 with <code>run_in_thread=True</code> match the same event they are dispatched <strong>in
 parallel</strong> via <code>asyncio.gather</code> — they do not block each other.</p>

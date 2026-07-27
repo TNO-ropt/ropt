@@ -968,15 +968,15 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#tablehandler" class="md-nav__link">
+  <a href="#dataframehandler" class="md-nav__link">
     <span class="md-ellipsis">
       
-        TableHandler
+        DataFrameHandler
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="TableHandler">
+    <nav class="md-nav" aria-label="DataFrameHandler">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -2643,15 +2643,15 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#tablehandler" class="md-nav__link">
+  <a href="#dataframehandler" class="md-nav__link">
     <span class="md-ellipsis">
       
-        TableHandler
+        DataFrameHandler
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="TableHandler">
+    <nav class="md-nav" aria-label="DataFrameHandler">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -3255,7 +3255,7 @@ pushed each event) rather than polling another handler's state.</p>
 <td>Forward selected event types to a user callback.</td>
 </tr>
 <tr>
-<td><a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.TableHandler" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.TableHandler"><code>TableHandler</code></a></td>
+<td><a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.DataFrameHandler" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.DataFrameHandler"><code>DataFrameHandler</code></a></td>
 <td>Append rows to a structured table per result.</td>
 </tr>
 <tr>
@@ -3266,7 +3266,7 @@ pushed each event) rather than polling another handler's state.</p>
 </table>
 <p>Handlers expose their state through dictionary access (<code>handler[key]</code>). By
 convention, <code>ResultsHandler</code> and <code>HistoryHandler</code> both use the key <code>"results"</code> —
-e.g. <code>result_handler["results"]</code> or <code>history_handler["results"]</code>. <code>TableHandler</code>
+e.g. <code>result_handler["results"]</code> or <code>history_handler["results"]</code>. <code>DataFrameHandler</code>
 uses the table name as key — e.g. <code>table["functions"]</code>.</p>
 <h3 id="resultshandler">ResultsHandler</h3>
 <p><a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.ResultsHandler" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.ResultsHandler"><code>ResultsHandler</code></a> listens for
@@ -3357,8 +3357,8 @@ attached to a compute step and forwards matching events to an
 dispatches them from the asyncio event loop's thread, so handlers registered on
 the dispatcher require no locking.</p>
 <p>See <a href="../parallel/#event-dispatcher">Event Dispatcher</a> for the full pattern.</p>
-<h3 id="tablehandler">TableHandler</h3>
-<p><a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.TableHandler" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.TableHandler"><code>TableHandler</code></a> tracks results and
+<h3 id="dataframehandler">DataFrameHandler</h3>
+<p><a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.DataFrameHandler" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.DataFrameHandler"><code>DataFrameHandler</code></a> tracks results and
 stores them in pandas DataFrames.</p>
 <h4 id="tables">Tables</h4>
 <p>Tables can be generated for
