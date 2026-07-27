@@ -135,7 +135,7 @@ class VariableTransform(ABC):
 
         Returns:
             Tuple of (coefficients, lower_bounds, upper_bounds) in optimizer domain.
-        """  # noqa: DOC202
+        """  # ruff: ignore[docstring-extraneous-returns]
         msg = "This transformer does not support linear constraints."
         raise NotImplementedError(msg)
 
@@ -152,11 +152,11 @@ class VariableTransform(ABC):
 
         Returns:
             Tuple of (lower_diffs, upper_diffs) in user domain.
-        """  # noqa: DOC202
+        """  # ruff: ignore[docstring-extraneous-returns]
         msg = "This transformer does not support linear constraints."
         raise NotImplementedError(msg)
 
-    def update(self, *args: Any, **kwargs: Any) -> None:  # noqa: ANN401, B027
+    def update(self, *args: Any, **kwargs: Any) -> None:  # ruff: ignore[any-type, empty-method-without-abstract-decorator]
         """Update internal state mid-run (optional).
 
         Override to support runtime parameter changes when values are not
@@ -227,7 +227,7 @@ class ObjectiveTransform(ABC):
             Transformed values in the user domain.
         """
 
-    def update(self, *args: Any, **kwargs: Any) -> None:  # noqa: ANN401, B027
+    def update(self, *args: Any, **kwargs: Any) -> None:  # ruff: ignore[any-type, empty-method-without-abstract-decorator]
         """Update internal state mid-run (optional).
 
         Args:
@@ -330,7 +330,7 @@ class NonlinearConstraintTransform(ABC):
             Tuple of (lower_diffs, upper_diffs) in user domain.
         """
 
-    def update(self, *args: Any, **kwargs: Any) -> None:  # noqa: ANN401, B027
+    def update(self, *args: Any, **kwargs: Any) -> None:  # ruff: ignore[any-type, empty-method-without-abstract-decorator]
         """Update internal state mid-run (optional).
 
         Args:

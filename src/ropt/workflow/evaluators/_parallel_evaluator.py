@@ -45,7 +45,7 @@ class ParallelEvaluator(Evaluator):
     details on how this integrates with the asyncio event loop.
     """
 
-    def __init__(  # noqa: PLR0913
+    def __init__(  # ruff: ignore[too-many-arguments]
         self,
         *,
         function: EvaluationFunctionCallback,

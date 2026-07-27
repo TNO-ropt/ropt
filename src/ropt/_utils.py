@@ -16,14 +16,14 @@ def normalize(array: NDArray[np.float64]) -> NDArray[np.float64]:
 
 def immutable_array(
     array_like: ArrayLike,
-    **kwargs: Any,  # noqa: ANN401
+    **kwargs: Any,  # ruff: ignore[any-type]
 ) -> NDArray[Any]:
     array = np.array(array_like, **kwargs)
     array.setflags(write=False)
     return array
 
 
-def broadcast_arrays(*args: Any) -> tuple[NDArray[Any], ...]:  # noqa: ANN401
+def broadcast_arrays(*args: Any) -> tuple[NDArray[Any], ...]:  # ruff: ignore[any-type]
     results = np.broadcast_arrays(*args)
     return tuple(immutable_array(result) for result in results)
 

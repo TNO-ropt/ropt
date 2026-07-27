@@ -3,7 +3,7 @@
 from ropt.enums import ExitCode
 
 
-class Abort(Exception):  # noqa: N818
+class Abort(Exception):  # ruff: ignore[error-suffix-on-exception-name]
     """Raised when a compute step is aborted prematurely.
 
     This exception signals that an optimization or another compute step could
@@ -27,5 +27,5 @@ class Abort(Exception):  # noqa: N818
         super().__init__()
 
 
-class ExecutorFailure(Exception):  # noqa: N818
+class ExecutorFailure(Exception):  # ruff: ignore[error-suffix-on-exception-name]
     """Raised when an executor fails to execute a task."""

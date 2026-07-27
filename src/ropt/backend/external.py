@@ -62,7 +62,7 @@ class ExternalBackend(Backend):
         instantiation raises `NotImplementedError`.
     """
 
-    def __init__(self, backend_config: BackendConfig) -> None:  # noqa: D107
+    def __init__(self, backend_config: BackendConfig) -> None:  # ruff: ignore[undocumented-public-init]
         if not _HAVE_CLOUDPICKLE:
             msg = "The cloudpickle module must be installed to use ExternalBackend"
             raise NotImplementedError(msg)
@@ -72,7 +72,7 @@ class ExternalBackend(Backend):
         )
         self._backend_plugin = get_plugin("backend", method=self._backend_config.method)
 
-    def init(  # noqa: D102
+    def init(  # ruff: ignore[undocumented-public-method]
         self, context: EnOptContext, optimizer_callback: OptimizerCallback
     ) -> None:
         self._context = context
@@ -83,7 +83,7 @@ class ExternalBackend(Backend):
         )
         self._is_parallel: bool = backend.is_parallel
 
-    def start(  # noqa: C901, D102
+    def start(  # ruff: ignore[complex-structure, undocumented-public-method]
         self, initial_values: NDArray[np.float64]
     ) -> None:
         context = multiprocessing.get_context("spawn")
@@ -137,7 +137,7 @@ class ExternalBackend(Backend):
                     return_functions=outcome["return_functions"],
                     return_gradients=outcome["return_gradients"],
                 )
-            except Exception as exc:  # noqa: BLE001
+            except Exception as exc:  # ruff: ignore[blind-except]
                 result = ExitCode.ABORT_FROM_ERROR
                 exception = exc
             result_queue.put(result)
@@ -156,13 +156,13 @@ class ExternalBackend(Backend):
         if exception is not None:
             raise exception
 
-    def validate_options(  # noqa: D102
+    def validate_options(  # ruff: ignore[undocumented-public-method]
         self,
     ) -> None:
         self._backend_plugin.create(self._backend_config).validate_options()
 
     @property
-    def is_parallel(self) -> bool:  # noqa: D102
+    def is_parallel(self) -> bool:  # ruff: ignore[undocumented-public-method]
         return self._is_parallel
 
 
@@ -188,7 +188,7 @@ def _run(
         backend.start(np.asarray(initial_values, dtype=np.float64))
     except Abort as exc:
         request_queue.put({"abort": True, "exit_code": exc.exit_code})
-    except Exception as exc:  # noqa: BLE001
+    except Exception as exc:  # ruff: ignore[blind-except]
         request_queue.put(_encode_child_exception(exc))
     finally:
         request_queue.put(None)
@@ -235,7 +235,7 @@ def _encode_child_exception(exc: BaseException) -> dict[str, Any]:
     tb_str = traceback.format_exc()
     try:
         pickled = cloudpickle.dumps(exc)
-    except Exception:  # noqa: BLE001
+    except Exception:  # ruff: ignore[blind-except]
         return {
             "error": type(exc).__name__,
             "message": str(exc),
@@ -248,7 +248,7 @@ def _decode_child_exception(request: dict[str, Any]) -> Exception:
     tb_str = request.get("traceback", "")
     try:
         original = cloudpickle.loads(request["exception"])
-    except Exception:  # noqa: BLE001
+    except Exception:  # ruff: ignore[blind-except]
         return _wrap_with_traceback(
             "External backend exception could not be deserialized", tb_str
         )

@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 _HAVE_PANDAS: Final = find_spec("pandas") is not None
 
 if TYPE_CHECKING and _HAVE_PANDAS:
-    import pandas as pd  # noqa: TC002
+    import pandas as pd  # ruff: ignore[typing-only-third-party-import]
 if _HAVE_PANDAS:
     from ._pandas import _to_dataframe
 

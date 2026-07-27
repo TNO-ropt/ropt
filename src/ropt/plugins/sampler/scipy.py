@@ -10,12 +10,12 @@ class SciPySamplerPlugin(SamplerPlugin):
     """Default sampler plugin class."""
 
     @classmethod
-    def create(  # noqa: D102
+    def create(  # ruff: ignore[undocumented-public-method]
         cls,
         sampler_config: SamplerConfig,
     ) -> SciPySampler:
         return SciPySampler(sampler_config)
 
     @classmethod
-    def is_supported(cls, method: str) -> bool:  # noqa: D102
+    def is_supported(cls, method: str) -> bool:  # ruff: ignore[undocumented-public-method]
         return method.lower() in (SCIPY_SAMPLER_SUPPORTED_METHODS | {"default"})

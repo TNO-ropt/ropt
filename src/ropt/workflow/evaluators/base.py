@@ -42,7 +42,7 @@ class Evaluator(ABC):
         for usage and pitfalls.
     """
 
-    def __init_subclass__(cls, **kwargs: object) -> None:  # noqa: D105
+    def __init_subclass__(cls, **kwargs: object) -> None:  # ruff: ignore[undocumented-magic-method]
         super().__init_subclass__(**kwargs)
         if "eval" in cls.__dict__ and not getattr(
             cls.__dict__["eval"], "__wrapped__", None
@@ -55,7 +55,7 @@ class Evaluator(ABC):
                 variables: NDArray[np.float64],
                 context: EvaluationBatchContext,
                 *,
-                _orig: Any = original,  # noqa: ANN401
+                _orig: Any = original,  # ruff: ignore[any-type]
             ) -> EvaluationBatchResult:
                 with self._owner_lock:
                     if self._in_use:
@@ -79,7 +79,7 @@ class Evaluator(ABC):
         self._used = False
         self._owner_lock = threading.Lock()
 
-    def __getstate__(self) -> dict[str, Any]:  # noqa: D105
+    def __getstate__(self) -> dict[str, Any]:  # ruff: ignore[undocumented-magic-method]
         if self._used:
             msg = "Cannot pickle an evaluator after it has been used."
             raise RuntimeError(msg)
@@ -87,7 +87,7 @@ class Evaluator(ABC):
         state.pop("_owner_lock", None)
         return state
 
-    def __setstate__(self, state: dict[str, Any]) -> None:  # noqa: D105
+    def __setstate__(self, state: dict[str, Any]) -> None:  # ruff: ignore[undocumented-magic-method]
         self.__dict__.update(state)
         self._owner_lock = threading.Lock()
 

@@ -10,7 +10,7 @@ import tempfile
 from collections import ChainMap
 from importlib.util import find_spec
 from pathlib import Path
-from pickle import UnpicklingError  # noqa: S403
+from pickle import UnpicklingError  # ruff: ignore[suspicious-pickle-import]
 from typing import TYPE_CHECKING, Any, Final
 from uuid import uuid4
 
@@ -44,7 +44,7 @@ class HPCExecutor(ExecutorBase):
     details on configuration and lifecycle.
     """
 
-    def __init__(  # noqa: PLR0913
+    def __init__(  # ruff: ignore[too-many-arguments]
         self,
         *,
         workdir: Path | str = "./",
@@ -193,7 +193,7 @@ class HPCExecutor(ExecutorBase):
     def _poll(self) -> None:
         try:
             jobs = self._queue_adapter.get_status_of_my_jobs()["jobid"].values
-        except Exception:  # noqa: BLE001
+        except Exception:  # ruff: ignore[blind-except]
             return
         for task_id in list(self._tasks):
             if self._jobs.get(task_id) is None or self._jobs[task_id] in jobs:

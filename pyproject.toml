@@ -49,30 +49,22 @@ filterwarnings = [
 ]
 
 [tool.ruff.format]
-exclude = ["src/ropt/version.py", "build"]
+exclude = ["src/ropt/version.py", "build", "docs/**/*.md"]
 
 [tool.ruff.lint]
 preview = true
 select = ["ALL"]
-ignore = [
-    "COM812", # missing-trailing-comma
-    "CPY",    # flake8-copyright
-    "E501",   # line-too-long
-    "S101",   # assert
-]
+ignore = ["missing-trailing-comma", "CPY", "line-too-long", "assert"]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = [
-    "D",       # pydocstyle
-    "ANN401",  # anytype
-    "PLC2701", # import-private-name
-    "PLR2004", # magic-value-comparison
-    "PLR0913", # too-many-arguments
+    "D",
+    "any-type",
+    "import-private-name",
+    "magic-value-comparison",
+    "too-many-arguments",
 ]
-"examples/*" = [
-    "INP001", # implicit-namespace-package
-    "T201",   # print
-]
+"examples/*" = ["implicit-namespace-package", "print"]
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"

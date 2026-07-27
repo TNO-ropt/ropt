@@ -502,7 +502,7 @@ class EnsembleEvaluator:
             constraints=constraints,
         )
 
-    def _compute_gradients(  # noqa: PLR0913, PLR0917
+    def _compute_gradients(  # ruff: ignore[too-many-arguments, too-many-positional-arguments]
         self,
         variables: NDArray[np.float64],
         mask: NDArray[np.bool_] | None,

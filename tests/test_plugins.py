@@ -1,4 +1,4 @@
-# ruff: noqa: SLF001
+# ruff: file-ignore[private-member-access]
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Literal

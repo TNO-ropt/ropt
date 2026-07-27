@@ -15,7 +15,7 @@ def main() -> int:
             function, args, kwargs = cloudpickle.load(fp)
         result = function(*args, **kwargs)
         exit_code = 0
-    except Exception as exc:  # noqa: BLE001
+    except Exception as exc:  # ruff: ignore[blind-except]
         result = exc
         exit_code = 1
     finally:

@@ -40,7 +40,7 @@ def _collect_results(
     finished_event.set()
 
 
-async def dispatch_tasks(  # noqa: PLR0913
+async def dispatch_tasks(  # ruff: ignore[too-many-arguments]
     functions: Sequence[Callable[[], None]] | Mapping[str, Callable[[], None]],
     executor: Literal["threading", "multiprocessing", "hpc"],
     *,

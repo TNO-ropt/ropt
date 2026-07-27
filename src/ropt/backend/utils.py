@@ -327,7 +327,7 @@ class NormalizedConstraints:
             for idx, (lower_bound, upper_bound) in enumerate(
                 zip(lower_bounds, upper_bounds, strict=True)
             ):
-                if abs(upper_bound - lower_bound) < 1e-15:  # noqa: PLR2004
+                if abs(upper_bound - lower_bound) < 1e-15:  # ruff: ignore[magic-value-comparison]
                     self._is_eq.append(True)
                     self._indices.append(idx)
                     self._is_lower.append(True)

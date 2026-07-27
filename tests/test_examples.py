@@ -64,7 +64,7 @@ async def test_example_parallel_evaluator(
 
     # We need to do an explicit import, otherwise we get pickling errors:
     monkeypatch.syspath_prepend(Path(__file__).parent.parent / "examples")
-    import parallel_evaluator  # type: ignore[import-not-found] # noqa: PLC0415
+    import parallel_evaluator  # type: ignore[import-not-found] # ruff: ignore[import-outside-top-level]
 
     await parallel_evaluator.main(multiprocessing=multiprocessing)
 
@@ -89,7 +89,7 @@ def test_example_nested_multiprocess(tmp_path: Path, monkeypatch: Any) -> None:
 
     # We need to do an explicit import, otherwise we get pickling errors:
     monkeypatch.syspath_prepend(Path(__file__).parent.parent / "examples")
-    import nested_multiprocess  # type: ignore[import-not-found] # noqa: PLC0415
+    import nested_multiprocess  # type: ignore[import-not-found] # ruff: ignore[import-outside-top-level]
 
     nested_multiprocess.main()
 

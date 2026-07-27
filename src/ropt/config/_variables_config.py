@@ -13,7 +13,7 @@ from ropt._utils import (
 )
 from ropt.enums import BoundaryType, PerturbationType, VariableType
 
-from ._validated_types import (  # noqa: TC001  # noqa: TC001
+from ._validated_types import (  # ruff: ignore[typing-only-first-party-import]
     Array1D,
     Array1DBool,
     Array1DInt,

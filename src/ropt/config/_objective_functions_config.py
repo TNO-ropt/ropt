@@ -9,7 +9,7 @@ from pydantic import BaseModel, ConfigDict, model_validator
 
 from ropt._utils import broadcast_1d_array, normalize
 
-from ._validated_types import (  # noqa: TC001
+from ._validated_types import (  # ruff: ignore[typing-only-first-party-import]
     Array1D,
     Array1DInt,
 )

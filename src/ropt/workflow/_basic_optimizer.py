@@ -132,7 +132,7 @@ class BasicOptimizer:
             callback: The callable to check for abort conditions.
         """
 
-        def _check_abort_callback(event: EnOptEvent) -> None:  # noqa: ARG001
+        def _check_abort_callback(event: EnOptEvent) -> None:  # ruff: ignore[unused-function-argument]
             if callback():
                 raise Abort(ExitCode.USER_ABORT)
 

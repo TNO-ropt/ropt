@@ -124,12 +124,12 @@ class CustomFunctionEstimator(FunctionEstimator):
     def init(self, _: EnOptContext) -> None:
         pass
 
-    def calculate_function(  # noqa: PLR6301
+    def calculate_function(  # ruff: ignore[no-self-use]
         self, functions: NDArray[np.float64], weights: NDArray[np.float64]
     ) -> NDArray[np.float64]:
         return np.asarray(np.dot(functions, weights) + 1.0)
 
-    def calculate_gradient(  # noqa: PLR6301
+    def calculate_gradient(  # ruff: ignore[no-self-use]
         self,
         _: NDArray[np.float64],
         gradient: NDArray[np.float64],

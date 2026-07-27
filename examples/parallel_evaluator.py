@@ -115,7 +115,7 @@ def run_optimization(
     return optimizer.results
 
 
-async def async_run(  # noqa: PLR0913
+async def async_run(  # ruff: ignore[too-many-arguments]
     config: dict[str, Any],
     a_list: list[NDArray[np.float64]],
     b_list: list[NDArray[np.float64]],

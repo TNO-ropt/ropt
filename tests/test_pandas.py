@@ -3,6 +3,7 @@ from typing import Any
 import numpy as np
 import pytest
 
+from ropt.context import EnOptContext
 from ropt.enums import AxisName
 from ropt.results import (
     FunctionEvaluations,
@@ -15,8 +16,9 @@ from ropt.results import (
 )
 
 pandas = pytest.importorskip("pandas")
-from ropt.context import EnOptContext  # noqa: E402
-from ropt.results._pandas import _to_series  # noqa: E402
+from ropt.results._pandas import (  # ruff: ignore[module-import-not-at-top-of-file]
+    _to_series,
+)
 
 initial_values = [0.0, 0.0]
 

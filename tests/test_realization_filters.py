@@ -1,4 +1,4 @@
-# ruff: noqa: RUF069
+# ruff: file-ignore[float-equality-comparison]
 
 from functools import partial
 from typing import Any, Literal
@@ -307,7 +307,7 @@ def test_sort_filter_on_constraints(
 
 
 @pytest.mark.parametrize("evaluation_policy", ["separate", "speculative"])
-def test_sort_filter_mixed(  # noqa: C901
+def test_sort_filter_mixed(  # ruff: ignore[complex-structure]
     config: Any,
     evaluator: Any,
     evaluation_policy: Literal["speculative", "separate", "auto"],
@@ -683,7 +683,7 @@ class CustomRealizationFilter(RealizationFilter):
     def __init__(self, _: RealizationFilterConfig) -> None:  # D107
         pass
 
-    def get_realization_weights(  # noqa: PLR6301
+    def get_realization_weights(  # ruff: ignore[no-self-use]
         self,
         objectives: NDArray[np.float64],
         _: NDArray[np.float64] | None,

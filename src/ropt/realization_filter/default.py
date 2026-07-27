@@ -108,7 +108,7 @@ class DefaultRealizationFilter(RealizationFilter):
     See [Realization Filters](../usage/realization_filters.md) for usage.
     """
 
-    def __init__(  # noqa: D107
+    def __init__(  # ruff: ignore[undocumented-public-init]
         self, filter_config: RealizationFilterConfig
     ) -> None:  # D107
         self._filter_config = filter_config
@@ -122,10 +122,10 @@ class DefaultRealizationFilter(RealizationFilter):
         assert isinstance(self._filter_config, RealizationFilterConfig)
         _, _, self._method = self._filter_config.method.lower().rpartition("/")
 
-    def init(self, context: EnOptContext) -> None:  # noqa: D102
+    def init(self, context: EnOptContext) -> None:  # ruff: ignore[undocumented-public-method]
         self._context = context
 
-    def get_realization_weights(  # D107  # noqa: D102
+    def get_realization_weights(  # D107  # ruff: ignore[undocumented-public-method]
         self,
         objectives: NDArray[np.float64],
         constraints: NDArray[np.float64] | None,

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import asyncio
-import subprocess  # noqa: S404
+import subprocess  # ruff: ignore[suspicious-subprocess-import]
 from functools import partial
 from typing import TYPE_CHECKING, Any
 
@@ -33,9 +33,9 @@ if TYPE_CHECKING:
     from ropt.workflow.executors import Executor
 
 try:
-    import cloudpickle  # noqa: F401
+    import cloudpickle  # ruff: ignore[unused-import]
     import pandas as pd
-    import pysqa  # noqa: F401
+    import pysqa  # ruff: ignore[unused-import]
 
     _TEST_HPC = True
 except ImportError:
@@ -100,7 +100,7 @@ async def test_executor_ok(
         case "hpc":
             monkeypatch.setattr(
                 "ropt.workflow.executors._hpc_executor.pysqa.QueueAdapter",
-                lambda *args, **kwargs: MockedHPCAdapter(tmp_path),  # noqa: ARG005
+                lambda *args, **kwargs: MockedHPCAdapter(tmp_path),  # ruff: ignore[unused-lambda-argument]
             )
             executor: Executor = HPCExecutor(
                 workdir=tmp_path, workers=2, interval=0, template=""
@@ -165,7 +165,7 @@ async def test_executor_error(
         case "hpc":
             monkeypatch.setattr(
                 "ropt.workflow.executors._hpc_executor.pysqa.QueueAdapter",
-                lambda *args, **kwargs: MockedHPCAdapter(tmp_path),  # noqa: ARG005
+                lambda *args, **kwargs: MockedHPCAdapter(tmp_path),  # ruff: ignore[unused-lambda-argument]
             )
             executor: Executor = HPCExecutor(
                 workdir=tmp_path, workers=2, interval=0, template=""
@@ -177,7 +177,7 @@ async def test_executor_error(
     assert not executor.is_running()
     all_processed = asyncio.Event()
     result_processor = _ResultProcessor()
-    with pytest.raises(ExceptionGroup) as excinfo:  # noqa: PT012
+    with pytest.raises(ExceptionGroup) as excinfo:  # ruff: ignore[pytest-raises-with-multiple-statements]
         async with asyncio.TaskGroup() as tg:
             await executor.start(tg)
             tg.create_task(
@@ -260,8 +260,8 @@ if _TEST_HPC:
             self._jobs: dict[int, str] = {}
             self._job_id = 0
 
-        def submit_job(self, job_name: str, command: str, **kwargs: Any) -> int:  # noqa: ARG002
-            subprocess.Popen(command.split())  # noqa: S603
+        def submit_job(self, job_name: str, command: str, **kwargs: Any) -> int:  # ruff: ignore[unused-method-argument]
+            subprocess.Popen(command.split())  # ruff: ignore[subprocess-without-shell-equals-true]
             self._job_id += 1
             self._jobs[self._job_id] = job_name
             return self._job_id
@@ -304,7 +304,7 @@ async def test_executor_evaluator_ok(
         case "hpc":
             monkeypatch.setattr(
                 "ropt.workflow.executors._hpc_executor.pysqa.QueueAdapter",
-                lambda *args, **kwargs: MockedHPCAdapter(tmp_path),  # noqa: ARG005
+                lambda *args, **kwargs: MockedHPCAdapter(tmp_path),  # ruff: ignore[unused-lambda-argument]
             )
             executor: Executor = HPCExecutor(
                 workdir=tmp_path, workers=2, interval=0, template=""
@@ -358,7 +358,7 @@ async def test_executor_evaluator_error(
         case "hpc":
             monkeypatch.setattr(
                 "ropt.workflow.executors._hpc_executor.pysqa.QueueAdapter",
-                lambda *args, **kwargs: MockedHPCAdapter(tmp_path),  # noqa: ARG005
+                lambda *args, **kwargs: MockedHPCAdapter(tmp_path),  # ruff: ignore[unused-lambda-argument]
             )
             executor: Executor = HPCExecutor(
                 workdir=tmp_path, workers=2, interval=0, template=""
@@ -368,7 +368,7 @@ async def test_executor_evaluator_error(
         case "multiprocessing":
             executor = MultiprocessingExecutor(workers=2)
     assert not executor.is_running()
-    with pytest.raises(ExceptionGroup) as excinfo:  # noqa: PT012
+    with pytest.raises(ExceptionGroup) as excinfo:  # ruff: ignore[pytest-raises-with-multiple-statements]
         async with asyncio.TaskGroup() as tg:
             await executor.start(tg)
             assert executor.is_running()
@@ -413,7 +413,7 @@ async def test_executor_evaluator_two_optimizations(
         case "hpc":
             monkeypatch.setattr(
                 "ropt.workflow.executors._hpc_executor.pysqa.QueueAdapter",
-                lambda *args, **kwargs: MockedHPCAdapter(tmp_path),  # noqa: ARG005
+                lambda *args, **kwargs: MockedHPCAdapter(tmp_path),  # ruff: ignore[unused-lambda-argument]
             )
             executor: Executor = HPCExecutor(
                 workdir=tmp_path, workers=2, interval=0, template=""
@@ -496,11 +496,11 @@ async def test_groups_tasks(
         assert 1 <= size <= expected_max
 
 
-async def test_invalid_bundle_size() -> None:  # noqa: RUF029
+async def test_invalid_bundle_size() -> None:  # ruff: ignore[unused-async]
     executor = ThreadingExecutor(workers=1)
     with pytest.raises(ValueError, match="bundle_size"):
         ParallelEvaluator(
-            function=lambda variables, context: EvaluationFunctionResult(  # noqa: ARG005
+            function=lambda variables, context: EvaluationFunctionResult(  # ruff: ignore[unused-lambda-argument]
                 objectives=0.0
             ),
             executor=executor,

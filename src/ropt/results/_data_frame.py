@@ -139,7 +139,7 @@ def _add_metadata(
     return data_frame
 
 
-def _get_value(data: dict[str, Any], keys: list[str]) -> Any | None:  # noqa: ANN401
+def _get_value(data: dict[str, Any], keys: list[str]) -> Any | None:  # ruff: ignore[any-type]
     for key in keys:
         if isinstance(data, dict):
             if key not in data:

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import pickle  # noqa: S403
+import pickle  # ruff: ignore[suspicious-pickle-import]
 import threading
 from copy import deepcopy
 from functools import partial
@@ -745,7 +745,7 @@ def test_evaluator_raises_on_concurrent_use() -> None:
     thread2_error: list[BaseException | None] = [None]
 
     class _BlockingEvaluator(Evaluator):
-        def eval(self, _variables: Any, _context: Any) -> EvaluationBatchResult:  # noqa: PLR6301
+        def eval(self, _variables: Any, _context: Any) -> EvaluationBatchResult:  # ruff: ignore[no-self-use]
             in_eval.set()
             can_finish.wait()
             return EvaluationBatchResult(objectives=np.zeros((1, 1), dtype=np.float64))
@@ -807,7 +807,7 @@ def test_evaluator_allows_repeated_use_on_same_thread() -> None:
 def test_evaluator_pickle_before_use_succeeds_and_resets_state() -> None:
     evaluator = _RecordingEvaluator()
 
-    restored = pickle.loads(pickle.dumps(evaluator))  # noqa: S301
+    restored = pickle.loads(pickle.dumps(evaluator))  # ruff: ignore[suspicious-pickle-usage]
 
     # Usable after unpickling (its lock was recreated).
     restored.eval(None, None)
@@ -845,7 +845,7 @@ def test_event_handler_raises_on_concurrent_use() -> None:
         def event_types(self) -> set[EnOptEventType]:
             return {EnOptEventType.FINISHED_EVALUATION}
 
-        def handle_event(self, _event: EnOptEvent) -> None:  # noqa: PLR6301
+        def handle_event(self, _event: EnOptEvent) -> None:  # ruff: ignore[no-self-use]
             in_handle.set()
             can_finish.wait()
 
@@ -973,7 +973,7 @@ def test_handler_may_be_attached_to_multiple_compute_steps() -> None:
 def test_pickle_before_use_succeeds_and_resets_state() -> None:
     handler = _RecordingHandler()
 
-    restored = pickle.loads(pickle.dumps(handler))  # noqa: S301
+    restored = pickle.loads(pickle.dumps(handler))  # ruff: ignore[suspicious-pickle-usage]
 
     # Usable after unpickling (its lock was recreated).
     restored.handle_event(object())

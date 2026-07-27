@@ -25,14 +25,14 @@ class DefaultVariableTransformPlugin(VariableTransformPlugin):
     """Default variable transform plugin class."""
 
     @classmethod
-    def create(  # noqa: D102
+    def create(  # ruff: ignore[undocumented-public-method]
         cls,
         config: VariableTransformConfig,
     ) -> DefaultVariableTransform:
         return DefaultVariableTransform(config)
 
     @classmethod
-    def is_supported(cls, method: str) -> bool:  # noqa: D102
+    def is_supported(cls, method: str) -> bool:  # ruff: ignore[undocumented-public-method]
         return method.lower() in (DEFAULT_VARIABLE_TRANSFORM_METHODS | {"default"})
 
 
@@ -40,14 +40,14 @@ class DefaultObjectiveTransformPlugin(ObjectiveTransformPlugin):
     """Default objective transform plugin class."""
 
     @classmethod
-    def create(  # noqa: D102
+    def create(  # ruff: ignore[undocumented-public-method]
         cls,
         config: ObjectiveTransformConfig,
     ) -> DefaultObjectiveTransform:
         return DefaultObjectiveTransform(config)
 
     @classmethod
-    def is_supported(cls, method: str) -> bool:  # noqa: D102
+    def is_supported(cls, method: str) -> bool:  # ruff: ignore[undocumented-public-method]
         return method.lower() in (DEFAULT_OBJECTIVE_TRANSFORM_METHODS | {"default"})
 
 
@@ -55,14 +55,14 @@ class DefaultNonlinearConstraintTransformPlugin(NonlinearConstraintTransformPlug
     """Default nonlinear constraint transform plugin class."""
 
     @classmethod
-    def create(  # noqa: D102
+    def create(  # ruff: ignore[undocumented-public-method]
         cls,
         config: NonlinearConstraintTransformConfig,
     ) -> DefaultNonlinearConstraintTransform:
         return DefaultNonlinearConstraintTransform(config)
 
     @classmethod
-    def is_supported(cls, method: str) -> bool:  # noqa: D102
+    def is_supported(cls, method: str) -> bool:  # ruff: ignore[undocumented-public-method]
         return method.lower() in (
             DEFAULT_NONLINEAR_CONSTRAINT_TRANSFORM_METHODS | {"default"}
         )

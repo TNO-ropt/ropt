@@ -24,16 +24,16 @@ class DefaultFunctionEstimator(FunctionEstimator):
     See [Function Estimators](../usage/function_estimators.md) for usage.
     """
 
-    def __init__(self, estimator_config: FunctionEstimatorConfig) -> None:  # noqa: D107
+    def __init__(self, estimator_config: FunctionEstimatorConfig) -> None:  # ruff: ignore[undocumented-public-init]
         self._estimator_config = estimator_config
         _, _, self._method = self._estimator_config.method.lower().rpartition("/")
         if self._method == "default":
             self._method = "mean"
 
-    def init(self, context: EnOptContext) -> None:  # noqa: D102
+    def init(self, context: EnOptContext) -> None:  # ruff: ignore[undocumented-public-method]
         self._context = context
 
-    def calculate_function(  # noqa: D102
+    def calculate_function(  # ruff: ignore[undocumented-public-method]
         self,
         functions: NDArray[np.float64],
         weights: NDArray[np.float64],
@@ -52,7 +52,7 @@ class DefaultFunctionEstimator(FunctionEstimator):
         msg = f"Function estimator method not supported: {estimator_method}"
         raise ValueError(msg)
 
-    def calculate_gradient(  # noqa: D102
+    def calculate_gradient(  # ruff: ignore[undocumented-public-method]
         self,
         functions: NDArray[np.float64],
         gradient: NDArray[np.float64],

@@ -68,7 +68,7 @@ class SciPySampler(Sampler):
     documentation for available options.
     """
 
-    def __init__(self, sampler_config: SamplerConfig) -> None:  # noqa: D107
+    def __init__(self, sampler_config: SamplerConfig) -> None:  # ruff: ignore[undocumented-public-init]
         self._sampler_config = sampler_config
         _, _, self._method = self._sampler_config.method.lower().rpartition("/")
         if self._method == "default":
@@ -79,7 +79,7 @@ class SciPySampler(Sampler):
             raise NotImplementedError(msg)
         self._sampler: rv_continuous | QMCEngine | None = None
 
-    def init(  # noqa: D102
+    def init(  # ruff: ignore[undocumented-public-method]
         self,
         context: EnOptContext,
         mask: NDArray[np.bool_] | None,
@@ -93,7 +93,7 @@ class SciPySampler(Sampler):
                 self._sampler_config.options
             )
 
-    def generate_samples(self) -> NDArray[np.float64]:  # noqa: D102
+    def generate_samples(self) -> NDArray[np.float64]:  # ruff: ignore[undocumented-public-method]
         variable_count = self._context.variables.variable_count
         realization_count = self._context.realizations.weights.size
         perturbation_count = self._context.gradient.number_of_perturbations

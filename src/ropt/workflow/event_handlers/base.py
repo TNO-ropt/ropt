@@ -57,7 +57,7 @@ class EventHandler(ABC):
         and pitfalls.
     """
 
-    def __init_subclass__(cls, **kwargs: object) -> None:  # noqa: D105
+    def __init_subclass__(cls, **kwargs: object) -> None:  # ruff: ignore[undocumented-magic-method]
         super().__init_subclass__(**kwargs)
         if "handle_event" in cls.__dict__ and not getattr(
             cls.__dict__["handle_event"], "__wrapped__", None
@@ -69,7 +69,7 @@ class EventHandler(ABC):
                 self: EventHandler,
                 event: EnOptEvent,
                 *,
-                _orig: Any = original,  # noqa: ANN401
+                _orig: Any = original,  # ruff: ignore[any-type]
             ) -> None:
                 if self._attached_to is _Attachment.DISPATCHER:
                     _orig(self, event)
@@ -96,7 +96,7 @@ class EventHandler(ABC):
         self._used = False
         self._owner_lock = threading.Lock()
 
-    def __getstate__(self) -> dict[str, Any]:  # noqa: D105
+    def __getstate__(self) -> dict[str, Any]:  # ruff: ignore[undocumented-magic-method]
         if self._used:
             msg = "Cannot pickle an event handler after it has been used."
             raise RuntimeError(msg)
@@ -104,7 +104,7 @@ class EventHandler(ABC):
         state.pop("_owner_lock", None)
         return state
 
-    def __setstate__(self, state: dict[str, Any]) -> None:  # noqa: D105
+    def __setstate__(self, state: dict[str, Any]) -> None:  # ruff: ignore[undocumented-magic-method]
         self.__dict__.update(state)
         self._owner_lock = threading.Lock()
 
@@ -162,7 +162,7 @@ class EventHandler(ABC):
             event: The event object.
         """
 
-    def __getitem__(self, key: str) -> Any:  # noqa: ANN401
+    def __getitem__(self, key: str) -> Any:  # ruff: ignore[any-type]
         """Retrieve a value from the event handler's internal state.
 
         This method enables dictionary-like access (`handler[key]`) to the
@@ -185,7 +185,7 @@ class EventHandler(ABC):
         msg = f"Unknown event handler data key: `{key}`"
         raise AttributeError(msg)
 
-    def __setitem__(self, key: str, value: Any) -> None:  # noqa: ANN401
+    def __setitem__(self, key: str, value: Any) -> None:  # ruff: ignore[any-type]
         """Store or update a value in the event handler's internal state.
 
         This method enables dictionary-like assignment (`handler[key] = value`)

@@ -127,7 +127,7 @@ def _estimate_merged_gradient(
     )
 
 
-def _calculate_gradient(  # noqa: PLR0913, PLR0917
+def _calculate_gradient(  # ruff: ignore[too-many-arguments, too-many-positional-arguments]
     functions: NDArray[np.float64],
     delta_variables: NDArray[np.float64],
     delta_functions: NDArray[np.float64],
@@ -146,7 +146,7 @@ def _calculate_gradient(  # noqa: PLR0913, PLR0917
     return estimator.calculate_gradient(functions, gradients, weights)
 
 
-def _calculate_estimated_gradients(  # noqa: PLR0913, PLR0917
+def _calculate_estimated_gradients(  # ruff: ignore[too-many-arguments, too-many-positional-arguments]
     function_estimators: tuple[FunctionEstimator, ...],
     estimator_indices: NDArray[np.intc] | None,
     variables: NDArray[np.float64],
