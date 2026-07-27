@@ -2843,7 +2843,14 @@ the process that created them. <code>EventForwardHandler</code> delivers events 
 calling the dispatcher's <code>put_event</code>, which schedules them onto its event
 loop with <code>call_soon_threadsafe</code> — a <em>thread</em>-safe call, not a
 <em>process</em>-safe one. A dispatcher reached from another process has no live
-loop, so the forwarded event is <strong>silently dropped</strong>.</p>
+loop, so a forwarded event cannot arrive. Rather than let it be silently
+dropped, forwarding an event or calling <code>put_event</code> from within a worker
+process raises a <code>RuntimeError</code>. Use
+<a class="autorefs autorefs-internal" title="            ropt.workflow.executors.is_worker_process" href="../../reference/workflow_executors/#ropt.workflow.executors.is_worker_process"><code>is_worker_process</code></a> — which
+returns <code>True</code> inside a
+<a class="autorefs autorefs-internal" title="            ropt.workflow.executors.MultiprocessingExecutor" href="../../reference/workflow_executors/#ropt.workflow.executors.MultiprocessingExecutor"><code>MultiprocessingExecutor</code></a>
+or <a class="autorefs autorefs-internal" title="            ropt.workflow.executors.HPCExecutor" href="../../reference/workflow_executors/#ropt.workflow.executors.HPCExecutor"><code>HPCExecutor</code></a> worker — to detect
+this context in your own code.</p>
 <p>Event handlers can therefore only observe events emitted <strong>within their own
 process</strong>. Any compute step executed out-of-process — for example a whole
 optimization sent to a

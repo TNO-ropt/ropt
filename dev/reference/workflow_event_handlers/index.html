@@ -5303,6 +5303,30 @@ etc.), register this handler with <code>run_in_thread=True</code> on the
     </table>
 
 
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError">RuntimeError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If called from within a worker process, where the
+          parent's EventDispatcher cannot be reached.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
     </div>
 
 </div>
@@ -5529,7 +5553,9 @@ parallel via <code>asyncio.gather</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If the dispatcher is not running.</p>
+                <p>If the dispatcher is not running, or if called from
+          within a worker process, where the dispatcher in the
+          parent process cannot be reached.</p>
               </div>
             </td>
           </tr>
