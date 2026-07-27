@@ -11,6 +11,7 @@ from typing import TYPE_CHECKING, Any
 from ropt._logging import get_logger
 from ropt.exceptions import ExecutorFailure
 
+from ._worker import _mark_worker_process
 from .base import Executor, ExecutorBase, Task
 
 if TYPE_CHECKING:
@@ -52,6 +53,7 @@ class MultiprocessingExecutor(ExecutorBase):
             max_workers=self._workers,
             mp_context=multiprocessing.get_context("spawn"),
             max_tasks_per_child=self._max_tasks_per_child,
+            initializer=_mark_worker_process,
         )
         _logger.debug(
             "Starting multiprocessing executor with %d worker(s)", self._workers

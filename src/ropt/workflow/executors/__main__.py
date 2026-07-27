@@ -7,9 +7,12 @@ from pathlib import Path
 
 import cloudpickle
 
+from ._worker import _mark_worker_process
+
 
 def main() -> int:
     """Run the script."""
+    _mark_worker_process()
     try:
         with Path(sys.argv[1]).open("rb") as fp:
             function, args, kwargs = cloudpickle.load(fp)

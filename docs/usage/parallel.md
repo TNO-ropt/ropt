@@ -266,7 +266,14 @@ handlers.
     calling the dispatcher's `put_event`, which schedules them onto its event
     loop with `call_soon_threadsafe` — a *thread*-safe call, not a
     *process*-safe one. A dispatcher reached from another process has no live
-    loop, so the forwarded event is **silently dropped**.
+    loop, so a forwarded event cannot arrive. Rather than let it be silently
+    dropped, forwarding an event or calling `put_event` from within a worker
+    process raises a `RuntimeError`. Use
+    [`is_worker_process`][ropt.workflow.executors.is_worker_process] — which
+    returns `True` inside a
+    [`MultiprocessingExecutor`][ropt.workflow.executors.MultiprocessingExecutor]
+    or [`HPCExecutor`][ropt.workflow.executors.HPCExecutor] worker — to detect
+    this context in your own code.
 
     Event handlers can therefore only observe events emitted **within their own
     process**. Any compute step executed out-of-process — for example a whole

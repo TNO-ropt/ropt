@@ -195,6 +195,29 @@ def test_event_forward_handler_event_types() -> None:
     assert forward.event_types == {EnOptEventType.FINISHED_EVALUATION}
 
 
+def test_event_forward_handler_raises_in_worker(
+    config: dict[str, Any], monkeypatch: Any
+) -> None:
+    monkeypatch.setattr("ropt.workflow.executors._worker._IS_WORKER", True)
+    context = EnOptContext.model_validate(config)
+    event = EnOptEvent(event_type=EnOptEventType.FINISHED_EVALUATION, context=context)
+    forward = EventForwardHandler(
+        EventDispatcher(), event_types={EnOptEventType.FINISHED_EVALUATION}
+    )
+    with pytest.raises(RuntimeError, match="Cannot send events to a handler"):
+        forward.handle_event(event)
+
+
+def test_event_dispatcher_put_event_raises_in_worker(
+    config: dict[str, Any], monkeypatch: Any
+) -> None:
+    monkeypatch.setattr("ropt.workflow.executors._worker._IS_WORKER", True)
+    context = EnOptContext.model_validate(config)
+    event = EnOptEvent(event_type=EnOptEventType.FINISHED_EVALUATION, context=context)
+    with pytest.raises(RuntimeError, match="Cannot send events to a handler"):
+        EventDispatcher().put_event(event)
+
+
 @pytest.mark.asyncio
 async def test_event_forward_handler_forwards_to_dispatcher(
     config: dict[str, Any],

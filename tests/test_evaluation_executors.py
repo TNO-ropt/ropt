@@ -21,6 +21,7 @@ from ropt.workflow.executors import (
     ResultsQueue,
     Task,
     ThreadingExecutor,
+    is_worker_process,
 )
 
 if TYPE_CHECKING:
@@ -129,6 +130,63 @@ async def test_executor_ok(
         executor.cancel()
     assert result_processor.results == {1, 2}
     assert not executor.is_running()
+
+
+@pytest.mark.parametrize(
+    ("executor_name", "expected_results"),
+    [
+        ("threading", {False}),
+        ("multiprocessing", {True}),
+        pytest.param(
+            "hpc",
+            {True},
+            marks=[
+                pytest.mark.slow,
+                pytest.mark.timeout(30),
+                pytest.mark.skipif(
+                    not _TEST_HPC, reason="hpc requirements are not installed"
+                ),
+            ],
+        ),
+    ],
+)
+async def test_is_worker_process(
+    executor_name: str, expected_results: set[bool], tmp_path: Path, monkeypatch: Any
+) -> None:
+    assert not is_worker_process()
+    result_queue: ResultsQueue = ResultsQueue()
+    tasks = [Task(function=is_worker_process, results_queue=result_queue)]
+    match executor_name:
+        case "hpc":
+            monkeypatch.setattr(
+                "ropt.workflow.executors._hpc_executor.pysqa.QueueAdapter",
+                lambda *args, **kwargs: MockedHPCAdapter(tmp_path),  # ruff: ignore[unused-lambda-argument]
+            )
+            executor: Executor = HPCExecutor(
+                workdir=tmp_path, workers=1, interval=0, template=""
+            )
+        case "threading":
+            executor = ThreadingExecutor(workers=1)
+        case "multiprocessing":
+            executor = MultiprocessingExecutor(workers=1)
+    all_processed = asyncio.Event()
+    result_processor = _ResultProcessor()
+    async with asyncio.TaskGroup() as tg:
+        await executor.start(tg)
+        tg.create_task(
+            asyncio.to_thread(
+                result_processor.process_results,
+                result_queue,
+                len(tasks),
+                all_processed,
+            )
+        )
+        for task in tasks:
+            await executor.task_queue.put(task)
+        await all_processed.wait()
+        executor.cancel()
+    assert result_processor.results == expected_results
+    assert not is_worker_process()
 
 
 @pytest.mark.parametrize(

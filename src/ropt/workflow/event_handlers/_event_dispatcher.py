@@ -6,6 +6,8 @@ import asyncio
 import threading
 from typing import TYPE_CHECKING
 
+from ropt.workflow.executors._worker import is_worker_process
+
 if TYPE_CHECKING:
     from ropt.events import EnOptEvent
 
@@ -55,8 +57,15 @@ class EventDispatcher:
             event: The event to submit.
 
         Raises:
-            RuntimeError: If the dispatcher is not running.
+            RuntimeError: If the dispatcher is not running, or if called from
+                          within a worker process, where the dispatcher in the
+                          parent process cannot be reached.
         """
+        if is_worker_process():
+            msg = (
+                "Cannot send events to a handler from a multiprocessing or HPC worker."
+            )
+            raise RuntimeError(msg)
         if not self._running.is_set():
             msg = "Cannot submit an event to an EventDispatcher that is not running."
             raise RuntimeError(msg)
