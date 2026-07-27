@@ -148,6 +148,15 @@ This allows deployments to ship pre-configured cluster definitions by
 installing them into `share/ropt/pysqa/` — no explicit `config_path`
 argument is needed at runtime.
 
+For multi-cluster `pysqa` configurations, the target cluster is resolved from
+the `cluster` and `queue` arguments:
+
+- If `cluster` is given, it is selected directly. When `queue` is also given,
+  it must be available on that cluster.
+- If only `queue` is given, the cluster that provides it is derived
+  automatically. This requires exactly one cluster to provide the queue;
+  otherwise (no match or multiple matches) an error is raised.
+
 ## Dispatching arbitrary tasks
 
 [`dispatch_tasks`][ropt.workflow.dispatch_tasks] is a utility function built on

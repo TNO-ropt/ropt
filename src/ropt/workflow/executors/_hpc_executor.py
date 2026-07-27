@@ -79,9 +79,18 @@ class HPCExecutor(ExecutorBase):
             retries:     Number of polling retries before declaring a task failed.
             cleanup:     Whether to remove task files after result retrieval.
 
+        For multi-cluster `pysqa` configurations the cluster is resolved as
+        follows: if `cluster` is given it is selected directly, and if `queue`
+        is also given it is verified to be available on that cluster. If only
+        `queue` is given the cluster that provides it is derived automatically;
+        this requires exactly one cluster to provide the queue.
+
         Raises:
             RuntimeError: If neither a `template` is provided nor a valid
-                          `config_path` can be found.
+                          `config_path` can be found, if the requested cluster
+                          is unknown, if the queue is not available on the
+                          requested cluster, or if the queue cannot be resolved
+                          to exactly one cluster.
         """
         super().__init__(queue_size=queue_size)
         self._workdir = Path(workdir)
@@ -111,8 +120,7 @@ class HPCExecutor(ExecutorBase):
             self._queue_adapter = pysqa.QueueAdapter(
                 directory=str(config_path / queue_type)
             )
-        if cluster is not None:
-            self._queue_adapter.switch_cluster(cluster)
+            _select_cluster(self._queue_adapter, cluster, queue)
 
         self._tasks: dict[str | UUID, Task] = {}
         self._results: dict[str | UUID, Any] = {}
@@ -260,3 +268,41 @@ def _get_config_path(config_path: Path | str | None) -> Path | None:
     else:
         return Path(config_path).resolve()
     return None
+
+
+def _select_cluster(
+    queue_adapter: pysqa.QueueAdapter, cluster: str | None, queue: str | None
+) -> None:
+    clusters = queue_adapter.list_clusters()
+    if cluster is not None and cluster not in clusters:
+        msg = f"Unknown HPC cluster: {cluster}"
+        raise RuntimeError(msg)
+    candidates = [cluster] if cluster is not None else clusters
+
+    if queue is None:
+        if cluster is not None:
+            queue_adapter.switch_cluster(cluster)
+        return
+
+    matches = [
+        name for name in candidates if _cluster_has_queue(queue_adapter, name, queue)
+    ]
+    if not matches:
+        target = (
+            f"HPC cluster '{cluster}'" if cluster is not None else "any HPC cluster"
+        )
+        msg = f"Queue '{queue}' is not available on {target}"
+        raise RuntimeError(msg)
+    if len(matches) > 1:
+        cluster_names = ", ".join(matches)
+        msg = f"Queue '{queue}' is available on multiple HPC clusters: {cluster_names}"
+        raise RuntimeError(msg)
+    queue_adapter.switch_cluster(matches[0])
+
+
+def _cluster_has_queue(
+    queue_adapter: pysqa.QueueAdapter, cluster: str, queue: str
+) -> bool:
+    queue_adapter.switch_cluster(cluster)
+    queue_list = queue_adapter.queue_list
+    return queue_list is not None and queue in queue_list
