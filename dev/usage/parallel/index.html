@@ -2704,6 +2704,15 @@ Find it with:</p>
 <p>This allows deployments to ship pre-configured cluster definitions by
 installing them into <code>share/ropt/pysqa/</code> — no explicit <code>config_path</code>
 argument is needed at runtime.</p>
+<p>For multi-cluster <code>pysqa</code> configurations, the target cluster is resolved from
+the <code>cluster</code> and <code>queue</code> arguments:</p>
+<ul>
+<li>If <code>cluster</code> is given, it is selected directly. When <code>queue</code> is also given,
+  it must be available on that cluster.</li>
+<li>If only <code>queue</code> is given, the cluster that provides it is derived
+  automatically. This requires exactly one cluster to provide the queue;
+  otherwise (no match or multiple matches) an error is raised.</li>
+</ul>
 <h2 id="dispatching-arbitrary-tasks">Dispatching arbitrary tasks</h2>
 <p><a class="autorefs autorefs-internal" title="            dispatch_tasks
 

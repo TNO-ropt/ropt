@@ -4025,6 +4025,11 @@ configuration details.</p>
           </tr>
       </tbody>
     </table>
+        <p>For multi-cluster <code>pysqa</code> configurations the cluster is resolved as
+follows: if <code>cluster</code> is given it is selected directly, and if <code>queue</code>
+is also given it is verified to be available on that cluster. If only
+<code>queue</code> is given the cluster that provides it is derived automatically;
+this requires exactly one cluster to provide the queue.</p>
 
 
 <p><span class="doc-section-title">Raises:</span></p>
@@ -4043,7 +4048,10 @@ configuration details.</p>
             <td>
               <div class="doc-md-description">
                 <p>If neither a <code>template</code> is provided nor a valid
-          <code>config_path</code> can be found.</p>
+          <code>config_path</code> can be found, if the requested cluster
+          is unknown, if the queue is not available on the
+          requested cluster, or if the queue cannot be resolved
+          to exactly one cluster.</p>
               </div>
             </td>
           </tr>
