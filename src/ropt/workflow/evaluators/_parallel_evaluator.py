@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import queue
 from itertools import starmap
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, NoReturn
 
 import numpy as np
 
@@ -96,6 +96,15 @@ class ParallelEvaluator(Evaluator):
     ) -> EvaluationBatchResult:
         """Evaluate all objective and constraints.
 
+        Results are collected following the two-class error contract described
+        in [Parallel Evaluation](../usage/parallel.md#error-handling). An
+        infrastructure failure arrives as an
+        [`ExecutorFailure`][ropt.exceptions.ExecutorFailure] result and is
+        recorded as a failed realization (NaN), while a user-code exception
+        arrives on the results queue and aborts the whole evaluation, raising
+        [`Abort`][ropt.exceptions.Abort] with the original exception chained as
+        the cause.
+
         Args:
             variables:      The matrix of variables to evaluate.
             evaluator_context: The evaluation context.
@@ -104,7 +113,8 @@ class ParallelEvaluator(Evaluator):
             The result of calling the wrapped evaluator function.
 
         Raises:
-            Abort: raise if the executor is not running.
+            Abort: If the executor is not running, or if a task's function
+                   raised a user-code exception.
         """
         if not self._executor.is_running():
             raise Abort(ExitCode.ABORT_FROM_ERROR)
@@ -138,16 +148,19 @@ class ParallelEvaluator(Evaluator):
         while received < active_count:
             while self._executor.is_running():
                 try:
-                    if (task := results_queue.get(timeout=1)) is None:
-                        raise Abort(ExitCode.ABORT_FROM_ERROR)
-                    received += _handle_result(
-                        task, results, metadata, no, variables.shape[0]
-                    )
-                    break
+                    item = results_queue.get(timeout=1)
                 except queue.Empty:
                     continue
+                if item is None:
+                    _abort(results_queue)
+                if isinstance(item, BaseException):
+                    raise Abort(ExitCode.ABORT_FROM_ERROR) from item
+                received += _handle_result(
+                    item, results, metadata, no, variables.shape[0]
+                )
+                break
             if not self._executor.is_running():
-                raise Abort(ExitCode.ABORT_FROM_ERROR)
+                _abort(results_queue)
 
         return EvaluationBatchResult(
             batch_id=batch_id,
@@ -218,6 +231,17 @@ def _run_bundle(
     bundle: list[tuple[NDArray[np.float64], EvaluationFunctionContext]],
 ) -> list[EvaluationFunctionResult]:
     return list(starmap(function, bundle))
+
+
+def _abort(results_queue: ResultsQueue) -> NoReturn:
+    while True:
+        try:
+            item = results_queue.get_nowait()
+        except queue.Empty:
+            break
+        if isinstance(item, BaseException):
+            raise Abort(ExitCode.ABORT_FROM_ERROR) from item
+    raise Abort(ExitCode.ABORT_FROM_ERROR)
 
 
 def _handle_result(

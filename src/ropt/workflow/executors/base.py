@@ -157,6 +157,22 @@ class ExecutorBase(Executor):
 class Task(ABC):
     """A task to be executed by a worker.
 
+    Task results are delivered on the associated
+    [`ResultsQueue`][ropt.workflow.executors.ResultsQueue]. Two distinct
+    failure classes are distinguished, following the error contract described in
+    [Parallel Evaluation](../usage/parallel.md#error-handling):
+
+    - An **infrastructure failure** (a killed worker process, or missing/corrupt
+      HPC output) is delivered as an ordinary result whose value is an
+      [`ExecutorFailure`][ropt.exceptions.ExecutorFailure] via
+      [`put_result`][ropt.workflow.executors.Task.put_result]. This is a
+      tolerated per-realization failure.
+    - A **user-code exception** (the task function itself raises) is delivered
+      via [`put_error`][ropt.workflow.executors.Task.put_error], which places
+      the exception on the queue and closes it. The owning evaluator turns this
+      into an abort of the whole evaluation, chaining the original exception as
+      the cause.
+
     Attributes:
         function:      The function to execute.
         args:          The arguments to pass to the function.
@@ -178,14 +194,37 @@ class Task(ABC):
         self.result = result
         self.results_queue.put(self)
 
+    def put_error(self, exc: BaseException) -> None:
+        """Deliver a user-code exception on the result queue.
+
+        Places the exception raised by the task's function on the queue and
+        closes it. Like [`cancel_all`][ropt.workflow.executors.Task.cancel_all]
+        this unblocks the waiting evaluator, but it additionally carries the
+        exception so the evaluator can surface it as the cause of the abort.
+
+        Args:
+            exc: The exception raised by the task's function.
+        """
+        self.results_queue.put(exc)
+        self.results_queue.close()
+
     def cancel_all(self) -> None:
         """Stop putting results in the result queue."""
         self.results_queue.put(None)
         self.results_queue.close()
 
 
-class ResultsQueue(queue.Queue[Task | None]):
-    """A queue that can be closed."""
+class ResultsQueue(queue.Queue["Task | BaseException | None"]):
+    """A queue that can be closed.
+
+    Items delivered on this queue follow the error contract of
+    [`Task`][ropt.workflow.executors.Task]: a [`Task`][ropt.workflow.executors.Task]
+    carries a normal result (including an
+    [`ExecutorFailure`][ropt.exceptions.ExecutorFailure] as its `result`), a
+    `BaseException` signals a user-code exception that must abort the
+    evaluation, and `None` is a plain sentinel used to unblock a waiting
+    consumer.
+    """
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:  # ruff: ignore[any-type]
         """Initialize the queue."""
@@ -196,7 +235,7 @@ class ResultsQueue(queue.Queue[Task | None]):
         """Close the queue."""
         self.closed = True
 
-    def put(self, item: Task | None, *args: Any, **kwargs: Any) -> None:  # ruff: ignore[any-type]
+    def put(self, item: Task | BaseException | None, *args: Any, **kwargs: Any) -> None:  # ruff: ignore[any-type]
         """Put an item in the queue."""
         if not self.closed:
             super().put(item, *args, **kwargs)

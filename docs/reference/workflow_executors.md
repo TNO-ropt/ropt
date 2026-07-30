@@ -8,6 +8,7 @@ See [Parallel Evaluation](../usage/parallel.md) for usage.
 
 ::: ropt.workflow.executors.Executor
 ::: ropt.workflow.executors.Task
+::: ropt.workflow.executors.ResultsQueue
 ::: ropt.workflow.executors.ThreadingExecutor
 ::: ropt.workflow.executors.MultiprocessingExecutor
 ::: ropt.workflow.executors.HPCExecutor

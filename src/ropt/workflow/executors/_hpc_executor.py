@@ -244,7 +244,7 @@ class HPCExecutor(ExecutorBase):
                 if isinstance(result, Exception) and not isinstance(
                     result, ExecutorFailure
                 ):
-                    task.cancel_all()
+                    task.put_error(result)
                     raise result
                 task.put_result(result)
                 remove.append(task_id)

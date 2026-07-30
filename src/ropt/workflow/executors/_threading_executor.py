@@ -60,9 +60,8 @@ class _Worker:
                     task.function, *task.args, **task.kwargs
                 )
                 await asyncio.to_thread(task.put_result, result)
-            except Exception:
-                task.cancel_all()
-                self._parent.cancel()
+            except Exception as exc:
+                task.put_error(exc)
                 raise
             finally:
                 self._task_queue.task_done()

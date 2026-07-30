@@ -157,6 +157,53 @@ the `cluster` and `queue` arguments:
   automatically. This requires exactly one cluster to provide the queue;
   otherwise (no match or multiple matches) an error is raised.
 
+## Error handling
+
+Executors and the [`ParallelEvaluator`][ropt.workflow.evaluators.ParallelEvaluator]
+distinguish two classes of failure, and treat them very differently.
+
+### Infrastructure failure (tolerated)
+
+An *infrastructure* failure is one that is not caused by the evaluation function
+itself: a worker process is killed (`BrokenProcessPool`), or an HPC job's output
+file never appears or cannot be deserialized. These are delivered as an ordinary
+result whose value is an [`ExecutorFailure`][ropt.exceptions.ExecutorFailure]
+(via [`put_result`][ropt.workflow.executors.Task.put_result]). The evaluator
+records the affected rows as failed realizations by writing `numpy.nan`. Such a
+failure is *tolerated*: the optimization continues, and only aborts (with
+`TOO_FEW_REALIZATIONS`) if too many realizations fail to satisfy the configured
+minimum.
+
+### User-code exception (aborts everything)
+
+A *user-code* exception is one raised by the evaluation function itself — a bug
+in the objective, a bad configuration, an unexpected input. This must not be
+silently turned into a failed realization; it signals a genuine error the user
+needs to see and fix. When the task function raises, the worker delivers the
+exception on the results queue (via
+[`put_error`][ropt.workflow.executors.Task.put_error], which also closes the
+queue) **and** re-raises it into the executor's `asyncio.TaskGroup`. The two
+channels play distinct roles:
+
+- The queue item unblocks the owning
+  [`ParallelEvaluator.eval`][ropt.workflow.evaluators.ParallelEvaluator.eval]
+  call, which raises [`Abort`][ropt.exceptions.Abort] with
+  `ExitCode.ABORT_FROM_ERROR`, chaining the original exception as the cause
+  (`raise Abort(...) from exc`) so its message and traceback remain visible.
+- The re-raise into the `TaskGroup` cancels sibling tasks. This is what makes
+  "abort everything" work when an advanced user runs several compute steps
+  concurrently in their own `asyncio.TaskGroup` sharing one executor: a genuine
+  error in one objective propagates into that group, cancels the siblings, and
+  surfaces with a traceback so they can fix and re-run.
+
+For the [`HPCExecutor`][ropt.workflow.executors.HPCExecutor] the exception
+crosses a process boundary. It is serialized with `cloudpickle`, which can
+handle exception objects that the standard `pickle` module cannot, but does not
+serialize tracebacks. The worker therefore attaches the formatted traceback as a
+note (`exc.add_note(...)`) before serializing, so the originating traceback
+travels with the exception. Exceptions that cannot be serialized at all are
+wrapped in a `RuntimeError` carrying their `repr` and notes.
+
 ## Dispatching arbitrary tasks
 
 [`dispatch_tasks`][ropt.workflow.dispatch_tasks] is a utility function built on

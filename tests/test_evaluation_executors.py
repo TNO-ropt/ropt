@@ -8,6 +8,8 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 import pytest
 
+from ropt.enums import ExitCode
+from ropt.exceptions import Abort, ExecutorFailure
 from ropt.workflow._basic_optimizer import BasicOptimizer
 from ropt.workflow.evaluators import (
     EvaluationFunctionCallback,
@@ -15,6 +17,7 @@ from ropt.workflow.evaluators import (
     EvaluationFunctionResult,
     ParallelEvaluator,
 )
+from ropt.workflow.evaluators._parallel_evaluator import _abort, _handle_result
 from ropt.workflow.executors import (
     HPCExecutor,
     MultiprocessingExecutor,
@@ -60,6 +63,7 @@ class _ResultProcessor:
             task = result_queue.get()
             if task is None:
                 break
+            assert isinstance(task, Task)
             assert task.result is not None
             self.results.add(task.result)
         finished_event.set()
@@ -233,28 +237,27 @@ async def test_executor_error(
         case "multiprocessing":
             executor = MultiprocessingExecutor(workers=2)
     assert not executor.is_running()
-    all_processed = asyncio.Event()
-    result_processor = _ResultProcessor()
     with pytest.raises(ExceptionGroup) as excinfo:  # ruff: ignore[pytest-raises-with-multiple-statements]
         async with asyncio.TaskGroup() as tg:
             await executor.start(tg)
-            tg.create_task(
-                asyncio.to_thread(
-                    result_processor.process_results,
-                    result_queue,
-                    len(tasks),
-                    all_processed,
-                )
-            )
             assert executor.is_running()
             for task in tasks:
                 await executor.task_queue.put(task)
-            await all_processed.wait()
-            executor.cancel()
     for err in excinfo.value.exceptions:
         assert isinstance(err, ValueError)
         assert "Test error in function" in str(err)
     assert not executor.is_running()
+
+    delivered = []
+    while not result_queue.empty():
+        delivered.append(result_queue.get_nowait())
+    errors = [item for item in delivered if isinstance(item, ValueError)]
+    assert errors
+    assert all("Test error in function" in str(err) for err in errors)
+    if executor_name == "hpc":
+        notes = getattr(errors[0], "__notes__", [])
+        assert any("Test error in function" in note for note in notes)
+        assert any("Traceback" in note for note in notes)
 
 
 initial_values = np.array([0.0, 0.0, 0.1])
@@ -564,3 +567,53 @@ async def test_invalid_bundle_size() -> None:  # ruff: ignore[unused-async]
             executor=executor,
             bundle_size=-1,
         )
+
+
+async def test_task_put_error_delivers_exception_and_closes_queue() -> None:  # ruff: ignore[unused-async]
+    result_queue = ResultsQueue()
+    task = Task(function=_function, args=(0,), results_queue=result_queue)
+    error = ValueError("Test error in function")
+    task.put_error(error)
+    assert result_queue.get_nowait() is error
+    assert result_queue.closed
+    task.put_result(1)
+    assert result_queue.empty()
+
+
+async def test_abort_chains_queued_exception_as_cause() -> None:  # ruff: ignore[unused-async]
+    result_queue = ResultsQueue()
+    error = ValueError("Test error in function")
+    result_queue.put(error)
+    with pytest.raises(Abort) as excinfo:
+        _abort(result_queue)
+    assert excinfo.value.exit_code == ExitCode.ABORT_FROM_ERROR
+    assert excinfo.value.__cause__ is error
+
+
+async def test_abort_without_queued_exception_has_no_cause() -> None:  # ruff: ignore[unused-async]
+    with pytest.raises(Abort) as excinfo:
+        _abort(ResultsQueue())
+    assert excinfo.value.exit_code == ExitCode.ABORT_FROM_ERROR
+    assert excinfo.value.__cause__ is None
+
+
+async def test_handle_result_records_executor_failure_as_nan() -> None:  # ruff: ignore[unused-async]
+    results = np.zeros((2, 1), dtype=np.float64)
+    bundle = [
+        (
+            np.zeros(2, dtype=np.float64),
+            EvaluationFunctionContext(
+                realization=0, perturbation=-1, batch_id=0, eval_idx=idx
+            ),
+        )
+        for idx in range(2)
+    ]
+    task = Task(
+        function=_function,
+        args=(None, bundle),
+        results_queue=ResultsQueue(),
+        result=ExecutorFailure("Background process was killed"),
+    )
+    handled = _handle_result(task, results, {}, objective_count=1, eval_count=2)
+    assert handled == 2
+    assert np.all(np.isnan(results))
