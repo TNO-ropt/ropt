@@ -645,6 +645,49 @@ def test_optimization_step_abort_flag_is_reset_between_runs(
     assert exit_code != ExitCode.USER_ABORT
 
 
+def test_optimization_step_cannot_be_transferred_into_worker(
+    evaluator: Any, monkeypatch: Any
+) -> None:
+    step = OptimizationStep(evaluator=evaluator())
+    data = pickle.dumps(step)
+    monkeypatch.setattr("ropt.workflow.executors._worker._IS_WORKER", True)
+    with pytest.raises(RuntimeError, match="cannot be transferred into a worker"):
+        pickle.loads(data)  # ruff: ignore[suspicious-pickle-usage]
+
+
+def test_optimization_step_can_be_transferred_outside_worker(evaluator: Any) -> None:
+    step = OptimizationStep(evaluator=evaluator())
+    restored = pickle.loads(pickle.dumps(step))  # ruff: ignore[suspicious-pickle-usage]
+    assert isinstance(restored, OptimizationStep)
+
+
+def test_optimization_step_concurrent_run_raises(config: Any, evaluator: Any) -> None:
+    entered = threading.Event()
+    release = threading.Event()
+
+    def _block(_: EnOptEvent) -> None:
+        entered.set()
+        release.wait(timeout=5)
+
+    step = OptimizationStep(evaluator=evaluator())
+    step.add_event_handler(
+        CallbackHandler(event_types={EnOptEventType.START_OPTIMIZER}, callback=_block)
+    )
+    context = EnOptContext.model_validate(config)
+
+    thread = threading.Thread(
+        target=lambda: step.run(variables=initial_values, context=context)
+    )
+    thread.start()
+    try:
+        assert entered.wait(timeout=5)
+        with pytest.raises(RuntimeError, match="already running on another thread"):
+            step.run(variables=initial_values, context=context)
+    finally:
+        release.set()
+        thread.join(timeout=5)
+
+
 def _cached_eval(
     obj: CachedEvaluator,
     variables: NDArray[np.float64],

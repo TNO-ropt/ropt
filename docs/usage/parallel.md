@@ -395,6 +395,33 @@ hard constraint on where each layer of a nested workflow may run:
     there would find `executor.loop is None` and raise `Abort`, and any events
     it emits would never reach the main-process dispatcher.
 
+[`OptimizationStep`][ropt.workflow.compute_steps.OptimizationStep] enforces this
+rule rather than leaving it to convention. **A step is bound to its process, not
+to a thread.** Its two control channels — the abort flag it polls and the event
+handlers it invokes — live in shared memory, so they keep working across threads
+within one process but cannot cross a process boundary. The invariant is
+therefore "a step lives in one process," *not* "a step must run where it was
+created." Concretely:
+
+- **Across threads (allowed).** A step may be created on one thread and run on
+  another within the same process — for example created on the main thread and
+  driven with `asyncio.to_thread` or a
+  [`ThreadingExecutor`][ropt.workflow.executors.ThreadingExecutor] while a
+  main-thread [`EventDispatcher`][ropt.workflow.event_handlers.EventDispatcher]
+  collects its events. Abort and event handling keep working because memory is
+  shared.
+- **Across processes (forbidden).** A step refuses to be *transferred* into a
+  [`MultiprocessingExecutor`][ropt.workflow.executors.MultiprocessingExecutor]
+  or [`HPCExecutor`][ropt.workflow.executors.HPCExecutor] worker: unpickling one
+  there raises a `RuntimeError`. Create the step **inside** the worker instead —
+  a self-contained optimization that returns its result as data. A step created
+  there is unknown to the host process and needs no cross-process communication.
+- **Concurrently (forbidden).** A single step must not run more than once at a
+  time: calling
+  [`run`][ropt.workflow.compute_steps.OptimizationStep.run] on a step that is
+  already running — for example from two threads — raises a `RuntimeError`. Give
+  each concurrent optimization its own step; serial reuse of one step is fine.
+
 Process- and HPC-based parallelism therefore belongs at the **innermost (leaf)
 evaluations**, where the actual model runs — not at a layer that itself drives a
 nested workflow. The nested examples follow exactly this shape:

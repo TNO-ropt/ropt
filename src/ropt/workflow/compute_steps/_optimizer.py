@@ -13,11 +13,12 @@ from ropt.core import EnsembleEvaluator, EnsembleOptimizer
 from ropt.enums import EnOptEventType, ExitCode
 from ropt.events import EnOptEvent
 from ropt.exceptions import Abort
+from ropt.workflow.executors._worker import is_worker_process
 
 from .base import ComputeStep
 
 if TYPE_CHECKING:
-    from numpy.typing import ArrayLike
+    from numpy.typing import ArrayLike, NDArray
 
     from ropt.context import EnOptContext
     from ropt.results import Results
@@ -49,6 +50,8 @@ class OptimizationStep(ComputeStep):
         super().__init__()
         self._evaluator = evaluator
         self._abort = threading.Event()
+        self._running = False
+        self._run_lock = threading.Lock()
 
     def run(
         self,
@@ -70,8 +73,31 @@ class OptimizationStep(ComputeStep):
             An exit code describing the outcome of the optimization.
 
         Raises:
+            RuntimeError: If this step is already running on another thread.
             ValueError: If the input variables have the wrong shape.
         """
+        variables = np.array(np.asarray(variables, dtype=np.float64), ndmin=1)
+        if variables.shape != (context.variables.variable_count,):
+            msg = "The input variables have the wrong shape"
+            raise ValueError(msg)
+        with self._run_lock:
+            if self._running:
+                msg = "The optimization step is already running on another thread."
+                raise RuntimeError(msg)
+            self._running = True
+        try:
+            return self._run(context, variables, metadata=metadata)
+        finally:
+            with self._run_lock:
+                self._running = False
+
+    def _run(
+        self,
+        context: EnOptContext,
+        variables: NDArray[np.float64],
+        *,
+        metadata: dict[str, Any] | None = None,
+    ) -> ExitCode:
         context.lock()
 
         self._abort.clear()
@@ -89,10 +115,6 @@ class OptimizationStep(ComputeStep):
             EnOptEvent(event_type=EnOptEventType.START_OPTIMIZER, context=context)
         )
 
-        variables = np.array(np.asarray(variables, dtype=np.float64), ndmin=1)
-        if variables.shape != (self._context.variables.variable_count,):
-            msg = "The input variables have the wrong shape"
-            raise ValueError(msg)
         for transform in context.variable_transforms:
             variables = transform.to_optimizer(variables)
 
@@ -136,16 +158,23 @@ class OptimizationStep(ComputeStep):
         self._abort.set()
 
     def __getstate__(self) -> dict[str, Any]:
-        # threading.Event is not picklable; drop it and recreate in __setstate__.
-        # A step pickled to another process is behind a process boundary and
-        # cannot be aborted from the parent, so a fresh unset event is correct.
         state = self.__dict__.copy()
         state.pop("_abort", None)
+        state.pop("_run_lock", None)
+        state.pop("_running", None)
         return state
 
     def __setstate__(self, state: dict[str, Any]) -> None:
+        if is_worker_process():
+            msg = (
+                "An OptimizationStep cannot be transferred into a worker process; "
+                "create it inside the worker instead."
+            )
+            raise RuntimeError(msg)
         self.__dict__.update(state)
         self._abort = threading.Event()
+        self._running = False
+        self._run_lock = threading.Lock()
 
     def _emit_event(self, event: EnOptEvent) -> None:
         for handler in self.event_handlers:
