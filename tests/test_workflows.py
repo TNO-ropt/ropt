@@ -605,46 +605,6 @@ def test_optimization_abort(config: Any, evaluator: Any) -> None:
     assert last_evaluation == 1
 
 
-def test_optimization_step_abort(config: Any, evaluator: Any) -> None:
-    result_handler = ResultsHandler()
-    step = OptimizationStep(evaluator=evaluator())
-    step.add_event_handler(result_handler)
-
-    last_evaluation = 0
-
-    def _observer(_: EnOptEvent) -> None:
-        nonlocal last_evaluation
-
-        last_evaluation += 1
-        if last_evaluation == 1:
-            step.abort()
-
-    step.add_event_handler(
-        CallbackHandler(
-            event_types={EnOptEventType.FINISHED_EVALUATION}, callback=_observer
-        )
-    )
-    exit_code = step.run(
-        variables=initial_values, context=EnOptContext.model_validate(config)
-    )
-    assert result_handler["results"] is not None
-    assert exit_code == ExitCode.USER_ABORT
-    assert last_evaluation == 1
-
-
-def test_optimization_step_abort_flag_is_reset_between_runs(
-    config: Any, evaluator: Any
-) -> None:
-    step = OptimizationStep(evaluator=evaluator())
-    step.add_event_handler(ResultsHandler())
-
-    step.abort()
-    exit_code = step.run(
-        variables=initial_values, context=EnOptContext.model_validate(config)
-    )
-    assert exit_code != ExitCode.USER_ABORT
-
-
 def test_optimization_step_cannot_be_transferred_into_worker(
     evaluator: Any, monkeypatch: Any
 ) -> None:

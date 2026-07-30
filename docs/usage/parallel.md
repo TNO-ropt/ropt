@@ -211,10 +211,9 @@ affect performance, it determines what a dispatched compute step can still
 *do*. One principle governs the difference.
 
 - A **thread** shares memory with the process that started it. A step's control
-  channels — the abort flag it polls, the event handlers it invokes, and the
-  live asyncio loop, executors, and
-  [`EventDispatcher`][ropt.workflow.event_handlers.EventDispatcher] it relies on
-  — all keep working across threads within one process.
+  channels — the event handlers it invokes and the live asyncio loop, executors,
+  and [`EventDispatcher`][ropt.workflow.event_handlers.EventDispatcher] it relies
+  on — all keep working across threads within one process.
 - A **process** — a
   [`MultiprocessingExecutor`][ropt.workflow.executors.MultiprocessingExecutor]
   worker or an [`HPCExecutor`][ropt.workflow.executors.HPCExecutor] job — shares
@@ -224,10 +223,9 @@ affect performance, it determines what a dispatched compute step can still
   evaluation that produces a value the optimizer needs.
 
 The rule that follows is: anything that must **communicate back** — emit events
-to a dispatcher, be aborted from the driver, or *drive* a nested compute step —
-must stay **in the host process**. A different *thread* is fine; a different
-*process* is not. Only **self-contained, data-in / data-out** work belongs
-across a process boundary.
+to a dispatcher or *drive* a nested compute step — must stay **in the host
+process**. A different *thread* is fine; a different *process* is not. Only
+**self-contained, data-in / data-out** work belongs across a process boundary.
 
 Two places where this matters in practice:
 
@@ -237,9 +235,9 @@ Two places where this matters in practice:
   the innermost leaf evaluations may go to a process or HPC worker. See
   [Nested workflows and process boundaries](#nested-workflows-and-process-boundaries).
 - **Dispatching functions to workers.** A function sent to a process or HPC
-  worker cannot use handlers, abort, or a dispatcher that live in the host
-  process. If it runs an optimization there, that optimization must be
-  self-contained and return its outcome as data. See
+  worker cannot use handlers or a dispatcher that live in the host process. If
+  it runs an optimization there, that optimization must be self-contained and
+  return its outcome as data. See
   [Dispatching arbitrary tasks](#dispatching-arbitrary-tasks).
 
 `ropt` enforces the hard edge of this rule rather than leaving it to convention:
@@ -440,19 +438,17 @@ hard constraint on where each layer of a nested workflow may run:
 
 [`OptimizationStep`][ropt.workflow.compute_steps.OptimizationStep] enforces this
 rule rather than leaving it to convention. **A step is bound to its process, not
-to a thread.** Its two control channels — the abort flag it polls and the event
-handlers it invokes — live in shared memory, so they keep working across threads
-within one process but cannot cross a process boundary. The invariant is
-therefore "a step lives in one process," *not* "a step must run where it was
-created." Concretely:
+to a thread.** The event handlers it invokes live in shared memory, so they keep
+working across threads within one process but cannot cross a process boundary.
+The invariant is therefore "a step lives in one process," *not* "a step must run
+where it was created." Concretely:
 
 - **Across threads (allowed).** A step may be created on one thread and run on
   another within the same process — for example created on the main thread and
   driven with `asyncio.to_thread` or a
   [`ThreadingExecutor`][ropt.workflow.executors.ThreadingExecutor] while a
   main-thread [`EventDispatcher`][ropt.workflow.event_handlers.EventDispatcher]
-  collects its events. Abort and event handling keep working because memory is
-  shared.
+  collects its events. Event handling keeps working because memory is shared.
 - **Across processes (forbidden).** A step refuses to be *transferred* into a
   [`MultiprocessingExecutor`][ropt.workflow.executors.MultiprocessingExecutor]
   or [`HPCExecutor`][ropt.workflow.executors.HPCExecutor] worker: unpickling one

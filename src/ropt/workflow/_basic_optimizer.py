@@ -14,7 +14,6 @@ import numpy as np
 
 from ropt.context import EnOptContext
 from ropt.enums import EnOptEventType, ExitCode
-from ropt.exceptions import Abort
 from ropt.workflow.evaluators import BatchEvaluator, Evaluator
 
 from .compute_steps import OptimizationStep
@@ -116,27 +115,6 @@ class BasicOptimizer:
         )
         self._results = result_handler["results"]
         return exit_code
-
-    def set_abort_callback(self, callback: Callable[[], bool]) -> None:
-        """Set a callback to check for abort conditions.
-
-        The provided callback function will be invoked repeatedly during the
-        optimization process. If the callback returns `True`, the optimization
-        will be aborted, and the `BasicOptimizer` will exit with an
-        [`ExitCode.USER_ABORT`][ropt.enums.ExitCode].
-
-        The callback function should have no arguments and return a boolean
-        value.
-
-        Args:
-            callback: The callable to check for abort conditions.
-        """
-
-        def _check_abort_callback(event: EnOptEvent) -> None:  # ruff: ignore[unused-function-argument]
-            if callback():
-                raise Abort(ExitCode.USER_ABORT)
-
-        self._observers.append((EnOptEventType.START_EVALUATION, _check_abort_callback))
 
     def set_results_callback(self, callback: Callable[..., None]) -> None:
         """Set a callback to report new results.

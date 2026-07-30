@@ -174,27 +174,6 @@ def test_failed_realizations_constraints(
     assert exit_code == ExitCode.TOO_FEW_REALIZATIONS
 
 
-def test_user_abort(config: Any, evaluator: Any, external: str) -> None:
-    last_evaluation = 0
-
-    def _abort() -> bool:
-        nonlocal last_evaluation
-
-        if last_evaluation == 1:
-            return True
-        last_evaluation += 1
-        return False
-
-    config["backend"]["method"] = f"{external}{_SLSQP}"
-
-    optimizer = BasicOptimizer(config, evaluator())
-    optimizer.set_abort_callback(_abort)
-    exit_code = optimizer.run(initial_values)
-    assert optimizer.results is not None
-    assert last_evaluation == 1
-    assert exit_code == ExitCode.USER_ABORT
-
-
 def test_single_perturbation(config: Any, evaluator: Any, external: str) -> None:
     config["gradient"] = {
         "number_of_perturbations": 1,

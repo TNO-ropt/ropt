@@ -12,7 +12,6 @@ from ropt._logging import get_logger
 from ropt.core import EnsembleEvaluator, EnsembleOptimizer
 from ropt.enums import EnOptEventType, ExitCode
 from ropt.events import EnOptEvent
-from ropt.exceptions import Abort
 from ropt.workflow.executors._worker import is_worker_process
 
 from .base import ComputeStep
@@ -49,7 +48,6 @@ class OptimizationStep(ComputeStep):
         """
         super().__init__()
         self._evaluator = evaluator
-        self._abort = threading.Event()
         self._running = False
         self._run_lock = threading.Lock()
 
@@ -100,7 +98,6 @@ class OptimizationStep(ComputeStep):
     ) -> ExitCode:
         context.lock()
 
-        self._abort.clear()
         self._context = context
         self._metadata = metadata
 
@@ -136,30 +133,8 @@ class OptimizationStep(ComputeStep):
 
         return exit_code
 
-    def abort(self) -> None:
-        """Request a cooperative abort of the running optimization.
-
-        Calling this method signals the optimization started by
-        [`run`][ropt.workflow.compute_steps.OptimizationStep.run] to stop at the
-        next evaluation boundary, causing `run` to return
-        [`ExitCode.USER_ABORT`][ropt.enums.ExitCode]. The optimization is not
-        interrupted mid-evaluation; the request takes effect before the next
-        batch of function evaluations starts.
-
-        This method is safe to call from any thread, for example from within an
-        event handler observing the optimization. It only affects an
-        optimization whose driver runs in the current process: an optimization
-        running behind a process or HPC boundary cannot be reached and can only
-        be terminated by stopping that process.
-
-        See [Optimization Workflows](../usage/workflows.md#aborting-an-optimization)
-        for details.
-        """
-        self._abort.set()
-
     def __getstate__(self) -> dict[str, Any]:
         state = self.__dict__.copy()
-        state.pop("_abort", None)
         state.pop("_run_lock", None)
         state.pop("_running", None)
         return state
@@ -172,7 +147,6 @@ class OptimizationStep(ComputeStep):
             )
             raise RuntimeError(msg)
         self.__dict__.update(state)
-        self._abort = threading.Event()
         self._running = False
         self._run_lock = threading.Lock()
 
@@ -188,8 +162,6 @@ class OptimizationStep(ComputeStep):
                     event_type=EnOptEventType.START_EVALUATION, context=self._context
                 )
             )
-            if self._abort.is_set():
-                raise Abort(ExitCode.USER_ABORT)
         else:
             if self._metadata is not None:
                 for item in results:

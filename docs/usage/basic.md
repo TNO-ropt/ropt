@@ -175,7 +175,6 @@ into a simple, single-run interface. The table below summarizes its API:
 | `run(initial_values)`     | Execute the optimization starting from `initial_values`. Returns an [`ExitCode`][ropt.enums.ExitCode].
 | `results`                 | Property returning the best [`FunctionResults`][ropt.results.FunctionResults] found, or `None`.
 | `set_results_callback(cb)`| Register a callback `cb(results: tuple[FunctionResults, ...]) -> None` invoked after each evaluation batch.
-| `set_abort_callback(cb)`  | Register a callback `cb() -> bool`; returning `True` aborts the run with [`ExitCode.USER_ABORT`][ropt.enums.ExitCode].
 
 ### Evaluator signature
 
