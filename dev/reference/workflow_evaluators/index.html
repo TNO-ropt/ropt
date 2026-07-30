@@ -3820,6 +3820,14 @@ for every evaluation in a task (a one-element sequence when
     <div class="doc doc-contents ">
 
         <p>Evaluate all objective and constraints.</p>
+<p>Results are collected following the two-class error contract described
+in <a href="../../usage/parallel/#error-handling">Parallel Evaluation</a>. An
+infrastructure failure arrives as an
+<a class="autorefs autorefs-internal" title="            ExecutorFailure" href="../exceptions/#ropt.exceptions.ExecutorFailure"><code>ExecutorFailure</code></a> result and is
+recorded as a failed realization (NaN), while a user-code exception
+arrives on the results queue and aborts the whole evaluation, raising
+<a class="autorefs autorefs-internal" title="            Abort" href="../exceptions/#ropt.exceptions.Abort"><code>Abort</code></a> with the original exception chained as
+the cause.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3917,7 +3925,8 @@ for every evaluation in a task (a one-element sequence when
             </td>
             <td>
               <div class="doc-md-description">
-                <p>raise if the executor is not running.</p>
+                <p>If the executor is not running, or if a task's function
+   raised a user-code exception.</p>
               </div>
             </td>
           </tr>

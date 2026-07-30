@@ -2037,10 +2037,71 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#ropt.workflow.executors.Task.put_error" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        put_error
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ropt.workflow.executors.Task.cancel_all" class="md-nav__link">
     <span class="md-ellipsis">
       
         cancel_all
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.workflow.executors.ResultsQueue" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ResultsQueue
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ResultsQueue">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.workflow.executors.ResultsQueue.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        __init__
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.workflow.executors.ResultsQueue.close" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        close
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.workflow.executors.ResultsQueue.put" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        put
       
     </span>
   </a>
@@ -2603,10 +2664,71 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#ropt.workflow.executors.Task.put_error" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        put_error
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ropt.workflow.executors.Task.cancel_all" class="md-nav__link">
     <span class="md-ellipsis">
       
         cancel_all
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.workflow.executors.ResultsQueue" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ResultsQueue
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ResultsQueue">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.workflow.executors.ResultsQueue.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        __init__
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.workflow.executors.ResultsQueue.close" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        close
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.workflow.executors.ResultsQueue.put" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        put
       
     </span>
   </a>
@@ -3177,6 +3299,22 @@ execution mechanism (threads, processes, or an HPC cluster).</p>
 
 
         <p>A task to be executed by a worker.</p>
+<p>Task results are delivered on the associated
+<a class="autorefs autorefs-internal" title="            ropt.workflow.executors.ResultsQueue" href="#ropt.workflow.executors.ResultsQueue"><code>ResultsQueue</code></a>. Two distinct
+failure classes are distinguished, following the error contract described in
+<a href="../../usage/parallel/#error-handling">Parallel Evaluation</a>:</p>
+<ul>
+<li>An <strong>infrastructure failure</strong> (a killed worker process, or missing/corrupt
+  HPC output) is delivered as an ordinary result whose value is an
+  <a class="autorefs autorefs-internal" title="            ExecutorFailure" href="../exceptions/#ropt.exceptions.ExecutorFailure"><code>ExecutorFailure</code></a> via
+  <a class="autorefs autorefs-internal" title="            put_result" href="#ropt.workflow.executors.Task.put_result"><code>put_result</code></a>. This is a
+  tolerated per-realization failure.</li>
+<li>A <strong>user-code exception</strong> (the task function itself raises) is delivered
+  via <a class="autorefs autorefs-internal" title="            put_error" href="#ropt.workflow.executors.Task.put_error"><code>put_error</code></a>, which places
+  the exception on the queue and closes it. The owning evaluator turns this
+  into an abort of the whole evaluation, chaining the original exception as
+  the cause.</li>
+</ul>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -3225,7 +3363,7 @@ execution mechanism (threads, processes, or an HPC cluster).</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.workflow.executors.Task.results_queue">results_queue</span></code></td>
             <td>
-                  <code><span title="ropt.workflow.executors.base.ResultsQueue">ResultsQueue</span></code>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.workflow.executors.ResultsQueue (ropt.workflow.executors.base.ResultsQueue)" href="#ropt.workflow.executors.ResultsQueue">ResultsQueue</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3304,6 +3442,66 @@ execution mechanism (threads, processes, or an HPC cluster).</p>
 <div class="doc doc-object doc-function">
 
 
+<h3 id="ropt.workflow.executors.Task.put_error" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">put_error</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">put_error</span><span class="p">(</span><span class="n">exc</span><span class="p">:</span> <span class="ne">BaseException</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Deliver a user-code exception on the result queue.</p>
+<p>Places the exception raised by the task's function on the queue and
+closes it. Like <a class="autorefs autorefs-internal" title="            cancel_all" href="#ropt.workflow.executors.Task.cancel_all"><code>cancel_all</code></a>
+this unblocks the waiting evaluator, but it additionally carries the
+exception so the evaluator can surface it as the cause of the abort.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>exc</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#BaseException">BaseException</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The exception raised by the task's function.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
 <h3 id="ropt.workflow.executors.Task.cancel_all" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">cancel_all</span>
 
@@ -3315,6 +3513,143 @@ execution mechanism (threads, processes, or an HPC cluster).</p>
     <div class="doc doc-contents ">
 
         <p>Stop putting results in the result queue.</p>
+
+
+    </div>
+
+</div>
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="ropt.workflow.executors.ResultsQueue" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.workflow.executors.ResultsQueue</span>
+
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-external" title="queue.Queue" href="https://docs.python.org/3/library/queue.html#queue.Queue">Queue</a>[&#39;Task | BaseException | None&#39;]</code></p>
+
+
+
+        <p>A queue that can be closed.</p>
+<p>Items delivered on this queue follow the error contract of
+<a class="autorefs autorefs-internal" title="            ropt.workflow.executors.Task
+
+
+  
+      dataclass
+  " href="#ropt.workflow.executors.Task"><code>Task</code></a>: a <a class="autorefs autorefs-internal" title="            ropt.workflow.executors.Task
+
+
+  
+      dataclass
+  " href="#ropt.workflow.executors.Task"><code>Task</code></a>
+carries a normal result (including an
+<a class="autorefs autorefs-internal" title="            ExecutorFailure" href="../exceptions/#ropt.exceptions.ExecutorFailure"><code>ExecutorFailure</code></a> as its <code>result</code>), a
+<code>BaseException</code> signals a user-code exception that must abort the
+evaluation, and <code>None</code> is a plain sentinel used to unblock a waiting
+consumer.</p>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.workflow.executors.ResultsQueue.__init__" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">__init__</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Initialize the queue.</p>
+
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.workflow.executors.ResultsQueue.close" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">close</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">close</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Close the queue.</p>
+
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.workflow.executors.ResultsQueue.put" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">put</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">put</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">item</span><span class="p">:</span> <span class="n">Task</span> <span class="o">|</span> <span class="ne">BaseException</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Put an item in the queue.</p>
 
 
     </div>

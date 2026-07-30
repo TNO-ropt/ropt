@@ -918,6 +918,45 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#error-handling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error handling
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Error handling">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#infrastructure-failure-tolerated" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Infrastructure failure (tolerated)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#user-code-exception-aborts-everything" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        User-code exception (aborts everything)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#dispatching-arbitrary-tasks" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2399,6 +2438,45 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#error-handling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error handling
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Error handling">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#infrastructure-failure-tolerated" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Infrastructure failure (tolerated)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#user-code-exception-aborts-everything" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        User-code exception (aborts everything)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#dispatching-arbitrary-tasks" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2713,6 +2791,47 @@ the <code>cluster</code> and <code>queue</code> arguments:</p>
   automatically. This requires exactly one cluster to provide the queue;
   otherwise (no match or multiple matches) an error is raised.</li>
 </ul>
+<h2 id="error-handling">Error handling</h2>
+<p>Executors and the <a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.ParallelEvaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.ParallelEvaluator"><code>ParallelEvaluator</code></a>
+distinguish two classes of failure, and treat them very differently.</p>
+<h3 id="infrastructure-failure-tolerated">Infrastructure failure (tolerated)</h3>
+<p>An <em>infrastructure</em> failure is one that is not caused by the evaluation function
+itself: a worker process is killed (<code>BrokenProcessPool</code>), or an HPC job's output
+file never appears or cannot be deserialized. These are delivered as an ordinary
+result whose value is an <a class="autorefs autorefs-internal" title="            ExecutorFailure" href="../../reference/exceptions/#ropt.exceptions.ExecutorFailure"><code>ExecutorFailure</code></a>
+(via <a class="autorefs autorefs-internal" title="            put_result" href="../../reference/workflow_executors/#ropt.workflow.executors.Task.put_result"><code>put_result</code></a>). The evaluator
+records the affected rows as failed realizations by writing <code>numpy.nan</code>. Such a
+failure is <em>tolerated</em>: the optimization continues, and only aborts (with
+<code>TOO_FEW_REALIZATIONS</code>) if too many realizations fail to satisfy the configured
+minimum.</p>
+<h3 id="user-code-exception-aborts-everything">User-code exception (aborts everything)</h3>
+<p>A <em>user-code</em> exception is one raised by the evaluation function itself — a bug
+in the objective, a bad configuration, an unexpected input. This must not be
+silently turned into a failed realization; it signals a genuine error the user
+needs to see and fix. When the task function raises, the worker delivers the
+exception on the results queue (via
+<a class="autorefs autorefs-internal" title="            put_error" href="../../reference/workflow_executors/#ropt.workflow.executors.Task.put_error"><code>put_error</code></a>, which also closes the
+queue) <strong>and</strong> re-raises it into the executor's <code>asyncio.TaskGroup</code>. The two
+channels play distinct roles:</p>
+<ul>
+<li>The queue item unblocks the owning
+  <a class="autorefs autorefs-internal" title="            eval" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.ParallelEvaluator.eval"><code>ParallelEvaluator.eval</code></a>
+  call, which raises <a class="autorefs autorefs-internal" title="            Abort" href="../../reference/exceptions/#ropt.exceptions.Abort"><code>Abort</code></a> with
+  <code>ExitCode.ABORT_FROM_ERROR</code>, chaining the original exception as the cause
+  (<code>raise Abort(...) from exc</code>) so its message and traceback remain visible.</li>
+<li>The re-raise into the <code>TaskGroup</code> cancels sibling tasks. This is what makes
+  "abort everything" work when an advanced user runs several compute steps
+  concurrently in their own <code>asyncio.TaskGroup</code> sharing one executor: a genuine
+  error in one objective propagates into that group, cancels the siblings, and
+  surfaces with a traceback so they can fix and re-run.</li>
+</ul>
+<p>For the <a class="autorefs autorefs-internal" title="            ropt.workflow.executors.HPCExecutor" href="../../reference/workflow_executors/#ropt.workflow.executors.HPCExecutor"><code>HPCExecutor</code></a> the exception
+crosses a process boundary. It is serialized with <code>cloudpickle</code>, which can
+handle exception objects that the standard <code>pickle</code> module cannot, but does not
+serialize tracebacks. The worker therefore attaches the formatted traceback as a
+note (<code>exc.add_note(...)</code>) before serializing, so the originating traceback
+travels with the exception. Exceptions that cannot be serialized at all are
+wrapped in a <code>RuntimeError</code> carrying their <code>repr</code> and notes.</p>
 <h2 id="dispatching-arbitrary-tasks">Dispatching arbitrary tasks</h2>
 <p><a class="autorefs autorefs-internal" title="            dispatch_tasks
 
