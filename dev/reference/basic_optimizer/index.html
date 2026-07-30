@@ -1371,17 +1371,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.workflow.BasicOptimizer.set_abort_callback" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        set_abort_callback
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ropt.workflow.BasicOptimizer.set_results_callback" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2353,17 +2342,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.workflow.BasicOptimizer.set_abort_callback" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        set_abort_callback
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ropt.workflow.BasicOptimizer.set_results_callback" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2683,68 +2661,6 @@ corresponding properties.</p>
               <div class="doc-md-description">
                 <p>The exit code returned by the optimization workflow.</p>
               </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="ropt.workflow.BasicOptimizer.set_abort_callback" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">set_abort_callback</span>
-
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">set_abort_callback</span><span class="p">(</span><span class="n">callback</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="nb">bool</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Set a callback to check for abort conditions.</p>
-<p>The provided callback function will be invoked repeatedly during the
-optimization process. If the callback returns <code>True</code>, the optimization
-will be aborted, and the <code>BasicOptimizer</code> will exit with an
-<a class="autorefs autorefs-internal" title="            ExitCode" href="../enums/#ropt.enums.ExitCode"><code>ExitCode.USER_ABORT</code></a>.</p>
-<p>The callback function should have no arguments and return a boolean
-value.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>callback</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" title="collections.abc.Callable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable">Callable</a>[[], <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The callable to check for abort conditions.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
             </td>
           </tr>
       </tbody>

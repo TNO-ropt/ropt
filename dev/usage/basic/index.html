@@ -2666,10 +2666,6 @@ into a simple, single-run interface. The table below summarizes its API:</p>
 <td><code>set_results_callback(cb)</code></td>
 <td>Register a callback <code>cb(results: tuple[FunctionResults, ...]) -&gt; None</code> invoked after each evaluation batch.</td>
 </tr>
-<tr>
-<td><code>set_abort_callback(cb)</code></td>
-<td>Register a callback <code>cb() -&gt; bool</code>; returning <code>True</code> aborts the run with <a class="autorefs autorefs-internal" title="            ExitCode" href="../../reference/enums/#ropt.enums.ExitCode"><code>ExitCode.USER_ABORT</code></a>.</td>
-</tr>
 </tbody>
 </table>
 <h3 id="evaluator-signature">Evaluator signature</h3>

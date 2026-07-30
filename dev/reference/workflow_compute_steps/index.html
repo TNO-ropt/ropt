@@ -1980,17 +1980,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#ropt.workflow.compute_steps.OptimizationStep.abort" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        abort
-      
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -2491,17 +2480,6 @@
     <span class="md-ellipsis">
       
         run
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.workflow.compute_steps.OptimizationStep.abort" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        abort
       
     </span>
   </a>
@@ -3333,44 +3311,6 @@ event.</p>
           </tr>
       </tbody>
     </table>
-
-
-    </div>
-
-</div>
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="ropt.workflow.compute_steps.OptimizationStep.abort" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">abort</span>
-
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">abort</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Request a cooperative abort of the running optimization.</p>
-<p>Calling this method signals the optimization started by
-<a class="autorefs autorefs-internal" title="            run" href="#ropt.workflow.compute_steps.OptimizationStep.run"><code>run</code></a> to stop at the
-next evaluation boundary, causing <code>run</code> to return
-<a class="autorefs autorefs-internal" title="            ExitCode" href="../enums/#ropt.enums.ExitCode"><code>ExitCode.USER_ABORT</code></a>. The optimization is not
-interrupted mid-evaluation; the request takes effect before the next
-batch of function evaluations starts.</p>
-<p>This method is safe to call from any thread, for example from within an
-event handler observing the optimization. It only affects an
-optimization whose driver runs in the current process: an optimization
-running behind a process or HPC boundary cannot be reached and can only
-be terminated by stopping that process.</p>
-<p>See <a href="../../usage/workflows/#aborting-an-optimization">Optimization Workflows</a>
-for details.</p>
 
 
     </div>

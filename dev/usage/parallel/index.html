@@ -2860,10 +2860,9 @@ affect performance, it determines what a dispatched compute step can still
 <em>do</em>. One principle governs the difference.</p>
 <ul>
 <li>A <strong>thread</strong> shares memory with the process that started it. A step's control
-  channels — the abort flag it polls, the event handlers it invokes, and the
-  live asyncio loop, executors, and
-  <a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.EventDispatcher" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.EventDispatcher"><code>EventDispatcher</code></a> it relies on
-  — all keep working across threads within one process.</li>
+  channels — the event handlers it invokes and the live asyncio loop, executors,
+  and <a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.EventDispatcher" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.EventDispatcher"><code>EventDispatcher</code></a> it relies
+  on — all keep working across threads within one process.</li>
 <li>A <strong>process</strong> — a
   <a class="autorefs autorefs-internal" title="            ropt.workflow.executors.MultiprocessingExecutor" href="../../reference/workflow_executors/#ropt.workflow.executors.MultiprocessingExecutor"><code>MultiprocessingExecutor</code></a>
   worker or an <a class="autorefs autorefs-internal" title="            ropt.workflow.executors.HPCExecutor" href="../../reference/workflow_executors/#ropt.workflow.executors.HPCExecutor"><code>HPCExecutor</code></a> job — shares
@@ -2873,10 +2872,9 @@ affect performance, it determines what a dispatched compute step can still
   evaluation that produces a value the optimizer needs.</li>
 </ul>
 <p>The rule that follows is: anything that must <strong>communicate back</strong> — emit events
-to a dispatcher, be aborted from the driver, or <em>drive</em> a nested compute step —
-must stay <strong>in the host process</strong>. A different <em>thread</em> is fine; a different
-<em>process</em> is not. Only <strong>self-contained, data-in / data-out</strong> work belongs
-across a process boundary.</p>
+to a dispatcher or <em>drive</em> a nested compute step — must stay <strong>in the host
+process</strong>. A different <em>thread</em> is fine; a different <em>process</em> is not. Only
+<strong>self-contained, data-in / data-out</strong> work belongs across a process boundary.</p>
 <p>Two places where this matters in practice:</p>
 <ul>
 <li><strong>Nested optimization.</strong> A step that runs an inner workflow must run
@@ -2885,9 +2883,9 @@ across a process boundary.</p>
   the innermost leaf evaluations may go to a process or HPC worker. See
   <a href="#nested-workflows-and-process-boundaries">Nested workflows and process boundaries</a>.</li>
 <li><strong>Dispatching functions to workers.</strong> A function sent to a process or HPC
-  worker cannot use handlers, abort, or a dispatcher that live in the host
-  process. If it runs an optimization there, that optimization must be
-  self-contained and return its outcome as data. See
+  worker cannot use handlers or a dispatcher that live in the host process. If
+  it runs an optimization there, that optimization must be self-contained and
+  return its outcome as data. See
   <a href="#dispatching-arbitrary-tasks">Dispatching arbitrary tasks</a>.</li>
 </ul>
 <p><code>ropt</code> enforces the hard edge of this rule rather than leaving it to convention:
@@ -3097,19 +3095,17 @@ it emits would never reach the main-process dispatcher.</p>
 </div>
 <p><a class="autorefs autorefs-internal" title="            ropt.workflow.compute_steps.OptimizationStep" href="../../reference/workflow_compute_steps/#ropt.workflow.compute_steps.OptimizationStep"><code>OptimizationStep</code></a> enforces this
 rule rather than leaving it to convention. <strong>A step is bound to its process, not
-to a thread.</strong> Its two control channels — the abort flag it polls and the event
-handlers it invokes — live in shared memory, so they keep working across threads
-within one process but cannot cross a process boundary. The invariant is
-therefore "a step lives in one process," <em>not</em> "a step must run where it was
-created." Concretely:</p>
+to a thread.</strong> The event handlers it invokes live in shared memory, so they keep
+working across threads within one process but cannot cross a process boundary.
+The invariant is therefore "a step lives in one process," <em>not</em> "a step must run
+where it was created." Concretely:</p>
 <ul>
 <li><strong>Across threads (allowed).</strong> A step may be created on one thread and run on
   another within the same process — for example created on the main thread and
   driven with <code>asyncio.to_thread</code> or a
   <a class="autorefs autorefs-internal" title="            ropt.workflow.executors.ThreadingExecutor" href="../../reference/workflow_executors/#ropt.workflow.executors.ThreadingExecutor"><code>ThreadingExecutor</code></a> while a
   main-thread <a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.EventDispatcher" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.EventDispatcher"><code>EventDispatcher</code></a>
-  collects its events. Abort and event handling keep working because memory is
-  shared.</li>
+  collects its events. Event handling keeps working because memory is shared.</li>
 <li><strong>Across processes (forbidden).</strong> A step refuses to be <em>transferred</em> into a
   <a class="autorefs autorefs-internal" title="            ropt.workflow.executors.MultiprocessingExecutor" href="../../reference/workflow_executors/#ropt.workflow.executors.MultiprocessingExecutor"><code>MultiprocessingExecutor</code></a>
   or <a class="autorefs autorefs-internal" title="            ropt.workflow.executors.HPCExecutor" href="../../reference/workflow_executors/#ropt.workflow.executors.HPCExecutor"><code>HPCExecutor</code></a> worker: unpickling one
