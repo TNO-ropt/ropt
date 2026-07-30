@@ -189,6 +189,40 @@ why the step finished:
 | `USER_ABORT`                 | The optimization was aborted by the user.                     |
 | `ABORT_FROM_ERROR`           | Aborted due to an error handled elsewhere.                    |
 
+### Aborting an optimization
+
+An [`OptimizationStep`][ropt.workflow.compute_steps.OptimizationStep] can be
+stopped cooperatively by calling its
+[`abort`][ropt.workflow.compute_steps.OptimizationStep.abort] method. The
+running optimization stops at the next evaluation boundary, and `run()` returns
+[`ExitCode.USER_ABORT`][ropt.enums.ExitCode]. The optimization is not
+interrupted mid-evaluation, and workers are not cancelled as an error;
+`USER_ABORT` is a normal termination.
+
+Because a caller must hold a reference to the specific step, an abort request
+always targets exactly one optimization run. This is typically wired from an
+event handler that observes the optimization and calls `abort()` on the step it
+should stop:
+
+```python
+step = OptimizationStep(evaluator=evaluator)
+
+def stop_when(event: EnOptEvent) -> None:
+    if should_stop():
+        step.abort()
+
+step.add_event_handler(
+    CallbackHandler(
+        event_types={EnOptEventType.FINISHED_EVALUATION}, callback=stop_when
+    )
+)
+```
+
+`abort()` is safe to call from any thread. However, it only reaches an
+optimization whose driver runs in the current process. An optimization running
+behind a process or HPC boundary cannot be signalled and can only be stopped by
+terminating that process.
+
 ## Event handlers
 
 Event handlers are attached to a compute step via its `add_event_handler`
