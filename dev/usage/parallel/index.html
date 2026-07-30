@@ -957,6 +957,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#threads-vs-processes-what-crosses-the-boundary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Threads vs. processes: what crosses the boundary
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#dispatching-arbitrary-tasks" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2477,6 +2488,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#threads-vs-processes-what-crosses-the-boundary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Threads vs. processes: what crosses the boundary
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#dispatching-arbitrary-tasks" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2832,6 +2854,46 @@ serialize tracebacks. The worker therefore attaches the formatted traceback as a
 note (<code>exc.add_note(...)</code>) before serializing, so the originating traceback
 travels with the exception. Exceptions that cannot be serialized at all are
 wrapped in a <code>RuntimeError</code> carrying their <code>repr</code> and notes.</p>
+<h2 id="threads-vs-processes-what-crosses-the-boundary">Threads vs. processes: what crosses the boundary</h2>
+<p>The three executor types are not interchangeable: the choice does not only
+affect performance, it determines what a dispatched compute step can still
+<em>do</em>. One principle governs the difference.</p>
+<ul>
+<li>A <strong>thread</strong> shares memory with the process that started it. A step's control
+  channels — the abort flag it polls, the event handlers it invokes, and the
+  live asyncio loop, executors, and
+  <a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.EventDispatcher" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.EventDispatcher"><code>EventDispatcher</code></a> it relies on
+  — all keep working across threads within one process.</li>
+<li>A <strong>process</strong> — a
+  <a class="autorefs autorefs-internal" title="            ropt.workflow.executors.MultiprocessingExecutor" href="../../reference/workflow_executors/#ropt.workflow.executors.MultiprocessingExecutor"><code>MultiprocessingExecutor</code></a>
+  worker or an <a class="autorefs autorefs-internal" title="            ropt.workflow.executors.HPCExecutor" href="../../reference/workflow_executors/#ropt.workflow.executors.HPCExecutor"><code>HPCExecutor</code></a> job — shares
+  none of that. It is <strong>input/output only</strong>: a task is serialized in and a
+  result is serialized out, and nothing in between can reach back into the host
+  process. This is deliberate, and it is enough for the common case — running an
+  evaluation that produces a value the optimizer needs.</li>
+</ul>
+<p>The rule that follows is: anything that must <strong>communicate back</strong> — emit events
+to a dispatcher, be aborted from the driver, or <em>drive</em> a nested compute step —
+must stay <strong>in the host process</strong>. A different <em>thread</em> is fine; a different
+<em>process</em> is not. Only <strong>self-contained, data-in / data-out</strong> work belongs
+across a process boundary.</p>
+<p>Two places where this matters in practice:</p>
+<ul>
+<li><strong>Nested optimization.</strong> A step that runs an inner workflow must run
+  in-process — sequentially or on a
+  <a class="autorefs autorefs-internal" title="            ropt.workflow.executors.ThreadingExecutor" href="../../reference/workflow_executors/#ropt.workflow.executors.ThreadingExecutor"><code>ThreadingExecutor</code></a> — while only
+  the innermost leaf evaluations may go to a process or HPC worker. See
+  <a href="#nested-workflows-and-process-boundaries">Nested workflows and process boundaries</a>.</li>
+<li><strong>Dispatching functions to workers.</strong> A function sent to a process or HPC
+  worker cannot use handlers, abort, or a dispatcher that live in the host
+  process. If it runs an optimization there, that optimization must be
+  self-contained and return its outcome as data. See
+  <a href="#dispatching-arbitrary-tasks">Dispatching arbitrary tasks</a>.</li>
+</ul>
+<p><code>ropt</code> enforces the hard edge of this rule rather than leaving it to convention:
+an <a class="autorefs autorefs-internal" title="            ropt.workflow.compute_steps.OptimizationStep" href="../../reference/workflow_compute_steps/#ropt.workflow.compute_steps.OptimizationStep"><code>OptimizationStep</code></a> is bound to
+its process and refuses to be transferred into a worker, as detailed under
+<a href="#nested-workflows-and-process-boundaries">Nested workflows and process boundaries</a>.</p>
 <h2 id="dispatching-arbitrary-tasks">Dispatching arbitrary tasks</h2>
 <p><a class="autorefs autorefs-internal" title="            dispatch_tasks
 
