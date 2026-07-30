@@ -204,6 +204,49 @@ note (`exc.add_note(...)`) before serializing, so the originating traceback
 travels with the exception. Exceptions that cannot be serialized at all are
 wrapped in a `RuntimeError` carrying their `repr` and notes.
 
+## Threads vs. processes: what crosses the boundary
+
+The three executor types are not interchangeable: the choice does not only
+affect performance, it determines what a dispatched compute step can still
+*do*. One principle governs the difference.
+
+- A **thread** shares memory with the process that started it. A step's control
+  channels — the abort flag it polls, the event handlers it invokes, and the
+  live asyncio loop, executors, and
+  [`EventDispatcher`][ropt.workflow.event_handlers.EventDispatcher] it relies on
+  — all keep working across threads within one process.
+- A **process** — a
+  [`MultiprocessingExecutor`][ropt.workflow.executors.MultiprocessingExecutor]
+  worker or an [`HPCExecutor`][ropt.workflow.executors.HPCExecutor] job — shares
+  none of that. It is **input/output only**: a task is serialized in and a
+  result is serialized out, and nothing in between can reach back into the host
+  process. This is deliberate, and it is enough for the common case — running an
+  evaluation that produces a value the optimizer needs.
+
+The rule that follows is: anything that must **communicate back** — emit events
+to a dispatcher, be aborted from the driver, or *drive* a nested compute step —
+must stay **in the host process**. A different *thread* is fine; a different
+*process* is not. Only **self-contained, data-in / data-out** work belongs
+across a process boundary.
+
+Two places where this matters in practice:
+
+- **Nested optimization.** A step that runs an inner workflow must run
+  in-process — sequentially or on a
+  [`ThreadingExecutor`][ropt.workflow.executors.ThreadingExecutor] — while only
+  the innermost leaf evaluations may go to a process or HPC worker. See
+  [Nested workflows and process boundaries](#nested-workflows-and-process-boundaries).
+- **Dispatching functions to workers.** A function sent to a process or HPC
+  worker cannot use handlers, abort, or a dispatcher that live in the host
+  process. If it runs an optimization there, that optimization must be
+  self-contained and return its outcome as data. See
+  [Dispatching arbitrary tasks](#dispatching-arbitrary-tasks).
+
+`ropt` enforces the hard edge of this rule rather than leaving it to convention:
+an [`OptimizationStep`][ropt.workflow.compute_steps.OptimizationStep] is bound to
+its process and refuses to be transferred into a worker, as detailed under
+[Nested workflows and process boundaries](#nested-workflows-and-process-boundaries).
+
 ## Dispatching arbitrary tasks
 
 [`dispatch_tasks`][ropt.workflow.dispatch_tasks] is a utility function built on
