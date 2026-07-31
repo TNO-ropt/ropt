@@ -2356,20 +2356,24 @@ functionality:</p>
   " href="../../reference/results/#ropt.results.Results"><code>Results</code></a> to data frames via <a class="autorefs autorefs-internal" title="            ropt.results.results_to_dataframe" href="../../reference/results/#ropt.results.results_to_dataframe"><code>results_to_dataframe</code></a>.</td>
 </tr>
 <tr>
+<td><code>cloudpickle</code></td>
+<td><code>cloudpickle</code></td>
+<td>Serializing lambdas, closures, and interactively-defined functions with the <a class="autorefs autorefs-internal" title="            ropt.workflow.executors.MultiprocessingExecutor" href="../../reference/workflow_executors/#ropt.workflow.executors.MultiprocessingExecutor"><code>MultiprocessingExecutor</code></a> (<code>processes</code>), and running evaluations in an external Python process via the <code>external</code> backend.</td>
+</tr>
+<tr>
 <td><code>hpc</code></td>
 <td><code>pysqa</code>, <code>cloudpickle</code></td>
 <td>Running evaluations on HPC clusters via <a class="autorefs autorefs-internal" title="            ropt.workflow.executors.HPCExecutor" href="../../reference/workflow_executors/#ropt.workflow.executors.HPCExecutor"><code>HPCExecutor</code></a>.</td>
 </tr>
-<tr>
-<td><code>external</code></td>
-<td><code>cloudpickle</code></td>
-<td>Running evaluations in an external Python process via the <code>external</code> backend.</td>
-</tr>
 </tbody>
 </table>
+<p>Without the <code>cloudpickle</code> extra the <code>processes</code> executor still works, but its
+task functions must be importable, module-level objects; installing it adds
+support for lambdas, closures, and notebook-defined functions. The <code>hpc</code> extra
+already includes <code>cloudpickle</code>.</p>
 <p>Install with:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;ropt[pandas]&quot;</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;ropt[pandas,hpc,external]&quot;</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;ropt[pandas,hpc,cloudpickle]&quot;</span>
 </span></code></pre></div>
 <h2 id="plugin-packages">Plugin packages</h2>
 <p>Additional optimization backends are provided as standalone packages that

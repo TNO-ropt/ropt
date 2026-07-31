@@ -903,6 +903,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#task-serialization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task serialization
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#the-__main__-guard" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2451,6 +2462,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#task-serialization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task serialization
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#the-__main__-guard" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2763,6 +2785,16 @@ evaluations where true parallelism is needed.</p>
 </tr>
 </tbody>
 </table>
+<h4 id="task-serialization">Task serialization</h4>
+<p>Each task crosses a process boundary, so its function, arguments, and result
+must be serialized. If <a href="https://github.com/cloudpipe/cloudpickle"><code>cloudpickle</code></a>
+is installed (the <code>cloudpickle</code> extra), it is used for both directions: this
+serializes lambdas, closures, and interactively-defined functions (such as those
+written in a notebook cell) by value, so they can be used as task functions and
+returned as results. Without <code>cloudpickle</code>, the executor falls back to the
+standard <code>pickle</code> module, which requires task functions to be importable,
+module-level objects; passing a lambda or closure then raises a <code>RuntimeError</code>
+suggesting the <code>cloudpickle</code> extra.</p>
 <h4 id="the-__main__-guard">The <code>__main__</code> guard</h4>
 <p>With the <code>"spawn"</code> start method, every worker process starts a fresh interpreter
 that <strong>re-imports the program's entry module</strong> to rebuild its environment. If the
