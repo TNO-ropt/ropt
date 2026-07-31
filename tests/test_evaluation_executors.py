@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import subprocess  # ruff: ignore[suspicious-subprocess-import]
+import sys
 from functools import partial
 from typing import TYPE_CHECKING, Any
 
@@ -617,3 +618,26 @@ async def test_handle_result_records_executor_failure_as_nan() -> None:  # ruff:
     handled = _handle_result(task, results, {}, objective_count=1, eval_count=2)
     assert handled == 2
     assert np.all(np.isnan(results))
+
+
+@pytest.mark.timeout(60)
+async def test_multiprocessing_unguarded_main_reports_startup_error(
+    tmp_path: Path,
+) -> None:
+    script = tmp_path / "unguarded.py"
+    script.write_text(
+        "import asyncio\n\n"
+        "from ropt.workflow import dispatch_tasks\n\n\n"
+        "def work() -> int:\n"
+        "    return 1\n\n\n"
+        'asyncio.run(dispatch_tasks([work], executor="multiprocessing"))\n'
+    )
+    proc = await asyncio.create_subprocess_exec(
+        sys.executable,
+        str(script),
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
+    )
+    _, stderr = await proc.communicate()
+    assert proc.returncode != 0
+    assert b"could not start its worker processes" in stderr

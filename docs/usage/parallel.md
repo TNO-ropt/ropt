@@ -101,6 +101,50 @@ evaluations where true parallelism is needed.
 | `queue_size`          | Maximum task queue size (0 = unlimited).                       |
 | `max_tasks_per_child` | Restart workers after this many tasks (default: `None` = never). Useful if evaluations leak memory, but adds significant overhead. |
 
+#### The `__main__` guard
+
+With the `"spawn"` start method, every worker process starts a fresh interpreter
+that **re-imports the program's entry module** to rebuild its environment. If the
+entry script creates or starts the executor at module top level, that re-import
+runs the same code again in each worker, which tries to start yet more processes
+before the interpreter has finished bootstrapping. Python aborts this, the
+workers never start, and `MultiprocessingExecutor` raises a `RuntimeError` at
+startup.
+
+The fix is to keep the code that creates and runs the executor behind an
+`if __name__ == "__main__":` guard (or inside a function called from there):
+
+```python
+# Wrong: created at module top level. Each worker re-imports this and fails.
+asyncio.run(dispatch_tasks(functions, executor="multiprocessing"))
+```
+
+```python
+# Right: the guarded block is skipped during the worker re-import.
+if __name__ == "__main__":
+    asyncio.run(dispatch_tasks(functions, executor="multiprocessing"))
+```
+
+This is the standard "safe importing of main module" contract of Python's
+`multiprocessing`; it applies equally to
+[`dispatch_tasks`](#dispatching-arbitrary-tasks) with
+`executor="multiprocessing"`. Interactive sessions (Jupyter/IPython) and test
+runners such as `pytest` are unaffected, because their entry module is
+import-safe and is not re-executed on re-import.
+
+A few less common issues cause the same startup error:
+
+- **Re-import safety.** The worker re-runs the entry module's *top-level* code
+  that sits outside the guard. Keep side-effecting statements — argument
+  parsing, binding a socket/port, opening resources — inside functions or behind
+  the guard, so re-importing the module in a worker is harmless.
+- **Frozen applications.** When bundling with PyInstaller or cx_Freeze, call
+  `multiprocessing.freeze_support()` as the first statement of the entry point;
+  otherwise each worker re-launches the whole application.
+- **Restricted environments.** An environment that cannot spawn processes — for
+  example due to process, file-descriptor, or memory limits, or a container
+  without shared-memory/semaphore support — will also fail this startup check.
+
 ### HPCExecutor
 
 [`HPCExecutor`][ropt.workflow.executors.HPCExecutor] submits tasks as jobs to an

@@ -21,7 +21,12 @@ _logger = get_logger(__name__)
 
 
 class MultiprocessingExecutor(ExecutorBase):
-    """An executor that employs a pool of multiprocessing workers."""
+    """An executor that employs a pool of multiprocessing workers.
+
+    See [Parallel Evaluation](../usage/parallel.md#multiprocessingexecutor) for
+    details, including the `if __name__ == "__main__":` guard that the entry
+    point must use.
+    """
 
     def __init__(
         self,
@@ -58,6 +63,7 @@ class MultiprocessingExecutor(ExecutorBase):
         _logger.debug(
             "Starting multiprocessing executor with %d worker(s)", self._workers
         )
+        await self._check_worker_startup()
         workers = [
             _Worker(self._task_queue, self, self._executor)
             for _ in range(self._workers)
@@ -66,6 +72,21 @@ class MultiprocessingExecutor(ExecutorBase):
             task_group.create_task(worker.run()) for worker in workers
         ]
         await self._finish_start(task_group)
+
+    async def _check_worker_startup(self) -> None:
+        assert self._executor is not None
+        loop = asyncio.get_running_loop()
+        try:
+            await loop.run_in_executor(self._executor, _canary)
+        except BrokenProcessPool as exc:
+            self._executor.shutdown(wait=False)
+            self._executor = None
+            msg = (
+                "MultiprocessingExecutor could not start its worker processes. "
+                "Usually this is caused by a missing 'if __name__ == \"__main__\":' "
+                "guard. See the parallel evaluation documentation for other causes."
+            )
+            raise RuntimeError(msg) from exc
 
     def cleanup(self) -> None:
         """Clean up the executor."""
@@ -115,3 +136,7 @@ def _run_function(
     function: Callable[..., Any], args: tuple[Any, ...], kwargs: dict[str, Any]
 ) -> Any:  # ruff: ignore[any-type]
     return function(*args, **kwargs)
+
+
+def _canary() -> None:
+    pass
