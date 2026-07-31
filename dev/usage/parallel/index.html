@@ -899,6 +899,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="MultiprocessingExecutor">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-__main__-guard" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The __main__ guard
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
           <li class="md-nav__item">
@@ -2430,6 +2447,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="MultiprocessingExecutor">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-__main__-guard" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The __main__ guard
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
           <li class="md-nav__item">
@@ -2729,6 +2763,42 @@ evaluations where true parallelism is needed.</p>
 </tr>
 </tbody>
 </table>
+<h4 id="the-__main__-guard">The <code>__main__</code> guard</h4>
+<p>With the <code>"spawn"</code> start method, every worker process starts a fresh interpreter
+that <strong>re-imports the program's entry module</strong> to rebuild its environment. If the
+entry script creates or starts the executor at module top level, that re-import
+runs the same code again in each worker, which tries to start yet more processes
+before the interpreter has finished bootstrapping. Python aborts this, the
+workers never start, and <code>MultiprocessingExecutor</code> raises a <code>RuntimeError</code> at
+startup.</p>
+<p>The fix is to keep the code that creates and runs the executor behind an
+<code>if __name__ == "__main__":</code> guard (or inside a function called from there):</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Wrong: created at module top level. Each worker re-imports this and fails.</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">dispatch_tasks</span><span class="p">(</span><span class="n">functions</span><span class="p">,</span> <span class="n">executor</span><span class="o">=</span><span class="s2">&quot;multiprocessing&quot;</span><span class="p">))</span>
+</span></code></pre></div>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Right: the guarded block is skipped during the worker re-import.</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">dispatch_tasks</span><span class="p">(</span><span class="n">functions</span><span class="p">,</span> <span class="n">executor</span><span class="o">=</span><span class="s2">&quot;multiprocessing&quot;</span><span class="p">))</span>
+</span></code></pre></div>
+<p>This is the standard "safe importing of main module" contract of Python's
+<code>multiprocessing</code>; it applies equally to
+<a href="#dispatching-arbitrary-tasks"><code>dispatch_tasks</code></a> with
+<code>executor="multiprocessing"</code>. Interactive sessions (Jupyter/IPython) and test
+runners such as <code>pytest</code> are unaffected, because their entry module is
+import-safe and is not re-executed on re-import.</p>
+<p>A few less common issues cause the same startup error:</p>
+<ul>
+<li><strong>Re-import safety.</strong> The worker re-runs the entry module's <em>top-level</em> code
+  that sits outside the guard. Keep side-effecting statements — argument
+  parsing, binding a socket/port, opening resources — inside functions or behind
+  the guard, so re-importing the module in a worker is harmless.</li>
+<li><strong>Frozen applications.</strong> When bundling with PyInstaller or cx_Freeze, call
+  <code>multiprocessing.freeze_support()</code> as the first statement of the entry point;
+  otherwise each worker re-launches the whole application.</li>
+<li><strong>Restricted environments.</strong> An environment that cannot spawn processes — for
+  example due to process, file-descriptor, or memory limits, or a container
+  without shared-memory/semaphore support — will also fail this startup check.</li>
+</ul>
 <h3 id="hpcexecutor">HPCExecutor</h3>
 <p><a class="autorefs autorefs-internal" title="            ropt.workflow.executors.HPCExecutor" href="../../reference/workflow_executors/#ropt.workflow.executors.HPCExecutor"><code>HPCExecutor</code></a> submits tasks as jobs to an
 HPC scheduler (e.g. Slurm) via the <code>pysqa</code> library. Each task is serialized to
@@ -2794,12 +2864,12 @@ deserialized back. Requires <code>ropt[hpc]</code> to be installed.</p>
 <p>Configuration can be provided either via a <code>template</code> string or a <code>config_path</code>
 directory containing <code>pysqa</code> configuration files. If neither is given, the
 executor looks for a default configuration at:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>&lt;prefix&gt;/share/ropt/pysqa/&lt;queue_type&gt;/
+<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>&lt;prefix&gt;/share/ropt/pysqa/&lt;queue_type&gt;/
 </span></code></pre></div>
 <p>where <code>&lt;prefix&gt;</code> is the Python installation prefix (or system data prefix).
 Find it with:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">sysconfig</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_paths</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="nb">print</span><span class="p">(</span><span class="n">get_paths</span><span class="p">()[</span><span class="s2">&quot;data&quot;</span><span class="p">])</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">sysconfig</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_paths</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="nb">print</span><span class="p">(</span><span class="n">get_paths</span><span class="p">()[</span><span class="s2">&quot;data&quot;</span><span class="p">])</span>
 </span></code></pre></div>
 <p>This allows deployments to ship pre-configured cluster definitions by
 installing them into <code>share/ropt/pysqa/</code> — no explicit <code>config_path</code>
@@ -2909,17 +2979,17 @@ submission.</p>
 returns the collected results.</p>
 <p><code>dispatch_tasks</code> is an <code>async</code> function — call it with <code>await</code> from an
 asyncio context, or use <code>asyncio.run(dispatch_tasks(...))</code>:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.workflow</span><span class="w"> </span><span class="kn">import</span> <span class="n">dispatch_tasks</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="k">def</span><span class="w"> </span><span class="nf">task_a</span><span class="p">():</span>
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    <span class="k">return</span> <span class="s2">&quot;result_a&quot;</span>
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>
-</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="k">def</span><span class="w"> </span><span class="nf">task_b</span><span class="p">():</span>
-</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>    <span class="k">return</span> <span class="s2">&quot;result_b&quot;</span>
-</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>
-</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="n">results</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">dispatch_tasks</span><span class="p">([</span><span class="n">task_a</span><span class="p">,</span> <span class="n">task_b</span><span class="p">],</span> <span class="n">executor</span><span class="o">=</span><span class="s2">&quot;threading&quot;</span><span class="p">))</span>
-</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="nb">print</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>  <span class="c1"># [&quot;result_a&quot;, &quot;result_b&quot;]</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.workflow</span><span class="w"> </span><span class="kn">import</span> <span class="n">dispatch_tasks</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="k">def</span><span class="w"> </span><span class="nf">task_a</span><span class="p">():</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>    <span class="k">return</span> <span class="s2">&quot;result_a&quot;</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="k">def</span><span class="w"> </span><span class="nf">task_b</span><span class="p">():</span>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>    <span class="k">return</span> <span class="s2">&quot;result_b&quot;</span>
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>
+</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="n">results</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">dispatch_tasks</span><span class="p">([</span><span class="n">task_a</span><span class="p">,</span> <span class="n">task_b</span><span class="p">],</span> <span class="n">executor</span><span class="o">=</span><span class="s2">&quot;threading&quot;</span><span class="p">))</span>
+</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="nb">print</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>  <span class="c1"># [&quot;result_a&quot;, &quot;result_b&quot;]</span>
 </span></code></pre></div>
 <p>The <code>functions</code> argument can be either a sequence of callables or a mapping
 from name to callable. When a mapping is used, the keys serve as task names
@@ -2994,29 +3064,29 @@ events arrive from multiple concurrent steps.</p>
 <p>This is especially useful when one set of handlers needs to aggregate results
 from multiple concurrent compute steps.</p>
 <p><code>EventDispatcher</code> follows the same lifecycle as executors:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">async</span> <span class="k">with</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">TaskGroup</span><span class="p">()</span> <span class="k">as</span> <span class="n">tg</span><span class="p">:</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="n">executor</span> <span class="o">=</span> <span class="n">ThreadingExecutor</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    <span class="k">await</span> <span class="n">executor</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="n">tg</span><span class="p">)</span>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="n">event_dispatcher</span> <span class="o">=</span> <span class="n">EventDispatcher</span><span class="p">()</span>
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    <span class="k">await</span> <span class="n">event_dispatcher</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="n">tg</span><span class="p">)</span>
-</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>
-</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>    <span class="c1"># Attach an EventForwardHandler to the compute step.</span>
-</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>    <span class="n">step</span><span class="o">.</span><span class="n">add_event_handler</span><span class="p">(</span>
-</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>        <span class="n">EventForwardHandler</span><span class="p">(</span>
-</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>            <span class="n">event_dispatcher</span><span class="p">,</span>
-</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>            <span class="n">event_types</span><span class="o">=</span><span class="p">{</span><span class="n">EnOptEventType</span><span class="o">.</span><span class="n">FINISHED_EVALUATION</span><span class="p">},</span>
-</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>        <span class="p">)</span>
-</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a>    <span class="p">)</span>
-</span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a>
-</span><span id="__span-3-16"><a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a>    <span class="c1"># Handlers registered on the dispatcher need no locking.</span>
-</span><span id="__span-3-17"><a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a>    <span class="n">result_handler</span> <span class="o">=</span> <span class="n">ResultsHandler</span><span class="p">()</span>
-</span><span id="__span-3-18"><a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a>    <span class="n">event_dispatcher</span><span class="o">.</span><span class="n">add_event_handler</span><span class="p">(</span><span class="n">result_handler</span><span class="p">)</span>
-</span><span id="__span-3-19"><a id="__codelineno-3-19" name="__codelineno-3-19" href="#__codelineno-3-19"></a>
-</span><span id="__span-3-20"><a id="__codelineno-3-20" name="__codelineno-3-20" href="#__codelineno-3-20"></a>    <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">to_thread</span><span class="p">(</span><span class="n">step</span><span class="o">.</span><span class="n">run</span><span class="p">,</span> <span class="n">variables</span><span class="o">=...</span><span class="p">,</span> <span class="n">context</span><span class="o">=...</span><span class="p">)</span>
-</span><span id="__span-3-21"><a id="__codelineno-3-21" name="__codelineno-3-21" href="#__codelineno-3-21"></a>
-</span><span id="__span-3-22"><a id="__codelineno-3-22" name="__codelineno-3-22" href="#__codelineno-3-22"></a>    <span class="n">event_dispatcher</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
-</span><span id="__span-3-23"><a id="__codelineno-3-23" name="__codelineno-3-23" href="#__codelineno-3-23"></a>    <span class="n">executor</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">async</span> <span class="k">with</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">TaskGroup</span><span class="p">()</span> <span class="k">as</span> <span class="n">tg</span><span class="p">:</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>    <span class="n">executor</span> <span class="o">=</span> <span class="n">ThreadingExecutor</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>    <span class="k">await</span> <span class="n">executor</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="n">tg</span><span class="p">)</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>    <span class="n">event_dispatcher</span> <span class="o">=</span> <span class="n">EventDispatcher</span><span class="p">()</span>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>    <span class="k">await</span> <span class="n">event_dispatcher</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="n">tg</span><span class="p">)</span>
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>    <span class="c1"># Attach an EventForwardHandler to the compute step.</span>
+</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>    <span class="n">step</span><span class="o">.</span><span class="n">add_event_handler</span><span class="p">(</span>
+</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>        <span class="n">EventForwardHandler</span><span class="p">(</span>
+</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>            <span class="n">event_dispatcher</span><span class="p">,</span>
+</span><span id="__span-5-12"><a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>            <span class="n">event_types</span><span class="o">=</span><span class="p">{</span><span class="n">EnOptEventType</span><span class="o">.</span><span class="n">FINISHED_EVALUATION</span><span class="p">},</span>
+</span><span id="__span-5-13"><a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a>        <span class="p">)</span>
+</span><span id="__span-5-14"><a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a>    <span class="p">)</span>
+</span><span id="__span-5-15"><a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a>
+</span><span id="__span-5-16"><a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a>    <span class="c1"># Handlers registered on the dispatcher need no locking.</span>
+</span><span id="__span-5-17"><a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a>    <span class="n">result_handler</span> <span class="o">=</span> <span class="n">ResultsHandler</span><span class="p">()</span>
+</span><span id="__span-5-18"><a id="__codelineno-5-18" name="__codelineno-5-18" href="#__codelineno-5-18"></a>    <span class="n">event_dispatcher</span><span class="o">.</span><span class="n">add_event_handler</span><span class="p">(</span><span class="n">result_handler</span><span class="p">)</span>
+</span><span id="__span-5-19"><a id="__codelineno-5-19" name="__codelineno-5-19" href="#__codelineno-5-19"></a>
+</span><span id="__span-5-20"><a id="__codelineno-5-20" name="__codelineno-5-20" href="#__codelineno-5-20"></a>    <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">to_thread</span><span class="p">(</span><span class="n">step</span><span class="o">.</span><span class="n">run</span><span class="p">,</span> <span class="n">variables</span><span class="o">=...</span><span class="p">,</span> <span class="n">context</span><span class="o">=...</span><span class="p">)</span>
+</span><span id="__span-5-21"><a id="__codelineno-5-21" name="__codelineno-5-21" href="#__codelineno-5-21"></a>
+</span><span id="__span-5-22"><a id="__codelineno-5-22" name="__codelineno-5-22" href="#__codelineno-5-22"></a>    <span class="n">event_dispatcher</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
+</span><span id="__span-5-23"><a id="__codelineno-5-23" name="__codelineno-5-23" href="#__codelineno-5-23"></a>    <span class="n">executor</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
 </span></code></pre></div>
 <p><a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.EventForwardHandler" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.EventForwardHandler"><code>EventForwardHandler</code></a> is a
 regular event handler that can be attached to a compute step. When invoked from
@@ -3062,7 +3132,7 @@ in-memory work, such as <code>ResultsHandler</code> or <code>HistoryHandler</cod
 <p>If a handler performs blocking operations — writing results to a file, pushing
 data to a database, sending over a network — pass <code>run_in_thread=True</code> when
 registering it:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">event_dispatcher</span><span class="o">.</span><span class="n">add_event_handler</span><span class="p">(</span><span class="n">my_handler</span><span class="p">,</span> <span class="n">run_in_thread</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">event_dispatcher</span><span class="o">.</span><span class="n">add_event_handler</span><span class="p">(</span><span class="n">my_handler</span><span class="p">,</span> <span class="n">run_in_thread</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </span></code></pre></div>
 <p><code>CallbackHandler</code> and <code>DataFrameHandler</code> (when a slow callback is set via
 <code>set_callback</code>) are common cases where this is needed. When multiple handlers
