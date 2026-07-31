@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import subprocess  # ruff: ignore[suspicious-subprocess-import]
 import sys
+import threading
 from functools import partial
 from typing import TYPE_CHECKING, Any
 
@@ -81,7 +82,7 @@ def _function(input_value: int, *, raise_error: bool = False) -> int:
     "executor_name",
     [
         "threading",
-        "multiprocessing",
+        pytest.param("multiprocessing", marks=pytest.mark.slow),
         pytest.param(
             "hpc",
             marks=[
@@ -141,7 +142,7 @@ async def test_executor_ok(
     ("executor_name", "expected_results"),
     [
         ("threading", {False}),
-        ("multiprocessing", {True}),
+        pytest.param("multiprocessing", {True}, marks=pytest.mark.slow),
         pytest.param(
             "hpc",
             {True},
@@ -198,7 +199,7 @@ async def test_is_worker_process(
     "executor_name",
     [
         "threading",
-        "multiprocessing",
+        pytest.param("multiprocessing", marks=pytest.mark.slow),
         pytest.param(
             "hpc",
             marks=[
@@ -342,7 +343,7 @@ if _TEST_HPC:
     "executor_name",
     [
         "threading",
-        "multiprocessing",
+        pytest.param("multiprocessing", marks=pytest.mark.slow),
         pytest.param(
             "hpc",
             marks=[
@@ -396,7 +397,7 @@ async def test_executor_evaluator_ok(
     "executor_name",
     [
         "threading",
-        "multiprocessing",
+        pytest.param("multiprocessing", marks=pytest.mark.slow),
         pytest.param(
             "hpc",
             marks=[
@@ -451,7 +452,7 @@ async def test_executor_evaluator_error(
     "executor_name",
     [
         "threading",
-        "multiprocessing",
+        pytest.param("multiprocessing", marks=pytest.mark.slow),
         pytest.param(
             "hpc",
             marks=[
@@ -513,7 +514,7 @@ async def test_executor_evaluator_two_optimizations(
     "executor_name",
     [
         "threading",
-        "multiprocessing",
+        pytest.param("multiprocessing", marks=pytest.mark.slow),
     ],
 )
 async def test_groups_tasks(
@@ -620,6 +621,7 @@ async def test_handle_result_records_executor_failure_as_nan() -> None:  # ruff:
     assert np.all(np.isnan(results))
 
 
+@pytest.mark.slow
 @pytest.mark.timeout(60)
 async def test_multiprocessing_unguarded_main_reports_startup_error(
     tmp_path: Path,
@@ -641,3 +643,100 @@ async def test_multiprocessing_unguarded_main_reports_startup_error(
     _, stderr = await proc.communicate()
     assert proc.returncode != 0
     assert b"could not start its worker processes" in stderr
+
+
+async def _run_multiprocessing_tasks(
+    tasks: list[Task], result_queue: ResultsQueue, *, workers: int = 2
+) -> list[Any]:
+    collected: list[Any] = []
+    finished = asyncio.Event()
+
+    def collect() -> None:
+        for _ in range(len(tasks)):
+            item = result_queue.get()
+            if item is None:
+                break
+            assert isinstance(item, Task)
+            collected.append(item.result)
+        finished.set()
+
+    executor = MultiprocessingExecutor(workers=workers)
+    async with asyncio.TaskGroup() as tg:
+        await executor.start(tg)
+        tg.create_task(asyncio.to_thread(collect))
+        for task in tasks:
+            await executor.task_queue.put(task)
+        await finished.wait()
+        executor.cancel()
+    return collected
+
+
+@pytest.mark.slow
+async def test_multiprocessing_cloudpickles_task_functions_and_results() -> None:
+    def make_adder(offset: int) -> Callable[[int], int]:
+        def add(value: int) -> int:
+            return value + offset
+
+        return add
+
+    def local_double(value: int) -> int:
+        return value * 2
+
+    def make_callable(value: int) -> Callable[[], int]:
+        return lambda: value
+
+    result_queue: ResultsQueue = ResultsQueue()
+    tasks = [
+        Task(
+            function=lambda value: value + 100,
+            args=(1,),
+            results_queue=result_queue,
+        ),
+        Task(function=make_adder(10), args=(2,), results_queue=result_queue),
+        Task(function=local_double, args=(3,), results_queue=result_queue),
+        Task(function=make_callable, args=(42,), results_queue=result_queue),
+    ]
+    results = await _run_multiprocessing_tasks(tasks, result_queue)
+    assert sorted(value for value in results if isinstance(value, int)) == [6, 12, 101]
+    returned = [value for value in results if callable(value)]
+    assert len(returned) == 1
+    assert returned[0]() == 42
+
+
+@pytest.mark.slow
+async def test_multiprocessing_unserializable_payload_reports_error() -> None:
+    lock = threading.Lock()
+
+    def use_lock() -> Any:
+        return lock
+
+    result_queue: ResultsQueue = ResultsQueue()
+    task = Task(function=use_lock, results_queue=result_queue)
+    executor = MultiprocessingExecutor(workers=1)
+    with pytest.raises(ExceptionGroup) as excinfo:  # ruff: ignore[pytest-raises-with-multiple-statements]
+        async with asyncio.TaskGroup() as tg:
+            await executor.start(tg)
+            await executor.task_queue.put(task)
+    assert any("pickle" in str(err).lower() for err in excinfo.value.exceptions)
+    assert not executor.is_running()
+
+
+@pytest.mark.slow
+async def test_multiprocessing_without_cloudpickle_rejects_lambda(
+    monkeypatch: Any,
+) -> None:
+    monkeypatch.setattr(
+        "ropt.workflow.executors._multiprocessing_executor._HAVE_CLOUDPICKLE",
+        False,
+    )
+    result_queue: ResultsQueue = ResultsQueue()
+    task = Task(function=lambda: 1, results_queue=result_queue)
+    executor = MultiprocessingExecutor(workers=1)
+    with pytest.raises(ExceptionGroup) as excinfo:  # ruff: ignore[pytest-raises-with-multiple-statements]
+        async with asyncio.TaskGroup() as tg:
+            await executor.start(tg)
+            await executor.task_queue.put(task)
+    errors = [err for err in excinfo.value.exceptions if isinstance(err, RuntimeError)]
+    assert errors
+    assert any("ropt[cloudpickle]" in str(err) for err in errors)
+    assert not executor.is_running()

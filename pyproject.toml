@@ -29,8 +29,8 @@ dependencies = ["numpy", "pydantic", "scipy>=1.15"]
 
 [project.optional-dependencies]
 pandas = ["pandas"]
+cloudpickle = ["cloudpickle"]
 hpc = ["pysqa", "cloudpickle"]
-external = ["cloudpickle"]
 
 [tool.setuptools.packages.find]
 where = ["src"]

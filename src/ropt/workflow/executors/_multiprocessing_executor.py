@@ -4,9 +4,11 @@ from __future__ import annotations
 
 import asyncio
 import multiprocessing
+import pickle  # ruff: ignore[suspicious-pickle-import]
 from concurrent.futures import ProcessPoolExecutor
 from concurrent.futures.process import BrokenProcessPool
-from typing import TYPE_CHECKING, Any
+from importlib.util import find_spec
+from typing import TYPE_CHECKING, Any, Final
 
 from ropt._logging import get_logger
 from ropt.exceptions import ExecutorFailure
@@ -16,6 +18,11 @@ from .base import Executor, ExecutorBase, Task
 
 if TYPE_CHECKING:
     from collections.abc import Callable
+
+_HAVE_CLOUDPICKLE: Final = find_spec("cloudpickle") is not None
+
+if _HAVE_CLOUDPICKLE:
+    import cloudpickle
 
 _logger = get_logger(__name__)
 
@@ -115,10 +122,7 @@ class _Worker:
         while True:
             task = await self._task_queue.get()
             try:
-                loop = asyncio.get_running_loop()
-                result = await loop.run_in_executor(
-                    self._executor, _run_function, task.function, task.args, task.kwargs
-                )
+                result = await self._run_task(task)
                 await asyncio.to_thread(task.put_result, result)
             except BrokenProcessPool:
                 _logger.warning("Worker process pool broken; task result lost")
@@ -131,11 +135,39 @@ class _Worker:
             finally:
                 self._task_queue.task_done()
 
+    async def _run_task(self, task: Task) -> Any:  # ruff: ignore[any-type]
+        loop = asyncio.get_running_loop()
+        if _HAVE_CLOUDPICKLE:
+            payload = cloudpickle.dumps((task.function, task.args, task.kwargs))
+            ok, blob = await loop.run_in_executor(
+                self._executor, _run_cloudpickled, payload
+            )
+            value = cloudpickle.loads(blob)
+            if not ok:
+                raise value
+            return value
+        try:
+            pickle.dumps(task.function)
+        except Exception as exc:
+            msg = "Task function is not picklable; install ropt[cloudpickle]."
+            raise RuntimeError(msg) from exc
+        return await loop.run_in_executor(
+            self._executor, _run_function, task.function, task.args, task.kwargs
+        )
+
 
 def _run_function(
     function: Callable[..., Any], args: tuple[Any, ...], kwargs: dict[str, Any]
 ) -> Any:  # ruff: ignore[any-type]
     return function(*args, **kwargs)
+
+
+def _run_cloudpickled(payload: bytes) -> tuple[bool, bytes]:
+    function, args, kwargs = cloudpickle.loads(payload)
+    try:
+        return True, cloudpickle.dumps(function(*args, **kwargs))
+    except Exception as exc:  # ruff: ignore[blind-except]
+        return False, cloudpickle.dumps(exc)
 
 
 def _canary() -> None:

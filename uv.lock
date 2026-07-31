@@ -1297,7 +1297,7 @@ dependencies = [
 ]
 
 [package.optional-dependencies]
-external = [
+cloudpickle = [
     { name = "cloudpickle" },
 ]
 hpc = [
@@ -1326,7 +1326,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "cloudpickle", marker = "extra == 'external'" },
+    { name = "cloudpickle", marker = "extra == 'cloudpickle'" },
     { name = "cloudpickle", marker = "extra == 'hpc'" },
     { name = "numpy" },
     { name = "pandas", marker = "extra == 'pandas'" },
@@ -1334,7 +1334,7 @@ requires-dist = [
     { name = "pysqa", marker = "extra == 'hpc'" },
     { name = "scipy", specifier = ">=1.15" },
 ]
-provides-extras = ["pandas", "hpc", "external"]
+provides-extras = ["pandas", "cloudpickle", "hpc"]
 
 [package.metadata.requires-dev]
 dev = [

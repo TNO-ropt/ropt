@@ -101,6 +101,18 @@ evaluations where true parallelism is needed.
 | `queue_size`          | Maximum task queue size (0 = unlimited).                       |
 | `max_tasks_per_child` | Restart workers after this many tasks (default: `None` = never). Useful if evaluations leak memory, but adds significant overhead. |
 
+#### Task serialization
+
+Each task crosses a process boundary, so its function, arguments, and result
+must be serialized. If [`cloudpickle`](https://github.com/cloudpipe/cloudpickle)
+is installed (the `cloudpickle` extra), it is used for both directions: this
+serializes lambdas, closures, and interactively-defined functions (such as those
+written in a notebook cell) by value, so they can be used as task functions and
+returned as results. Without `cloudpickle`, the executor falls back to the
+standard `pickle` module, which requires task functions to be importable,
+module-level objects; passing a lambda or closure then raises a `RuntimeError`
+suggesting the `cloudpickle` extra.
+
 #### The `__main__` guard
 
 With the `"spawn"` start method, every worker process starts a fresh interpreter
