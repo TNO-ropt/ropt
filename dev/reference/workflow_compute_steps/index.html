@@ -2543,6 +2543,9 @@ single ensemble evaluation.</p>
 within an optimization workflow. Concrete implementations, which perform
 specific actions like running an optimizer or evaluating functions, must
 inherit from this base class.</p>
+<p>A compute step instance may only have one active <code>run</code> at a time; its
+<code>run</code> method acquires a guard that raises a <code>RuntimeError</code> if the same
+instance is already running on another thread.</p>
 
 
 
@@ -3289,16 +3292,6 @@ event.</p>
         </tr>
       </thead>
       <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError">RuntimeError</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>If this step is already running on another thread.</p>
-              </div>
-            </td>
-          </tr>
           <tr class="doc-section-item">
             <td>
                   <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#ValueError">ValueError</a></code>
