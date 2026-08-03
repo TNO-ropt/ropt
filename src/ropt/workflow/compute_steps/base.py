@@ -2,15 +2,12 @@
 
 from __future__ import annotations
 
+import functools
 import threading
 from abc import ABC, abstractmethod
-from contextlib import contextmanager
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 from ropt.workflow.event_handlers import EventHandler
-
-if TYPE_CHECKING:
-    from collections.abc import Iterator
 
 
 class ComputeStep(ABC):
@@ -21,29 +18,43 @@ class ComputeStep(ABC):
     specific actions like running an optimizer or evaluating functions, must
     inherit from this base class.
 
-    A compute step instance may only have one active `run` at a time; its
-    `run` method acquires a guard that raises a `RuntimeError` if the same
-    instance is already running on another thread.
+    A compute step instance may only have one active `run` at a time. The guard
+    is applied automatically to every subclass's `run` method, which raises a
+    `RuntimeError` if the same instance is already running on another thread.
     """
+
+    def __init_subclass__(cls, **kwargs: object) -> None:  # ruff: ignore[undocumented-magic-method]
+        super().__init_subclass__(**kwargs)
+        if "run" in cls.__dict__ and not getattr(
+            cls.__dict__["run"], "__wrapped__", None
+        ):
+            original = cls.__dict__["run"]
+
+            @functools.wraps(original)
+            def _guarded(
+                self: ComputeStep,
+                *args: Any,  # ruff: ignore[any-type]
+                _orig: Any = original,  # ruff: ignore[any-type]
+                **kwargs: Any,  # ruff: ignore[any-type]
+            ) -> Any:  # ruff: ignore[any-type]
+                with self._run_lock:
+                    if self._running:
+                        msg = "The compute step is already running on another thread."
+                        raise RuntimeError(msg)
+                    self._running = True
+                try:
+                    return _orig(self, *args, **kwargs)
+                finally:
+                    with self._run_lock:
+                        self._running = False
+
+            cls.run = _guarded  # type: ignore[method-assign]
 
     def __init__(self) -> None:
         """Initialize the ComputeStep."""
         self._event_handlers: list[EventHandler] = []
         self._running = False
         self._run_lock = threading.Lock()
-
-    @contextmanager
-    def _running_guard(self) -> Iterator[None]:
-        with self._run_lock:
-            if self._running:
-                msg = "The compute step is already running on another thread."
-                raise RuntimeError(msg)
-            self._running = True
-        try:
-            yield
-        finally:
-            with self._run_lock:
-                self._running = False
 
     def __getstate__(self) -> dict[str, Any]:  # ruff: ignore[undocumented-magic-method]
         state = self.__dict__.copy()

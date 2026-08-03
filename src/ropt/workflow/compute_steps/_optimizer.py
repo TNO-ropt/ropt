@@ -15,7 +15,7 @@ from ropt.events import EnOptEvent
 from .base import ComputeStep
 
 if TYPE_CHECKING:
-    from numpy.typing import ArrayLike, NDArray
+    from numpy.typing import ArrayLike
 
     from ropt.context import EnOptContext
     from ropt.results import Results
@@ -73,16 +73,6 @@ class OptimizationStep(ComputeStep):
         if variables.shape != (context.variables.variable_count,):
             msg = "The input variables have the wrong shape"
             raise ValueError(msg)
-        with self._running_guard():
-            return self._run(context, variables, metadata=metadata)
-
-    def _run(
-        self,
-        context: EnOptContext,
-        variables: NDArray[np.float64],
-        *,
-        metadata: dict[str, Any] | None = None,
-    ) -> ExitCode:
         context.lock()
 
         self._context = context
