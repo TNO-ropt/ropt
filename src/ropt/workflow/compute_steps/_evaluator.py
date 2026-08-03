@@ -17,9 +17,10 @@ from ropt.results import FunctionResults
 from .base import ComputeStep
 
 if TYPE_CHECKING:
-    from numpy.typing import ArrayLike
+    from numpy.typing import ArrayLike, NDArray
 
     from ropt.context import EnOptContext
+    from ropt.results import Results
     from ropt.workflow.evaluators import Evaluator
 
 
@@ -77,6 +78,30 @@ class EvaluationStep(ComputeStep):
         context.lock()
 
         _logger.info("Starting evaluation")
+
+        try:
+            exit_code, results = self._evaluate(context, variables, metadata)
+        except Abort as exc:
+            _logger.info("Evaluation aborted: %s", exc.exit_code.name)
+            return exc.exit_code
+
+        _logger.info("Evaluation finished: %s", exit_code.name)
+        self._emit_event(
+            EnOptEvent(
+                event_type=EnOptEventType.FINISHED_ENSEMBLE_EVALUATOR,
+                context=context,
+                results=results,
+            )
+        )
+
+        return exit_code
+
+    def _evaluate(
+        self,
+        context: EnOptContext,
+        variables: NDArray[np.float64],
+        metadata: dict[str, Any] | None,
+    ) -> tuple[ExitCode, tuple[Results, ...]]:
         self._emit_event(
             EnOptEvent(
                 event_type=EnOptEventType.START_ENSEMBLE_EVALUATOR, context=context
@@ -88,22 +113,20 @@ class EvaluationStep(ComputeStep):
 
         ensemble_evaluator = EnsembleEvaluator(context, self._evaluator.eval)
 
-        exit_code = ExitCode.ENSEMBLE_EVALUATOR_FINISHED
-
         self._emit_event(
             EnOptEvent(event_type=EnOptEventType.START_EVALUATION, context=context)
         )
-        try:
-            results = ensemble_evaluator.calculate(
-                variables, compute_functions=True, compute_gradients=False
-            )
-        except Abort as exc:
-            exit_code = exc.exit_code
+        results = ensemble_evaluator.calculate(
+            variables, compute_functions=True, compute_gradients=False
+        )
 
         assert results
         assert isinstance(results[0], FunctionResults)
-        if results[0].functions is None:
-            exit_code = ExitCode.TOO_FEW_REALIZATIONS
+        exit_code = (
+            ExitCode.TOO_FEW_REALIZATIONS
+            if results[0].functions is None
+            else ExitCode.ENSEMBLE_EVALUATOR_FINISHED
+        )
 
         if metadata is not None:
             for item in results:
@@ -117,16 +140,7 @@ class EvaluationStep(ComputeStep):
             )
         )
 
-        _logger.info("Evaluation finished: %s", exit_code.name)
-        self._emit_event(
-            EnOptEvent(
-                event_type=EnOptEventType.FINISHED_ENSEMBLE_EVALUATOR,
-                context=context,
-                results=results,
-            )
-        )
-
-        return exit_code
+        return exit_code, results
 
     def _emit_event(self, event: EnOptEvent) -> None:
         for handler in self.event_handlers:

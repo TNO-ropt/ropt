@@ -611,6 +611,69 @@ def test_optimization_abort(config: Any, evaluator: Any) -> None:
     assert last_evaluation == 1
 
 
+_EVALUATION_EVENTS = {
+    EnOptEventType.START_ENSEMBLE_EVALUATOR,
+    EnOptEventType.START_EVALUATION,
+    EnOptEventType.FINISHED_EVALUATION,
+    EnOptEventType.FINISHED_ENSEMBLE_EVALUATOR,
+}
+
+
+def test_evaluation_abort_from_finished_evaluation_skips_terminal_event(
+    config: Any, evaluator: Any
+) -> None:
+    emitted: list[EnOptEventType] = []
+
+    def _record(event: EnOptEvent) -> None:
+        emitted.append(event.event_type)
+
+    def _abort(_: EnOptEvent) -> None:
+        raise Abort(ExitCode.USER_ABORT)
+
+    step = EvaluationStep(evaluator=evaluator())
+    step.add_event_handler(
+        CallbackHandler(event_types=_EVALUATION_EVENTS, callback=_record)
+    )
+    step.add_event_handler(
+        CallbackHandler(
+            event_types={EnOptEventType.FINISHED_EVALUATION}, callback=_abort
+        )
+    )
+    exit_code = step.run(
+        variables=initial_values, context=EnOptContext.model_validate(config)
+    )
+    assert exit_code == ExitCode.USER_ABORT
+    assert EnOptEventType.FINISHED_EVALUATION in emitted
+    assert EnOptEventType.FINISHED_ENSEMBLE_EVALUATOR not in emitted
+
+
+def test_evaluation_abort_before_results_skips_remaining_events(
+    config: Any, evaluator: Any
+) -> None:
+    emitted: list[EnOptEventType] = []
+
+    def _record(event: EnOptEvent) -> None:
+        emitted.append(event.event_type)
+
+    def _abort(_: EnOptEvent) -> None:
+        raise Abort(ExitCode.USER_ABORT)
+
+    step = EvaluationStep(evaluator=evaluator())
+    step.add_event_handler(
+        CallbackHandler(event_types=_EVALUATION_EVENTS, callback=_record)
+    )
+    step.add_event_handler(
+        CallbackHandler(event_types={EnOptEventType.START_EVALUATION}, callback=_abort)
+    )
+    exit_code = step.run(
+        variables=initial_values, context=EnOptContext.model_validate(config)
+    )
+    assert exit_code == ExitCode.USER_ABORT
+    assert EnOptEventType.START_EVALUATION in emitted
+    assert EnOptEventType.FINISHED_EVALUATION not in emitted
+    assert EnOptEventType.FINISHED_ENSEMBLE_EVALUATOR not in emitted
+
+
 def test_workflow_object_is_pickled_as_a_placeholder(evaluator: Any) -> None:
     reset_transferred()
     step = OptimizationStep(evaluator=evaluator())
