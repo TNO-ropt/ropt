@@ -615,7 +615,7 @@ async def test_multiprocessing_unguarded_main_reports_startup_error(
     )
     _, stderr = await proc.communicate()
     assert proc.returncode != 0
-    assert b"could not start its worker processes" in stderr
+    assert b"Could not start MultiprocessingExecutor workers" in stderr
 
 
 async def _run_multiprocessing_tasks(

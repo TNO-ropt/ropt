@@ -185,7 +185,7 @@ class PluginManager:
             if default_plugin in plugins:
                 return default_plugin, plugins[default_plugin]
             if len(plugins) > 1:
-                msg = f"Ambiguous method: '{method}' is available in multiple plugins: {set(plugins.keys())}"
+                msg = f"Method '{method}' is ambiguous across plugins: {set(plugins.keys())}"
                 raise ValueError(msg)
             if plugins:
                 return plugins.popitem()
@@ -269,7 +269,7 @@ class PluginManager:
                 plugins[entry_point.name], self._PLUGIN_TYPES[plugin_type]
             ):
                 msg = (
-                    f"Incorrect type for {plugin_type} plugin `{entry_point.name}`"
+                    f"Wrong type for {plugin_type} plugin `{entry_point.name}`"
                     f": {type(plugins[entry_point.name])}"
                 )
                 raise TypeError(msg)

@@ -69,8 +69,8 @@ class OptionsSchemaModel(BaseModel):
         for method_name, method_schema in self.methods.items():
             if method_schema.exclude - common_options:
                 msg = (
-                    f"Option(s) {method_schema.exclude - common_options} are "
-                    f"excluded from `{method_name}` schema but not defined in `common`."
+                    f"Excluded option(s) for {method_name} not in "
+                    f"common: {method_schema.exclude - common_options}."
                 )
                 raise ValueError(msg)
         return self

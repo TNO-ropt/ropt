@@ -72,9 +72,7 @@ def test_added_ambiguous_method(monkeypatch: Any) -> None:
     manager._add_plugin("backend", "test1", MockedPlugin1)
     manager._add_plugin("backend", "test2", MockedPlugin2)
 
-    with pytest.raises(
-        ValueError, match="Ambiguous method: 'test' is available in multiple plugins"
-    ):
+    with pytest.raises(ValueError, match="Method 'test' is ambiguous across plugins"):
         manager.get_plugin("backend", "test")
 
 

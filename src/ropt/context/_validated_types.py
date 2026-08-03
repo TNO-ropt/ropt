@@ -44,7 +44,7 @@ def _convert_backend(value: Backend | BackendConfig | dict[str, Any]) -> Backend
         assert isinstance(result, Backend)
         result.validate_options()
         return result
-    msg = "Value must be a Backend instance, a BackendConfig instance, or a dict."
+    msg = "Value must be a Backend, BackendConfig, or dict."
     raise ValueError(msg)
 
 
@@ -62,7 +62,7 @@ def _convert_sampler(value: Sampler | SamplerConfig | dict[str, Any]) -> Sampler
         )
         assert isinstance(result, Sampler)
         return result
-    msg = "Value must be a Sampler instance, a SamplerConfig instance, or a dict."
+    msg = "Value must be a Sampler, SamplerConfig, or dict."
     raise ValueError(msg)
 
 
@@ -82,7 +82,7 @@ def _convert_realization_filter(
         ).create(realization_filter_config)
         assert isinstance(result, RealizationFilter)
         return result
-    msg = "Value must be a RealizationFilter instance, a RealizationFilterConfig instance, or a dict."
+    msg = "Value must be a RealizationFilter, RealizationFilterConfig, or dict."
     raise ValueError(msg)
 
 
@@ -102,7 +102,7 @@ def _convert_function_estimator(
         ).create(function_estimator_config)
         assert isinstance(result, FunctionEstimator)
         return result
-    msg = "Value must be a FunctionEstimator instance, a FunctionEstimatorConfig instance, or a dict."
+    msg = "Value must be a FunctionEstimator, FunctionEstimatorConfig, or dict."
     raise ValueError(msg)
 
 
@@ -122,7 +122,7 @@ def _convert_variable_transform(
         ).create(variable_transform_config)
         assert isinstance(result, VariableTransform)
         return result
-    msg = "Value must be a VariableTransform instance, a VariableTransformConfig instance, or a dict."
+    msg = "Value must be a VariableTransform, VariableTransformConfig, or dict."
     raise ValueError(msg)
 
 
@@ -142,7 +142,7 @@ def _convert_objective_transform(
         ).create(objective_transform_config)
         assert isinstance(result, ObjectiveTransform)
         return result
-    msg = "Value must be an ObjectiveTransform instance, an ObjectiveTransformConfig instance, or a dict."
+    msg = "Value must be an ObjectiveTransform, ObjectiveTransformConfig, or dict."
     raise ValueError(msg)
 
 
@@ -169,7 +169,10 @@ def _convert_nonlinear_constraint_transform(
         ).create(nonlinear_constraint_transform_config)
         assert isinstance(result, NonlinearConstraintTransform)
         return result
-    msg = "Value must be a NonlinearConstraintTransform instance, a NonlinearConstraintTransformConfig instance, or a dict."
+    msg = (
+        "Value must be a NonlinearConstraintTransform, "
+        "NonlinearConstraintTransformConfig, or dict."
+    )
     raise ValueError(msg)
 
 

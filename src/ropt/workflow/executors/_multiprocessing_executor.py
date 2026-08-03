@@ -87,11 +87,7 @@ class MultiprocessingExecutor(ExecutorBase):
         except BrokenProcessPool as exc:
             self._executor.shutdown(wait=False)
             self._executor = None
-            msg = (
-                "MultiprocessingExecutor could not start its worker processes. "
-                "Usually this is caused by a missing 'if __name__ == \"__main__\":' "
-                "guard. See the parallel evaluation documentation for other causes."
-            )
+            msg = "Could not start MultiprocessingExecutor workers (missing '__main__' guard?)"
             raise RuntimeError(msg) from exc
 
     def cleanup(self) -> None:
@@ -148,7 +144,7 @@ class _Worker:
         try:
             pickle.dumps(task.function)
         except Exception as exc:
-            msg = "Task function is not picklable; install ropt[cloudpickle]."
+            msg = "Task function is not picklable without ropt[cloudpickle]"
             raise RuntimeError(msg) from exc
         return await loop.run_in_executor(
             self._executor, _run_function, task.function, task.args, task.kwargs
