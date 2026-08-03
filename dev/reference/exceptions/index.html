@@ -2220,6 +2220,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#ropt.exceptions.TransferError" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TransferError
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2312,6 +2323,17 @@
     <span class="md-ellipsis">
       
         ExecutorFailure
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.exceptions.TransferError" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TransferError
       
     </span>
   </a>
@@ -2509,6 +2531,48 @@ attribute.</p>
 
 
         <p>Raised when an executor fails to execute a task.</p>
+
+
+
+
+
+
+
+
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="ropt.exceptions.TransferError" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">TransferError</span>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#Exception">Exception</a></code></p>
+
+
+
+        <p>Raised when a workflow object is used in a worker process.</p>
+<p>Workflow objects such as compute steps, evaluators, and event handlers are
+process-local. They may be pickled as part of a task payload, but they must
+not be used in a worker: if a task dispatched to a
+<a class="autorefs autorefs-internal" title="            ropt.workflow.executors.MultiprocessingExecutor" href="../workflow_executors/#ropt.workflow.executors.MultiprocessingExecutor"><code>MultiprocessingExecutor</code></a>
+or <a class="autorefs autorefs-internal" title="            ropt.workflow.executors.HPCExecutor" href="../workflow_executors/#ropt.workflow.executors.HPCExecutor"><code>HPCExecutor</code></a> worker captures one,
+the worker detects it and raises this error before running the task.</p>
 
 
 

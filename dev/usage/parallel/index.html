@@ -2993,8 +2993,13 @@ process</strong>. A different <em>thread</em> is fine; a different <em>process</
 <p><code>ropt</code> enforces this at the process boundary. The workflow objects that hold
 in-process state or a process-local communication channel — compute steps,
 evaluators, event handlers, and the
-<a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.EventDispatcher" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.EventDispatcher"><code>EventDispatcher</code></a> — refuse to be
-serialized: transferring one into a worker raises a <code>RuntimeError</code>. See
+<a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.EventDispatcher" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.EventDispatcher"><code>EventDispatcher</code></a> — may still be
+serialized, but they do not survive the trip: on the worker side they are
+reconstructed as inert placeholders that discard their original state. Before a
+process or HPC worker runs a dispatched task, <code>ropt</code> checks whether such a
+placeholder was transferred and, if so, raises a
+<a class="autorefs autorefs-internal" title="            TransferError" href="../../reference/exceptions/#ropt.exceptions.TransferError"><code>TransferError</code></a> instead of running the task
+against a disconnected copy. See
 <a href="#nested-workflows-and-process-boundaries">Nested workflows and process boundaries</a>
 for what belongs where.</p>
 <h2 id="dispatching-arbitrary-tasks">Dispatching arbitrary tasks</h2>
@@ -3204,12 +3209,14 @@ where it was created." Concretely:</p>
   <a class="autorefs autorefs-internal" title="            ropt.workflow.executors.ThreadingExecutor" href="../../reference/workflow_executors/#ropt.workflow.executors.ThreadingExecutor"><code>ThreadingExecutor</code></a> while a
   main-thread <a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.EventDispatcher" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.EventDispatcher"><code>EventDispatcher</code></a>
   collects its events. Event handling keeps working because memory is shared.</li>
-<li><strong>Across processes (forbidden).</strong> A step refuses to be <em>transferred</em> into a
+<li><strong>Across processes (forbidden).</strong> A step must not be <em>transferred</em> into a
   <a class="autorefs autorefs-internal" title="            ropt.workflow.executors.MultiprocessingExecutor" href="../../reference/workflow_executors/#ropt.workflow.executors.MultiprocessingExecutor"><code>MultiprocessingExecutor</code></a>
-  or <a class="autorefs autorefs-internal" title="            ropt.workflow.executors.HPCExecutor" href="../../reference/workflow_executors/#ropt.workflow.executors.HPCExecutor"><code>HPCExecutor</code></a> worker: serializing one
-  — for example when a dispatched task captures it — raises a <code>RuntimeError</code>
-  rather than silently shipping a disconnected copy whose events never reach the
-  host. Create the step <strong>inside</strong> the worker instead — a self-contained
+  or <a class="autorefs autorefs-internal" title="            ropt.workflow.executors.HPCExecutor" href="../../reference/workflow_executors/#ropt.workflow.executors.HPCExecutor"><code>HPCExecutor</code></a> worker. Serializing one
+  — for example when a dispatched task captures it — reconstructs it in the
+  worker as an inert placeholder rather than a working copy whose events reach
+  the host. <code>ropt</code> detects the transferred placeholder and raises a
+  <a class="autorefs autorefs-internal" title="            TransferError" href="../../reference/exceptions/#ropt.exceptions.TransferError"><code>TransferError</code></a> before running the task.
+  Create the step <strong>inside</strong> the worker instead — a self-contained
   optimization that returns its result as data. A step created there is unknown
   to the host process and needs no cross-process communication.</li>
 <li><strong>Concurrently (forbidden).</strong> A single step must not run more than once at a

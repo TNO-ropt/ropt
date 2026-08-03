@@ -3213,9 +3213,11 @@ never overlap.</p>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Handlers are process-local</p>
-<p>An event handler cannot be transferred to another process; serializing one
-(for example when a task dispatched to a worker captures it) raises a
-<code>RuntimeError</code>. Create handlers inside the worker and return their results
+<p>An event handler cannot be transferred to another process. Serializing one
+(for example when a task dispatched to a worker captures it) reconstructs it
+in the worker as an inert placeholder; <code>ropt</code> detects this and raises a
+<a class="autorefs autorefs-internal" title="            TransferError" href="../../reference/exceptions/#ropt.exceptions.TransferError"><code>TransferError</code></a> before the task runs.
+Create handlers inside the worker and return their results
 as data. See
 <a href="../parallel/#nested-workflows-and-process-boundaries">Nested workflows and process boundaries</a>.</p>
 </div>
@@ -3522,7 +3524,9 @@ Note that the parallelism of
 <a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.ParallelEvaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.ParallelEvaluator"><code>ParallelEvaluator</code></a> happens
 <em>below</em> <code>eval</code> — it dispatches tasks to an executor, so its own <code>eval</code> is
 still called on a single thread. An evaluator cannot be transferred to
-another process; serializing one raises a <code>RuntimeError</code>.</p>
+another process; serializing one reconstructs it as an inert placeholder in
+the worker, and <code>ropt</code> raises a
+<a class="autorefs autorefs-internal" title="            TransferError" href="../../reference/exceptions/#ropt.exceptions.TransferError"><code>TransferError</code></a> before the task runs.</p>
 </div>
 <h3 id="batchevaluator">BatchEvaluator</h3>
 <p><a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.BatchEvaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.BatchEvaluator"><code>BatchEvaluator</code></a> defers to a callable
