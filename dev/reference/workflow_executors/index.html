@@ -2263,17 +2263,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#ropt.workflow.executors.is_worker_process" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        is_worker_process
-      
-    </span>
-  </a>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -2887,17 +2876,6 @@
         
       </ul>
     </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#ropt.workflow.executors.is_worker_process" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        is_worker_process
-      
-    </span>
-  </a>
   
 </li>
       
@@ -4490,56 +4468,6 @@ this requires exactly one cluster to provide the queue.</p>
 
 
   </div>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h2 id="ropt.workflow.executors.is_worker_process" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">ropt.workflow.executors.is_worker_process</span>
-
-
-</h2>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">is_worker_process</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">bool</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents first">
-
-        <p>Check whether the current process is a ropt worker process.</p>
-<p>Returns <code>True</code> when running inside a worker spawned by a
-<a class="autorefs autorefs-internal" title="            ropt.workflow.executors.MultiprocessingExecutor" href="#ropt.workflow.executors.MultiprocessingExecutor"><code>MultiprocessingExecutor</code></a>
-or a job launched by an
-<a class="autorefs autorefs-internal" title="            ropt.workflow.executors.HPCExecutor" href="#ropt.workflow.executors.HPCExecutor"><code>HPCExecutor</code></a>, and <code>False</code> in the
-driver process or in a
-<a class="autorefs autorefs-internal" title="            ropt.workflow.executors.ThreadingExecutor" href="#ropt.workflow.executors.ThreadingExecutor"><code>ThreadingExecutor</code></a> worker,
-which share the driver's process.</p>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>True if running inside a ropt worker process.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
 
     </div>
 
