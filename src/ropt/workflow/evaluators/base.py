@@ -9,6 +9,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Protocol
 
 from ropt.evaluation import EvaluationBatchResult
+from ropt.workflow._transferred import _make_placeholder
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -77,14 +78,8 @@ class Evaluator(ABC):
         self._in_use = False
         self._owner_lock = threading.Lock()
 
-    def __getstate__(self) -> dict[str, Any]:  # ruff: ignore[undocumented-magic-method]
-        state = self.__dict__.copy()
-        state.pop("_owner_lock", None)
-        return state
-
-    def __setstate__(self, state: dict[str, Any]) -> None:  # ruff: ignore[undocumented-magic-method]
-        self.__dict__.update(state)
-        self._owner_lock = threading.Lock()
+    def __reduce__(self) -> tuple[object, tuple[str]]:  # ruff: ignore[undocumented-magic-method]
+        return (_make_placeholder, ("An evaluator",))
 
     @abstractmethod
     def eval(

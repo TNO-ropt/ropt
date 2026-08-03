@@ -296,10 +296,18 @@ Two places where this matters in practice:
   return its outcome as data. See
   [Dispatching arbitrary tasks](#dispatching-arbitrary-tasks).
 
-`ropt` enforces the hard edge of this rule rather than leaving it to convention:
-an [`OptimizationStep`][ropt.workflow.compute_steps.OptimizationStep] is bound to
-its process and refuses to be transferred into a worker, as detailed under
-[Nested workflows and process boundaries](#nested-workflows-and-process-boundaries).
+`ropt` enforces this at the process boundary. The workflow objects that hold
+in-process state or a process-local communication channel — compute steps,
+evaluators, event handlers, and the
+[`EventDispatcher`][ropt.workflow.event_handlers.EventDispatcher] — may still be
+serialized, but they do not survive the trip: on the worker side they are
+reconstructed as inert placeholders that discard their original state. Before a
+process or HPC worker runs a dispatched task, `ropt` checks whether such a
+placeholder was transferred and, if so, raises a
+[`TransferError`][ropt.exceptions.TransferError] instead of running the task
+against a disconnected copy. See
+[Nested workflows and process boundaries](#nested-workflows-and-process-boundaries)
+for what belongs where.
 
 ## Dispatching arbitrary tasks
 
@@ -486,7 +494,7 @@ hard constraint on where each layer of a nested workflow may run:
     it emits would never reach the main-process dispatcher.
 
 [`OptimizationStep`][ropt.workflow.compute_steps.OptimizationStep] enforces this
-rule rather than leaving it to convention. **A step is bound to its process, not
+rule. **A step is bound to its process, not
 to a thread.** The event handlers it invokes live in shared memory, so they keep
 working across threads within one process but cannot cross a process boundary.
 The invariant is therefore "a step lives in one process," *not* "a step must run
@@ -498,12 +506,16 @@ where it was created." Concretely:
   [`ThreadingExecutor`][ropt.workflow.executors.ThreadingExecutor] while a
   main-thread [`EventDispatcher`][ropt.workflow.event_handlers.EventDispatcher]
   collects its events. Event handling keeps working because memory is shared.
-- **Across processes (forbidden).** A step refuses to be *transferred* into a
+- **Across processes (forbidden).** A step must not be *transferred* into a
   [`MultiprocessingExecutor`][ropt.workflow.executors.MultiprocessingExecutor]
-  or [`HPCExecutor`][ropt.workflow.executors.HPCExecutor] worker: unpickling one
-  there raises a `RuntimeError`. Create the step **inside** the worker instead —
-  a self-contained optimization that returns its result as data. A step created
-  there is unknown to the host process and needs no cross-process communication.
+  or [`HPCExecutor`][ropt.workflow.executors.HPCExecutor] worker. Serializing one
+  — for example when a dispatched task captures it — reconstructs it in the
+  worker as an inert placeholder rather than a working copy whose events reach
+  the host. `ropt` detects the transferred placeholder and raises a
+  [`TransferError`][ropt.exceptions.TransferError] before running the task.
+  Create the step **inside** the worker instead — a self-contained
+  optimization that returns its result as data. A step created there is unknown
+  to the host process and needs no cross-process communication.
 - **Concurrently (forbidden).** A single step must not run more than once at a
   time: calling
   [`run`][ropt.workflow.compute_steps.OptimizationStep.run] on a step that is

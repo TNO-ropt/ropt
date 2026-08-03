@@ -7,6 +7,7 @@ import threading
 from abc import ABC, abstractmethod
 from typing import Any
 
+from ropt.workflow._transferred import _make_placeholder
 from ropt.workflow.event_handlers import EventHandler
 
 
@@ -56,16 +57,8 @@ class ComputeStep(ABC):
         self._running = False
         self._run_lock = threading.Lock()
 
-    def __getstate__(self) -> dict[str, Any]:  # ruff: ignore[undocumented-magic-method]
-        state = self.__dict__.copy()
-        state.pop("_run_lock", None)
-        state.pop("_running", None)
-        return state
-
-    def __setstate__(self, state: dict[str, Any]) -> None:  # ruff: ignore[undocumented-magic-method]
-        self.__dict__.update(state)
-        self._running = False
-        self._run_lock = threading.Lock()
+    def __reduce__(self) -> tuple[object, tuple[str]]:  # ruff: ignore[undocumented-magic-method]
+        return (_make_placeholder, ("A compute step",))
 
     def add_event_handler(self, handler: EventHandler) -> None:
         """Add an event handler.

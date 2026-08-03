@@ -8,12 +8,16 @@ from pathlib import Path
 
 import cloudpickle
 
+from ropt.workflow._transferred import check_transferred, reset_transferred
+
 
 def main() -> int:
     """Run the script."""
+    reset_transferred()
     try:
         with Path(sys.argv[1]).open("rb") as fp:
             function, args, kwargs = cloudpickle.load(fp)
+        check_transferred()
         result = function(*args, **kwargs)
         exit_code = 0
     except Exception as exc:  # ruff: ignore[blind-except]

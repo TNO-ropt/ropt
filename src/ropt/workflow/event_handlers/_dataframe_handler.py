@@ -253,15 +253,6 @@ class _ResultsTable:
         self._frames: list[pd.DataFrame] = []
         self._lock = threading.Lock()
 
-    def __getstate__(self) -> dict[str, Any]:
-        state = self.__dict__.copy()
-        state.pop("_lock", None)
-        return state
-
-    def __setstate__(self, state: dict[str, Any]) -> None:
-        self.__dict__.update(state)
-        self._lock = threading.Lock()
-
     @property
     def domain(self) -> DomainType:
         return self._domain

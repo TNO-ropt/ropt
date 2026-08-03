@@ -6,6 +6,8 @@ import asyncio
 import threading
 from typing import TYPE_CHECKING
 
+from ropt.workflow._transferred import _make_placeholder
+
 if TYPE_CHECKING:
     from ropt.events import EnOptEvent
 
@@ -27,6 +29,9 @@ class EventDispatcher:
         self._queue: asyncio.Queue[EnOptEvent | None] | None = None
         self._loop: asyncio.AbstractEventLoop | None = None
         self._running = threading.Event()
+
+    def __reduce__(self) -> tuple[object, tuple[str]]:
+        return (_make_placeholder, ("An event dispatcher",))
 
     def add_event_handler(
         self, handler: EventHandler, *, run_in_thread: bool = False

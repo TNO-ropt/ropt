@@ -231,10 +231,15 @@ Mixing the two, or registering with a second dispatcher, raises a
     run one after another, even on different threads, as long as their calls
     never overlap.
 
-!!! note "Pickling"
+!!! note "Handlers are process-local"
 
-    A handler can be pickled — for example, when a compute step is shipped to a
-    worker process.
+    An event handler cannot be transferred to another process. Serializing one
+    (for example when a task dispatched to a worker captures it) reconstructs it
+    in the worker as an inert placeholder; `ropt` detects this and raises a
+    [`TransferError`][ropt.exceptions.TransferError] before the task runs.
+    Create handlers inside the worker and return their results
+    as data. See
+    [Nested workflows and process boundaries](parallel.md#nested-workflows-and-process-boundaries).
 
 !!! note "Reading results is not thread-guarded"
 
@@ -490,11 +495,10 @@ the [next section](parallel.md):
     Note that the parallelism of
     [`ParallelEvaluator`][ropt.workflow.evaluators.ParallelEvaluator] happens
     *below* `eval` — it dispatches tasks to an executor, so its own `eval` is
-    still called on a single thread.
-
-    An evaluator can be pickled before it is first used (e.g. when shipped to a
-    worker process), but pickling one that has already run raises a
-    `RuntimeError`.
+    still called on a single thread. An evaluator cannot be transferred to
+    another process; serializing one reconstructs it as an inert placeholder in
+    the worker, and `ropt` raises a
+    [`TransferError`][ropt.exceptions.TransferError] before the task runs.
 
 ### BatchEvaluator
 

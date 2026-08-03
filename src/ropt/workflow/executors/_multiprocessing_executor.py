@@ -12,6 +12,7 @@ from typing import TYPE_CHECKING, Any, Final
 
 from ropt._logging import get_logger
 from ropt.exceptions import ExecutorFailure
+from ropt.workflow._transferred import check_transferred, reset_transferred
 
 from .base import Executor, ExecutorBase, Task
 
@@ -157,12 +158,15 @@ class _Worker:
 def _run_function(
     function: Callable[..., Any], args: tuple[Any, ...], kwargs: dict[str, Any]
 ) -> Any:  # ruff: ignore[any-type]
+    check_transferred()
     return function(*args, **kwargs)
 
 
 def _run_cloudpickled(payload: bytes) -> tuple[bool, bytes]:
-    function, args, kwargs = cloudpickle.loads(payload)
+    reset_transferred()
     try:
+        function, args, kwargs = cloudpickle.loads(payload)
+        check_transferred()
         return True, cloudpickle.dumps(function(*args, **kwargs))
     except Exception as exc:  # ruff: ignore[blind-except]
         return False, cloudpickle.dumps(exc)

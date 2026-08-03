@@ -8,6 +8,8 @@ from abc import ABC, abstractmethod
 from enum import Enum, auto
 from typing import TYPE_CHECKING, Any
 
+from ropt.workflow._transferred import _make_placeholder
+
 if TYPE_CHECKING:
     from ropt.enums import EnOptEventType
     from ropt.events import EnOptEvent
@@ -94,14 +96,8 @@ class EventHandler(ABC):
         self._in_use = False
         self._owner_lock = threading.Lock()
 
-    def __getstate__(self) -> dict[str, Any]:  # ruff: ignore[undocumented-magic-method]
-        state = self.__dict__.copy()
-        state.pop("_owner_lock", None)
-        return state
-
-    def __setstate__(self, state: dict[str, Any]) -> None:  # ruff: ignore[undocumented-magic-method]
-        self.__dict__.update(state)
-        self._owner_lock = threading.Lock()
+    def __reduce__(self) -> tuple[object, tuple[str]]:  # ruff: ignore[undocumented-magic-method]
+        return (_make_placeholder, ("An event handler",))
 
     def register_dispatcher(self) -> None:
         """Mark this handler as owned by an event dispatcher.

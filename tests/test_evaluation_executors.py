@@ -11,7 +11,7 @@ import numpy as np
 import pytest
 
 from ropt.enums import ExitCode
-from ropt.exceptions import Abort, ExecutorFailure
+from ropt.exceptions import Abort, ExecutorFailure, TransferError
 from ropt.workflow._basic_optimizer import BasicOptimizer
 from ropt.workflow.evaluators import (
     EvaluationFunctionCallback,
@@ -20,6 +20,7 @@ from ropt.workflow.evaluators import (
     ParallelEvaluator,
 )
 from ropt.workflow.evaluators._parallel_evaluator import _abort, _handle_result
+from ropt.workflow.event_handlers import ResultsHandler
 from ropt.workflow.executors import (
     HPCExecutor,
     MultiprocessingExecutor,
@@ -75,6 +76,10 @@ def _function(input_value: int, *, raise_error: bool = False) -> int:
         msg = f"Test error in function {input_value}"
         raise ValueError(msg)
     return input_value + 1
+
+
+def _construct_handler_in_worker(_: int) -> str:
+    return type(ResultsHandler()).__name__
 
 
 @pytest.mark.parametrize(
@@ -135,6 +140,32 @@ async def test_executor_ok(
         executor.cancel()
     assert result_processor.results == {1, 2}
     assert not executor.is_running()
+
+
+@pytest.mark.slow
+@pytest.mark.timeout(30)
+async def test_worker_may_construct_workflow_objects() -> None:
+    result_queue: ResultsQueue = ResultsQueue()
+    task = Task(
+        function=_construct_handler_in_worker, args=(0,), results_queue=result_queue
+    )
+    executor = MultiprocessingExecutor(workers=1)
+    results: list[Any] = []
+    finished = asyncio.Event()
+
+    def _collect() -> None:
+        item = result_queue.get()
+        assert isinstance(item, Task)
+        results.append(item.result)
+        finished.set()
+
+    async with asyncio.TaskGroup() as tg:
+        await executor.start(tg)
+        tg.create_task(asyncio.to_thread(_collect))
+        await executor.task_queue.put(task)
+        await finished.wait()
+        executor.cancel()
+    assert results == ["ResultsHandler"]
 
 
 @pytest.mark.parametrize(
@@ -682,3 +713,70 @@ async def test_multiprocessing_without_cloudpickle_rejects_lambda(
     assert errors
     assert any("ropt[cloudpickle]" in str(err) for err in errors)
     assert not executor.is_running()
+
+
+def _return_captured(_handler: Any) -> int:
+    return 0
+
+
+def _opt_function_capturing_handler(
+    variables: NDArray[np.float64],
+    context: EvaluationFunctionContext,
+    test_functions: Any,
+    handler: Any,  # ruff: ignore[unused-function-argument]
+) -> EvaluationFunctionResult:
+    return EvaluationFunctionResult(
+        objectives=np.fromiter(
+            (func(variables, context) for func in test_functions), dtype=np.float64
+        )
+    )
+
+
+@pytest.mark.slow
+@pytest.mark.timeout(30)
+async def test_task_capturing_a_workflow_object_raises_transfer_error() -> None:
+    result_queue: ResultsQueue = ResultsQueue()
+    task = Task(
+        function=_return_captured,
+        args=(ResultsHandler(),),
+        results_queue=result_queue,
+    )
+    executor = MultiprocessingExecutor(workers=1)
+    with pytest.raises(ExceptionGroup) as excinfo:  # ruff: ignore[pytest-raises-with-multiple-statements]
+        async with asyncio.TaskGroup() as tg:
+            await executor.start(tg)
+            await executor.task_queue.put(task)
+    assert any(isinstance(err, TransferError) for err in excinfo.value.exceptions)
+    assert not executor.is_running()
+
+
+@pytest.mark.slow
+@pytest.mark.timeout(30)
+async def test_transfer_error_from_parallel_evaluation_bubbles_up(
+    config: dict[str, Any],
+    test_functions: Sequence[Callable[[NDArray[np.float64], int], float]],
+) -> None:
+    executor = MultiprocessingExecutor(workers=1)
+    with pytest.raises(ExceptionGroup) as excinfo:  # ruff: ignore[pytest-raises-with-multiple-statements]
+        async with asyncio.TaskGroup() as tg:
+            await executor.start(tg)
+            await asyncio.to_thread(
+                _opt_workflow,
+                executor,
+                config,
+                partial(
+                    _opt_function_capturing_handler,
+                    test_functions=test_functions,
+                    handler=ResultsHandler(),
+                ),
+            )
+            executor.cancel()
+    assert any(isinstance(err, TransferError) for err in excinfo.value.exceptions)
+
+
+async def test_abort_reraises_transfer_error() -> None:  # ruff: ignore[unused-async]
+    result_queue = ResultsQueue()
+    error = TransferError("Workflow objects cannot be used in a worker process: X.")
+    result_queue.put(error)
+    with pytest.raises(TransferError):
+        _abort(result_queue)

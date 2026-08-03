@@ -3,7 +3,8 @@
 from __future__ import annotations
 
 import threading
-from typing import Any
+
+from ropt.workflow._transferred import _make_placeholder
 
 
 class BatchIdCounter:
@@ -32,12 +33,5 @@ class BatchIdCounter:
             self._value += 1
             return value
 
-    def __getstate__(self) -> dict[str, Any]:
-        # threading.Lock is not picklable; drop it and recreate in __setstate__.
-        state = self.__dict__.copy()
-        state.pop("_lock", None)
-        return state
-
-    def __setstate__(self, state: dict[str, Any]) -> None:
-        self.__dict__.update(state)
-        self._lock = threading.Lock()
+    def __reduce__(self) -> tuple[object, tuple[str]]:
+        return (_make_placeholder, ("A batch ID counter",))

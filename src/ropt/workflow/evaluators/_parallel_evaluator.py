@@ -11,7 +11,7 @@ import numpy as np
 from ropt._logging import get_logger
 from ropt.enums import ExitCode
 from ropt.evaluation import EvaluationBatchContext, EvaluationBatchResult
-from ropt.exceptions import Abort, ExecutorFailure
+from ropt.exceptions import Abort, ExecutorFailure, TransferError
 from ropt.workflow.executors import Executor, ResultsQueue, Task
 
 from ._common import _active_evaluations, _scatter_result
@@ -153,6 +153,8 @@ class ParallelEvaluator(Evaluator):
                     continue
                 if item is None:
                     _abort(results_queue)
+                if isinstance(item, TransferError):
+                    raise item
                 if isinstance(item, BaseException):
                     raise Abort(ExitCode.ABORT_FROM_ERROR) from item
                 received += _handle_result(
@@ -239,6 +241,8 @@ def _abort(results_queue: ResultsQueue) -> NoReturn:
             item = results_queue.get_nowait()
         except queue.Empty:
             break
+        if isinstance(item, TransferError):
+            raise item
         if isinstance(item, BaseException):
             raise Abort(ExitCode.ABORT_FROM_ERROR) from item
     raise Abort(ExitCode.ABORT_FROM_ERROR)

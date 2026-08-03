@@ -12,9 +12,14 @@ import pytest
 from ropt.context import EnOptContext
 from ropt.enums import EnOptEventType, ExitCode
 from ropt.evaluation import EvaluationBatchResult
-from ropt.exceptions import Abort
+from ropt.exceptions import Abort, TransferError
 from ropt.results import FunctionResults
 from ropt.workflow import BasicOptimizer
+from ropt.workflow._transferred import (
+    _Placeholder,
+    check_transferred,
+    reset_transferred,
+)
 from ropt.workflow.compute_steps import EvaluationStep, OptimizationStep
 from ropt.workflow.evaluators import (
     CachedEvaluator,
@@ -23,6 +28,7 @@ from ropt.workflow.evaluators import (
     Evaluator,
     FunctionEvaluator,
 )
+from ropt.workflow.evaluators._counter import BatchIdCounter
 from ropt.workflow.event_handlers import (
     CallbackHandler,
     EventDispatcher,
@@ -605,10 +611,11 @@ def test_optimization_abort(config: Any, evaluator: Any) -> None:
     assert last_evaluation == 1
 
 
-def test_optimization_step_can_be_pickled(evaluator: Any) -> None:
+def test_workflow_object_is_pickled_as_a_placeholder(evaluator: Any) -> None:
+    reset_transferred()
     step = OptimizationStep(evaluator=evaluator())
     restored = pickle.loads(pickle.dumps(step))  # ruff: ignore[suspicious-pickle-usage]
-    assert isinstance(restored, OptimizationStep)
+    assert isinstance(restored, _Placeholder)
 
 
 def test_optimization_step_concurrent_run_raises(config: Any, evaluator: Any) -> None:
@@ -837,28 +844,11 @@ def test_evaluator_allows_repeated_use_on_same_thread() -> None:
     assert len(evaluator.threads) == 2
 
 
-def test_evaluator_pickle_before_use_succeeds_and_resets_state() -> None:
-    evaluator = _RecordingEvaluator()
-
-    restored = pickle.loads(pickle.dumps(evaluator))  # ruff: ignore[suspicious-pickle-usage]
-
-    # Usable after unpickling (its lock was recreated).
-    restored.eval(None, None)
-    assert len(restored.threads) == 1
-
-    # A later, non-overlapping call from a different thread is allowed.
-    errors: list[BaseException] = []
-
-    def _use() -> None:
-        try:
-            restored.eval(None, None)
-        except RuntimeError as exc:  # pragma: no cover - should not happen
-            errors.append(exc)
-
-    _run_in_thread(_use)
-
-    assert errors == []
-    assert len(restored.threads) == 2
+def test_unpickling_a_workflow_object_records_it_as_transferred() -> None:
+    reset_transferred()
+    pickle.loads(pickle.dumps(_RecordingEvaluator()))  # ruff: ignore[suspicious-pickle-usage]
+    with pytest.raises(TransferError, match="cannot be used in a worker process"):
+        check_transferred()
 
 
 def test_event_handler_raises_on_concurrent_use() -> None:
@@ -996,25 +986,36 @@ def test_handler_may_be_attached_to_multiple_compute_steps() -> None:
     handler.register_compute_step()  # allowed, no error
 
 
-def test_pickle_before_use_succeeds_and_resets_state() -> None:
-    handler = _RecordingHandler()
+def test_check_transferred_is_silent_without_a_transfer() -> None:
+    reset_transferred()
+    check_transferred()  # nothing transferred -> no error
 
-    restored = pickle.loads(pickle.dumps(handler))  # ruff: ignore[suspicious-pickle-usage]
 
-    # Usable after unpickling (its lock was recreated).
-    restored.handle_event(object())
-    assert len(restored.threads) == 1
+@pytest.mark.parametrize(
+    ("factory", "subject"),
+    [
+        (_RecordingHandler, "An event handler"),
+        (EventDispatcher, "An event dispatcher"),
+        (BatchIdCounter, "A batch ID counter"),
+    ],
+)
+def test_transferred_workflow_object_reports_its_kind(
+    factory: Any, subject: str
+) -> None:
+    reset_transferred()
+    pickle.loads(pickle.dumps(factory()))  # ruff: ignore[suspicious-pickle-usage]
+    with pytest.raises(TransferError, match=subject):
+        check_transferred()
 
-    # A later, non-overlapping call from a different thread is allowed.
-    errors: list[BaseException] = []
 
-    def _use() -> None:
-        try:
-            restored.handle_event(object())
-        except RuntimeError as exc:  # pragma: no cover - should not happen
-            errors.append(exc)
+def test_capturing_a_workflow_object_in_a_callable_is_detectable() -> None:
+    cloudpickle = pytest.importorskip("cloudpickle")
+    reset_transferred()
+    handler = ResultsHandler()
 
-    _run_in_thread(_use)
+    def _thunk() -> Any:
+        return handler["results"]
 
-    assert errors == []
-    assert len(restored.threads) == 2
+    cloudpickle.loads(cloudpickle.dumps(_thunk))  # unpickling records the capture
+    with pytest.raises(TransferError, match="cannot be used in a worker process"):
+        check_transferred()
