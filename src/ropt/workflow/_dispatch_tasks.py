@@ -41,7 +41,7 @@ def _collect_results(
 
 
 async def dispatch_tasks(  # ruff: ignore[too-many-arguments]
-    functions: Sequence[Callable[[], None]] | Mapping[str, Callable[[], None]],
+    functions: Sequence[Callable[[], Any]] | Mapping[str, Callable[[], Any]],
     executor: Literal["threading", "multiprocessing", "hpc"],
     *,
     report: Callable[[Any], None] | None = None,
