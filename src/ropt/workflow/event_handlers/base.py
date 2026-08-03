@@ -79,7 +79,6 @@ class EventHandler(ABC):
                         msg = "The event handler is already running on another thread."
                         raise RuntimeError(msg)
                     self._in_use = True
-                    self._used = True
                 try:
                     _orig(self, event)
                 finally:
@@ -93,13 +92,9 @@ class EventHandler(ABC):
         self.__stored_values: dict[str, Any] = {}
         self._attached_to: _Attachment = _Attachment.NONE
         self._in_use = False
-        self._used = False
         self._owner_lock = threading.Lock()
 
     def __getstate__(self) -> dict[str, Any]:  # ruff: ignore[undocumented-magic-method]
-        if self._used:
-            msg = "Cannot pickle an event handler after it has been used."
-            raise RuntimeError(msg)
         state = self.__dict__.copy()
         state.pop("_owner_lock", None)
         return state

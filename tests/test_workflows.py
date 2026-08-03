@@ -861,13 +861,6 @@ def test_evaluator_pickle_before_use_succeeds_and_resets_state() -> None:
     assert len(restored.threads) == 2
 
 
-def test_evaluator_pickle_after_use_raises() -> None:
-    evaluator = _RecordingEvaluator()
-    evaluator.eval(None, None)
-    with pytest.raises(RuntimeError, match="after it has been used"):
-        pickle.dumps(evaluator)
-
-
 def test_event_handler_raises_on_concurrent_use() -> None:
     in_handle = threading.Event()
     can_finish = threading.Event()
@@ -1025,10 +1018,3 @@ def test_pickle_before_use_succeeds_and_resets_state() -> None:
 
     assert errors == []
     assert len(restored.threads) == 2
-
-
-def test_pickle_after_use_raises() -> None:
-    handler = _RecordingHandler()
-    handler.handle_event(object())  # type: ignore[arg-type]
-    with pytest.raises(RuntimeError, match="after it has been used"):
-        pickle.dumps(handler)

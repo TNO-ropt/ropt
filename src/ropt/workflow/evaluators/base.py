@@ -62,7 +62,6 @@ class Evaluator(ABC):
                         msg = "The evaluator is already running on another thread."
                         raise RuntimeError(msg)
                     self._in_use = True
-                    self._used = True
                 try:
                     result = _orig(self, variables, context)
                 finally:
@@ -76,13 +75,9 @@ class Evaluator(ABC):
     def __init__(self) -> None:
         """Initialize the Evaluator."""
         self._in_use = False
-        self._used = False
         self._owner_lock = threading.Lock()
 
     def __getstate__(self) -> dict[str, Any]:  # ruff: ignore[undocumented-magic-method]
-        if self._used:
-            msg = "Cannot pickle an evaluator after it has been used."
-            raise RuntimeError(msg)
         state = self.__dict__.copy()
         state.pop("_owner_lock", None)
         return state

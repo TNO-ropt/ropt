@@ -233,9 +233,8 @@ Mixing the two, or registering with a second dispatcher, raises a
 
 !!! note "Pickling"
 
-    A handler can be pickled before it is first used — for example, when a
-    compute step is shipped to a worker process. A handler that has already
-    processed an event cannot be pickled and raises a `RuntimeError`.
+    A handler can be pickled — for example, when a compute step is shipped to a
+    worker process.
 
 !!! note "Reading results is not thread-guarded"
 
