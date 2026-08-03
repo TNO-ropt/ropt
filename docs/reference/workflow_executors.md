@@ -12,5 +12,4 @@ See [Parallel Evaluation](../usage/parallel.md) for usage.
 ::: ropt.workflow.executors.ThreadingExecutor
 ::: ropt.workflow.executors.MultiprocessingExecutor
 ::: ropt.workflow.executors.HPCExecutor
-::: ropt.workflow.executors.is_worker_process
 

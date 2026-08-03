@@ -605,17 +605,7 @@ def test_optimization_abort(config: Any, evaluator: Any) -> None:
     assert last_evaluation == 1
 
 
-def test_optimization_step_cannot_be_transferred_into_worker(
-    evaluator: Any, monkeypatch: Any
-) -> None:
-    step = OptimizationStep(evaluator=evaluator())
-    data = pickle.dumps(step)
-    monkeypatch.setattr("ropt.workflow.executors._worker._IS_WORKER", True)
-    with pytest.raises(RuntimeError, match="cannot be transferred into a worker"):
-        pickle.loads(data)  # ruff: ignore[suspicious-pickle-usage]
-
-
-def test_optimization_step_can_be_transferred_outside_worker(evaluator: Any) -> None:
+def test_optimization_step_can_be_pickled(evaluator: Any) -> None:
     step = OptimizationStep(evaluator=evaluator())
     restored = pickle.loads(pickle.dumps(step))  # ruff: ignore[suspicious-pickle-usage]
     assert isinstance(restored, OptimizationStep)

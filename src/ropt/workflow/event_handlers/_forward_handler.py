@@ -4,8 +4,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from ropt.workflow.executors._worker import is_worker_process
-
 from .base import EventHandler
 
 if TYPE_CHECKING:
@@ -42,16 +40,7 @@ class EventForwardHandler(EventHandler):
 
         Args:
             event: The event to forward.
-
-        Raises:
-            RuntimeError: If called from within a worker process, where the
-                          parent's EventDispatcher cannot be reached.
         """
-        if is_worker_process():
-            msg = (
-                "Cannot send events to a handler from a multiprocessing or HPC worker."
-            )
-            raise RuntimeError(msg)
         self._dispatcher.put_event(event)
 
     @property

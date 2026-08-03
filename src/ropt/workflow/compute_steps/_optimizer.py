@@ -12,7 +12,6 @@ from ropt._logging import get_logger
 from ropt.core import EnsembleEvaluator, EnsembleOptimizer
 from ropt.enums import EnOptEventType, ExitCode
 from ropt.events import EnOptEvent
-from ropt.workflow.executors._worker import is_worker_process
 
 from .base import ComputeStep
 
@@ -140,12 +139,6 @@ class OptimizationStep(ComputeStep):
         return state
 
     def __setstate__(self, state: dict[str, Any]) -> None:
-        if is_worker_process():
-            msg = (
-                "An OptimizationStep cannot be transferred into a worker process; "
-                "create it inside the worker instead."
-            )
-            raise RuntimeError(msg)
         self.__dict__.update(state)
         self._running = False
         self._run_lock = threading.Lock()
