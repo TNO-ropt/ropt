@@ -3212,9 +3212,12 @@ run one after another, even on different threads, as long as their calls
 never overlap.</p>
 </div>
 <div class="admonition note">
-<p class="admonition-title">Pickling</p>
-<p>A handler can be pickled — for example, when a compute step is shipped to a
-worker process.</p>
+<p class="admonition-title">Handlers are process-local</p>
+<p>An event handler cannot be transferred to another process; serializing one
+(for example when a task dispatched to a worker captures it) raises a
+<code>RuntimeError</code>. Create handlers inside the worker and return their results
+as data. See
+<a href="../parallel/#nested-workflows-and-process-boundaries">Nested workflows and process boundaries</a>.</p>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Reading results is not thread-guarded</p>
@@ -3518,10 +3521,8 @@ layer of a nested workflow may run, see
 Note that the parallelism of
 <a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.ParallelEvaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.ParallelEvaluator"><code>ParallelEvaluator</code></a> happens
 <em>below</em> <code>eval</code> — it dispatches tasks to an executor, so its own <code>eval</code> is
-still called on a single thread.</p>
-<p>An evaluator can be pickled before it is first used (e.g. when shipped to a
-worker process), but pickling one that has already run raises a
-<code>RuntimeError</code>.</p>
+still called on a single thread. An evaluator cannot be transferred to
+another process; serializing one raises a <code>RuntimeError</code>.</p>
 </div>
 <h3 id="batchevaluator">BatchEvaluator</h3>
 <p><a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.BatchEvaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.BatchEvaluator"><code>BatchEvaluator</code></a> defers to a callable

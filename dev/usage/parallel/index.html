@@ -2990,10 +2990,13 @@ process</strong>. A different <em>thread</em> is fine; a different <em>process</
   return its outcome as data. See
   <a href="#dispatching-arbitrary-tasks">Dispatching arbitrary tasks</a>.</li>
 </ul>
-<p><code>ropt</code> enforces the hard edge of this rule rather than leaving it to convention:
-an <a class="autorefs autorefs-internal" title="            ropt.workflow.compute_steps.OptimizationStep" href="../../reference/workflow_compute_steps/#ropt.workflow.compute_steps.OptimizationStep"><code>OptimizationStep</code></a> is bound to
-its process and refuses to be transferred into a worker, as detailed under
-<a href="#nested-workflows-and-process-boundaries">Nested workflows and process boundaries</a>.</p>
+<p><code>ropt</code> enforces this at the process boundary. The workflow objects that hold
+in-process state or a process-local communication channel — compute steps,
+evaluators, event handlers, and the
+<a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.EventDispatcher" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.EventDispatcher"><code>EventDispatcher</code></a> — refuse to be
+serialized: transferring one into a worker raises a <code>RuntimeError</code>. See
+<a href="#nested-workflows-and-process-boundaries">Nested workflows and process boundaries</a>
+for what belongs where.</p>
 <h2 id="dispatching-arbitrary-tasks">Dispatching arbitrary tasks</h2>
 <p><a class="autorefs autorefs-internal" title="            dispatch_tasks
 
@@ -3189,7 +3192,7 @@ there would find <code>executor.loop is None</code> and raise <code>Abort</code>
 it emits would never reach the main-process dispatcher.</p>
 </div>
 <p><a class="autorefs autorefs-internal" title="            ropt.workflow.compute_steps.OptimizationStep" href="../../reference/workflow_compute_steps/#ropt.workflow.compute_steps.OptimizationStep"><code>OptimizationStep</code></a> enforces this
-rule rather than leaving it to convention. <strong>A step is bound to its process, not
+rule. <strong>A step is bound to its process, not
 to a thread.</strong> The event handlers it invokes live in shared memory, so they keep
 working across threads within one process but cannot cross a process boundary.
 The invariant is therefore "a step lives in one process," <em>not</em> "a step must run
@@ -3203,10 +3206,12 @@ where it was created." Concretely:</p>
   collects its events. Event handling keeps working because memory is shared.</li>
 <li><strong>Across processes (forbidden).</strong> A step refuses to be <em>transferred</em> into a
   <a class="autorefs autorefs-internal" title="            ropt.workflow.executors.MultiprocessingExecutor" href="../../reference/workflow_executors/#ropt.workflow.executors.MultiprocessingExecutor"><code>MultiprocessingExecutor</code></a>
-  or <a class="autorefs autorefs-internal" title="            ropt.workflow.executors.HPCExecutor" href="../../reference/workflow_executors/#ropt.workflow.executors.HPCExecutor"><code>HPCExecutor</code></a> worker: unpickling one
-  there raises a <code>RuntimeError</code>. Create the step <strong>inside</strong> the worker instead —
-  a self-contained optimization that returns its result as data. A step created
-  there is unknown to the host process and needs no cross-process communication.</li>
+  or <a class="autorefs autorefs-internal" title="            ropt.workflow.executors.HPCExecutor" href="../../reference/workflow_executors/#ropt.workflow.executors.HPCExecutor"><code>HPCExecutor</code></a> worker: serializing one
+  — for example when a dispatched task captures it — raises a <code>RuntimeError</code>
+  rather than silently shipping a disconnected copy whose events never reach the
+  host. Create the step <strong>inside</strong> the worker instead — a self-contained
+  optimization that returns its result as data. A step created there is unknown
+  to the host process and needs no cross-process communication.</li>
 <li><strong>Concurrently (forbidden).</strong> A single step must not run more than once at a
   time: calling
   <a class="autorefs autorefs-internal" title="            run" href="../../reference/workflow_compute_steps/#ropt.workflow.compute_steps.OptimizationStep.run"><code>run</code></a> on a step that is
