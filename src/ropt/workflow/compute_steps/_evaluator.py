@@ -17,7 +17,7 @@ from ropt.results import FunctionResults
 from .base import ComputeStep
 
 if TYPE_CHECKING:
-    from numpy.typing import ArrayLike
+    from numpy.typing import ArrayLike, NDArray
 
     from ropt.context import EnOptContext
     from ropt.workflow.evaluators import Evaluator
@@ -70,6 +70,20 @@ class EvaluationStep(ComputeStep):
         Raises:
             ValueError: If the input variables have the wrong shape.
         """
+        variables = np.array(np.asarray(variables, dtype=np.float64), ndmin=2)
+        if variables.shape[-1] != context.variables.variable_count:
+            msg = "The input variables have the wrong shape"
+            raise ValueError(msg)
+        with self._running_guard():
+            return self._run(context, variables, metadata=metadata)
+
+    def _run(
+        self,
+        context: EnOptContext,
+        variables: NDArray[np.float64],
+        *,
+        metadata: dict[str, Any] | None = None,
+    ) -> ExitCode:
         context.lock()
 
         _logger.info("Starting evaluation")
@@ -79,10 +93,6 @@ class EvaluationStep(ComputeStep):
             )
         )
 
-        variables = np.array(np.asarray(variables, dtype=np.float64), ndmin=2)
-        if variables.shape[-1] != context.variables.variable_count:
-            msg = "The input variables have the wrong shape"
-            raise ValueError(msg)
         for transform in context.variable_transforms:
             variables = transform.to_optimizer(variables)
 

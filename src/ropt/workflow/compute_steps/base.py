@@ -2,10 +2,15 @@
 
 from __future__ import annotations
 
+import threading
 from abc import ABC, abstractmethod
-from typing import Any
+from contextlib import contextmanager
+from typing import TYPE_CHECKING, Any
 
 from ropt.workflow.event_handlers import EventHandler
+
+if TYPE_CHECKING:
+    from collections.abc import Iterator
 
 
 class ComputeStep(ABC):
@@ -15,11 +20,41 @@ class ComputeStep(ABC):
     within an optimization workflow. Concrete implementations, which perform
     specific actions like running an optimizer or evaluating functions, must
     inherit from this base class.
+
+    A compute step instance may only have one active `run` at a time; its
+    `run` method acquires a guard that raises a `RuntimeError` if the same
+    instance is already running on another thread.
     """
 
     def __init__(self) -> None:
         """Initialize the ComputeStep."""
         self._event_handlers: list[EventHandler] = []
+        self._running = False
+        self._run_lock = threading.Lock()
+
+    @contextmanager
+    def _running_guard(self) -> Iterator[None]:
+        with self._run_lock:
+            if self._running:
+                msg = "The compute step is already running on another thread."
+                raise RuntimeError(msg)
+            self._running = True
+        try:
+            yield
+        finally:
+            with self._run_lock:
+                self._running = False
+
+    def __getstate__(self) -> dict[str, Any]:  # ruff: ignore[undocumented-magic-method]
+        state = self.__dict__.copy()
+        state.pop("_run_lock", None)
+        state.pop("_running", None)
+        return state
+
+    def __setstate__(self, state: dict[str, Any]) -> None:  # ruff: ignore[undocumented-magic-method]
+        self.__dict__.update(state)
+        self._running = False
+        self._run_lock = threading.Lock()
 
     def add_event_handler(self, handler: EventHandler) -> None:
         """Add an event handler.

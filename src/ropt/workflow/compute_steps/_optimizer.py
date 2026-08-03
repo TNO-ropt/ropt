@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import threading
 from copy import deepcopy
 from typing import TYPE_CHECKING, Any
 
@@ -47,8 +46,6 @@ class OptimizationStep(ComputeStep):
         """
         super().__init__()
         self._evaluator = evaluator
-        self._running = False
-        self._run_lock = threading.Lock()
 
     def run(
         self,
@@ -70,23 +67,14 @@ class OptimizationStep(ComputeStep):
             An exit code describing the outcome of the optimization.
 
         Raises:
-            RuntimeError: If this step is already running on another thread.
             ValueError: If the input variables have the wrong shape.
         """
         variables = np.array(np.asarray(variables, dtype=np.float64), ndmin=1)
         if variables.shape != (context.variables.variable_count,):
             msg = "The input variables have the wrong shape"
             raise ValueError(msg)
-        with self._run_lock:
-            if self._running:
-                msg = "The optimization step is already running on another thread."
-                raise RuntimeError(msg)
-            self._running = True
-        try:
+        with self._running_guard():
             return self._run(context, variables, metadata=metadata)
-        finally:
-            with self._run_lock:
-                self._running = False
 
     def _run(
         self,
@@ -131,17 +119,6 @@ class OptimizationStep(ComputeStep):
         )
 
         return exit_code
-
-    def __getstate__(self) -> dict[str, Any]:
-        state = self.__dict__.copy()
-        state.pop("_run_lock", None)
-        state.pop("_running", None)
-        return state
-
-    def __setstate__(self, state: dict[str, Any]) -> None:
-        self.__dict__.update(state)
-        self._running = False
-        self._run_lock = threading.Lock()
 
     def _emit_event(self, event: EnOptEvent) -> None:
         for handler in self.event_handlers:
