@@ -2543,9 +2543,9 @@ single ensemble evaluation.</p>
 within an optimization workflow. Concrete implementations, which perform
 specific actions like running an optimizer or evaluating functions, must
 inherit from this base class.</p>
-<p>A compute step instance may only have one active <code>run</code> at a time; its
-<code>run</code> method acquires a guard that raises a <code>RuntimeError</code> if the same
-instance is already running on another thread.</p>
+<p>A compute step instance may only have one active <code>run</code> at a time. The guard
+is applied automatically to every subclass's <code>run</code> method, which raises a
+<code>RuntimeError</code> if the same instance is already running on another thread.</p>
 
 
 
