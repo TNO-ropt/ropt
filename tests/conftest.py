@@ -7,6 +7,7 @@ import pytest
 from numpy.typing import NDArray
 
 from ropt.workflow.evaluators import (
+    EvaluationFunctionCallback,
     EvaluationFunctionContext,
     EvaluationFunctionResult,
     FunctionEvaluator,
@@ -78,17 +79,30 @@ def _function(
 
 
 @pytest.fixture(scope="session")
-def evaluator(test_functions: Any, constraint_functions: Any | None = None) -> Any:
+def objective(test_functions: Any) -> Any:
+    def _objective(
+        objective_functions: list[_Function] = test_functions,
+        constraint_functions: list[_Function] | None = None,
+    ) -> EvaluationFunctionCallback:
+        return partial(
+            _function,
+            objective_functions=objective_functions,
+            constraint_functions=constraint_functions,
+        )
+
+    return _objective
+
+
+@pytest.fixture(scope="session")
+def evaluator(
+    test_functions: Any, objective: Any, constraint_functions: Any | None = None
+) -> Any:
     def _evaluator(
         objective_functions: list[_Function] = test_functions,
         constraint_functions: list[_Function] | None = constraint_functions,
     ) -> Any:
         return FunctionEvaluator(
-            function=partial(
-                _function,
-                objective_functions=objective_functions,
-                constraint_functions=constraint_functions,
-            )
+            function=objective(objective_functions, constraint_functions)
         )
 
     return _evaluator

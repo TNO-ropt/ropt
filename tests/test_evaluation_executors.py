@@ -331,7 +331,7 @@ if _TEST_HPC:
 )
 async def test_executor_evaluator_ok(
     config: dict[str, Any],
-    test_functions: Any,
+    objective: Any,
     executor_name: str,
     monkeypatch: Any,
     tmp_path: Path,
@@ -357,7 +357,7 @@ async def test_executor_evaluator_ok(
             _opt_workflow,
             executor,
             config,
-            partial(_opt_function, test_functions=test_functions),
+            objective(),
         )
         executor.cancel()
     assert not executor.is_running()
@@ -440,7 +440,7 @@ async def test_executor_evaluator_error(
 )
 async def test_executor_evaluator_two_optimizations(
     config: dict[str, Any],
-    test_functions: Sequence[Callable[[NDArray[np.float64], int], float]],
+    objective: Any,
     executor_name: str,
     monkeypatch: Any,
     tmp_path: Path,
@@ -468,7 +468,7 @@ async def test_executor_evaluator_two_optimizations(
                     _opt_workflow,
                     executor,
                     config,
-                    partial(_opt_function, test_functions=test_functions),
+                    objective(),
                 )
                 for _ in range(2)
             )
@@ -492,7 +492,7 @@ async def test_executor_evaluator_two_optimizations(
 )
 async def test_groups_tasks(
     config: dict[str, Any],
-    test_functions: Sequence[Callable[[NDArray[np.float64], int], float]],
+    objective: Any,
     executor_name: str,
     bundle_size: int,
 ) -> None:
@@ -514,7 +514,7 @@ async def test_groups_tasks(
     async with asyncio.TaskGroup() as tg:
         await executor.start(tg)
         evaluator = ParallelEvaluator(
-            function=partial(_opt_function, test_functions=test_functions),
+            function=objective(),
             executor=executor,
             bundle_size=bundle_size,
         )
