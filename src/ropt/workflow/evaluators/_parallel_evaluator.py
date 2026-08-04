@@ -11,7 +11,7 @@ import numpy as np
 from ropt._logging import get_logger
 from ropt.enums import ExitCode
 from ropt.evaluation import EvaluationBatchContext, EvaluationBatchResult
-from ropt.exceptions import Abort, ExecutorFailure, TransferError
+from ropt.exceptions import Abort, ExecutorFailure
 from ropt.workflow.executors import Executor, ResultsQueue, Task
 
 from ._common import _active_evaluations, _scatter_result
@@ -101,9 +101,9 @@ class ParallelEvaluator(Evaluator):
         infrastructure failure arrives as an
         [`ExecutorFailure`][ropt.exceptions.ExecutorFailure] result and is
         recorded as a failed realization (NaN), while a user-code exception
-        arrives on the results queue and aborts the whole evaluation, raising
-        [`Abort`][ropt.exceptions.Abort] with the original exception chained as
-        the cause.
+        arrives on the results queue and aborts the current evaluation by
+        re-raising the original exception unchanged. The executor is left
+        running, so a consumer may reuse it for further evaluations.
 
         Args:
             variables:      The matrix of variables to evaluate.
@@ -113,8 +113,8 @@ class ParallelEvaluator(Evaluator):
             The result of calling the wrapped evaluator function.
 
         Raises:
-            Abort: If the executor is not running, or if a task's function
-                   raised a user-code exception.
+            Abort: With `ExitCode.ABORT_FROM_ERROR` if the executor is not
+                running and no task exception is available to re-raise.
         """
         if not self._executor.is_running():
             raise Abort(ExitCode.ABORT_FROM_ERROR)
@@ -153,10 +153,8 @@ class ParallelEvaluator(Evaluator):
                     continue
                 if item is None:
                     _abort(results_queue)
-                if isinstance(item, TransferError):
-                    raise item
                 if isinstance(item, BaseException):
-                    raise Abort(ExitCode.ABORT_FROM_ERROR) from item
+                    raise item
                 received += _handle_result(
                     item, results, metadata, no, variables.shape[0]
                 )
@@ -241,10 +239,8 @@ def _abort(results_queue: ResultsQueue) -> NoReturn:
             item = results_queue.get_nowait()
         except queue.Empty:
             break
-        if isinstance(item, TransferError):
-            raise item
         if isinstance(item, BaseException):
-            raise Abort(ExitCode.ABORT_FROM_ERROR) from item
+            raise item
     raise Abort(ExitCode.ABORT_FROM_ERROR)
 
 

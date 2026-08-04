@@ -230,7 +230,7 @@ failure is *tolerated*: the optimization continues, and only aborts (with
 `TOO_FEW_REALIZATIONS`) if too many realizations fail to satisfy the configured
 minimum.
 
-### User-code exception (aborts everything)
+### User-code exception (raised)
 
 A *user-code* exception is one raised by the evaluation function itself — a bug
 in the objective, a bad configuration, an unexpected input. This must not be
@@ -238,19 +238,31 @@ silently turned into a failed realization; it signals a genuine error the user
 needs to see and fix. When the task function raises, the worker delivers the
 exception on the results queue (via
 [`put_error`][ropt.workflow.executors.Task.put_error], which also closes the
-queue) **and** re-raises it into the executor's `asyncio.TaskGroup`. The two
-channels play distinct roles:
+queue) and returns to serving further tasks. It does **not** tear the executor
+down.
 
-- The queue item unblocks the owning
-  [`ParallelEvaluator.eval`][ropt.workflow.evaluators.ParallelEvaluator.eval]
-  call, which raises [`Abort`][ropt.exceptions.Abort] with
-  `ExitCode.ABORT_FROM_ERROR`, chaining the original exception as the cause
-  (`raise Abort(...) from exc`) so its message and traceback remain visible.
-- The re-raise into the `TaskGroup` cancels sibling tasks. This is what makes
-  "abort everything" work when an advanced user runs several compute steps
-  concurrently in their own `asyncio.TaskGroup` sharing one executor: a genuine
-  error in one objective propagates into that group, cancels the siblings, and
-  surfaces with a traceback so they can fix and re-run.
+The owning
+[`ParallelEvaluator.eval`][ropt.workflow.evaluators.ParallelEvaluator.eval]
+call receives the exception and **re-raises the original unchanged**, aborting
+the current evaluation. This is deliberately identical to the sequential
+[`FunctionEvaluator`][ropt.workflow.evaluators.FunctionEvaluator]: whichever
+evaluator is used, a bug in the objective surfaces as the same exception,
+propagating out of `eval()` (and out of the compute step) on the calling thread.
+
+Because the executor keeps running, its lifetime is owned by the **consumer's
+scope**, not by the error:
+
+- Left unhandled, the exception propagates out of the block that owns the
+  executor (for example an `async with asyncio.TaskGroup()` that a compute step
+  runs inside), whose unwinding cancels the workers and stops the executor —
+  "abort everything".
+- Caught before it reaches that block, the executor stays alive and can be
+  reused for further evaluations. This is what lets several compute steps share
+  one executor and lets a bug in one be isolated from the others.
+
+Only a `BaseException` (for example a cancellation) still propagates out of the
+worker directly, tearing the executor down — that is the intended teardown
+signal and is left untouched.
 
 For the [`HPCExecutor`][ropt.workflow.executors.HPCExecutor] the exception
 crosses a process boundary. It is serialized with `cloudpickle`, which can

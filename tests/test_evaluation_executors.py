@@ -213,27 +213,23 @@ async def test_executor_error(
         case "multiprocessing":
             executor = MultiprocessingExecutor(workers=2)
     assert not executor.is_running()
-    with pytest.raises(ExceptionGroup) as excinfo:  # ruff: ignore[pytest-raises-with-multiple-statements]
-        async with asyncio.TaskGroup() as tg:
-            await executor.start(tg)
-            assert executor.is_running()
-            for task in tasks:
-                await executor.task_queue.put(task)
-    for err in excinfo.value.exceptions:
-        assert isinstance(err, ValueError)
-        assert "Test error in function" in str(err)
+    async with asyncio.TaskGroup() as tg:
+        await executor.start(tg)
+        assert executor.is_running()
+        for task in tasks:
+            await executor.task_queue.put(task)
+        # A user-code exception is delivered on the results queue as the
+        # original exception, and does not tear the executor down.
+        item = await asyncio.to_thread(result_queue.get, timeout=10)
+        assert isinstance(item, ValueError)
+        assert "Test error in function" in str(item)
+        assert executor.is_running()
+        if executor_name == "hpc":
+            notes = getattr(item, "__notes__", [])
+            assert any("Test error in function" in note for note in notes)
+            assert any("Traceback" in note for note in notes)
+        executor.cancel()
     assert not executor.is_running()
-
-    delivered = []
-    while not result_queue.empty():
-        delivered.append(result_queue.get_nowait())
-    errors = [item for item in delivered if isinstance(item, ValueError)]
-    assert errors
-    assert all("Test error in function" in str(err) for err in errors)
-    if executor_name == "hpc":
-        notes = getattr(errors[0], "__notes__", [])
-        assert any("Test error in function" in note for note in notes)
-        assert any("Traceback" in note for note in notes)
 
 
 initial_values = np.array([0.0, 0.0, 0.1])
@@ -419,9 +415,67 @@ async def test_executor_evaluator_error(
                 partial(_opt_function, test_functions=test_functions, raise_error=True),
             )
             executor.cancel()
-    for err in excinfo.value.exceptions:
-        assert isinstance(err, ValueError)
-        assert "Test error in function" in str(err)
+    # The user-code error surfaces as the original exception (not an exit code),
+    # wrapped by the consumer's task group when it leaves the block.
+    matched, _ = excinfo.value.split(ValueError)
+    assert matched is not None
+    assert all("Test error in function" in str(err) for err in matched.exceptions)
+    assert not executor.is_running()
+
+
+@pytest.mark.parametrize(
+    "executor_name",
+    [
+        "threading",
+        pytest.param("multiprocessing", marks=pytest.mark.slow),
+    ],
+)
+async def test_executor_survives_user_code_error_and_is_reusable(
+    config: dict[str, Any],
+    test_functions: Sequence[Callable[[NDArray[np.float64], int], float]],
+    objective: Any,
+    executor_name: str,
+) -> None:
+    match executor_name:
+        case "threading":
+            executor: Executor = ThreadingExecutor(workers=2)
+        case "multiprocessing":
+            executor = MultiprocessingExecutor(workers=2)
+    async with asyncio.TaskGroup() as tg:
+        await executor.start(tg)
+        # A user-code error aborts only its own evaluation; the executor keeps
+        # running, so a caught error does not prevent a subsequent reuse.
+        with pytest.raises(ValueError, match="Test error in function"):
+            await asyncio.to_thread(
+                _opt_workflow,
+                executor,
+                config,
+                partial(_opt_function, test_functions=test_functions, raise_error=True),
+            )
+        assert executor.is_running()
+        results = await asyncio.to_thread(_opt_workflow, executor, config, objective())
+        assert results is not None
+        assert np.allclose(results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02)
+        executor.cancel()
+    assert not executor.is_running()
+
+
+async def test_error_escaping_the_body_closes_the_executor(
+    config: dict[str, Any],
+    test_functions: Sequence[Callable[[NDArray[np.float64], int], float]],
+) -> None:
+    # No explicit executor.cancel(): an error escaping the block must still
+    # close the executor through the task group's teardown.
+    executor = ThreadingExecutor(workers=2)
+    with pytest.raises(ExceptionGroup):  # ruff: ignore[pytest-raises-with-multiple-statements]
+        async with asyncio.TaskGroup() as tg:
+            await executor.start(tg)
+            await asyncio.to_thread(
+                _opt_workflow,
+                executor,
+                config,
+                partial(_opt_function, test_functions=test_functions, raise_error=True),
+            )
     assert not executor.is_running()
 
 
@@ -559,14 +613,13 @@ async def test_task_put_error_delivers_exception_and_closes_queue() -> None:  # 
     assert result_queue.empty()
 
 
-async def test_abort_chains_queued_exception_as_cause() -> None:  # ruff: ignore[unused-async]
+async def test_abort_reraises_queued_exception() -> None:  # ruff: ignore[unused-async]
     result_queue = ResultsQueue()
     error = ValueError("Test error in function")
     result_queue.put(error)
-    with pytest.raises(Abort) as excinfo:
+    with pytest.raises(ValueError, match="Test error in function") as excinfo:
         _abort(result_queue)
-    assert excinfo.value.exit_code == ExitCode.ABORT_FROM_ERROR
-    assert excinfo.value.__cause__ is error
+    assert excinfo.value is error
 
 
 async def test_abort_without_queued_exception_has_no_cause() -> None:  # ruff: ignore[unused-async]
@@ -574,6 +627,28 @@ async def test_abort_without_queued_exception_has_no_cause() -> None:  # ruff: i
         _abort(ResultsQueue())
     assert excinfo.value.exit_code == ExitCode.ABORT_FROM_ERROR
     assert excinfo.value.__cause__ is None
+
+
+class _FatalError(BaseException):
+    pass
+
+
+async def test_worker_base_exception_propagates_into_task_group() -> None:
+    def _raise_fatal(input_value: int) -> int:  # ruff: ignore[unused-function-argument]
+        msg = "fatal"
+        raise _FatalError(msg)
+
+    result_queue: ResultsQueue = ResultsQueue()
+    executor = ThreadingExecutor(workers=1)
+    with pytest.raises(BaseExceptionGroup) as excinfo:  # ruff: ignore[pytest-raises-with-multiple-statements]
+        async with asyncio.TaskGroup() as tg:
+            await executor.start(tg)
+            await executor.task_queue.put(
+                Task(function=_raise_fatal, args=(0,), results_queue=result_queue)
+            )
+    matched, _ = excinfo.value.split(_FatalError)
+    assert matched is not None
+    assert not executor.is_running()
 
 
 async def test_handle_result_records_executor_failure_as_nan() -> None:  # ruff: ignore[unused-async]
@@ -690,11 +765,15 @@ async def test_multiprocessing_unserializable_payload_reports_error() -> None:
     result_queue: ResultsQueue = ResultsQueue()
     task = Task(function=use_lock, results_queue=result_queue)
     executor = MultiprocessingExecutor(workers=1)
-    with pytest.raises(ExceptionGroup) as excinfo:  # ruff: ignore[pytest-raises-with-multiple-statements]
-        async with asyncio.TaskGroup() as tg:
-            await executor.start(tg)
-            await executor.task_queue.put(task)
-    assert any("pickle" in str(err).lower() for err in excinfo.value.exceptions)
+    async with asyncio.TaskGroup() as tg:
+        await executor.start(tg)
+        await executor.task_queue.put(task)
+        # The serialization failure is delivered as the exception, not a teardown.
+        item = await asyncio.to_thread(result_queue.get, timeout=30)
+        assert isinstance(item, BaseException)
+        assert "pickle" in str(item).lower()
+        assert executor.is_running()
+        executor.cancel()
     assert not executor.is_running()
 
 
@@ -709,13 +788,14 @@ async def test_multiprocessing_without_cloudpickle_rejects_lambda(
     result_queue: ResultsQueue = ResultsQueue()
     task = Task(function=lambda: 1, results_queue=result_queue)
     executor = MultiprocessingExecutor(workers=1)
-    with pytest.raises(ExceptionGroup) as excinfo:  # ruff: ignore[pytest-raises-with-multiple-statements]
-        async with asyncio.TaskGroup() as tg:
-            await executor.start(tg)
-            await executor.task_queue.put(task)
-    errors = [err for err in excinfo.value.exceptions if isinstance(err, RuntimeError)]
-    assert errors
-    assert any("ropt[cloudpickle]" in str(err) for err in errors)
+    async with asyncio.TaskGroup() as tg:
+        await executor.start(tg)
+        await executor.task_queue.put(task)
+        item = await asyncio.to_thread(result_queue.get, timeout=30)
+        assert isinstance(item, RuntimeError)
+        assert "ropt[cloudpickle]" in str(item)
+        assert executor.is_running()
+        executor.cancel()
     assert not executor.is_running()
 
 
@@ -746,11 +826,13 @@ async def test_task_capturing_a_workflow_object_raises_transfer_error() -> None:
         results_queue=result_queue,
     )
     executor = MultiprocessingExecutor(workers=1)
-    with pytest.raises(ExceptionGroup) as excinfo:  # ruff: ignore[pytest-raises-with-multiple-statements]
-        async with asyncio.TaskGroup() as tg:
-            await executor.start(tg)
-            await executor.task_queue.put(task)
-    assert any(isinstance(err, TransferError) for err in excinfo.value.exceptions)
+    async with asyncio.TaskGroup() as tg:
+        await executor.start(tg)
+        await executor.task_queue.put(task)
+        item = await asyncio.to_thread(result_queue.get, timeout=30)
+        assert isinstance(item, TransferError)
+        assert executor.is_running()
+        executor.cancel()
     assert not executor.is_running()
 
 

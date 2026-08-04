@@ -169,9 +169,9 @@ class Task(ABC):
       tolerated per-realization failure.
     - A **user-code exception** (the task function itself raises) is delivered
       via [`put_error`][ropt.workflow.executors.Task.put_error], which places
-      the exception on the queue and closes it. The owning evaluator turns this
-      into an abort of the whole evaluation, chaining the original exception as
-      the cause.
+      the exception on the queue and closes it. The owning evaluator re-raises
+      the original exception unchanged, aborting the current evaluation; the
+      executor keeps running.
 
     Attributes:
         function:      The function to execute.
@@ -200,7 +200,7 @@ class Task(ABC):
         Places the exception raised by the task's function on the queue and
         closes it. Like [`cancel_all`][ropt.workflow.executors.Task.cancel_all]
         this unblocks the waiting evaluator, but it additionally carries the
-        exception so the evaluator can surface it as the cause of the abort.
+        exception so the evaluator can re-raise the original unchanged.
 
         Args:
             exc: The exception raised by the task's function.

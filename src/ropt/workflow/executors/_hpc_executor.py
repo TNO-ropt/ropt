@@ -244,9 +244,10 @@ class HPCExecutor(ExecutorBase):
                 if isinstance(result, Exception) and not isinstance(
                     result, ExecutorFailure
                 ):
+                    # Deliver to the evaluator; keep the executor alive (no raise).
                     task.put_error(result)
-                    raise result
-                task.put_result(result)
+                else:
+                    task.put_result(result)
                 remove.append(task_id)
         for task_id in remove:
             self._tasks.pop(task_id)

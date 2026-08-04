@@ -124,9 +124,9 @@ class _Worker:
                 await asyncio.to_thread(
                     task.put_result, ExecutorFailure("Background process was killed")
                 )
-            except Exception as exc:
+            except Exception as exc:  # ruff: ignore[blind-except]
+                # Deliver to the evaluator; keep the executor alive (no re-raise).
                 task.put_error(exc)
-                raise
             finally:
                 self._task_queue.task_done()
 
