@@ -125,8 +125,8 @@ class ExitCode(IntEnum):
     ENSEMBLE_EVALUATOR_FINISHED = 6
     """Returned when an evaluation step terminates normally."""
 
-    ABORT_FROM_ERROR = 7
-    """Returned when aborting due to an error raises and handled elsewhere."""
+    EXECUTOR_STOPPED = 7
+    """Returned when the executor stopped before the evaluation could finish."""
 
 
 class AxisName(StrEnum):

@@ -187,7 +187,7 @@ why the step finished:
 | `MAX_FUNCTIONS_REACHED`      | Maximum number of function evaluations was reached.           |
 | `MAX_BATCHES_REACHED`        | Maximum number of evaluation batches was reached.             |
 | `USER_ABORT`                 | Reserved for internal use; not currently exposed to users.    |
-| `ABORT_FROM_ERROR`           | Aborted due to an error handled elsewhere.                    |
+| `EXECUTOR_STOPPED`           | Aborted because the executor stopped before finishing.        |
 
 ## Event handlers
 

@@ -113,11 +113,11 @@ class ParallelEvaluator(Evaluator):
             The result of calling the wrapped evaluator function.
 
         Raises:
-            Abort: With `ExitCode.ABORT_FROM_ERROR` if the executor is not
+            Abort: With `ExitCode.EXECUTOR_STOPPED` if the executor is not
                 running and no task exception is available to re-raise.
         """
         if not self._executor.is_running():
-            raise Abort(ExitCode.ABORT_FROM_ERROR)
+            raise Abort(ExitCode.EXECUTOR_STOPPED)
 
         batch_id = self._batch_id_callback()
 
@@ -184,7 +184,7 @@ class ParallelEvaluator(Evaluator):
             raise
 
         if not self._executor.is_running():
-            raise Abort(ExitCode.ABORT_FROM_ERROR)
+            raise Abort(ExitCode.EXECUTOR_STOPPED)
 
     async def _submit_bundles(
         self,
@@ -241,7 +241,7 @@ def _abort(results_queue: ResultsQueue) -> NoReturn:
             break
         if isinstance(item, BaseException):
             raise item
-    raise Abort(ExitCode.ABORT_FROM_ERROR)
+    raise Abort(ExitCode.EXECUTOR_STOPPED)
 
 
 def _handle_result(

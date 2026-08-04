@@ -625,7 +625,7 @@ async def test_abort_reraises_queued_exception() -> None:  # ruff: ignore[unused
 async def test_abort_without_queued_exception_has_no_cause() -> None:  # ruff: ignore[unused-async]
     with pytest.raises(Abort) as excinfo:
         _abort(ResultsQueue())
-    assert excinfo.value.exit_code == ExitCode.ABORT_FROM_ERROR
+    assert excinfo.value.exit_code == ExitCode.EXECUTOR_STOPPED
     assert excinfo.value.__cause__ is None
 
 

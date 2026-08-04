@@ -138,7 +138,7 @@ class ExternalBackend(Backend):
                     return_gradients=outcome["return_gradients"],
                 )
             except Exception as exc:  # ruff: ignore[blind-except]
-                result = ExitCode.ABORT_FROM_ERROR
+                result = ExitCode.EXECUTOR_STOPPED
                 exception = exc
             result_queue.put(result)
         process.join(_PROCESS_TIMEOUT)
