@@ -3289,9 +3289,9 @@ failure classes are distinguished, following the error contract described in
   tolerated per-realization failure.</li>
 <li>A <strong>user-code exception</strong> (the task function itself raises) is delivered
   via <a class="autorefs autorefs-internal" title="            put_error" href="#ropt.workflow.executors.Task.put_error"><code>put_error</code></a>, which places
-  the exception on the queue and closes it. The owning evaluator turns this
-  into an abort of the whole evaluation, chaining the original exception as
-  the cause.</li>
+  the exception on the queue and closes it. The owning evaluator re-raises
+  the original exception unchanged, aborting the current evaluation; the
+  executor keeps running.</li>
 </ul>
 
 
@@ -3434,7 +3434,7 @@ failure classes are distinguished, following the error contract described in
 <p>Places the exception raised by the task's function on the queue and
 closes it. Like <a class="autorefs autorefs-internal" title="            cancel_all" href="#ropt.workflow.executors.Task.cancel_all"><code>cancel_all</code></a>
 this unblocks the waiting evaluator, but it additionally carries the
-exception so the evaluator can surface it as the cause of the abort.</p>
+exception so the evaluator can re-raise the original unchanged.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>

@@ -3825,9 +3825,9 @@ in <a href="../../usage/parallel/#error-handling">Parallel Evaluation</a>. An
 infrastructure failure arrives as an
 <a class="autorefs autorefs-internal" title="            ExecutorFailure" href="../exceptions/#ropt.exceptions.ExecutorFailure"><code>ExecutorFailure</code></a> result and is
 recorded as a failed realization (NaN), while a user-code exception
-arrives on the results queue and aborts the whole evaluation, raising
-<a class="autorefs autorefs-internal" title="            Abort" href="../exceptions/#ropt.exceptions.Abort"><code>Abort</code></a> with the original exception chained as
-the cause.</p>
+arrives on the results queue and aborts the current evaluation by
+re-raising the original exception unchanged. The executor is left
+running, so a consumer may reuse it for further evaluations.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3925,8 +3925,8 @@ the cause.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If the executor is not running, or if a task's function
-   raised a user-code exception.</p>
+                <p>With <code>ExitCode.ABORT_FROM_ERROR</code> if the executor is not
+running and no task exception is available to re-raise.</p>
               </div>
             </td>
           </tr>

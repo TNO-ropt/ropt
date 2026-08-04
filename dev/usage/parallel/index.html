@@ -969,10 +969,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#user-code-exception-aborts-everything" class="md-nav__link">
+  <a href="#user-code-exception-raised" class="md-nav__link">
     <span class="md-ellipsis">
       
-        User-code exception (aborts everything)
+        User-code exception (raised)
       
     </span>
   </a>
@@ -2528,10 +2528,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#user-code-exception-aborts-everything" class="md-nav__link">
+  <a href="#user-code-exception-raised" class="md-nav__link">
     <span class="md-ellipsis">
       
-        User-code exception (aborts everything)
+        User-code exception (raised)
       
     </span>
   </a>
@@ -2928,27 +2928,36 @@ records the affected rows as failed realizations by writing <code>numpy.nan</cod
 failure is <em>tolerated</em>: the optimization continues, and only aborts (with
 <code>TOO_FEW_REALIZATIONS</code>) if too many realizations fail to satisfy the configured
 minimum.</p>
-<h3 id="user-code-exception-aborts-everything">User-code exception (aborts everything)</h3>
+<h3 id="user-code-exception-raised">User-code exception (raised)</h3>
 <p>A <em>user-code</em> exception is one raised by the evaluation function itself — a bug
 in the objective, a bad configuration, an unexpected input. This must not be
 silently turned into a failed realization; it signals a genuine error the user
 needs to see and fix. When the task function raises, the worker delivers the
 exception on the results queue (via
 <a class="autorefs autorefs-internal" title="            put_error" href="../../reference/workflow_executors/#ropt.workflow.executors.Task.put_error"><code>put_error</code></a>, which also closes the
-queue) <strong>and</strong> re-raises it into the executor's <code>asyncio.TaskGroup</code>. The two
-channels play distinct roles:</p>
+queue) and returns to serving further tasks. It does <strong>not</strong> tear the executor
+down.</p>
+<p>The owning
+<a class="autorefs autorefs-internal" title="            eval" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.ParallelEvaluator.eval"><code>ParallelEvaluator.eval</code></a>
+call receives the exception and <strong>re-raises the original unchanged</strong>, aborting
+the current evaluation. This is deliberately identical to the sequential
+<a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.FunctionEvaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.FunctionEvaluator"><code>FunctionEvaluator</code></a>: whichever
+evaluator is used, a bug in the objective surfaces as the same exception,
+propagating out of <code>eval()</code> (and out of the compute step) on the calling thread.</p>
+<p>Because the executor keeps running, its lifetime is owned by the <strong>consumer's
+scope</strong>, not by the error:</p>
 <ul>
-<li>The queue item unblocks the owning
-  <a class="autorefs autorefs-internal" title="            eval" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.ParallelEvaluator.eval"><code>ParallelEvaluator.eval</code></a>
-  call, which raises <a class="autorefs autorefs-internal" title="            Abort" href="../../reference/exceptions/#ropt.exceptions.Abort"><code>Abort</code></a> with
-  <code>ExitCode.ABORT_FROM_ERROR</code>, chaining the original exception as the cause
-  (<code>raise Abort(...) from exc</code>) so its message and traceback remain visible.</li>
-<li>The re-raise into the <code>TaskGroup</code> cancels sibling tasks. This is what makes
-  "abort everything" work when an advanced user runs several compute steps
-  concurrently in their own <code>asyncio.TaskGroup</code> sharing one executor: a genuine
-  error in one objective propagates into that group, cancels the siblings, and
-  surfaces with a traceback so they can fix and re-run.</li>
+<li>Left unhandled, the exception propagates out of the block that owns the
+  executor (for example an <code>async with asyncio.TaskGroup()</code> that a compute step
+  runs inside), whose unwinding cancels the workers and stops the executor —
+  "abort everything".</li>
+<li>Caught before it reaches that block, the executor stays alive and can be
+  reused for further evaluations. This is what lets several compute steps share
+  one executor and lets a bug in one be isolated from the others.</li>
 </ul>
+<p>Only a <code>BaseException</code> (for example a cancellation) still propagates out of the
+worker directly, tearing the executor down — that is the intended teardown
+signal and is left untouched.</p>
 <p>For the <a class="autorefs autorefs-internal" title="            ropt.workflow.executors.HPCExecutor" href="../../reference/workflow_executors/#ropt.workflow.executors.HPCExecutor"><code>HPCExecutor</code></a> the exception
 crosses a process boundary. It is serialized with <code>cloudpickle</code>, which can
 handle exception objects that the standard <code>pickle</code> module cannot, but does not
