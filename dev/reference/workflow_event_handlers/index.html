@@ -1920,6 +1920,28 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#ropt.workflow.event_handlers.EventHandler.claim" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        claim
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.workflow.event_handlers.EventHandler.claimed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        claimed
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ropt.workflow.event_handlers.EventHandler.event_types" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2730,6 +2752,28 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#ropt.workflow.event_handlers.EventHandler.claim" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        claim
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.workflow.event_handlers.EventHandler.claimed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        claimed
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ropt.workflow.event_handlers.EventHandler.event_types" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3380,6 +3424,118 @@ and pitfalls.</p>
       </tbody>
     </table>
 
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.workflow.event_handlers.EventHandler.claim" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">claim</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">claim</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Claim this handler for exclusive, single-run ownership.</p>
+<p>Claiming marks the handler as dedicated to a single consumer, such as
+one optimization run, for the remainder of its lifetime. A claimed
+handler cannot be claimed again, which guarantees it is never
+accidentally reused by, or shared with, another run. Handlers meant to
+aggregate across several runs are not claimed; they are shared
+explicitly, for example through an
+<a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.EventDispatcher" href="#ropt.workflow.event_handlers.EventDispatcher"><code>EventDispatcher</code></a>.</p>
+<p>This claim is independent of the attachment state set by
+<a class="autorefs autorefs-internal" title="            register_compute_step" href="#ropt.workflow.event_handlers.EventHandler.register_compute_step"><code>register_compute_step</code></a>
+and
+<a class="autorefs autorefs-internal" title="            register_dispatcher" href="#ropt.workflow.event_handlers.EventHandler.register_dispatcher"><code>register_dispatcher</code></a>,
+and of the transient concurrency guard on <code>handle_event</code>.</p>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError">RuntimeError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the handler has already been claimed.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="ropt.workflow.event_handlers.EventHandler.claimed" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">claimed</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">claimed</span><span class="p">:</span> <span class="nb">bool</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Whether this handler has been claimed for exclusive use.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>True if the handler has been claimed.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
     </div>
 
