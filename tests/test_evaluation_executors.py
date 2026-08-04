@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import asyncio
-import subprocess  # ruff: ignore[suspicious-subprocess-import]
 import sys
 import threading
 from functools import partial
@@ -42,6 +41,8 @@ try:
     import cloudpickle  # ruff: ignore[unused-import]
     import pandas as pd
     import pysqa  # ruff: ignore[unused-import]
+
+    from ropt.workflow.executors.__main__ import run_task
 
     _TEST_HPC = True
 except ImportError:
@@ -297,7 +298,10 @@ if _TEST_HPC:
             self._job_id = 0
 
         def submit_job(self, job_name: str, command: str, **kwargs: Any) -> int:  # ruff: ignore[unused-method-argument]
-            subprocess.Popen(command.split())  # ruff: ignore[subprocess-without-shell-equals-true]
+            *_, input_file, output_file = command.split()
+            threading.Thread(
+                target=run_task, args=(input_file, output_file), daemon=True
+            ).start()
             self._job_id += 1
             self._jobs[self._job_id] = job_name
             return self._job_id
