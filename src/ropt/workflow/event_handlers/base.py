@@ -94,6 +94,7 @@ class EventHandler(ABC):
         self.__stored_values: dict[str, Any] = {}
         self._attached_to: _Attachment = _Attachment.NONE
         self._in_use = False
+        self._claimed = False
         self._owner_lock = threading.Lock()
 
     def __reduce__(self) -> tuple[object, tuple[str]]:  # ruff: ignore[undocumented-magic-method]
@@ -126,6 +127,41 @@ class EventHandler(ABC):
             msg = "This event handler is already registered with a dispatcher."
             raise RuntimeError(msg)
         self._attached_to = _Attachment.COMPUTE_STEP
+
+    def claim(self) -> None:
+        """Claim this handler for exclusive, single-run ownership.
+
+        Claiming marks the handler as dedicated to a single consumer, such as
+        one optimization run, for the remainder of its lifetime. A claimed
+        handler cannot be claimed again, which guarantees it is never
+        accidentally reused by, or shared with, another run. Handlers meant to
+        aggregate across several runs are not claimed; they are shared
+        explicitly, for example through an
+        [`EventDispatcher`][ropt.workflow.event_handlers.EventDispatcher].
+
+        This claim is independent of the attachment state set by
+        [`register_compute_step`][ropt.workflow.event_handlers.EventHandler.register_compute_step]
+        and
+        [`register_dispatcher`][ropt.workflow.event_handlers.EventHandler.register_dispatcher],
+        and of the transient concurrency guard on `handle_event`.
+
+        Raises:
+            RuntimeError: If the handler has already been claimed.
+        """
+        with self._owner_lock:
+            if self._claimed:
+                msg = "This event handler has already been claimed for exclusive use."
+                raise RuntimeError(msg)
+            self._claimed = True
+
+    @property
+    def claimed(self) -> bool:
+        """Whether this handler has been claimed for exclusive use.
+
+        Returns:
+            True if the handler has been claimed.
+        """
+        return self._claimed
 
     @property
     @abstractmethod

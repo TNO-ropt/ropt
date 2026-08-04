@@ -1049,6 +1049,27 @@ def test_handler_may_be_attached_to_multiple_compute_steps() -> None:
     handler.register_compute_step()  # allowed, no error
 
 
+def test_claim_marks_handler_as_claimed() -> None:
+    handler = _RecordingHandler()
+    assert handler.claimed is False
+    handler.claim()
+    assert handler.claimed is True
+
+
+def test_claim_twice_raises() -> None:
+    handler = _RecordingHandler()
+    handler.claim()
+    with pytest.raises(RuntimeError, match="already been claimed for exclusive use"):
+        handler.claim()
+
+
+def test_claim_is_independent_of_attachment() -> None:
+    handler = _RecordingHandler()
+    handler.claim()
+    handler.register_compute_step()
+    assert handler.claimed is True
+
+
 def test_check_transferred_is_silent_without_a_transfer() -> None:
     reset_transferred()
     check_transferred()  # nothing transferred -> no error
