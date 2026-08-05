@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import asyncio
+import logging
+import queue
 import threading
 from typing import TYPE_CHECKING
 
@@ -13,9 +15,7 @@ if TYPE_CHECKING:
 
     from .base import EventHandler
 
-
-async def _call(handler: EventHandler, event: EnOptEvent) -> None:  # ruff: ignore[unused-async]
-    handler.handle_event(event)
+_logger = logging.getLogger(__name__)
 
 
 class EventDispatcher:
@@ -29,6 +29,7 @@ class EventDispatcher:
         self._queue: asyncio.Queue[EnOptEvent | None] | None = None
         self._loop: asyncio.AbstractEventLoop | None = None
         self._running = threading.Event()
+        self._errors: queue.Queue[Exception] = queue.Queue()
 
     def __reduce__(self) -> tuple[object, tuple[str]]:
         return (_make_placeholder, ("An event dispatcher",))
@@ -69,6 +70,26 @@ class EventDispatcher:
         assert self._queue is not None
         self._loop.call_soon_threadsafe(self._queue.put_nowait, event)
 
+    def raise_pending_error(self) -> None:
+        """Re-raise a recorded handler failure on the caller's stack.
+
+        A failing event handler cannot raise from the dispatcher task without
+        tearing down the session task group as a `BaseExceptionGroup`. Instead
+        the failure is recorded, and the emitting run drains it here — on its
+        own call stack — where the original exception propagates as a clean,
+        single exception with a normal exit code, mirroring how the executor's
+        [`put_error`][ropt.workflow.executors.Task.put_error] is re-raised by
+        the awaiting evaluator. If no failure is pending this is a no-op.
+
+        Raises:
+            Exception: The original exception raised by a failing event handler.
+        """  # ruff: ignore[docstring-extraneous-exception]
+        try:
+            exc = self._errors.get_nowait()
+        except queue.Empty:
+            return
+        raise exc
+
     def is_running(self) -> bool:
         """Check if the dispatcher is running.
 
@@ -102,13 +123,27 @@ class EventDispatcher:
     async def _dispatch(self, event: EnOptEvent) -> None:
         await asyncio.gather(
             *(
-                asyncio.to_thread(handler.handle_event, event)
-                if run_in_thread
-                else _call(handler, event)
+                self._run_handler(handler, event, run_in_thread=run_in_thread)
                 for handler, run_in_thread in self._handlers
                 if event.event_type in handler.event_types
             )
         )
+
+    async def _run_handler(
+        self, handler: EventHandler, event: EnOptEvent, *, run_in_thread: bool
+    ) -> None:
+        try:
+            if run_in_thread:
+                await asyncio.to_thread(handler.handle_event, event)
+            else:
+                handler.handle_event(event)
+        except Exception as exc:
+            _logger.exception(
+                "Event handler %r failed while handling %s",
+                handler,
+                event.event_type,
+            )
+            self._errors.put(exc)
 
     async def _drain(self) -> None:
         assert self._queue is not None

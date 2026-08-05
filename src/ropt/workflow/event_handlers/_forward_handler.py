@@ -38,9 +38,16 @@ class EventForwardHandler(EventHandler):
     def handle_event(self, event: EnOptEvent) -> None:
         """Forward the event to the EventDispatcher.
 
+        Before forwarding, re-raise any failure recorded by a previously
+        dispatched handler. This runs on the emitting run's own call stack, so a
+        handler fault surfaces as a clean exception with a normal exit code
+        instead of tearing down the session task group. See
+        [`raise_pending_error`][ropt.workflow.event_handlers.EventDispatcher.raise_pending_error].
+
         Args:
             event: The event to forward.
         """
+        self._dispatcher.raise_pending_error()
         self._dispatcher.put_event(event)
 
     @property

@@ -287,3 +287,151 @@ async def test_event_dispatcher_with_optimization_step(
     assert np.allclose(
         result_handler["results"].evaluations.variables, [0.0, 0.0, 0.5], atol=0.02
     )
+
+
+class _HandlerError(Exception):
+    pass
+
+
+class _HandlerBaseError(BaseException):
+    pass
+
+
+_ERROR_MESSAGE = "boom"
+_FATAL_MESSAGE = "fatal"
+
+
+@pytest.mark.asyncio
+async def test_event_dispatcher_isolates_failing_handler(
+    config: dict[str, Any],
+) -> None:
+    context = EnOptContext.model_validate(config)
+    calls: list[EnOptEvent] = []
+    received: list[EnOptEvent] = []
+
+    def _fail(event: EnOptEvent) -> None:
+        calls.append(event)
+        raise _HandlerError(_ERROR_MESSAGE)
+
+    dispatcher = EventDispatcher()
+    dispatcher.add_event_handler(
+        CallbackHandler(
+            event_types={EnOptEventType.FINISHED_EVALUATION}, callback=_fail
+        )
+    )
+    dispatcher.add_event_handler(
+        CallbackHandler(
+            event_types={EnOptEventType.FINISHED_EVALUATION},
+            callback=received.append,
+        )
+    )
+    event = EnOptEvent(event_type=EnOptEventType.FINISHED_EVALUATION, context=context)
+    # Exiting the task group without a BaseExceptionGroup proves the handler
+    # fault did not escape the dispatcher task and tear the session down.
+    async with asyncio.TaskGroup() as tg:
+        await dispatcher.start(tg)
+        dispatcher.put_event(event)
+        dispatcher.put_event(event)
+        dispatcher.cancel()
+    # The healthy handler received both events and the failing handler was
+    # invoked for both (recorded each time, not quarantined).
+    assert received == [event, event]
+    assert calls == [event, event]
+    # The failure is recorded and can be re-raised on the caller's stack.
+    with pytest.raises(_HandlerError, match=_ERROR_MESSAGE):
+        dispatcher.raise_pending_error()
+
+
+@pytest.mark.asyncio
+async def test_event_dispatcher_isolates_failing_thread_handler(
+    config: dict[str, Any],
+) -> None:
+    context = EnOptContext.model_validate(config)
+    received: list[EnOptEvent] = []
+
+    def _fail(_event: EnOptEvent) -> None:
+        raise _HandlerError(_ERROR_MESSAGE)
+
+    dispatcher = EventDispatcher()
+    dispatcher.add_event_handler(
+        CallbackHandler(
+            event_types={EnOptEventType.FINISHED_EVALUATION}, callback=_fail
+        ),
+        run_in_thread=True,
+    )
+    dispatcher.add_event_handler(
+        CallbackHandler(
+            event_types={EnOptEventType.FINISHED_EVALUATION},
+            callback=received.append,
+        )
+    )
+    event = EnOptEvent(event_type=EnOptEventType.FINISHED_EVALUATION, context=context)
+    async with asyncio.TaskGroup() as tg:
+        await dispatcher.start(tg)
+        dispatcher.put_event(event)
+        dispatcher.cancel()
+    # A run_in_thread handler is isolated exactly like an inline one.
+    assert received == [event]
+    with pytest.raises(_HandlerError, match=_ERROR_MESSAGE):
+        dispatcher.raise_pending_error()
+
+
+@pytest.mark.asyncio
+async def test_event_forward_handler_reraises_recorded_failure(
+    config: dict[str, Any],
+) -> None:
+    context = EnOptContext.model_validate(config)
+
+    def _fail(_event: EnOptEvent) -> None:
+        raise _HandlerError(_ERROR_MESSAGE)
+
+    dispatcher = EventDispatcher()
+    dispatcher.add_event_handler(
+        CallbackHandler(
+            event_types={EnOptEventType.FINISHED_EVALUATION}, callback=_fail
+        )
+    )
+    forward = EventForwardHandler(
+        dispatcher, event_types={EnOptEventType.FINISHED_EVALUATION}
+    )
+    forward.register_compute_step()
+    event = EnOptEvent(event_type=EnOptEventType.FINISHED_EVALUATION, context=context)
+    async with asyncio.TaskGroup() as tg:
+        await dispatcher.start(tg)
+        dispatcher.put_event(event)
+        dispatcher.cancel()
+    # On the emitting run's own stack the forward handler re-raises the original
+    # exception, unwrapped — a clean stop, not a BaseExceptionGroup.
+    with pytest.raises(_HandlerError, match=_ERROR_MESSAGE):
+        forward.handle_event(event)
+
+
+@pytest.mark.asyncio
+async def test_event_dispatcher_base_exception_propagates(
+    config: dict[str, Any],
+) -> None:
+    context = EnOptContext.model_validate(config)
+
+    def _fail(_event: EnOptEvent) -> None:
+        raise _HandlerBaseError(_FATAL_MESSAGE)
+
+    dispatcher = EventDispatcher()
+    dispatcher.add_event_handler(
+        CallbackHandler(
+            event_types={EnOptEventType.FINISHED_EVALUATION}, callback=_fail
+        )
+    )
+    event = EnOptEvent(event_type=EnOptEventType.FINISHED_EVALUATION, context=context)
+
+    async def _run() -> None:
+        async with asyncio.TaskGroup() as tg:
+            await dispatcher.start(tg)
+            dispatcher.put_event(event)
+            dispatcher.cancel()
+
+    # A BaseException is not isolated: it stays the teardown backstop and tears
+    # the session task group down as a BaseExceptionGroup.
+    with pytest.raises(BaseExceptionGroup) as exc_info:
+        await _run()
+    _, unhandled = exc_info.value.split(_HandlerBaseError)
+    assert unhandled is None

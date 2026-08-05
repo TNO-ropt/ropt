@@ -458,6 +458,34 @@ handlers.
     that drives event-producing compute steps must run in-process. See
     [Nested workflows and process boundaries](#nested-workflows-and-process-boundaries).
 
+### Handler failures
+
+A handler dispatched by an `EventDispatcher` runs on the dispatcher's own loop
+task, decoupled from the run that emitted the event. If such a handler were
+allowed to raise there, the exception would tear down the shared session task
+group — killing the executor and every other concurrent run — as a
+`BaseExceptionGroup`, far from its cause. The dispatcher therefore isolates
+handler failures, mirroring the executor's tolerated-vs-fatal split:
+
+- An ordinary `Exception` from a handler is **caught, logged** (with the handler
+  and the event type), and **recorded**; it never escapes the dispatcher task.
+  The dispatcher keeps running and other handlers still receive the event.
+- The recorded failure is **fatal, but surfaced cleanly**: the next time the
+  emitting run forwards an event,
+  [`EventForwardHandler`][ropt.workflow.event_handlers.EventForwardHandler]
+  re-raises the **original** exception on that run's own call stack — a single,
+  clean exception that stops the run normally, exactly as if a directly-attached
+  handler had raised inline. A repeatedly-failing handler is recorded on each
+  call (it is not quarantined).
+- A `BaseException` (such as `CancelledError`) is **not** isolated: it remains
+  the session teardown backstop and propagates, as with the executor.
+
+Because the failure surfaces at the next forwarded event, a run that is blocked
+waiting inside a long parallel batch only re-raises once it emits again (its next
+evaluation boundary). The failure is never lost — it is logged when caught and
+re-raised at the next emission or at run end — but prompt mid-evaluation
+surfacing is a planned refinement tied to the shared abort signal.
+
 ### Thread-based dispatch
 
 By default, handlers registered with `EventDispatcher` are called directly in
