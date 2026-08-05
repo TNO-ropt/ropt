@@ -1019,6 +1019,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#handler-failures" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Handler failures
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#thread-based-dispatch" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2578,6 +2589,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#handler-failures" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Handler failures
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#thread-based-dispatch" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3167,6 +3189,32 @@ shared handlers.</p>
 that drives event-producing compute steps must run in-process. See
 <a href="#nested-workflows-and-process-boundaries">Nested workflows and process boundaries</a>.</p>
 </div>
+<h3 id="handler-failures">Handler failures</h3>
+<p>A handler dispatched by an <code>EventDispatcher</code> runs on the dispatcher's own loop
+task, decoupled from the run that emitted the event. If such a handler were
+allowed to raise there, the exception would tear down the shared session task
+group — killing the executor and every other concurrent run — as a
+<code>BaseExceptionGroup</code>, far from its cause. The dispatcher therefore isolates
+handler failures, mirroring the executor's tolerated-vs-fatal split:</p>
+<ul>
+<li>An ordinary <code>Exception</code> from a handler is <strong>caught, logged</strong> (with the handler
+  and the event type), and <strong>recorded</strong>; it never escapes the dispatcher task.
+  The dispatcher keeps running and other handlers still receive the event.</li>
+<li>The recorded failure is <strong>fatal, but surfaced cleanly</strong>: the next time the
+  emitting run forwards an event,
+  <a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.EventForwardHandler" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.EventForwardHandler"><code>EventForwardHandler</code></a>
+  re-raises the <strong>original</strong> exception on that run's own call stack — a single,
+  clean exception that stops the run normally, exactly as if a directly-attached
+  handler had raised inline. A repeatedly-failing handler is recorded on each
+  call (it is not quarantined).</li>
+<li>A <code>BaseException</code> (such as <code>CancelledError</code>) is <strong>not</strong> isolated: it remains
+  the session teardown backstop and propagates, as with the executor.</li>
+</ul>
+<p>Because the failure surfaces at the next forwarded event, a run that is blocked
+waiting inside a long parallel batch only re-raises once it emits again (its next
+evaluation boundary). The failure is never lost — it is logged when caught and
+re-raised at the next emission or at run end — but prompt mid-evaluation
+surfacing is a planned refinement tied to the shared abort signal.</p>
 <h3 id="thread-based-dispatch">Thread-based dispatch</h3>
 <p>By default, handlers registered with <code>EventDispatcher</code> are called directly in
 the asyncio event loop's thread. This is efficient for handlers that only do
