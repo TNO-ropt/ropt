@@ -2319,21 +2319,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.workflow.event_handlers.EventDispatcher.put_event" class="md-nav__link">
+  <a href="#ropt.workflow.event_handlers.EventDispatcher.dispatch_event" class="md-nav__link">
     <span class="md-ellipsis">
       
-        put_event
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.workflow.event_handlers.EventDispatcher.raise_pending_error" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        raise_pending_error
+        dispatch_event
       
     </span>
   </a>
@@ -3162,21 +3151,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.workflow.event_handlers.EventDispatcher.put_event" class="md-nav__link">
+  <a href="#ropt.workflow.event_handlers.EventDispatcher.dispatch_event" class="md-nav__link">
     <span class="md-ellipsis">
       
-        put_event
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.workflow.event_handlers.EventDispatcher.raise_pending_error" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        raise_pending_error
+        dispatch_event
       
     </span>
   </a>
@@ -5442,12 +5420,12 @@ etc.), register this handler with <code>run_in_thread=True</code> on the
 
     <div class="doc doc-contents ">
 
-        <p>Forward the event to the EventDispatcher.</p>
-<p>Before forwarding, re-raise any failure recorded by a previously
-dispatched handler. This runs on the emitting run's own call stack, so a
-handler fault surfaces as a clean exception with a normal exit code
-instead of tearing down the session task group. See
-<a class="autorefs autorefs-internal" title="            raise_pending_error" href="#ropt.workflow.event_handlers.EventDispatcher.raise_pending_error"><code>raise_pending_error</code></a>.</p>
+        <p>Forward the event to the EventDispatcher and wait for it.</p>
+<p>Submits the event to the dispatcher and blocks on the emitting run's own
+call stack until every handler has processed it. A handler fault is
+re-raised here as a clean exception with a normal exit code, instead of
+tearing down the session task group. See
+<a class="autorefs autorefs-internal" title="            dispatch_event" href="#ropt.workflow.event_handlers.EventDispatcher.dispatch_event"><code>dispatch_event</code></a>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -5648,17 +5626,24 @@ parallel via <code>asyncio.gather</code>.</p>
 <div class="doc doc-object doc-function">
 
 
-<h3 id="ropt.workflow.event_handlers.EventDispatcher.put_event" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">put_event</span>
+<h3 id="ropt.workflow.event_handlers.EventDispatcher.dispatch_event" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">dispatch_event</span>
 
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">put_event</span><span class="p">(</span><span class="n">event</span><span class="p">:</span> <span class="n">EnOptEvent</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">dispatch_event</span><span class="p">(</span><span class="n">event</span><span class="p">:</span> <span class="n">EnOptEvent</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
 
-        <p>Submit an event from any thread.</p>
+        <p>Submit an event and block until every handler has processed it.</p>
+<p>The event is queued to the dispatcher and this call blocks on the
+calling thread until the dispatcher has finished handling it. Events are
+handled in submission order. If a handler raises, the original exception
+is re-raised here — on the caller's own stack — so it surfaces as a
+clean, single exception, mirroring how the executor's
+<a class="autorefs autorefs-internal" title="            put_error" href="../workflow_executors/#ropt.workflow.executors.Task.put_error"><code>put_error</code></a> is re-raised by the
+awaiting evaluator.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -5716,58 +5701,13 @@ parallel via <code>asyncio.gather</code>.</p>
               </div>
             </td>
           </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="ropt.workflow.event_handlers.EventDispatcher.raise_pending_error" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">raise_pending_error</span>
-
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">raise_pending_error</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Re-raise a recorded handler failure on the caller's stack.</p>
-<p>A failing event handler cannot raise from the dispatcher task without
-tearing down the session task group as a <code>BaseExceptionGroup</code>. Instead
-the failure is recorded, and the emitting run drains it here — on its
-own call stack — where the original exception propagates as a clean,
-single exception with a normal exit code, mirroring how the executor's
-<a class="autorefs autorefs-internal" title="            put_error" href="../workflow_executors/#ropt.workflow.executors.Task.put_error"><code>put_error</code></a> is re-raised by
-the awaiting evaluator. If no failure is pending this is a no-op.</p>
-
-
-<p><span class="doc-section-title">Raises:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
           <tr class="doc-section-item">
             <td>
                   <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#Exception">Exception</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The original exception raised by a failing event handler.</p>
+                <p>Whatever a handler raised while processing the event.</p>
               </div>
             </td>
           </tr>

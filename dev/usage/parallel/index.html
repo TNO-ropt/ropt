@@ -3160,17 +3160,18 @@ from multiple concurrent compute steps.</p>
 </span><span id="__span-5-23"><a id="__codelineno-5-23" name="__codelineno-5-23" href="#__codelineno-5-23"></a>    <span class="n">executor</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
 </span></code></pre></div>
 <p><a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.EventForwardHandler" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.EventForwardHandler"><code>EventForwardHandler</code></a> is a
-regular event handler that can be attached to a compute step. When invoked from
-the worker thread it puts the event on the dispatcher's queue via a thread-safe
-call. The dispatcher's processing loop then dispatches it to the registered
-handlers.</p>
+regular event handler that can be attached to a compute step. When the step
+emits an event it submits the event to the dispatcher and <strong>blocks on the
+emitting run's own thread until every handler has processed it</strong>, preserving the
+order in which events are submitted. If a handler raises, the original exception
+is re-raised there, on the run's stack (see <a href="#handler-failures">Handler failures</a>).</p>
 <div class="admonition warning">
 <p class="admonition-title">Event handling is a single-process mechanism</p>
 <p>An <a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.EventDispatcher" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.EventDispatcher"><code>EventDispatcher</code></a> and
 every <a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.EventHandler" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.EventHandler"><code>EventHandler</code></a> live in
 the process that created them. <code>EventForwardHandler</code> delivers events by
-calling the dispatcher's <code>put_event</code>, which schedules them onto its event
-loop with <code>call_soon_threadsafe</code> — a <em>thread</em>-safe call, not a
+calling the dispatcher's <code>dispatch_event</code>, which schedules them onto its
+event loop with <code>call_soon_threadsafe</code> — a <em>thread</em>-safe call, not a
 <em>process</em>-safe one. A dispatcher reached from another process has no live
 loop, so a forwarded event cannot arrive.</p>
 <p>Event handlers can therefore only observe events emitted <strong>within their own
@@ -3190,31 +3191,24 @@ that drives event-producing compute steps must run in-process. See
 <a href="#nested-workflows-and-process-boundaries">Nested workflows and process boundaries</a>.</p>
 </div>
 <h3 id="handler-failures">Handler failures</h3>
-<p>A handler dispatched by an <code>EventDispatcher</code> runs on the dispatcher's own loop
-task, decoupled from the run that emitted the event. If such a handler were
-allowed to raise there, the exception would tear down the shared session task
-group — killing the executor and every other concurrent run — as a
-<code>BaseExceptionGroup</code>, far from its cause. The dispatcher therefore isolates
-handler failures, mirroring the executor's tolerated-vs-fatal split:</p>
+<p>Forwarding an event through an
+<a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.EventForwardHandler" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.EventForwardHandler"><code>EventForwardHandler</code></a> is
+<strong>synchronous</strong>: the emitting run blocks until the dispatcher has run every
+handler for that event. A handler failure is therefore delivered like an
+evaluation error — on the emitting run's own call stack — mirroring the
+executor's tolerated-vs-fatal split:</p>
 <ul>
-<li>An ordinary <code>Exception</code> from a handler is <strong>caught, logged</strong> (with the handler
-  and the event type), and <strong>recorded</strong>; it never escapes the dispatcher task.
-  The dispatcher keeps running and other handlers still receive the event.</li>
-<li>The recorded failure is <strong>fatal, but surfaced cleanly</strong>: the next time the
-  emitting run forwards an event,
-  <a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.EventForwardHandler" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.EventForwardHandler"><code>EventForwardHandler</code></a>
-  re-raises the <strong>original</strong> exception on that run's own call stack — a single,
-  clean exception that stops the run normally, exactly as if a directly-attached
-  handler had raised inline. A repeatedly-failing handler is recorded on each
-  call (it is not quarantined).</li>
-<li>A <code>BaseException</code> (such as <code>CancelledError</code>) is <strong>not</strong> isolated: it remains
-  the session teardown backstop and propagates, as with the executor.</li>
+<li>An ordinary <code>Exception</code> from a handler is <strong>re-raised on the emitting run's
+  stack</strong>, unwrapped — a single, clean exception that stops the run normally,
+  exactly as if a directly-attached handler had raised inline. It is logged
+  (with the handler and the event type) as it is caught. Because emission is
+  synchronous, this covers the run's <strong>last</strong> event too; nothing is deferred or
+  lost. Every handler for the event still runs before the error surfaces; if
+  several fail, the first (in registration order) is raised.</li>
+<li>A <code>BaseException</code> (such as <code>CancelledError</code>) is <strong>not</strong> delivered this way: it
+  remains the session teardown backstop and propagates, tearing the dispatcher
+  task group down, as with the executor.</li>
 </ul>
-<p>Because the failure surfaces at the next forwarded event, a run that is blocked
-waiting inside a long parallel batch only re-raises once it emits again (its next
-evaluation boundary). The failure is never lost — it is logged when caught and
-re-raised at the next emission or at run end — but prompt mid-evaluation
-surfacing is a planned refinement tied to the shared abort signal.</p>
 <h3 id="thread-based-dispatch">Thread-based dispatch</h3>
 <p>By default, handlers registered with <code>EventDispatcher</code> are called directly in
 the asyncio event loop's thread. This is efficient for handlers that only do

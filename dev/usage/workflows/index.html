@@ -3201,16 +3201,15 @@ steps — never both — and may be registered with <strong>at most one</strong>
 Mixing the two, or registering with a second dispatcher, raises a
 <code>RuntimeError</code>.</p>
 <div class="admonition note">
-<p class="admonition-title">A handler failure is fatal, but isolated</p>
+<p class="admonition-title">A handler failure is fatal</p>
 <p>An exception raised by a handler is a fatal error that stops the run. A
 directly-attached handler raises on the optimizer's own stack, so it
 propagates normally. A handler behind an
-<a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.EventDispatcher" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.EventDispatcher"><code>EventDispatcher</code></a> runs on the
-dispatcher's loop task instead; there the exception is caught, logged and
-recorded rather than allowed to tear down the shared session task group, and
-it is re-raised on the emitting run's own stack at its next forwarded event.
-Either way a handler bug surfaces as a single, clean exception — never a
-<code>BaseExceptionGroup</code>. See
+<a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.EventDispatcher" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.EventDispatcher"><code>EventDispatcher</code></a> runs while
+the emitting run <strong>waits</strong> for the event to be handled, so its exception is
+re-raised on that run's own stack too — synchronously, including for the
+run's last event. Either way a handler bug surfaces as a single, clean
+exception — never a <code>BaseExceptionGroup</code>. See
 <a href="../parallel/#handler-failures">Handler failures</a> for details.</p>
 </div>
 <div class="admonition warning">
