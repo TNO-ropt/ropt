@@ -146,5 +146,5 @@ near $0$.
 - [Ensemble-based Optimization](ensemble.md) — Add uncertainty to the
   problem with multiple realizations
 - [Using FunctionEvaluator](function_evaluator.md) — Use per-evaluation callbacks
-- [Using the Workflow Framework](workflow.md) — Use the workflow framework for
+- [Building a Workflow](workflow.md) — Assemble the workflow components for
   more control

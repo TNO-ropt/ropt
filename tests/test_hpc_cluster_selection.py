@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from ropt.workflow.executors._hpc_executor import _select_cluster
+from ropt.components.executors._hpc_executor import _select_cluster
 
 
 class _MockClusterAdapter:

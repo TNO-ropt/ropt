@@ -18,8 +18,8 @@ from ropt.results import (
 
 pytest.importorskip("pandas")
 
+from ropt.components.event_handlers import DataFrameHandler
 from ropt.context import EnOptContext
-from ropt.workflow.event_handlers import DataFrameHandler
 
 _CONFIG: dict[str, Any] = {
     "variables": {"variable_count": 2},

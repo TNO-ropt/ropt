@@ -16,9 +16,9 @@ from ropt.backend.scipy import (
     _CONSTRAINT_SUPPORT_NONLINEAR_INEQ,
     SUPPORTED_SCIPY_METHODS,
 )
+from ropt.components.evaluators import EvaluationFunctionContext
 from ropt.results import Results
 from ropt.workflow import BasicOptimizer, validate_backend_options
-from ropt.workflow.evaluators import EvaluationFunctionContext
 
 _REQUIRES_BOUNDS = _CONSTRAINT_REQUIRES_BOUNDS - {"differential_evolution"}
 _SUPPORTS_BOUNDS = _CONSTRAINT_SUPPORT_BOUNDS - {"differential_evolution"}

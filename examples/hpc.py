@@ -19,14 +19,14 @@ import numpy as np
 from numpy.random import default_rng
 from numpy.typing import NDArray
 
-from ropt.results import FunctionResults, Results
-from ropt.workflow import BasicOptimizer
-from ropt.workflow.evaluators import (
+from ropt.components.evaluators import (
     EvaluationFunctionContext,
     EvaluationFunctionResult,
     ParallelEvaluator,
 )
-from ropt.workflow.executors import Executor, HPCExecutor, MultiprocessingExecutor
+from ropt.components.executors import Executor, HPCExecutor, MultiprocessingExecutor
+from ropt.results import FunctionResults, Results
+from ropt.workflow import BasicOptimizer
 
 DIM = 2
 UNCERTAINTY = 0.01

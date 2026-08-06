@@ -7,8 +7,8 @@ and the protocol that user callables must follow.
 
 For detailed usage, including examples of handling inactive rows and partial
 failures, see [Writing Evaluation Callbacks](../usage/evaluation_callbacks.md).
-For higher-level `Evaluator` *classes* used by the workflow framework, see
-[Workflow Evaluator Classes](workflow_evaluators.md).
+For higher-level `Evaluator` *classes* used by the workflow components, see
+[Evaluators](components_evaluators.md).
 
 ::: ropt.evaluation.EvaluationBatchContext
 ::: ropt.evaluation.EvaluationBatchResult

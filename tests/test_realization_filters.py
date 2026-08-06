@@ -7,6 +7,7 @@ import numpy as np
 import pytest
 from numpy.typing import NDArray
 
+from ropt.components.evaluators import EvaluationFunctionContext
 from ropt.config._realization_filter_config import RealizationFilterConfig
 from ropt.context import EnOptContext
 from ropt.realization_filter import RealizationFilter
@@ -16,7 +17,6 @@ from ropt.realization_filter.default import (
 )
 from ropt.results import FunctionResults, GradientResults, Results
 from ropt.workflow import BasicOptimizer
-from ropt.workflow.evaluators import EvaluationFunctionContext
 
 initial_values = 3 * [0]
 

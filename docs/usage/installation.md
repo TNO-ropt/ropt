@@ -23,8 +23,8 @@ functionality:
 | Extra          | Pulls in                | Enables                                                                                              |
 | -------------- | ----------------------- | ---------------------------------------------------------------------------------------------------- |
 | `pandas`       | `pandas`                | Exporting [`Results`][ropt.results.Results] to data frames via [`results_to_dataframe`][ropt.results.results_to_dataframe]. |
-| `cloudpickle`  | `cloudpickle`           | Serializing lambdas, closures, and interactively-defined functions with the [`MultiprocessingExecutor`][ropt.workflow.executors.MultiprocessingExecutor] (`processes`), and running evaluations in an external Python process via the `external` backend. |
-| `hpc`          | `pysqa`, `cloudpickle`  | Running evaluations on HPC clusters via [`HPCExecutor`][ropt.workflow.executors.HPCExecutor].        |
+| `cloudpickle`  | `cloudpickle`           | Serializing lambdas, closures, and interactively-defined functions with the [`MultiprocessingExecutor`][ropt.components.executors.MultiprocessingExecutor] (`processes`), and running evaluations in an external Python process via the `external` backend. |
+| `hpc`          | `pysqa`, `cloudpickle`  | Running evaluations on HPC clusters via [`HPCExecutor`][ropt.components.executors.HPCExecutor].        |
 
 Without the `cloudpickle` extra the `processes` executor still works, but its
 task functions must be importable, module-level objects; installing it adds

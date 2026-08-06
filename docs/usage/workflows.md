@@ -4,16 +4,16 @@
 [`BasicOptimizer`][ropt.workflow.BasicOptimizer] to drive a single optimization
 run with a single evaluator. For anything more elaborate — multiple optimizers
 in sequence, nested optimizations, custom event handling, parallel/async
-execution — drop down to the workflow framework.
+execution — drop down to the workflow components.
 
-The framework has four concepts:
+There are four core workflow components:
 
 | Concept                                                                     | Role                                                                                            |
 | --------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| [`ComputeStep`][ropt.workflow.compute_steps.ComputeStep]                    | An executable unit of work (run an optimizer, run a single ensemble evaluation, etc.).          |
-| [`EventHandler`][ropt.workflow.event_handlers.EventHandler]                 | A reactive object that observes events emitted by a compute step.                               |
-| [`Evaluator`][ropt.workflow.evaluators.Evaluator]                           | The object a compute step uses to actually evaluate the model.                                  |
-| [`Executor`][ropt.workflow.executors.Executor]                              | Dispatches evaluation tasks to threads, processes, or an HPC cluster.                           |
+| [`ComputeStep`][ropt.components.compute_steps.ComputeStep]                    | An executable unit of work (run an optimizer, run a single ensemble evaluation, etc.).          |
+| [`EventHandler`][ropt.components.event_handlers.EventHandler]                 | A reactive object that observes events emitted by a compute step.                               |
+| [`Evaluator`][ropt.components.evaluators.Evaluator]                           | The object a compute step uses to actually evaluate the model.                                  |
+| [`Executor`][ropt.components.executors.Executor]                              | Dispatches evaluation tasks to threads, processes, or an HPC cluster.                           |
 
 The first three are covered below. Executors are only relevant for asynchronous
 and parallel execution and are discussed in [Parallel Evaluation](parallel.md).
@@ -61,13 +61,13 @@ import numpy as np
 from numpy.typing import NDArray
 
 from ropt.context import EnOptContext
-from ropt.workflow.compute_steps import OptimizationStep
-from ropt.workflow.evaluators import (
+from ropt.components.compute_steps import OptimizationStep
+from ropt.components.evaluators import (
     EvaluationFunctionContext,
     EvaluationFunctionResult,
     FunctionEvaluator,
 )
-from ropt.workflow.event_handlers import ResultsHandler
+from ropt.components.event_handlers import ResultsHandler
 
 # 1. Build the configuration.
 CONFIG = {
@@ -113,9 +113,9 @@ parameters can be found here:
 
 Two compute steps ship with `ropt`:
 
-- [`OptimizationStep`][ropt.workflow.compute_steps.OptimizationStep] — runs
+- [`OptimizationStep`][ropt.components.compute_steps.OptimizationStep] — runs
   an optimization algorithm.
-- [`EvaluationStep`][ropt.workflow.compute_steps.EvaluationStep] — runs
+- [`EvaluationStep`][ropt.components.compute_steps.EvaluationStep] — runs
   a single ensemble evaluation (no optimizer). For example, useful for evaluating an
   optimum on a different ensemble, or on a sub-set of realizations.
 
@@ -130,7 +130,7 @@ emitted via the `FINISHED_EVALUATION` event.
 
 ### Events emitted by OptimizationStep
 
-[`OptimizationStep`][ropt.workflow.compute_steps.OptimizationStep]
+[`OptimizationStep`][ropt.components.compute_steps.OptimizationStep]
 executes an optimization algorithm based on the provided context. It
 iteratively performs function and potentially gradient evaluations, yielding a
 sequence of [`FunctionResults`][ropt.results.FunctionResults] and
@@ -153,7 +153,7 @@ The following events are emitted during execution:
 
 ### Events emitted by EvaluationStep
 
-[`EvaluationStep`][ropt.workflow.compute_steps.EvaluationStep]
+[`EvaluationStep`][ropt.components.compute_steps.EvaluationStep]
 evaluates a batch of variable vectors. The `variables` argument can be a
 single 1-D vector (treated as one row) or a 2-D matrix where each row is a
 variable vector. The evaluator performs a function evaluation for the full
@@ -207,7 +207,7 @@ There are two ways to drive one, and they are mutually exclusive:
   `RuntimeError` is raised.
 
 - **Registered with an
-  [`EventDispatcher`][ropt.workflow.event_handlers.EventDispatcher].** When work
+  [`EventDispatcher`][ropt.components.event_handlers.EventDispatcher].** When work
   runs on several threads at once (for example, `ParallelEvaluator` with a
   multi-worker `ThreadingExecutor`), route events through a dispatcher. It
   receives events from any thread and delivers them to its handlers one at a
@@ -224,7 +224,7 @@ Mixing the two, or registering with a second dispatcher, raises a
     An exception raised by a handler is a fatal error that stops the run. A
     directly-attached handler raises on the optimizer's own stack, so it
     propagates normally. A handler behind an
-    [`EventDispatcher`][ropt.workflow.event_handlers.EventDispatcher] runs while
+    [`EventDispatcher`][ropt.components.event_handlers.EventDispatcher] runs while
     the emitting run **waits** for the event to be handled, so its exception is
     re-raised on that run's own stack too — synchronously, including for the
     run's last event. Either way a handler bug surfaces as a single, clean
@@ -259,7 +259,7 @@ Mixing the two, or registering with a second dispatcher, raises a
     a thread, so results can be read after a run from any thread. Read a
     handler's stored values only **after its producer has finished**: after
     `step.run()` returns for a directly-attached handler, or after the
-    [`EventDispatcher`][ropt.workflow.event_handlers.EventDispatcher] has been
+    [`EventDispatcher`][ropt.components.event_handlers.EventDispatcher] has been
     cancelled and its task group has exited for a handler registered with a
     dispatcher. Both are synchronization points that make the latest values
     visible.
@@ -267,18 +267,18 @@ Mixing the two, or registering with a second dispatcher, raises a
     Reading a handler's state *while it is still processing events on another
     thread* returns a valid object, but possibly a stale one — do not rely on it
     for the latest result. For live progress during a parallel run, use a
-    [`CallbackHandler`][ropt.workflow.event_handlers.CallbackHandler] (which is
+    [`CallbackHandler`][ropt.components.event_handlers.CallbackHandler] (which is
     pushed each event) rather than polling another handler's state.
 
 The framework ships four reusable handlers:
 
 | Handler                                                                  | Purpose                                                                |
 | ------------------------------------------------------------------------ | ---------------------------------------------------------------------- |
-| [`ResultsHandler`][ropt.workflow.event_handlers.ResultsHandler]          | Keep the best (or last) result. Backs `BasicOptimizer.results`.        |
-| [`HistoryHandler`][ropt.workflow.event_handlers.HistoryHandler]          | Keep every result.                                                     |
-| [`CallbackHandler`][ropt.workflow.event_handlers.CallbackHandler]        | Forward selected event types to a user callback.                       |
-| [`DataFrameHandler`][ropt.workflow.event_handlers.DataFrameHandler]              | Append rows to a structured table per result.                          |
-| [`EventForwardHandler`][ropt.workflow.event_handlers.EventForwardHandler]| Forward events to an [`EventDispatcher`][ropt.workflow.event_handlers.EventDispatcher] for lock-free dispatch. |
+| [`ResultsHandler`][ropt.components.event_handlers.ResultsHandler]          | Keep the best (or last) result. Backs `BasicOptimizer.results`.        |
+| [`HistoryHandler`][ropt.components.event_handlers.HistoryHandler]          | Keep every result.                                                     |
+| [`CallbackHandler`][ropt.components.event_handlers.CallbackHandler]        | Forward selected event types to a user callback.                       |
+| [`DataFrameHandler`][ropt.components.event_handlers.DataFrameHandler]              | Append rows to a structured table per result.                          |
+| [`EventForwardHandler`][ropt.components.event_handlers.EventForwardHandler]| Forward events to an [`EventDispatcher`][ropt.components.event_handlers.EventDispatcher] for lock-free dispatch. |
 
 Handlers expose their state through dictionary access (`handler[key]`). By
 convention, `ResultsHandler` and `HistoryHandler` both use the key `"results"` —
@@ -287,7 +287,7 @@ uses the table name as key — e.g. `table["functions"]`.
 
 ### ResultsHandler
 
-[`ResultsHandler`][ropt.workflow.event_handlers.ResultsHandler] listens for
+[`ResultsHandler`][ropt.components.event_handlers.ResultsHandler] listens for
 [`FINISHED_EVALUATION`][ropt.enums.EnOptEventType.FINISHED_EVALUATION] events
 emitted from within an optimization workflow. It processes the
 [`Results`][ropt.results.Results] objects contained within these events and
@@ -320,7 +320,7 @@ domain to the user domain before being stored.
 
 ### HistoryHandler
 
-[`HistoryHandler`][ropt.workflow.event_handlers.HistoryHandler] listens for
+[`HistoryHandler`][ropt.components.event_handlers.HistoryHandler] listens for
 [`FINISHED_EVALUATION`][ropt.enums.EnOptEventType.FINISHED_EVALUATION] events
 emitted by compute steps from within an optimization workflow. It collects all
 [`Results`][ropt.results.Results] objects contained within these events and
@@ -336,7 +336,7 @@ domain to the user domain before being stored.
 
 ### CallbackHandler
 
-[`CallbackHandler`][ropt.workflow.event_handlers.CallbackHandler] listens for
+[`CallbackHandler`][ropt.components.event_handlers.CallbackHandler] listens for
 events and forwards them to a callback function. It is constructed with a set of
 `event_types` to respond to and a single `callback`. When an event with a
 matching type arrives, the callback is called with the
@@ -344,9 +344,9 @@ matching type arrives, the callback is called with the
 
 ### EventForwardHandler
 
-[`EventForwardHandler`][ropt.workflow.event_handlers.EventForwardHandler] is
+[`EventForwardHandler`][ropt.components.event_handlers.EventForwardHandler] is
 attached to a compute step and forwards matching events to an
-[`EventDispatcher`][ropt.workflow.event_handlers.EventDispatcher]. The dispatcher
+[`EventDispatcher`][ropt.components.event_handlers.EventDispatcher]. The dispatcher
 dispatches them from the asyncio event loop's thread, so handlers registered on
 the dispatcher require no locking.
 
@@ -354,7 +354,7 @@ See [Event Dispatcher](parallel.md#event-dispatcher) for the full pattern.
 
 ### DataFrameHandler
 
-[`DataFrameHandler`][ropt.workflow.event_handlers.DataFrameHandler] tracks results and
+[`DataFrameHandler`][ropt.components.event_handlers.DataFrameHandler] tracks results and
 stores them in pandas DataFrames.
 
 #### Tables
@@ -481,17 +481,17 @@ tables to be updated.
 
 ## Evaluators
 
-Compute steps take an [`Evaluator`][ropt.workflow.evaluators.Evaluator]
+Compute steps take an [`Evaluator`][ropt.components.evaluators.Evaluator]
 instance — *not* the plain callable accepted by `BasicOptimizer`. Three
 synchronous evaluators are provided, plus an asynchronous one described in
 the [next section](parallel.md):
 
 | Evaluator                                                                      | Interface                                                                                                                     |
 | ------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------- |
-| [`BatchEvaluator`][ropt.workflow.evaluators.BatchEvaluator]                    | Batch: `f(variables_2d, context)` → `EvaluationBatchResult`.                                                                  |
-| [`FunctionEvaluator`][ropt.workflow.evaluators.FunctionEvaluator]              | Per-row: `f(variables_1d, context)` → `EvaluationFunctionResult`.                                                             |
-| [`CachedEvaluator`][ropt.workflow.evaluators.CachedEvaluator]                  | Wraps another evaluator, caching results by variable vector.                                                                  |
-| [`ParallelEvaluator`][ropt.workflow.evaluators.ParallelEvaluator]              | Parallel evaluation via an [`Executor`][ropt.workflow.executors.Executor] — see [Parallel Evaluation](parallel.md).           |
+| [`BatchEvaluator`][ropt.components.evaluators.BatchEvaluator]                    | Batch: `f(variables_2d, context)` → `EvaluationBatchResult`.                                                                  |
+| [`FunctionEvaluator`][ropt.components.evaluators.FunctionEvaluator]              | Per-row: `f(variables_1d, context)` → `EvaluationFunctionResult`.                                                             |
+| [`CachedEvaluator`][ropt.components.evaluators.CachedEvaluator]                  | Wraps another evaluator, caching results by variable vector.                                                                  |
+| [`ParallelEvaluator`][ropt.components.evaluators.ParallelEvaluator]              | Parallel evaluation via an [`Executor`][ropt.components.executors.Executor] — see [Parallel Evaluation](parallel.md).           |
 
 !!! warning "Evaluators are not safe for concurrent use"
 
@@ -505,7 +505,7 @@ the [next section](parallel.md):
     layer of a nested workflow may run, see
     [Nested workflows and process boundaries](parallel.md#nested-workflows-and-process-boundaries).
     Note that the parallelism of
-    [`ParallelEvaluator`][ropt.workflow.evaluators.ParallelEvaluator] happens
+    [`ParallelEvaluator`][ropt.components.evaluators.ParallelEvaluator] happens
     *below* `eval` — it dispatches tasks to an executor, so its own `eval` is
     still called on a single thread. An evaluator cannot be transferred to
     another process; serializing one reconstructs it as an inert placeholder in
@@ -514,7 +514,7 @@ the [next section](parallel.md):
 
 ### BatchEvaluator
 
-[`BatchEvaluator`][ropt.workflow.evaluators.BatchEvaluator] defers to a callable
+[`BatchEvaluator`][ropt.components.evaluators.BatchEvaluator] defers to a callable
 callback that receives the full 2-D variable matrix and an
 [`EvaluationBatchContext`][ropt.evaluation.EvaluationBatchContext], and returns
 an [`EvaluationBatchResult`][ropt.evaluation.EvaluationBatchResult]. Use this
@@ -524,18 +524,18 @@ the callable accepted by `BasicOptimizer`.
 
 ### FunctionEvaluator
 
-[`FunctionEvaluator`][ropt.workflow.evaluators.FunctionEvaluator] stores a
+[`FunctionEvaluator`][ropt.components.evaluators.FunctionEvaluator] stores a
 single function that returns a value for each objective and constraint. The
 function is called once per row of the evaluation batch with the variable
 vector and an
-[`EvaluationFunctionContext`][ropt.workflow.evaluators.EvaluationFunctionContext]
+[`EvaluationFunctionContext`][ropt.components.evaluators.EvaluationFunctionContext]
 dataclass exposing `realization`, `perturbation`, `batch_id`, `eval_idx`, and
 `name`. The `perturbation` value is `-1` when the evaluation is not a
 perturbation (i.e. the unperturbed function evaluation). The `name` value is the
 optional task name set by the evaluator (e.g. via `ParallelEvaluator`'s
 `get_name` callback) and is `None` when no name was assigned. The function must
 return an
-[`EvaluationFunctionResult`][ropt.workflow.evaluators.EvaluationFunctionResult]
+[`EvaluationFunctionResult`][ropt.components.evaluators.EvaluationFunctionResult]
 dataclass with:
 
 - `objectives`: a scalar or 1-D NumPy array of length *n_objectives*.
@@ -550,7 +550,7 @@ for a worked example.
 
 ### CachedEvaluator
 
-[`CachedEvaluator`][ropt.workflow.evaluators.CachedEvaluator] wraps another
+[`CachedEvaluator`][ropt.components.evaluators.CachedEvaluator] wraps another
 evaluator with result caching. It retrieves previously computed function results
 from `EventHandler` instances specified as `sources` — typically a
 `HistoryHandler` or `ResultsHandler`. For each variable vector and realization,
@@ -591,7 +591,7 @@ The evaluators above run each function call sequentially in the current thread.
 For parallel evaluation — whether via worker threads, separate processes, or an
 HPC cluster — a parallel evaluator is needed. See [Parallel
 Evaluation](parallel.md) for details on
-[`ParallelEvaluator`][ropt.workflow.evaluators.ParallelEvaluator] and the
+[`ParallelEvaluator`][ropt.components.evaluators.ParallelEvaluator] and the
 available executors.
 
 !!! tip "Reusing objectives and constraints"
@@ -606,7 +606,7 @@ available executors.
 
 - [Parallel Evaluation](parallel.md) — run evaluations off-process
   or on a cluster.
-- [Using the Workflow Framework](../tutorials/workflow.md) — step-by-step
+- [Building a Workflow](../tutorials/workflow.md) — step-by-step
   example building a workflow from scratch.
 - Full example:
   [examples/workflow.py](https://github.com/TNO-ropt/ropt/blob/main/examples/workflow.py).

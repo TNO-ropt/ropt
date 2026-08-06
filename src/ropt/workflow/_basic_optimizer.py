@@ -12,12 +12,11 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from ropt.components.compute_steps import OptimizationStep
+from ropt.components.evaluators import BatchEvaluator, Evaluator
+from ropt.components.event_handlers import CallbackHandler, ResultsHandler
 from ropt.context import EnOptContext
 from ropt.enums import EnOptEventType, ExitCode
-from ropt.workflow.evaluators import BatchEvaluator, Evaluator
-
-from .compute_steps import OptimizationStep
-from .event_handlers import CallbackHandler, ResultsHandler
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
@@ -32,7 +31,7 @@ if TYPE_CHECKING:
 class BasicOptimizer:
     r"""A simple interface for single optimization runs.
 
-    Wraps the workflow framework into a run-once interface with built-in
+    Wraps the workflow components into a run-once interface with built-in
     result tracking.
 
     See [Basic Optimization](../usage/basic.md) for a walkthrough and full

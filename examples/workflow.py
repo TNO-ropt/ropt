@@ -26,6 +26,9 @@ import numpy as np
 from numpy.random import default_rng
 from numpy.typing import NDArray
 
+from ropt.components.compute_steps import OptimizationStep
+from ropt.components.evaluators import BatchEvaluator
+from ropt.components.event_handlers import CallbackHandler, ResultsHandler
 from ropt.context import EnOptContext
 from ropt.enums import EnOptEventType
 from ropt.evaluation import (
@@ -34,9 +37,6 @@ from ropt.evaluation import (
 )
 from ropt.events import EnOptEvent
 from ropt.results import FunctionResults
-from ropt.workflow.compute_steps import OptimizationStep
-from ropt.workflow.evaluators import BatchEvaluator
-from ropt.workflow.event_handlers import CallbackHandler, ResultsHandler
 
 DIM = 5
 CONFIG: dict[str, Any] = {

@@ -166,12 +166,12 @@ setting up and running the optimizer are:
 
 ## BasicOptimizer reference
 
-[`BasicOptimizer`][ropt.workflow.BasicOptimizer] wraps the workflow framework
+[`BasicOptimizer`][ropt.workflow.BasicOptimizer] wraps the workflow components
 into a simple, single-run interface. The table below summarizes its API:
 
 | Member                    | Description
 | ------------------------- | ---------------------------------------------------------------------------------------------------
-| `__init__(config, evaluator, *, constraint_tolerance=1e-10)` | Create the optimizer from a config dict and a [`EvaluationBatchCallback`][ropt.evaluation.EvaluationBatchCallback] callable or an [`Evaluator`][ropt.workflow.evaluators.Evaluator] object.
+| `__init__(config, evaluator, *, constraint_tolerance=1e-10)` | Create the optimizer from a config dict and a [`EvaluationBatchCallback`][ropt.evaluation.EvaluationBatchCallback] callable or an [`Evaluator`][ropt.components.evaluators.Evaluator] object.
 | `run(initial_values)`     | Execute the optimization starting from `initial_values`. Returns an [`ExitCode`][ropt.enums.ExitCode].
 | `results`                 | Property returning the best [`FunctionResults`][ropt.results.FunctionResults] found, or `None`.
 | `set_results_callback(cb)`| Register a callback `cb(results: tuple[FunctionResults, ...]) -> None` invoked after each evaluation batch.
@@ -196,16 +196,16 @@ Internally, `BasicOptimizer` creates an optimization workflow that does the foll
 
 1. Validates `config` into an [`EnOptContext`][ropt.context.EnOptContext].
 2. Instantiates a
-   [`BatchEvaluator`][ropt.workflow.evaluators.BatchEvaluator] object that
+   [`BatchEvaluator`][ropt.components.evaluators.BatchEvaluator] object that
    calls your callable when needed.
-3. Creates an [`OptimizationStep`][ropt.workflow.compute_steps.OptimizationStep]
+3. Creates an [`OptimizationStep`][ropt.components.compute_steps.OptimizationStep]
    compute step.
-4. Attaches a [`ResultsHandler`][ropt.workflow.event_handlers.ResultsHandler] to
+4. Attaches a [`ResultsHandler`][ropt.components.event_handlers.ResultsHandler] to
    remember the best result.
 5. Runs the step and exposes the best result via the `results` property.
 
 If you need more control (multiple runs, custom handlers, async evaluation),
-use the workflow framework directly — see
+use the workflow components directly — see
 [Optimization Workflows](workflows.md).
 
 ### Customization
@@ -239,7 +239,7 @@ The JSON file lists handlers under `basic_optimizer.event_handlers` as
 
 `mylogger` must be importable from the active Python environment. The
 referenced class must subclass
-[`EventHandler`][ropt.workflow.event_handlers.EventHandler] and accept no
+[`EventHandler`][ropt.components.event_handlers.EventHandler] and accept no
 required constructor arguments.
 
 ## Where to next

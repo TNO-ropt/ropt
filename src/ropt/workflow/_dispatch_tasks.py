@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import Any, Literal
 
 from ropt._logging import get_logger
-from ropt.workflow.executors import (
+from ropt.components.executors import (
     Executor,
     HPCExecutor,
     MultiprocessingExecutor,

@@ -35,19 +35,19 @@ import numpy as np
 from numpy.random import default_rng
 from numpy.typing import NDArray
 
-from ropt.results import FunctionResults
-from ropt.workflow import BasicOptimizer
-from ropt.workflow.evaluators import (
+from ropt.components.evaluators import (
     EvaluationFunctionCallback,
     EvaluationFunctionContext,
     EvaluationFunctionResult,
     ParallelEvaluator,
 )
-from ropt.workflow.executors import (
+from ropt.components.executors import (
     Executor,
     MultiprocessingExecutor,
     ThreadingExecutor,
 )
+from ropt.results import FunctionResults
+from ropt.workflow import BasicOptimizer
 
 DIM = 5
 UNCERTAINTY = 0.1

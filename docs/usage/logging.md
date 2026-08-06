@@ -13,8 +13,8 @@ public package path:
 
 ```
 ropt
-├── ropt.workflow
-│   └── ropt.workflow.compute_steps    ← OptimizationStep, EvaluationStep
+├── ropt.components
+│   └── ropt.components.compute_steps    ← OptimizationStep, EvaluationStep
 ├── ropt.core                          ← EnsembleOptimizer, EnsembleEvaluator
 └── ropt.plugins
     └── ropt.plugins.manager           ← PluginManager
@@ -71,21 +71,21 @@ This outputs `INFO` and above from all loggers, including `ropt`. Example
 output during a short optimization run:
 
 ```
-ropt.workflow.compute_steps - INFO - Starting optimization
+ropt.components.compute_steps - INFO - Starting optimization
 ropt.core - INFO - Function evaluation: 10/10 realizations succeeded
 ropt.core - INFO - Gradient evaluation: 10/10 realizations succeeded
 ropt.core - INFO - Function evaluation: 10/10 realizations succeeded
 ropt.core - INFO - Gradient evaluation: 9/10 realizations succeeded
 ...
 ropt.core - INFO - Stopping: Maximum number of function evaluations reached (200)
-ropt.workflow.compute_steps - INFO - Optimization finished: Maximum number of function evaluations reached (200)
+ropt.components.compute_steps - INFO - Optimization finished: Maximum number of function evaluations reached (200)
 ```
 
 ### High-level only — workflow messages without core detail
 
 Because `ropt.core` covers both stopping conditions and per-batch statistics,
 you cannot suppress one without the other by logger name alone. To see only
-workflow start/stop messages, enable `INFO` on `ropt.workflow.compute_steps`
+workflow start/stop messages, enable `INFO` on `ropt.components.compute_steps`
 and leave `ropt.core` at `WARNING`:
 
 ```python
@@ -93,7 +93,7 @@ import logging
 
 logging.basicConfig(level=logging.WARNING)  # silence everything by default
 
-logging.getLogger("ropt.workflow.compute_steps").setLevel(logging.INFO)
+logging.getLogger("ropt.components.compute_steps").setLevel(logging.INFO)
 # ropt.core stays at WARNING → no batch statistics and no stopping conditions
 ```
 

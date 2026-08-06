@@ -17,17 +17,17 @@ import numpy as np
 from numpy.random import default_rng
 from numpy.typing import NDArray
 
-from ropt.context import EnOptContext
-from ropt.enums import EnOptEventType, VariableType
-from ropt.events import EnOptEvent
-from ropt.results import FunctionResults
-from ropt.workflow.compute_steps import OptimizationStep
-from ropt.workflow.evaluators import (
+from ropt.components.compute_steps import OptimizationStep
+from ropt.components.evaluators import (
     EvaluationFunctionContext,
     EvaluationFunctionResult,
     FunctionEvaluator,
 )
-from ropt.workflow.event_handlers import CallbackHandler, ResultsHandler
+from ropt.components.event_handlers import CallbackHandler, ResultsHandler
+from ropt.context import EnOptContext
+from ropt.enums import EnOptEventType, VariableType
+from ropt.events import EnOptEvent
+from ropt.results import FunctionResults
 
 DIM = 4
 REALIZATIONS = 10

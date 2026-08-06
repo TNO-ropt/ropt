@@ -1,7 +1,7 @@
-# Using the Workflow Framework
+# Building a Workflow from Components
 
 This tutorial demonstrates optimization of the multi-dimensional Rosenbrock
-function using the workflow framework directly. This approach offers more
+function using ropt's workflow components directly. This approach offers more
 control and flexibility compared to
 [`BasicOptimizer`][ropt.workflow.BasicOptimizer].
 
@@ -10,9 +10,9 @@ control and flexibility compared to
     [examples/workflow.py](https://github.com/TNO-ropt/ropt/blob/main/examples/workflow.py).
 
 
-## When to Use the Workflow Framework
+## When to Build a Workflow Yourself
 
-Use the workflow framework when you need:
+Assemble the workflow components yourself when you need:
 
 - Custom event handling beyond simple callbacks
 - Chained or nested optimizations
@@ -42,9 +42,9 @@ from ropt.evaluation import (
 )
 from ropt.events import EnOptEvent
 from ropt.results import FunctionResults
-from ropt.workflow.compute_steps import OptimizationStep
-from ropt.workflow.evaluators import BatchEvaluator
-from ropt.workflow.event_handlers import CallbackHandler, ResultsHandler
+from ropt.components.compute_steps import OptimizationStep
+from ropt.components.evaluators import BatchEvaluator
+from ropt.components.event_handlers import CallbackHandler, ResultsHandler
 
 DIM = 5
 CONFIG: dict[str, Any] = {
@@ -57,15 +57,15 @@ INITIAL_VALUES = 2 * np.arange(DIM) / DIM + 0.5
 UNCERTAINTY = 0.1
 ```
 
-Note the additional imports for the workflow framework:
+Note the additional imports for the workflow components:
 
 - [`EnOptContext`][ropt.context.EnOptContext] — The optimization context
 - [`EnOptEventType`][ropt.enums.EnOptEventType] — Event type enumeration
 - [`EnOptEvent`][ropt.events.EnOptEvent] — Event objects
-- [`OptimizationStep`][ropt.workflow.compute_steps.OptimizationStep] — The compute step
-- [`BatchEvaluator`][ropt.workflow.evaluators.BatchEvaluator] — Wraps a batch callback
-- [`CallbackHandler`][ropt.workflow.event_handlers.CallbackHandler],
-  [`ResultsHandler`][ropt.workflow.event_handlers.ResultsHandler] — Event handlers
+- [`OptimizationStep`][ropt.components.compute_steps.OptimizationStep] — The compute step
+- [`BatchEvaluator`][ropt.components.evaluators.BatchEvaluator] — Wraps a batch callback
+- [`CallbackHandler`][ropt.components.event_handlers.CallbackHandler],
+  [`ResultsHandler`][ropt.components.event_handlers.ResultsHandler] — Event handlers
 
 
 ## The Batch Evaluation Callback
@@ -90,7 +90,7 @@ def rosenbrock(
 
 ## Event-Based Progress Reporting
 
-With the workflow framework, the report callback receives
+With the workflow components, the report callback receives
 [`EnOptEvent`][ropt.events.EnOptEvent] objects instead of raw results:
 
 ```python
@@ -167,18 +167,18 @@ def main(*, merge: bool = False) -> None:
 The workflow approach involves these steps:
 
 1. **Create a batch evaluator**: Wrap the callback in a
-   [`BatchEvaluator`][ropt.workflow.evaluators.BatchEvaluator]
+   [`BatchEvaluator`][ropt.components.evaluators.BatchEvaluator]
 
 2. **Create an optimization step**: The
-   [`OptimizationStep`][ropt.workflow.compute_steps.OptimizationStep] runs
+   [`OptimizationStep`][ropt.components.compute_steps.OptimizationStep] runs
    the optimization algorithm
 
 3. **Add a result handler**: The
-   [`ResultsHandler`][ropt.workflow.event_handlers.ResultsHandler] stores the
+   [`ResultsHandler`][ropt.components.event_handlers.ResultsHandler] stores the
    best result found
 
 4. **Add a callback handler**: The
-   [`CallbackHandler`][ropt.workflow.event_handlers.CallbackHandler] calls
+   [`CallbackHandler`][ropt.components.event_handlers.CallbackHandler] calls
    our report function for `FINISHED_EVALUATION` events
 
 5. **Create the context**: Parse the config into an
@@ -216,7 +216,7 @@ python workflow.py --merge
 
 ## Comparison with BasicOptimizer
 
-| Aspect | BasicOptimizer | Workflow Framework |
+| Aspect | BasicOptimizer | Workflow Components |
 |--------|----------------|-------------------|
 | Setup | Minimal | More explicit |
 | Event handling | Callback only | Full event system |
@@ -232,5 +232,5 @@ python workflow.py --merge
 - [Using FunctionEvaluator](function_evaluator.md) — Use per-evaluation
   callbacks
 - [Optimization Workflows](../usage/workflows.md) — Full reference on the
-  workflow framework, event handlers, and evaluators
+  workflow components, event handlers, and evaluators
 - [Working with Results](../usage/results.md) — Understanding result objects

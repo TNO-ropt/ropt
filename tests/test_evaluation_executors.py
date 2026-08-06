@@ -9,26 +9,26 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 import pytest
 
-from ropt.context import EnOptContext
-from ropt.enums import ExitCode
-from ropt.evaluation import EvaluationBatchContext
-from ropt.exceptions import Abort, ExecutorFailure, TransferError
-from ropt.workflow._basic_optimizer import BasicOptimizer
-from ropt.workflow.evaluators import (
+from ropt.components.evaluators import (
     EvaluationFunctionCallback,
     EvaluationFunctionContext,
     EvaluationFunctionResult,
     ParallelEvaluator,
 )
-from ropt.workflow.evaluators._parallel_evaluator import _abort, _handle_result
-from ropt.workflow.event_handlers import ResultsHandler
-from ropt.workflow.executors import (
+from ropt.components.evaluators._parallel_evaluator import _abort, _handle_result
+from ropt.components.event_handlers import ResultsHandler
+from ropt.components.executors import (
     HPCExecutor,
     MultiprocessingExecutor,
     ResultsQueue,
     Task,
     ThreadingExecutor,
 )
+from ropt.context import EnOptContext
+from ropt.enums import ExitCode
+from ropt.evaluation import EvaluationBatchContext
+from ropt.exceptions import Abort, ExecutorFailure, TransferError
+from ropt.workflow._basic_optimizer import BasicOptimizer
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
@@ -36,15 +36,15 @@ if TYPE_CHECKING:
 
     from numpy.typing import NDArray
 
+    from ropt.components.executors import Executor
     from ropt.results import FunctionResults
-    from ropt.workflow.executors import Executor
 
 try:
     import cloudpickle  # ruff: ignore[unused-import]
     import pandas as pd
     import pysqa  # ruff: ignore[unused-import]
 
-    from ropt.workflow.executors.__main__ import run_task
+    from ropt.components.executors.__main__ import run_task
 
     _TEST_HPC = True
 except ImportError:
@@ -113,7 +113,7 @@ async def test_executor_ok(
     match executor_name:
         case "hpc":
             monkeypatch.setattr(
-                "ropt.workflow.executors._hpc_executor.pysqa.QueueAdapter",
+                "ropt.components.executors._hpc_executor.pysqa.QueueAdapter",
                 lambda *args, **kwargs: MockedHPCAdapter(tmp_path),  # ruff: ignore[unused-lambda-argument]
             )
             executor: Executor = HPCExecutor(
@@ -204,7 +204,7 @@ async def test_executor_error(
     match executor_name:
         case "hpc":
             monkeypatch.setattr(
-                "ropt.workflow.executors._hpc_executor.pysqa.QueueAdapter",
+                "ropt.components.executors._hpc_executor.pysqa.QueueAdapter",
                 lambda *args, **kwargs: MockedHPCAdapter(tmp_path),  # ruff: ignore[unused-lambda-argument]
             )
             executor: Executor = HPCExecutor(
@@ -341,7 +341,7 @@ async def test_executor_evaluator_ok(
     match executor_name:
         case "hpc":
             monkeypatch.setattr(
-                "ropt.workflow.executors._hpc_executor.pysqa.QueueAdapter",
+                "ropt.components.executors._hpc_executor.pysqa.QueueAdapter",
                 lambda *args, **kwargs: MockedHPCAdapter(tmp_path),  # ruff: ignore[unused-lambda-argument]
             )
             executor: Executor = HPCExecutor(
@@ -395,7 +395,7 @@ async def test_executor_evaluator_error(
     match executor_name:
         case "hpc":
             monkeypatch.setattr(
-                "ropt.workflow.executors._hpc_executor.pysqa.QueueAdapter",
+                "ropt.components.executors._hpc_executor.pysqa.QueueAdapter",
                 lambda *args, **kwargs: MockedHPCAdapter(tmp_path),  # ruff: ignore[unused-lambda-argument]
             )
             executor: Executor = HPCExecutor(
@@ -508,7 +508,7 @@ async def test_executor_evaluator_two_optimizations(
     match executor_name:
         case "hpc":
             monkeypatch.setattr(
-                "ropt.workflow.executors._hpc_executor.pysqa.QueueAdapter",
+                "ropt.components.executors._hpc_executor.pysqa.QueueAdapter",
                 lambda *args, **kwargs: MockedHPCAdapter(tmp_path),  # ruff: ignore[unused-lambda-argument]
             )
             executor: Executor = HPCExecutor(
@@ -803,7 +803,7 @@ async def test_multiprocessing_without_cloudpickle_rejects_lambda(
     monkeypatch: Any,
 ) -> None:
     monkeypatch.setattr(
-        "ropt.workflow.executors._multiprocessing_executor._HAVE_CLOUDPICKLE",
+        "ropt.components.executors._multiprocessing_executor._HAVE_CLOUDPICKLE",
         False,
     )
     result_queue: ResultsQueue = ResultsQueue()

@@ -115,7 +115,7 @@ nav:
       - "Deterministic Optimization": tutorials/deterministic.md
       - "Ensemble-based Optimization": tutorials/ensemble.md
       - "Using FunctionEvaluator": tutorials/function_evaluator.md
-      - "Using the Workflow Framework": tutorials/workflow.md
+      - "Building a Workflow": tutorials/workflow.md
       - "Constrained Optimization": tutorials/constrained.md
   - "Reference":
       - "Configuration":
@@ -128,18 +128,18 @@ nav:
       - "Optimization Engine":
         - "Core Classes": reference/core.md
         - "Evaluation Classes": reference/evaluation.md
-      - "Optimization Components":
+      - "Optimizer Components":
         - "Function Estimators": reference/function_estimator.md
         - "Realization Filters": reference/realization_filter.md
         - "Optimizer Backends": reference/backend.md
         - "Samplers": reference/sampler.md
         - "Transforms": reference/transforms.md
-      - "Workflow System":
-        - "Compute Steps": reference/workflow_compute_steps.md
-        - "Event Handlers": reference/workflow_event_handlers.md
-        - "Evaluators": reference/workflow_evaluators.md
-        - "Executors": reference/workflow_executors.md
-        - "Workflow Utilities": reference/workflow_utils.md
+      - "Workflow Components":
+        - "Compute Steps": reference/components_compute_steps.md
+        - "Event Handlers": reference/components_event_handlers.md
+        - "Evaluators": reference/components_evaluators.md
+        - "Executors": reference/components_executors.md
+        - "Utilities": reference/components_utils.md
       - "Plugin System":
         - "Plugin Bases": reference/plugin_bases.md
         - "Plugin Manager": reference/plugin_manager.md

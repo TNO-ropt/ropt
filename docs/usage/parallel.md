@@ -15,10 +15,10 @@ steps run concurrently**. With `asyncio`, several optimizations can share the
 same pool of workers, the event loop dispatches evaluation tasks as they
 arrive, and results flow back without blocking other work.
 
-The [`ParallelEvaluator`][ropt.workflow.evaluators.ParallelEvaluator] is the
+The [`ParallelEvaluator`][ropt.components.evaluators.ParallelEvaluator] is the
 evaluator that bridges the synchronous compute-step `run()` call and the
 asynchronous world. It submits individual evaluation tasks (one per row in the
-variable batch) to an [`Executor`][ropt.workflow.executors.Executor] via an
+variable batch) to an [`Executor`][ropt.components.executors.Executor] via an
 `asyncio.Queue`. The executor picks tasks from the queue, runs them on its
 workers, and places results into a results queue that the evaluator collects.
 
@@ -28,10 +28,10 @@ the executor's workers and other concurrent steps.
 
 ## ParallelEvaluator
 
-[`ParallelEvaluator`][ropt.workflow.evaluators.ParallelEvaluator] wraps a
+[`ParallelEvaluator`][ropt.components.evaluators.ParallelEvaluator] wraps a
 per-realization function — the same kind of callable used by
-[`FunctionEvaluator`][ropt.workflow.evaluators.FunctionEvaluator] — and submits
-the rows of the evaluation batch as [`Task`][ropt.workflow.executors.Task]
+[`FunctionEvaluator`][ropt.components.evaluators.FunctionEvaluator] — and submits
+the rows of the evaluation batch as [`Task`][ropt.components.executors.Task]
 objects to the executor's task queue. It then waits for results to arrive on a
 results queue.
 
@@ -40,7 +40,7 @@ Constructor parameters:
 | Parameter     | Description                                                          |
 | ------------- | -------------------------------------------------------------------- |
 | `function`    | Per-realization callable (same interface as `FunctionEvaluator`).    |
-| `executor`    | The [`Executor`][ropt.workflow.executors.Executor] to dispatch tasks to. |
+| `executor`    | The [`Executor`][ropt.components.executors.Executor] to dispatch tasks to. |
 | `bundle_size` | Number of active evaluations to group into a single task (default: `1`). Use an integer `> 1` for a fixed maximum bundle size, or `0` to bundle all active evaluations of a batch into one task. |
 | `queue_size`  | Maximum size of the results queue (0 = unlimited).                   |
 | `get_name`    | Optional callable to generate a name for each task.                  |
@@ -53,7 +53,7 @@ individual evaluation, or when the total number of active evaluations in a batch
 is much larger than the number of available workers.
 
 The `get_name` callable, if provided, is called with the sequence of
-[`EvaluationFunctionContext`][ropt.workflow.evaluators.EvaluationFunctionContext]
+[`EvaluationFunctionContext`][ropt.components.evaluators.EvaluationFunctionContext]
 objects for every evaluation packed into the task (a single-element sequence
 when `bundle_size=1`) and should return a single task name. When using the
 `HPCExecutor`, names also serve as task identifiers and must be unique within a
@@ -66,8 +66,8 @@ If the executor is not running when `eval()` is called, the evaluator raises an
 
 ## Executors
 
-An [`Executor`][ropt.workflow.executors.Executor] manages an `asyncio.Queue` of
-[`Task`][ropt.workflow.executors.Task] objects and dispatches them to a pool of
+An [`Executor`][ropt.components.executors.Executor] manages an `asyncio.Queue` of
+[`Task`][ropt.components.executors.Task] objects and dispatches them to a pool of
 workers. All executors share the same lifecycle:
 
 1. Create the executor instance.
@@ -79,7 +79,7 @@ Three implementations are provided:
 
 ### ThreadingExecutor
 
-[`ThreadingExecutor`][ropt.workflow.executors.ThreadingExecutor] dispatches
+[`ThreadingExecutor`][ropt.components.executors.ThreadingExecutor] dispatches
 tasks to worker threads via `asyncio.to_thread`. Use this for I/O-bound
 evaluations or when the evaluation function releases the GIL (e.g. calls into
 C/Fortran).
@@ -91,7 +91,7 @@ C/Fortran).
 
 ### MultiprocessingExecutor
 
-[`MultiprocessingExecutor`][ropt.workflow.executors.MultiprocessingExecutor]
+[`MultiprocessingExecutor`][ropt.components.executors.MultiprocessingExecutor]
 uses a `ProcessPoolExecutor` with a `"spawn"` context. Use this for CPU-bound
 evaluations where true parallelism is needed.
 
@@ -159,7 +159,7 @@ A few less common issues cause the same startup error:
 
 ### HPCExecutor
 
-[`HPCExecutor`][ropt.workflow.executors.HPCExecutor] submits tasks as jobs to an
+[`HPCExecutor`][ropt.components.executors.HPCExecutor] submits tasks as jobs to an
 HPC scheduler (e.g. Slurm) via the `pysqa` library. Each task is serialized to
 disk, submitted to the queue, polled for completion, and its result is
 deserialized back. Requires `ropt[hpc]` to be installed.
@@ -215,7 +215,7 @@ the `cluster` and `queue` arguments:
 
 ## Error handling
 
-Executors and the [`ParallelEvaluator`][ropt.workflow.evaluators.ParallelEvaluator]
+Executors and the [`ParallelEvaluator`][ropt.components.evaluators.ParallelEvaluator]
 distinguish two classes of failure, and treat them very differently.
 
 ### Infrastructure failure (tolerated)
@@ -224,7 +224,7 @@ An *infrastructure* failure is one that is not caused by the evaluation function
 itself: a worker process is killed (`BrokenProcessPool`), or an HPC job's output
 file never appears or cannot be deserialized. These are delivered as an ordinary
 result whose value is an [`ExecutorFailure`][ropt.exceptions.ExecutorFailure]
-(via [`put_result`][ropt.workflow.executors.Task.put_result]). The evaluator
+(via [`put_result`][ropt.components.executors.Task.put_result]). The evaluator
 records the affected rows as failed realizations by writing `numpy.nan`. Such a
 failure is *tolerated*: the optimization continues, and only aborts (with
 `TOO_FEW_REALIZATIONS`) if too many realizations fail to satisfy the configured
@@ -237,15 +237,15 @@ in the objective, a bad configuration, an unexpected input. This must not be
 silently turned into a failed realization; it signals a genuine error the user
 needs to see and fix. When the task function raises, the worker delivers the
 exception on the results queue (via
-[`put_error`][ropt.workflow.executors.Task.put_error], which also closes the
+[`put_error`][ropt.components.executors.Task.put_error], which also closes the
 queue) and returns to serving further tasks. It does **not** tear the executor
 down.
 
 The owning
-[`ParallelEvaluator.eval`][ropt.workflow.evaluators.ParallelEvaluator.eval]
+[`ParallelEvaluator.eval`][ropt.components.evaluators.ParallelEvaluator.eval]
 call receives the exception and **re-raises the original unchanged**, aborting
 the current evaluation. This is deliberately identical to the sequential
-[`FunctionEvaluator`][ropt.workflow.evaluators.FunctionEvaluator]: whichever
+[`FunctionEvaluator`][ropt.components.evaluators.FunctionEvaluator]: whichever
 evaluator is used, a bug in the objective surfaces as the same exception,
 propagating out of `eval()` (and out of the compute step) on the calling thread.
 
@@ -264,7 +264,7 @@ Only a `BaseException` (for example a cancellation) still propagates out of the
 worker directly, tearing the executor down — that is the intended teardown
 signal and is left untouched.
 
-For the [`HPCExecutor`][ropt.workflow.executors.HPCExecutor] the exception
+For the [`HPCExecutor`][ropt.components.executors.HPCExecutor] the exception
 crosses a process boundary. It is serialized with `cloudpickle`, which can
 handle exception objects that the standard `pickle` module cannot, but does not
 serialize tracebacks. The worker therefore attaches the formatted traceback as a
@@ -280,11 +280,11 @@ affect performance, it determines what a dispatched compute step can still
 
 - A **thread** shares memory with the process that started it. A step's control
   channels — the event handlers it invokes and the live asyncio loop, executors,
-  and [`EventDispatcher`][ropt.workflow.event_handlers.EventDispatcher] it relies
+  and [`EventDispatcher`][ropt.components.event_handlers.EventDispatcher] it relies
   on — all keep working across threads within one process.
 - A **process** — a
-  [`MultiprocessingExecutor`][ropt.workflow.executors.MultiprocessingExecutor]
-  worker or an [`HPCExecutor`][ropt.workflow.executors.HPCExecutor] job — shares
+  [`MultiprocessingExecutor`][ropt.components.executors.MultiprocessingExecutor]
+  worker or an [`HPCExecutor`][ropt.components.executors.HPCExecutor] job — shares
   none of that. It is **input/output only**: a task is serialized in and a
   result is serialized out, and nothing in between can reach back into the host
   process. This is deliberate, and it is enough for the common case — running an
@@ -299,7 +299,7 @@ Two places where this matters in practice:
 
 - **Nested optimization.** A step that runs an inner workflow must run
   in-process — sequentially or on a
-  [`ThreadingExecutor`][ropt.workflow.executors.ThreadingExecutor] — while only
+  [`ThreadingExecutor`][ropt.components.executors.ThreadingExecutor] — while only
   the innermost leaf evaluations may go to a process or HPC worker. See
   [Nested workflows and process boundaries](#nested-workflows-and-process-boundaries).
 - **Dispatching functions to workers.** A function sent to a process or HPC
@@ -311,7 +311,7 @@ Two places where this matters in practice:
 `ropt` enforces this at the process boundary. The workflow objects that hold
 in-process state or a process-local communication channel — compute steps,
 evaluators, event handlers, and the
-[`EventDispatcher`][ropt.workflow.event_handlers.EventDispatcher] — may still be
+[`EventDispatcher`][ropt.components.event_handlers.EventDispatcher] — may still be
 serialized, but they do not survive the trip: on the worker side they are
 reconstructed as inert placeholders that discard their original state. Before a
 process or HPC worker runs a dispatched task, `ropt` checks whether such a
@@ -388,7 +388,7 @@ When multiple compute steps run concurrently in worker threads, their event
 handlers are called from multiple threads simultaneously. **Event handlers must
 not be shared across concurrent compute steps**: doing so raises a `RuntimeError`.
 
-[`EventDispatcher`][ropt.workflow.event_handlers.EventDispatcher] is the
+[`EventDispatcher`][ropt.components.event_handlers.EventDispatcher] is the
 required solution: it receives events on a queue and dispatches them to its own
 handlers from the asyncio event loop's thread. Because all handler calls happen
 on a single thread, handlers registered on the dispatcher are safe even when
@@ -425,7 +425,7 @@ async with asyncio.TaskGroup() as tg:
     executor.cancel()
 ```
 
-[`EventForwardHandler`][ropt.workflow.event_handlers.EventForwardHandler] is a
+[`EventForwardHandler`][ropt.components.event_handlers.EventForwardHandler] is a
 regular event handler that can be attached to a compute step. When the step
 emits an event it submits the event to the dispatcher and **blocks on the
 emitting run's own thread until every handler has processed it**, preserving the
@@ -434,8 +434,8 @@ is re-raised there, on the run's stack (see [Handler failures](#handler-failures
 
 !!! warning "Event handling is a single-process mechanism"
 
-    An [`EventDispatcher`][ropt.workflow.event_handlers.EventDispatcher] and
-    every [`EventHandler`][ropt.workflow.event_handlers.EventHandler] live in
+    An [`EventDispatcher`][ropt.components.event_handlers.EventDispatcher] and
+    every [`EventHandler`][ropt.components.event_handlers.EventHandler] live in
     the process that created them. `EventForwardHandler` delivers events by
     calling the dispatcher's `dispatch_event`, which schedules them onto its
     event loop with `call_soon_threadsafe` — a *thread*-safe call, not a
@@ -445,8 +445,8 @@ is re-raised there, on the run's stack (see [Handler failures](#handler-failures
     Event handlers can therefore only observe events emitted **within their own
     process**. Any compute step executed out-of-process — for example a whole
     optimization sent to a
-    [`MultiprocessingExecutor`][ropt.workflow.executors.MultiprocessingExecutor]
-    or [`HPCExecutor`][ropt.workflow.executors.HPCExecutor], whether via
+    [`MultiprocessingExecutor`][ropt.components.executors.MultiprocessingExecutor]
+    or [`HPCExecutor`][ropt.components.executors.HPCExecutor], whether via
     [`dispatch_tasks`](#dispatching-arbitrary-tasks) or as the enclosing layer
     of a nested workflow — may attach handlers local to that worker process,
     but those handlers cannot deliver events to a dispatcher or handler in the
@@ -462,7 +462,7 @@ is re-raised there, on the run's stack (see [Handler failures](#handler-failures
 ### Handler failures
 
 Forwarding an event through an
-[`EventForwardHandler`][ropt.workflow.event_handlers.EventForwardHandler] is
+[`EventForwardHandler`][ropt.components.event_handlers.EventForwardHandler] is
 **synchronous**: the emitting run blocks until the dispatcher has run every
 handler for that event. A handler failure is therefore delivered like an
 evaluation error — on the emitting run's own call stack — mirroring the
@@ -504,8 +504,8 @@ A *nested* workflow is a compute step whose evaluation function itself runs
 another compute step — for example an outer optimizer whose objective is the
 outcome of an inner optimization. As noted in [Why asyncio?](#why-asyncio),
 several concurrent steps can share one asyncio event loop, and usually shared
-[`Executor`][ropt.workflow.executors.Executor]s and an
-[`EventDispatcher`][ropt.workflow.event_handlers.EventDispatcher] as well. All
+[`Executor`][ropt.components.executors.Executor]s and an
+[`EventDispatcher`][ropt.components.event_handlers.EventDispatcher] as well. All
 of these live **in a single process**.
 
 This is a consequence of the general rule that
@@ -516,17 +516,17 @@ hard constraint on where each layer of a nested workflow may run:
 
     The step that *runs* an inner workflow must execute in the same process as
     the shared event loop — dispatch it via a
-    [`ThreadingExecutor`][ropt.workflow.executors.ThreadingExecutor], or run it
+    [`ThreadingExecutor`][ropt.components.executors.ThreadingExecutor], or run it
     synchronously. It cannot run inside a
-    [`MultiprocessingExecutor`][ropt.workflow.executors.MultiprocessingExecutor]
-    or [`HPCExecutor`][ropt.workflow.executors.HPCExecutor] worker, because a
+    [`MultiprocessingExecutor`][ropt.components.executors.MultiprocessingExecutor]
+    or [`HPCExecutor`][ropt.components.executors.HPCExecutor] worker, because a
     subprocess or HPC job has no access to the live loop, executors, or
     dispatcher. An inner
-    [`ParallelEvaluator`][ropt.workflow.evaluators.ParallelEvaluator] running
+    [`ParallelEvaluator`][ropt.components.evaluators.ParallelEvaluator] running
     there would find `executor.loop is None` and raise `Abort`, and any events
     it emits would never reach the main-process dispatcher.
 
-[`OptimizationStep`][ropt.workflow.compute_steps.OptimizationStep] enforces this
+[`OptimizationStep`][ropt.components.compute_steps.OptimizationStep] enforces this
 rule. **A step is bound to its process, not
 to a thread.** The event handlers it invokes live in shared memory, so they keep
 working across threads within one process but cannot cross a process boundary.
@@ -536,12 +536,12 @@ where it was created." Concretely:
 - **Across threads (allowed).** A step may be created on one thread and run on
   another within the same process — for example created on the main thread and
   driven with `asyncio.to_thread` or a
-  [`ThreadingExecutor`][ropt.workflow.executors.ThreadingExecutor] while a
-  main-thread [`EventDispatcher`][ropt.workflow.event_handlers.EventDispatcher]
+  [`ThreadingExecutor`][ropt.components.executors.ThreadingExecutor] while a
+  main-thread [`EventDispatcher`][ropt.components.event_handlers.EventDispatcher]
   collects its events. Event handling keeps working because memory is shared.
 - **Across processes (forbidden).** A step must not be *transferred* into a
-  [`MultiprocessingExecutor`][ropt.workflow.executors.MultiprocessingExecutor]
-  or [`HPCExecutor`][ropt.workflow.executors.HPCExecutor] worker. Serializing one
+  [`MultiprocessingExecutor`][ropt.components.executors.MultiprocessingExecutor]
+  or [`HPCExecutor`][ropt.components.executors.HPCExecutor] worker. Serializing one
   — for example when a dispatched task captures it — reconstructs it in the
   worker as an inert placeholder rather than a working copy whose events reach
   the host. `ropt` detects the transferred placeholder and raises a
@@ -551,7 +551,7 @@ where it was created." Concretely:
   to the host process and needs no cross-process communication.
 - **Concurrently (forbidden).** A single step must not run more than once at a
   time: calling
-  [`run`][ropt.workflow.compute_steps.OptimizationStep.run] on a step that is
+  [`run`][ropt.components.compute_steps.OptimizationStep.run] on a step that is
   already running — for example from two threads — raises a `RuntimeError`. Give
   each concurrent optimization its own step; serial reuse of one step is fine.
 
@@ -573,5 +573,5 @@ nested workflow. The nested examples follow exactly this shape:
 
 - Wire a parallel evaluator into a workflow:
   [Optimization Workflows](workflows.md).
-- Reference: [Executors](../reference/workflow_executors.md),
-  [Evaluators](../reference/workflow_evaluators.md).
+- Reference: [Executors](../reference/components_executors.md),
+  [Evaluators](../reference/components_evaluators.md).

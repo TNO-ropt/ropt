@@ -51,7 +51,7 @@ class EnsembleEvaluator:
     the calculations.
 
     The core functionality relies on an evaluator callable, (usually provided by
-    an [`Evaluator`][ropt.workflow.evaluators.Evaluator] object), which is used to
+    an [`Evaluator`][ropt.components.evaluators.Evaluator] object), which is used to
     evaluate the individual functions within the ensemble. The evaluator
     provides the raw function values, which are then processed by the
     `EnsembleEvaluator` to produce the final function and gradient estimates.
@@ -70,7 +70,7 @@ class EnsembleEvaluator:
         The `context` object contains all the settings required for the ensemble
         evaluation, such as the number of realizations, the function estimators,
         and the gradient settings. The `evaluator` callable is usually provide
-        by a [`Evaluator`][ropt.workflow.evaluators.Evaluator] object.
+        by a [`Evaluator`][ropt.components.evaluators.Evaluator] object.
 
         Args:
             context:   The optimization context object.

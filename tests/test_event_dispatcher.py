@@ -7,16 +7,16 @@ from typing import Any
 import numpy as np
 import pytest
 
-from ropt.context import EnOptContext
-from ropt.enums import EnOptEventType
-from ropt.events import EnOptEvent
-from ropt.workflow.compute_steps import OptimizationStep
-from ropt.workflow.event_handlers import (
+from ropt.components.compute_steps import OptimizationStep
+from ropt.components.event_handlers import (
     CallbackHandler,
     EventDispatcher,
     EventForwardHandler,
     ResultsHandler,
 )
+from ropt.context import EnOptContext
+from ropt.enums import EnOptEventType
+from ropt.events import EnOptEvent
 
 pytestmark = pytest.mark.timeout(5)
 

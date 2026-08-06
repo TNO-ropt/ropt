@@ -207,7 +207,7 @@ value near $0$.
 
 - [Function Evaluator Tutorial](function_evaluator.md) — Use a simpler
   per-evaluation callback
-- [Workflow Tutorial](workflow.md) — Use the workflow framework for
+- [Building a Workflow](workflow.md) — Assemble the workflow components for
   more control
 - [Basic Optimization](../usage/basic.md) — Detailed explanation of
   `BasicOptimizer` and its API

@@ -77,7 +77,7 @@ size-1 value is broadcast to match the relevant count, e.g.:
 
 Length-mismatched arrays raise a validation error.
 
-### Index-based sharing of component objects
+### Index-based sharing of optimizer components
 
 The tuple-typed fields hold *objects* that implement the corresponding abstract
 base class:
@@ -116,7 +116,7 @@ For optional fields like `realization_filters` and the transform fields, an
 index of `-1` (the default) or any other out-of-range value leaves the
 corresponding element unfiltered/untransformed.
 
-### Providing component objects
+### Providing optimizer components
 
 Although these fields are typed as abstract-base instances, you generally do
 not need to construct them directly. Each tuple element accepts any of three
@@ -446,8 +446,8 @@ objective functions and gradients are calculated:
 
 ### `function_estimators`, `realization_filters`, `samplers`, `transforms`
 
-These are lists of component object configurations (see [Index-based sharing of
-component objects](#index-based-sharing-of-component-objects) above for how
+These are lists of optimizer component configurations (see [Index-based sharing of
+optimizer components](#index-based-sharing-of-optimizer-components) above for how
 objects are referenced by index). Each entry configures a plugin instance via a
 `method` field and an optional `options` dict.
 

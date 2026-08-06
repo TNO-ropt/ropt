@@ -1,7 +1,7 @@
 # Using FunctionEvaluator
 
 This tutorial demonstrates optimization of the multi-dimensional Rosenbrock
-function using [`FunctionEvaluator`][ropt.workflow.evaluators.FunctionEvaluator].
+function using [`FunctionEvaluator`][ropt.components.evaluators.FunctionEvaluator].
 This approach uses a simpler per-evaluation callback instead of handling batches
 directly.
 
@@ -12,7 +12,7 @@ directly.
 
 ## When to Use FunctionEvaluator
 
-Use [`FunctionEvaluator`][ropt.workflow.evaluators.FunctionEvaluator] when:
+Use [`FunctionEvaluator`][ropt.components.evaluators.FunctionEvaluator] when:
 
 - Your evaluation logic is simpler to express for a single variable vector
 - You don't need to vectorize across evaluations
@@ -35,7 +35,7 @@ from numpy.typing import NDArray
 
 from ropt.results import FunctionResults, Results
 from ropt.workflow import BasicOptimizer
-from ropt.workflow.evaluators import (
+from ropt.components.evaluators import (
     EvaluationFunctionContext,
     EvaluationFunctionResult,
     FunctionEvaluator,
@@ -52,11 +52,11 @@ INITIAL_VALUES = 2 * np.arange(DIM) / DIM + 0.5
 UNCERTAINTY = 0.1
 ```
 
-Note that we import [`FunctionEvaluator`][ropt.workflow.evaluators.FunctionEvaluator]
+Note that we import [`FunctionEvaluator`][ropt.components.evaluators.FunctionEvaluator]
 together with the helper types
-[`EvaluationFunctionContext`][ropt.workflow.evaluators.EvaluationFunctionContext]
+[`EvaluationFunctionContext`][ropt.components.evaluators.EvaluationFunctionContext]
 and
-[`EvaluationFunctionResult`][ropt.workflow.evaluators.EvaluationFunctionResult]
+[`EvaluationFunctionResult`][ropt.components.evaluators.EvaluationFunctionResult]
 instead of the batch evaluation types.
 
 
@@ -86,7 +86,7 @@ Key differences from the batch callback:
 - Additional metadata is available on `context`: `perturbation`, `batch_id`,
   `eval_idx`, and `name` (the optional task name set by the evaluator)
 - Returns an
-  [`EvaluationFunctionResult`][ropt.workflow.evaluators.EvaluationFunctionResult]
+  [`EvaluationFunctionResult`][ropt.components.evaluators.EvaluationFunctionResult]
   carrying the objective values (and optional constraints and metadata) for this
   single evaluation
 
@@ -108,7 +108,7 @@ This callback filters for FunctionResults and prints the current best variables 
 
 ## Running the Optimization
 
-The main difference is creating a [`FunctionEvaluator`][ropt.workflow.evaluators.FunctionEvaluator]
+The main difference is creating a [`FunctionEvaluator`][ropt.components.evaluators.FunctionEvaluator]
 to wrap the function callback:
 
 ```python
@@ -156,7 +156,7 @@ evaluator = FunctionEvaluator(function=partial(rosenbrock, a=a, b=b))
 ```
 
 This wraps the per-evaluation function callback in a
-[`FunctionEvaluator`][ropt.workflow.evaluators.FunctionEvaluator], which handles
+[`FunctionEvaluator`][ropt.components.evaluators.FunctionEvaluator], which handles
 calling it for each evaluation in a batch.
 
 
@@ -201,7 +201,7 @@ python function_evaluator.py --merge
 
 - [Ensemble-based Optimization](ensemble.md) — Use batch callbacks for
   better performance
-- [Using the Workflow Framework](workflow.md) — Use the workflow framework for
+- [Building a Workflow](workflow.md) — Assemble the workflow components for
   more control
 - [Writing Evaluation Callbacks](../usage/evaluation_callbacks.md) — Detailed
   reference on evaluation callbacks and `FunctionEvaluator`

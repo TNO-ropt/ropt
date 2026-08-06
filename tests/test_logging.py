@@ -9,13 +9,13 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from ropt.plugins.manager import PluginManager
-from ropt.workflow import BasicOptimizer
-from ropt.workflow.evaluators import (
+from ropt.components.evaluators import (
     EvaluationFunctionContext,
     EvaluationFunctionResult,
     FunctionEvaluator,
 )
+from ropt.plugins.manager import PluginManager
+from ropt.workflow import BasicOptimizer
 
 if TYPE_CHECKING:
     import pytest
@@ -100,7 +100,7 @@ def test_logger_names_identify_source(caplog: pytest.LogCaptureFixture) -> None:
     with caplog.at_level(logging.INFO, logger="ropt"):
         BasicOptimizer(_CONFIG, FunctionEvaluator(function=_objective)).run(_INITIAL)
     names = {r.name for r in caplog.records}
-    assert "ropt.workflow.compute_steps" in names
+    assert "ropt.components.compute_steps" in names
     assert "ropt.core" in names
 
 

@@ -9,33 +9,33 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 import pytest
 
-from ropt.context import EnOptContext
-from ropt.enums import EnOptEventType, ExitCode
-from ropt.evaluation import EvaluationBatchResult
-from ropt.exceptions import Abort, TransferError
-from ropt.results import FunctionResults
-from ropt.workflow import BasicOptimizer
-from ropt.workflow._transferred import (
+from ropt.components._transferred import (
     _Placeholder,
     check_transferred,
     reset_transferred,
 )
-from ropt.workflow.compute_steps import EvaluationStep, OptimizationStep
-from ropt.workflow.evaluators import (
+from ropt.components.compute_steps import EvaluationStep, OptimizationStep
+from ropt.components.evaluators import (
     CachedEvaluator,
     EvaluationFunctionContext,
     EvaluationFunctionResult,
     Evaluator,
     FunctionEvaluator,
 )
-from ropt.workflow.evaluators._counter import BatchIdCounter
-from ropt.workflow.event_handlers import (
+from ropt.components.evaluators._counter import BatchIdCounter
+from ropt.components.event_handlers import (
     CallbackHandler,
     EventDispatcher,
     EventHandler,
     HistoryHandler,
     ResultsHandler,
 )
+from ropt.context import EnOptContext
+from ropt.enums import EnOptEventType, ExitCode
+from ropt.evaluation import EvaluationBatchResult
+from ropt.exceptions import Abort, TransferError
+from ropt.results import FunctionResults
+from ropt.workflow import BasicOptimizer
 
 if TYPE_CHECKING:
     from collections.abc import Callable

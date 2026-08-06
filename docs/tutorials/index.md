@@ -20,13 +20,13 @@ optimization with different implementation approaches:
   callback.
 
 - **[Using FunctionEvaluator](function_evaluator.md)** — Using
-  [`FunctionEvaluator`][ropt.workflow.evaluators.FunctionEvaluator] with a
+  [`FunctionEvaluator`][ropt.components.evaluators.FunctionEvaluator] with a
   per-evaluation function callback. This approach is simpler to write when you
   don't need to handle batches.
 
-- **[Using the Workflow Framework](workflow.md)** — Using the workflow
-  framework directly with
-  [`OptimizationStep`][ropt.workflow.compute_steps.OptimizationStep]. This
+- **[Building a Workflow](workflow.md)** — Assemble the workflow components
+  directly with
+  [`OptimizationStep`][ropt.components.compute_steps.OptimizationStep]. This
   approach offers more control and flexibility for complex workflows.
 
 - **[Constrained Optimization](constrained.md)** — Adding linear

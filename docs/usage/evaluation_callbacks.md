@@ -11,13 +11,13 @@ There are two ways to provide such evaluation code to
 1. **A plain callable** — A callable adhering to the
    [`EvaluationBatchCallback`][ropt.evaluation.EvaluationBatchCallback] protocol
    that receives all variable vectors at once as a 2-D array.
-2. **An [`Evaluator`][ropt.workflow.evaluators.Evaluator] subclass** — Classes
+2. **An [`Evaluator`][ropt.components.evaluators.Evaluator] subclass** — Classes
     that support advanced features such as caching, parallel execution, or HPC
     dispatch. Here we only discuss
-   [`FunctionEvaluator`][ropt.workflow.evaluators.FunctionEvaluator], a
+   [`FunctionEvaluator`][ropt.components.evaluators.FunctionEvaluator], a
    convenience wrapper around a simpler per-row function following the
-   [`EvaluationFunctionCallback`][ropt.workflow.evaluators.EvaluationFunctionCallback] protocol.
-   [`Evaluator`][ropt.workflow.evaluators.Evaluator] classes are discussed
+   [`EvaluationFunctionCallback`][ropt.components.evaluators.EvaluationFunctionCallback] protocol.
+   [`Evaluator`][ropt.components.evaluators.Evaluator] classes are discussed
    in more detail in
    [Optimization Workflows](workflows.md) and [Parallel Evaluation](parallel.md).
 
@@ -90,11 +90,11 @@ problem. `metadata` is stored verbatim on the resulting
 to the input vectors that produced them. `batch_id` defaults to `0`; all
 results will carry this label unless you set it yourself. For
 auto-incrementing IDs pass a
-[`BatchIdCounter`][ropt.workflow.evaluators.BatchIdCounter] (or any
+[`BatchIdCounter`][ropt.components.evaluators.BatchIdCounter] (or any
 `Callable[[], int]`) to the `batch_id_callback` argument of
-[`FunctionEvaluator`][ropt.workflow.evaluators.FunctionEvaluator] or
-[`ParallelEvaluator`][ropt.workflow.evaluators.ParallelEvaluator]; for raw
-[`BatchEvaluator`][ropt.workflow.evaluators.BatchEvaluator] callbacks set it
+[`FunctionEvaluator`][ropt.components.evaluators.FunctionEvaluator] or
+[`ParallelEvaluator`][ropt.components.evaluators.ParallelEvaluator]; for raw
+[`BatchEvaluator`][ropt.components.evaluators.BatchEvaluator] callbacks set it
 yourself.
 
 Inactive rows (where `active` is `False`) should have their result values set
@@ -141,7 +141,7 @@ optimization to continue as long as enough realizations succeed.
 
 When your evaluation function naturally works on a single variable vector at a
 time — for instance when it calls an external simulator once per realization —
-the [`FunctionEvaluator`][ropt.workflow.evaluators.FunctionEvaluator] offers a
+the [`FunctionEvaluator`][ropt.components.evaluators.FunctionEvaluator] offers a
 simpler alternative. Instead of receiving the full 2-D batch and managing the
 loop yourself, you write a function that takes a single 1-D variable vector and
 returns the objective (and optional constraint) values for that row. The
@@ -150,13 +150,13 @@ assembly of the final
 [`EvaluationBatchResult`][ropt.evaluation.EvaluationBatchResult].
 
 A function passed to `FunctionEvaluator` must follow the
-[`EvaluationFunctionCallback`][ropt.workflow.evaluators.EvaluationFunctionCallback] protocol:
+[`EvaluationFunctionCallback`][ropt.components.evaluators.EvaluationFunctionCallback] protocol:
 
 ```python
 from numpy.typing import NDArray
 import numpy as np
 
-from ropt.workflow.evaluators import (
+from ropt.components.evaluators import (
     EvaluationFunctionContext,
     EvaluationFunctionResult,
 )
@@ -171,7 +171,7 @@ def my_function(
 
 - `variables` is a 1-D array for a single evaluation row.
 - `context` is an
-  [`EvaluationFunctionContext`][ropt.workflow.evaluators.EvaluationFunctionContext]
+  [`EvaluationFunctionContext`][ropt.components.evaluators.EvaluationFunctionContext]
   dataclass identifying the evaluation. It exposes:
 
     | Field          | Meaning
@@ -186,7 +186,7 @@ def my_function(
     callback) and can be used to associate results with named tasks.
 
 - The return value is an
-  [`EvaluationFunctionResult`][ropt.workflow.evaluators.EvaluationFunctionResult]
+  [`EvaluationFunctionResult`][ropt.components.evaluators.EvaluationFunctionResult]
   dataclass with the following fields:
 
     | Field          | Meaning
@@ -201,12 +201,12 @@ def my_function(
 
 To use it with
 [`BasicOptimizer`][ropt.workflow.BasicOptimizer], wrap the function in a
-[`FunctionEvaluator`][ropt.workflow.evaluators.FunctionEvaluator] and pass it as
+[`FunctionEvaluator`][ropt.components.evaluators.FunctionEvaluator] and pass it as
 the evaluator argument:
 
 ```python
 from ropt.workflow import BasicOptimizer
-from ropt.workflow.evaluators import FunctionEvaluator
+from ropt.components.evaluators import FunctionEvaluator
 
 optimizer = BasicOptimizer(
     config,
