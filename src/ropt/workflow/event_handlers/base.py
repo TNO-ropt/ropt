@@ -73,9 +73,6 @@ class EventHandler(ABC):
                 *,
                 _orig: Any = original,  # ruff: ignore[any-type]
             ) -> None:
-                if self._attached_to is _Attachment.DISPATCHER:
-                    _orig(self, event)
-                    return
                 with self._owner_lock:
                     if self._in_use:
                         msg = "The event handler is already running on another thread."

@@ -219,17 +219,16 @@ steps — never both — and may be registered with **at most one** dispatcher.
 Mixing the two, or registering with a second dispatcher, raises a
 `RuntimeError`.
 
-!!! note "A handler failure is fatal, but isolated"
+!!! note "A handler failure is fatal"
 
     An exception raised by a handler is a fatal error that stops the run. A
     directly-attached handler raises on the optimizer's own stack, so it
     propagates normally. A handler behind an
-    [`EventDispatcher`][ropt.workflow.event_handlers.EventDispatcher] runs on the
-    dispatcher's loop task instead; there the exception is caught, logged and
-    recorded rather than allowed to tear down the shared session task group, and
-    it is re-raised on the emitting run's own stack at its next forwarded event.
-    Either way a handler bug surfaces as a single, clean exception — never a
-    `BaseExceptionGroup`. See
+    [`EventDispatcher`][ropt.workflow.event_handlers.EventDispatcher] runs while
+    the emitting run **waits** for the event to be handled, so its exception is
+    re-raised on that run's own stack too — synchronously, including for the
+    run's last event. Either way a handler bug surfaces as a single, clean
+    exception — never a `BaseExceptionGroup`. See
     [Handler failures](parallel.md#handler-failures) for details.
 
 !!! warning "Do not share a handler across parallel steps"

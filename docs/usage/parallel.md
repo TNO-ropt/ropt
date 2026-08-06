@@ -426,18 +426,19 @@ async with asyncio.TaskGroup() as tg:
 ```
 
 [`EventForwardHandler`][ropt.workflow.event_handlers.EventForwardHandler] is a
-regular event handler that can be attached to a compute step. When invoked from
-the worker thread it puts the event on the dispatcher's queue via a thread-safe
-call. The dispatcher's processing loop then dispatches it to the registered
-handlers.
+regular event handler that can be attached to a compute step. When the step
+emits an event it submits the event to the dispatcher and **blocks on the
+emitting run's own thread until every handler has processed it**, preserving the
+order in which events are submitted. If a handler raises, the original exception
+is re-raised there, on the run's stack (see [Handler failures](#handler-failures)).
 
 !!! warning "Event handling is a single-process mechanism"
 
     An [`EventDispatcher`][ropt.workflow.event_handlers.EventDispatcher] and
     every [`EventHandler`][ropt.workflow.event_handlers.EventHandler] live in
     the process that created them. `EventForwardHandler` delivers events by
-    calling the dispatcher's `put_event`, which schedules them onto its event
-    loop with `call_soon_threadsafe` — a *thread*-safe call, not a
+    calling the dispatcher's `dispatch_event`, which schedules them onto its
+    event loop with `call_soon_threadsafe` — a *thread*-safe call, not a
     *process*-safe one. A dispatcher reached from another process has no live
     loop, so a forwarded event cannot arrive.
 
@@ -460,31 +461,23 @@ handlers.
 
 ### Handler failures
 
-A handler dispatched by an `EventDispatcher` runs on the dispatcher's own loop
-task, decoupled from the run that emitted the event. If such a handler were
-allowed to raise there, the exception would tear down the shared session task
-group — killing the executor and every other concurrent run — as a
-`BaseExceptionGroup`, far from its cause. The dispatcher therefore isolates
-handler failures, mirroring the executor's tolerated-vs-fatal split:
+Forwarding an event through an
+[`EventForwardHandler`][ropt.workflow.event_handlers.EventForwardHandler] is
+**synchronous**: the emitting run blocks until the dispatcher has run every
+handler for that event. A handler failure is therefore delivered like an
+evaluation error — on the emitting run's own call stack — mirroring the
+executor's tolerated-vs-fatal split:
 
-- An ordinary `Exception` from a handler is **caught, logged** (with the handler
-  and the event type), and **recorded**; it never escapes the dispatcher task.
-  The dispatcher keeps running and other handlers still receive the event.
-- The recorded failure is **fatal, but surfaced cleanly**: the next time the
-  emitting run forwards an event,
-  [`EventForwardHandler`][ropt.workflow.event_handlers.EventForwardHandler]
-  re-raises the **original** exception on that run's own call stack — a single,
-  clean exception that stops the run normally, exactly as if a directly-attached
-  handler had raised inline. A repeatedly-failing handler is recorded on each
-  call (it is not quarantined).
-- A `BaseException` (such as `CancelledError`) is **not** isolated: it remains
-  the session teardown backstop and propagates, as with the executor.
-
-Because the failure surfaces at the next forwarded event, a run that is blocked
-waiting inside a long parallel batch only re-raises once it emits again (its next
-evaluation boundary). The failure is never lost — it is logged when caught and
-re-raised at the next emission or at run end — but prompt mid-evaluation
-surfacing is a planned refinement tied to the shared abort signal.
+- An ordinary `Exception` from a handler is **re-raised on the emitting run's
+  stack**, unwrapped — a single, clean exception that stops the run normally,
+  exactly as if a directly-attached handler had raised inline. It is logged
+  (with the handler and the event type) as it is caught. Because emission is
+  synchronous, this covers the run's **last** event too; nothing is deferred or
+  lost. Every handler for the event still runs before the error surfaces; if
+  several fail, the first (in registration order) is raised.
+- A `BaseException` (such as `CancelledError`) is **not** delivered this way: it
+  remains the session teardown backstop and propagates, tearing the dispatcher
+  task group down, as with the executor.
 
 ### Thread-based dispatch
 

@@ -36,19 +36,18 @@ class EventForwardHandler(EventHandler):
         self._event_types = event_types
 
     def handle_event(self, event: EnOptEvent) -> None:
-        """Forward the event to the EventDispatcher.
+        """Forward the event to the EventDispatcher and wait for it.
 
-        Before forwarding, re-raise any failure recorded by a previously
-        dispatched handler. This runs on the emitting run's own call stack, so a
-        handler fault surfaces as a clean exception with a normal exit code
-        instead of tearing down the session task group. See
-        [`raise_pending_error`][ropt.workflow.event_handlers.EventDispatcher.raise_pending_error].
+        Submits the event to the dispatcher and blocks on the emitting run's own
+        call stack until every handler has processed it. A handler fault is
+        re-raised here as a clean exception with a normal exit code, instead of
+        tearing down the session task group. See
+        [`dispatch_event`][ropt.workflow.event_handlers.EventDispatcher.dispatch_event].
 
         Args:
             event: The event to forward.
         """
-        self._dispatcher.raise_pending_error()
-        self._dispatcher.put_event(event)
+        self._dispatcher.dispatch_event(event)
 
     @property
     def event_types(self) -> set[EnOptEventType]:

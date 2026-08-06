@@ -36,32 +36,32 @@ def config_fixture() -> dict[str, Any]:
     }
 
 
+def _event(context: EnOptContext) -> EnOptEvent:
+    return EnOptEvent(event_type=EnOptEventType.FINISHED_EVALUATION, context=context)
+
+
 def test_event_dispatcher_not_running_before_start() -> None:
     assert not EventDispatcher().is_running()
 
 
-def test_event_dispatcher_put_event_before_start_raises(
-    config: dict[str, Any],
-) -> None:
-    context = EnOptContext.model_validate(config)
-    event = EnOptEvent(event_type=EnOptEventType.FINISHED_EVALUATION, context=context)
+def test_event_dispatcher_dispatch_before_start_raises(config: dict[str, Any]) -> None:
+    event = _event(EnOptContext.model_validate(config))
     with pytest.raises(RuntimeError, match="not running"):
-        EventDispatcher().put_event(event)
+        EventDispatcher().dispatch_event(event)
 
 
 @pytest.mark.asyncio
-async def test_event_dispatcher_put_event_after_stop_raises(
+async def test_event_dispatcher_dispatch_after_stop_raises(
     config: dict[str, Any],
 ) -> None:
-    context = EnOptContext.model_validate(config)
-    event = EnOptEvent(event_type=EnOptEventType.FINISHED_EVALUATION, context=context)
+    event = _event(EnOptContext.model_validate(config))
     dispatcher = EventDispatcher()
     async with asyncio.TaskGroup() as tg:
         await dispatcher.start(tg)
         dispatcher.cancel()
     assert not dispatcher.is_running()
     with pytest.raises(RuntimeError, match="not running"):
-        dispatcher.put_event(event)
+        dispatcher.dispatch_event(event)
 
 
 @pytest.mark.asyncio
@@ -95,10 +95,10 @@ async def test_event_dispatcher_dispatches_to_handler(config: dict[str, Any]) ->
             callback=received.append,
         )
     )
-    event = EnOptEvent(event_type=EnOptEventType.FINISHED_EVALUATION, context=context)
+    event = _event(context)
     async with asyncio.TaskGroup() as tg:
         await dispatcher.start(tg)
-        dispatcher.put_event(event)
+        await asyncio.to_thread(dispatcher.dispatch_event, event)
         dispatcher.cancel()
     assert received == [event]
 
@@ -114,23 +114,20 @@ async def test_event_dispatcher_filters_by_event_type(config: dict[str, Any]) ->
             callback=received.append,
         )
     )
+    matching = _event(context)
     async with asyncio.TaskGroup() as tg:
         await dispatcher.start(tg)
-        dispatcher.put_event(
-            EnOptEvent(event_type=EnOptEventType.START_OPTIMIZER, context=context)
+        await asyncio.to_thread(
+            dispatcher.dispatch_event,
+            EnOptEvent(event_type=EnOptEventType.START_OPTIMIZER, context=context),
         )
-        dispatcher.put_event(
-            EnOptEvent(event_type=EnOptEventType.START_EVALUATION, context=context)
-        )
-        dispatcher.put_event(
-            EnOptEvent(event_type=EnOptEventType.FINISHED_EVALUATION, context=context)
-        )
-        dispatcher.put_event(
-            EnOptEvent(event_type=EnOptEventType.FINISHED_OPTIMIZER, context=context)
+        await asyncio.to_thread(dispatcher.dispatch_event, matching)
+        await asyncio.to_thread(
+            dispatcher.dispatch_event,
+            EnOptEvent(event_type=EnOptEventType.FINISHED_OPTIMIZER, context=context),
         )
         dispatcher.cancel()
-    assert len(received) == 1
-    assert received[0].event_type == EnOptEventType.FINISHED_EVALUATION
+    assert received == [matching]
 
 
 @pytest.mark.asyncio
@@ -153,10 +150,10 @@ async def test_event_dispatcher_multiple_handlers_all_receive(
             callback=received_b.append,
         )
     )
-    event = EnOptEvent(event_type=EnOptEventType.FINISHED_EVALUATION, context=context)
+    event = _event(context)
     async with asyncio.TaskGroup() as tg:
         await dispatcher.start(tg)
-        dispatcher.put_event(event)
+        await asyncio.to_thread(dispatcher.dispatch_event, event)
         dispatcher.cancel()
     assert received_a == [event]
     assert received_b == [event]
@@ -175,14 +172,11 @@ async def test_event_dispatcher_events_processed_in_order(
             callback=received.append,
         )
     )
-    events = [
-        EnOptEvent(event_type=EnOptEventType.FINISHED_EVALUATION, context=context)
-        for _ in range(5)
-    ]
+    events = [_event(context) for _ in range(5)]
     async with asyncio.TaskGroup() as tg:
         await dispatcher.start(tg)
         for event in events:
-            dispatcher.put_event(event)
+            await asyncio.to_thread(dispatcher.dispatch_event, event)
         dispatcher.cancel()
     assert received == events
 
@@ -211,10 +205,10 @@ async def test_event_forward_handler_forwards_to_dispatcher(
     forward = EventForwardHandler(
         dispatcher, event_types={EnOptEventType.FINISHED_EVALUATION}
     )
-    event = EnOptEvent(event_type=EnOptEventType.FINISHED_EVALUATION, context=context)
+    event = _event(context)
     async with asyncio.TaskGroup() as tg:
         await dispatcher.start(tg)
-        forward.handle_event(event)
+        await asyncio.to_thread(forward.handle_event, event)
         dispatcher.cancel()
     assert received == [event]
 
@@ -225,9 +219,9 @@ async def test_event_dispatcher_run_in_thread_dispatches(
 ) -> None:
     context = EnOptContext.model_validate(config)
 
-    # Use a barrier to prove the two thread handlers run concurrently: if they
-    # ran sequentially the barrier would never be reached by both threads and
-    # the test would hang (caught by the timeout mark).
+    # A barrier proves the two thread handlers run concurrently: if they ran
+    # sequentially the barrier would never release and the test would hang
+    # (caught by the timeout mark).
     barrier = threading.Barrier(2)
     received_a: list[EnOptEvent] = []
     received_b: list[EnOptEvent] = []
@@ -253,10 +247,10 @@ async def test_event_dispatcher_run_in_thread_dispatches(
         ),
         run_in_thread=True,
     )
-    event = EnOptEvent(event_type=EnOptEventType.FINISHED_EVALUATION, context=context)
+    event = _event(context)
     async with asyncio.TaskGroup() as tg:
         await dispatcher.start(tg)
-        dispatcher.put_event(event)
+        await asyncio.to_thread(dispatcher.dispatch_event, event)
         dispatcher.cancel()
     assert received_a == [event]
     assert received_b == [event]
@@ -302,15 +296,13 @@ _FATAL_MESSAGE = "fatal"
 
 
 @pytest.mark.asyncio
-async def test_event_dispatcher_isolates_failing_handler(
+async def test_event_dispatcher_reraises_failing_handler(
     config: dict[str, Any],
 ) -> None:
     context = EnOptContext.model_validate(config)
-    calls: list[EnOptEvent] = []
     received: list[EnOptEvent] = []
 
-    def _fail(event: EnOptEvent) -> None:
-        calls.append(event)
+    def _fail(_event: EnOptEvent) -> None:
         raise _HandlerError(_ERROR_MESSAGE)
 
     dispatcher = EventDispatcher()
@@ -325,25 +317,19 @@ async def test_event_dispatcher_isolates_failing_handler(
             callback=received.append,
         )
     )
-    event = EnOptEvent(event_type=EnOptEventType.FINISHED_EVALUATION, context=context)
-    # Exiting the task group without a BaseExceptionGroup proves the handler
-    # fault did not escape the dispatcher task and tear the session down.
+    event = _event(context)
     async with asyncio.TaskGroup() as tg:
         await dispatcher.start(tg)
-        dispatcher.put_event(event)
-        dispatcher.put_event(event)
+        # The failure surfaces on the caller's own stack, unwrapped.
+        with pytest.raises(_HandlerError, match=_ERROR_MESSAGE):
+            await asyncio.to_thread(dispatcher.dispatch_event, event)
         dispatcher.cancel()
-    # The healthy handler received both events and the failing handler was
-    # invoked for both (recorded each time, not quarantined).
-    assert received == [event, event]
-    assert calls == [event, event]
-    # The failure is recorded and can be re-raised on the caller's stack.
-    with pytest.raises(_HandlerError, match=_ERROR_MESSAGE):
-        dispatcher.raise_pending_error()
+    # Every handler for the event still ran before the error surfaced.
+    assert received == [event]
 
 
 @pytest.mark.asyncio
-async def test_event_dispatcher_isolates_failing_thread_handler(
+async def test_event_dispatcher_reraises_failing_thread_handler(
     config: dict[str, Any],
 ) -> None:
     context = EnOptContext.model_validate(config)
@@ -365,19 +351,17 @@ async def test_event_dispatcher_isolates_failing_thread_handler(
             callback=received.append,
         )
     )
-    event = EnOptEvent(event_type=EnOptEventType.FINISHED_EVALUATION, context=context)
+    event = _event(context)
     async with asyncio.TaskGroup() as tg:
         await dispatcher.start(tg)
-        dispatcher.put_event(event)
+        with pytest.raises(_HandlerError, match=_ERROR_MESSAGE):
+            await asyncio.to_thread(dispatcher.dispatch_event, event)
         dispatcher.cancel()
-    # A run_in_thread handler is isolated exactly like an inline one.
     assert received == [event]
-    with pytest.raises(_HandlerError, match=_ERROR_MESSAGE):
-        dispatcher.raise_pending_error()
 
 
 @pytest.mark.asyncio
-async def test_event_forward_handler_reraises_recorded_failure(
+async def test_event_forward_handler_reraises_failure(
     config: dict[str, Any],
 ) -> None:
     context = EnOptContext.model_validate(config)
@@ -394,20 +378,17 @@ async def test_event_forward_handler_reraises_recorded_failure(
     forward = EventForwardHandler(
         dispatcher, event_types={EnOptEventType.FINISHED_EVALUATION}
     )
-    forward.register_compute_step()
-    event = EnOptEvent(event_type=EnOptEventType.FINISHED_EVALUATION, context=context)
+    event = _event(context)
     async with asyncio.TaskGroup() as tg:
         await dispatcher.start(tg)
-        dispatcher.put_event(event)
+        # The forward handler re-raises the original on the emitting run's stack.
+        with pytest.raises(_HandlerError, match=_ERROR_MESSAGE):
+            await asyncio.to_thread(forward.handle_event, event)
         dispatcher.cancel()
-    # On the emitting run's own stack the forward handler re-raises the original
-    # exception, unwrapped — a clean stop, not a BaseExceptionGroup.
-    with pytest.raises(_HandlerError, match=_ERROR_MESSAGE):
-        forward.handle_event(event)
 
 
 @pytest.mark.asyncio
-async def test_event_dispatcher_base_exception_propagates(
+async def test_event_dispatcher_base_exception_tears_down(
     config: dict[str, Any],
 ) -> None:
     context = EnOptContext.model_validate(config)
@@ -421,17 +402,46 @@ async def test_event_dispatcher_base_exception_propagates(
             event_types={EnOptEventType.FINISHED_EVALUATION}, callback=_fail
         )
     )
-    event = EnOptEvent(event_type=EnOptEventType.FINISHED_EVALUATION, context=context)
+    event = _event(context)
 
+    # A BaseException is not isolated: it stays the teardown backstop and tears
+    # the dispatcher task group down as a BaseExceptionGroup.
     async def _run() -> None:
         async with asyncio.TaskGroup() as tg:
             await dispatcher.start(tg)
-            dispatcher.put_event(event)
-            dispatcher.cancel()
+            tg.create_task(asyncio.to_thread(dispatcher.dispatch_event, event))
 
-    # A BaseException is not isolated: it stays the teardown backstop and tears
-    # the session task group down as a BaseExceptionGroup.
     with pytest.raises(BaseExceptionGroup) as exc_info:
         await _run()
-    _, unhandled = exc_info.value.split(_HandlerBaseError)
-    assert unhandled is None
+    matched, _ = exc_info.value.split(_HandlerBaseError)
+    assert matched is not None
+
+
+def test_dispatcher_owned_handler_rejects_concurrent_handle_event(
+    config: dict[str, Any],
+) -> None:
+    # The dispatcher serializes calls, but the concurrency guard still applies to
+    # a dispatcher-owned handler, so a stray direct call entering handle_event
+    # while it is already running (bypassing the dispatcher) is rejected.
+    event = _event(EnOptContext.model_validate(config))
+    entered = threading.Event()
+    release = threading.Event()
+
+    def _block(_event: EnOptEvent) -> None:
+        entered.set()
+        release.wait()
+
+    handler = CallbackHandler(
+        event_types={EnOptEventType.FINISHED_EVALUATION}, callback=_block
+    )
+    EventDispatcher().add_event_handler(handler)
+
+    first = threading.Thread(target=handler.handle_event, args=(event,))
+    first.start()
+    entered.wait()
+    try:
+        with pytest.raises(RuntimeError, match="already running on another thread"):
+            handler.handle_event(event)
+    finally:
+        release.set()
+        first.join()
