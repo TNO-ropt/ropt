@@ -1021,7 +1021,7 @@
   <span class="md-ellipsis">
     
   
-    Using the Workflow Framework
+    Building a Workflow
   
 
     
@@ -1678,7 +1678,7 @@
   <span class="md-ellipsis">
     
   
-    Optimization Components
+    Optimizer Components
   
 
     
@@ -1694,7 +1694,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Optimization Components
+    Optimizer Components
   
 
           </label>
@@ -1883,7 +1883,7 @@
   <span class="md-ellipsis">
     
   
-    Workflow System
+    Workflow Components
   
 
     
@@ -1899,7 +1899,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Workflow System
+    Workflow Components
   
 
           </label>
@@ -1912,7 +1912,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../workflow_compute_steps/" class="md-nav__link">
+      <a href="../components_compute_steps/" class="md-nav__link">
         
   
   
@@ -1940,7 +1940,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../workflow_event_handlers/" class="md-nav__link">
+      <a href="../components_event_handlers/" class="md-nav__link">
         
   
   
@@ -1968,7 +1968,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../workflow_evaluators/" class="md-nav__link">
+      <a href="../components_evaluators/" class="md-nav__link">
         
   
   
@@ -1996,7 +1996,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../workflow_executors/" class="md-nav__link">
+      <a href="../components_executors/" class="md-nav__link">
         
   
   
@@ -2024,14 +2024,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../workflow_utils/" class="md-nav__link">
+      <a href="../components_utils/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Workflow Utilities
+    Utilities
   
 
     
@@ -2396,8 +2396,8 @@ must be evaluated, an output container for the objective and constraint values,
 and the protocol that user callables must follow.</p>
 <p>For detailed usage, including examples of handling inactive rows and partial
 failures, see <a href="../../usage/evaluation_callbacks/">Writing Evaluation Callbacks</a>.
-For higher-level <code>Evaluator</code> <em>classes</em> used by the workflow framework, see
-<a href="../workflow_evaluators/">Workflow Evaluator Classes</a>.</p>
+For higher-level <code>Evaluator</code> <em>classes</em> used by the workflow components, see
+<a href="../components_evaluators/">Evaluators</a>.</p>
 
 
 <div class="doc doc-object doc-class">
@@ -2718,11 +2718,11 @@ should be set to <code>numpy.nan</code>.</p>
 <p>The <code>batch_id</code> field defaults to <code>0</code>. If you do not need to distinguish
 between batches, leave it unset — all results will be labelled batch <code>0</code>.
 To get auto-incrementing IDs managed by the framework, pass a
-<a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.BatchIdCounter" href="../workflow_evaluators/#ropt.workflow.evaluators.BatchIdCounter"><code>BatchIdCounter</code></a> (or any
+<a class="autorefs autorefs-internal" title="            ropt.components.evaluators.BatchIdCounter" href="../components_evaluators/#ropt.components.evaluators.BatchIdCounter"><code>BatchIdCounter</code></a> (or any
 <code>Callable[[], int]</code>) to the <code>batch_id_callback</code> argument of
-<a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.FunctionEvaluator" href="../workflow_evaluators/#ropt.workflow.evaluators.FunctionEvaluator"><code>FunctionEvaluator</code></a> or
-<a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.ParallelEvaluator" href="../workflow_evaluators/#ropt.workflow.evaluators.ParallelEvaluator"><code>ParallelEvaluator</code></a>. For raw
-<a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.BatchEvaluator" href="../workflow_evaluators/#ropt.workflow.evaluators.BatchEvaluator"><code>BatchEvaluator</code></a> callbacks,
+<a class="autorefs autorefs-internal" title="            ropt.components.evaluators.FunctionEvaluator" href="../components_evaluators/#ropt.components.evaluators.FunctionEvaluator"><code>FunctionEvaluator</code></a> or
+<a class="autorefs autorefs-internal" title="            ropt.components.evaluators.ParallelEvaluator" href="../components_evaluators/#ropt.components.evaluators.ParallelEvaluator"><code>ParallelEvaluator</code></a>. For raw
+<a class="autorefs autorefs-internal" title="            ropt.components.evaluators.BatchEvaluator" href="../components_evaluators/#ropt.components.evaluators.BatchEvaluator"><code>BatchEvaluator</code></a> callbacks,
 set <code>batch_id</code> yourself.</p>
 <p>See <a href="../../usage/evaluation_callbacks/">Writing Evaluation Callbacks</a> for
 detailed conventions and examples.</p>

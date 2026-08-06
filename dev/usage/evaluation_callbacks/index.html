@@ -1146,7 +1146,7 @@
   <span class="md-ellipsis">
     
   
-    Using the Workflow Framework
+    Building a Workflow
   
 
     
@@ -1663,7 +1663,7 @@
   <span class="md-ellipsis">
     
   
-    Optimization Components
+    Optimizer Components
   
 
     
@@ -1679,7 +1679,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Optimization Components
+    Optimizer Components
   
 
           </label>
@@ -1865,7 +1865,7 @@
   <span class="md-ellipsis">
     
   
-    Workflow System
+    Workflow Components
   
 
     
@@ -1881,7 +1881,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Workflow System
+    Workflow Components
   
 
           </label>
@@ -1894,7 +1894,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/workflow_compute_steps/" class="md-nav__link">
+      <a href="../../reference/components_compute_steps/" class="md-nav__link">
         
   
   
@@ -1922,7 +1922,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/workflow_event_handlers/" class="md-nav__link">
+      <a href="../../reference/components_event_handlers/" class="md-nav__link">
         
   
   
@@ -1950,7 +1950,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/workflow_evaluators/" class="md-nav__link">
+      <a href="../../reference/components_evaluators/" class="md-nav__link">
         
   
   
@@ -1978,7 +1978,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/workflow_executors/" class="md-nav__link">
+      <a href="../../reference/components_executors/" class="md-nav__link">
         
   
   
@@ -2006,14 +2006,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/workflow_utils/" class="md-nav__link">
+      <a href="../../reference/components_utils/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Workflow Utilities
+    Utilities
   
 
     
@@ -2372,18 +2372,18 @@
 objectives and optional nonlinear-constraints. The user must provide the code to
 perform these function evaluations.</p>
 <p>There are two ways to provide such evaluation code to
-<a class="autorefs autorefs-internal" title="            ropt.workflow.BasicOptimizer" href="../../reference/basic_optimizer/#ropt.workflow.BasicOptimizer"><code>BasicOptimizer</code></a>:</p>
+<a class="autorefs autorefs-internal" title="            ropt.components.BasicOptimizer" href="../../reference/basic_optimizer/#ropt.components.BasicOptimizer"><code>BasicOptimizer</code></a>:</p>
 <ol>
 <li><strong>A plain callable</strong> — A callable adhering to the
    <a class="autorefs autorefs-internal" title="            ropt.evaluation.EvaluationBatchCallback" href="../../reference/evaluation/#ropt.evaluation.EvaluationBatchCallback"><code>EvaluationBatchCallback</code></a> protocol
    that receives all variable vectors at once as a 2-D array.</li>
-<li><strong>An <a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.Evaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.Evaluator"><code>Evaluator</code></a> subclass</strong> — Classes
+<li><strong>An <a class="autorefs autorefs-internal" title="            ropt.components.evaluators.Evaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.Evaluator"><code>Evaluator</code></a> subclass</strong> — Classes
     that support advanced features such as caching, parallel execution, or HPC
     dispatch. Here we only discuss
-   <a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.FunctionEvaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.FunctionEvaluator"><code>FunctionEvaluator</code></a>, a
+   <a class="autorefs autorefs-internal" title="            ropt.components.evaluators.FunctionEvaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.FunctionEvaluator"><code>FunctionEvaluator</code></a>, a
    convenience wrapper around a simpler per-row function following the
-   <a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.EvaluationFunctionCallback" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.EvaluationFunctionCallback"><code>EvaluationFunctionCallback</code></a> protocol.
-   <a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.Evaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.Evaluator"><code>Evaluator</code></a> classes are discussed
+   <a class="autorefs autorefs-internal" title="            ropt.components.evaluators.EvaluationFunctionCallback" href="../../reference/components_evaluators/#ropt.components.evaluators.EvaluationFunctionCallback"><code>EvaluationFunctionCallback</code></a> protocol.
+   <a class="autorefs autorefs-internal" title="            ropt.components.evaluators.Evaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.Evaluator"><code>Evaluator</code></a> classes are discussed
    in more detail in
    <a href="../workflows/">Optimization Workflows</a> and <a href="../parallel/">Parallel Evaluation</a>.</li>
 </ol>
@@ -2505,11 +2505,11 @@ problem. <code>metadata</code> is stored verbatim on the resulting
 to the input vectors that produced them. <code>batch_id</code> defaults to <code>0</code>; all
 results will carry this label unless you set it yourself. For
 auto-incrementing IDs pass a
-<a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.BatchIdCounter" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.BatchIdCounter"><code>BatchIdCounter</code></a> (or any
+<a class="autorefs autorefs-internal" title="            ropt.components.evaluators.BatchIdCounter" href="../../reference/components_evaluators/#ropt.components.evaluators.BatchIdCounter"><code>BatchIdCounter</code></a> (or any
 <code>Callable[[], int]</code>) to the <code>batch_id_callback</code> argument of
-<a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.FunctionEvaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.FunctionEvaluator"><code>FunctionEvaluator</code></a> or
-<a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.ParallelEvaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.ParallelEvaluator"><code>ParallelEvaluator</code></a>; for raw
-<a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.BatchEvaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.BatchEvaluator"><code>BatchEvaluator</code></a> callbacks set it
+<a class="autorefs autorefs-internal" title="            ropt.components.evaluators.FunctionEvaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.FunctionEvaluator"><code>FunctionEvaluator</code></a> or
+<a class="autorefs autorefs-internal" title="            ropt.components.evaluators.ParallelEvaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.ParallelEvaluator"><code>ParallelEvaluator</code></a>; for raw
+<a class="autorefs autorefs-internal" title="            ropt.components.evaluators.BatchEvaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.BatchEvaluator"><code>BatchEvaluator</code></a> callbacks set it
 yourself.</p>
 <p>Inactive rows (where <code>active</code> is <code>False</code>) should have their result values set
 to zero. Rows where an evaluation failed should be set to <code>np.nan</code> (see
@@ -2545,7 +2545,7 @@ optimization to continue as long as enough realizations succeed.</p>
 <h2 id="using-functionevaluator">Using <code>FunctionEvaluator</code></h2>
 <p>When your evaluation function naturally works on a single variable vector at a
 time — for instance when it calls an external simulator once per realization —
-the <a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.FunctionEvaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.FunctionEvaluator"><code>FunctionEvaluator</code></a> offers a
+the <a class="autorefs autorefs-internal" title="            ropt.components.evaluators.FunctionEvaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.FunctionEvaluator"><code>FunctionEvaluator</code></a> offers a
 simpler alternative. Instead of receiving the full 2-D batch and managing the
 loop yourself, you write a function that takes a single 1-D variable vector and
 returns the objective (and optional constraint) values for that row. The
@@ -2558,11 +2558,11 @@ assembly of the final
       dataclass
   " href="../../reference/evaluation/#ropt.evaluation.EvaluationBatchResult"><code>EvaluationBatchResult</code></a>.</p>
 <p>A function passed to <code>FunctionEvaluator</code> must follow the
-<a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.EvaluationFunctionCallback" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.EvaluationFunctionCallback"><code>EvaluationFunctionCallback</code></a> protocol:</p>
+<a class="autorefs autorefs-internal" title="            ropt.components.evaluators.EvaluationFunctionCallback" href="../../reference/components_evaluators/#ropt.components.evaluators.EvaluationFunctionCallback"><code>EvaluationFunctionCallback</code></a> protocol:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">numpy.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">NDArray</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.workflow.evaluators</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.components.evaluators</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
 </span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="n">EvaluationFunctionContext</span><span class="p">,</span>
 </span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    <span class="n">EvaluationFunctionResult</span><span class="p">,</span>
 </span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="p">)</span>
@@ -2578,12 +2578,12 @@ assembly of the final
 <li><code>variables</code> is a 1-D array for a single evaluation row.</li>
 <li>
 <p><code>context</code> is an
-  <a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.EvaluationFunctionContext
+  <a class="autorefs autorefs-internal" title="            ropt.components.evaluators.EvaluationFunctionContext
 
 
   
       dataclass
-  " href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.EvaluationFunctionContext"><code>EvaluationFunctionContext</code></a>
+  " href="../../reference/components_evaluators/#ropt.components.evaluators.EvaluationFunctionContext"><code>EvaluationFunctionContext</code></a>
   dataclass identifying the evaluation. It exposes:</p>
 <table>
 <thead>
@@ -2620,12 +2620,12 @@ callback) and can be used to associate results with named tasks.</p>
 </li>
 <li>
 <p>The return value is an
-  <a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.EvaluationFunctionResult
+  <a class="autorefs autorefs-internal" title="            ropt.components.evaluators.EvaluationFunctionResult
 
 
   
       dataclass
-  " href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.EvaluationFunctionResult"><code>EvaluationFunctionResult</code></a>
+  " href="../../reference/components_evaluators/#ropt.components.evaluators.EvaluationFunctionResult"><code>EvaluationFunctionResult</code></a>
   dataclass with the following fields:</p>
 <table>
 <thead>
@@ -2660,11 +2660,11 @@ for the corresponding row.</p>
 </li>
 </ul>
 <p>To use it with
-<a class="autorefs autorefs-internal" title="            ropt.workflow.BasicOptimizer" href="../../reference/basic_optimizer/#ropt.workflow.BasicOptimizer"><code>BasicOptimizer</code></a>, wrap the function in a
-<a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.FunctionEvaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.FunctionEvaluator"><code>FunctionEvaluator</code></a> and pass it as
+<a class="autorefs autorefs-internal" title="            ropt.components.BasicOptimizer" href="../../reference/basic_optimizer/#ropt.components.BasicOptimizer"><code>BasicOptimizer</code></a>, wrap the function in a
+<a class="autorefs autorefs-internal" title="            ropt.components.evaluators.FunctionEvaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.FunctionEvaluator"><code>FunctionEvaluator</code></a> and pass it as
 the evaluator argument:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.workflow</span><span class="w"> </span><span class="kn">import</span> <span class="n">BasicOptimizer</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.workflow.evaluators</span><span class="w"> </span><span class="kn">import</span> <span class="n">FunctionEvaluator</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.components</span><span class="w"> </span><span class="kn">import</span> <span class="n">BasicOptimizer</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.components.evaluators</span><span class="w"> </span><span class="kn">import</span> <span class="n">FunctionEvaluator</span>
 </span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
 </span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="n">optimizer</span> <span class="o">=</span> <span class="n">BasicOptimizer</span><span class="p">(</span>
 </span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>    <span class="n">config</span><span class="p">,</span>

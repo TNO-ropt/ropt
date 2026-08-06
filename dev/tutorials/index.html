@@ -1091,7 +1091,7 @@
   <span class="md-ellipsis">
     
   
-    Using the Workflow Framework
+    Building a Workflow
   
 
     
@@ -1608,7 +1608,7 @@
   <span class="md-ellipsis">
     
   
-    Optimization Components
+    Optimizer Components
   
 
     
@@ -1624,7 +1624,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Optimization Components
+    Optimizer Components
   
 
           </label>
@@ -1810,7 +1810,7 @@
   <span class="md-ellipsis">
     
   
-    Workflow System
+    Workflow Components
   
 
     
@@ -1826,7 +1826,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Workflow System
+    Workflow Components
   
 
           </label>
@@ -1839,7 +1839,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../reference/workflow_compute_steps/" class="md-nav__link">
+      <a href="../reference/components_compute_steps/" class="md-nav__link">
         
   
   
@@ -1867,7 +1867,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../reference/workflow_event_handlers/" class="md-nav__link">
+      <a href="../reference/components_event_handlers/" class="md-nav__link">
         
   
   
@@ -1895,7 +1895,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../reference/workflow_evaluators/" class="md-nav__link">
+      <a href="../reference/components_evaluators/" class="md-nav__link">
         
   
   
@@ -1923,7 +1923,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../reference/workflow_executors/" class="md-nav__link">
+      <a href="../reference/components_executors/" class="md-nav__link">
         
   
   
@@ -1951,14 +1951,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../reference/workflow_utils/" class="md-nav__link">
+      <a href="../reference/components_utils/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Workflow Utilities
+    Utilities
   
 
     
@@ -2274,19 +2274,19 @@ optimization with different implementation approaches:</p>
 <li>
 <p><strong><a href="ensemble/">Ensemble-based Optimization</a></strong> — Introduces uncertainty
   by sampling parameters across multiple realizations. Uses
-  <a class="autorefs autorefs-internal" title="            ropt.workflow.BasicOptimizer" href="../reference/basic_optimizer/#ropt.workflow.BasicOptimizer"><code>BasicOptimizer</code></a> with a batch evaluation
+  <a class="autorefs autorefs-internal" title="            ropt.components.BasicOptimizer" href="../reference/basic_optimizer/#ropt.components.BasicOptimizer"><code>BasicOptimizer</code></a> with a batch evaluation
   callback.</p>
 </li>
 <li>
 <p><strong><a href="function_evaluator/">Using FunctionEvaluator</a></strong> — Using
-  <a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.FunctionEvaluator" href="../reference/workflow_evaluators/#ropt.workflow.evaluators.FunctionEvaluator"><code>FunctionEvaluator</code></a> with a
+  <a class="autorefs autorefs-internal" title="            ropt.components.evaluators.FunctionEvaluator" href="../reference/components_evaluators/#ropt.components.evaluators.FunctionEvaluator"><code>FunctionEvaluator</code></a> with a
   per-evaluation function callback. This approach is simpler to write when you
   don't need to handle batches.</p>
 </li>
 <li>
-<p><strong><a href="workflow/">Using the Workflow Framework</a></strong> — Using the workflow
-  framework directly with
-  <a class="autorefs autorefs-internal" title="            ropt.workflow.compute_steps.OptimizationStep" href="../reference/workflow_compute_steps/#ropt.workflow.compute_steps.OptimizationStep"><code>OptimizationStep</code></a>. This
+<p><strong><a href="workflow/">Building a Workflow</a></strong> — Assemble the workflow components
+  directly with
+  <a class="autorefs autorefs-internal" title="            ropt.components.compute_steps.OptimizationStep" href="../reference/components_compute_steps/#ropt.components.compute_steps.OptimizationStep"><code>OptimizationStep</code></a>. This
   approach offers more control and flexibility for complex workflows.</p>
 </li>
 <li>

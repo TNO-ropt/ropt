@@ -1019,7 +1019,7 @@
   <span class="md-ellipsis">
     
   
-    Using the Workflow Framework
+    Building a Workflow
   
 
     
@@ -1551,7 +1551,7 @@
   <span class="md-ellipsis">
     
   
-    Optimization Components
+    Optimizer Components
   
 
     
@@ -1567,7 +1567,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Optimization Components
+    Optimizer Components
   
 
           </label>
@@ -1756,7 +1756,7 @@
   <span class="md-ellipsis">
     
   
-    Workflow System
+    Workflow Components
   
 
     
@@ -1772,7 +1772,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Workflow System
+    Workflow Components
   
 
           </label>
@@ -1785,7 +1785,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../workflow_compute_steps/" class="md-nav__link">
+      <a href="../components_compute_steps/" class="md-nav__link">
         
   
   
@@ -1813,7 +1813,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../workflow_event_handlers/" class="md-nav__link">
+      <a href="../components_event_handlers/" class="md-nav__link">
         
   
   
@@ -1841,7 +1841,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../workflow_evaluators/" class="md-nav__link">
+      <a href="../components_evaluators/" class="md-nav__link">
         
   
   
@@ -1869,7 +1869,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../workflow_executors/" class="md-nav__link">
+      <a href="../components_executors/" class="md-nav__link">
         
   
   
@@ -1897,14 +1897,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../workflow_utils/" class="md-nav__link">
+      <a href="../components_utils/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Workflow Utilities
+    Utilities
   
 
     
@@ -2570,8 +2570,8 @@ attribute.</p>
 <p>Workflow objects such as compute steps, evaluators, and event handlers are
 process-local. They may be pickled as part of a task payload, but they must
 not be used in a worker: if a task dispatched to a
-<a class="autorefs autorefs-internal" title="            ropt.workflow.executors.MultiprocessingExecutor" href="../workflow_executors/#ropt.workflow.executors.MultiprocessingExecutor"><code>MultiprocessingExecutor</code></a>
-or <a class="autorefs autorefs-internal" title="            ropt.workflow.executors.HPCExecutor" href="../workflow_executors/#ropt.workflow.executors.HPCExecutor"><code>HPCExecutor</code></a> worker captures one,
+<a class="autorefs autorefs-internal" title="            ropt.components.executors.MultiprocessingExecutor" href="../components_executors/#ropt.components.executors.MultiprocessingExecutor"><code>MultiprocessingExecutor</code></a>
+or <a class="autorefs autorefs-internal" title="            ropt.components.executors.HPCExecutor" href="../components_executors/#ropt.components.executors.HPCExecutor"><code>HPCExecutor</code></a> worker captures one,
 the worker detects it and raises this error before running the task.</p>
 
 

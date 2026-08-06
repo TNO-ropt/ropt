@@ -667,10 +667,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#index-based-sharing-of-component-objects" class="md-nav__link">
+  <a href="#index-based-sharing-of-optimizer-components" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Index-based sharing of component objects
+        Index-based sharing of optimizer components
       
     </span>
   </a>
@@ -678,10 +678,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#providing-component-objects" class="md-nav__link">
+  <a href="#providing-optimizer-components" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Providing component objects
+        Providing optimizer components
       
     </span>
   </a>
@@ -1401,7 +1401,7 @@
   <span class="md-ellipsis">
     
   
-    Using the Workflow Framework
+    Building a Workflow
   
 
     
@@ -1918,7 +1918,7 @@
   <span class="md-ellipsis">
     
   
-    Optimization Components
+    Optimizer Components
   
 
     
@@ -1934,7 +1934,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Optimization Components
+    Optimizer Components
   
 
           </label>
@@ -2120,7 +2120,7 @@
   <span class="md-ellipsis">
     
   
-    Workflow System
+    Workflow Components
   
 
     
@@ -2136,7 +2136,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Workflow System
+    Workflow Components
   
 
           </label>
@@ -2149,7 +2149,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/workflow_compute_steps/" class="md-nav__link">
+      <a href="../../reference/components_compute_steps/" class="md-nav__link">
         
   
   
@@ -2177,7 +2177,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/workflow_event_handlers/" class="md-nav__link">
+      <a href="../../reference/components_event_handlers/" class="md-nav__link">
         
   
   
@@ -2205,7 +2205,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/workflow_evaluators/" class="md-nav__link">
+      <a href="../../reference/components_evaluators/" class="md-nav__link">
         
   
   
@@ -2233,7 +2233,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/workflow_executors/" class="md-nav__link">
+      <a href="../../reference/components_executors/" class="md-nav__link">
         
   
   
@@ -2261,14 +2261,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/workflow_utils/" class="md-nav__link">
+      <a href="../../reference/components_utils/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Workflow Utilities
+    Utilities
   
 
     
@@ -2571,10 +2571,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#index-based-sharing-of-component-objects" class="md-nav__link">
+  <a href="#index-based-sharing-of-optimizer-components" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Index-based sharing of component objects
+        Index-based sharing of optimizer components
       
     </span>
   </a>
@@ -2582,10 +2582,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#providing-component-objects" class="md-nav__link">
+  <a href="#providing-optimizer-components" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Providing component objects
+        Providing optimizer components
       
     </span>
   </a>
@@ -2938,7 +2938,7 @@ size-1 value is broadcast to match the relevant count, e.g.:</p>
 </span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="p">}</span>
 </span></code></pre></div>
 <p>Length-mismatched arrays raise a validation error.</p>
-<h3 id="index-based-sharing-of-component-objects">Index-based sharing of component objects</h3>
+<h3 id="index-based-sharing-of-optimizer-components">Index-based sharing of optimizer components</h3>
 <p>The tuple-typed fields hold <em>objects</em> that implement the corresponding abstract
 base class:</p>
 <table>
@@ -2994,7 +2994,7 @@ thanks to broadcasting, a single <code>0</code> (the default) is sufficient.</p>
 <p>For optional fields like <code>realization_filters</code> and the transform fields, an
 index of <code>-1</code> (the default) or any other out-of-range value leaves the
 corresponding element unfiltered/untransformed.</p>
-<h3 id="providing-component-objects">Providing component objects</h3>
+<h3 id="providing-optimizer-components">Providing optimizer components</h3>
 <p>Although these fields are typed as abstract-base instances, you generally do
 not need to construct them directly. Each tuple element accepts any of three
 equivalent forms, and a Pydantic validator converts it to the required object:</p>
@@ -3327,8 +3327,8 @@ objective functions and gradients are calculated:</p>
   needed based on information obtained from the function evaluations.</li>
 </ul>
 <h3 id="function_estimators-realization_filters-samplers-transforms"><code>function_estimators</code>, <code>realization_filters</code>, <code>samplers</code>, <code>transforms</code></h3>
-<p>These are lists of component object configurations (see <a href="#index-based-sharing-of-component-objects">Index-based sharing of
-component objects</a> above for how
+<p>These are lists of optimizer component configurations (see <a href="#index-based-sharing-of-optimizer-components">Index-based sharing of
+optimizer components</a> above for how
 objects are referenced by index). Each entry configures a plugin instance via a
 <code>method</code> field and an optional <code>options</code> dict.</p>
 <h4 id="function-estimators-functionestimatorconfig">Function estimators — <a class="autorefs autorefs-internal" title="            FunctionEstimatorConfig" href="../../reference/config/#ropt.config.FunctionEstimatorConfig"><code>FunctionEstimatorConfig</code></a></h4>
@@ -3429,22 +3429,22 @@ these labels appear in exported DataFrames.</p>
 <p><code>ropt</code> provides helper functions for querying installed plugins at runtime.
 These are useful for verifying your environment or building dynamic
 configurations.</p>
-<p><a class="autorefs autorefs-internal" title="            find_backend_plugin" href="../../reference/workflow_utils/#ropt.workflow.find_backend_plugin"><code>find_backend_plugin</code></a> and
-<a class="autorefs autorefs-internal" title="            find_sampler_plugin" href="../../reference/workflow_utils/#ropt.workflow.find_sampler_plugin"><code>find_sampler_plugin</code></a> look up which plugin
+<p><a class="autorefs autorefs-internal" title="            find_backend_plugin" href="../../reference/components_utils/#ropt.components.find_backend_plugin"><code>find_backend_plugin</code></a> and
+<a class="autorefs autorefs-internal" title="            find_sampler_plugin" href="../../reference/components_utils/#ropt.components.find_sampler_plugin"><code>find_sampler_plugin</code></a> look up which plugin
 provides a given method. They accept the same <code>"plugin/method"</code> or <code>"method"</code>
 strings used in configuration and return the plugin name, or <code>None</code> if no
 plugin supports the method:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.workflow</span><span class="w"> </span><span class="kn">import</span> <span class="n">find_backend_plugin</span><span class="p">,</span> <span class="n">find_sampler_plugin</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.components</span><span class="w"> </span><span class="kn">import</span> <span class="n">find_backend_plugin</span><span class="p">,</span> <span class="n">find_sampler_plugin</span>
 </span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>
 </span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="n">find_backend_plugin</span><span class="p">(</span><span class="s2">&quot;slsqp&quot;</span><span class="p">)</span>          <span class="c1"># &quot;scipy&quot;</span>
 </span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="n">find_backend_plugin</span><span class="p">(</span><span class="s2">&quot;scipy/L-BFGS-B&quot;</span><span class="p">)</span> <span class="c1"># &quot;scipy&quot;</span>
 </span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="n">find_backend_plugin</span><span class="p">(</span><span class="s2">&quot;unknown&quot;</span><span class="p">)</span>        <span class="c1"># None</span>
 </span></code></pre></div>
-<p><a class="autorefs autorefs-internal" title="            validate_backend_options" href="../../reference/workflow_utils/#ropt.workflow.validate_backend_options"><code>validate_backend_options</code></a> checks
+<p><a class="autorefs autorefs-internal" title="            validate_backend_options" href="../../reference/components_utils/#ropt.components.validate_backend_options"><code>validate_backend_options</code></a> checks
 whether a set of backend-specific options is valid for a given method, raising
 an error if not. Call it before starting a long optimization run to catch
 configuration mistakes early:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.workflow</span><span class="w"> </span><span class="kn">import</span> <span class="n">validate_backend_options</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.components</span><span class="w"> </span><span class="kn">import</span> <span class="n">validate_backend_options</span>
 </span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>
 </span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="n">validate_backend_options</span><span class="p">(</span><span class="s2">&quot;scipy/slsqp&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;maxiter&quot;</span><span class="p">:</span> <span class="mi">200</span><span class="p">})</span>
 </span></code></pre></div>

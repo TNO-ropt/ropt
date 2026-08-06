@@ -1191,7 +1191,7 @@
   <span class="md-ellipsis">
     
   
-    Using the Workflow Framework
+    Building a Workflow
   
 
     
@@ -1708,7 +1708,7 @@
   <span class="md-ellipsis">
     
   
-    Optimization Components
+    Optimizer Components
   
 
     
@@ -1724,7 +1724,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Optimization Components
+    Optimizer Components
   
 
           </label>
@@ -1910,7 +1910,7 @@
   <span class="md-ellipsis">
     
   
-    Workflow System
+    Workflow Components
   
 
     
@@ -1926,7 +1926,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Workflow System
+    Workflow Components
   
 
           </label>
@@ -1939,7 +1939,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/workflow_compute_steps/" class="md-nav__link">
+      <a href="../../reference/components_compute_steps/" class="md-nav__link">
         
   
   
@@ -1967,7 +1967,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/workflow_event_handlers/" class="md-nav__link">
+      <a href="../../reference/components_event_handlers/" class="md-nav__link">
         
   
   
@@ -1995,7 +1995,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/workflow_evaluators/" class="md-nav__link">
+      <a href="../../reference/components_evaluators/" class="md-nav__link">
         
   
   
@@ -2023,7 +2023,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/workflow_executors/" class="md-nav__link">
+      <a href="../../reference/components_executors/" class="md-nav__link">
         
   
   
@@ -2051,14 +2051,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/workflow_utils/" class="md-nav__link">
+      <a href="../../reference/components_utils/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Workflow Utilities
+    Utilities
   
 
     
@@ -2467,8 +2467,8 @@ explicitly enables them.</p>
 <p>Every module in <code>ropt</code> creates its own logger whose name is derived from the
 public package path:</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>ropt
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>├── ropt.workflow
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>│   └── ropt.workflow.compute_steps    ← OptimizationStep, EvaluationStep
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>├── ropt.components
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>│   └── ropt.components.compute_steps    ← OptimizationStep, EvaluationStep
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>├── ropt.core                          ← EnsembleOptimizer, EnsembleEvaluator
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>└── ropt.plugins
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    └── ropt.plugins.manager           ← PluginManager
@@ -2561,25 +2561,25 @@ for gradients per iteration.</p>
 </span></code></pre></div>
 <p>This outputs <code>INFO</code> and above from all loggers, including <code>ropt</code>. Example
 output during a short optimization run:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>ropt.workflow.compute_steps - INFO - Starting optimization
+<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>ropt.components.compute_steps - INFO - Starting optimization
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>ropt.core - INFO - Function evaluation: 10/10 realizations succeeded
 </span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>ropt.core - INFO - Gradient evaluation: 10/10 realizations succeeded
 </span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>ropt.core - INFO - Function evaluation: 10/10 realizations succeeded
 </span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>ropt.core - INFO - Gradient evaluation: 9/10 realizations succeeded
 </span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>...
 </span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>ropt.core - INFO - Stopping: Maximum number of function evaluations reached (200)
-</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>ropt.workflow.compute_steps - INFO - Optimization finished: Maximum number of function evaluations reached (200)
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>ropt.components.compute_steps - INFO - Optimization finished: Maximum number of function evaluations reached (200)
 </span></code></pre></div>
 <h3 id="high-level-only-workflow-messages-without-core-detail">High-level only — workflow messages without core detail</h3>
 <p>Because <code>ropt.core</code> covers both stopping conditions and per-batch statistics,
 you cannot suppress one without the other by logger name alone. To see only
-workflow start/stop messages, enable <code>INFO</code> on <code>ropt.workflow.compute_steps</code>
+workflow start/stop messages, enable <code>INFO</code> on <code>ropt.components.compute_steps</code>
 and leave <code>ropt.core</code> at <code>WARNING</code>:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">)</span>  <span class="c1"># silence everything by default</span>
 </span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;ropt.workflow.compute_steps&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;ropt.components.compute_steps&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
 </span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="c1"># ropt.core stays at WARNING → no batch statistics and no stopping conditions</span>
 </span></code></pre></div>
 <p>To also include stopping conditions and batch statistics, add <code>ropt.core</code>:</p>

@@ -1224,7 +1224,7 @@
   <span class="md-ellipsis">
     
   
-    Using the Workflow Framework
+    Building a Workflow
   
 
     
@@ -1741,7 +1741,7 @@
   <span class="md-ellipsis">
     
   
-    Optimization Components
+    Optimizer Components
   
 
     
@@ -1757,7 +1757,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Optimization Components
+    Optimizer Components
   
 
           </label>
@@ -1943,7 +1943,7 @@
   <span class="md-ellipsis">
     
   
-    Workflow System
+    Workflow Components
   
 
     
@@ -1959,7 +1959,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Workflow System
+    Workflow Components
   
 
           </label>
@@ -1972,7 +1972,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/workflow_compute_steps/" class="md-nav__link">
+      <a href="../../reference/components_compute_steps/" class="md-nav__link">
         
   
   
@@ -2000,7 +2000,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/workflow_event_handlers/" class="md-nav__link">
+      <a href="../../reference/components_event_handlers/" class="md-nav__link">
         
   
   
@@ -2028,7 +2028,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/workflow_evaluators/" class="md-nav__link">
+      <a href="../../reference/components_evaluators/" class="md-nav__link">
         
   
   
@@ -2056,7 +2056,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/workflow_executors/" class="md-nav__link">
+      <a href="../../reference/components_executors/" class="md-nav__link">
         
   
   
@@ -2084,14 +2084,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/workflow_utils/" class="md-nav__link">
+      <a href="../../reference/components_utils/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Workflow Utilities
+    Utilities
   
 
     
@@ -2673,9 +2673,9 @@ object with variables, objectives, and constraints mapped back to user-domain
 values (including bound/constraint violation differences).</p>
 <p>Higher-level helpers handle this automatically:</p>
 <ul>
-<li><a class="autorefs autorefs-internal" title="            ropt.workflow.BasicOptimizer" href="../../reference/basic_optimizer/#ropt.workflow.BasicOptimizer"><code>BasicOptimizer</code></a> returns user-domain results.</li>
+<li><a class="autorefs autorefs-internal" title="            ropt.components.BasicOptimizer" href="../../reference/basic_optimizer/#ropt.components.BasicOptimizer"><code>BasicOptimizer</code></a> returns user-domain results.</li>
 <li>Event handlers may or may not perform the conversion automatically. For
-  example, <a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.ResultsHandler" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.ResultsHandler"><code>ResultsHandler</code></a> accepts
+  example, <a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.ResultsHandler" href="../../reference/components_event_handlers/#ropt.components.event_handlers.ResultsHandler"><code>ResultsHandler</code></a> accepts
   a <code>domain</code> argument (<code>"user"</code> or <code>"optimizer"</code>) to control which domain its
   stored result lives in.</li>
 </ul>

@@ -1368,7 +1368,7 @@
   <span class="md-ellipsis">
     
   
-    Using the Workflow Framework
+    Building a Workflow
   
 
     
@@ -1885,7 +1885,7 @@
   <span class="md-ellipsis">
     
   
-    Optimization Components
+    Optimizer Components
   
 
     
@@ -1901,7 +1901,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Optimization Components
+    Optimizer Components
   
 
           </label>
@@ -2087,7 +2087,7 @@
   <span class="md-ellipsis">
     
   
-    Workflow System
+    Workflow Components
   
 
     
@@ -2103,7 +2103,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Workflow System
+    Workflow Components
   
 
           </label>
@@ -2116,7 +2116,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/workflow_compute_steps/" class="md-nav__link">
+      <a href="../../reference/components_compute_steps/" class="md-nav__link">
         
   
   
@@ -2144,7 +2144,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/workflow_event_handlers/" class="md-nav__link">
+      <a href="../../reference/components_event_handlers/" class="md-nav__link">
         
   
   
@@ -2172,7 +2172,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/workflow_evaluators/" class="md-nav__link">
+      <a href="../../reference/components_evaluators/" class="md-nav__link">
         
   
   
@@ -2200,7 +2200,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/workflow_executors/" class="md-nav__link">
+      <a href="../../reference/components_executors/" class="md-nav__link">
         
   
   
@@ -2228,14 +2228,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/workflow_utils/" class="md-nav__link">
+      <a href="../../reference/components_utils/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Workflow Utilities
+    Utilities
   
 
     
@@ -2813,11 +2813,11 @@
 
 <h1 id="optimization-workflows">Optimization Workflows</h1>
 <p><a href="../basic/">Basic Optimization</a> uses
-<a class="autorefs autorefs-internal" title="            ropt.workflow.BasicOptimizer" href="../../reference/basic_optimizer/#ropt.workflow.BasicOptimizer"><code>BasicOptimizer</code></a> to drive a single optimization
+<a class="autorefs autorefs-internal" title="            ropt.components.BasicOptimizer" href="../../reference/basic_optimizer/#ropt.components.BasicOptimizer"><code>BasicOptimizer</code></a> to drive a single optimization
 run with a single evaluator. For anything more elaborate — multiple optimizers
 in sequence, nested optimizations, custom event handling, parallel/async
-execution — drop down to the workflow framework.</p>
-<p>The framework has four concepts:</p>
+execution — drop down to the workflow components.</p>
+<p>There are four core workflow components:</p>
 <table>
 <thead>
 <tr>
@@ -2827,19 +2827,19 @@ execution — drop down to the workflow framework.</p>
 </thead>
 <tbody>
 <tr>
-<td><a class="autorefs autorefs-internal" title="            ropt.workflow.compute_steps.ComputeStep" href="../../reference/workflow_compute_steps/#ropt.workflow.compute_steps.ComputeStep"><code>ComputeStep</code></a></td>
+<td><a class="autorefs autorefs-internal" title="            ropt.components.compute_steps.ComputeStep" href="../../reference/components_compute_steps/#ropt.components.compute_steps.ComputeStep"><code>ComputeStep</code></a></td>
 <td>An executable unit of work (run an optimizer, run a single ensemble evaluation, etc.).</td>
 </tr>
 <tr>
-<td><a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.EventHandler" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.EventHandler"><code>EventHandler</code></a></td>
+<td><a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventHandler" href="../../reference/components_event_handlers/#ropt.components.event_handlers.EventHandler"><code>EventHandler</code></a></td>
 <td>A reactive object that observes events emitted by a compute step.</td>
 </tr>
 <tr>
-<td><a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.Evaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.Evaluator"><code>Evaluator</code></a></td>
+<td><a class="autorefs autorefs-internal" title="            ropt.components.evaluators.Evaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.Evaluator"><code>Evaluator</code></a></td>
 <td>The object a compute step uses to actually evaluate the model.</td>
 </tr>
 <tr>
-<td><a class="autorefs autorefs-internal" title="            ropt.workflow.executors.Executor" href="../../reference/workflow_executors/#ropt.workflow.executors.Executor"><code>Executor</code></a></td>
+<td><a class="autorefs autorefs-internal" title="            ropt.components.executors.Executor" href="../../reference/components_executors/#ropt.components.executors.Executor"><code>Executor</code></a></td>
 <td>Dispatches evaluation tasks to threads, processes, or an HPC cluster.</td>
 </tr>
 </tbody>
@@ -2952,13 +2952,13 @@ types are useful for logging, progress bars, or custom lifecycle hooks.</p>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">numpy.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">NDArray</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.context</span><span class="w"> </span><span class="kn">import</span> <span class="n">EnOptContext</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.workflow.compute_steps</span><span class="w"> </span><span class="kn">import</span> <span class="n">OptimizationStep</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.workflow.evaluators</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.components.compute_steps</span><span class="w"> </span><span class="kn">import</span> <span class="n">OptimizationStep</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.components.evaluators</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
 </span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">EvaluationFunctionContext</span><span class="p">,</span>
 </span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">EvaluationFunctionResult</span><span class="p">,</span>
 </span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="n">FunctionEvaluator</span><span class="p">,</span>
 </span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="p">)</span>
-</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.workflow.event_handlers</span><span class="w"> </span><span class="kn">import</span> <span class="n">ResultsHandler</span>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.components.event_handlers</span><span class="w"> </span><span class="kn">import</span> <span class="n">ResultsHandler</span>
 </span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>
 </span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="c1"># 1. Build the configuration.</span>
 </span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="n">CONFIG</span> <span class="o">=</span> <span class="p">{</span>
@@ -3001,9 +3001,9 @@ parameters can be found here:
 <h2 id="compute-steps">Compute steps</h2>
 <p>Two compute steps ship with <code>ropt</code>:</p>
 <ul>
-<li><a class="autorefs autorefs-internal" title="            ropt.workflow.compute_steps.OptimizationStep" href="../../reference/workflow_compute_steps/#ropt.workflow.compute_steps.OptimizationStep"><code>OptimizationStep</code></a> — runs
+<li><a class="autorefs autorefs-internal" title="            ropt.components.compute_steps.OptimizationStep" href="../../reference/components_compute_steps/#ropt.components.compute_steps.OptimizationStep"><code>OptimizationStep</code></a> — runs
   an optimization algorithm.</li>
-<li><a class="autorefs autorefs-internal" title="            ropt.workflow.compute_steps.EvaluationStep" href="../../reference/workflow_compute_steps/#ropt.workflow.compute_steps.EvaluationStep"><code>EvaluationStep</code></a> — runs
+<li><a class="autorefs autorefs-internal" title="            ropt.components.compute_steps.EvaluationStep" href="../../reference/components_compute_steps/#ropt.components.compute_steps.EvaluationStep"><code>EvaluationStep</code></a> — runs
   a single ensemble evaluation (no optimizer). For example, useful for evaluating an
   optimum on a different ensemble, or on a sub-set of realizations.</li>
 </ul>
@@ -3021,7 +3021,7 @@ provided, it is included in the <a class="autorefs autorefs-internal" title="   
   " href="../../reference/results/#ropt.results.Results"><code>Results</code></a> objects
 emitted via the <code>FINISHED_EVALUATION</code> event.</p>
 <h3 id="events-emitted-by-optimizationstep">Events emitted by OptimizationStep</h3>
-<p><a class="autorefs autorefs-internal" title="            ropt.workflow.compute_steps.OptimizationStep" href="../../reference/workflow_compute_steps/#ropt.workflow.compute_steps.OptimizationStep"><code>OptimizationStep</code></a>
+<p><a class="autorefs autorefs-internal" title="            ropt.components.compute_steps.OptimizationStep" href="../../reference/components_compute_steps/#ropt.components.compute_steps.OptimizationStep"><code>OptimizationStep</code></a>
 executes an optimization algorithm based on the provided context. It
 iteratively performs function and potentially gradient evaluations, yielding a
 sequence of <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
@@ -3081,7 +3081,7 @@ sequence of <a class="autorefs autorefs-internal" title="            ropt.result
   or due to termination conditions or errors).</li>
 </ul>
 <h3 id="events-emitted-by-evaluationstep">Events emitted by EvaluationStep</h3>
-<p><a class="autorefs autorefs-internal" title="            ropt.workflow.compute_steps.EvaluationStep" href="../../reference/workflow_compute_steps/#ropt.workflow.compute_steps.EvaluationStep"><code>EvaluationStep</code></a>
+<p><a class="autorefs autorefs-internal" title="            ropt.components.compute_steps.EvaluationStep" href="../../reference/components_compute_steps/#ropt.components.compute_steps.EvaluationStep"><code>EvaluationStep</code></a>
 evaluates a batch of variable vectors. The <code>variables</code> argument can be a
 single 1-D vector (treated as one row) or a 2-D matrix where each row is a
 variable vector. The evaluator performs a function evaluation for the full
@@ -3188,7 +3188,7 @@ There are two ways to drive one, and they are mutually exclusive:</p>
 </li>
 <li>
 <p><strong>Registered with an
-  <a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.EventDispatcher" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.EventDispatcher"><code>EventDispatcher</code></a>.</strong> When work
+  <a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventDispatcher" href="../../reference/components_event_handlers/#ropt.components.event_handlers.EventDispatcher"><code>EventDispatcher</code></a>.</strong> When work
   runs on several threads at once (for example, <code>ParallelEvaluator</code> with a
   multi-worker <code>ThreadingExecutor</code>), route events through a dispatcher. It
   receives events from any thread and delivers them to its handlers one at a
@@ -3205,7 +3205,7 @@ Mixing the two, or registering with a second dispatcher, raises a
 <p>An exception raised by a handler is a fatal error that stops the run. A
 directly-attached handler raises on the optimizer's own stack, so it
 propagates normally. A handler behind an
-<a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.EventDispatcher" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.EventDispatcher"><code>EventDispatcher</code></a> runs while
+<a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventDispatcher" href="../../reference/components_event_handlers/#ropt.components.event_handlers.EventDispatcher"><code>EventDispatcher</code></a> runs while
 the emitting run <strong>waits</strong> for the event to be handled, so its exception is
 re-raised on that run's own stack too — synchronously, including for the
 run's last event. Either way a handler bug surfaces as a single, clean
@@ -3239,14 +3239,14 @@ as data. See
 a thread, so results can be read after a run from any thread. Read a
 handler's stored values only <strong>after its producer has finished</strong>: after
 <code>step.run()</code> returns for a directly-attached handler, or after the
-<a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.EventDispatcher" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.EventDispatcher"><code>EventDispatcher</code></a> has been
+<a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventDispatcher" href="../../reference/components_event_handlers/#ropt.components.event_handlers.EventDispatcher"><code>EventDispatcher</code></a> has been
 cancelled and its task group has exited for a handler registered with a
 dispatcher. Both are synchronization points that make the latest values
 visible.</p>
 <p>Reading a handler's state <em>while it is still processing events on another
 thread</em> returns a valid object, but possibly a stale one — do not rely on it
 for the latest result. For live progress during a parallel run, use a
-<a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.CallbackHandler" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.CallbackHandler"><code>CallbackHandler</code></a> (which is
+<a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.CallbackHandler" href="../../reference/components_event_handlers/#ropt.components.event_handlers.CallbackHandler"><code>CallbackHandler</code></a> (which is
 pushed each event) rather than polling another handler's state.</p>
 </div>
 <p>The framework ships four reusable handlers:</p>
@@ -3259,24 +3259,24 @@ pushed each event) rather than polling another handler's state.</p>
 </thead>
 <tbody>
 <tr>
-<td><a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.ResultsHandler" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.ResultsHandler"><code>ResultsHandler</code></a></td>
+<td><a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.ResultsHandler" href="../../reference/components_event_handlers/#ropt.components.event_handlers.ResultsHandler"><code>ResultsHandler</code></a></td>
 <td>Keep the best (or last) result. Backs <code>BasicOptimizer.results</code>.</td>
 </tr>
 <tr>
-<td><a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.HistoryHandler" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.HistoryHandler"><code>HistoryHandler</code></a></td>
+<td><a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.HistoryHandler" href="../../reference/components_event_handlers/#ropt.components.event_handlers.HistoryHandler"><code>HistoryHandler</code></a></td>
 <td>Keep every result.</td>
 </tr>
 <tr>
-<td><a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.CallbackHandler" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.CallbackHandler"><code>CallbackHandler</code></a></td>
+<td><a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.CallbackHandler" href="../../reference/components_event_handlers/#ropt.components.event_handlers.CallbackHandler"><code>CallbackHandler</code></a></td>
 <td>Forward selected event types to a user callback.</td>
 </tr>
 <tr>
-<td><a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.DataFrameHandler" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.DataFrameHandler"><code>DataFrameHandler</code></a></td>
+<td><a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.DataFrameHandler" href="../../reference/components_event_handlers/#ropt.components.event_handlers.DataFrameHandler"><code>DataFrameHandler</code></a></td>
 <td>Append rows to a structured table per result.</td>
 </tr>
 <tr>
-<td><a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.EventForwardHandler" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.EventForwardHandler"><code>EventForwardHandler</code></a></td>
-<td>Forward events to an <a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.EventDispatcher" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.EventDispatcher"><code>EventDispatcher</code></a> for lock-free dispatch.</td>
+<td><a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventForwardHandler" href="../../reference/components_event_handlers/#ropt.components.event_handlers.EventForwardHandler"><code>EventForwardHandler</code></a></td>
+<td>Forward events to an <a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventDispatcher" href="../../reference/components_event_handlers/#ropt.components.event_handlers.EventDispatcher"><code>EventDispatcher</code></a> for lock-free dispatch.</td>
 </tr>
 </tbody>
 </table>
@@ -3285,7 +3285,7 @@ convention, <code>ResultsHandler</code> and <code>HistoryHandler</code> both use
 e.g. <code>result_handler["results"]</code> or <code>history_handler["results"]</code>. <code>DataFrameHandler</code>
 uses the table name as key — e.g. <code>table["functions"]</code>.</p>
 <h3 id="resultshandler">ResultsHandler</h3>
-<p><a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.ResultsHandler" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.ResultsHandler"><code>ResultsHandler</code></a> listens for
+<p><a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.ResultsHandler" href="../../reference/components_event_handlers/#ropt.components.event_handlers.ResultsHandler"><code>ResultsHandler</code></a> listens for
 <a class="autorefs autorefs-internal" title="            FINISHED_EVALUATION
 
 
@@ -3333,7 +3333,7 @@ transformed to the user's domain (when <code>domain="user"</code>, the default).
 <p>If the domain type is <code>"user"</code>, the result is converted from the optimizer
 domain to the user domain before being stored.</p>
 <h3 id="historyhandler">HistoryHandler</h3>
-<p><a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.HistoryHandler" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.HistoryHandler"><code>HistoryHandler</code></a> listens for
+<p><a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.HistoryHandler" href="../../reference/components_event_handlers/#ropt.components.event_handlers.HistoryHandler"><code>HistoryHandler</code></a> listens for
 <a class="autorefs autorefs-internal" title="            FINISHED_EVALUATION
 
 
@@ -3356,7 +3356,7 @@ Initially, <code>history_handler["results"]</code> is <code>None</code>.</p>
 <p>If the domain type is <code>"user"</code>, the results are converted from the optimizer
 domain to the user domain before being stored.</p>
 <h3 id="callbackhandler">CallbackHandler</h3>
-<p><a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.CallbackHandler" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.CallbackHandler"><code>CallbackHandler</code></a> listens for
+<p><a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.CallbackHandler" href="../../reference/components_event_handlers/#ropt.components.event_handlers.CallbackHandler"><code>CallbackHandler</code></a> listens for
 events and forwards them to a callback function. It is constructed with a set of
 <code>event_types</code> to respond to and a single <code>callback</code>. When an event with a
 matching type arrives, the callback is called with the
@@ -3367,14 +3367,14 @@ matching type arrives, the callback is called with the
       dataclass
   " href="../../reference/events/#ropt.events.EnOptEvent"><code>EnOptEvent</code></a>.</p>
 <h3 id="eventforwardhandler">EventForwardHandler</h3>
-<p><a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.EventForwardHandler" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.EventForwardHandler"><code>EventForwardHandler</code></a> is
+<p><a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventForwardHandler" href="../../reference/components_event_handlers/#ropt.components.event_handlers.EventForwardHandler"><code>EventForwardHandler</code></a> is
 attached to a compute step and forwards matching events to an
-<a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.EventDispatcher" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.EventDispatcher"><code>EventDispatcher</code></a>. The dispatcher
+<a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventDispatcher" href="../../reference/components_event_handlers/#ropt.components.event_handlers.EventDispatcher"><code>EventDispatcher</code></a>. The dispatcher
 dispatches them from the asyncio event loop's thread, so handlers registered on
 the dispatcher require no locking.</p>
 <p>See <a href="../parallel/#event-dispatcher">Event Dispatcher</a> for the full pattern.</p>
 <h3 id="dataframehandler">DataFrameHandler</h3>
-<p><a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.DataFrameHandler" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.DataFrameHandler"><code>DataFrameHandler</code></a> tracks results and
+<p><a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.DataFrameHandler" href="../../reference/components_event_handlers/#ropt.components.event_handlers.DataFrameHandler"><code>DataFrameHandler</code></a> tracks results and
 stores them in pandas DataFrames.</p>
 <h4 id="tables">Tables</h4>
 <p>Tables can be generated for
@@ -3491,7 +3491,7 @@ callback signature is:</p>
   " href="../../reference/events/#ropt.events.EnOptEvent"><code>EnOptEvent</code></a> that caused the
 tables to be updated.</p>
 <h2 id="evaluators">Evaluators</h2>
-<p>Compute steps take an <a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.Evaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.Evaluator"><code>Evaluator</code></a>
+<p>Compute steps take an <a class="autorefs autorefs-internal" title="            ropt.components.evaluators.Evaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.Evaluator"><code>Evaluator</code></a>
 instance — <em>not</em> the plain callable accepted by <code>BasicOptimizer</code>. Three
 synchronous evaluators are provided, plus an asynchronous one described in
 the <a href="../parallel/">next section</a>:</p>
@@ -3504,20 +3504,20 @@ the <a href="../parallel/">next section</a>:</p>
 </thead>
 <tbody>
 <tr>
-<td><a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.BatchEvaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.BatchEvaluator"><code>BatchEvaluator</code></a></td>
+<td><a class="autorefs autorefs-internal" title="            ropt.components.evaluators.BatchEvaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.BatchEvaluator"><code>BatchEvaluator</code></a></td>
 <td>Batch: <code>f(variables_2d, context)</code> → <code>EvaluationBatchResult</code>.</td>
 </tr>
 <tr>
-<td><a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.FunctionEvaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.FunctionEvaluator"><code>FunctionEvaluator</code></a></td>
+<td><a class="autorefs autorefs-internal" title="            ropt.components.evaluators.FunctionEvaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.FunctionEvaluator"><code>FunctionEvaluator</code></a></td>
 <td>Per-row: <code>f(variables_1d, context)</code> → <code>EvaluationFunctionResult</code>.</td>
 </tr>
 <tr>
-<td><a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.CachedEvaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.CachedEvaluator"><code>CachedEvaluator</code></a></td>
+<td><a class="autorefs autorefs-internal" title="            ropt.components.evaluators.CachedEvaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.CachedEvaluator"><code>CachedEvaluator</code></a></td>
 <td>Wraps another evaluator, caching results by variable vector.</td>
 </tr>
 <tr>
-<td><a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.ParallelEvaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.ParallelEvaluator"><code>ParallelEvaluator</code></a></td>
-<td>Parallel evaluation via an <a class="autorefs autorefs-internal" title="            ropt.workflow.executors.Executor" href="../../reference/workflow_executors/#ropt.workflow.executors.Executor"><code>Executor</code></a> — see <a href="../parallel/">Parallel Evaluation</a>.</td>
+<td><a class="autorefs autorefs-internal" title="            ropt.components.evaluators.ParallelEvaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.ParallelEvaluator"><code>ParallelEvaluator</code></a></td>
+<td>Parallel evaluation via an <a class="autorefs autorefs-internal" title="            ropt.components.executors.Executor" href="../../reference/components_executors/#ropt.components.executors.Executor"><code>Executor</code></a> — see <a href="../parallel/">Parallel Evaluation</a>.</td>
 </tr>
 </tbody>
 </table>
@@ -3533,7 +3533,7 @@ give each parallel step its own evaluator. For the constraints on where each
 layer of a nested workflow may run, see
 <a href="../parallel/#nested-workflows-and-process-boundaries">Nested workflows and process boundaries</a>.
 Note that the parallelism of
-<a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.ParallelEvaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.ParallelEvaluator"><code>ParallelEvaluator</code></a> happens
+<a class="autorefs autorefs-internal" title="            ropt.components.evaluators.ParallelEvaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.ParallelEvaluator"><code>ParallelEvaluator</code></a> happens
 <em>below</em> <code>eval</code> — it dispatches tasks to an executor, so its own <code>eval</code> is
 still called on a single thread. An evaluator cannot be transferred to
 another process; serializing one reconstructs it as an inert placeholder in
@@ -3541,7 +3541,7 @@ the worker, and <code>ropt</code> raises a
 <a class="autorefs autorefs-internal" title="            TransferError" href="../../reference/exceptions/#ropt.exceptions.TransferError"><code>TransferError</code></a> before the task runs.</p>
 </div>
 <h3 id="batchevaluator">BatchEvaluator</h3>
-<p><a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.BatchEvaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.BatchEvaluator"><code>BatchEvaluator</code></a> defers to a callable
+<p><a class="autorefs autorefs-internal" title="            ropt.components.evaluators.BatchEvaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.BatchEvaluator"><code>BatchEvaluator</code></a> defers to a callable
 callback that receives the full 2-D variable matrix and an
 <a class="autorefs autorefs-internal" title="            ropt.evaluation.EvaluationBatchContext
 
@@ -3559,28 +3559,28 @@ when you need the full batch (e.g. vectorized computation, or an external
 simulator that accepts all rows at once). The callback has the same signature as
 the callable accepted by <code>BasicOptimizer</code>.</p>
 <h3 id="functionevaluator">FunctionEvaluator</h3>
-<p><a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.FunctionEvaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.FunctionEvaluator"><code>FunctionEvaluator</code></a> stores a
+<p><a class="autorefs autorefs-internal" title="            ropt.components.evaluators.FunctionEvaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.FunctionEvaluator"><code>FunctionEvaluator</code></a> stores a
 single function that returns a value for each objective and constraint. The
 function is called once per row of the evaluation batch with the variable
 vector and an
-<a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.EvaluationFunctionContext
+<a class="autorefs autorefs-internal" title="            ropt.components.evaluators.EvaluationFunctionContext
 
 
   
       dataclass
-  " href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.EvaluationFunctionContext"><code>EvaluationFunctionContext</code></a>
+  " href="../../reference/components_evaluators/#ropt.components.evaluators.EvaluationFunctionContext"><code>EvaluationFunctionContext</code></a>
 dataclass exposing <code>realization</code>, <code>perturbation</code>, <code>batch_id</code>, <code>eval_idx</code>, and
 <code>name</code>. The <code>perturbation</code> value is <code>-1</code> when the evaluation is not a
 perturbation (i.e. the unperturbed function evaluation). The <code>name</code> value is the
 optional task name set by the evaluator (e.g. via <code>ParallelEvaluator</code>'s
 <code>get_name</code> callback) and is <code>None</code> when no name was assigned. The function must
 return an
-<a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.EvaluationFunctionResult
+<a class="autorefs autorefs-internal" title="            ropt.components.evaluators.EvaluationFunctionResult
 
 
   
       dataclass
-  " href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.EvaluationFunctionResult"><code>EvaluationFunctionResult</code></a>
+  " href="../../reference/components_evaluators/#ropt.components.evaluators.EvaluationFunctionResult"><code>EvaluationFunctionResult</code></a>
 dataclass with:</p>
 <ul>
 <li><code>objectives</code>: a scalar or 1-D NumPy array of length <em>n_objectives</em>.</li>
@@ -3598,7 +3598,7 @@ dataclass with:</p>
 <p>See <a href="../evaluation_callbacks/#using-functionevaluator">Writing Evaluation Callbacks</a>
 for a worked example.</p>
 <h3 id="cachedevaluator">CachedEvaluator</h3>
-<p><a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.CachedEvaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.CachedEvaluator"><code>CachedEvaluator</code></a> wraps another
+<p><a class="autorefs autorefs-internal" title="            ropt.components.evaluators.CachedEvaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.CachedEvaluator"><code>CachedEvaluator</code></a> wraps another
 evaluator with result caching. It retrieves previously computed function results
 from <code>EventHandler</code> instances specified as <code>sources</code> — typically a
 <code>HistoryHandler</code> or <code>ResultsHandler</code>. For each variable vector and realization,
@@ -3647,7 +3647,7 @@ dictionary mapping evaluation indices to their cached
 For parallel evaluation — whether via worker threads, separate processes, or an
 HPC cluster — a parallel evaluator is needed. See <a href="../parallel/">Parallel
 Evaluation</a> for details on
-<a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.ParallelEvaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.ParallelEvaluator"><code>ParallelEvaluator</code></a> and the
+<a class="autorefs autorefs-internal" title="            ropt.components.evaluators.ParallelEvaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.ParallelEvaluator"><code>ParallelEvaluator</code></a> and the
 available executors.</p>
 <div class="admonition tip">
 <p class="admonition-title">Reusing objectives and constraints</p>
@@ -3661,7 +3661,7 @@ values for both objectives from a single evaluator call.</p>
 <ul>
 <li><a href="../parallel/">Parallel Evaluation</a> — run evaluations off-process
   or on a cluster.</li>
-<li><a href="../../tutorials/workflow/">Using the Workflow Framework</a> — step-by-step
+<li><a href="../../tutorials/workflow/">Building a Workflow</a> — step-by-step
   example building a workflow from scratch.</li>
 <li>Full example:
   <a href="https://github.com/TNO-ropt/ropt/blob/main/examples/workflow.py">examples/workflow.py</a>.</li>

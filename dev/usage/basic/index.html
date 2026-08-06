@@ -1185,7 +1185,7 @@
   <span class="md-ellipsis">
     
   
-    Using the Workflow Framework
+    Building a Workflow
   
 
     
@@ -1702,7 +1702,7 @@
   <span class="md-ellipsis">
     
   
-    Optimization Components
+    Optimizer Components
   
 
     
@@ -1718,7 +1718,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Optimization Components
+    Optimizer Components
   
 
           </label>
@@ -1904,7 +1904,7 @@
   <span class="md-ellipsis">
     
   
-    Workflow System
+    Workflow Components
   
 
     
@@ -1920,7 +1920,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Workflow System
+    Workflow Components
   
 
           </label>
@@ -1933,7 +1933,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/workflow_compute_steps/" class="md-nav__link">
+      <a href="../../reference/components_compute_steps/" class="md-nav__link">
         
   
   
@@ -1961,7 +1961,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/workflow_event_handlers/" class="md-nav__link">
+      <a href="../../reference/components_event_handlers/" class="md-nav__link">
         
   
   
@@ -1989,7 +1989,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/workflow_evaluators/" class="md-nav__link">
+      <a href="../../reference/components_evaluators/" class="md-nav__link">
         
   
   
@@ -2017,7 +2017,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/workflow_executors/" class="md-nav__link">
+      <a href="../../reference/components_executors/" class="md-nav__link">
         
   
   
@@ -2045,14 +2045,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/workflow_utils/" class="md-nav__link">
+      <a href="../../reference/components_utils/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Workflow Utilities
+    Utilities
   
 
     
@@ -2446,7 +2446,7 @@
 
 
 <h1 id="running-a-basic-optimization-task">Running a basic optimization task</h1>
-<p>The <code>ropt</code> library provides a <a class="autorefs autorefs-internal" title="            ropt.workflow.BasicOptimizer" href="../../reference/basic_optimizer/#ropt.workflow.BasicOptimizer"><code>BasicOptimizer</code></a>
+<p>The <code>ropt</code> library provides a <a class="autorefs autorefs-internal" title="            ropt.components.BasicOptimizer" href="../../reference/basic_optimizer/#ropt.components.BasicOptimizer"><code>BasicOptimizer</code></a>
 class that simplifies running an optimization task.</p>
 <p>This section walks you through an example of how to use <code>BasicOptimizer</code> to
 solve a simple optimization problem. We minimize the multi-dimensional
@@ -2464,7 +2464,7 @@ of the script in the following sections.</p>
 </span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>
 </span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.evaluation</span><span class="w"> </span><span class="kn">import</span> <span class="n">EvaluationBatchContext</span><span class="p">,</span> <span class="n">EvaluationBatchResult</span>
 </span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.results</span><span class="w"> </span><span class="kn">import</span> <span class="n">FunctionResults</span><span class="p">,</span> <span class="n">Results</span>
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.workflow</span><span class="w"> </span><span class="kn">import</span> <span class="n">BasicOptimizer</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.components</span><span class="w"> </span><span class="kn">import</span> <span class="n">BasicOptimizer</span>
 </span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>
 </span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="n">DIM</span> <span class="o">=</span> <span class="mi">5</span>
 </span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="n">UNCERTAINTY</span> <span class="o">=</span> <span class="mf">0.1</span>
@@ -2635,7 +2635,7 @@ setting up and running the optimizer are:</p>
 </li>
 </ol>
 <h2 id="basicoptimizer-reference">BasicOptimizer reference</h2>
-<p><a class="autorefs autorefs-internal" title="            ropt.workflow.BasicOptimizer" href="../../reference/basic_optimizer/#ropt.workflow.BasicOptimizer"><code>BasicOptimizer</code></a> wraps the workflow framework
+<p><a class="autorefs autorefs-internal" title="            ropt.components.BasicOptimizer" href="../../reference/basic_optimizer/#ropt.components.BasicOptimizer"><code>BasicOptimizer</code></a> wraps the workflow components
 into a simple, single-run interface. The table below summarizes its API:</p>
 <table>
 <thead>
@@ -2647,7 +2647,7 @@ into a simple, single-run interface. The table below summarizes its API:</p>
 <tbody>
 <tr>
 <td><code>__init__(config, evaluator, *, constraint_tolerance=1e-10)</code></td>
-<td>Create the optimizer from a config dict and a <a class="autorefs autorefs-internal" title="            ropt.evaluation.EvaluationBatchCallback" href="../../reference/evaluation/#ropt.evaluation.EvaluationBatchCallback"><code>EvaluationBatchCallback</code></a> callable or an <a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.Evaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.Evaluator"><code>Evaluator</code></a> object.</td>
+<td>Create the optimizer from a config dict and a <a class="autorefs autorefs-internal" title="            ropt.evaluation.EvaluationBatchCallback" href="../../reference/evaluation/#ropt.evaluation.EvaluationBatchCallback"><code>EvaluationBatchCallback</code></a> callable or an <a class="autorefs autorefs-internal" title="            ropt.components.evaluators.Evaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.Evaluator"><code>Evaluator</code></a> object.</td>
 </tr>
 <tr>
 <td><code>run(initial_values)</code></td>
@@ -2683,16 +2683,16 @@ into a simple, single-run interface. The table below summarizes its API:</p>
 <ol>
 <li>Validates <code>config</code> into an <a class="autorefs autorefs-internal" title="            EnOptContext" href="../../reference/context/#ropt.context.EnOptContext"><code>EnOptContext</code></a>.</li>
 <li>Instantiates a
-   <a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.BatchEvaluator" href="../../reference/workflow_evaluators/#ropt.workflow.evaluators.BatchEvaluator"><code>BatchEvaluator</code></a> object that
+   <a class="autorefs autorefs-internal" title="            ropt.components.evaluators.BatchEvaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.BatchEvaluator"><code>BatchEvaluator</code></a> object that
    calls your callable when needed.</li>
-<li>Creates an <a class="autorefs autorefs-internal" title="            ropt.workflow.compute_steps.OptimizationStep" href="../../reference/workflow_compute_steps/#ropt.workflow.compute_steps.OptimizationStep"><code>OptimizationStep</code></a>
+<li>Creates an <a class="autorefs autorefs-internal" title="            ropt.components.compute_steps.OptimizationStep" href="../../reference/components_compute_steps/#ropt.components.compute_steps.OptimizationStep"><code>OptimizationStep</code></a>
    compute step.</li>
-<li>Attaches a <a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.ResultsHandler" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.ResultsHandler"><code>ResultsHandler</code></a> to
+<li>Attaches a <a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.ResultsHandler" href="../../reference/components_event_handlers/#ropt.components.event_handlers.ResultsHandler"><code>ResultsHandler</code></a> to
    remember the best result.</li>
 <li>Runs the step and exposes the best result via the <code>results</code> property.</li>
 </ol>
 <p>If you need more control (multiple runs, custom handlers, async evaluation),
-use the workflow framework directly — see
+use the workflow components directly — see
 <a href="../workflows/">Optimization Workflows</a>.</p>
 <h3 id="customization">Customization</h3>
 <p>Sometimes you want to inject behavior — extra logging, telemetry, a custom
@@ -2715,7 +2715,7 @@ Find it with:</p>
 </span></code></pre></div>
 <p><code>mylogger</code> must be importable from the active Python environment. The
 referenced class must subclass
-<a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.EventHandler" href="../../reference/workflow_event_handlers/#ropt.workflow.event_handlers.EventHandler"><code>EventHandler</code></a> and accept no
+<a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventHandler" href="../../reference/components_event_handlers/#ropt.components.event_handlers.EventHandler"><code>EventHandler</code></a> and accept no
 required constructor arguments.</p>
 <h2 id="where-to-next">Where to next</h2>
 <ul>
