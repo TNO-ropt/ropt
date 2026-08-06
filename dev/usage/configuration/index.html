@@ -3429,22 +3429,22 @@ these labels appear in exported DataFrames.</p>
 <p><code>ropt</code> provides helper functions for querying installed plugins at runtime.
 These are useful for verifying your environment or building dynamic
 configurations.</p>
-<p><a class="autorefs autorefs-internal" title="            find_backend_plugin" href="../../reference/components_utils/#ropt.components.find_backend_plugin"><code>find_backend_plugin</code></a> and
-<a class="autorefs autorefs-internal" title="            find_sampler_plugin" href="../../reference/components_utils/#ropt.components.find_sampler_plugin"><code>find_sampler_plugin</code></a> look up which plugin
+<p><a class="autorefs autorefs-internal" title="            find_backend_plugin" href="../../reference/components_utils/#ropt.workflow.find_backend_plugin"><code>find_backend_plugin</code></a> and
+<a class="autorefs autorefs-internal" title="            find_sampler_plugin" href="../../reference/components_utils/#ropt.workflow.find_sampler_plugin"><code>find_sampler_plugin</code></a> look up which plugin
 provides a given method. They accept the same <code>"plugin/method"</code> or <code>"method"</code>
 strings used in configuration and return the plugin name, or <code>None</code> if no
 plugin supports the method:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.components</span><span class="w"> </span><span class="kn">import</span> <span class="n">find_backend_plugin</span><span class="p">,</span> <span class="n">find_sampler_plugin</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.workflow</span><span class="w"> </span><span class="kn">import</span> <span class="n">find_backend_plugin</span><span class="p">,</span> <span class="n">find_sampler_plugin</span>
 </span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>
 </span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="n">find_backend_plugin</span><span class="p">(</span><span class="s2">&quot;slsqp&quot;</span><span class="p">)</span>          <span class="c1"># &quot;scipy&quot;</span>
 </span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="n">find_backend_plugin</span><span class="p">(</span><span class="s2">&quot;scipy/L-BFGS-B&quot;</span><span class="p">)</span> <span class="c1"># &quot;scipy&quot;</span>
 </span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="n">find_backend_plugin</span><span class="p">(</span><span class="s2">&quot;unknown&quot;</span><span class="p">)</span>        <span class="c1"># None</span>
 </span></code></pre></div>
-<p><a class="autorefs autorefs-internal" title="            validate_backend_options" href="../../reference/components_utils/#ropt.components.validate_backend_options"><code>validate_backend_options</code></a> checks
+<p><a class="autorefs autorefs-internal" title="            validate_backend_options" href="../../reference/components_utils/#ropt.workflow.validate_backend_options"><code>validate_backend_options</code></a> checks
 whether a set of backend-specific options is valid for a given method, raising
 an error if not. Call it before starting a long optimization run to catch
 configuration mistakes early:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.components</span><span class="w"> </span><span class="kn">import</span> <span class="n">validate_backend_options</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.workflow</span><span class="w"> </span><span class="kn">import</span> <span class="n">validate_backend_options</span>
 </span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>
 </span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="n">validate_backend_options</span><span class="p">(</span><span class="s2">&quot;scipy/slsqp&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;maxiter&quot;</span><span class="p">:</span> <span class="mi">200</span><span class="p">})</span>
 </span></code></pre></div>

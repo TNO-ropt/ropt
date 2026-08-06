@@ -3039,7 +3039,7 @@ for what belongs where.</p>
 
   
       async
-  " href="../../reference/components_utils/#ropt.components.dispatch_tasks"><code>dispatch_tasks</code></a> is a utility function built on
+  " href="../../reference/components_utils/#ropt.workflow.dispatch_tasks"><code>dispatch_tasks</code></a> is a utility function built on
 top of the executor infrastructure. It runs an arbitrary collection of Python
 callables in parallel — not necessarily as part of an optimization workflow. Use
 it for one-off parallel work such as post-processing, ensemble replay, or any
@@ -3051,7 +3051,7 @@ returns the collected results.</p>
 <p><code>dispatch_tasks</code> is an <code>async</code> function — call it with <code>await</code> from an
 asyncio context, or use <code>asyncio.run(dispatch_tasks(...))</code>:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.components</span><span class="w"> </span><span class="kn">import</span> <span class="n">dispatch_tasks</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.workflow</span><span class="w"> </span><span class="kn">import</span> <span class="n">dispatch_tasks</span>
 </span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
 </span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="k">def</span><span class="w"> </span><span class="nf">task_a</span><span class="p">():</span>
 </span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>    <span class="k">return</span> <span class="s2">&quot;result_a&quot;</span>
