@@ -183,9 +183,6 @@ class ParallelEvaluator(Evaluator):
             results_queue.close()
             raise
 
-        if not self._executor.is_running():
-            raise Abort(ExitCode.EXECUTOR_STOPPED)
-
     async def _submit_bundles(
         self,
         variables: NDArray[np.float64],

@@ -9,7 +9,9 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 import pytest
 
+from ropt.context import EnOptContext
 from ropt.enums import ExitCode
+from ropt.evaluation import EvaluationBatchContext
 from ropt.exceptions import Abort, ExecutorFailure, TransferError
 from ropt.workflow._basic_optimizer import BasicOptimizer
 from ropt.workflow.evaluators import (
@@ -627,6 +629,25 @@ async def test_abort_without_queued_exception_has_no_cause() -> None:  # ruff: i
         _abort(ResultsQueue())
     assert excinfo.value.exit_code == ExitCode.EXECUTOR_STOPPED
     assert excinfo.value.__cause__ is None
+
+
+async def test_put_tasks_does_not_raise_executor_stopped_into_task_group(
+    config: dict[str, Any], objective: Any
+) -> None:
+    # A stopped executor is reported to the caller by eval()'s consumer loop, so
+    # the unawaited producer task must return cleanly instead of raising
+    # EXECUTOR_STOPPED into the executor's task group, which would tear it down.
+    executor = ThreadingExecutor(workers=1)
+    assert not executor.is_running()
+    evaluator = ParallelEvaluator(function=objective(), executor=executor)
+    batch_context = EvaluationBatchContext(
+        context=EnOptContext.model_validate(config),
+        active=np.array([True]),
+        realizations=np.array([0], dtype=np.intc),
+    )
+    await evaluator._put_tasks(  # ruff: ignore[private-member-access]
+        np.zeros((1, 1)), batch_context, ResultsQueue(), 0
+    )
 
 
 class _FatalError(BaseException):
