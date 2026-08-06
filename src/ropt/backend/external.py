@@ -17,6 +17,8 @@ from ropt.exceptions import Abort
 from ropt.plugins.manager import get_plugin
 
 if TYPE_CHECKING:
+    from multiprocessing.process import BaseProcess
+
     from numpy.typing import NDArray
 
     from ropt.config import BackendConfig
@@ -90,7 +92,7 @@ class ExternalBackend(Backend):
         )
         self._is_parallel: bool = backend.is_parallel
 
-    def start(  # ruff: ignore[complex-structure, undocumented-public-method]
+    def start(  # ruff: ignore[undocumented-public-method]
         self, initial_values: NDArray[np.float64]
     ) -> None:
         context = multiprocessing.get_context("spawn")
@@ -117,51 +119,40 @@ class ExternalBackend(Backend):
 
         _logger.info("Starting external optimization in subprocess")
         process.start()
-        while exception is None:
-            try:
-                request = request_queue.get(timeout=_QUEUE_POLL_INTERVAL)
-            except queue.Empty:
-                if not process.is_alive():
-                    _logger.warning(
-                        "External backend subprocess died unexpectedly (exit code %s)",
-                        process.exitcode,
-                    )
-                    exception = RuntimeError(
-                        "External backend subprocess died unexpectedly "
-                        f"(exit code {process.exitcode})"
-                    )
-                    break
-                continue
-            if request is None:
-                break
-            outcome = _handle_request(request)
-            if isinstance(outcome, Exception):
-                exception = outcome
-                break
-            try:
-                result = self._optimizer_callback(
-                    outcome["variables"],
-                    return_functions=outcome["return_functions"],
-                    return_gradients=outcome["return_gradients"],
-                )
-            except Exception as exc:  # ruff: ignore[blind-except]
-                # The evaluation callback failed in the driver: signal the child
-                # to abort (None means "no result"). The real error is re-raised
-                # below.
-                result = None
-                exception = exc
-            result_queue.put(result)
-        process.join(_PROCESS_TIMEOUT)
-
-        if process.is_alive():
-            process.terminate()
-            process.join(_PROCESS_TIMEOUT)
-            if process.is_alive():
+        try:
+            while exception is None:
                 try:
-                    process.kill()
-                    process.join(_PROCESS_TIMEOUT)
-                except AttributeError:
-                    pass
+                    request = request_queue.get(timeout=_QUEUE_POLL_INTERVAL)
+                except queue.Empty:
+                    if not process.is_alive():
+                        _logger.warning(
+                            "External backend subprocess died unexpectedly (exit code %s)",
+                            process.exitcode,
+                        )
+                        exception = RuntimeError(
+                            "External backend subprocess died unexpectedly "
+                            f"(exit code {process.exitcode})"
+                        )
+                        break
+                    continue
+                if request is None:
+                    break
+                outcome = _handle_request(request)
+                if isinstance(outcome, Exception):
+                    exception = outcome
+                    break
+                try:
+                    result = self._optimizer_callback(
+                        outcome["variables"],
+                        return_functions=outcome["return_functions"],
+                        return_gradients=outcome["return_gradients"],
+                    )
+                except Exception as exc:  # ruff: ignore[blind-except]
+                    result = None
+                    exception = exc
+                result_queue.put(result)
+        finally:
+            _shutdown(process, request_queue, result_queue)
 
         if exception is not None:
             raise exception
@@ -174,6 +165,27 @@ class ExternalBackend(Backend):
     @property
     def is_parallel(self) -> bool:  # ruff: ignore[undocumented-public-method]
         return self._is_parallel
+
+
+def _shutdown(
+    process: BaseProcess,
+    request_queue: multiprocessing.Queue[dict[str, Any] | None],
+    result_queue: multiprocessing.Queue[OptimizerCallbackResult | None],
+) -> None:
+    process.join(_PROCESS_TIMEOUT)
+    if process.is_alive():
+        process.terminate()
+        process.join(_PROCESS_TIMEOUT)
+        if process.is_alive():
+            try:
+                process.kill()
+                process.join(_PROCESS_TIMEOUT)
+            except AttributeError:
+                pass
+    request_queue.close()
+    request_queue.join_thread()
+    result_queue.close()
+    result_queue.join_thread()
 
 
 def _run(
