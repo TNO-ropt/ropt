@@ -13,8 +13,6 @@ import numpy as np
 
 from ropt._logging import get_logger
 from ropt.backend import Backend
-from ropt.core import OptimizerCallback, OptimizerCallbackResult
-from ropt.enums import ExitCode
 from ropt.exceptions import Abort
 from ropt.plugins.manager import get_plugin
 
@@ -23,6 +21,7 @@ if TYPE_CHECKING:
 
     from ropt.config import BackendConfig
     from ropt.context import EnOptContext
+    from ropt.core import OptimizerCallback, OptimizerCallbackResult
 
 _logger = get_logger(__name__)
 
@@ -34,6 +33,14 @@ if _HAVE_CLOUDPICKLE:
 
 _PROCESS_TIMEOUT: Final = 10
 _QUEUE_POLL_INTERVAL: Final = 1.0
+
+
+class _DriverStopped(Exception):  # ruff: ignore[error-suffix-on-exception-name]
+    """Unwinds the child optimizer after a driver-side evaluation failure.
+
+    Swallowed in the child and never reported back; the driver re-raises the
+    real exception.
+    """
 
 
 class ExternalBackend(Backend):
@@ -105,7 +112,7 @@ class ExternalBackend(Backend):
             ),
         )
 
-        result: OptimizerCallbackResult | ExitCode
+        result: OptimizerCallbackResult | None
         exception: Exception | None = None
 
         _logger.info("Starting external optimization in subprocess")
@@ -138,7 +145,10 @@ class ExternalBackend(Backend):
                     return_gradients=outcome["return_gradients"],
                 )
             except Exception as exc:  # ruff: ignore[blind-except]
-                result = ExitCode.EXECUTOR_STOPPED
+                # The evaluation callback failed in the driver: signal the child
+                # to abort (None means "no result"). The real error is re-raised
+                # below.
+                result = None
                 exception = exc
             result_queue.put(result)
         process.join(_PROCESS_TIMEOUT)
@@ -169,7 +179,7 @@ class ExternalBackend(Backend):
 def _run(
     data: bytes,
     request_queue: multiprocessing.Queue[dict[str, Any] | None],
-    result_queue: multiprocessing.Queue[OptimizerCallbackResult | ExitCode],
+    result_queue: multiprocessing.Queue[OptimizerCallbackResult | None],
 ) -> None:
     data_dict = cloudpickle.loads(data)
     config = data_dict["config"]
@@ -186,6 +196,8 @@ def _run(
 
     try:
         backend.start(np.asarray(initial_values, dtype=np.float64))
+    except _DriverStopped:
+        pass  # the driver already holds the real error; nothing to report
     except Abort as exc:
         request_queue.put({"abort": True, "exit_code": exc.exit_code})
     except Exception as exc:  # ruff: ignore[blind-except]
@@ -200,7 +212,7 @@ def _callback(
     return_functions: bool,
     return_gradients: bool,
     request_queue: multiprocessing.Queue[dict[str, Any] | None],
-    result_queue: multiprocessing.Queue[OptimizerCallbackResult | ExitCode],
+    result_queue: multiprocessing.Queue[OptimizerCallbackResult | None],
 ) -> OptimizerCallbackResult:
     request_queue.put(
         {
@@ -210,10 +222,11 @@ def _callback(
         },
     )
     result = result_queue.get()
-    if isinstance(result, OptimizerCallbackResult):
-        return result
-    assert isinstance(result, ExitCode)
-    raise Abort(result)
+    if result is None:
+        # The driver's evaluation callback failed; unwind this optimizer. The
+        # driver re-raises the real exception, so nothing is reported back here.
+        raise _DriverStopped
+    return result
 
 
 def _handle_request(
