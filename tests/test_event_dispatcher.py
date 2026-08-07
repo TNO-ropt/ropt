@@ -445,3 +445,49 @@ def test_dispatcher_owned_handler_rejects_concurrent_handle_event(
     finally:
         release.set()
         first.join()
+
+
+@pytest.mark.asyncio
+async def test_event_dispatcher_removed_handler_no_longer_receives_events(
+    config: dict[str, Any],
+) -> None:
+    context = EnOptContext.model_validate(config)
+    received_a: list[EnOptEvent] = []
+    received_b: list[EnOptEvent] = []
+    handler_a = CallbackHandler(
+        event_types={EnOptEventType.FINISHED_EVALUATION}, callback=received_a.append
+    )
+    handler_b = CallbackHandler(
+        event_types={EnOptEventType.FINISHED_EVALUATION}, callback=received_b.append
+    )
+    dispatcher = EventDispatcher()
+    dispatcher.add_event_handler(handler_a)
+    dispatcher.add_event_handler(handler_b)
+    event = _event(context)
+    async with asyncio.TaskGroup() as tg:
+        await dispatcher.start(tg)
+        dispatcher.remove_event_handler(handler_a)
+        await asyncio.to_thread(dispatcher.dispatch_event, event)
+        dispatcher.cancel()
+    assert received_a == []
+    assert received_b == [event]
+
+
+def test_event_dispatcher_removed_handler_can_be_added_to_another_dispatcher() -> None:
+    received: list[EnOptEvent] = []
+    handler = CallbackHandler(
+        event_types={EnOptEventType.FINISHED_EVALUATION}, callback=received.append
+    )
+    first = EventDispatcher()
+    first.add_event_handler(handler)
+    first.remove_event_handler(handler)
+    EventDispatcher().add_event_handler(handler)
+
+
+def test_event_dispatcher_remove_unknown_handler_raises() -> None:
+    received: list[EnOptEvent] = []
+    handler = CallbackHandler(
+        event_types={EnOptEventType.FINISHED_EVALUATION}, callback=received.append
+    )
+    with pytest.raises(ValueError, match="not added to the dispatcher"):
+        EventDispatcher().remove_event_handler(handler)

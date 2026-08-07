@@ -114,6 +114,20 @@ class EventHandler(ABC):
             raise RuntimeError(msg)
         self._attached_to = _Attachment.DISPATCHER
 
+    def unregister_dispatcher(self) -> None:
+        """Reverse `register_dispatcher`, releasing the handler.
+
+        After unregistering, the handler is free to be registered with another
+        dispatcher or with a compute step.
+
+        Raises:
+            RuntimeError: If the handler is not registered with a dispatcher.
+        """
+        if self._attached_to is not _Attachment.DISPATCHER:
+            msg = "This event handler is not registered with a dispatcher."
+            raise RuntimeError(msg)
+        self._attached_to = _Attachment.NONE
+
     def register_compute_step(self) -> None:
         """Mark this handler as owned by one or more compute steps.
 

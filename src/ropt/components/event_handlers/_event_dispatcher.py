@@ -55,6 +55,25 @@ class EventDispatcher:
         handler.register_dispatcher()
         self._handlers.append((handler, run_in_thread))
 
+    def remove_event_handler(self, handler: EventHandler) -> None:
+        """Remove a previously added handler.
+
+        The handler is released, so it can afterwards be added to another
+        dispatcher or registered with a compute step.
+
+        Args:
+            handler: The handler to remove.
+
+        Raises:
+            ValueError: If the handler was not added to this dispatcher.
+        """
+        remaining = [item for item in self._handlers if item[0] is not handler]
+        if len(remaining) == len(self._handlers):
+            msg = "This handler was not added to the dispatcher."
+            raise ValueError(msg)
+        self._handlers = remaining
+        handler.unregister_dispatcher()
+
     def dispatch_event(self, event: EnOptEvent) -> None:
         """Submit an event and block until every handler has processed it.
 
