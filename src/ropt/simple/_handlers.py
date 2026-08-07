@@ -5,11 +5,12 @@ session's task group) holding exactly the handlers listed for that block. Runs
 inside the block deliver their events to the innermost block's dispatcher, which
 serializes the handlers across concurrent runs.
 
-Blocks nest, but there is no automatic inheritance: a nested block sees only the
-handlers it lists. Re-listing an enclosing handler *migrates* it into the nested
-block's dispatcher for the duration of that block, and it is migrated back when
-the block exits. Because an enclosing block is suspended while a nested block
-runs, a handler is always attached to exactly one dispatcher at a time.
+Blocks nest. By default a nested block *inherits* the enclosing blocks'
+handlers: it steals them into its own dispatcher for the block's duration and
+gives them back on exit, so those handlers also aggregate the nested runs. Pass
+``inherit=False`` to skip that and re-list only the enclosing handlers you want.
+Because an enclosing block is suspended while a nested block runs, a handler is
+always attached to exactly one dispatcher at a time.
 """
 
 from __future__ import annotations
@@ -44,14 +45,16 @@ class HandlerScope:
     handlers with `attach_to`.
     """
 
-    def __init__(self, handlers: Sequence[EventHandler]) -> None:
+    def __init__(self, handlers: Sequence[EventHandler], *, inherit: bool) -> None:
         self._handlers = tuple(handlers)
+        self._inherit = inherit
         self._session: Session | None = None
         self._session_token: Token[Session | None] | None = None
         self._stack_token: Token[tuple[HandlerScope, ...]] | None = None
         self._dispatcher: EventDispatcher | None = None
         # The handlers currently attached to this scope's dispatcher; a nested
-        # block temporarily removes any it re-lists and restores them on exit.
+        # block temporarily steals these (re-listed or inherited) and restores
+        # them on exit.
         self.current: set[EventHandler] = set()
         self._migrated: list[tuple[EventHandler, HandlerScope]] = []
 
@@ -83,7 +86,7 @@ class HandlerScope:
         stack = _handler_stack.get()
         migrated: list[tuple[EventHandler, HandlerScope]] = []
         try:
-            self._attach(dispatcher, stack, migrated)
+            added = self._attach(dispatcher, stack, migrated)
             session.open_dispatcher(dispatcher)
         except BaseException:
             self._detach(dispatcher, migrated)
@@ -93,7 +96,7 @@ class HandlerScope:
         self._session = session
         self._session_token = session_token
         self._dispatcher = dispatcher
-        self.current = set(self._handlers)
+        self.current = added
         self._migrated = migrated
         self._stack_token = _handler_stack.set((*stack, self))
 
@@ -102,7 +105,8 @@ class HandlerScope:
         dispatcher: EventDispatcher,
         stack: tuple[HandlerScope, ...],
         migrated: list[tuple[EventHandler, HandlerScope]],
-    ) -> None:
+    ) -> set[EventHandler]:
+        added: set[EventHandler] = set()
         for handler in self._handlers:
             source = _find_scope(stack, handler)
             if source is not None:
@@ -110,6 +114,16 @@ class HandlerScope:
                 source.current.discard(handler)
                 migrated.append((handler, source))
             dispatcher.add_event_handler(handler)
+            added.add(handler)
+        if self._inherit:
+            for source in stack:
+                for handler in list(source.current):
+                    source.dispatcher.remove_event_handler(handler)
+                    source.current.discard(handler)
+                    migrated.append((handler, source))
+                    dispatcher.add_event_handler(handler)
+                    added.add(handler)
+        return added
 
     @staticmethod
     def _detach(
@@ -130,23 +144,25 @@ class HandlerScope:
         _release_session(self._session, self._session_token)
 
 
-def handlers(*handler: EventHandler) -> HandlerScope:
+def handlers(*handler: EventHandler, inherit: bool = True) -> HandlerScope:
     """Aggregate results across every optimization run in the block.
 
     Each handler receives events from all runs in the block (sequential or
-    concurrent) and is serialized across them. Blocks nest, but a nested block
-    sees only the handlers it lists; re-listing an enclosing handler feeds it
-    from the nested block too, for the duration of that block.
+    concurrent) and is serialized across them. Blocks nest: by default a nested
+    block also inherits the enclosing blocks' handlers, so they aggregate the
+    nested runs too. Pass ``inherit=False`` to include only the handlers the
+    nested block lists (re-list an enclosing handler to feed it explicitly).
 
     See [High-Level API](../usage/simple.md) for a walkthrough.
 
     Args:
         handler: The result handlers to share across the block.
+        inherit: Whether to also inherit the enclosing blocks' handlers.
 
     Returns:
         A context manager scoping the shared handlers.
     """
-    return HandlerScope(handler)
+    return HandlerScope(handler, inherit=inherit)
 
 
 def _find_scope(

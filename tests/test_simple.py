@@ -350,22 +350,34 @@ def test_shared_handler_aggregates_across_optimize_many(
     assert len(shared["results"]) > len(single["results"])
 
 
-def test_nested_handlers_isolated_by_default(config: Any, test_functions: Any) -> None:
+def test_nested_handlers_inherit_by_default(config: Any, test_functions: Any) -> None:
     outer = HistoryHandler()
     inner = HistoryHandler()
     with handlers(outer), handlers(inner):
         optimize(config, initial_values, test_functions[0])
     assert inner["results"]
+    assert outer["results"]
+    assert len(outer["results"]) == len(inner["results"])
+
+
+def test_nested_handlers_inherit_false_isolates(
+    config: Any, test_functions: Any
+) -> None:
+    outer = HistoryHandler()
+    inner = HistoryHandler()
+    with handlers(outer), handlers(inner, inherit=False):
+        optimize(config, initial_values, test_functions[0])
+    assert inner["results"]
     assert outer["results"] is None
 
 
-def test_nested_handlers_relisted_enclosing_also_receives(
+def test_nested_handlers_inherit_false_with_manual_relist(
     config: Any, test_functions: Any
 ) -> None:
     outer = HistoryHandler()
     other = HistoryHandler()
     inner = HistoryHandler()
-    with handlers(outer, other), handlers(inner, outer):
+    with handlers(outer, other), handlers(inner, outer, inherit=False):
         optimize(config, initial_values, test_functions[0])
     assert inner["results"]
     assert outer["results"]
@@ -373,16 +385,29 @@ def test_nested_handlers_relisted_enclosing_also_receives(
     assert other["results"] is None
 
 
-def test_relisted_handler_returns_to_enclosing_block_after_nested_exit(
+def test_inherit_steals_from_all_enclosing_across_inherit_false(
+    config: Any, test_functions: Any
+) -> None:
+    a = HistoryHandler()
+    b = HistoryHandler()
+    c = HistoryHandler()
+    with handlers(a), handlers(b, inherit=False), handlers(c):
+        optimize(config, initial_values, test_functions[0])
+    assert a["results"]
+    assert b["results"]
+    assert c["results"]
+
+
+def test_inherited_handler_returns_to_enclosing_block_after_nested_exit(
     config: Any, test_functions: Any
 ) -> None:
     outer = HistoryHandler()
     with handlers(outer):
-        with handlers(outer):
+        with handlers(HistoryHandler()):
             optimize(config, initial_values, test_functions[0])
-        migrated_back = len(outer["results"])
+        inherited = len(outer["results"])
         optimize(config, initial_values, test_functions[0])
-    assert len(outer["results"]) > migrated_back
+    assert len(outer["results"]) > inherited
 
 
 def test_compose_accessors_reflect_open_blocks() -> None:
