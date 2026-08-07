@@ -22,10 +22,12 @@ from __future__ import annotations
 import asyncio
 import threading
 from contextvars import ContextVar, Token
+from pathlib import Path
 from typing import TYPE_CHECKING, TypeVar, cast
 
 from ropt.components.executors import (
     Executor,
+    HPCExecutor,
     MultiprocessingExecutor,
     ThreadingExecutor,
 )
@@ -248,6 +250,54 @@ def processes(*, workers: int = 1) -> _ExecutionScope:
         A context manager backing evaluations with a process pool.
     """
     return _ExecutionScope(lambda: MultiprocessingExecutor(workers=workers))
+
+
+def hpc(  # ruff: ignore[too-many-arguments]
+    *,
+    workers: int = 1,
+    cores: int = 1,
+    cluster: str | None = None,
+    queue: str | None = None,
+    workdir: Path | str | None = None,
+    config_path: Path | str | None = None,
+    template: str | None = None,
+    queue_type: str = "slurm",
+) -> _ExecutionScope:
+    """Run evaluations on an HPC cluster for the duration of the block.
+
+    Interfaces with a cluster queue (e.g. Slurm) through `pysqa`; requires the
+    `ropt[hpc]` extra, and the objective must be picklable. The cluster is
+    selected from `cluster`/`queue`: give a queue to search for its cluster, a
+    cluster to use its default queue, or both to be explicit. See
+    [High-Level API](../usage/simple.md) for a walkthrough.
+
+    Args:
+        workers:     The maximum number of concurrent cluster jobs.
+        cores:       The number of CPUs per job.
+        cluster:     The cluster name, when the `pysqa` config defines several.
+        queue:       The queue or partition name.
+        workdir:     The shared-filesystem working directory (defaults to the
+                     current directory).
+        config_path: The path to the `pysqa` configuration directory.
+        template:    An inline submission-script template, instead of a config.
+        queue_type:  The queueing system type.
+
+    Returns:
+        A context manager backing evaluations with an HPC cluster.
+    """
+    resolved = Path.cwd() if workdir is None else Path(workdir).resolve()
+    return _ExecutionScope(
+        lambda: HPCExecutor(
+            workers=workers,
+            cores=cores,
+            cluster=cluster,
+            queue=queue,
+            workdir=resolved,
+            config_path=config_path,
+            template=template,
+            queue_type=queue_type,
+        )
+    )
 
 
 def current_session() -> Session | None:

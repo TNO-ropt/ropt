@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import threading
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
@@ -17,6 +18,7 @@ from ropt.simple import (
     evaluate,
     evaluate_many,
     handlers,
+    hpc,
     optimize,
     optimize_many,
     processes,
@@ -25,7 +27,20 @@ from ropt.simple import (
 from ropt.simple._objective import adapt_objective
 
 if TYPE_CHECKING:
+    from pathlib import Path
+
     from numpy.typing import NDArray
+
+try:
+    import cloudpickle  # ruff: ignore[unused-import]
+    import pandas as pd
+    import pysqa  # ruff: ignore[unused-import]
+
+    from ropt.components.executors.__main__ import run_task
+
+    _TEST_HPC = True
+except ImportError:
+    _TEST_HPC = False
 
 initial_values = np.array([0.0, 0.0, 0.1])
 
@@ -430,3 +445,45 @@ def test_compose_accessors_reflect_open_blocks() -> None:
     assert compose.current_session() is None
     assert compose.current_handlers() is None
     assert compose.current_executor() is None
+
+
+if _TEST_HPC:
+
+    class _MockedHPCAdapter:
+        def __init__(self, path: Path) -> None:
+            self._path = path
+            self._jobs: dict[int, str] = {}
+            self._job_id = 0
+
+        def submit_job(self, job_name: str, command: str, **_kwargs: Any) -> int:
+            *_, input_file, output_file = command.split()
+            threading.Thread(
+                target=run_task, args=(input_file, output_file), daemon=True
+            ).start()
+            self._job_id += 1
+            self._jobs[self._job_id] = job_name
+            return self._job_id
+
+        def get_status_of_my_jobs(self) -> pd.DataFrame:
+            running = [
+                job_id
+                for job_id, job_name in self._jobs.items()
+                if not (self._path / f"{job_name}.out").exists()
+            ]
+            self._jobs = {job_id: self._jobs[job_id] for job_id in running}
+            return pd.DataFrame(list(self._jobs.keys()), columns=["jobid"])
+
+
+@pytest.mark.slow
+@pytest.mark.timeout(30)
+@pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
+def test_hpc_evaluates_through_the_simple_api(
+    config: Any, test_functions: Any, monkeypatch: Any, tmp_path: Path
+) -> None:
+    monkeypatch.setattr(
+        "ropt.components.executors._hpc_executor.pysqa.QueueAdapter",
+        lambda *args, **kwargs: _MockedHPCAdapter(tmp_path),  # ruff: ignore[unused-lambda-argument]
+    )
+    with hpc(workers=2, workdir=tmp_path, template=""):
+        result = evaluate(config, initial_values, test_functions[0])
+    assert result.target_objective is not None
