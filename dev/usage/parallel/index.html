@@ -3280,13 +3280,13 @@ where it was created." Concretely:</p>
 evaluations</strong>, where the actual model runs — not at a layer that itself drives a
 nested workflow. The nested examples follow exactly this shape:</p>
 <ul>
-<li><a href="https://github.com/TNO-ropt/ropt/blob/main/examples/nested.py"><code>examples/nested.py</code></a>
+<li><a href="https://github.com/TNO-ropt/ropt/blob/main/examples/advanced/nested.py"><code>examples/advanced/nested.py</code></a>
   — outer and inner optimizations run sequentially in the main process via
   <code>FunctionEvaluator</code>.</li>
-<li><a href="https://github.com/TNO-ropt/ropt/blob/main/examples/nested_multiprocess.py"><code>examples/nested_multiprocess.py</code></a>
+<li><a href="https://github.com/TNO-ropt/ropt/blob/main/examples/advanced/nested_multiprocess.py"><code>examples/advanced/nested_multiprocess.py</code></a>
   — outer optimizations run on a <code>ThreadingExecutor</code> (in-process); only the
   inner leaf evaluations run on a <code>MultiprocessingExecutor</code>.</li>
-<li><a href="https://github.com/TNO-ropt/ropt/blob/main/examples/nested_hpc.py"><code>examples/nested_hpc.py</code></a>
+<li><a href="https://github.com/TNO-ropt/ropt/blob/main/examples/advanced/nested_hpc.py"><code>examples/advanced/nested_hpc.py</code></a>
   — same pattern, with the inner leaf evaluations submitted to the cluster via
   <code>HPCExecutor</code>.</li>
 </ul>
