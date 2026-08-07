@@ -24,7 +24,6 @@ import threading
 from contextvars import ContextVar, Token
 from typing import TYPE_CHECKING, TypeVar, cast
 
-from ropt.components.evaluators import FunctionEvaluator, ParallelEvaluator
 from ropt.components.executors import (
     Executor,
     MultiprocessingExecutor,
@@ -37,7 +36,7 @@ if TYPE_CHECKING:
     from numpy.typing import ArrayLike
 
     from ropt.components.compute_steps import ComputeStep
-    from ropt.components.evaluators import EvaluationFunctionCallback, Evaluator
+    from ropt.components.event_handlers import EventDispatcher
     from ropt.context import EnOptContext
     from ropt.enums import ExitCode
 
@@ -125,7 +124,31 @@ class Session:
     def get_executor(self) -> Executor | None:
         return self._executor
 
+    def open_dispatcher(self, dispatcher: EventDispatcher) -> None:
+        assert self._loop is not None
+        assert self._task_group is not None
+        asyncio.run_coroutine_threadsafe(
+            dispatcher.start(self._task_group), self._loop
+        ).result()
+
+    def close_dispatcher(self, dispatcher: EventDispatcher) -> None:
+        if self._loop is not None:
+            self._loop.call_soon_threadsafe(dispatcher.cancel)
+
     def gather(self, jobs: Sequence[Callable[[], _T]], limit: int | None) -> list[_T]:
+        """Run jobs concurrently on the session's loop and return their results.
+
+        Each job runs on its own worker thread; ``limit`` bounds how many run at
+        once. The first job to raise cancels the others and its error propagates
+        (fail-fast).
+
+        Args:
+            jobs:  The zero-argument callables to run, one result each.
+            limit: The maximum number to run at once, or ``None`` for no limit.
+
+        Returns:
+            The job results, in the order of ``jobs``.
+        """
         assert self._loop is not None
         try:
             return asyncio.run_coroutine_threadsafe(
@@ -181,7 +204,7 @@ class _ExecutionScope:
         self._session: Session | None = None
         self._token: Token[Session | None] | None = None
 
-    def __enter__(self) -> Session:
+    def __enter__(self) -> None:
         session, token = _acquire_session()
         try:
             session.open_executor(self._make_executor)
@@ -191,7 +214,6 @@ class _ExecutionScope:
             raise
         self._session = session
         self._token = token
-        return session
 
     def __exit__(self, *_exc: object) -> None:
         assert self._session is not None
@@ -237,24 +259,20 @@ def current_session() -> Session | None:
     return _active_session.get()
 
 
-def make_evaluator(
-    callback: EvaluationFunctionCallback, session: Session | None
-) -> Evaluator:
-    """Build the evaluator for the given session.
+def current_executor() -> Executor | None:
+    """Return the active executor pool, or `None` on the sequential floor.
 
-    Args:
-        callback: The adapted per-evaluation callback.
-        session:  The session whose pool to use, or `None` for the sequential
-                  floor.
+    Call this from a compute step to build its evaluator: with a pool, wrap it in
+    a `ParallelEvaluator`; a `None` result means evaluate directly in-process
+    with a `FunctionEvaluator`. Read it on the thread that owns the block and
+    pass the result to each run, so `optimize_many`'s worker threads use the same
+    pool.
 
     Returns:
-        A `ParallelEvaluator` bound to the session's pool, or a
-        `FunctionEvaluator` when there is no session.
+        The active executor pool, or `None` when no execution block is open.
     """
-    executor = None if session is None else session.get_executor()
-    if executor is None:
-        return FunctionEvaluator(function=callback)
-    return ParallelEvaluator(function=callback, executor=executor)
+    session = _active_session.get()
+    return None if session is None else session.get_executor()
 
 
 def run_step(

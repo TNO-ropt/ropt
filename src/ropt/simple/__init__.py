@@ -7,6 +7,7 @@ directly, for example ``from ropt.simple import optimize, threads``.
 from __future__ import annotations
 
 from ._evaluate import evaluate, evaluate_many
+from ._handlers import handlers
 from ._objective import ObjectiveCallback
 from ._optimize import optimize, optimize_many
 from ._result import EvaluateResult, OptimizeResult
@@ -18,6 +19,7 @@ __all__ = [
     "OptimizeResult",
     "evaluate",
     "evaluate_many",
+    "handlers",
     "optimize",
     "optimize_many",
     "processes",

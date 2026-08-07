@@ -9,12 +9,14 @@ from typing import TYPE_CHECKING
 import numpy as np
 
 from ropt.components.compute_steps import OptimizationStep
+from ropt.components.evaluators import FunctionEvaluator, ParallelEvaluator
 from ropt.components.event_handlers import ResultsHandler
 from ropt.context import EnOptContext
 
+from ._handlers import current_handlers
 from ._objective import adapt_objective
 from ._result import OptimizeResult
-from ._session import current_session, make_evaluator, run_step
+from ._session import current_executor, current_session, run_step
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
@@ -23,11 +25,12 @@ if TYPE_CHECKING:
     from numpy.typing import ArrayLike
 
     from ropt.components.event_handlers import EventHandler
+    from ropt.components.executors import Executor
     from ropt.enums import ExitCode
     from ropt.results import FunctionResults
 
+    from ._handlers import HandlerScope
     from ._objective import ObjectiveCallback
-    from ._session import Session
 
 
 def optimize(
@@ -55,23 +58,25 @@ def optimize(
         A [`OptimizeResult`][ropt.simple.OptimizeResult] describing the outcome.
     """
     return _optimize(
-        current_session(),
+        current_executor(),
         config,
         x0,
         objective,
         handlers=handlers,
         constraint_tolerance=constraint_tolerance,
+        shared=current_handlers(),
     )
 
 
 def _optimize(  # ruff: ignore[too-many-arguments]
-    session: Session | None,
+    executor: Executor | None,
     config: dict[str, Any],
     x0: ArrayLike,
     objective: ObjectiveCallback,
     *,
     handlers: Sequence[EventHandler] | None,
     constraint_tolerance: float,
+    shared: HandlerScope | None,
 ) -> OptimizeResult:
     context = EnOptContext.model_validate(config)
     n_obj = context.objectives.weights.size
@@ -81,13 +86,20 @@ def _optimize(  # ruff: ignore[too-many-arguments]
         else context.nonlinear_constraints.lower_bounds.size
     )
 
-    evaluator = make_evaluator(adapt_objective(objective, n_obj, n_con), session)
+    callback = adapt_objective(objective, n_obj, n_con)
+    evaluator = (
+        FunctionEvaluator(function=callback)
+        if executor is None
+        else ParallelEvaluator(function=callback, executor=executor)
+    )
     result_handler = ResultsHandler(constraint_tolerance=constraint_tolerance)
     step = OptimizationStep(evaluator=evaluator)
     step.add_event_handler(result_handler)
     for handler in handlers or ():
         handler.claim()
         step.add_event_handler(handler)
+    if shared is not None:
+        shared.attach_to(step)
 
     exit_code = run_step(
         step, context=context, variables=np.asarray(x0, dtype=np.float64)
@@ -160,16 +172,19 @@ def optimize_many(
         )
         raise RuntimeError(msg)
 
+    executor = current_executor()
+    shared = current_handlers()
     runs = _broadcast(config, x0, objective)
     jobs: list[Callable[[], OptimizeResult]] = [
         partial(
             _optimize,
-            session,
+            executor,
             run_config,
             run_x0,
             run_objective,
             handlers=None,
             constraint_tolerance=constraint_tolerance,
+            shared=shared,
         )
         for run_config, run_x0, run_objective in runs
     ]

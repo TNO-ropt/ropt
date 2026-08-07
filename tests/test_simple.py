@@ -7,16 +7,16 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 import pytest
 
-from ropt.components.evaluators import (
-    EvaluationFunctionContext,
-)
+from ropt.components.evaluators import EvaluationFunctionContext
 from ropt.components.event_handlers import HistoryHandler
 from ropt.enums import ExitCode
 from ropt.simple import (
     EvaluateResult,
     OptimizeResult,
+    compose,
     evaluate,
     evaluate_many,
+    handlers,
     optimize,
     optimize_many,
     processes,
@@ -316,3 +316,92 @@ def test_optimize_many_fail_fast(config: Any, test_functions: Any) -> None:
     starts = np.tile(initial_values, (3, 1))
     with threads(workers=2), pytest.raises(ValueError, match="boom"):
         optimize_many(config, starts, [test_functions[0], boom, test_functions[0]])
+
+
+def test_shared_handler_aggregates_single_run(config: Any, test_functions: Any) -> None:
+    history = HistoryHandler()
+    with handlers(history):
+        optimize(config, initial_values, test_functions[0])
+    assert history["results"]
+
+
+def test_shared_handler_without_execution_manager_aggregates_runs(
+    config: Any, test_functions: Any
+) -> None:
+    history = HistoryHandler()
+    with handlers(history):
+        optimize(config, initial_values, test_functions[0])
+        optimize(config, initial_values, test_functions[0])
+    assert history["results"]
+
+
+def test_shared_handler_aggregates_across_optimize_many(
+    config: Any, test_functions: Any
+) -> None:
+    single = HistoryHandler()
+    with handlers(single):
+        optimize(config, initial_values, test_functions[0])
+
+    shared = HistoryHandler()
+    starts = np.tile(initial_values, (3, 1))
+    with threads(workers=2), handlers(shared):
+        optimize_many(config, starts, test_functions[0])
+
+    assert len(shared["results"]) > len(single["results"])
+
+
+def test_nested_handlers_isolated_by_default(config: Any, test_functions: Any) -> None:
+    outer = HistoryHandler()
+    inner = HistoryHandler()
+    with handlers(outer), handlers(inner):
+        optimize(config, initial_values, test_functions[0])
+    assert inner["results"]
+    assert outer["results"] is None
+
+
+def test_nested_handlers_relisted_enclosing_also_receives(
+    config: Any, test_functions: Any
+) -> None:
+    outer = HistoryHandler()
+    other = HistoryHandler()
+    inner = HistoryHandler()
+    with handlers(outer, other), handlers(inner, outer):
+        optimize(config, initial_values, test_functions[0])
+    assert inner["results"]
+    assert outer["results"]
+    assert len(outer["results"]) == len(inner["results"])
+    assert other["results"] is None
+
+
+def test_relisted_handler_returns_to_enclosing_block_after_nested_exit(
+    config: Any, test_functions: Any
+) -> None:
+    outer = HistoryHandler()
+    with handlers(outer):
+        with handlers(outer):
+            optimize(config, initial_values, test_functions[0])
+        migrated_back = len(outer["results"])
+        optimize(config, initial_values, test_functions[0])
+    assert len(outer["results"]) > migrated_back
+
+
+def test_compose_accessors_reflect_open_blocks() -> None:
+    assert compose.current_session() is None
+    assert compose.current_handlers() is None
+    assert compose.current_executor() is None
+
+    outer = HistoryHandler()
+    inner = HistoryHandler()
+    with threads(workers=1):
+        assert compose.current_session() is not None
+        assert compose.current_executor() is not None
+        assert compose.current_handlers() is None
+        with handlers(outer):
+            outer_scope = compose.current_handlers()
+            assert outer_scope is not None
+            with handlers(inner):
+                assert compose.current_handlers() is not outer_scope
+            assert compose.current_handlers() is outer_scope
+    assert compose.current_session() is None
+    assert compose.current_handlers() is None
+    assert compose.current_executor() is None

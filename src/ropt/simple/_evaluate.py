@@ -7,23 +7,25 @@ from typing import TYPE_CHECKING
 import numpy as np
 
 from ropt.components.compute_steps import EvaluationStep
+from ropt.components.evaluators import FunctionEvaluator, ParallelEvaluator
 from ropt.components.event_handlers import HistoryHandler
 from ropt.context import EnOptContext
 from ropt.enums import ExitCode
 
+from ._handlers import current_handlers
 from ._objective import adapt_objective
 from ._result import EvaluateResult
-from ._session import current_session, make_evaluator, run_step
+from ._session import current_executor, run_step
 
 if TYPE_CHECKING:
     from typing import Any
 
     from numpy.typing import ArrayLike
 
+    from ropt.components.executors import Executor
     from ropt.results import FunctionResults
 
     from ._objective import ObjectiveCallback
-    from ._session import Session
 
 
 def evaluate(
@@ -52,7 +54,7 @@ def evaluate(
     if array.ndim != 1:
         msg = "evaluate() takes a single vector; use evaluate_many() for a batch."
         raise ValueError(msg)
-    results = _run_evaluation(current_session(), config, array, objective)
+    results = _run_evaluation(current_executor(), config, array, objective)
     return _build_evaluate_result(results[0])
 
 
@@ -85,12 +87,12 @@ def evaluate_many(
             "use evaluate() for a single vector."
         )
         raise ValueError(msg)
-    results = _run_evaluation(current_session(), config, array, objective)
+    results = _run_evaluation(current_executor(), config, array, objective)
     return tuple(_build_evaluate_result(result) for result in results)
 
 
 def _run_evaluation(
-    session: Session | None,
+    executor: Executor | None,
     config: dict[str, Any],
     variables: ArrayLike,
     objective: ObjectiveCallback,
@@ -103,10 +105,18 @@ def _run_evaluation(
         else context.nonlinear_constraints.lower_bounds.size
     )
 
-    evaluator = make_evaluator(adapt_objective(objective, n_obj, n_con), session)
+    callback = adapt_objective(objective, n_obj, n_con)
+    evaluator = (
+        FunctionEvaluator(function=callback)
+        if executor is None
+        else ParallelEvaluator(function=callback, executor=executor)
+    )
     history = HistoryHandler()
     step = EvaluationStep(evaluator=evaluator)
     step.add_event_handler(history)
+    shared = current_handlers()
+    if shared is not None:
+        shared.attach_to(step)
 
     run_step(
         step,
