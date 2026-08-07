@@ -1909,6 +1909,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#ropt.components.event_handlers.EventHandler.unregister_dispatcher" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        unregister_dispatcher
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ropt.components.event_handlers.EventHandler.register_compute_step" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2312,6 +2323,17 @@
     <span class="md-ellipsis">
       
         add_event_handler
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.components.event_handlers.EventDispatcher.remove_event_handler" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        remove_event_handler
       
     </span>
   </a>
@@ -2741,6 +2763,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#ropt.components.event_handlers.EventHandler.unregister_dispatcher" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        unregister_dispatcher
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ropt.components.event_handlers.EventHandler.register_compute_step" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3151,6 +3184,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#ropt.components.event_handlers.EventDispatcher.remove_event_handler" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        remove_event_handler
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ropt.components.event_handlers.EventDispatcher.dispatch_event" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3370,6 +3414,56 @@ and pitfalls.</p>
               <div class="doc-md-description">
                 <p>If the handler is already registered with a dispatcher
           or attached to a compute step.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.components.event_handlers.EventHandler.unregister_dispatcher" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">unregister_dispatcher</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">unregister_dispatcher</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Reverse <code>register_dispatcher</code>, releasing the handler.</p>
+<p>After unregistering, the handler is free to be registered with another
+dispatcher or with a compute step.</p>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError">RuntimeError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the handler is not registered with a dispatcher.</p>
               </div>
             </td>
           </tr>
@@ -5608,6 +5702,87 @@ parallel via <code>asyncio.gather</code>.</p>
             </td>
             <td>
                   <code>False</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.components.event_handlers.EventDispatcher.remove_event_handler" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">remove_event_handler</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">remove_event_handler</span><span class="p">(</span><span class="n">handler</span><span class="p">:</span> <span class="n">EventHandler</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Remove a previously added handler.</p>
+<p>The handler is released, so it can afterwards be added to another
+dispatcher or registered with a compute step.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>handler</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventHandler (ropt.components.event_handlers.base.EventHandler)" href="#ropt.components.event_handlers.EventHandler">EventHandler</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The handler to remove.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#ValueError">ValueError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the handler was not added to this dispatcher.</p>
+              </div>
             </td>
           </tr>
       </tbody>
