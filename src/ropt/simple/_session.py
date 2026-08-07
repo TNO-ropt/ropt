@@ -1,14 +1,20 @@
-"""The background session: a loop thread, a task group, an executor.
+"""The background session: a loop thread, a task group, and an optional executor.
 
-A session opens one background event loop (on its own daemon thread) with a
-long-lived `TaskGroup`. The evaluation executor is started on that task group
-when the session opens and runs for the session's lifetime. A user-code error is
-re-raised out of the compute step (on the calling thread) and leaves the
-executor running, so the session stays usable and the executor is reused.
+Any high-level block (an execution manager such as `threads()`/`processes()`)
+opens a background event loop on its own daemon thread, with a long-lived
+`TaskGroup`. The **session** is that loop and task group; it is established by
+the first block to open and torn down by that same owner when it exits, so
+nested blocks reuse one loop.
 
-The active session is held in a single contextvar slot; sessions do not nest.
-With no session open, the high-level entry points run sequentially on the
-calling thread.
+The **executor** is a separate layer: an execution manager installs one on the
+session's task group and removes it on exit. At most one executor is active at a
+time — opening a second execution manager while one is active raises (nested
+executors are not supported). The evaluator for each `optimize()`/`evaluate()`
+call is chosen from whatever executor is active at that moment, or a sequential
+`FunctionEvaluator` when none is.
+
+The active session is held in a single contextvar slot. With no block open, the
+high-level entry points run sequentially on the calling thread.
 """
 
 from __future__ import annotations
@@ -16,7 +22,7 @@ from __future__ import annotations
 import asyncio
 import threading
 from contextvars import ContextVar, Token
-from typing import TYPE_CHECKING, Self, TypeVar, cast
+from typing import TYPE_CHECKING, TypeVar, cast
 
 from ropt.components.evaluators import FunctionEvaluator, ParallelEvaluator
 from ropt.components.executors import (
@@ -44,70 +50,79 @@ _active_session: ContextVar[Session | None] = ContextVar(
 
 
 class Session:
-    """A background loop, task group, and a single worker pool."""
+    """A background event loop and task group hosting at most one executor.
 
-    def __init__(self, make_executor: Callable[[], Executor]) -> None:
-        self._make_executor = make_executor
+    The session (loop + task group) is opened by the first high-level block and
+    reused by nested blocks; the owning block tears it down on exit. An execution
+    manager installs an executor via `open_executor` and removes it via
+    `close_executor` — at most one may be active at a time.
+    """
+
+    def __init__(self) -> None:
         self._loop: asyncio.AbstractEventLoop | None = None
         self._thread: threading.Thread | None = None
         self._ready = threading.Event()
-        self._token: Token[Session | None] | None = None
         self._task_group: asyncio.TaskGroup | None = None
         self._shutdown: asyncio.Event | None = None
         self._executor: Executor | None = None
-        self._start_error: BaseException | None = None
 
-    def __enter__(self) -> Self:
-        if _active_session.get() is not None:
-            msg = "Sessions do not nest; a session is already active in this context."
-            raise RuntimeError(msg)
+    def start(self) -> None:
         self._loop = asyncio.new_event_loop()
         self._thread = threading.Thread(target=self._thread_main, daemon=True)
         self._thread.start()
         self._ready.wait()
-        if self._start_error is not None:
-            self._thread.join()
-            raise self._start_error
-        self._token = _active_session.set(self)
-        return self
 
-    def __exit__(self, *_exc: object) -> None:
-        assert self._token is not None
-        _active_session.reset(self._token)
-        assert self._shutdown is not None
+    def stop(self) -> None:
         assert self._loop is not None
-        self._loop.call_soon_threadsafe(self._shutdown.set)
+        assert self._shutdown is not None
         assert self._thread is not None
+        self._loop.call_soon_threadsafe(self._shutdown.set)
         self._thread.join()
 
     def _thread_main(self) -> None:
         assert self._loop is not None
         asyncio.set_event_loop(self._loop)
         try:
-            self._loop.run_until_complete(self._execute_task_group())
+            self._loop.run_until_complete(self._run())
         finally:
             self._loop.close()
 
-    async def _execute_task_group(self) -> None:
+    async def _run(self) -> None:
         self._shutdown = asyncio.Event()
         async with asyncio.TaskGroup() as task_group:
             self._task_group = task_group
-            try:
-                executor = self._make_executor()
-                await executor.start(task_group)
-            except Exception as exc:  # ruff: ignore[blind-except]
-                # Surface a start failure to __enter__ instead of deadlocking it.
-                self._start_error = exc
-                self._ready.set()
-                return
-            self._executor = executor
             self._ready.set()
             await self._shutdown.wait()
-            if executor.is_running():
-                executor.cancel()
+            # Defensive: a scope normally removes its executor before the session
+            # stops; cancel a leftover so the task group can exit.
+            if self._executor is not None and self._executor.is_running():
+                self._executor.cancel()
 
-    def get_executor(self) -> Executor:
-        assert self._executor is not None
+    def open_executor(self, make_executor: Callable[[], Executor]) -> None:
+        if self._executor is not None:
+            msg = (
+                "Only one executor may be active at a time; nested execution "
+                "managers are not supported."
+            )
+            raise RuntimeError(msg)
+        assert self._loop is not None
+        assert self._task_group is not None
+        executor = make_executor()
+        # Start on the loop thread and block until ready, surfacing a start
+        # failure (e.g. a process pool that cannot spawn) on the caller's stack.
+        asyncio.run_coroutine_threadsafe(
+            executor.start(self._task_group), self._loop
+        ).result()
+        self._executor = executor
+
+    def close_executor(self) -> None:
+        executor = self._executor
+        self._executor = None
+        if executor is not None:
+            assert self._loop is not None
+            self._loop.call_soon_threadsafe(executor.cancel)
+
+    def get_executor(self) -> Executor | None:
         return self._executor
 
     def gather(self, jobs: Sequence[Callable[[], _T]], limit: int | None) -> list[_T]:
@@ -143,7 +158,48 @@ class Session:
         return cast("list[_T]", results)
 
 
-def threads(*, workers: int = 1) -> Session:
+def _acquire_session() -> tuple[Session, Token[Session | None] | None]:
+    session = _active_session.get()
+    if session is not None:
+        return session, None
+    session = Session()
+    session.start()
+    return session, _active_session.set(session)
+
+
+def _release_session(session: Session, token: Token[Session | None] | None) -> None:
+    if token is not None:
+        session.stop()
+        _active_session.reset(token)
+
+
+class _ExecutionScope:
+    """Install an executor on the ambient session for the duration of a block."""
+
+    def __init__(self, make_executor: Callable[[], Executor]) -> None:
+        self._make_executor = make_executor
+        self._session: Session | None = None
+        self._token: Token[Session | None] | None = None
+
+    def __enter__(self) -> Session:
+        session, token = _acquire_session()
+        try:
+            session.open_executor(self._make_executor)
+        except BaseException:
+            # Roll back a session this scope created before re-raising.
+            _release_session(session, token)
+            raise
+        self._session = session
+        self._token = token
+        return session
+
+    def __exit__(self, *_exc: object) -> None:
+        assert self._session is not None
+        self._session.close_executor()
+        _release_session(self._session, self._token)
+
+
+def threads(*, workers: int = 1) -> _ExecutionScope:
     """Run evaluations in a thread pool for the duration of the block.
 
     See [High-Level API](../usage/simple.md) for a walkthrough.
@@ -152,12 +208,12 @@ def threads(*, workers: int = 1) -> Session:
         workers: The number of worker threads.
 
     Returns:
-        A session context manager backing evaluations with threads.
+        A context manager backing evaluations with a thread pool.
     """
-    return Session(lambda: ThreadingExecutor(workers=workers))
+    return _ExecutionScope(lambda: ThreadingExecutor(workers=workers))
 
 
-def processes(*, workers: int = 1) -> Session:
+def processes(*, workers: int = 1) -> _ExecutionScope:
     """Run evaluations in a process pool for the duration of the block.
 
     The objective must be picklable. See
@@ -167,9 +223,9 @@ def processes(*, workers: int = 1) -> Session:
         workers: The number of worker processes.
 
     Returns:
-        A session context manager backing evaluations with processes.
+        A context manager backing evaluations with a process pool.
     """
-    return Session(lambda: MultiprocessingExecutor(workers=workers))
+    return _ExecutionScope(lambda: MultiprocessingExecutor(workers=workers))
 
 
 def current_session() -> Session | None:
@@ -195,9 +251,10 @@ def make_evaluator(
         A `ParallelEvaluator` bound to the session's pool, or a
         `FunctionEvaluator` when there is no session.
     """
-    if session is None:
+    executor = None if session is None else session.get_executor()
+    if executor is None:
         return FunctionEvaluator(function=callback)
-    return ParallelEvaluator(function=callback, executor=session.get_executor())
+    return ParallelEvaluator(function=callback, executor=executor)
 
 
 def run_step(

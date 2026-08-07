@@ -199,13 +199,24 @@ def test_evaluate_many_with_threads(config: Any, test_functions: Any) -> None:
         assert result.target_objective == pytest.approx(expected)
 
 
-def test_sessions_do_not_nest() -> None:
+def test_nested_execution_managers_raise() -> None:
     with (
         threads(workers=1),
-        pytest.raises(RuntimeError, match="do not nest"),
+        pytest.raises(RuntimeError, match="Only one executor may be active at a time"),
         threads(workers=1),
     ):
         pass
+
+
+def test_sequential_execution_managers_are_allowed(
+    config: Any, test_functions: Any
+) -> None:
+    with threads(workers=2):
+        first = optimize(config, initial_values, test_functions[0])
+    with processes(workers=2):
+        second = optimize(config, initial_values, test_functions[0])
+    assert first.exit_code == second.exit_code
+    assert first.variables == pytest.approx(second.variables)
 
 
 def test_session_clears_after_block(config: Any, test_functions: Any) -> None:
