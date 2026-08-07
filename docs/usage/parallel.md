@@ -559,13 +559,13 @@ Process- and HPC-based parallelism therefore belongs at the **innermost (leaf)
 evaluations**, where the actual model runs — not at a layer that itself drives a
 nested workflow. The nested examples follow exactly this shape:
 
-- [`examples/nested.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/nested.py)
+- [`examples/advanced/nested.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/advanced/nested.py)
   — outer and inner optimizations run sequentially in the main process via
   `FunctionEvaluator`.
-- [`examples/nested_multiprocess.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/nested_multiprocess.py)
+- [`examples/advanced/nested_multiprocess.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/advanced/nested_multiprocess.py)
   — outer optimizations run on a `ThreadingExecutor` (in-process); only the
   inner leaf evaluations run on a `MultiprocessingExecutor`.
-- [`examples/nested_hpc.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/nested_hpc.py)
+- [`examples/advanced/nested_hpc.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/advanced/nested_hpc.py)
   — same pattern, with the inner leaf evaluations submitted to the cluster via
   `HPCExecutor`.
 

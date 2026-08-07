@@ -7,7 +7,7 @@ directly.
 
 !!! tip "Source Code"
     The complete source code for this tutorial is available at
-    [examples/function_evaluator.py](https://github.com/TNO-ropt/ropt/blob/main/examples/function_evaluator.py).
+    [examples/advanced/function_evaluator.py](https://github.com/TNO-ropt/ropt/blob/main/examples/advanced/function_evaluator.py).
 
 
 ## When to Use FunctionEvaluator

@@ -6,7 +6,7 @@ constraints and linear constraints.
 
 !!! tip "Source Code"
     The complete source code for this tutorial is available at
-    [examples/constrained.py](https://github.com/TNO-ropt/ropt/blob/main/examples/constrained.py).
+    [examples/advanced/constrained.py](https://github.com/TNO-ropt/ropt/blob/main/examples/advanced/constrained.py).
 
 
 ## Types of Constraints

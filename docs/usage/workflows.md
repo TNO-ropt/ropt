@@ -107,7 +107,7 @@ print(f"Optimal variables: {result_handler['results'].evaluations.variables}")
 This is a minimal example of optimizing a simple deterministic function. A full
 runnable example for optimizing the Rosenbrock function with uncertain
 parameters can be found here:
-[examples/ensemble.py](https://github.com/TNO-ropt/ropt/blob/main/examples/ensemble.py).
+[examples/advanced/ensemble.py](https://github.com/TNO-ropt/ropt/blob/main/examples/advanced/ensemble.py).
 
 ## Compute steps
 
@@ -609,4 +609,4 @@ available executors.
 - [Building a Workflow](../tutorials/workflow.md) — step-by-step
   example building a workflow from scratch.
 - Full example:
-  [examples/workflow.py](https://github.com/TNO-ropt/ropt/blob/main/examples/workflow.py).
+  [examples/advanced/workflow.py](https://github.com/TNO-ropt/ropt/blob/main/examples/advanced/workflow.py).

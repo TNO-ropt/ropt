@@ -7,7 +7,7 @@ control and flexibility compared to
 
 !!! tip "Source Code"
     The complete source code for this tutorial is available at
-    [examples/workflow.py](https://github.com/TNO-ropt/ropt/blob/main/examples/workflow.py).
+    [examples/advanced/workflow.py](https://github.com/TNO-ropt/ropt/blob/main/examples/advanced/workflow.py).
 
 
 ## When to Build a Workflow Yourself
