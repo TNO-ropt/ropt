@@ -2182,19 +2182,19 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.exceptions.Abort" class="md-nav__link">
+  <a href="#ropt.exceptions.OptimizerStop" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Abort
+        OptimizerStop
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Abort">
+    <nav class="md-nav" aria-label="OptimizerStop">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.exceptions.Abort.__init__" class="md-nav__link">
+  <a href="#ropt.exceptions.OptimizerStop.__init__" class="md-nav__link">
     <span class="md-ellipsis">
       
         __init__
@@ -2206,6 +2206,28 @@
         
       </ul>
     </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.exceptions.TooFewRealizations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TooFewRealizations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.exceptions.ExecutorStopped" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ExecutorStopped
+      
+    </span>
+  </a>
   
 </li>
         
@@ -2291,19 +2313,19 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.exceptions.Abort" class="md-nav__link">
+  <a href="#ropt.exceptions.OptimizerStop" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Abort
+        OptimizerStop
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Abort">
+    <nav class="md-nav" aria-label="OptimizerStop">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.exceptions.Abort.__init__" class="md-nav__link">
+  <a href="#ropt.exceptions.OptimizerStop.__init__" class="md-nav__link">
     <span class="md-ellipsis">
       
         __init__
@@ -2315,6 +2337,28 @@
         
       </ul>
     </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.exceptions.TooFewRealizations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TooFewRealizations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.exceptions.ExecutorStopped" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ExecutorStopped
+      
+    </span>
+  </a>
   
 </li>
         
@@ -2408,8 +2452,8 @@
 
 
 
-<h3 id="ropt.exceptions.Abort" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">Abort</span>
+<h3 id="ropt.exceptions.OptimizerStop" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">OptimizerStop</span>
 
 
 </h3>
@@ -2421,12 +2465,10 @@
 
 
 
-        <p>Raised when a compute step is aborted prematurely.</p>
-<p>This exception signals that an optimization or another compute step could
-not complete its intended task due to a specific condition (e.g.,
-insufficient valid realizations, user request).</p>
-<p>It must be initialized with an <a class="autorefs autorefs-internal" title="            ExitCode" href="../enums/#ropt.enums.ExitCode"><code>ExitCode</code></a> describing
-the reason for the abortion.</p>
+        <p>Raised internally to stop an optimization with a specific exit code.</p>
+<p>Used only within the optimizer core to unwind the backend optimization loop
+(for example when a function or batch budget is reached). It carries the
+<a class="autorefs autorefs-internal" title="            ExitCode" href="../enums/#ropt.enums.ExitCode"><code>ExitCode</code></a> the optimization terminates with.</p>
 
 
 
@@ -2449,7 +2491,7 @@ the reason for the abortion.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.exceptions.Abort.__init__" class="doc doc-heading">
+<h4 id="ropt.exceptions.OptimizerStop.__init__" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">__init__</span>
 
 
@@ -2459,9 +2501,7 @@ the reason for the abortion.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Initialize the Abort exception.</p>
-<p>Stores the reason for the abortion, accessible via the <code>exit_code</code>
-attribute.</p>
+        <p>Initialize the OptimizerStop exception.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2484,7 +2524,7 @@ attribute.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The exit code describing why the compute step was aborted.</p>
+                <p>The exit code the optimization terminates with.</p>
               </div>
             </td>
             <td>
@@ -2503,6 +2543,81 @@ attribute.</p>
 
 
   </div>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="ropt.exceptions.TooFewRealizations" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">TooFewRealizations</span>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#Exception">Exception</a></code></p>
+
+
+
+        <p>Raised when too few realizations are available to compute a result.</p>
+<p>A generic signal, carrying no exit code.</p>
+
+
+
+
+
+
+
+
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="ropt.exceptions.ExecutorStopped" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ExecutorStopped</span>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#Exception">Exception</a></code></p>
+
+
+
+        <p>Raised when the evaluation executor is no longer running.</p>
+<p>A generic signal, carrying no exit code, raised by the parallel evaluator
+when its executor has stopped and the current evaluation cannot proceed.</p>
+
+
+
+
+
+
+
+
 
     </div>
 

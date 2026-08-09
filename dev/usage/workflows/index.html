@@ -2997,7 +2997,7 @@ types are useful for logging, progress bars, or custom lifecycle hooks.</p>
 <p>This is a minimal example of optimizing a simple deterministic function. A full
 runnable example for optimizing the Rosenbrock function with uncertain
 parameters can be found here:
-<a href="https://github.com/TNO-ropt/ropt/blob/main/examples/advanced/ensemble.py">examples/advanced/ensemble.py</a>.</p>
+<a href="https://github.com/TNO-ropt/ropt/blob/main/examples/ensemble.py">examples/ensemble.py</a>.</p>
 <h2 id="compute-steps">Compute steps</h2>
 <p>Two compute steps ship with <code>ropt</code>:</p>
 <ul>
@@ -3131,8 +3131,11 @@ batch and produces a tuple of
   finished.</li>
 </ul>
 <h3 id="exit-codes">Exit codes</h3>
-<p>Both <code>run()</code> methods return an <a class="autorefs autorefs-internal" title="            ExitCode" href="../../reference/enums/#ropt.enums.ExitCode"><code>ExitCode</code></a> indicating
-why the step finished:</p>
+<p>The <a class="autorefs autorefs-internal" title="            ropt.components.compute_steps.OptimizationStep" href="../../reference/components_compute_steps/#ropt.components.compute_steps.OptimizationStep"><code>OptimizationStep</code></a>'s
+<code>run()</code> method returns an <a class="autorefs autorefs-internal" title="            ExitCode" href="../../reference/enums/#ropt.enums.ExitCode"><code>ExitCode</code></a> indicating why the
+optimizer finished; the
+<a class="autorefs autorefs-internal" title="            ropt.components.compute_steps.EvaluationStep" href="../../reference/components_compute_steps/#ropt.components.compute_steps.EvaluationStep"><code>EvaluationStep</code></a>'s <code>run()</code>
+returns nothing:</p>
 <table>
 <thead>
 <tr>
@@ -3144,10 +3147,6 @@ why the step finished:</p>
 <tr>
 <td><code>OPTIMIZER_FINISHED</code></td>
 <td>The optimizer terminated normally.</td>
-</tr>
-<tr>
-<td><code>ENSEMBLE_EVALUATOR_FINISHED</code></td>
-<td>The evaluator step completed normally.</td>
 </tr>
 <tr>
 <td><code>TOO_FEW_REALIZATIONS</code></td>
@@ -3664,7 +3663,7 @@ values for both objectives from a single evaluator call.</p>
 <li><a href="../../tutorials/workflow/">Building a Workflow</a> — step-by-step
   example building a workflow from scratch.</li>
 <li>Full example:
-  <a href="https://github.com/TNO-ropt/ropt/blob/main/examples/advanced/workflow.py">examples/advanced/workflow.py</a>.</li>
+  <a href="https://github.com/TNO-ropt/ropt/blob/main/examples/workflow.py">examples/workflow.py</a>.</li>
 </ul>
 
 
