@@ -20,7 +20,8 @@ class HistoryHandler(EventHandler):
 
     Listens for `FINISHED_EVALUATION` events and appends every
     [`Results`][ropt.results.Results] object to a growing tuple accessible
-    via `handler["results"]`.
+    via the [`results`][ropt.components.event_handlers.HistoryHandler.results]
+    property or `handler["results"]`.
 
     See [Optimization Workflows](../usage/workflows.md#history) for full
     details on domain handling and accumulation behavior.
@@ -35,6 +36,12 @@ class HistoryHandler(EventHandler):
         super().__init__()
         self["results"] = None
         self._domain = domain
+
+    @property
+    def results(self) -> tuple[Results, ...]:
+        """All results collected so far, in the order received."""
+        collected: tuple[Results, ...] | None = self["results"]
+        return () if collected is None else collected
 
     def handle_event(self, event: EnOptEvent) -> None:
         """Handle incoming events.

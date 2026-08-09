@@ -26,7 +26,9 @@ class ResultsHandler(EventHandler):
 
     Listens for `FINISHED_EVALUATION` events and retains either the best
     (lowest weighted objective) or most recent valid result. Optionally
-    filters by constraint tolerance.
+    filters by constraint tolerance. The selected result is accessible via the
+    [`result`][ropt.components.event_handlers.ResultsHandler.result] property or
+    `handler["results"]`.
 
     See [Optimization Workflows](../usage/workflows.md#result_handler) for full
     details on selection criteria and domain handling.
@@ -55,6 +57,12 @@ class ResultsHandler(EventHandler):
         self._filter = filter
         self._best_results: FunctionResults | None = None
         self["results"] = None
+
+    @property
+    def result(self) -> FunctionResults | None:
+        """The selected (best or last) result, or `None` if none is available."""
+        selected: FunctionResults | None = self["results"]
+        return selected
 
     def handle_event(self, event: EnOptEvent) -> None:
         results: tuple[FunctionResults, ...] = tuple(

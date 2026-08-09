@@ -506,6 +506,33 @@ def test_evaluator_multi(config: dict[str, Any], evaluator: Any) -> None:
     assert np.allclose(values, [1.66, 1.75])
 
 
+def test_history_handler_results_property_returns_collected_results(
+    config: dict[str, Any], evaluator: Any
+) -> None:
+    history_handler = HistoryHandler()
+    assert history_handler.results == ()
+    step = EvaluationStep(evaluator=evaluator())
+    step.add_event_handler(history_handler)
+    step.run(
+        context=EnOptContext.model_validate(config),
+        variables=np.array([[0, 0, 0.1], [0, 0, 0]]),
+    )
+    assert history_handler.results
+    assert history_handler.results == history_handler["results"]
+
+
+def test_results_handler_result_property_returns_selected_result(
+    config: dict[str, Any], evaluator: Any
+) -> None:
+    result_handler = ResultsHandler()
+    assert result_handler.result is None
+    step = OptimizationStep(evaluator=evaluator())
+    step.add_event_handler(result_handler)
+    step.run(variables=initial_values, context=EnOptContext.model_validate(config))
+    assert result_handler.result is not None
+    assert result_handler.result is result_handler["results"]
+
+
 @pytest.mark.parametrize(
     ("max_criterion", "max_enum"),
     [
