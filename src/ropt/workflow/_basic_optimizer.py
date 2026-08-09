@@ -31,11 +31,50 @@ if TYPE_CHECKING:
 class BasicOptimizer:
     r"""A simple interface for single optimization runs.
 
-    Wraps the workflow components into a run-once interface with built-in
-    result tracking.
+    Wraps the workflow components into a run-once interface with built-in result
+    tracking. Passing a configuration dictionary and an evaluator is enough to
+    run an optimization and retrieve the best result. Internally it:
 
-    See [Basic Optimization](../usage/basic.md) for a walkthrough and full
-    example.
+    1. validates `config` into an [`EnOptContext`][ropt.context.EnOptContext];
+    2. wraps a plain
+       [`EvaluationBatchCallback`][ropt.evaluation.EvaluationBatchCallback] in a
+       [`BatchEvaluator`][ropt.components.evaluators.BatchEvaluator], or uses a
+       supplied [`Evaluator`][ropt.components.evaluators.Evaluator] as given;
+    3. creates an
+       [`OptimizationStep`][ropt.components.compute_steps.OptimizationStep] and
+       attaches a
+       [`ResultsHandler`][ropt.components.event_handlers.ResultsHandler] to
+       remember the best result;
+    4. runs the step, exposing the best
+       [`FunctionResults`][ropt.results.FunctionResults] via
+       [`results`][ropt.workflow.BasicOptimizer.results].
+
+    Progress can be monitored by registering a callback with
+    [`set_results_callback`][ropt.workflow.BasicOptimizer.set_results_callback].
+    For more control (multiple runs, custom event handlers, or parallel/async
+    evaluation) use the workflow components directly.
+
+    **Injecting event handlers into every run.** Extra event handlers can be
+    added to *every* `BasicOptimizer` run without changing any call site, for
+    example to add logging, telemetry, or a custom results store. On start-up
+    `BasicOptimizer` reads a JSON file at `<prefix>/share/ropt/options.json`,
+    where `<prefix>` is the Python installation's data prefix (the value of
+    `sysconfig.get_paths()["data"]`). Handlers are listed under
+    `basic_optimizer.event_handlers` as `module.ClassName` strings:
+
+    ```json
+    {
+        "basic_optimizer": {
+            "event_handlers": ["mypackage.MyHandler"]
+        }
+    }
+    ```
+
+    Each referenced class must be importable from the active environment and must
+    subclass [`EventHandler`][ropt.components.event_handlers.EventHandler] with no
+    required constructor arguments; it is instantiated and attached to every run.
+    Entries whose module cannot be imported are skipped, and a missing or
+    malformed file is ignored.
     """
 
     def __init__(
@@ -57,8 +96,13 @@ class BasicOptimizer:
 
         Args:
             config:               The configuration for the optimization.
-            evaluator:            The evaluator object.
-            constraint_tolerance: The constraint violation tolerance.
+            evaluator:            An
+                [`EvaluationBatchCallback`][ropt.evaluation.EvaluationBatchCallback]
+                callable that evaluates a batch of variable vectors, or an
+                [`Evaluator`][ropt.components.evaluators.Evaluator] instance for
+                advanced features such as caching, parallel, or HPC evaluation.
+            constraint_tolerance: The constraint violation tolerance; a
+                constraint within this tolerance is considered satisfied.
         """
         self._context = EnOptContext.model_validate(config)
         self._constraint_tolerance = constraint_tolerance
@@ -89,6 +133,9 @@ class BasicOptimizer:
         handling, and event processing. After the optimization is complete, the
         optimal results, variables, and exit code can be accessed via the
         corresponding properties.
+
+        Args:
+            initial_values: The variable vector to start the optimization from.
 
         Returns:
             The exit code returned by the optimization workflow.
