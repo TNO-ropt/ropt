@@ -50,7 +50,6 @@ class EvaluateResult:
     [High-Level API](../usage/simple.md) for a walkthrough.
 
     Attributes:
-        exit_code:        The exit code describing the outcome for this vector.
         target_objective: The weighted objective, or `None` where the evaluation
                           produced no valid result.
         objectives:       The individual objective values, shape `(n_obj,)`, or
@@ -62,7 +61,6 @@ class EvaluateResult:
                           [`FunctionResults`][ropt.results.FunctionResults] object.
     """
 
-    exit_code: ExitCode
     target_objective: float | None
     objectives: NDArray[np.float64] | None
     constraints: NDArray[np.float64] | None

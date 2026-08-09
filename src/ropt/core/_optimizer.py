@@ -11,7 +11,7 @@ import numpy as np
 
 from ropt._logging import get_logger
 from ropt.enums import ExitCode
-from ropt.exceptions import Abort
+from ropt.exceptions import ExecutorStopped, OptimizerStop, TooFewRealizations
 from ropt.results import FunctionResults, GradientResults
 
 from ._callback import OptimizerCallbackResult
@@ -140,7 +140,11 @@ class EnsembleOptimizer:
         try:
             with self._redirector.start():
                 self._backend.start(variables)
-        except Abort as exc:
+        except TooFewRealizations:
+            exit_code = ExitCode.TOO_FEW_REALIZATIONS
+        except ExecutorStopped:
+            exit_code = ExitCode.EXECUTOR_STOPPED
+        except OptimizerStop as exc:
             exit_code = exc.exit_code
         return exit_code
 
@@ -225,14 +229,14 @@ class EnsembleOptimizer:
                 "Stopping: Maximum number of function evaluations reached (%d)",
                 max_functions,
             )
-            raise Abort(ExitCode.MAX_FUNCTIONS_REACHED)
+            raise OptimizerStop(ExitCode.MAX_FUNCTIONS_REACHED)
         max_batches = self._context.optimizer.max_batches
         if max_batches is not None and self._completed_batches >= max_batches:
             _logger.info(
                 "Stopping: Maximum number of evaluation batches reached (%d)",
                 max_batches,
             )
-            raise Abort(ExitCode.MAX_BATCHES_REACHED)
+            raise OptimizerStop(ExitCode.MAX_BATCHES_REACHED)
 
     def _run_evaluations(
         self,
@@ -251,20 +255,20 @@ class EnsembleOptimizer:
                 compute_gradients=compute_gradients,
             )
 
-            exit_code: ExitCode | None = None
+            too_few = False
             for result in results:
                 assert isinstance(result, FunctionResults | GradientResults)
                 if (
                     isinstance(result, FunctionResults) and result.functions is None
                 ) or (isinstance(result, GradientResults) and result.gradients is None):
-                    exit_code = ExitCode.TOO_FEW_REALIZATIONS
+                    too_few = True
                     break
 
             if self._signal_evaluation:
                 self._signal_evaluation(results)
 
-            if exit_code is not None:
-                raise Abort(exit_code=exit_code)
+            if too_few:
+                raise TooFewRealizations
 
         return results
 

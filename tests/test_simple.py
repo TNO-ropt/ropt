@@ -155,7 +155,6 @@ def test_adapt_objective_splits_objectives_and_constraints() -> None:
 def test_evaluate_single_vector(config: Any, test_functions: Any) -> None:
     result = evaluate(config, initial_values, test_functions[0])
     assert isinstance(result, EvaluateResult)
-    assert result.exit_code == ExitCode.ENSEMBLE_EVALUATOR_FINISHED
     assert result.target_objective is not None
     assert result.target_objective == pytest.approx(0.66)
     assert result.objectives is not None

@@ -3,28 +3,37 @@
 from ropt.enums import ExitCode
 
 
-class Abort(Exception):  # ruff: ignore[error-suffix-on-exception-name]
-    """Raised when a compute step is aborted prematurely.
+class OptimizerStop(Exception):  # ruff: ignore[error-suffix-on-exception-name]
+    """Raised internally to stop an optimization with a specific exit code.
 
-    This exception signals that an optimization or another compute step could
-    not complete its intended task due to a specific condition (e.g.,
-    insufficient valid realizations, user request).
-
-    It must be initialized with an [`ExitCode`][ropt.enums.ExitCode] describing
-    the reason for the abortion.
+    Used only within the optimizer core to unwind the backend optimization loop
+    (for example when a function or batch budget is reached). It carries the
+    [`ExitCode`][ropt.enums.ExitCode] the optimization terminates with.
     """
 
     def __init__(self, exit_code: ExitCode) -> None:
-        """Initialize the Abort exception.
-
-        Stores the reason for the abortion, accessible via the `exit_code`
-        attribute.
+        """Initialize the OptimizerStop exception.
 
         Args:
-            exit_code: The exit code describing why the compute step was aborted.
+            exit_code: The exit code the optimization terminates with.
         """
         self.exit_code = exit_code
         super().__init__()
+
+
+class TooFewRealizations(Exception):  # ruff: ignore[error-suffix-on-exception-name]
+    """Raised when too few realizations are available to compute a result.
+
+    A generic signal, carrying no exit code.
+    """
+
+
+class ExecutorStopped(Exception):  # ruff: ignore[error-suffix-on-exception-name]
+    """Raised when the evaluation executor is no longer running.
+
+    A generic signal, carrying no exit code, raised by the parallel evaluator
+    when its executor has stopped and the current evaluation cannot proceed.
+    """
 
 
 class ExecutorFailure(Exception):  # ruff: ignore[error-suffix-on-exception-name]

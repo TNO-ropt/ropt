@@ -176,13 +176,15 @@ The following events are emitted during execution:
 
 ### Exit codes
 
-Both `run()` methods return an [`ExitCode`][ropt.enums.ExitCode] indicating
-why the step finished:
+The [`OptimizationStep`][ropt.components.compute_steps.OptimizationStep]'s
+`run()` method returns an [`ExitCode`][ropt.enums.ExitCode] indicating why the
+optimizer finished; the
+[`EvaluationStep`][ropt.components.compute_steps.EvaluationStep]'s `run()`
+returns nothing:
 
 | Exit code                    | Meaning                                                       |
 | ---------------------------- | ------------------------------------------------------------- |
 | `OPTIMIZER_FINISHED`         | The optimizer terminated normally.                            |
-| `ENSEMBLE_EVALUATOR_FINISHED`| The evaluator step completed normally.                        |
 | `TOO_FEW_REALIZATIONS`       | Too few realizations were evaluated successfully.             |
 | `MAX_FUNCTIONS_REACHED`      | Maximum number of function evaluations was reached.           |
 | `MAX_BATCHES_REACHED`        | Maximum number of evaluation batches was reached.             |

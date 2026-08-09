@@ -25,9 +25,8 @@ from ropt.components.executors import (
     ThreadingExecutor,
 )
 from ropt.context import EnOptContext
-from ropt.enums import ExitCode
 from ropt.evaluation import EvaluationBatchContext
-from ropt.exceptions import Abort, ExecutorFailure, TransferError
+from ropt.exceptions import ExecutorFailure, ExecutorStopped, TransferError
 from ropt.workflow._basic_optimizer import BasicOptimizer
 
 if TYPE_CHECKING:
@@ -625,9 +624,8 @@ async def test_abort_reraises_queued_exception() -> None:  # ruff: ignore[unused
 
 
 async def test_abort_without_queued_exception_has_no_cause() -> None:  # ruff: ignore[unused-async]
-    with pytest.raises(Abort) as excinfo:
+    with pytest.raises(ExecutorStopped) as excinfo:
         _abort(ResultsQueue())
-    assert excinfo.value.exit_code == ExitCode.EXECUTOR_STOPPED
     assert excinfo.value.__cause__ is None
 
 

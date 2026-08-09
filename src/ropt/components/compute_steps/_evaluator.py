@@ -9,9 +9,8 @@ import numpy as np
 
 from ropt._logging import get_logger
 from ropt.core import EnsembleEvaluator
-from ropt.enums import EnOptEventType, ExitCode
+from ropt.enums import EnOptEventType
 from ropt.events import EnOptEvent
-from ropt.exceptions import Abort
 from ropt.results import FunctionResults
 
 from .base import ComputeStep
@@ -55,7 +54,7 @@ class EvaluationStep(ComputeStep):
         variables: ArrayLike,
         *,
         metadata: dict[str, Any] | None = None,
-    ) -> ExitCode:
+    ) -> None:
         """Run the ensemble evaluation.
 
         Args:
@@ -64,9 +63,6 @@ class EvaluationStep(ComputeStep):
             metadata:  Optional dictionary attached to emitted
                        [`FunctionResults`][ropt.results.FunctionResults] via the
                        `FINISHED_EVALUATION` event.
-
-        Returns:
-            An [`ExitCode`][ropt.enums.ExitCode] describing the outcome.
 
         Raises:
             ValueError: If the input variables have the wrong shape.
@@ -78,14 +74,8 @@ class EvaluationStep(ComputeStep):
         context.lock()
 
         _logger.info("Starting evaluation")
-
-        try:
-            exit_code, results = self._evaluate(context, variables, metadata)
-        except Abort as exc:
-            _logger.info("Evaluation aborted: %s", exc.exit_code.name)
-            return exc.exit_code
-
-        _logger.info("Evaluation finished: %s", exit_code.name)
+        results = self._evaluate(context, variables, metadata)
+        _logger.info("Evaluation finished")
         self._emit_event(
             EnOptEvent(
                 event_type=EnOptEventType.FINISHED_ENSEMBLE_EVALUATOR,
@@ -94,14 +84,12 @@ class EvaluationStep(ComputeStep):
             )
         )
 
-        return exit_code
-
     def _evaluate(
         self,
         context: EnOptContext,
         variables: NDArray[np.float64],
         metadata: dict[str, Any] | None,
-    ) -> tuple[ExitCode, tuple[Results, ...]]:
+    ) -> tuple[Results, ...]:
         self._emit_event(
             EnOptEvent(
                 event_type=EnOptEventType.START_ENSEMBLE_EVALUATOR, context=context
@@ -122,11 +110,6 @@ class EvaluationStep(ComputeStep):
 
         assert results
         assert isinstance(results[0], FunctionResults)
-        exit_code = (
-            ExitCode.TOO_FEW_REALIZATIONS
-            if results[0].functions is None
-            else ExitCode.ENSEMBLE_EVALUATOR_FINISHED
-        )
 
         if metadata is not None:
             for item in results:
@@ -140,7 +123,7 @@ class EvaluationStep(ComputeStep):
             )
         )
 
-        return exit_code, results
+        return results
 
     def _emit_event(self, event: EnOptEvent) -> None:
         for handler in self.event_handlers:

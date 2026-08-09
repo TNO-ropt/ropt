@@ -13,7 +13,7 @@ import numpy as np
 
 from ropt._logging import get_logger
 from ropt.backend import Backend
-from ropt.exceptions import Abort
+from ropt.exceptions import OptimizerStop
 from ropt.plugins.manager import get_plugin
 
 if TYPE_CHECKING:
@@ -210,8 +210,8 @@ def _run(
         backend.start(np.asarray(initial_values, dtype=np.float64))
     except _DriverStopped:
         pass  # the driver already holds the real error; nothing to report
-    except Abort as exc:
-        request_queue.put({"abort": True, "exit_code": exc.exit_code})
+    except OptimizerStop as exc:
+        request_queue.put({"stop": True, "exit_code": exc.exit_code})
     except Exception as exc:  # ruff: ignore[blind-except]
         request_queue.put(_encode_child_exception(exc))
     finally:
@@ -244,8 +244,8 @@ def _callback(
 def _handle_request(
     request: dict[str, Any],
 ) -> Exception | dict[str, Any]:
-    if "abort" in request:
-        return Abort(request["exit_code"])
+    if "stop" in request:
+        return OptimizerStop(request["exit_code"])
     if "exception" in request:
         return _decode_child_exception(request)
     if "error" in request:

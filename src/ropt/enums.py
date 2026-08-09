@@ -122,10 +122,7 @@ class ExitCode(IntEnum):
     OPTIMIZER_FINISHED = 5
     """Returned when an optimization step terminates normally."""
 
-    ENSEMBLE_EVALUATOR_FINISHED = 6
-    """Returned when an evaluation step terminates normally."""
-
-    EXECUTOR_STOPPED = 7
+    EXECUTOR_STOPPED = 6
     """Returned when the executor stopped before the evaluation could finish."""
 
 

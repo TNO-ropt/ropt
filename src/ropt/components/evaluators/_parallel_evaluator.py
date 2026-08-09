@@ -10,9 +10,8 @@ import numpy as np
 
 from ropt._logging import get_logger
 from ropt.components.executors import Executor, ResultsQueue, Task
-from ropt.enums import ExitCode
 from ropt.evaluation import EvaluationBatchContext, EvaluationBatchResult
-from ropt.exceptions import Abort, ExecutorFailure
+from ropt.exceptions import ExecutorFailure, ExecutorStopped
 
 from ._common import _active_evaluations, _scatter_result
 from ._counter import BatchIdCounter
@@ -113,11 +112,11 @@ class ParallelEvaluator(Evaluator):
             The result of calling the wrapped evaluator function.
 
         Raises:
-            Abort: With `ExitCode.EXECUTOR_STOPPED` if the executor is not
-                running and no task exception is available to re-raise.
+            ExecutorStopped: If the executor is not running and no task
+                exception is available to re-raise.
         """
         if not self._executor.is_running():
-            raise Abort(ExitCode.EXECUTOR_STOPPED)
+            raise ExecutorStopped
 
         batch_id = self._batch_id_callback()
 
@@ -238,7 +237,7 @@ def _abort(results_queue: ResultsQueue) -> NoReturn:
             break
         if isinstance(item, BaseException):
             raise item
-    raise Abort(ExitCode.EXECUTOR_STOPPED)
+    raise ExecutorStopped
 
 
 def _handle_result(

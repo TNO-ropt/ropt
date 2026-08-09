@@ -33,7 +33,7 @@ from ropt.components.event_handlers import (
 from ropt.context import EnOptContext
 from ropt.enums import EnOptEventType, ExitCode
 from ropt.evaluation import EvaluationBatchResult
-from ropt.exceptions import Abort, TransferError
+from ropt.exceptions import OptimizerStop, TransferError
 from ropt.results import FunctionResults
 from ropt.workflow import BasicOptimizer
 
@@ -593,7 +593,7 @@ def test_optimization_abort(config: Any, evaluator: Any) -> None:
 
         last_evaluation += 1
         if last_evaluation == 1:
-            raise Abort(ExitCode.USER_ABORT)
+            raise OptimizerStop(ExitCode.USER_ABORT)
 
     result_handler = ResultsHandler()
     step = OptimizationStep(evaluator=evaluator())
@@ -628,7 +628,8 @@ def test_evaluation_abort_from_finished_evaluation_skips_terminal_event(
         emitted.append(event.event_type)
 
     def _abort(_: EnOptEvent) -> None:
-        raise Abort(ExitCode.USER_ABORT)
+        msg = "stop"
+        raise RuntimeError(msg)
 
     step = EvaluationStep(evaluator=evaluator())
     step.add_event_handler(
@@ -639,10 +640,8 @@ def test_evaluation_abort_from_finished_evaluation_skips_terminal_event(
             event_types={EnOptEventType.FINISHED_EVALUATION}, callback=_abort
         )
     )
-    exit_code = step.run(
-        variables=initial_values, context=EnOptContext.model_validate(config)
-    )
-    assert exit_code == ExitCode.USER_ABORT
+    with pytest.raises(RuntimeError, match="stop"):
+        step.run(variables=initial_values, context=EnOptContext.model_validate(config))
     assert EnOptEventType.FINISHED_EVALUATION in emitted
     assert EnOptEventType.FINISHED_ENSEMBLE_EVALUATOR not in emitted
 
@@ -656,7 +655,8 @@ def test_evaluation_abort_before_results_skips_remaining_events(
         emitted.append(event.event_type)
 
     def _abort(_: EnOptEvent) -> None:
-        raise Abort(ExitCode.USER_ABORT)
+        msg = "stop"
+        raise RuntimeError(msg)
 
     step = EvaluationStep(evaluator=evaluator())
     step.add_event_handler(
@@ -665,10 +665,8 @@ def test_evaluation_abort_before_results_skips_remaining_events(
     step.add_event_handler(
         CallbackHandler(event_types={EnOptEventType.START_EVALUATION}, callback=_abort)
     )
-    exit_code = step.run(
-        variables=initial_values, context=EnOptContext.model_validate(config)
-    )
-    assert exit_code == ExitCode.USER_ABORT
+    with pytest.raises(RuntimeError, match="stop"):
+        step.run(variables=initial_values, context=EnOptContext.model_validate(config))
     assert EnOptEventType.START_EVALUATION in emitted
     assert EnOptEventType.FINISHED_EVALUATION not in emitted
     assert EnOptEventType.FINISHED_ENSEMBLE_EVALUATOR not in emitted

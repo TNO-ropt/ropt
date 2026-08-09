@@ -6,6 +6,7 @@ import numpy as np
 from numpy.random import default_rng
 
 from ropt._logging import get_logger
+from ropt.exceptions import TooFewRealizations
 from ropt.results import (
     ConstraintInfo,
     FunctionEvaluations,
@@ -186,10 +187,6 @@ class EnsembleEvaluator:
         variables: NDArray[np.float64],
         realizations_to_evaluate: NDArray[np.bool_],
     ) -> FunctionResults:
-        objective_weights, constraint_weights = (
-            self._calculate_filtered_realization_weights(f_eval_results)
-        )
-
         failed_realizations = _get_failed_function_realizations(
             f_eval_results.objectives
         )
@@ -199,18 +196,27 @@ class EnsembleEvaluator:
             int(failed_realizations.size),
         )
         assert self._context.realizations.realization_min_success is not None
-        if (
-            np.count_nonzero(~failed_realizations)
-            >= self._context.realizations.realization_min_success
-        ):
-            functions = self._compute_functions(
-                f_eval_results.objectives,
-                f_eval_results.constraints,
-                objective_weights,
-                constraint_weights,
-                failed_realizations,
+        objective_weights: NDArray[np.float64] | None = None
+        constraint_weights: NDArray[np.float64] | None = None
+        functions: Functions | None = None
+        try:
+            objective_weights, constraint_weights = (
+                self._calculate_filtered_realization_weights(f_eval_results)
             )
-        else:
+            if (
+                np.count_nonzero(~failed_realizations)
+                >= self._context.realizations.realization_min_success
+            ):
+                functions = self._compute_functions(
+                    f_eval_results.objectives,
+                    f_eval_results.constraints,
+                    objective_weights,
+                    constraint_weights,
+                    failed_realizations,
+                )
+        except TooFewRealizations:
+            # A filter or estimator could not produce a value; record this
+            # evaluation as failed so the batch continues with the others.
             functions = None
 
         evaluations = FunctionEvaluations.create(

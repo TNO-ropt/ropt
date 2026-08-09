@@ -10,7 +10,6 @@ from ropt.components.compute_steps import EvaluationStep
 from ropt.components.evaluators import FunctionEvaluator, ParallelEvaluator
 from ropt.components.event_handlers import HistoryHandler
 from ropt.context import EnOptContext
-from ropt.enums import ExitCode
 
 from ._handlers import current_handlers
 from ._objective import adapt_objective
@@ -129,14 +128,12 @@ def _run_evaluation(
 def _build_evaluate_result(result: FunctionResults) -> EvaluateResult:
     if result.functions is None:
         return EvaluateResult(
-            exit_code=ExitCode.TOO_FEW_REALIZATIONS,
             target_objective=None,
             objectives=None,
             constraints=None,
             results=result,
         )
     return EvaluateResult(
-        exit_code=ExitCode.ENSEMBLE_EVALUATOR_FINISHED,
         target_objective=float(result.functions.target_objective),
         objectives=result.functions.objectives,
         constraints=result.functions.constraints,
