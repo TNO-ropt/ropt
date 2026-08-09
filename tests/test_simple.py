@@ -116,6 +116,29 @@ def test_optimize_local_handler_collects_results(
     assert len(history["results"]) > 0
 
 
+def test_optimize_report_callback_receives_evaluate_results(
+    config: Any, test_functions: Any
+) -> None:
+    reported: list[EvaluateResult] = []
+    optimize(config, initial_values, test_functions[0], report=reported.append)
+    assert reported
+    assert all(isinstance(item, EvaluateResult) for item in reported)
+    assert any(item.target_objective is not None for item in reported)
+
+
+def test_handlers_report_callback_reports_across_the_block(
+    config: Any, test_functions: Any
+) -> None:
+    reported: list[EvaluateResult] = []
+    with handlers(report=reported.append):
+        optimize(config, initial_values, test_functions[0])
+        after_first = len(reported)
+        optimize(config, initial_values, test_functions[0])
+    assert after_first > 0
+    assert len(reported) > after_first
+    assert all(isinstance(item, EvaluateResult) for item in reported)
+
+
 def test_optimize_local_handler_rejects_reuse(config: Any, test_functions: Any) -> None:
     history = HistoryHandler()
     optimize(config, initial_values, test_functions[0], handlers=[history])
@@ -298,6 +321,40 @@ def test_optimize_many_per_run_objectives(config: Any, test_functions: Any) -> N
     assert results[1].variables is not None
     assert np.allclose(results[0].variables, [0.5, 0.5, 0.5], atol=0.02)
     assert np.allclose(results[1].variables, [-1.5, -1.5, 0.5], atol=0.02)
+
+
+def test_optimize_many_report_callback_shared_across_runs(
+    config: Any, test_functions: Any
+) -> None:
+    reported: list[EvaluateResult] = []
+    starts = np.array([initial_values, np.zeros(initial_values.size)])
+    with threads(workers=2):
+        optimize_many(config, starts, test_functions[0], report=reported.append)
+    assert reported
+    assert all(isinstance(item, EvaluateResult) for item in reported)
+
+
+def test_optimize_many_accepts_a_report_per_run(
+    config: Any, test_functions: Any
+) -> None:
+    first: list[EvaluateResult] = []
+    second: list[EvaluateResult] = []
+    starts = np.array([initial_values, np.zeros(initial_values.size)])
+    with threads(workers=2):
+        optimize_many(
+            config, starts, test_functions[0], report=[first.append, second.append]
+        )
+    assert first
+    assert second
+    assert all(isinstance(item, EvaluateResult) for item in (*first, *second))
+
+
+def test_optimize_many_rejects_mismatched_report_sequence(
+    config: Any, test_functions: Any
+) -> None:
+    starts = np.array([initial_values, np.zeros(initial_values.size)])
+    with threads(workers=2), pytest.raises(ValueError, match="number of runs"):
+        optimize_many(config, starts, test_functions[0], report=[lambda _r: None])
 
 
 def test_optimize_many_respects_limit(config: Any, test_functions: Any) -> None:

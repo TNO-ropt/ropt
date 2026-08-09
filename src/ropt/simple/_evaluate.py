@@ -13,7 +13,7 @@ from ropt.context import EnOptContext
 
 from ._handlers import current_handlers
 from ._objective import adapt_objective
-from ._result import EvaluateResult
+from ._result import EvaluateResult, _build_evaluate_result
 from ._session import current_executor, run_step
 
 if TYPE_CHECKING:
@@ -123,19 +123,3 @@ def _run_evaluation(
         variables=np.asarray(variables, dtype=np.float64),
     )
     return history["results"] or ()
-
-
-def _build_evaluate_result(result: FunctionResults) -> EvaluateResult:
-    if result.functions is None:
-        return EvaluateResult(
-            target_objective=None,
-            objectives=None,
-            constraints=None,
-            results=result,
-        )
-    return EvaluateResult(
-        target_objective=float(result.functions.target_objective),
-        objectives=result.functions.objectives,
-        constraints=result.functions.constraints,
-        results=result,
-    )

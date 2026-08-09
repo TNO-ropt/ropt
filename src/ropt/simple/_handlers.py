@@ -20,6 +20,7 @@ from typing import TYPE_CHECKING
 
 from ropt.components.event_handlers import EventDispatcher, EventForwardHandler
 
+from ._report import make_report_handler
 from ._session import _acquire_session, _release_session
 
 if TYPE_CHECKING:
@@ -29,6 +30,7 @@ if TYPE_CHECKING:
     from ropt.components.event_handlers import EventHandler
     from ropt.enums import EnOptEventType
 
+    from ._report import ReportCallback
     from ._session import Session
 
 
@@ -144,7 +146,11 @@ class HandlerScope:
         _release_session(self._session, self._session_token)
 
 
-def handlers(*handler: EventHandler, inherit: bool = True) -> HandlerScope:
+def handlers(
+    *handler: EventHandler,
+    inherit: bool = True,
+    report: ReportCallback | None = None,
+) -> HandlerScope:
     """Aggregate results across every optimization run in the block.
 
     Each handler receives events from all runs in the block (sequential or
@@ -158,11 +164,16 @@ def handlers(*handler: EventHandler, inherit: bool = True) -> HandlerScope:
     Args:
         handler: The result handlers to share across the block.
         inherit: Whether to also inherit the enclosing blocks' handlers.
+        report:  An optional callback invoked with an `EvaluateResult` for each
+                 function evaluation across the block's runs.
 
     Returns:
         A context manager scoping the shared handlers.
     """
-    return HandlerScope(handler, inherit=inherit)
+    scope_handlers: tuple[EventHandler, ...] = handler
+    if report is not None:
+        scope_handlers = (*handler, make_report_handler(report))
+    return HandlerScope(scope_handlers, inherit=inherit)
 
 
 def _find_scope(

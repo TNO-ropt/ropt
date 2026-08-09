@@ -15,6 +15,7 @@ from ropt.context import EnOptContext
 
 from ._handlers import current_handlers
 from ._objective import adapt_objective
+from ._report import make_report_handler
 from ._result import OptimizeResult
 from ._session import current_executor, current_session, run_step
 
@@ -31,14 +32,16 @@ if TYPE_CHECKING:
 
     from ._handlers import HandlerScope
     from ._objective import ObjectiveCallback
+    from ._report import ReportCallback
 
 
-def optimize(
+def optimize(  # ruff: ignore[too-many-arguments]
     config: dict[str, Any],
     x0: ArrayLike,
     objective: ObjectiveCallback,
     *,
     handlers: Sequence[EventHandler] | None = None,
+    report: ReportCallback | None = None,
     constraint_tolerance: float = 1e-10,
 ) -> OptimizeResult:
     """Run a single optimization.
@@ -51,6 +54,8 @@ def optimize(
         objective:            The per-realization objective callback.
         handlers:             Optional local result handlers, each owned by this
                               optimization alone.
+        report:               An optional callback invoked with an
+                              `EvaluateResult` for each function evaluation.
         constraint_tolerance: The tolerance within which a constraint is
                               considered satisfied.
 
@@ -63,6 +68,7 @@ def optimize(
         x0,
         objective,
         handlers=handlers,
+        report=report,
         constraint_tolerance=constraint_tolerance,
         shared=current_handlers(),
     )
@@ -75,6 +81,7 @@ def _optimize(  # ruff: ignore[too-many-arguments]
     objective: ObjectiveCallback,
     *,
     handlers: Sequence[EventHandler] | None,
+    report: ReportCallback | None,
     constraint_tolerance: float,
     shared: HandlerScope | None,
 ) -> OptimizeResult:
@@ -98,6 +105,8 @@ def _optimize(  # ruff: ignore[too-many-arguments]
     for handler in handlers or ():
         handler.claim()
         step.add_event_handler(handler)
+    if report is not None:
+        step.add_event_handler(make_report_handler(report))
     if shared is not None:
         shared.attach_to(step)
 
@@ -129,11 +138,12 @@ def _build_run_result(
     )
 
 
-def optimize_many(
+def optimize_many(  # ruff: ignore[too-many-arguments]
     config: dict[str, Any] | Sequence[dict[str, Any]],
     x0: ArrayLike,
     objective: ObjectiveCallback | Sequence[ObjectiveCallback],
     *,
+    report: ReportCallback | Sequence[ReportCallback] | None = None,
     limit: int | None = None,
     constraint_tolerance: float = 1e-10,
 ) -> tuple[OptimizeResult, ...]:
@@ -154,6 +164,9 @@ def optimize_many(
         config:               The configuration, or one per run.
         x0:                   The initial variable vector, or one per row.
         objective:            The objective callback, or one per run.
+        report:               An optional callback invoked with an
+                              `EvaluateResult` for each function evaluation,
+                              either shared by every run or one per run.
         limit:                The maximum number of runs to execute at once.
         constraint_tolerance: The tolerance within which a constraint is
                               considered satisfied.
@@ -175,6 +188,7 @@ def optimize_many(
     executor = current_executor()
     shared = current_handlers()
     runs = _broadcast(config, x0, objective)
+    reports = _broadcast_reports(report, len(runs))
     jobs: list[Callable[[], OptimizeResult]] = [
         partial(
             _optimize,
@@ -183,10 +197,13 @@ def optimize_many(
             run_x0,
             run_objective,
             handlers=None,
+            report=run_report,
             constraint_tolerance=constraint_tolerance,
             shared=shared,
         )
-        for run_config, run_x0, run_objective in runs
+        for (run_config, run_x0, run_objective), run_report in zip(
+            runs, reports, strict=True
+        )
     ]
     return tuple(session.gather(jobs, limit))
 
@@ -225,3 +242,17 @@ def _broadcast(
             strict=True,
         )
     )
+
+
+def _broadcast_reports(
+    report: ReportCallback | Sequence[ReportCallback] | None, count: int
+) -> list[ReportCallback | None]:
+    if report is None:
+        return [None] * count
+    if callable(report):
+        return [report] * count
+    reports: list[ReportCallback | None] = list(report)
+    if len(reports) != count:
+        msg = "report sequence length must match the number of runs."
+        raise ValueError(msg)
+    return reports

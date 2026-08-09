@@ -10,6 +10,7 @@ from ._evaluate import evaluate, evaluate_many
 from ._handlers import handlers
 from ._objective import ObjectiveCallback
 from ._optimize import optimize, optimize_many
+from ._report import ReportCallback
 from ._result import EvaluateResult, OptimizeResult
 from ._session import hpc, processes, threads
 
@@ -17,6 +18,7 @@ __all__ = [
     "EvaluateResult",
     "ObjectiveCallback",
     "OptimizeResult",
+    "ReportCallback",
     "evaluate",
     "evaluate_many",
     "handlers",
