@@ -15,19 +15,6 @@ def _load_from_file(name: str, sub_path: str = "advanced") -> Any:
     return module
 
 
-def test_example_deterministic(tmp_path: Path, monkeypatch: Any) -> None:
-    monkeypatch.chdir(tmp_path)
-    module = _load_from_file("deterministic")
-    module.main()
-
-
-@pytest.mark.parametrize("merge", [True, False])
-def test_example_ensemble(tmp_path: Path, monkeypatch: Any, merge: Any) -> None:
-    monkeypatch.chdir(tmp_path)
-    module = _load_from_file("ensemble")
-    module.main(merge=merge)
-
-
 @pytest.mark.parametrize("merge", [True, False])
 def test_example_function_evaluator(
     tmp_path: Path, monkeypatch: Any, merge: Any
@@ -42,13 +29,6 @@ def test_example_workflow(tmp_path: Path, monkeypatch: Any, merge: Any) -> None:
     monkeypatch.chdir(tmp_path)
     module = _load_from_file("workflow")
     module.main(merge=merge)
-
-
-@pytest.mark.parametrize("linear", [True, False])
-def test_example_constrained(tmp_path: Path, monkeypatch: Any, linear: Any) -> None:
-    monkeypatch.chdir(tmp_path)
-    module = _load_from_file("constrained")
-    module.main(linear=linear)
 
 
 @pytest.mark.slow
@@ -67,13 +47,6 @@ async def test_example_parallel_evaluator(
 
 
 @pytest.mark.slow
-def test_example_discrete(tmp_path: Path, monkeypatch: Any) -> None:
-    monkeypatch.chdir(tmp_path)
-    module = _load_from_file("discrete")
-    module.main()
-
-
-@pytest.mark.slow
 def test_example_nested(tmp_path: Path, monkeypatch: Any) -> None:
     monkeypatch.chdir(tmp_path)
     module = _load_from_file("nested")
@@ -89,15 +62,6 @@ def test_example_nested_multiprocess(tmp_path: Path, monkeypatch: Any) -> None:
     import nested_multiprocess  # type: ignore[import-not-found] # ruff: ignore[import-outside-top-level]
 
     nested_multiprocess.main()
-
-
-@pytest.mark.parametrize("linear", [True, False])
-def test_example_differential_evolution(
-    tmp_path: Path, monkeypatch: Any, linear: Any
-) -> None:
-    monkeypatch.chdir(tmp_path)
-    module = _load_from_file("differential_evolution")
-    module.main(linear=linear)
 
 
 def test_example_simple_optimize(tmp_path: Path, monkeypatch: Any) -> None:
@@ -125,17 +89,27 @@ def test_example_simple_handlers(tmp_path: Path, monkeypatch: Any) -> None:
     _load_from_file("handlers", "simple").main()
 
 
-def test_example_simple_ensemble(tmp_path: Path, monkeypatch: Any) -> None:
+@pytest.mark.parametrize("merge", [True, False])
+def test_example_simple_ensemble(tmp_path: Path, monkeypatch: Any, merge: Any) -> None:
     monkeypatch.chdir(tmp_path)
-    _load_from_file("ensemble", "simple").main()
+    _load_from_file("ensemble", "simple").main(merge=merge)
 
 
-def test_example_simple_constrained(tmp_path: Path, monkeypatch: Any) -> None:
+@pytest.mark.parametrize("linear", [True, False])
+def test_example_simple_constrained(
+    tmp_path: Path, monkeypatch: Any, linear: Any
+) -> None:
     monkeypatch.chdir(tmp_path)
-    _load_from_file("constrained", "simple").main()
+    _load_from_file("constrained", "simple").main(linear=linear)
+
+
+@pytest.mark.parametrize("linear", [True, False])
+def test_example_simple_discrete(tmp_path: Path, monkeypatch: Any, linear: Any) -> None:
+    monkeypatch.chdir(tmp_path)
+    _load_from_file("discrete", "simple").main(linear=linear)
 
 
 @pytest.mark.slow
-def test_example_simple_discrete(tmp_path: Path, monkeypatch: Any) -> None:
+def test_example_simple_mixed(tmp_path: Path, monkeypatch: Any) -> None:
     monkeypatch.chdir(tmp_path)
-    _load_from_file("discrete", "simple").main()
+    _load_from_file("mixed", "simple").main()

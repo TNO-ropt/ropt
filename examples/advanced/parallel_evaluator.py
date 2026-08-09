@@ -35,19 +35,21 @@ import numpy as np
 from numpy.random import default_rng
 from numpy.typing import NDArray
 
+from ropt.components.compute_steps import OptimizationStep
 from ropt.components.evaluators import (
     EvaluationFunctionCallback,
     EvaluationFunctionContext,
     EvaluationFunctionResult,
     ParallelEvaluator,
 )
+from ropt.components.event_handlers import ResultsHandler
 from ropt.components.executors import (
     Executor,
     MultiprocessingExecutor,
     ThreadingExecutor,
 )
+from ropt.context import EnOptContext
 from ropt.results import FunctionResults
-from ropt.workflow import BasicOptimizer
 
 DIM = 5
 UNCERTAINTY = 0.1
@@ -109,10 +111,13 @@ def run_optimization(
         The optimal results.
     """
     evaluator = ParallelEvaluator(function=function, executor=executor)
-    optimizer = BasicOptimizer(config=config, evaluator=evaluator)
-    optimizer.run(INITIAL_VALUES)
-    assert optimizer.results is not None
-    return optimizer.results
+    result_handler = ResultsHandler()
+    step = OptimizationStep(evaluator=evaluator)
+    step.add_event_handler(result_handler)
+    step.run(variables=INITIAL_VALUES, context=EnOptContext.model_validate(config))
+    result = result_handler.result
+    assert result is not None
+    return result
 
 
 async def async_run(  # ruff: ignore[too-many-arguments]

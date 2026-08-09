@@ -5,9 +5,12 @@ function. In the high-level API a single objective callback returns the
 objective **and** the constraint (objectives first, then constraints); the
 config declares the constraint bounds under ``nonlinear_constraints``, and
 ``constraint_tolerance`` sets when a constraint counts as satisfied. A
-``report`` callback flags any evaluation that violates the constraint.
+``report`` callback flags any evaluation that violates the constraint. Pass
+``--linear`` to additionally impose a deterministic linear equality constraint
+(declared in the config rather than returned by the objective).
 """
 
+import argparse
 from typing import Any
 
 import numpy as np
@@ -79,10 +82,21 @@ def report(result: EvaluateResult) -> None:
         print(f"  constraint violation: {info.nonlinear_violation}")
 
 
-def main() -> None:
-    """Run the constrained optimization and check the result."""
+def main(*, linear: bool = False) -> None:
+    """Run the constrained optimization and check the result.
+
+    Args:
+        linear: Also add a deterministic linear equality constraint.
+    """
+    config = {**CONFIG}
+    if linear:
+        config["linear_constraints"] = {
+            "coefficients": [[0.0, 0.0, 0.0, 1.0, -1.0]],
+            "lower_bounds": 0.0,
+            "upper_bounds": 0.0,
+        }
     result = optimize(
-        CONFIG, INITIAL_VALUES, rosenbrock, report=report, constraint_tolerance=1e-6
+        config, INITIAL_VALUES, rosenbrock, report=report, constraint_tolerance=1e-6
     )
     print(f"optimal variables:  {result.variables}")
     print(f"optimal objective:  {result.target_objective}")
@@ -92,4 +106,10 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--linear",
+        action="store_true",
+        help="add a linear equality constraint",
+    )
+    main(**vars(parser.parse_args()))

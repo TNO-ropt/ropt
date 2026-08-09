@@ -1,73 +1,24 @@
-"""Mixed-integer optimization with the high-level ``ropt.simple`` API.
+"""Constrained integer optimization with differential evolution.
 
-Two of the four variables are continuous and two are discrete (integer-valued),
-so the problem is solved with a gradient-free *differential evolution* backend
-selected in the config. Discreteness is declared through ``variables.types``;
-everything else is the same ensemble Rosenbrock setup. A ``report`` callback
-prints each evaluation as the search proceeds.
+A small integer problem solved with the gradient-free *differential evolution*
+backend: maximize ``min(3 * x, y)`` (by minimizing its negation) over two
+integer variables subject to ``x + y <= 10``. Integer variables are declared
+through ``variables.types``. Pass ``--linear`` to impose the ``x + y <= 10``
+bound as a deterministic *linear* constraint (declared in the config) instead of
+a *nonlinear* one (returned by the objective).
 """
 
+import argparse
 from typing import Any
 
 import numpy as np
-from numpy.random import default_rng
 from numpy.typing import NDArray
 
 from ropt.components.evaluators import EvaluationFunctionContext
 from ropt.enums import VariableType
 from ropt.simple import EvaluateResult, optimize
 
-DIM = 4
-REALIZATIONS = 10
-UNCERTAINTY = 0.1
-CONFIG: dict[str, Any] = {
-    "variables": {
-        "variable_count": DIM,
-        "perturbation_magnitudes": 1e-6,
-        "lower_bounds": 0.0,
-        "upper_bounds": 10.0,
-        "types": [
-            VariableType.REAL,
-            VariableType.REAL,
-            VariableType.INTEGER,
-            VariableType.INTEGER,
-        ],
-    },
-    "backend": {
-        "method": "differential_evolution",
-        "options": {"rng": 4},
-        "max_iterations": 50,
-    },
-    "realizations": {
-        "weights": [1.0] * REALIZATIONS,
-    },
-}
-INITIAL_VALUES = [1.0, 1.0, 1.0, 1.0]
-
-_RNG = default_rng(seed=123)
-A = _RNG.normal(loc=1.0, scale=UNCERTAINTY, size=REALIZATIONS)
-B = _RNG.normal(loc=100.0, scale=100 * UNCERTAINTY, size=REALIZATIONS)
-
-
-def rosenbrock(
-    variables: NDArray[np.float64], context: EvaluationFunctionContext
-) -> float:
-    """The Rosenbrock function for one realization, minimized at ``[1, 2, 3, 4]``.
-
-    Args:
-        variables: The variable vector to evaluate.
-        context:   Identifies the realization being evaluated.
-
-    Returns:
-        The Rosenbrock objective for ``context.realization``.
-    """
-    r = context.realization
-    objective = 0.0
-    scaled = variables / np.arange(1, DIM + 1)
-    for idx in range(DIM - 1):
-        x, y = scaled[idx : idx + 2]
-        objective += (A[r] - x) ** 2 + B[r] * (y - x * x) ** 2
-    return float(objective)
+INITIAL_VALUES = [0.0, 0.0]
 
 
 def report(result: EvaluateResult) -> None:
@@ -81,14 +32,63 @@ def report(result: EvaluateResult) -> None:
         print(f"  objective: {result.target_objective}")
 
 
-def main() -> None:
-    """Run the mixed-integer optimization and check the result."""
-    result = optimize(CONFIG, INITIAL_VALUES, rosenbrock, report=report)
+def main(*, linear: bool = False) -> None:
+    """Run the differential evolution optimization and check the result.
+
+    Args:
+        linear: Impose ``x + y <= 10`` as a linear rather than nonlinear
+                constraint.
+    """
+    config: dict[str, Any] = {
+        "variables": {
+            "variable_count": 2,
+            "types": VariableType.INTEGER,
+            "lower_bounds": [0.0, 0.0],
+            "upper_bounds": [10.0, 10.0],
+        },
+        "optimizer": {
+            "max_functions": 5,
+        },
+        "backend": {
+            "method": "differential_evolution",
+            "options": {"rng": 4},
+            "parallel": False,
+        },
+    }
+    if linear:
+        config["linear_constraints"] = {
+            "coefficients": [1.0, 1.0],
+            "lower_bounds": [-np.inf],
+            "upper_bounds": [10.0],
+        }
+    else:
+        config["nonlinear_constraints"] = {
+            "lower_bounds": [-np.inf],
+            "upper_bounds": [10.0],
+        }
+
+    def function(
+        variables: NDArray[np.float64],
+        _context: EvaluationFunctionContext,
+    ) -> float | list[float]:
+        x, y = variables
+        objective = -min(3.0 * x, y)
+        if linear:
+            return float(objective)
+        return [float(objective), float(x + y)]
+
+    result = optimize(config, INITIAL_VALUES, function, report=report)
     print(f"optimal variables: {result.variables}")
     print(f"optimal objective: {result.target_objective}")
     assert result.variables is not None
-    assert np.allclose(result.variables, [1, 2, 3, 4], atol=1e-1)
+    assert np.all(result.variables == [3, 7])
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--linear",
+        action="store_true",
+        help="solve using a linear constraint",
+    )
+    main(**vars(parser.parse_args()))
