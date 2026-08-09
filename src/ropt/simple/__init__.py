@@ -2,10 +2,18 @@
 
 This module builds on the low-level `ropt` primitives. Import its names
 directly, for example ``from ropt.simple import optimize, threads``.
+
+Enumerations used in the configuration and results (for example
+[`ExitCode`][ropt.enums.ExitCode] and [`VariableType`][ropt.enums.VariableType])
+are not re-exported here; import them from [`ropt.enums`][ropt.enums].
 """
 
 from __future__ import annotations
 
+from ropt.components.evaluators import (
+    EvaluationFunctionContext,
+    EvaluationFunctionResult,
+)
 from ropt.components.event_handlers import (
     DataFrameHandler,
     EventHandler,
@@ -24,6 +32,8 @@ from ._session import hpc, processes, threads
 __all__ = [
     "DataFrameHandler",
     "EvaluateResult",
+    "EvaluationFunctionContext",
+    "EvaluationFunctionResult",
     "EventHandler",
     "HistoryHandler",
     "ObjectiveCallback",

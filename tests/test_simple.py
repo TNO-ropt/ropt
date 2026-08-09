@@ -8,10 +8,10 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 import pytest
 
-from ropt.components.evaluators import EvaluationFunctionContext
 from ropt.enums import ExitCode
 from ropt.simple import (
     EvaluateResult,
+    EvaluationFunctionContext,
     HistoryHandler,
     OptimizeResult,
     compose,

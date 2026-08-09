@@ -14,8 +14,13 @@ import numpy as np
 from numpy.random import default_rng
 from numpy.typing import NDArray
 
-from ropt.components.evaluators import EvaluationFunctionContext
-from ropt.simple import EvaluateResult, hpc, optimize, processes
+from ropt.simple import (
+    EvaluateResult,
+    EvaluationFunctionContext,
+    hpc,
+    optimize,
+    processes,
+)
 
 DIM = 2
 REALIZATIONS = 5

@@ -11,8 +11,7 @@ from typing import Any
 import numpy as np
 from numpy.typing import NDArray
 
-from ropt.components.evaluators import EvaluationFunctionContext
-from ropt.simple import HistoryHandler, handlers, optimize
+from ropt.simple import EvaluationFunctionContext, HistoryHandler, handlers, optimize
 
 DIM = 5
 CONFIG: dict[str, Any] = {

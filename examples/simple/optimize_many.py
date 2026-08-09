@@ -12,8 +12,7 @@ from typing import Any
 import numpy as np
 from numpy.typing import NDArray
 
-from ropt.components.evaluators import EvaluationFunctionContext
-from ropt.simple import optimize_many, threads
+from ropt.simple import EvaluationFunctionContext, optimize_many, threads
 
 DIM = 5
 CONFIG: dict[str, Any] = {

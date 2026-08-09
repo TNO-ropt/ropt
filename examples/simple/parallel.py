@@ -18,7 +18,7 @@ from ropt.simple import optimize, processes, threads
 if TYPE_CHECKING:
     from numpy.typing import NDArray
 
-    from ropt.components.evaluators import EvaluationFunctionContext
+    from ropt.simple import EvaluationFunctionContext
 
 DIM = 5
 CONFIG: dict[str, Any] = {
