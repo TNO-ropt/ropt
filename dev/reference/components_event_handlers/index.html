@@ -2025,6 +2025,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#ropt.components.event_handlers.ResultsHandler.result" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        result
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ropt.components.event_handlers.ResultsHandler.event_types" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2057,6 +2068,17 @@
     <span class="md-ellipsis">
       
         __init__
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.components.event_handlers.HistoryHandler.results" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        results
       
     </span>
   </a>
@@ -2879,6 +2901,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#ropt.components.event_handlers.ResultsHandler.result" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        result
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ropt.components.event_handlers.ResultsHandler.event_types" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2911,6 +2944,17 @@
     <span class="md-ellipsis">
       
         __init__
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.components.event_handlers.HistoryHandler.results" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        results
       
     </span>
   </a>
@@ -4001,7 +4045,14 @@ data available to other components of the workflow.</p>
         <p>Track a single optimization result based on selection criteria.</p>
 <p>Listens for <code>FINISHED_EVALUATION</code> events and retains either the best
 (lowest weighted objective) or most recent valid result. Optionally
-filters by constraint tolerance.</p>
+filters by constraint tolerance. The selected result is accessible via the
+<a class="autorefs autorefs-internal" title="            result
+
+
+  
+      property
+  " href="#ropt.components.event_handlers.ResultsHandler.result"><code>result</code></a> property or
+<code>handler["results"]</code>.</p>
 <p>See <a href="../../usage/workflows/#result_handler">Optimization Workflows</a> for full
 details on selection criteria and domain handling.</p>
 
@@ -4142,6 +4193,35 @@ details on selection criteria and domain handling.</p>
 
 
 
+<h3 id="ropt.components.event_handlers.ResultsHandler.result" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">result</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">result</span><span class="p">:</span> <span class="n">FunctionResults</span> <span class="o">|</span> <span class="kc">None</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>The selected (best or last) result, or <code>None</code> if none is available.</p>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
 <h3 id="ropt.components.event_handlers.ResultsHandler.event_types" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">event_types</span>
 
@@ -4219,7 +4299,13 @@ details on selection criteria and domain handling.</p>
   
       dataclass
   " href="../results/#ropt.results.Results"><code>Results</code></a> object to a growing tuple accessible
-via <code>handler["results"]</code>.</p>
+via the <a class="autorefs autorefs-internal" title="            results
+
+
+  
+      property
+  " href="#ropt.components.event_handlers.HistoryHandler.results"><code>results</code></a>
+property or <code>handler["results"]</code>.</p>
 <p>See <a href="../../usage/workflows/#history">Optimization Workflows</a> for full
 details on domain handling and accumulation behavior.</p>
 
@@ -4287,6 +4373,35 @@ details on domain handling and accumulation behavior.</p>
       </tbody>
     </table>
 
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="ropt.components.event_handlers.HistoryHandler.results" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">results</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">results</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Results</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>All results collected so far, in the order received.</p>
 
     </div>
 
