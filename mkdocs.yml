@@ -95,29 +95,36 @@ repo_name: TNO-ropt/ropt
 
 nav:
   - "About": index.md
-  - "Usage":
+  - "Getting Started":
       - "Background": usage/background.md
       - "Installation": usage/installation.md
       - "Quickstart": usage/quickstart.md
-      - "Basic Optimization": usage/basic.md
+      - "Your First Optimization": usage/basic.md
+      - "Running in Parallel": usage/execution.md
+  - "Concepts":
       - "Configuration": usage/configuration.md
-      - "Writing Evaluation Callbacks": usage/evaluation_callbacks.md
-      - "Working with Results": usage/results.md
+      - "Stochastic Gradients": usage/gradients.md
       - "Realization Filters": usage/realization_filters.md
       - "Function Estimators": usage/function_estimators.md
       - "Transforms": usage/transforms.md
-      - "Stochastic Gradients": usage/gradients.md
+      - "Working with Results": usage/results.md
+  - "Simple API":
+      - "The Simple API": usage/simple.md
+  - "Low-Level API":
       - "Optimization Workflows": usage/workflows.md
+      - "Writing Evaluation Callbacks": usage/evaluation_callbacks.md
       - "Parallel Evaluation": usage/parallel.md
+  - "Advanced Topics":
       - "Logging": usage/logging.md
   - "Tutorials":
       - "Overview": tutorials/index.md
-      - "Deterministic Optimization": tutorials/deterministic.md
-      - "Ensemble-based Optimization": tutorials/ensemble.md
-      - "Using FunctionEvaluator": tutorials/function_evaluator.md
-      - "Building a Workflow": tutorials/workflow.md
+      - "Your First Optimization": tutorials/optimize.md
+      - "Ensemble Optimization": tutorials/ensemble.md
       - "Constrained Optimization": tutorials/constrained.md
+      - "Mixed-Integer Optimization": tutorials/discrete.md
+      - "Building a Workflow": tutorials/workflow.md
   - "Reference":
+      - "Simple API": reference/simple.md
       - "Configuration":
         - "Context Class": reference/context.md
         - "Configuration Classes": reference/config.md

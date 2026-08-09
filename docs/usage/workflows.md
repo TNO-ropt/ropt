@@ -1,10 +1,9 @@
 # Optimization Workflows
 
-[Basic Optimization](basic.md) uses
-[`BasicOptimizer`][ropt.workflow.BasicOptimizer] to drive a single optimization
-run with a single evaluator. For anything more elaborate — multiple optimizers
-in sequence, nested optimizations, custom event handling, parallel/async
-execution — drop down to the workflow components.
+The [simple API](simple.md) covers the common case: a single optimization run
+with one evaluator. For anything more elaborate — multiple optimizers in
+sequence, nested optimizations, custom event handling, parallel/async execution
+— drop down to the workflow components described here.
 
 There are four core workflow components:
 
@@ -105,9 +104,9 @@ print(f"Optimal variables: {result_handler['results'].evaluations.variables}")
 ```
 
 This is a minimal example of optimizing a simple deterministic function. A full
-runnable example for optimizing the Rosenbrock function with uncertain
-parameters can be found here:
-[examples/advanced/ensemble.py](https://github.com/TNO-ropt/ropt/blob/main/examples/advanced/ensemble.py).
+runnable example that assembles the workflow components by hand can be found
+here:
+[examples/advanced/workflow.py](https://github.com/TNO-ropt/ropt/blob/main/examples/advanced/workflow.py).
 
 ## Compute steps
 
@@ -276,7 +275,7 @@ The framework ships four reusable handlers:
 
 | Handler                                                                  | Purpose                                                                |
 | ------------------------------------------------------------------------ | ---------------------------------------------------------------------- |
-| [`ResultsHandler`][ropt.components.event_handlers.ResultsHandler]          | Keep the best (or last) result. Backs `BasicOptimizer.results`.        |
+| [`ResultsHandler`][ropt.components.event_handlers.ResultsHandler]          | Keep the best (or last) result.        |
 | [`HistoryHandler`][ropt.components.event_handlers.HistoryHandler]          | Keep every result.                                                     |
 | [`CallbackHandler`][ropt.components.event_handlers.CallbackHandler]        | Forward selected event types to a user callback.                       |
 | [`DataFrameHandler`][ropt.components.event_handlers.DataFrameHandler]              | Append rows to a structured table per result.                          |
@@ -484,7 +483,7 @@ tables to be updated.
 ## Evaluators
 
 Compute steps take an [`Evaluator`][ropt.components.evaluators.Evaluator]
-instance — *not* the plain callable accepted by `BasicOptimizer`. Three
+instance — *not* a bare evaluation callback. Three
 synchronous evaluators are provided, plus an asynchronous one described in
 the [next section](parallel.md):
 
@@ -521,8 +520,8 @@ callback that receives the full 2-D variable matrix and an
 [`EvaluationBatchContext`][ropt.evaluation.EvaluationBatchContext], and returns
 an [`EvaluationBatchResult`][ropt.evaluation.EvaluationBatchResult]. Use this
 when you need the full batch (e.g. vectorized computation, or an external
-simulator that accepts all rows at once). The callback has the same signature as
-the callable accepted by `BasicOptimizer`.
+simulator that accepts all rows at once). The callback follows the
+[`EvaluationBatchCallback`][ropt.evaluation.EvaluationBatchCallback] protocol.
 
 ### FunctionEvaluator
 

@@ -1,46 +1,25 @@
 # Tutorials
 
-This section contains step-by-step tutorials that guide you through complete
-working examples. Each tutorial builds on concepts from the [Usage](../usage/background.md)
-documentation and demonstrates practical applications of `ropt`.
+These tutorials walk through the runnable scripts in the
+[examples](https://github.com/TNO-ropt/ropt/tree/main/examples) folder. Each one
+starts with a link to the full script, then explains it a few lines at a time.
+The scripts are short, so keep the file open next to the tutorial.
 
-## Rosenbrock Function Tutorials
+More tutorials will be added over time.
 
-These tutorials demonstrate optimization of the multi-dimensional Rosenbrock
-function, progressing from a simple deterministic case to stochastic
-optimization with different implementation approaches:
+## Simple API
 
-- **[Deterministic Optimization](deterministic.md)** — The simplest
-  example: optimizing the classic Rosenbrock function with fixed parameters.
-  Start here to understand the basics.
+These use the [simple API](../usage/simple.md) and are the best place to start.
 
-- **[Ensemble-based Optimization](ensemble.md)** — Introduces uncertainty
-  by sampling parameters across multiple realizations. Uses
-  [`BasicOptimizer`][ropt.workflow.BasicOptimizer] with a batch evaluation
-  callback.
+- [Your First Optimization](optimize.md) — run one optimization.
+- [Ensemble Optimization](ensemble.md) — optimize over uncertain realizations.
+- [Constrained Optimization](constrained.md) — add constraints.
+- [Mixed-Integer Optimization](discrete.md) — integer variables with
+  differential evolution.
 
-- **[Using FunctionEvaluator](function_evaluator.md)** — Using
-  [`FunctionEvaluator`][ropt.components.evaluators.FunctionEvaluator] with a
-  per-evaluation function callback. This approach is simpler to write when you
-  don't need to handle batches.
+## Low-level API
 
-- **[Building a Workflow](workflow.md)** — Assemble the workflow components
-  directly with
-  [`OptimizationStep`][ropt.components.compute_steps.OptimizationStep]. This
-  approach offers more control and flexibility for complex workflows.
+For advanced users who need full control over the optimization workflow.
 
-- **[Constrained Optimization](constrained.md)** — Adding linear
-  and nonlinear constraints to the optimization problem.
-
-## Prerequisites
-
-Before starting these tutorials, you should be familiar with:
-
-1. [Installation](../usage/installation.md) — How to install `ropt`
-2. [Background](../usage/background.md) — Core concepts of ensemble-based optimization
-3. [Quickstart](../usage/quickstart.md) — A minimal working example
-
-Each tutorial provides complete, runnable code that you can copy and experiment
-with. The full source code for all examples is available in the
-[examples directory](https://github.com/TNO-ropt/ropt/tree/main/examples) of the
-repository.
+- [Building a Workflow](workflow.md) — assemble compute steps and event handlers
+  by hand.

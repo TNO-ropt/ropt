@@ -4,8 +4,7 @@ During optimization `ropt` decides which variable vectors need values for the
 objectives and optional nonlinear-constraints. The user must provide the code to
 perform these function evaluations.
 
-There are two ways to provide such evaluation code to
-[`BasicOptimizer`][ropt.workflow.BasicOptimizer]:
+There are two ways to provide such evaluation code to the low-level evaluators:
 
 
 1. **A plain callable** — A callable adhering to the
@@ -199,20 +198,14 @@ def my_function(
     [`EvaluationBatchResult.metadata`][ropt.evaluation.EvaluationBatchResult]
     for the corresponding row.
 
-To use it with
-[`BasicOptimizer`][ropt.workflow.BasicOptimizer], wrap the function in a
-[`FunctionEvaluator`][ropt.components.evaluators.FunctionEvaluator] and pass it as
-the evaluator argument:
+Wrap the function in a
+[`FunctionEvaluator`][ropt.components.evaluators.FunctionEvaluator] and give the
+evaluator to a compute step (see [Optimization Workflows](workflows.md)):
 
 ```python
-from ropt.workflow import BasicOptimizer
 from ropt.components.evaluators import FunctionEvaluator
 
-optimizer = BasicOptimizer(
-    config,
-    FunctionEvaluator(function=my_function),
-)
-optimizer.run(initial_values)
+evaluator = FunctionEvaluator(function=my_function)
 ```
 
 ## Where to next
@@ -220,7 +213,4 @@ optimizer.run(initial_values)
 - Read the results: [Working with Results](results.md).
 - Use evaluator subclasses for caching, async, or HPC dispatch:
   [Optimization Workflows](workflows.md).
-- See it in action: [Ensemble-based Optimization](../tutorials/ensemble.md)
-  (batch callback) and
-  [Using FunctionEvaluator](../tutorials/function_evaluator.md)
-  (per-evaluation callback).
+- See it in action: [Building a Workflow](../tutorials/workflow.md).

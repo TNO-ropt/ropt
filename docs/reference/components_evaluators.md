@@ -1,9 +1,8 @@
 # Evaluators
 
 These are the [`Evaluator`][ropt.components.evaluators.Evaluator] subclasses
-used by the workflow components' compute steps. For the simple callable
-protocol used by [`BasicOptimizer`][ropt.workflow.BasicOptimizer], see
-[Evaluation Classes](evaluation.md).
+used by the workflow components' compute steps. For the plain callable
+protocols, see [Evaluation Classes](evaluation.md).
 
 See [Writing Evaluation Callbacks](../usage/evaluation_callbacks.md) and
 [Parallel Evaluation](../usage/parallel.md) for usage.

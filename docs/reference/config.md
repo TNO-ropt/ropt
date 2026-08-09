@@ -3,8 +3,7 @@
 The [`ropt.config`][ropt.config] package contains the Pydantic models that
 define an optimization run. Each class corresponds to a top-level section of
 the configuration dictionary consumed by
-[`EnOptContext`][ropt.context.EnOptContext] and
-[`BasicOptimizer`][ropt.workflow.BasicOptimizer].
+[`EnOptContext`][ropt.context.EnOptContext] and the optimization functions.
 
 For detailed descriptions of each field, including defaults, usage patterns,
 and examples, see the [Configuration](../usage/configuration.md) user-manual

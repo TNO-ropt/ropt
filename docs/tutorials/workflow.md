@@ -1,236 +1,72 @@
-# Building a Workflow from Components
+# Building a Workflow
 
-This tutorial demonstrates optimization of the multi-dimensional Rosenbrock
-function using ropt's workflow components directly. This approach offers more
-control and flexibility compared to
-[`BasicOptimizer`][ropt.workflow.BasicOptimizer].
+*Audience: advanced users who need full control over the optimization.*
 
-!!! tip "Source Code"
-    The complete source code for this tutorial is available at
-    [examples/advanced/workflow.py](https://github.com/TNO-ropt/ropt/blob/main/examples/advanced/workflow.py).
+The [simple API](../usage/simple.md) covers most cases. When you need more —
+custom event handling, several optimizers, or nested runs — you assemble the
+low-level workflow components yourself. This tutorial follows
+[examples/advanced/workflow.py](https://github.com/TNO-ropt/ropt/blob/main/examples/advanced/workflow.py).
 
+See [Optimization Workflows](../usage/workflows.md) for the full reference on the
+components used here.
 
-## When to Build a Workflow Yourself
+## The evaluator
 
-Assemble the workflow components yourself when you need:
-
-- Custom event handling beyond simple callbacks
-- Chained or nested optimizations
-- Fine-grained control over the optimization process
-- Access to all events emitted during optimization
-
-For simple single-run optimizations,
-[`BasicOptimizer`][ropt.workflow.BasicOptimizer] is usually sufficient.
-
-
-## Imports and Constants
+At the low level the evaluation callback receives the whole batch of variable
+vectors at once (a 2-D array) and returns an
+[`EvaluationBatchResult`][ropt.evaluation.EvaluationBatchResult]:
 
 ```python
-import argparse
-from functools import partial
-from typing import Any
-
-import numpy as np
-from numpy.random import default_rng
-from numpy.typing import NDArray
-
-from ropt.context import EnOptContext
-from ropt.enums import EnOptEventType
-from ropt.evaluation import (
-    EvaluationBatchContext,
-    EvaluationBatchResult,
-)
-from ropt.events import EnOptEvent
-from ropt.results import FunctionResults
-from ropt.components.compute_steps import OptimizationStep
-from ropt.components.evaluators import BatchEvaluator
-from ropt.components.event_handlers import CallbackHandler, ResultsHandler
-
-DIM = 5
-CONFIG: dict[str, Any] = {
-    "variables": {
-        "variable_count": DIM,
-        "perturbation_magnitudes": 1e-6,
-    },
-}
-INITIAL_VALUES = 2 * np.arange(DIM) / DIM + 0.5
-UNCERTAINTY = 0.1
-```
-
-Note the additional imports for the workflow components:
-
-- [`EnOptContext`][ropt.context.EnOptContext] — The optimization context
-- [`EnOptEventType`][ropt.enums.EnOptEventType] — Event type enumeration
-- [`EnOptEvent`][ropt.events.EnOptEvent] — Event objects
-- [`OptimizationStep`][ropt.components.compute_steps.OptimizationStep] — The compute step
-- [`BatchEvaluator`][ropt.components.evaluators.BatchEvaluator] — Wraps a batch callback
-- [`CallbackHandler`][ropt.components.event_handlers.CallbackHandler],
-  [`ResultsHandler`][ropt.components.event_handlers.ResultsHandler] — Event handlers
-
-
-## The Batch Evaluation Callback
-
-The evaluation callback is the same as in the basic tutorial:
-
-```python
-def rosenbrock(
-    variables: NDArray[np.float64],
-    context: EvaluationBatchContext,
-    a: NDArray[np.float64],
-    b: NDArray[np.float64],
-) -> EvaluationBatchResult:
-    objectives = np.zeros((variables.shape[0], 1), dtype=np.float64)
+def rosenbrock(variables, context, a, b):
+    objectives = np.zeros((variables.shape[0], 1))
     for v_idx, r in enumerate(context.realizations):
-        for d_idx in range(DIM - 1):
-            x, y = variables[v_idx, d_idx : d_idx + 2]
-            objectives[v_idx, 0] += (a[r] - x) ** 2 + b[r] * (y - x * x) ** 2
+        ...
     return EvaluationBatchResult(objectives=objectives)
 ```
 
-
-## Event-Based Progress Reporting
-
-With the workflow components, the report callback receives
-[`EnOptEvent`][ropt.events.EnOptEvent] objects instead of raw results:
+Wrap it in a [`BatchEvaluator`][ropt.components.evaluators.BatchEvaluator]:
 
 ```python
-def report(event: EnOptEvent) -> None:
-    for item in event.results:
-        if isinstance(item, FunctionResults) and item.functions is not None:
-            print(f"  variables: {item.evaluations.variables}")
-            print(f"  objective: {item.functions.target_objective}\n")
+from ropt.components.evaluators import BatchEvaluator
+
+evaluator = BatchEvaluator(callback=partial(rosenbrock, a=a, b=b))
 ```
 
-This callback filters for FunctionResults and prints the current best variables
-and objective value. The event object provides access to:
+## The compute step and its handlers
 
-- `event.results` — The results tuple
-- `event.event_type` — The type of event ([`EnOptEventType`][ropt.enums.EnOptEventType])
-- `event.context` — The optimization context
-
-
-## Running the Optimization
-
-The main function shows how to build and run a workflow:
+An [`OptimizationStep`][ropt.components.compute_steps.OptimizationStep] runs the
+optimization. You attach event handlers to it: a
+[`ResultsHandler`][ropt.components.event_handlers.ResultsHandler] to keep the best
+result, and a [`CallbackHandler`][ropt.components.event_handlers.CallbackHandler]
+to report progress:
 
 ```python
-def main(*, merge: bool = False) -> None:
-    # Set the number of realizations and the merge option
-    realizations = 50 if merge else 10
-    CONFIG.update(
-        {
-            "realizations": {
-                "weights": [1.0] * realizations,
-            },
-            "gradient": {
-                "number_of_perturbations": 1 if merge else 5,
-                "merge_realizations": merge,
-            },
-        }
-    )
+from ropt.components.compute_steps import OptimizationStep
+from ropt.components.event_handlers import CallbackHandler, ResultsHandler
+from ropt.enums import EnOptEventType
 
-    # Generate random parameters for the Rosenbrock function
-    rng = default_rng(seed=123)
-    a = rng.normal(loc=1.0, scale=UNCERTAINTY, size=realizations)
-    b = rng.normal(loc=100.0, scale=100 * UNCERTAINTY, size=realizations)
-
-    # Create a batch evaluator
-    evaluator = BatchEvaluator(callback=partial(rosenbrock, a=a, b=b))
-
-    # Create an optimization step
-    step = OptimizationStep(evaluator=evaluator)
-
-    # Add a result handler to track the best result
-    result_handler = ResultsHandler()
-    step.add_event_handler(result_handler)
-
-    # Add an event handler to report results after each evaluation
-    reporter = CallbackHandler(
-        callback=report, event_types={EnOptEventType.FINISHED_EVALUATION}
-    )
-    step.add_event_handler(reporter)
-
-    # Create an optimization context from the configuration
-    context = EnOptContext.model_validate(CONFIG)
-
-    # Run the optimization step using the initial values
-    step.run(variables=INITIAL_VALUES, context=context)
-
-    # Retrieve the best result from the result handler
-    optimal_result = result_handler["results"]
-
-    # Check the results
-    print(f"Optimal variables: {optimal_result.evaluations.variables}")
-    print(f"Optimal objective: {optimal_result.functions.target_objective}\n")
+step = OptimizationStep(evaluator=evaluator)
+result_handler = ResultsHandler()
+step.add_event_handler(result_handler)
+step.add_event_handler(
+    CallbackHandler(callback=report, event_types={EnOptEventType.FINISHED_EVALUATION})
+)
 ```
 
-The workflow approach involves these steps:
+## Run it and read the result
 
-1. **Create a batch evaluator**: Wrap the callback in a
-   [`BatchEvaluator`][ropt.components.evaluators.BatchEvaluator]
-
-2. **Create an optimization step**: The
-   [`OptimizationStep`][ropt.components.compute_steps.OptimizationStep] runs
-   the optimization algorithm
-
-3. **Add a result handler**: The
-   [`ResultsHandler`][ropt.components.event_handlers.ResultsHandler] stores the
-   best result found
-
-4. **Add a callback handler**: The
-   [`CallbackHandler`][ropt.components.event_handlers.CallbackHandler] calls
-   our report function for `FINISHED_EVALUATION` events
-
-5. **Create the context**: Parse the config into an
-   [`EnOptContext`][ropt.context.EnOptContext]
-
-6. **Run the step**: Execute with initial variables and context
-
-7. **Retrieve results**: Get the best result from the handler
-
-
-## Command-Line Interface
+The step takes the variables and an
+[`EnOptContext`][ropt.context.EnOptContext] built from the config. The best result
+is on the handler:
 
 ```python
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser("python rosenbrock.py")
-    parser.add_argument(
-        "--merge",
-        action="store_true",
-        help="merge the realizations in gradient calculation",
-    )
-    main(**vars(parser.parse_args()))
+from ropt.context import EnOptContext
+
+step.run(variables=INITIAL_VALUES, context=EnOptContext.model_validate(CONFIG))
+best = result_handler.result
 ```
 
+## Next
 
-## Running the Example
-
-```bash
-# Default: 10 realizations with 5 perturbations
-python workflow.py
-
-# Use merged realizations
-python workflow.py --merge
-```
-
-
-## Comparison with BasicOptimizer
-
-| Aspect | BasicOptimizer | Workflow Components |
-|--------|----------------|-------------------|
-| Setup | Minimal | More explicit |
-| Event handling | Callback only | Full event system |
-| Result access | `optimizer.results` | Via `ResultsHandler` |
-| Flexibility | Limited | High |
-| Best for | Simple optimizations | Complex workflows |
-
-
-## Next Steps
-
-- [Ensemble-based Optimization](ensemble.md) — Use BasicOptimizer for
-  simpler setup
-- [Using FunctionEvaluator](function_evaluator.md) — Use per-evaluation
-  callbacks
-- [Optimization Workflows](../usage/workflows.md) — Full reference on the
-  workflow components, event handlers, and evaluators
-- [Working with Results](../usage/results.md) — Understanding result objects
+- The full component reference: [Optimization Workflows](../usage/workflows.md).
+- Running evaluations in parallel: [Parallel Evaluation](../usage/parallel.md).

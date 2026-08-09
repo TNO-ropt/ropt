@@ -2,7 +2,7 @@
 
 `ropt` exposes the full intermediate and final state of an optimization through
 [`Results`][ropt.results.Results] objects. This page describes the result
-classes and how to inspect them; see [Basic Optimization](basic.md) and
+classes and how to inspect them; see [The Simple API](simple.md) and
 [Optimization Workflows](workflows.md) for how results are produced and
 delivered to your code.
 
@@ -185,8 +185,8 @@ this optimizer domain.
 The [`transform_from_optimizer`][ropt.results.Results.transform_from_optimizer]
 method reverses these transforms, mapping results back to the *user domain*.
 
-When using [`BasicOptimizer`][ropt.workflow.BasicOptimizer], results passed to
-observer callbacks are always transformed to user domain automatically.
+In the [simple API](simple.md), results are always transformed to the user
+domain automatically.
 
 In [workflows](workflows.md), event handlers determine how results are returned,
 for instance by offering a `domain` argument that controls whether results are

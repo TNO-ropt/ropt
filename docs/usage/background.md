@@ -110,5 +110,5 @@ optimization as implemented by `ropt`.
 - Learn the configuration vocabulary: [Configuration](configuration.md).
 - Understand the stochastic gradient (StoSAG) machinery in depth:
   [Stochastic Gradients](gradients.md).
-- Build custom optimization workflows beyond a single `BasicOptimizer` run:
+- Build custom optimization workflows beyond a single optimization run:
   [Optimization Workflows](workflows.md).
