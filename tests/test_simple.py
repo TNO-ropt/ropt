@@ -9,10 +9,10 @@ import numpy as np
 import pytest
 
 from ropt.components.evaluators import EvaluationFunctionContext
-from ropt.components.event_handlers import HistoryHandler
 from ropt.enums import ExitCode
 from ropt.simple import (
     EvaluateResult,
+    HistoryHandler,
     OptimizeResult,
     compose,
     evaluate,

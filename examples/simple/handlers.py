@@ -12,8 +12,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from ropt.components.evaluators import EvaluationFunctionContext
-from ropt.components.event_handlers import HistoryHandler
-from ropt.simple import handlers, optimize
+from ropt.simple import HistoryHandler, handlers, optimize
 
 DIM = 5
 CONFIG: dict[str, Any] = {
