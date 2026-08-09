@@ -2434,10 +2434,56 @@ a walkthrough.</p>
 
 
         <p>A simple interface for single optimization runs.</p>
-<p>Wraps the workflow components into a run-once interface with built-in
-result tracking.</p>
-<p>See <a href="../../usage/basic/">Basic Optimization</a> for a walkthrough and full
-example.</p>
+<p>Wraps the workflow components into a run-once interface with built-in result
+tracking. Passing a configuration dictionary and an evaluator is enough to
+run an optimization and retrieve the best result. Internally it:</p>
+<ol>
+<li>validates <code>config</code> into an <a class="autorefs autorefs-internal" title="            EnOptContext" href="../context/#ropt.context.EnOptContext"><code>EnOptContext</code></a>;</li>
+<li>wraps a plain
+   <a class="autorefs autorefs-internal" title="            ropt.evaluation.EvaluationBatchCallback" href="../evaluation/#ropt.evaluation.EvaluationBatchCallback"><code>EvaluationBatchCallback</code></a> in a
+   <a class="autorefs autorefs-internal" title="            ropt.components.evaluators.BatchEvaluator" href="../components_evaluators/#ropt.components.evaluators.BatchEvaluator"><code>BatchEvaluator</code></a>, or uses a
+   supplied <a class="autorefs autorefs-internal" title="            ropt.components.evaluators.Evaluator" href="../components_evaluators/#ropt.components.evaluators.Evaluator"><code>Evaluator</code></a> as given;</li>
+<li>creates an
+   <a class="autorefs autorefs-internal" title="            ropt.components.compute_steps.OptimizationStep" href="../components_compute_steps/#ropt.components.compute_steps.OptimizationStep"><code>OptimizationStep</code></a> and
+   attaches a
+   <a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.ResultsHandler" href="../components_event_handlers/#ropt.components.event_handlers.ResultsHandler"><code>ResultsHandler</code></a> to
+   remember the best result;</li>
+<li>runs the step, exposing the best
+   <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="../results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> via
+   <a class="autorefs autorefs-internal" title="            results
+
+
+  
+      property
+  " href="#ropt.workflow.BasicOptimizer.results"><code>results</code></a>.</li>
+</ol>
+<p>Progress can be monitored by registering a callback with
+<a class="autorefs autorefs-internal" title="            set_results_callback" href="#ropt.workflow.BasicOptimizer.set_results_callback"><code>set_results_callback</code></a>.
+For more control (multiple runs, custom event handlers, or parallel/async
+evaluation) use the workflow components directly.</p>
+<p><strong>Injecting event handlers into every run.</strong> Extra event handlers can be
+added to <em>every</em> <code>BasicOptimizer</code> run without changing any call site, for
+example to add logging, telemetry, or a custom results store. On start-up
+<code>BasicOptimizer</code> reads a JSON file at <code>&lt;prefix&gt;/share/ropt/options.json</code>,
+where <code>&lt;prefix&gt;</code> is the Python installation's data prefix (the value of
+<code>sysconfig.get_paths()["data"]</code>). Handlers are listed under
+<code>basic_optimizer.event_handlers</code> as <code>module.ClassName</code> strings:</p>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="p">{</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span><span class="nt">&quot;basic_optimizer&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">        </span><span class="nt">&quot;event_handlers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;mypackage.MyHandler&quot;</span><span class="p">]</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="p">}</span>
+</span></code></pre></div>
+<p>Each referenced class must be importable from the active environment and must
+subclass <a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventHandler" href="../components_event_handlers/#ropt.components.event_handlers.EventHandler"><code>EventHandler</code></a> with no
+required constructor arguments; it is instantiated and attached to every run.
+Entries whose module cannot be imported are skipped, and a missing or
+malformed file is ignored.</p>
 
 
 
@@ -2520,7 +2566,11 @@ constraint value is within this tolerance, it is considered satisfied.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The evaluator object.</p>
+                <p>An
+<a class="autorefs autorefs-internal" title="            ropt.evaluation.EvaluationBatchCallback" href="../evaluation/#ropt.evaluation.EvaluationBatchCallback"><code>EvaluationBatchCallback</code></a>
+callable that evaluates a batch of variable vectors, or an
+<a class="autorefs autorefs-internal" title="            ropt.components.evaluators.Evaluator" href="../components_evaluators/#ropt.components.evaluators.Evaluator"><code>Evaluator</code></a> instance for
+advanced features such as caching, parallel, or HPC evaluation.</p>
               </div>
             </td>
             <td>
@@ -2536,7 +2586,8 @@ constraint value is within this tolerance, it is considered satisfied.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The constraint violation tolerance.</p>
+                <p>The constraint violation tolerance; a
+constraint within this tolerance is considered satisfied.</p>
               </div>
             </td>
             <td>
@@ -2642,6 +2693,37 @@ the <code>BasicOptimizer</code> object. It manages the optimization, result
 handling, and event processing. After the optimization is complete, the
 optimal results, variables, and exit code can be accessed via the
 corresponding properties.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>initial_values</code>
+            </td>
+            <td>
+                  <code><span title="numpy.typing.ArrayLike">ArrayLike</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The variable vector to start the optimization from.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
