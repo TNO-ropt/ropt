@@ -7,7 +7,7 @@ with a batch evaluation callback.
 
 !!! tip "Source Code"
     The complete source code for this tutorial is available at
-    [examples/ensemble.py](https://github.com/TNO-ropt/ropt/blob/main/examples/ensemble.py).
+    [examples/advanced/ensemble.py](https://github.com/TNO-ropt/ropt/blob/main/examples/advanced/ensemble.py).
 
 
 ## Adding Uncertainty

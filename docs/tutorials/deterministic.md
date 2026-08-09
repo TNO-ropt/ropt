@@ -6,7 +6,7 @@ is the simplest possible optimization example in `ropt`.
 
 !!! tip "Source Code"
     The complete source code for this tutorial is available at
-    [examples/deterministic.py](https://github.com/TNO-ropt/ropt/blob/main/examples/deterministic.py).
+    [examples/advanced/deterministic.py](https://github.com/TNO-ropt/ropt/blob/main/examples/advanced/deterministic.py).
 
 
 ## The Rosenbrock Function

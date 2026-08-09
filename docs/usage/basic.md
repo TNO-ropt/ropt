@@ -251,4 +251,4 @@ required constructor arguments.
   [Working with Results](results.md).
 - Move beyond a single optimization run:
   [Optimization Workflows](workflows.md).
-- Full runnable variants of this example: [examples/ensemble.py](https://github.com/TNO-ropt/ropt/blob/main/examples/ensemble.py)
+- Full runnable variants of this example: [examples/advanced/ensemble.py](https://github.com/TNO-ropt/ropt/blob/main/examples/advanced/ensemble.py)
