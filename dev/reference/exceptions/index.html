@@ -2662,6 +2662,50 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#ropt.exceptions.RoptError" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RoptError
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.exceptions.WorkflowError" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        WorkflowError
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.exceptions.ExecutionError" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ExecutionError
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.exceptions.UnsupportedError" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        UnsupportedError
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ropt.exceptions.OptimizerStop" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2793,6 +2837,50 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#ropt.exceptions.RoptError" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RoptError
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.exceptions.WorkflowError" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        WorkflowError
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.exceptions.ExecutionError" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ExecutionError
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.exceptions.UnsupportedError" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        UnsupportedError
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ropt.exceptions.OptimizerStop" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2922,6 +3010,164 @@
 
 
 
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="ropt.exceptions.RoptError" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">RoptError</span>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#Exception">Exception</a></code></p>
+
+
+
+        <p>Base class for all runtime errors raised by <code>ropt</code>.</p>
+<p>Catch this to handle any error raised by <code>ropt</code> itself. Configuration and
+validation errors are <strong>not</strong> part of this hierarchy; they surface as
+<code>pydantic.ValidationError</code>. The internal stop signals
+(<a class="autorefs autorefs-internal" title="            OptimizerStop" href="#ropt.exceptions.OptimizerStop"><code>OptimizerStop</code></a>,
+<a class="autorefs autorefs-internal" title="            TooFewRealizations" href="#ropt.exceptions.TooFewRealizations"><code>TooFewRealizations</code></a>,
+<a class="autorefs autorefs-internal" title="            ExecutorStopped" href="#ropt.exceptions.ExecutorStopped"><code>ExecutorStopped</code></a>) are control flow, not
+errors, and are excluded too.</p>
+
+
+
+
+
+
+
+
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="ropt.exceptions.WorkflowError" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">WorkflowError</span>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="            RoptError (ropt.exceptions.RoptError)" href="#ropt.exceptions.RoptError">RoptError</a></code></p>
+
+
+
+        <p>A workflow or runtime object was used incorrectly.</p>
+<p>For example a compute step, evaluator, or event handler used concurrently or
+out of order, an ownership or registration conflict, submitting to a
+dispatcher that is not running, or reusing a locked context.</p>
+
+
+
+
+
+
+
+
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="ropt.exceptions.ExecutionError" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ExecutionError</span>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="            RoptError (ropt.exceptions.RoptError)" href="#ropt.exceptions.RoptError">RoptError</a></code></p>
+
+
+
+        <p>The execution infrastructure failed at runtime.</p>
+<p>For example a worker pool that cannot start, a broken process pool, a task
+that cannot be serialized, or an HPC setup or submission problem.</p>
+
+
+
+
+
+
+
+
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="ropt.exceptions.UnsupportedError" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">UnsupportedError</span>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="            RoptError (ropt.exceptions.RoptError)" href="#ropt.exceptions.RoptError">RoptError</a></code></p>
+
+
+
+        <p>An optional dependency is missing or a requested feature is unsupported.</p>
+<p>For example a required extra (such as pandas or cloudpickle) is not
+installed, or the selected plugin does not support the requested method.</p>
+
+
+
+
+
+
+
+
+
+    </div>
+
+</div>
 
 
 
@@ -3157,7 +3403,7 @@ when its executor has stopped and the current evaluation cannot proceed.</p>
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#Exception">Exception</a></code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="            WorkflowError (ropt.exceptions.WorkflowError)" href="#ropt.exceptions.WorkflowError">WorkflowError</a></code></p>
 
 
 
