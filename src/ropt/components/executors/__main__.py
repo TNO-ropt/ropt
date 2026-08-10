@@ -34,8 +34,7 @@ def run_task(input_path: str, output_path: str) -> int:
         result = function(*args, **kwargs)
         exit_code = 0
     except Exception as exc:  # ruff: ignore[blind-except]
-        exc.add_note(traceback.format_exc())
-        result = _picklable_exception(exc)
+        result = picklable_exception(exc)
         exit_code = 1
     finally:
         out_path = Path(output_path)
@@ -53,7 +52,20 @@ def run_task(input_path: str, output_path: str) -> int:
     return exit_code
 
 
-def _picklable_exception(exc: BaseException) -> BaseException:
+def picklable_exception(exc: BaseException) -> BaseException:
+    """Attach the worker traceback and return a cloudpickle-safe exception.
+
+    The active traceback is recorded as a note so it survives serialization back
+    to the parent process. If `exc` itself cannot be pickled, it is replaced by
+    a `RuntimeError` carrying its `repr` and notes.
+
+    Args:
+        exc: The exception raised while running the task.
+
+    Returns:
+        A picklable exception with the worker traceback attached as a note.
+    """
+    exc.add_note(traceback.format_exc())
     try:
         cloudpickle.loads(cloudpickle.dumps(exc))
     except Exception:  # ruff: ignore[blind-except]

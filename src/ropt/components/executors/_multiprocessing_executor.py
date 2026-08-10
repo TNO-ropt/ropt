@@ -24,6 +24,8 @@ _HAVE_CLOUDPICKLE: Final = find_spec("cloudpickle") is not None
 if _HAVE_CLOUDPICKLE:
     import cloudpickle
 
+    from .__main__ import picklable_exception
+
 _logger = get_logger(__name__)
 
 
@@ -165,7 +167,7 @@ def _run_cloudpickled(payload: bytes) -> tuple[bool, bytes]:
         check_transferred()
         return True, cloudpickle.dumps(function(*args, **kwargs))
     except Exception as exc:  # ruff: ignore[blind-except]
-        return False, cloudpickle.dumps(exc)
+        return False, cloudpickle.dumps(picklable_exception(exc))
 
 
 def _canary() -> None:

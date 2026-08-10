@@ -24,6 +24,10 @@ from ropt.components.executors import (
     Task,
     ThreadingExecutor,
 )
+from ropt.components.executors._multiprocessing_executor import (
+    _HAVE_CLOUDPICKLE,
+    _run_cloudpickled,
+)
 from ropt.context import EnOptContext
 from ropt.evaluation import EvaluationBatchContext
 from ropt.exceptions import ExecutorFailure, ExecutorStopped, TransferError
@@ -39,7 +43,7 @@ if TYPE_CHECKING:
     from ropt.results import FunctionResults
 
 try:
-    import cloudpickle  # ruff: ignore[unused-import]
+    import cloudpickle
     import pandas as pd
     import pysqa  # ruff: ignore[unused-import]
 
@@ -78,6 +82,10 @@ def _function(input_value: int, *, raise_error: bool = False) -> int:
         msg = f"Test error in function {input_value}"
         raise ValueError(msg)
     return input_value + 1
+
+
+def _raise_unpicklable_error(_input: int) -> int:
+    raise ValueError(threading.Lock())  # a lock cannot be (cloud)pickled
 
 
 def _construct_handler_in_worker(_: int) -> str:
@@ -162,6 +170,28 @@ async def test_hpc_executor_refuses_to_overwrite_existing_task_files(
         executor._submit(task)  # ruff: ignore[private-member-access]
 
 
+@pytest.mark.skipif(not _HAVE_CLOUDPICKLE, reason="cloudpickle is not installed")
+async def test_cloudpickled_worker_records_the_worker_traceback_as_a_note() -> None:
+    payload = cloudpickle.dumps((partial(_function, 0, raise_error=True), (), {}))
+    await asyncio.sleep(0)  # this module runs tests on the event loop
+    ok, blob = _run_cloudpickled(payload)
+    assert not ok
+    exc = cloudpickle.loads(blob)
+    assert isinstance(exc, ValueError)
+    assert any("Traceback" in note for note in exc.__notes__)
+
+
+@pytest.mark.skipif(not _HAVE_CLOUDPICKLE, reason="cloudpickle is not installed")
+async def test_cloudpickled_worker_wraps_an_unpicklable_exception() -> None:
+    payload = cloudpickle.dumps((_raise_unpicklable_error, (0,), {}))
+    await asyncio.sleep(0)  # this module runs tests on the event loop
+    ok, blob = _run_cloudpickled(payload)
+    assert not ok
+    exc = cloudpickle.loads(blob)
+    assert isinstance(exc, RuntimeError)
+    assert any("Traceback" in note for note in exc.__notes__)
+
+
 @pytest.mark.slow
 @pytest.mark.timeout(30)
 async def test_worker_may_construct_workflow_objects() -> None:
@@ -243,7 +273,10 @@ async def test_executor_error(
         assert isinstance(item, ValueError)
         assert "Test error in function" in str(item)
         assert executor.is_running()
-        if executor_name == "hpc":
+        expects_notes = executor_name == "hpc" or (
+            executor_name == "multiprocessing" and _HAVE_CLOUDPICKLE
+        )
+        if expects_notes:
             notes = getattr(item, "__notes__", [])
             assert any("Test error in function" in note for note in notes)
             assert any("Traceback" in note for note in notes)
