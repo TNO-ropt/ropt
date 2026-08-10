@@ -173,6 +173,13 @@ class HPCExecutor(ExecutorBase):
         if task_id in ChainMap(self._tasks, self._results, self._jobs, self._retries):
             msg = "Task ID already in use, unique names required"
             raise RuntimeError(msg)
+        existing = any(
+            (self._workdir / f"{task_id}{suffix}").exists()
+            for suffix in (".in", ".out", ".txt")
+        )
+        if existing:
+            msg = f"Task files for '{task_id}' already exist in {self._workdir}"
+            raise RuntimeError(msg)
         self._tasks[task_id] = task
         input_file = self._workdir / f"{task_id}.in"
         output_file = self._workdir / f"{task_id}.out"

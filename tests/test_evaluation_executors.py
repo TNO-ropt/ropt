@@ -144,6 +144,24 @@ async def test_executor_ok(
     assert not executor.is_running()
 
 
+@pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
+async def test_hpc_executor_refuses_to_overwrite_existing_task_files(
+    tmp_path: Path, monkeypatch: Any
+) -> None:
+    monkeypatch.setattr(
+        "ropt.components.executors._hpc_executor.pysqa.QueueAdapter",
+        lambda *args, **kwargs: MockedHPCAdapter(tmp_path),  # ruff: ignore[unused-lambda-argument]
+    )
+    executor = HPCExecutor(workdir=tmp_path, workers=1, interval=0, template="")
+    (tmp_path / "job1.out").touch()  # a stale file, e.g. from another executor
+    task = Task(
+        function=_function, args=(0,), results_queue=ResultsQueue(), name="job1"
+    )
+    await asyncio.sleep(0)  # this module runs tests on the event loop
+    with pytest.raises(RuntimeError, match="already exist"):
+        executor._submit(task)  # ruff: ignore[private-member-access]
+
+
 @pytest.mark.slow
 @pytest.mark.timeout(30)
 async def test_worker_may_construct_workflow_objects() -> None:
