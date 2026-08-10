@@ -9,10 +9,10 @@
       
       
       
-        <link rel="prev" href="../workflows/">
+        <link rel="prev" href="../function_estimators/">
       
       
-        <link rel="next" href="../parallel/">
+        <link rel="next" href="../results/">
       
       
         
@@ -23,7 +23,7 @@
     
     
       
-        <title>Writing Evaluation Callbacks - ropt Documentation</title>
+        <title>Transforms - ropt Documentation</title>
       
     
     
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#writing-evaluation-callbacks" class="md-skip">
+        <a href="#transforms" class="md-skip">
           Skip to content
         </a>
       
@@ -118,7 +118,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Writing Evaluation Callbacks
+              Transforms
             
           </span>
         </div>
@@ -260,57 +260,57 @@
   
   
   
-  
-    
-    
-      <li class="md-tabs__item">
-        <a href="../../optimizer_configuration/key_concepts/" class="md-tabs__link">
-          
-  
-  
-  Optimizer Configuration
-
-        </a>
-      </li>
-    
-  
-
-      
-        
-  
-  
-  
-  
-    
-    
-      <li class="md-tabs__item">
-        <a href="../../simple/simple/" class="md-tabs__link">
-          
-  
-  
-  Simple API
-
-        </a>
-      </li>
-    
-  
-
-      
-        
-  
-  
-  
     
   
   
     
     
       <li class="md-tabs__item md-tabs__item--active">
-        <a href="../workflows/" class="md-tabs__link">
+        <a href="../key_concepts/" class="md-tabs__link">
           
   
   
-  Low-Level API
+  Optimizer Setup
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../running/running/" class="md-tabs__link">
+          
+  
+  
+  Running
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../workflows/workflows/" class="md-tabs__link">
+          
+  
+  
+  Workflows
 
         </a>
       </li>
@@ -689,35 +689,38 @@
       
   
   
+    
   
   
+  
     
     
     
     
+      
+        
+        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
         
           
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
-        
-          
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
             
   
   
   <span class="md-ellipsis">
     
   
-    Optimizer Configuration
+    Optimizer Setup
   
 
     
@@ -728,12 +731,12 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_3">
             <span class="md-nav__icon md-icon"></span>
             
   
-    Optimizer Configuration
+    Optimizer Setup
   
 
           </label>
@@ -746,7 +749,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../optimizer_configuration/key_concepts/" class="md-nav__link">
+      <a href="../key_concepts/" class="md-nav__link">
         
   
   
@@ -774,7 +777,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../optimizer_configuration/configuration/" class="md-nav__link">
+      <a href="../configuration/" class="md-nav__link">
         
   
   
@@ -802,7 +805,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../optimizer_configuration/gradients/" class="md-nav__link">
+      <a href="../gradients/" class="md-nav__link">
         
   
   
@@ -830,7 +833,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../optimizer_configuration/realization_filters/" class="md-nav__link">
+      <a href="../realization_filters/" class="md-nav__link">
         
   
   
@@ -858,7 +861,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../optimizer_configuration/function_estimators/" class="md-nav__link">
+      <a href="../function_estimators/" class="md-nav__link">
         
   
   
@@ -883,10 +886,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../../optimizer_configuration/transforms/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Transforms
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -902,6 +932,181 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#why-use-them" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why use them
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-they-plug-in" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How they plug in
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#default-transforms" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Default transforms
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Default transforms">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#defaultvariabletransform" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DefaultVariableTransform
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#defaultobjectivetransform" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DefaultObjectiveTransform
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#defaultnonlinearconstrainttransform" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DefaultNonlinearConstraintTransform
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#effects-on-bounds-and-constraints" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Effects on bounds and constraints
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#round-tripping-results" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Round-tripping results
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#writing-a-custom-transform" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Writing a custom transform
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Writing a custom transform">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#lifecycle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Lifecycle
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#variabletransform-methods" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        VariableTransform methods
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#objectivetransform-nonlinearconstrainttransform-methods" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ObjectiveTransform / NonlinearConstraintTransform methods
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#where-to-next" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Where to next
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -914,7 +1119,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../optimizer_configuration/results/" class="md-nav__link">
+      <a href="../results/" class="md-nav__link">
         
   
   
@@ -974,7 +1179,7 @@
   <span class="md-ellipsis">
     
   
-    Simple API
+    Running
   
 
     
@@ -990,7 +1195,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Simple API
+    Running
   
 
           </label>
@@ -1003,14 +1208,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../simple/simple/" class="md-nav__link">
+      <a href="../../running/running/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    The Simple API
+    Running Optimizations
   
 
     
@@ -1035,38 +1240,35 @@
       
   
   
-    
   
   
-  
     
     
     
     
-      
-        
-        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
         
           
-          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
             
   
   
   <span class="md-ellipsis">
     
   
-    Low-Level API
+    Workflows
   
 
     
@@ -1077,12 +1279,12 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
             
   
-    Low-Level API
+    Workflows
   
 
           </label>
@@ -1095,7 +1297,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../workflows/" class="md-nav__link">
+      <a href="../../workflows/workflows/" class="md-nav__link">
         
   
   
@@ -1120,37 +1322,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Writing Evaluation Callbacks
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../workflows/evaluation_callbacks/" class="md-nav__link">
         
   
   
@@ -1166,103 +1341,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#the-callable-signature" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        The callable signature
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#what-is-in-evaluationbatchcontext" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        What is in EvaluationBatchContext
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#returning-results" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Returning results
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#returning-constraints" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Returning constraints
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#handling-partial-failures" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Handling partial failures
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#using-functionevaluator" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Using FunctionEvaluator
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#where-to-next" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Where to next
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1275,7 +1353,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../parallel/" class="md-nav__link">
+      <a href="../../workflows/parallel/" class="md-nav__link">
         
   
   
@@ -2753,10 +2831,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#the-callable-signature" class="md-nav__link">
+  <a href="#why-use-them" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The callable signature
+        Why use them
       
     </span>
   </a>
@@ -2764,10 +2842,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#what-is-in-evaluationbatchcontext" class="md-nav__link">
+  <a href="#how-they-plug-in" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What is in EvaluationBatchContext
+        How they plug in
       
     </span>
   </a>
@@ -2775,10 +2853,60 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#returning-results" class="md-nav__link">
+  <a href="#default-transforms" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Returning results
+        Default transforms
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Default transforms">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#defaultvariabletransform" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DefaultVariableTransform
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#defaultobjectivetransform" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DefaultObjectiveTransform
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#defaultnonlinearconstrainttransform" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DefaultNonlinearConstraintTransform
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#effects-on-bounds-and-constraints" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Effects on bounds and constraints
       
     </span>
   </a>
@@ -2786,10 +2914,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#returning-constraints" class="md-nav__link">
+  <a href="#round-tripping-results" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Returning constraints
+        Round-tripping results
       
     </span>
   </a>
@@ -2797,24 +2925,52 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#handling-partial-failures" class="md-nav__link">
+  <a href="#writing-a-custom-transform" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Handling partial failures
+        Writing a custom transform
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Writing a custom transform">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#lifecycle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Lifecycle
       
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#using-functionevaluator" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#variabletransform-methods" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Using FunctionEvaluator
+        VariableTransform methods
       
     </span>
   </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#objectivetransform-nonlinearconstrainttransform-methods" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ObjectiveTransform / NonlinearConstraintTransform methods
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -2849,310 +3005,227 @@
   
 
 
-<h1 id="writing-evaluation-callbacks">Writing Evaluation Callbacks</h1>
-<p>During optimization <code>ropt</code> decides which variable vectors need values for the
-objectives and optional nonlinear-constraints. The user must provide the code to
-perform these function evaluations.</p>
-<p>There are two ways to provide such evaluation code to the low-level evaluators:</p>
+<h1 id="transforms">Transforms</h1>
+<p>A transform converts a quantity between the <strong>user domain</strong> (the values you
+specify in the configuration and read back from results) and the <strong>optimizer
+domain</strong> (the values actually presented to the optimization algorithm).</p>
+<p>Three independent transform types exist:</p>
+<table>
+<thead>
+<tr>
+<th>Transform</th>
+<th>Applied to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a class="autorefs autorefs-internal" title="            VariableTransform" href="../../reference/transforms/#ropt.transforms.VariableTransform"><code>VariableTransform</code></a></td>
+<td>Optimization variables (and their bounds).</td>
+</tr>
+<tr>
+<td><a class="autorefs autorefs-internal" title="            ObjectiveTransform" href="../../reference/transforms/#ropt.transforms.ObjectiveTransform"><code>ObjectiveTransform</code></a></td>
+<td>Objective function values.</td>
+</tr>
+<tr>
+<td><a class="autorefs autorefs-internal" title="            NonlinearConstraintTransform" href="../../reference/transforms/#ropt.transforms.NonlinearConstraintTransform"><code>NonlinearConstraintTransform</code></a></td>
+<td>Nonlinear constraint values.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="why-use-them">Why use them</h2>
+<ul>
+<li><strong>Scaling</strong> — bring variables of different physical magnitudes onto a common
+  numerical scale so the optimizer treats them evenly.</li>
+<li><strong>Reparametrization</strong> — optimize in a more convenient space (log-space,
+  normalized <span class="arithmatex">\([0,1]\)</span> space).</li>
+<li><strong>Stability</strong> — apply monotone transforms to objectives that span many
+  orders of magnitude.</li>
+</ul>
+<h2 id="how-they-plug-in">How they plug in</h2>
+<p>Transform instances are stored in top-level tuples on the
+<a class="autorefs autorefs-internal" title="            EnOptContext" href="../../reference/context/#ropt.context.EnOptContext"><code>EnOptContext</code></a>:</p>
+<ul>
+<li><code>variable_transforms</code></li>
+<li><code>objective_transforms</code></li>
+<li><code>nonlinear_constraint_transforms</code></li>
+</ul>
+<p>Each variable, objective, or constraint is assigned to a transform by its
+<strong>index</strong> in the corresponding <code>transforms</code> array inside <code>VariablesConfig</code>,
+<code>ObjectiveFunctionsConfig</code>, or <code>NonlinearConstraintsConfig</code>. An index of <code>-1</code>
+(the default) means no transform applies.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="s2">&quot;variable_transforms&quot;</span><span class="p">:</span> <span class="p">[</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="p">{</span><span class="s2">&quot;method&quot;</span><span class="p">:</span> <span class="s2">&quot;default/scaler&quot;</span><span class="p">,</span> <span class="s2">&quot;options&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;scales&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1e3</span><span class="p">,</span> <span class="mf">1e-3</span><span class="p">]}},</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">],</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="s2">&quot;variables&quot;</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="s2">&quot;variable_count&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="s2">&quot;transforms&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>   <span class="c1"># all three variables use transform 0</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">},</span>
+</span></code></pre></div>
+<p>Multiple transforms may exists, each handling a different subset of variables or
+objectives/constraints.</p>
+<p>At context initialization, each transform's <code>init(mask)</code> method is called
+with a boolean mask combining:</p>
+<ul>
+<li>For variables: which variables are free (<code>variables.mask</code>) <strong>and</strong> assigned
+  to this transform (<code>variables.transforms == idx</code>).</li>
+<li>For objectives/constraints: which objectives or constraints are assigned to
+  this transform.</li>
+</ul>
+<p>The transform must treat unmasked elements as identity (pass through
+unchanged).</p>
+<p>See <a href="../configuration/">Configuration</a> for the broadcasting and index-sharing
+rules.</p>
+<h2 id="default-transforms">Default transforms</h2>
+<p>The <code>ropt.plugins.transforms.default</code> package provides built-in linear scaling
+transforms, exposed as the <code>default/scaler</code> method.</p>
+<h3 id="defaultvariabletransform">DefaultVariableTransform</h3>
+<p><a class="autorefs autorefs-internal" title="            ropt.transforms.default.DefaultVariableTransform" href="../../reference/transforms/#ropt.transforms.default.DefaultVariableTransform"><code>DefaultVariableTransform</code></a>
+applies a per-variable linear scale and offset:</p>
+<div class="arithmatex">\[x_{\text{opt}} = \frac{x_{\text{user}} - \text{offset}}{\text{scale}}, \qquad
+  x_{\text{user}} = x_{\text{opt}} \cdot \text{scale} + \text{offset}\]</div>
+<p>Configuration options:</p>
+<ul>
+<li><strong><code>scales</code></strong> — array of per-variable scaling factors (default: no scaling).</li>
+<li><strong><code>offsets</code></strong> — array of per-variable offsets (default: no offset).</li>
+</ul>
+<p>When both are provided they are broadcasted to the same length.</p>
+<p>This transform also handles:</p>
+<ul>
+<li><strong>Perturbation magnitudes</strong> — divided by <code>scale</code> so perturbations remain
+  proportional in optimizer space.</li>
+<li><strong>Variable bound differences</strong> — multiplied by <code>scale</code> when reporting
+  constraint violations back in user units.</li>
+<li><strong>Linear constraints</strong> — the coefficient matrix <span class="arithmatex">\(\mathbf{A}\)</span> and RHS bounds
+  <span class="arithmatex">\(\mathbf{b}\)</span> are adjusted to account for the scale and offset (see the
+  <a class="autorefs autorefs-internal" title="            linear_constraints_to_optimizer" href="../../reference/transforms/#ropt.transforms.default.DefaultVariableTransform.linear_constraints_to_optimizer">API reference</a>
+  for the full derivation). The resulting equations are further normalized by
+  dividing each row by its maximum absolute coefficient.</li>
+</ul>
+<h3 id="defaultobjectivetransform">DefaultObjectiveTransform</h3>
+<p><a class="autorefs autorefs-internal" title="            ropt.transforms.default.DefaultObjectiveTransform" href="../../reference/transforms/#ropt.transforms.default.DefaultObjectiveTransform"><code>DefaultObjectiveTransform</code></a>
+divides objective values by <code>scales</code> when going to the optimizer domain and
+multiplies when returning:</p>
+<div class="arithmatex">\[f_{\text{opt}} = f_{\text{user}} / \text{scale}, \qquad
+  f_{\text{user}} = f_{\text{opt}} \cdot \text{scale}\]</div>
+<p>Configuration options:</p>
+<ul>
+<li><strong><code>scales</code></strong> — array of per-objective scaling factors.</li>
+</ul>
+<p>The <code>update(scales)</code> method allows changing scales mid-run (e.g., for adaptive
+normalization when initial magnitudes are unknown).</p>
+<h3 id="defaultnonlinearconstrainttransform">DefaultNonlinearConstraintTransform</h3>
+<p><a class="autorefs autorefs-internal" title="            ropt.transforms.default.DefaultNonlinearConstraintTransform" href="../../reference/transforms/#ropt.transforms.default.DefaultNonlinearConstraintTransform"><code>DefaultNonlinearConstraintTransform</code></a>
+divides constraint values <em>and</em> their RHS bounds by <code>scales</code>:</p>
+<div class="arithmatex">\[c_{\text{opt}} = c_{\text{user}} / \text{scale}, \qquad
+  b_{\text{opt}} = b_{\text{user}} / \text{scale}\]</div>
+<p>Configuration options:</p>
+<ul>
+<li><strong><code>scales</code></strong> — array of per-constraint scaling factors.</li>
+</ul>
+<p>Like the objective transform, it supports <code>update(scales)</code> for mid-run
+changes. Constraint-violation differences are multiplied by <code>scales</code> when
+converting back to user domain.</p>
+<h2 id="effects-on-bounds-and-constraints">Effects on bounds and constraints</h2>
+<p>During context initialization, <code>ropt</code> automatically applies variable transforms
+to:</p>
+<ul>
+<li>Variable <strong>lower and upper bounds</strong> (via <code>to_optimizer</code>).</li>
+<li><strong>Perturbation magnitudes</strong> (via <code>magnitudes_to_optimizer</code>).</li>
+<li><strong>Linear constraint</strong> coefficients and RHS bounds (via
+  <code>linear_constraints_to_optimizer</code>).</li>
+</ul>
+<p>This happens once at startup, so you always specify bounds, magnitudes, and
+linear constraints in user-domain terms. See
+<a class="autorefs autorefs-internal" title="            LinearConstraintsConfig" href="../../reference/config/#ropt.config.LinearConstraintsConfig"><code>LinearConstraintsConfig</code></a> for the
+underlying math.</p>
+<h2 id="round-tripping-results">Round-tripping results</h2>
+<p>During optimization, objective/constraint values are computed in the user
+domain by the evaluator, then transformed to the optimizer domain for the
+algorithm. Results objects therefore live in the <strong>optimizer domain</strong> by
+default.</p>
+<p>To obtain user-domain results, call
+<a class="autorefs autorefs-internal" title="            transform_from_optimizer
+
+
+  
+      abstractmethod
+  " href="../../reference/results/#ropt.results.Results.transform_from_optimizer"><code>transform_from_optimizer</code></a> on
+a <code>FunctionResults</code> or <code>GradientResults</code> object. This returns a new results
+object with variables, objectives, and constraints mapped back to user-domain
+values (including bound/constraint violation differences).</p>
+<p>Higher-level helpers handle this automatically:</p>
+<ul>
+<li>The <a href="../../running/running/">simple API</a> returns user-domain results.</li>
+<li>Event handlers may or may not perform the conversion automatically. For
+  example, <a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.ResultsHandler" href="../../reference/components_event_handlers/#ropt.components.event_handlers.ResultsHandler"><code>ResultsHandler</code></a> accepts
+  a <code>domain</code> argument (<code>"user"</code> or <code>"optimizer"</code>) to control which domain its
+  stored result lives in.</li>
+</ul>
+<h2 id="writing-a-custom-transform">Writing a custom transform</h2>
+<p>Custom transforms are plugins; see the base classes listed under
+<a href="../../reference/plugin_bases/">Reference / Plugin Bases</a>.</p>
+<h3 id="lifecycle">Lifecycle</h3>
+<p>All three transform types follow the same lifecycle:</p>
 <ol>
-<li><strong>A plain callable</strong> — A callable adhering to the
-   <a class="autorefs autorefs-internal" title="            ropt.evaluation.EvaluationBatchCallback" href="../../reference/evaluation/#ropt.evaluation.EvaluationBatchCallback"><code>EvaluationBatchCallback</code></a> protocol
-   that receives all variable vectors at once as a 2-D array.</li>
-<li><strong>An <a class="autorefs autorefs-internal" title="            ropt.components.evaluators.Evaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.Evaluator"><code>Evaluator</code></a> subclass</strong> — Classes
-    that support advanced features such as caching, parallel execution, or HPC
-    dispatch. Here we only discuss
-   <a class="autorefs autorefs-internal" title="            ropt.components.evaluators.FunctionEvaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.FunctionEvaluator"><code>FunctionEvaluator</code></a>, a
-   convenience wrapper around a simpler per-row function following the
-   <a class="autorefs autorefs-internal" title="            ropt.components.evaluators.EvaluationFunctionCallback" href="../../reference/components_evaluators/#ropt.components.evaluators.EvaluationFunctionCallback"><code>EvaluationFunctionCallback</code></a> protocol.
-   <a class="autorefs autorefs-internal" title="            ropt.components.evaluators.Evaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.Evaluator"><code>Evaluator</code></a> classes are discussed
-   in more detail in
-   <a href="../workflows/">Optimization Workflows</a> and <a href="../parallel/">Parallel Evaluation</a>.</li>
+<li><code>__init__(transform_config)</code> — store configuration (scales, offsets, etc.).</li>
+<li><code>init(mask)</code> — called once at context initialization with a boolean mask.
+   For variables the mask is <code>free AND assigned-to-this-transform</code>; for
+   objectives/constraints it is <code>assigned-to-this-transform</code>. Implementations
+   must ensure that unmasked elements pass through unchanged (e.g., set
+   scale=1, offset=0 for those positions).</li>
+<li><code>to_optimizer(values)</code> / <code>from_optimizer(values)</code> — called repeatedly to
+   map values between domains.</li>
+<li><code>update(*args, **kwargs)</code> (optional) — update internal state mid-run when
+   parameters are not known at initialization.</li>
 </ol>
-<h2 id="the-callable-signature">The callable signature</h2>
-<p>Evaluation callbacks must adhere to the
-<a class="autorefs autorefs-internal" title="            ropt.evaluation.EvaluationBatchCallback" href="../../reference/evaluation/#ropt.evaluation.EvaluationBatchCallback"><code>EvaluationBatchCallback</code></a> protocol.
-For instance an evaluator function should look like this:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">numpy.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">NDArray</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.evaluation</span><span class="w"> </span><span class="kn">import</span> <span class="n">EvaluationBatchContext</span><span class="p">,</span> <span class="n">EvaluationBatchResult</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="k">def</span><span class="w"> </span><span class="nf">my_evaluator</span><span class="p">(</span>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">variables</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">context</span><span class="p">:</span> <span class="n">EvaluationBatchContext</span><span class="p">,</span>
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EvaluationBatchResult</span><span class="p">:</span>
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    <span class="o">...</span>
-</span></code></pre></div>
+<h3 id="variabletransform-methods">VariableTransform methods</h3>
+<p><a class="autorefs autorefs-internal" title="            VariableTransform" href="../../reference/transforms/#ropt.transforms.VariableTransform"><code>VariableTransform</code></a> is the most involved
+because variables interact with bounds and constraints. Beyond <code>to_optimizer</code>
+and <code>from_optimizer</code>, implementations must also provide:</p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>magnitudes_to_optimizer</code></td>
+<td>Scale perturbation magnitudes consistently with the variable transform.</td>
+</tr>
+<tr>
+<td><code>bound_constraint_diffs_from_optimizer</code></td>
+<td>Map bound-violation differences back to user domain for reporting.</td>
+</tr>
+<tr>
+<td><code>linear_constraints_to_optimizer</code></td>
+<td>Transform the coefficient matrix and RHS bounds so linear constraints remain valid.</td>
+</tr>
+<tr>
+<td><code>linear_constraints_diffs_from_optimizer</code></td>
+<td>Map linear-constraint-violation differences back to user domain.</td>
+</tr>
+</tbody>
+</table>
+<p>All value arrays use the last axis for the element dimension; if the array
+layout differs, reorder axes before and after calling the transform.</p>
+<h3 id="objectivetransform-nonlinearconstrainttransform-methods">ObjectiveTransform / NonlinearConstraintTransform methods</h3>
+<p><a class="autorefs autorefs-internal" title="            ObjectiveTransform" href="../../reference/transforms/#ropt.transforms.ObjectiveTransform"><code>ObjectiveTransform</code></a> requires only
+<code>to_optimizer</code> and <code>from_optimizer</code>.</p>
+<p><a class="autorefs autorefs-internal" title="            NonlinearConstraintTransform" href="../../reference/transforms/#ropt.transforms.NonlinearConstraintTransform"><code>NonlinearConstraintTransform</code></a>
+additionally requires:</p>
 <ul>
-<li><code>variables</code> has shape <code>(n_rows, n_variables)</code>. Each row is a separate
-  variable vector to evaluate.</li>
-<li><code>context</code> carries per-row metadata (see below) plus the immutable
-  <a class="autorefs autorefs-internal" title="            EnOptContext" href="../../reference/context/#ropt.context.EnOptContext"><code>EnOptContext</code></a> for the run.</li>
-<li>The return value should be an
-  <a class="autorefs autorefs-internal" title="            ropt.evaluation.EvaluationBatchResult
-
-
-  
-      dataclass
-  " href="../../reference/evaluation/#ropt.evaluation.EvaluationBatchResult"><code>EvaluationBatchResult</code></a> object that
-  packages objective values (and optional constraint values, metadata,
-  and per-row error indicators).</li>
+<li><code>bounds_to_optimizer</code> — transform constraint RHS bounds to optimizer domain.</li>
+<li><code>nonlinear_constraint_diffs_from_optimizer</code> — map violation differences back
+  to user domain.</li>
 </ul>
-<p>One advantage of this approach is that the callback receives all variable
-vectors at once as a 2-D NumPy array. This makes it possible to exploit NumPy's
-vectorized operations to evaluate all rows in a single pass, avoiding explicit
-Python loops and achieving better performance.</p>
-<h2 id="what-is-in-evaluationbatchcontext">What is in <code>EvaluationBatchContext</code></h2>
-<p>The <a class="autorefs autorefs-internal" title="            ropt.evaluation.EvaluationBatchContext
-
-
-  
-      dataclass
-  " href="../../reference/evaluation/#ropt.evaluation.EvaluationBatchContext"><code>EvaluationBatchContext</code></a> dataclass exposes:</p>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Meaning</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>context</code></td>
-<td>The full <a class="autorefs autorefs-internal" title="            EnOptContext" href="../../reference/context/#ropt.context.EnOptContext"><code>EnOptContext</code></a> (read-only).</td>
-</tr>
-<tr>
-<td><code>active</code></td>
-<td>A boolean array indicating which rows actually need evaluation.</td>
-</tr>
-<tr>
-<td><code>realizations</code></td>
-<td>Integer realization index for each row.</td>
-</tr>
-<tr>
-<td><code>perturbations</code></td>
-<td>Integer perturbation index per row, or <code>-1</code> for unperturbed rows. <code>None</code> if no perturbations are used.</td>
-</tr>
-</tbody>
-</table>
-<p>Use <code>realizations</code> to pick the right per-realization model parameters (an
-uncertainty draw, a different simulation deck, etc.). Use <code>active</code> to skip rows
-that are not needed: utility methods
-<a class="autorefs autorefs-internal" title="            get_active_evaluations" href="../../reference/evaluation/#ropt.evaluation.EvaluationBatchContext.get_active_evaluations"><code>get_active_evaluations</code></a>
-and
-<a class="autorefs autorefs-internal" title="            insert_inactive_results" href="../../reference/evaluation/#ropt.evaluation.EvaluationBatchContext.insert_inactive_results"><code>insert_inactive_results</code></a>
-help filter the input and re-expand the output.</p>
-<h2 id="returning-results">Returning results</h2>
-<p><a class="autorefs autorefs-internal" title="            ropt.evaluation.EvaluationBatchResult
-
-
-  
-      dataclass
-  " href="../../reference/evaluation/#ropt.evaluation.EvaluationBatchResult"><code>EvaluationBatchResult</code></a> stores:</p>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Meaning</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>objectives</code></td>
-<td>Objective values, shape <code>(n_rows, n_objectives)</code>.</td>
-</tr>
-<tr>
-<td><code>constraints</code></td>
-<td>Optional constraint values, shape <code>(n_rows, n_nonlinear_constraints)</code>.</td>
-</tr>
-<tr>
-<td><code>metadata</code></td>
-<td>Optional per-row metadata dict; not used by <code>ropt</code>.</td>
-</tr>
-<tr>
-<td><code>batch_id</code></td>
-<td>Batch label (default <code>0</code>).</td>
-</tr>
-</tbody>
-</table>
-<p><code>constraints</code> is required when <code>nonlinear_constraints</code> is configured in the
-problem. <code>metadata</code> is stored verbatim on the resulting
-<a class="autorefs autorefs-internal" title="            ropt.results.Results
-
-
-  
-      dataclass
-  " href="../../reference/results/#ropt.results.Results"><code>Results</code></a> object and is useful for linking results back
-to the input vectors that produced them. <code>batch_id</code> defaults to <code>0</code>; all
-results will carry this label unless you set it yourself. For
-auto-incrementing IDs pass a
-<a class="autorefs autorefs-internal" title="            ropt.components.evaluators.BatchIdCounter" href="../../reference/components_evaluators/#ropt.components.evaluators.BatchIdCounter"><code>BatchIdCounter</code></a> (or any
-<code>Callable[[], int]</code>) to the <code>batch_id_callback</code> argument of
-<a class="autorefs autorefs-internal" title="            ropt.components.evaluators.FunctionEvaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.FunctionEvaluator"><code>FunctionEvaluator</code></a> or
-<a class="autorefs autorefs-internal" title="            ropt.components.evaluators.ParallelEvaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.ParallelEvaluator"><code>ParallelEvaluator</code></a>; for raw
-<a class="autorefs autorefs-internal" title="            ropt.components.evaluators.BatchEvaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.BatchEvaluator"><code>BatchEvaluator</code></a> callbacks set it
-yourself.</p>
-<p>Inactive rows (where <code>active</code> is <code>False</code>) should have their result values set
-to zero. Rows where an evaluation failed should be set to <code>np.nan</code> (see
-<a href="#handling-partial-failures">Handling partial failures</a> below).</p>
-<h2 id="returning-constraints">Returning constraints</h2>
-<p><div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">evaluator</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    <span class="n">obj</span> <span class="o">=</span> <span class="o">...</span>    <span class="c1"># shape (n_rows, n_objectives)</span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    <span class="n">con</span> <span class="o">=</span> <span class="o">...</span>    <span class="c1"># shape (n_rows, n_nonlinear_constraints)</span>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    <span class="k">return</span> <span class="n">EvaluationBatchResult</span><span class="p">(</span><span class="n">objectives</span><span class="o">=</span><span class="n">obj</span><span class="p">,</span> <span class="n">constraints</span><span class="o">=</span><span class="n">con</span><span class="p">)</span>
-</span></code></pre></div>
-The constraint values are compared to the <code>lower_bounds</code> / <code>upper_bounds</code>
-declared in
-<a class="autorefs autorefs-internal" title="            NonlinearConstraintsConfig" href="../../reference/config/#ropt.config.NonlinearConstraintsConfig"><code>NonlinearConstraintsConfig</code></a>.</p>
-<h2 id="handling-partial-failures">Handling partial failures</h2>
-<p>If your evaluator cannot compute a given objective, set the corresponding entry
-in the <code>objectives</code> field to <code>np.nan</code>. <code>ropt</code> treats NaN rows as failed
-evaluations; the <a class="autorefs autorefs-internal" title="            RealizationsConfig" href="../../reference/config/#ropt.config.RealizationsConfig"><code>realization_min_success</code></a> and
-<a class="autorefs autorefs-internal" title="            GradientConfig" href="../../reference/config/#ropt.config.GradientConfig"><code>perturbation_min_success</code></a> settings determine
-whether the optimization can recover. For example:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">evaluator</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    <span class="n">n_rows</span><span class="p">,</span> <span class="n">n_obj</span> <span class="o">=</span> <span class="n">variables</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    <span class="n">obj</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">n_rows</span><span class="p">,</span> <span class="n">n_obj</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_rows</span><span class="p">):</span>
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>        <span class="k">try</span><span class="p">:</span>
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>            <span class="n">obj</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">simulate</span><span class="p">(</span><span class="n">variables</span><span class="p">[</span><span class="n">row</span><span class="p">])</span>
-</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>        <span class="k">except</span> <span class="n">SimulationError</span><span class="p">:</span>
-</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>            <span class="k">pass</span>  <span class="c1"># leave NaN</span>
-</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>    <span class="k">return</span> <span class="n">EvaluationBatchResult</span><span class="p">(</span><span class="n">objectives</span><span class="o">=</span><span class="n">obj</span><span class="p">)</span>
-</span></code></pre></div>
-<p>Combined with the <code>realization_min_success</code> field of
-<a class="autorefs autorefs-internal" title="            RealizationsConfig" href="../../reference/config/#ropt.config.RealizationsConfig"><code>RealizationsConfig</code></a>, this allows the
-optimization to continue as long as enough realizations succeed.</p>
-<h2 id="using-functionevaluator">Using <code>FunctionEvaluator</code></h2>
-<p>When your evaluation function naturally works on a single variable vector at a
-time — for instance when it calls an external simulator once per realization —
-the <a class="autorefs autorefs-internal" title="            ropt.components.evaluators.FunctionEvaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.FunctionEvaluator"><code>FunctionEvaluator</code></a> offers a
-simpler alternative. Instead of receiving the full 2-D batch and managing the
-loop yourself, you write a function that takes a single 1-D variable vector and
-returns the objective (and optional constraint) values for that row. The
-<code>FunctionEvaluator</code> handles the batching, the active-row filtering, and the
-assembly of the final
-<a class="autorefs autorefs-internal" title="            ropt.evaluation.EvaluationBatchResult
-
-
-  
-      dataclass
-  " href="../../reference/evaluation/#ropt.evaluation.EvaluationBatchResult"><code>EvaluationBatchResult</code></a>.</p>
-<p>A function passed to <code>FunctionEvaluator</code> must follow the
-<a class="autorefs autorefs-internal" title="            ropt.components.evaluators.EvaluationFunctionCallback" href="../../reference/components_evaluators/#ropt.components.evaluators.EvaluationFunctionCallback"><code>EvaluationFunctionCallback</code></a> protocol:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">numpy.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">NDArray</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.components.evaluators</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="n">EvaluationFunctionContext</span><span class="p">,</span>
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    <span class="n">EvaluationFunctionResult</span><span class="p">,</span>
-</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="p">)</span>
-</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>
-</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>
-</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="k">def</span><span class="w"> </span><span class="nf">my_function</span><span class="p">(</span>
-</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>    <span class="n">variables</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
-</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>    <span class="n">context</span><span class="p">:</span> <span class="n">EvaluationFunctionContext</span><span class="p">,</span>
-</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EvaluationFunctionResult</span><span class="p">:</span>
-</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a>    <span class="o">...</span>
-</span></code></pre></div>
-<ul>
-<li><code>variables</code> is a 1-D array for a single evaluation row.</li>
-<li>
-<p><code>context</code> is an
-  <a class="autorefs autorefs-internal" title="            ropt.components.evaluators.EvaluationFunctionContext
-
-
-  
-      dataclass
-  " href="../../reference/components_evaluators/#ropt.components.evaluators.EvaluationFunctionContext"><code>EvaluationFunctionContext</code></a>
-  dataclass identifying the evaluation. It exposes:</p>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Meaning</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>realization</code></td>
-<td>Integer realization index for this row.</td>
-</tr>
-<tr>
-<td><code>perturbation</code></td>
-<td>Perturbation index, or <code>-1</code> when unperturbed.</td>
-</tr>
-<tr>
-<td><code>batch_id</code></td>
-<td>Integer identifying the current evaluation batch.</td>
-</tr>
-<tr>
-<td><code>eval_idx</code></td>
-<td>Row index within the batch.</td>
-</tr>
-<tr>
-<td><code>name</code></td>
-<td>Optional task name; <code>None</code> if unset.</td>
-</tr>
-</tbody>
-</table>
-<p><code>name</code> is set by the evaluator (e.g. via <code>ParallelEvaluator</code>'s <code>get_name</code>
-callback) and can be used to associate results with named tasks.</p>
-</li>
-<li>
-<p>The return value is an
-  <a class="autorefs autorefs-internal" title="            ropt.components.evaluators.EvaluationFunctionResult
-
-
-  
-      dataclass
-  " href="../../reference/components_evaluators/#ropt.components.evaluators.EvaluationFunctionResult"><code>EvaluationFunctionResult</code></a>
-  dataclass with the following fields:</p>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Meaning</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>objectives</code></td>
-<td>Scalar or 1-D array of length <code>n_objectives</code>.</td>
-</tr>
-<tr>
-<td><code>constraints</code></td>
-<td>Optional scalar or 1-D array of length <code>n_nonlinear_constraints</code>.</td>
-</tr>
-<tr>
-<td><code>metadata</code></td>
-<td>Optional <code>dict[str, Any]</code>; stored verbatim in the batch result.</td>
-</tr>
-</tbody>
-</table>
-<p>Each <code>metadata</code> entry is forwarded into
-<a class="autorefs autorefs-internal" title="            ropt.evaluation.EvaluationBatchResult
-
-
-  
-      dataclass
-  " href="../../reference/evaluation/#ropt.evaluation.EvaluationBatchResult"><code>EvaluationBatchResult.metadata</code></a>
-for the corresponding row.</p>
-</li>
-</ul>
-<p>Wrap the function in a
-<a class="autorefs autorefs-internal" title="            ropt.components.evaluators.FunctionEvaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.FunctionEvaluator"><code>FunctionEvaluator</code></a> and give the
-evaluator to a compute step (see <a href="../workflows/">Optimization Workflows</a>):</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.components.evaluators</span><span class="w"> </span><span class="kn">import</span> <span class="n">FunctionEvaluator</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="n">evaluator</span> <span class="o">=</span> <span class="n">FunctionEvaluator</span><span class="p">(</span><span class="n">function</span><span class="o">=</span><span class="n">my_function</span><span class="p">)</span>
-</span></code></pre></div>
 <h2 id="where-to-next">Where to next</h2>
 <ul>
-<li>Read the results: <a href="../../optimizer_configuration/results/">Working with Results</a>.</li>
-<li>Use evaluator subclasses for caching, async, or HPC dispatch:
-  <a href="../workflows/">Optimization Workflows</a>.</li>
-<li>See it in action: <a href="../../tutorials/workflow/">Building a Workflow</a>.</li>
+<li><a href="../realization_filters/">Realization Filters</a> — also configured via
+  index-sharing.</li>
+<li><a href="../configuration/">Configuration</a> — broadcasting and index-sharing rules in
+  context.</li>
 </ul>
 
 
@@ -3189,7 +3262,7 @@ evaluator to a compute step (see <a href="../workflows/">Optimization Workflows<
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../workflows/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Optimization Workflows">
+          <a href="../function_estimators/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Function Estimators">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -3199,20 +3272,20 @@ evaluator to a compute step (see <a href="../workflows/">Optimization Workflows<
                 Previous
               </span>
               <div class="md-ellipsis">
-                Optimization Workflows
+                Function Estimators
               </div>
             </div>
           </a>
         
         
           
-          <a href="../parallel/" class="md-footer__link md-footer__link--next" aria-label="Next: Parallel Evaluation">
+          <a href="../results/" class="md-footer__link md-footer__link--next" aria-label="Next: Working with Results">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Parallel Evaluation
+                Working with Results
               </div>
             </div>
             <div class="md-footer__button md-icon">

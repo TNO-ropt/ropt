@@ -9,10 +9,10 @@
       
       
       
-        <link rel="prev" href="../configuration/">
+        <link rel="prev" href="../workflows/">
       
       
-        <link rel="next" href="../realization_filters/">
+        <link rel="next" href="../parallel/">
       
       
         
@@ -23,7 +23,7 @@
     
     
       
-        <title>Stochastic Gradients - ropt Documentation</title>
+        <title>Writing Evaluation Callbacks - ropt Documentation</title>
       
     
     
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#stochastic-gradients" class="md-skip">
+        <a href="#writing-evaluation-callbacks" class="md-skip">
           Skip to content
         </a>
       
@@ -118,7 +118,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Stochastic Gradients
+              Writing Evaluation Callbacks
             
           </span>
         </div>
@@ -260,57 +260,57 @@
   
   
   
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../optimizer_setup/key_concepts/" class="md-tabs__link">
+          
+  
+  
+  Optimizer Setup
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../running/running/" class="md-tabs__link">
+          
+  
+  
+  Running
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
     
   
   
     
     
       <li class="md-tabs__item md-tabs__item--active">
-        <a href="../key_concepts/" class="md-tabs__link">
+        <a href="../workflows/" class="md-tabs__link">
           
   
   
-  Optimizer Configuration
-
-        </a>
-      </li>
-    
-  
-
-      
-        
-  
-  
-  
-  
-    
-    
-      <li class="md-tabs__item">
-        <a href="../../simple/simple/" class="md-tabs__link">
-          
-  
-  
-  Simple API
-
-        </a>
-      </li>
-    
-  
-
-      
-        
-  
-  
-  
-  
-    
-    
-      <li class="md-tabs__item">
-        <a href="../../low_level/workflows/" class="md-tabs__link">
-          
-  
-  
-  Low-Level API
+  Workflows
 
         </a>
       </li>
@@ -689,38 +689,35 @@
       
   
   
-    
   
   
-  
     
     
     
     
-      
-        
-        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
         
           
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
             
   
   
   <span class="md-ellipsis">
     
   
-    Optimizer Configuration
+    Optimizer Setup
   
 
     
@@ -731,12 +728,12 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_3">
             <span class="md-nav__icon md-icon"></span>
             
   
-    Optimizer Configuration
+    Optimizer Setup
   
 
           </label>
@@ -749,7 +746,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../key_concepts/" class="md-nav__link">
+      <a href="../../optimizer_setup/key_concepts/" class="md-nav__link">
         
   
   
@@ -777,7 +774,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../configuration/" class="md-nav__link">
+      <a href="../../optimizer_setup/configuration/" class="md-nav__link">
         
   
   
@@ -802,37 +799,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Stochastic Gradients
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../optimizer_setup/gradients/" class="md-nav__link">
         
   
   
@@ -848,153 +818,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#the-pieces" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        The pieces
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#configuration-in-one-place" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Configuration in one place
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#perturbation-magnitude-and-scaling" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Perturbation magnitude and scaling
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#choosing-number_of_perturbations" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Choosing number_of_perturbations
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#tolerating-failures" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Tolerating failures
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#evaluation-policy" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Evaluation policy
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#samplers" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Samplers
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Samplers">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#sample-scaling" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Sample scaling
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#shared-perturbations" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Shared perturbations
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#function-estimators" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Function estimators
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#where-to-next" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Where to next
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1007,7 +830,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../realization_filters/" class="md-nav__link">
+      <a href="../../optimizer_setup/realization_filters/" class="md-nav__link">
         
   
   
@@ -1035,7 +858,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../function_estimators/" class="md-nav__link">
+      <a href="../../optimizer_setup/function_estimators/" class="md-nav__link">
         
   
   
@@ -1063,7 +886,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../transforms/" class="md-nav__link">
+      <a href="../../optimizer_setup/transforms/" class="md-nav__link">
         
   
   
@@ -1091,7 +914,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../results/" class="md-nav__link">
+      <a href="../../optimizer_setup/results/" class="md-nav__link">
         
   
   
@@ -1151,7 +974,7 @@
   <span class="md-ellipsis">
     
   
-    Simple API
+    Running
   
 
     
@@ -1167,7 +990,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Simple API
+    Running
   
 
           </label>
@@ -1180,14 +1003,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../simple/simple/" class="md-nav__link">
+      <a href="../../running/running/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    The Simple API
+    Running Optimizations
   
 
     
@@ -1212,35 +1035,38 @@
       
   
   
+    
   
   
+  
     
     
     
     
+      
+        
+        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
         
           
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
-        
-          
-          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
             
   
   
   <span class="md-ellipsis">
     
   
-    Low-Level API
+    Workflows
   
 
     
@@ -1251,12 +1077,12 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
             
   
-    Low-Level API
+    Workflows
   
 
           </label>
@@ -1269,7 +1095,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../low_level/workflows/" class="md-nav__link">
+      <a href="../workflows/" class="md-nav__link">
         
   
   
@@ -1294,10 +1120,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../../low_level/evaluation_callbacks/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Writing Evaluation Callbacks
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -1313,6 +1166,103 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#the-callable-signature" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The callable signature
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-is-in-evaluationbatchcontext" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What is in EvaluationBatchContext
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#returning-results" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Returning results
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#returning-constraints" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Returning constraints
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#handling-partial-failures" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Handling partial failures
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#using-functionevaluator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Using FunctionEvaluator
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#where-to-next" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Where to next
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1325,7 +1275,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../low_level/parallel/" class="md-nav__link">
+      <a href="../parallel/" class="md-nav__link">
         
   
   
@@ -2803,10 +2753,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#the-pieces" class="md-nav__link">
+  <a href="#the-callable-signature" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The pieces
+        The callable signature
       
     </span>
   </a>
@@ -2814,10 +2764,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#configuration-in-one-place" class="md-nav__link">
+  <a href="#what-is-in-evaluationbatchcontext" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Configuration in one place
+        What is in EvaluationBatchContext
       
     </span>
   </a>
@@ -2825,10 +2775,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#perturbation-magnitude-and-scaling" class="md-nav__link">
+  <a href="#returning-results" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Perturbation magnitude and scaling
+        Returning results
       
     </span>
   </a>
@@ -2836,10 +2786,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#choosing-number_of_perturbations" class="md-nav__link">
+  <a href="#returning-constraints" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Choosing number_of_perturbations
+        Returning constraints
       
     </span>
   </a>
@@ -2847,10 +2797,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#tolerating-failures" class="md-nav__link">
+  <a href="#handling-partial-failures" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Tolerating failures
+        Handling partial failures
       
     </span>
   </a>
@@ -2858,60 +2808,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#evaluation-policy" class="md-nav__link">
+  <a href="#using-functionevaluator" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Evaluation policy
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#samplers" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Samplers
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Samplers">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#sample-scaling" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Sample scaling
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#shared-perturbations" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Shared perturbations
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#function-estimators" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Function estimators
+        Using FunctionEvaluator
       
     </span>
   </a>
@@ -2949,176 +2849,310 @@
   
 
 
-<h1 id="stochastic-gradients">Stochastic Gradients</h1>
-<p>Many <code>ropt</code> optimizers are gradient-based, but the objective functions are
-often black-box simulations with no analytic derivative. <code>ropt</code> estimates
-gradients stochastically using the <em>Stochastic Simplex Approximate Gradient</em>
-(StoSAG) approach: the gradient at the current point is approximated from
-function values evaluated at the current point and at a number of randomly
-perturbed points.</p>
-<p>This page explains how perturbations, samplers, function estimators, and the
-gradient configuration work together.</p>
-<h2 id="the-pieces">The pieces</h2>
+<h1 id="writing-evaluation-callbacks">Writing Evaluation Callbacks</h1>
+<p>During optimization <code>ropt</code> decides which variable vectors need values for the
+objectives and optional nonlinear-constraints. The user must provide the code to
+perform these function evaluations.</p>
+<p>There are two ways to provide such evaluation code to the low-level evaluators:</p>
+<ol>
+<li><strong>A plain callable</strong> — A callable adhering to the
+   <a class="autorefs autorefs-internal" title="            ropt.evaluation.EvaluationBatchCallback" href="../../reference/evaluation/#ropt.evaluation.EvaluationBatchCallback"><code>EvaluationBatchCallback</code></a> protocol
+   that receives all variable vectors at once as a 2-D array.</li>
+<li><strong>An <a class="autorefs autorefs-internal" title="            ropt.components.evaluators.Evaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.Evaluator"><code>Evaluator</code></a> subclass</strong> — Classes
+    that support advanced features such as caching, parallel execution, or HPC
+    dispatch. Here we only discuss
+   <a class="autorefs autorefs-internal" title="            ropt.components.evaluators.FunctionEvaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.FunctionEvaluator"><code>FunctionEvaluator</code></a>, a
+   convenience wrapper around a simpler per-row function following the
+   <a class="autorefs autorefs-internal" title="            ropt.components.evaluators.EvaluationFunctionCallback" href="../../reference/components_evaluators/#ropt.components.evaluators.EvaluationFunctionCallback"><code>EvaluationFunctionCallback</code></a> protocol.
+   <a class="autorefs autorefs-internal" title="            ropt.components.evaluators.Evaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.Evaluator"><code>Evaluator</code></a> classes are discussed
+   in more detail in
+   <a href="../workflows/">Optimization Workflows</a> and <a href="../parallel/">Parallel Evaluation</a>.</li>
+</ol>
+<h2 id="the-callable-signature">The callable signature</h2>
+<p>Evaluation callbacks must adhere to the
+<a class="autorefs autorefs-internal" title="            ropt.evaluation.EvaluationBatchCallback" href="../../reference/evaluation/#ropt.evaluation.EvaluationBatchCallback"><code>EvaluationBatchCallback</code></a> protocol.
+For instance an evaluator function should look like this:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">numpy.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">NDArray</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.evaluation</span><span class="w"> </span><span class="kn">import</span> <span class="n">EvaluationBatchContext</span><span class="p">,</span> <span class="n">EvaluationBatchResult</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="k">def</span><span class="w"> </span><span class="nf">my_evaluator</span><span class="p">(</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">variables</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">context</span><span class="p">:</span> <span class="n">EvaluationBatchContext</span><span class="p">,</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EvaluationBatchResult</span><span class="p">:</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    <span class="o">...</span>
+</span></code></pre></div>
+<ul>
+<li><code>variables</code> has shape <code>(n_rows, n_variables)</code>. Each row is a separate
+  variable vector to evaluate.</li>
+<li><code>context</code> carries per-row metadata (see below) plus the immutable
+  <a class="autorefs autorefs-internal" title="            EnOptContext" href="../../reference/context/#ropt.context.EnOptContext"><code>EnOptContext</code></a> for the run.</li>
+<li>The return value should be an
+  <a class="autorefs autorefs-internal" title="            ropt.evaluation.EvaluationBatchResult
+
+
+  
+      dataclass
+  " href="../../reference/evaluation/#ropt.evaluation.EvaluationBatchResult"><code>EvaluationBatchResult</code></a> object that
+  packages objective values (and optional constraint values, metadata,
+  and per-row error indicators).</li>
+</ul>
+<p>One advantage of this approach is that the callback receives all variable
+vectors at once as a 2-D NumPy array. This makes it possible to exploit NumPy's
+vectorized operations to evaluate all rows in a single pass, avoiding explicit
+Python loops and achieving better performance.</p>
+<h2 id="what-is-in-evaluationbatchcontext">What is in <code>EvaluationBatchContext</code></h2>
+<p>The <a class="autorefs autorefs-internal" title="            ropt.evaluation.EvaluationBatchContext
+
+
+  
+      dataclass
+  " href="../../reference/evaluation/#ropt.evaluation.EvaluationBatchContext"><code>EvaluationBatchContext</code></a> dataclass exposes:</p>
 <table>
 <thead>
 <tr>
-<th>Piece</th>
-<th>Purpose</th>
+<th>Field</th>
+<th>Meaning</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><a class="autorefs autorefs-internal" title="            GradientConfig" href="../../reference/config/#ropt.config.GradientConfig"><code>GradientConfig</code></a></td>
-<td>Number of perturbations, success thresholds, evaluation policy.</td>
+<td><code>context</code></td>
+<td>The full <a class="autorefs autorefs-internal" title="            EnOptContext" href="../../reference/context/#ropt.context.EnOptContext"><code>EnOptContext</code></a> (read-only).</td>
 </tr>
 <tr>
-<td><a class="autorefs autorefs-internal" title="            VariablesConfig" href="../../reference/config/#ropt.config.VariablesConfig"><code>VariablesConfig</code></a> perturbation fields</td>
-<td>Magnitudes, scaling type, boundary handling, sampler indices.</td>
+<td><code>active</code></td>
+<td>A boolean array indicating which rows actually need evaluation.</td>
 </tr>
 <tr>
-<td><a class="autorefs autorefs-internal" title="            SamplerConfig" href="../../reference/config/#ropt.config.SamplerConfig"><code>SamplerConfig</code></a> + samplers tuple</td>
-<td>How perturbation samples are drawn (uniform, normal, Sobol, ...).</td>
+<td><code>realizations</code></td>
+<td>Integer realization index for each row.</td>
 </tr>
 <tr>
-<td><a class="autorefs autorefs-internal" title="            FunctionEstimatorConfig" href="../../reference/config/#ropt.config.FunctionEstimatorConfig"><code>FunctionEstimatorConfig</code></a></td>
-<td>How per-realization gradients combine into the final estimate.</td>
+<td><code>perturbations</code></td>
+<td>Integer perturbation index per row, or <code>-1</code> for unperturbed rows. <code>None</code> if no perturbations are used.</td>
 </tr>
 </tbody>
 </table>
-<h2 id="configuration-in-one-place">Configuration in one place</h2>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.enums</span><span class="w"> </span><span class="kn">import</span> <span class="n">BoundaryType</span><span class="p">,</span> <span class="n">PerturbationType</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">CONFIG</span> <span class="o">=</span> <span class="p">{</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="s2">&quot;variables&quot;</span><span class="p">:</span> <span class="p">{</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>        <span class="s2">&quot;variable_count&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>        <span class="s2">&quot;perturbation_magnitudes&quot;</span><span class="p">:</span> <span class="mf">1e-5</span><span class="p">,</span>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>        <span class="s2">&quot;perturbation_types&quot;</span><span class="p">:</span> <span class="n">PerturbationType</span><span class="o">.</span><span class="n">ABSOLUTE</span><span class="p">,</span>  <span class="c1"># or PerturbationType.RELATIVE</span>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>        <span class="s2">&quot;boundary_types&quot;</span><span class="p">:</span> <span class="n">BoundaryType</span><span class="o">.</span><span class="n">TRUNCATE_BOTH</span><span class="p">,</span>     <span class="c1"># see BoundaryType</span>
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>        <span class="s2">&quot;samplers&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>                      <span class="c1"># per-variable sampler index</span>
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    <span class="p">},</span>
-</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    <span class="s2">&quot;realizations&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;weights&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">]</span> <span class="o">*</span> <span class="mi">10</span><span class="p">},</span>
-</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>    <span class="s2">&quot;gradient&quot;</span><span class="p">:</span> <span class="p">{</span>
-</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>        <span class="s2">&quot;number_of_perturbations&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
-</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>        <span class="s2">&quot;perturbation_min_success&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>  <span class="c1"># allow some failures</span>
-</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>        <span class="s2">&quot;merge_realizations&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>    <span class="c1"># estimate per-realization then combine</span>
-</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>        <span class="s2">&quot;evaluation_policy&quot;</span><span class="p">:</span> <span class="s2">&quot;auto&quot;</span><span class="p">,</span>    <span class="c1"># &quot;speculative&quot; | &quot;separate&quot; | &quot;auto&quot;</span>
-</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>    <span class="p">},</span>
-</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>    <span class="s2">&quot;samplers&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;method&quot;</span><span class="p">:</span> <span class="s2">&quot;scipy/default&quot;</span><span class="p">},</span> <span class="p">{</span><span class="s2">&quot;method&quot;</span><span class="p">:</span> <span class="s2">&quot;scipy/sobol&quot;</span><span class="p">}],</span>
-</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="p">}</span>
+<p>Use <code>realizations</code> to pick the right per-realization model parameters (an
+uncertainty draw, a different simulation deck, etc.). Use <code>active</code> to skip rows
+that are not needed: utility methods
+<a class="autorefs autorefs-internal" title="            get_active_evaluations" href="../../reference/evaluation/#ropt.evaluation.EvaluationBatchContext.get_active_evaluations"><code>get_active_evaluations</code></a>
+and
+<a class="autorefs autorefs-internal" title="            insert_inactive_results" href="../../reference/evaluation/#ropt.evaluation.EvaluationBatchContext.insert_inactive_results"><code>insert_inactive_results</code></a>
+help filter the input and re-expand the output.</p>
+<h2 id="returning-results">Returning results</h2>
+<p><a class="autorefs autorefs-internal" title="            ropt.evaluation.EvaluationBatchResult
+
+
+  
+      dataclass
+  " href="../../reference/evaluation/#ropt.evaluation.EvaluationBatchResult"><code>EvaluationBatchResult</code></a> stores:</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>objectives</code></td>
+<td>Objective values, shape <code>(n_rows, n_objectives)</code>.</td>
+</tr>
+<tr>
+<td><code>constraints</code></td>
+<td>Optional constraint values, shape <code>(n_rows, n_nonlinear_constraints)</code>.</td>
+</tr>
+<tr>
+<td><code>metadata</code></td>
+<td>Optional per-row metadata dict; not used by <code>ropt</code>.</td>
+</tr>
+<tr>
+<td><code>batch_id</code></td>
+<td>Batch label (default <code>0</code>).</td>
+</tr>
+</tbody>
+</table>
+<p><code>constraints</code> is required when <code>nonlinear_constraints</code> is configured in the
+problem. <code>metadata</code> is stored verbatim on the resulting
+<a class="autorefs autorefs-internal" title="            ropt.results.Results
+
+
+  
+      dataclass
+  " href="../../reference/results/#ropt.results.Results"><code>Results</code></a> object and is useful for linking results back
+to the input vectors that produced them. <code>batch_id</code> defaults to <code>0</code>; all
+results will carry this label unless you set it yourself. For
+auto-incrementing IDs pass a
+<a class="autorefs autorefs-internal" title="            ropt.components.evaluators.BatchIdCounter" href="../../reference/components_evaluators/#ropt.components.evaluators.BatchIdCounter"><code>BatchIdCounter</code></a> (or any
+<code>Callable[[], int]</code>) to the <code>batch_id_callback</code> argument of
+<a class="autorefs autorefs-internal" title="            ropt.components.evaluators.FunctionEvaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.FunctionEvaluator"><code>FunctionEvaluator</code></a> or
+<a class="autorefs autorefs-internal" title="            ropt.components.evaluators.ParallelEvaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.ParallelEvaluator"><code>ParallelEvaluator</code></a>; for raw
+<a class="autorefs autorefs-internal" title="            ropt.components.evaluators.BatchEvaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.BatchEvaluator"><code>BatchEvaluator</code></a> callbacks set it
+yourself.</p>
+<p>Inactive rows (where <code>active</code> is <code>False</code>) should have their result values set
+to zero. Rows where an evaluation failed should be set to <code>np.nan</code> (see
+<a href="#handling-partial-failures">Handling partial failures</a> below).</p>
+<h2 id="returning-constraints">Returning constraints</h2>
+<p><div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">evaluator</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    <span class="n">obj</span> <span class="o">=</span> <span class="o">...</span>    <span class="c1"># shape (n_rows, n_objectives)</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    <span class="n">con</span> <span class="o">=</span> <span class="o">...</span>    <span class="c1"># shape (n_rows, n_nonlinear_constraints)</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    <span class="k">return</span> <span class="n">EvaluationBatchResult</span><span class="p">(</span><span class="n">objectives</span><span class="o">=</span><span class="n">obj</span><span class="p">,</span> <span class="n">constraints</span><span class="o">=</span><span class="n">con</span><span class="p">)</span>
 </span></code></pre></div>
-<h2 id="perturbation-magnitude-and-scaling">Perturbation magnitude and scaling</h2>
-<p><code>perturbation_magnitudes</code> sets the scale of the sample applied to each
-variable. The <code>perturbation_types</code> field decides how that scale is interpreted:</p>
+The constraint values are compared to the <code>lower_bounds</code> / <code>upper_bounds</code>
+declared in
+<a class="autorefs autorefs-internal" title="            NonlinearConstraintsConfig" href="../../reference/config/#ropt.config.NonlinearConstraintsConfig"><code>NonlinearConstraintsConfig</code></a>.</p>
+<h2 id="handling-partial-failures">Handling partial failures</h2>
+<p>If your evaluator cannot compute a given objective, set the corresponding entry
+in the <code>objectives</code> field to <code>np.nan</code>. <code>ropt</code> treats NaN rows as failed
+evaluations; the <a class="autorefs autorefs-internal" title="            RealizationsConfig" href="../../reference/config/#ropt.config.RealizationsConfig"><code>realization_min_success</code></a> and
+<a class="autorefs autorefs-internal" title="            GradientConfig" href="../../reference/config/#ropt.config.GradientConfig"><code>perturbation_min_success</code></a> settings determine
+whether the optimization can recover. For example:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">evaluator</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    <span class="n">n_rows</span><span class="p">,</span> <span class="n">n_obj</span> <span class="o">=</span> <span class="n">variables</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    <span class="n">obj</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">n_rows</span><span class="p">,</span> <span class="n">n_obj</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_rows</span><span class="p">):</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>        <span class="k">try</span><span class="p">:</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>            <span class="n">obj</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">simulate</span><span class="p">(</span><span class="n">variables</span><span class="p">[</span><span class="n">row</span><span class="p">])</span>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>        <span class="k">except</span> <span class="n">SimulationError</span><span class="p">:</span>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>            <span class="k">pass</span>  <span class="c1"># leave NaN</span>
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>    <span class="k">return</span> <span class="n">EvaluationBatchResult</span><span class="p">(</span><span class="n">objectives</span><span class="o">=</span><span class="n">obj</span><span class="p">)</span>
+</span></code></pre></div>
+<p>Combined with the <code>realization_min_success</code> field of
+<a class="autorefs autorefs-internal" title="            RealizationsConfig" href="../../reference/config/#ropt.config.RealizationsConfig"><code>RealizationsConfig</code></a>, this allows the
+optimization to continue as long as enough realizations succeed.</p>
+<h2 id="using-functionevaluator">Using <code>FunctionEvaluator</code></h2>
+<p>When your evaluation function naturally works on a single variable vector at a
+time — for instance when it calls an external simulator once per realization —
+the <a class="autorefs autorefs-internal" title="            ropt.components.evaluators.FunctionEvaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.FunctionEvaluator"><code>FunctionEvaluator</code></a> offers a
+simpler alternative. Instead of receiving the full 2-D batch and managing the
+loop yourself, you write a function that takes a single 1-D variable vector and
+returns the objective (and optional constraint) values for that row. The
+<code>FunctionEvaluator</code> handles the batching, the active-row filtering, and the
+assembly of the final
+<a class="autorefs autorefs-internal" title="            ropt.evaluation.EvaluationBatchResult
+
+
+  
+      dataclass
+  " href="../../reference/evaluation/#ropt.evaluation.EvaluationBatchResult"><code>EvaluationBatchResult</code></a>.</p>
+<p>A function passed to <code>FunctionEvaluator</code> must follow the
+<a class="autorefs autorefs-internal" title="            ropt.components.evaluators.EvaluationFunctionCallback" href="../../reference/components_evaluators/#ropt.components.evaluators.EvaluationFunctionCallback"><code>EvaluationFunctionCallback</code></a> protocol:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">numpy.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">NDArray</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.components.evaluators</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="n">EvaluationFunctionContext</span><span class="p">,</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    <span class="n">EvaluationFunctionResult</span><span class="p">,</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="p">)</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>
+</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="k">def</span><span class="w"> </span><span class="nf">my_function</span><span class="p">(</span>
+</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>    <span class="n">variables</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
+</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>    <span class="n">context</span><span class="p">:</span> <span class="n">EvaluationFunctionContext</span><span class="p">,</span>
+</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EvaluationFunctionResult</span><span class="p">:</span>
+</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a>    <span class="o">...</span>
+</span></code></pre></div>
 <ul>
-<li><a class="autorefs autorefs-internal" title="            ABSOLUTE
+<li><code>variables</code> is a 1-D array for a single evaluation row.</li>
+<li>
+<p><code>context</code> is an
+  <a class="autorefs autorefs-internal" title="            ropt.components.evaluators.EvaluationFunctionContext
 
 
   
-      class-attribute
-      instance-attribute
-  " href="../../reference/enums/#ropt.enums.PerturbationType.ABSOLUTE"><code>PerturbationType.ABSOLUTE</code></a> — the
-  magnitude is added directly to the variable value.</li>
-<li><a class="autorefs autorefs-internal" title="            RELATIVE
+      dataclass
+  " href="../../reference/components_evaluators/#ropt.components.evaluators.EvaluationFunctionContext"><code>EvaluationFunctionContext</code></a>
+  dataclass identifying the evaluation. It exposes:</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>realization</code></td>
+<td>Integer realization index for this row.</td>
+</tr>
+<tr>
+<td><code>perturbation</code></td>
+<td>Perturbation index, or <code>-1</code> when unperturbed.</td>
+</tr>
+<tr>
+<td><code>batch_id</code></td>
+<td>Integer identifying the current evaluation batch.</td>
+</tr>
+<tr>
+<td><code>eval_idx</code></td>
+<td>Row index within the batch.</td>
+</tr>
+<tr>
+<td><code>name</code></td>
+<td>Optional task name; <code>None</code> if unset.</td>
+</tr>
+</tbody>
+</table>
+<p><code>name</code> is set by the evaluator (e.g. via <code>ParallelEvaluator</code>'s <code>get_name</code>
+callback) and can be used to associate results with named tasks.</p>
+</li>
+<li>
+<p>The return value is an
+  <a class="autorefs autorefs-internal" title="            ropt.components.evaluators.EvaluationFunctionResult
 
 
   
-      class-attribute
-      instance-attribute
-  " href="../../reference/enums/#ropt.enums.PerturbationType.RELATIVE"><code>PerturbationType.RELATIVE</code></a> — the
-  magnitude is multiplied by <code>upper_bound - lower_bound</code> before being applied.
-  Requires finite bounds.</li>
+      dataclass
+  " href="../../reference/components_evaluators/#ropt.components.evaluators.EvaluationFunctionResult"><code>EvaluationFunctionResult</code></a>
+  dataclass with the following fields:</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>objectives</code></td>
+<td>Scalar or 1-D array of length <code>n_objectives</code>.</td>
+</tr>
+<tr>
+<td><code>constraints</code></td>
+<td>Optional scalar or 1-D array of length <code>n_nonlinear_constraints</code>.</td>
+</tr>
+<tr>
+<td><code>metadata</code></td>
+<td>Optional <code>dict[str, Any]</code>; stored verbatim in the batch result.</td>
+</tr>
+</tbody>
+</table>
+<p>Each <code>metadata</code> entry is forwarded into
+<a class="autorefs autorefs-internal" title="            ropt.evaluation.EvaluationBatchResult
+
+
+  
+      dataclass
+  " href="../../reference/evaluation/#ropt.evaluation.EvaluationBatchResult"><code>EvaluationBatchResult.metadata</code></a>
+for the corresponding row.</p>
+</li>
 </ul>
-<p>See <a class="autorefs autorefs-internal" title="            PerturbationType" href="../../reference/enums/#ropt.enums.PerturbationType"><code>PerturbationType</code></a>.</p>
-<p>After a perturbed value is computed, it may fall outside the variable bounds.
-<code>boundary_types</code> controls the correction strategy:</p>
-<ul>
-<li><a class="autorefs autorefs-internal" title="            NONE
-
-
-  
-      class-attribute
-      instance-attribute
-  " href="../../reference/enums/#ropt.enums.BoundaryType.NONE"><code>BoundaryType.NONE</code></a> — leave as-is.</li>
-<li><a class="autorefs autorefs-internal" title="            TRUNCATE_BOTH
-
-
-  
-      class-attribute
-      instance-attribute
-  " href="../../reference/enums/#ropt.enums.BoundaryType.TRUNCATE_BOTH"><code>BoundaryType.TRUNCATE_BOTH</code></a> —
-  clamp to the nearest bound.</li>
-<li><a class="autorefs autorefs-internal" title="            MIRROR_BOTH
-
-
-  
-      class-attribute
-      instance-attribute
-  " href="../../reference/enums/#ropt.enums.BoundaryType.MIRROR_BOTH"><code>BoundaryType.MIRROR_BOTH</code></a> — reflect
-  through the violated bound.</li>
-</ul>
-<p>See <a class="autorefs autorefs-internal" title="            BoundaryType" href="../../reference/enums/#ropt.enums.BoundaryType"><code>BoundaryType</code></a>.</p>
-<h2 id="choosing-number_of_perturbations">Choosing <code>number_of_perturbations</code></h2>
-<p>More perturbations → more accurate gradient estimates but more evaluator calls
-per iteration. With <code>merge_realizations=False</code> (the default) the per-realization
-gradient is estimated from <code>number_of_perturbations</code> samples <em>per realization</em>;
-with <code>merge_realizations=True</code> all realizations are pooled before estimation,
-which lets you use a much smaller <code>number_of_perturbations</code> (down to 1) at the
-cost of losing per-realization signal.</p>
-<h2 id="tolerating-failures">Tolerating failures</h2>
-<p>If an evaluator returns NaN for some perturbed rows (e.g. simulator
-crashes), the gradient can still be computed when at least
-<code>perturbation_min_success</code> rows succeeded. Combine with the <code>realization_min_success</code> field of
-<a class="autorefs autorefs-internal" title="            RealizationsConfig" href="../../reference/config/#ropt.config.RealizationsConfig"><code>RealizationsConfig</code></a>
-to also tolerate failed realizations.</p>
-<h2 id="evaluation-policy">Evaluation policy</h2>
-<p><a class="autorefs autorefs-internal" title="            GradientConfig" href="../../reference/config/#ropt.config.GradientConfig"><code>GradientConfig.evaluation_policy</code></a> picks one of:</p>
-<ul>
-<li><code>"auto"</code> — compute objectives and gradients strictly when the backend asks
-  for them. Default and most efficient.</li>
-<li><code>"speculative"</code> — also compute the gradient whenever an objective is
-  requested. Improves load balancing on HPC clusters when gradient evaluations
-  are likely to be needed soon.</li>
-<li><code>"separate"</code> — never combine function and gradient evaluations into a single
-  batch. Useful with <a href="../realization_filters/">realization filters</a> that disable
-  realizations and reduce gradient work.</li>
-</ul>
-<h2 id="samplers">Samplers</h2>
-<p>A sampler draws the perturbation samples used for gradient estimation. The
-default <a class="autorefs autorefs-internal" title="            ropt.sampler.scipy.SciPySampler" href="../../reference/sampler/#ropt.sampler.scipy.SciPySampler"><code>SciPySampler</code></a> draws from a standard
-normal distribution <span class="arithmatex">\(N(0, 1)\)</span>; other samplers can be added through the plugin
-system. Configure the <code>samplers</code> tuple at the top level of the config and
-reference them by index from <code>variables.samplers</code> (see
-<a href="../configuration/">Configuration</a> on index sharing).</p>
-<h3 id="sample-scaling">Sample scaling</h3>
-<p>Samplers produce <strong>unscaled</strong> perturbations — values with a characteristic
-magnitude of approximately one. During gradient estimation, these samples are
-multiplied element-wise by the <code>perturbation_magnitudes</code> defined in
-<a class="autorefs autorefs-internal" title="            VariablesConfig" href="../../reference/config/#ropt.config.VariablesConfig"><code>VariablesConfig</code></a>. This separation means that
-<code>perturbation_magnitudes</code> directly controls the effective size of the
-perturbations, regardless of which sampler is used.</p>
-<h3 id="shared-perturbations">Shared perturbations</h3>
-<p>By default, each realization receives its own independently drawn set of
-perturbations. Setting the <code>shared</code> flag to <code>True</code> in
-<a class="autorefs autorefs-internal" title="            SamplerConfig" href="../../reference/config/#ropt.config.SamplerConfig"><code>SamplerConfig</code></a> causes the same perturbation
-values to be reused across all realizations. This can reduce noise in the
-gradient estimate when the objective function varies smoothly across
-realizations.</p>
-<h2 id="function-estimators">Function estimators</h2>
-<p>A function estimator decides how the gradient samples (and the function
-samples for non-default estimators) are combined into the final estimate.
-The default
-<a class="autorefs autorefs-internal" title="            ropt.plugins.function_estimator.default.DefaultFunctionEstimator" href="../../reference/function_estimator/#ropt.plugins.function_estimator.default.DefaultFunctionEstimator"><code>DefaultFunctionEstimator</code></a>
-uses the mean of the functions and gradients. Alternative estimators are configured via the
-<code>function_estimators</code> tuple and selected per-objective in
-<a class="autorefs autorefs-internal" title="            ObjectiveFunctionsConfig" href="../../reference/config/#ropt.config.ObjectiveFunctionsConfig"><code>ObjectiveFunctionsConfig.function_estimators</code></a>.</p>
+<p>Wrap the function in a
+<a class="autorefs autorefs-internal" title="            ropt.components.evaluators.FunctionEvaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.FunctionEvaluator"><code>FunctionEvaluator</code></a> and give the
+evaluator to a compute step (see <a href="../workflows/">Optimization Workflows</a>):</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.components.evaluators</span><span class="w"> </span><span class="kn">import</span> <span class="n">FunctionEvaluator</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="n">evaluator</span> <span class="o">=</span> <span class="n">FunctionEvaluator</span><span class="p">(</span><span class="n">function</span><span class="o">=</span><span class="n">my_function</span><span class="p">)</span>
+</span></code></pre></div>
 <h2 id="where-to-next">Where to next</h2>
 <ul>
-<li>Filter out unhelpful realizations before estimation:
-  <a href="../realization_filters/">Realization Filters</a>.</li>
-<li>Inspect the gradient values produced:
-  <a href="../results/">Working with Results</a> (<code>GradientResults</code>).</li>
-<li>Algorithm-specific gradient details: see the relevant backend page under
-  <a href="../../reference/backend/">Reference / Optimizer Backends</a>.</li>
+<li>Read the results: <a href="../../optimizer_setup/results/">Working with Results</a>.</li>
+<li>Use evaluator subclasses for caching, async, or HPC dispatch:
+  <a href="../workflows/">Optimization Workflows</a>.</li>
+<li>See it in action: <a href="../../tutorials/workflow/">Building a Workflow</a>.</li>
 </ul>
 
 
@@ -3155,7 +3189,7 @@ uses the mean of the functions and gradients. Alternative estimators are configu
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../configuration/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Configuration">
+          <a href="../workflows/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Optimization Workflows">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -3165,20 +3199,20 @@ uses the mean of the functions and gradients. Alternative estimators are configu
                 Previous
               </span>
               <div class="md-ellipsis">
-                Configuration
+                Optimization Workflows
               </div>
             </div>
           </a>
         
         
           
-          <a href="../realization_filters/" class="md-footer__link md-footer__link--next" aria-label="Next: Realization Filters">
+          <a href="../parallel/" class="md-footer__link md-footer__link--next" aria-label="Next: Parallel Evaluation">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Realization Filters
+                Parallel Evaluation
               </div>
             </div>
             <div class="md-footer__button md-icon">

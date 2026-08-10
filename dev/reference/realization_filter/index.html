@@ -264,11 +264,11 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../optimizer_configuration/key_concepts/" class="md-tabs__link">
+        <a href="../../optimizer_setup/key_concepts/" class="md-tabs__link">
           
   
   
-  Optimizer Configuration
+  Optimizer Setup
 
         </a>
       </li>
@@ -284,11 +284,11 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../simple/simple/" class="md-tabs__link">
+        <a href="../../running/running/" class="md-tabs__link">
           
   
   
-  Simple API
+  Running
 
         </a>
       </li>
@@ -304,11 +304,11 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../low_level/workflows/" class="md-tabs__link">
+        <a href="../../workflows/workflows/" class="md-tabs__link">
           
   
   
-  Low-Level API
+  Workflows
 
         </a>
       </li>
@@ -717,7 +717,7 @@
   <span class="md-ellipsis">
     
   
-    Optimizer Configuration
+    Optimizer Setup
   
 
     
@@ -733,7 +733,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Optimizer Configuration
+    Optimizer Setup
   
 
           </label>
@@ -746,7 +746,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../optimizer_configuration/key_concepts/" class="md-nav__link">
+      <a href="../../optimizer_setup/key_concepts/" class="md-nav__link">
         
   
   
@@ -774,7 +774,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../optimizer_configuration/configuration/" class="md-nav__link">
+      <a href="../../optimizer_setup/configuration/" class="md-nav__link">
         
   
   
@@ -802,7 +802,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../optimizer_configuration/gradients/" class="md-nav__link">
+      <a href="../../optimizer_setup/gradients/" class="md-nav__link">
         
   
   
@@ -830,7 +830,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../optimizer_configuration/realization_filters/" class="md-nav__link">
+      <a href="../../optimizer_setup/realization_filters/" class="md-nav__link">
         
   
   
@@ -858,7 +858,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../optimizer_configuration/function_estimators/" class="md-nav__link">
+      <a href="../../optimizer_setup/function_estimators/" class="md-nav__link">
         
   
   
@@ -886,7 +886,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../optimizer_configuration/transforms/" class="md-nav__link">
+      <a href="../../optimizer_setup/transforms/" class="md-nav__link">
         
   
   
@@ -914,7 +914,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../optimizer_configuration/results/" class="md-nav__link">
+      <a href="../../optimizer_setup/results/" class="md-nav__link">
         
   
   
@@ -974,7 +974,7 @@
   <span class="md-ellipsis">
     
   
-    Simple API
+    Running
   
 
     
@@ -990,7 +990,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Simple API
+    Running
   
 
           </label>
@@ -1003,14 +1003,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../simple/simple/" class="md-nav__link">
+      <a href="../../running/running/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    The Simple API
+    Running Optimizations
   
 
     
@@ -1063,7 +1063,7 @@
   <span class="md-ellipsis">
     
   
-    Low-Level API
+    Workflows
   
 
     
@@ -1079,7 +1079,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Low-Level API
+    Workflows
   
 
           </label>
@@ -1092,7 +1092,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../low_level/workflows/" class="md-nav__link">
+      <a href="../../workflows/workflows/" class="md-nav__link">
         
   
   
@@ -1120,7 +1120,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../low_level/evaluation_callbacks/" class="md-nav__link">
+      <a href="../../workflows/evaluation_callbacks/" class="md-nav__link">
         
   
   
@@ -1148,7 +1148,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../low_level/parallel/" class="md-nav__link">
+      <a href="../../workflows/parallel/" class="md-nav__link">
         
   
   
@@ -2949,7 +2949,7 @@
 <p>A realization filter selects which realizations contribute to a function or
 gradient value at each evaluation. The defaults provide worst-/best-N sorting
 and CVaR-style tail selection, enabling risk-aware objectives.</p>
-<p>See <a href="../../optimizer_configuration/realization_filters/">Realization Filters</a> for usage.</p>
+<p>See <a href="../../optimizer_setup/realization_filters/">Realization Filters</a> for usage.</p>
 
 
 <div class="doc doc-object doc-module">
@@ -2965,7 +2965,7 @@ and CVaR-style tail selection, enabling risk-aware objectives.</p>
     <div class="doc doc-contents first">
 
         <p>Public API for realization filter implementations.</p>
-<p>See <a href="../../optimizer_configuration/realization_filters/">Realization Filters</a> for usage and
+<p>See <a href="../../optimizer_setup/realization_filters/">Realization Filters</a> for usage and
 algorithm descriptions.</p>
 
 
@@ -3015,7 +3015,7 @@ algorithm descriptions.</p>
 <li><code>get_realization_weights</code> — called at each evaluation; return a
    non-negative weight per realization.</li>
 </ol>
-<p>See <a href="../../optimizer_configuration/realization_filters/">Realization Filters</a> for examples
+<p>See <a href="../../optimizer_setup/realization_filters/">Realization Filters</a> for examples
 and further guidance.</p>
 
 
@@ -3288,7 +3288,7 @@ normalizes weights to sum to one before use.</p>
         <p>Default filter implementation providing sort and CVaR methods.</p>
 <p>The method is selected via the <code>method</code> field of
 <a class="autorefs autorefs-internal" title="            RealizationFilterConfig" href="../config/#ropt.config.RealizationFilterConfig"><code>RealizationFilterConfig</code></a>.
-See <a href="../../optimizer_configuration/realization_filters/">Realization Filters</a> for usage.</p>
+See <a href="../../optimizer_setup/realization_filters/">Realization Filters</a> for usage.</p>
 
 
 
@@ -3331,7 +3331,7 @@ See <a href="../../optimizer_configuration/realization_filters/">Realization Fil
 
         <p>Options for the <code>sort-objective</code> filter method.</p>
 <p>Selects realizations by ranking a weighted sum of objectives.
-See <a href="../../optimizer_configuration/realization_filters/#how-sorting-filters-work">Realization Filters</a>
+See <a href="../../optimizer_setup/realization_filters/#how-sorting-filters-work">Realization Filters</a>
 for the algorithm.</p>
 
 
@@ -3422,7 +3422,7 @@ for the algorithm.</p>
 
         <p>Options for the <code>sort-constraint</code> filter method.</p>
 <p>Selects realizations by ranking a single constraint function value.
-See <a href="../../optimizer_configuration/realization_filters/#how-sorting-filters-work">Realization Filters</a>
+See <a href="../../optimizer_setup/realization_filters/#how-sorting-filters-work">Realization Filters</a>
 for the algorithm.</p>
 
 
@@ -3514,7 +3514,7 @@ for the algorithm.</p>
         <p>Options for the <code>cvar-objective</code> filter method.</p>
 <p>Assigns CVaR-derived weights to the worst-performing realizations based
 on a weighted sum of objectives.
-See <a href="../../optimizer_configuration/realization_filters/#how-cvar-filters-work">Realization Filters</a>
+See <a href="../../optimizer_setup/realization_filters/#how-cvar-filters-work">Realization Filters</a>
 for the algorithm.</p>
 
 
@@ -3595,7 +3595,7 @@ for the algorithm.</p>
         <p>Options for the <code>cvar-constraint</code> filter method.</p>
 <p>Assigns CVaR-derived weights based on a single constraint function value,
 with "worst" defined by the constraint type (LE/GE/EQ).
-See <a href="../../optimizer_configuration/realization_filters/#how-cvar-filters-work">Realization Filters</a>
+See <a href="../../optimizer_setup/realization_filters/#how-cvar-filters-work">Realization Filters</a>
 for the algorithm.</p>
 
 

@@ -270,7 +270,7 @@
           
   
   
-  Optimizer Configuration
+  Optimizer Setup
 
         </a>
       </li>
@@ -286,11 +286,11 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../simple/simple/" class="md-tabs__link">
+        <a href="../../running/running/" class="md-tabs__link">
           
   
   
-  Simple API
+  Running
 
         </a>
       </li>
@@ -306,11 +306,11 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../low_level/workflows/" class="md-tabs__link">
+        <a href="../../workflows/workflows/" class="md-tabs__link">
           
   
   
-  Low-Level API
+  Workflows
 
         </a>
       </li>
@@ -720,7 +720,7 @@
   <span class="md-ellipsis">
     
   
-    Optimizer Configuration
+    Optimizer Setup
   
 
     
@@ -736,7 +736,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Optimizer Configuration
+    Optimizer Setup
   
 
           </label>
@@ -1046,7 +1046,7 @@
   <span class="md-ellipsis">
     
   
-    Simple API
+    Running
   
 
     
@@ -1062,7 +1062,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Simple API
+    Running
   
 
           </label>
@@ -1075,14 +1075,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../simple/simple/" class="md-nav__link">
+      <a href="../../running/running/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    The Simple API
+    Running Optimizations
   
 
     
@@ -1135,7 +1135,7 @@
   <span class="md-ellipsis">
     
   
-    Low-Level API
+    Workflows
   
 
     
@@ -1151,7 +1151,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Low-Level API
+    Workflows
   
 
           </label>
@@ -1164,7 +1164,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../low_level/workflows/" class="md-nav__link">
+      <a href="../../workflows/workflows/" class="md-nav__link">
         
   
   
@@ -1192,7 +1192,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../low_level/evaluation_callbacks/" class="md-nav__link">
+      <a href="../../workflows/evaluation_callbacks/" class="md-nav__link">
         
   
   
@@ -1220,7 +1220,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../low_level/parallel/" class="md-nav__link">
+      <a href="../../workflows/parallel/" class="md-nav__link">
         
   
   
@@ -2742,11 +2742,11 @@
 <h1 id="key-concepts">Key Concepts</h1>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>This section describes the <strong>optimizer configuration</strong> — <em>what</em> to optimize
-(variables, objectives, constraints, and the components that drive the run).
-It is independent of how you run the optimization. Running a configured
-optimization is the job of the <a href="../../simple/simple/">Simple API</a> or the
-<a href="../../low_level/workflows/">low-level API</a>.</p>
+<p>This section describes how an optimization is <strong>set up</strong> — its variables,
+objectives, constraints, and the components that drive it. It is independent
+of how you run the optimization; running a configured optimization is done in
+<a href="../../running/running/">Running Optimizations</a> or
+<a href="../../workflows/workflows/">Optimization Workflows</a>.</p>
 </div>
 <p>This page introduces the ideas and terms that appear throughout the <code>ropt</code>
 documentation and shows how they fit together. For the mathematical background
@@ -2841,7 +2841,7 @@ perturbed variable vectors across all realizations. The resulting
 per-realization gradients are aggregated into a single gradient vector.</dd>
 <dt><strong>Batch</strong></dt>
 <dd>A group of one or more variable vectors evaluated together in a single call
-to the <a href="../../low_level/evaluation_callbacks/">evaluator</a>. These may include
+to the <a href="../../workflows/evaluation_callbacks/">evaluator</a>. These may include
 points in optimization space that the optimizer is exploring, or perturbed
 points for gradient calculations.</dd>
 <dt><strong>Iteration</strong></dt>

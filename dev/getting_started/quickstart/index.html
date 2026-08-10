@@ -266,11 +266,11 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../optimizer_configuration/key_concepts/" class="md-tabs__link">
+        <a href="../../optimizer_setup/key_concepts/" class="md-tabs__link">
           
   
   
-  Optimizer Configuration
+  Optimizer Setup
 
         </a>
       </li>
@@ -286,11 +286,11 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../simple/simple/" class="md-tabs__link">
+        <a href="../../running/running/" class="md-tabs__link">
           
   
   
-  Simple API
+  Running
 
         </a>
       </li>
@@ -306,11 +306,11 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../low_level/workflows/" class="md-tabs__link">
+        <a href="../../workflows/workflows/" class="md-tabs__link">
           
   
   
-  Low-Level API
+  Workflows
 
         </a>
       </li>
@@ -811,7 +811,7 @@
   <span class="md-ellipsis">
     
   
-    Optimizer Configuration
+    Optimizer Setup
   
 
     
@@ -827,7 +827,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Optimizer Configuration
+    Optimizer Setup
   
 
           </label>
@@ -840,7 +840,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../optimizer_configuration/key_concepts/" class="md-nav__link">
+      <a href="../../optimizer_setup/key_concepts/" class="md-nav__link">
         
   
   
@@ -868,7 +868,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../optimizer_configuration/configuration/" class="md-nav__link">
+      <a href="../../optimizer_setup/configuration/" class="md-nav__link">
         
   
   
@@ -896,7 +896,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../optimizer_configuration/gradients/" class="md-nav__link">
+      <a href="../../optimizer_setup/gradients/" class="md-nav__link">
         
   
   
@@ -924,7 +924,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../optimizer_configuration/realization_filters/" class="md-nav__link">
+      <a href="../../optimizer_setup/realization_filters/" class="md-nav__link">
         
   
   
@@ -952,7 +952,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../optimizer_configuration/function_estimators/" class="md-nav__link">
+      <a href="../../optimizer_setup/function_estimators/" class="md-nav__link">
         
   
   
@@ -980,7 +980,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../optimizer_configuration/transforms/" class="md-nav__link">
+      <a href="../../optimizer_setup/transforms/" class="md-nav__link">
         
   
   
@@ -1008,7 +1008,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../optimizer_configuration/results/" class="md-nav__link">
+      <a href="../../optimizer_setup/results/" class="md-nav__link">
         
   
   
@@ -1068,7 +1068,7 @@
   <span class="md-ellipsis">
     
   
-    Simple API
+    Running
   
 
     
@@ -1084,7 +1084,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Simple API
+    Running
   
 
           </label>
@@ -1097,14 +1097,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../simple/simple/" class="md-nav__link">
+      <a href="../../running/running/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    The Simple API
+    Running Optimizations
   
 
     
@@ -1157,7 +1157,7 @@
   <span class="md-ellipsis">
     
   
-    Low-Level API
+    Workflows
   
 
     
@@ -1173,7 +1173,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Low-Level API
+    Workflows
   
 
           </label>
@@ -1186,7 +1186,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../low_level/workflows/" class="md-nav__link">
+      <a href="../../workflows/workflows/" class="md-nav__link">
         
   
   
@@ -1214,7 +1214,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../low_level/evaluation_callbacks/" class="md-nav__link">
+      <a href="../../workflows/evaluation_callbacks/" class="md-nav__link">
         
   
   
@@ -1242,7 +1242,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../low_level/parallel/" class="md-nav__link">
+      <a href="../../workflows/parallel/" class="md-nav__link">
         
   
   
@@ -2822,10 +2822,10 @@ function.</p>
 <li><strong>A config dictionary</strong> — it describes the problem. Here we set only the
    minimum: how many variables there are, and a small <code>perturbation_magnitudes</code>
    value that <code>ropt</code> uses to estimate gradients. See
-   <a href="../../optimizer_configuration/configuration/">Configuration</a> for the full list of settings.</li>
+   <a href="../../optimizer_setup/configuration/">Configuration</a> for the full list of settings.</li>
 <li><strong>An objective function</strong> — a Python function that takes a set of variable
    values and returns the number to minimize. See
-   <a href="../../simple/simple/#the-objective-function">The Simple API</a>.</li>
+   <a href="../../running/running/#the-objective-function">Running Optimizations</a>.</li>
 <li><strong>A start point</strong> — the variable values to start from.</li>
 </ol>
 <p><a class="autorefs autorefs-internal" title="            ropt.simple.optimize" href="../../reference/simple/#ropt.simple.optimize"><code>optimize</code></a> wires these together, runs the optimization,
@@ -2839,8 +2839,8 @@ values it found.</p>
 <h2 id="where-to-next">Where to next</h2>
 <ul>
 <li>A fuller walkthrough: <a href="../deterministic/">Deterministic Optimization</a>.</li>
-<li>The complete simple API: <a href="../../simple/simple/">The Simple API</a>.</li>
-<li>All configuration settings: <a href="../../optimizer_configuration/configuration/">Configuration</a>.</li>
+<li>The complete simple API: <a href="../../running/running/">Running Optimizations</a>.</li>
+<li>All configuration settings: <a href="../../optimizer_setup/configuration/">Configuration</a>.</li>
 </ul>
 
 

@@ -9,10 +9,10 @@
       
       
       
-        <link rel="prev" href="../../optimizer_configuration/results/">
+        <link rel="prev" href="../../optimizer_setup/results/">
       
       
-        <link rel="next" href="../../low_level/workflows/">
+        <link rel="next" href="../../workflows/workflows/">
       
       
         
@@ -23,7 +23,7 @@
     
     
       
-        <title>The Simple API - ropt Documentation</title>
+        <title>Running Optimizations - ropt Documentation</title>
       
     
     
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#the-simple-api" class="md-skip">
+        <a href="#running-optimizations" class="md-skip">
           Skip to content
         </a>
       
@@ -118,7 +118,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              The Simple API
+              Running Optimizations
             
           </span>
         </div>
@@ -264,11 +264,11 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../optimizer_configuration/key_concepts/" class="md-tabs__link">
+        <a href="../../optimizer_setup/key_concepts/" class="md-tabs__link">
           
   
   
-  Optimizer Configuration
+  Optimizer Setup
 
         </a>
       </li>
@@ -290,7 +290,7 @@
           
   
   
-  Simple API
+  Running
 
         </a>
       </li>
@@ -306,11 +306,11 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../low_level/workflows/" class="md-tabs__link">
+        <a href="../../workflows/workflows/" class="md-tabs__link">
           
   
   
-  Low-Level API
+  Workflows
 
         </a>
       </li>
@@ -717,7 +717,7 @@
   <span class="md-ellipsis">
     
   
-    Optimizer Configuration
+    Optimizer Setup
   
 
     
@@ -733,7 +733,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Optimizer Configuration
+    Optimizer Setup
   
 
           </label>
@@ -746,7 +746,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../optimizer_configuration/key_concepts/" class="md-nav__link">
+      <a href="../../optimizer_setup/key_concepts/" class="md-nav__link">
         
   
   
@@ -774,7 +774,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../optimizer_configuration/configuration/" class="md-nav__link">
+      <a href="../../optimizer_setup/configuration/" class="md-nav__link">
         
   
   
@@ -802,7 +802,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../optimizer_configuration/gradients/" class="md-nav__link">
+      <a href="../../optimizer_setup/gradients/" class="md-nav__link">
         
   
   
@@ -830,7 +830,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../optimizer_configuration/realization_filters/" class="md-nav__link">
+      <a href="../../optimizer_setup/realization_filters/" class="md-nav__link">
         
   
   
@@ -858,7 +858,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../optimizer_configuration/function_estimators/" class="md-nav__link">
+      <a href="../../optimizer_setup/function_estimators/" class="md-nav__link">
         
   
   
@@ -886,7 +886,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../optimizer_configuration/transforms/" class="md-nav__link">
+      <a href="../../optimizer_setup/transforms/" class="md-nav__link">
         
   
   
@@ -914,7 +914,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../optimizer_configuration/results/" class="md-nav__link">
+      <a href="../../optimizer_setup/results/" class="md-nav__link">
         
   
   
@@ -977,7 +977,7 @@
   <span class="md-ellipsis">
     
   
-    Simple API
+    Running
   
 
     
@@ -993,7 +993,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Simple API
+    Running
   
 
           </label>
@@ -1022,7 +1022,7 @@
   <span class="md-ellipsis">
     
   
-    The Simple API
+    Running Optimizations
   
 
     
@@ -1040,7 +1040,7 @@
   <span class="md-ellipsis">
     
   
-    The Simple API
+    Running Optimizations
   
 
     
@@ -1307,7 +1307,7 @@
   <span class="md-ellipsis">
     
   
-    Low-Level API
+    Workflows
   
 
     
@@ -1323,7 +1323,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Low-Level API
+    Workflows
   
 
           </label>
@@ -1336,7 +1336,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../low_level/workflows/" class="md-nav__link">
+      <a href="../../workflows/workflows/" class="md-nav__link">
         
   
   
@@ -1364,7 +1364,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../low_level/evaluation_callbacks/" class="md-nav__link">
+      <a href="../../workflows/evaluation_callbacks/" class="md-nav__link">
         
   
   
@@ -1392,7 +1392,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../low_level/parallel/" class="md-nav__link">
+      <a href="../../workflows/parallel/" class="md-nav__link">
         
   
   
@@ -3083,14 +3083,14 @@
   
 
 
-<h1 id="the-simple-api">The Simple API</h1>
+<h1 id="running-optimizations">Running Optimizations</h1>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>The Simple API is one of two ways to <strong>run</strong> an optimization; the other is
-the <a href="../../low_level/workflows/">low-level API</a>. What the optimization does —
-its variables, objectives, constraints, and components — is the
-<a href="../../optimizer_configuration/key_concepts/">optimizer configuration</a>, which is the same
-whichever API you use.</p>
+<p>This is one of two ways to <strong>run</strong> an optimization; the other is
+<a href="../../workflows/workflows/">Optimization Workflows</a>. What the optimization
+does — its variables, objectives, constraints, and components — is set up in
+<a href="../../optimizer_setup/key_concepts/">Optimizer Setup</a>, the same whichever way you run
+it.</p>
 </div>
 <p>The <code>ropt.simple</code> module is the recommended entry point for running an
 optimization. Everything you need is imported from a single module:</p>
@@ -3147,7 +3147,7 @@ additional options.</p>
 </ul>
 <p>If a realization fails to compute, return <code>float("nan")</code> for it. <code>ropt</code> treats
 <code>NaN</code> as a failed realization and keeps going, as long as enough realizations
-succeed (see <a href="../../optimizer_configuration/configuration/">Configuration</a>).</p>
+succeed (see <a href="../../optimizer_setup/configuration/">Configuration</a>).</p>
 <h2 id="the-result">The result</h2>
 <p><code>optimize</code> returns an <a class="autorefs autorefs-internal" title="            ropt.simple.OptimizeResult
 
@@ -3173,7 +3173,7 @@ too few realizations succeeded). <code>result.results</code> is the full
       dataclass
   " href="../../reference/results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> object; you rarely need it at
 first, but it holds every detail if you do. See
-<a href="../../optimizer_configuration/results/">Working with Results</a>.</p>
+<a href="../../optimizer_setup/results/">Working with Results</a>.</p>
 <h2 id="reporting-progress">Reporting progress</h2>
 <p>Pass a <code>report</code> callback to watch the optimization as it runs. It is called once
 for every function evaluation, with an <a class="autorefs autorefs-internal" title="            ropt.simple.EvaluateResult
@@ -3227,7 +3227,7 @@ for every function evaluation, with an <a class="autorefs autorefs-internal" tit
 <p>Neither kind is interpreted by <code>ropt</code>. Constant metadata ends up on
 <code>result.results.metadata</code>; per-evaluation metadata on
 <code>result.results.evaluations.metadata</code> (one entry per realization). See
-<a href="../../optimizer_configuration/results/#metadata">Working with Results</a> for how
+<a href="../../optimizer_setup/results/#metadata">Working with Results</a> for how
 each appears in the pandas export. The full runnable script is
 <a href="https://github.com/TNO-ropt/ropt/blob/main/examples/simple/metadata.py">examples/simple/metadata.py</a>.</p>
 <h2 id="evaluating-without-optimizing">Evaluating without optimizing</h2>
@@ -3420,7 +3420,7 @@ column levels come from the field's axis labels (or indices), joined to the
 title with a separator (<code>,</code> by default, set with <code>sep=</code>). For example, a
 length-2 <code>evaluations.variables</code> gives <code>Variable,v0</code> and <code>Variable,v1</code>. Because
 the column names follow
-<a href="../../optimizer_configuration/results/#metadata-columns"><code>results_to_dataframe</code></a>,
+<a href="../../optimizer_setup/results/#metadata-columns"><code>results_to_dataframe</code></a>,
 both result-level and per-realization metadata can be included and renamed.</p>
 <p>Convenience methods:</p>
 <ul>
@@ -3433,7 +3433,7 @@ both result-level and per-realization metadata can be included and renamed.</p>
 <h3 id="custom-handlers">Custom handlers</h3>
 <p>Handlers are not limited to the built-ins: you — or another package — can
 provide your own by implementing <code>ropt</code>'s event-handler interface. The
-<a href="../../low_level/workflows/#event-handlers">Low-Level API</a> describes the event
+<a href="../../workflows/workflows/#event-handlers">Low-Level API</a> describes the event
 model, the handler protocol, and how to write one.</p>
 <h2 id="a-note-on-enums">A note on enums</h2>
 <p>A few config values and result fields use enumerations, such as
@@ -3477,7 +3477,7 @@ of <code>ropt.simple</code>; import them from <a class="autorefs autorefs-intern
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../../optimizer_configuration/results/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Working with Results">
+          <a href="../../optimizer_setup/results/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Working with Results">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -3494,7 +3494,7 @@ of <code>ropt.simple</code>; import them from <a class="autorefs autorefs-intern
         
         
           
-          <a href="../../low_level/workflows/" class="md-footer__link md-footer__link--next" aria-label="Next: Optimization Workflows">
+          <a href="../../workflows/workflows/" class="md-footer__link md-footer__link--next" aria-label="Next: Optimization Workflows">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next

@@ -264,11 +264,11 @@
     
     
       <li class="md-tabs__item">
-        <a href="optimizer_configuration/key_concepts/" class="md-tabs__link">
+        <a href="optimizer_setup/key_concepts/" class="md-tabs__link">
           
   
   
-  Optimizer Configuration
+  Optimizer Setup
 
         </a>
       </li>
@@ -284,11 +284,11 @@
     
     
       <li class="md-tabs__item">
-        <a href="simple/simple/" class="md-tabs__link">
+        <a href="running/running/" class="md-tabs__link">
           
   
   
-  Simple API
+  Running
 
         </a>
       </li>
@@ -304,11 +304,11 @@
     
     
       <li class="md-tabs__item">
-        <a href="low_level/workflows/" class="md-tabs__link">
+        <a href="workflows/workflows/" class="md-tabs__link">
           
   
   
-  Low-Level API
+  Workflows
 
         </a>
       </li>
@@ -823,7 +823,7 @@
   <span class="md-ellipsis">
     
   
-    Optimizer Configuration
+    Optimizer Setup
   
 
     
@@ -839,7 +839,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Optimizer Configuration
+    Optimizer Setup
   
 
           </label>
@@ -852,7 +852,7 @@
   
   
     <li class="md-nav__item">
-      <a href="optimizer_configuration/key_concepts/" class="md-nav__link">
+      <a href="optimizer_setup/key_concepts/" class="md-nav__link">
         
   
   
@@ -880,7 +880,7 @@
   
   
     <li class="md-nav__item">
-      <a href="optimizer_configuration/configuration/" class="md-nav__link">
+      <a href="optimizer_setup/configuration/" class="md-nav__link">
         
   
   
@@ -908,7 +908,7 @@
   
   
     <li class="md-nav__item">
-      <a href="optimizer_configuration/gradients/" class="md-nav__link">
+      <a href="optimizer_setup/gradients/" class="md-nav__link">
         
   
   
@@ -936,7 +936,7 @@
   
   
     <li class="md-nav__item">
-      <a href="optimizer_configuration/realization_filters/" class="md-nav__link">
+      <a href="optimizer_setup/realization_filters/" class="md-nav__link">
         
   
   
@@ -964,7 +964,7 @@
   
   
     <li class="md-nav__item">
-      <a href="optimizer_configuration/function_estimators/" class="md-nav__link">
+      <a href="optimizer_setup/function_estimators/" class="md-nav__link">
         
   
   
@@ -992,7 +992,7 @@
   
   
     <li class="md-nav__item">
-      <a href="optimizer_configuration/transforms/" class="md-nav__link">
+      <a href="optimizer_setup/transforms/" class="md-nav__link">
         
   
   
@@ -1020,7 +1020,7 @@
   
   
     <li class="md-nav__item">
-      <a href="optimizer_configuration/results/" class="md-nav__link">
+      <a href="optimizer_setup/results/" class="md-nav__link">
         
   
   
@@ -1080,7 +1080,7 @@
   <span class="md-ellipsis">
     
   
-    Simple API
+    Running
   
 
     
@@ -1096,7 +1096,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Simple API
+    Running
   
 
           </label>
@@ -1109,14 +1109,14 @@
   
   
     <li class="md-nav__item">
-      <a href="simple/simple/" class="md-nav__link">
+      <a href="running/running/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    The Simple API
+    Running Optimizations
   
 
     
@@ -1169,7 +1169,7 @@
   <span class="md-ellipsis">
     
   
-    Low-Level API
+    Workflows
   
 
     
@@ -1185,7 +1185,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Low-Level API
+    Workflows
   
 
           </label>
@@ -1198,7 +1198,7 @@
   
   
     <li class="md-nav__item">
-      <a href="low_level/workflows/" class="md-nav__link">
+      <a href="workflows/workflows/" class="md-nav__link">
         
   
   
@@ -1226,7 +1226,7 @@
   
   
     <li class="md-nav__item">
-      <a href="low_level/evaluation_callbacks/" class="md-nav__link">
+      <a href="workflows/evaluation_callbacks/" class="md-nav__link">
         
   
   
@@ -1254,7 +1254,7 @@
   
   
     <li class="md-nav__item">
-      <a href="low_level/parallel/" class="md-nav__link">
+      <a href="workflows/parallel/" class="md-nav__link">
         
   
   
@@ -2818,13 +2818,13 @@
 <li>Read the <a href="getting_started/background/">Background</a> for the ideas behind
   <code>ropt</code>, then work through <a href="getting_started/installation/">Installation</a> and
   the <a href="getting_started/quickstart/">Quickstart</a>.</li>
-<li>The <a href="simple/simple/">Simple API</a> is the recommended starting point for
-  running an optimization and covers most cases.</li>
-<li>The <a href="optimizer_configuration/key_concepts/">Key Concepts</a> page introduces the terms used
+<li><a href="running/running/">Running Optimizations</a> is the recommended starting point
+  for running an optimization and covers most cases.</li>
+<li>The <a href="optimizer_setup/key_concepts/">Key Concepts</a> page introduces the terms used
   throughout the documentation.</li>
 <li>The <a href="tutorials/">Tutorials</a> show <code>ropt</code> in action through worked
   examples.</li>
-<li>The <a href="optimizer_configuration/configuration/">Configuration</a> page describes the
+<li>The <a href="optimizer_setup/configuration/">Configuration</a> page describes the
   configuration format in detail.</li>
 </ul>
 <h2 id="overview">Overview</h2>
@@ -2845,17 +2845,18 @@ exposes all intermediate results of the optimization, such as objective and
 gradient values, but functionality to report or store any of these values must
 be added by the user. Optional functionality to assist with this is included
 with <code>ropt</code>.</p>
-<p><code>ropt</code> separates two concerns. The optimizer configuration describes <em>what</em> to
+<p><code>ropt</code> separates two concerns. The optimizer setup describes <em>what</em> to
 solve — the variables, objectives, constraints, and the components that drive
 the optimization — and is the same no matter how you run it; it is covered in
-the <a href="optimizer_configuration/key_concepts/">Optimizer Configuration</a> section. There are two
-options convering <em>how</em> to run a configured optimization:</p>
+the <a href="optimizer_setup/key_concepts/">Optimizer Setup</a> section. There are two options
+covering <em>how</em> to run a configured optimization:</p>
 <ol>
-<li>The <a href="simple/simple/">Simple API</a> is the recommended starting point: a
-   handful of functions cover most optimization tasks with very little code.</li>
+<li><a href="running/running/">Running Optimizations</a> is the recommended starting
+   point: a handful of functions cover most optimization tasks with very little
+   code.</li>
 <li>For full control — custom workflows, nested optimizations, or your own event
-   handling — the flexible low-level API exposes the individual building blocks
-   (see <a href="low_level/workflows/">Optimization Workflows</a>).</li>
+   handling — the <a href="workflows/workflows/">Optimization Workflows</a> expose the
+   individual building blocks.</li>
 </ol>
 <p><code>ropt</code> provides several features for efficiently solving complex robust
 optimization problems:</p>

@@ -12,7 +12,7 @@
         <link rel="prev" href="../transforms/">
       
       
-        <link rel="next" href="../../simple/simple/">
+        <link rel="next" href="../../running/running/">
       
       
         
@@ -270,7 +270,7 @@
           
   
   
-  Optimizer Configuration
+  Optimizer Setup
 
         </a>
       </li>
@@ -286,11 +286,11 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../simple/simple/" class="md-tabs__link">
+        <a href="../../running/running/" class="md-tabs__link">
           
   
   
-  Simple API
+  Running
 
         </a>
       </li>
@@ -306,11 +306,11 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../low_level/workflows/" class="md-tabs__link">
+        <a href="../../workflows/workflows/" class="md-tabs__link">
           
   
   
-  Low-Level API
+  Workflows
 
         </a>
       </li>
@@ -720,7 +720,7 @@
   <span class="md-ellipsis">
     
   
-    Optimizer Configuration
+    Optimizer Setup
   
 
     
@@ -736,7 +736,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Optimizer Configuration
+    Optimizer Setup
   
 
           </label>
@@ -1207,7 +1207,7 @@
   <span class="md-ellipsis">
     
   
-    Simple API
+    Running
   
 
     
@@ -1223,7 +1223,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Simple API
+    Running
   
 
           </label>
@@ -1236,14 +1236,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../simple/simple/" class="md-nav__link">
+      <a href="../../running/running/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    The Simple API
+    Running Optimizations
   
 
     
@@ -1296,7 +1296,7 @@
   <span class="md-ellipsis">
     
   
-    Low-Level API
+    Workflows
   
 
     
@@ -1312,7 +1312,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Low-Level API
+    Workflows
   
 
           </label>
@@ -1325,7 +1325,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../low_level/workflows/" class="md-nav__link">
+      <a href="../../workflows/workflows/" class="md-nav__link">
         
   
   
@@ -1353,7 +1353,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../low_level/evaluation_callbacks/" class="md-nav__link">
+      <a href="../../workflows/evaluation_callbacks/" class="md-nav__link">
         
   
   
@@ -1381,7 +1381,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../low_level/parallel/" class="md-nav__link">
+      <a href="../../workflows/parallel/" class="md-nav__link">
         
   
   
@@ -3069,8 +3069,8 @@
   
       dataclass
   " href="../../reference/results/#ropt.results.Results"><code>Results</code></a> objects. This page describes the result
-classes and how to inspect them; see <a href="../../simple/simple/">The Simple API</a> and
-<a href="../../low_level/workflows/">Optimization Workflows</a> for how results are produced and
+classes and how to inspect them; see <a href="../../running/running/">Running Optimizations</a> and
+<a href="../../workflows/workflows/">Optimization Workflows</a> for how results are produced and
 delivered to your code.</p>
 <h2 id="the-result-hierarchy">The result hierarchy</h2>
 <p>During optimization, function and gradient evaluations generate data that is
@@ -3403,11 +3403,11 @@ this optimizer domain.</p>
       abstractmethod
   " href="../../reference/results/#ropt.results.Results.transform_from_optimizer"><code>transform_from_optimizer</code></a>
 method reverses these transforms, mapping results back to the <em>user domain</em>.</p>
-<p>In the <a href="../../simple/simple/">simple API</a>, results are always transformed to the user
+<p>In the <a href="../../running/running/">simple API</a>, results are always transformed to the user
 domain automatically.</p>
-<p>In <a href="../../low_level/workflows/">workflows</a>, event handlers determine how results are returned,
+<p>In <a href="../../workflows/workflows/">workflows</a>, event handlers determine how results are returned,
 for instance by offering a <code>domain</code> argument that controls whether results are
-handled in user or optimizer domain. See <a href="../../low_level/workflows/">Optimization Workflows</a>
+handled in user or optimizer domain. See <a href="../../workflows/workflows/">Optimization Workflows</a>
 for details on how individual event handlers handle this.</p>
 <h2 id="metadata">Metadata</h2>
 <p>Results carry two independent kinds of metadata, neither interpreted by <code>ropt</code>:</p>
@@ -3457,7 +3457,7 @@ This requires the <code>pandas</code> optional extra (see <a href="../../getting
 <p class="admonition-title">Note</p>
 <p>The <code>to_dataframe</code> and <code>results_to_dataframe</code> functions shown here are the
 low-level export primitives. Most users do not call them directly: the
-<a href="../../simple/simple/#dataframehandler"><code>DataFrameHandler</code></a> builds and updates
+<a href="../../running/running/#dataframehandler"><code>DataFrameHandler</code></a> builds and updates
 these tables automatically as an optimization runs. This section explains
 what that handler produces under the hood.</p>
 </div>
@@ -3607,7 +3607,7 @@ first example of this section.</p>
 <li>Run an optimization and receive results via callbacks:
   <a href="../../getting_started/deterministic/">Deterministic Optimization</a>.</li>
 <li>Use event handlers to collect or react to results in a workflow:
-  <a href="../../low_level/workflows/">Optimization Workflows</a>.</li>
+  <a href="../../workflows/workflows/">Optimization Workflows</a>.</li>
 </ul>
 
 
@@ -3661,13 +3661,13 @@ first example of this section.</p>
         
         
           
-          <a href="../../simple/simple/" class="md-footer__link md-footer__link--next" aria-label="Next: The Simple API">
+          <a href="../../running/running/" class="md-footer__link md-footer__link--next" aria-label="Next: Running Optimizations">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                The Simple API
+                Running Optimizations
               </div>
             </div>
             <div class="md-footer__button md-icon">

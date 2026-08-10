@@ -264,11 +264,11 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../optimizer_configuration/key_concepts/" class="md-tabs__link">
+        <a href="../../optimizer_setup/key_concepts/" class="md-tabs__link">
           
   
   
-  Optimizer Configuration
+  Optimizer Setup
 
         </a>
       </li>
@@ -284,11 +284,11 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../simple/simple/" class="md-tabs__link">
+        <a href="../../running/running/" class="md-tabs__link">
           
   
   
-  Simple API
+  Running
 
         </a>
       </li>
@@ -304,11 +304,11 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../low_level/workflows/" class="md-tabs__link">
+        <a href="../../workflows/workflows/" class="md-tabs__link">
           
   
   
-  Low-Level API
+  Workflows
 
         </a>
       </li>
@@ -717,7 +717,7 @@
   <span class="md-ellipsis">
     
   
-    Optimizer Configuration
+    Optimizer Setup
   
 
     
@@ -733,7 +733,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Optimizer Configuration
+    Optimizer Setup
   
 
           </label>
@@ -746,7 +746,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../optimizer_configuration/key_concepts/" class="md-nav__link">
+      <a href="../../optimizer_setup/key_concepts/" class="md-nav__link">
         
   
   
@@ -774,7 +774,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../optimizer_configuration/configuration/" class="md-nav__link">
+      <a href="../../optimizer_setup/configuration/" class="md-nav__link">
         
   
   
@@ -802,7 +802,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../optimizer_configuration/gradients/" class="md-nav__link">
+      <a href="../../optimizer_setup/gradients/" class="md-nav__link">
         
   
   
@@ -830,7 +830,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../optimizer_configuration/realization_filters/" class="md-nav__link">
+      <a href="../../optimizer_setup/realization_filters/" class="md-nav__link">
         
   
   
@@ -858,7 +858,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../optimizer_configuration/function_estimators/" class="md-nav__link">
+      <a href="../../optimizer_setup/function_estimators/" class="md-nav__link">
         
   
   
@@ -886,7 +886,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../optimizer_configuration/transforms/" class="md-nav__link">
+      <a href="../../optimizer_setup/transforms/" class="md-nav__link">
         
   
   
@@ -914,7 +914,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../optimizer_configuration/results/" class="md-nav__link">
+      <a href="../../optimizer_setup/results/" class="md-nav__link">
         
   
   
@@ -974,7 +974,7 @@
   <span class="md-ellipsis">
     
   
-    Simple API
+    Running
   
 
     
@@ -990,7 +990,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Simple API
+    Running
   
 
           </label>
@@ -1003,14 +1003,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../simple/simple/" class="md-nav__link">
+      <a href="../../running/running/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    The Simple API
+    Running Optimizations
   
 
     
@@ -1063,7 +1063,7 @@
   <span class="md-ellipsis">
     
   
-    Low-Level API
+    Workflows
   
 
     
@@ -1079,7 +1079,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Low-Level API
+    Workflows
   
 
           </label>
@@ -1092,7 +1092,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../low_level/workflows/" class="md-nav__link">
+      <a href="../../workflows/workflows/" class="md-nav__link">
         
   
   
@@ -1120,7 +1120,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../low_level/evaluation_callbacks/" class="md-nav__link">
+      <a href="../../workflows/evaluation_callbacks/" class="md-nav__link">
         
   
   
@@ -1148,7 +1148,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../low_level/parallel/" class="md-nav__link">
+      <a href="../../workflows/parallel/" class="md-nav__link">
         
   
   
@@ -3332,7 +3332,7 @@ for gradient estimates. Each is a frozen container of
       dataclass
   " href="#ropt.results.ResultField"><code>ResultField</code></a> sub-objects holding NumPy arrays
 with axis-name metadata.</p>
-<p>See <a href="../../optimizer_configuration/results/">Working with Results</a> for a tour of the access
+<p>See <a href="../../optimizer_setup/results/">Working with Results</a> for a tour of the access
 patterns.</p>
 
 
@@ -3349,7 +3349,7 @@ patterns.</p>
     <div class="doc doc-contents first">
 
         <p>Data classes for storing intermediate optimization results.</p>
-<p>See <a href="../../optimizer_configuration/results/">Working with Results</a> for a narrative overview of
+<p>See <a href="../../optimizer_setup/results/">Working with Results</a> for a narrative overview of
 the result hierarchy, axis metadata, domain transforms, and pandas export.</p>
 
 
@@ -3407,7 +3407,7 @@ the result hierarchy, axis metadata, domain transforms, and pandas export.</p>
   
       dataclass
   " href="#ropt.results.GradientResults"><code>GradientResults</code></a>.</p>
-<p>See <a href="../../optimizer_configuration/results/">Working with Results</a> for a narrative overview.</p>
+<p>See <a href="../../optimizer_setup/results/">Working with Results</a> for a narrative overview.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -3500,7 +3500,7 @@ are labeled using the <code>names</code> mapping (numeric indices if absent).
 <code>batch_id</code> is always prepended to the index. The <code>unstack</code>
 argument pivots selected axes into columns, producing tuple column
 names of the form <code>(sub-field, label, ...)</code>.</p>
-<p>See <a href="../../optimizer_configuration/results/#exporting-to-pandas">Working with Results</a> for
+<p>See <a href="../../optimizer_setup/results/#exporting-to-pandas">Working with Results</a> for
 further details and examples.</p>
 
 
@@ -3746,7 +3746,7 @@ optimization, restoring values to the user-defined domain.</p>
 
 
         <p>Base class for result field containers that carry axis metadata.</p>
-<p>See <a href="../../optimizer_configuration/results/#axes-and-dimensionality">Working with Results</a> for
+<p>See <a href="../../optimizer_setup/results/#axes-and-dimensionality">Working with Results</a> for
 how axis metadata is used.</p>
 
 
@@ -3904,7 +3904,7 @@ how axis metadata is used.</p>
 
 
         <p>Results of a function evaluation batch.</p>
-<p>See <a href="../../optimizer_configuration/results/">Working with Results</a> for usage details.</p>
+<p>See <a href="../../optimizer_setup/results/">Working with Results</a> for usage details.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -4122,7 +4122,7 @@ Realization metadata is passed through unchanged.</p>
 
 
         <p>Results of a gradient evaluation batch.</p>
-<p>See <a href="../../optimizer_configuration/results/">Working with Results</a> for usage details.</p>
+<p>See <a href="../../optimizer_setup/results/">Working with Results</a> for usage details.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -4324,7 +4324,7 @@ passed through unchanged.</p>
 
 
         <p>Aggregated objective and constraint function values.</p>
-<p>See <a href="../../optimizer_configuration/results/">Working with Results</a> for usage details.</p>
+<p>See <a href="../../optimizer_setup/results/">Working with Results</a> for usage details.</p>
 <p><strong>Result descriptions</strong></p>
 <div class="tabbed-set tabbed-alternate" data-tabs="1:3"><input checked="checked" id="ropt.results.Functions--__tabbed_1_1" name="ropt.results.Functions--__tabbed_1" type="radio" /><input id="ropt.results.Functions--__tabbed_1_2" name="ropt.results.Functions--__tabbed_1" type="radio" /><input id="ropt.results.Functions--__tabbed_1_3" name="ropt.results.Functions--__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="ropt.results.Functions--__tabbed_1_1">Weighted Objective</label><label for="ropt.results.Functions--__tabbed_1_2">Objectives</label><label for="ropt.results.Functions--__tabbed_1_3">Constraints</label></div>
 <div class="tabbed-content">
@@ -4601,7 +4601,7 @@ one-dimensional array of floating point values:</p>
 
 
         <p>Aggregated objective and constraint gradients.</p>
-<p>See <a href="../../optimizer_configuration/results/">Working with Results</a> for usage details.</p>
+<p>See <a href="../../optimizer_setup/results/">Working with Results</a> for usage details.</p>
 <p><strong>Result descriptions</strong></p>
 <div class="tabbed-set tabbed-alternate" data-tabs="1:3"><input checked="checked" id="ropt.results.Gradients--__tabbed_1_1" name="ropt.results.Gradients--__tabbed_1" type="radio" /><input id="ropt.results.Gradients--__tabbed_1_2" name="ropt.results.Gradients--__tabbed_1" type="radio" /><input id="ropt.results.Gradients--__tabbed_1_3" name="ropt.results.Gradients--__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="ropt.results.Gradients--__tabbed_1_1">Weighted Objective Gradient</label><label for="ropt.results.Gradients--__tabbed_1_2">Objective Gradients</label><label for="ropt.results.Gradients--__tabbed_1_3">Constraint Gradients</label></div>
 <div class="tabbed-content">
@@ -4905,7 +4905,7 @@ floating point values:</p>
 
 
         <p>Per-realization objective and constraint values for an evaluation batch.</p>
-<p>See <a href="../../optimizer_configuration/results/">Working with Results</a> for usage details.</p>
+<p>See <a href="../../optimizer_setup/results/">Working with Results</a> for usage details.</p>
 <p><strong>Result descriptions</strong></p>
 <div class="tabbed-set tabbed-alternate" data-tabs="1:4"><input checked="checked" id="ropt.results.FunctionEvaluations--__tabbed_1_1" name="ropt.results.FunctionEvaluations--__tabbed_1" type="radio" /><input id="ropt.results.FunctionEvaluations--__tabbed_1_2" name="ropt.results.FunctionEvaluations--__tabbed_1" type="radio" /><input id="ropt.results.FunctionEvaluations--__tabbed_1_3" name="ropt.results.FunctionEvaluations--__tabbed_1" type="radio" /><input id="ropt.results.FunctionEvaluations--__tabbed_1_4" name="ropt.results.FunctionEvaluations--__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="ropt.results.FunctionEvaluations--__tabbed_1_1">Variables</label><label for="ropt.results.FunctionEvaluations--__tabbed_1_2">Objectives</label><label for="ropt.results.FunctionEvaluations--__tabbed_1_3">Constraints</label><label for="ropt.results.FunctionEvaluations--__tabbed_1_4">Metadata</label></div>
 <div class="tabbed-content">
@@ -5273,7 +5273,7 @@ objects.</p>
 
 
         <p>Per-realization evaluation data for perturbed variables.</p>
-<p>See <a href="../../optimizer_configuration/results/">Working with Results</a> for usage details.</p>
+<p>See <a href="../../optimizer_setup/results/">Working with Results</a> for usage details.</p>
 <p><strong>Result descriptions</strong></p>
 <div class="tabbed-set tabbed-alternate" data-tabs="1:5"><input checked="checked" id="ropt.results.GradientEvaluations--__tabbed_1_1" name="ropt.results.GradientEvaluations--__tabbed_1" type="radio" /><input id="ropt.results.GradientEvaluations--__tabbed_1_2" name="ropt.results.GradientEvaluations--__tabbed_1" type="radio" /><input id="ropt.results.GradientEvaluations--__tabbed_1_3" name="ropt.results.GradientEvaluations--__tabbed_1" type="radio" /><input id="ropt.results.GradientEvaluations--__tabbed_1_4" name="ropt.results.GradientEvaluations--__tabbed_1" type="radio" /><input id="ropt.results.GradientEvaluations--__tabbed_1_5" name="ropt.results.GradientEvaluations--__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="ropt.results.GradientEvaluations--__tabbed_1_1">Variables</label><label for="ropt.results.GradientEvaluations--__tabbed_1_2">Perturbed Variables</label><label for="ropt.results.GradientEvaluations--__tabbed_1_3">Perturbed Objectives</label><label for="ropt.results.GradientEvaluations--__tabbed_1_4">Perturbed Constraints</label><label for="ropt.results.GradientEvaluations--__tabbed_1_5">Metadata</label></div>
 <div class="tabbed-content">
@@ -5732,7 +5732,7 @@ objects.</p>
 
 
         <p>Per-realization activity, success, and weight information.</p>
-<p>See <a href="../../optimizer_configuration/results/">Working with Results</a> for usage details.</p>
+<p>See <a href="../../optimizer_setup/results/">Working with Results</a> for usage details.</p>
 <p><strong>Result descriptions</strong></p>
 <div class="tabbed-set tabbed-alternate" data-tabs="1:3"><input checked="checked" id="ropt.results.Realizations--__tabbed_1_1" name="ropt.results.Realizations--__tabbed_1" type="radio" /><input id="ropt.results.Realizations--__tabbed_1_2" name="ropt.results.Realizations--__tabbed_1" type="radio" /><input id="ropt.results.Realizations--__tabbed_1_3" name="ropt.results.Realizations--__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="ropt.results.Realizations--__tabbed_1_1">Evaluated Realizations</label><label for="ropt.results.Realizations--__tabbed_1_2">Objective Weights</label><label for="ropt.results.Realizations--__tabbed_1_3">Constraint Weights</label></div>
 <div class="tabbed-content">
@@ -5927,7 +5927,7 @@ and the magnitude of any violations.</p>
 <li><em>Violations:</em> the absolute value of the difference when a bound is
   violated, zero otherwise.</li>
 </ul>
-<p>See <a href="../../optimizer_configuration/results/">Working with Results</a> for usage details.</p>
+<p>See <a href="../../optimizer_setup/results/">Working with Results</a> for usage details.</p>
 <p><strong>Result descriptions</strong></p>
 <p>The class stores the following information for bound, linear constraint, and
 non-linear constraint differences and violations as one-dimensional vectors:</p>
@@ -6312,7 +6312,7 @@ selected using dot notation (e.g., <code>evaluations.variables</code>); nested
 <code>metadata</code> entries are accessed as <code>evaluations.metadata.key</code>.
 Multi-dimensional fields are automatically unstacked into tuple-named
 columns.</p>
-<p>See <a href="../../optimizer_configuration/results/#exporting-to-pandas">Working with Results</a> for
+<p>See <a href="../../optimizer_setup/results/#exporting-to-pandas">Working with Results</a> for
 further details and examples.</p>
 
 

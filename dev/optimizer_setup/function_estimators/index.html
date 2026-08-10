@@ -9,10 +9,10 @@
       
       
       
-        <link rel="prev" href="../gradients/">
+        <link rel="prev" href="../realization_filters/">
       
       
-        <link rel="next" href="../function_estimators/">
+        <link rel="next" href="../transforms/">
       
       
         
@@ -23,7 +23,7 @@
     
     
       
-        <title>Realization Filters - ropt Documentation</title>
+        <title>Function Estimators - ropt Documentation</title>
       
     
     
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#realization-filters" class="md-skip">
+        <a href="#function-estimators" class="md-skip">
           Skip to content
         </a>
       
@@ -118,7 +118,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Realization Filters
+              Function Estimators
             
           </span>
         </div>
@@ -270,7 +270,7 @@
           
   
   
-  Optimizer Configuration
+  Optimizer Setup
 
         </a>
       </li>
@@ -286,11 +286,11 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../simple/simple/" class="md-tabs__link">
+        <a href="../../running/running/" class="md-tabs__link">
           
   
   
-  Simple API
+  Running
 
         </a>
       </li>
@@ -306,11 +306,11 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../low_level/workflows/" class="md-tabs__link">
+        <a href="../../workflows/workflows/" class="md-tabs__link">
           
   
   
-  Low-Level API
+  Workflows
 
         </a>
       </li>
@@ -720,7 +720,7 @@
   <span class="md-ellipsis">
     
   
-    Optimizer Configuration
+    Optimizer Setup
   
 
     
@@ -736,7 +736,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Optimizer Configuration
+    Optimizer Setup
   
 
           </label>
@@ -830,6 +830,34 @@
                 
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../realization_filters/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Realization Filters
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
     
   
   
@@ -849,7 +877,7 @@
   <span class="md-ellipsis">
     
   
-    Realization Filters
+    Function Estimators
   
 
     
@@ -867,7 +895,7 @@
   <span class="md-ellipsis">
     
   
-    Realization Filters
+    Function Estimators
   
 
     
@@ -893,10 +921,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#how-filters-fit-in" class="md-nav__link">
+  <a href="#how-estimators-fit-in" class="md-nav__link">
     <span class="md-ellipsis">
       
-        How filters fit in
+        How estimators fit in
       
     </span>
   </a>
@@ -904,22 +932,44 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#worst-n-example-sorting-filter" class="md-nav__link">
+  <a href="#mean-estimator-default" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Worst-N example (sorting filter)
+        Mean estimator (default)
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Worst-N example (sorting filter)">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#standard-deviation-estimator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Standard-deviation estimator
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#writing-a-custom-estimator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Writing a custom estimator
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Writing a custom estimator">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#how-sorting-filters-work" class="md-nav__link">
+  <a href="#the-merge_realizations-setting" class="md-nav__link">
     <span class="md-ellipsis">
       
-        How sorting filters work
+        The merge_realizations setting
       
     </span>
   </a>
@@ -928,56 +978,6 @@
         
       </ul>
     </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#cvar-example" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        CVaR example
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="CVaR example">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#how-cvar-filters-work" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        How CVaR filters work
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#interaction-with-evaluation_policy" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Interaction with evaluation_policy
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#writing-a-custom-filter" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Writing a custom filter
-      
-    </span>
-  </a>
   
 </li>
       
@@ -996,34 +996,6 @@
   
 </nav>
       
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../function_estimators/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Function Estimators
-  
-
-    
-  </span>
-  
-  
-
-      </a>
     </li>
   
 
@@ -1124,7 +1096,7 @@
   <span class="md-ellipsis">
     
   
-    Simple API
+    Running
   
 
     
@@ -1140,7 +1112,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Simple API
+    Running
   
 
           </label>
@@ -1153,14 +1125,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../simple/simple/" class="md-nav__link">
+      <a href="../../running/running/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    The Simple API
+    Running Optimizations
   
 
     
@@ -1213,7 +1185,7 @@
   <span class="md-ellipsis">
     
   
-    Low-Level API
+    Workflows
   
 
     
@@ -1229,7 +1201,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Low-Level API
+    Workflows
   
 
           </label>
@@ -1242,7 +1214,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../low_level/workflows/" class="md-nav__link">
+      <a href="../../workflows/workflows/" class="md-nav__link">
         
   
   
@@ -1270,7 +1242,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../low_level/evaluation_callbacks/" class="md-nav__link">
+      <a href="../../workflows/evaluation_callbacks/" class="md-nav__link">
         
   
   
@@ -1298,7 +1270,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../low_level/parallel/" class="md-nav__link">
+      <a href="../../workflows/parallel/" class="md-nav__link">
         
   
   
@@ -2776,10 +2748,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#how-filters-fit-in" class="md-nav__link">
+  <a href="#how-estimators-fit-in" class="md-nav__link">
     <span class="md-ellipsis">
       
-        How filters fit in
+        How estimators fit in
       
     </span>
   </a>
@@ -2787,22 +2759,44 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#worst-n-example-sorting-filter" class="md-nav__link">
+  <a href="#mean-estimator-default" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Worst-N example (sorting filter)
+        Mean estimator (default)
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Worst-N example (sorting filter)">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#standard-deviation-estimator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Standard-deviation estimator
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#writing-a-custom-estimator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Writing a custom estimator
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Writing a custom estimator">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#how-sorting-filters-work" class="md-nav__link">
+  <a href="#the-merge_realizations-setting" class="md-nav__link">
     <span class="md-ellipsis">
       
-        How sorting filters work
+        The merge_realizations setting
       
     </span>
   </a>
@@ -2811,56 +2805,6 @@
         
       </ul>
     </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#cvar-example" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        CVaR example
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="CVaR example">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#how-cvar-filters-work" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        How CVaR filters work
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#interaction-with-evaluation_policy" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Interaction with evaluation_policy
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#writing-a-custom-filter" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Writing a custom filter
-      
-    </span>
-  </a>
   
 </li>
       
@@ -2895,133 +2839,113 @@
   
 
 
-<h1 id="realization-filters">Realization Filters</h1>
-<p>A realization filter selects, for each evaluation batch, which realizations
-contribute to the combined function or gradient value. Filters enable
-risk-aware optimization (e.g., focus on the worst-performing realizations) and
-common variance-reduction tricks.</p>
-<p><code>ropt</code> ships with two default filters in the
-<code>ropt.realization_filter.default</code> module:</p>
+<h1 id="function-estimators">Function Estimators</h1>
+<p>A function estimator aggregates per-realization objective or constraint values
+(and their gradients) into the single representative values used by the
+optimizer. In ensemble-based optimization each realization produces its own
+function and gradient values; the estimator combines them according to a chosen
+strategy.</p>
+<p><code>ropt</code> ships with a default estimator in the
+<code>ropt.function_estimator.default</code> module that provides two methods:</p>
 <ul>
-<li>A <strong>sorting filter</strong> that keeps the worst (or best) <code>N</code> realizations.</li>
-<li>A <strong>CVaR filter</strong> that selects realizations contributing to the
-  Conditional-Value-at-Risk tail.</li>
+<li><strong><code>mean</code></strong> (or <strong><code>default</code></strong>): weighted average of realization values and
+  gradients — the standard approach for expected-value optimization.</li>
+<li><strong><code>stddev</code></strong>: weighted standard deviation of realization values with
+  chain-rule gradients — useful when the optimization target is variability
+  rather than the mean.</li>
 </ul>
-<p>Each filter can be configured for objectives, for constraints, or both.</p>
-<h2 id="how-filters-fit-in">How filters fit in</h2>
+<h2 id="how-estimators-fit-in">How estimators fit in</h2>
 <ol>
-<li>You add filter configurations to the top-level <code>realization_filters</code> list.</li>
-<li>You point objectives (or constraints) at a filter by its index in
-   <code>ObjectiveFunctionsConfig.realization_filters</code> /
-   <code>NonlinearConstraintsConfig.realization_filters</code>.</li>
-<li>At each evaluation, the filter is consulted to compute per-realization
-   weights that override the static <code>realizations.weights</code>.</li>
+<li>You add estimator configurations to the top-level <code>function_estimators</code>
+   list in the context.</li>
+<li>You point objectives (or constraints) at an estimator by its index in
+   <code>ObjectiveFunctionsConfig.function_estimators</code> /
+   <code>NonlinearConstraintsConfig.function_estimators</code>.</li>
+<li>During optimization, the estimator is called with per-realization function
+   and gradient arrays plus the current weights, and returns a single
+   aggregated value.</li>
 </ol>
 <p>See <a href="../configuration/">Configuration</a> for the index-sharing pattern.</p>
-<h2 id="worst-n-example-sorting-filter">Worst-<code>N</code> example (sorting filter)</h2>
-<p>Optimize the average of the 3 worst realizations out of 10:</p>
+<h2 id="mean-estimator-default">Mean estimator (default)</h2>
+<p>The default method computes a simple weighted average:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">CONFIG</span> <span class="o">=</span> <span class="p">{</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="s2">&quot;variables&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;variable_count&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="s2">&quot;perturbation_magnitudes&quot;</span><span class="p">:</span> <span class="mf">1e-6</span><span class="p">},</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="s2">&quot;variables&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;variable_count&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;perturbation_magnitudes&quot;</span><span class="p">:</span> <span class="mf">1e-5</span><span class="p">},</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="s2">&quot;realizations&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;weights&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">]</span> <span class="o">*</span> <span class="mi">10</span><span class="p">},</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="s2">&quot;objectives&quot;</span><span class="p">:</span> <span class="p">{</span>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>        <span class="s2">&quot;weights&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">],</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>        <span class="s2">&quot;realization_filters&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span>   <span class="c1"># objective uses filter 0</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>        <span class="s2">&quot;function_estimators&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span>   <span class="c1"># objective uses estimator 0</span>
 </span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="p">},</span>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="s2">&quot;realization_filters&quot;</span><span class="p">:</span> <span class="p">[</span>
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>        <span class="p">{</span>
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>            <span class="s2">&quot;method&quot;</span><span class="p">:</span> <span class="s2">&quot;default/sort-objective&quot;</span><span class="p">,</span>
-</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>            <span class="s2">&quot;options&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;sort&quot;</span><span class="p">:</span> <span class="s2">&quot;descending&quot;</span><span class="p">,</span> <span class="s2">&quot;first&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;last&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span>
-</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>        <span class="p">},</span>
-</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>    <span class="p">],</span>
-</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>    <span class="s2">&quot;gradient&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;number_of_perturbations&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">},</span>
-</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="p">}</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="s2">&quot;function_estimators&quot;</span><span class="p">:</span> <span class="p">[</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>        <span class="p">{</span><span class="s2">&quot;method&quot;</span><span class="p">:</span> <span class="s2">&quot;default/mean&quot;</span><span class="p">},</span>   <span class="c1"># index 0</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    <span class="p">],</span>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>Options are validated against
-<a class="autorefs autorefs-internal" title="            ropt.realization_filter.default.SortObjectiveOptions" href="../../reference/realization_filter/#ropt.realization_filter.default.SortObjectiveOptions"><code>SortObjectiveOptions</code></a>.</p>
-<h3 id="how-sorting-filters-work">How sorting filters work</h3>
-<p>The <code>sort-objective</code> method:</p>
-<ol>
-<li>Computes a weighted sum of the objective values specified by the <code>sort</code>
-   indices for each realization (using the objective weights from the
-   configuration). If a single objective index is given, no weighting is
-   applied.</li>
-<li>Sorts realizations by that value.</li>
-<li>Selects realizations whose rank falls in the inclusive range
-   [<code>first</code>, <code>last</code>].</li>
-<li>Retains the original realization weights for selected realizations; all
-   others receive zero. Failed realizations (NaN values) are given the lowest
-   rank and excluded before selection.</li>
-</ol>
-<p>The <code>sort-constraint</code> variant
-(<a class="autorefs autorefs-internal" title="            ropt.realization_filter.default.SortConstraintOptions" href="../../reference/realization_filter/#ropt.realization_filter.default.SortConstraintOptions"><code>SortConstraintOptions</code></a>)
-works identically but sorts on a single constraint function value.</p>
-<h2 id="cvar-example">CVaR example</h2>
-<p>Optimize the conditional expectation of the worst 30% of realizations:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="s2">&quot;realization_filters&quot;</span><span class="p">:</span> <span class="p">[</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    <span class="p">{</span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>        <span class="s2">&quot;method&quot;</span><span class="p">:</span> <span class="s2">&quot;default/cvar-objective&quot;</span><span class="p">,</span>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>        <span class="s2">&quot;options&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;percentile&quot;</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">},</span>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    <span class="p">},</span>
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="p">],</span>
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="s2">&quot;objectives&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;weights&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">],</span> <span class="s2">&quot;realization_filters&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">]},</span>
+<p>Because <code>mean</code> is the default, you can omit the <code>function_estimators</code> list
+entirely when weighted-average aggregation is all you need.</p>
+<h2 id="standard-deviation-estimator">Standard-deviation estimator</h2>
+<p>To optimize for low variability instead of low mean, use <code>stddev</code>:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="s2">&quot;function_estimators&quot;</span><span class="p">:</span> <span class="p">[</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    <span class="p">{</span><span class="s2">&quot;method&quot;</span><span class="p">:</span> <span class="s2">&quot;default/stddev&quot;</span><span class="p">},</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="p">],</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="s2">&quot;objectives&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;weights&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">],</span> <span class="s2">&quot;function_estimators&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">]},</span>
 </span></code></pre></div>
-<p>See <a class="autorefs autorefs-internal" title="            ropt.realization_filter.default.CVaRObjectiveOptions" href="../../reference/realization_filter/#ropt.realization_filter.default.CVaRObjectiveOptions"><code>CVaRObjectiveOptions</code></a>
-for the parameters. The corresponding constraint variant is
-<a class="autorefs autorefs-internal" title="            ropt.realization_filter.default.CVaRConstraintOptions" href="../../reference/realization_filter/#ropt.realization_filter.default.CVaRConstraintOptions"><code>CVaRConstraintOptions</code></a>.</p>
-<h3 id="how-cvar-filters-work">How CVaR filters work</h3>
-<p>The <code>cvar-objective</code> method:</p>
-<ol>
-<li>Computes a weighted sum of objectives (same as the sorting filter).</li>
-<li>Conceptually sorts realizations by that value (ascending, assuming
-   minimization).</li>
-<li>Identifies the subset corresponding to the <code>percentile</code> worst outcomes
-   (highest weighted values).</li>
-<li>Assigns CVaR-derived weights to those realizations. When the percentile
-   boundary falls between two realizations, interpolation produces partial
-   weights. All other realizations receive zero.</li>
-<li>Failed realizations (NaN values) are excluded.</li>
-</ol>
-<p>The <code>cvar-constraint</code> variant applies CVaR to a single constraint function,
-with "worst" defined by constraint type:</p>
+<p>Note:</p>
 <ul>
-<li><strong>LE (<code>&lt;=</code>):</strong> largest positive values (most violated).</li>
-<li><strong>GE (<code>&gt;=</code>):</strong> smallest negative values (most violated).</li>
-<li><strong>EQ (<code>==</code>):</strong> largest absolute values (furthest from zero).</li>
+<li>At least two realizations with non-zero weight are required.</li>
+<li>The <code>stddev</code> method is incompatible with <code>gradient.merge_realizations = True</code>;
+  per-realization gradients must be available.</li>
 </ul>
-<div class="admonition note">
-<p class="admonition-title">Weight normalization</p>
-<p>The optimizer normalizes all filter-produced weights to sum to one before
-use, so any non-negative values are permissible.</p>
-</div>
-<h2 id="interaction-with-evaluation_policy">Interaction with <code>evaluation_policy</code></h2>
-<p>Filters that disable some realizations only deliver savings on the gradient
-side when the optimizer requests gradients separately from functions. Set
-<code>gradient.evaluation_policy = "separate"</code> (see
-<a href="../gradients/">Stochastic Gradients</a>) to maximize that benefit.</p>
-<h2 id="writing-a-custom-filter">Writing a custom filter</h2>
-<p>Custom filters are implemented as plugins. See the
-<a class="autorefs autorefs-internal" title="            ropt.realization_filter.RealizationFilter" href="../../reference/realization_filter/#ropt.realization_filter.RealizationFilter"><code>RealizationFilter</code></a> base class.</p>
-<p>A filter subclass must implement three methods:</p>
+<h2 id="writing-a-custom-estimator">Writing a custom estimator</h2>
+<p>Custom estimators are implemented as plugins. See the
+<a class="autorefs autorefs-internal" title="            ropt.function_estimator.FunctionEstimator" href="../../reference/function_estimator/#ropt.function_estimator.FunctionEstimator"><code>FunctionEstimator</code></a> base class for
+the interface you need to implement.</p>
+<p>A subclass must implement four methods:</p>
 <ol>
-<li><code>__init__(filter_config)</code> — store the configuration; keep setup lightweight.</li>
+<li><code>__init__(estimator_config)</code> — store the configuration; keep setup
+   lightweight.</li>
 <li><code>init(context)</code> — called once with the
-   <a class="autorefs autorefs-internal" title="            EnOptContext" href="../../reference/context/#ropt.context.EnOptContext"><code>EnOptContext</code></a> after all configuration is
-   finalized. Perform validation and precomputation here.</li>
-<li><code>get_realization_weights(objectives, constraints)</code> — called at each
-   evaluation. Return a 1-D array of non-negative weights (one per
-   realization).</li>
+   <a class="autorefs autorefs-internal" title="            EnOptContext" href="../../reference/context/#ropt.context.EnOptContext"><code>EnOptContext</code></a> after configuration is
+   finalized. Validate settings (e.g., check compatibility with
+   <code>merge_realizations</code>) and pre-compute any state here.</li>
+<li><code>calculate_function(functions, weights)</code> — aggregate per-realization
+   function values into a single representative value.<ul>
+<li><code>functions</code>: shape <code>(n_realizations,)</code>.</li>
+<li><code>weights</code>: shape <code>(n_realizations,)</code>.</li>
+<li>Returns: a scalar or 1-D array.</li>
+</ul>
+</li>
+<li><code>calculate_gradient(functions, gradient, weights)</code> — aggregate
+   per-realization gradients into a single gradient vector.<ul>
+<li><code>functions</code>: shape <code>(n_realizations,)</code> — needed for chain-rule estimators.</li>
+<li><code>gradient</code>: shape <code>(n_realizations, n_variables)</code> (or <code>(n_variables,)</code> when
+  <code>merge_realizations=True</code>).</li>
+<li><code>weights</code>: shape <code>(n_realizations,)</code>.</li>
+<li>Returns: 1-D array of shape <code>(n_variables,)</code>.</li>
+</ul>
+</li>
 </ol>
-<p>Registering a filter with the plugin system is only required when the filter
+<h3 id="the-merge_realizations-setting">The <code>merge_realizations</code> setting</h3>
+<p>The <a class="autorefs autorefs-internal" title="            GradientConfig" href="../../reference/config/#ropt.config.GradientConfig"><code>GradientConfig.merge_realizations</code></a> flag
+controls how gradients are presented to the estimator:</p>
+<ul>
+<li><code>False</code> (default): <code>ropt</code> estimates a separate gradient per realization. The
+  estimator combines them using weights.</li>
+<li><code>True</code>: <code>ropt</code> estimates a single merged gradient from all perturbations
+  collectively. Suitable only for averaging-type estimators. If your estimator
+  is incompatible (e.g., <code>stddev</code> needs per-realization gradients), raise
+  <code>ValueError</code> from <code>init</code>.</li>
+</ul>
+<p>Registering the estimator with the plugin system is only required when it
 should be selectable via
-<a class="autorefs autorefs-internal" title="            RealizationFilterConfig" href="../../reference/config/#ropt.config.RealizationFilterConfig"><code>RealizationFilterConfig</code></a>. Otherwise,
-filter instances can be passed directly in the <code>realization_filters</code> field of
+<a class="autorefs autorefs-internal" title="            FunctionEstimatorConfig" href="../../reference/config/#ropt.config.FunctionEstimatorConfig"><code>FunctionEstimatorConfig</code></a>. Otherwise,
+instances can be passed directly in the <code>function_estimators</code> field of
 <a class="autorefs autorefs-internal" title="            EnOptContext" href="../../reference/context/#ropt.context.EnOptContext"><code>EnOptContext</code></a>.</p>
 <h2 id="where-to-next">Where to next</h2>
 <ul>
-<li>Combine filters with transforms:
+<li>Filter realizations before aggregation:
+  <a href="../realization_filters/">Realization Filters</a>.</li>
+<li>Transform aggregated values:
   <a href="../transforms/">Transforms</a>.</li>
-<li>Inspect per-realization output:
-  <a href="../results/">Working with Results</a>.</li>
 </ul>
 
 
@@ -3058,7 +2982,7 @@ filter instances can be passed directly in the <code>realization_filters</code> 
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../gradients/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Stochastic Gradients">
+          <a href="../realization_filters/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Realization Filters">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -3068,20 +2992,20 @@ filter instances can be passed directly in the <code>realization_filters</code> 
                 Previous
               </span>
               <div class="md-ellipsis">
-                Stochastic Gradients
+                Realization Filters
               </div>
             </div>
           </a>
         
         
           
-          <a href="../function_estimators/" class="md-footer__link md-footer__link--next" aria-label="Next: Function Estimators">
+          <a href="../transforms/" class="md-footer__link md-footer__link--next" aria-label="Next: Transforms">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Function Estimators
+                Transforms
               </div>
             </div>
             <div class="md-footer__button md-icon">
