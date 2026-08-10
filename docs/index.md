@@ -5,13 +5,13 @@
 - Read the [Background](getting_started/background.md) for the ideas behind
   `ropt`, then work through [Installation](getting_started/installation.md) and
   the [Quickstart](getting_started/quickstart.md).
-- The [Simple API](simple/simple.md) is the recommended starting point for
-  running an optimization and covers most cases.
-- The [Key Concepts](optimizer_configuration/key_concepts.md) page introduces the terms used
+- [Running Optimizations](running/running.md) is the recommended starting point
+  for running an optimization and covers most cases.
+- The [Key Concepts](optimizer_setup/key_concepts.md) page introduces the terms used
   throughout the documentation.
 - The [Tutorials](tutorials/index.md) show `ropt` in action through worked
   examples.
-- The [Configuration](optimizer_configuration/configuration.md) page describes the
+- The [Configuration](optimizer_setup/configuration.md) page describes the
   configuration format in detail.
 
 ## Overview
@@ -35,17 +35,18 @@ gradient values, but functionality to report or store any of these values must
 be added by the user. Optional functionality to assist with this is included
 with `ropt`.
 
-`ropt` separates two concerns. The optimizer configuration describes *what* to
+`ropt` separates two concerns. The optimizer setup describes *what* to
 solve — the variables, objectives, constraints, and the components that drive
 the optimization — and is the same no matter how you run it; it is covered in
-the [Optimizer Configuration](optimizer_configuration/key_concepts.md) section. There are two
-options convering *how* to run a configured optimization:
+the [Optimizer Setup](optimizer_setup/key_concepts.md) section. There are two options
+covering *how* to run a configured optimization:
 
-1. The [Simple API](simple/simple.md) is the recommended starting point: a
-   handful of functions cover most optimization tasks with very little code.
+1. [Running Optimizations](running/running.md) is the recommended starting
+   point: a handful of functions cover most optimization tasks with very little
+   code.
 2. For full control — custom workflows, nested optimizations, or your own event
-   handling — the flexible low-level API exposes the individual building blocks
-   (see [Optimization Workflows](low_level/workflows.md)).
+   handling — the [Optimization Workflows](workflows/workflows.md) expose the
+   individual building blocks.
 
 `ropt` provides several features for efficiently solving complex robust
 optimization problems:

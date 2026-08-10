@@ -34,7 +34,7 @@ config = {
 ```
 
 The weights need not sum to one; `ropt` normalizes them. Equal weights, as here,
-give a plain average. See [Configuration](../optimizer_configuration/configuration.md) for the
+give a plain average. See [Configuration](../optimizer_setup/configuration.md) for the
 other realization settings.
 
 ## 2. Draw the uncertain parameters
@@ -107,7 +107,7 @@ uncertain coefficients rather than any single realization.
 
 ## Where to next
 
-- The complete simple API: [The Simple API](../simple/simple.md).
-- All realization settings: [Configuration](../optimizer_configuration/configuration.md).
+- The complete simple API: [Running Optimizations](../running/running.md).
+- All realization settings: [Configuration](../optimizer_setup/configuration.md).
 - The ideas and terms behind ensembles:
-  [Key Concepts](../optimizer_configuration/key_concepts.md).
+  [Key Concepts](../optimizer_setup/key_concepts.md).

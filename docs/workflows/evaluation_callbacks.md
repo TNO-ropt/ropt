@@ -210,7 +210,7 @@ evaluator = FunctionEvaluator(function=my_function)
 
 ## Where to next
 
-- Read the results: [Working with Results](../optimizer_configuration/results.md).
+- Read the results: [Working with Results](../optimizer_setup/results.md).
 - Use evaluator subclasses for caching, async, or HPC dispatch:
   [Optimization Workflows](workflows.md).
 - See it in action: [Building a Workflow](../tutorials/workflow.md).

@@ -7,7 +7,7 @@ between user-defined domains and the optimizer's internal domain:
 - [`ObjectiveTransform`][ropt.transforms.ObjectiveTransform]
 - [`NonlinearConstraintTransform`][ropt.transforms.NonlinearConstraintTransform]
 
-See [Transforms](../optimizer_configuration/transforms.md) for usage, configuration, and
+See [Transforms](../optimizer_setup/transforms.md) for usage, configuration, and
 implementation guidance.
 """
 

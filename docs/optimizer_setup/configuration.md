@@ -707,7 +707,7 @@ Expand the block below to see every field and its default value.
 
 ## Where to next
 
-- [Writing Evaluation Callbacks](../low_level/evaluation_callbacks.md) — produce the values that `ropt`
+- [Writing Evaluation Callbacks](../workflows/evaluation_callbacks.md) — produce the values that `ropt`
   consumes.
 - [Working with Results](results.md) — read the optimization output.
-- [Optimization Workflows](../low_level/workflows.md) — go beyond a single optimization run.
+- [Optimization Workflows](../workflows/workflows.md) — go beyond a single optimization run.

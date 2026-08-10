@@ -2,12 +2,12 @@
 
 *Audience: advanced users who need full control over the optimization.*
 
-The [simple API](../simple/simple.md) covers most cases. When you need more —
+The [simple API](../running/running.md) covers most cases. When you need more —
 custom event handling, several optimizers, or nested runs — you assemble the
 low-level workflow components yourself. This tutorial follows
 [examples/advanced/workflow.py](https://github.com/TNO-ropt/ropt/blob/main/examples/advanced/workflow.py).
 
-See [Optimization Workflows](../low_level/workflows.md) for the full reference on the
+See [Optimization Workflows](../workflows/workflows.md) for the full reference on the
 components used here.
 
 ## The evaluator
@@ -68,5 +68,5 @@ best = result_handler.result
 
 ## Next
 
-- The full component reference: [Optimization Workflows](../low_level/workflows.md).
-- Running evaluations in parallel: [Parallel Evaluation](../low_level/parallel.md).
+- The full component reference: [Optimization Workflows](../workflows/workflows.md).
+- Running evaluations in parallel: [Parallel Evaluation](../workflows/parallel.md).

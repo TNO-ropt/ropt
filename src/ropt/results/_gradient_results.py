@@ -19,7 +19,7 @@ TypeResults = TypeVar("TypeResults", bound="Results")
 class GradientResults(Results):
     """Results of a gradient evaluation batch.
 
-    See [Working with Results](../optimizer_configuration/results.md) for usage details.
+    See [Working with Results](../optimizer_setup/results.md) for usage details.
 
     Attributes:
         evaluations:  Perturbed-variable evaluation data.

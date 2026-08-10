@@ -4,7 +4,7 @@ A realization filter selects which realizations contribute to a function or
 gradient value at each evaluation. The defaults provide worst-/best-N sorting
 and CVaR-style tail selection, enabling risk-aware objectives.
 
-See [Realization Filters](../optimizer_configuration/realization_filters.md) for usage.
+See [Realization Filters](../optimizer_setup/realization_filters.md) for usage.
 
 ::: ropt.realization_filter
     options:

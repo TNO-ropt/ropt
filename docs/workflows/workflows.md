@@ -2,13 +2,13 @@
 
 !!! note
 
-    The low-level API is one of two ways to **run** an optimization; the other is
-    the [Simple API](../simple/simple.md). What the optimization does — its
-    variables, objectives, constraints, and components — is the
-    [optimizer configuration](../optimizer_configuration/key_concepts.md), which is the same
-    whichever API you use.
+    This is one of two ways to **run** an optimization; the other is
+    [Running Optimizations](../running/running.md). What the optimization does —
+    its variables, objectives, constraints, and components — is set up in
+    [Optimizer Setup](../optimizer_setup/key_concepts.md), the same whichever way you run
+    it.
 
-The [simple API](../simple/simple.md) covers the common case: a single optimization run
+The [simple API](../running/running.md) covers the common case: a single optimization run
 with one evaluator. For anything more elaborate — multiple optimizers in
 sequence, nested optimizations, custom event handling, parallel/async execution
 — drop down to the workflow components described here.
@@ -203,6 +203,15 @@ returns nothing:
 Event handlers are attached to a compute step via its `add_event_handler`
 method. Once attached, the handler receives every event the step emits.
 
+The built-in [`ResultsHandler`][ropt.components.event_handlers.ResultsHandler],
+[`HistoryHandler`][ropt.components.event_handlers.HistoryHandler], and
+[`DataFrameHandler`][ropt.components.event_handlers.DataFrameHandler] are the same
+objects you meet in [Running Optimizations](../running/running.md#built-in-handlers),
+where they are described in full — there they are attached with a `handlers()`
+block or `optimize(handlers=...)`, here with `add_event_handler`, and they behave
+identically. This section covers the underlying event model and the handlers
+specific to workflows.
+
 ### Using handlers safely
 
 An event handler is a stateful object that is **not safe for concurrent use**.
@@ -279,69 +288,24 @@ Mixing the two, or registering with a second dispatcher, raises a
     [`CallbackHandler`][ropt.components.event_handlers.CallbackHandler] (which is
     pushed each event) rather than polling another handler's state.
 
-The framework ships four reusable handlers:
+The result-collecting built-ins —
+[`ResultsHandler`][ropt.components.event_handlers.ResultsHandler],
+[`HistoryHandler`][ropt.components.event_handlers.HistoryHandler], and
+[`DataFrameHandler`][ropt.components.event_handlers.DataFrameHandler] — are
+described in full in [Running Optimizations](../running/running.md#built-in-handlers).
+They expose their state through dictionary access (`handler[key]`);
+`ResultsHandler` and `HistoryHandler` use the key `"results"`, while
+`DataFrameHandler` uses the table name. At this level each also accepts a
+`domain` argument (`"user"` — the default — or `"optimizer"`) that selects
+whether results are transformed to the user domain before being stored; the
+Simple API always uses the user domain.
 
-| Handler                                                                  | Purpose                                                                |
-| ------------------------------------------------------------------------ | ---------------------------------------------------------------------- |
-| [`ResultsHandler`][ropt.components.event_handlers.ResultsHandler]          | Keep the best (or last) result.        |
-| [`HistoryHandler`][ropt.components.event_handlers.HistoryHandler]          | Keep every result.                                                     |
-| [`CallbackHandler`][ropt.components.event_handlers.CallbackHandler]        | Forward selected event types to a user callback.                       |
-| [`DataFrameHandler`][ropt.components.event_handlers.DataFrameHandler]              | Append rows to a structured table per result.                          |
+Two more handlers exist only at this level, for wiring events:
+
+| Handler                                                                    | Purpose                                                                                                          |
+| -------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| [`CallbackHandler`][ropt.components.event_handlers.CallbackHandler]        | Forward selected event types to a user callback.                                                                |
 | [`EventForwardHandler`][ropt.components.event_handlers.EventForwardHandler]| Forward events to an [`EventDispatcher`][ropt.components.event_handlers.EventDispatcher] for lock-free dispatch. |
-
-Handlers expose their state through dictionary access (`handler[key]`). By
-convention, `ResultsHandler` and `HistoryHandler` both use the key `"results"` —
-e.g. `result_handler["results"]` or `history_handler["results"]`. `DataFrameHandler`
-uses the table name as key — e.g. `table["functions"]`.
-
-### ResultsHandler
-
-[`ResultsHandler`][ropt.components.event_handlers.ResultsHandler] listens for
-[`FINISHED_EVALUATION`][ropt.enums.EnOptEventType.FINISHED_EVALUATION] events
-emitted from within an optimization workflow. It processes the
-[`Results`][ropt.results.Results] objects contained within these events and
-selects a single [`FunctionResults`][ropt.results.FunctionResults] object to
-retain based on defined criteria.
-
-The criteria for selection are:
-
-- **`what='best'` (default):** Tracks the result with the lowest weighted
-  objective value encountered so far.
-- **`what='last'`:** Tracks the most recently received valid result.
-
-Optionally, results can be filtered based on constraint violations using the
-`constraint_tolerance` parameter. If provided, any result violating
-constraints beyond this tolerance is ignored.
-
-Additionally, a `filter` callable can be supplied to apply custom filtering
-logic. It receives a [`Results`][ropt.results.Results] object and should return
-`True` to keep the result or `False` to discard it. Only results that pass both
-the constraint tolerance check and the custom filter (if provided) are
-considered for selection.
-
-Tracking logic (comparing 'best' or selecting 'last') operates on the
-results in the optimizer's domain. However, the final selected result
-that is made accessible via dictionary access (`result_handler["results"]`) is
-transformed to the user's domain (when `domain="user"`, the default).
-
-If the domain type is `"user"`, the result is converted from the optimizer
-domain to the user domain before being stored.
-
-### HistoryHandler
-
-[`HistoryHandler`][ropt.components.event_handlers.HistoryHandler] listens for
-[`FINISHED_EVALUATION`][ropt.enums.EnOptEventType.FINISHED_EVALUATION] events
-emitted by compute steps from within an optimization workflow. It collects all
-[`Results`][ropt.results.Results] objects contained within these events and
-stores them sequentially in memory.
-
-The accumulated results are stored as a tuple and can be accessed via dictionary
-access using the key `"results"` (e.g., `history_handler["results"]`). Each time
-new results are received from a valid source, they are appended to this tuple.
-Initially, `history_handler["results"]` is `None`.
-
-If the domain type is `"user"`, the results are converted from the optimizer
-domain to the user domain before being stored.
 
 ### CallbackHandler
 
@@ -360,133 +324,6 @@ dispatches them from the asyncio event loop's thread, so handlers registered on
 the dispatcher require no locking.
 
 See [Event Dispatcher](parallel.md#event-dispatcher) for the full pattern.
-
-### DataFrameHandler
-
-[`DataFrameHandler`][ropt.components.event_handlers.DataFrameHandler] tracks results and
-stores them in pandas DataFrames.
-
-#### Tables
-
-Tables can be generated for
-[`FunctionResults`][ropt.results.FunctionResults] and
-[`GradientResults`][ropt.results.GradientResults] respectively. Tables are
-added via the `add_table` method, which takes a name, a type (either
-`"functions"` or `"gradients"`), a column specification and an optional domain
-type. The column specification determines which fields of the results are
-stored in the table and how they are named. The domain type determines
-whether the results are transformed to the user domain before being stored
-in the table.
-
-Tables are accessed by their name via dictionary syntax, for example, as
-`handler["evaluations"]`.
-
-!!! warning
-
-    Tables are generated on the fly from internal data when accessing them
-    in this way. When multiple accesses are needed, it is more efficient to
-    first store them in a variable.
-
-#### Column specification
-
-Columns are specified by providing a dictionary that maps field names to
-column titles. The keys denote the names of the fields, using attribute
-syntax. For instance a `functions.objectives` key indicates that the
-result should contain a column with objective values that are found in the
-`objectives` field of the `functions` field of the result. The values
-corresponding to the keys are used to provide the column names.
-
-For example, passing this dictionary via the `columns` argument generates a
-table containing the batch id, the values of all calculated objectives and
-the vector of variables:
-
-```python
-{
-    "batch_id": "Batch",
-    "functions.objectives": "Objective",
-    "evaluations.variables": "Variables",
-}
-```
-
-Some fields may result in multiple columns in the DataFrame if their values
-are vectors or matrices. For example, `evaluations.variables` will generate
-a separate column for each variable. The table specification above may
-generate a pandas DataFrame looking something like this:
-
-```
-    Batch   Objective,0  Variables,v0  Variables,v1  Variables,v2
-0       0  1.309826e+02      0.500000      0.900000      1.300000
-1       0  4.362553e+12    120.900265     20.698539    -90.578972
-...
-```
-
-Here, because the variables are vectors of length 2, there are two variable
-columns generated. The corresponding column names consist of the column
-title and the name of the variable vector, separated by a comma. Note that
-the `functions.objectives` column also contains a comma followed by a 0
-value. This is because `functions.objectives` is also a vector of
-values, there just happens to be only one objective. Its index is used
-instead of a name, because no name was provided in the configuration of the
-optimization. Fields may even have matrix values, in which case the column
-names may contain two item names or indices separated by commas.
-
-!!! tip "Changing the column name separator"
-
-    By default a comma is used to separate fields in the column names if
-    needed. The `sep` input can be used to provide an alternative separator.
-
-    You can exploit this by specifying a newline as the separator and
-    display a nicely formatted table using the `tabulate` package:
-
-    ```python
-    from tabulate import tabulate
-
-    print(tabulate(table["functions"], headers="keys", showindex=False))
-    ```
-
-    which will show something like this using multi-line headers:
-
-    ```
-      Batch         Objective    Variables    Variables     Variables
-                            0           v0           v1            v2
-    -------  ----------------  -----------  -----------  ------------
-          0           130.983          0.5          0.9           1.3
-    ...
-    ```
-
-#### Default tables
-
-The `set_default_tables` method can be used to add a set of default tables:
-
-- For function results it generates these tables:
-    - `"functions"`: contains a set of values of the calculated functions.
-    - `"evaluations"`: contains a set of values for all evaluations.
-    - `"constraints"`: contains a set of values for all constraints.
-- For gradient results it generates these tables:
-    - `"gradients"`: contains a set of values of the calculated gradients.
-    - `"perturbations"`: contains a set of values for all perturbations.
-
-#### Adding columns and retrieving all tables
-
-A single column can be added to an existing table after creation using
-`add_column(table_name, field_name, title)`.
-
-To retrieve all tables at once as a dictionary mapping names to DataFrames,
-use `get_tables()`.
-
-#### Callback functionality
-
-The tables are updated anytime a result is processed. A callback can be
-registered via `set_callback` to react each time the tables change. The
-callback signature is:
-
-```python
-def my_callback(event: EnOptEvent) -> None:
-    ...
-```
-
-It receives the [`EnOptEvent`][ropt.events.EnOptEvent] that caused the
-tables to be updated.
 
 ## Evaluators
 

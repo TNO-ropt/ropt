@@ -78,7 +78,7 @@ class PerturbationType(IntEnum):
 class EnOptEventType(IntEnum):
     """Enumerates the types of events emitted during optimization workflows.
 
-    See [Optimization Workflows](../low_level/workflows.md#event-types) for a
+    See [Optimization Workflows](../workflows/workflows.md#event-types) for a
     description of when each event type fires and what data it carries.
     """
 

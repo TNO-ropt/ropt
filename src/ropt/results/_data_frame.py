@@ -165,7 +165,7 @@ def results_to_dataframe(
     Multi-dimensional fields are automatically unstacked into tuple-named
     columns.
 
-    See [Working with Results](../optimizer_configuration/results.md#exporting-to-pandas) for
+    See [Working with Results](../optimizer_setup/results.md#exporting-to-pandas) for
     further details and examples.
 
     Args:

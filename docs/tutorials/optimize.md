@@ -57,5 +57,5 @@ print(f"optimal objective: {result.target_objective}")
 
 ## Next
 
-- The full simple API: [The Simple API](../simple/simple.md).
+- The full simple API: [Running Optimizations](../running/running.md).
 - Optimize over uncertain realizations: [Ensemble Optimization](ensemble.md).

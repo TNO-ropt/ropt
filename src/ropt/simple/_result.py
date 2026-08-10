@@ -25,7 +25,7 @@ class _ResultBase:
 class OptimizeResult(_ResultBase):
     """The outcome of a single optimization run.
 
-    See [High-Level API](../simple/simple.md) for a walkthrough.
+    See [Running Optimizations](../running/running.md) for a walkthrough.
 
     Attributes:
         target_objective: The weighted objective at the optimum, or `None`.
@@ -52,7 +52,7 @@ class EvaluateResult(_ResultBase):
     [`evaluate_many`][ropt.simple.evaluate_many] returns one of these per
     input vector. Each shared field has the same shape as its counterpart on
     [`OptimizeResult`][ropt.simple.OptimizeResult]. See
-    [High-Level API](../simple/simple.md) for a walkthrough.
+    [Running Optimizations](../running/running.md) for a walkthrough.
 
     Attributes:
         target_objective: The weighted objective, or `None` where the evaluation

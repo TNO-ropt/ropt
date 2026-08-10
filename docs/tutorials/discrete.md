@@ -55,5 +55,5 @@ The best point is `[3, 7]`.
 
 ## Next
 
-- The full simple API: [The Simple API](../simple/simple.md).
-- Variable settings: [Configuration](../optimizer_configuration/configuration.md).
+- The full simple API: [Running Optimizations](../running/running.md).
+- Variable settings: [Configuration](../optimizer_setup/configuration.md).

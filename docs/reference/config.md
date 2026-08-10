@@ -6,7 +6,7 @@ the configuration dictionary consumed by
 [`EnOptContext`][ropt.context.EnOptContext] and the optimization functions.
 
 For detailed descriptions of each field, including defaults, usage patterns,
-and examples, see the [Configuration](../optimizer_configuration/configuration.md) user-manual
+and examples, see the [Configuration](../optimizer_setup/configuration.md) user-manual
 page.
 
 ::: ropt.config

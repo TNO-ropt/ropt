@@ -14,7 +14,7 @@ class VariableTransformConfig(BaseModel):
     [`VariableTransform`][ropt.transforms.VariableTransform] plugin that
     transforms variables to the optimizer's domain.
 
-    See the [Configuration guide](../optimizer_configuration/configuration.md#transforms) for
+    See the [Configuration guide](../optimizer_setup/configuration.md#transforms) for
     detailed descriptions and usage examples.
 
     Attributes:
@@ -41,7 +41,7 @@ class ObjectiveTransformConfig(BaseModel):
     [`ObjectiveTransform`][ropt.transforms.ObjectiveTransform] plugin that
     transforms objective values.
 
-    See the [Configuration guide](../optimizer_configuration/configuration.md#transforms) for
+    See the [Configuration guide](../optimizer_setup/configuration.md#transforms) for
     detailed descriptions and usage examples.
 
     Attributes:
@@ -68,7 +68,7 @@ class NonlinearConstraintTransformConfig(BaseModel):
     [`NonlinearConstraintTransform`][ropt.transforms.NonlinearConstraintTransform]
     plugin that transforms constraint values.
 
-    See the [Configuration guide](../optimizer_configuration/configuration.md#transforms) for
+    See the [Configuration guide](../optimizer_setup/configuration.md#transforms) for
     detailed descriptions and usage examples.
 
     Attributes:

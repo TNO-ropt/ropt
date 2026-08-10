@@ -50,4 +50,4 @@ The result still converges close to all ones.
 ## Next
 
 - Add constraints: [Constrained Optimization](constrained.md).
-- More on realizations: [Configuration](../optimizer_configuration/configuration.md).
+- More on realizations: [Configuration](../optimizer_setup/configuration.md).

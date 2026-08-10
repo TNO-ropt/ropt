@@ -40,7 +40,7 @@ class HPCExecutor(ExecutorBase):
     Interfaces with an HPC queueing system (e.g. Slurm) via `pysqa`.
     Requires `ropt[hpc]` to be installed.
 
-    See [Parallel Evaluation](../low_level/parallel.md#hpcexecutor) for full
+    See [Parallel Evaluation](../workflows/parallel.md#hpcexecutor) for full
     details on configuration and lifecycle.
     """
 
@@ -62,7 +62,7 @@ class HPCExecutor(ExecutorBase):
     ) -> None:
         """Initialize the HPC executor.
 
-        See [Parallel Evaluation](../low_level/parallel.md#hpcexecutor) for
+        See [Parallel Evaluation](../workflows/parallel.md#hpcexecutor) for
         configuration details.
 
         Args:

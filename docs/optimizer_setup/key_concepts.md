@@ -2,11 +2,11 @@
 
 !!! note
 
-    This section describes the **optimizer configuration** — *what* to optimize
-    (variables, objectives, constraints, and the components that drive the run).
-    It is independent of how you run the optimization. Running a configured
-    optimization is the job of the [Simple API](../simple/simple.md) or the
-    [low-level API](../low_level/workflows.md).
+    This section describes how an optimization is **set up** — its variables,
+    objectives, constraints, and the components that drive it. It is independent
+    of how you run the optimization; running a configured optimization is done in
+    [Running Optimizations](../running/running.md) or
+    [Optimization Workflows](../workflows/workflows.md).
 
 This page introduces the ideas and terms that appear throughout the `ropt`
 documentation and shows how they fit together. For the mathematical background
@@ -117,7 +117,7 @@ optimization as implemented by `ropt`.
 
 **Batch**
 :   A group of one or more variable vectors evaluated together in a single call
-    to the [evaluator](../low_level/evaluation_callbacks.md). These may include
+    to the [evaluator](../workflows/evaluation_callbacks.md). These may include
     points in optimization space that the optimizer is exploring, or perturbed
     points for gradient calculations.
 

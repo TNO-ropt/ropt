@@ -44,7 +44,7 @@ class EnOptContext(BaseModel):
     settings, samplers, filters, and the optimizer/backend. It is constructed
     from plain Python dicts or config objects and validated on creation.
 
-    See the [Configuration guide](../optimizer_configuration/configuration.md)
+    See the [Configuration guide](../optimizer_setup/configuration.md)
     for an in-depth description of broadcasting rules, index-based sharing of
     plugin instances, the `names` attribute, and how dicts are resolved into
     plugin instances.

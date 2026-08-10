@@ -48,10 +48,10 @@ Every `ropt` optimization needs three things:
 1. **A config dictionary** — it describes the problem. Here we set only the
    minimum: how many variables there are, and a small `perturbation_magnitudes`
    value that `ropt` uses to estimate gradients. See
-   [Configuration](../optimizer_configuration/configuration.md) for the full list of settings.
+   [Configuration](../optimizer_setup/configuration.md) for the full list of settings.
 2. **An objective function** — a Python function that takes a set of variable
    values and returns the number to minimize. See
-   [The Simple API](../simple/simple.md#the-objective-function).
+   [Running Optimizations](../running/running.md#the-objective-function).
 3. **A start point** — the variable values to start from.
 
 [`optimize`][ropt.simple.optimize] wires these together, runs the optimization,
@@ -61,5 +61,5 @@ values it found.
 ## Where to next
 
 - A fuller walkthrough: [Deterministic Optimization](deterministic.md).
-- The complete simple API: [The Simple API](../simple/simple.md).
-- All configuration settings: [Configuration](../optimizer_configuration/configuration.md).
+- The complete simple API: [Running Optimizations](../running/running.md).
+- All configuration settings: [Configuration](../optimizer_setup/configuration.md).

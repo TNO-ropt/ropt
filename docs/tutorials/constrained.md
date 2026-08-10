@@ -66,4 +66,4 @@ declared entirely in the config.
 
 - Integer variables: [Mixed-Integer Optimization](discrete.md).
 - All constraint settings:
-  [Configuration](../optimizer_configuration/configuration.md).
+  [Configuration](../optimizer_setup/configuration.md).

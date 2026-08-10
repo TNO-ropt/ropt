@@ -4,7 +4,7 @@ Executors dispatch [`Task`][ropt.components.executors.Task] objects produced by 
 [`ParallelEvaluator`][ropt.components.evaluators.ParallelEvaluator] to a concrete
 execution mechanism (threads, processes, or an HPC cluster).
 
-See [Parallel Evaluation](../low_level/parallel.md) for usage.
+See [Parallel Evaluation](../workflows/parallel.md) for usage.
 
 ::: ropt.components.executors.Executor
 ::: ropt.components.executors.Task

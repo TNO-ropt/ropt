@@ -26,7 +26,7 @@ config = {
 
 `variable_count` is how many variables there are. `perturbation_magnitudes` is a
 small step size that `ropt` uses to estimate gradients. Every other setting keeps
-its default; see [Configuration](../optimizer_configuration/configuration.md) for the full list.
+its default; see [Configuration](../optimizer_setup/configuration.md) for the full list.
 
 ## 2. Write the objective function
 
@@ -51,7 +51,7 @@ def rosenbrock(variables: np.ndarray, _) -> float:
 
 The function returns a single number. You can also return a list (objectives
 first, then constraints) or attach metadata; see
-[The Simple API](../simple/simple.md#the-objective-function).
+[Running Optimizations](../running/running.md#the-objective-function).
 
 ## 3. Follow the progress (optional)
 
@@ -102,6 +102,6 @@ print(f"optimal objective: {result.target_objective}")
 - Optimizing under uncertainty:
   [Ensemble-Based Optimization](ensemble.md).
 - The complete simple API — evaluating, running many optimizations, collecting
-  results: [The Simple API](../simple/simple.md).
-- Every configuration setting: [Configuration](../optimizer_configuration/configuration.md).
+  results: [Running Optimizations](../running/running.md).
+- Every configuration setting: [Configuration](../optimizer_setup/configuration.md).
 - Step-by-step tutorials: [Tutorials](../tutorials/index.md).

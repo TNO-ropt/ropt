@@ -66,9 +66,9 @@ different types, in an alternating or nested fashion.
 
 - Install and run your first optimization: [Installation](installation.md) and
   [Quickstart](quickstart.md).
-- Learn the terms used across the documentation: [Key Concepts](../optimizer_configuration/key_concepts.md).
-- Learn the configuration format: [Configuration](../optimizer_configuration/configuration.md).
+- Learn the terms used across the documentation: [Key Concepts](../optimizer_setup/key_concepts.md).
+- Learn the configuration format: [Configuration](../optimizer_setup/configuration.md).
 - Understand the stochastic gradient (StoSAG) machinery in depth:
-  [Stochastic Gradients](../optimizer_configuration/gradients.md).
+  [Stochastic Gradients](../optimizer_setup/gradients.md).
 - Build custom optimization workflows beyond a single optimization run:
-  [Optimization Workflows](../low_level/workflows.md).
+  [Optimization Workflows](../workflows/workflows.md).

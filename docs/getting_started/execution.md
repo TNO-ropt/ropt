@@ -68,7 +68,7 @@ With no further arguments, `hpc` uses the default cluster and queue from the
 `pysqa` configuration of your `ropt` installation. Cluster-specific parameters —
 such as the `cluster` name, the `queue`, and the number of `cores` per job — can
 be passed to `hpc` when you need them; see
-[The Simple API](../simple/simple.md#running-on-an-hpc-cluster) for the full list.
+[Running Optimizations](../running/running.md#running-on-an-hpc-cluster) for the full list.
 
 Like `processes`, work is sent to the cluster, so the `cloudpickle` extra is
 needed here too (it is already part of the `ropt[hpc]` extra).
@@ -101,4 +101,4 @@ share its one worker pool. So `threads(workers=1)` runs the optimizations
 together but evaluates one point at a time, while a larger pool (or `processes`
 or `hpc`) evaluates several at once. An execution block is required.
 
-See [The Simple API](../simple/simple.md#many-optimizations-at-once) for more.
+See [Running Optimizations](../running/running.md#many-optimizations-at-once) for more.

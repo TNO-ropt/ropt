@@ -21,7 +21,7 @@ class GradientConfig(BaseModel):
     optimizers. It is used as the `gradient` field of
     [`EnOptContext`][ropt.context.EnOptContext].
 
-    See the [Configuration guide](../optimizer_configuration/configuration.md#gradient) for
+    See the [Configuration guide](../optimizer_setup/configuration.md#gradient) for
     detailed descriptions and usage examples.
 
     Attributes:

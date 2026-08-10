@@ -30,7 +30,7 @@ class ConstraintInfo(ResultField):
     - _Violations:_ the absolute value of the difference when a bound is
       violated, zero otherwise.
 
-    See [Working with Results](../optimizer_configuration/results.md) for usage details.
+    See [Working with Results](../optimizer_setup/results.md) for usage details.
 
 
     **Result descriptions**

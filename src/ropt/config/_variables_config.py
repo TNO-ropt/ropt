@@ -35,7 +35,7 @@ class VariablesConfig(BaseModel):
     [`EnOptContext`][ropt.context.EnOptContext] object: bounds, types, mask, and
     perturbation settings.
 
-    See the [Configuration guide](../optimizer_configuration/configuration.md#variables) for
+    See the [Configuration guide](../optimizer_setup/configuration.md#variables) for
     detailed descriptions and usage examples.
 
     Attributes:

@@ -30,7 +30,7 @@ class ResultsHandler(EventHandler):
     [`result`][ropt.components.event_handlers.ResultsHandler.result] property or
     `handler["results"]`.
 
-    See [Optimization Workflows](../low_level/workflows.md#result_handler) for full
+    See [Optimization Workflows](../workflows/workflows.md#result_handler) for full
     details on selection criteria and domain handling.
     """
 

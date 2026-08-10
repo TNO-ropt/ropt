@@ -30,7 +30,7 @@ _logger = get_logger(__name__)
 class MultiprocessingExecutor(ExecutorBase):
     """An executor that employs a pool of multiprocessing workers.
 
-    See [Parallel Evaluation](../low_level/parallel.md#multiprocessingexecutor) for
+    See [Parallel Evaluation](../workflows/parallel.md#multiprocessingexecutor) for
     details, including the `if __name__ == "__main__":` guard that the entry
     point must use.
     """

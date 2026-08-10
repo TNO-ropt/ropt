@@ -9,7 +9,7 @@ More tutorials will be added over time.
 
 ## Simple API
 
-These use the [simple API](../simple/simple.md) and are the best place to start.
+These use the [simple API](../running/running.md) and are the best place to start.
 
 - [Your First Optimization](optimize.md) — run one optimization.
 - [Ensemble Optimization](ensemble.md) — optimize over uncertain realizations.

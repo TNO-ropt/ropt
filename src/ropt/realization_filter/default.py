@@ -33,7 +33,7 @@ class SortObjectiveOptions(_ConfigBaseModel):
     """Options for the `sort-objective` filter method.
 
     Selects realizations by ranking a weighted sum of objectives.
-    See [Realization Filters](../optimizer_configuration/realization_filters.md#how-sorting-filters-work)
+    See [Realization Filters](../optimizer_setup/realization_filters.md#how-sorting-filters-work)
     for the algorithm.
 
     Attributes:
@@ -51,7 +51,7 @@ class SortConstraintOptions(_ConfigBaseModel):
     """Options for the `sort-constraint` filter method.
 
     Selects realizations by ranking a single constraint function value.
-    See [Realization Filters](../optimizer_configuration/realization_filters.md#how-sorting-filters-work)
+    See [Realization Filters](../optimizer_setup/realization_filters.md#how-sorting-filters-work)
     for the algorithm.
 
     Attributes:
@@ -70,7 +70,7 @@ class CVaRObjectiveOptions(_ConfigBaseModel):
 
     Assigns CVaR-derived weights to the worst-performing realizations based
     on a weighted sum of objectives.
-    See [Realization Filters](../optimizer_configuration/realization_filters.md#how-cvar-filters-work)
+    See [Realization Filters](../optimizer_setup/realization_filters.md#how-cvar-filters-work)
     for the algorithm.
 
     Attributes:
@@ -87,7 +87,7 @@ class CVaRConstraintOptions(_ConfigBaseModel):
 
     Assigns CVaR-derived weights based on a single constraint function value,
     with "worst" defined by the constraint type (LE/GE/EQ).
-    See [Realization Filters](../optimizer_configuration/realization_filters.md#how-cvar-filters-work)
+    See [Realization Filters](../optimizer_setup/realization_filters.md#how-cvar-filters-work)
     for the algorithm.
 
     Attributes:
@@ -104,7 +104,7 @@ class DefaultRealizationFilter(RealizationFilter):
 
     The method is selected via the `method` field of
     [`RealizationFilterConfig`][ropt.config.RealizationFilterConfig].
-    See [Realization Filters](../optimizer_configuration/realization_filters.md) for usage.
+    See [Realization Filters](../optimizer_setup/realization_filters.md) for usage.
     """
 
     def __init__(  # ruff: ignore[undocumented-public-init]

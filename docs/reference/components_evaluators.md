@@ -4,8 +4,8 @@ These are the [`Evaluator`][ropt.components.evaluators.Evaluator] subclasses
 used by the workflow components' compute steps. For the plain callable
 protocols, see [Evaluation Classes](evaluation.md).
 
-See [Writing Evaluation Callbacks](../low_level/evaluation_callbacks.md) and
-[Parallel Evaluation](../low_level/parallel.md) for usage.
+See [Writing Evaluation Callbacks](../workflows/evaluation_callbacks.md) and
+[Parallel Evaluation](../workflows/parallel.md) for usage.
 
 ::: ropt.components.evaluators.Evaluator
 ::: ropt.components.evaluators.BatchEvaluator

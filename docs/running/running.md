@@ -1,12 +1,12 @@
-# The Simple API
+# Running Optimizations
 
 !!! note
 
-    The Simple API is one of two ways to **run** an optimization; the other is
-    the [low-level API](../low_level/workflows.md). What the optimization does —
-    its variables, objectives, constraints, and components — is the
-    [optimizer configuration](../optimizer_configuration/key_concepts.md), which is the same
-    whichever API you use.
+    This is one of two ways to **run** an optimization; the other is
+    [Optimization Workflows](../workflows/workflows.md). What the optimization
+    does — its variables, objectives, constraints, and components — is set up in
+    [Optimizer Setup](../optimizer_setup/key_concepts.md), the same whichever way you run
+    it.
 
 The `ropt.simple` module is the recommended entry point for running an
 optimization. Everything you need is imported from a single module:
@@ -67,7 +67,7 @@ The function returns the objective value. There are three ways to return it:
 
 If a realization fails to compute, return `float("nan")` for it. `ropt` treats
 `NaN` as a failed realization and keeps going, as long as enough realizations
-succeed (see [Configuration](../optimizer_configuration/configuration.md)).
+succeed (see [Configuration](../optimizer_setup/configuration.md)).
 
 ## The result
 
@@ -88,7 +88,7 @@ The fields are `None` when the run produced no valid result (for example when
 too few realizations succeeded). `result.results` is the full
 [`FunctionResults`][ropt.results.FunctionResults] object; you rarely need it at
 first, but it holds every detail if you do. See
-[Working with Results](../optimizer_configuration/results.md).
+[Working with Results](../optimizer_setup/results.md).
 
 ## Reporting progress
 
@@ -144,7 +144,7 @@ You can attach arbitrary **metadata** to a run, from two sources:
 Neither kind is interpreted by `ropt`. Constant metadata ends up on
 `result.results.metadata`; per-evaluation metadata on
 `result.results.evaluations.metadata` (one entry per realization). See
-[Working with Results](../optimizer_configuration/results.md#metadata) for how
+[Working with Results](../optimizer_setup/results.md#metadata) for how
 each appears in the pandas export. The full runnable script is
 [examples/simple/metadata.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/metadata.py).
 
@@ -254,28 +254,105 @@ There are two independent levels of concurrency here:
 An execution block is required: calling `optimize_many` without one raises a
 `RuntimeError`.
 
-## Collecting results across runs
+## Result handlers
 
-An [`optimize`][ropt.simple.optimize] call returns only the best result. To
-collect *every* result — for example across a loop of runs — use a
-[`handlers`][ropt.simple.handlers] block with a
-[`HistoryHandler`][ropt.simple.HistoryHandler]:
+An [`optimize`][ropt.simple.optimize] call returns only the best result. A
+**handler** lets you collect or react to *every* result instead: it is an object
+that observes an optimization and processes its results as they arrive — keeping
+them, tabulating them, or invoking a callback.
+
+Attach handlers to a single optimization with the `handlers` argument, or share
+them across a block of runs with a [`handlers`][ropt.simple.handlers] block so
+one handler accumulates results from every `optimize` inside it:
 
 ```python
 from ropt.simple import HistoryHandler, handlers, optimize
 
 history = HistoryHandler()
+
+optimize(config, x0, objective, handlers=[history])   # a single run
+# ...or accumulate across many runs:
 with handlers(history):
     for x0 in start_points:
         optimize(config, x0, objective)
 
-print(history.results)   # all results from every run in the block
+print(history.results)   # every result collected
 ```
 
-The handlers ([`HistoryHandler`][ropt.simple.HistoryHandler],
-[`ResultsHandler`][ropt.simple.ResultsHandler],
-[`DataFrameHandler`][ropt.simple.DataFrameHandler]) are imported straight from
-`ropt.simple`.
+Handlers that store results expose them through `handler["results"]` (and, for
+`HistoryHandler`, the `history.results` shortcut).
+
+### Built-in handlers
+
+`ropt` ships several ready-to-use handlers, all re-exported from `ropt.simple`.
+
+#### `ResultsHandler`
+
+[`ResultsHandler`][ropt.simple.ResultsHandler] keeps a single result, read via
+`handler["results"]`:
+
+- `what="best"` (default) keeps the result with the lowest weighted objective
+  seen so far; `what="last"` keeps the most recent valid result.
+- `constraint_tolerance` (optional) discards results that violate a constraint
+  by more than the given tolerance.
+- `filter` (optional) is a callable that receives each
+  [`Results`][ropt.results.Results] and returns `True` to keep it or `False` to
+  drop it.
+
+#### `HistoryHandler`
+
+[`HistoryHandler`][ropt.simple.HistoryHandler] keeps *every* result it receives,
+in order, as a tuple read via `handler["results"]` (or `handler.results`). It is
+`None` until the first result arrives.
+
+#### `DataFrameHandler`
+
+[`DataFrameHandler`][ropt.simple.DataFrameHandler] collects results into named
+pandas DataFrames (`pandas` must be installed). Define a table with
+`add_table(name, table_type, columns)`, where `table_type` is `"functions"` or
+`"gradients"` and `columns` maps result-field names (dotted attribute syntax) to
+column titles:
+
+```python
+from ropt.simple import DataFrameHandler
+
+tables = DataFrameHandler()
+tables.add_table(
+    "summary",
+    "functions",
+    {
+        "batch_id": "Batch",
+        "functions.objectives": "Objective",
+        "evaluations.variables": "Variable",
+    },
+)
+optimize(config, x0, objective, handlers=[tables])
+df = tables["summary"]
+```
+
+Read one table with `tables["summary"]`, or all of them with `get_tables()`. A
+field whose value is a vector or matrix expands to several columns; the extra
+column levels come from the field's axis labels (or indices), joined to the
+title with a separator (`,` by default, set with `sep=`). For example, a
+length-2 `evaluations.variables` gives `Variable,v0` and `Variable,v1`. Because
+the column names follow
+[`results_to_dataframe`](../optimizer_setup/results.md#metadata-columns),
+both result-level and per-realization metadata can be included and renamed.
+
+Convenience methods:
+
+- `set_default_tables()` registers a standard set of tables (`functions`,
+  `evaluations`, `constraints` for function results; `gradients`,
+  `perturbations` for gradient results).
+- `add_column(table, name, title)` adds one column to an existing table.
+- `set_callback(fn)` calls `fn(event)` whenever the tables are updated.
+
+### Custom handlers
+
+Handlers are not limited to the built-ins: you — or another package — can
+provide your own by implementing `ropt`'s event-handler interface. The
+[Low-Level API](../workflows/workflows.md#event-handlers) describes the event
+model, the handler protocol, and how to write one.
 
 ## A note on enums
 

@@ -1,7 +1,7 @@
 # Simple API
 
 The `ropt.simple` module is the high-level, convenience interface
-for running optimizations. See [The Simple API](../simple/simple.md) for a
+for running optimizations. See [Running Optimizations](../running/running.md) for a
 walkthrough.
 
 Enumerations used in the configuration and results (for example

@@ -1,6 +1,6 @@
 """Data classes for storing intermediate optimization results.
 
-See [Working with Results](../optimizer_configuration/results.md) for a narrative overview of
+See [Working with Results](../optimizer_setup/results.md) for a narrative overview of
 the result hierarchy, axis metadata, domain transforms, and pandas export.
 """
 

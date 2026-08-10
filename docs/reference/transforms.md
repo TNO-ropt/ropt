@@ -5,7 +5,7 @@ transform is initialized with a boolean mask and applied in sequence during
 optimization. The base classes define the contract; the built-in defaults
 provide linear scale/offset transforms.
 
-See [Transforms](../optimizer_configuration/transforms.md) for usage, configuration, and
+See [Transforms](../optimizer_setup/transforms.md) for usage, configuration, and
 implementation guidance.
 
 ::: ropt.transforms

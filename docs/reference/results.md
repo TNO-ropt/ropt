@@ -7,7 +7,7 @@ for gradient estimates. Each is a frozen container of
 [`ResultField`][ropt.results.ResultField] sub-objects holding NumPy arrays
 with axis-name metadata.
 
-See [Working with Results](../optimizer_configuration/results.md) for a tour of the access
+See [Working with Results](../optimizer_setup/results.md) for a tour of the access
 patterns.
 
 ::: ropt.results

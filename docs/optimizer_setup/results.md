@@ -2,8 +2,8 @@
 
 `ropt` exposes the full intermediate and final state of an optimization through
 [`Results`][ropt.results.Results] objects. This page describes the result
-classes and how to inspect them; see [The Simple API](../simple/simple.md) and
-[Optimization Workflows](../low_level/workflows.md) for how results are produced and
+classes and how to inspect them; see [Running Optimizations](../running/running.md) and
+[Optimization Workflows](../workflows/workflows.md) for how results are produced and
 delivered to your code.
 
 ## The result hierarchy
@@ -185,12 +185,12 @@ this optimizer domain.
 The [`transform_from_optimizer`][ropt.results.Results.transform_from_optimizer]
 method reverses these transforms, mapping results back to the *user domain*.
 
-In the [simple API](../simple/simple.md), results are always transformed to the user
+In the [simple API](../running/running.md), results are always transformed to the user
 domain automatically.
 
-In [workflows](../low_level/workflows.md), event handlers determine how results are returned,
+In [workflows](../workflows/workflows.md), event handlers determine how results are returned,
 for instance by offering a `domain` argument that controls whether results are
-handled in user or optimizer domain. See [Optimization Workflows](../low_level/workflows.md)
+handled in user or optimizer domain. See [Optimization Workflows](../workflows/workflows.md)
 for details on how individual event handlers handle this.
 
 ## Metadata
@@ -236,6 +236,14 @@ The full runnable script is
 
 `ropt` can export results to `pandas` DataFrames for analysis and reporting.
 This requires the `pandas` optional extra (see [Installation](../getting_started/installation.md)).
+
+!!! note
+
+    The `to_dataframe` and `results_to_dataframe` functions shown here are the
+    low-level export primitives. Most users do not call them directly: the
+    [`DataFrameHandler`](../running/running.md#dataframehandler) builds and updates
+    these tables automatically as an optimization runs. This section explains
+    what that handler produces under the hood.
 
 The row index and the unstacked column labels come from the
 [`names`](configuration.md#names) mapping in the configuration. If an axis is
@@ -413,4 +421,4 @@ first example of this section.
 - Run an optimization and receive results via callbacks:
   [Deterministic Optimization](../getting_started/deterministic.md).
 - Use event handlers to collect or react to results in a workflow:
-  [Optimization Workflows](../low_level/workflows.md).
+  [Optimization Workflows](../workflows/workflows.md).

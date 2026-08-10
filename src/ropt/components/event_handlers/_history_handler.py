@@ -23,7 +23,7 @@ class HistoryHandler(EventHandler):
     via the [`results`][ropt.components.event_handlers.HistoryHandler.results]
     property or `handler["results"]`.
 
-    See [Optimization Workflows](../low_level/workflows.md#history) for full
+    See [Optimization Workflows](../workflows/workflows.md#history) for full
     details on domain handling and accumulation behavior.
     """
 

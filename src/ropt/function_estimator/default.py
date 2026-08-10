@@ -20,7 +20,7 @@ class DefaultFunctionEstimator(FunctionEstimator):
 
     The method is selected via the `method` field of
     [`FunctionEstimatorConfig`][ropt.config.FunctionEstimatorConfig].
-    See [Function Estimators](../optimizer_configuration/function_estimators.md) for usage.
+    See [Function Estimators](../optimizer_setup/function_estimators.md) for usage.
     """
 
     def __init__(self, estimator_config: FunctionEstimatorConfig) -> None:  # ruff: ignore[undocumented-public-init]

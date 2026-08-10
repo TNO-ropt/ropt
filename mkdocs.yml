@@ -103,20 +103,20 @@ nav:
       - "Deterministic Optimization": getting_started/deterministic.md
       - "Ensemble-Based Optimization": getting_started/ensemble.md
       - "Running in Parallel": getting_started/execution.md
-  - "Optimizer Configuration":
-      - "Key Concepts": optimizer_configuration/key_concepts.md
-      - "Configuration": optimizer_configuration/configuration.md
-      - "Stochastic Gradients": optimizer_configuration/gradients.md
-      - "Realization Filters": optimizer_configuration/realization_filters.md
-      - "Function Estimators": optimizer_configuration/function_estimators.md
-      - "Transforms": optimizer_configuration/transforms.md
-      - "Working with Results": optimizer_configuration/results.md
-  - "Simple API":
-      - "The Simple API": simple/simple.md
-  - "Low-Level API":
-      - "Optimization Workflows": low_level/workflows.md
-      - "Writing Evaluation Callbacks": low_level/evaluation_callbacks.md
-      - "Parallel Evaluation": low_level/parallel.md
+  - "Optimizer Setup":
+      - "Key Concepts": optimizer_setup/key_concepts.md
+      - "Configuration": optimizer_setup/configuration.md
+      - "Stochastic Gradients": optimizer_setup/gradients.md
+      - "Realization Filters": optimizer_setup/realization_filters.md
+      - "Function Estimators": optimizer_setup/function_estimators.md
+      - "Transforms": optimizer_setup/transforms.md
+      - "Working with Results": optimizer_setup/results.md
+  - "Running":
+      - "Running Optimizations": running/running.md
+  - "Workflows":
+      - "Optimization Workflows": workflows/workflows.md
+      - "Writing Evaluation Callbacks": workflows/evaluation_callbacks.md
+      - "Parallel Evaluation": workflows/parallel.md
   - "Utilities":
       - "Logging": utilities/logging.md
       - "Plugin Discovery": utilities/plugin_discovery.md

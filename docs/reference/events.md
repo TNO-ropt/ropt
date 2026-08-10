@@ -6,7 +6,7 @@ milestones. Event handlers
 [`CallbackHandler`][ropt.components.event_handlers.CallbackHandler], etc.) consume
 these events to track progress, store results, or trigger user logic.
 
-See [Working with Results](../optimizer_configuration/results.md) for an example of subscribing to
+See [Working with Results](../optimizer_setup/results.md) for an example of subscribing to
 events, and [`EnOptEventType`][ropt.enums.EnOptEventType] for the available
 event types.
 

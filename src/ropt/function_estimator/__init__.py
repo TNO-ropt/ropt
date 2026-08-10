@@ -1,6 +1,6 @@
 """Public API for function estimator implementations.
 
-See [Function Estimators](../optimizer_configuration/function_estimators.md) for usage and
+See [Function Estimators](../optimizer_setup/function_estimators.md) for usage and
 algorithm descriptions.
 """
 

@@ -65,7 +65,7 @@ After installation, the plugin's methods become available through the
   only when a single plugin exposes that method name.
 
 Both the plugin name and the method name are case-insensitive. See the
-[method strings](../optimizer_configuration/configuration.md#method-strings) section of the
+[method strings](../optimizer_setup/configuration.md#method-strings) section of the
 configuration guide for the full details.
 
 ## Verifying the installation

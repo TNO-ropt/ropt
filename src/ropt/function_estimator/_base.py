@@ -24,7 +24,7 @@ class FunctionEstimator(ABC):
     3. `calculate_function` — aggregate per-realization function values.
     4. `calculate_gradient` — aggregate per-realization gradients.
 
-    See [Function Estimators](../optimizer_configuration/function_estimators.md) for examples
+    See [Function Estimators](../optimizer_setup/function_estimators.md) for examples
     and further guidance.
     """
 
