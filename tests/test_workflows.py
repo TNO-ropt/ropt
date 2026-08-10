@@ -638,6 +638,95 @@ def test_optimization_abort(config: Any, evaluator: Any) -> None:
     assert last_evaluation == 1
 
 
+def test_that_handler_stop_ends_optimization_with_user_abort(
+    config: Any, evaluator: Any
+) -> None:
+    evaluations = 0
+
+    def _observer(event: EnOptEvent) -> None:
+        nonlocal evaluations
+        evaluations += 1
+        if evaluations == 1:
+            assert event.source is not None
+            event.source.stop()
+
+    step = OptimizationStep(evaluator=evaluator())
+    step.add_event_handler(ResultsHandler())
+    step.add_event_handler(
+        CallbackHandler(
+            event_types={EnOptEventType.FINISHED_EVALUATION}, callback=_observer
+        )
+    )
+    exit_code = step.run(
+        variables=initial_values, context=EnOptContext.model_validate(config)
+    )
+    assert exit_code == ExitCode.USER_ABORT
+    assert evaluations == 1
+
+
+def test_that_handler_stop_still_runs_remaining_handlers_for_the_event(
+    config: Any, evaluator: Any
+) -> None:
+    stops = 0
+    later_ran = 0
+
+    def _stop(event: EnOptEvent) -> None:
+        nonlocal stops
+        stops += 1
+        if stops == 1:
+            assert event.source is not None
+            event.source.stop()
+
+    def _later(_: EnOptEvent) -> None:
+        nonlocal later_ran
+        later_ran += 1
+
+    step = OptimizationStep(evaluator=evaluator())
+    step.add_event_handler(
+        CallbackHandler(
+            event_types={EnOptEventType.FINISHED_EVALUATION}, callback=_stop
+        )
+    )
+    step.add_event_handler(
+        CallbackHandler(
+            event_types={EnOptEventType.FINISHED_EVALUATION}, callback=_later
+        )
+    )
+    exit_code = step.run(
+        variables=initial_values, context=EnOptContext.model_validate(config)
+    )
+    assert exit_code == ExitCode.USER_ABORT
+    assert stops == 1
+    assert later_ran == 1
+
+
+def test_that_stop_request_is_cleared_between_runs(config: Any, evaluator: Any) -> None:
+    calls = 0
+
+    def _stop_first_evaluation(event: EnOptEvent) -> None:
+        nonlocal calls
+        calls += 1
+        if calls == 1:
+            assert event.source is not None
+            event.source.stop()
+
+    step = OptimizationStep(evaluator=evaluator())
+    step.add_event_handler(ResultsHandler())
+    step.add_event_handler(
+        CallbackHandler(
+            event_types={EnOptEventType.FINISHED_EVALUATION},
+            callback=_stop_first_evaluation,
+        )
+    )
+    context = EnOptContext.model_validate(config)
+    first = step.run(variables=initial_values, context=context)
+    second = step.run(
+        variables=initial_values, context=EnOptContext.model_validate(config)
+    )
+    assert first == ExitCode.USER_ABORT
+    assert second != ExitCode.USER_ABORT
+
+
 _EVALUATION_EVENTS = {
     EnOptEventType.START_ENSEMBLE_EVALUATOR,
     EnOptEventType.START_EVALUATION,

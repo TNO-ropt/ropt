@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     from ropt.events import EnOptEvent
 
 
-ReportCallback = Callable[[EvaluateResult], None]
+ReportCallback = Callable[[EvaluateResult], bool | None]
 
 
 def make_report_handler(report: ReportCallback) -> EventHandler:
@@ -24,7 +24,8 @@ def make_report_handler(report: ReportCallback) -> EventHandler:
 
     The results are transformed to the user domain and adapted to an
     `EvaluateResult` before the callback is invoked; gradient results are
-    skipped.
+    skipped. If the callback returns `True`, the emitting run is asked to stop
+    gracefully (exit code `USER_ABORT`); any other return value continues it.
 
     Args:
         report: The callback invoked with an `EvaluateResult` per evaluation.
@@ -36,8 +37,13 @@ def make_report_handler(report: ReportCallback) -> EventHandler:
     def _callback(event: EnOptEvent) -> None:
         for item in event.results or ():
             transformed = item.transform_from_optimizer(event.context)
-            if isinstance(transformed, FunctionResults):
-                report(_build_evaluate_result(transformed))
+            if (
+                isinstance(transformed, FunctionResults)
+                and report(_build_evaluate_result(transformed))
+                and event.source is not None
+            ):
+                event.source.stop()
+                break
 
     return CallbackHandler(
         event_types={EnOptEventType.FINISHED_EVALUATION}, callback=_callback

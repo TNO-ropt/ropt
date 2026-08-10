@@ -103,6 +103,30 @@ def report(result):
 optimize(config, x0, objective, report=report)
 ```
 
+### Stopping early from the callback
+
+The `report` callback doubles as a **user-defined stopping criterion**: return
+`True` and the optimization stops gracefully after the current evaluation, with
+exit code `USER_ABORT`. Any other return value (including `None`) lets it
+continue.
+
+```python
+from ropt.enums import ExitCode
+
+
+def report(result):
+    if result.target_objective is not None and result.target_objective < 1e-6:
+        return True  # good enough — stop this optimization
+    return None
+
+
+result = optimize(config, x0, objective, report=report)
+assert result.exit_code is ExitCode.USER_ABORT
+```
+
+With `optimize_many` this stops only the run whose callback returned `True`; the
+other runs continue.
+
 ## Attaching metadata
 
 You can attach arbitrary **metadata** to a run, from two sources:
@@ -353,6 +377,13 @@ Handlers are not limited to the built-ins: you — or another package — can
 provide your own by implementing `ropt`'s event-handler interface. The
 [Low-Level API](../workflows/workflows.md#event-handlers) describes the event
 model, the handler protocol, and how to write one.
+
+A custom handler can also **stop its own optimization**: every event carries the
+compute step that emitted it, so calling `event.source.stop()` from `handle_event`
+ends that run gracefully with `USER_ABORT` (the [`report`](#stopping-early-from-the-callback)
+callback above is just a convenience wrapper around this). Only the run that owns
+the emitting step is affected, so concurrent runs continue. See
+[Aborting a run](../workflows/workflows.md#exit-codes) in the low-level docs.
 
 ## A note on enums
 

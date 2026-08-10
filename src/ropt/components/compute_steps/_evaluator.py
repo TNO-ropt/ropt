@@ -126,6 +126,7 @@ class EvaluationStep(ComputeStep):
         return results
 
     def _emit_event(self, event: EnOptEvent) -> None:
+        event.source = self
         for handler in self.event_handlers:
             if event.event_type in handler.event_types:
                 handler.handle_event(event)

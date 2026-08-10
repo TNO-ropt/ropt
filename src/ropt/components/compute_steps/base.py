@@ -43,6 +43,7 @@ class ComputeStep(ABC):
                         msg = "The compute step is already running on another thread."
                         raise RuntimeError(msg)
                     self._running = True
+                self._stop_flag.clear()
                 try:
                     return _orig(self, *args, **kwargs)
                 finally:
@@ -56,6 +57,7 @@ class ComputeStep(ABC):
         self._event_handlers: list[EventHandler] = []
         self._running = False
         self._run_lock = threading.Lock()
+        self._stop_flag = threading.Event()
 
     def __reduce__(self) -> tuple[object, tuple[str]]:  # ruff: ignore[undocumented-magic-method]
         return (_make_placeholder, ("A compute step",))
@@ -84,6 +86,26 @@ class ComputeStep(ABC):
             A list of handlers.
         """
         return self._event_handlers
+
+    def stop(self) -> None:
+        """Request that this run stop gracefully at the next safe point.
+
+        Intended for an event handler that decides, after inspecting an event,
+        that its optimization should stop; the run then ends with
+        `ExitCode.USER_ABORT`. Setting the request is thread-safe, so a handler
+        running behind an event dispatcher may call it too. A new `run` clears
+        any earlier request.
+        """
+        self._stop_flag.set()
+
+    @property
+    def stopped(self) -> bool:
+        """Whether a stop has been requested for the current run.
+
+        Returns:
+            `True` if `stop` has been called since the run started.
+        """
+        return self._stop_flag.is_set()
 
     @abstractmethod
     def run(self, *args: Any, **kwargs: Any) -> Any:  # ruff: ignore[any-type]

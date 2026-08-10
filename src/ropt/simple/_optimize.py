@@ -62,7 +62,9 @@ def optimize(  # ruff: ignore[too-many-arguments]
         handlers:             Optional local result handlers, each owned by this
                               optimization alone.
         report:               An optional callback invoked with an
-                              `EvaluateResult` for each function evaluation.
+                              `EvaluateResult` for each function evaluation;
+                              return `True` from it to stop the optimization
+                              early with `USER_ABORT`.
         constraint_tolerance: The tolerance within which a constraint is
                               considered satisfied.
         metadata:             An optional dictionary attached to every
@@ -185,7 +187,9 @@ def optimize_many(  # ruff: ignore[too-many-arguments]
         objective:            The objective callback, or one per run.
         report:               An optional callback invoked with an
                               `EvaluateResult` for each function evaluation,
-                              either shared by every run or one per run.
+                              either shared by every run or one per run; return
+                              `True` from it to stop that run early with
+                              `USER_ABORT`.
         limit:                The maximum number of runs to execute at once.
         constraint_tolerance: The tolerance within which a constraint is
                               considered satisfied.

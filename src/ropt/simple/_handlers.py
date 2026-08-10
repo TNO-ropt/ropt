@@ -165,7 +165,8 @@ def handlers(
         handler: The result handlers to share across the block.
         inherit: Whether to also inherit the enclosing blocks' handlers.
         report:  An optional callback invoked with an `EvaluateResult` for each
-                 function evaluation across the block's runs.
+                 function evaluation across the block's runs; return `True` from
+                 it to stop the emitting run early with `USER_ABORT`.
 
     Returns:
         A context manager scoping the shared handlers.

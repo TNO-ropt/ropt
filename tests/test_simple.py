@@ -157,6 +157,39 @@ def test_optimize_local_handler_rejects_reuse(config: Any, test_functions: Any) 
         optimize(config, initial_values, test_functions[0], handlers=[history])
 
 
+def test_that_report_callback_returning_true_stops_optimization(
+    config: Any, test_functions: Any
+) -> None:
+    reported = 0
+
+    def _report(_: EvaluateResult) -> bool:
+        nonlocal reported
+        reported += 1
+        return True
+
+    result = optimize(config, initial_values, test_functions[0], report=_report)
+    assert result.exit_code == ExitCode.USER_ABORT
+    assert reported == 1
+
+
+def test_that_report_callback_stops_only_its_own_run_in_optimize_many(
+    config: Any, test_functions: Any
+) -> None:
+    def _stop(_: EvaluateResult) -> bool:
+        return True
+
+    def _continue(_: EvaluateResult) -> None:
+        return None
+
+    x0 = np.array([initial_values, initial_values])
+    with threads(workers=2):
+        results = optimize_many(
+            config, x0, test_functions[0], report=[_stop, _continue]
+        )
+    assert results[0].exit_code == ExitCode.USER_ABORT
+    assert results[1].exit_code != ExitCode.USER_ABORT
+
+
 def test_adapt_objective_rejects_scalar_for_multiple_objectives() -> None:
     callback = adapt_objective(lambda _v, _c: 1.0, n_obj=2, n_con=0)
     context = EvaluationFunctionContext(

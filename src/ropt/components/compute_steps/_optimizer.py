@@ -11,6 +11,7 @@ from ropt._logging import get_logger
 from ropt.core import EnsembleEvaluator, EnsembleOptimizer
 from ropt.enums import EnOptEventType, ExitCode
 from ropt.events import EnOptEvent
+from ropt.exceptions import OptimizerStop
 
 from .base import ComputeStep
 
@@ -111,6 +112,7 @@ class OptimizationStep(ComputeStep):
         return exit_code
 
     def _emit_event(self, event: EnOptEvent) -> None:
+        event.source = self
         for handler in self.event_handlers:
             if event.event_type in handler.event_types:
                 handler.handle_event(event)
@@ -134,3 +136,6 @@ class OptimizationStep(ComputeStep):
                     results=results,
                 ),
             )
+        # Poll on the optimizer stack so a handler's stop() becomes a clean exit.
+        if self.stopped:
+            raise OptimizerStop(ExitCode.USER_ABORT)

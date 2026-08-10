@@ -35,7 +35,7 @@ track, store, or react to results as they arrive.
 
 ### The EnOptEvent object
 
-Each event is an [`EnOptEvent`][ropt.events.EnOptEvent] dataclass with three
+Each event is an [`EnOptEvent`][ropt.events.EnOptEvent] dataclass with four
 fields:
 
 | Field                      | Type                                                               | Description                                          |
@@ -43,6 +43,7 @@ fields:
 | `event_type`               | [`EnOptEventType`][ropt.enums.EnOptEventType]                      | Which lifecycle point triggered the event.           |
 | `context`                  | [`EnOptContext`][ropt.context.EnOptContext]                         | The optimizer context active at the time of the event. |
 | `results`                  | `tuple[`[`Results`][ropt.results.Results]`, ...]`                  | Result objects (empty tuple when no results apply).  |
+| `source`                   | [`ComputeStep`][ropt.components.compute_steps.ComputeStep]` \| None` | The compute step that emitted the event; call its `stop()` to stop that run. |
 
 ### Event types
 
@@ -195,8 +196,17 @@ returns nothing:
 | `TOO_FEW_REALIZATIONS`       | Too few realizations were evaluated successfully.             |
 | `MAX_FUNCTIONS_REACHED`      | Maximum number of function evaluations was reached.           |
 | `MAX_BATCHES_REACHED`        | Maximum number of evaluation batches was reached.             |
-| `USER_ABORT`                 | Reserved for internal use; not currently exposed to users.    |
+| `USER_ABORT`                 | An event handler requested a stop via `event.source.stop()`.  |
 | `EXECUTOR_STOPPED`           | Aborted because the executor stopped before finishing.        |
+
+An event handler can stop its own optimization by calling `event.source.stop()`
+— for example after inspecting the `results` of a `FINISHED_EVALUATION` event and
+deciding no further evaluations are worthwhile. The remaining handlers for that
+event still run, and the optimizer then stops with `USER_ABORT` before the next
+evaluation. Only the run that owns the emitting step is affected, so concurrent
+optimizations continue. `stop()` merely sets a thread-safe flag, so it is safe
+to call from a handler running behind an
+[`EventDispatcher`][ropt.components.event_handlers.EventDispatcher] as well.
 
 ## Event handlers
 
