@@ -13,7 +13,7 @@ TypeResultField = TypeVar("TypeResultField", bound="ResultField")
 class ResultField:
     """Base class for result field containers that carry axis metadata.
 
-    See [Working with Results](../usage/results.md#axes-and-dimensionality) for
+    See [Working with Results](../optimizer_configuration/results.md#axes-and-dimensionality) for
     how axis metadata is used.
     """
 

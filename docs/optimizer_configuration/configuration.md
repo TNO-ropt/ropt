@@ -1,23 +1,13 @@
 # Configuration
 
-Every `ropt` optimization run is described by a configuration dictionary that
-is validated into an [`EnOptContext`][ropt.context.EnOptContext]. This page
-walks through the top-level keys of that dictionary, the rules that apply to
-all of them, and how to compose them for typical problems.
+Every `ropt` optimization run is described by a configuration dictionary that is
+validated into an [`EnOptContext`][ropt.context.EnOptContext] object. This page
+walks through the top-level keys of that dictionary, the rules that apply to all
+of them, and how to compose them for typical problems.
 
 For the full schema, see the reference page for
 [`EnOptContext`][ropt.context.EnOptContext] and
 [Configuration Classes](../reference/config.md).
-
-!!! warning
-
-    `EnOptContext` objects are immutable after construction. Do not attempt to
-    serialize and round-trip them (e.g., to/from JSON). Some parameters are
-    transformed during construction in an irreversible manner. Constructing a
-    `EnOptContext` object from serialized values may incorrectly transform those
-    parameters again. Moreover, NumPy arrays and plugin instances may not survive a
-    round-trip faithfully. Persist the raw input dicts instead if you intent to
-    modify the values.
 
 ## Top-level layout
 
@@ -79,10 +69,10 @@ Length-mismatched arrays raise a validation error.
 
 ### Index-based sharing of optimizer components
 
-The tuple-typed fields hold *objects* that implement the corresponding abstract
-base class:
+Each tuple-typed field holds the optimizer **components** of the corresponding
+kind:
 
-| Field                              | Base class                                                                      |
+| Field                              | Component type                                                                  |
 | ---------------------------------- | ------------------------------------------------------------------------------- |
 | `realization_filters`              | [`RealizationFilter`][ropt.realization_filter.RealizationFilter]                |
 | `function_estimators`              | [`FunctionEstimator`][ropt.function_estimator.FunctionEstimator]                |
@@ -91,8 +81,8 @@ base class:
 | `objective_transforms`             | [`ObjectiveTransform`][ropt.transforms.ObjectiveTransform]                      |
 | `nonlinear_constraint_transforms`  | [`NonlinearConstraintTransform`][ropt.transforms.NonlinearConstraintTransform]  |
 
-Built-in implementations live in their respective sub-packages — for example,
-the SciPy-based samplers are classes defined in `ropt.sampler.scipy`.
+You usually specify each component with a small config dict; see
+[Providing optimizer components](#providing-optimizer-components) below.
 
 Other config sections refer to the entries in these tuples by integer index.
 For example, [`VariablesConfig`][ropt.config.VariablesConfig] has a `samplers`
@@ -100,16 +90,16 @@ field that is an integer array indexing into `EnOptContext.samplers`:
 
 ```python
 "samplers": [
-    sampler_a,   # index 0  (a Sampler instance)
-    sampler_b,   # index 1
+    {"method": "scipy/default"},   # index 0
+    {"method": "scipy/sobol"},     # index 1
 ],
 "variables": {
     "variable_count": 4,
-    "samplers": [0, 0, 1, 1],   # variables 0,1 use sampler_a; 2,3 use sampler_b
+    "samplers": [0, 0, 1, 1],   # variables 0,1 use sampler 0; 2,3 use sampler 1
 },
 ```
 
-Use all zeros to share a single instance across all elements;
+Use all zeros to share a single component across all elements;
 thanks to broadcasting, a single `0` (the default) is sufficient.
 
 For optional fields like `realization_filters` and the transform fields, an
@@ -118,35 +108,44 @@ corresponding element unfiltered/untransformed.
 
 ### Providing optimizer components
 
-Although these fields are typed as abstract-base instances, you generally do
-not need to construct them directly. Each tuple element accepts any of three
-equivalent forms, and a Pydantic validator converts it to the required object:
+Each entry ends up as an object that implements the component's base class (from
+the table above). You can build that object yourself, but usually you just
+provide a config dict and let the plugin system build it. Each tuple element
+accepts any of three equivalent forms, and a Pydantic validator converts it to
+the required object:
 
-1. **An already-constructed object** — any instance of a built-in class (e.g. a
-   `SciPySampler` from `ropt.sampler.scipy`), or of your own `Sampler` subclass.
-   The instance is used as-is.
+1. **A plain `dict`** — *the usual case*. Give a small dictionary with a `method`
+   field (and optional `options`), and `ropt` builds the object for you through
+   the plugin system:
+
+    ```python
+    "samplers": [
+        {"method": "scipy/default"},   # index 0  -> SciPySampler
+        {"method": "scipy/sobol"},     # index 1  -> SciPySampler
+    ],
+    ```
+
+    The validator looks up a plugin in the `ropt.plugins` sub-package by the
+    `method` field (`"plugin/method"` form, or just `"method"` for implicit
+    discovery) and builds the object, applying any `options`.
+
 2. **A typed config object**, e.g.
-   [`SamplerConfig`][ropt.config.SamplerConfig]. The validator looks up a
-   plugin in the `ropt.plugins` sub-package by the `method` field
-   (`"plugin/method"` form, or just `"method"` for implicit discovery) and
-   calls its `create()` factory to build the object.
-3. **A plain `dict`**, which is first validated into the matching config object
-   and then handled as in (2).
+   [`SamplerConfig`][ropt.config.SamplerConfig]. This is the same as the dict
+   form — the dict is validated into exactly this object — but lets you build it
+   explicitly in Python.
 
-So the snippet above can equivalently be written as:
-
-```python
-"samplers": [
-    {"method": "scipy/default"},   # index 0  -> SciPySampler
-    {"method": "scipy/sobol"},     # index 1  -> SciPySampler
-],
-```
+3. **An already-constructed object** — *advanced*. Pass an instance of a built-in
+   class (e.g. a `SciPySampler` from `ropt.sampler.scipy`) or of your own
+   `Sampler` subclass, and it is used as-is. This is mainly for when you write
+   the Python object yourself and want to provide it directly, without
+   registering it as a plugin.
 
 The same pattern applies to `backend`, `function_estimators`,
-`realization_filters`, and the three transform fields. Mix instances and dicts
-freely — for example, you can register a hand-built `Sampler` instance alongside
-a dict-configured one in the same tuple. However, note that the second and third
-options require the corresponding class to be registered with the plugin system.
+`realization_filters`, and the three transform fields. You can mix these forms
+freely — for example, a hand-built `Sampler` instance alongside a dict-configured
+one in the same tuple. The dict and config-object forms resolve the `method`
+through the plugin system, so the plugin must be registered; providing an object
+directly does not.
 
 ### Method strings
 
@@ -175,9 +174,19 @@ same backend.
 Once built, an [`EnOptContext`][ropt.context.EnOptContext] is frozen. To
 change settings, build a new context from a modified dict.
 
+!!! warning
+
+    `EnOptContext` objects are immutable after construction. Do not attempt to
+    serialize and round-trip them (e.g., to/from JSON). Some parameters are
+    transformed during construction in an irreversible manner. Constructing a
+    `EnOptContext` object from serialized values may incorrectly transform those
+    parameters again. Moreover, NumPy arrays and plugin instances may not survive a
+    round-trip faithfully. Persist the raw input dicts instead if you intend to
+    modify the values.
+
 ## Section reference
 
-### `variables` — [`VariablesConfig`][ropt.config.VariablesConfig]
+### `variables` — [`VariablesConfig`][ropt.config.VariablesConfig] { #variables }
 
 Defines the decision variables for the optimization problem.
 
@@ -210,7 +219,7 @@ free). `True` means the variable is free; `False` means it is fixed.
 }
 ```
 
-#### Variable perturbations
+#### Variable perturbations { #variable-perturbations }
 
 The `variables` section also stores information needed to generate perturbed
 variables for stochastic gradient estimation (see [Stochastic
@@ -258,7 +267,7 @@ to a [variable transform](transforms.md) by index. An out-of-range index
     [`DEFAULT_PERTURBATION_TYPE`][ropt.config.constants.DEFAULT_PERTURBATION_TYPE], and
     [`DEFAULT_PERTURBATION_BOUNDARY_TYPE`][ropt.config.constants.DEFAULT_PERTURBATION_BOUNDARY_TYPE].
 
-### `objectives` — [`ObjectiveFunctionsConfig`][ropt.config.ObjectiveFunctionsConfig]
+### `objectives` — [`ObjectiveFunctionsConfig`][ropt.config.ObjectiveFunctionsConfig] { #objectives }
 
 `ropt` supports multi-objective optimization. Multiple objectives are combined
 into a single value by summing them after weighting. The `weights` field
@@ -287,7 +296,7 @@ entry selects an object by its position in the corresponding tuple defined in
 
 An out-of-range index means no object is applied to that objective.
 
-### `linear_constraints` — [`LinearConstraintsConfig`][ropt.config.LinearConstraintsConfig]
+### `linear_constraints` — [`LinearConstraintsConfig`][ropt.config.LinearConstraintsConfig] { #linear_constraints }
 
 Linear constraints are defined by a set of linear equations involving the
 optimization variables. The `coefficients` field is a 2D array where each row
@@ -305,7 +314,7 @@ number of constraints.
 All three fields (`coefficients`, `lower_bounds`, `upper_bounds`) are required;
 there are no defaults.
 
-### `nonlinear_constraints` — [`NonlinearConstraintsConfig`][ropt.config.NonlinearConstraintsConfig]
+### `nonlinear_constraints` — [`NonlinearConstraintsConfig`][ropt.config.NonlinearConstraintsConfig] { #nonlinear_constraints }
 
 Nonlinear constraints are defined by comparing a constraint function to
 right-hand-side bounds. The `lower_bounds` and `upper_bounds` fields specify
@@ -329,7 +338,7 @@ Like objectives, nonlinear constraints can optionally be processed using
   default computes a weighted average of per-realization values).
 - `transforms`: default `-1` (no transform applied).
 
-### `realizations` — [`RealizationsConfig`][ropt.config.RealizationsConfig]
+### `realizations` — [`RealizationsConfig`][ropt.config.RealizationsConfig] { #realizations }
 
 To optimize an ensemble of functions, a set of realizations is defined. When the
 optimizer requests a function value or a gradient, these are calculated for each
@@ -354,7 +363,7 @@ of realizations, meaning no failures are allowed).
     will treat it as if the value were one, requiring at least one successful
     realization.
 
-### `optimizer` — [`OptimizerConfig`][ropt.config.OptimizerConfig]
+### `optimizer` — [`OptimizerConfig`][ropt.config.OptimizerConfig] { #optimizer }
 
 Workflow-level settings that control how the optimization run is managed. All
 fields are optional and default to `None` (no limit) or `None` (no
@@ -381,7 +390,7 @@ redirection):
 - **`stderr`** (default: `None`): Redirect optimizer standard error to the given
   file. When `None`, standard error is not redirected.
 
-### `backend` — [`BackendConfig`][ropt.config.BackendConfig]
+### `backend` — [`BackendConfig`][ropt.config.BackendConfig] { #backend }
 
 Selects the optimizer algorithm and provides a standardized set of common
 settings that are forwarded to the backend:
@@ -409,7 +418,7 @@ settings that are forwarded to the backend:
 }
 ```
 
-### `gradient` — [`GradientConfig`][ropt.config.GradientConfig]
+### `gradient` — [`GradientConfig`][ropt.config.GradientConfig] { #gradient }
 
 Controls how stochastic gradients are estimated (see also [Stochastic
 Gradients](gradients.md) for a deeper discussion).
@@ -451,7 +460,7 @@ optimizer components](#index-based-sharing-of-optimizer-components) above for ho
 objects are referenced by index). Each entry configures a plugin instance via a
 `method` field and an optional `options` dict.
 
-#### Function estimators — [`FunctionEstimatorConfig`][ropt.config.FunctionEstimatorConfig]
+#### Function estimators — [`FunctionEstimatorConfig`][ropt.config.FunctionEstimatorConfig] { #function-estimators }
 
 [Function estimators](function_estimators.md) control how objective and
 constraint function values (and their gradients) are combined across
@@ -464,7 +473,7 @@ Fields:
 - `method` (default: `"default/default"`): Selects the estimator plugin.
 - `options` (default: `{}`): Plugin-specific options.
 
-#### Realization filters — [`RealizationFilterConfig`][ropt.config.RealizationFilterConfig]
+#### Realization filters — [`RealizationFilterConfig`][ropt.config.RealizationFilterConfig] { #realization-filters }
 
 [Realization filters](realization_filters.md) modify the weights of individual
 realizations. For example, they can select a subset of realizations by setting
@@ -476,7 +485,7 @@ Fields:
 - `method` (required, no default): Selects the filter plugin.
 - `options` (default: `{}`): Plugin-specific options.
 
-#### Samplers — [`SamplerConfig`][ropt.config.SamplerConfig]
+#### Samplers — [`SamplerConfig`][ropt.config.SamplerConfig] { #samplers }
 
 [Samplers](gradients.md) generate perturbations added to variables for gradient
 calculations. These perturbations can be deterministic or stochastic.
@@ -489,7 +498,7 @@ Fields:
 - `shared` (default: `False`): If `True`, the same set of perturbed values is
   used for all realizations.
 
-#### Transforms
+#### Transforms { #transforms }
 
 [Transforms](transforms.md) modify values as they pass between the user's
 domain and the optimizer's domain. Three types exist:
@@ -534,37 +543,6 @@ match the count of that axis. For example, with 3 variables and 2 objectives:
 You only need to provide labels for axes you want named — unlabelled axes
 default to integer indices. See [Working with Results](results.md) for how
 these labels appear in exported DataFrames.
-
-### Plugin discovery and validation
-
-`ropt` provides helper functions for querying installed plugins at runtime.
-These are useful for verifying your environment or building dynamic
-configurations.
-
-[`find_backend_plugin`][ropt.workflow.find_backend_plugin] and
-[`find_sampler_plugin`][ropt.workflow.find_sampler_plugin] look up which plugin
-provides a given method. They accept the same `"plugin/method"` or `"method"`
-strings used in configuration and return the plugin name, or `None` if no
-plugin supports the method:
-
-```python
-from ropt.workflow import find_backend_plugin, find_sampler_plugin
-
-find_backend_plugin("slsqp")          # "scipy"
-find_backend_plugin("scipy/L-BFGS-B") # "scipy"
-find_backend_plugin("unknown")        # None
-```
-
-[`validate_backend_options`][ropt.workflow.validate_backend_options] checks
-whether a set of backend-specific options is valid for a given method, raising
-an error if not. Call it before starting a long optimization run to catch
-configuration mistakes early:
-
-```python
-from ropt.workflow import validate_backend_options
-
-validate_backend_options("scipy/slsqp", {"maxiter": 200})
-```
 
 ## A worked example
 
@@ -729,8 +707,7 @@ Expand the block below to see every field and its default value.
 
 ## Where to next
 
-- [Writing Evaluation Callbacks](evaluation_callbacks.md) — produce the values that `ropt`
+- [Writing Evaluation Callbacks](../low_level/evaluation_callbacks.md) — produce the values that `ropt`
   consumes.
 - [Working with Results](results.md) — read the optimization output.
-- [Optimization Workflows](workflows.md) — go beyond a single `BasicOptimizer`
-  run.
+- [Optimization Workflows](../low_level/workflows.md) — go beyond a single optimization run.

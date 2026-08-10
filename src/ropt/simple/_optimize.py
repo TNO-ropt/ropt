@@ -46,7 +46,7 @@ def optimize(  # ruff: ignore[too-many-arguments]
 ) -> OptimizeResult:
     """Run a single optimization.
 
-    See [High-Level API](../usage/simple.md) for a walkthrough.
+    See [High-Level API](../simple/simple.md) for a walkthrough.
 
     Args:
         config:               The optimization configuration.
@@ -158,7 +158,7 @@ def optimize_many(  # ruff: ignore[too-many-arguments]
     worker pool, so this must be called inside a `threads`/`processes` block.
     `limit` bounds how many run simultaneously. The first run to raise cancels
     the rest and propagates (fail-fast). See
-    [High-Level API](../usage/simple.md) for a walkthrough.
+    [High-Level API](../simple/simple.md) for a walkthrough.
 
     Args:
         config:               The configuration, or one per run.

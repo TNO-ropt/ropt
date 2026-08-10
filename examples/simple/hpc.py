@@ -2,9 +2,12 @@
 
 Opening an ``hpc`` block fixes an HPC worker pool (through ``pysqa``) for the
 block, so the same ``optimize`` call submits its ensemble evaluations as cluster
-jobs. Running it needs the ``ropt[hpc]`` extra and a reachable cluster; pass
-``--multiprocessing`` to run the identical optimization on a local process pool
-instead, which needs no cluster and lets the example be exercised anywhere.
+jobs. It uses the default cluster and queue from the ``pysqa`` configuration of
+the ``ropt`` installation; cluster-specific parameters (such as ``cluster``,
+``queue``, and ``cores``) can be passed to ``hpc`` when needed. Running it needs
+the ``ropt[hpc]`` extra and a reachable cluster; pass ``--multiprocessing`` to
+run the identical optimization on a local process pool instead, which needs no
+cluster and lets the example be exercised anywhere.
 """
 
 import argparse
@@ -85,11 +88,7 @@ def main(*, multiprocessing: bool = False) -> None:
     Args:
         multiprocessing: Run on a local process pool instead of an HPC cluster.
     """
-    manager = (
-        processes(workers=WORKERS)
-        if multiprocessing
-        else hpc(workers=WORKERS, cluster="slurm")
-    )
+    manager = processes(workers=WORKERS) if multiprocessing else hpc(workers=WORKERS)
     with manager:
         result = optimize(CONFIG, INITIAL_VALUES, rosenbrock, report=report)
     print(f"optimal variables: {result.variables}")

@@ -19,7 +19,7 @@ if TYPE_CHECKING:
 class FunctionEvaluations(ResultField):
     """Per-realization objective and constraint values for an evaluation batch.
 
-    See [Working with Results](../usage/results.md) for usage details.
+    See [Working with Results](../optimizer_configuration/results.md) for usage details.
 
     **Result descriptions**
 

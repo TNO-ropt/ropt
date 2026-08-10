@@ -7,7 +7,7 @@ callback protocols connecting them. Most users will not interact with these
 classes directly; they are exposed for plugin authors and advanced workflow
 developers.
 
-See [Optimization Workflows](../usage/workflows.md) for the higher-level
+See [Optimization Workflows](../low_level/workflows.md) for the higher-level
 framework that wraps these engines.
 
 ::: ropt.core.EnsembleEvaluator

@@ -17,7 +17,7 @@ class BatchIdCounter:
     across them — useful in nested or parallel optimization setups where all
     evaluators should produce globally unique batch IDs.
 
-    See [Writing Evaluation Callbacks](../usage/evaluation_callbacks.md) for
+    See [Writing Evaluation Callbacks](../low_level/evaluation_callbacks.md) for
     usage details and examples.
     """
 

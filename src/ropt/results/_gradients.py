@@ -20,7 +20,7 @@ if TYPE_CHECKING:
 class Gradients(ResultField):
     """Aggregated objective and constraint gradients.
 
-    See [Working with Results](../usage/results.md) for usage details.
+    See [Working with Results](../optimizer_configuration/results.md) for usage details.
 
     **Result descriptions**
 

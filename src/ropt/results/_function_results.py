@@ -21,7 +21,7 @@ TypeResults = TypeVar("TypeResults", bound="Results")
 class FunctionResults(Results):
     """Results of a function evaluation batch.
 
-    See [Working with Results](../usage/results.md) for usage details.
+    See [Working with Results](../optimizer_configuration/results.md) for usage details.
 
     Attributes:
         evaluations:     Per-realization evaluation data.

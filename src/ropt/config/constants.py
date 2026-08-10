@@ -3,8 +3,8 @@
 See the [Configuration guide][config-perturbations] for detailed explanations
 of these defaults and their interactions.
 
-[config-perturbations]: ../usage/configuration.md#variable-perturbations
-[config-gradient]: ../usage/configuration.md#gradient-gradientconfig
+[config-perturbations]: ../optimizer_configuration/configuration.md#variable-perturbations
+[config-gradient]: ../optimizer_configuration/configuration.md#gradient
 """
 
 from typing import Final

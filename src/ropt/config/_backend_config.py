@@ -19,7 +19,7 @@ class BackendConfig(BaseModel):
     `BackendConfig` defines the configuration for the optimization algorithm
     used by an optimization backend plugin.
 
-    See the [Configuration guide](../usage/configuration.md#backend) for
+    See the [Configuration guide](../optimizer_configuration/configuration.md#backend) for
     detailed descriptions and usage examples.
 
     Attributes:

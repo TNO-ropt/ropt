@@ -32,7 +32,7 @@ class VariableTransform(ABC):
 
     All arrays use the last axis for the variable dimension.
 
-    See [Transforms](../usage/transforms.md) for lifecycle and guidance.
+    See [Transforms](../optimizer_configuration/transforms.md) for lifecycle and guidance.
     """
 
     @abstractmethod

@@ -20,7 +20,7 @@ class EnOptEvent:
         context:     Optimizer context associated with the event.
         results:     Tuple of result objects associated with the event.
 
-    See [Optimization Workflows](../usage/workflows.md#the-enoptevent-object)
+    See [Optimization Workflows](../low_level/workflows.md#the-enoptevent-object)
     for a detailed description of events and their lifecycle.
     """
 

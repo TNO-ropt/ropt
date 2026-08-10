@@ -20,16 +20,15 @@ are sufficient for most basic optimization tasks.
 `ropt` exposes a few optional dependency groups that enable additional
 functionality:
 
-| Extra          | Pulls in                | Enables                                                                                              |
-| -------------- | ----------------------- | ---------------------------------------------------------------------------------------------------- |
-| `pandas`       | `pandas`                | Exporting [`Results`][ropt.results.Results] to data frames via [`results_to_dataframe`][ropt.results.results_to_dataframe]. |
-| `cloudpickle`  | `cloudpickle`           | Serializing lambdas, closures, and interactively-defined functions with the [`MultiprocessingExecutor`][ropt.components.executors.MultiprocessingExecutor] (`processes`), and running evaluations in an external Python process via the `external` backend. |
-| `hpc`          | `pysqa`, `cloudpickle`  | Running evaluations on HPC clusters via [`HPCExecutor`][ropt.components.executors.HPCExecutor].        |
+| Extra          | Pulls in                | Enables                                                    |
+| -------------- | ----------------------- | ---------------------------------------------------------- |
+| `pandas`       | `pandas`                | Exporting results to data frames .                         |
+| `cloudpickle`  | `cloudpickle`           | Serializing Python code to run them in external processes. |
+| `hpc`          | `pysqa`, `cloudpickle`  | Running evaluations on HPC clusters.                       |
 
-Without the `cloudpickle` extra the `processes` executor still works, but its
-task functions must be importable, module-level objects; installing it adds
-support for lambdas, closures, and notebook-defined functions. The `hpc` extra
-already includes `cloudpickle`.
+Without the `cloudpickle` limits the Python code that can be run in external
+processes; installing it adds support for lambdas, closures, and
+notebook-defined functions. The `hpc` extra already includes `cloudpickle`.
 
 Install with:
 
@@ -56,10 +55,18 @@ Install any of them alongside `ropt`:
 pip install ropt ropt-pymoo
 ```
 
-After installation, select a method from the plugin by setting the
-`backend.method` field in your configuration (see
-[Configuration](configuration.md)) to a `"plugin/method"` string such as
-`"pymoo/nelder-mead"`.
+After installation, the plugin's methods become available through the
+`backend.method` field in your configuration. This field accepts two forms:
+
+- **Explicit** — `"plugin/method"` names both the plugin and the method, for
+  example `"pymoo/nelder-mead"`.
+- **Implicit** — a bare `"method"` (for example `"nelder-mead"`) lets `ropt`
+  search the installed plugins for one that provides it. This is unambiguous
+  only when a single plugin exposes that method name.
+
+Both the plugin name and the method name are case-insensitive. See the
+[method strings](../optimizer_configuration/configuration.md#method-strings) section of the
+configuration guide for the full details.
 
 ## Verifying the installation
 

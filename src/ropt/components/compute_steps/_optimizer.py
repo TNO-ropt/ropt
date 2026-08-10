@@ -34,7 +34,7 @@ class OptimizationStep(ComputeStep):
     gradient evaluations. Emits `START_OPTIMIZER`, `START_EVALUATION`,
     `FINISHED_EVALUATION`, and `FINISHED_OPTIMIZER` events.
 
-    See [Optimization Workflows](../usage/workflows.md#events-emitted-by-optimizationstep)
+    See [Optimization Workflows](../low_level/workflows.md#events-emitted-by-optimizationstep)
     for the full event lifecycle description.
     """
 

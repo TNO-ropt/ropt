@@ -3,7 +3,7 @@
 Opening a ``threads``/``processes`` block fixes a worker pool for the whole
 block; the same `optimize` call then evaluates its realizations and gradient
 perturbations on that pool. Pass ``-m``/``--multiprocessing`` to use a process
-pool instead of threads (the objective must be picklable).
+pool instead of threads (needs the ``cloudpickle`` extra).
 """
 
 from __future__ import annotations

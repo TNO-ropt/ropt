@@ -35,7 +35,7 @@ def evaluate(
     """Evaluate a single variable vector without optimizing.
 
     Use [`evaluate_many`][ropt.simple.evaluate_many] to evaluate several
-    vectors at once. See [High-Level API](../usage/simple.md) for a
+    vectors at once. See [High-Level API](../simple/simple.md) for a
     walkthrough.
 
     Args:
@@ -65,7 +65,7 @@ def evaluate_many(
     """Evaluate a batch of variable vectors without optimizing.
 
     Each row of `variables` is one variable vector; the results are returned in
-    the same order. See [High-Level API](../usage/simple.md) for a
+    the same order. See [High-Level API](../simple/simple.md) for a
     walkthrough.
 
     Args:

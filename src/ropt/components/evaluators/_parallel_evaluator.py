@@ -40,7 +40,7 @@ class ParallelEvaluator(Evaluator):
     used to group several active evaluations into a single task that the worker
     executes sequentially.
 
-    See [Parallel Evaluation](../usage/parallel.md#parallelevaluator) for
+    See [Parallel Evaluation](../low_level/parallel.md#parallelevaluator) for
     details on how this integrates with the asyncio event loop.
     """
 
@@ -96,7 +96,7 @@ class ParallelEvaluator(Evaluator):
         """Evaluate all objective and constraints.
 
         Results are collected following the two-class error contract described
-        in [Parallel Evaluation](../usage/parallel.md#error-handling). An
+        in [Parallel Evaluation](../low_level/parallel.md#error-handling). An
         infrastructure failure arrives as an
         [`ExecutorFailure`][ropt.exceptions.ExecutorFailure] result and is
         recorded as a failed realization (NaN), while a user-code exception

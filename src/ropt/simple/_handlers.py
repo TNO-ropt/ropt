@@ -159,7 +159,7 @@ def handlers(
     nested runs too. Pass ``inherit=False`` to include only the handlers the
     nested block lists (re-list an enclosing handler to feed it explicitly).
 
-    See [High-Level API](../usage/simple.md) for a walkthrough.
+    See [High-Level API](../simple/simple.md) for a walkthrough.
 
     Args:
         handler: The result handlers to share across the block.

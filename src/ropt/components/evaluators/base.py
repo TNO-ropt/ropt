@@ -39,7 +39,7 @@ class Evaluator(ABC):
         a dispatching evaluator such as
         [`ParallelEvaluator`][ropt.components.evaluators.ParallelEvaluator], which
         dispatches tasks to an executor rather than sharing an evaluator across
-        threads. See [Optimization Workflows](../usage/workflows.md#evaluators)
+        threads. See [Optimization Workflows](../low_level/workflows.md#evaluators)
         for usage and pitfalls.
     """
 

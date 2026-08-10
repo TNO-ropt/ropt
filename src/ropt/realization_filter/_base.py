@@ -24,7 +24,7 @@ class RealizationFilter(ABC):
     3. `get_realization_weights` — called at each evaluation; return a
        non-negative weight per realization.
 
-    See [Realization Filters](../usage/realization_filters.md) for examples
+    See [Realization Filters](../optimizer_configuration/realization_filters.md) for examples
     and further guidance.
     """
 

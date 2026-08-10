@@ -5,7 +5,7 @@ estimation. The default SciPy-based sampler covers normal- and
 quasi-random-distribution sampling; alternative samplers can be added through
 the plugin system.
 
-See [Stochastic Gradients](../usage/gradients.md) for how samplers fit into
+See [Stochastic Gradients](../optimizer_configuration/gradients.md) for how samplers fit into
 the gradient pipeline.
 
 ::: ropt.sampler

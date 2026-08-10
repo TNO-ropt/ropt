@@ -226,7 +226,7 @@ class _ExecutionScope:
 def threads(*, workers: int = 1) -> _ExecutionScope:
     """Run evaluations in a thread pool for the duration of the block.
 
-    See [High-Level API](../usage/simple.md) for a walkthrough.
+    See [High-Level API](../simple/simple.md) for a walkthrough.
 
     Args:
         workers: The number of worker threads.
@@ -241,7 +241,7 @@ def processes(*, workers: int = 1) -> _ExecutionScope:
     """Run evaluations in a process pool for the duration of the block.
 
     The objective must be picklable. See
-    [High-Level API](../usage/simple.md) for a walkthrough.
+    [High-Level API](../simple/simple.md) for a walkthrough.
 
     Args:
         workers: The number of worker processes.
@@ -269,7 +269,7 @@ def hpc(  # ruff: ignore[too-many-arguments]
     `ropt[hpc]` extra, and the objective must be picklable. The cluster is
     selected from `cluster`/`queue`: give a queue to search for its cluster, a
     cluster to use its default queue, or both to be explicit. See
-    [High-Level API](../usage/simple.md) for a walkthrough.
+    [High-Level API](../simple/simple.md) for a walkthrough.
 
     Args:
         workers:     The maximum number of concurrent cluster jobs.

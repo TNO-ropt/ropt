@@ -58,7 +58,7 @@ The `sort-objective` method:
    indices for each realization (using the objective weights from the
    configuration). If a single objective index is given, no weighting is
    applied.
-2. Sorts realizations by that value (ascending).
+2. Sorts realizations by that value.
 3. Selects realizations whose rank falls in the inclusive range
    \[`first`, `last`\].
 4. Retains the original realization weights for selected realizations; all

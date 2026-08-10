@@ -23,7 +23,7 @@ _logger = logging.getLogger(__name__)
 class EventDispatcher:
     """Dispatches events to handlers from the asyncio event loop's thread.
 
-    See [Parallel Evaluation](../usage/parallel.md#event-dispatcher) for usage.
+    See [Parallel Evaluation](../low_level/parallel.md#event-dispatcher) for usage.
     """
 
     def __init__(self) -> None:

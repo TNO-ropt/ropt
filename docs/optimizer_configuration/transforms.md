@@ -156,7 +156,7 @@ values (including bound/constraint violation differences).
 
 Higher-level helpers handle this automatically:
 
-- [`BasicOptimizer`][ropt.workflow.BasicOptimizer] returns user-domain results.
+- The [simple API](../simple/simple.md) returns user-domain results.
 - Event handlers may or may not perform the conversion automatically. For
   example, [`ResultsHandler`][ropt.components.event_handlers.ResultsHandler] accepts
   a `domain` argument (`"user"` or `"optimizer"`) to control which domain its

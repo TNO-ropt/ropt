@@ -54,6 +54,7 @@ plugins:
 
 markdown_extensions:
   - admonition
+  - attr_list
   - def_list
   - footnotes
   - pymdownx.arithmatex:
@@ -95,29 +96,39 @@ repo_name: TNO-ropt/ropt
 
 nav:
   - "About": index.md
-  - "Usage":
-      - "Background": usage/background.md
-      - "Installation": usage/installation.md
-      - "Quickstart": usage/quickstart.md
-      - "Basic Optimization": usage/basic.md
-      - "Configuration": usage/configuration.md
-      - "Writing Evaluation Callbacks": usage/evaluation_callbacks.md
-      - "Working with Results": usage/results.md
-      - "Realization Filters": usage/realization_filters.md
-      - "Function Estimators": usage/function_estimators.md
-      - "Transforms": usage/transforms.md
-      - "Stochastic Gradients": usage/gradients.md
-      - "Optimization Workflows": usage/workflows.md
-      - "Parallel Evaluation": usage/parallel.md
-      - "Logging": usage/logging.md
+  - "Getting Started":
+      - "Background": getting_started/background.md
+      - "Installation": getting_started/installation.md
+      - "Quickstart": getting_started/quickstart.md
+      - "Deterministic Optimization": getting_started/deterministic.md
+      - "Ensemble-Based Optimization": getting_started/ensemble.md
+      - "Running in Parallel": getting_started/execution.md
+  - "Optimizer Configuration":
+      - "Key Concepts": optimizer_configuration/key_concepts.md
+      - "Configuration": optimizer_configuration/configuration.md
+      - "Stochastic Gradients": optimizer_configuration/gradients.md
+      - "Realization Filters": optimizer_configuration/realization_filters.md
+      - "Function Estimators": optimizer_configuration/function_estimators.md
+      - "Transforms": optimizer_configuration/transforms.md
+      - "Working with Results": optimizer_configuration/results.md
+  - "Simple API":
+      - "The Simple API": simple/simple.md
+  - "Low-Level API":
+      - "Optimization Workflows": low_level/workflows.md
+      - "Writing Evaluation Callbacks": low_level/evaluation_callbacks.md
+      - "Parallel Evaluation": low_level/parallel.md
+  - "Utilities":
+      - "Logging": utilities/logging.md
+      - "Plugin Discovery": utilities/plugin_discovery.md
   - "Tutorials":
       - "Overview": tutorials/index.md
-      - "Deterministic Optimization": tutorials/deterministic.md
-      - "Ensemble-based Optimization": tutorials/ensemble.md
-      - "Using FunctionEvaluator": tutorials/function_evaluator.md
-      - "Building a Workflow": tutorials/workflow.md
+      - "Your First Optimization": tutorials/optimize.md
+      - "Ensemble Optimization": tutorials/ensemble.md
       - "Constrained Optimization": tutorials/constrained.md
+      - "Mixed-Integer Optimization": tutorials/discrete.md
+      - "Building a Workflow": tutorials/workflow.md
   - "Reference":
+      - "Simple API": reference/simple.md
       - "Configuration":
         - "Context Class": reference/context.md
         - "Configuration Classes": reference/config.md

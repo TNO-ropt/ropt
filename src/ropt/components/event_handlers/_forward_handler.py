@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 class EventForwardHandler(EventHandler):
     """Forwards events from a compute step to an `EventDispatcher`.
 
-    See [Optimization Workflows](../usage/workflows.md#eventforwardhandler) for usage.
+    See [Optimization Workflows](../low_level/workflows.md#eventforwardhandler) for usage.
     """
 
     def __init__(

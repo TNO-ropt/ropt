@@ -29,7 +29,7 @@ class Results(ABC):
     Subclassed by [`FunctionResults`][ropt.results.FunctionResults] and
     [`GradientResults`][ropt.results.GradientResults].
 
-    See [Working with Results](../usage/results.md) for a narrative overview.
+    See [Working with Results](../optimizer_configuration/results.md) for a narrative overview.
 
     Attributes:
         batch_id: Identifier for the evaluation batch.
@@ -58,7 +58,7 @@ class Results(ABC):
         argument pivots selected axes into columns, producing tuple column
         names of the form `(sub-field, label, ...)`.
 
-        See [Working with Results](../usage/results.md#exporting-to-pandas) for
+        See [Working with Results](../optimizer_configuration/results.md#exporting-to-pandas) for
         further details and examples.
 
         Args:

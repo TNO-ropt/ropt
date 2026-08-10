@@ -2,8 +2,8 @@
 
 `ropt` exposes the full intermediate and final state of an optimization through
 [`Results`][ropt.results.Results] objects. This page describes the result
-classes and how to inspect them; see [Basic Optimization](basic.md) and
-[Optimization Workflows](workflows.md) for how results are produced and
+classes and how to inspect them; see [The Simple API](../simple/simple.md) and
+[Optimization Workflows](../low_level/workflows.md) for how results are produced and
 delivered to your code.
 
 ## The result hierarchy
@@ -185,18 +185,41 @@ this optimizer domain.
 The [`transform_from_optimizer`][ropt.results.Results.transform_from_optimizer]
 method reverses these transforms, mapping results back to the *user domain*.
 
-When using [`BasicOptimizer`][ropt.workflow.BasicOptimizer], results passed to
-observer callbacks are always transformed to user domain automatically.
+In the [simple API](../simple/simple.md), results are always transformed to the user
+domain automatically.
 
-In [workflows](workflows.md), event handlers determine how results are returned,
+In [workflows](../low_level/workflows.md), event handlers determine how results are returned,
 for instance by offering a `domain` argument that controls whether results are
-handled in user or optimizer domain. See [Optimization Workflows](workflows.md)
+handled in user or optimizer domain. See [Optimization Workflows](../low_level/workflows.md)
 for details on how individual event handlers handle this.
 
 ## Exporting to pandas
 
 `ropt` can export results to `pandas` DataFrames for analysis and reporting.
-This requires the `pandas` optional extra (see [Installation](installation.md)).
+This requires the `pandas` optional extra (see [Installation](../getting_started/installation.md)).
+
+The row index and the unstacked column labels come from the
+[`names`](configuration.md#names) mapping in the configuration. If an axis is
+not named, its labels fall back to 0-based integer indices. For example,
+exporting the objectives of a single result **without** any `names` gives plain
+numbers for both the realization and the objective axes:
+
+```python
+df = result.to_dataframe("evaluations", select=["objectives"])
+```
+
+```
+                               objectives
+batch_id realization objective
+1        0           0               2.10
+                     1               0.94
+         1           0               2.35
+                     1               1.02
+```
+
+Adding a `names` entry replaces those numbers with meaningful labels. The
+examples below assume the realizations are named `"r0"`/`"r1"` and the objectives
+`"val"`/`"cost"`.
 
 ### Exporting a single result field
 
@@ -204,95 +227,111 @@ The [`to_dataframe`][ropt.results.Results.to_dataframe] method on an individual
 result exports one field (or a subset of its sub-fields):
 
 ```python
+df = result.to_dataframe("evaluations", select=["variables", "objectives"])
+```
+
+By default, every axis of the exported sub-fields becomes a level in a
+multi-index. For example, `objectives` in
+[`FunctionEvaluations`][ropt.results.FunctionEvaluations] has the axes
+`REALIZATION` and `OBJECTIVE`, so exporting it keeps both in the index — now
+with the configured names:
+
+```python
+df = result.to_dataframe("evaluations", select=["objectives"])
+```
+
+```
+                               objectives
+batch_id realization objective
+1        r0          val             2.10
+                     cost            0.94
+         r1          val             2.35
+                     cost            1.02
+```
+
+Passing `unstack` pivots selected axes out of the index and into columns. Here
+the `OBJECTIVE` axis is unstacked:
+
+```python
 from ropt.enums import AxisName
 
 df = result.to_dataframe(
     "evaluations",
-    select=["variables", "objectives"],
+    select=["objectives"],
+    unstack=[AxisName.OBJECTIVE],
 )
 ```
 
-By default, all axes of the exported sub-fields are represented as levels in a
-multi-index. For example, exporting `objectives` from
-[`FunctionEvaluations`][ropt.results.FunctionEvaluations] (which has axes
-`REALIZATION` and `OBJECTIVE`) produces a DataFrame with a two-level index: one
-level for the realization, one for the objective.
-
-You can *unstack* selected axes into separate columns using the `unstack`
-argument:
-
-```python
-df = result.to_dataframe(
-    "evaluations",
-    select=["variables", "objectives"],
-    unstack=[AxisName.VARIABLE, AxisName.OBJECTIVE],
-)
+```
+                     (objectives, val)  (objectives, cost)
+batch_id realization
+1        r0                       2.10                0.94
+         r1                       2.35                1.02
 ```
 
-This pivots the specified axes out of the index and into columns. Column names
-become tuples combining the sub-field name and the axis label(s). For instance,
-unstacking `VARIABLE` on a `variables` sub-field with labels `("x0", "x1",
-"x2")` produces columns named `("variables", "x0")`, `("variables", "x1")`,
-`("variables", "x2")`.
+The unstacked axis is flattened into the column labels, so each new column is a
+tuple of the sub-field name and the axis label — here `("objectives", "val")`
+and `("objectives", "cost")`. Unstacking more axes adds more elements to these
+tuples; unstacking every axis leaves a flat table with one row per result.
 
 ### Aggregating multiple results
 
 [`results_to_dataframe`][ropt.results.results_to_dataframe] builds on
-`to_dataframe` to convert a *sequence* of results into a single DataFrame. It
-handles field selection and automatically unstacks the most common axes into
-columns (e.g., `VARIABLE`, `OBJECTIVE`, `NONLINEAR_CONSTRAINT`):
+`to_dataframe` to convert a *sequence* of results into a single DataFrame, one
+row per result. It automatically unstacks the most common axes (`VARIABLE`,
+`OBJECTIVE`, `NONLINEAR_CONSTRAINT`) into columns:
 
 ```python
 from ropt.results import results_to_dataframe
 
 df = results_to_dataframe(
     all_results,
-    fields={"evaluations.variables", "functions.objectives"},
+    fields={"evaluations.variables"},
     result_type="functions",
 )
 ```
 
-Field names use dot notation for nested sub-fields (e.g.,
-`evaluations.variables`, `functions.target_objective`). For `metadata`
-dictionaries, use a second dot: `evaluations.metadata.my_key`.
+```
+          (evaluations.variables, x0)  (evaluations.variables, x1)  (evaluations.variables, x2)
+batch_id
+1                                0.30                         0.42                        -0.11
+2                                0.55                         0.48                         0.02
+3                                0.61                         0.50                         0.10
+```
 
-The `result_type` argument selects which result objects to process:
-`"functions"` includes only
-[`FunctionResults`][ropt.results.FunctionResults], `"gradients"` includes only
-[`GradientResults`][ropt.results.GradientResults].
+Each column is a `(field, label)` pair, and each row is one result identified by
+its `batch_id`. Field names use dot notation for nested sub-fields (e.g.,
+`evaluations.variables`, `functions.target_objective`); for `metadata`
+dictionaries, use a second dot (`evaluations.metadata.my_key`). The `result_type`
+argument selects which results to process: `"functions"` for
+[`FunctionResults`][ropt.results.FunctionResults] only, `"gradients"` for
+[`GradientResults`][ropt.results.GradientResults] only.
 
-### Multi-index labelling
+### Labels and the index
 
-The DataFrame index is constructed from the axis metadata of each exported
-field. Each axis becomes an index level, named after the
-[`AxisName`][ropt.enums.AxisName] value (e.g., `"variable"`, `"realization"`,
-`"objective"`).
-
-Labels for each level come from the `names` attribute on the result (which is
-populated from the [`names`](configuration.md#names) field in
-[`EnOptContext`][ropt.context.EnOptContext]). This is a dict mapping axis name
-strings to tuples of labels:
+Every axis of an exported field becomes an index level, named after its
+[`AxisName`][ropt.enums.AxisName] value (e.g. `"variable"`, `"realization"`,
+`"objective"`), and `batch_id` is always prepended so results from different
+batches stay distinct. The label on each level — and on each unstacked column —
+comes from the [`names`](configuration.md#names) mapping in the configuration, a
+dict from axis name to a tuple of labels:
 
 ```python
 CONFIG = {
     ...
     "names": {
         "variable": ("x0", "x1", "x2"),
-        "objective": ("NPV", "cost"),
+        "objective": ("val", "cost"),
     },
 }
 ```
 
-When labels are provided for an axis, they appear in the DataFrame index or
-column headers. When no labels are provided, 0-based integer indices are used
-instead.
-
-The `batch_id` on the result is always prepended to the index, allowing results
-from multiple batches to be distinguished in an aggregated DataFrame.
+An axis without a `names` entry falls back to 0-based integer indices, as in the
+first example of this section.
 
 ## Where to next
 
 - Run an optimization and receive results via callbacks:
-  [Basic Optimization](basic.md).
+  [Deterministic Optimization](../getting_started/deterministic.md).
 - Use event handlers to collect or react to results in a workflow:
-  [Optimization Workflows](workflows.md).
+  [Optimization Workflows](../low_level/workflows.md).

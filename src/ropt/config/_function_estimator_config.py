@@ -15,7 +15,7 @@ class FunctionEstimatorConfig(BaseModel):
     are combined across realizations.
 
     See the [Configuration
-    guide](../usage/configuration.md#function-estimators) for detailed
+    guide](../optimizer_configuration/configuration.md#function-estimators) for detailed
     descriptions and usage examples.
 
     Attributes:

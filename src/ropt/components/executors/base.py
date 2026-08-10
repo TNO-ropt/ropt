@@ -160,7 +160,7 @@ class Task(ABC):
     Task results are delivered on the associated
     [`ResultsQueue`][ropt.components.executors.ResultsQueue]. Two distinct
     failure classes are distinguished, following the error contract described in
-    [Parallel Evaluation](../usage/parallel.md#error-handling):
+    [Parallel Evaluation](../low_level/parallel.md#error-handling):
 
     - An **infrastructure failure** (a killed worker process, or missing/corrupt
       HPC output) is delivered as an ordinary result whose value is an

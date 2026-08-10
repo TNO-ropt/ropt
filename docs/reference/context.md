@@ -6,7 +6,7 @@ typically built from a plain dict (`EnOptContext.model_validate(CONFIG)`).
 
 For a narrative overview of all fields — including broadcasting rules,
 index-based sharing of plugin instances, defaults, and worked examples — see
-the [Configuration](../usage/configuration.md) user-manual page.
+the [Configuration](../optimizer_configuration/configuration.md) user-manual page.
 
 ::: ropt.context
     options:

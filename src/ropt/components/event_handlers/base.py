@@ -55,7 +55,7 @@ class EventHandler(ABC):
         [`EventDispatcher`][ropt.components.event_handlers.EventDispatcher], which
         serializes the calls. A handler may be owned by at most one dispatcher,
         or by one or more compute steps, but not both. See
-        [Optimization Workflows](../usage/workflows.md#event-handlers) for usage
+        [Optimization Workflows](../low_level/workflows.md#event-handlers) for usage
         and pitfalls.
     """
 
