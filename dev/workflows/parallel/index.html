@@ -3218,8 +3218,11 @@ is much larger than the number of available workers.</p>
   " href="../../reference/components_evaluators/#ropt.components.evaluators.EvaluationFunctionContext"><code>EvaluationFunctionContext</code></a>
 objects for every evaluation packed into the task (a single-element sequence
 when <code>bundle_size=1</code>) and should return a single task name. When using the
-<code>HPCExecutor</code>, names also serve as task identifiers and must be unique within a
-batch. The returned name is stamped onto the <code>name</code> field of every
+<code>HPCExecutor</code>, names also serve as task identifiers and as the base of each
+task's filenames, so they must be unique within the executor (and
+filesystem-safe); the executor refuses to overwrite pre-existing task files, so
+distinct executors sharing a <code>workdir</code> also need distinct names. The returned
+name is stamped onto the <code>name</code> field of every
 <code>EvaluationFunctionContext</code> in the task, so the user function can read
 <code>context.name</code> to recover it.</p>
 <p>If the executor is not running when <code>eval()</code> is called, the evaluator raises an
@@ -3357,7 +3360,7 @@ deserialized back. Requires <code>ropt[hpc]</code> to be installed.</p>
 <tbody>
 <tr>
 <td><code>workdir</code></td>
-<td>Shared filesystem directory for temporary I/O files.</td>
+<td>Shared-filesystem directory for each task's serialized I/O files.</td>
 </tr>
 <tr>
 <td><code>workers</code></td>
@@ -3397,6 +3400,14 @@ deserialized back. Requires <code>ropt[hpc]</code> to be installed.</p>
 </tr>
 </tbody>
 </table>
+<p>The <code>workdir</code> holds each task's serialized <code>.in</code>/<code>.out</code> files (written at
+absolute paths) and its captured stdout. It is also passed to <code>pysqa</code> as the
+job's <code>working_directory</code>, which the standard scheduler templates turn into a
+<code>chdir</code> directive (e.g. <code>#SBATCH --chdir=...</code>) — but whether a job actually runs
+there depends on the submission template, so do not rely on it. Because task
+filenames derive from task names, the executor <strong>refuses to overwrite</strong>
+pre-existing task files; give each concurrently-running executor its own
+<code>workdir</code>.</p>
 <p>Configuration can be provided either via a <code>template</code> string or a <code>config_path</code>
 directory containing <code>pysqa</code> configuration files. If neither is given, the
 executor looks for a default configuration at:</p>

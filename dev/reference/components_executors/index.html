@@ -4636,7 +4636,10 @@ configuration details.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Shared filesystem directory for temporary I/O files.</p>
+                <p>Shared-filesystem directory for each task's serialized
+         I/O files; also passed as the job working directory
+         (template-dependent). Task files are never overwritten,
+         so concurrent executors need distinct workdirs.</p>
               </div>
             </td>
             <td>

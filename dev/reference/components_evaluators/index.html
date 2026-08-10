@@ -4136,7 +4136,9 @@ sequentially; <code>0</code> packs all active evaluations of a batch into a sing
 task.</p>
 <p>The <code>get_name</code> callback receives the <code>EvaluationFunctionContext</code> objects
 for every evaluation in a task (a one-element sequence when
-<code>bundle_size=1</code>) and must return a single task name.</p>
+<code>bundle_size=1</code>) and must return a single task name. For the
+<code>HPCExecutor</code> the name is also the task id and filename base, so it must
+be unique within the executor.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
