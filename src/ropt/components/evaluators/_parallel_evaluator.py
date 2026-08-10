@@ -64,7 +64,9 @@ class ParallelEvaluator(Evaluator):
 
         The `get_name` callback receives the `EvaluationFunctionContext` objects
         for every evaluation in a task (a one-element sequence when
-        `bundle_size=1`) and must return a single task name.
+        `bundle_size=1`) and must return a single task name. For the
+        `HPCExecutor` the name is also the task id and filename base, so it must
+        be unique within the executor.
 
         Args:
             function:          The function used for objectives and constraints.

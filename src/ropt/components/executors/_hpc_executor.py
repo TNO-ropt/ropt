@@ -66,7 +66,10 @@ class HPCExecutor(ExecutorBase):
         configuration details.
 
         Args:
-            workdir:     Shared filesystem directory for temporary I/O files.
+            workdir:     Shared-filesystem directory for each task's serialized
+                         I/O files; also passed as the job working directory
+                         (template-dependent). Task files are never overwritten,
+                         so concurrent executors need distinct workdirs.
             workers:     Maximum concurrent HPC jobs.
             queue_size:  Maximum task queue size (0 = unlimited).
             interval:    Polling interval in seconds.

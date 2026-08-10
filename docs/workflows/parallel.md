@@ -56,8 +56,11 @@ The `get_name` callable, if provided, is called with the sequence of
 [`EvaluationFunctionContext`][ropt.components.evaluators.EvaluationFunctionContext]
 objects for every evaluation packed into the task (a single-element sequence
 when `bundle_size=1`) and should return a single task name. When using the
-`HPCExecutor`, names also serve as task identifiers and must be unique within a
-batch. The returned name is stamped onto the `name` field of every
+`HPCExecutor`, names also serve as task identifiers and as the base of each
+task's filenames, so they must be unique within the executor (and
+filesystem-safe); the executor refuses to overwrite pre-existing task files, so
+distinct executors sharing a `workdir` also need distinct names. The returned
+name is stamped onto the `name` field of every
 `EvaluationFunctionContext` in the task, so the user function can read
 `context.name` to recover it.
 
@@ -173,7 +176,7 @@ The executor manages the full remote task lifecycle:
 
 | Parameter     | Description                                                              |
 | ------------- | ------------------------------------------------------------------------ |
-| `workdir`     | Shared filesystem directory for temporary I/O files.                     |
+| `workdir`     | Shared-filesystem directory for each task's serialized I/O files.        |
 | `workers`     | Maximum concurrent HPC jobs (default: 1).                                |
 | `queue_size`  | Maximum task queue size (0 = unlimited).                                 |
 | `interval`    | Polling interval in seconds (default: 1).                                |
@@ -183,6 +186,15 @@ The executor manages the full remote task lifecycle:
 | `cluster`     | Optional cluster name (for multi-cluster installations).                 |
 | `queue`       | Optional queue/partition name.                                           |
 | `cores`       | CPUs per task (default: 1).                                              |
+
+The `workdir` holds each task's serialized `.in`/`.out` files (written at
+absolute paths) and its captured stdout. It is also passed to `pysqa` as the
+job's `working_directory`, which the standard scheduler templates turn into a
+`chdir` directive (e.g. `#SBATCH --chdir=...`) — but whether a job actually runs
+there depends on the submission template, so do not rely on it. Because task
+filenames derive from task names, the executor **refuses to overwrite**
+pre-existing task files; give each concurrently-running executor its own
+`workdir`.
 
 Configuration can be provided either via a `template` string or a `config_path`
 directory containing `pysqa` configuration files. If neither is given, the
