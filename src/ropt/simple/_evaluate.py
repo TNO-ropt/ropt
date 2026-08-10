@@ -14,7 +14,7 @@ from ropt.context import EnOptContext
 from ._handlers import current_handlers
 from ._objective import adapt_objective
 from ._result import EvaluateResult, _build_evaluate_result
-from ._session import current_executor, run_step
+from ._session import current_executor, current_session, make_task_namer, run_step
 
 if TYPE_CHECKING:
     from typing import Any
@@ -114,10 +114,11 @@ def _run_evaluation(
     )
 
     callback = adapt_objective(objective, n_obj, n_con)
+    get_name = make_task_namer(current_session(), executor)
     evaluator = (
         FunctionEvaluator(function=callback)
         if executor is None
-        else ParallelEvaluator(function=callback, executor=executor)
+        else ParallelEvaluator(function=callback, executor=executor, get_name=get_name)
     )
     history = HistoryHandler()
     step = EvaluationStep(evaluator=evaluator)

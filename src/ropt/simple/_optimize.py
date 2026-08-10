@@ -17,7 +17,12 @@ from ._handlers import current_handlers
 from ._objective import adapt_objective
 from ._report import make_report_handler
 from ._result import OptimizeResult
-from ._session import current_executor, current_session, run_step
+from ._session import (
+    current_executor,
+    current_session,
+    make_task_namer,
+    run_step,
+)
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
@@ -25,6 +30,7 @@ if TYPE_CHECKING:
 
     from numpy.typing import ArrayLike
 
+    from ropt.components.evaluators import NameCallback
     from ropt.components.event_handlers import EventHandler
     from ropt.components.executors import Executor
     from ropt.enums import ExitCode
@@ -66,8 +72,9 @@ def optimize(  # ruff: ignore[too-many-arguments]
     Returns:
         A [`OptimizeResult`][ropt.simple.OptimizeResult] describing the outcome.
     """
+    executor = current_executor()
     return _optimize(
-        current_executor(),
+        executor,
         config,
         x0,
         objective,
@@ -76,6 +83,7 @@ def optimize(  # ruff: ignore[too-many-arguments]
         constraint_tolerance=constraint_tolerance,
         shared=current_handlers(),
         metadata=metadata,
+        get_name=make_task_namer(current_session(), executor),
     )
 
 
@@ -90,6 +98,7 @@ def _optimize(  # ruff: ignore[too-many-arguments]
     constraint_tolerance: float,
     shared: HandlerScope | None,
     metadata: dict[str, Any] | None = None,
+    get_name: NameCallback | None = None,
 ) -> OptimizeResult:
     context = EnOptContext.model_validate(config)
     n_obj = context.objectives.weights.size
@@ -103,7 +112,7 @@ def _optimize(  # ruff: ignore[too-many-arguments]
     evaluator = (
         FunctionEvaluator(function=callback)
         if executor is None
-        else ParallelEvaluator(function=callback, executor=executor)
+        else ParallelEvaluator(function=callback, executor=executor, get_name=get_name)
     )
     result_handler = ResultsHandler(constraint_tolerance=constraint_tolerance)
     step = OptimizationStep(evaluator=evaluator)
@@ -216,6 +225,7 @@ def optimize_many(  # ruff: ignore[too-many-arguments]
             constraint_tolerance=constraint_tolerance,
             shared=shared,
             metadata=run_metadata,
+            get_name=make_task_namer(session, executor),
         )
         for (run_config, run_x0, run_objective), run_report, run_metadata in zip(
             runs, reports, metadatas, strict=True

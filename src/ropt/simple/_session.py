@@ -20,8 +20,10 @@ high-level entry points run sequentially on the calling thread.
 from __future__ import annotations
 
 import asyncio
+import itertools
 import threading
 from contextvars import ContextVar, Token
+from functools import partial
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, TypeVar, cast
 
@@ -38,6 +40,7 @@ if TYPE_CHECKING:
     from numpy.typing import ArrayLike
 
     from ropt.components.compute_steps import ComputeStep
+    from ropt.components.evaluators import EvaluationFunctionContext, NameCallback
     from ropt.components.event_handlers import EventDispatcher
     from ropt.context import EnOptContext
     from ropt.enums import ExitCode
@@ -66,6 +69,7 @@ class Session:
         self._task_group: asyncio.TaskGroup | None = None
         self._shutdown: asyncio.Event | None = None
         self._executor: Executor | None = None
+        self._run_counter = itertools.count()
 
     def start(self) -> None:
         self._loop = asyncio.new_event_loop()
@@ -115,6 +119,11 @@ class Session:
             executor.start(self._task_group), self._loop
         ).result()
         self._executor = executor
+        # Restart run numbering so task names are unique within this executor.
+        self._run_counter = itertools.count()
+
+    def next_run_id(self) -> int:
+        return next(self._run_counter)
 
     def close_executor(self) -> None:
         executor = self._executor
@@ -351,3 +360,33 @@ def run_step(
         "ExitCode",
         step.run(context=context, variables=variables, metadata=metadata),
     )
+
+
+def _name_task(run_id: int, contexts: Sequence[EvaluationFunctionContext]) -> str:
+    context = contexts[0]
+    name = f"run{run_id}-b{context.batch_id}-r{context.realization}"
+    if context.perturbation >= 0:
+        name = f"{name}-p{context.perturbation}"
+    return name
+
+
+def make_task_namer(
+    session: Session | None, executor: Executor | None
+) -> NameCallback | None:
+    """Build an auto-naming callback for a single run's tasks.
+
+    Names have the form `run{id}-b{batch}-r{realization}[-p{perturbation}]`,
+    where `id` is unique within the executor and the `-p` suffix is dropped for
+    unperturbed evaluations. Only the `HPCExecutor` uses these names; for other
+    executors the callback is harmless.
+
+    Args:
+        session:  The active session, or `None` on the sequential floor.
+        executor: The active executor, or `None` on the sequential floor.
+
+    Returns:
+        A naming callback, or `None` when there is no executor.
+    """
+    if session is None or executor is None:
+        return None
+    return partial(_name_task, session.next_run_id())

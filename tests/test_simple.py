@@ -25,6 +25,7 @@ from ropt.simple import (
     threads,
 )
 from ropt.simple._objective import adapt_objective
+from ropt.simple._session import current_executor, current_session, make_task_namer
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -257,6 +258,72 @@ def test_optimize_with_threads(config: Any, test_functions: Any) -> None:
         result = optimize(config, initial_values, test_functions[0])
     assert result.variables is not None
     assert np.allclose(result.variables, 0.5, atol=0.02)
+
+
+def test_task_name_omits_perturbation_index_for_unperturbed_evaluation() -> None:
+    with threads(workers=1):
+        namer = make_task_namer(current_session(), current_executor())
+        assert namer is not None
+        context = EvaluationFunctionContext(
+            realization=2, perturbation=-1, batch_id=3, eval_idx=0
+        )
+        assert namer([context]) == "run0-b3-r2"
+
+
+def test_task_name_includes_perturbation_index_for_perturbed_evaluation() -> None:
+    with threads(workers=1):
+        namer = make_task_namer(current_session(), current_executor())
+        assert namer is not None
+        context = EvaluationFunctionContext(
+            realization=2, perturbation=5, batch_id=3, eval_idx=0
+        )
+        assert namer([context]) == "run0-b3-r2-p5"
+
+
+def test_task_name_uses_the_first_context_of_a_bundle() -> None:
+    with threads(workers=1):
+        namer = make_task_namer(current_session(), current_executor())
+        assert namer is not None
+        contexts = [
+            EvaluationFunctionContext(
+                realization=4, perturbation=-1, batch_id=1, eval_idx=0
+            ),
+            EvaluationFunctionContext(
+                realization=5, perturbation=-1, batch_id=1, eval_idx=1
+            ),
+        ]
+        assert namer(contexts) == "run0-b1-r4"
+
+
+def test_task_run_ids_are_unique_within_an_execution_block() -> None:
+    context = EvaluationFunctionContext(
+        realization=0, perturbation=-1, batch_id=0, eval_idx=0
+    )
+    with threads(workers=1):
+        first = make_task_namer(current_session(), current_executor())
+        second = make_task_namer(current_session(), current_executor())
+        assert first is not None
+        assert second is not None
+        assert first([context]) == "run0-b0-r0"
+        assert second([context]) == "run1-b0-r0"
+
+
+def test_task_run_ids_restart_for_each_execution_block() -> None:
+    context = EvaluationFunctionContext(
+        realization=0, perturbation=-1, batch_id=0, eval_idx=0
+    )
+    with threads(workers=1):
+        first = make_task_namer(current_session(), current_executor())
+    with threads(workers=1):
+        second = make_task_namer(current_session(), current_executor())
+    assert first is not None
+    assert second is not None
+    assert first([context]) == "run0-b0-r0"
+    assert second([context]) == "run0-b0-r0"
+
+
+def test_no_task_namer_without_an_execution_block() -> None:
+    assert make_task_namer(current_session(), current_executor()) is None
 
 
 def test_evaluate_many_with_threads(config: Any, test_functions: Any) -> None:
