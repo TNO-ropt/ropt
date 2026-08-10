@@ -103,6 +103,51 @@ def report(result):
 optimize(config, x0, objective, report=report)
 ```
 
+## Attaching metadata
+
+You can attach arbitrary **metadata** to a run, from two sources:
+
+- **Constant, per run** — pass a `metadata` dict to `optimize`, `optimize_many`,
+  `evaluate`, or `evaluate_many`. `ropt` copies it onto every result the run
+  produces, which is handy for tagging a run:
+
+  ```python
+  result = optimize(config, x0, objective, metadata={"run_id": 7})
+  print(result.results.metadata["run_id"])   # 7
+  ```
+
+  With `optimize_many`, give one dict (shared by all runs) or a list with one
+  dict per run:
+
+  ```python
+  results = optimize_many(
+      config,
+      start_points,
+      objective,
+      metadata=[{"run_id": i} for i in range(len(start_points))],
+  )
+  ```
+
+- **Per evaluation** — return an
+  [`EvaluationFunctionResult`][ropt.components.evaluators.EvaluationFunctionResult]
+  from the objective with a `metadata` field. This value is stored per
+  realization, next to the objective values:
+
+  ```python
+  from ropt.simple import EvaluationFunctionResult
+
+  def objective(variables, context):
+      value = ...
+      return EvaluationFunctionResult(objectives=value, metadata={"seconds": 1.3})
+  ```
+
+Neither kind is interpreted by `ropt`. Constant metadata ends up on
+`result.results.metadata`; per-evaluation metadata on
+`result.results.evaluations.metadata` (one entry per realization). See
+[Working with Results](../optimizer_configuration/results.md#metadata) for how
+each appears in the pandas export. The full runnable script is
+[examples/simple/metadata.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/metadata.py).
+
 ## Evaluating without optimizing
 
 Sometimes you only want the objective value for a point, without running an

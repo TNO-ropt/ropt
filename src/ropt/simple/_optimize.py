@@ -43,6 +43,7 @@ def optimize(  # ruff: ignore[too-many-arguments]
     handlers: Sequence[EventHandler] | None = None,
     report: ReportCallback | None = None,
     constraint_tolerance: float = 1e-10,
+    metadata: dict[str, Any] | None = None,
 ) -> OptimizeResult:
     """Run a single optimization.
 
@@ -58,6 +59,9 @@ def optimize(  # ruff: ignore[too-many-arguments]
                               `EvaluateResult` for each function evaluation.
         constraint_tolerance: The tolerance within which a constraint is
                               considered satisfied.
+        metadata:             An optional dictionary attached to every
+                              [`Results`][ropt.results.Results] this run emits,
+                              for example to tag or identify the run.
 
     Returns:
         A [`OptimizeResult`][ropt.simple.OptimizeResult] describing the outcome.
@@ -71,6 +75,7 @@ def optimize(  # ruff: ignore[too-many-arguments]
         report=report,
         constraint_tolerance=constraint_tolerance,
         shared=current_handlers(),
+        metadata=metadata,
     )
 
 
@@ -84,6 +89,7 @@ def _optimize(  # ruff: ignore[too-many-arguments]
     report: ReportCallback | None,
     constraint_tolerance: float,
     shared: HandlerScope | None,
+    metadata: dict[str, Any] | None = None,
 ) -> OptimizeResult:
     context = EnOptContext.model_validate(config)
     n_obj = context.objectives.weights.size
@@ -111,7 +117,10 @@ def _optimize(  # ruff: ignore[too-many-arguments]
         shared.attach_to(step)
 
     exit_code = run_step(
-        step, context=context, variables=np.asarray(x0, dtype=np.float64)
+        step,
+        context=context,
+        variables=np.asarray(x0, dtype=np.float64),
+        metadata=metadata,
     )
     return _build_run_result(exit_code, result_handler["results"])
 
@@ -146,6 +155,7 @@ def optimize_many(  # ruff: ignore[too-many-arguments]
     report: ReportCallback | Sequence[ReportCallback] | None = None,
     limit: int | None = None,
     constraint_tolerance: float = 1e-10,
+    metadata: dict[str, Any] | Sequence[dict[str, Any]] | None = None,
 ) -> tuple[OptimizeResult, ...]:
     """Run several optimizations concurrently, sharing the open session.
 
@@ -170,6 +180,10 @@ def optimize_many(  # ruff: ignore[too-many-arguments]
         limit:                The maximum number of runs to execute at once.
         constraint_tolerance: The tolerance within which a constraint is
                               considered satisfied.
+        metadata:             An optional dictionary attached to every
+                              [`Results`][ropt.results.Results] a run emits,
+                              shared by all runs or given one per run — for
+                              example to tag each run with `{"run_id": i}`.
 
     Returns:
         One [`OptimizeResult`][ropt.simple.OptimizeResult] per run, in order.
@@ -189,6 +203,7 @@ def optimize_many(  # ruff: ignore[too-many-arguments]
     shared = current_handlers()
     runs = _broadcast(config, x0, objective)
     reports = _broadcast_reports(report, len(runs))
+    metadatas = _broadcast_metadata(metadata, len(runs))
     jobs: list[Callable[[], OptimizeResult]] = [
         partial(
             _optimize,
@@ -200,9 +215,10 @@ def optimize_many(  # ruff: ignore[too-many-arguments]
             report=run_report,
             constraint_tolerance=constraint_tolerance,
             shared=shared,
+            metadata=run_metadata,
         )
-        for (run_config, run_x0, run_objective), run_report in zip(
-            runs, reports, strict=True
+        for (run_config, run_x0, run_objective), run_report, run_metadata in zip(
+            runs, reports, metadatas, strict=True
         )
     ]
     return tuple(session.gather(jobs, limit))
@@ -256,3 +272,17 @@ def _broadcast_reports(
         msg = "report sequence length must match the number of runs."
         raise ValueError(msg)
     return reports
+
+
+def _broadcast_metadata(
+    metadata: dict[str, Any] | Sequence[dict[str, Any]] | None, count: int
+) -> list[dict[str, Any] | None]:
+    if metadata is None:
+        return [None] * count
+    if isinstance(metadata, Mapping):
+        return [metadata] * count
+    metadatas: list[dict[str, Any] | None] = list(metadata)
+    if len(metadatas) != count:
+        msg = "metadata sequence length must match the number of runs."
+        raise ValueError(msg)
+    return metadatas

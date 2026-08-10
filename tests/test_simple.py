@@ -107,6 +107,16 @@ def test_optimize_no_valid_result_has_none_fields(config: Any) -> None:
     assert result.results is None
 
 
+def test_optimize_attaches_metadata_to_results(
+    config: Any, test_functions: Any
+) -> None:
+    result = optimize(
+        config, initial_values, test_functions[0], metadata={"tag": "run-a"}
+    )
+    assert result.results is not None
+    assert result.results.metadata["tag"] == "run-a"
+
+
 def test_optimize_local_handler_collects_results(
     config: Any, test_functions: Any
 ) -> None:
@@ -219,6 +229,27 @@ def test_evaluate_multiple_objectives(config: Any, objective: Any) -> None:
     assert result.objectives is not None
     assert result.objectives.shape == (2,)
     assert result.constraints is None
+
+
+def test_evaluate_attaches_metadata_to_results(
+    config: Any, test_functions: Any
+) -> None:
+    result = evaluate(
+        config, initial_values, test_functions[0], metadata={"tag": "eval"}
+    )
+    assert result.results is not None
+    assert result.results.metadata["tag"] == "eval"
+
+
+def test_evaluate_many_attaches_metadata_to_every_result(
+    config: Any, test_functions: Any
+) -> None:
+    matrix = np.array([initial_values, np.zeros(initial_values.size)])
+    results = evaluate_many(config, matrix, test_functions[0], metadata={"tag": "eval"})
+    assert len(results) == 2
+    for result in results:
+        assert result.results is not None
+        assert result.results.metadata["tag"] == "eval"
 
 
 def test_optimize_with_threads(config: Any, test_functions: Any) -> None:
@@ -355,6 +386,44 @@ def test_optimize_many_rejects_mismatched_report_sequence(
     starts = np.array([initial_values, np.zeros(initial_values.size)])
     with threads(workers=2), pytest.raises(ValueError, match="number of runs"):
         optimize_many(config, starts, test_functions[0], report=[lambda _r: None])
+
+
+def test_optimize_many_broadcasts_a_single_metadata_dict(
+    config: Any, test_functions: Any
+) -> None:
+    starts = np.array([initial_values, np.zeros(initial_values.size)])
+    with threads(workers=2):
+        results = optimize_many(
+            config, starts, test_functions[0], metadata={"group": "g"}
+        )
+    for result in results:
+        assert result.results is not None
+        assert result.results.metadata["group"] == "g"
+
+
+def test_optimize_many_accepts_metadata_per_run(
+    config: Any, test_functions: Any
+) -> None:
+    starts = np.array([initial_values, np.zeros(initial_values.size)])
+    with threads(workers=2):
+        results = optimize_many(
+            config,
+            starts,
+            test_functions[0],
+            metadata=[{"run_id": 0}, {"run_id": 1}],
+        )
+    assert len(results) == 2
+    for idx, result in enumerate(results):
+        assert result.results is not None
+        assert result.results.metadata["run_id"] == idx
+
+
+def test_optimize_many_rejects_mismatched_metadata_sequence(
+    config: Any, test_functions: Any
+) -> None:
+    starts = np.array([initial_values, np.zeros(initial_values.size)])
+    with threads(workers=2), pytest.raises(ValueError, match="number of runs"):
+        optimize_many(config, starts, test_functions[0], metadata=[{"run_id": 0}])
 
 
 def test_optimize_many_respects_limit(config: Any, test_functions: Any) -> None:

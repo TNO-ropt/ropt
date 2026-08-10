@@ -31,6 +31,8 @@ def evaluate(
     config: dict[str, Any],
     variables: ArrayLike,
     objective: ObjectiveCallback,
+    *,
+    metadata: dict[str, Any] | None = None,
 ) -> EvaluateResult:
     """Evaluate a single variable vector without optimizing.
 
@@ -42,6 +44,8 @@ def evaluate(
         config:    The optimization configuration.
         variables: The variable vector to evaluate.
         objective: The per-realization objective callback.
+        metadata:  An optional dictionary attached to the emitted
+                   [`Results`][ropt.results.Results].
 
     Returns:
         An [`EvaluateResult`][ropt.simple.EvaluateResult] for the vector.
@@ -53,7 +57,7 @@ def evaluate(
     if array.ndim != 1:
         msg = "evaluate() takes a single vector; use evaluate_many() for a batch."
         raise ValueError(msg)
-    results = _run_evaluation(current_executor(), config, array, objective)
+    results = _run_evaluation(current_executor(), config, array, objective, metadata)
     return _build_evaluate_result(results[0])
 
 
@@ -61,6 +65,8 @@ def evaluate_many(
     config: dict[str, Any],
     variables: ArrayLike,
     objective: ObjectiveCallback,
+    *,
+    metadata: dict[str, Any] | None = None,
 ) -> tuple[EvaluateResult, ...]:
     """Evaluate a batch of variable vectors without optimizing.
 
@@ -72,6 +78,8 @@ def evaluate_many(
         config:    The optimization configuration.
         variables: The variable vectors to evaluate, one per row.
         objective: The per-realization objective callback.
+        metadata:  An optional dictionary attached to every emitted
+                   [`Results`][ropt.results.Results].
 
     Returns:
         One [`EvaluateResult`][ropt.simple.EvaluateResult] per input vector.
@@ -86,7 +94,7 @@ def evaluate_many(
             "use evaluate() for a single vector."
         )
         raise ValueError(msg)
-    results = _run_evaluation(current_executor(), config, array, objective)
+    results = _run_evaluation(current_executor(), config, array, objective, metadata)
     return tuple(_build_evaluate_result(result) for result in results)
 
 
@@ -95,6 +103,7 @@ def _run_evaluation(
     config: dict[str, Any],
     variables: ArrayLike,
     objective: ObjectiveCallback,
+    metadata: dict[str, Any] | None = None,
 ) -> tuple[FunctionResults, ...]:
     context = EnOptContext.model_validate(config)
     n_obj = context.objectives.weights.size
@@ -121,5 +130,6 @@ def _run_evaluation(
         step,
         context=context,
         variables=np.asarray(variables, dtype=np.float64),
+        metadata=metadata,
     )
     return history["results"] or ()

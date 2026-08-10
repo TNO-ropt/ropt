@@ -23,7 +23,7 @@ import asyncio
 import threading
 from contextvars import ContextVar, Token
 from pathlib import Path
-from typing import TYPE_CHECKING, TypeVar, cast
+from typing import TYPE_CHECKING, Any, TypeVar, cast
 
 from ropt.components.executors import (
     Executor,
@@ -330,6 +330,7 @@ def run_step(
     *,
     context: EnOptContext,
     variables: ArrayLike,
+    metadata: dict[str, Any] | None = None,
 ) -> ExitCode:
     """Run a compute step on the calling thread.
 
@@ -340,8 +341,13 @@ def run_step(
         step:      The compute step to run.
         context:   The optimizer context.
         variables: The initial variable vector(s).
+        metadata:  Optional dictionary attached to every emitted
+                   [`Results`][ropt.results.Results].
 
     Returns:
         The exit code returned by the step.
     """
-    return cast("ExitCode", step.run(context=context, variables=variables))
+    return cast(
+        "ExitCode",
+        step.run(context=context, variables=variables, metadata=metadata),
+    )

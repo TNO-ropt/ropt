@@ -193,6 +193,45 @@ for instance by offering a `domain` argument that controls whether results are
 handled in user or optimizer domain. See [Optimization Workflows](../low_level/workflows.md)
 for details on how individual event handlers handle this.
 
+## Metadata
+
+Results carry two independent kinds of metadata, neither interpreted by `ropt`:
+
+- **Result metadata** — the `metadata` dict on every
+  [`Results`][ropt.results.Results] object, identical for every result of a run.
+  It is set once when the run starts: pass a `metadata` dict to the simple-API
+  [`optimize`][ropt.simple.optimize] /
+  [`optimize_many`][ropt.simple.optimize_many] /
+  [`evaluate`][ropt.simple.evaluate] functions (or to the low-level compute
+  step). Use it to tag or identify a run, for example `{"run_id": 7}`.
+- **Per-realization metadata** — the `metadata` dict on the `evaluations` field,
+  with one array entry per realization. It is produced by the objective when it
+  returns an
+  [`EvaluationFunctionResult`][ropt.components.evaluators.EvaluationFunctionResult]
+  with a `metadata` field.
+
+Result metadata is passed to the run and read back from `metadata`:
+
+```python
+result = optimize(config, x0, objective, metadata={"run_id": 7})
+result.results.metadata            # {'run_id': 7}
+```
+
+Per-realization metadata is returned by the objective and read back from the
+`evaluations` field, with one entry per realization:
+
+```python
+def objective(variables, context):
+    ...
+    return EvaluationFunctionResult(objectives=value, metadata={"shift": shift})
+
+
+result.results.evaluations.metadata   # {'shift': array([...])}
+```
+
+The full runnable script is
+[examples/simple/metadata.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/metadata.py).
+
 ## Exporting to pandas
 
 `ropt` can export results to `pandas` DataFrames for analysis and reporting.
@@ -301,11 +340,51 @@ batch_id
 
 Each column is a `(field, label)` pair, and each row is one result identified by
 its `batch_id`. Field names use dot notation for nested sub-fields (e.g.,
-`evaluations.variables`, `functions.target_objective`); for `metadata`
-dictionaries, use a second dot (`evaluations.metadata.my_key`). The `result_type`
+`evaluations.variables`, `functions.target_objective`). The `result_type`
 argument selects which results to process: `"functions"` for
 [`FunctionResults`][ropt.results.FunctionResults] only, `"gradients"` for
 [`GradientResults`][ropt.results.GradientResults] only.
+
+### Metadata columns
+
+The two kinds of [metadata](#metadata) are exported differently, and the two
+functions are **not** symmetric.
+
+`to_dataframe` works on a single result field, so it reaches that field's
+**per-realization metadata** (named `metadata.<key>`), which keeps the
+`realization` axis. For example, if the objective attached a per-realization
+`shift`:
+
+```python
+df = result.to_dataframe("evaluations", select=["metadata.shift"])
+```
+
+```
+                     metadata.shift
+batch_id realization
+1        r0                     0.9
+         r1                     1.1
+```
+
+`to_dataframe` **cannot** reach the run-level **result metadata**, because it is
+not part of any single field. Use `results_to_dataframe` for that: name it with a
+top-level `metadata.` prefix to get one value per result — handy for pulling in a
+run tag:
+
+```python
+df = results_to_dataframe(
+    all_results,
+    fields={"metadata.run_id", "functions.target_objective"},
+    result_type="functions",
+)
+```
+
+```
+          functions.target_objective  metadata.run_id
+batch_id
+1                               1.83                0
+2                               0.42                1
+```
 
 ### Labels and the index
 

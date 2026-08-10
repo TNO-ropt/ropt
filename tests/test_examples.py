@@ -84,6 +84,11 @@ def test_example_simple_optimize_many(tmp_path: Path, monkeypatch: Any) -> None:
     _load_from_file("optimize_many", "simple").main()
 
 
+def test_example_simple_metadata(tmp_path: Path, monkeypatch: Any) -> None:
+    monkeypatch.chdir(tmp_path)
+    _load_from_file("metadata", "simple").main()
+
+
 def test_example_simple_handlers(tmp_path: Path, monkeypatch: Any) -> None:
     monkeypatch.chdir(tmp_path)
     _load_from_file("handlers", "simple").main()

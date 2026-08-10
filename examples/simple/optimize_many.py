@@ -4,7 +4,8 @@
 open session and its pool. Any of ``config``/``x0``/``objective`` may be a
 single value (broadcast to every run) or a per-run sequence; here a matrix of
 start vectors sets the number of runs while the config and objective are re-used
-by all runs.
+by all runs. Each run is tagged with a ``metadata`` dictionary (``run_id``) that
+is attached to its results, so the runs can be told apart afterwards.
 """
 
 from typing import Any
@@ -44,11 +45,16 @@ def rosenbrock(
 
 
 def main() -> None:
-    """Run one optimization per start vector, concurrently."""
+    """Run one optimization per start vector, concurrently, tagging each run."""
+    run_metadata = [{"run_id": idx} for idx in range(len(STARTS))]
     with threads(workers=3):
-        results = optimize_many(CONFIG, STARTS, rosenbrock, limit=2)
-    for start, result in zip(STARTS, results, strict=True):
-        print(f"start {start} -> objective {result.target_objective}")
+        results = optimize_many(
+            CONFIG, STARTS, rosenbrock, metadata=run_metadata, limit=2
+        )
+    for result in results:
+        assert result.results is not None
+        run_id = result.results.metadata["run_id"]
+        print(f"run {run_id} -> objective {result.target_objective}")
         assert result.target_objective is not None
         assert result.target_objective < 1.0
 
