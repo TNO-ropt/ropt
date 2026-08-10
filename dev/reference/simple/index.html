@@ -3292,7 +3292,9 @@ are not part of this module; import them from <a class="autorefs autorefs-intern
             <td>
               <div class="doc-md-description">
                 <p>An optional callback invoked with an
-                  <code>EvaluateResult</code> for each function evaluation.</p>
+                  <code>EvaluateResult</code> for each function evaluation;
+                  return <code>True</code> from it to stop the optimization
+                  early with <code>USER_ABORT</code>.</p>
               </div>
             </td>
             <td>
@@ -3499,7 +3501,9 @@ the rest and propagates (fail-fast). See
               <div class="doc-md-description">
                 <p>An optional callback invoked with an
                   <code>EvaluateResult</code> for each function evaluation,
-                  either shared by every run or one per run.</p>
+                  either shared by every run or one per run; return
+                  <code>True</code> from it to stop that run early with
+                  <code>USER_ABORT</code>.</p>
               </div>
             </td>
             <td>
@@ -4407,7 +4411,8 @@ nested block lists (re-list an enclosing handler to feed it explicitly).</p>
             <td>
               <div class="doc-md-description">
                 <p>An optional callback invoked with an <code>EvaluateResult</code> for each
-     function evaluation across the block's runs.</p>
+     function evaluation across the block's runs; return <code>True</code> from
+     it to stop the emitting run early with <code>USER_ABORT</code>.</p>
               </div>
             </td>
             <td>
@@ -4886,7 +4891,7 @@ input vector. Each shared field has the same shape as its counterpart on
   </span>
 
 </h2>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">ReportCallback</span> <span class="o">=</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">EvaluateResult</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">ReportCallback</span> <span class="o">=</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">EvaluateResult</span><span class="p">],</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents first">
