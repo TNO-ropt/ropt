@@ -2828,6 +2828,10 @@ event types.</p>
 
 
 
+
+
+
+
 <div class="doc doc-object doc-class">
 
 
@@ -2895,6 +2899,18 @@ event types.</p>
             <td>
               <div class="doc-md-description">
                 <p>Tuple of result objects associated with the event.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.events.EnOptEvent.source">source</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.components.compute_steps.ComputeStep (ropt.components.compute_steps.base.ComputeStep)" href="../components_compute_steps/#ropt.components.compute_steps.ComputeStep">ComputeStep</a> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The compute step that emitted the event; a handler may call
+         its <code>stop()</code> to stop that run.</p>
               </div>
             </td>
           </tr>

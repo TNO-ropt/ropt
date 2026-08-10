@@ -3176,7 +3176,7 @@ track, store, or react to results as they arrive.</p>
 
   
       dataclass
-  " href="../../reference/events/#ropt.events.EnOptEvent"><code>EnOptEvent</code></a> dataclass with three
+  " href="../../reference/events/#ropt.events.EnOptEvent"><code>EnOptEvent</code></a> dataclass with four
 fields:</p>
 <table>
 <thead>
@@ -3206,6 +3206,11 @@ fields:</p>
       dataclass
   " href="../../reference/results/#ropt.results.Results"><code>Results</code></a><code>, ...]</code></td>
 <td>Result objects (empty tuple when no results apply).</td>
+</tr>
+<tr>
+<td><code>source</code></td>
+<td><a class="autorefs autorefs-internal" title="            ropt.components.compute_steps.ComputeStep" href="../../reference/components_compute_steps/#ropt.components.compute_steps.ComputeStep"><code>ComputeStep</code></a><code>\| None</code></td>
+<td>The compute step that emitted the event; call its <code>stop()</code> to stop that run.</td>
 </tr>
 </tbody>
 </table>
@@ -3463,7 +3468,7 @@ returns nothing:</p>
 </tr>
 <tr>
 <td><code>USER_ABORT</code></td>
-<td>Reserved for internal use; not currently exposed to users.</td>
+<td>An event handler requested a stop via <code>event.source.stop()</code>.</td>
 </tr>
 <tr>
 <td><code>EXECUTOR_STOPPED</code></td>
@@ -3471,6 +3476,14 @@ returns nothing:</p>
 </tr>
 </tbody>
 </table>
+<p>An event handler can stop its own optimization by calling <code>event.source.stop()</code>
+— for example after inspecting the <code>results</code> of a <code>FINISHED_EVALUATION</code> event and
+deciding no further evaluations are worthwhile. The remaining handlers for that
+event still run, and the optimizer then stops with <code>USER_ABORT</code> before the next
+evaluation. Only the run that owns the emitting step is affected, so concurrent
+optimizations continue. <code>stop()</code> merely sets a thread-safe flag, so it is safe
+to call from a handler running behind an
+<a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventDispatcher" href="../../reference/components_event_handlers/#ropt.components.event_handlers.EventDispatcher"><code>EventDispatcher</code></a> as well.</p>
 <h2 id="event-handlers">Event handlers</h2>
 <p>Event handlers are attached to a compute step via its <code>add_event_handler</code>
 method. Once attached, the handler receives every event the step emits.</p>

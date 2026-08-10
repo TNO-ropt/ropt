@@ -2372,6 +2372,28 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#ropt.components.compute_steps.ComputeStep.stop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        stop
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.components.compute_steps.ComputeStep.stopped" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        stopped
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ropt.components.compute_steps.ComputeStep.run" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2878,6 +2900,28 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#ropt.components.compute_steps.ComputeStep.stop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        stop
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.components.compute_steps.ComputeStep.stopped" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        stopped
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ropt.components.compute_steps.ComputeStep.run" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3173,6 +3217,88 @@ compute step.</p>
             <td>
               <div class="doc-md-description">
                 <p>A list of handlers.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.components.compute_steps.ComputeStep.stop" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">stop</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">stop</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Request that this run stop gracefully at the next safe point.</p>
+<p>Intended for an event handler that decides, after inspecting an event,
+that its optimization should stop; the run then ends with
+<code>ExitCode.USER_ABORT</code>. Setting the request is thread-safe, so a handler
+running behind an event dispatcher may call it too. A new <code>run</code> clears
+any earlier request.</p>
+
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="ropt.components.compute_steps.ComputeStep.stopped" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">stopped</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">stopped</span><span class="p">:</span> <span class="nb">bool</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Whether a stop has been requested for the current run.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p><code>True</code> if <code>stop</code> has been called since the run started.</p>
               </div>
             </td>
           </tr>
