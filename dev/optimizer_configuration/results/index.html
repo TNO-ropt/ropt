@@ -3453,6 +3453,14 @@ for details on how individual event handlers handle this.</p>
 <h2 id="exporting-to-pandas">Exporting to pandas</h2>
 <p><code>ropt</code> can export results to <code>pandas</code> DataFrames for analysis and reporting.
 This requires the <code>pandas</code> optional extra (see <a href="../../getting_started/installation/">Installation</a>).</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The <code>to_dataframe</code> and <code>results_to_dataframe</code> functions shown here are the
+low-level export primitives. Most users do not call them directly: the
+<a href="../../simple/simple/#dataframehandler"><code>DataFrameHandler</code></a> builds and updates
+these tables automatically as an optimization runs. This section explains
+what that handler produces under the hood.</p>
+</div>
 <p>The row index and the unstacked column labels come from the
 <a href="../configuration/#names"><code>names</code></a> mapping in the configuration. If an axis is
 not named, its labels fall back to 0-based integer indices. For example,

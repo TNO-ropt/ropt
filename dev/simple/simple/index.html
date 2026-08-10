@@ -1171,13 +1171,80 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#collecting-results-across-runs" class="md-nav__link">
+  <a href="#result-handlers" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Collecting results across runs
+        Result handlers
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Result handlers">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#built-in-handlers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Built-in handlers
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Built-in handlers">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#resultshandler" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ResultsHandler
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#historyhandler" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HistoryHandler
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dataframehandler" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DataFrameHandler
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#custom-handlers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Custom handlers
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -2908,13 +2975,80 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#collecting-results-across-runs" class="md-nav__link">
+  <a href="#result-handlers" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Collecting results across runs
+        Result handlers
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Result handlers">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#built-in-handlers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Built-in handlers
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Built-in handlers">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#resultshandler" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ResultsHandler
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#historyhandler" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HistoryHandler
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dataframehandler" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DataFrameHandler
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#custom-handlers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Custom handlers
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -3214,30 +3348,99 @@ list (one per run):</p>
 </ul>
 <p>An execution block is required: calling <code>optimize_many</code> without one raises a
 <code>RuntimeError</code>.</p>
-<h2 id="collecting-results-across-runs">Collecting results across runs</h2>
-<p>An <a class="autorefs autorefs-internal" title="            ropt.simple.optimize" href="../../reference/simple/#ropt.simple.optimize"><code>optimize</code></a> call returns only the best result. To
-collect <em>every</em> result — for example across a loop of runs — use a
-<a class="autorefs autorefs-internal" title="            ropt.simple.handlers" href="../../reference/simple/#ropt.simple.handlers"><code>handlers</code></a> block with a
-<a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.HistoryHandler" href="../../reference/components_event_handlers/#ropt.components.event_handlers.HistoryHandler"><code>HistoryHandler</code></a>:</p>
+<h2 id="result-handlers">Result handlers</h2>
+<p>An <a class="autorefs autorefs-internal" title="            ropt.simple.optimize" href="../../reference/simple/#ropt.simple.optimize"><code>optimize</code></a> call returns only the best result. A
+<strong>handler</strong> lets you collect or react to <em>every</em> result instead: it is an object
+that observes an optimization and processes its results as they arrive — keeping
+them, tabulating them, or invoking a callback.</p>
+<p>Attach handlers to a single optimization with the <code>handlers</code> argument, or share
+them across a block of runs with a <a class="autorefs autorefs-internal" title="            ropt.simple.handlers" href="../../reference/simple/#ropt.simple.handlers"><code>handlers</code></a> block so
+one handler accumulates results from every <code>optimize</code> inside it:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.simple</span><span class="w"> </span><span class="kn">import</span> <span class="n">HistoryHandler</span><span class="p">,</span> <span class="n">handlers</span><span class="p">,</span> <span class="n">optimize</span>
 </span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>
 </span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="n">history</span> <span class="o">=</span> <span class="n">HistoryHandler</span><span class="p">()</span>
-</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="k">with</span> <span class="n">handlers</span><span class="p">(</span><span class="n">history</span><span class="p">):</span>
-</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>    <span class="k">for</span> <span class="n">x0</span> <span class="ow">in</span> <span class="n">start_points</span><span class="p">:</span>
-</span><span id="__span-13-6"><a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a>        <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>
-</span><span id="__span-13-7"><a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a>
-</span><span id="__span-13-8"><a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a><span class="nb">print</span><span class="p">(</span><span class="n">history</span><span class="o">.</span><span class="n">results</span><span class="p">)</span>   <span class="c1"># all results from every run in the block</span>
+</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>
+</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">handlers</span><span class="o">=</span><span class="p">[</span><span class="n">history</span><span class="p">])</span>   <span class="c1"># a single run</span>
+</span><span id="__span-13-6"><a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a><span class="c1"># ...or accumulate across many runs:</span>
+</span><span id="__span-13-7"><a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a><span class="k">with</span> <span class="n">handlers</span><span class="p">(</span><span class="n">history</span><span class="p">):</span>
+</span><span id="__span-13-8"><a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a>    <span class="k">for</span> <span class="n">x0</span> <span class="ow">in</span> <span class="n">start_points</span><span class="p">:</span>
+</span><span id="__span-13-9"><a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a>        <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>
+</span><span id="__span-13-10"><a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a>
+</span><span id="__span-13-11"><a id="__codelineno-13-11" name="__codelineno-13-11" href="#__codelineno-13-11"></a><span class="nb">print</span><span class="p">(</span><span class="n">history</span><span class="o">.</span><span class="n">results</span><span class="p">)</span>   <span class="c1"># every result collected</span>
 </span></code></pre></div>
-<p>The handlers (<a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.HistoryHandler" href="../../reference/components_event_handlers/#ropt.components.event_handlers.HistoryHandler"><code>HistoryHandler</code></a>,
-<a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.ResultsHandler" href="../../reference/components_event_handlers/#ropt.components.event_handlers.ResultsHandler"><code>ResultsHandler</code></a>,
-<a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.DataFrameHandler" href="../../reference/components_event_handlers/#ropt.components.event_handlers.DataFrameHandler"><code>DataFrameHandler</code></a>) are imported straight from
-<code>ropt.simple</code>.</p>
+<p>Handlers that store results expose them through <code>handler["results"]</code> (and, for
+<code>HistoryHandler</code>, the <code>history.results</code> shortcut).</p>
+<h3 id="built-in-handlers">Built-in handlers</h3>
+<p><code>ropt</code> ships several ready-to-use handlers, all re-exported from <code>ropt.simple</code>.</p>
+<h4 id="resultshandler"><code>ResultsHandler</code></h4>
+<p><a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.ResultsHandler" href="../../reference/components_event_handlers/#ropt.components.event_handlers.ResultsHandler"><code>ResultsHandler</code></a> keeps a single result, read via
+<code>handler["results"]</code>:</p>
+<ul>
+<li><code>what="best"</code> (default) keeps the result with the lowest weighted objective
+  seen so far; <code>what="last"</code> keeps the most recent valid result.</li>
+<li><code>constraint_tolerance</code> (optional) discards results that violate a constraint
+  by more than the given tolerance.</li>
+<li><code>filter</code> (optional) is a callable that receives each
+  <a class="autorefs autorefs-internal" title="            ropt.results.Results
+
+
+  
+      dataclass
+  " href="../../reference/results/#ropt.results.Results"><code>Results</code></a> and returns <code>True</code> to keep it or <code>False</code> to
+  drop it.</li>
+</ul>
+<h4 id="historyhandler"><code>HistoryHandler</code></h4>
+<p><a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.HistoryHandler" href="../../reference/components_event_handlers/#ropt.components.event_handlers.HistoryHandler"><code>HistoryHandler</code></a> keeps <em>every</em> result it receives,
+in order, as a tuple read via <code>handler["results"]</code> (or <code>handler.results</code>). It is
+<code>None</code> until the first result arrives.</p>
+<h4 id="dataframehandler"><code>DataFrameHandler</code></h4>
+<p><a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.DataFrameHandler" href="../../reference/components_event_handlers/#ropt.components.event_handlers.DataFrameHandler"><code>DataFrameHandler</code></a> collects results into named
+pandas DataFrames (<code>pandas</code> must be installed). Define a table with
+<code>add_table(name, table_type, columns)</code>, where <code>table_type</code> is <code>"functions"</code> or
+<code>"gradients"</code> and <code>columns</code> maps result-field names (dotted attribute syntax) to
+column titles:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.simple</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataFrameHandler</span>
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>
+</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="n">tables</span> <span class="o">=</span> <span class="n">DataFrameHandler</span><span class="p">()</span>
+</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="n">tables</span><span class="o">.</span><span class="n">add_table</span><span class="p">(</span>
+</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>    <span class="s2">&quot;summary&quot;</span><span class="p">,</span>
+</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a>    <span class="s2">&quot;functions&quot;</span><span class="p">,</span>
+</span><span id="__span-14-7"><a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a>    <span class="p">{</span>
+</span><span id="__span-14-8"><a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a>        <span class="s2">&quot;batch_id&quot;</span><span class="p">:</span> <span class="s2">&quot;Batch&quot;</span><span class="p">,</span>
+</span><span id="__span-14-9"><a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a>        <span class="s2">&quot;functions.objectives&quot;</span><span class="p">:</span> <span class="s2">&quot;Objective&quot;</span><span class="p">,</span>
+</span><span id="__span-14-10"><a id="__codelineno-14-10" name="__codelineno-14-10" href="#__codelineno-14-10"></a>        <span class="s2">&quot;evaluations.variables&quot;</span><span class="p">:</span> <span class="s2">&quot;Variable&quot;</span><span class="p">,</span>
+</span><span id="__span-14-11"><a id="__codelineno-14-11" name="__codelineno-14-11" href="#__codelineno-14-11"></a>    <span class="p">},</span>
+</span><span id="__span-14-12"><a id="__codelineno-14-12" name="__codelineno-14-12" href="#__codelineno-14-12"></a><span class="p">)</span>
+</span><span id="__span-14-13"><a id="__codelineno-14-13" name="__codelineno-14-13" href="#__codelineno-14-13"></a><span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">handlers</span><span class="o">=</span><span class="p">[</span><span class="n">tables</span><span class="p">])</span>
+</span><span id="__span-14-14"><a id="__codelineno-14-14" name="__codelineno-14-14" href="#__codelineno-14-14"></a><span class="n">df</span> <span class="o">=</span> <span class="n">tables</span><span class="p">[</span><span class="s2">&quot;summary&quot;</span><span class="p">]</span>
+</span></code></pre></div>
+<p>Read one table with <code>tables["summary"]</code>, or all of them with <code>get_tables()</code>. A
+field whose value is a vector or matrix expands to several columns; the extra
+column levels come from the field's axis labels (or indices), joined to the
+title with a separator (<code>,</code> by default, set with <code>sep=</code>). For example, a
+length-2 <code>evaluations.variables</code> gives <code>Variable,v0</code> and <code>Variable,v1</code>. Because
+the column names follow
+<a href="../../optimizer_configuration/results/#metadata-columns"><code>results_to_dataframe</code></a>,
+both result-level and per-realization metadata can be included and renamed.</p>
+<p>Convenience methods:</p>
+<ul>
+<li><code>set_default_tables()</code> registers a standard set of tables (<code>functions</code>,
+  <code>evaluations</code>, <code>constraints</code> for function results; <code>gradients</code>,
+  <code>perturbations</code> for gradient results).</li>
+<li><code>add_column(table, name, title)</code> adds one column to an existing table.</li>
+<li><code>set_callback(fn)</code> calls <code>fn(event)</code> whenever the tables are updated.</li>
+</ul>
+<h3 id="custom-handlers">Custom handlers</h3>
+<p>Handlers are not limited to the built-ins: you — or another package — can
+provide your own by implementing <code>ropt</code>'s event-handler interface. The
+<a href="../../low_level/workflows/#event-handlers">Low-Level API</a> describes the event
+model, the handler protocol, and how to write one.</p>
 <h2 id="a-note-on-enums">A note on enums</h2>
 <p>A few config values and result fields use enumerations, such as
 <a class="autorefs autorefs-internal" title="            VariableType" href="../../reference/enums/#ropt.enums.VariableType"><code>VariableType</code></a> for integer variables and
 <a class="autorefs autorefs-internal" title="            ExitCode" href="../../reference/enums/#ropt.enums.ExitCode"><code>ExitCode</code></a> for <code>result.exit_code</code>. These are <strong>not</strong> part
 of <code>ropt.simple</code>; import them from <a class="autorefs autorefs-internal" title="            ropt.enums" href="../../reference/enums/#ropt.enums"><code>ropt.enums</code></a>:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.enums</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExitCode</span><span class="p">,</span> <span class="n">VariableType</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.enums</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExitCode</span><span class="p">,</span> <span class="n">VariableType</span>
 </span></code></pre></div>
 
 
