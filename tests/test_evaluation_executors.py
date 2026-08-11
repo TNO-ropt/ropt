@@ -15,7 +15,7 @@ from ropt.components.evaluators import (
     EvaluationFunctionResult,
     ParallelEvaluator,
 )
-from ropt.components.evaluators._parallel_evaluator import _abort, _handle_result
+from ropt.components.evaluators._parallel_evaluator import _handle_result
 from ropt.components.event_handlers import ResultsHandler
 from ropt.components.executors import (
     HPCExecutor,
@@ -24,6 +24,7 @@ from ropt.components.executors import (
     Task,
     ThreadingExecutor,
 )
+from ropt.components.executors._collect import _abort
 from ropt.components.executors._multiprocessing_executor import (
     _HAVE_CLOUDPICKLE,
     _run_cloudpickled,
@@ -699,8 +700,11 @@ async def test_put_tasks_does_not_raise_executor_stopped_into_task_group(
         active=np.array([True]),
         realizations=np.array([0], dtype=np.intc),
     )
+    bundles = evaluator._make_bundles(  # ruff: ignore[private-member-access]
+        np.zeros((1, 1)), batch_context, 0
+    )
     await evaluator._put_tasks(  # ruff: ignore[private-member-access]
-        np.zeros((1, 1)), batch_context, ResultsQueue(), 0
+        bundles, ResultsQueue()
     )
 
 
@@ -743,8 +747,7 @@ async def test_handle_result_records_executor_failure_as_nan() -> None:  # ruff:
         results_queue=ResultsQueue(),
         result=ExecutorFailure("Background process was killed"),
     )
-    handled = _handle_result(task, results, {}, objective_count=1, eval_count=2)
-    assert handled == 2
+    _handle_result(task, results, {}, objective_count=1, eval_count=2)
     assert np.all(np.isnan(results))
 
 

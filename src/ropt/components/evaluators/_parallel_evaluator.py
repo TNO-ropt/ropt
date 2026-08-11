@@ -2,14 +2,15 @@
 
 from __future__ import annotations
 
-import queue
+from functools import partial
 from itertools import starmap
-from typing import TYPE_CHECKING, Any, NoReturn
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
 from ropt._logging import get_logger
 from ropt.components.executors import Executor, ResultsQueue, Task
+from ropt.components.executors._collect import submit_and_collect
 from ropt.evaluation import EvaluationBatchContext, EvaluationBatchResult
 from ropt.exceptions import ExecutorFailure, ExecutorStopped
 
@@ -130,38 +131,24 @@ class ParallelEvaluator(Evaluator):
         )
 
         results_queue = ResultsQueue(self._queue_size)
-        if self._executor.loop is not None and self._executor.task_group is not None:
-            self._executor.loop.call_soon_threadsafe(
-                self._executor.task_group.create_task,
-                self._put_tasks(variables, evaluator_context, results_queue, batch_id),
-            )
-
         results = np.zeros((variables.shape[0], no + nc), dtype=np.float64)
         metadata: dict[str, NDArray[Any]] = {}
 
-        active_count = (
-            variables.shape[0]
-            if evaluator_context.active is None
-            else int(evaluator_context.active.sum())
+        bundles = self._make_bundles(variables, evaluator_context, batch_id)
+        _logger.debug("Dispatching %d task(s) to executor", len(bundles))
+        submit_and_collect(
+            self._executor,
+            self._put_tasks(bundles, results_queue),
+            results_queue,
+            len(bundles),
+            partial(
+                _handle_result,
+                results=results,
+                metadata=metadata,
+                objective_count=no,
+                eval_count=variables.shape[0],
+            ),
         )
-        _logger.debug("Dispatching %d active evaluations to executor", active_count)
-        received = 0
-        while received < active_count:
-            while self._executor.is_running():
-                try:
-                    item = results_queue.get(timeout=1)
-                except queue.Empty:
-                    continue
-                if item is None:
-                    _abort(results_queue)
-                if isinstance(item, BaseException):
-                    raise item
-                received += _handle_result(
-                    item, results, metadata, no, variables.shape[0]
-                )
-                break
-            if not self._executor.is_running():
-                _abort(results_queue)
 
         return EvaluationBatchResult(
             batch_id=batch_id,
@@ -172,37 +159,37 @@ class ParallelEvaluator(Evaluator):
 
     async def _put_tasks(
         self,
-        variables: NDArray[np.float64],
-        context: EvaluationBatchContext,
+        bundles: list[list[tuple[NDArray[np.float64], EvaluationFunctionContext]]],
         results_queue: ResultsQueue,
-        batch_id: int,
     ) -> None:
         try:
-            await self._submit_bundles(variables, context, results_queue, batch_id)
+            for bundle in bundles:
+                if not self._executor.is_running():
+                    break
+                await self._executor.task_queue.put(
+                    self._make_task(bundle, results_queue)
+                )
         except Exception:
             results_queue.put(None)
             results_queue.close()
             raise
 
-    async def _submit_bundles(
+    def _make_bundles(
         self,
         variables: NDArray[np.float64],
         context: EvaluationBatchContext,
-        results_queue: ResultsQueue,
         batch_id: int,
-    ) -> None:
+    ) -> list[list[tuple[NDArray[np.float64], EvaluationFunctionContext]]]:
+        bundles: list[list[tuple[NDArray[np.float64], EvaluationFunctionContext]]] = []
         bundle: list[tuple[NDArray[np.float64], EvaluationFunctionContext]] = []
         for eval_idx, function_context in _active_evaluations(context, batch_id):
-            if not self._executor.is_running():
-                break
             bundle.append((variables[eval_idx, :], function_context))
             if self._bundle_size and len(bundle) >= self._bundle_size:
-                await self._executor.task_queue.put(
-                    self._make_task(bundle, results_queue)
-                )
+                bundles.append(bundle)
                 bundle = []
         if bundle:
-            await self._executor.task_queue.put(self._make_task(bundle, results_queue))
+            bundles.append(bundle)
+        return bundles
 
     def _make_task(
         self,
@@ -231,29 +218,18 @@ def _run_bundle(
     return list(starmap(function, bundle))
 
 
-def _abort(results_queue: ResultsQueue) -> NoReturn:
-    while True:
-        try:
-            item = results_queue.get_nowait()
-        except queue.Empty:
-            break
-        if isinstance(item, BaseException):
-            raise item
-    raise ExecutorStopped
-
-
 def _handle_result(
     task: Task,
     results: NDArray[np.float64],
     metadata: dict[str, NDArray[Any]],
     objective_count: int,
     eval_count: int,
-) -> int:
+) -> None:
     bundle: list[tuple[NDArray[np.float64], EvaluationFunctionContext]] = task.args[1]
     if isinstance(task.result, ExecutorFailure):
         for _, function_context in bundle:
             results[function_context.eval_idx, :] = np.nan
-        return len(bundle)
+        return
     assert isinstance(task.result, list)
     assert len(task.result) == len(bundle)
     for (_, function_context), result in zip(bundle, task.result, strict=True):
@@ -266,4 +242,3 @@ def _handle_result(
             objective_count,
             eval_count,
         )
-    return len(bundle)
