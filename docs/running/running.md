@@ -481,6 +481,59 @@ with handlers(threaded=slow_writer):
     optimize(config, x0, objective)
 ```
 
+## Offloading your own work
+
+Inside an execution block you can hand **your own** functions to the same pool
+that runs the evaluations, with [`offload`][ropt.simple.offload]. It is useful
+when code you control — a custom step, a domain transform, or a helper you call
+between optimizations — has an expensive, self-contained piece of work you want
+to run on the block's `threads`/`processes`/`hpc` executor instead of inline.
+
+Pass a single callable to run one call and get its result back:
+
+```python
+from functools import partial
+
+from ropt.simple import offload, processes
+
+with processes(workers=4):
+    result = offload(partial(expensive, data))
+```
+
+`offload` takes **zero-argument** callables — bind arguments with
+`functools.partial` (or a closure). Pass a **sequence** of callables to run them
+concurrently and get a tuple of results in order; they may be entirely different
+functions:
+
+```python
+with processes(workers=4):
+    first, second = offload([partial(expensive, x), partial(other, y)])
+```
+
+As with the objective under `processes`/`hpc`, the callables and their arguments
+must be **picklable**, since they run in a separate process.
+
+### Requiring an open block
+
+`offload` **requires** an execution block: with none open it raises a
+[`WorkflowError`][ropt.exceptions.WorkflowError] rather than silently running
+inline, so a missing block is never a surprise. For code that may run **with or
+without** a block — a plugin or transform that should not force its caller to
+open one — guard with [`can_offload`][ropt.simple.can_offload] and fall back to a
+direct call:
+
+```python
+result = offload(partial(expensive, x)) if can_offload() else expensive(x)
+```
+
+If you already know a block is open, call `offload` directly; `can_offload` is
+only for the uncertain case.
+
+!!! note "Not from a result handler"
+    `offload` cannot be called from a result handler: a handler runs on the
+    session's internal event loop, and offloading from there is unsupported (it
+    raises). Do parallel work from your optimization code, not from handlers.
+
 ## A note on enums
 
 A few config values and result fields use enumerations, such as

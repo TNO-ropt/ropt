@@ -24,6 +24,7 @@ from ropt.components.event_handlers import (
 from ._evaluate import evaluate, evaluate_many
 from ._handlers import handlers
 from ._objective import ObjectiveCallback
+from ._offload import can_offload, offload
 from ._optimize import optimize, optimize_many
 from ._report import ReportCallback
 from ._result import EvaluateResult, OptimizeResult
@@ -40,10 +41,12 @@ __all__ = [
     "OptimizeResult",
     "ReportCallback",
     "ResultsHandler",
+    "can_offload",
     "evaluate",
     "evaluate_many",
     "handlers",
     "hpc",
+    "offload",
     "optimize",
     "optimize_many",
     "processes",

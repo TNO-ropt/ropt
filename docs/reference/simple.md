@@ -24,6 +24,11 @@ are not part of this module; import them from [`ropt.enums`][ropt.enums].
 ::: ropt.simple.processes
 ::: ropt.simple.hpc
 
+## Offloading work to the executor
+
+::: ropt.simple.offload
+::: ropt.simple.can_offload
+
 ## Aggregating results across runs
 
 ::: ropt.simple.handlers

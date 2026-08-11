@@ -164,7 +164,7 @@ class Session:
         assert self._loop is not None
         try:
             return asyncio.run_coroutine_threadsafe(
-                self._gather_coro(jobs, limit), self._loop
+                self._gather_coro(self, jobs, limit), self._loop
             ).result()
         except BaseExceptionGroup as exc:
             # TaskGroup wraps failures in a group; unwrap to the first leaf so
@@ -176,14 +176,16 @@ class Session:
 
     @staticmethod
     async def _gather_coro(
-        jobs: Sequence[Callable[[], _T]], limit: int | None
+        session: Session, jobs: Sequence[Callable[[], _T]], limit: int | None
     ) -> list[_T]:
         semaphore = asyncio.Semaphore(max(limit if limit is not None else len(jobs), 1))
         results: list[_T | None] = [None] * len(jobs)
 
         async def _run_job(index: int, job: Callable[[], _T]) -> None:
             async with semaphore:
-                results[index] = await asyncio.to_thread(job)
+                results[index] = await asyncio.to_thread(
+                    _run_with_active_session, session, job
+                )
 
         # Fail-fast: the first job to raise cancels the others' awaits and its
         # error propagates out at once; the orphaned to_thread jobs run on.
@@ -191,6 +193,17 @@ class Session:
             for index, job in enumerate(jobs):
                 task_group.create_task(_run_job(index, job))
         return cast("list[_T]", results)
+
+
+def _run_with_active_session(session: Session, job: Callable[[], _T]) -> _T:
+    # gather() runs each job on its own worker thread, which does not inherit the
+    # _active_session contextvar. Set it so current_executor()/offload() used
+    # inside the job resolve the session, as on the thread that opened the block.
+    token = _active_session.set(session)
+    try:
+        return job()
+    finally:
+        _active_session.reset(token)
 
 
 def _acquire_session() -> tuple[Session, Token[Session | None] | None]:
