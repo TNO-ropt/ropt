@@ -1277,6 +1277,34 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#offloading-your-own-work" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Offloading your own work
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Offloading your own work">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#requiring-an-open-block" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Requiring an open block
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#a-note-on-enums" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3109,6 +3137,34 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#offloading-your-own-work" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Offloading your own work
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Offloading your own work">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#requiring-an-open-block" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Requiring an open block
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#a-note-on-enums" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3604,12 +3660,52 @@ block:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="k">with</span> <span class="n">handlers</span><span class="p">(</span><span class="n">threaded</span><span class="o">=</span><span class="n">slow_writer</span><span class="p">):</span>
 </span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>    <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>
 </span></code></pre></div>
+<h2 id="offloading-your-own-work">Offloading your own work</h2>
+<p>Inside an execution block you can hand <strong>your own</strong> functions to the same pool
+that runs the evaluations, with <a class="autorefs autorefs-internal" title="            ropt.simple.offload" href="../../reference/simple/#ropt.simple.offload"><code>offload</code></a>. It is useful
+when code you control — a custom step, a domain transform, or a helper you call
+between optimizations — has an expensive, self-contained piece of work you want
+to run on the block's <code>threads</code>/<code>processes</code>/<code>hpc</code> executor instead of inline.</p>
+<p>Pass a single callable to run one call and get its result back:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
+</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>
+</span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.simple</span><span class="w"> </span><span class="kn">import</span> <span class="n">offload</span><span class="p">,</span> <span class="n">processes</span>
+</span><span id="__span-20-4"><a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a>
+</span><span id="__span-20-5"><a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a><span class="k">with</span> <span class="n">processes</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">):</span>
+</span><span id="__span-20-6"><a id="__codelineno-20-6" name="__codelineno-20-6" href="#__codelineno-20-6"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">offload</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="n">expensive</span><span class="p">,</span> <span class="n">data</span><span class="p">))</span>
+</span></code></pre></div>
+<p><code>offload</code> takes <strong>zero-argument</strong> callables — bind arguments with
+<code>functools.partial</code> (or a closure). Pass a <strong>sequence</strong> of callables to run them
+concurrently and get a tuple of results in order; they may be entirely different
+functions:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="k">with</span> <span class="n">processes</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">):</span>
+</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>    <span class="n">first</span><span class="p">,</span> <span class="n">second</span> <span class="o">=</span> <span class="n">offload</span><span class="p">([</span><span class="n">partial</span><span class="p">(</span><span class="n">expensive</span><span class="p">,</span> <span class="n">x</span><span class="p">),</span> <span class="n">partial</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">y</span><span class="p">)])</span>
+</span></code></pre></div>
+<p>As with the objective under <code>processes</code>/<code>hpc</code>, the callables and their arguments
+must be <strong>picklable</strong>, since they run in a separate process.</p>
+<h3 id="requiring-an-open-block">Requiring an open block</h3>
+<p><code>offload</code> <strong>requires</strong> an execution block: with none open it raises a
+<a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a> rather than silently running
+inline, so a missing block is never a surprise. For code that may run <strong>with or
+without</strong> a block — a plugin or transform that should not force its caller to
+open one — guard with <a class="autorefs autorefs-internal" title="            ropt.simple.can_offload" href="../../reference/simple/#ropt.simple.can_offload"><code>can_offload</code></a> and fall back to a
+direct call:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="n">result</span> <span class="o">=</span> <span class="n">offload</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="n">expensive</span><span class="p">,</span> <span class="n">x</span><span class="p">))</span> <span class="k">if</span> <span class="n">can_offload</span><span class="p">()</span> <span class="k">else</span> <span class="n">expensive</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</span></code></pre></div>
+<p>If you already know a block is open, call <code>offload</code> directly; <code>can_offload</code> is
+only for the uncertain case.</p>
+<div class="admonition note">
+<p class="admonition-title">Not from a result handler</p>
+<p><code>offload</code> cannot be called from a result handler: a handler runs on the
+session's internal event loop, and offloading from there is unsupported (it
+raises). Do parallel work from your optimization code, not from handlers.</p>
+</div>
 <h2 id="a-note-on-enums">A note on enums</h2>
 <p>A few config values and result fields use enumerations, such as
 <a class="autorefs autorefs-internal" title="            VariableType" href="../../reference/enums/#ropt.enums.VariableType"><code>VariableType</code></a> for integer variables and
 <a class="autorefs autorefs-internal" title="            ExitCode" href="../../reference/enums/#ropt.enums.ExitCode"><code>ExitCode</code></a> for <code>result.exit_code</code>. These are <strong>not</strong> part
 of <code>ropt.simple</code>; import them from <a class="autorefs autorefs-internal" title="            ropt.enums" href="../../reference/enums/#ropt.enums"><code>ropt.enums</code></a>:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.enums</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExitCode</span><span class="p">,</span> <span class="n">VariableType</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.enums</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExitCode</span><span class="p">,</span> <span class="n">VariableType</span>
 </span></code></pre></div>
 
 
