@@ -1756,6 +1756,39 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#offloading-work-to-the-executor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Offloading work to the executor
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.simple.offload" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        offload
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.simple.can_offload" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        can_offload
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#aggregating-results-across-runs" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3023,6 +3056,39 @@
     <span class="md-ellipsis">
       
         hpc
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#offloading-work-to-the-executor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Offloading work to the executor
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.simple.offload" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        offload
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.simple.can_offload" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        can_offload
       
     </span>
   </a>
@@ -4315,6 +4381,151 @@ cluster to use its default queue, or both to be explicit. See
             <td>
               <div class="doc-md-description">
                 <p>A context manager backing evaluations with an HPC cluster.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div><h2 id="offloading-work-to-the-executor">Offloading work to the executor</h2>
+
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="ropt.simple.offload" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">ropt.simple.offload</span>
+
+
+</h2>
+          <div class="doc-overloads">
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">offload</span><span class="p">(</span><span class="n">work</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="n">_T</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">_T</span>
+</span></code></pre></div><div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">offload</span><span class="p">(</span><span class="n">work</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[],</span> <span class="n">_T</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">_T</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
+</span></code></pre></div>          </div>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">offload</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">work</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="n">_T</span><span class="p">]</span> <span class="o">|</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[],</span> <span class="n">_T</span><span class="p">]],</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_T</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">_T</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents first">
+
+        <p>Offload one or more callables to the active executor.</p>
+<p>Runs <code>work</code> on the open execution block's executor
+(<code>threads</code>/<code>processes</code>/<code>hpc</code>). Pass a single zero-argument callable to run
+one call and return its result, or a sequence of callables to run them
+concurrently (they may be entirely different functions) and return a tuple
+of results in the order of <code>work</code>. Bind arguments with <code>functools.partial</code>.</p>
+<p>It raises a <a class="autorefs autorefs-internal" title="            WorkflowError" href="../exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a> when no block is
+open or when called from a result handler (which runs on the event loop);
+check <a class="autorefs autorefs-internal" title="            ropt.simple.can_offload" href="#ropt.simple.can_offload"><code>can_offload</code></a> first and call the callables
+directly when there is no executor. The callables must be picklable for a
+process or HPC executor.</p>
+<p>See <a href="../../running/running/">Running Optimizations</a> for a walkthrough.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>work</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="collections.abc.Callable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable">Callable</a>[[], <span title="ropt.simple._offload._T">_T</span>] | <a class="autorefs autorefs-external" title="collections.abc.Sequence" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence">Sequence</a>[<a class="autorefs autorefs-external" title="collections.abc.Callable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable">Callable</a>[[], <span title="ropt.simple._offload._T">_T</span>]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A single zero-argument callable, or a sequence of them.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="ropt.simple._offload._T">_T</span> | <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a>[<span title="ropt.simple._offload._T">_T</span>, ...]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The single result, or a tuple of results in the order of <code>work</code>.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="ropt.simple.can_offload" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">ropt.simple.can_offload</span>
+
+
+</h2>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">can_offload</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">bool</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents first">
+
+        <p>Report whether <code>offload</code> would dispatch to an executor.</p>
+<p>Returns <code>True</code> when an execution block (<code>threads</code>/<code>processes</code>/<code>hpc</code>) is open
+and the caller can dispatch to it, and <code>False</code> otherwise (no block open, or
+called from a result handler).</p>
+<p>Use it in code that may run with or without an execution block (for example
+a plugin, transform, or custom step) to fall back to a direct call instead
+of letting <code>offload</code> raise:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">result</span> <span class="o">=</span> <span class="n">offload</span><span class="p">(</span><span class="n">work</span><span class="p">)</span> <span class="k">if</span> <span class="n">can_offload</span><span class="p">()</span> <span class="k">else</span> <span class="n">work</span><span class="p">()</span>
+</span></code></pre></div>
+<p>You do not need it when you know a block is open — call <code>offload</code> directly.</p>
+<p>See <a href="../../running/running/">Running Optimizations</a> for a walkthrough.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p><code>True</code> if <code>offload</code> would dispatch, <code>False</code> otherwise.</p>
               </div>
             </td>
           </tr>
