@@ -151,6 +151,46 @@ def test_handlers_report_callback_reports_across_the_block(
     assert all(isinstance(item, EvaluateResult) for item in reported)
 
 
+def test_that_threaded_handlers_are_attached_to_run_in_a_thread() -> None:
+    loop_handler = HistoryHandler()
+    io_handler = HistoryHandler()
+    scope = handlers(loop_handler, threaded=io_handler)
+    with scope:
+        in_thread = dict(scope.dispatcher._handlers)  # ruff: ignore[private-member-access]
+    assert in_thread[loop_handler] is False
+    assert in_thread[io_handler] is True
+
+
+def test_that_threaded_accepts_a_sequence_of_handlers() -> None:
+    first = HistoryHandler()
+    second = HistoryHandler()
+    scope = handlers(threaded=[first, second])
+    with scope:
+        in_thread = dict(scope.dispatcher._handlers)  # ruff: ignore[private-member-access]
+    assert in_thread[first] is True
+    assert in_thread[second] is True
+
+
+def test_that_a_threaded_handler_keeps_its_flag_when_inherited() -> None:
+    io_handler = HistoryHandler()
+    outer = handlers(threaded=io_handler)
+    with outer:
+        inner = handlers()
+        with inner:
+            assert dict(inner.dispatcher._handlers)[io_handler] is True  # ruff: ignore[private-member-access]
+        assert dict(outer.dispatcher._handlers)[io_handler] is True  # ruff: ignore[private-member-access]
+
+
+def test_that_relisting_a_handler_overrides_its_threaded_flag() -> None:
+    handler = HistoryHandler()
+    outer = handlers(threaded=handler)
+    with outer:
+        inner = handlers(handler)  # re-listed as a loop-thread handler
+        with inner:
+            assert dict(inner.dispatcher._handlers)[handler] is False  # ruff: ignore[private-member-access]
+        assert dict(outer.dispatcher._handlers)[handler] is True  # ruff: ignore[private-member-access]
+
+
 def test_optimize_local_handler_rejects_reuse(config: Any, test_functions: Any) -> None:
     history = HistoryHandler()
     optimize(config, initial_values, test_functions[0], handlers=[history])

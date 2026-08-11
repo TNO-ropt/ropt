@@ -492,3 +492,17 @@ def test_event_dispatcher_remove_unknown_handler_raises() -> None:
     )
     with pytest.raises(ValueError, match="not added to the dispatcher"):
         EventDispatcher().remove_event_handler(handler)
+
+
+def test_event_dispatcher_remove_returns_run_in_thread_flag() -> None:
+    dispatcher = EventDispatcher()
+    threaded = CallbackHandler(
+        event_types={EnOptEventType.FINISHED_EVALUATION}, callback=lambda _event: None
+    )
+    plain = CallbackHandler(
+        event_types={EnOptEventType.FINISHED_EVALUATION}, callback=lambda _event: None
+    )
+    dispatcher.add_event_handler(threaded, run_in_thread=True)
+    dispatcher.add_event_handler(plain)
+    assert dispatcher.remove_event_handler(threaded) is True
+    assert dispatcher.remove_event_handler(plain) is False

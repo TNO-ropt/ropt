@@ -18,7 +18,11 @@ from __future__ import annotations
 from contextvars import ContextVar, Token
 from typing import TYPE_CHECKING
 
-from ropt.components.event_handlers import EventDispatcher, EventForwardHandler
+from ropt.components.event_handlers import (
+    EventDispatcher,
+    EventForwardHandler,
+    EventHandler,
+)
 
 from ._report import make_report_handler
 from ._session import _acquire_session, _release_session
@@ -27,7 +31,6 @@ if TYPE_CHECKING:
     from collections.abc import Sequence
 
     from ropt.components.compute_steps import ComputeStep
-    from ropt.components.event_handlers import EventHandler
     from ropt.enums import EnOptEventType
 
     from ._report import ReportCallback
@@ -47,7 +50,12 @@ class HandlerScope:
     handlers with `attach_to`.
     """
 
-    def __init__(self, handlers: Sequence[EventHandler], *, inherit: bool) -> None:
+    def __init__(
+        self,
+        handlers: Sequence[tuple[EventHandler, bool]],
+        *,
+        inherit: bool,
+    ) -> None:
         self._handlers = tuple(handlers)
         self._inherit = inherit
         self._session: Session | None = None
@@ -58,7 +66,7 @@ class HandlerScope:
         # block temporarily steals these (re-listed or inherited) and restores
         # them on exit.
         self.current: set[EventHandler] = set()
-        self._migrated: list[tuple[EventHandler, HandlerScope]] = []
+        self._migrated: list[tuple[EventHandler, HandlerScope, bool]] = []
 
     def attach_to(self, step: ComputeStep) -> None:
         """Forward the events of a run's compute step to this block's handlers.
@@ -86,7 +94,7 @@ class HandlerScope:
         session, session_token = _acquire_session()
         dispatcher = EventDispatcher()
         stack = _handler_stack.get()
-        migrated: list[tuple[EventHandler, HandlerScope]] = []
+        migrated: list[tuple[EventHandler, HandlerScope, bool]] = []
         try:
             added = self._attach(dispatcher, stack, migrated)
             session.open_dispatcher(dispatcher)
@@ -106,35 +114,35 @@ class HandlerScope:
         self,
         dispatcher: EventDispatcher,
         stack: tuple[HandlerScope, ...],
-        migrated: list[tuple[EventHandler, HandlerScope]],
+        migrated: list[tuple[EventHandler, HandlerScope, bool]],
     ) -> set[EventHandler]:
         added: set[EventHandler] = set()
-        for handler in self._handlers:
+        for handler, run_in_thread in self._handlers:
             source = _find_scope(stack, handler)
             if source is not None:
-                source.dispatcher.remove_event_handler(handler)
+                source_thread = source.dispatcher.remove_event_handler(handler)
                 source.current.discard(handler)
-                migrated.append((handler, source))
-            dispatcher.add_event_handler(handler)
+                migrated.append((handler, source, source_thread))
+            dispatcher.add_event_handler(handler, run_in_thread=run_in_thread)
             added.add(handler)
         if self._inherit:
             for source in stack:
                 for handler in list(source.current):
-                    source.dispatcher.remove_event_handler(handler)
+                    source_thread = source.dispatcher.remove_event_handler(handler)
                     source.current.discard(handler)
-                    migrated.append((handler, source))
-                    dispatcher.add_event_handler(handler)
+                    migrated.append((handler, source, source_thread))
+                    dispatcher.add_event_handler(handler, run_in_thread=source_thread)
                     added.add(handler)
         return added
 
     @staticmethod
     def _detach(
         dispatcher: EventDispatcher,
-        migrated: list[tuple[EventHandler, HandlerScope]],
+        migrated: list[tuple[EventHandler, HandlerScope, bool]],
     ) -> None:
-        for handler, source in migrated:
+        for handler, source, source_thread in migrated:
             dispatcher.remove_event_handler(handler)
-            source.dispatcher.add_event_handler(handler)
+            source.dispatcher.add_event_handler(handler, run_in_thread=source_thread)
             source.current.add(handler)
 
     def __exit__(self, *_exc: object) -> None:
@@ -148,6 +156,7 @@ class HandlerScope:
 
 def handlers(
     *handler: EventHandler,
+    threaded: EventHandler | Sequence[EventHandler] = (),
     inherit: bool = True,
     report: ReportCallback | None = None,
 ) -> HandlerScope:
@@ -162,18 +171,28 @@ def handlers(
     See [Running Optimizations](../running/running.md) for a walkthrough.
 
     Args:
-        handler: The result handlers to share across the block.
-        inherit: Whether to also inherit the enclosing blocks' handlers.
-        report:  An optional callback invoked with an `EvaluateResult` for each
-                 function evaluation across the block's runs; return `True` from
-                 it to stop the emitting run early with `USER_ABORT`.
+        handler:  The result handlers to share across the block, each run on the
+                  block's event-loop thread.
+        threaded: Handlers (one, or a sequence) to run on a worker thread instead
+                  of the loop. This only helps handlers that spend real time in
+                  blocking, GIL-releasing I/O (files, databases, network); for
+                  in-memory work it gives no benefit under CPython's GIL. See
+                  [Running Optimizations](../running/running.md#running-a-handler-in-a-thread).
+        inherit:  Whether to also inherit the enclosing blocks' handlers.
+        report:   An optional callback invoked with an `EvaluateResult` for each
+                  function evaluation across the block's runs; return `True` from
+                  it to stop the emitting run early with `USER_ABORT`.
 
     Returns:
         A context manager scoping the shared handlers.
     """
-    scope_handlers: tuple[EventHandler, ...] = handler
+    in_thread = (threaded,) if isinstance(threaded, EventHandler) else tuple(threaded)
+    scope_handlers: list[tuple[EventHandler, bool]] = [
+        *((item, False) for item in handler),
+        *((item, True) for item in in_thread),
+    ]
     if report is not None:
-        scope_handlers = (*handler, make_report_handler(report))
+        scope_handlers.append((make_report_handler(report), False))
     return HandlerScope(scope_handlers, inherit=inherit)
 
 

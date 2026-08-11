@@ -407,6 +407,9 @@ Convenience methods:
     optimize(config, x0, objective, handlers=[tables])
     ```
 
+    Because this writes to disk on every update, it is a good candidate for
+    [running on a worker thread](#running-a-handler-in-a-thread).
+
 ### Custom handlers
 
 Handlers are not limited to the built-ins: you — or another package — can
@@ -420,6 +423,63 @@ ends that run gracefully with `USER_ABORT` (the [`report`](#stopping-early-from-
 callback above is just a convenience wrapper around this). Only the run that owns
 the emitting step is affected, so concurrent runs continue. See
 [Aborting a run](../workflows/workflows.md#exit-codes) in the low-level docs.
+
+### Running a handler in a thread
+
+By default every handler runs **inline**, on the thread that drives the
+optimization: each result is delivered to the handlers one after another, and the
+run waits for `handle_event` to return before it continues. That is exactly what
+you want for handlers that only touch memory — storing results, updating a
+DataFrame, keeping a running statistic — because the work is fast and there is no
+reason to hand it off.
+
+A [`handlers`][ropt.simple.handlers] block can instead run one or more handlers
+on a **worker thread** with the `threaded` keyword. Pass it a single handler or a
+sequence of handlers; those handlers run off the driving thread, while positional
+handlers stay inline:
+
+```python
+from ropt.simple import DataFrameHandler, HistoryHandler, handlers, optimize
+
+history = HistoryHandler()          # cheap, in-memory  -> inline
+tables = DataFrameHandler()         # writes a report to disk -> worker thread
+tables.set_default_tables()
+tables.set_callback(dump_to_disk)   # some function that writes a file
+
+with handlers(history, threaded=tables):
+    for x0 in start_points:
+        optimize(config, x0, objective)
+```
+
+Moving a handler to a thread changes **where** its code runs, nothing else: the
+run still waits for every handler to finish before delivering the next result,
+results still arrive in order, and an exception raised by a threaded handler is
+re-raised on the run's own stack, so early stops and fatal errors propagate
+exactly as they do for an inline handler.
+
+!!! warning "Only I/O-bound handlers benefit"
+    `threaded` helps in **one** situation: a handler that spends most of its time
+    waiting on an operation that *releases* CPython's global interpreter lock
+    (GIL) — writing to a file, a socket or a database, or a NumPy/C routine that
+    drops the lock. Only then can the optimization make progress while that work
+    is in flight.
+
+    Under the GIL only one thread runs Python bytecode at a time. A handler that
+    stays in Python — building DataFrames, accumulating results, doing numerical
+    work in pure Python — therefore gets **no** speed-up from `threaded`. It
+    merely pays the small cost of handing work to another thread, which makes it
+    marginally *slower*, never faster. When in doubt, leave a handler inline; only
+    reach for `threaded` when you know it is busy with interruptible I/O.
+
+`threaded` is only available on a `handlers` block; a handler passed to a single
+`optimize(..., handlers=[...])` call always runs inline. To run a blocking
+handler on a thread for just one optimization, wrap that call in a one-shot
+block:
+
+```python
+with handlers(threaded=slow_writer):
+    optimize(config, x0, objective)
+```
 
 ## A note on enums
 
