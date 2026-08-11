@@ -2875,6 +2875,32 @@ optimization inside it uses that block:</p>
 </span></code></pre></div>
 <p>The block fixes one worker pool for everything inside it. You cannot open a
 second block inside the first one.</p>
+<p>Where your objective runs depends on which block you open (or none):</p>
+<pre class="mermaid"><code>flowchart TB
+    subgraph proc["your Python process"]
+        main(["your program&lt;br/&gt;(main thread)"])
+        seq["no block —&lt;br/&gt;one eval at a time"]
+        th["threads —&lt;br/&gt;worker threads&lt;br/&gt;(share memory)"]
+    end
+    wp["processes —&lt;br/&gt;separate processes&lt;br/&gt;(data copied)"]
+    clu["hpc —&lt;br/&gt;cluster jobs&lt;br/&gt;(data copied)"]
+    main --&gt; seq
+    main --&gt; th
+    main --&gt; wp
+    main --&gt; clu</code></pre>
+<p>Threads stay <strong>inside</strong> your Python process and share its memory, so any Python
+function works and nothing is copied. <code>processes</code> and <code>hpc</code> run the work
+<strong>outside</strong> your process, so the objective and its data are copied there.</p>
+<details class="info">
+<summary>New to threads and processes?</summary>
+<p>A <strong>process</strong> is a running program with its own private memory. A <strong>thread</strong>
+is a worker inside a process, and all threads in a process share that memory.
+Threads are cheap and share data for free, but Python runs only one thread's
+code at a time, so threads do not speed up pure computation — only work that
+waits (for a file, a network reply, an external tool). Separate <strong>processes</strong>
+each have their own interpreter and run truly in parallel, but they do not
+share memory, so data has to be copied between them.</p>
+</details>
 <h2 id="the-three-choices">The three choices</h2>
 <h3 id="threads-a-pool-of-threads-in-the-same-process"><code>threads</code> — a pool of threads in the same process</h3>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.simple</span><span class="w"> </span><span class="kn">import</span> <span class="n">threads</span>
@@ -2892,8 +2918,13 @@ up work that is pure Python number-crunching. For that, use <code>processes</cod
 </span></code></pre></div>
 <p>The evaluations run in <strong>separate processes</strong>. This gives real parallel speed for
 heavy Python computations, because each process has its own interpreter.</p>
-<p>Your objective is sent to the worker processes, so this needs the <code>cloudpickle</code>
-extra (<code>pip install "ropt[cloudpickle]"</code>).</p>
+<p>Your objective and its data are <strong>copied</strong> to the worker processes, which
+currently requires the <code>cloudpickle</code> extra (see
+<a href="../installation/#optional-extras">Installation</a>).</p>
+<p>Because each worker is a separate process, your objective can only send results
+<strong>back</strong> through its return value; it cannot share memory with your handlers or
+the rest of your program. See
+<a href="../../running/running/#handlers-and-the-process-boundary">Handlers and the process boundary</a>.</p>
 <h3 id="hpc-a-pool-of-jobs-on-a-cluster"><code>hpc</code> — a pool of jobs on a cluster</h3>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.simple</span><span class="w"> </span><span class="kn">import</span> <span class="n">hpc</span>
 </span></code></pre></div>
@@ -2908,32 +2939,48 @@ the <code>ropt[hpc]</code> extra and a reachable cluster:</p>
 such as the <code>cluster</code> name, the <code>queue</code>, and the number of <code>cores</code> per job — can
 be passed to <code>hpc</code> when you need them; see
 <a href="../../running/running/#running-on-an-hpc-cluster">Running Optimizations</a> for the full list.</p>
-<p>Like <code>processes</code>, work is sent to the cluster, so the <code>cloudpickle</code> extra is
-needed here too (it is already part of the <code>ropt[hpc]</code> extra).</p>
+<p>Like <code>processes</code>, the work is copied to the cluster. This currently uses
+<code>cloudpickle</code>, which is included in the <code>ropt[hpc]</code> extra (see
+<a href="../installation/#optional-extras">Installation</a>).</p>
 <h2 id="which-one-should-i-use">Which one should I use?</h2>
 <table>
 <thead>
 <tr>
-<th>Situation</th>
-<th>Use</th>
+<th>Block</th>
+<th>Where evaluations run</th>
+<th>Data</th>
+<th>Speeds up heavy Python?</th>
+<th>Use when</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>Evaluations are fast</td>
-<td>no block (the default)</td>
+<td>none (default)</td>
+<td>the main thread, one at a time</td>
+<td>shared</td>
+<td>no</td>
+<td>evaluations are fast</td>
 </tr>
 <tr>
-<td>Each evaluation mostly waits (external tool, I/O)</td>
 <td><code>threads</code></td>
+<td>background threads, one process</td>
+<td>shared</td>
+<td>no — one interpreter</td>
+<td>each evaluation mostly <strong>waits</strong> (external tool, I/O)</td>
 </tr>
 <tr>
-<td>Each evaluation is heavy Python computation</td>
 <td><code>processes</code></td>
+<td>separate processes</td>
+<td>copied</td>
+<td>yes</td>
+<td>each evaluation is heavy <strong>Python computation</strong></td>
 </tr>
 <tr>
-<td>Each evaluation is a big job for a cluster</td>
 <td><code>hpc</code></td>
+<td>jobs on a cluster</td>
+<td>copied</td>
+<td>yes</td>
+<td>each evaluation is a big <strong>cluster job</strong></td>
 </tr>
 </tbody>
 </table>
@@ -2964,8 +3011,8 @@ and it runs on the same pool:</p>
 </span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">offload</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="n">expensive</span><span class="p">,</span> <span class="n">data</span><span class="p">))</span>
 </span></code></pre></div>
 <p>This is for expensive, self-contained work in code you write — a helper, a custom
-step, or a transform. Like the objective, such functions must be picklable under
-<code>processes</code>/<code>hpc</code>. See
+step, or a transform. Like the objective, such functions are copied to the
+workers under <code>processes</code>/<code>hpc</code>. See
 <a href="../../running/running/#offloading-your-own-work">Running Optimizations</a> for
 details.</p>
 

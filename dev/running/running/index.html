@@ -1305,6 +1305,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#handlers-and-the-process-boundary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Handlers and the process boundary
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#a-note-on-enums" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3165,6 +3176,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#handlers-and-the-process-boundary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Handlers and the process boundary
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#a-note-on-enums" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3523,7 +3545,7 @@ functions:</p>
 </span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>    <span class="n">first</span><span class="p">,</span> <span class="n">second</span> <span class="o">=</span> <span class="n">offload</span><span class="p">([</span><span class="n">partial</span><span class="p">(</span><span class="n">expensive</span><span class="p">,</span> <span class="n">x</span><span class="p">),</span> <span class="n">partial</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">y</span><span class="p">)])</span>
 </span></code></pre></div>
 <p>As with the objective under <code>processes</code>/<code>hpc</code>, the callables and their arguments
-must be <strong>picklable</strong>, since they run in a separate process.</p>
+are <strong>copied to the workers</strong>, since they run in separate processes.</p>
 <h3 id="requiring-an-open-block">Requiring an open block</h3>
 <p><code>offload</code> <strong>requires</strong> an execution block: with none open it raises a
 <a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a> rather than silently running
@@ -3700,6 +3722,53 @@ block:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="k">with</span> <span class="n">handlers</span><span class="p">(</span><span class="n">threaded</span><span class="o">=</span><span class="n">slow_writer</span><span class="p">):</span>
 </span><span id="__span-22-2"><a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a>    <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>
 </span></code></pre></div>
+<h2 id="handlers-and-the-process-boundary">Handlers and the process boundary</h2>
+<p>With <code>threads</code> (or no block) your objective and your handlers run in the <strong>same
+process</strong> and share memory: a handler can see anything the objective left behind
+— a global it set, a list it appended to, an object it mutated.</p>
+<p><code>processes</code> and <code>hpc</code> break that. The objective runs in a <strong>separate worker
+process</strong>, while the optimizer, your handlers, and the rest of your program stay
+in the <strong>main process</strong>. They cannot share memory. The objective's <em>only</em> way to
+send information back is through what it <strong>returns</strong> — the objective and
+constraint values, and the result's <code>metadata</code> — all copied back to the main
+process:</p>
+<pre class="mermaid"><code>flowchart LR
+    subgraph main["your main process"]
+        opt["optimizer"]
+        hand["handlers +&lt;br/&gt;your code"]
+        opt --&gt; hand
+    end
+    subgraph worker["worker process (processes / hpc)"]
+        obj["objective"]
+    end
+    opt --&gt;|"variables"| obj
+    obj --&gt;|"result + metadata&lt;br/&gt;(copied back)"| opt</code></pre>
+<details class="info">
+<summary>How data crosses the boundary</summary>
+<p>To move work and results between processes, <code>ropt</code> <strong>serializes</strong> them —
+turns the objects into bytes and rebuilds them on the other side. It
+currently uses <strong><code>cloudpickle</code></strong> (an extended form of Python's <code>pickle</code>),
+which is why <code>processes</code> and <code>hpc</code> need the <code>cloudpickle</code> extra; most
+functions and data serialize fine, but things like open files, locks, or
+database connections may not.</p>
+<p>With <code>processes</code> the bytes travel over an in-machine channel. With <code>hpc</code> they
+are written as <strong>files on a shared filesystem</strong> that the cluster nodes read,
+so <code>hpc</code> needs such a shared filesystem (its <code>workdir</code>).</p>
+<p>Serialization is only the mechanism <code>ropt</code> uses today; the essential
+requirement is that the data can be <em>carried across the boundary</em>, so a
+future version could use a different transport — for example one that works
+over a network.</p>
+</details>
+<p>Handlers see those returned results and nothing else. Anything the objective did
+only in memory — setting a module global, appending to a shared list, updating an
+object — happened <strong>inside the worker</strong> and is discarded when it finishes; your
+handlers and your main program never see it.</p>
+<p>So to get extra information from an evaluation to a handler (or to a later part
+of your program), <strong>return it</strong> instead of stashing it in shared state: attach it
+to the result's <code>metadata</code> (see <a href="#attaching-metadata">Attaching metadata</a>), which
+travels back with the result. Relying on shared state happens to work under
+<code>threads</code>, but breaks the moment you switch to <code>processes</code>; returning the data
+works everywhere.</p>
 <h2 id="a-note-on-enums">A note on enums</h2>
 <p>A few config values and result fields use enumerations, such as
 <a class="autorefs autorefs-internal" title="            VariableType" href="../../reference/enums/#ropt.enums.VariableType"><code>VariableType</code></a> for integer variables and
