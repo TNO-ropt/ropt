@@ -791,6 +791,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#offloading-your-own-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Offloading your own functions
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -2819,6 +2830,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#offloading-your-own-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Offloading your own functions
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -2930,6 +2952,22 @@ share its one worker pool. So <code>threads(workers=1)</code> runs the optimizat
 together but evaluates one point at a time, while a larger pool (or <code>processes</code>
 or <code>hpc</code>) evaluates several at once. An execution block is required.</p>
 <p>See <a href="../../running/running/#many-optimizations-at-once">Running Optimizations</a> for more.</p>
+<h2 id="offloading-your-own-functions">Offloading your own functions</h2>
+<p>A block can also run <strong>your own</strong> functions in parallel, not just the optimizer's
+evaluations. Pass a function — or several — to <a class="autorefs autorefs-internal" title="            ropt.simple.offload" href="../../reference/simple/#ropt.simple.offload"><code>offload</code></a>
+and it runs on the same pool:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.simple</span><span class="w"> </span><span class="kn">import</span> <span class="n">offload</span><span class="p">,</span> <span class="n">processes</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="k">with</span> <span class="n">processes</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">):</span>
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">offload</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="n">expensive</span><span class="p">,</span> <span class="n">data</span><span class="p">))</span>
+</span></code></pre></div>
+<p>This is for expensive, self-contained work in code you write — a helper, a custom
+step, or a transform. Like the objective, such functions must be picklable under
+<code>processes</code>/<code>hpc</code>. See
+<a href="../../running/running/#offloading-your-own-work">Running Optimizations</a> for
+details.</p>
 
 
 
