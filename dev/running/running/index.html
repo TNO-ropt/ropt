@@ -1260,6 +1260,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#running-a-handler-in-a-thread" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Running a handler in a thread
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -3081,6 +3092,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#running-a-handler-in-a-thread" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Running a handler in a thread
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -3520,6 +3542,8 @@ if you have <code>tabulate</code> installed:</p>
 </span><span id="__span-17-6"><a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a><span class="n">tables</span><span class="o">.</span><span class="n">set_callback</span><span class="p">(</span><span class="n">dump</span><span class="p">)</span>
 </span><span id="__span-17-7"><a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a><span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">handlers</span><span class="o">=</span><span class="p">[</span><span class="n">tables</span><span class="p">])</span>
 </span></code></pre></div>
+<p>Because this writes to disk on every update, it is a good candidate for
+<a href="#running-a-handler-in-a-thread">running on a worker thread</a>.</p>
 </div>
 <h3 id="custom-handlers">Custom handlers</h3>
 <p>Handlers are not limited to the built-ins: you — or another package — can
@@ -3532,12 +3556,60 @@ ends that run gracefully with <code>USER_ABORT</code> (the <a href="#stopping-ea
 callback above is just a convenience wrapper around this). Only the run that owns
 the emitting step is affected, so concurrent runs continue. See
 <a href="../../workflows/workflows/#exit-codes">Aborting a run</a> in the low-level docs.</p>
+<h3 id="running-a-handler-in-a-thread">Running a handler in a thread</h3>
+<p>By default every handler runs <strong>inline</strong>, on the thread that drives the
+optimization: each result is delivered to the handlers one after another, and the
+run waits for <code>handle_event</code> to return before it continues. That is exactly what
+you want for handlers that only touch memory — storing results, updating a
+DataFrame, keeping a running statistic — because the work is fast and there is no
+reason to hand it off.</p>
+<p>A <a class="autorefs autorefs-internal" title="            ropt.simple.handlers" href="../../reference/simple/#ropt.simple.handlers"><code>handlers</code></a> block can instead run one or more handlers
+on a <strong>worker thread</strong> with the <code>threaded</code> keyword. Pass it a single handler or a
+sequence of handlers; those handlers run off the driving thread, while positional
+handlers stay inline:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.simple</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataFrameHandler</span><span class="p">,</span> <span class="n">HistoryHandler</span><span class="p">,</span> <span class="n">handlers</span><span class="p">,</span> <span class="n">optimize</span>
+</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>
+</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="n">history</span> <span class="o">=</span> <span class="n">HistoryHandler</span><span class="p">()</span>          <span class="c1"># cheap, in-memory  -&gt; inline</span>
+</span><span id="__span-18-4"><a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="n">tables</span> <span class="o">=</span> <span class="n">DataFrameHandler</span><span class="p">()</span>         <span class="c1"># writes a report to disk -&gt; worker thread</span>
+</span><span id="__span-18-5"><a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="n">tables</span><span class="o">.</span><span class="n">set_default_tables</span><span class="p">()</span>
+</span><span id="__span-18-6"><a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a><span class="n">tables</span><span class="o">.</span><span class="n">set_callback</span><span class="p">(</span><span class="n">dump_to_disk</span><span class="p">)</span>   <span class="c1"># some function that writes a file</span>
+</span><span id="__span-18-7"><a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a>
+</span><span id="__span-18-8"><a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a><span class="k">with</span> <span class="n">handlers</span><span class="p">(</span><span class="n">history</span><span class="p">,</span> <span class="n">threaded</span><span class="o">=</span><span class="n">tables</span><span class="p">):</span>
+</span><span id="__span-18-9"><a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a>    <span class="k">for</span> <span class="n">x0</span> <span class="ow">in</span> <span class="n">start_points</span><span class="p">:</span>
+</span><span id="__span-18-10"><a id="__codelineno-18-10" name="__codelineno-18-10" href="#__codelineno-18-10"></a>        <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>
+</span></code></pre></div>
+<p>Moving a handler to a thread changes <strong>where</strong> its code runs, nothing else: the
+run still waits for every handler to finish before delivering the next result,
+results still arrive in order, and an exception raised by a threaded handler is
+re-raised on the run's own stack, so early stops and fatal errors propagate
+exactly as they do for an inline handler.</p>
+<div class="admonition warning">
+<p class="admonition-title">Only I/O-bound handlers benefit</p>
+<p><code>threaded</code> helps in <strong>one</strong> situation: a handler that spends most of its time
+waiting on an operation that <em>releases</em> CPython's global interpreter lock
+(GIL) — writing to a file, a socket or a database, or a NumPy/C routine that
+drops the lock. Only then can the optimization make progress while that work
+is in flight.</p>
+<p>Under the GIL only one thread runs Python bytecode at a time. A handler that
+stays in Python — building DataFrames, accumulating results, doing numerical
+work in pure Python — therefore gets <strong>no</strong> speed-up from <code>threaded</code>. It
+merely pays the small cost of handing work to another thread, which makes it
+marginally <em>slower</em>, never faster. When in doubt, leave a handler inline; only
+reach for <code>threaded</code> when you know it is busy with interruptible I/O.</p>
+</div>
+<p><code>threaded</code> is only available on a <code>handlers</code> block; a handler passed to a single
+<code>optimize(..., handlers=[...])</code> call always runs inline. To run a blocking
+handler on a thread for just one optimization, wrap that call in a one-shot
+block:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="k">with</span> <span class="n">handlers</span><span class="p">(</span><span class="n">threaded</span><span class="o">=</span><span class="n">slow_writer</span><span class="p">):</span>
+</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>    <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>
+</span></code></pre></div>
 <h2 id="a-note-on-enums">A note on enums</h2>
 <p>A few config values and result fields use enumerations, such as
 <a class="autorefs autorefs-internal" title="            VariableType" href="../../reference/enums/#ropt.enums.VariableType"><code>VariableType</code></a> for integer variables and
 <a class="autorefs autorefs-internal" title="            ExitCode" href="../../reference/enums/#ropt.enums.ExitCode"><code>ExitCode</code></a> for <code>result.exit_code</code>. These are <strong>not</strong> part
 of <code>ropt.simple</code>; import them from <a class="autorefs autorefs-internal" title="            ropt.enums" href="../../reference/enums/#ropt.enums"><code>ropt.enums</code></a>:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.enums</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExitCode</span><span class="p">,</span> <span class="n">VariableType</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.enums</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExitCode</span><span class="p">,</span> <span class="n">VariableType</span>
 </span></code></pre></div>
 
 
