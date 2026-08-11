@@ -8,10 +8,26 @@
     [Optimizer Setup](../optimizer_setup/key_concepts.md), the same whichever way you run
     it.
 
-The [simple API](../running/running.md) covers the common case: a single optimization run
-with one evaluator. For anything more elaborate — multiple optimizers in
-sequence, nested optimizations, custom event handling, parallel/async execution
-— drop down to the workflow components described here.
+The [simple API](../running/running.md) covers the common case with a single
+call: one optimization run, one evaluator, results returned when it finishes. The
+workflow components documented here are the layer beneath it — the same building
+blocks the simple API is assembled from, exposed directly.
+
+**When to use them.** Reach for the workflow components when the single-run model
+of the simple API is too rigid: to chain several optimizers, nest optimizations
+inside one another, react to results as they arrive through custom event
+handlers, or drive evaluations across threads, processes, or an HPC cluster.
+Wiring a workflow together by hand takes more code, but that code is where the
+extra flexibility lives — these components can express applications the simple
+API cannot.
+
+**Who this is for.** This is the low-level API, and it assumes you are
+comfortable with `asyncio` and threads. Parallel execution runs on an event
+loop, event handlers may be invoked from several threads at once, and you are
+responsible for respecting the concurrency and process-boundary rules spelled out
+on these pages. Those rules are real limitations, not incidental detail: ignore
+them and a workflow will raise rather than silently misbehave. In return you get
+control that the simple API deliberately hides.
 
 There are four core workflow components:
 
@@ -232,7 +248,7 @@ There are two ways to drive one, and they are mutually exclusive:
   long as those steps do not run it concurrently. Serial reuse is fine, even
   across different threads: each `handle_event` call must fully complete before
   the next begins. If two threads execute `handle_event` at the same time, a
-  `RuntimeError` is raised.
+  [`WorkflowError`][ropt.exceptions.WorkflowError] is raised.
 
 - **Registered with an
   [`EventDispatcher`][ropt.components.event_handlers.EventDispatcher].** When work
@@ -245,7 +261,7 @@ There are two ways to drive one, and they are mutually exclusive:
 A handler is owned by **either** one dispatcher **or** one-or-more compute
 steps — never both — and may be registered with **at most one** dispatcher.
 Mixing the two, or registering with a second dispatcher, raises a
-`RuntimeError`.
+[`WorkflowError`][ropt.exceptions.WorkflowError].
 
 !!! note "A handler failure is fatal"
 
@@ -263,7 +279,8 @@ Mixing the two, or registering with a second dispatcher, raises a
 
     Never attach the same handler instance to compute steps that may run at the
     same time on different threads; the moment a second thread executes it while
-    the first is still inside `handle_event`, a `RuntimeError` is raised. Give
+    the first is still inside `handle_event`, a
+    [`WorkflowError`][ropt.exceptions.WorkflowError] is raised. Give
     each parallel step its own handler, or route events through an
     `EventDispatcher`.
 
@@ -337,126 +354,13 @@ See [Event Dispatcher](parallel.md#event-dispatcher) for the full pattern.
 
 ## Evaluators
 
-Compute steps take an [`Evaluator`][ropt.components.evaluators.Evaluator]
-instance — *not* a bare evaluation callback. Three
-synchronous evaluators are provided, plus an asynchronous one described in
-the [next section](parallel.md):
-
-| Evaluator                                                                      | Interface                                                                                                                     |
-| ------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------- |
-| [`BatchEvaluator`][ropt.components.evaluators.BatchEvaluator]                    | Batch: `f(variables_2d, context)` → `EvaluationBatchResult`.                                                                  |
-| [`FunctionEvaluator`][ropt.components.evaluators.FunctionEvaluator]              | Per-row: `f(variables_1d, context)` → `EvaluationFunctionResult`.                                                             |
-| [`CachedEvaluator`][ropt.components.evaluators.CachedEvaluator]                  | Wraps another evaluator, caching results by variable vector.                                                                  |
-| [`ParallelEvaluator`][ropt.components.evaluators.ParallelEvaluator]              | Parallel evaluation via an [`Executor`][ropt.components.executors.Executor] — see [Parallel Evaluation](parallel.md).           |
-
-!!! warning "Evaluators are not safe for concurrent use"
-
-    Like event handlers, an evaluator raises a `RuntimeError` if two threads
-    execute its `eval` method at the same time. Serial reuse is allowed: a
-    single evaluator instance may be shared by several compute steps that run
-    one after another, even on different threads (for example, reusing one
-    `FunctionEvaluator` across nested inner optimizations to keep batch ids
-    counting). Do **not** share one evaluator across steps that run in parallel;
-    give each parallel step its own evaluator. For the constraints on where each
-    layer of a nested workflow may run, see
-    [Nested workflows and process boundaries](parallel.md#nested-workflows-and-process-boundaries).
-    Note that the parallelism of
-    [`ParallelEvaluator`][ropt.components.evaluators.ParallelEvaluator] happens
-    *below* `eval` — it dispatches tasks to an executor, so its own `eval` is
-    still called on a single thread. An evaluator cannot be transferred to
-    another process; serializing one reconstructs it as an inert placeholder in
-    the worker, and `ropt` raises a
-    [`TransferError`][ropt.exceptions.TransferError] before the task runs.
-
-### BatchEvaluator
-
-[`BatchEvaluator`][ropt.components.evaluators.BatchEvaluator] defers to a callable
-callback that receives the full 2-D variable matrix and an
-[`EvaluationBatchContext`][ropt.evaluation.EvaluationBatchContext], and returns
-an [`EvaluationBatchResult`][ropt.evaluation.EvaluationBatchResult]. Use this
-when you need the full batch (e.g. vectorized computation, or an external
-simulator that accepts all rows at once). The callback follows the
-[`EvaluationBatchCallback`][ropt.evaluation.EvaluationBatchCallback] protocol.
-
-### FunctionEvaluator
-
-[`FunctionEvaluator`][ropt.components.evaluators.FunctionEvaluator] stores a
-single function that returns a value for each objective and constraint. The
-function is called once per row of the evaluation batch with the variable
-vector and an
-[`EvaluationFunctionContext`][ropt.components.evaluators.EvaluationFunctionContext]
-dataclass exposing `realization`, `perturbation`, `batch_id`, `eval_idx`, and
-`name`. The `perturbation` value is `-1` when the evaluation is not a
-perturbation (i.e. the unperturbed function evaluation). The `name` value is the
-optional task name set by the evaluator (e.g. via `ParallelEvaluator`'s
-`get_name` callback) and is `None` when no name was assigned. The function must
-return an
-[`EvaluationFunctionResult`][ropt.components.evaluators.EvaluationFunctionResult]
-dataclass with:
-
-- `objectives`: a scalar or 1-D NumPy array of length *n_objectives*.
-- `constraints` (optional): a scalar or 1-D NumPy array of length
-  *n_nonlinear_constraints*.
-- `metadata` (optional): a `dict[str, Any]` whose entries are stored in the
-  `metadata` field of the returned
-  [`EvaluationBatchResult`][ropt.evaluation.EvaluationBatchResult].
-
-See [Writing Evaluation Callbacks](evaluation_callbacks.md#using-functionevaluator)
-for a worked example.
-
-### CachedEvaluator
-
-[`CachedEvaluator`][ropt.components.evaluators.CachedEvaluator] wraps another
-evaluator with result caching. It retrieves previously computed function results
-from `EventHandler` instances specified as `sources` — typically a
-`HistoryHandler` or `ResultsHandler`. For each variable vector and realization,
-if a matching cached result is found, the cached objectives and constraints are
-reused without calling the wrapped evaluator. Only uncached evaluations are
-forwarded to the underlying evaluator.
-
-Cache matching works as follows: for each requested variable vector and
-realization, the evaluator searches through the `"results"` stored by its
-sources. A match is found when the variables are equal (within floating-point
-tolerance) and the realization matches. If realization names are configured,
-they are used for matching (allowing cache hits across different optimization
-runs with the same realization names). Otherwise, realization indices are used.
-
-If some but not all evaluations are found in cache, the cached ones are
-marked as inactive and only the missing evaluations are delegated to the
-wrapped evaluator. The final combined result contains both cached and newly
-computed values.
-
-Sources can be added dynamically with `add_sources()`.
-
-To record which evaluations were served from cache, pass a `hits_key` string
-at construction time. When set, the returned
-[`EvaluationBatchResult`][ropt.evaluation.EvaluationBatchResult] will contain
-a boolean NumPy array in its `metadata` dictionary under that key —
-`True` for evaluations that came from the cache, `False` for those that were
-freshly computed.
-
-The `eval_cached()` method is available for derived classes that need access to
-which evaluations were cache hits — it returns both the
-[`EvaluationBatchResult`][ropt.evaluation.EvaluationBatchResult] and a
-dictionary mapping evaluation indices to their cached
-[`FunctionResults`][ropt.results.FunctionResults].
-
-### ParallelEvaluator
-
-The evaluators above run each function call sequentially in the current thread.
-For parallel evaluation — whether via worker threads, separate processes, or an
-HPC cluster — a parallel evaluator is needed. See [Parallel
-Evaluation](parallel.md) for details on
-[`ParallelEvaluator`][ropt.components.evaluators.ParallelEvaluator] and the
-available executors.
-
-!!! tip "Reusing objectives and constraints"
-
-    When defining multiple objectives, you may need to reuse the same
-    underlying computation. For example, a total objective could consist of
-    the mean of the realizations plus their standard deviation. Rather than
-    evaluating all realizations twice, compute them once and return the
-    values for both objectives from a single evaluator call.
+A compute step never evaluates the model itself — it delegates to an
+[`Evaluator`][ropt.components.evaluators.Evaluator] instance that you supply. The
+available evaluators, and how to write the evaluation code they wrap, are covered
+in [Writing Evaluation Callbacks](evaluation_callbacks.md). For parallel,
+process-based, or HPC evaluation, see
+[`ParallelEvaluator`][ropt.components.evaluators.ParallelEvaluator] in
+[Parallel Evaluation](parallel.md).
 
 ## Where to next
 

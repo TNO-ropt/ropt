@@ -90,8 +90,8 @@ class MultiprocessingExecutor(ExecutorBase):
             self._executor.shutdown(wait=False)
             self._executor = None
             msg = (
-                "Could not start MultiprocessingExecutor workers; guard the "
-                'program entry point with `if __name__ == "__main__":`.'
+                "Could not start worker processes; guard the program entry point "
+                'with `if __name__ == "__main__":`.'
             )
             raise ExecutionError(msg) from exc
 
@@ -149,7 +149,11 @@ class _Worker:
         try:
             pickle.dumps(task.function)
         except Exception as exc:
-            msg = "The task function is not picklable; install ropt[cloudpickle] or make it picklable."
+            msg = (
+                "The task function could not be sent to a worker process because "
+                "it is not picklable; install ropt[cloudpickle] or make it "
+                "picklable."
+            )
             raise ExecutionError(msg) from exc
         return await loop.run_in_executor(
             self._executor, _run_function, task.function, task.args, task.kwargs

@@ -33,9 +33,15 @@ def rosenbrock(variables, context):
     return float(objective)
 ```
 
+The second argument, `context`, identifies *which* evaluation this is. This first
+example ignores it, but ensemble problems use `context.realization` to pick the
+right parameters — see [Ensemble Optimization](ensemble.md).
+
 ## Report progress (optional)
 
-A `report` callback is called after every evaluation:
+A `report` callback is called after every evaluation. It can also stop the run
+early by returning `True`. See
+[Reporting progress](../running/running.md#reporting-progress) for details:
 
 ```python
 def report(result):

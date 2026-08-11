@@ -33,15 +33,26 @@ config = {
 
 ## Add the constraint
 
-The problem keeps `x + y` at or below `10`. Here it is a nonlinear constraint, so
-the objective returns the objective and the constraint:
+The problem keeps `x + y` at or below `10`. Declare the bound in the config under
+`nonlinear_constraints`, and have the objective return the constraint value after
+the objective:
 
 ```python
+config["nonlinear_constraints"] = {
+    "lower_bounds": [-np.inf],
+    "upper_bounds": [10.0],
+}
+
+
 def function(variables, context):
     x, y = variables
     objective = -min(3.0 * x, y)
     return [float(objective), float(x + y)]
 ```
+
+As in [Constrained Optimization](constrained.md), the config declares the bounds
+while the objective returns the value; `ropt` pairs them by position (objectives
+first, then constraints).
 
 ## Run it
 

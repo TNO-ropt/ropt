@@ -408,10 +408,10 @@ def test_evaluate_many_with_threads(config: Any, test_functions: Any) -> None:
         assert result.target_objective == pytest.approx(expected)
 
 
-def test_nested_execution_managers_raise() -> None:
+def test_nested_execution_blocks_raise() -> None:
     with (
         threads(workers=1),
-        pytest.raises(WorkflowError, match="Only one executor may be active at a time"),
+        pytest.raises(WorkflowError, match="Only one execution block"),
         threads(workers=1),
     ):
         pass

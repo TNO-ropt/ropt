@@ -65,7 +65,7 @@ name is stamped onto the `name` field of every
 `context.name` to recover it.
 
 If the executor is not running when `eval()` is called, the evaluator raises an
-`Abort` exception.
+[`ExecutorStopped`][ropt.exceptions.ExecutorStopped] exception.
 
 ## Executors
 
@@ -113,8 +113,8 @@ serializes lambdas, closures, and interactively-defined functions (such as those
 written in a notebook cell) by value, so they can be used as task functions and
 returned as results. Without `cloudpickle`, the executor falls back to the
 standard `pickle` module, which requires task functions to be importable,
-module-level objects; passing a lambda or closure then raises a `RuntimeError`
-suggesting the `cloudpickle` extra.
+module-level objects; passing a lambda or closure then raises an
+[`ExecutionError`][ropt.exceptions.ExecutionError] suggesting the `cloudpickle` extra.
 
 #### The `__main__` guard
 
@@ -123,8 +123,8 @@ that **re-imports the program's entry module** to rebuild its environment. If th
 entry script creates or starts the executor at module top level, that re-import
 runs the same code again in each worker, which tries to start yet more processes
 before the interpreter has finished bootstrapping. Python aborts this, the
-workers never start, and `MultiprocessingExecutor` raises a `RuntimeError` at
-startup.
+workers never start, and `MultiprocessingExecutor` raises an
+[`ExecutionError`][ropt.exceptions.ExecutionError] at startup.
 
 The fix is to keep the code that creates and runs the executor behind an
 `if __name__ == "__main__":` guard (or inside a function called from there):
@@ -398,7 +398,8 @@ from name to callable. When a mapping is used, the keys serve as task names
 
 When multiple compute steps run concurrently in worker threads, their event
 handlers are called from multiple threads simultaneously. **Event handlers must
-not be shared across concurrent compute steps**: doing so raises a `RuntimeError`.
+not be shared across concurrent compute steps**: doing so raises a
+[`WorkflowError`][ropt.exceptions.WorkflowError].
 
 [`EventDispatcher`][ropt.components.event_handlers.EventDispatcher] is the
 required solution: it receives events on a queue and dispatches them to its own
@@ -535,15 +536,14 @@ hard constraint on where each layer of a nested workflow may run:
     subprocess or HPC job has no access to the live loop, executors, or
     dispatcher. An inner
     [`ParallelEvaluator`][ropt.components.evaluators.ParallelEvaluator] running
-    there would find `executor.loop is None` and raise `Abort`, and any events
+    there would find `executor.loop is None` and raise
+    [`ExecutorStopped`][ropt.exceptions.ExecutorStopped], and any events
     it emits would never reach the main-process dispatcher.
 
 [`OptimizationStep`][ropt.components.compute_steps.OptimizationStep] enforces this
-rule. **A step is bound to its process, not
-to a thread.** The event handlers it invokes live in shared memory, so they keep
-working across threads within one process but cannot cross a process boundary.
-The invariant is therefore "a step lives in one process," *not* "a step must run
-where it was created." Concretely:
+rule: a step is **bound to its process, not to the thread that created it**. The
+invariant is "a step lives in one process," not "a step runs where it was
+created." Concretely:
 
 - **Across threads (allowed).** A step may be created on one thread and run on
   another within the same process — for example created on the main thread and
@@ -564,7 +564,8 @@ where it was created." Concretely:
 - **Concurrently (forbidden).** A single step must not run more than once at a
   time: calling
   [`run`][ropt.components.compute_steps.OptimizationStep.run] on a step that is
-  already running — for example from two threads — raises a `RuntimeError`. Give
+  already running — for example from two threads — raises a
+  [`WorkflowError`][ropt.exceptions.WorkflowError]. Give
   each concurrent optimization its own step; serial reuse of one step is fine.
 
 Process- and HPC-based parallelism therefore belongs at the **innermost (leaf)

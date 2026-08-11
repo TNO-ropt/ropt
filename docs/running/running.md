@@ -220,9 +220,9 @@ run the evaluations in parallel, open an execution block first. See
 and their trade-offs:
 
 ```python
-from ropt.simple import processes
+from ropt.simple import threads
 
-with processes(workers=8):
+with threads(workers=8):
     result = optimize(config, x0, objective)
 ```
 
@@ -296,6 +296,59 @@ There are two independent levels of concurrency here:
 
 An execution block is required: calling `optimize_many` without one raises a
 `WorkflowError`.
+
+## Offloading your own work
+
+Inside an execution block you can hand **your own** functions to the same pool
+that runs the evaluations, with [`offload`][ropt.simple.offload]. It is useful
+when code you control — a custom step, a domain transform, or a helper you call
+between optimizations — has an expensive, self-contained piece of work you want
+to run on the block's `threads`/`processes`/`hpc` executor instead of inline.
+
+Pass a single callable to run one call and get its result back:
+
+```python
+from functools import partial
+
+from ropt.simple import offload, processes
+
+with processes(workers=4):
+    result = offload(partial(expensive, data))
+```
+
+`offload` takes **zero-argument** callables — bind arguments with
+`functools.partial` (or a closure). Pass a **sequence** of callables to run them
+concurrently and get a tuple of results in order; they may be entirely different
+functions:
+
+```python
+with processes(workers=4):
+    first, second = offload([partial(expensive, x), partial(other, y)])
+```
+
+As with the objective under `processes`/`hpc`, the callables and their arguments
+are **copied to the workers**, since they run in separate processes.
+
+### Requiring an open block
+
+`offload` **requires** an execution block: with none open it raises a
+[`WorkflowError`][ropt.exceptions.WorkflowError] rather than silently running
+inline, so a missing block is never a surprise. For code that may run **with or
+without** a block — a plugin or transform that should not force its caller to
+open one — guard with [`can_offload`][ropt.simple.can_offload] and fall back to a
+direct call:
+
+```python
+result = offload(partial(expensive, x)) if can_offload() else expensive(x)
+```
+
+If you already know a block is open, call `offload` directly; `can_offload` is
+only for the uncertain case.
+
+!!! note "Not from a result handler"
+    `offload` cannot be called from a result handler: a handler runs on the
+    session's internal event loop, and offloading from there is unsupported (it
+    raises). Do parallel work from your optimization code, not from handlers.
 
 ## Result handlers
 
@@ -481,58 +534,61 @@ with handlers(threaded=slow_writer):
     optimize(config, x0, objective)
 ```
 
-## Offloading your own work
+## Handlers and the process boundary
 
-Inside an execution block you can hand **your own** functions to the same pool
-that runs the evaluations, with [`offload`][ropt.simple.offload]. It is useful
-when code you control — a custom step, a domain transform, or a helper you call
-between optimizations — has an expensive, self-contained piece of work you want
-to run on the block's `threads`/`processes`/`hpc` executor instead of inline.
+With `threads` (or no block) your objective and your handlers run in the **same
+process** and share memory: a handler can see anything the objective left behind
+— a global it set, a list it appended to, an object it mutated.
 
-Pass a single callable to run one call and get its result back:
+`processes` and `hpc` break that. The objective runs in a **separate worker
+process**, while the optimizer, your handlers, and the rest of your program stay
+in the **main process**. They cannot share memory. The objective's *only* way to
+send information back is through what it **returns** — the objective and
+constraint values, and the result's `metadata` — all copied back to the main
+process:
 
-```python
-from functools import partial
-
-from ropt.simple import offload, processes
-
-with processes(workers=4):
-    result = offload(partial(expensive, data))
+```mermaid
+flowchart LR
+    subgraph main["your main process"]
+        opt["optimizer"]
+        hand["handlers +<br/>your code"]
+        opt --> hand
+    end
+    subgraph worker["worker process (processes / hpc)"]
+        obj["objective"]
+    end
+    opt -->|"variables"| obj
+    obj -->|"result + metadata<br/>(copied back)"| opt
 ```
 
-`offload` takes **zero-argument** callables — bind arguments with
-`functools.partial` (or a closure). Pass a **sequence** of callables to run them
-concurrently and get a tuple of results in order; they may be entirely different
-functions:
+??? info "How data crosses the boundary"
+    To move work and results between processes, `ropt` **serializes** them —
+    turns the objects into bytes and rebuilds them on the other side. It
+    currently uses **`cloudpickle`** (an extended form of Python's `pickle`),
+    which is why `processes` and `hpc` need the `cloudpickle` extra; most
+    functions and data serialize fine, but things like open files, locks, or
+    database connections may not.
 
-```python
-with processes(workers=4):
-    first, second = offload([partial(expensive, x), partial(other, y)])
-```
+    With `processes` the bytes travel over an in-machine channel. With `hpc` they
+    are written as **files on a shared filesystem** that the cluster nodes read,
+    so `hpc` needs such a shared filesystem (its `workdir`).
 
-As with the objective under `processes`/`hpc`, the callables and their arguments
-must be **picklable**, since they run in a separate process.
+    Serialization is only the mechanism `ropt` uses today; the essential
+    requirement is that the data can be *carried across the boundary*, so a
+    future version could use a different transport — for example one that works
+    over a network.
 
-### Requiring an open block
+Handlers see those returned results and nothing else. Anything the objective did
+only in memory — setting a module global, appending to a shared list, updating an
+object — happened **inside the worker** and is discarded when it finishes; your
+handlers and your main program never see it.
 
-`offload` **requires** an execution block: with none open it raises a
-[`WorkflowError`][ropt.exceptions.WorkflowError] rather than silently running
-inline, so a missing block is never a surprise. For code that may run **with or
-without** a block — a plugin or transform that should not force its caller to
-open one — guard with [`can_offload`][ropt.simple.can_offload] and fall back to a
-direct call:
-
-```python
-result = offload(partial(expensive, x)) if can_offload() else expensive(x)
-```
-
-If you already know a block is open, call `offload` directly; `can_offload` is
-only for the uncertain case.
-
-!!! note "Not from a result handler"
-    `offload` cannot be called from a result handler: a handler runs on the
-    session's internal event loop, and offloading from there is unsupported (it
-    raises). Do parallel work from your optimization code, not from handlers.
+So to get extra information from an evaluation to a handler (or to a later part
+of your program), **return it** instead of stashing it in shared state: attach it
+to the result's `metadata` (see [Attaching metadata](#attaching-metadata)), which
+travels back with the result. Relying on shared state happens to work under
+`threads`, but breaks the moment you switch to `processes`; returning the data
+works everywhere.
 
 ## A note on enums
 

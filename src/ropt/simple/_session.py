@@ -107,8 +107,8 @@ class Session:
     def open_executor(self, make_executor: Callable[[], Executor]) -> None:
         if self._executor is not None:
             msg = (
-                "Only one executor may be active at a time; nested execution "
-                "managers are not supported."
+                "Only one execution block (threads/processes/hpc) can be open at "
+                "a time; they cannot be nested."
             )
             raise WorkflowError(msg)
         assert self._loop is not None

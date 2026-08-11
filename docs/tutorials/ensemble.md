@@ -47,6 +47,11 @@ result = optimize(config, INITIAL_VALUES, rosenbrock, report=report)
 
 The result still converges close to all ones.
 
+The script also accepts `--merge`, which estimates the gradient from a single
+perturbation per realization (`merge_realizations`) instead of several
+perturbations each. See [Stochastic Gradients](../optimizer_setup/gradients.md)
+for the trade-off.
+
 ## Next
 
 - Add constraints: [Constrained Optimization](constrained.md).

@@ -32,6 +32,9 @@ from ropt.components.evaluators import BatchEvaluator
 evaluator = BatchEvaluator(callback=partial(rosenbrock, a=a, b=b))
 ```
 
+See [Writing Evaluation Callbacks](../workflows/evaluation_callbacks.md) for the
+batch callback signature and the other evaluators.
+
 ## The compute step and its handlers
 
 An [`OptimizationStep`][ropt.components.compute_steps.OptimizationStep] runs the
@@ -69,4 +72,6 @@ best = result_handler.result
 ## Next
 
 - The full component reference: [Optimization Workflows](../workflows/workflows.md).
+- Writing the evaluation callback:
+  [Writing Evaluation Callbacks](../workflows/evaluation_callbacks.md).
 - Running evaluations in parallel: [Parallel Evaluation](../workflows/parallel.md).

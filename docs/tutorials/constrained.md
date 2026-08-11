@@ -20,7 +20,9 @@ config = {
 ## Return the constraint from the objective
 
 With one objective and one nonlinear constraint, the objective returns a list:
-the objective first, then the constraint value:
+the objective first, then the constraint value (see
+[the objective function](../running/running.md#the-objective-function) for all
+return types):
 
 ```python
 def rosenbrock(variables, context):

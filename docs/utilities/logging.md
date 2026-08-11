@@ -6,6 +6,10 @@ it produces **no output at all** — a `NullHandler` is installed on the `ropt`
 logger so that log records are silently discarded unless an application
 explicitly enables them.
 
+Logging gives a human-readable *trace* of a run. To *react* to results
+programmatically — collect them, tabulate them, or stop early — use
+[result handlers](../running/running.md#result-handlers) instead.
+
 ## Logger hierarchy
 
 Every module in `ropt` creates its own logger whose name is derived from the
