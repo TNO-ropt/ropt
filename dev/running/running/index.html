@@ -3162,7 +3162,14 @@ additional options.</p>
 </span></code></pre></div>
 <ul>
 <li><code>variables</code> is a 1-D NumPy array: one set of variable values to evaluate.</li>
-<li><code>context</code> tells you <em>which</em> evaluation this is. Its most important field is
+<li><code>context</code> is an
+  <a class="autorefs autorefs-internal" title="            ropt.components.evaluators.EvaluationFunctionContext
+
+
+  
+      dataclass
+  " href="../../reference/components_evaluators/#ropt.components.evaluators.EvaluationFunctionContext"><code>EvaluationFunctionContext</code></a>
+  that tells you <em>which</em> evaluation this is. Its most important field is
   <code>context.realization</code>, the realization number (see
   <a href="#optimizing-over-an-ensemble">Ensembles</a> below).</li>
 </ul>
@@ -3195,7 +3202,7 @@ succeed (see <a href="../../optimizer_setup/configuration/">Configuration</a>).<
 </span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="n">result</span><span class="o">.</span><span class="n">variables</span>         <span class="c1"># the best variables, or None if none was valid</span>
 </span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="n">result</span><span class="o">.</span><span class="n">target_objective</span>  <span class="c1"># the objective value at the best point, or None</span>
 </span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="n">result</span><span class="o">.</span><span class="n">objectives</span>        <span class="c1"># the separate objective values, or None</span>
-</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="n">result</span><span class="o">.</span><span class="n">constraints</span>        <span class="c1"># the nonlinear constraint values, or None</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="n">result</span><span class="o">.</span><span class="n">constraints</span>       <span class="c1"># the nonlinear constraint values, or None</span>
 </span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="n">result</span><span class="o">.</span><span class="n">results</span>           <span class="c1"># the full low-level result object (see below)</span>
 </span></code></pre></div>
 <p>The fields are <code>None</code> when the run produced no valid result (for example when
@@ -3279,7 +3286,8 @@ other runs continue.</p>
 </span></code></pre></div>
 <p>Neither kind is interpreted by <code>ropt</code>. Constant metadata ends up on
 <code>result.results.metadata</code>; per-evaluation metadata on
-<code>result.results.evaluations.metadata</code> (one entry per realization). See
+<code>result.results.evaluations.metadata</code> (one entry per realization). Both kinds can
+be tabulated as columns by the <a href="#dataframehandler"><code>DataFrameHandler</code></a>. See
 <a href="../../optimizer_setup/results/#metadata">Working with Results</a> for how
 each appears in the pandas export. The full runnable script is
 <a href="https://github.com/TNO-ropt/ropt/blob/main/examples/simple/metadata.py">examples/simple/metadata.py</a>.</p>
@@ -3388,6 +3396,20 @@ list (one per run):</p>
 </span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="k">with</span> <span class="n">threads</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">):</span>
 </span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>    <span class="n">results</span> <span class="o">=</span> <span class="n">optimize_many</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">start_points</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>   <span class="c1"># one run per start</span>
 </span></code></pre></div>
+<div class="admonition tip">
+<p class="admonition-title">Give each run an ID</p>
+<p>Pass a per-run <code>metadata</code> list to tag every run with a user-defined
+identifier that travels with its results (and shows up in a
+<a href="#dataframehandler"><code>DataFrameHandler</code></a>'s tables):</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;low&quot;</span><span class="p">,</span> <span class="s2">&quot;mid&quot;</span><span class="p">,</span> <span class="s2">&quot;high&quot;</span><span class="p">]</span>
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="n">results</span> <span class="o">=</span> <span class="n">optimize_many</span><span class="p">(</span>
+</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>    <span class="n">config</span><span class="p">,</span> <span class="n">start_points</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">[{</span><span class="s2">&quot;run_id&quot;</span><span class="p">:</span> <span class="n">x</span><span class="p">}</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">labels</span><span class="p">]</span>
+</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="p">)</span>
+</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
+</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a>    <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;run_id&quot;</span><span class="p">])</span>
+</span></code></pre></div>
+<p>See <a href="#attaching-metadata">Attaching metadata</a> for details.</p>
+</div>
 <p>There are two independent levels of concurrency here:</p>
 <ul>
 <li><strong>The optimizations</strong> always run concurrently, each on its own driver thread.
@@ -3400,7 +3422,7 @@ list (one per run):</p>
   <code>processes</code>, or <code>hpc</code> — runs several evaluations at once.</li>
 </ul>
 <p>An execution block is required: calling <code>optimize_many</code> without one raises a
-<code>RuntimeError</code>.</p>
+<code>WorkflowError</code>.</p>
 <h2 id="result-handlers">Result handlers</h2>
 <p>An <a class="autorefs autorefs-internal" title="            ropt.simple.optimize" href="../../reference/simple/#ropt.simple.optimize"><code>optimize</code></a> call returns only the best result. A
 <strong>handler</strong> lets you collect or react to <em>every</em> result instead: it is an object
@@ -3409,17 +3431,17 @@ them, tabulating them, or invoking a callback.</p>
 <p>Attach handlers to a single optimization with the <code>handlers</code> argument, or share
 them across a block of runs with a <a class="autorefs autorefs-internal" title="            ropt.simple.handlers" href="../../reference/simple/#ropt.simple.handlers"><code>handlers</code></a> block so
 one handler accumulates results from every <code>optimize</code> inside it:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.simple</span><span class="w"> </span><span class="kn">import</span> <span class="n">HistoryHandler</span><span class="p">,</span> <span class="n">handlers</span><span class="p">,</span> <span class="n">optimize</span>
-</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>
-</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="n">history</span> <span class="o">=</span> <span class="n">HistoryHandler</span><span class="p">()</span>
-</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>
-</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">handlers</span><span class="o">=</span><span class="p">[</span><span class="n">history</span><span class="p">])</span>   <span class="c1"># a single run</span>
-</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="c1"># ...or accumulate across many runs:</span>
-</span><span id="__span-14-7"><a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a><span class="k">with</span> <span class="n">handlers</span><span class="p">(</span><span class="n">history</span><span class="p">):</span>
-</span><span id="__span-14-8"><a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a>    <span class="k">for</span> <span class="n">x0</span> <span class="ow">in</span> <span class="n">start_points</span><span class="p">:</span>
-</span><span id="__span-14-9"><a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a>        <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>
-</span><span id="__span-14-10"><a id="__codelineno-14-10" name="__codelineno-14-10" href="#__codelineno-14-10"></a>
-</span><span id="__span-14-11"><a id="__codelineno-14-11" name="__codelineno-14-11" href="#__codelineno-14-11"></a><span class="nb">print</span><span class="p">(</span><span class="n">history</span><span class="o">.</span><span class="n">results</span><span class="p">)</span>   <span class="c1"># every result collected</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.simple</span><span class="w"> </span><span class="kn">import</span> <span class="n">HistoryHandler</span><span class="p">,</span> <span class="n">handlers</span><span class="p">,</span> <span class="n">optimize</span>
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>
+</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="n">history</span> <span class="o">=</span> <span class="n">HistoryHandler</span><span class="p">()</span>
+</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>
+</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">handlers</span><span class="o">=</span><span class="p">[</span><span class="n">history</span><span class="p">])</span>   <span class="c1"># a single run</span>
+</span><span id="__span-15-6"><a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a><span class="c1"># ...or accumulate across many runs:</span>
+</span><span id="__span-15-7"><a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a><span class="k">with</span> <span class="n">handlers</span><span class="p">(</span><span class="n">history</span><span class="p">):</span>
+</span><span id="__span-15-8"><a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a>    <span class="k">for</span> <span class="n">x0</span> <span class="ow">in</span> <span class="n">start_points</span><span class="p">:</span>
+</span><span id="__span-15-9"><a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a>        <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>
+</span><span id="__span-15-10"><a id="__codelineno-15-10" name="__codelineno-15-10" href="#__codelineno-15-10"></a>
+</span><span id="__span-15-11"><a id="__codelineno-15-11" name="__codelineno-15-11" href="#__codelineno-15-11"></a><span class="nb">print</span><span class="p">(</span><span class="n">history</span><span class="o">.</span><span class="n">results</span><span class="p">)</span>   <span class="c1"># every result collected</span>
 </span></code></pre></div>
 <p>Handlers that store results expose them through <code>handler["results"]</code> (and, for
 <code>HistoryHandler</code>, the <code>history.results</code> shortcut).</p>
@@ -3452,20 +3474,20 @@ pandas DataFrames (<code>pandas</code> must be installed). Define a table with
 <code>add_table(name, table_type, columns)</code>, where <code>table_type</code> is <code>"functions"</code> or
 <code>"gradients"</code> and <code>columns</code> maps result-field names (dotted attribute syntax) to
 column titles:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.simple</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataFrameHandler</span>
-</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>
-</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="n">tables</span> <span class="o">=</span> <span class="n">DataFrameHandler</span><span class="p">()</span>
-</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="n">tables</span><span class="o">.</span><span class="n">add_table</span><span class="p">(</span>
-</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>    <span class="s2">&quot;summary&quot;</span><span class="p">,</span>
-</span><span id="__span-15-6"><a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a>    <span class="s2">&quot;functions&quot;</span><span class="p">,</span>
-</span><span id="__span-15-7"><a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a>    <span class="p">{</span>
-</span><span id="__span-15-8"><a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a>        <span class="s2">&quot;batch_id&quot;</span><span class="p">:</span> <span class="s2">&quot;Batch&quot;</span><span class="p">,</span>
-</span><span id="__span-15-9"><a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a>        <span class="s2">&quot;functions.objectives&quot;</span><span class="p">:</span> <span class="s2">&quot;Objective&quot;</span><span class="p">,</span>
-</span><span id="__span-15-10"><a id="__codelineno-15-10" name="__codelineno-15-10" href="#__codelineno-15-10"></a>        <span class="s2">&quot;evaluations.variables&quot;</span><span class="p">:</span> <span class="s2">&quot;Variable&quot;</span><span class="p">,</span>
-</span><span id="__span-15-11"><a id="__codelineno-15-11" name="__codelineno-15-11" href="#__codelineno-15-11"></a>    <span class="p">},</span>
-</span><span id="__span-15-12"><a id="__codelineno-15-12" name="__codelineno-15-12" href="#__codelineno-15-12"></a><span class="p">)</span>
-</span><span id="__span-15-13"><a id="__codelineno-15-13" name="__codelineno-15-13" href="#__codelineno-15-13"></a><span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">handlers</span><span class="o">=</span><span class="p">[</span><span class="n">tables</span><span class="p">])</span>
-</span><span id="__span-15-14"><a id="__codelineno-15-14" name="__codelineno-15-14" href="#__codelineno-15-14"></a><span class="n">df</span> <span class="o">=</span> <span class="n">tables</span><span class="p">[</span><span class="s2">&quot;summary&quot;</span><span class="p">]</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.simple</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataFrameHandler</span>
+</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>
+</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="n">tables</span> <span class="o">=</span> <span class="n">DataFrameHandler</span><span class="p">()</span>
+</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="n">tables</span><span class="o">.</span><span class="n">add_table</span><span class="p">(</span>
+</span><span id="__span-16-5"><a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a>    <span class="s2">&quot;summary&quot;</span><span class="p">,</span>
+</span><span id="__span-16-6"><a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a>    <span class="s2">&quot;functions&quot;</span><span class="p">,</span>
+</span><span id="__span-16-7"><a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a>    <span class="p">{</span>
+</span><span id="__span-16-8"><a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a>        <span class="s2">&quot;batch_id&quot;</span><span class="p">:</span> <span class="s2">&quot;Batch&quot;</span><span class="p">,</span>
+</span><span id="__span-16-9"><a id="__codelineno-16-9" name="__codelineno-16-9" href="#__codelineno-16-9"></a>        <span class="s2">&quot;functions.objectives&quot;</span><span class="p">:</span> <span class="s2">&quot;Objective&quot;</span><span class="p">,</span>
+</span><span id="__span-16-10"><a id="__codelineno-16-10" name="__codelineno-16-10" href="#__codelineno-16-10"></a>        <span class="s2">&quot;evaluations.variables&quot;</span><span class="p">:</span> <span class="s2">&quot;Variable&quot;</span><span class="p">,</span>
+</span><span id="__span-16-11"><a id="__codelineno-16-11" name="__codelineno-16-11" href="#__codelineno-16-11"></a>    <span class="p">},</span>
+</span><span id="__span-16-12"><a id="__codelineno-16-12" name="__codelineno-16-12" href="#__codelineno-16-12"></a><span class="p">)</span>
+</span><span id="__span-16-13"><a id="__codelineno-16-13" name="__codelineno-16-13" href="#__codelineno-16-13"></a><span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">handlers</span><span class="o">=</span><span class="p">[</span><span class="n">tables</span><span class="p">])</span>
+</span><span id="__span-16-14"><a id="__codelineno-16-14" name="__codelineno-16-14" href="#__codelineno-16-14"></a><span class="n">df</span> <span class="o">=</span> <span class="n">tables</span><span class="p">[</span><span class="s2">&quot;summary&quot;</span><span class="p">]</span>
 </span></code></pre></div>
 <p>Read one table with <code>tables["summary"]</code>, or all of them with <code>get_tables()</code>. A
 field whose value is a vector or matrix expands to several columns; the extra
@@ -3483,6 +3505,22 @@ both result-level and per-realization metadata can be included and renamed.</p>
 <li><code>add_column(table, name, title)</code> adds one column to an existing table.</li>
 <li><code>set_callback(fn)</code> calls <code>fn(event)</code> whenever the tables are updated.</li>
 </ul>
+<div class="admonition tip">
+<p class="admonition-title">Write the tables to a file as they update</p>
+<p><code>set_callback</code> fires on every update, so it is a convenient hook for saving
+the tables — to watch progress live or to write a final report. Pandas'
+<code>to_string()</code> gives aligned, human-readable columns with no extra
+dependencies; use <code>to_csv()</code> for machine-readable data, or <code>to_markdown()</code>
+if you have <code>tabulate</code> installed:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">dump</span><span class="p">(</span><span class="n">_event</span><span class="p">):</span>
+</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;progress.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
+</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">df</span> <span class="ow">in</span> <span class="n">tables</span><span class="o">.</span><span class="n">get_tables</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a>            <span class="n">fh</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;# </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="n">df</span><span class="o">.</span><span class="n">to_string</span><span class="p">()</span><span class="si">}</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a>
+</span><span id="__span-17-6"><a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a><span class="n">tables</span><span class="o">.</span><span class="n">set_callback</span><span class="p">(</span><span class="n">dump</span><span class="p">)</span>
+</span><span id="__span-17-7"><a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a><span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">handlers</span><span class="o">=</span><span class="p">[</span><span class="n">tables</span><span class="p">])</span>
+</span></code></pre></div>
+</div>
 <h3 id="custom-handlers">Custom handlers</h3>
 <p>Handlers are not limited to the built-ins: you — or another package — can
 provide your own by implementing <code>ropt</code>'s event-handler interface. The
@@ -3499,7 +3537,7 @@ the emitting step is affected, so concurrent runs continue. See
 <a class="autorefs autorefs-internal" title="            VariableType" href="../../reference/enums/#ropt.enums.VariableType"><code>VariableType</code></a> for integer variables and
 <a class="autorefs autorefs-internal" title="            ExitCode" href="../../reference/enums/#ropt.enums.ExitCode"><code>ExitCode</code></a> for <code>result.exit_code</code>. These are <strong>not</strong> part
 of <code>ropt.simple</code>; import them from <a class="autorefs autorefs-internal" title="            ropt.enums" href="../../reference/enums/#ropt.enums"><code>ropt.enums</code></a>:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.enums</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExitCode</span><span class="p">,</span> <span class="n">VariableType</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.enums</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExitCode</span><span class="p">,</span> <span class="n">VariableType</span>
 </span></code></pre></div>
 
 
