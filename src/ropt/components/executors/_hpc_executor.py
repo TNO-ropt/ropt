@@ -15,7 +15,7 @@ from typing import TYPE_CHECKING, Any, Final
 from uuid import uuid4
 
 from ropt._logging import get_logger
-from ropt.exceptions import ExecutorFailure
+from ropt.exceptions import ExecutionError, ExecutorFailure, WorkflowError
 
 from .base import ExecutorBase, Task
 
@@ -89,7 +89,7 @@ class HPCExecutor(ExecutorBase):
         this requires exactly one cluster to provide the queue.
 
         Raises:
-            RuntimeError: If neither a `template` is provided nor a valid
+            ExecutionError: If neither a `template` is provided nor a valid
                           `config_path` can be found, if the requested cluster
                           is unknown, if the queue is not available on the
                           requested cluster, or if the queue cannot be resolved
@@ -98,11 +98,11 @@ class HPCExecutor(ExecutorBase):
         super().__init__(queue_size=queue_size)
         self._workdir = Path(workdir)
         if not self._workdir.is_absolute():
-            msg = f"HPC working directory is not absolute: {self._workdir}"
-            raise RuntimeError(msg)
+            msg = f"The HPC working directory must be an absolute path: {self._workdir}"
+            raise ExecutionError(msg)
         if not self._workdir.exists():
-            msg = f"HPC work directory not found: {self._workdir}"
-            raise RuntimeError(msg)
+            msg = f"The HPC working directory does not exist: {self._workdir}"
+            raise ExecutionError(msg)
         self._workers = workers
         self._interval = interval
         self._queue = queue
@@ -114,8 +114,8 @@ class HPCExecutor(ExecutorBase):
         self._template = template
         config_path = _get_config_path(config_path)
         if self._template is None and config_path is None:
-            msg = "The HPC cluster has not been configured"
-            raise RuntimeError(msg)
+            msg = "The HPC cluster is not configured; provide a template or a config_path."
+            raise ExecutionError(msg)
         if self._template is not None:
             self._queue_adapter = pysqa.QueueAdapter(queue_type=queue_type)
         else:
@@ -174,15 +174,18 @@ class HPCExecutor(ExecutorBase):
     def _submit(self, task: Task) -> None:
         task_id = task.name or uuid4()
         if task_id in ChainMap(self._tasks, self._results, self._jobs, self._retries):
-            msg = "Task ID already in use, unique names required"
-            raise RuntimeError(msg)
+            msg = f"Task ID '{task_id}' is already in use; task names must be unique."
+            raise WorkflowError(msg)
         existing = any(
             (self._workdir / f"{task_id}{suffix}").exists()
             for suffix in (".in", ".out", ".txt")
         )
         if existing:
-            msg = f"Task files for '{task_id}' already exist in {self._workdir}"
-            raise RuntimeError(msg)
+            msg = (
+                f"Task files for '{task_id}' already exist in {self._workdir}; "
+                "give each executor its own working directory."
+            )
+            raise ExecutionError(msg)
         self._tasks[task_id] = task
         input_file = self._workdir / f"{task_id}.in"
         output_file = self._workdir / f"{task_id}.out"
@@ -286,8 +289,8 @@ def _select_cluster(
 ) -> None:
     clusters = queue_adapter.list_clusters()
     if cluster is not None and cluster not in clusters:
-        msg = f"Unknown HPC cluster: {cluster}"
-        raise RuntimeError(msg)
+        msg = f"Unknown HPC cluster: {cluster}."
+        raise ExecutionError(msg)
     candidates = [cluster] if cluster is not None else clusters
 
     if queue is None:
@@ -302,12 +305,15 @@ def _select_cluster(
         target = (
             f"HPC cluster '{cluster}'" if cluster is not None else "any HPC cluster"
         )
-        msg = f"Queue '{queue}' is not available on {target}"
-        raise RuntimeError(msg)
+        msg = f"Queue '{queue}' is not available on {target}."
+        raise ExecutionError(msg)
     if len(matches) > 1:
         cluster_names = ", ".join(matches)
-        msg = f"Queue '{queue}' is available on multiple HPC clusters: {cluster_names}"
-        raise RuntimeError(msg)
+        msg = (
+            f"Queue '{queue}' is available on multiple HPC clusters: {cluster_names}. "
+            "Specify a cluster."
+        )
+        raise ExecutionError(msg)
     queue_adapter.switch_cluster(matches[0])
 
 

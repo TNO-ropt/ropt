@@ -5,6 +5,7 @@ from importlib.util import find_spec
 from typing import TYPE_CHECKING, Any, Final, Literal
 
 from ropt.enums import EnOptEventType
+from ropt.exceptions import UnsupportedError
 from ropt.results import DomainType, Results, results_to_dataframe
 
 from .base import EventHandler
@@ -95,10 +96,13 @@ class DataFrameHandler(EventHandler):
 
         Args:
             sep:       Separator used in column names.
+
+        Raises:
+            UnsupportedError: If the `pandas` module is not installed.
         """
         if not _HAVE_PANDAS:
-            msg = "The pandas module must be installed to use DataFrameHandler"
-            raise NotImplementedError(msg)
+            msg = "DataFrameHandler requires the pandas module; install ropt[pandas]."
+            raise UnsupportedError(msg)
 
         super().__init__()
         self._sep = sep

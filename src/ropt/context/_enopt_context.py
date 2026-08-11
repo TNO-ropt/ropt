@@ -21,6 +21,7 @@ from ropt.config import (
     VariablesConfig,
 )
 from ropt.enums import PerturbationType
+from ropt.exceptions import WorkflowError
 from ropt.plugins.manager import get_plugin
 
 from ._validated_types import (  # ruff: ignore[typing-only-first-party-import]
@@ -211,10 +212,10 @@ class EnOptContext(BaseModel):
         """Lock the object to prevent sharing and re-use.
 
         Raises:
-            RuntimeError: If the object is already locked.
+            WorkflowError: If the object is already locked.
         """
         with _global_lock:
             if self._locked:
                 msg = "The EnOptContext object has already been used."
-                raise RuntimeError(msg)
+                raise WorkflowError(msg)
             object.__setattr__(self, "_locked", True)  # ruff: ignore[unnecessary-dunder-call]

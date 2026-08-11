@@ -9,6 +9,7 @@ from typing import Any
 
 from ropt.components._transferred import _make_placeholder
 from ropt.components.event_handlers import EventHandler
+from ropt.exceptions import WorkflowError
 
 
 class ComputeStep(ABC):
@@ -21,7 +22,7 @@ class ComputeStep(ABC):
 
     A compute step instance may only have one active `run` at a time. The guard
     is applied automatically to every subclass's `run` method, which raises a
-    `RuntimeError` if the same instance is already running on another thread.
+    `WorkflowError` if the same instance is already running on another thread.
     """
 
     def __init_subclass__(cls, **kwargs: object) -> None:  # ruff: ignore[undocumented-magic-method]
@@ -41,7 +42,7 @@ class ComputeStep(ABC):
                 with self._run_lock:
                     if self._running:
                         msg = "The compute step is already running on another thread."
-                        raise RuntimeError(msg)
+                        raise WorkflowError(msg)
                     self._running = True
                 self._stop_flag.clear()
                 try:

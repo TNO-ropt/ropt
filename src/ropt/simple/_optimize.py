@@ -12,6 +12,7 @@ from ropt.components.compute_steps import OptimizationStep
 from ropt.components.evaluators import FunctionEvaluator, ParallelEvaluator
 from ropt.components.event_handlers import ResultsHandler
 from ropt.context import EnOptContext
+from ropt.exceptions import WorkflowError
 
 from ._handlers import current_handlers
 from ._objective import adapt_objective
@@ -202,7 +203,7 @@ def optimize_many(  # ruff: ignore[too-many-arguments]
         One [`OptimizeResult`][ropt.simple.OptimizeResult] per run, in order.
 
     Raises:
-        RuntimeError: If no `threads`/`processes` block is open.
+        WorkflowError: If no `threads`/`processes` block is open.
     """
     session = current_session()
     if session is None:
@@ -210,7 +211,7 @@ def optimize_many(  # ruff: ignore[too-many-arguments]
             "optimize_many() requires an execution block, "
             "e.g. `with ropt.threads(...):`."
         )
-        raise RuntimeError(msg)
+        raise WorkflowError(msg)
 
     executor = current_executor()
     shared = current_handlers()

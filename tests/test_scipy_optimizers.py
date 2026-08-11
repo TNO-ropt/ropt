@@ -17,6 +17,7 @@ from ropt.backend.scipy import (
     SUPPORTED_SCIPY_METHODS,
 )
 from ropt.components.evaluators import EvaluationFunctionContext
+from ropt.exceptions import UnsupportedError
 from ropt.results import Results
 from ropt.workflow import BasicOptimizer, validate_backend_options
 
@@ -88,7 +89,7 @@ def test_scipy_unsupported_constraints_bounds(
 ) -> None:
     config["backend"]["method"] = method
     config["variables"]["lower_bounds"] = [0.1, -np.inf, -np.inf]
-    with pytest.raises(NotImplementedError, match="does not support bound constraints"):
+    with pytest.raises(UnsupportedError, match="does not support bound constraints"):
         BasicOptimizer(config, evaluator()).run(initial_values)
 
 
@@ -97,7 +98,7 @@ def test_scipy_required_constraints_bounds(
     config: Any, method: str, evaluator: Any
 ) -> None:
     config["backend"]["method"] = method
-    with pytest.raises(NotImplementedError, match="requires bound constraints"):
+    with pytest.raises(UnsupportedError, match="requires bound constraints"):
         BasicOptimizer(config, evaluator()).run(initial_values)
 
 
@@ -115,7 +116,7 @@ def test_scipy_unsupported_constraints_linear_eq(
         "upper_bounds": 1.0,
     }
     with pytest.raises(
-        NotImplementedError, match="does not support linear equality constraints"
+        UnsupportedError, match="does not support linear equality constraints"
     ):
         BasicOptimizer(config, evaluator()).run(initial_values)
 
@@ -139,7 +140,7 @@ def test_scipy_unsupported_constraints_linear_ineq(
         "upper_bounds": upper_bounds,
     }
     with pytest.raises(
-        NotImplementedError, match="does not support linear inequality constraints"
+        UnsupportedError, match="does not support linear inequality constraints"
     ):
         BasicOptimizer(config, evaluator()).run(initial_values)
 
@@ -158,7 +159,7 @@ def test_scipy_unsupported_constraints_nonlinear_eq(
     }
 
     with pytest.raises(
-        NotImplementedError, match="does not support non-linear equality constraints"
+        UnsupportedError, match="does not support non-linear equality constraints"
     ):
         BasicOptimizer(config, evaluator()).run(initial_values)
 
@@ -181,7 +182,7 @@ def test_scipy_unsupported_constraints_nonlinear_ineq(
         "upper_bounds": upper_bounds,
     }
     with pytest.raises(
-        NotImplementedError, match="does not support non-linear inequality constraints"
+        UnsupportedError, match="does not support non-linear inequality constraints"
     ):
         BasicOptimizer(config, evaluator()).run(initial_values)
 

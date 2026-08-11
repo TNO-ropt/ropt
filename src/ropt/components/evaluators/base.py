@@ -10,6 +10,7 @@ from typing import TYPE_CHECKING, Any, Protocol
 
 from ropt.components._transferred import _make_placeholder
 from ropt.evaluation import EvaluationBatchResult
+from ropt.exceptions import WorkflowError
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -61,7 +62,7 @@ class Evaluator(ABC):
                 with self._owner_lock:
                     if self._in_use:
                         msg = "The evaluator is already running on another thread."
-                        raise RuntimeError(msg)
+                        raise WorkflowError(msg)
                     self._in_use = True
                 try:
                     result = _orig(self, variables, context)
@@ -99,7 +100,7 @@ class Evaluator(ABC):
             An evaluation results object containing the calculated values.
 
         Raises:
-            RuntimeError: If another thread is executing this evaluator's `eval`
+            WorkflowError: If another thread is executing this evaluator's `eval`
                           method at the same time.
         """
 

@@ -9,6 +9,7 @@ from concurrent.futures import Future
 from typing import TYPE_CHECKING
 
 from ropt.components._transferred import _make_placeholder
+from ropt.exceptions import WorkflowError
 
 if TYPE_CHECKING:
     from ropt.events import EnOptEvent
@@ -89,12 +90,12 @@ class EventDispatcher:
             event: The event to submit.
 
         Raises:
-            RuntimeError: If the dispatcher is not running.
+            WorkflowError: If the dispatcher is not running.
             Exception:    Whatever a handler raised while processing the event.
         """  # ruff: ignore[docstring-extraneous-exception]
         if not self._running.is_set():
-            msg = "Cannot submit an event to an EventDispatcher that is not running."
-            raise RuntimeError(msg)
+            msg = "Cannot submit an event because the event dispatcher is not running."
+            raise WorkflowError(msg)
         assert self._loop is not None
         assert self._queue is not None
         future: Future[None] = Future()
@@ -116,11 +117,11 @@ class EventDispatcher:
             task_group: The task group to use.
 
         Raises:
-            RuntimeError: If the dispatcher is already running.
+            WorkflowError: If the dispatcher is already running.
         """
         if self._running.is_set():
-            msg = "EventDispatcher is already running."
-            raise RuntimeError(msg)
+            msg = "The event dispatcher is already running."
+            raise WorkflowError(msg)
         self._queue = asyncio.Queue()
         self._loop = asyncio.get_running_loop()
         self._running.set()
@@ -178,7 +179,7 @@ class EventDispatcher:
     @staticmethod
     def _reject(future: Future[None]) -> None:
         if not future.done():
-            future.set_exception(RuntimeError("The event dispatcher stopped."))
+            future.set_exception(WorkflowError("The event dispatcher stopped."))
 
     def _reject_queued(self) -> None:
         assert self._queue is not None

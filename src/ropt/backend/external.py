@@ -13,7 +13,7 @@ import numpy as np
 
 from ropt._logging import get_logger
 from ropt.backend import Backend
-from ropt.exceptions import OptimizerStop
+from ropt.exceptions import OptimizerStop, UnsupportedError
 from ropt.plugins.manager import get_plugin
 
 if TYPE_CHECKING:
@@ -73,8 +73,8 @@ class ExternalBackend(Backend):
 
     def __init__(self, backend_config: BackendConfig) -> None:  # ruff: ignore[undocumented-public-init]
         if not _HAVE_CLOUDPICKLE:
-            msg = "The cloudpickle module must be installed to use ExternalBackend"
-            raise NotImplementedError(msg)
+            msg = "ExternalBackend requires the cloudpickle module; install ropt[cloudpickle]."
+            raise UnsupportedError(msg)
 
         self._backend_config = backend_config.model_copy(
             update={"method": backend_config.method.split("/", maxsplit=1)[1]}

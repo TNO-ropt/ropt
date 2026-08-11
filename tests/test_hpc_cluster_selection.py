@@ -3,6 +3,7 @@ from __future__ import annotations
 import pytest
 
 from ropt.components.executors._hpc_executor import _select_cluster
+from ropt.exceptions import ExecutionError
 
 
 class _MockClusterAdapter:
@@ -33,7 +34,7 @@ def test_cluster_derived_from_queue() -> None:
 def test_queue_without_cluster() -> None:
     adapter = _MockClusterAdapter({"cpu": ["short"], "gpu": ["gpu_short"]})
     with pytest.raises(
-        RuntimeError, match="Queue 'missing' is not available on any HPC cluster"
+        ExecutionError, match="Queue 'missing' is not available on any HPC cluster"
     ):
         _select_cluster(adapter, None, "missing")
 
@@ -41,7 +42,7 @@ def test_queue_without_cluster() -> None:
 def test_queue_in_multiple_clusters() -> None:
     adapter = _MockClusterAdapter({"cpu": ["shared"], "gpu": ["shared"]})
     with pytest.raises(
-        RuntimeError, match="available on multiple HPC clusters: cpu, gpu"
+        ExecutionError, match="available on multiple HPC clusters: cpu, gpu"
     ):
         _select_cluster(adapter, None, "shared")
 
@@ -61,12 +62,12 @@ def test_explicit_cluster_with_queue() -> None:
 def test_explicit_cluster_missing_queue() -> None:
     adapter = _MockClusterAdapter({"cpu": ["short"], "gpu": ["gpu_short"]})
     with pytest.raises(
-        RuntimeError, match="Queue 'short' is not available on HPC cluster 'gpu'"
+        ExecutionError, match="Queue 'short' is not available on HPC cluster 'gpu'"
     ):
         _select_cluster(adapter, "gpu", "short")
 
 
 def test_unknown_cluster() -> None:
     adapter = _MockClusterAdapter({"cpu": ["short"], "gpu": ["gpu_short"]})
-    with pytest.raises(RuntimeError, match="Unknown HPC cluster: tpu"):
+    with pytest.raises(ExecutionError, match="Unknown HPC cluster: tpu"):
         _select_cluster(adapter, "tpu", None)

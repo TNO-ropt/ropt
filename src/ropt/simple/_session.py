@@ -33,6 +33,7 @@ from ropt.components.executors import (
     MultiprocessingExecutor,
     ThreadingExecutor,
 )
+from ropt.exceptions import WorkflowError
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
@@ -109,7 +110,7 @@ class Session:
                 "Only one executor may be active at a time; nested execution "
                 "managers are not supported."
             )
-            raise RuntimeError(msg)
+            raise WorkflowError(msg)
         assert self._loop is not None
         assert self._task_group is not None
         executor = make_executor()

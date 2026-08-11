@@ -17,6 +17,7 @@ from ropt.components.event_handlers import (
 from ropt.context import EnOptContext
 from ropt.enums import EnOptEventType
 from ropt.events import EnOptEvent
+from ropt.exceptions import WorkflowError
 
 pytestmark = pytest.mark.timeout(5)
 
@@ -46,7 +47,7 @@ def test_event_dispatcher_not_running_before_start() -> None:
 
 def test_event_dispatcher_dispatch_before_start_raises(config: dict[str, Any]) -> None:
     event = _event(EnOptContext.model_validate(config))
-    with pytest.raises(RuntimeError, match="not running"):
+    with pytest.raises(WorkflowError, match="not running"):
         EventDispatcher().dispatch_event(event)
 
 
@@ -60,7 +61,7 @@ async def test_event_dispatcher_dispatch_after_stop_raises(
         await dispatcher.start(tg)
         dispatcher.cancel()
     assert not dispatcher.is_running()
-    with pytest.raises(RuntimeError, match="not running"):
+    with pytest.raises(WorkflowError, match="not running"):
         dispatcher.dispatch_event(event)
 
 
@@ -79,7 +80,7 @@ async def test_event_dispatcher_already_running_raises() -> None:
     dispatcher = EventDispatcher()
     async with asyncio.TaskGroup() as tg:
         await dispatcher.start(tg)
-        with pytest.raises(RuntimeError, match="already running"):
+        with pytest.raises(WorkflowError, match="already running"):
             await dispatcher.start(tg)
         dispatcher.cancel()
 
@@ -440,7 +441,7 @@ def test_dispatcher_owned_handler_rejects_concurrent_handle_event(
     first.start()
     entered.wait()
     try:
-        with pytest.raises(RuntimeError, match="already running on another thread"):
+        with pytest.raises(WorkflowError, match="already running on another thread"):
             handler.handle_event(event)
     finally:
         release.set()

@@ -9,6 +9,7 @@ from enum import Enum, auto
 from typing import TYPE_CHECKING, Any
 
 from ropt.components._transferred import _make_placeholder
+from ropt.exceptions import WorkflowError
 
 if TYPE_CHECKING:
     from ropt.enums import EnOptEventType
@@ -46,7 +47,7 @@ class EventHandler(ABC):
 
     Note:
         Event handlers are not safe for concurrent use. A handler attached to
-        compute steps raises a `RuntimeError` if two threads execute its
+        compute steps raises a `WorkflowError` if two threads execute its
         `handle_event` method at the same time. Serial reuse across threads is
         allowed, as long as each call completes before the next begins. A
         handler must not run a compute step or otherwise cause new events to be
@@ -76,7 +77,7 @@ class EventHandler(ABC):
                 with self._owner_lock:
                     if self._in_use:
                         msg = "The event handler is already running on another thread."
-                        raise RuntimeError(msg)
+                        raise WorkflowError(msg)
                     self._in_use = True
                 try:
                     _orig(self, event)
@@ -101,17 +102,17 @@ class EventHandler(ABC):
         """Mark this handler as owned by an event dispatcher.
 
         Raises:
-            RuntimeError: If the handler is already registered with a dispatcher
+            WorkflowError: If the handler is already registered with a dispatcher
                           or attached to a compute step.
         """
         if self._attached_to is _Attachment.DISPATCHER:
             msg = "This event handler is already registered with a dispatcher."
-            raise RuntimeError(msg)
+            raise WorkflowError(msg)
         if self._attached_to is _Attachment.COMPUTE_STEP:
             msg = (
                 "This event handler is already registered directly with a compute step."
             )
-            raise RuntimeError(msg)
+            raise WorkflowError(msg)
         self._attached_to = _Attachment.DISPATCHER
 
     def unregister_dispatcher(self) -> None:
@@ -121,22 +122,22 @@ class EventHandler(ABC):
         dispatcher or with a compute step.
 
         Raises:
-            RuntimeError: If the handler is not registered with a dispatcher.
+            WorkflowError: If the handler is not registered with a dispatcher.
         """
         if self._attached_to is not _Attachment.DISPATCHER:
             msg = "This event handler is not registered with a dispatcher."
-            raise RuntimeError(msg)
+            raise WorkflowError(msg)
         self._attached_to = _Attachment.NONE
 
     def register_compute_step(self) -> None:
         """Mark this handler as owned by one or more compute steps.
 
         Raises:
-            RuntimeError: If the handler is registered with a dispatcher.
+            WorkflowError: If the handler is registered with a dispatcher.
         """
         if self._attached_to is _Attachment.DISPATCHER:
             msg = "This event handler is already registered with a dispatcher."
-            raise RuntimeError(msg)
+            raise WorkflowError(msg)
         self._attached_to = _Attachment.COMPUTE_STEP
 
     def claim(self) -> None:
@@ -157,12 +158,12 @@ class EventHandler(ABC):
         and of the transient concurrency guard on `handle_event`.
 
         Raises:
-            RuntimeError: If the handler has already been claimed.
+            WorkflowError: If the handler has already been claimed.
         """
         with self._owner_lock:
             if self._claimed:
                 msg = "This event handler has already been claimed for exclusive use."
-                raise RuntimeError(msg)
+                raise WorkflowError(msg)
             self._claimed = True
 
     @property

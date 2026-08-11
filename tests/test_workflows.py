@@ -33,7 +33,7 @@ from ropt.components.event_handlers import (
 from ropt.context import EnOptContext
 from ropt.enums import EnOptEventType, ExitCode
 from ropt.evaluation import EvaluationBatchResult
-from ropt.exceptions import OptimizerStop, TransferError
+from ropt.exceptions import OptimizerStop, TransferError, WorkflowError
 from ropt.results import FunctionResults
 from ropt.workflow import BasicOptimizer
 
@@ -815,7 +815,7 @@ def test_optimization_step_concurrent_run_raises(config: Any, evaluator: Any) ->
     thread.start()
     try:
         assert entered.wait(timeout=5)
-        with pytest.raises(RuntimeError, match="already running on another thread"):
+        with pytest.raises(WorkflowError, match="already running on another thread"):
             step.run(variables=initial_values, context=context)
     finally:
         release.set()
@@ -976,7 +976,7 @@ def test_evaluator_raises_on_concurrent_use() -> None:
         in_eval.wait()
         try:
             ev.eval(None, None)
-        except RuntimeError as exc:
+        except WorkflowError as exc:
             thread2_error[0] = exc
 
     t1 = threading.Thread(target=_thread1)
@@ -987,7 +987,7 @@ def test_evaluator_raises_on_concurrent_use() -> None:
     can_finish.set()
     t1.join(timeout=5.0)
 
-    assert isinstance(thread2_error[0], RuntimeError)
+    assert isinstance(thread2_error[0], WorkflowError)
     assert "thread" in str(thread2_error[0])
 
 
@@ -1052,7 +1052,7 @@ def test_event_handler_raises_on_concurrent_use() -> None:
         in_handle.wait()
         try:
             handler.handle_event(mock_event)  # type: ignore[arg-type]
-        except RuntimeError as exc:
+        except WorkflowError as exc:
             thread2_error[0] = exc
 
     t1 = threading.Thread(target=_thread1)
@@ -1063,7 +1063,7 @@ def test_event_handler_raises_on_concurrent_use() -> None:
     can_finish.set()
     t1.join(timeout=5.0)
 
-    assert isinstance(thread2_error[0], RuntimeError)
+    assert isinstance(thread2_error[0], WorkflowError)
     assert "thread" in str(thread2_error[0])
 
 
@@ -1118,7 +1118,7 @@ def test_dispatcher_handler_is_not_thread_pinned() -> None:
     def _use() -> None:
         try:
             handler.handle_event(event)  # type: ignore[arg-type]
-        except RuntimeError as exc:  # pragma: no cover - should not happen
+        except WorkflowError as exc:  # pragma: no cover - should not happen
             errors.append(exc)
 
     _run_in_thread(_use)
@@ -1131,7 +1131,7 @@ def test_dispatcher_handler_is_not_thread_pinned() -> None:
 def test_register_dispatcher_twice_raises() -> None:
     handler = _RecordingHandler()
     handler.register_dispatcher()
-    with pytest.raises(RuntimeError, match="already registered with a dispatcher"):
+    with pytest.raises(WorkflowError, match="already registered with a dispatcher"):
         handler.register_dispatcher()
 
 
@@ -1139,21 +1139,21 @@ def test_register_dispatcher_via_add_event_handler_twice_raises() -> None:
     handler = _RecordingHandler()
     dispatcher = EventDispatcher()
     dispatcher.add_event_handler(handler)
-    with pytest.raises(RuntimeError, match="already registered with a dispatcher"):
+    with pytest.raises(WorkflowError, match="already registered with a dispatcher"):
         dispatcher.add_event_handler(handler)
 
 
 def test_dispatcher_then_compute_step_raises() -> None:
     handler = _RecordingHandler()
     handler.register_dispatcher()
-    with pytest.raises(RuntimeError, match="registered with a dispatcher"):
+    with pytest.raises(WorkflowError, match="registered with a dispatcher"):
         handler.register_compute_step()
 
 
 def test_compute_step_then_dispatcher_raises() -> None:
     handler = _RecordingHandler()
     handler.register_compute_step()
-    with pytest.raises(RuntimeError, match="compute step"):
+    with pytest.raises(WorkflowError, match="compute step"):
         handler.register_dispatcher()
 
 
@@ -1173,7 +1173,7 @@ def test_claim_marks_handler_as_claimed() -> None:
 def test_claim_twice_raises() -> None:
     handler = _RecordingHandler()
     handler.claim()
-    with pytest.raises(RuntimeError, match="already been claimed for exclusive use"):
+    with pytest.raises(WorkflowError, match="already been claimed for exclusive use"):
         handler.claim()
 
 

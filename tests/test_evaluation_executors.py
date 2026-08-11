@@ -30,7 +30,12 @@ from ropt.components.executors._multiprocessing_executor import (
 )
 from ropt.context import EnOptContext
 from ropt.evaluation import EvaluationBatchContext
-from ropt.exceptions import ExecutorFailure, ExecutorStopped, TransferError
+from ropt.exceptions import (
+    ExecutionError,
+    ExecutorFailure,
+    ExecutorStopped,
+    TransferError,
+)
 from ropt.workflow._basic_optimizer import BasicOptimizer
 
 if TYPE_CHECKING:
@@ -166,7 +171,7 @@ async def test_hpc_executor_refuses_to_overwrite_existing_task_files(
         function=_function, args=(0,), results_queue=ResultsQueue(), name="job1"
     )
     await asyncio.sleep(0)  # this module runs tests on the event loop
-    with pytest.raises(RuntimeError, match="already exist"):
+    with pytest.raises(ExecutionError, match="already exist"):
         executor._submit(task)  # ruff: ignore[private-member-access]
 
 
@@ -862,7 +867,7 @@ async def test_multiprocessing_without_cloudpickle_rejects_lambda(
         await executor.start(tg)
         await executor.task_queue.put(task)
         item = await asyncio.to_thread(result_queue.get, timeout=30)
-        assert isinstance(item, RuntimeError)
+        assert isinstance(item, ExecutionError)
         assert "ropt[cloudpickle]" in str(item)
         assert executor.is_running()
         executor.cancel()

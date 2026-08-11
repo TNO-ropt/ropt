@@ -12,7 +12,7 @@ from typing import TYPE_CHECKING, Any, Final
 
 from ropt._logging import get_logger
 from ropt.components._transferred import check_transferred, reset_transferred
-from ropt.exceptions import ExecutorFailure
+from ropt.exceptions import ExecutionError, ExecutorFailure
 
 from .base import Executor, ExecutorBase, Task
 
@@ -89,8 +89,11 @@ class MultiprocessingExecutor(ExecutorBase):
         except BrokenProcessPool as exc:
             self._executor.shutdown(wait=False)
             self._executor = None
-            msg = "Could not start MultiprocessingExecutor workers (missing '__main__' guard?)"
-            raise RuntimeError(msg) from exc
+            msg = (
+                "Could not start MultiprocessingExecutor workers; guard the "
+                'program entry point with `if __name__ == "__main__":`.'
+            )
+            raise ExecutionError(msg) from exc
 
     def cleanup(self) -> None:
         """Clean up the executor."""
@@ -146,8 +149,8 @@ class _Worker:
         try:
             pickle.dumps(task.function)
         except Exception as exc:
-            msg = "Task function is not picklable without ropt[cloudpickle]"
-            raise RuntimeError(msg) from exc
+            msg = "The task function is not picklable; install ropt[cloudpickle] or make it picklable."
+            raise ExecutionError(msg) from exc
         return await loop.run_in_executor(
             self._executor, _run_function, task.function, task.args, task.kwargs
         )

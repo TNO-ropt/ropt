@@ -32,6 +32,7 @@ from ropt.backend.utils import (
 )
 from ropt.config.options import OptionsSchemaModel
 from ropt.enums import VariableType
+from ropt.exceptions import UnsupportedError
 
 if TYPE_CHECKING:
     from ropt.config import BackendConfig
@@ -143,8 +144,8 @@ class SciPyBackend(Backend):
         if self._method == "default":
             self._method = DEFAULT_SCIPY_METHOD
         if self._method not in SUPPORTED_SCIPY_METHODS:
-            msg = f"SciPy optimizer algorithm {self._method} is not supported"
-            raise NotImplementedError(msg)
+            msg = f"SciPy optimizer algorithm {self._method} is not supported."
+            raise UnsupportedError(msg)
 
     def init(  # ruff: ignore[undocumented-public-method]
         self, context: EnOptContext, optimizer_callback: OptimizerCallback

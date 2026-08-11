@@ -5,6 +5,7 @@ from typing import Any
 import numpy as np
 import pytest
 
+from ropt.exceptions import UnsupportedError
 from ropt.workflow import BasicOptimizer, validate_backend_options
 
 pytestmark = [pytest.mark.slow]
@@ -32,7 +33,7 @@ def config_fixture() -> dict[str, Any]:
 
 def test_scipy_required_constraints_bounds_de(config: Any, evaluator: Any) -> None:
     optimizer = BasicOptimizer(config, evaluator())
-    with pytest.raises(NotImplementedError, match="requires bound constraints"):
+    with pytest.raises(UnsupportedError, match="requires bound constraints"):
         optimizer.run(initial_values)
 
 

@@ -9,6 +9,7 @@ import numpy as np
 import pytest
 
 from ropt.enums import ExitCode
+from ropt.exceptions import WorkflowError
 from ropt.simple import (
     EvaluateResult,
     EvaluationFunctionContext,
@@ -153,7 +154,7 @@ def test_handlers_report_callback_reports_across_the_block(
 def test_optimize_local_handler_rejects_reuse(config: Any, test_functions: Any) -> None:
     history = HistoryHandler()
     optimize(config, initial_values, test_functions[0], handlers=[history])
-    with pytest.raises(RuntimeError, match="already been claimed for exclusive use"):
+    with pytest.raises(WorkflowError, match="already been claimed for exclusive use"):
         optimize(config, initial_values, test_functions[0], handlers=[history])
 
 
@@ -370,7 +371,7 @@ def test_evaluate_many_with_threads(config: Any, test_functions: Any) -> None:
 def test_nested_execution_managers_raise() -> None:
     with (
         threads(workers=1),
-        pytest.raises(RuntimeError, match="Only one executor may be active at a time"),
+        pytest.raises(WorkflowError, match="Only one executor may be active at a time"),
         threads(workers=1),
     ):
         pass
@@ -544,7 +545,7 @@ def test_optimize_many_mismatched_lengths_raises(
 
 
 def test_optimize_many_requires_session(config: Any, test_functions: Any) -> None:
-    with pytest.raises(RuntimeError, match="requires an execution block"):
+    with pytest.raises(WorkflowError, match="requires an execution block"):
         optimize_many(config, initial_values, test_functions[0])
 
 

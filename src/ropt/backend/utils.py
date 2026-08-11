@@ -11,6 +11,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from ropt.context import EnOptContext
+from ropt.exceptions import UnsupportedError
 
 _MESSAGES = {
     "bounds": "bound constraints",
@@ -69,11 +70,11 @@ def _check_constraint(
     }
     msg = _MESSAGES[constraint_type]
     if have_constraint and method.lower() not in supported:
-        msg = f"optimizer {method} does not support {msg}"
-        raise NotImplementedError(msg)
+        msg = f"Optimizer '{method}' does not support {msg}."
+        raise UnsupportedError(msg)
     if not have_constraint and method.lower() in required:
-        msg = f"optimizer {method} requires {msg}"
-        raise NotImplementedError(msg)
+        msg = f"Optimizer '{method}' requires {msg}."
+        raise UnsupportedError(msg)
 
 
 def _validate_bounds(

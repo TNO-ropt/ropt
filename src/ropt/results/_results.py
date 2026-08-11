@@ -5,6 +5,8 @@ from dataclasses import dataclass
 from importlib.util import find_spec
 from typing import TYPE_CHECKING, Any, Final, TypeVar
 
+from ropt.exceptions import UnsupportedError
+
 if TYPE_CHECKING:
     from collections.abc import Iterable
 
@@ -70,12 +72,12 @@ class Results(ABC):
             A DataFrame with sub-fields as columns and axis indices as rows.
 
         Raises:
-            NotImplementedError: If the `pandas` module is not installed.
+            UnsupportedError: If the `pandas` module is not installed.
             AttributeError:      If the field name is invalid.
         """
         if not _HAVE_PANDAS:
-            msg = "The pandas module must be installed to use to_dataframe"
-            raise NotImplementedError(msg)
+            msg = "to_dataframe requires the pandas module; install ropt[pandas]."
+            raise UnsupportedError(msg)
 
         result_field = getattr(self, field_name, None)
         if result_field is None:

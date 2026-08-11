@@ -9,6 +9,8 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any
 
+from ropt.exceptions import WorkflowError
+
 if TYPE_CHECKING:
     from collections.abc import Callable
 
@@ -105,8 +107,8 @@ class ExecutorBase(Executor):
 
     async def _finish_start(self, task_group: asyncio.TaskGroup) -> None:
         if self._running.is_set():
-            msg = "Executor is already running."
-            raise RuntimeError(msg)
+            msg = "The executor is already running."
+            raise WorkflowError(msg)
         self._running.set()
         self._loop = asyncio.get_running_loop()
         self._task_group = task_group

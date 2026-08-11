@@ -12,6 +12,7 @@ from scipy.stats.qmc import Halton, LatinHypercube, QMCEngine, Sobol, scale
 
 from ropt.config import SamplerConfig
 from ropt.context import EnOptContext
+from ropt.exceptions import UnsupportedError
 from ropt.sampler import Sampler
 
 _STATS_SAMPLERS: Final[dict[str, Any]] = {
@@ -75,8 +76,8 @@ class SciPySampler(Sampler):
             self._method = "norm"
         self._options: dict[str, Any]
         if self._method not in SCIPY_SAMPLER_SUPPORTED_METHODS:
-            msg = f"Method `{self._method}` is not implemented by the SciPy plugin"
-            raise NotImplementedError(msg)
+            msg = f"Method '{self._method}' is not implemented by the SciPy plugin."
+            raise UnsupportedError(msg)
         self._sampler: rv_continuous | QMCEngine | None = None
 
     def init(  # ruff: ignore[undocumented-public-method]
@@ -138,8 +139,8 @@ class SciPySampler(Sampler):
             )
             sampler = _QMC_ENGINES[self._method](sample_dim, seed=self._rng, **options)
         else:
-            msg = "sampler {self._method} is not supported by this SciPy version"
-            raise NotImplementedError(msg)
+            msg = f"Sampler '{self._method}' is not supported by this SciPy version."
+            raise UnsupportedError(msg)
         return sampler, options
 
     def _set_options(self, options: dict[str, Any]) -> None:
