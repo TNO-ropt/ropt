@@ -53,7 +53,9 @@ def objective(variables: np.ndarray, context: EvaluationFunctionContext) -> floa
 ```
 
 - `variables` is a 1-D NumPy array: one set of variable values to evaluate.
-- `context` tells you *which* evaluation this is. Its most important field is
+- `context` is an
+  [`EvaluationFunctionContext`][ropt.components.evaluators.EvaluationFunctionContext]
+  that tells you *which* evaluation this is. Its most important field is
   `context.realization`, the realization number (see
   [Ensembles](#optimizing-over-an-ensemble) below).
 
@@ -80,7 +82,7 @@ result.exit_code         # why the run stopped (an ropt.enums.ExitCode)
 result.variables         # the best variables, or None if none was valid
 result.target_objective  # the objective value at the best point, or None
 result.objectives        # the separate objective values, or None
-result.constraints        # the nonlinear constraint values, or None
+result.constraints       # the nonlinear constraint values, or None
 result.results           # the full low-level result object (see below)
 ```
 
@@ -167,7 +169,8 @@ You can attach arbitrary **metadata** to a run, from two sources:
 
 Neither kind is interpreted by `ropt`. Constant metadata ends up on
 `result.results.metadata`; per-evaluation metadata on
-`result.results.evaluations.metadata` (one entry per realization). See
+`result.results.evaluations.metadata` (one entry per realization). Both kinds can
+be tabulated as columns by the [`DataFrameHandler`](#dataframehandler). See
 [Working with Results](../optimizer_setup/results.md#metadata) for how
 each appears in the pandas export. The full runnable script is
 [examples/simple/metadata.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/metadata.py).
@@ -264,6 +267,22 @@ with threads(workers=4):
     results = optimize_many(config, start_points, objective)   # one run per start
 ```
 
+!!! tip "Give each run an ID"
+    Pass a per-run `metadata` list to tag every run with a user-defined
+    identifier that travels with its results (and shows up in a
+    [`DataFrameHandler`](#dataframehandler)'s tables):
+
+    ```python
+    labels = ["low", "mid", "high"]
+    results = optimize_many(
+        config, start_points, objective, metadata=[{"run_id": x} for x in labels]
+    )
+    for result in results:
+        print(result.results.metadata["run_id"])
+    ```
+
+    See [Attaching metadata](#attaching-metadata) for details.
+
 There are two independent levels of concurrency here:
 
 - **The optimizations** always run concurrently, each on its own driver thread.
@@ -276,7 +295,7 @@ There are two independent levels of concurrency here:
   `processes`, or `hpc` — runs several evaluations at once.
 
 An execution block is required: calling `optimize_many` without one raises a
-`RuntimeError`.
+`WorkflowError`.
 
 ## Result handlers
 
@@ -370,6 +389,23 @@ Convenience methods:
   `perturbations` for gradient results).
 - `add_column(table, name, title)` adds one column to an existing table.
 - `set_callback(fn)` calls `fn(event)` whenever the tables are updated.
+
+!!! tip "Write the tables to a file as they update"
+    `set_callback` fires on every update, so it is a convenient hook for saving
+    the tables — to watch progress live or to write a final report. Pandas'
+    `to_string()` gives aligned, human-readable columns with no extra
+    dependencies; use `to_csv()` for machine-readable data, or `to_markdown()`
+    if you have `tabulate` installed:
+
+    ```python
+    def dump(_event):
+        with open("progress.txt", "w") as fh:
+            for name, df in tables.get_tables().items():
+                fh.write(f"# {name}\n{df.to_string()}\n\n")
+
+    tables.set_callback(dump)
+    optimize(config, x0, objective, handlers=[tables])
+    ```
 
 ### Custom handlers
 
