@@ -2823,9 +2823,9 @@ function.</p>
    minimum: how many variables there are, and a small <code>perturbation_magnitudes</code>
    value that <code>ropt</code> uses to estimate gradients. See
    <a href="../../optimizer_setup/configuration/">Configuration</a> for the full list of settings.</li>
-<li><strong>An objective function</strong> — a Python function that takes a set of variable
+<li><strong>An evaluation function</strong> — a Python function that takes a set of variable
    values and returns the number to minimize. See
-   <a href="../../running/running/#the-objective-function">Running Optimizations</a>.</li>
+   <a href="../../running/running/#the-evaluation-function">Running Optimizations</a>.</li>
 <li><strong>A start point</strong> — the variable values to start from.</li>
 </ol>
 <p><a class="autorefs autorefs-internal" title="            ropt.simple.optimize" href="../../reference/simple/#ropt.simple.optimize"><code>optimize</code></a> wires these together, runs the optimization,

@@ -1512,10 +1512,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#return-the-constraint-from-the-objective" class="md-nav__link">
+  <a href="#return-the-constraint-from-the-evaluation-function" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Return the constraint from the objective
+        Return the constraint from the evaluation function
       
     </span>
   </a>
@@ -2742,10 +2742,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#return-the-constraint-from-the-objective" class="md-nav__link">
+  <a href="#return-the-constraint-from-the-evaluation-function" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Return the constraint from the objective
+        Return the constraint from the evaluation function
       
     </span>
   </a>
@@ -2818,10 +2818,10 @@ at or below <code>-1</code>:</p>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="s2">&quot;nonlinear_constraints&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;lower_bounds&quot;</span><span class="p">:</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="s2">&quot;upper_bounds&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">},</span>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="p">}</span>
 </span></code></pre></div>
-<h2 id="return-the-constraint-from-the-objective">Return the constraint from the objective</h2>
-<p>With one objective and one nonlinear constraint, the objective returns a list:
-the objective first, then the constraint value (see
-<a href="../../running/running/#the-objective-function">the objective function</a> for all
+<h2 id="return-the-constraint-from-the-evaluation-function">Return the constraint from the evaluation function</h2>
+<p>With one objective and one nonlinear constraint, the evaluation function returns
+a list: the objective first, then the constraint value (see
+<a href="../../running/running/#the-evaluation-function">the evaluation function</a> for all
 return types):</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">rosenbrock</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    <span class="n">r</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">realization</span>

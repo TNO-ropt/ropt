@@ -2862,7 +2862,7 @@
 
 
 <h1 id="running-in-parallel">Running in Parallel</h1>
-<p>An optimization calls your objective function many times. By default these calls
+<p>An optimization calls your evaluation function many times. By default these calls
 happen one after another, on the same thread that called
 <a class="autorefs autorefs-internal" title="            ropt.simple.optimize" href="../../reference/simple/#ropt.simple.optimize"><code>optimize</code></a>. If each call is slow, you can run several at
 the same time by opening an <strong>execution block</strong> first.</p>

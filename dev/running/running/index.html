@@ -1066,10 +1066,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#the-objective-function" class="md-nav__link">
+  <a href="#the-evaluation-function" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The objective function
+        The evaluation function
       
     </span>
   </a>
@@ -2937,10 +2937,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#the-objective-function" class="md-nav__link">
+  <a href="#the-evaluation-function" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The objective function
+        The evaluation function
       
     </span>
   </a>
@@ -3234,7 +3234,8 @@ optimization. Everything you need is imported from a single module:</p>
 <ul>
 <li>a <strong>config</strong> dictionary that describes the problem,</li>
 <li>a <strong>start point</strong> (the first set of variable values),</li>
-<li>an <strong>objective function</strong> that returns the value to minimize.</li>
+<li>an <strong>evaluation function</strong> that returns the objective value(s) to minimize,
+  followed by any constraint values.</li>
 </ul>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.simple</span><span class="w"> </span><span class="kn">import</span> <span class="n">optimize</span>
@@ -3252,8 +3253,8 @@ optimization. Everything you need is imported from a single module:</p>
 </span></code></pre></div>
 <p>That is the basic pattern. The rest of this page explains each part and the
 additional options.</p>
-<h2 id="the-objective-function">The objective function</h2>
-<p>The objective is a Python function with two arguments:</p>
+<h2 id="the-evaluation-function">The evaluation function</h2>
+<p>The evaluation function is a Python function with two arguments:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.simple</span><span class="w"> </span><span class="kn">import</span> <span class="n">EvaluationFunctionContext</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
 </span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
@@ -3273,7 +3274,8 @@ additional options.</p>
   <code>context.realization</code>, the realization number (see
   <a href="#optimizing-over-an-ensemble">Ensembles</a> below).</li>
 </ul>
-<p>The function returns the objective value. There are three ways to return it:</p>
+<p>The function returns the objective value(s), followed by any constraint values.
+There are three ways to return them:</p>
 <ul>
 <li>a <strong>single number</strong> when there is one objective and no nonlinear constraints;</li>
 <li>a <strong>list</strong> of numbers when there are several objectives or nonlinear
@@ -3375,7 +3377,7 @@ other runs continue.</p>
   
       dataclass
   " href="../../reference/components_evaluators/#ropt.components.evaluators.EvaluationFunctionResult"><code>EvaluationFunctionResult</code></a>
-  from the objective with a <code>metadata</code> field. This value is stored per
+  from the evaluation function with a <code>metadata</code> field. This value is stored per
   realization, next to the objective values:</li>
 </ul>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.simple</span><span class="w"> </span><span class="kn">import</span> <span class="n">EvaluationFunctionResult</span>
@@ -3544,8 +3546,8 @@ functions:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="k">with</span> <span class="n">processes</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">):</span>
 </span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>    <span class="n">first</span><span class="p">,</span> <span class="n">second</span> <span class="o">=</span> <span class="n">offload</span><span class="p">([</span><span class="n">partial</span><span class="p">(</span><span class="n">expensive</span><span class="p">,</span> <span class="n">x</span><span class="p">),</span> <span class="n">partial</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">y</span><span class="p">)])</span>
 </span></code></pre></div>
-<p>As with the objective under <code>processes</code>/<code>hpc</code>, the callables and their arguments
-are <strong>copied to the workers</strong>, since they run in separate processes.</p>
+<p>As with the evaluation function under <code>processes</code>/<code>hpc</code>, the callables and their
+arguments are <strong>copied to the workers</strong>, since they run in separate processes.</p>
 <h3 id="requiring-an-open-block">Requiring an open block</h3>
 <p><code>offload</code> <strong>requires</strong> an execution block: with none open it raises a
 <a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a> rather than silently running

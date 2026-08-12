@@ -1855,19 +1855,19 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.simple.ObjectiveCallback" class="md-nav__link">
+  <a href="#ropt.simple.EvaluationFunction" class="md-nav__link">
     <span class="md-ellipsis">
       
-        ObjectiveCallback
+        EvaluationFunction
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="ObjectiveCallback">
+    <nav class="md-nav" aria-label="EvaluationFunction">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.simple.ObjectiveCallback.__call__" class="md-nav__link">
+  <a href="#ropt.simple.EvaluationFunction.__call__" class="md-nav__link">
     <span class="md-ellipsis">
       
         __call__
@@ -3162,19 +3162,19 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.simple.ObjectiveCallback" class="md-nav__link">
+  <a href="#ropt.simple.EvaluationFunction" class="md-nav__link">
     <span class="md-ellipsis">
       
-        ObjectiveCallback
+        EvaluationFunction
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="ObjectiveCallback">
+    <nav class="md-nav" aria-label="EvaluationFunction">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.simple.ObjectiveCallback.__call__" class="md-nav__link">
+  <a href="#ropt.simple.EvaluationFunction.__call__" class="md-nav__link">
     <span class="md-ellipsis">
       
         __call__
@@ -3252,7 +3252,7 @@ are not part of this module; import them from <a class="autorefs autorefs-intern
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">optimize</span><span class="p">(</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">x0</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">objective</span><span class="p">:</span> <span class="n">ObjectiveCallback</span><span class="p">,</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">function</span><span class="p">:</span> <span class="n">EvaluationFunction</span><span class="p">,</span>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="o">*</span><span class="p">,</span>
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">handlers</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">EventHandler</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">report</span><span class="p">:</span> <span class="n">ReportCallback</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -3312,14 +3312,14 @@ are not part of this module; import them from <a class="autorefs autorefs-intern
           </tr>
           <tr class="doc-section-item">
             <td>
-                <code>objective</code>
+                <code>function</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.simple.ObjectiveCallback (ropt.simple._objective.ObjectiveCallback)" href="#ropt.simple.ObjectiveCallback">ObjectiveCallback</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.simple.EvaluationFunction (ropt.simple._function.EvaluationFunction)" href="#ropt.simple.EvaluationFunction">EvaluationFunction</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The per-realization objective callback.</p>
+                <p>The per-realization evaluation function.</p>
               </div>
             </td>
             <td>
@@ -3459,8 +3459,8 @@ are not part of this module; import them from <a class="autorefs autorefs-intern
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">optimize_many</span><span class="p">(</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">x0</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">objective</span><span class="p">:</span> <span class="n">ObjectiveCallback</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="o">|</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">ObjectiveCallback</span><span class="p">],</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">function</span><span class="p">:</span> <span class="n">EvaluationFunction</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="o">|</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">EvaluationFunction</span><span class="p">],</span>
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="o">*</span><span class="p">,</span>
 </span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">report</span><span class="p">:</span> <span class="n">ReportCallback</span>
 </span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="o">|</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">ReportCallback</span><span class="p">]</span>
@@ -3476,7 +3476,7 @@ are not part of this module; import them from <a class="autorefs autorefs-intern
     <div class="doc doc-contents first">
 
         <p>Run several optimizations concurrently, sharing the open session.</p>
-<p>Each of <code>config</code>, <code>x0</code>, and <code>objective</code> may be a single value (used for
+<p>Each of <code>config</code>, <code>x0</code>, and <code>function</code> may be a single value (used for
 every run) or a sequence (one per run). Sequences set the number of runs and
 must agree in length; single values are broadcast. A single <code>x0</code> is a 1-D
 vector; a per-run sequence of <code>x0</code>s is a 2-D matrix with one vector per row.</p>
@@ -3532,14 +3532,14 @@ the rest and propagates (fail-fast). See
           </tr>
           <tr class="doc-section-item">
             <td>
-                <code>objective</code>
+                <code>function</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.simple.ObjectiveCallback (ropt.simple._objective.ObjectiveCallback)" href="#ropt.simple.ObjectiveCallback">ObjectiveCallback</a> | <a class="autorefs autorefs-external" title="collections.abc.Sequence" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence">Sequence</a>[<a class="autorefs autorefs-internal" title="            ropt.simple.ObjectiveCallback (ropt.simple._objective.ObjectiveCallback)" href="#ropt.simple.ObjectiveCallback">ObjectiveCallback</a>]</code>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.simple.EvaluationFunction (ropt.simple._function.EvaluationFunction)" href="#ropt.simple.EvaluationFunction">EvaluationFunction</a> | <a class="autorefs autorefs-external" title="collections.abc.Sequence" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence">Sequence</a>[<a class="autorefs autorefs-internal" title="            ropt.simple.EvaluationFunction (ropt.simple._function.EvaluationFunction)" href="#ropt.simple.EvaluationFunction">EvaluationFunction</a>]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The objective callback, or one per run.</p>
+                <p>The evaluation function, or one per run.</p>
               </div>
             </td>
             <td>
@@ -3709,7 +3709,7 @@ the rest and propagates (fail-fast). See
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">evaluate</span><span class="p">(</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">variables</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">objective</span><span class="p">:</span> <span class="n">ObjectiveCallback</span><span class="p">,</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">function</span><span class="p">:</span> <span class="n">EvaluationFunction</span><span class="p">,</span>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="o">*</span><span class="p">,</span>
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EvaluateResult</span>
@@ -3768,14 +3768,14 @@ walkthrough.</p>
           </tr>
           <tr class="doc-section-item">
             <td>
-                <code>objective</code>
+                <code>function</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.simple.ObjectiveCallback (ropt.simple._objective.ObjectiveCallback)" href="#ropt.simple.ObjectiveCallback">ObjectiveCallback</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.simple.EvaluationFunction (ropt.simple._function.EvaluationFunction)" href="#ropt.simple.EvaluationFunction">EvaluationFunction</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The per-realization objective callback.</p>
+                <p>The per-realization evaluation function.</p>
               </div>
             </td>
             <td>
@@ -3879,7 +3879,7 @@ walkthrough.</p>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">evaluate_many</span><span class="p">(</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">variables</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">objective</span><span class="p">:</span> <span class="n">ObjectiveCallback</span><span class="p">,</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">function</span><span class="p">:</span> <span class="n">EvaluationFunction</span><span class="p">,</span>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="o">*</span><span class="p">,</span>
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">EvaluateResult</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
@@ -3938,14 +3938,14 @@ walkthrough.</p>
           </tr>
           <tr class="doc-section-item">
             <td>
-                <code>objective</code>
+                <code>function</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.simple.ObjectiveCallback (ropt.simple._objective.ObjectiveCallback)" href="#ropt.simple.ObjectiveCallback">ObjectiveCallback</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.simple.EvaluationFunction (ropt.simple._function.EvaluationFunction)" href="#ropt.simple.EvaluationFunction">EvaluationFunction</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The per-realization objective callback.</p>
+                <p>The per-realization evaluation function.</p>
               </div>
             </td>
             <td>
@@ -4956,8 +4956,8 @@ input vector. Each shared field has the same shape as its counterpart on
 
 
 
-<h2 id="ropt.simple.ObjectiveCallback" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.simple.ObjectiveCallback</span>
+<h2 id="ropt.simple.EvaluationFunction" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.simple.EvaluationFunction</span>
 
 
 </h2>
@@ -4969,7 +4969,7 @@ input vector. Each shared field has the same shape as its counterpart on
 
 
 
-        <p>The call signature for a high-level objective callback.</p>
+        <p>The call signature for a high-level evaluation function.</p>
 
 
 
@@ -4992,7 +4992,7 @@ input vector. Each shared field has the same shape as its counterpart on
 <div class="doc doc-object doc-function">
 
 
-<h3 id="ropt.simple.ObjectiveCallback.__call__" class="doc doc-heading">
+<h3 id="ropt.simple.EvaluationFunction.__call__" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">__call__</span>
 
 
@@ -5000,12 +5000,12 @@ input vector. Each shared field has the same shape as its counterpart on
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">__call__</span><span class="p">(</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">variables</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">context</span><span class="p">:</span> <span class="n">EvaluationFunctionContext</span><span class="p">,</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ObjectiveResult</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FunctionValue</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
 
-        <p>Evaluate objectives and constraints for a single variable vector.</p>
+        <p>Evaluate the objectives and constraints for a single variable vector.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -5071,7 +5071,7 @@ input vector. Each shared field has the same shape as its counterpart on
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="ropt.simple._objective.ObjectiveResult">ObjectiveResult</span></code>
+                  <code><span title="ropt.simple._function.FunctionValue">FunctionValue</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -5086,7 +5086,7 @@ input vector. Each shared field has the same shape as its counterpart on
           </tr>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="ropt.simple._objective.ObjectiveResult">ObjectiveResult</span></code>
+                  <code><span title="ropt.simple._function.FunctionValue">FunctionValue</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -5136,7 +5136,7 @@ input vector. Each shared field has the same shape as its counterpart on
 from one place), but they are the low-level classes and are documented with the
 components:</p>
 <ul>
-<li>the objective context and result:
+<li>the evaluation context and result:
   <a class="autorefs autorefs-internal" title="            ropt.components.evaluators.EvaluationFunctionContext
 
 

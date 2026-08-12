@@ -2811,8 +2811,8 @@ integer-valued. The <code>backend</code> section chooses the differential evolut
 <p><code>VariableType</code> comes from <code>ropt.enums</code>, not from <code>ropt.simple</code>.</p>
 <h2 id="add-the-constraint">Add the constraint</h2>
 <p>The problem keeps <code>x + y</code> at or below <code>10</code>. Declare the bound in the config under
-<code>nonlinear_constraints</code>, and have the objective return the constraint value after
-the objective:</p>
+<code>nonlinear_constraints</code>, and have the evaluation function return the constraint
+value after the objective:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">config</span><span class="p">[</span><span class="s2">&quot;nonlinear_constraints&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    <span class="s2">&quot;lower_bounds&quot;</span><span class="p">:</span> <span class="p">[</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">],</span>
 </span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    <span class="s2">&quot;upper_bounds&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">10.0</span><span class="p">],</span>
