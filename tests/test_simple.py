@@ -450,7 +450,7 @@ def _return_one() -> float:
     return 1.0
 
 
-def test_nested_block_in_threads_evaluation(config: Any) -> None:
+def test_isolated_nested_block_in_threads_evaluation(config: Any) -> None:
     with threads(workers=2):
         result = optimize(config, initial_values, _run_inner_optimization)
     assert result.variables is not None
@@ -458,11 +458,47 @@ def test_nested_block_in_threads_evaluation(config: Any) -> None:
 
 
 @pytest.mark.slow
-def test_nested_block_in_processes_evaluation(config: Any) -> None:
+def test_isolated_nested_block_in_processes_evaluation(config: Any) -> None:
     with processes(workers=2):
         result = optimize(config, initial_values, _run_inner_optimization)
     assert result.variables is not None
     assert result.target_objective is not None
+
+
+_BILEVEL_CONFIG: dict[str, Any] = {
+    "optimizer": {"max_functions": 20},
+    "backend": {"method": "slsqp", "max_iterations": 15, "convergence_tolerance": 1e-6},
+    "variables": {"variable_count": 1, "perturbation_magnitudes": 0.01},
+}
+
+
+def _inner_objective(
+    variables: NDArray[np.float64], _context: Any, outer_value: float
+) -> float:
+    # For a fixed outer value, minimized at b = 3, leaving (outer_value - 2) ** 2.
+    b = float(variables[0])
+    return (outer_value - 2.0) ** 2 + (b - 3.0) ** 2
+
+
+def _bilevel_outer(variables: NDArray[np.float64], _context: Any) -> float:
+    # Each outer evaluation runs an isolated inner optimization over b.
+    a = float(variables[0])
+    with threads(workers=1):
+        inner = optimize(
+            _BILEVEL_CONFIG, [0.0], partial(_inner_objective, outer_value=a)
+        )
+    assert inner.target_objective is not None
+    return inner.target_objective
+
+
+def test_isolated_nested_optimization_on_threads() -> None:
+    # A small bilevel problem: the outer converges to a = 2 while every inner
+    # run (isolated, on its own threads block) drives b to 3.
+    with threads(workers=1):
+        result = optimize(_BILEVEL_CONFIG, [0.0], _bilevel_outer)
+    assert result.variables is not None
+    assert result.variables[0] == pytest.approx(2.0, abs=0.05)
+    assert result.target_objective == pytest.approx(0.0, abs=1e-2)
 
 
 def test_offload_in_evaluation_finds_no_executor(config: Any) -> None:
