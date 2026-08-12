@@ -11,8 +11,8 @@ from ropt.components.evaluators import FunctionEvaluator, ParallelEvaluator
 from ropt.components.event_handlers import HistoryHandler
 from ropt.context import EnOptContext
 
+from ._function import adapt_function
 from ._handlers import current_handlers
-from ._objective import adapt_objective
 from ._result import EvaluateResult, _build_evaluate_result
 from ._session import current_executor, current_session, make_task_namer, run_step
 
@@ -24,13 +24,13 @@ if TYPE_CHECKING:
     from ropt.components.executors import Executor
     from ropt.results import FunctionResults
 
-    from ._objective import ObjectiveCallback
+    from ._function import EvaluationFunction
 
 
 def evaluate(
     config: dict[str, Any],
     variables: ArrayLike,
-    objective: ObjectiveCallback,
+    function: EvaluationFunction,
     *,
     metadata: dict[str, Any] | None = None,
 ) -> EvaluateResult:
@@ -43,7 +43,7 @@ def evaluate(
     Args:
         config:    The optimization configuration.
         variables: The variable vector to evaluate.
-        objective: The per-realization objective callback.
+        function:  The per-realization evaluation function.
         metadata:  An optional dictionary attached to the emitted
                    [`Results`][ropt.results.Results].
 
@@ -57,14 +57,14 @@ def evaluate(
     if array.ndim != 1:
         msg = "evaluate() takes a single vector; use evaluate_many() for a batch."
         raise ValueError(msg)
-    results = _run_evaluation(current_executor(), config, array, objective, metadata)
+    results = _run_evaluation(current_executor(), config, array, function, metadata)
     return _build_evaluate_result(results[0])
 
 
 def evaluate_many(
     config: dict[str, Any],
     variables: ArrayLike,
-    objective: ObjectiveCallback,
+    function: EvaluationFunction,
     *,
     metadata: dict[str, Any] | None = None,
 ) -> tuple[EvaluateResult, ...]:
@@ -77,7 +77,7 @@ def evaluate_many(
     Args:
         config:    The optimization configuration.
         variables: The variable vectors to evaluate, one per row.
-        objective: The per-realization objective callback.
+        function:  The per-realization evaluation function.
         metadata:  An optional dictionary attached to every emitted
                    [`Results`][ropt.results.Results].
 
@@ -94,7 +94,7 @@ def evaluate_many(
             "use evaluate() for a single vector."
         )
         raise ValueError(msg)
-    results = _run_evaluation(current_executor(), config, array, objective, metadata)
+    results = _run_evaluation(current_executor(), config, array, function, metadata)
     return tuple(_build_evaluate_result(result) for result in results)
 
 
@@ -102,7 +102,7 @@ def _run_evaluation(
     executor: Executor | None,
     config: dict[str, Any],
     variables: ArrayLike,
-    objective: ObjectiveCallback,
+    function: EvaluationFunction,
     metadata: dict[str, Any] | None = None,
 ) -> tuple[FunctionResults, ...]:
     context = EnOptContext.model_validate(config)
@@ -113,7 +113,7 @@ def _run_evaluation(
         else context.nonlinear_constraints.lower_bounds.size
     )
 
-    callback = adapt_objective(objective, n_obj, n_con)
+    callback = adapt_function(function, n_obj, n_con)
     get_name = make_task_namer(current_session(), executor)
     evaluator = (
         FunctionEvaluator(function=callback)

@@ -51,10 +51,10 @@ a = rng.normal(loc=1.0, scale=0.1, size=10)
 b = rng.normal(loc=100.0, scale=10.0, size=10)
 ```
 
-## 3. Write the objective function
+## 3. Write the evaluation function
 
-`ropt` calls the objective once for every realization at each point it evaluates,
-so the objective must return the value for *its own* realization. The second
+`ropt` calls the evaluation function once for every realization at each point it
+evaluates, so it must return the value for *its own* realization. The second
 argument tells it which one: `context.realization` is the realization number,
 which we use to index the parameter arrays:
 

@@ -28,7 +28,7 @@ from ropt.simple import (
     processes,
     threads,
 )
-from ropt.simple._objective import adapt_objective
+from ropt.simple._function import adapt_function
 from ropt.simple._session import current_executor, current_session, make_task_namer
 
 if TYPE_CHECKING:
@@ -234,17 +234,17 @@ def test_that_report_callback_stops_only_its_own_run_in_optimize_many(
     assert results[1].exit_code != ExitCode.USER_ABORT
 
 
-def test_adapt_objective_rejects_scalar_for_multiple_objectives() -> None:
-    callback = adapt_objective(lambda _v, _c: 1.0, n_obj=2, n_con=0)
+def test_adapt_function_rejects_scalar_for_multiple_objectives() -> None:
+    callback = adapt_function(lambda _v, _c: 1.0, n_obj=2, n_con=0)
     context = EvaluationFunctionContext(
         realization=0, perturbation=-1, batch_id=0, eval_idx=0
     )
-    with pytest.raises(ValueError, match="scalar objective result"):
+    with pytest.raises(ValueError, match="scalar return value"):
         callback(np.zeros(2), context)
 
 
-def test_adapt_objective_rejects_wrong_shape() -> None:
-    callback = adapt_objective(lambda _v, _c: [1.0, 2.0, 3.0], n_obj=1, n_con=1)
+def test_adapt_function_rejects_wrong_shape() -> None:
+    callback = adapt_function(lambda _v, _c: [1.0, 2.0, 3.0], n_obj=1, n_con=1)
     context = EvaluationFunctionContext(
         realization=0, perturbation=-1, batch_id=0, eval_idx=0
     )
@@ -252,8 +252,8 @@ def test_adapt_objective_rejects_wrong_shape() -> None:
         callback(np.zeros(2), context)
 
 
-def test_adapt_objective_splits_objectives_and_constraints() -> None:
-    callback = adapt_objective(lambda _v, _c: [1.0, 2.0, 3.0], n_obj=1, n_con=2)
+def test_adapt_function_splits_objectives_and_constraints() -> None:
+    callback = adapt_function(lambda _v, _c: [1.0, 2.0, 3.0], n_obj=1, n_con=2)
     context = EvaluationFunctionContext(
         realization=0, perturbation=-1, batch_id=0, eval_idx=0
     )

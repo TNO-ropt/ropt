@@ -17,11 +17,11 @@ config = {
 }
 ```
 
-## Return the constraint from the objective
+## Return the constraint from the evaluation function
 
-With one objective and one nonlinear constraint, the objective returns a list:
-the objective first, then the constraint value (see
-[the objective function](../running/running.md#the-objective-function) for all
+With one objective and one nonlinear constraint, the evaluation function returns
+a list: the objective first, then the constraint value (see
+[the evaluation function](../running/running.md#the-evaluation-function) for all
 return types):
 
 ```python

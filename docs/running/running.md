@@ -19,7 +19,8 @@ You give `optimize` three things:
 
 - a **config** dictionary that describes the problem,
 - a **start point** (the first set of variable values),
-- an **objective function** that returns the value to minimize.
+- an **evaluation function** that returns the objective value(s) to minimize,
+  followed by any constraint values.
 
 ```python
 import numpy as np
@@ -40,9 +41,9 @@ print(result.target_objective)   # the objective value there
 That is the basic pattern. The rest of this page explains each part and the
 additional options.
 
-## The objective function
+## The evaluation function
 
-The objective is a Python function with two arguments:
+The evaluation function is a Python function with two arguments:
 
 ```python
 from ropt.simple import EvaluationFunctionContext
@@ -59,7 +60,8 @@ def objective(variables: np.ndarray, context: EvaluationFunctionContext) -> floa
   `context.realization`, the realization number (see
   [Ensembles](#optimizing-over-an-ensemble) below).
 
-The function returns the objective value. There are three ways to return it:
+The function returns the objective value(s), followed by any constraint values.
+There are three ways to return them:
 
 - a **single number** when there is one objective and no nonlinear constraints;
 - a **list** of numbers when there are several objectives or nonlinear
@@ -156,7 +158,7 @@ You can attach arbitrary **metadata** to a run, from two sources:
 
 - **Per evaluation** — return an
   [`EvaluationFunctionResult`][ropt.components.evaluators.EvaluationFunctionResult]
-  from the objective with a `metadata` field. This value is stored per
+  from the evaluation function with a `metadata` field. This value is stored per
   realization, next to the objective values:
 
   ```python
@@ -326,8 +328,8 @@ with processes(workers=4):
     first, second = offload([partial(expensive, x), partial(other, y)])
 ```
 
-As with the objective under `processes`/`hpc`, the callables and their arguments
-are **copied to the workers**, since they run in separate processes.
+As with the evaluation function under `processes`/`hpc`, the callables and their
+arguments are **copied to the workers**, since they run in separate processes.
 
 ### Requiring an open block
 

@@ -49,9 +49,9 @@ Every `ropt` optimization needs three things:
    minimum: how many variables there are, and a small `perturbation_magnitudes`
    value that `ropt` uses to estimate gradients. See
    [Configuration](../optimizer_setup/configuration.md) for the full list of settings.
-2. **An objective function** — a Python function that takes a set of variable
+2. **An evaluation function** — a Python function that takes a set of variable
    values and returns the number to minimize. See
-   [Running Optimizations](../running/running.md#the-objective-function).
+   [Running Optimizations](../running/running.md#the-evaluation-function).
 3. **A start point** — the variable values to start from.
 
 [`optimize`][ropt.simple.optimize] wires these together, runs the optimization,

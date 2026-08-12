@@ -34,8 +34,8 @@ config = {
 ## Add the constraint
 
 The problem keeps `x + y` at or below `10`. Declare the bound in the config under
-`nonlinear_constraints`, and have the objective return the constraint value after
-the objective:
+`nonlinear_constraints`, and have the evaluation function return the constraint
+value after the objective:
 
 ```python
 config["nonlinear_constraints"] = {

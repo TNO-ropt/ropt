@@ -28,10 +28,10 @@ config = {
 small step size that `ropt` uses to estimate gradients. Every other setting keeps
 its default; see [Configuration](../optimizer_setup/configuration.md) for the full list.
 
-## 2. Write the objective function
+## 2. Write the evaluation function
 
-The objective is a Python function. It receives one set of variable values and
-returns the number to minimize:
+The evaluation function is a Python function. It receives one set of variable
+values and returns the number to minimize:
 
 ```python
 import numpy as np
@@ -51,7 +51,7 @@ def rosenbrock(variables: np.ndarray, _) -> float:
 
 The function returns a single number. You can also return a list (objectives
 first, then constraints) or attach metadata; see
-[Running Optimizations](../running/running.md#the-objective-function).
+[Running Optimizations](../running/running.md#the-evaluation-function).
 
 ## 3. Follow the progress (optional)
 

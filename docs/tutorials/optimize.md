@@ -19,10 +19,10 @@ CONFIG = {
 }
 ```
 
-## Write the objective
+## Write the evaluation function
 
-The objective takes one set of variable values and returns the number to
-minimize:
+The evaluation function takes one set of variable values and returns the number
+to minimize:
 
 ```python
 def rosenbrock(variables, context):

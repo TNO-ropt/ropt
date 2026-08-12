@@ -22,8 +22,8 @@ from ropt.components.event_handlers import (
 )
 
 from ._evaluate import evaluate, evaluate_many
+from ._function import EvaluationFunction
 from ._handlers import handlers
-from ._objective import ObjectiveCallback
 from ._offload import can_offload, offload
 from ._optimize import optimize, optimize_many
 from ._report import ReportCallback
@@ -33,11 +33,11 @@ from ._session import hpc, processes, threads
 __all__ = [
     "DataFrameHandler",
     "EvaluateResult",
+    "EvaluationFunction",
     "EvaluationFunctionContext",
     "EvaluationFunctionResult",
     "EventHandler",
     "HistoryHandler",
-    "ObjectiveCallback",
     "OptimizeResult",
     "ReportCallback",
     "ResultsHandler",

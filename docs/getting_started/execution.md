@@ -1,6 +1,6 @@
 # Running in Parallel
 
-An optimization calls your objective function many times. By default these calls
+An optimization calls your evaluation function many times. By default these calls
 happen one after another, on the same thread that called
 [`optimize`][ropt.simple.optimize]. If each call is slow, you can run several at
 the same time by opening an **execution block** first.

@@ -40,7 +40,7 @@ are not part of this module; import them from [`ropt.enums`][ropt.enums].
 
 ## Callback types
 
-::: ropt.simple.ObjectiveCallback
+::: ropt.simple.EvaluationFunction
 ::: ropt.simple.ReportCallback
 
 ## Re-exported for convenience
@@ -49,7 +49,7 @@ These names are re-exported from `ropt.simple` (so simple-API code imports them
 from one place), but they are the low-level classes and are documented with the
 components:
 
-- the objective context and result:
+- the evaluation context and result:
   [`EvaluationFunctionContext`][ropt.components.evaluators.EvaluationFunctionContext],
   [`EvaluationFunctionResult`][ropt.components.evaluators.EvaluationFunctionResult];
 - the result handlers:

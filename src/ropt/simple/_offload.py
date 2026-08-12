@@ -1,12 +1,16 @@
 """Offload arbitrary callables to the active executor.
 
 `offload` runs a single callable, or a sequence of callables concurrently (which
-may be entirely different functions), on whatever execution block
-(`threads`/`processes`/`hpc`) is open — exactly as evaluations are offloaded. It
-**requires** an executor: with no block open (or when called from a result handler,
-which runs on the session's event loop) it raises. Use `can_offload` to check
-first and call the callables directly when no executor is available. The
-callables must be picklable for a process or HPC executor.
+may be entirely different functions), on the innermost open execution block
+(`threads`/`processes`/`hpc`). It **requires** an executor: with no block open (or
+when called from a result handler, which runs on the session's event loop) it
+raises. Use `can_offload` to check first and call the callables directly when no
+executor is available. The callables must be picklable for a process or HPC
+executor.
+
+Because it targets the innermost open block, `offload` called from within an
+evaluation function dispatches to a block that evaluation opens itself, not to
+the enclosing optimizer's executor (an evaluation runs detached from it).
 """
 
 from __future__ import annotations

@@ -14,8 +14,8 @@ from ropt.components.event_handlers import ResultsHandler
 from ropt.context import EnOptContext
 from ropt.exceptions import WorkflowError
 
+from ._function import adapt_function
 from ._handlers import current_handlers
-from ._objective import adapt_objective
 from ._report import make_report_handler
 from ._result import OptimizeResult
 from ._session import (
@@ -37,15 +37,15 @@ if TYPE_CHECKING:
     from ropt.enums import ExitCode
     from ropt.results import FunctionResults
 
+    from ._function import EvaluationFunction
     from ._handlers import HandlerScope
-    from ._objective import ObjectiveCallback
     from ._report import ReportCallback
 
 
 def optimize(  # ruff: ignore[too-many-arguments]
     config: dict[str, Any],
     x0: ArrayLike,
-    objective: ObjectiveCallback,
+    function: EvaluationFunction,
     *,
     handlers: Sequence[EventHandler] | None = None,
     report: ReportCallback | None = None,
@@ -59,7 +59,7 @@ def optimize(  # ruff: ignore[too-many-arguments]
     Args:
         config:               The optimization configuration.
         x0:                   The initial variable vector.
-        objective:            The per-realization objective callback.
+        function:             The per-realization evaluation function.
         handlers:             Optional local result handlers, each owned by this
                               optimization alone.
         report:               An optional callback invoked with an
@@ -80,7 +80,7 @@ def optimize(  # ruff: ignore[too-many-arguments]
         executor,
         config,
         x0,
-        objective,
+        function,
         handlers=handlers,
         report=report,
         constraint_tolerance=constraint_tolerance,
@@ -94,7 +94,7 @@ def _optimize(  # ruff: ignore[too-many-arguments]
     executor: Executor | None,
     config: dict[str, Any],
     x0: ArrayLike,
-    objective: ObjectiveCallback,
+    function: EvaluationFunction,
     *,
     handlers: Sequence[EventHandler] | None,
     report: ReportCallback | None,
@@ -111,7 +111,7 @@ def _optimize(  # ruff: ignore[too-many-arguments]
         else context.nonlinear_constraints.lower_bounds.size
     )
 
-    callback = adapt_objective(objective, n_obj, n_con)
+    callback = adapt_function(function, n_obj, n_con)
     evaluator = (
         FunctionEvaluator(function=callback)
         if executor is None
@@ -162,7 +162,7 @@ def _build_run_result(
 def optimize_many(  # ruff: ignore[too-many-arguments]
     config: dict[str, Any] | Sequence[dict[str, Any]],
     x0: ArrayLike,
-    objective: ObjectiveCallback | Sequence[ObjectiveCallback],
+    function: EvaluationFunction | Sequence[EvaluationFunction],
     *,
     report: ReportCallback | Sequence[ReportCallback] | None = None,
     limit: int | None = None,
@@ -171,7 +171,7 @@ def optimize_many(  # ruff: ignore[too-many-arguments]
 ) -> tuple[OptimizeResult, ...]:
     """Run several optimizations concurrently, sharing the open session.
 
-    Each of `config`, `x0`, and `objective` may be a single value (used for
+    Each of `config`, `x0`, and `function` may be a single value (used for
     every run) or a sequence (one per run). Sequences set the number of runs and
     must agree in length; single values are broadcast. A single `x0` is a 1-D
     vector; a per-run sequence of `x0`s is a 2-D matrix with one vector per row.
@@ -185,7 +185,7 @@ def optimize_many(  # ruff: ignore[too-many-arguments]
     Args:
         config:               The configuration, or one per run.
         x0:                   The initial variable vector, or one per row.
-        objective:            The objective callback, or one per run.
+        function:             The evaluation function, or one per run.
         report:               An optional callback invoked with an
                               `EvaluateResult` for each function evaluation,
                               either shared by every run or one per run; return
@@ -215,7 +215,7 @@ def optimize_many(  # ruff: ignore[too-many-arguments]
 
     executor = current_executor()
     shared = current_handlers()
-    runs = _broadcast(config, x0, objective)
+    runs = _broadcast(config, x0, function)
     reports = _broadcast_reports(report, len(runs))
     metadatas = _broadcast_metadata(metadata, len(runs))
     jobs: list[Callable[[], OptimizeResult]] = [
@@ -224,7 +224,7 @@ def optimize_many(  # ruff: ignore[too-many-arguments]
             executor,
             run_config,
             run_x0,
-            run_objective,
+            run_function,
             handlers=None,
             report=run_report,
             constraint_tolerance=constraint_tolerance,
@@ -232,7 +232,7 @@ def optimize_many(  # ruff: ignore[too-many-arguments]
             metadata=run_metadata,
             get_name=make_task_namer(session, executor),
         )
-        for (run_config, run_x0, run_objective), run_report, run_metadata in zip(
+        for (run_config, run_x0, run_function), run_report, run_metadata in zip(
             runs, reports, metadatas, strict=True
         )
     ]
@@ -242,10 +242,10 @@ def optimize_many(  # ruff: ignore[too-many-arguments]
 def _broadcast(
     config: dict[str, Any] | Sequence[dict[str, Any]],
     x0: ArrayLike,
-    objective: ObjectiveCallback | Sequence[ObjectiveCallback],
-) -> list[tuple[dict[str, Any], ArrayLike, ObjectiveCallback]]:
+    function: EvaluationFunction | Sequence[EvaluationFunction],
+) -> list[tuple[dict[str, Any], ArrayLike, EvaluationFunction]]:
     configs = [config] if isinstance(config, Mapping) else list(config)
-    objectives = [objective] if callable(objective) else list(objective)
+    functions = [function] if callable(function) else list(function)
 
     x0_array = np.asarray(x0, dtype=np.float64)
     if x0_array.ndim == 1:
@@ -256,9 +256,9 @@ def _broadcast(
         msg = "x0 must be a vector or a 2-D matrix of vectors."
         raise ValueError(msg)
 
-    counts = {len(seq) for seq in (configs, objectives, x0s) if len(seq) != 1}
+    counts = {len(seq) for seq in (configs, functions, x0s) if len(seq) != 1}
     if len(counts) > 1:
-        msg = "config, x0 and objective sequences must have the same length."
+        msg = "config, x0 and function sequences must have the same length."
         raise ValueError(msg)
     count = counts.pop() if counts else 1
 
@@ -269,7 +269,7 @@ def _broadcast(
         zip(
             _broadcast_seq(configs),
             _broadcast_seq(x0s),
-            _broadcast_seq(objectives),
+            _broadcast_seq(functions),
             strict=True,
         )
     )
