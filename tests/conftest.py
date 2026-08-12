@@ -79,8 +79,8 @@ def _function(
 
 
 @pytest.fixture(scope="session")
-def objective(test_functions: Any) -> Any:
-    def _objective(
+def eval_func(test_functions: Any) -> Any:
+    def _eval_func(
         objective_functions: list[_Function] = test_functions,
         constraint_functions: list[_Function] | None = None,
     ) -> EvaluationFunctionCallback:
@@ -90,19 +90,19 @@ def objective(test_functions: Any) -> Any:
             constraint_functions=constraint_functions,
         )
 
-    return _objective
+    return _eval_func
 
 
 @pytest.fixture(scope="session")
 def evaluator(
-    test_functions: Any, objective: Any, constraint_functions: Any | None = None
+    test_functions: Any, eval_func: Any, constraint_functions: Any | None = None
 ) -> Any:
     def _evaluator(
         objective_functions: list[_Function] = test_functions,
         constraint_functions: list[_Function] | None = constraint_functions,
     ) -> Any:
         return FunctionEvaluator(
-            function=objective(objective_functions, constraint_functions)
+            function=eval_func(objective_functions, constraint_functions)
         )
 
     return _evaluator

@@ -35,7 +35,6 @@ from ropt.enums import EnOptEventType, ExitCode
 from ropt.evaluation import EvaluationBatchResult
 from ropt.exceptions import OptimizerStop, TransferError, WorkflowError
 from ropt.results import FunctionResults
-from ropt.workflow import BasicOptimizer
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -76,13 +75,6 @@ def test_run_basic(config: dict[str, Any], evaluator: Any) -> None:
     assert result_handler["results"] is not None
     assert np.allclose(
         result_handler["results"].evaluations.variables, [0.0, 0.0, 0.5], atol=0.02
-    )
-
-    optimizer = BasicOptimizer(config, evaluator())
-    optimizer.run(initial_values)
-    assert optimizer.results is not None
-    assert np.allclose(
-        optimizer.results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02
     )
 
 

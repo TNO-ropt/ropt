@@ -6,7 +6,8 @@ import numpy as np
 import pytest
 
 from ropt.exceptions import UnsupportedError
-from ropt.workflow import BasicOptimizer, validate_backend_options
+from ropt.simple import optimize
+from ropt.workflow import validate_backend_options
 
 pytestmark = [pytest.mark.slow]
 
@@ -31,39 +32,32 @@ def config_fixture() -> dict[str, Any]:
     }
 
 
-def test_scipy_required_constraints_bounds_de(config: Any, evaluator: Any) -> None:
-    optimizer = BasicOptimizer(config, evaluator())
+def test_scipy_required_constraints_bounds_de(config: Any, eval_func: Any) -> None:
     with pytest.raises(UnsupportedError, match="requires bound constraints"):
-        optimizer.run(initial_values)
+        optimize(config, initial_values, eval_func())
 
 
-def test_scipy_bound_constraints_de(config: Any, evaluator: Any) -> None:
+def test_scipy_bound_constraints_de(config: Any, eval_func: Any) -> None:
     config["variables"]["lower_bounds"] = [0.15, 0.0, 0.0]
     config["variables"]["upper_bounds"] = [0.5, 0.5, 0.2]
 
     validate_backend_options("differential_evolution", config["backend"]["options"])
 
-    optimizer = BasicOptimizer(config, evaluator())
-    optimizer.run([0.2, *initial_values[1:]])
-    assert optimizer.results is not None
-    assert np.allclose(
-        optimizer.results.evaluations.variables, [0.15, 0.0, 0.2], atol=0.03
-    )
+    result = optimize(config, [0.2, *initial_values[1:]], eval_func())
+    assert result.variables is not None
+    assert np.allclose(result.variables, [0.15, 0.0, 0.2], atol=0.03)
 
 
 def test_scipy_bound_constraints_differential_evolution_de(
-    config: Any, evaluator: Any, test_functions: Any
+    config: Any, eval_func: Any, test_functions: Any
 ) -> None:
     config["variables"]["lower_bounds"] = [0.15, 0.0, 0.0]
     config["variables"]["upper_bounds"] = [0.5, 0.5, 0.2]
 
     config["realizations"] = {"realization_min_success": 0}
-    optimizer1 = BasicOptimizer(config, evaluator())
-    optimizer1.run([0.2, *initial_values[1:]])
-    assert optimizer1.results is not None
-    assert np.allclose(
-        optimizer1.results.evaluations.variables, [0.15, 0.0, 0.2], atol=0.03
-    )
+    result1 = optimize(config, [0.2, *initial_values[1:]], eval_func())
+    assert result1.variables is not None
+    assert np.allclose(result1.variables, [0.15, 0.0, 0.2], atol=0.03)
 
     counter = 0
 
@@ -75,19 +69,15 @@ def test_scipy_bound_constraints_differential_evolution_de(
             return np.nan
         return test_functions[0](x, c)
 
-    optimizer2 = BasicOptimizer(config, evaluator((_add_nan, test_functions[1])))
-    optimizer2.run([0.2, *initial_values[1:]])
-    assert optimizer2.results is not None
-    assert np.allclose(
-        optimizer2.results.evaluations.variables, [0.15, 0.0, 0.2], atol=0.03
+    result2 = optimize(
+        config, [0.2, *initial_values[1:]], eval_func((_add_nan, test_functions[1]))
     )
-    assert not np.all(
-        optimizer1.results.evaluations.variables
-        == optimizer2.results.evaluations.variables
-    )
+    assert result2.variables is not None
+    assert np.allclose(result2.variables, [0.15, 0.0, 0.2], atol=0.03)
+    assert not np.all(result1.variables == result2.variables)
 
 
-def test_scipy_eq_linear_constraints_de(config: Any, evaluator: Any) -> None:
+def test_scipy_eq_linear_constraints_de(config: Any, eval_func: Any) -> None:
     config["variables"]["lower_bounds"] = [-1.0, -1.0, -1.0]
     config["variables"]["upper_bounds"] = [1.0, 1.0, 1.0]
 
@@ -97,21 +87,16 @@ def test_scipy_eq_linear_constraints_de(config: Any, evaluator: Any) -> None:
         "upper_bounds": [1.0, 0.75],
     }
 
-    optimizer = BasicOptimizer(config, evaluator())
-    optimizer.run(initial_values)
-    assert optimizer.results is not None
+    result = optimize(config, initial_values, eval_func())
+    assert result.variables is not None
     # The result should be [0.25, 0.0, 0.75], but DE appears to have
     # difficulties with linear equality equations. Therefore, we just test if it
     # does not violate them.
-    assert optimizer.results.evaluations.variables[
-        0
-    ] + optimizer.results.evaluations.variables[2] == pytest.approx(1.0, abs=0.02)
-    assert optimizer.results.evaluations.variables[
-        1
-    ] + optimizer.results.evaluations.variables[2] == pytest.approx(0.75, abs=0.02)
+    assert result.variables[0] + result.variables[2] == pytest.approx(1.0, abs=0.02)
+    assert result.variables[1] + result.variables[2] == pytest.approx(0.75, abs=0.02)
 
 
-def test_scipy_ge_linear_constraints_de(config: Any, evaluator: Any) -> None:
+def test_scipy_ge_linear_constraints_de(config: Any, eval_func: Any) -> None:
     config["variables"]["lower_bounds"] = [-1.0, -1.0, -1.0]
     config["variables"]["upper_bounds"] = [1.0, 1.0, 1.0]
 
@@ -121,15 +106,12 @@ def test_scipy_ge_linear_constraints_de(config: Any, evaluator: Any) -> None:
         "upper_bounds": np.inf,
     }
 
-    optimizer = BasicOptimizer(config, evaluator())
-    optimizer.run(initial_values)
-    assert optimizer.results is not None
-    assert np.allclose(
-        optimizer.results.evaluations.variables, [-0.05, 0.0, 0.45], atol=0.03
-    )
+    result = optimize(config, initial_values, eval_func())
+    assert result.variables is not None
+    assert np.allclose(result.variables, [-0.05, 0.0, 0.45], atol=0.03)
 
 
-def test_scipy_le_linear_constraints_de(config: Any, evaluator: Any) -> None:
+def test_scipy_le_linear_constraints_de(config: Any, eval_func: Any) -> None:
     config["variables"]["lower_bounds"] = [-1.0, -1.0, -1.0]
     config["variables"]["upper_bounds"] = [1.0, 1.0, 1.0]
 
@@ -139,15 +121,12 @@ def test_scipy_le_linear_constraints_de(config: Any, evaluator: Any) -> None:
         "upper_bounds": 0.4,
     }
 
-    optimizer = BasicOptimizer(config, evaluator())
-    optimizer.run(initial_values)
-    assert optimizer.results is not None
-    assert np.allclose(
-        optimizer.results.evaluations.variables, [-0.05, 0.0, 0.45], atol=0.03
-    )
+    result = optimize(config, initial_values, eval_func())
+    assert result.variables is not None
+    assert np.allclose(result.variables, [-0.05, 0.0, 0.45], atol=0.03)
 
 
-def test_scipy_le_ge_linear_constraints_de(config: Any, evaluator: Any) -> None:
+def test_scipy_le_ge_linear_constraints_de(config: Any, eval_func: Any) -> None:
     config["variables"]["lower_bounds"] = [-1.0, -1.0, -1.0]
     config["variables"]["upper_bounds"] = [1.0, 1.0, 1.0]
 
@@ -157,16 +136,13 @@ def test_scipy_le_ge_linear_constraints_de(config: Any, evaluator: Any) -> None:
         "upper_bounds": [0.4, np.inf],
     }
 
-    optimizer = BasicOptimizer(config, evaluator())
-    optimizer.run(initial_values)
-    assert optimizer.results is not None
-    assert np.allclose(
-        optimizer.results.evaluations.variables, [-0.05, 0.0, 0.45], atol=0.03
-    )
+    result = optimize(config, initial_values, eval_func())
+    assert result.variables is not None
+    assert np.allclose(result.variables, [-0.05, 0.0, 0.45], atol=0.03)
 
 
 def test_scipy_le_ge_linear_constraints_two_sided_de(
-    config: Any, evaluator: Any
+    config: Any, eval_func: Any
 ) -> None:
     config["variables"]["lower_bounds"] = [-1.0, -1.0, -1.0]
     config["variables"]["upper_bounds"] = [1.0, 1.0, 1.0]
@@ -177,12 +153,9 @@ def test_scipy_le_ge_linear_constraints_two_sided_de(
         "upper_bounds": [0.3, np.inf],
     }
 
-    optimizer = BasicOptimizer(config, evaluator())
-    optimizer.run(initial_values)
-    assert optimizer.results is not None
-    assert np.allclose(
-        optimizer.results.evaluations.variables, [-0.1, 0.0, 0.4], atol=0.03
-    )
+    result = optimize(config, initial_values, eval_func())
+    assert result.variables is not None
+    assert np.allclose(result.variables, [-0.1, 0.0, 0.4], atol=0.03)
 
     config["linear_constraints"] = {
         "coefficients": [[1, 0, 1]],
@@ -190,16 +163,13 @@ def test_scipy_le_ge_linear_constraints_two_sided_de(
         "upper_bounds": [0.3],
     }
 
-    optimizer = BasicOptimizer(config, evaluator())
-    optimizer.run(initial_values)
-    assert optimizer.results is not None
-    assert np.allclose(
-        optimizer.results.evaluations.variables, [-0.1, 0.0, 0.4], atol=0.03
-    )
+    result = optimize(config, initial_values, eval_func())
+    assert result.variables is not None
+    assert np.allclose(result.variables, [-0.1, 0.0, 0.4], atol=0.03)
 
 
 def test_scipy_eq_nonlinear_constraints_de(
-    config: Any, evaluator: Any, test_functions: Any
+    config: Any, eval_func: Any, test_functions: Any
 ) -> None:
     config["variables"]["lower_bounds"] = [-1.0, -1.0, -1.0]
     config["variables"]["upper_bounds"] = [1.0, 1.0, 1.0]
@@ -212,12 +182,11 @@ def test_scipy_eq_nonlinear_constraints_de(
     def constraint_function(variables: Any, _: Any) -> Any:
         return variables[0] + variables[2]
 
-    optimizer = BasicOptimizer(config, evaluator(test_functions, [constraint_function]))
-    optimizer.run(initial_values)
-    assert optimizer.results is not None
-    assert np.allclose(
-        optimizer.results.evaluations.variables, [0.25, 0.0, 0.75], atol=0.03
+    result = optimize(
+        config, initial_values, eval_func(test_functions, [constraint_function])
     )
+    assert result.variables is not None
+    assert np.allclose(result.variables, [0.25, 0.0, 0.75], atol=0.03)
 
 
 @pytest.mark.parametrize(
@@ -227,7 +196,7 @@ def test_scipy_ineq_nonlinear_constraints_de(
     config: Any,
     lower_bounds: Any,
     upper_bounds: Any,
-    evaluator: Any,
+    eval_func: Any,
     test_functions: Any,
 ) -> None:
     config["variables"]["lower_bounds"] = [-1.0, -1.0, -1.0]
@@ -243,17 +212,16 @@ def test_scipy_ineq_nonlinear_constraints_de(
     def constraint_function(variables: Any, _: Any) -> Any:
         return weight * variables[0] + weight * variables[2]
 
-    optimizer = BasicOptimizer(config, evaluator(test_functions, [constraint_function]))
-    optimizer.run(initial_values)
-    assert optimizer.results is not None
-    assert np.allclose(
-        optimizer.results.evaluations.variables, [-0.05, 0.0, 0.45], atol=0.03
+    result = optimize(
+        config, initial_values, eval_func(test_functions, [constraint_function])
     )
+    assert result.variables is not None
+    assert np.allclose(result.variables, [-0.05, 0.0, 0.45], atol=0.03)
 
 
 def test_scipy_ineq_nonlinear_constraints_two_sided_de(
     config: Any,
-    evaluator: Any,
+    eval_func: Any,
     test_functions: Any,
 ) -> None:
     config["variables"]["lower_bounds"] = [-1.0, -1.0, -1.0]
@@ -266,9 +234,8 @@ def test_scipy_ineq_nonlinear_constraints_two_sided_de(
     def constraint_function(variables: Any, _: Any) -> Any:
         return variables[0] + variables[2]
 
-    optimizer = BasicOptimizer(config, evaluator(test_functions, [constraint_function]))
-    optimizer.run(initial_values)
-    assert optimizer.results is not None
-    assert np.allclose(
-        optimizer.results.evaluations.variables, [-0.1, 0.0, 0.4], atol=0.03
+    result = optimize(
+        config, initial_values, eval_func(test_functions, [constraint_function])
     )
+    assert result.variables is not None
+    assert np.allclose(result.variables, [-0.1, 0.0, 0.4], atol=0.03)

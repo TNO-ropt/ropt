@@ -4,14 +4,14 @@ This example demonstrates optimization of the a modified multi-dimensional
 Rosenbrock function that exhibits uncertainty in its parameters. It shows how to
 write a minimal configuration and how to run and monitor the optimization.
 
-This script demonstrate the use of a custom workflow to run the optimization
-instead of a basic optimizer.
+This script demonstrates the use of a custom workflow, assembling the low-level
+`ropt.components` building blocks directly to run the optimization.
 
 This script demonstrate how to use either multiple perturbations or only a
 single one with the `merge_realizations` option. You can select between the two
 options using a command line argument:
 
-    usage: python rosenbrock.py [-h] [--merge] [--function] [--workflow]
+    usage: python workflow.py [-h] [--merge]
 
     options:
     -h, --help  show this help message and exit

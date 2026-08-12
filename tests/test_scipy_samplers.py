@@ -4,9 +4,12 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 import pytest
 
-from ropt.results import GradientResults, Results
+from ropt.components.event_handlers import CallbackHandler
+from ropt.enums import EnOptEventType
+from ropt.events import EnOptEvent
+from ropt.results import GradientResults
 from ropt.sampler.scipy import SCIPY_SAMPLER_SUPPORTED_METHODS
-from ropt.workflow import BasicOptimizer
+from ropt.simple import optimize
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray
@@ -34,17 +37,14 @@ def config_fixture() -> dict[str, Any]:
 
 
 @pytest.mark.parametrize("method", sorted(SCIPY_SAMPLER_SUPPORTED_METHODS))
-def test_scipy_samplers_unconstrained(config: Any, method: str, evaluator: Any) -> None:
+def test_scipy_samplers_unconstrained(config: Any, method: str, eval_func: Any) -> None:
     config["samplers"] = [{"method": method}]
-    optimizer = BasicOptimizer(config, evaluator())
-    optimizer.run(initial_values)
-    assert optimizer.results is not None
-    assert np.allclose(
-        optimizer.results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02
-    )
+    result = optimize(config, initial_values, eval_func())
+    assert result.variables is not None
+    assert np.allclose(result.variables, [0.0, 0.0, 0.5], atol=0.02)
 
 
-def test_scipy_indexed_sampler(config: Any, evaluator: Any) -> None:
+def test_scipy_indexed_sampler(config: Any, eval_func: Any) -> None:
     # Removing the second variable will fix its value, since it will not be
     # perturbed and its gradient will always be zero.
     config["variables"]["samplers"] = [0, -1, 0]
@@ -52,37 +52,52 @@ def test_scipy_indexed_sampler(config: Any, evaluator: Any) -> None:
     initial = initial_values.copy()
     initial[1] = 0.1
 
-    optimizer = BasicOptimizer(config, evaluator())
-    optimizer.run(initial)
-    assert optimizer.results is not None
-    assert pytest.approx(optimizer.results.evaluations.variables[0]) != 0.0
-    assert pytest.approx(optimizer.results.evaluations.variables[1]) == 0.1
-    assert pytest.approx(optimizer.results.evaluations.variables[2]) != 0.5
+    result = optimize(config, initial, eval_func())
+    assert result.variables is not None
+    assert pytest.approx(result.variables[0]) != 0.0
+    assert pytest.approx(result.variables[1]) == 0.1
+    assert pytest.approx(result.variables[2]) != 0.5
 
 
 @pytest.mark.parametrize("method", sorted(SCIPY_SAMPLER_SUPPORTED_METHODS))
-def test_scipy_samplers_shared(config: Any, method: str, evaluator: Any) -> None:
+def test_scipy_samplers_shared(config: Any, method: str, eval_func: Any) -> None:
     config["realizations"] = {"weights": [1.0, 1.0]}
     config["samplers"] = [{"method": method}]
 
     perturbations: dict[str, NDArray[np.float64]] = {}
 
-    def _observer(results: tuple[Results, ...], tag: str) -> None:
-        for item in results:
+    def _observer(event: EnOptEvent, tag: str) -> None:
+        for item in event.results:
             if isinstance(item, GradientResults) and tag not in perturbations:
                 perturbations[tag] = item.evaluations.perturbed_variables
 
     config["samplers"][0]["shared"] = False
-    optimizer1 = BasicOptimizer(config, evaluator())
-    optimizer1.set_results_callback(partial(_observer, tag="result1"))
-    optimizer1.run(initial_values)
-    assert optimizer1.results is not None
+    result1 = optimize(
+        config,
+        initial_values,
+        eval_func(),
+        handlers=[
+            CallbackHandler(
+                event_types={EnOptEventType.FINISHED_EVALUATION},
+                callback=partial(_observer, tag="result1"),
+            )
+        ],
+    )
+    assert result1.variables is not None
 
     config["samplers"][0]["shared"] = True
-    optimizer2 = BasicOptimizer(config, evaluator())
-    optimizer2.set_results_callback(partial(_observer, tag="result2"))
-    optimizer2.run(initial_values)
-    assert optimizer2.results is not None
+    result2 = optimize(
+        config,
+        initial_values,
+        eval_func(),
+        handlers=[
+            CallbackHandler(
+                event_types={EnOptEventType.FINISHED_EVALUATION},
+                callback=partial(_observer, tag="result2"),
+            )
+        ],
+    )
+    assert result2.variables is not None
 
     # The perturbations of the two realizations must differ, if not shared:
     assert not np.allclose(
@@ -95,14 +110,6 @@ def test_scipy_samplers_shared(config: Any, method: str, evaluator: Any) -> None
     )
 
     # The results should be correct, but slightly different:
-    assert np.allclose(
-        optimizer1.results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02
-    )
-    assert np.allclose(
-        optimizer2.results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02
-    )
-    assert not np.allclose(
-        optimizer1.results.evaluations.variables,
-        optimizer2.results.evaluations.variables,
-        atol=1e-3,
-    )
+    assert np.allclose(result1.variables, [0.0, 0.0, 0.5], atol=0.02)
+    assert np.allclose(result2.variables, [0.0, 0.0, 0.5], atol=0.02)
+    assert not np.allclose(result1.variables, result2.variables, atol=1e-3)

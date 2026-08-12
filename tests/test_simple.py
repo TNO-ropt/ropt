@@ -81,9 +81,9 @@ def test_optimize_returns_run_result(config: Any, test_functions: Any) -> None:
 
 
 def test_optimize_accepts_evaluation_function_result(
-    config: Any, objective: Any, test_functions: Any
+    config: Any, eval_func: Any, test_functions: Any
 ) -> None:
-    result = optimize(config, initial_values, objective([test_functions[0]]))
+    result = optimize(config, initial_values, eval_func([test_functions[0]]))
     assert result.variables is not None
     assert np.allclose(result.variables, 0.5, atol=0.02)
 
@@ -301,9 +301,9 @@ def test_evaluate_many_rejects_vector(config: Any, test_functions: Any) -> None:
         evaluate_many(config, initial_values, test_functions[0])
 
 
-def test_evaluate_multiple_objectives(config: Any, objective: Any) -> None:
+def test_evaluate_multiple_objectives(config: Any, eval_func: Any) -> None:
     config["objectives"] = {"weights": [0.75, 0.25]}
-    result = evaluate(config, initial_values, objective())
+    result = evaluate(config, initial_values, eval_func())
     assert result.objectives is not None
     assert result.objectives.shape == (2,)
     assert result.constraints is None

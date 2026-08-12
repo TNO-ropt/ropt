@@ -9,7 +9,7 @@ from ropt.components.evaluators import EvaluationFunctionContext
 from ropt.config._function_estimator_config import FunctionEstimatorConfig
 from ropt.context import EnOptContext
 from ropt.function_estimator import FunctionEstimator
-from ropt.workflow import BasicOptimizer
+from ropt.simple import optimize
 
 initial_values = 3 * [0]
 
@@ -38,7 +38,7 @@ def config_fixture() -> dict[str, Any]:
 
 
 def test_stddev_function_estimator_merge_error(
-    config: Any, evaluator: Any, test_functions: Any
+    config: Any, eval_func: Any, test_functions: Any
 ) -> None:
     # Add dummy functions, these will be estimated using stddev.
     test_functions += test_functions
@@ -47,18 +47,17 @@ def test_stddev_function_estimator_merge_error(
     config["objectives"]["weights"].extend([0.75, 0.25])
     config["objectives"]["function_estimators"] = [0, 0, 1, 1]
     config["function_estimators"] = [{"method": "mean"}, {"method": "stddev"}]
-    optimizer = BasicOptimizer(config, evaluator(test_functions))
     with pytest.raises(
         ValueError,
         match=(
             "The stddev estimator does not support merging realizations in the gradient"
         ),
     ):
-        optimizer.run(initial_values)
+        optimize(config, initial_values, eval_func(test_functions))
 
 
 def test_mean_stddev_function_estimator(
-    config: Any, evaluator: Any, test_functions: Any
+    config: Any, eval_func: Any, test_functions: Any
 ) -> None:
     # Add dummy functions, these will be estimated using stddev.
     test_functions += test_functions
@@ -66,12 +65,9 @@ def test_mean_stddev_function_estimator(
     config["objectives"]["weights"].extend([0.75, 0.25])
     config["objectives"]["function_estimators"] = [0, 0, 1, 1]
     config["function_estimators"] = [{"method": "mean"}, {"method": "stddev"}]
-    optimizer = BasicOptimizer(config, evaluator(test_functions))
-    optimizer.run(initial_values)
-    assert optimizer.results is not None
-    assert np.allclose(
-        optimizer.results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02
-    )
+    result = optimize(config, initial_values, eval_func(test_functions))
+    assert result.variables is not None
+    assert np.allclose(result.variables, [0.0, 0.0, 0.5], atol=0.02)
 
 
 def _compute_distance_squared_stddev(
@@ -99,7 +95,7 @@ def _compute_distance_squared_stddev(
 @pytest.mark.parametrize("evaluation_policy", ["separate", "auto"])
 def test_stddev_function_estimator(
     config: Any,
-    evaluator: Any,
+    eval_func: Any,
     evaluation_policy: Literal["speculative", "separate", "auto"],
 ) -> None:
     functions = [
@@ -109,12 +105,9 @@ def test_stddev_function_estimator(
 
     config["gradient"]["evaluation_policy"] = evaluation_policy
     config["function_estimators"] = [{"method": "stddev"}]
-    optimizer = BasicOptimizer(config, evaluator(functions))
-    optimizer.run(initial_values)
-    assert optimizer.results is not None
-    assert np.allclose(
-        optimizer.results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02
-    )
+    result = optimize(config, initial_values, eval_func(functions))
+    assert result.variables is not None
+    assert np.allclose(result.variables, [0.0, 0.0, 0.5], atol=0.02)
 
 
 class CustomFunctionEstimator(FunctionEstimator):
@@ -139,15 +132,12 @@ class CustomFunctionEstimator(FunctionEstimator):
 
 
 def test_custom_function_estimator(
-    config: Any, evaluator: Any, test_functions: Any
+    config: Any, eval_func: Any, test_functions: Any
 ) -> None:
     config["objectives"]["function_estimators"] = 0
     config["function_estimators"] = [
         CustomFunctionEstimator(FunctionEstimatorConfig(method="custom"))
     ]
-    optimizer = BasicOptimizer(config, evaluator(test_functions))
-    optimizer.run(initial_values)
-    assert optimizer.results is not None
-    assert np.allclose(
-        optimizer.results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02
-    )
+    result = optimize(config, initial_values, eval_func(test_functions))
+    assert result.variables is not None
+    assert np.allclose(result.variables, [0.0, 0.0, 0.5], atol=0.02)

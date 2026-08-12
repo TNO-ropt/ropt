@@ -8,15 +8,18 @@ import pytest
 from numpy.typing import NDArray
 
 from ropt.components.evaluators import EvaluationFunctionContext
+from ropt.components.event_handlers import CallbackHandler
 from ropt.config._realization_filter_config import RealizationFilterConfig
 from ropt.context import EnOptContext
+from ropt.enums import EnOptEventType
+from ropt.events import EnOptEvent
 from ropt.realization_filter import RealizationFilter
 from ropt.realization_filter.default import (
     _get_cvar_weights_from_percentile,
     _sort_and_select,
 )
 from ropt.results import FunctionResults, GradientResults, Results
-from ropt.workflow import BasicOptimizer
+from ropt.simple import optimize
 
 initial_values = 3 * [0]
 
@@ -114,14 +117,14 @@ def _constraint_function(
     return float(result)
 
 
-def _track_results(results: tuple[Results, ...], result_list: list[Results]) -> None:
-    result_list.extend(results)
+def _track_results(event: EnOptEvent, result_list: list[Results]) -> None:
+    result_list.extend(event.results or ())
 
 
 @pytest.mark.parametrize("evaluation_policy", ["separate", "speculative"])
 def test_sort_filter_on_objectives(
     config: Any,
-    evaluator: Any,
+    eval_func: Any,
     evaluation_policy: Literal["speculative", "separate", "auto"],
 ) -> None:
     functions = [
@@ -131,12 +134,9 @@ def test_sort_filter_on_objectives(
 
     config["gradient"]["evaluation_policy"] = evaluation_policy
 
-    optimizer = BasicOptimizer(config, evaluator(functions))
-    optimizer.run(initial_values)
-    assert optimizer.results is not None
-    assert not np.allclose(
-        optimizer.results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02
-    )
+    opt_result = optimize(config, initial_values, eval_func(functions))
+    assert opt_result.variables is not None
+    assert not np.allclose(opt_result.variables, [0.0, 0.0, 0.5], atol=0.02)
 
     config["realization_filters"] = [
         {
@@ -151,13 +151,19 @@ def test_sort_filter_on_objectives(
     config["objectives"]["realization_filters"] = [0, 0]
 
     result_list: list[Results] = []
-    optimizer = BasicOptimizer(config, evaluator(functions))
-    optimizer.set_results_callback(partial(_track_results, result_list=result_list))
-    optimizer.run(initial_values)
-    assert optimizer.results is not None
-    assert np.allclose(
-        optimizer.results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02
+    opt_result = optimize(
+        config,
+        initial_values,
+        eval_func(functions),
+        handlers=[
+            CallbackHandler(
+                event_types={EnOptEventType.FINISHED_EVALUATION},
+                callback=partial(_track_results, result_list=result_list),
+            )
+        ],
     )
+    assert opt_result.variables is not None
+    assert np.allclose(opt_result.variables, [0.0, 0.0, 0.5], atol=0.02)
     for result in result_list:
         assert result is not None
         if isinstance(result, FunctionResults):
@@ -178,7 +184,7 @@ def test_sort_filter_on_objectives(
 @pytest.mark.parametrize("evaluation_policy", ["separate", "speculative"])
 def test_sort_filter_on_objectives_with_constraints(
     config: Any,
-    evaluator: Any,
+    eval_func: Any,
     evaluation_policy: Literal["speculative", "separate", "auto"],
 ) -> None:
     objective_functions = [
@@ -208,15 +214,19 @@ def test_sort_filter_on_objectives_with_constraints(
     config["objectives"]["realization_filters"] = [0, 0]
     config["nonlinear_constraints"]["realization_filters"] = [0]
     result_list: list[Results] = []
-    optimizer = BasicOptimizer(
-        config, evaluator(objective_functions, constraint_functions)
+    opt_result = optimize(
+        config,
+        initial_values,
+        eval_func(objective_functions, constraint_functions),
+        handlers=[
+            CallbackHandler(
+                event_types={EnOptEventType.FINISHED_EVALUATION},
+                callback=partial(_track_results, result_list=result_list),
+            )
+        ],
     )
-    optimizer.set_results_callback(partial(_track_results, result_list=result_list))
-    optimizer.run(initial_values)
-    assert optimizer.results is not None
-    assert np.allclose(
-        optimizer.results.evaluations.variables, [-0.05, 0.0, 0.45], atol=0.02
-    )
+    assert opt_result.variables is not None
+    assert np.allclose(opt_result.variables, [-0.05, 0.0, 0.45], atol=0.02)
     for result in result_list:
         assert result is not None
         if isinstance(result, FunctionResults):
@@ -244,7 +254,7 @@ def test_sort_filter_on_objectives_with_constraints(
 @pytest.mark.parametrize("evaluation_policy", ["separate", "speculative"])
 def test_sort_filter_on_constraints(
     config: Any,
-    evaluator: Any,
+    eval_func: Any,
     evaluation_policy: Literal["speculative", "separate", "auto"],
 ) -> None:
     objective_functions = [
@@ -273,15 +283,19 @@ def test_sort_filter_on_constraints(
     config["objectives"]["realization_filters"] = [0, 0]
     config["nonlinear_constraints"]["realization_filters"] = [0]
     result_list: list[Results] = []
-    optimizer = BasicOptimizer(
-        config, evaluator(objective_functions, constraint_functions)
+    opt_result = optimize(
+        config,
+        initial_values,
+        eval_func(objective_functions, constraint_functions),
+        handlers=[
+            CallbackHandler(
+                event_types={EnOptEventType.FINISHED_EVALUATION},
+                callback=partial(_track_results, result_list=result_list),
+            )
+        ],
     )
-    optimizer.set_results_callback(partial(_track_results, result_list=result_list))
-    optimizer.run(initial_values)
-    assert optimizer.results is not None
-    assert np.allclose(
-        optimizer.results.evaluations.variables, [-0.05, 0.0, 0.45], atol=0.02
-    )
+    assert opt_result.variables is not None
+    assert np.allclose(opt_result.variables, [-0.05, 0.0, 0.45], atol=0.02)
     for result in result_list:
         assert result is not None
         if isinstance(result, FunctionResults):
@@ -307,9 +321,9 @@ def test_sort_filter_on_constraints(
 
 
 @pytest.mark.parametrize("evaluation_policy", ["separate", "speculative"])
-def test_sort_filter_mixed(  # ruff: ignore[complex-structure]
+def test_sort_filter_mixed(
     config: Any,
-    evaluator: Any,
+    eval_func: Any,
     evaluation_policy: Literal["speculative", "separate", "auto"],
 ) -> None:
     objective_functions = [
@@ -324,13 +338,12 @@ def test_sort_filter_mixed(  # ruff: ignore[complex-structure]
 
     objective_values: list[NDArray[np.float64]] = []
 
-    def _add_objective(results: tuple[Results, ...]) -> None:
-        if results:
-            for item in results:
-                if isinstance(item, FunctionResults):
-                    assert item.functions is not None
-                    objective_values.append(item.functions.target_objective)
-        _track_results(results, result_list=result_list)
+    def _add_objective(event: EnOptEvent) -> None:
+        for item in event.results or ():
+            if isinstance(item, FunctionResults):
+                assert item.functions is not None
+                objective_values.append(item.functions.target_objective)
+        _track_results(event, result_list=result_list)
 
     # Apply the filtering to all objectives, giving the expected result.
     config["realization_filters"] = [
@@ -346,13 +359,19 @@ def test_sort_filter_mixed(  # ruff: ignore[complex-structure]
     config["objectives"]["realization_filters"] = [0, 0, 0, 0]
 
     result_list: list[Results] = []
-    optimizer = BasicOptimizer(config, evaluator(objective_functions))
-    optimizer.set_results_callback(_add_objective)
-    optimizer.run(initial_values)
-    assert optimizer.results is not None
-    assert np.allclose(
-        optimizer.results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02
+    opt_result = optimize(
+        config,
+        initial_values,
+        eval_func(objective_functions),
+        handlers=[
+            CallbackHandler(
+                event_types={EnOptEventType.FINISHED_EVALUATION},
+                callback=_add_objective,
+            )
+        ],
     )
+    assert opt_result.variables is not None
+    assert np.allclose(opt_result.variables, [0.0, 0.0, 0.5], atol=0.02)
     for result in result_list:
         assert result is not None
         if isinstance(result, FunctionResults):
@@ -383,13 +402,19 @@ def test_sort_filter_mixed(  # ruff: ignore[complex-structure]
     config["objectives"]["realization_filters"] = [0, 0, -1, -1]
 
     result_list = []
-    optimizer = BasicOptimizer(config, evaluator(objective_functions))
-    optimizer.set_results_callback(_add_objective)
-    optimizer.run(initial_values)
-    assert optimizer.results is not None
-    assert not np.allclose(
-        optimizer.results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02
+    opt_result = optimize(
+        config,
+        initial_values,
+        eval_func(objective_functions),
+        handlers=[
+            CallbackHandler(
+                event_types={EnOptEventType.FINISHED_EVALUATION},
+                callback=_add_objective,
+            )
+        ],
     )
+    assert opt_result.variables is not None
+    assert not np.allclose(opt_result.variables, [0.0, 0.0, 0.5], atol=0.02)
     for result in result_list:
         assert result is not None
         if isinstance(result, FunctionResults):
@@ -404,7 +429,7 @@ def test_sort_filter_mixed(  # ruff: ignore[complex-structure]
 @pytest.mark.parametrize("evaluation_policy", ["separate", "speculative"])
 def test_cvar_filter_on_objectives(
     config: Any,
-    evaluator: Any,
+    eval_func: Any,
     evaluation_policy: Literal["speculative", "separate", "auto"],
 ) -> None:
     objective_functions = [
@@ -414,12 +439,9 @@ def test_cvar_filter_on_objectives(
 
     config["gradient"]["evaluation_policy"] = evaluation_policy
 
-    optimizer = BasicOptimizer(config, evaluator(objective_functions))
-    optimizer.run(initial_values)
-    assert optimizer.results is not None
-    assert not np.allclose(
-        optimizer.results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02
-    )
+    opt_result = optimize(config, initial_values, eval_func(objective_functions))
+    assert opt_result.variables is not None
+    assert not np.allclose(opt_result.variables, [0.0, 0.0, 0.5], atol=0.02)
 
     config["realization_filters"] = [
         {
@@ -433,13 +455,19 @@ def test_cvar_filter_on_objectives(
     config["objectives"]["realization_filters"] = [0, 0]
     result_list: list[Results] = []
 
-    optimizer = BasicOptimizer(config, evaluator(objective_functions))
-    optimizer.set_results_callback(partial(_track_results, result_list=result_list))
-    optimizer.run(initial_values)
-    assert optimizer.results is not None
-    assert np.allclose(
-        optimizer.results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02
+    opt_result = optimize(
+        config,
+        initial_values,
+        eval_func(objective_functions),
+        handlers=[
+            CallbackHandler(
+                event_types={EnOptEventType.FINISHED_EVALUATION},
+                callback=partial(_track_results, result_list=result_list),
+            )
+        ],
     )
+    assert opt_result.variables is not None
+    assert np.allclose(opt_result.variables, [0.0, 0.0, 0.5], atol=0.02)
     for result in result_list:
         assert result is not None
         if isinstance(result, FunctionResults):
@@ -460,7 +488,7 @@ def test_cvar_filter_on_objectives(
 @pytest.mark.parametrize("evaluation_policy", ["separate", "speculative"])
 def test_cvar_filter_on_objectives_with_constraints(
     config: Any,
-    evaluator: Any,
+    eval_func: Any,
     evaluation_policy: Literal["speculative", "separate", "auto"],
 ) -> None:
     objective_functions = [
@@ -489,15 +517,19 @@ def test_cvar_filter_on_objectives_with_constraints(
     config["objectives"]["realization_filters"] = [0, 0]
     config["nonlinear_constraints"]["realization_filters"] = [0]
     result_list: list[Results] = []
-    optimizer = BasicOptimizer(
-        config, evaluator(objective_functions, constraint_functions)
+    opt_result = optimize(
+        config,
+        initial_values,
+        eval_func(objective_functions, constraint_functions),
+        handlers=[
+            CallbackHandler(
+                event_types={EnOptEventType.FINISHED_EVALUATION},
+                callback=partial(_track_results, result_list=result_list),
+            )
+        ],
     )
-    optimizer.set_results_callback(partial(_track_results, result_list=result_list))
-    optimizer.run(initial_values)
-    assert optimizer.results is not None
-    assert np.allclose(
-        optimizer.results.evaluations.variables, [-0.05, 0.0, 0.45], atol=0.02
-    )
+    assert opt_result.variables is not None
+    assert np.allclose(opt_result.variables, [-0.05, 0.0, 0.45], atol=0.02)
     for result in result_list:
         assert result is not None
         if isinstance(result, FunctionResults):
@@ -525,7 +557,7 @@ def test_cvar_filter_on_objectives_with_constraints(
 @pytest.mark.parametrize("evaluation_policy", ["separate", "speculative"])
 def test_cvar_filter_on_constraints(
     config: Any,
-    evaluator: Any,
+    eval_func: Any,
     evaluation_policy: Literal["speculative", "separate", "auto"],
 ) -> None:
     objective_functions = [
@@ -554,15 +586,19 @@ def test_cvar_filter_on_constraints(
     config["objectives"]["realization_filters"] = [0, 0]
     config["nonlinear_constraints"]["realization_filters"] = [0]
     result_list: list[Results] = []
-    optimizer = BasicOptimizer(
-        config, evaluator(objective_functions, constraint_functions)
+    opt_result = optimize(
+        config,
+        initial_values,
+        eval_func(objective_functions, constraint_functions),
+        handlers=[
+            CallbackHandler(
+                event_types={EnOptEventType.FINISHED_EVALUATION},
+                callback=partial(_track_results, result_list=result_list),
+            )
+        ],
     )
-    optimizer.set_results_callback(partial(_track_results, result_list=result_list))
-    optimizer.run(initial_values)
-    assert optimizer.results is not None
-    assert np.allclose(
-        optimizer.results.evaluations.variables, [-0.05, 0.0, 0.45], atol=0.02
-    )
+    assert opt_result.variables is not None
+    assert np.allclose(opt_result.variables, [-0.05, 0.0, 0.45], atol=0.02)
     for result in result_list:
         assert result is not None
         if isinstance(result, FunctionResults):
@@ -590,7 +626,7 @@ def test_cvar_filter_on_constraints(
 @pytest.mark.parametrize("evaluation_policy", ["separate", "speculative"])
 def test_cvar_filter_mixed(
     config: Any,
-    evaluator: Any,
+    eval_func: Any,
     evaluation_policy: Literal["speculative", "separate", "auto"],
 ) -> None:
     objective_functions = [
@@ -605,12 +641,12 @@ def test_cvar_filter_mixed(
 
     objective_values: list[NDArray[np.float64]] = []
 
-    def _add_objective(results: tuple[Results, ...]) -> None:
-        for item in results:
+    def _add_objective(event: EnOptEvent) -> None:
+        for item in event.results or ():
             if isinstance(item, FunctionResults):
                 assert item.functions is not None
                 objective_values.append(item.functions.target_objective)
-        _track_results(results, result_list=result_list)
+        _track_results(event, result_list=result_list)
 
     # Apply the filtering to all objectives, giving the expected result.
     config["realization_filters"] = [
@@ -625,13 +661,19 @@ def test_cvar_filter_mixed(
     config["objectives"]["realization_filters"] = [0, 0, 0, 0]
 
     result_list: list[Results] = []
-    optimizer = BasicOptimizer(config, evaluator(objective_functions))
-    optimizer.set_results_callback(_add_objective)
-    optimizer.run(initial_values)
-    assert optimizer.results is not None
-    assert np.allclose(
-        optimizer.results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02
+    opt_result = optimize(
+        config,
+        initial_values,
+        eval_func(objective_functions),
+        handlers=[
+            CallbackHandler(
+                event_types={EnOptEventType.FINISHED_EVALUATION},
+                callback=_add_objective,
+            )
+        ],
     )
+    assert opt_result.variables is not None
+    assert np.allclose(opt_result.variables, [0.0, 0.0, 0.5], atol=0.02)
     for result in result_list:
         assert result is not None
         if isinstance(result, FunctionResults):
@@ -661,13 +703,19 @@ def test_cvar_filter_mixed(
     config["objectives"]["realization_filters"] = [0, 0, -1, -1]
 
     result_list = []
-    optimizer = BasicOptimizer(config, evaluator(objective_functions))
-    optimizer.set_results_callback(_add_objective)
-    optimizer.run(initial_values)
-    assert optimizer.results is not None
-    assert not np.allclose(
-        optimizer.results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02
+    opt_result = optimize(
+        config,
+        initial_values,
+        eval_func(objective_functions),
+        handlers=[
+            CallbackHandler(
+                event_types={EnOptEventType.FINISHED_EVALUATION},
+                callback=_add_objective,
+            )
+        ],
     )
+    assert opt_result.variables is not None
+    assert not np.allclose(opt_result.variables, [0.0, 0.0, 0.5], atol=0.02)
     for result in result_list:
         assert result is not None
         if isinstance(result, FunctionResults):
@@ -695,15 +743,12 @@ class CustomRealizationFilter(RealizationFilter):
 
 
 def test_custom_realization_filter(
-    config: Any, evaluator: Any, test_functions: Any
+    config: Any, eval_func: Any, test_functions: Any
 ) -> None:
     config["objectives"]["realization_filters"] = 0
     config["realization_filters"] = [
         CustomRealizationFilter(RealizationFilterConfig(method="custom"))
     ]
-    optimizer = BasicOptimizer(config, evaluator(test_functions))
-    optimizer.run(initial_values)
-    assert optimizer.results is not None
-    assert np.allclose(
-        optimizer.results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02
-    )
+    opt_result = optimize(config, initial_values, eval_func(test_functions))
+    assert opt_result.variables is not None
+    assert np.allclose(opt_result.variables, [0.0, 0.0, 0.5], atol=0.02)

@@ -3,9 +3,11 @@ from typing import Any, Literal
 
 import pytest
 
-from ropt.enums import AxisName
-from ropt.results import Results, results_to_dataframe
-from ropt.workflow import BasicOptimizer
+from ropt.components.event_handlers import CallbackHandler
+from ropt.enums import AxisName, EnOptEventType
+from ropt.events import EnOptEvent
+from ropt.results import results_to_dataframe
+from ropt.simple import optimize
 
 # Requires pandas:
 pytest.importorskip("pandas")
@@ -43,12 +45,13 @@ def config_fixture() -> dict[str, Any]:
 
 
 def _handle_results(
-    results: tuple[Results, ...],
+    event: EnOptEvent,
     frames: list[pd.DataFrame],
     fields: set[str],
     result_type: Literal["functions", "gradients"],
     metadata: dict[str, Any] | None = None,
 ) -> None:
+    results = event.results or ()
     if metadata is not None:
         for item in results:
             item.metadata = metadata
@@ -57,31 +60,48 @@ def _handle_results(
         frames.append(frame)
 
 
-def test_dataframe_results_no_results(config: Any, evaluator: Any) -> None:
+def test_dataframe_results_no_results(config: Any, eval_func: Any) -> None:
     frames: list[pd.DataFrame] = []
-    optimizer = BasicOptimizer(config, evaluator())
-    optimizer.set_results_callback(
-        partial(_handle_results, frames=frames, fields=set(), result_type="functions")
+    optimize(
+        config,
+        initial_values,
+        eval_func(),
+        handlers=[
+            CallbackHandler(
+                event_types={EnOptEventType.FINISHED_EVALUATION},
+                callback=partial(
+                    _handle_results,
+                    frames=frames,
+                    fields=set(),
+                    result_type="functions",
+                ),
+            )
+        ],
     )
-    optimizer.run(initial_values)
     assert not frames
 
 
-def test_dataframe_results_function_results(config: Any, evaluator: Any) -> None:
+def test_dataframe_results_function_results(config: Any, eval_func: Any) -> None:
     del config["names"]
     frames: list[pd.DataFrame] = []
-    optimizer = BasicOptimizer(config, evaluator())
-    optimizer.set_results_callback(
-        partial(
-            _handle_results,
-            frames=frames,
-            fields={
-                "evaluations.variables",
-            },
-            result_type="functions",
-        )
+    optimize(
+        config,
+        initial_values,
+        eval_func(),
+        handlers=[
+            CallbackHandler(
+                event_types={EnOptEventType.FINISHED_EVALUATION},
+                callback=partial(
+                    _handle_results,
+                    frames=frames,
+                    fields={
+                        "evaluations.variables",
+                    },
+                    result_type="functions",
+                ),
+            )
+        ],
     )
-    optimizer.run(initial_values)
     frame = pd.concat(frames)
     assert len(frame) == 3
     assert list(frame.columns.get_level_values(level=0)) == [
@@ -90,21 +110,27 @@ def test_dataframe_results_function_results(config: Any, evaluator: Any) -> None
 
 
 def test_dataframe_results_function_results_formatted_names(
-    config: Any, evaluator: Any
+    config: Any, eval_func: Any
 ) -> None:
     frames: list[pd.DataFrame] = []
-    optimizer = BasicOptimizer(config, evaluator())
-    optimizer.set_results_callback(
-        partial(
-            _handle_results,
-            frames=frames,
-            fields={
-                "evaluations.variables",
-            },
-            result_type="functions",
-        ),
+    optimize(
+        config,
+        initial_values,
+        eval_func(),
+        handlers=[
+            CallbackHandler(
+                event_types={EnOptEventType.FINISHED_EVALUATION},
+                callback=partial(
+                    _handle_results,
+                    frames=frames,
+                    fields={
+                        "evaluations.variables",
+                    },
+                    result_type="functions",
+                ),
+            )
+        ],
     )
-    optimizer.run(initial_values)
     frame = pd.concat(frames)
     assert len(frame) == 3
     assert list(frame.columns.get_level_values(level=0)) == [
@@ -112,20 +138,26 @@ def test_dataframe_results_function_results_formatted_names(
     ]
 
 
-def test_dataframe_results_gradient_results(config: Any, evaluator: Any) -> None:
+def test_dataframe_results_gradient_results(config: Any, eval_func: Any) -> None:
     frames: list[pd.DataFrame] = []
-    optimizer = BasicOptimizer(config, evaluator())
-    optimizer.set_results_callback(
-        partial(
-            _handle_results,
-            frames=frames,
-            fields={
-                "gradients.target_objective",
-            },
-            result_type="gradients",
-        ),
+    optimize(
+        config,
+        initial_values,
+        eval_func(),
+        handlers=[
+            CallbackHandler(
+                event_types={EnOptEventType.FINISHED_EVALUATION},
+                callback=partial(
+                    _handle_results,
+                    frames=frames,
+                    fields={
+                        "gradients.target_objective",
+                    },
+                    result_type="gradients",
+                ),
+            )
+        ],
     )
-    optimizer.run(initial_values)
     frame = pd.concat(frames)
     assert len(frame) == 3
     assert list(frame.columns.get_level_values(level=0)) == [
@@ -133,24 +165,30 @@ def test_dataframe_results_gradient_results(config: Any, evaluator: Any) -> None
     ]
 
 
-def test_dataframe_results_metadata(config: Any, evaluator: Any) -> None:
+def test_dataframe_results_metadata(config: Any, eval_func: Any) -> None:
     del config["names"]
     frames: list[pd.DataFrame] = []
-    optimizer = BasicOptimizer(config, evaluator())
-    optimizer.set_results_callback(
-        partial(
-            _handle_results,
-            frames=frames,
-            fields={
-                "evaluations.variables",
-                "metadata.foo.bar",
-                "metadata.not.existing",
-            },
-            result_type="functions",
-            metadata={"foo": {"bar": 1}},
-        ),
+    optimize(
+        config,
+        initial_values,
+        eval_func(),
+        handlers=[
+            CallbackHandler(
+                event_types={EnOptEventType.FINISHED_EVALUATION},
+                callback=partial(
+                    _handle_results,
+                    frames=frames,
+                    fields={
+                        "evaluations.variables",
+                        "metadata.foo.bar",
+                        "metadata.not.existing",
+                    },
+                    result_type="functions",
+                    metadata={"foo": {"bar": 1}},
+                ),
+            )
+        ],
     )
-    optimizer.run(initial_values)
     frame = pd.concat(frames)
     assert len(frame) == 3
     assert list(frame.columns.get_level_values(level=0)) == [

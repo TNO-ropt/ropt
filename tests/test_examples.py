@@ -16,15 +16,6 @@ def _load_from_file(name: str, sub_path: str = "advanced") -> Any:
 
 
 @pytest.mark.parametrize("merge", [True, False])
-def test_example_function_evaluator(
-    tmp_path: Path, monkeypatch: Any, merge: Any
-) -> None:
-    monkeypatch.chdir(tmp_path)
-    module = _load_from_file("function_evaluator")
-    module.main(merge=merge)
-
-
-@pytest.mark.parametrize("merge", [True, False])
 def test_example_workflow(tmp_path: Path, monkeypatch: Any, merge: Any) -> None:
     monkeypatch.chdir(tmp_path)
     module = _load_from_file("workflow")

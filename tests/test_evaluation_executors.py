@@ -4,11 +4,12 @@ import asyncio
 import sys
 import threading
 from functools import partial
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 import numpy as np
 import pytest
 
+from ropt.components.compute_steps import OptimizationStep
 from ropt.components.evaluators import (
     EvaluationFunctionCallback,
     EvaluationFunctionContext,
@@ -37,7 +38,6 @@ from ropt.exceptions import (
     ExecutorStopped,
     TransferError,
 )
-from ropt.workflow._basic_optimizer import BasicOptimizer
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
@@ -338,9 +338,11 @@ def _opt_workflow(
     test_function: EvaluationFunctionCallback,
 ) -> FunctionResults | None:
     evaluator = ParallelEvaluator(function=test_function, executor=executor)
-    optimizer = BasicOptimizer(config=config, evaluator=evaluator)
-    optimizer.run(initial_values)
-    return optimizer.results
+    result_handler = ResultsHandler()
+    step = OptimizationStep(evaluator=evaluator)
+    step.add_event_handler(result_handler)
+    step.run(variables=initial_values, context=EnOptContext.model_validate(config))
+    return cast("FunctionResults | None", result_handler["results"])
 
 
 if _TEST_HPC:
@@ -389,7 +391,7 @@ if _TEST_HPC:
 )
 async def test_executor_evaluator_ok(
     config: dict[str, Any],
-    objective: Any,
+    eval_func: Any,
     executor_name: str,
     monkeypatch: Any,
     tmp_path: Path,
@@ -415,7 +417,7 @@ async def test_executor_evaluator_ok(
             _opt_workflow,
             executor,
             config,
-            objective(),
+            eval_func(),
         )
         executor.cancel()
     assert not executor.is_running()
@@ -491,7 +493,7 @@ async def test_executor_evaluator_error(
 async def test_executor_survives_user_code_error_and_is_reusable(
     config: dict[str, Any],
     test_functions: Sequence[Callable[[NDArray[np.float64], int], float]],
-    objective: Any,
+    eval_func: Any,
     executor_name: str,
 ) -> None:
     match executor_name:
@@ -511,7 +513,7 @@ async def test_executor_survives_user_code_error_and_is_reusable(
                 partial(_opt_function, test_functions=test_functions, raise_error=True),
             )
         assert executor.is_running()
-        results = await asyncio.to_thread(_opt_workflow, executor, config, objective())
+        results = await asyncio.to_thread(_opt_workflow, executor, config, eval_func())
         assert results is not None
         assert np.allclose(results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02)
         executor.cancel()
@@ -556,7 +558,7 @@ async def test_error_escaping_the_body_closes_the_executor(
 )
 async def test_executor_evaluator_two_optimizations(
     config: dict[str, Any],
-    objective: Any,
+    eval_func: Any,
     executor_name: str,
     monkeypatch: Any,
     tmp_path: Path,
@@ -584,7 +586,7 @@ async def test_executor_evaluator_two_optimizations(
                     _opt_workflow,
                     executor,
                     config,
-                    objective(),
+                    eval_func(),
                 )
                 for _ in range(2)
             )
@@ -608,7 +610,7 @@ async def test_executor_evaluator_two_optimizations(
 )
 async def test_groups_tasks(
     config: dict[str, Any],
-    objective: Any,
+    eval_func: Any,
     executor_name: str,
     bundle_size: int,
 ) -> None:
@@ -630,18 +632,23 @@ async def test_groups_tasks(
     async with asyncio.TaskGroup() as tg:
         await executor.start(tg)
         evaluator = ParallelEvaluator(
-            function=objective(),
+            function=eval_func(),
             executor=executor,
             bundle_size=bundle_size,
         )
-        optimizer = BasicOptimizer(config=config, evaluator=evaluator)
-        await asyncio.to_thread(optimizer.run, initial_values)
+        result_handler = ResultsHandler()
+        step = OptimizationStep(evaluator=evaluator)
+        step.add_event_handler(result_handler)
+        await asyncio.to_thread(
+            step.run,
+            variables=initial_values,
+            context=EnOptContext.model_validate(config),
+        )
         executor.cancel()
 
-    assert optimizer.results is not None
-    assert np.allclose(
-        optimizer.results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02
-    )
+    results = result_handler["results"]
+    assert results is not None
+    assert np.allclose(results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02)
     assert task_sizes, "No tasks were submitted"
     expected_max = max(task_sizes) if bundle_size == 0 else bundle_size
     for size in task_sizes:
@@ -687,14 +694,14 @@ async def test_abort_without_queued_exception_has_no_cause() -> None:  # ruff: i
 
 
 async def test_put_tasks_does_not_raise_executor_stopped_into_task_group(
-    config: dict[str, Any], objective: Any
+    config: dict[str, Any], eval_func: Any
 ) -> None:
     # A stopped executor is reported to the caller by eval()'s consumer loop, so
     # the unawaited producer task must return cleanly instead of raising
     # EXECUTOR_STOPPED into the executor's task group, which would tear it down.
     executor = ThreadingExecutor(workers=1)
     assert not executor.is_running()
-    evaluator = ParallelEvaluator(function=objective(), executor=executor)
+    evaluator = ParallelEvaluator(function=eval_func(), executor=executor)
     batch_context = EvaluationBatchContext(
         context=EnOptContext.model_validate(config),
         active=np.array([True]),

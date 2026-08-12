@@ -10,7 +10,7 @@ from ropt.config import SamplerConfig
 from ropt.context import EnOptContext
 from ropt.core._gradient import _perturb_variables
 from ropt.sampler import Sampler
-from ropt.workflow import BasicOptimizer
+from ropt.simple import optimize
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray
@@ -154,18 +154,15 @@ def test_sampler_indexed(config: Any) -> None:
     assert np.allclose(perturbed_variables[0, ...], np.diag([0.01, -0.01, -0.01]))
 
 
-def test_sampler_order(config: Any, evaluator: Any) -> None:
+def test_sampler_order(config: Any, eval_func: Any) -> None:
     config["variables"]["samplers"] = [0, 0, 1]
     config["samplers"] = [
         {"method": "norm"},
         {"method": "uniform"},
     ]
-    optimizer1 = BasicOptimizer(config, evaluator())
-    optimizer1.run(initial_values)
-    assert optimizer1.results is not None
-    assert np.allclose(
-        optimizer1.results.evaluations.variables, [0, 0, 0.5], atol=0.025
-    )
+    result1 = optimize(config, initial_values, eval_func())
+    assert result1.variables is not None
+    assert np.allclose(result1.variables, [0, 0, 0.5], atol=0.025)
 
     # Switch the samplers:
     config["samplers"] = [
@@ -173,14 +170,8 @@ def test_sampler_order(config: Any, evaluator: Any) -> None:
         {"method": "norm"},
     ]
     config["variables"]["samplers"] = [1, 1, 0]
-    optimizer2 = BasicOptimizer(config, evaluator())
-    optimizer2.run(initial_values)
-    assert optimizer2.results is not None
-    assert np.allclose(
-        optimizer2.results.evaluations.variables, [0, 0, 0.5], atol=0.025
-    )
+    result2 = optimize(config, initial_values, eval_func())
+    assert result2.variables is not None
+    assert np.allclose(result2.variables, [0, 0, 0.5], atol=0.025)
 
-    assert np.allclose(
-        optimizer1.results.evaluations.variables,
-        optimizer2.results.evaluations.variables,
-    )
+    assert np.allclose(result1.variables, result2.variables)
