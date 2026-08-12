@@ -1183,10 +1183,21 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#the-callable-signature" class="md-nav__link">
+  <a href="#the-evaluators" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The callable signature
+        The evaluators
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#writing-a-batch-callback" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Writing a batch callback
       
     </span>
   </a>
@@ -1242,6 +1253,28 @@
     <span class="md-ellipsis">
       
         Using FunctionEvaluator
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#using-cachedevaluator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Using CachedEvaluator
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#using-parallelevaluator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Using ParallelEvaluator
       
     </span>
   </a>
@@ -2753,10 +2786,21 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#the-callable-signature" class="md-nav__link">
+  <a href="#the-evaluators" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The callable signature
+        The evaluators
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#writing-a-batch-callback" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Writing a batch callback
       
     </span>
   </a>
@@ -2819,6 +2863,28 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#using-cachedevaluator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Using CachedEvaluator
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#using-parallelevaluator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Using ParallelEvaluator
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#where-to-next" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2851,24 +2917,70 @@
 
 <h1 id="writing-evaluation-callbacks">Writing Evaluation Callbacks</h1>
 <p>During optimization <code>ropt</code> decides which variable vectors need values for the
-objectives and optional nonlinear-constraints. The user must provide the code to
-perform these function evaluations.</p>
-<p>There are two ways to provide such evaluation code to the low-level evaluators:</p>
-<ol>
-<li><strong>A plain callable</strong> — A callable adhering to the
-   <a class="autorefs autorefs-internal" title="            ropt.evaluation.EvaluationBatchCallback" href="../../reference/evaluation/#ropt.evaluation.EvaluationBatchCallback"><code>EvaluationBatchCallback</code></a> protocol
-   that receives all variable vectors at once as a 2-D array.</li>
-<li><strong>An <a class="autorefs autorefs-internal" title="            ropt.components.evaluators.Evaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.Evaluator"><code>Evaluator</code></a> subclass</strong> — Classes
-    that support advanced features such as caching, parallel execution, or HPC
-    dispatch. Here we only discuss
-   <a class="autorefs autorefs-internal" title="            ropt.components.evaluators.FunctionEvaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.FunctionEvaluator"><code>FunctionEvaluator</code></a>, a
-   convenience wrapper around a simpler per-row function following the
-   <a class="autorefs autorefs-internal" title="            ropt.components.evaluators.EvaluationFunctionCallback" href="../../reference/components_evaluators/#ropt.components.evaluators.EvaluationFunctionCallback"><code>EvaluationFunctionCallback</code></a> protocol.
-   <a class="autorefs autorefs-internal" title="            ropt.components.evaluators.Evaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.Evaluator"><code>Evaluator</code></a> classes are discussed
-   in more detail in
-   <a href="../workflows/">Optimization Workflows</a> and <a href="../parallel/">Parallel Evaluation</a>.</li>
-</ol>
-<h2 id="the-callable-signature">The callable signature</h2>
+objectives and optional nonlinear-constraints. A compute step does not compute
+these values itself — it delegates to an
+<a class="autorefs autorefs-internal" title="            ropt.components.evaluators.Evaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.Evaluator"><code>Evaluator</code></a> instance that you supply. This
+page describes the evaluators <code>ropt</code> provides and how to write the evaluation
+code they wrap.</p>
+<h2 id="the-evaluators">The evaluators</h2>
+<table>
+<thead>
+<tr>
+<th>Evaluator</th>
+<th>Interface</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a class="autorefs autorefs-internal" title="            ropt.components.evaluators.BatchEvaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.BatchEvaluator"><code>BatchEvaluator</code></a></td>
+<td>Batch: <code>f(variables_2d, context)</code> → <code>EvaluationBatchResult</code>.</td>
+</tr>
+<tr>
+<td><a class="autorefs autorefs-internal" title="            ropt.components.evaluators.FunctionEvaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.FunctionEvaluator"><code>FunctionEvaluator</code></a></td>
+<td>Per-row: <code>f(variables_1d, context)</code> → <code>EvaluationFunctionResult</code>.</td>
+</tr>
+<tr>
+<td><a class="autorefs autorefs-internal" title="            ropt.components.evaluators.CachedEvaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.CachedEvaluator"><code>CachedEvaluator</code></a></td>
+<td>Wraps another evaluator, caching results by variable vector.</td>
+</tr>
+<tr>
+<td><a class="autorefs autorefs-internal" title="            ropt.components.evaluators.ParallelEvaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.ParallelEvaluator"><code>ParallelEvaluator</code></a></td>
+<td>Parallel evaluation via an <a class="autorefs autorefs-internal" title="            ropt.components.executors.Executor" href="../../reference/components_executors/#ropt.components.executors.Executor"><code>Executor</code></a> — see <a href="../parallel/">Parallel Evaluation</a>.</td>
+</tr>
+</tbody>
+</table>
+<p>The first three run synchronously in the calling thread;
+<a class="autorefs autorefs-internal" title="            ropt.components.evaluators.ParallelEvaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.ParallelEvaluator"><code>ParallelEvaluator</code></a> dispatches
+work to an <a class="autorefs autorefs-internal" title="            ropt.components.executors.Executor" href="../../reference/components_executors/#ropt.components.executors.Executor"><code>Executor</code></a> and is described in
+<a href="../parallel/">Parallel Evaluation</a>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Evaluators are not safe for concurrent use</p>
+<p>An evaluator raises a
+<a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a> if two threads execute its
+<code>eval</code> method at the same time. Serial reuse is allowed: a single evaluator
+instance may be shared by several compute steps that run one after another,
+even on different threads (for example, reusing one <code>FunctionEvaluator</code>
+across nested inner optimizations to keep batch ids counting). Do <strong>not</strong>
+share one evaluator across steps that run in parallel; give each parallel
+step its own evaluator. For the constraints on where each layer of a nested
+workflow may run, see
+<a href="../parallel/#nested-workflows-and-process-boundaries">Nested workflows and process boundaries</a>.
+Note that the parallelism of
+<a class="autorefs autorefs-internal" title="            ropt.components.evaluators.ParallelEvaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.ParallelEvaluator"><code>ParallelEvaluator</code></a> happens
+<em>below</em> <code>eval</code> — it dispatches tasks to an executor, so its own <code>eval</code> is
+still called on a single thread. An evaluator cannot be transferred to
+another process; serializing one reconstructs it as an inert placeholder in
+the worker, and <code>ropt</code> raises a
+<a class="autorefs autorefs-internal" title="            TransferError" href="../../reference/exceptions/#ropt.exceptions.TransferError"><code>TransferError</code></a> before the task runs.</p>
+</div>
+<p>You write evaluation code for two of them.
+<a class="autorefs autorefs-internal" title="            ropt.components.evaluators.BatchEvaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.BatchEvaluator"><code>BatchEvaluator</code></a> takes a callback
+that receives the full 2-D batch of variable vectors;
+<a class="autorefs autorefs-internal" title="            ropt.components.evaluators.FunctionEvaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.FunctionEvaluator"><code>FunctionEvaluator</code></a> wraps a
+simpler function called once per row. Both are covered below, followed by
+<a class="autorefs autorefs-internal" title="            ropt.components.evaluators.CachedEvaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.CachedEvaluator"><code>CachedEvaluator</code></a>, which wraps
+another evaluator to reuse previously computed results.</p>
+<h2 id="writing-a-batch-callback">Writing a batch callback</h2>
 <p>Evaluation callbacks must adhere to the
 <a class="autorefs autorefs-internal" title="            ropt.evaluation.EvaluationBatchCallback" href="../../reference/evaluation/#ropt.evaluation.EvaluationBatchCallback"><code>EvaluationBatchCallback</code></a> protocol.
 For instance an evaluator function should look like this:</p>
@@ -3147,11 +3259,71 @@ evaluator to a compute step (see <a href="../workflows/">Optimization Workflows<
 </span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
 </span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="n">evaluator</span> <span class="o">=</span> <span class="n">FunctionEvaluator</span><span class="p">(</span><span class="n">function</span><span class="o">=</span><span class="n">my_function</span><span class="p">)</span>
 </span></code></pre></div>
+<h2 id="using-cachedevaluator">Using <code>CachedEvaluator</code></h2>
+<p><a class="autorefs autorefs-internal" title="            ropt.components.evaluators.CachedEvaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.CachedEvaluator"><code>CachedEvaluator</code></a> wraps another
+evaluator with result caching. It retrieves previously computed function results
+from <code>EventHandler</code> instances specified as <code>sources</code> — typically a
+<code>HistoryHandler</code> or <code>ResultsHandler</code>. For each variable vector and realization,
+if a matching cached result is found, the cached objectives and constraints are
+reused without calling the wrapped evaluator. Only uncached evaluations are
+forwarded to the underlying evaluator.</p>
+<p>Cache matching works as follows: for each requested variable vector and
+realization, the evaluator searches through the <code>"results"</code> stored by its
+sources. A match is found when the variables are equal (within floating-point
+tolerance) and the realization matches. If realization names are configured,
+they are used for matching (allowing cache hits across different optimization
+runs with the same realization names). Otherwise, realization indices are used.</p>
+<p>If some but not all evaluations are found in cache, the cached ones are
+marked as inactive and only the missing evaluations are delegated to the
+wrapped evaluator. The final combined result contains both cached and newly
+computed values.</p>
+<p>Sources can be added dynamically with <code>add_sources()</code>.</p>
+<p>To record which evaluations were served from cache, pass a <code>hits_key</code> string
+at construction time. When set, the returned
+<a class="autorefs autorefs-internal" title="            ropt.evaluation.EvaluationBatchResult
+
+
+  
+      dataclass
+  " href="../../reference/evaluation/#ropt.evaluation.EvaluationBatchResult"><code>EvaluationBatchResult</code></a> will contain
+a boolean NumPy array in its <code>metadata</code> dictionary under that key —
+<code>True</code> for evaluations that came from the cache, <code>False</code> for those that were
+freshly computed.</p>
+<p>The <code>eval_cached()</code> method is available for derived classes that need access to
+which evaluations were cache hits — it returns both the
+<a class="autorefs autorefs-internal" title="            ropt.evaluation.EvaluationBatchResult
+
+
+  
+      dataclass
+  " href="../../reference/evaluation/#ropt.evaluation.EvaluationBatchResult"><code>EvaluationBatchResult</code></a> and a
+dictionary mapping evaluation indices to their cached
+<a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="../../reference/results/#ropt.results.FunctionResults"><code>FunctionResults</code></a>.</p>
+<h2 id="using-parallelevaluator">Using <code>ParallelEvaluator</code></h2>
+<p>The evaluators above run each function call sequentially in the current thread.
+For parallel evaluation — whether via worker threads, separate processes, or an
+HPC cluster — use
+<a class="autorefs autorefs-internal" title="            ropt.components.evaluators.ParallelEvaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.ParallelEvaluator"><code>ParallelEvaluator</code></a>. See
+<a href="../parallel/">Parallel Evaluation</a> for the evaluator and the available
+executors.</p>
+<div class="admonition tip">
+<p class="admonition-title">Reusing objectives and constraints</p>
+<p>When defining multiple objectives, you may need to reuse the same
+underlying computation. For example, a total objective could consist of
+the mean of the realizations plus their standard deviation. Rather than
+evaluating all realizations twice, compute them once and return the
+values for both objectives from a single evaluator call.</p>
+</div>
 <h2 id="where-to-next">Where to next</h2>
 <ul>
 <li>Read the results: <a href="../../optimizer_setup/results/">Working with Results</a>.</li>
-<li>Use evaluator subclasses for caching, async, or HPC dispatch:
-  <a href="../workflows/">Optimization Workflows</a>.</li>
+<li>Run evaluations in parallel, in processes, or on a cluster:
+  <a href="../parallel/">Parallel Evaluation</a>.</li>
 <li>See it in action: <a href="../../tutorials/workflow/">Building a Workflow</a>.</li>
 </ul>
 

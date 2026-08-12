@@ -3743,11 +3743,9 @@ there would find <code>executor.loop is None</code> and raise
 it emits would never reach the main-process dispatcher.</p>
 </div>
 <p><a class="autorefs autorefs-internal" title="            ropt.components.compute_steps.OptimizationStep" href="../../reference/components_compute_steps/#ropt.components.compute_steps.OptimizationStep"><code>OptimizationStep</code></a> enforces this
-rule. <strong>A step is bound to its process, not
-to a thread.</strong> The event handlers it invokes live in shared memory, so they keep
-working across threads within one process but cannot cross a process boundary.
-The invariant is therefore "a step lives in one process," <em>not</em> "a step must run
-where it was created." Concretely:</p>
+rule: a step is <strong>bound to its process, not to the thread that created it</strong>. The
+invariant is "a step lives in one process," not "a step runs where it was
+created." Concretely:</p>
 <ul>
 <li><strong>Across threads (allowed).</strong> A step may be created on one thread and run on
   another within the same process — for example created on the main thread and
