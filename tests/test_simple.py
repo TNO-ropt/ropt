@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import threading
+from functools import partial
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
@@ -15,11 +16,13 @@ from ropt.simple import (
     EvaluationFunctionContext,
     HistoryHandler,
     OptimizeResult,
+    can_offload,
     compose,
     evaluate,
     evaluate_many,
     handlers,
     hpc,
+    offload,
     optimize,
     optimize_many,
     processes,
@@ -415,6 +418,102 @@ def test_nested_execution_blocks_raise() -> None:
         threads(workers=1),
     ):
         pass
+
+
+_INNER_CONFIG: dict[str, Any] = {
+    "optimizer": {"max_functions": 3},
+    "backend": {"method": "slsqp", "max_iterations": 2},
+    "variables": {
+        "variable_count": initial_values.size,
+        "perturbation_magnitudes": 0.01,
+    },
+}
+
+
+def _sphere(variables: NDArray[np.float64], _context: Any) -> float:
+    return float(variables @ variables)
+
+
+def _run_inner_optimization(variables: NDArray[np.float64], _context: Any) -> float:
+    # The outer evaluation opens its own independent block and optimizer.
+    with threads(workers=1):
+        result = optimize(_INNER_CONFIG, variables, _sphere)
+    assert result.target_objective is not None
+    return result.target_objective
+
+
+def _offload_from_evaluation(_variables: NDArray[np.float64], _context: Any) -> float:
+    return float(offload(_return_one))
+
+
+def _return_one() -> float:
+    return 1.0
+
+
+def test_nested_block_in_threads_evaluation(config: Any) -> None:
+    with threads(workers=2):
+        result = optimize(config, initial_values, _run_inner_optimization)
+    assert result.variables is not None
+    assert result.target_objective is not None
+
+
+@pytest.mark.slow
+def test_nested_block_in_processes_evaluation(config: Any) -> None:
+    with processes(workers=2):
+        result = optimize(config, initial_values, _run_inner_optimization)
+    assert result.variables is not None
+    assert result.target_objective is not None
+
+
+def test_offload_in_evaluation_finds_no_executor(config: Any) -> None:
+    with (
+        threads(workers=2),
+        pytest.raises(WorkflowError, match="found no executor"),
+    ):
+        optimize(config, initial_values, _offload_from_evaluation)
+
+
+def _double(value: float) -> float:
+    return 2.0 * value
+
+
+def _offload_in_own_block(variables: NDArray[np.float64], _context: Any) -> float:
+    # The evaluation offloads to a block it opens itself, not the outer one.
+    with threads(workers=2):
+        doubled = offload([partial(_double, 3.0), partial(_double, 4.0)])
+    assert doubled == (6.0, 8.0)
+    return float(variables @ variables)
+
+
+def _assert_cannot_offload(variables: NDArray[np.float64], _context: Any) -> float:
+    assert can_offload() is False
+    return float(variables @ variables)
+
+
+def _own_handlers_in_evaluation(variables: NDArray[np.float64], _context: Any) -> float:
+    history = HistoryHandler()
+    with handlers(history):
+        optimize(_INNER_CONFIG, variables, _sphere)
+    assert len(history.results) > 0
+    return float(variables @ variables)
+
+
+def test_offload_in_evaluation_uses_its_own_block(config: Any) -> None:
+    with threads(workers=2):
+        result = optimize(config, initial_values, _offload_in_own_block)
+    assert result.target_objective is not None
+
+
+def test_can_offload_is_false_in_an_evaluation(config: Any) -> None:
+    with threads(workers=2):
+        result = optimize(config, initial_values, _assert_cannot_offload)
+    assert result.target_objective is not None
+
+
+def test_handlers_block_in_an_evaluation(config: Any) -> None:
+    with threads(workers=2):
+        result = optimize(config, initial_values, _own_handlers_in_evaluation)
+    assert result.target_objective is not None
 
 
 def test_sequential_execution_managers_are_allowed(

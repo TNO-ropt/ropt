@@ -12,6 +12,9 @@ from ropt.components.evaluators import (
     EvaluationFunctionResult,
 )
 
+from ._handlers import _handler_stack
+from ._session import _active_session
+
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
@@ -60,9 +63,28 @@ def adapt_objective(
     def _callback(
         variables: NDArray[np.float64], context: EvaluationFunctionContext
     ) -> EvaluationFunctionResult:
-        return _coerce(objective(variables, context), n_obj, n_con)
+        return _coerce(_invoke_detached(objective, variables, context), n_obj, n_con)
 
     return _callback
+
+
+def _invoke_detached(
+    objective: ObjectiveCallback,
+    variables: NDArray[np.float64],
+    context: EvaluationFunctionContext,
+) -> ObjectiveResult:
+    # A user objective must not reach the optimizer's own executor or shared
+    # handlers; detach the ambient session/handlers so any block it opens is
+    # independent (as it already is in a process worker, where both are absent).
+    # Kept a module-level function so a worker-bound callback pickles it by
+    # reference rather than serializing the (unpicklable) ContextVars.
+    session_token = _active_session.set(None)
+    handler_token = _handler_stack.set(())
+    try:
+        return objective(variables, context)
+    finally:
+        _handler_stack.reset(handler_token)
+        _active_session.reset(session_token)
 
 
 def _coerce(
