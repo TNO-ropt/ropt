@@ -2830,8 +2830,13 @@ minimize:</p>
 </span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>        <span class="n">objective</span> <span class="o">+=</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">x</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">100</span> <span class="o">*</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">x</span> <span class="o">*</span> <span class="n">x</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
 </span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">objective</span><span class="p">)</span>
 </span></code></pre></div>
+<p>The second argument, <code>context</code>, identifies <em>which</em> evaluation this is. This first
+example ignores it, but ensemble problems use <code>context.realization</code> to pick the
+right parameters — see <a href="../ensemble/">Ensemble Optimization</a>.</p>
 <h2 id="report-progress-optional">Report progress (optional)</h2>
-<p>A <code>report</code> callback is called after every evaluation:</p>
+<p>A <code>report</code> callback is called after every evaluation. It can also stop the run
+early by returning <code>True</code>. See
+<a href="../../running/running/#reporting-progress">Reporting progress</a> for details:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">report</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">target_objective</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
 </span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  objective: </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">target_objective</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>

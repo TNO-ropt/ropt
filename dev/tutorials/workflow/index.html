@@ -2811,6 +2811,8 @@ vectors at once (a 2-D array) and returns an
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
 </span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">evaluator</span> <span class="o">=</span> <span class="n">BatchEvaluator</span><span class="p">(</span><span class="n">callback</span><span class="o">=</span><span class="n">partial</span><span class="p">(</span><span class="n">rosenbrock</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">b</span><span class="p">))</span>
 </span></code></pre></div>
+<p>See <a href="../../workflows/evaluation_callbacks/">Writing Evaluation Callbacks</a> for the
+batch callback signature and the other evaluators.</p>
 <h2 id="the-compute-step-and-its-handlers">The compute step and its handlers</h2>
 <p>An <a class="autorefs autorefs-internal" title="            ropt.components.compute_steps.OptimizationStep" href="../../reference/components_compute_steps/#ropt.components.compute_steps.OptimizationStep"><code>OptimizationStep</code></a> runs the
 optimization. You attach event handlers to it: a
@@ -2840,6 +2842,8 @@ is on the handler:</p>
 <h2 id="next">Next</h2>
 <ul>
 <li>The full component reference: <a href="../../workflows/workflows/">Optimization Workflows</a>.</li>
+<li>Writing the evaluation callback:
+  <a href="../../workflows/evaluation_callbacks/">Writing Evaluation Callbacks</a>.</li>
 <li>Running evaluations in parallel: <a href="../../workflows/parallel/">Parallel Evaluation</a>.</li>
 </ul>
 

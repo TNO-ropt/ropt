@@ -2816,6 +2816,10 @@ realization to compute, so you can pick the right uncertain parameters:</p>
 </span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">INITIAL_VALUES</span><span class="p">,</span> <span class="n">rosenbrock</span><span class="p">,</span> <span class="n">report</span><span class="o">=</span><span class="n">report</span><span class="p">)</span>
 </span></code></pre></div>
 <p>The result still converges close to all ones.</p>
+<p>The script also accepts <code>--merge</code>, which estimates the gradient from a single
+perturbation per realization (<code>merge_realizations</code>) instead of several
+perturbations each. See <a href="../../optimizer_setup/gradients/">Stochastic Gradients</a>
+for the trade-off.</p>
 <h2 id="next">Next</h2>
 <ul>
 <li>Add constraints: <a href="../constrained/">Constrained Optimization</a>.</li>
