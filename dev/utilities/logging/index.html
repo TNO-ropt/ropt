@@ -2945,6 +2945,9 @@ module to report what is happening during an optimization workflow. By default
 it produces <strong>no output at all</strong> — a <code>NullHandler</code> is installed on the <code>ropt</code>
 logger so that log records are silently discarded unless an application
 explicitly enables them.</p>
+<p>Logging gives a human-readable <em>trace</em> of a run. To <em>react</em> to results
+programmatically — collect them, tabulate them, or stop early — use
+<a href="../../running/running/#result-handlers">result handlers</a> instead.</p>
 <h2 id="logger-hierarchy">Logger hierarchy</h2>
 <p>Every module in <code>ropt</code> creates its own logger whose name is derived from the
 public package path:</p>
