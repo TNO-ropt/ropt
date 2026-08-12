@@ -3226,7 +3226,7 @@ name is stamped onto the <code>name</code> field of every
 <code>EvaluationFunctionContext</code> in the task, so the user function can read
 <code>context.name</code> to recover it.</p>
 <p>If the executor is not running when <code>eval()</code> is called, the evaluator raises an
-<code>Abort</code> exception.</p>
+<a class="autorefs autorefs-internal" title="            ExecutorStopped" href="../../reference/exceptions/#ropt.exceptions.ExecutorStopped"><code>ExecutorStopped</code></a> exception.</p>
 <h2 id="executors">Executors</h2>
 <p>An <a class="autorefs autorefs-internal" title="            ropt.components.executors.Executor" href="../../reference/components_executors/#ropt.components.executors.Executor"><code>Executor</code></a> manages an <code>asyncio.Queue</code> of
 <a class="autorefs autorefs-internal" title="            ropt.components.executors.Task
@@ -3300,16 +3300,16 @@ serializes lambdas, closures, and interactively-defined functions (such as those
 written in a notebook cell) by value, so they can be used as task functions and
 returned as results. Without <code>cloudpickle</code>, the executor falls back to the
 standard <code>pickle</code> module, which requires task functions to be importable,
-module-level objects; passing a lambda or closure then raises a <code>RuntimeError</code>
-suggesting the <code>cloudpickle</code> extra.</p>
+module-level objects; passing a lambda or closure then raises an
+<a class="autorefs autorefs-internal" title="            ExecutionError" href="../../reference/exceptions/#ropt.exceptions.ExecutionError"><code>ExecutionError</code></a> suggesting the <code>cloudpickle</code> extra.</p>
 <h4 id="the-__main__-guard">The <code>__main__</code> guard</h4>
 <p>With the <code>"spawn"</code> start method, every worker process starts a fresh interpreter
 that <strong>re-imports the program's entry module</strong> to rebuild its environment. If the
 entry script creates or starts the executor at module top level, that re-import
 runs the same code again in each worker, which tries to start yet more processes
 before the interpreter has finished bootstrapping. Python aborts this, the
-workers never start, and <code>MultiprocessingExecutor</code> raises a <code>RuntimeError</code> at
-startup.</p>
+workers never start, and <code>MultiprocessingExecutor</code> raises an
+<a class="autorefs autorefs-internal" title="            ExecutionError" href="../../reference/exceptions/#ropt.exceptions.ExecutionError"><code>ExecutionError</code></a> at startup.</p>
 <p>The fix is to keep the code that creates and runs the executor behind an
 <code>if __name__ == "__main__":</code> guard (or inside a function called from there):</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Wrong: created at module top level. Each worker re-imports this and fails.</span>
@@ -3619,7 +3619,8 @@ See <a href="#event-dispatcher">Event handling is a single-process mechanism</a>
 <h2 id="event-dispatcher">Event dispatcher</h2>
 <p>When multiple compute steps run concurrently in worker threads, their event
 handlers are called from multiple threads simultaneously. <strong>Event handlers must
-not be shared across concurrent compute steps</strong>: doing so raises a <code>RuntimeError</code>.</p>
+not be shared across concurrent compute steps</strong>: doing so raises a
+<a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a>.</p>
 <p><a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventDispatcher" href="../../reference/components_event_handlers/#ropt.components.event_handlers.EventDispatcher"><code>EventDispatcher</code></a> is the
 required solution: it receives events on a queue and dispatches them to its own
 handlers from the asyncio event loop's thread. Because all handler calls happen
@@ -3737,7 +3738,8 @@ or <a class="autorefs autorefs-internal" title="            ropt.components.exec
 subprocess or HPC job has no access to the live loop, executors, or
 dispatcher. An inner
 <a class="autorefs autorefs-internal" title="            ropt.components.evaluators.ParallelEvaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.ParallelEvaluator"><code>ParallelEvaluator</code></a> running
-there would find <code>executor.loop is None</code> and raise <code>Abort</code>, and any events
+there would find <code>executor.loop is None</code> and raise
+<a class="autorefs autorefs-internal" title="            ExecutorStopped" href="../../reference/exceptions/#ropt.exceptions.ExecutorStopped"><code>ExecutorStopped</code></a>, and any events
 it emits would never reach the main-process dispatcher.</p>
 </div>
 <p><a class="autorefs autorefs-internal" title="            ropt.components.compute_steps.OptimizationStep" href="../../reference/components_compute_steps/#ropt.components.compute_steps.OptimizationStep"><code>OptimizationStep</code></a> enforces this
@@ -3766,7 +3768,8 @@ where it was created." Concretely:</p>
 <li><strong>Concurrently (forbidden).</strong> A single step must not run more than once at a
   time: calling
   <a class="autorefs autorefs-internal" title="            run" href="../../reference/components_compute_steps/#ropt.components.compute_steps.OptimizationStep.run"><code>run</code></a> on a step that is
-  already running — for example from two threads — raises a <code>RuntimeError</code>. Give
+  already running — for example from two threads — raises a
+  <a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a>. Give
   each concurrent optimization its own step; serial reuse of one step is fine.</li>
 </ul>
 <p>Process- and HPC-based parallelism therefore belongs at the <strong>innermost (leaf)

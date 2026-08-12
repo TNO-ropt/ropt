@@ -3114,10 +3114,24 @@ its variables, objectives, constraints, and components — is set up in
 <a href="../../optimizer_setup/key_concepts/">Optimizer Setup</a>, the same whichever way you run
 it.</p>
 </div>
-<p>The <a href="../../running/running/">simple API</a> covers the common case: a single optimization run
-with one evaluator. For anything more elaborate — multiple optimizers in
-sequence, nested optimizations, custom event handling, parallel/async execution
-— drop down to the workflow components described here.</p>
+<p>The <a href="../../running/running/">simple API</a> covers the common case with a single
+call: one optimization run, one evaluator, results returned when it finishes. The
+workflow components documented here are the layer beneath it — the same building
+blocks the simple API is assembled from, exposed directly.</p>
+<p><strong>When to use them.</strong> Reach for the workflow components when the single-run model
+of the simple API is too rigid: to chain several optimizers, nest optimizations
+inside one another, react to results as they arrive through custom event
+handlers, or drive evaluations across threads, processes, or an HPC cluster.
+Wiring a workflow together by hand takes more code, but that code is where the
+extra flexibility lives — these components can express applications the simple
+API cannot.</p>
+<p><strong>Who this is for.</strong> This is the low-level API, and it assumes you are
+comfortable with <code>asyncio</code> and threads. Parallel execution runs on an event
+loop, event handlers may be invoked from several threads at once, and you are
+responsible for respecting the concurrency and process-boundary rules spelled out
+on these pages. Those rules are real limitations, not incidental detail: ignore
+them and a workflow will raise rather than silently misbehave. In return you get
+control that the simple API deliberately hides.</p>
 <p>There are four core workflow components:</p>
 <table>
 <thead>
@@ -3505,7 +3519,7 @@ There are two ways to drive one, and they are mutually exclusive:</p>
   long as those steps do not run it concurrently. Serial reuse is fine, even
   across different threads: each <code>handle_event</code> call must fully complete before
   the next begins. If two threads execute <code>handle_event</code> at the same time, a
-  <code>RuntimeError</code> is raised.</p>
+  <a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a> is raised.</p>
 </li>
 <li>
 <p><strong>Registered with an
@@ -3520,7 +3534,7 @@ There are two ways to drive one, and they are mutually exclusive:</p>
 <p>A handler is owned by <strong>either</strong> one dispatcher <strong>or</strong> one-or-more compute
 steps — never both — and may be registered with <strong>at most one</strong> dispatcher.
 Mixing the two, or registering with a second dispatcher, raises a
-<code>RuntimeError</code>.</p>
+<a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a>.</p>
 <div class="admonition note">
 <p class="admonition-title">A handler failure is fatal</p>
 <p>An exception raised by a handler is a fatal error that stops the run. A
@@ -3537,7 +3551,8 @@ exception — never a <code>BaseExceptionGroup</code>. See
 <p class="admonition-title">Do not share a handler across parallel steps</p>
 <p>Never attach the same handler instance to compute steps that may run at the
 same time on different threads; the moment a second thread executes it while
-the first is still inside <code>handle_event</code>, a <code>RuntimeError</code> is raised. Give
+the first is still inside <code>handle_event</code>, a
+<a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a> is raised. Give
 each parallel step its own handler, or route events through an
 <code>EventDispatcher</code>.</p>
 <p>Serial reuse is allowed: the same handler may be reused across steps that
@@ -3651,7 +3666,8 @@ the <a href="../parallel/">next section</a>:</p>
 </table>
 <div class="admonition warning">
 <p class="admonition-title">Evaluators are not safe for concurrent use</p>
-<p>Like event handlers, an evaluator raises a <code>RuntimeError</code> if two threads
+<p>Like event handlers, an evaluator raises a
+<a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a> if two threads
 execute its <code>eval</code> method at the same time. Serial reuse is allowed: a
 single evaluator instance may be shared by several compute steps that run
 one after another, even on different threads (for example, reusing one
