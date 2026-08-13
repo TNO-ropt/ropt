@@ -3335,8 +3335,10 @@ are not part of this module; import them from <a class="autorefs autorefs-intern
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional local result handlers, each owned by this
-                  optimization alone.</p>
+                <p>Optional local result handlers, each claimed for
+                  the duration of this run. A handler may be reused
+                  across sequential <code>optimize</code> calls to accumulate
+                  results, but not shared with a concurrent run.</p>
               </div>
             </td>
             <td>

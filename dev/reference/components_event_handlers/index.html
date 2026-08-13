@@ -2422,6 +2422,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#ropt.components.event_handlers.EventHandler.release" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        release
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ropt.components.event_handlers.EventHandler.claimed" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3298,6 +3309,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#ropt.components.event_handlers.EventHandler.release" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        release
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ropt.components.event_handlers.EventHandler.claimed" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -4065,13 +4087,15 @@ dispatcher or with a compute step.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Claim this handler for exclusive, single-run ownership.</p>
+        <p>Claim this handler for exclusive use by one run at a time.</p>
 <p>Claiming marks the handler as dedicated to a single consumer, such as
-one optimization run, for the remainder of its lifetime. A claimed
-handler cannot be claimed again, which guarantees it is never
-accidentally reused by, or shared with, another run. Handlers meant to
-aggregate across several runs are not claimed; they are shared
-explicitly, for example through an
+one optimization run, until it is released with
+<a class="autorefs autorefs-internal" title="            release" href="#ropt.components.event_handlers.EventHandler.release"><code>release</code></a>. While a
+claim is held, a second claim raises, so a handler can never be shared by
+two runs at once; releasing it at the end of a run lets the same handler
+be reused by a later, sequential run, for example to accumulate results.
+Handlers meant to aggregate across <em>concurrent</em> runs are not claimed;
+they are shared explicitly through an
 <a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventDispatcher" href="#ropt.components.event_handlers.EventDispatcher"><code>EventDispatcher</code></a>.</p>
 <p>This claim is independent of the attachment state set by
 <a class="autorefs autorefs-internal" title="            register_compute_step" href="#ropt.components.event_handlers.EventHandler.register_compute_step"><code>register_compute_step</code></a>
@@ -4095,12 +4119,41 @@ and of the transient concurrency guard on <code>handle_event</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If the handler has already been claimed.</p>
+                <p>If the handler is currently claimed.</p>
               </div>
             </td>
           </tr>
       </tbody>
     </table>
+
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.components.event_handlers.EventHandler.release" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">release</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">release</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Release a claim taken with <code>claim</code> so the handler can be reused.</p>
+<p>Clears the exclusive-use flag, letting a later run claim the handler
+again, for example to accumulate results across sequential runs. The
+attachment state set by <code>register_compute_step</code>/<code>register_dispatcher</code> is
+left untouched. Releasing an unclaimed handler is a no-op.</p>
 
 
     </div>
