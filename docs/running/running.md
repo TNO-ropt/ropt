@@ -359,26 +359,50 @@ An [`optimize`][ropt.simple.optimize] call returns only the best result. A
 that observes an optimization and processes its results as they arrive — keeping
 them, tabulating them, or invoking a callback.
 
-Attach handlers to a single optimization with the `handlers` argument, or share
-them across a block of runs with a [`handlers`][ropt.simple.handlers] block so
-one handler accumulates results from every `optimize` inside it:
+Attach handlers to a run with the `handlers` argument. The same handler can be
+passed to several **sequential** `optimize` calls, accumulating the results of
+each in turn:
 
 ```python
-from ropt.simple import HistoryHandler, handlers, optimize
+from ropt.simple import HistoryHandler, optimize
 
 history = HistoryHandler()
 
-optimize(config, x0, objective, handlers=[history])   # a single run
-# ...or accumulate across many runs:
-with handlers(history):
-    for x0 in start_points:
-        optimize(config, x0, objective)
+optimize(config, x0, objective, handlers=[history])       # a single run
+for x0 in start_points:                                   # ...or reused to
+    optimize(config, x0, objective, handlers=[history])   # accumulate in turn
 
-print(history.results)   # every result collected
+print(history.results)   # every result collected, across all the runs above
 ```
 
 Handlers that store results expose them through `handler["results"]` (and, for
 `HistoryHandler`, the `history.results` shortcut).
+
+To let one handler collect from optimizations that run **concurrently** — the
+runs of an `optimize_many`, or several `optimize` calls in a `threads`/`processes`
+block — share it with a [`handlers`][ropt.simple.handlers] block instead:
+
+```python
+from ropt.simple import HistoryHandler, handlers, optimize_many, threads
+
+history = HistoryHandler()
+with threads(workers=4), handlers(history):
+    optimize_many(config, start_points, objective)   # concurrent runs share it
+
+print(history.results)
+```
+
+!!! warning "Reach for a shared block only for real concurrency"
+    A `handlers` block routes every run's events through a single, serialized
+    `EventDispatcher` on a background loop. That serialization is what makes a
+    handler safe to share across *concurrent* runs — but around a plain
+    **sequential** loop it is pure overhead (a background loop plus a cross-thread
+    hand-off per result) and buys nothing. Prefer a reused local handler for
+    sequential accumulation, and keep `handlers` blocks for genuinely concurrent
+    runs (`optimize_many`, or future nested optimizations). When you do share a
+    block, move any slow, GIL-releasing (I/O) handler onto a worker thread with
+    [`threaded`](#running-a-handler-in-a-thread) so it does not stall the shared
+    loop for every run.
 
 ### Built-in handlers
 

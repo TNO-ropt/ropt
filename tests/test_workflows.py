@@ -1176,6 +1176,21 @@ def test_claim_is_independent_of_attachment() -> None:
     assert handler.claimed is True
 
 
+def test_release_allows_reclaiming() -> None:
+    handler = _RecordingHandler()
+    handler.claim()
+    handler.release()
+    assert handler.claimed is False
+    handler.claim()  # allowed once released
+    assert handler.claimed is True
+
+
+def test_release_without_claim_is_a_noop() -> None:
+    handler = _RecordingHandler()
+    handler.release()
+    assert handler.claimed is False
+
+
 def test_check_transferred_is_silent_without_a_transfer() -> None:
     reset_transferred()
     check_transferred()  # nothing transferred -> no error

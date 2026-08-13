@@ -141,14 +141,16 @@ class EventHandler(ABC):
         self._attached_to = _Attachment.COMPUTE_STEP
 
     def claim(self) -> None:
-        """Claim this handler for exclusive, single-run ownership.
+        """Claim this handler for exclusive use by one run at a time.
 
         Claiming marks the handler as dedicated to a single consumer, such as
-        one optimization run, for the remainder of its lifetime. A claimed
-        handler cannot be claimed again, which guarantees it is never
-        accidentally reused by, or shared with, another run. Handlers meant to
-        aggregate across several runs are not claimed; they are shared
-        explicitly, for example through an
+        one optimization run, until it is released with
+        [`release`][ropt.components.event_handlers.EventHandler.release]. While a
+        claim is held, a second claim raises, so a handler can never be shared by
+        two runs at once; releasing it at the end of a run lets the same handler
+        be reused by a later, sequential run, for example to accumulate results.
+        Handlers meant to aggregate across *concurrent* runs are not claimed;
+        they are shared explicitly through an
         [`EventDispatcher`][ropt.components.event_handlers.EventDispatcher].
 
         This claim is independent of the attachment state set by
@@ -158,13 +160,24 @@ class EventHandler(ABC):
         and of the transient concurrency guard on `handle_event`.
 
         Raises:
-            WorkflowError: If the handler has already been claimed.
+            WorkflowError: If the handler is currently claimed.
         """
         with self._owner_lock:
             if self._claimed:
                 msg = "This event handler has already been claimed for exclusive use."
                 raise WorkflowError(msg)
             self._claimed = True
+
+    def release(self) -> None:
+        """Release a claim taken with `claim` so the handler can be reused.
+
+        Clears the exclusive-use flag, letting a later run claim the handler
+        again, for example to accumulate results across sequential runs. The
+        attachment state set by `register_compute_step`/`register_dispatcher` is
+        left untouched. Releasing an unclaimed handler is a no-op.
+        """
+        with self._owner_lock:
+            self._claimed = False
 
     @property
     def claimed(self) -> bool:

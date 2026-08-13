@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
+from contextlib import contextmanager
 from functools import partial
 from typing import TYPE_CHECKING
 
@@ -26,7 +27,7 @@ from ._session import (
 )
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Sequence
+    from collections.abc import Callable, Iterator, Sequence
     from typing import Any
 
     from numpy.typing import ArrayLike
@@ -60,8 +61,10 @@ def optimize(  # ruff: ignore[too-many-arguments]
         config:               The optimization configuration.
         x0:                   The initial variable vector.
         function:             The per-realization evaluation function.
-        handlers:             Optional local result handlers, each owned by this
-                              optimization alone.
+        handlers:             Optional local result handlers, each claimed for
+                              the duration of this run. A handler may be reused
+                              across sequential `optimize` calls to accumulate
+                              results, but not shared with a concurrent run.
         report:               An optional callback invoked with an
                               `EvaluateResult` for each function evaluation;
                               return `True` from it to stop the optimization
@@ -88,6 +91,21 @@ def optimize(  # ruff: ignore[too-many-arguments]
         metadata=metadata,
         get_name=make_task_namer(current_session(), executor),
     )
+
+
+@contextmanager
+def _claim_for_run(handlers: Sequence[EventHandler]) -> Iterator[None]:
+    # Release in the finally so a handler is reusable by a later run, and roll
+    # back already-taken claims if a later handler in the list is claimed.
+    claimed: list[EventHandler] = []
+    try:
+        for handler in handlers:
+            handler.claim()
+            claimed.append(handler)
+        yield
+    finally:
+        for handler in claimed:
+            handler.release()
 
 
 def _optimize(  # ruff: ignore[too-many-arguments]
@@ -120,20 +138,21 @@ def _optimize(  # ruff: ignore[too-many-arguments]
     result_handler = ResultsHandler(constraint_tolerance=constraint_tolerance)
     step = OptimizationStep(evaluator=evaluator)
     step.add_event_handler(result_handler)
-    for handler in handlers or ():
-        handler.claim()
-        step.add_event_handler(handler)
-    if report is not None:
-        step.add_event_handler(make_report_handler(report))
-    if shared is not None:
-        shared.attach_to(step)
+    user_handlers = tuple(handlers or ())
+    with _claim_for_run(user_handlers):
+        for handler in user_handlers:
+            step.add_event_handler(handler)
+        if report is not None:
+            step.add_event_handler(make_report_handler(report))
+        if shared is not None:
+            shared.attach_to(step)
 
-    exit_code = run_step(
-        step,
-        context=context,
-        variables=np.asarray(x0, dtype=np.float64),
-        metadata=metadata,
-    )
+        exit_code = run_step(
+            step,
+            context=context,
+            variables=np.asarray(x0, dtype=np.float64),
+            metadata=metadata,
+        )
     return _build_run_result(exit_code, result_handler["results"])
 
 

@@ -194,11 +194,68 @@ def test_that_relisting_a_handler_overrides_its_threaded_flag() -> None:
         assert dict(outer.dispatcher._handlers)[handler] is True  # ruff: ignore[private-member-access]
 
 
-def test_optimize_local_handler_rejects_reuse(config: Any, test_functions: Any) -> None:
+def test_optimize_local_handler_accumulates_across_sequential_calls(
+    config: Any, test_functions: Any
+) -> None:
     history = HistoryHandler()
     optimize(config, initial_values, test_functions[0], handlers=[history])
-    with pytest.raises(WorkflowError, match="already been claimed for exclusive use"):
-        optimize(config, initial_values, test_functions[0], handlers=[history])
+    after_first = len(history["results"])
+    optimize(config, initial_values, test_functions[0], handlers=[history])
+    assert len(history["results"]) > after_first
+
+
+def test_optimize_local_handler_released_after_run(
+    config: Any, test_functions: Any
+) -> None:
+    history = HistoryHandler()
+    optimize(config, initial_values, test_functions[0], handlers=[history])
+    assert history.claimed is False
+
+
+def test_optimize_local_handler_released_after_error(config: Any) -> None:
+    history = HistoryHandler()
+
+    def _boom(_v: Any, _c: Any) -> float:
+        msg = "boom"
+        raise RuntimeError(msg)
+
+    with pytest.raises(RuntimeError, match="boom"):
+        optimize(config, initial_values, _boom, handlers=[history])
+    assert history.claimed is False
+
+
+def test_optimize_local_handler_claimed_during_run(
+    config: Any, test_functions: Any
+) -> None:
+    history = HistoryHandler()
+    observed: list[bool] = []
+
+    def _report(_: EvaluateResult) -> None:
+        observed.append(history.claimed)
+        with pytest.raises(WorkflowError, match="already been claimed"):
+            history.claim()
+
+    optimize(
+        config,
+        initial_values,
+        test_functions[0],
+        handlers=[history],
+        report=_report,
+    )
+    assert observed
+    assert all(observed)
+    assert history.claimed is False
+
+
+def test_optimize_local_handler_claim_rolls_back_on_failure(
+    config: Any, test_functions: Any
+) -> None:
+    first = HistoryHandler()
+    second = HistoryHandler()
+    second.claim()  # stands in for a handler already in use by another run
+    with pytest.raises(WorkflowError, match="already been claimed"):
+        optimize(config, initial_values, test_functions[0], handlers=[first, second])
+    assert first.claimed is False
 
 
 def test_that_report_callback_returning_true_stops_optimization(
