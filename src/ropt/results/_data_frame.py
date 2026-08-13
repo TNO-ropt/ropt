@@ -4,10 +4,9 @@ from __future__ import annotations
 
 from functools import partial
 from importlib.util import find_spec
-from typing import TYPE_CHECKING, Any, Final, Literal
+from typing import TYPE_CHECKING, Final, Literal
 
-from ropt.enums import AxisName
-
+from ._frame_core import FRAME_SPECS, _get_select, _get_value
 from ._function_results import FunctionResults
 from ._gradient_results import GradientResults
 
@@ -25,81 +24,34 @@ if _HAVE_PANDAS:
     import pandas as pd
 
 
-def _get_function_results(
+def _has_results(
+    results: Results, result_type: Literal["functions", "gradients"]
+) -> bool:
+    # These are None if too few realizations succeeded to aggregate them.
+    if result_type == "functions":
+        return isinstance(results, FunctionResults) and results.functions is not None
+    return isinstance(results, GradientResults) and results.gradients is not None
+
+
+def _get_results(
     results: Results,
     sub_fields: set[str],
+    result_type: Literal["functions", "gradients"],
 ) -> pd.DataFrame:
-    if (
-        not sub_fields
-        or not isinstance(results, FunctionResults)
-        or results.functions is None
-    ):
+    if not sub_fields or not _has_results(results, result_type):
         return pd.DataFrame()
 
-    functions = results.to_dataframe(
-        "functions",
-        select=_get_select("functions", sub_fields),
-        unstack=[AxisName.OBJECTIVE, AxisName.NONLINEAR_CONSTRAINT],
-    ).rename(columns=partial(_add_prefix, prefix="functions"))
-
-    evaluations = results.to_dataframe(
-        "evaluations",
-        select=_get_select("evaluations", sub_fields),
-        unstack=[
-            AxisName.VARIABLE,
-            AxisName.OBJECTIVE,
-            AxisName.NONLINEAR_CONSTRAINT,
-        ],
-    ).rename(columns=partial(_add_prefix, prefix="evaluations"))
-
-    if results.constraint_info is not None:
-        constraint_info = results.to_dataframe(
-            "constraint_info",
-            select=_get_select("constraint_info", sub_fields),
-            unstack=[
-                AxisName.VARIABLE,
-                AxisName.LINEAR_CONSTRAINT,
-                AxisName.NONLINEAR_CONSTRAINT,
-            ],
-        ).rename(columns=partial(_add_prefix, prefix="constraint_info"))
-
-        return _join_frames(functions, evaluations, constraint_info)
-
-    return _join_frames(functions, evaluations)
-
-
-def _get_gradient_results(
-    results: Results,
-    sub_fields: set[str],
-) -> pd.DataFrame:
-    if (
-        not sub_fields
-        or not isinstance(results, GradientResults)
-        or results.gradients is None
-    ):
-        return pd.DataFrame()
-
-    gradients = results.to_dataframe(
-        "gradients",
-        select=_get_select("gradients", sub_fields),
-        unstack=[
-            AxisName.OBJECTIVE,
-            AxisName.NONLINEAR_CONSTRAINT,
-            AxisName.VARIABLE,
-        ],
-    ).rename(columns=partial(_add_prefix, prefix="gradients"))
-
-    evaluations = results.to_dataframe(
-        "evaluations",
-        select=_get_select("evaluations", sub_fields),
-        unstack=[
-            AxisName.VARIABLE,
-            AxisName.OBJECTIVE,
-            AxisName.NONLINEAR_CONSTRAINT,
-        ],
-    ).rename(columns=partial(_add_prefix, prefix="evaluations"))
-
-    return _join_frames(gradients, evaluations)
+    return _join_frames(
+        *(
+            results.to_dataframe(
+                spec.field,
+                select=_get_select(spec.field, sub_fields),
+                unstack=spec.unstack,
+            ).rename(columns=partial(_add_prefix, prefix=spec.field))
+            for spec in FRAME_SPECS[result_type]
+            if getattr(results, spec.field, None) is not None
+        )
+    )
 
 
 def _join_frames(*args: pd.DataFrame) -> pd.DataFrame:
@@ -109,14 +61,6 @@ def _join_frames(*args: pd.DataFrame) -> pd.DataFrame:
     return (
         frames[0].join(list(frames[1:]), how="outer") if len(frames) > 1 else frames[0]
     )
-
-
-def _get_select(field_name: str, sub_fields: set[str]) -> list[str]:
-    return [
-        item.removeprefix(f"{field_name}.")
-        for item in sub_fields
-        if item.startswith(f"{field_name}.")
-    ]
 
 
 def _add_prefix(name: tuple[str, ...] | str, prefix: str) -> tuple[str, ...] | str:
@@ -137,17 +81,6 @@ def _add_metadata(
             if value is not None:
                 data_frame[field] = value
     return data_frame
-
-
-def _get_value(data: dict[str, Any], keys: list[str]) -> Any | None:  # ruff: ignore[any-type]
-    for key in keys:
-        if isinstance(data, dict):
-            if key not in data:
-                return None
-            data = data[key]
-        else:
-            break
-    return data
 
 
 def results_to_dataframe(
@@ -183,33 +116,15 @@ def results_to_dataframe(
         msg = f"Invalid frame output type: {result_type}"
         raise TypeError(msg)
 
-    frame = pd.DataFrame()
+    frames: list[pd.DataFrame] = []
     for item in results:
         if not isinstance(item, (FunctionResults, GradientResults)):
             msg = f"Invalid result type: {type(item)}"
             raise TypeError(msg)
 
-        if (
-            result_type == "functions"
-            and isinstance(item, FunctionResults)
-            and item.functions is not None
-        ):
-            frame = pd.concat(
-                [
-                    frame,
-                    _add_metadata(_get_function_results(item, fields), item, fields),
-                ]
-            )
-        elif (
-            result_type == "gradients"
-            and isinstance(item, GradientResults)
-            and item.gradients is not None
-        ):
-            frame = pd.concat(
-                [
-                    frame,
-                    _add_metadata(_get_gradient_results(item, fields), item, fields),
-                ]
+        if _has_results(item, result_type):
+            frames.append(
+                _add_metadata(_get_results(item, fields, result_type), item, fields)
             )
 
-    return frame
+    return pd.concat(frames) if frames else pd.DataFrame()

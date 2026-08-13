@@ -1,3 +1,4 @@
+from itertools import product
 from typing import Any
 
 import numpy as np
@@ -14,11 +15,9 @@ from ropt.results import (
     Gradients,
     Realizations,
 )
+from ropt.results._frame_core import _get_field_data
 
 pandas = pytest.importorskip("pandas")
-from ropt.results._pandas import (  # ruff: ignore[module-import-not-at-top-of-file]
-    _to_series,
-)
 
 initial_values = [0.0, 0.0]
 
@@ -95,45 +94,46 @@ def gradient_result_fixture(config: dict[str, Any]) -> GradientResults:
     )
 
 
-def test__to_series(gradient_result: GradientResults) -> None:
-    series = _to_series(
-        gradient_result.evaluations, "perturbed_variables", None, gradient_result.names
+def test__get_field_data(gradient_result: GradientResults) -> None:
+    field_data = _get_field_data(
+        gradient_result.evaluations, "perturbed_variables", gradient_result.names
     )
-    assert series is not None
-    assert len(series) == gradient_result.evaluations.perturbed_variables.size
-    assert series.index.names == [
+    assert field_data is not None
+    assert field_data.name == "perturbed_variables"
+    assert [axis.value for axis in field_data.axes] == [
         "realization",
         "perturbation",
         "variable",
     ]
+    assert len(field_data.data) == gradient_result.evaluations.perturbed_variables.size
+    values = dict(zip(product(*field_data.labels), field_data.data, strict=True))
     for v_idx, var in enumerate(gradient_result.names[AxisName.VARIABLE]):
         for r_idx, real in enumerate(gradient_result.names[AxisName.REALIZATION]):
             for pert in range(gradient_result.evaluations.perturbed_variables.shape[1]):
                 assert (
-                    series.loc[real, pert, var]
+                    values[real, pert, var]
                     == gradient_result.evaluations.perturbed_variables[
                         r_idx, pert, v_idx
                     ]
                 )
 
 
-def test__to_series_metadata(gradient_result: GradientResults) -> None:
-    series = _to_series(
-        gradient_result.evaluations,
-        "metadata",
-        "foo",
-        gradient_result.names,
+def test__get_field_data_metadata(gradient_result: GradientResults) -> None:
+    field_data = _get_field_data(
+        gradient_result.evaluations, "metadata.foo", gradient_result.names
     )
-    assert series is not None
+    assert field_data is not None
+    assert field_data.name == "metadata.foo"
     info = np.array(gradient_result.evaluations.metadata["foo"])
-    assert len(series) == info.size
-    assert series.index.names == [
+    assert len(field_data.data) == info.size
+    assert [axis.value for axis in field_data.axes] == [
         "realization",
         "perturbation",
     ]
+    values = dict(zip(product(*field_data.labels), field_data.data, strict=True))
     for r_idx, real in enumerate(gradient_result.names[AxisName.REALIZATION]):
         for pert in range(gradient_result.evaluations.perturbed_variables.shape[1]):
-            assert series.loc[real, pert] == info[r_idx, pert]
+            assert values[real, pert] == info[r_idx, pert]
 
 
 def test_to_dataframe_function(function_result: FunctionResults) -> None:
