@@ -11,28 +11,28 @@ if TYPE_CHECKING:
 
     from ropt.enums import AxisName
 
-    from ._result_field import ResultField
+    from ._results import Results
 
 
 def _to_dataframe(
-    result_field: ResultField,
-    batch_id: int,
+    results: Results,
+    field_name: str,
     select: Iterable[str],
     unstack: Iterable[AxisName] | None,
-    names: dict[str, tuple[str | int, ...]],
 ) -> pd.DataFrame:
     if unstack is None:
         unstack = []
+    result_field = getattr(results, field_name)
     joined_frame = pd.DataFrame()
-    for field_data in _iter_field_data(result_field, select, names):
+    for field_data in _iter_field_data(result_field, select, results.names):
         index: pd.Index[Any]
         if field_data.axes:
             index = pd.MultiIndex.from_product(
-                [(batch_id,), *field_data.labels],
+                [(results.batch_id,), *field_data.labels],
                 names=("batch_id", *(axis.value for axis in field_data.axes)),
             )
         else:
-            index = pd.Index([batch_id] * field_data.data.size, name="batch_id")
+            index = pd.Index([results.batch_id] * field_data.data.size, name="batch_id")
         frame = pd.DataFrame({field_data.name: field_data.data}, index=index)
         levels = [axis.value for axis in unstack if axis.value in frame.index.names]
         if levels:

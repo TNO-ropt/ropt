@@ -416,6 +416,112 @@ CONFIG = {
 An axis without a `names` entry falls back to 0-based integer indices, as in the
 first example of this section.
 
+## Exporting to polars
+
+Every pandas export has a `polars` counterpart:
+[`to_polars`][ropt.results.Results.to_polars] and
+[`results_to_polars`][ropt.results.results_to_polars]. They accept the same
+arguments and select and unstack exactly the same fields, so everything in the
+previous section carries over. This requires the `polars` optional extra (see
+[Installation](../getting_started/installation.md)).
+
+Polars has no index and its column names must be strings, which leads to the two
+differences you need to know about.
+
+**Index levels become ordinary columns.** What pandas puts in the index, polars
+puts in leading columns of the frame:
+
+```python
+df = result.to_polars("evaluations", select=["objectives"])
+```
+
+```
+┌──────────┬─────────────┬───────────┬────────────┐
+│ batch_id ┆ realization ┆ objective ┆ objectives │
+╞══════════╪═════════════╪═══════════╪════════════╡
+│ 1        ┆ r0          ┆ val       ┆ 2.10       │
+│ 1        ┆ r0          ┆ cost      ┆ 0.94       │
+│ 1        ┆ r1          ┆ val       ┆ 2.35       │
+│ 1        ┆ r1          ┆ cost      ┆ 1.02       │
+└──────────┴─────────────┴───────────┴────────────┘
+```
+
+**Tuple column labels become joined strings.** Where pandas produces the column
+`("objectives", "val")`, polars produces `"objectives,val"`. The separator is
+configurable with the `sep` argument, which defaults to `","`:
+
+```python
+from ropt.enums import AxisName
+
+df = result.to_polars(
+    "evaluations",
+    select=["objectives"],
+    unstack=[AxisName.OBJECTIVE],
+)
+```
+
+```
+┌──────────┬─────────────┬────────────────┬─────────────────┐
+│ batch_id ┆ realization ┆ objectives,val ┆ objectives,cost │
+╞══════════╪═════════════╪════════════════╪═════════════════╡
+│ 1        ┆ r0          ┆ 2.10           ┆ 0.94            │
+│ 1        ┆ r1          ┆ 2.35           ┆ 1.02            │
+└──────────┴─────────────┴────────────────┴─────────────────┘
+```
+
+Aggregating a sequence of results works the same way:
+
+```python
+from ropt.results import results_to_polars
+
+df = results_to_polars(
+    all_results,
+    fields={"evaluations.variables"},
+    result_type="functions",
+)
+```
+
+```
+┌──────────┬──────────────────────────┬──────────────────────────┬──────────────────────────┐
+│ batch_id ┆ evaluations.variables,x0 ┆ evaluations.variables,x1 ┆ evaluations.variables,x2 │
+╞══════════╪══════════════════════════╪══════════════════════════╪══════════════════════════╡
+│ 1        ┆ 0.30                     ┆ 0.42                     ┆ -0.11                    │
+│ 2        ┆ 0.55                     ┆ 0.48                     ┆ 0.02                     │
+│ 3        ┆ 0.61                     ┆ 0.50                     ┆ 0.10                     │
+└──────────┴──────────────────────────┴──────────────────────────┴──────────────────────────┘
+```
+
+Metadata behaves exactly as described [above](#metadata-columns): per-realization
+metadata is reachable from `to_polars`, run-level result metadata only from
+`results_to_polars`:
+
+```python
+df = results_to_polars(
+    all_results,
+    fields={"metadata.run_id", "functions.target_objective"},
+    result_type="functions",
+)
+```
+
+```
+┌──────────┬────────────────────────────┬─────────────────┐
+│ batch_id ┆ functions.target_objective ┆ metadata.run_id │
+╞══════════╪════════════════════════════╪═════════════════╡
+│ 1        ┆ 1.83                       ┆ 0               │
+│ 2        ┆ 0.42                       ┆ 1               │
+│ 3        ┆ 0.11                       ┆ 2               │
+└──────────┴────────────────────────────┴─────────────────┘
+```
+
+!!! note
+
+    Because polars keeps the keys as real columns, it can join fields that vary
+    at different granularities — for example a per-batch gradient with
+    per-perturbation evaluations — by repeating the coarser values across the
+    finer rows. Pandas cannot align such fields and returns them as disjoint
+    blocks of rows padded with missing values instead, so prefer polars when a
+    single table has to mix granularities.
+
 ## Where to next
 
 - Run an optimization and receive results via callbacks:

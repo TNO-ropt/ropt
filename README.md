@@ -23,9 +23,11 @@ From PyPI:
 pip install ropt
 ```
 
-To enable support for `pandas` export, you can install the `pandas` dependency:
+To enable exporting results to data frames, install the `pandas` and/or the
+`polars` dependency:
 ```bash
 pip install ropt[pandas]
+pip install ropt[polars]
 ```
 
 

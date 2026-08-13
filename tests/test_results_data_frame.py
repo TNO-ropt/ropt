@@ -194,3 +194,7 @@ def test_dataframe_results_metadata(config: Any, eval_func: Any) -> None:
     assert list(frame.columns.get_level_values(level=0)) == [
         ("evaluations.variables", idx) for idx in range(3)
     ] + ["metadata.foo.bar"]
+
+
+def test_pandas_results_empty_input() -> None:
+    assert results_to_dataframe((), set(), result_type="functions").empty

@@ -9,7 +9,7 @@ produce identical column names, values and row ordering.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Final
+from typing import TYPE_CHECKING, Any, Final, Literal
 
 from ropt.enums import AxisName
 
@@ -19,6 +19,7 @@ if TYPE_CHECKING:
     from numpy.typing import NDArray
 
     from ._result_field import ResultField
+    from ._results import Results
 
 
 @dataclass(slots=True)
@@ -143,3 +144,12 @@ def _get_value(data: dict[str, Any], keys: list[str]) -> Any | None:  # ruff: ig
         else:
             break
     return data
+
+
+def _has_results(
+    results: Results, result_type: Literal["functions", "gradients"]
+) -> bool:
+    # These are None if too few realizations succeeded to aggregate them.
+    if result_type == "functions":
+        return getattr(results, "functions", None) is not None
+    return getattr(results, "gradients", None) is not None

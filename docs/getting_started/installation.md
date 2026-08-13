@@ -22,7 +22,8 @@ functionality:
 
 | Extra          | Pulls in                | Enables                                                    |
 | -------------- | ----------------------- | ---------------------------------------------------------- |
-| `pandas`       | `pandas`                | Exporting results to data frames .                         |
+| `pandas`       | `pandas`                | Exporting results to pandas data frames.                   |
+| `polars`       | `polars`                | Exporting results to polars data frames.                   |
 | `cloudpickle`  | `cloudpickle`           | Serializing Python code to run them in external processes. |
 | `hpc`          | `pysqa`, `cloudpickle`  | Running evaluations on HPC clusters.                       |
 
@@ -34,6 +35,7 @@ Install with:
 
 ```bash
 pip install "ropt[pandas]"
+pip install "ropt[polars]"
 pip install "ropt[pandas,hpc,cloudpickle]"
 ```
 

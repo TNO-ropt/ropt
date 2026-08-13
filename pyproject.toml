@@ -29,6 +29,7 @@ dependencies = ["numpy", "pydantic", "scipy>=1.15"]
 
 [project.optional-dependencies]
 pandas = ["pandas"]
+polars = ["polars"]
 cloudpickle = ["cloudpickle"]
 hpc = ["pysqa", "cloudpickle"]
 

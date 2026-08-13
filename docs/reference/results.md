@@ -36,4 +36,5 @@ patterns.
     options:
         members: [create]
 ::: ropt.results.results_to_dataframe
+::: ropt.results.results_to_polars
 

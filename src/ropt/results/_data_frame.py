@@ -6,7 +6,9 @@ from functools import partial
 from importlib.util import find_spec
 from typing import TYPE_CHECKING, Final, Literal
 
-from ._frame_core import FRAME_SPECS, _get_select, _get_value
+from ropt.exceptions import UnsupportedError
+
+from ._frame_core import FRAME_SPECS, _get_select, _get_value, _has_results
 from ._function_results import FunctionResults
 from ._gradient_results import GradientResults
 
@@ -17,20 +19,8 @@ if TYPE_CHECKING:
 
 _HAVE_PANDAS: Final = find_spec("pandas") is not None
 
-if TYPE_CHECKING:
-    from ropt.results import Results
-
 if _HAVE_PANDAS:
     import pandas as pd
-
-
-def _has_results(
-    results: Results, result_type: Literal["functions", "gradients"]
-) -> bool:
-    # These are None if too few realizations succeeded to aggregate them.
-    if result_type == "functions":
-        return isinstance(results, FunctionResults) and results.functions is not None
-    return isinstance(results, GradientResults) and results.gradients is not None
 
 
 def _get_results(
@@ -110,8 +100,14 @@ def results_to_dataframe(
         A DataFrame with one row per result and requested fields as columns.
 
     Raises:
-        TypeError: If `result_type` is invalid or results contain unexpected types.
+        TypeError:        If `result_type` is invalid or results contain
+                          unexpected types.
+        UnsupportedError: If the `pandas` module is not installed.
     """
+    if not _HAVE_PANDAS:
+        msg = "results_to_dataframe requires the pandas module; install ropt[pandas]."
+        raise UnsupportedError(msg)
+
     if result_type not in {"functions", "gradients"}:
         msg = f"Invalid frame output type: {result_type}"
         raise TypeError(msg)

@@ -430,7 +430,8 @@ in order, as a tuple read via `handler["results"]` (or `handler.results`). It is
 #### `DataFrameHandler`
 
 [`DataFrameHandler`][ropt.simple.DataFrameHandler] collects results into named
-pandas DataFrames (`pandas` must be installed). Define a table with
+DataFrames, using either `pandas` (the default) or `polars` as its backend; the
+corresponding package must be installed. Define a table with
 `add_table(name, table_type, columns)`, where `table_type` is `"functions"` or
 `"gradients"` and `columns` maps result-field names (dotted attribute syntax) to
 column titles:
@@ -460,6 +461,19 @@ length-2 `evaluations.variables` gives `Variable,v0` and `Variable,v1`. Because
 the column names follow
 [`results_to_dataframe`](../optimizer_setup/results.md#metadata-columns),
 both result-level and per-realization metadata can be included and renamed.
+
+Pass `backend="polars"` to get polars DataFrames instead:
+
+```python
+tables = DataFrameHandler(backend="polars")
+```
+
+The tables carry the same columns under the same titles. As explained in
+[Exporting to polars](../optimizer_setup/results.md#exporting-to-polars), polars
+has no index, so the key columns (`batch_id`, `realization`, and the other axis
+names) appear as ordinary leading columns rather than in the index. This also
+means the polars backend can build tables that mix per-batch and
+per-realization fields, which the pandas backend cannot.
 
 Convenience methods:
 
