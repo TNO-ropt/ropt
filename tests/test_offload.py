@@ -77,15 +77,6 @@ def test_offload_preserves_order_across_workers() -> None:
         assert offload(functions) == (1, 4, 9, 16, 25)
 
 
-def test_offload_from_a_driver_thread() -> None:
-    with threads(workers=2):
-        session = current_session()
-        assert session is not None
-        functions = [partial(_square, i) for i in (1, 2, 3)]
-        [result] = session.gather([lambda: offload(functions)], limit=1)
-    assert result == (1, 4, 9)
-
-
 def test_offload_raises_on_the_event_loop() -> None:
     async def _offload_on_loop() -> int:  # ruff: ignore[unused-async]
         return offload(partial(_square, 5))

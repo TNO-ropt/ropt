@@ -236,7 +236,7 @@ def optimize_many(  # ruff: ignore[too-many-arguments]
             runs, reports, metadatas, strict=True
         )
     ]
-    return tuple(session.gather(jobs, limit))
+    return tuple(session.gather_shared(jobs, limit))
 
 
 def _broadcast(

@@ -509,6 +509,20 @@ def test_offload_in_evaluation_finds_no_executor(config: Any) -> None:
         optimize(config, initial_values, _offload_from_evaluation)
 
 
+def test_gather_shared_activates_the_session_on_driver_threads() -> None:
+    # gather_shared sets the block's session on each driver thread, so a
+    # session-consuming call (offload here) resolves the shared executor there.
+    def _square(value: int) -> int:
+        return value * value
+
+    with threads(workers=2):
+        session = current_session()
+        assert session is not None
+        functions = [partial(_square, i) for i in (1, 2, 3)]
+        [result] = session.gather_shared([lambda: offload(functions)], limit=1)
+    assert result == (1, 4, 9)
+
+
 def _double(value: float) -> float:
     return 2.0 * value
 
