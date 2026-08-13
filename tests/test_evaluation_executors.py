@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import sys
 import threading
+from concurrent.futures import ThreadPoolExecutor
 from functools import partial
 from typing import TYPE_CHECKING, Any, cast
 
@@ -156,6 +157,46 @@ async def test_executor_ok(
         executor.cancel()
     assert result_processor.results == {1, 2}
     assert not executor.is_running()
+
+
+def _wait_at_barrier(barrier: threading.Barrier, value: int) -> int:
+    barrier.wait(timeout=4.0)
+    return value
+
+
+async def test_threading_executor_exceeds_the_shared_default_pool() -> None:
+    # Shrink asyncio's shared default executor (the pool the old code dispatched
+    # task functions through) and configure more workers: all tasks reach the
+    # barrier at once only if the executor uses its own pool of that size.
+    shared_pool_size = 2
+    workers = shared_pool_size + 2
+    asyncio.get_running_loop().set_default_executor(
+        ThreadPoolExecutor(max_workers=shared_pool_size)
+    )
+    barrier = threading.Barrier(workers)
+    result_queue: ResultsQueue = ResultsQueue()
+    tasks = [
+        Task(function=_wait_at_barrier, args=(barrier, idx), results_queue=result_queue)
+        for idx in range(workers)
+    ]
+    executor = ThreadingExecutor(workers=workers)
+    all_processed = asyncio.Event()
+    result_processor = _ResultProcessor()
+    async with asyncio.TaskGroup() as tg:
+        await executor.start(tg)
+        tg.create_task(
+            asyncio.to_thread(
+                result_processor.process_results,
+                result_queue,
+                len(tasks),
+                all_processed,
+            )
+        )
+        for task in tasks:
+            await executor.task_queue.put(task)
+        await all_processed.wait()
+        executor.cancel()
+    assert result_processor.results == set(range(workers))
 
 
 @pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")

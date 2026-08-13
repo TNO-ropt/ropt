@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import asyncio
+from concurrent.futures import ThreadPoolExecutor
+from functools import partial
 
 from ropt._logging import get_logger
 
@@ -24,6 +26,7 @@ class ThreadingExecutor(ExecutorBase):
         super().__init__(queue_size=queue_size)
         self._workers = workers
         self._worker_tasks: list[asyncio.Task[None]] = []
+        self._pool: ThreadPoolExecutor | None = None
 
     async def start(self, task_group: asyncio.TaskGroup) -> None:
         """Start the executor.
@@ -31,8 +34,11 @@ class ThreadingExecutor(ExecutorBase):
         Args:
             task_group: The task group to use.
         """
-        workers = [_Worker(self._task_queue, parent=self) for _ in range(self._workers)]
+        self._pool = ThreadPoolExecutor(max_workers=self._workers)
         _logger.debug("Starting threading executor with %d worker(s)", self._workers)
+        workers = [
+            _Worker(self._task_queue, self, self._pool) for _ in range(self._workers)
+        ]
         self._worker_tasks = [
             task_group.create_task(worker.run()) for worker in workers
         ]
@@ -40,6 +46,9 @@ class ThreadingExecutor(ExecutorBase):
 
     def cleanup(self) -> None:
         """Clean up the executor."""
+        if self._pool is not None:
+            self._pool.shutdown(wait=False)
+            self._pool = None
         for worker_task in self._worker_tasks:
             if not worker_task.done():
                 worker_task.cancel()
@@ -48,16 +57,23 @@ class ThreadingExecutor(ExecutorBase):
 
 
 class _Worker:
-    def __init__(self, task_queue: asyncio.Queue[Task], parent: Executor) -> None:
+    def __init__(
+        self,
+        task_queue: asyncio.Queue[Task],
+        parent: Executor,
+        pool: ThreadPoolExecutor,
+    ) -> None:
         self._task_queue = task_queue
         self._parent = parent
+        self._pool = pool
 
     async def run(self) -> None:
+        loop = asyncio.get_running_loop()
         while self._parent.is_running():
             task = await self._task_queue.get()
             try:
-                result = await asyncio.to_thread(
-                    task.function, *task.args, **task.kwargs
+                result = await loop.run_in_executor(
+                    self._pool, partial(task.function, *task.args, **task.kwargs)
                 )
                 await asyncio.to_thread(task.put_result, result)
             except Exception as exc:  # ruff: ignore[blind-except]
