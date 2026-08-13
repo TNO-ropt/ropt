@@ -276,7 +276,8 @@ class SciPyBackend(Backend):
                 self._context.nonlinear_constraints.upper_bounds,
             )
         )
-        if (bounds := self._get_constraint_bounds(nonlinear_bounds)) is not None:
+        bounds = self._get_constraint_bounds(nonlinear_bounds)
+        if bounds is not None:
             self._normalized_constraints = NormalizedConstraints()
             self._normalized_constraints.set_bounds(*bounds)
         if self._method in _USE_CONSTRAINT_OBJECTS:

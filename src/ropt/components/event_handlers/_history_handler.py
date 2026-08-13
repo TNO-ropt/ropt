@@ -53,7 +53,8 @@ class HistoryHandler(EventHandler):
             event: The event object.
         """
         results: tuple[Results, ...] | Generator[Results, None, None]
-        if results := event.results:
+        results = event.results
+        if results:
             if self._domain == "user":
                 results = (
                     item.transform_from_optimizer(event.context) for item in results

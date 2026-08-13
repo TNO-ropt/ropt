@@ -187,7 +187,8 @@ class DataFrameHandler(EventHandler):
         Args:
             event: The event object.
         """
-        if results := event.results:
+        results = event.results
+        if results:
             transformed_results = (
                 tuple(item.transform_from_optimizer(event.context) for item in results)
                 if any(table.domain == "user" for table in self._tables.values())
