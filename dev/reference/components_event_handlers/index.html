@@ -2627,6 +2627,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#ropt.components.event_handlers.DataFrameHandler.backend" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        backend
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ropt.components.event_handlers.DataFrameHandler.set_default_tables" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3507,6 +3518,17 @@
     <span class="md-ellipsis">
       
         __init__
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.components.event_handlers.DataFrameHandler.backend" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        backend
       
     </span>
   </a>
@@ -5081,7 +5103,7 @@ to the user domain, and appends them to <code>self["results"]</code>.</p>
 
 
 
-        <p>Build pandas DataFrames from optimization results.</p>
+        <p>Build pandas or polars DataFrames from optimization results.</p>
 <p>Collects <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
 
 
@@ -5096,6 +5118,10 @@ to the user domain, and appends them to <code>self["results"]</code>.</p>
   " href="../results/#ropt.results.GradientResults"><code>GradientResults</code></a> into named tables.
 Tables are defined via <code>add_table</code> with a column specification, or
 registered in bulk with <code>set_default_tables</code>.</p>
+<p>The frame library is chosen with the <code>backend</code> argument. The <code>"pandas"</code>
+backend produces tables indexed by batch and axis labels, the <code>"polars"</code>
+backend produces long-format tables in which those become ordinary leading
+columns.</p>
 <p>Access tables via dictionary syntax: <code>handler["functions"]</code>.</p>
 
 
@@ -5133,7 +5159,9 @@ specification, default tables, and callback details.</p>
 
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">__init__</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">sep</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;,&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">__init__</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="o">*</span><span class="p">,</span> <span class="n">backend</span><span class="p">:</span> <span class="n">Backend</span> <span class="o">=</span> <span class="s2">&quot;pandas&quot;</span><span class="p">,</span> <span class="n">sep</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;,&quot;</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -5152,6 +5180,22 @@ specification, default tables, and callback details.</p>
         </tr>
       </thead>
       <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>backend</code>
+            </td>
+            <td>
+                  <code><span title="ropt.components.event_handlers._dataframe_handler.Backend">Backend</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Frame library used to build the tables.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;pandas&#39;</code>
+            </td>
+          </tr>
           <tr class="doc-section-item">
             <td>
                 <code>sep</code>
@@ -5183,17 +5227,79 @@ specification, default tables, and callback details.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#ValueError">ValueError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If <code>backend</code> is not <code>"pandas"</code> or <code>"polars"</code>.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
                   <code><a class="autorefs autorefs-internal" title="            UnsupportedError (ropt.exceptions.UnsupportedError)" href="../exceptions/#ropt.exceptions.UnsupportedError">UnsupportedError</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If the <code>pandas</code> module is not installed.</p>
+                <p>If the selected backend module is not installed.</p>
               </div>
             </td>
           </tr>
       </tbody>
     </table>
 
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="ropt.components.event_handlers.DataFrameHandler.backend" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">backend</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">backend</span><span class="p">:</span> <span class="n">Backend</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>The frame library used to build the tables.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="ropt.components.event_handlers._dataframe_handler.Backend">Backend</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Either <code>"pandas"</code> or <code>"polars"</code>.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
     </div>
 
@@ -5455,7 +5561,7 @@ this handler with <code>run_in_thread=True</code> on the
 
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">get_tables</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">]</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">get_tables</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">|</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">]</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -5474,7 +5580,7 @@ this handler with <code>run_in_thread=True</code> on the
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <span title="pandas.DataFrame">DataFrame</span>]</code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <span title="pandas.DataFrame">DataFrame</span> | <span title="polars.DataFrame">DataFrame</span>]</code>
             </td>
             <td>
               <div class="doc-md-description">

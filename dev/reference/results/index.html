@@ -1914,6 +1914,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#ropt.results.Results.to_polars" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        to_polars
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ropt.results.Results.transform_from_optimizer" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2169,6 +2180,17 @@
     <span class="md-ellipsis">
       
         results_to_dataframe
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.results.results_to_polars" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        results_to_polars
       
     </span>
   </a>
@@ -3024,6 +3046,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#ropt.results.Results.to_polars" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        to_polars
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ropt.results.Results.transform_from_optimizer" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3285,6 +3318,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#ropt.results.results_to_polars" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        results_to_polars
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -3350,7 +3394,7 @@ patterns.</p>
 
         <p>Data classes for storing intermediate optimization results.</p>
 <p>See <a href="../../optimizer_setup/results/">Working with Results</a> for a narrative overview of
-the result hierarchy, axis metadata, domain transforms, and pandas export.</p>
+the result hierarchy, axis metadata, domain transforms, and pandas/polars export.</p>
 
 
 
@@ -3606,6 +3650,181 @@ further details and examples.</p>
             <td>
               <div class="doc-md-description">
                 <p>If the <code>pandas</code> module is not installed.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#AttributeError">AttributeError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the field name is invalid.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.results.Results.to_polars" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">to_polars</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">to_polars</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">field_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">select</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">unstack</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">AxisName</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">sep</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;,&quot;</span><span class="p">,</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Export a field to a polars DataFrame.</p>
+<p>This is the polars counterpart of
+<a class="autorefs autorefs-internal" title="            to_dataframe" href="#ropt.results.Results.to_dataframe"><code>to_dataframe</code></a>. Polars has no index,
+so the frame is returned in long format: <code>batch_id</code> and the axis labels
+become regular columns, followed by one column per sub-field.</p>
+<p>Since polars column names must be strings, the tuple column names that
+<code>to_dataframe</code> produces for unstacked axes are joined into a single
+string using <code>sep</code>: the pandas column <code>(sub-field, label, ...)</code> becomes
+<code>"sub-field&lt;sep&gt;label&lt;sep&gt;..."</code>.</p>
+<p>See <a href="../../optimizer_setup/results/#exporting-to-polars">Working with Results</a> for
+further details and examples.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>field_name</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The field to export.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>select</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="collections.abc.Iterable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterable">Iterable</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Sub-fields to include.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>unstack</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="collections.abc.Iterable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterable">Iterable</a>[<a class="autorefs autorefs-internal" title="            AxisName (ropt.enums.AxisName)" href="../enums/#ropt.enums.AxisName">AxisName</a>] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Axes to pivot into columns (default: none).</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>sep</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Separator used to join unstacked column names.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;,&#39;</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="polars.DataFrame">DataFrame</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A DataFrame with axis labels and sub-fields as columns.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            UnsupportedError (ropt.exceptions.UnsupportedError)" href="../exceptions/#ropt.exceptions.UnsupportedError">UnsupportedError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the <code>polars</code> module is not installed.</p>
               </div>
             </td>
           </tr>
@@ -6427,7 +6646,222 @@ further details and examples.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If <code>result_type</code> is invalid or results contain unexpected types.</p>
+                <p>If <code>result_type</code> is invalid or results contain
+              unexpected types.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            UnsupportedError (ropt.exceptions.UnsupportedError)" href="../exceptions/#ropt.exceptions.UnsupportedError">UnsupportedError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the <code>pandas</code> module is not installed.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="ropt.results.results_to_polars" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">ropt.results.results_to_polars</span>
+
+
+</h2>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">results_to_polars</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">results</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Results</span><span class="p">],</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">fields</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">result_type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;functions&quot;</span><span class="p">,</span> <span class="s2">&quot;gradients&quot;</span><span class="p">],</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">sep</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;,&quot;</span><span class="p">,</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents first">
+
+        <p>Aggregate multiple results into a single polars DataFrame.</p>
+<p>This is the polars counterpart of
+<a class="autorefs autorefs-internal" title="            ropt.results.results_to_dataframe" href="#ropt.results.results_to_dataframe"><code>results_to_dataframe</code></a>. It concatenates the
+specified fields from a sequence of
+<a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="#ropt.results.FunctionResults"><code>FunctionResults</code></a> or
+<a class="autorefs autorefs-internal" title="            ropt.results.GradientResults
+
+
+  
+      dataclass
+  " href="#ropt.results.GradientResults"><code>GradientResults</code></a> objects. Fields are
+selected using dot notation (e.g., <code>evaluations.variables</code>); nested
+<code>metadata</code> entries are accessed as <code>evaluations.metadata.key</code>.
+Multi-dimensional fields are automatically unstacked into columns.</p>
+<p>Polars has no index and its column names must be strings, so the frame is
+returned in long format and the tuple column names produced by
+<code>results_to_dataframe</code> are joined into a single string using <code>sep</code>.</p>
+
+
+<details class="note" open>
+  <summary>Note</summary>
+  <p>Fields with different granularities (e.g. <code>gradients.objectives</code>, which
+varies only per batch, and <code>evaluations.perturbed_objectives</code>, which
+also varies per realization and perturbation) are joined on their shared
+key columns, so coarser values are repeated across the finer rows. The
+pandas export cannot align such fields and returns them as separate
+blocks of rows padded with missing values instead.</p>
+</details>        <p>See <a href="../../optimizer_setup/results/#exporting-to-polars">Working with Results</a> for
+further details and examples.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>results</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="collections.abc.Sequence" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence">Sequence</a>[<a class="autorefs autorefs-internal" title="            ropt.results.Results
+
+
+  
+      dataclass
+  " href="#ropt.results.Results">Results</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A sequence of <a class="autorefs autorefs-internal" title="            ropt.results.Results
+
+
+  
+      dataclass
+  " href="#ropt.results.Results"><code>Results</code></a> objects.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>fields</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#set">set</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Field names to include (dot notation for nested fields).</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>result_type</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="typing.Literal" href="https://docs.python.org/3/library/typing.html#typing.Literal">Literal</a>[&#39;functions&#39;, &#39;gradients&#39;]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p><code>"functions"</code> or <code>"gradients"</code>.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>sep</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Separator used to join unstacked column names.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;,&#39;</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="polars.DataFrame">DataFrame</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A DataFrame with one row per result and requested fields as columns.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#TypeError">TypeError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If <code>result_type</code> is invalid or results contain
+              unexpected types.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            UnsupportedError (ropt.exceptions.UnsupportedError)" href="../exceptions/#ropt.exceptions.UnsupportedError">UnsupportedError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the <code>polars</code> module is not installed.</p>
               </div>
             </td>
           </tr>

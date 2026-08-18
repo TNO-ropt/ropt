@@ -2830,7 +2830,12 @@ functionality:</p>
 <tr>
 <td><code>pandas</code></td>
 <td><code>pandas</code></td>
-<td>Exporting results to data frames .</td>
+<td>Exporting results to pandas data frames.</td>
+</tr>
+<tr>
+<td><code>polars</code></td>
+<td><code>polars</code></td>
+<td>Exporting results to polars data frames.</td>
 </tr>
 <tr>
 <td><code>cloudpickle</code></td>
@@ -2849,7 +2854,8 @@ processes; installing it adds support for lambdas, closures, and
 notebook-defined functions. The <code>hpc</code> extra already includes <code>cloudpickle</code>.</p>
 <p>Install with:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;ropt[pandas]&quot;</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;ropt[pandas,hpc,cloudpickle]&quot;</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;ropt[polars]&quot;</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;ropt[pandas,hpc,cloudpickle]&quot;</span>
 </span></code></pre></div>
 <h2 id="plugin-packages">Plugin packages</h2>
 <p>Additional optimization backends are provided as standalone packages that
