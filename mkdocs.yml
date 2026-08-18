@@ -132,7 +132,9 @@ nav:
       - "Mixed-Integer Optimization": tutorials/discrete.md
       - "Building a Workflow": tutorials/workflow.md
   - "Reference":
-      - "Simple API": reference/simple.md
+      - "Simple API":
+        - "Optimization Entry Points": reference/simple.md
+        - "Composing Custom Runs": reference/simple_compose.md
       - "Configuration":
         - "Context Class": reference/context.md
         - "Configuration Classes": reference/config.md

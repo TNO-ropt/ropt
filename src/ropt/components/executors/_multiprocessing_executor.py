@@ -141,12 +141,12 @@ async def _run_work_item(work_item: WorkItem, executor: ProcessPoolExecutor) -> 
             raise value
         return value
     try:
-        pickle.dumps(work_item.function)
+        pickle.dumps((work_item.function, work_item.args, work_item.kwargs))
     except Exception as exc:
         msg = (
-            "The work item function could not be sent to a worker process "
-            "because it is not picklable; install ropt[cloudpickle] or make it "
-            "picklable."
+            "The work item could not be sent to a worker process because its "
+            "function or arguments are not picklable; install "
+            "ropt[cloudpickle] or make them picklable."
         )
         raise ExecutionError(msg) from exc
     return await loop.run_in_executor(

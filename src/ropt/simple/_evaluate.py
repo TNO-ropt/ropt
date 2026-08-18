@@ -7,14 +7,13 @@ from typing import TYPE_CHECKING
 import numpy as np
 
 from ropt.components.compute_steps import EvaluationStep
-from ropt.components.evaluators import FunctionEvaluator, ParallelEvaluator
 from ropt.components.event_handlers import HistoryHandler
-from ropt.context import EnOptContext
 
-from ._function import adapt_function
+from ._evaluator import make_evaluator, run_step
 from ._handlers import current_handlers
+from ._naming import make_task_namer
 from ._result import EvaluateResult, _build_evaluate_result
-from ._session import current_executor, current_session, make_task_namer, run_step
+from ._session import current_executor, current_session
 
 if TYPE_CHECKING:
     from typing import Any
@@ -39,6 +38,11 @@ def evaluate(
     Use [`evaluate_many`][ropt.simple.evaluate_many] to evaluate several
     vectors at once. See [Running Optimizations](../running/running.md) for a
     walkthrough.
+
+    Unlike [`optimize`][ropt.simple.optimize] this takes no `handlers` or
+    `report`: there is no optimization to stop early, and a single batch has
+    nothing to accumulate across. An open [`handlers`][ropt.simple.handlers]
+    block still receives the results, its `report` callback included.
 
     Args:
         config:    The optimization configuration.
@@ -74,6 +78,10 @@ def evaluate_many(
     the same order. See [Running Optimizations](../running/running.md) for a
     walkthrough.
 
+    Like [`evaluate`][ropt.simple.evaluate], this takes no `handlers` or
+    `report`; an open [`handlers`][ropt.simple.handlers] block still receives
+    the results.
+
     Args:
         config:    The optimization configuration.
         variables: The variable vectors to evaluate, one per row.
@@ -105,20 +113,8 @@ def _run_evaluation(
     function: EvaluationFunction,
     metadata: dict[str, Any] | None = None,
 ) -> tuple[FunctionResults, ...]:
-    context = EnOptContext.model_validate(config)
-    n_obj = context.objectives.weights.size
-    n_con = (
-        0
-        if context.nonlinear_constraints is None
-        else context.nonlinear_constraints.lower_bounds.size
-    )
-
-    callback = adapt_function(function, n_obj, n_con)
-    get_name = make_task_namer(current_session(), executor)
-    evaluator = (
-        FunctionEvaluator(function=callback)
-        if executor is None
-        else ParallelEvaluator(function=callback, executor=executor, get_name=get_name)
+    context, evaluator = make_evaluator(
+        config, function, executor, make_task_namer(current_session(), executor)
     )
     history = HistoryHandler()
     step = EvaluationStep(evaluator=evaluator)

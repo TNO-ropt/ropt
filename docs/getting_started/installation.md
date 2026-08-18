@@ -24,12 +24,13 @@ functionality:
 | -------------- | ----------------------- | ---------------------------------------------------------- |
 | `pandas`       | `pandas`                | Exporting results to pandas data frames.                   |
 | `polars`       | `polars`                | Exporting results to polars data frames.                   |
-| `cloudpickle`  | `cloudpickle`           | Serializing Python code to run them in external processes. |
+| `cloudpickle`  | `cloudpickle`           | Running lambdas, closures, and notebook-defined functions in external processes. |
 | `hpc`          | `pysqa`, `cloudpickle`  | Running evaluations on HPC clusters.                       |
 
-Without the `cloudpickle` limits the Python code that can be run in external
-processes; installing it adds support for lambdas, closures, and
-notebook-defined functions. The `hpc` extra already includes `cloudpickle`.
+Without `cloudpickle`, code that runs in external processes is serialized with
+the standard `pickle` module, which requires importable, module-level functions;
+installing it adds support for lambdas, closures, and notebook-defined
+functions. The `hpc` extra already includes `cloudpickle`.
 
 Install with:
 

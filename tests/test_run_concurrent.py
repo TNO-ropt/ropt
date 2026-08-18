@@ -1,5 +1,10 @@
 """Tests for the loop-independent concurrent-job primitive."""
 
+# test_run_concurrent_skips_pending_jobs_after_a_failure is the authoritative
+# statement of the skip: it asserts at the point the decision is made, with no
+# waiting. test_simple.py can only wait for the effect, so if the two ever
+# disagree, this one is right.
+
 from __future__ import annotations
 
 import threading

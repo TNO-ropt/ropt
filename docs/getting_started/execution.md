@@ -76,8 +76,10 @@ from ropt.simple import processes
 The evaluations run in **separate processes**. This gives real parallel speed for
 heavy Python computations, because each process has its own interpreter.
 
-Your objective and its data are **copied** to the worker processes, which
-currently requires the `cloudpickle` extra (see
+Your objective and its data are **copied** to the worker processes, so they must
+be serializable: an objective defined at module level works out of the box, while
+a lambda, a closure, or a function defined in a notebook cell needs the
+`cloudpickle` extra (see
 [Installation](installation.md#optional-extras)).
 
 Because each worker is a separate process, your objective can only send results

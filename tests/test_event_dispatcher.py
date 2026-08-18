@@ -277,7 +277,7 @@ class _FatalHandlerError(BaseException):
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize("run_in_thread", [False, True])
-async def test_that_a_handler_dispatching_on_its_own_dispatcher_raises(
+async def test_handler_dispatching_on_own_dispatcher_raises(
     config: dict[str, Any], *, run_in_thread: bool
 ) -> None:
     # Events are handled one at a time, so a nested dispatch waits for an event
@@ -323,7 +323,7 @@ def _blocking_handler(
 
 
 @pytest.mark.asyncio
-async def test_that_events_queued_when_the_dispatcher_stops_are_still_handled(
+async def test_events_queued_at_stop_are_handled(
     config: dict[str, Any],
 ) -> None:
     # cancel() queues a sentinel; events that arrive behind it must still be
@@ -353,7 +353,7 @@ async def test_that_events_queued_when_the_dispatcher_stops_are_still_handled(
 
 
 @pytest.mark.asyncio
-async def test_that_events_still_queued_when_the_dispatcher_fails_are_rejected(
+async def test_events_queued_at_failure_are_rejected(
     config: dict[str, Any],
 ) -> None:
     # The queue cannot simply be dropped when processing dies: every emitter is
@@ -396,7 +396,7 @@ async def test_that_events_still_queued_when_the_dispatcher_fails_are_rejected(
 
 
 @pytest.mark.asyncio
-async def test_that_a_handler_base_exception_reaches_the_emitter_unmasked(
+async def test_handler_base_exception_reaches_emitter(
     config: dict[str, Any],
 ) -> None:
     # A BaseException is fatal, but reporting it as "dispatcher stopped" would
@@ -437,7 +437,7 @@ def test_event_dispatcher_reports_a_closed_loop_as_a_workflow_error(
         dispatcher.dispatch_event(_event(context))
 
 
-def test_that_cancelling_a_dispatcher_whose_loop_is_gone_does_nothing() -> None:
+def test_cancelling_dispatcher_without_loop() -> None:
     dispatcher = EventDispatcher()
     loop = asyncio.new_event_loop()
     loop.run_until_complete(asyncio.sleep(0))

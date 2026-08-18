@@ -630,9 +630,7 @@ def test_optimization_abort(config: Any, evaluator: Any) -> None:
     assert last_evaluation == 1
 
 
-def test_that_handler_stop_ends_optimization_with_user_abort(
-    config: Any, evaluator: Any
-) -> None:
+def test_handler_stop_ends_with_user_abort(config: Any, evaluator: Any) -> None:
     evaluations = 0
 
     def _observer(event: EnOptEvent) -> None:
@@ -656,9 +654,7 @@ def test_that_handler_stop_ends_optimization_with_user_abort(
     assert evaluations == 1
 
 
-def test_that_handler_stop_still_runs_remaining_handlers_for_the_event(
-    config: Any, evaluator: Any
-) -> None:
+def test_handler_stop_runs_remaining_handlers(config: Any, evaluator: Any) -> None:
     stops = 0
     later_ran = 0
 
@@ -692,7 +688,7 @@ def test_that_handler_stop_still_runs_remaining_handlers_for_the_event(
     assert later_ran == 1
 
 
-def test_that_stop_request_is_cleared_between_runs(config: Any, evaluator: Any) -> None:
+def test_stop_request_cleared_between_runs(config: Any, evaluator: Any) -> None:
     calls = 0
 
     def _stop_first_evaluation(event: EnOptEvent) -> None:

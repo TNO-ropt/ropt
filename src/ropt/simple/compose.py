@@ -9,19 +9,14 @@ from `ropt.simple.compose` marks the code as advanced use.
 
 from __future__ import annotations
 
+from ._evaluator import run_step
 from ._handlers import HandlerScope, current_handlers
-from ._session import (
-    Session,
-    current_executor,
-    current_session,
-    run_step,
-)
+from ._session import current_executor, gather_shared
 
 __all__ = [
     "HandlerScope",
-    "Session",
     "current_executor",
     "current_handlers",
-    "current_session",
+    "gather_shared",
     "run_step",
 ]

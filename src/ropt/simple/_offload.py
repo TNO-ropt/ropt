@@ -2,11 +2,11 @@
 
 `offload` runs a single callable, or a sequence of callables concurrently (which
 may be entirely different functions), on the innermost open execution block
-(`threads`/`processes`/`hpc`). It **requires** an executor: with no block open (or
-when called from a result handler, which runs on the session's event loop) it
-raises. Use `can_offload` to check first and call the callables directly when no
-executor is available. The callables must be picklable for a process or HPC
-executor.
+(`threads`/`processes`/`hpc`). It **requires** an executor: with no block open, or
+from a handler in a `handlers` block (which runs on the session's event loop, or
+on a dispatcher worker that has no block of its own), it raises. Use
+`can_offload` to check first and call the callables directly when no executor is
+available. The callables must be picklable for a process or HPC executor.
 
 Because it targets the innermost open block, `offload` called from within an
 evaluation function dispatches to a block that evaluation opens itself, not to
@@ -57,10 +57,12 @@ def offload(
     of results in the order of `work`. Bind arguments with `functools.partial`.
 
     It raises a [`WorkflowError`][ropt.exceptions.WorkflowError] when no block is
-    open or when called from a result handler (which runs on the event loop);
-    check [`can_offload`][ropt.simple.can_offload] first and call the callables
-    directly when there is no executor. The callables must be picklable for a
-    process or HPC executor.
+    open, or when called from a handler in a `handlers` block; a handler passed
+    to a single `optimize` call runs on the driving thread and can offload.
+    Check [`can_offload`][ropt.simple.can_offload] first and call the callables
+    directly when there is no executor. This holds for an empty sequence too, so
+    that a call site is not silently accepted in a context where it cannot
+    dispatch. The callables must be picklable for a process or HPC executor.
 
     See [Running Optimizations](../running/running.md) for a walkthrough.
 
@@ -70,13 +72,12 @@ def offload(
     Returns:
         The single result, or a tuple of results in the order of `work`.
     """
+    executor = _require_executor()
     if callable(work):
-        executor = _require_executor()
         return cast("_T", _dispatch(executor, [work])[0])
     functions = list(work)
     if not functions:
         return ()
-    executor = _require_executor()
     return tuple(_dispatch(executor, functions))
 
 
@@ -85,7 +86,8 @@ def can_offload() -> bool:
 
     Returns `True` when an execution block (`threads`/`processes`/`hpc`) is open
     and the caller can dispatch to it, and `False` otherwise (no block open, the
-    block's executor has stopped, or called from a result handler).
+    block's executor has stopped, or called from a handler in a `handlers`
+    block).
 
     Use it in code that may run with or without an execution block (for example
     a plugin, transform, or custom step) to fall back to a direct call instead
@@ -111,9 +113,13 @@ def can_offload() -> bool:
 def _require_executor() -> Executor:
     executor = current_executor()
     if executor is None:
+        # A threaded handler lands here even inside an open block: it runs on a
+        # dispatcher worker, which carries no session to find the block through.
         msg = (
             "offload() found no executor to dispatch to here; open an execution "
-            "block (threads/processes/hpc), or use can_offload() to run inline."
+            "block (threads/processes/hpc), or use can_offload() to run inline. "
+            "A handler running in a thread always lands here, because the "
+            "dispatcher worker it runs on carries no block of its own."
         )
         raise WorkflowError(msg)
     if executor.on_worker_loop():

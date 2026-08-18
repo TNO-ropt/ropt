@@ -8,6 +8,13 @@ Enumerations used in the configuration and results (for example
 [`ExitCode`][ropt.enums.ExitCode] and [`VariableType`][ropt.enums.VariableType])
 are not part of this module; import them from [`ropt.enums`][ropt.enums].
 
+An execution block (`threads`, `processes`, `hpc`) and a `handlers` block apply
+to the thread that opens them and to the runs this API starts on their behalf.
+A run started on a thread you spawn yourself sees neither: it falls back to
+evaluating in-process, and its results do not reach the shared handlers. Start
+concurrent runs with [`optimize_many`][ropt.simple.optimize_many] instead, which
+carries the open blocks to each run.
+
 ## Running optimizations
 
 ::: ropt.simple.optimize

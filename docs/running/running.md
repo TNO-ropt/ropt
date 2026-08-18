@@ -347,10 +347,17 @@ result = offload(partial(expensive, x)) if can_offload() else expensive(x)
 If you already know a block is open, call `offload` directly; `can_offload` is
 only for the uncertain case.
 
-!!! note "Not from a result handler"
-    `offload` cannot be called from a result handler: a handler runs on the
-    session's internal event loop, and offloading from there is unsupported (it
-    raises). Do parallel work from your optimization code, not from handlers.
+!!! note "Not from a handler in a shared block"
+    A handler in a [`handlers`](#result-handlers) block cannot offload: an
+    inline one runs on the session's event loop, and a
+    [`threaded`](#running-a-handler-in-a-thread) one runs on a dispatcher worker
+    that has no block of its own. Both raise. A handler passed to a single
+    `optimize(..., handlers=[...])` call is the exception — it runs on the
+    thread driving the run and can offload like any other code there.
+
+    `can_offload` reports which of the two you are in, so a handler that might
+    offload should guard with it rather than assume. Better still, do parallel
+    work from your optimization code and leave handlers to handle results.
 
 ## Result handlers
 
@@ -404,6 +411,12 @@ print(history.results)
     [`threaded`](#running-a-handler-in-a-thread) so it does not stall the shared
     loop for every run.
 
+!!! warning "A handler is either local or shared, for good"
+    Passing a handler to `optimize` as a local handler binds it to that run's
+    compute step permanently, and a `handlers` block will refuse it afterwards.
+    Decide per handler which of the two roles it plays; if you need both, use
+    two handlers.
+
 ### Built-in handlers
 
 `ropt` ships several ready-to-use handlers, all re-exported from `ropt.simple`.
@@ -424,8 +437,9 @@ print(history.results)
 #### `HistoryHandler`
 
 [`HistoryHandler`][ropt.simple.HistoryHandler] keeps *every* result it receives,
-in order, as a tuple read via `handler["results"]` (or `handler.results`). It is
-`None` until the first result arrives.
+in order, as a tuple. Read it with `handler.results`, which is an empty tuple
+until the first result arrives, or with `handler["results"]`, the raw stored
+value, which is `None` until then.
 
 #### `DataFrameHandler`
 
@@ -603,9 +617,10 @@ flowchart LR
 
 ??? info "How data crosses the boundary"
     To move work and results between processes, `ropt` **serializes** them —
-    turns the objects into bytes and rebuilds them on the other side. It
-    currently uses **`cloudpickle`** (an extended form of Python's `pickle`),
-    which is why `processes` and `hpc` need the `cloudpickle` extra; most
+    turns the objects into bytes and rebuilds them on the other side. With
+    `processes` this uses Python's standard `pickle`, so an objective defined at
+    module level works as is; a lambda, a closure, or a notebook-defined
+    objective needs the `cloudpickle` extra, which `hpc` always uses. Most
     functions and data serialize fine, but things like open files, locks, or
     database connections may not.
 

@@ -26,6 +26,7 @@ def make_report_handler(report: ReportCallback) -> EventHandler:
     `EvaluateResult` before the callback is invoked; gradient results are
     skipped. If the callback returns `True`, the emitting run is asked to stop
     gracefully (exit code `USER_ABORT`); any other return value continues it.
+    Reporting stops there: results after it in the same batch are not passed on.
 
     Args:
         report: The callback invoked with an `EvaluateResult` per evaluation.

@@ -59,13 +59,26 @@ def adapt_function(
     Returns:
         A callback returning an `EvaluationFunctionResult` for every evaluation.
     """
+    return _AdaptedFunction(function, n_obj, n_con)
 
-    def _callback(
-        variables: NDArray[np.float64], context: EvaluationFunctionContext
+
+class _AdaptedFunction:
+    # A class rather than a closure, so that a process or HPC executor can
+    # serialize it with the standard pickle module.
+
+    def __init__(self, function: EvaluationFunction, n_obj: int, n_con: int) -> None:
+        self._function = function
+        self._n_obj = n_obj
+        self._n_con = n_con
+
+    def __call__(
+        self, variables: NDArray[np.float64], context: EvaluationFunctionContext
     ) -> EvaluationFunctionResult:
-        return _coerce(_invoke_detached(function, variables, context), n_obj, n_con)
-
-    return _callback
+        return _coerce(
+            _invoke_detached(self._function, variables, context),
+            self._n_obj,
+            self._n_con,
+        )
 
 
 def _invoke_detached(

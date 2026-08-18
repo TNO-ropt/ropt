@@ -1,3 +1,7 @@
+# test_hpc_job_submitted_during_stop_is_cancelled is sensitive to what runs
+# before it: it has failed under a mutation it does not detect, while passing
+# 3/3 in isolation. Re-run it alone before believing a failure here.
+
 from __future__ import annotations
 
 import asyncio
@@ -105,6 +109,10 @@ def _function(input_value: int, *, raise_error: bool = False) -> int:
 
 def _raise_unpicklable_error(_input: int) -> int:
     raise ValueError(threading.Lock())  # a lock cannot be (cloud)pickled
+
+
+def _call(function: Callable[[], Any]) -> Any:
+    return function()
 
 
 def _exit_task() -> int:
@@ -240,7 +248,7 @@ async def test_threading_executor_delivers_results_without_the_shared_default_po
     assert sorted(collected) == [1, 2, 3]
 
 
-async def test_that_work_in_flight_is_aborted_when_the_executor_stops() -> None:
+async def test_work_in_flight_aborted_on_stop() -> None:
     started = threading.Event()
     release = threading.Event()
     submission = Submission([WorkItem(function=_blocked_work, args=(started, release))])
@@ -255,7 +263,7 @@ async def test_that_work_in_flight_is_aborted_when_the_executor_stops() -> None:
         _collect(submission)
 
 
-async def test_that_stopping_aborts_a_submission_whose_work_is_still_queued() -> None:
+async def test_stopping_aborts_queued_submission() -> None:
     # One worker, blocked on the first work item, so the rest of the submission
     # is still sitting on the work queue when the executor stops.
     started = threading.Event()
@@ -274,7 +282,7 @@ async def test_that_stopping_aborts_a_submission_whose_work_is_still_queued() ->
         _collect(submission)
 
 
-async def test_that_submitting_to_a_stopped_executor_aborts_the_submission() -> None:  # ruff: ignore[unused-async]
+async def test_submitting_to_stopped_executor_aborts() -> None:  # ruff: ignore[unused-async]
     # The caller is released by the executor rather than left waiting for
     # results that can never arrive.
     executor = ThreadingExecutor(workers=1)
@@ -322,7 +330,7 @@ async def test_hpc_executor_polls_without_the_shared_default_pool(
 
 
 @pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
-async def test_that_a_failing_scheduler_query_fails_the_work_after_the_retry_limit(
+async def test_hpc_scheduler_query_fails_after_retry_limit(
     tmp_path: Path, monkeypatch: Any
 ) -> None:
     # A scheduler that cannot be queried must not look like "nothing finished
@@ -351,7 +359,7 @@ async def test_that_a_failing_scheduler_query_fails_the_work_after_the_retry_lim
 
 
 @pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
-async def test_that_an_hpc_output_file_that_never_appears_fails_the_work(
+async def test_hpc_missing_output_file_fails_work(
     tmp_path: Path, monkeypatch: Any
 ) -> None:
     # A job that dies before writing its result: the scheduler reports it gone,
@@ -384,7 +392,7 @@ async def test_that_an_hpc_output_file_that_never_appears_fails_the_work(
 
 
 @pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
-async def test_that_an_unreadable_hpc_output_file_fails_the_work(
+async def test_hpc_unreadable_output_file_fails_work(
     tmp_path: Path, monkeypatch: Any
 ) -> None:
     # A result read while it is still being written: retrying is right, but it
@@ -418,7 +426,7 @@ async def test_that_an_unreadable_hpc_output_file_fails_the_work(
 
 
 @pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
-async def test_that_hpc_outstanding_work_is_aborted_when_the_executor_stops(
+async def test_hpc_outstanding_work_aborted_on_stop(
     tmp_path: Path, monkeypatch: Any
 ) -> None:
     submitted = threading.Event()
@@ -447,7 +455,7 @@ async def test_that_hpc_outstanding_work_is_aborted_when_the_executor_stops(
 
 
 @pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
-async def test_that_stopping_the_hpc_executor_cancels_its_submitted_jobs(
+async def test_stopping_hpc_executor_cancels_jobs(
     tmp_path: Path, monkeypatch: Any
 ) -> None:
     submitted = threading.Event()
@@ -483,7 +491,7 @@ async def test_that_stopping_the_hpc_executor_cancels_its_submitted_jobs(
 
 
 @pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
-async def test_that_a_job_submitted_while_the_hpc_executor_stops_is_cancelled(
+async def test_hpc_job_submitted_during_stop_is_cancelled(
     tmp_path: Path, monkeypatch: Any
 ) -> None:
     submitting = threading.Event()
@@ -522,7 +530,7 @@ async def test_that_a_job_submitted_while_the_hpc_executor_stops_is_cancelled(
 
 
 @pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
-async def test_that_an_idle_hpc_executor_does_not_query_the_scheduler(
+async def test_idle_hpc_executor_does_not_query_scheduler(
     tmp_path: Path, monkeypatch: Any
 ) -> None:
     class _CountingScheduler(MockedHPCAdapter):
@@ -550,7 +558,7 @@ async def test_that_an_idle_hpc_executor_does_not_query_the_scheduler(
 
 
 @pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
-async def test_that_the_hpc_poll_loop_honours_the_interval_while_workers_are_busy(
+async def test_hpc_poll_loop_honours_interval_when_busy(
     tmp_path: Path, monkeypatch: Any
 ) -> None:
     monkeypatch.setattr(
@@ -577,7 +585,7 @@ async def test_that_the_hpc_poll_loop_honours_the_interval_while_workers_are_bus
 
 
 @pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
-async def test_that_queued_hpc_work_is_picked_up_when_a_worker_frees_up(
+async def test_queued_hpc_work_resumes_on_free_worker(
     tmp_path: Path, monkeypatch: Any
 ) -> None:
     monkeypatch.setattr(
@@ -613,7 +621,7 @@ async def test_hpc_executor_refuses_to_overwrite_existing_work_item_files(
 
 
 @pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
-async def test_that_a_failing_hpc_submission_fails_only_its_own_work(
+async def test_hpc_failing_submission_fails_own_work(
     tmp_path: Path, monkeypatch: Any
 ) -> None:
     monkeypatch.setattr(
@@ -636,7 +644,7 @@ async def test_that_a_failing_hpc_submission_fails_only_its_own_work(
 
 
 @pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
-async def test_that_a_rejected_hpc_submission_leaves_no_input_file_behind(
+async def test_rejected_hpc_submission_leaves_no_input_file(
     tmp_path: Path, monkeypatch: Any
 ) -> None:
     # The input file is written before the job is handed over, so a scheduler
@@ -662,7 +670,7 @@ async def test_that_a_rejected_hpc_submission_leaves_no_input_file_behind(
 
 
 @pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
-async def test_that_a_duplicate_hpc_name_fails_only_its_own_submission(
+async def test_hpc_duplicate_name_fails_own_submission(
     tmp_path: Path, monkeypatch: Any
 ) -> None:
     # A name clash must abort the offending submission rather than tear down
@@ -706,7 +714,7 @@ async def test_cloudpickled_worker_wraps_an_unpicklable_exception() -> None:
 
 
 @pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
-async def test_that_a_job_exiting_the_interpreter_still_writes_its_output_file(
+async def test_hpc_job_exit_writes_output_file(
     tmp_path: Path,
 ) -> None:
     input_file = tmp_path / "job.in"
@@ -734,7 +742,7 @@ async def test_worker_may_construct_workflow_objects() -> None:
 
 @pytest.mark.slow
 @pytest.mark.timeout(30)
-async def test_that_max_tasks_per_child_restarts_the_worker() -> None:
+async def test_max_tasks_per_child_restarts_worker() -> None:
     submission = Submission(
         [WorkItem(function=_worker_pid, args=(index,)) for index in range(3)]
     )
@@ -1192,7 +1200,7 @@ async def test_invalid_bundle_size() -> None:  # ruff: ignore[unused-async]
         )
 
 
-async def test_that_failing_a_submission_reraises_the_exception() -> None:  # ruff: ignore[unused-async]
+async def test_failing_submission_reraises() -> None:  # ruff: ignore[unused-async]
     submission = Submission([WorkItem(function=_function, args=(0,))])
     error = ValueError("Test error in function")
     submission.fail(error)
@@ -1201,7 +1209,7 @@ async def test_that_failing_a_submission_reraises_the_exception() -> None:  # ru
     assert excinfo.value is error
 
 
-async def test_that_submitting_to_a_closed_loop_aborts_the_submission() -> None:  # ruff: ignore[unused-async]
+async def test_submitting_to_closed_loop_aborts() -> None:  # ruff: ignore[unused-async]
     # The executor still looks running, but its loop is gone, so handing the
     # submission over cannot succeed and the caller must not be left waiting.
     executor = ThreadingExecutor(workers=1)
@@ -1215,21 +1223,21 @@ async def test_that_submitting_to_a_closed_loop_aborts_the_submission() -> None:
         _collect(submission)
 
 
-async def test_that_cancelling_an_executor_that_never_started_does_nothing() -> None:  # ruff: ignore[unused-async]
+async def test_cancelling_unstarted_executor() -> None:  # ruff: ignore[unused-async]
     executor = ThreadingExecutor(workers=1)
     executor.cancel()
     assert not executor._running.is_set()  # ruff: ignore[private-member-access]
 
 
 @pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
-async def test_that_a_relative_hpc_workdir_is_rejected(tmp_path: Path) -> None:  # ruff: ignore[unused-async, unused-function-argument]
+async def test_hpc_relative_workdir_rejected(tmp_path: Path) -> None:  # ruff: ignore[unused-async, unused-function-argument]
     # The workdir is shared with the cluster nodes, which do not necessarily
     # share this process's working directory.
     with pytest.raises(ExecutionError, match="must be an absolute path"):
         HPCExecutor(workdir="relative/path", template="")
 
 
-async def test_that_a_broken_worker_pool_is_reported_at_startup(
+async def test_broken_worker_pool_reported_at_startup(
     monkeypatch: Any,
 ) -> None:
     # The same failure the unguarded-main test triggers out of process, checked
@@ -1257,13 +1265,13 @@ async def test_that_a_broken_worker_pool_is_reported_at_startup(
 
 
 @pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
-async def test_that_a_missing_hpc_workdir_is_rejected(tmp_path: Path) -> None:  # ruff: ignore[unused-async]
+async def test_hpc_missing_workdir_rejected(tmp_path: Path) -> None:  # ruff: ignore[unused-async]
     with pytest.raises(ExecutionError, match="does not exist"):
         HPCExecutor(workdir=tmp_path / "nowhere", template="")
 
 
 @pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
-async def test_that_an_unconfigured_hpc_executor_is_rejected(  # ruff: ignore[unused-async]
+async def test_unconfigured_hpc_executor_rejected(  # ruff: ignore[unused-async]
     tmp_path: Path, monkeypatch: Any
 ) -> None:
     # No template and no usable pysqa configuration: there is nothing to submit
@@ -1286,14 +1294,14 @@ async def test_that_an_unconfigured_hpc_executor_is_rejected(  # ruff: ignore[un
         ({"retries": -1}, "retries must not be negative"),
     ],
 )
-async def test_that_an_out_of_range_hpc_setting_is_rejected(  # ruff: ignore[unused-async]
+async def test_hpc_out_of_range_setting_rejected(  # ruff: ignore[unused-async]
     tmp_path: Path, kwargs: dict[str, Any], match: str
 ) -> None:
     with pytest.raises(ExecutionError, match=match):
         HPCExecutor(workdir=tmp_path, template="", **kwargs)
 
 
-async def test_that_aborting_a_submission_raises_executor_stopped() -> None:  # ruff: ignore[unused-async]
+async def test_aborting_submission_raises_executor_stopped() -> None:  # ruff: ignore[unused-async]
     submission = Submission([WorkItem(function=_function, args=(0,))])
     submission.abort()
     with pytest.raises(ExecutorStopped) as excinfo:
@@ -1301,7 +1309,7 @@ async def test_that_aborting_a_submission_raises_executor_stopped() -> None:  # 
     assert excinfo.value.__cause__ is None
 
 
-async def test_that_a_queued_exception_is_preferred_over_the_abort_sentinel() -> None:  # ruff: ignore[unused-async]
+async def test_queued_exception_preferred_over_abort() -> None:  # ruff: ignore[unused-async]
     submission = Submission(
         [WorkItem(function=_function, args=(idx,)) for idx in range(2)]
     )
@@ -1312,7 +1320,7 @@ async def test_that_a_queued_exception_is_preferred_over_the_abort_sentinel() ->
         _collect(submission)
 
 
-async def test_that_a_finished_submission_delivers_nothing_more() -> None:  # ruff: ignore[unused-async]
+async def test_finished_submission_delivers_nothing_more() -> None:  # ruff: ignore[unused-async]
     work_item = WorkItem(function=_function, args=(0,))
     submission = Submission([work_item])
     submission.abort()
@@ -1321,7 +1329,7 @@ async def test_that_a_finished_submission_delivers_nothing_more() -> None:  # ru
         _collect(submission)
 
 
-async def test_that_an_empty_submission_is_not_retained() -> None:  # ruff: ignore[unused-async]
+async def test_empty_submission_not_retained() -> None:  # ruff: ignore[unused-async]
     executor = ThreadingExecutor(workers=1)
     executor._running.set()  # ruff: ignore[private-member-access]
     for _ in range(100):
@@ -1332,7 +1340,7 @@ async def test_that_an_empty_submission_is_not_retained() -> None:  # ruff: igno
     assert executor._submissions == {submission}  # ruff: ignore[private-member-access]
 
 
-async def test_that_accepting_a_submission_twice_queues_its_work_once() -> None:  # ruff: ignore[unused-async]
+async def test_accepting_submission_twice_queues_work_once() -> None:  # ruff: ignore[unused-async]
     submission = Submission(
         [WorkItem(function=_function, args=(idx,)) for idx in range(3)]
     )
@@ -1343,7 +1351,7 @@ async def test_that_accepting_a_submission_twice_queues_its_work_once() -> None:
     assert executor._work_queue.qsize() == 3  # ruff: ignore[private-member-access]
 
 
-async def test_that_a_submission_arriving_after_stopping_is_aborted() -> None:
+async def test_submission_after_stopping_is_aborted() -> None:
     # submit() hands over on the loop, where stopping is decided; this is the
     # guard that makes "every submission settles" hold when the two race.
     submission = Submission([WorkItem(function=_function, args=(0,))])
@@ -1359,7 +1367,7 @@ async def test_that_a_submission_arriving_after_stopping_is_aborted() -> None:
         _collect(submission)
 
 
-async def test_that_cancelling_from_another_thread_stops_the_executor() -> None:
+async def test_cancelling_from_another_thread() -> None:
     executor = ThreadingExecutor(workers=1)
     loop_is_idle = threading.Event()
 
@@ -1375,7 +1383,7 @@ async def test_that_cancelling_from_another_thread_stops_the_executor() -> None:
     assert not executor._running.is_set()  # ruff: ignore[private-member-access]
 
 
-async def test_that_a_raising_callback_ends_the_submission() -> None:  # ruff: ignore[unused-async]
+async def test_raising_callback_ends_submission() -> None:  # ruff: ignore[unused-async]
     work_items = [WorkItem(function=_function, args=(idx,)) for idx in range(3)]
     submission = Submission(work_items)
     submission.deliver(work_items[0], 1)
@@ -1403,17 +1411,17 @@ def _returns_none() -> None:
     return None
 
 
-async def test_that_dispatch_tasks_returns_results_in_order() -> None:
+async def test_dispatch_tasks_results_in_order() -> None:
     functions = [partial(_function, idx) for idx in range(4)]
     assert await dispatch_tasks(functions, "threading", workers=2) == [1, 2, 3, 4]
 
 
-async def test_that_dispatch_tasks_accepts_named_functions() -> None:
+async def test_dispatch_tasks_named_functions() -> None:
     functions = {f"job{idx}": partial(_function, idx) for idx in range(3)}
     assert await dispatch_tasks(functions, "threading", workers=2) == [1, 2, 3]
 
 
-async def test_that_dispatch_tasks_reports_every_result() -> None:
+async def test_dispatch_tasks_reports_every_result() -> None:
     reported: list[Any] = []
     functions = [partial(_function, idx) for idx in range(3)]
     results = await dispatch_tasks(
@@ -1423,7 +1431,7 @@ async def test_that_dispatch_tasks_reports_every_result() -> None:
     assert sorted(reported) == [1, 2, 3]
 
 
-async def test_that_dispatch_tasks_keeps_a_none_result() -> None:
+async def test_dispatch_tasks_keeps_none_result() -> None:
     # None is a legitimate result, not a marker for "nothing was delivered".
     results = await dispatch_tasks(
         [_returns_none, partial(_function, 0)], "threading", workers=2
@@ -1431,12 +1439,12 @@ async def test_that_dispatch_tasks_keeps_a_none_result() -> None:
     assert results == [None, 1]
 
 
-async def test_that_dispatch_tasks_rejects_an_unknown_executor() -> None:
+async def test_dispatch_tasks_unknown_executor() -> None:
     with pytest.raises(ValueError, match="Invalid executor"):
         await dispatch_tasks([partial(_function, 0)], "bogus")  # type: ignore[arg-type]
 
 
-async def test_that_dispatch_tasks_resolves_its_default_hpc_workdir(
+async def test_dispatch_tasks_default_hpc_workdir(
     monkeypatch: Any,
 ) -> None:
     captured: dict[str, Any] = {}
@@ -1453,12 +1461,12 @@ async def test_that_dispatch_tasks_resolves_its_default_hpc_workdir(
 
 @pytest.mark.slow
 @pytest.mark.timeout(60)
-async def test_that_dispatch_tasks_runs_on_a_multiprocessing_executor() -> None:
+async def test_dispatch_tasks_multiprocessing() -> None:
     functions = [partial(_function, idx) for idx in range(2)]
     assert await dispatch_tasks(functions, "multiprocessing", workers=1) == [1, 2]
 
 
-async def test_that_dispatch_tasks_reraises_a_failing_function() -> None:
+async def test_dispatch_tasks_reraises_failing_function() -> None:
     functions = [partial(_function, 0, raise_error=True)]
     with pytest.raises(ExceptionGroup) as excinfo:
         await dispatch_tasks(functions, "threading", workers=2)
@@ -1484,7 +1492,7 @@ async def test_that_dispatch_tasks_reraises_a_failing_function() -> None:
         ),
     ],
 )
-async def test_that_a_stopped_executor_can_be_started_again(
+async def test_stopped_executor_restarts(
     executor_name: str, tmp_path: Path, monkeypatch: Any
 ) -> None:
     match executor_name:
@@ -1521,7 +1529,7 @@ async def test_that_a_stopped_executor_can_be_started_again(
     assert results == [1]
 
 
-async def test_that_starting_a_running_executor_is_refused() -> None:
+async def test_starting_running_executor_refused() -> None:
     executor = ThreadingExecutor(workers=1)
     async with asyncio.TaskGroup() as tg:
         await executor.start(tg)
@@ -1530,7 +1538,7 @@ async def test_that_starting_a_running_executor_is_refused() -> None:
         executor.cancel()
 
 
-async def test_that_work_queued_for_an_ended_submission_is_not_run() -> None:
+async def test_queued_work_for_ended_submission_not_run() -> None:
     # One worker and a FIFO queue, so the sentinel completing proves everything
     # queued ahead of it was dealt with, one way or the other.
     executed: list[int] = []
@@ -1553,7 +1561,7 @@ async def test_that_work_queued_for_an_ended_submission_is_not_run() -> None:
 
 
 @pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
-async def test_that_no_hpc_jobs_are_submitted_for_an_ended_submission(
+async def test_no_hpc_jobs_for_ended_submission(
     tmp_path: Path, monkeypatch: Any
 ) -> None:
     # On this executor each item queued behind the failure would become a real
@@ -1589,7 +1597,7 @@ async def test_that_no_hpc_jobs_are_submitted_for_an_ended_submission(
     assert "item5" not in _NamingAdapter.names
 
 
-async def test_that_starting_a_running_executor_leaves_it_untouched() -> None:
+async def test_starting_running_executor_leaves_it_untouched() -> None:
     executor = ThreadingExecutor(workers=1)
     async with asyncio.TaskGroup() as tg:
         await executor.start(tg)
@@ -1604,7 +1612,7 @@ async def test_that_starting_a_running_executor_leaves_it_untouched() -> None:
     assert not executor._running.is_set()  # ruff: ignore[private-member-access]
 
 
-async def test_that_evaluating_on_the_executor_loop_thread_raises(
+async def test_evaluating_on_executor_loop_raises(
     config: dict[str, Any], eval_func: Any
 ) -> None:
     executor = ThreadingExecutor(workers=1)
@@ -1660,7 +1668,7 @@ async def test_worker_base_exception_propagates_into_task_group() -> None:
     assert not executor._running.is_set()  # ruff: ignore[private-member-access]
 
 
-async def test_that_a_fatal_work_item_error_is_what_its_caller_receives() -> None:
+async def test_fatal_work_item_error_reaches_caller() -> None:
     # The executor's teardown would release the caller anyway, but with the
     # generic abort; only the worker can hand over the real cause.
     def _raise_fatal(input_value: int) -> int:  # ruff: ignore[unused-function-argument]
@@ -1715,7 +1723,7 @@ async def test_handle_result_records_executor_failure_as_nan() -> None:  # ruff:
         pytest.param([], id="too_short"),
     ],
 )
-async def test_that_an_evaluation_function_returning_the_wrong_shape_is_rejected(  # ruff: ignore[unused-async]
+async def test_evaluation_function_wrong_shape_rejected(  # ruff: ignore[unused-async]
     returned: Any,
 ) -> None:
     bundle = [
@@ -1737,7 +1745,7 @@ async def test_that_an_evaluation_function_returning_the_wrong_shape_is_rejected
         )
 
 
-async def test_that_a_wrong_evaluation_result_type_is_rejected() -> None:  # ruff: ignore[unused-async]
+async def test_wrong_evaluation_result_type_rejected() -> None:  # ruff: ignore[unused-async]
     bundle = [
         (
             np.zeros(2, dtype=np.float64),
@@ -1782,6 +1790,7 @@ async def test_multiprocessing_unguarded_main_reports_startup_error(
 
 
 @pytest.mark.slow
+@pytest.mark.skipif(not _HAVE_CLOUDPICKLE, reason="cloudpickle is not installed")
 async def test_multiprocessing_cloudpickles_functions_and_results() -> None:
     def make_adder(offset: int) -> Callable[[int], int]:
         def add(value: int) -> int:
@@ -1853,6 +1862,26 @@ async def test_multiprocessing_without_cloudpickle_rejects_lambda(
         assert executor._running.is_set()  # ruff: ignore[private-member-access]
         executor.cancel()
     assert not executor._running.is_set()  # ruff: ignore[private-member-access]
+
+
+@pytest.mark.slow
+async def test_multiprocessing_without_cloudpickle_rejects_an_unpicklable_argument(
+    monkeypatch: Any,
+) -> None:
+    # ParallelEvaluator submits a picklable module-level function and passes the
+    # user callback as an argument, so the arguments must be checked too.
+    monkeypatch.setattr(
+        "ropt.components.executors._multiprocessing_executor._HAVE_CLOUDPICKLE",
+        False,
+    )
+    submission = Submission([WorkItem(function=_call, args=(lambda: 1,))])
+    executor = MultiprocessingExecutor(workers=1)
+    async with asyncio.TaskGroup() as tg:
+        await executor.start(tg)
+        executor.submit(submission)
+        with pytest.raises(ExecutionError, match=r"ropt\[cloudpickle\]"):
+            await asyncio.to_thread(_collect, submission)
+        executor.cancel()
 
 
 def _return_captured(_handler: Any) -> int:

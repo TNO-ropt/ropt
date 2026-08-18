@@ -24,44 +24,29 @@ import itertools
 import threading
 from contextvars import ContextVar, Token
 from functools import partial
-from pathlib import Path
-from typing import TYPE_CHECKING, Any, TypeVar, cast
+from typing import TYPE_CHECKING, Any, TypeVar
 
 from ropt.components._loop import schedule
 from ropt.components.concurrency import run_concurrent
-from ropt.components.executors import (
-    Executor,
-    HPCExecutor,
-    MultiprocessingExecutor,
-    ThreadingExecutor,
-)
 from ropt.exceptions import WorkflowError
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Coroutine, Sequence
 
-    from numpy.typing import ArrayLike
-
-    from ropt.components.compute_steps import ComputeStep
-    from ropt.components.evaluators import EvaluationFunctionContext, NameCallback
     from ropt.components.event_handlers import EventDispatcher
-    from ropt.context import EnOptContext
-    from ropt.enums import ExitCode
+    from ropt.components.executors import Executor
 
 _T = TypeVar("_T")
 
-_STOPPED = (
-    "The block's background session has stopped and cannot be reused; leave "
-    "this block and open a new one."
-)
+_STOPPED = "The block's background session is not running; open a new block."
 
 
-_active_session: ContextVar[Session | None] = ContextVar(
+_active_session: ContextVar[_Session | None] = ContextVar(
     "ropt_simple_session", default=None
 )
 
 
-class Session:
+class _Session:
     """A background event loop and task group hosting at most one executor.
 
     The session (loop + task group) is opened by the first high-level block and
@@ -103,8 +88,6 @@ class Session:
         try:
             self._loop.run_until_complete(main_task)
         except BaseException as exc:  # ruff: ignore[blind-except]
-            # Kept for stop(), so the owning block reports why the session died
-            # instead of losing it on this thread.
             self._failure = exc
         finally:
             # Normally already set by `_run`; this also covers a session that
@@ -145,14 +128,12 @@ class Session:
                 self._task_group = task_group
                 self._ready.set()
                 await self._shutdown.wait()
-                # Defensive: a scope normally removes its executor before the
-                # session stops; cancel a leftover so the task group can exit.
                 if self._executor is not None:
                     self._executor.cancel()
         finally:
-            # A session is single-use. Marking it here, on the loop thread while
-            # the loop is still serving, means a caller cannot pass the check in
-            # `_start_on_loop` and then hand work to a loop that will not run it.
+            # Set here, on the loop thread while the loop is still serving, so a
+            # caller cannot pass the check in `_start_on_loop` and then hand work
+            # to a loop that will not run it.
             self._stopped.set()
 
     def _start_on_loop(self, coro: Coroutine[Any, Any, None]) -> None:
@@ -163,12 +144,17 @@ class Session:
         try:
             asyncio.run_coroutine_threadsafe(coro, self._loop).result()
         except RuntimeError:
-            # Lost the race with the shutdown: the loop or its task group had
-            # already gone by the time the coroutine ran.
             coro.close()
+            # Lost the race with the shutdown: the check above passed, but by
+            # the time the work reached the loop, it or its task group was gone.
             if self._stopped.is_set():
                 raise WorkflowError(_STOPPED) from None
             raise
+
+    def _require_task_group(self) -> asyncio.TaskGroup:
+        if self._stopped.is_set() or self._task_group is None:
+            raise WorkflowError(_STOPPED)
+        return self._task_group
 
     def open_executor(self, make_executor: Callable[[], Executor]) -> None:
         if self._executor is not None:
@@ -177,13 +163,10 @@ class Session:
                 "a time; they cannot be nested."
             )
             raise WorkflowError(msg)
-        assert self._task_group is not None
+        task_group = self._require_task_group()
         executor = make_executor()
-        # Start on the loop thread and block until ready, surfacing a start
-        # failure (e.g. a process pool that cannot spawn) on the caller's stack.
-        self._start_on_loop(executor.start(self._task_group))
-        self._executor = executor
-        # Restart run numbering so task names are unique within this executor.
+        self._start_on_loop(executor.start(task_group))
+        self._executor = executor  # Only set on success.
         self._run_counter = itertools.count()
 
     def next_run_id(self) -> int:
@@ -199,8 +182,7 @@ class Session:
         return self._executor
 
     def open_dispatcher(self, dispatcher: EventDispatcher) -> None:
-        assert self._task_group is not None
-        self._start_on_loop(dispatcher.start(self._task_group))
+        self._start_on_loop(dispatcher.start(self._require_task_group()))
 
     def close_dispatcher(self, dispatcher: EventDispatcher) -> None:
         schedule(self._loop, dispatcher.cancel)
@@ -210,14 +192,8 @@ class Session:
     ) -> list[_T]:
         """Run jobs concurrently with this session shared, and collect results.
 
-        Each job runs on its own thread with this session set active, so
-        ``current_executor()``/``offload()`` and a nested ``optimize()`` inside a
-        job resolve to this block's executor. An open ``handlers`` block is not
-        propagated: read ``current_handlers()`` on the calling thread and pass
-        the scope into each job, as ``optimize_many`` does. ``limit`` bounds how
-        many run at once. The first job to raise propagates its error at once
-        (fail-fast); pending jobs are then skipped and any already running are
-        abandoned.
+        See the module-level `gather_shared`, which is the entry point for
+        callers outside this package.
 
         Args:
             jobs:  The zero-argument callables to run, one result each.
@@ -237,128 +213,24 @@ class Session:
         return run_concurrent([partial(_run, job) for job in jobs], limit)
 
 
-def _acquire_session() -> tuple[Session, Token[Session | None] | None]:
+def _acquire_session() -> tuple[_Session, Token[_Session | None] | None]:
     session = _active_session.get()
     if session is not None:
         return session, None
-    session = Session()
+    session = _Session()
     session.start()
     return session, _active_session.set(session)
 
 
-def _release_session(session: Session, token: Token[Session | None] | None) -> None:
+def _release_session(session: _Session, token: Token[_Session | None] | None) -> None:
     if token is not None:
         try:
-            # Reports a session that died on its own thread, so the context var
-            # must be restored even then.
             session.stop()
         finally:
             _active_session.reset(token)
 
 
-class _ExecutionScope:
-    """Install an executor on the ambient session for the duration of a block."""
-
-    def __init__(self, make_executor: Callable[[], Executor]) -> None:
-        self._make_executor = make_executor
-        self._session: Session | None = None
-        self._token: Token[Session | None] | None = None
-
-    def __enter__(self) -> None:
-        session, token = _acquire_session()
-        try:
-            session.open_executor(self._make_executor)
-        except BaseException:
-            # Roll back a session this scope created before re-raising.
-            _release_session(session, token)
-            raise
-        self._session = session
-        self._token = token
-
-    def __exit__(self, *_exc: object) -> None:
-        assert self._session is not None
-        self._session.close_executor()
-        _release_session(self._session, self._token)
-
-
-def threads(*, workers: int = 1) -> _ExecutionScope:
-    """Run evaluations in a thread pool for the duration of the block.
-
-    See [Running Optimizations](../running/running.md) for a walkthrough.
-
-    Args:
-        workers: The number of worker threads.
-
-    Returns:
-        A context manager backing evaluations with a thread pool.
-    """
-    return _ExecutionScope(lambda: ThreadingExecutor(workers=workers))
-
-
-def processes(*, workers: int = 1) -> _ExecutionScope:
-    """Run evaluations in a process pool for the duration of the block.
-
-    The objective must be picklable. See
-    [Running Optimizations](../running/running.md) for a walkthrough.
-
-    Args:
-        workers: The number of worker processes.
-
-    Returns:
-        A context manager backing evaluations with a process pool.
-    """
-    return _ExecutionScope(lambda: MultiprocessingExecutor(workers=workers))
-
-
-def hpc(  # ruff: ignore[too-many-arguments]
-    *,
-    workers: int = 1,
-    cores: int = 1,
-    cluster: str | None = None,
-    queue: str | None = None,
-    workdir: Path | str | None = None,
-    config_path: Path | str | None = None,
-    template: str | None = None,
-    queue_type: str = "slurm",
-) -> _ExecutionScope:
-    """Run evaluations on an HPC cluster for the duration of the block.
-
-    Interfaces with a cluster queue (e.g. Slurm) through `pysqa`; requires the
-    `ropt[hpc]` extra, and the objective must be picklable. The cluster is
-    selected from `cluster`/`queue`: give a queue to search for its cluster, a
-    cluster to use its default queue, or both to be explicit. See
-    [Running Optimizations](../running/running.md) for a walkthrough.
-
-    Args:
-        workers:     The maximum number of concurrent cluster jobs.
-        cores:       The number of CPUs per job.
-        cluster:     The cluster name, when the `pysqa` config defines several.
-        queue:       The queue or partition name.
-        workdir:     The shared-filesystem working directory (defaults to the
-                     current directory).
-        config_path: The path to the `pysqa` configuration directory.
-        template:    An inline submission-script template, instead of a config.
-        queue_type:  The queueing system type.
-
-    Returns:
-        A context manager backing evaluations with an HPC cluster.
-    """
-    resolved = Path.cwd() if workdir is None else Path(workdir).resolve()
-    return _ExecutionScope(
-        lambda: HPCExecutor(
-            workers=workers,
-            cores=cores,
-            cluster=cluster,
-            queue=queue,
-            workdir=resolved,
-            config_path=config_path,
-            template=template,
-            queue_type=queue_type,
-        )
-    )
-
-
-def current_session() -> Session | None:
+def current_session() -> _Session | None:
     """Return the session active in the current context, if any.
 
     Returns:
@@ -383,59 +255,39 @@ def current_executor() -> Executor | None:
     return None if session is None else session.get_executor()
 
 
-def run_step(
-    step: ComputeStep,
-    *,
-    context: EnOptContext,
-    variables: ArrayLike,
-    metadata: dict[str, Any] | None = None,
-) -> ExitCode:
-    """Run a compute step on the calling thread.
+def gather_shared(
+    jobs: Sequence[Callable[[], _T]], limit: int | None = None
+) -> list[_T]:
+    """Run jobs concurrently on driver threads, sharing the open block.
 
-    The step's evaluator is already wired to the session's executor (if any) at
-    construction time, so running the step needs no session.
+    Each job runs on its own thread with the block's session set active, so
+    `current_executor`, [`offload`][ropt.simple.offload] and a nested
+    [`optimize`][ropt.simple.optimize] inside a job resolve to this block's
+    executor. This is what [`optimize_many`][ropt.simple.optimize_many] is built
+    on; use it directly to launch runs of your own concurrently.
 
-    Args:
-        step:      The compute step to run.
-        context:   The optimizer context.
-        variables: The initial variable vector(s).
-        metadata:  Optional dictionary attached to every emitted
-                   [`Results`][ropt.results.Results].
-
-    Returns:
-        The exit code returned by the step.
-    """
-    return cast(
-        "ExitCode",
-        step.run(context=context, variables=variables, metadata=metadata),
-    )
-
-
-def _name_task(run_id: int, contexts: Sequence[EvaluationFunctionContext]) -> str:
-    context = contexts[0]
-    name = f"run{run_id}-b{context.batch_id}-r{context.realization}"
-    if context.perturbation >= 0:
-        name = f"{name}-p{context.perturbation}"
-    return name
-
-
-def make_task_namer(
-    session: Session | None, executor: Executor | None
-) -> NameCallback | None:
-    """Build an auto-naming callback for a single run's tasks.
-
-    Names have the form `run{id}-b{batch}-r{realization}[-p{perturbation}]`,
-    where `id` is unique within the executor and the `-p` suffix is dropped for
-    unperturbed evaluations. Only the `HPCExecutor` uses these names; for other
-    executors the callback is harmless.
+    An open `handlers` block is not propagated, because a bare thread does not
+    inherit context variables: read `current_handlers` on the calling thread and
+    pass the scope into each job. `limit` bounds how many run at once. The first
+    job to raise propagates its error at once (fail-fast); pending jobs are then
+    skipped and any already running are abandoned, since a Python thread cannot
+    be stopped from the outside.
 
     Args:
-        session:  The active session, or `None` on the sequential floor.
-        executor: The active executor, or `None` on the sequential floor.
+        jobs:  The zero-argument callables to run, one result each.
+        limit: The maximum number to run at once, or `None` for no limit.
 
     Returns:
-        A naming callback, or `None` when there is no executor.
+        The job results, in the order of `jobs`.
+
+    Raises:
+        WorkflowError: If no execution block is open.
     """
-    if session is None or executor is None:
-        return None
-    return partial(_name_task, session.next_run_id())
+    session = _active_session.get()
+    if session is None:
+        msg = (
+            "gather_shared() requires an execution block, "
+            "e.g. `with ropt.threads(...):`."
+        )
+        raise WorkflowError(msg)
+    return session.gather_shared(jobs, limit)

@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping
 from contextlib import contextmanager
 from functools import partial
 from typing import TYPE_CHECKING
@@ -10,21 +9,16 @@ from typing import TYPE_CHECKING
 import numpy as np
 
 from ropt.components.compute_steps import OptimizationStep
-from ropt.components.evaluators import FunctionEvaluator, ParallelEvaluator
 from ropt.components.event_handlers import ResultsHandler
-from ropt.context import EnOptContext
 from ropt.exceptions import WorkflowError
 
-from ._function import adapt_function
+from ._broadcast import broadcast_metadata, broadcast_reports, broadcast_runs
+from ._evaluator import make_evaluator, run_step
 from ._handlers import current_handlers
+from ._naming import make_task_namer
 from ._report import make_report_handler
 from ._result import OptimizeResult
-from ._session import (
-    current_executor,
-    current_session,
-    make_task_namer,
-    run_step,
-)
+from ._session import current_executor, current_session
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator, Sequence
@@ -64,11 +58,17 @@ def optimize(  # ruff: ignore[too-many-arguments]
         handlers:             Optional local result handlers, each claimed for
                               the duration of this run. A handler may be reused
                               across sequential `optimize` calls to accumulate
-                              results, but not shared with a concurrent run.
+                              results, but not shared with a concurrent run, and
+                              not passed to
+                              [`handlers`][ropt.simple.handlers] afterwards: a
+                              handler used locally stays bound to its run and is
+                              rejected by a shared block.
         report:               An optional callback invoked with an
                               `EvaluateResult` for each function evaluation;
                               return `True` from it to stop the optimization
-                              early with `USER_ABORT`.
+                              early with `USER_ABORT`. Reporting stops there,
+                              so results after it in the same batch are not
+                              passed on.
         constraint_tolerance: The tolerance within which a constraint is
                               considered satisfied.
         metadata:             An optional dictionary attached to every
@@ -121,20 +121,7 @@ def _optimize(  # ruff: ignore[too-many-arguments]
     metadata: dict[str, Any] | None = None,
     get_name: NameCallback | None = None,
 ) -> OptimizeResult:
-    context = EnOptContext.model_validate(config)
-    n_obj = context.objectives.weights.size
-    n_con = (
-        0
-        if context.nonlinear_constraints is None
-        else context.nonlinear_constraints.lower_bounds.size
-    )
-
-    callback = adapt_function(function, n_obj, n_con)
-    evaluator = (
-        FunctionEvaluator(function=callback)
-        if executor is None
-        else ParallelEvaluator(function=callback, executor=executor, get_name=get_name)
-    )
+    context, evaluator = make_evaluator(config, function, executor, get_name)
     result_handler = ResultsHandler(constraint_tolerance=constraint_tolerance)
     step = OptimizationStep(evaluator=evaluator)
     step.add_event_handler(result_handler)
@@ -194,12 +181,28 @@ def optimize_many(  # ruff: ignore[too-many-arguments]
     every run) or a sequence (one per run). Sequences set the number of runs and
     must agree in length; single values are broadcast. A single `x0` is a 1-D
     vector; a per-run sequence of `x0`s is a 2-D matrix with one vector per row.
+    A sequence that is empty gives no runs, and returns no results.
 
     The runs execute concurrently on driver threads and share the session's
     worker pool, so this must be called inside a `threads`/`processes` block.
-    `limit` bounds how many run simultaneously. The first run to raise cancels
-    the rest and propagates (fail-fast). See
+    `limit` bounds how many run simultaneously. See
     [Running Optimizations](../running/running.md) for a walkthrough.
+
+    The first run to raise propagates its exception immediately (fail-fast).
+    Runs that have not started are skipped, but a run already in progress
+    cannot be stopped from the outside: it is abandoned, and keeps going until
+    its next evaluation finds the block's executor gone. It then stops and
+    returns, rather than raising — usually with
+    [`ExitCode.EXECUTOR_STOPPED`][ropt.enums.ExitCode], though a run that ends
+    its own optimizer loop first reports that reason instead. Either way its
+    result is discarded. So leaving the block after a failure can still take as
+    long as one evaluation, and with `processes` or `hpc` that is one full
+    simulation.
+
+    Unlike `optimize`, this takes no per-run `handlers`: a handler is claimed by
+    one run at a time and these runs overlap. Collect results across the runs
+    with a shared [`handlers`][ropt.simple.handlers] block, which tags each
+    event with its run, or with a per-run `report` callback.
 
     Args:
         config:               The configuration, or one per run.
@@ -234,9 +237,9 @@ def optimize_many(  # ruff: ignore[too-many-arguments]
 
     executor = current_executor()
     shared = current_handlers()
-    runs = _broadcast(config, x0, function)
-    reports = _broadcast_reports(report, len(runs))
-    metadatas = _broadcast_metadata(metadata, len(runs))
+    runs = broadcast_runs(config, x0, function)
+    reports = broadcast_reports(report, len(runs))
+    metadatas = broadcast_metadata(metadata, len(runs))
     jobs: list[Callable[[], OptimizeResult]] = [
         partial(
             _optimize,
@@ -256,67 +259,3 @@ def optimize_many(  # ruff: ignore[too-many-arguments]
         )
     ]
     return tuple(session.gather_shared(jobs, limit))
-
-
-def _broadcast(
-    config: dict[str, Any] | Sequence[dict[str, Any]],
-    x0: ArrayLike,
-    function: EvaluationFunction | Sequence[EvaluationFunction],
-) -> list[tuple[dict[str, Any], ArrayLike, EvaluationFunction]]:
-    configs = [config] if isinstance(config, Mapping) else list(config)
-    functions = [function] if callable(function) else list(function)
-
-    x0_array = np.asarray(x0, dtype=np.float64)
-    if x0_array.ndim == 1:
-        x0s: list[ArrayLike] = [x0_array]
-    elif x0_array.ndim == 2:  # ruff: ignore[magic-value-comparison]
-        x0s = list(x0_array)
-    else:
-        msg = "x0 must be a vector or a 2-D matrix of vectors."
-        raise ValueError(msg)
-
-    counts = {len(seq) for seq in (configs, functions, x0s) if len(seq) != 1}
-    if len(counts) > 1:
-        msg = "config, x0 and function sequences must have the same length."
-        raise ValueError(msg)
-    count = counts.pop() if counts else 1
-
-    def _broadcast_seq(seq: list[Any]) -> list[Any]:
-        return seq * count if len(seq) == 1 else seq
-
-    return list(
-        zip(
-            _broadcast_seq(configs),
-            _broadcast_seq(x0s),
-            _broadcast_seq(functions),
-            strict=True,
-        )
-    )
-
-
-def _broadcast_reports(
-    report: ReportCallback | Sequence[ReportCallback] | None, count: int
-) -> list[ReportCallback | None]:
-    if report is None:
-        return [None] * count
-    if callable(report):
-        return [report] * count
-    reports: list[ReportCallback | None] = list(report)
-    if len(reports) != count:
-        msg = "report sequence length must match the number of runs."
-        raise ValueError(msg)
-    return reports
-
-
-def _broadcast_metadata(
-    metadata: dict[str, Any] | Sequence[dict[str, Any]] | None, count: int
-) -> list[dict[str, Any] | None]:
-    if metadata is None:
-        return [None] * count
-    if isinstance(metadata, Mapping):
-        return [metadata] * count
-    metadatas: list[dict[str, Any] | None] = list(metadata)
-    if len(metadatas) != count:
-        msg = "metadata sequence length must match the number of runs."
-        raise ValueError(msg)
-    return metadatas

@@ -1,5 +1,15 @@
 """Tests for the sequential high-level ``optimize`` API."""
 
+# Two things here are easy to "simplify" and must not be; the other traps in
+# this file are explained where they sit.
+#
+# - test_execution_block_refuses_reentry has to match the message. Asserting
+#   `WorkflowError` alone passes with the guard removed, because
+#   open_executor's "Only one execution block" surfaces instead.
+# - The monkeypatched tests name their target as an attribute and assert it was
+#   used. An earlier version patched a method by string and became a no-op the
+#   day it was renamed, which mypy cannot see.
+
 from __future__ import annotations
 
 import threading
@@ -9,6 +19,10 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 import pytest
 
+from ropt.components.compute_steps import EvaluationStep
+from ropt.components.evaluators import FunctionEvaluator
+from ropt.components.event_handlers import EventDispatcher
+from ropt.components.executors import ThreadingExecutor
 from ropt.enums import ExitCode
 from ropt.exceptions import ExecutorStopped, WorkflowError
 from ropt.simple import (
@@ -16,6 +30,7 @@ from ropt.simple import (
     EvaluationFunctionContext,
     HistoryHandler,
     OptimizeResult,
+    _blocks,
     can_offload,
     compose,
     evaluate,
@@ -29,7 +44,9 @@ from ropt.simple import (
     threads,
 )
 from ropt.simple._function import adapt_function
-from ropt.simple._session import current_executor, current_session, make_task_namer
+from ropt.simple._handlers import _handler_stack, current_handlers
+from ropt.simple._naming import make_task_namer
+from ropt.simple._session import _Session, current_executor, current_session
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -154,44 +171,205 @@ def test_handlers_report_callback_reports_across_the_block(
     assert all(isinstance(item, EvaluateResult) for item in reported)
 
 
-def test_that_threaded_handlers_are_attached_to_run_in_a_thread() -> None:
+def test_threaded_handlers_run_in_thread() -> None:
     loop_handler = HistoryHandler()
     io_handler = HistoryHandler()
     scope = handlers(loop_handler, threaded=io_handler)
     with scope:
-        in_thread = dict(scope.dispatcher._handlers)  # ruff: ignore[private-member-access]
+        in_thread = dict(scope._running_dispatcher._handlers)  # ruff: ignore[private-member-access]
     assert in_thread[loop_handler] is False
     assert in_thread[io_handler] is True
 
 
-def test_that_threaded_accepts_a_sequence_of_handlers() -> None:
+def test_threaded_accepts_handler_sequence() -> None:
     first = HistoryHandler()
     second = HistoryHandler()
     scope = handlers(threaded=[first, second])
     with scope:
-        in_thread = dict(scope.dispatcher._handlers)  # ruff: ignore[private-member-access]
+        in_thread = dict(scope._running_dispatcher._handlers)  # ruff: ignore[private-member-access]
     assert in_thread[first] is True
     assert in_thread[second] is True
 
 
-def test_that_a_threaded_handler_keeps_its_flag_when_inherited() -> None:
+def test_threaded_handler_keeps_flag_when_inherited() -> None:
     io_handler = HistoryHandler()
     outer = handlers(threaded=io_handler)
     with outer:
         inner = handlers()
         with inner:
-            assert dict(inner.dispatcher._handlers)[io_handler] is True  # ruff: ignore[private-member-access]
-        assert dict(outer.dispatcher._handlers)[io_handler] is True  # ruff: ignore[private-member-access]
+            assert dict(inner._running_dispatcher._handlers)[io_handler] is True  # ruff: ignore[private-member-access]
+        assert dict(outer._running_dispatcher._handlers)[io_handler] is True  # ruff: ignore[private-member-access]
 
 
-def test_that_relisting_a_handler_overrides_its_threaded_flag() -> None:
+def test_relisting_handler_overrides_threaded_flag() -> None:
     handler = HistoryHandler()
     outer = handlers(threaded=handler)
     with outer:
         inner = handlers(handler)  # re-listed as a loop-thread handler
         with inner:
-            assert dict(inner.dispatcher._handlers)[handler] is False  # ruff: ignore[private-member-access]
-        assert dict(outer.dispatcher._handlers)[handler] is True  # ruff: ignore[private-member-access]
+            assert dict(inner._running_dispatcher._handlers)[handler] is False  # ruff: ignore[private-member-access]
+        assert dict(outer._running_dispatcher._handlers)[handler] is True  # ruff: ignore[private-member-access]
+
+
+def test_handlers_block_binds_scope() -> None:
+    handler = HistoryHandler()
+    with handlers(handler) as scope:
+        assert scope is current_handlers()
+
+
+def test_empty_handlers_block_adds_no_forwarding_handler(
+    config: Any, test_functions: Any
+) -> None:
+    with handlers() as scope:
+        step = EvaluationStep(
+            evaluator=FunctionEvaluator(
+                function=adapt_function(test_functions[0], 1, 0)
+            )
+        )
+        # Nothing wants events, so the run must not be given a forwarding handler.
+        scope.attach_to(step)
+        assert step.event_handlers == []
+        result = optimize(config, initial_values, test_functions[0])
+    assert result.exit_code == ExitCode.OPTIMIZER_FINISHED
+
+
+def test_handler_reusable_after_scope_closes() -> None:
+    handler = HistoryHandler()
+    with handlers(handler):
+        pass
+    scope = handlers(handler)
+    with scope:
+        assert set(dict(scope._running_dispatcher._handlers)) == {handler}  # ruff: ignore[private-member-access]
+
+
+def test_handler_reusable_after_scope_fails_to_open() -> None:
+    good = HistoryHandler()
+    bad = HistoryHandler()
+    with (
+        pytest.raises(WorkflowError, match="already registered with a dispatcher"),
+        handlers(good, bad, bad),
+    ):
+        pass
+    scope = handlers(good, bad)
+    with scope:
+        assert set(dict(scope._running_dispatcher._handlers)) == {good, bad}  # ruff: ignore[private-member-access]
+
+
+def test_handlers_block_refuses_reentry(config: Any, test_functions: Any) -> None:
+    handler = HistoryHandler()
+    scope = handlers(handler)
+    with pytest.raises(WorkflowError, match="already open"), scope, scope:
+        pass
+    # The rejected re-entry must leave nothing behind: a scope stranded on the
+    # stack would feed every later run to a dispatcher that no longer runs.
+    assert _handler_stack.get() == ()
+    with handlers(handler):
+        optimize(config, initial_values, test_functions[0])
+    assert len(handler["results"]) > 0
+
+
+def test_execution_block_refuses_reentry(config: Any, test_functions: Any) -> None:
+    scope = threads(workers=1)
+    with pytest.raises(WorkflowError, match="already open"), scope, scope:
+        pass
+    # The rejected re-entry must leave the first block's state alone, so the
+    # scope still releases its session and can be opened again.
+    assert current_session() is None
+    with scope:
+        result = optimize(config, initial_values, test_functions[0])
+    assert result.exit_code == ExitCode.OPTIMIZER_FINISHED
+
+
+def test_execution_block_survives_a_failed_session_acquire(
+    config: Any, test_functions: Any, monkeypatch: Any
+) -> None:
+    # A scope that fails before it acquires anything has nothing to release, and
+    # must not refuse every later block on the strength of an entry that opened
+    # nothing. Reachable: _acquire_session starts a loop and a thread.
+    calls = 0
+
+    def _boom() -> tuple[_Session, None]:
+        nonlocal calls
+        calls += 1
+        msg = "no thread for you"
+        raise RuntimeError(msg)
+
+    scope = threads(workers=1)
+    monkeypatch.setattr(_blocks, "_acquire_session", _boom)
+    with pytest.raises(RuntimeError, match="no thread for you"), scope:
+        pass
+    assert calls == 1
+    monkeypatch.undo()
+    with scope:
+        result = optimize(config, initial_values, test_functions[0])
+    assert result.exit_code == ExitCode.OPTIMIZER_FINISHED
+
+
+def test_closed_execution_block_releases_session() -> None:
+    # A scope that keeps a stopped session keeps its loop and its thread with
+    # it, and would hand a dead one to a second use of the same object.
+    scope = threads(workers=1)
+    with scope:
+        assert scope._session is not None  # ruff: ignore[private-member-access]
+    assert scope._session is None  # ruff: ignore[private-member-access]
+    assert scope._token is None  # ruff: ignore[private-member-access]
+    with scope:
+        assert scope._session is not None  # ruff: ignore[private-member-access]
+
+
+def test_local_handler_refused_by_block(config: Any, test_functions: Any) -> None:
+    handler = HistoryHandler()
+    optimize(config, initial_values, test_functions[0], handlers=[handler])
+    with (
+        pytest.raises(WorkflowError, match="already in use") as excinfo,
+        handlers(handler),
+    ):
+        pass
+    # The low-level refusal names a compute step, which this API never hands
+    # out; a reader cannot act on it.
+    assert "compute step" not in str(excinfo.value)
+    assert "separate handler" in str(excinfo.value)
+
+
+def test_closed_handlers_block_reopens() -> None:
+    handler = HistoryHandler()
+    scope = handlers(handler)
+    with scope:
+        assert set(dict(scope._running_dispatcher._handlers)) == {handler}  # ruff: ignore[private-member-access]
+    assert scope._current_handlers == set()  # ruff: ignore[private-member-access]
+    with scope:
+        assert set(dict(scope._running_dispatcher._handlers)) == {handler}  # ruff: ignore[private-member-access]
+    assert scope._current_handlers == set()  # ruff: ignore[private-member-access]
+
+
+def test_handlers_block_releases_session_on_rollback_failure(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    def _failing_remove(*_args: object, **_kwargs: object) -> None:
+        msg = "rollback failed"
+        raise RuntimeError(msg)
+
+    monkeypatch.setattr(EventDispatcher, "remove_event_handler", _failing_remove)
+    handler = HistoryHandler()
+    with (
+        pytest.raises(RuntimeError, match="rollback failed"),
+        handlers(handler, handler),
+    ):
+        pass
+    assert current_session() is None
+
+
+def test_failing_block_teardown_releases_session(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    def _failing_close(_self: object) -> None:
+        msg = "teardown failed"
+        raise RuntimeError(msg)
+
+    monkeypatch.setattr(_Session, "close_executor", _failing_close)
+    with pytest.raises(RuntimeError, match="teardown failed"), threads(workers=1):
+        pass
+    assert current_session() is None
 
 
 def test_optimize_local_handler_accumulates_across_sequential_calls(
@@ -258,9 +436,7 @@ def test_optimize_local_handler_claim_rolls_back_on_failure(
     assert first._claimed is False  # ruff: ignore[private-member-access]
 
 
-def test_that_report_callback_returning_true_stops_optimization(
-    config: Any, test_functions: Any
-) -> None:
+def test_report_callback_stops_optimization(config: Any, test_functions: Any) -> None:
     reported = 0
 
     def _report(_: EvaluateResult) -> bool:
@@ -273,9 +449,7 @@ def test_that_report_callback_returning_true_stops_optimization(
     assert reported == 1
 
 
-def test_that_report_callback_stops_only_its_own_run_in_optimize_many(
-    config: Any, test_functions: Any
-) -> None:
+def test_report_callback_stops_only_own_run(config: Any, test_functions: Any) -> None:
     def _stop(_: EvaluateResult) -> bool:
         return True
 
@@ -329,6 +503,41 @@ def test_evaluate_single_vector(config: Any, test_functions: Any) -> None:
     assert result.objectives.shape == (1,)
     assert result.constraints is None
     assert result.results.evaluations.variables.shape == (initial_values.size,)
+
+
+def test_user_thread_does_not_inherit_open_blocks(
+    config: Any, test_functions: Any
+) -> None:
+    handler = HistoryHandler()
+    seen: dict[str, Any] = {}
+
+    def worker() -> None:
+        seen["session"] = current_session()
+        seen["executor"] = current_executor()
+        seen["handlers"] = current_handlers()
+        optimize(config, initial_values, test_functions[0])
+
+    with threads(workers=2), handlers(handler):
+        assert current_session() is not None
+        assert current_executor() is not None
+        thread = threading.Thread(target=worker)
+        thread.start()
+        thread.join()
+
+    assert seen["session"] is None
+    assert seen["executor"] is None
+    assert seen["handlers"] is None
+    assert handler["results"] is None
+
+
+def test_evaluate_feeds_a_shared_handlers_block(
+    config: Any, test_functions: Any
+) -> None:
+    handler = HistoryHandler()
+    with handlers(handler):
+        evaluate(config, initial_values, test_functions[0])
+        evaluate(config, np.zeros(initial_values.size), test_functions[0])
+    assert len(handler["results"]) == 2
 
 
 def test_evaluate_rejects_matrix(config: Any, test_functions: Any) -> None:
@@ -492,7 +701,6 @@ def _sphere(variables: NDArray[np.float64], _context: Any) -> float:
 
 
 def _run_inner_optimization(variables: NDArray[np.float64], _context: Any) -> float:
-    # The outer evaluation opens its own independent block and optimizer.
     with threads(workers=1):
         result = optimize(_INNER_CONFIG, variables, _sphere)
     assert result.target_objective is not None
@@ -532,13 +740,11 @@ _BILEVEL_CONFIG: dict[str, Any] = {
 def _inner_objective(
     variables: NDArray[np.float64], _context: Any, outer_value: float
 ) -> float:
-    # For a fixed outer value, minimized at b = 3, leaving (outer_value - 2) ** 2.
     b = float(variables[0])
     return (outer_value - 2.0) ** 2 + (b - 3.0) ** 2
 
 
 def _bilevel_outer(variables: NDArray[np.float64], _context: Any) -> float:
-    # Each outer evaluation runs an isolated inner optimization over b.
     a = float(variables[0])
     with threads(workers=1):
         inner = optimize(
@@ -549,8 +755,6 @@ def _bilevel_outer(variables: NDArray[np.float64], _context: Any) -> float:
 
 
 def test_isolated_nested_optimization_on_threads() -> None:
-    # A small bilevel problem: the outer converges to a = 2 while every inner
-    # run (isolated, on its own threads block) drives b to 3.
     with threads(workers=1):
         result = optimize(_BILEVEL_CONFIG, [0.0], _bilevel_outer)
     assert result.variables is not None
@@ -567,22 +771,21 @@ def test_offload_in_evaluation_finds_no_executor(config: Any) -> None:
 
 
 def test_gather_shared_activates_the_session_on_driver_threads() -> None:
-    # gather_shared sets the block's session on each driver thread, so a
-    # session-consuming call (offload here) resolves the shared executor there.
     def _square(value: int) -> int:
         return value * value
 
     with threads(workers=2):
-        session = current_session()
-        assert session is not None
         functions = [partial(_square, i) for i in (1, 2, 3)]
-        [result] = session.gather_shared([lambda: offload(functions)], limit=1)
+        [result] = compose.gather_shared([lambda: offload(functions)], limit=1)
     assert result == (1, 4, 9)
 
 
-def test_that_gather_shared_does_not_propagate_the_handler_scope() -> None:
-    # Jobs run on bare threads, which do not inherit context variables. The
-    # documented pattern is to read the scope here and pass it into each job.
+def test_gather_shared_requires_execution_block() -> None:
+    with pytest.raises(WorkflowError, match="requires an execution block"):
+        compose.gather_shared([lambda: 1])
+
+
+def test_gather_shared_does_not_propagate_handler_scope() -> None:
     seen: list[bool] = []
 
     def _look() -> bool:
@@ -590,11 +793,9 @@ def test_that_gather_shared_does_not_propagate_the_handler_scope() -> None:
         return True
 
     with threads(workers=1), handlers(report=lambda _: None):
-        session = current_session()
-        assert session is not None
         assert compose.current_handlers() is not None
         assert current_executor() is not None
-        session.gather_shared([_look], limit=1)
+        compose.gather_shared([_look], limit=1)
     assert seen == [False]
 
 
@@ -607,10 +808,7 @@ def _fatal_work() -> int:
     raise _FatalWork(msg)
 
 
-def test_that_a_fatal_worker_error_is_reported_when_the_block_exits() -> None:
-    # It tears down the session, closing its loop while the block is still
-    # open. The cause must reach the caller instead of being lost on the
-    # session thread behind a stray "Event loop is closed".
+def test_fatal_worker_error_reported_on_block_exit() -> None:
     def _run_block() -> None:
         with threads(workers=1), pytest.raises(ExecutorStopped):
             offload(_fatal_work)
@@ -626,7 +824,6 @@ def _double(value: float) -> float:
 
 
 def _offload_in_own_block(variables: NDArray[np.float64], _context: Any) -> float:
-    # The evaluation offloads to a block it opens itself, not the outer one.
     with threads(workers=2):
         doubled = offload([partial(_double, 3.0), partial(_double, 4.0)])
     assert doubled == (6.0, 8.0)
@@ -664,6 +861,7 @@ def test_handlers_block_in_an_evaluation(config: Any) -> None:
     assert result.target_objective is not None
 
 
+@pytest.mark.slow
 def test_sequential_execution_managers_are_allowed(
     config: Any, test_functions: Any
 ) -> None:
@@ -675,10 +873,17 @@ def test_sequential_execution_managers_are_allowed(
     assert first.variables == pytest.approx(second.variables)
 
 
+def test_session_without_task_group_reports_stopped() -> None:
+    session = _Session()
+    with pytest.raises(WorkflowError, match="is not running"):
+        session.open_dispatcher(EventDispatcher())
+    with pytest.raises(WorkflowError, match="is not running"):
+        session.open_executor(lambda: ThreadingExecutor(workers=1))
+
+
 def test_session_clears_after_block(config: Any, test_functions: Any) -> None:
     with threads(workers=1):
         pass
-    # A sequential run works again once the block has exited.
     result = optimize(config, initial_values, test_functions[0])
     assert result.variables is not None
     assert np.allclose(result.variables, 0.5, atol=0.02)
@@ -715,6 +920,29 @@ def test_optimize_with_processes(config: Any, test_functions: Any) -> None:
         result = optimize(config, initial_values, test_functions[0])
     assert result.variables is not None
     assert np.allclose(result.variables, 0.5, atol=0.02)
+
+
+@pytest.mark.slow
+def test_processes_without_cloudpickle(config: Any, monkeypatch: Any) -> None:
+    monkeypatch.setattr(
+        "ropt.components.executors._multiprocessing_executor._HAVE_CLOUDPICKLE",
+        False,
+    )
+    with processes(workers=2):
+        result = optimize(config, initial_values, _sphere)
+    assert result.variables is not None
+    assert np.allclose(result.variables, 0.0, atol=0.02)
+
+
+@pytest.mark.slow
+def test_evaluate_without_cloudpickle(config: Any, monkeypatch: Any) -> None:
+    monkeypatch.setattr(
+        "ropt.components.executors._multiprocessing_executor._HAVE_CLOUDPICKLE",
+        False,
+    )
+    with processes(workers=2):
+        result = evaluate(config, initial_values, _sphere)
+    assert result.target_objective == pytest.approx(0.01)
 
 
 def test_optimize_many_broadcasts_config_and_objective(
@@ -831,6 +1059,19 @@ def test_optimize_many_mismatched_lengths_raises(
         )
 
 
+def test_optimize_many_rejects_more_than_two_dimensional_starts(
+    config: Any, test_functions: Any
+) -> None:
+    starts = np.tile(initial_values, (2, 2, 1))
+    with threads(workers=2), pytest.raises(ValueError, match="vector or a 2-D matrix"):
+        optimize_many(config, starts, test_functions[0])
+
+
+def test_optimize_many_without_runs_returns_nothing(test_functions: Any) -> None:
+    with threads(workers=2):
+        assert optimize_many([], initial_values, test_functions[0]) == ()
+
+
 def test_optimize_many_requires_session(config: Any, test_functions: Any) -> None:
     with pytest.raises(WorkflowError, match="requires an execution block"):
         optimize_many(config, initial_values, test_functions[0])
@@ -844,6 +1085,140 @@ def test_optimize_many_fail_fast(config: Any, test_functions: Any) -> None:
     starts = np.tile(initial_values, (3, 1))
     with threads(workers=2), pytest.raises(ValueError, match="boom"):
         optimize_many(config, starts, [test_functions[0], boom, test_functions[0]])
+
+
+@pytest.mark.timeout(60)
+def test_optimize_many_skips_runs_that_have_not_started(config: Any) -> None:
+    calls = 0
+    lock = threading.Lock()
+    ran_again = threading.Event()
+
+    def boom(_v: Any, _c: Any) -> float:
+        nonlocal calls
+        with lock:
+            calls += 1
+            if calls > 1:
+                ran_again.set()
+        msg = "boom"
+        raise ValueError(msg)
+
+    # One at a time, so the first run to be let through fails before any other
+    # is admitted, and `run_concurrent` sets its stop flag inside the slot
+    # before releasing it. A pending run therefore cannot start -- but that is
+    # a negative, and the runs that would disprove it are released just after
+    # the failure propagates, so asserting straight away proves nothing. Wait
+    # on the event a second run would set: it returns the moment one does, and
+    # only costs the ceiling when no run does. The wait happens inside the
+    # block, while the session is still alive: leaving it first would stop the
+    # pending runs by killing the session, which is not the mechanism here.
+    starts = np.tile(initial_values, (5, 1))
+    with threads(workers=2):
+        with pytest.raises(ValueError, match="boom"):
+            optimize_many(config, starts, boom, limit=1)
+        assert not ran_again.wait(timeout=0.2)
+        with lock:
+            assert calls == 1
+
+
+@pytest.mark.timeout(60)
+def test_optimize_many_leaves_the_block_usable_after_a_failure(
+    config: Any, test_functions: Any
+) -> None:
+    # Every run reaches its first evaluation before any of them returns, so the
+    # three siblings are provably in flight when the fourth fails and are
+    # abandoned rather than skipped. A barrier gives that ordering outright;
+    # sleeping for it only makes it likely. One worker per run, so the
+    # rendezvous cannot starve on the pool.
+    started = threading.Barrier(4)
+
+    def boom(_v: Any, _c: Any) -> float:
+        started.wait(timeout=30)
+        msg = "boom"
+        raise ValueError(msg)
+
+    def first_evaluation_waits() -> Any:
+        waited = False
+
+        def objective(variables: Any, context: Any) -> float:
+            nonlocal waited
+            if not waited:
+                waited = True
+                started.wait(timeout=30)
+            return float(test_functions[0](variables, context))
+
+        return objective
+
+    starts = np.tile(initial_values, (4, 1))
+    with threads(workers=4):
+        with pytest.raises(ValueError, match="boom"):
+            optimize_many(
+                config,
+                starts,
+                [
+                    first_evaluation_waits(),
+                    first_evaluation_waits(),
+                    boom,
+                    first_evaluation_waits(),
+                ],
+            )
+        # Siblings are abandoned, not cancelled, so they may still be running
+        # here; the block must stay usable and must not deadlock against them.
+        # The executor has to still be there: without this check a run that
+        # quietly fell back to evaluating in-process would satisfy the exit
+        # code just as well.
+        assert compose.current_executor() is not None
+        result = optimize(config, initial_values, test_functions[0])
+    assert result.exit_code == ExitCode.OPTIMIZER_FINISHED
+
+
+@pytest.mark.timeout(60)
+def test_run_abandoned_by_fail_fast_returns(config: Any, test_functions: Any) -> None:
+    # `gather_shared` is the primitive `optimize_many` runs its drivers on. A
+    # run already in flight when a sibling fails cannot be cancelled, so it
+    # keeps going until its next evaluation finds the executor gone. It must
+    # then end by *returning* a result — that is why a fail-fast failure never
+    # sprays exceptions out of its driver threads.
+    #
+    # Which exit code it returns is a race and must not be asserted: usually
+    # the session reports the stop first (EXECUTOR_STOPPED), but the optimizer
+    # sometimes ends its own loop first and reports OPTIMIZER_FINISHED. Over
+    # 111 abandoned runs both codes appeared and none ever raised.
+    outcomes: list[Any] = []
+    lock = threading.Lock()
+    started = threading.Barrier(4)
+    finished = threading.Semaphore(0)
+
+    def record() -> None:
+        started.wait(timeout=30)
+        try:
+            result = optimize(config, initial_values, test_functions[0])
+        except BaseException as exc:  # ruff: ignore[blind-except]
+            with lock:
+                outcomes.append(exc)
+        else:
+            with lock:
+                outcomes.append(result.exit_code)
+        finally:
+            finished.release()
+
+    def boom() -> None:
+        # The rendezvous puts every sibling past the point where it could be
+        # skipped, so all three are genuinely abandoned rather than never run.
+        started.wait(timeout=30)
+        msg = "boom"
+        raise ValueError(msg)
+
+    with threads(workers=4), pytest.raises(ValueError, match="boom"):
+        compose.gather_shared([record, record, boom, record], None)
+
+    # Each abandoned run releases the semaphore as it ends, so this returns as
+    # soon as the last one does; the timeout is only a ceiling on a hang.
+    for _ in range(3):
+        assert finished.acquire(timeout=30), "abandoned runs never finished"
+
+    assert len(outcomes) == 3
+    assert all(isinstance(outcome, ExitCode) for outcome in outcomes), outcomes
+    assert set(outcomes) <= {ExitCode.EXECUTOR_STOPPED, ExitCode.OPTIMIZER_FINISHED}
 
 
 def test_shared_handler_aggregates_single_run(config: Any, test_functions: Any) -> None:
@@ -939,14 +1314,12 @@ def test_inherited_handler_returns_to_enclosing_block_after_nested_exit(
 
 
 def test_compose_accessors_reflect_open_blocks() -> None:
-    assert compose.current_session() is None
     assert compose.current_handlers() is None
     assert compose.current_executor() is None
 
     outer = HistoryHandler()
     inner = HistoryHandler()
     with threads(workers=1):
-        assert compose.current_session() is not None
         assert compose.current_executor() is not None
         assert compose.current_handlers() is None
         with handlers(outer):
@@ -955,7 +1328,6 @@ def test_compose_accessors_reflect_open_blocks() -> None:
             with handlers(inner):
                 assert compose.current_handlers() is not outer_scope
             assert compose.current_handlers() is outer_scope
-    assert compose.current_session() is None
     assert compose.current_handlers() is None
     assert compose.current_executor() is None
 
