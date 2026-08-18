@@ -4120,10 +4120,9 @@ details on how this integrates with the asyncio event loop.</p>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">function</span><span class="p">:</span> <span class="n">EvaluationFunctionCallback</span><span class="p">,</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">executor</span><span class="p">:</span> <span class="n">Executor</span><span class="p">,</span>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">bundle_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">queue_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">get_name</span><span class="p">:</span> <span class="n">NameCallback</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">batch_id_callback</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">get_name</span><span class="p">:</span> <span class="n">NameCallback</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">batch_id_callback</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -4198,22 +4197,6 @@ be unique within the executor.</p>
             </td>
             <td>
                   <code>1</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>queue_size</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Maximum size of the result queue.</p>
-              </div>
-            </td>
-            <td>
-                  <code>0</code>
             </td>
           </tr>
           <tr class="doc-section-item">
@@ -4308,7 +4291,9 @@ infrastructure failure arrives as an
 recorded as a failed realization (NaN), while a user-code exception
 arrives on the results queue and aborts the current evaluation by
 re-raising the original exception unchanged. The executor is left
-running, so a consumer may reuse it for further evaluations.</p>
+running, so a consumer may reuse it for further evaluations. If the
+executor cannot run the evaluation,
+<a class="autorefs autorefs-internal" title="            ExecutorStopped" href="../exceptions/#ropt.exceptions.ExecutorStopped"><code>ExecutorStopped</code></a> is raised.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -4402,12 +4387,11 @@ running, so a consumer may reuse it for further evaluations.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ExecutorStopped (ropt.exceptions.ExecutorStopped)" href="../exceptions/#ropt.exceptions.ExecutorStopped">ExecutorStopped</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            WorkflowError (ropt.exceptions.WorkflowError)" href="../exceptions/#ropt.exceptions.WorkflowError">WorkflowError</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If the executor is not running and no task
-exception is available to re-raise.</p>
+                <p>If called on the executor's own event loop thread.</p>
               </div>
             </td>
           </tr>

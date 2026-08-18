@@ -2423,39 +2423,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.components.executors.Executor.task_queue" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        task_queue
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.components.executors.Executor.loop" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        loop
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.components.executors.Executor.task_group" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        task_group
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ropt.components.executors.Executor.start" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2478,6 +2445,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#ropt.components.executors.Executor.on_worker_loop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        on_worker_loop
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ropt.components.executors.Executor.is_running" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2488,50 +2466,11 @@
   
 </li>
         
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#ropt.components.executors.Task" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Task
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Task">
-      <ul class="md-nav__list">
-        
           <li class="md-nav__item">
-  <a href="#ropt.components.executors.Task.put_result" class="md-nav__link">
+  <a href="#ropt.components.executors.Executor.submit" class="md-nav__link">
     <span class="md-ellipsis">
       
-        put_result
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.components.executors.Task.put_error" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        put_error
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.components.executors.Task.cancel_all" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        cancel_all
+        submit
       
     </span>
   </a>
@@ -2544,19 +2483,30 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.components.executors.ResultsQueue" class="md-nav__link">
+  <a href="#ropt.components.executors.WorkItem" class="md-nav__link">
     <span class="md-ellipsis">
       
-        ResultsQueue
+        WorkItem
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="ResultsQueue">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.components.executors.Submission" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Submission
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Submission">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.components.executors.ResultsQueue.__init__" class="md-nav__link">
+  <a href="#ropt.components.executors.Submission.__init__" class="md-nav__link">
     <span class="md-ellipsis">
       
         __init__
@@ -2567,10 +2517,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.components.executors.ResultsQueue.close" class="md-nav__link">
+  <a href="#ropt.components.executors.Submission.work_items" class="md-nav__link">
     <span class="md-ellipsis">
       
-        close
+        work_items
       
     </span>
   </a>
@@ -2578,10 +2528,54 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.components.executors.ResultsQueue.put" class="md-nav__link">
+  <a href="#ropt.components.executors.Submission.is_finished" class="md-nav__link">
     <span class="md-ellipsis">
       
-        put
+        is_finished
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.components.executors.Submission.deliver" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        deliver
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.components.executors.Submission.fail" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        fail
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.components.executors.Submission.abort" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        abort
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.components.executors.Submission.collect" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        collect
       
     </span>
   </a>
@@ -2627,17 +2621,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#ropt.components.executors.ThreadingExecutor.cleanup" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        cleanup
-      
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -2677,17 +2660,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#ropt.components.executors.MultiprocessingExecutor.cleanup" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        cleanup
-      
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -2721,17 +2693,6 @@
     <span class="md-ellipsis">
       
         start
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.components.executors.HPCExecutor.cleanup" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        cleanup
       
     </span>
   </a>
@@ -3039,39 +3000,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.components.executors.Executor.task_queue" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        task_queue
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.components.executors.Executor.loop" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        loop
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.components.executors.Executor.task_group" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        task_group
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ropt.components.executors.Executor.start" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3094,6 +3022,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#ropt.components.executors.Executor.on_worker_loop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        on_worker_loop
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ropt.components.executors.Executor.is_running" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3104,50 +3043,11 @@
   
 </li>
         
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#ropt.components.executors.Task" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Task
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Task">
-      <ul class="md-nav__list">
-        
           <li class="md-nav__item">
-  <a href="#ropt.components.executors.Task.put_result" class="md-nav__link">
+  <a href="#ropt.components.executors.Executor.submit" class="md-nav__link">
     <span class="md-ellipsis">
       
-        put_result
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.components.executors.Task.put_error" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        put_error
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.components.executors.Task.cancel_all" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        cancel_all
+        submit
       
     </span>
   </a>
@@ -3160,19 +3060,30 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.components.executors.ResultsQueue" class="md-nav__link">
+  <a href="#ropt.components.executors.WorkItem" class="md-nav__link">
     <span class="md-ellipsis">
       
-        ResultsQueue
+        WorkItem
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="ResultsQueue">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.components.executors.Submission" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Submission
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Submission">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.components.executors.ResultsQueue.__init__" class="md-nav__link">
+  <a href="#ropt.components.executors.Submission.__init__" class="md-nav__link">
     <span class="md-ellipsis">
       
         __init__
@@ -3183,10 +3094,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.components.executors.ResultsQueue.close" class="md-nav__link">
+  <a href="#ropt.components.executors.Submission.work_items" class="md-nav__link">
     <span class="md-ellipsis">
       
-        close
+        work_items
       
     </span>
   </a>
@@ -3194,10 +3105,54 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.components.executors.ResultsQueue.put" class="md-nav__link">
+  <a href="#ropt.components.executors.Submission.is_finished" class="md-nav__link">
     <span class="md-ellipsis">
       
-        put
+        is_finished
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.components.executors.Submission.deliver" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        deliver
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.components.executors.Submission.fail" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        fail
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.components.executors.Submission.abort" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        abort
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.components.executors.Submission.collect" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        collect
       
     </span>
   </a>
@@ -3243,17 +3198,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#ropt.components.executors.ThreadingExecutor.cleanup" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        cleanup
-      
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -3287,17 +3231,6 @@
     <span class="md-ellipsis">
       
         start
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.components.executors.MultiprocessingExecutor.cleanup" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        cleanup
       
     </span>
   </a>
@@ -3343,17 +3276,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#ropt.components.executors.HPCExecutor.cleanup" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        cleanup
-      
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -3380,13 +3302,14 @@
 
 
 <h1 id="executors">Executors</h1>
-<p>Executors dispatch <a class="autorefs autorefs-internal" title="            ropt.components.executors.Task
+<p>Executors run the <a class="autorefs autorefs-internal" title="            ropt.components.executors.WorkItem
 
 
   
       dataclass
-  " href="#ropt.components.executors.Task"><code>Task</code></a> objects produced by a
-<a class="autorefs autorefs-internal" title="            ropt.components.evaluators.ParallelEvaluator" href="../components_evaluators/#ropt.components.evaluators.ParallelEvaluator"><code>ParallelEvaluator</code></a> to a concrete
+  " href="#ropt.components.executors.WorkItem"><code>WorkItem</code></a> objects of a
+<a class="autorefs autorefs-internal" title="            ropt.components.executors.Submission" href="#ropt.components.executors.Submission"><code>Submission</code></a>, produced by a
+<a class="autorefs autorefs-internal" title="            ropt.components.evaluators.ParallelEvaluator" href="../components_evaluators/#ropt.components.evaluators.ParallelEvaluator"><code>ParallelEvaluator</code></a>, on a concrete
 execution mechanism (threads, processes, or an HPC cluster).</p>
 <p>See <a href="../../workflows/parallel/">Parallel Evaluation</a> for usage.</p>
 
@@ -3409,7 +3332,7 @@ execution mechanism (threads, processes, or an HPC cluster).</p>
 
 
         <p>Abstract base class for executor components within an optimization workflow.</p>
-<p>Subclasses must implement the following abstract methods and properties:</p>
+<p>Subclasses must implement the following abstract methods:</p>
 <ul>
 <li><a class="autorefs autorefs-internal" title="            start
 
@@ -3424,37 +3347,19 @@ execution mechanism (threads, processes, or an HPC cluster).</p>
   
       abstractmethod
   " href="#ropt.components.executors.Executor.cancel"><code>cancel</code></a>: Stops the executor.</li>
-<li><a class="autorefs autorefs-internal" title="            task_queue
+<li><a class="autorefs autorefs-internal" title="            submit
 
 
   
       abstractmethod
-      property
-  " href="#ropt.components.executors.Executor.task_queue"><code>task_queue</code></a>: Retrieves the
-  executor's task queue.</li>
-<li><a class="autorefs autorefs-internal" title="            loop
-
-
-  
-      abstractmethod
-      property
-  " href="#ropt.components.executors.Executor.loop"><code>loop</code></a>: Retrieves the
-  currently running asyncio loop.</li>
-<li><a class="autorefs autorefs-internal" title="            task_group
-
-
-  
-      abstractmethod
-      property
-  " href="#ropt.components.executors.Executor.task_group"><code>task_group</code></a>: The asyncio.Taskgroup
-  used by this executor.</li>
+  " href="#ropt.components.executors.Executor.submit"><code>submit</code></a>: Hands over a submission.</li>
 <li><a class="autorefs autorefs-internal" title="            is_running
 
 
   
       abstractmethod
-  " href="#ropt.components.executors.Executor.is_running"><code>is_running</code></a>: Checks if the
-  executor is running.</li>
+  " href="#ropt.components.executors.Executor.is_running"><code>is_running</code></a>: Reports
+  whether the executor accepts work.</li>
 </ul>
 
 
@@ -3469,96 +3374,6 @@ execution mechanism (threads, processes, or an HPC cluster).</p>
 
 <div class="doc doc-children">
 
-
-
-
-
-
-
-<div class="doc doc-object doc-attribute">
-
-
-
-<h3 id="ropt.components.executors.Executor.task_queue" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">task_queue</span>
-
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
-      <small class="doc doc-label doc-label-property"><code>property</code></small>
-  </span>
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">task_queue</span><span class="p">:</span> <span class="n">Queue</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>The task queue.</p>
-
-    </div>
-
-</div>
-
-
-
-
-
-
-<div class="doc doc-object doc-attribute">
-
-
-
-<h3 id="ropt.components.executors.Executor.loop" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">loop</span>
-
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
-      <small class="doc doc-label doc-label-property"><code>property</code></small>
-  </span>
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">loop</span><span class="p">:</span> <span class="n">AbstractEventLoop</span> <span class="o">|</span> <span class="kc">None</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>The asyncio loop used by this executor.</p>
-
-    </div>
-
-</div>
-
-
-
-
-
-
-<div class="doc doc-object doc-attribute">
-
-
-
-<h3 id="ropt.components.executors.Executor.task_group" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">task_group</span>
-
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
-      <small class="doc doc-label doc-label-property"><code>property</code></small>
-  </span>
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">task_group</span><span class="p">:</span> <span class="n">TaskGroup</span> <span class="o">|</span> <span class="kc">None</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>The task group used by this executor.</p>
-
-    </div>
-
-</div>
 
 
 
@@ -3628,12 +3443,11 @@ execution mechanism (threads, processes, or an HPC cluster).</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError">RuntimeError</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            WorkflowError (ropt.exceptions.WorkflowError)" href="../exceptions/#ropt.exceptions.WorkflowError">WorkflowError</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If the executor is already running or using an
-          external queue.</p>
+                <p>If the executor is already running.</p>
               </div>
             </td>
           </tr>
@@ -3668,6 +3482,59 @@ execution mechanism (threads, processes, or an HPC cluster).</p>
     <div class="doc doc-contents ">
 
         <p>Stop the executor.</p>
+<p>May be called from any thread.</p>
+
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.components.executors.Executor.on_worker_loop" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">on_worker_loop</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">on_worker_loop</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">bool</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Report whether the caller is on the event loop that runs the work.</p>
+<p>Blocking that loop starves the work being waited for, so callers use
+this to refuse rather than deadlock. Implementations that run their
+work on an event loop must override this; the default <code>False</code> is for
+executors that do not have one.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p><code>True</code> if the calling thread is running the executor's loop.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
     </div>
@@ -3696,7 +3563,10 @@ execution mechanism (threads, processes, or an HPC cluster).</p>
 
     <div class="doc doc-contents ">
 
-        <p>Check if the executor is running.</p>
+        <p>Report whether the executor accepts work.</p>
+<p>May be called from any thread. A <code>False</code> result means a submission would
+be aborted rather than run, so a caller that is able to do the work
+itself may fall back to doing so.</p>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
@@ -3714,8 +3584,71 @@ execution mechanism (threads, processes, or an HPC cluster).</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>True if the executor is running.</p>
+                <p><code>True</code> if the executor accepts work, <code>False</code> otherwise.</p>
               </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.components.executors.Executor.submit" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">submit</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+  </span>
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">submit</span><span class="p">(</span><span class="n">submission</span><span class="p">:</span> <span class="n">Submission</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Hand a submission to the executor.</p>
+<p>May be called from any thread. A submission handed to an executor that
+is no longer running is aborted rather than queued, so its caller is
+never left waiting for results that cannot arrive.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>submission</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.components.executors.Submission (ropt.components.executors.base.Submission)" href="#ropt.components.executors.Submission">Submission</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The submission to run.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
             </td>
           </tr>
       </tbody>
@@ -3739,8 +3672,8 @@ execution mechanism (threads, processes, or an HPC cluster).</p>
 
 
 
-<h2 id="ropt.components.executors.Task" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.components.executors.Task</span>
+<h2 id="ropt.components.executors.WorkItem" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.components.executors.WorkItem</span>
 
 
   <span class="doc doc-labels">
@@ -3751,28 +3684,13 @@ execution mechanism (threads, processes, or an HPC cluster).</p>
 
 
     <div class="doc doc-contents first">
-            <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-external" title="abc.ABC" href="https://docs.python.org/3/library/abc.html#abc.ABC">ABC</a></code></p>
 
 
 
-        <p>A task to be executed by a worker.</p>
-<p>Task results are delivered on the associated
-<a class="autorefs autorefs-internal" title="            ropt.components.executors.ResultsQueue" href="#ropt.components.executors.ResultsQueue"><code>ResultsQueue</code></a>. Two distinct
-failure classes are distinguished, following the error contract described in
-<a href="../../workflows/parallel/#error-handling">Parallel Evaluation</a>:</p>
-<ul>
-<li>An <strong>infrastructure failure</strong> (a killed worker process, or missing/corrupt
-  HPC output) is delivered as an ordinary result whose value is an
-  <a class="autorefs autorefs-internal" title="            ExecutorFailure" href="../exceptions/#ropt.exceptions.ExecutorFailure"><code>ExecutorFailure</code></a> via
-  <a class="autorefs autorefs-internal" title="            put_result" href="#ropt.components.executors.Task.put_result"><code>put_result</code></a>. This is a
-  tolerated per-realization failure.</li>
-<li>A <strong>user-code exception</strong> (the task function itself raises) is delivered
-  via <a class="autorefs autorefs-internal" title="            put_error" href="#ropt.components.executors.Task.put_error"><code>put_error</code></a>, which places
-  the exception on the queue and closes it. The owning evaluator re-raises
-  the original exception unchanged, aborting the current evaluation; the
-  executor keeps running.</li>
-</ul>
+        <p>A single unit of work to run on a worker.</p>
+<p>A work item is a plain description of a call. It carries no delivery
+channel, so it can be handed to a worker process without dragging the
+submission that owns it along.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -3786,7 +3704,7 @@ failure classes are distinguished, following the error contract described in
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.components.executors.Task.function">function</span></code></td>
+            <td><code><span title="ropt.components.executors.WorkItem.function">function</span></code></td>
             <td>
                   <code><a class="autorefs autorefs-external" title="collections.abc.Callable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable">Callable</a>[..., <a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a>]</code>
             </td>
@@ -3797,7 +3715,7 @@ failure classes are distinguished, following the error contract described in
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.components.executors.Task.args">args</span></code></td>
+            <td><code><span title="ropt.components.executors.WorkItem.args">args</span></code></td>
             <td>
                   <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a>[<a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a>, ...]</code>
             </td>
@@ -3808,7 +3726,7 @@ failure classes are distinguished, following the error contract described in
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.components.executors.Task.kwargs">kwargs</span></code></td>
+            <td><code><span title="ropt.components.executors.WorkItem.kwargs">kwargs</span></code></td>
             <td>
                   <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a>]</code>
             </td>
@@ -3819,35 +3737,25 @@ failure classes are distinguished, following the error contract described in
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.components.executors.Task.results_queue">results_queue</span></code></td>
+            <td><code><span title="ropt.components.executors.WorkItem.result">result</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.components.executors.ResultsQueue (ropt.components.executors.base.ResultsQueue)" href="#ropt.components.executors.ResultsQueue">ResultsQueue</a></code>
+                  <code><a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The queue to put the result in.</p>
+                <p>The result of the function, only meaningful once the work
+      item has been delivered.</p>
               </div>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.components.executors.Task.result">result</span></code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a> | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The result of the function, or None if no result is available.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.components.executors.Task.name">name</span></code></td>
+            <td><code><span title="ropt.components.executors.WorkItem.name">name</span></code></td>
             <td>
                   <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional unique name of the task.</p>
+                <p>Optional unique name of the work item.</p>
               </div>
             </td>
           </tr>
@@ -3870,28 +3778,58 @@ failure classes are distinguished, following the error contract described in
 
 
 
-
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="ropt.components.executors.Task.put_result" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">put_result</span>
-
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">put_result</span><span class="p">(</span><span class="n">result</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Put the result in the result queue.</p>
-
+  </div>
 
     </div>
 
 </div>
 
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="ropt.components.executors.Submission" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.components.executors.Submission</span>
+
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+
+
+
+        <p>A group of work items and the channel back to the caller awaiting them.</p>
+<p>A submission owns its results channel, so ending it is one operation on one
+object. Handing a submission to an executor transfers responsibility: the
+executor either runs the work items or aborts the submission, so a caller
+blocked in <a class="autorefs autorefs-internal" title="            collect" href="#ropt.components.executors.Submission.collect"><code>collect</code></a> is
+always released.</p>
+<p>Two failure classes are distinguished, following the error contract in
+<a href="../../workflows/parallel/#error-handling">Parallel Evaluation</a>:</p>
+<ul>
+<li>An <strong>infrastructure failure</strong> (a killed worker process, or missing or
+  corrupt HPC output) arrives as an ordinary result whose value is an
+  <a class="autorefs autorefs-internal" title="            ExecutorFailure" href="../exceptions/#ropt.exceptions.ExecutorFailure"><code>ExecutorFailure</code></a>. This is a tolerated
+  per-realization failure.</li>
+<li>A <strong>user-code exception</strong> ends the submission via
+  <a class="autorefs autorefs-internal" title="            fail" href="#ropt.components.executors.Submission.fail"><code>fail</code></a>, which re-raises the
+  original exception in <code>collect</code>. The executor keeps running.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
 
 
 
@@ -3900,21 +3838,17 @@ failure classes are distinguished, following the error contract described in
 <div class="doc doc-object doc-function">
 
 
-<h3 id="ropt.components.executors.Task.put_error" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">put_error</span>
+<h3 id="ropt.components.executors.Submission.__init__" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">__init__</span>
 
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">put_error</span><span class="p">(</span><span class="n">exc</span><span class="p">:</span> <span class="ne">BaseException</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">__init__</span><span class="p">(</span><span class="n">work_items</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">WorkItem</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
 
-        <p>Deliver a user-code exception on the result queue.</p>
-<p>Places the exception raised by the task's function on the queue and
-closes it. Like <a class="autorefs autorefs-internal" title="            cancel_all" href="#ropt.components.executors.Task.cancel_all"><code>cancel_all</code></a>
-this unblocks the waiting evaluator, but it additionally carries the
-exception so the evaluator can re-raise the original unchanged.</p>
+        <p>Initialize the submission.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3930,14 +3864,205 @@ exception so the evaluator can re-raise the original unchanged.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                <code>exc</code>
+                <code>work_items</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#BaseException">BaseException</a></code>
+                  <code><a class="autorefs autorefs-external" title="collections.abc.Sequence" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence">Sequence</a>[<a class="autorefs autorefs-internal" title="            ropt.components.executors.WorkItem
+
+
+  
+      dataclass
+   (ropt.components.executors.base.WorkItem)" href="#ropt.components.executors.WorkItem">WorkItem</a>]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The exception raised by the task's function.</p>
+                <p>The work items to run.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="ropt.components.executors.Submission.work_items" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">work_items</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">work_items</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">WorkItem</span><span class="p">]</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>The work items to run.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#list">list</a>[<a class="autorefs autorefs-internal" title="            ropt.components.executors.WorkItem
+
+
+  
+      dataclass
+   (ropt.components.executors.base.WorkItem)" href="#ropt.components.executors.WorkItem">WorkItem</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The work items.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="ropt.components.executors.Submission.is_finished" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">is_finished</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">is_finished</span><span class="p">:</span> <span class="nb">bool</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Whether anything more will be delivered.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p><code>True</code> if every work item was delivered, or the submission ended.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.components.executors.Submission.deliver" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">deliver</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">deliver</span><span class="p">(</span><span class="n">work_item</span><span class="p">:</span> <span class="n">WorkItem</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Deliver the result of a single work item.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>work_item</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.components.executors.WorkItem
+
+
+  
+      dataclass
+   (ropt.components.executors.base.WorkItem)" href="#ropt.components.executors.WorkItem">WorkItem</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The work item that ran.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>result</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The result it produced.</p>
               </div>
             </td>
             <td>
@@ -3960,17 +4085,48 @@ exception so the evaluator can re-raise the original unchanged.</p>
 <div class="doc doc-object doc-function">
 
 
-<h3 id="ropt.components.executors.Task.cancel_all" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">cancel_all</span>
+<h3 id="ropt.components.executors.Submission.fail" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">fail</span>
 
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">cancel_all</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">fail</span><span class="p">(</span><span class="n">exc</span><span class="p">:</span> <span class="ne">BaseException</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
 
-        <p>Stop putting results in the result queue.</p>
+        <p>End the submission, re-raising an exception in the caller.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>exc</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#BaseException">BaseException</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The exception raised by the work item's function.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
     </div>
@@ -3980,134 +4136,110 @@ exception so the evaluator can re-raise the original unchanged.</p>
 
 
 
-  </div>
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.components.executors.Submission.abort" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">abort</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">abort</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>End the submission, releasing the caller with <code>ExecutorStopped</code>.</p>
+
 
     </div>
 
 </div>
 
-<div class="doc doc-object doc-class">
 
 
 
-<h2 id="ropt.components.executors.ResultsQueue" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.components.executors.ResultsQueue</span>
 
 
-</h2>
+<div class="doc doc-object doc-function">
 
 
-    <div class="doc doc-contents first">
-            <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-external" title="queue.Queue" href="https://docs.python.org/3/library/queue.html#queue.Queue">Queue</a>[&#39;Task | BaseException | None&#39;]</code></p>
+<h3 id="ropt.components.executors.Submission.collect" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">collect</span>
 
 
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">collect</span><span class="p">(</span><span class="n">on_result</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">WorkItem</span><span class="p">],</span> <span class="kc">None</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
 
-        <p>A queue that can be closed.</p>
-<p>Items delivered on this queue follow the error contract of
-<a class="autorefs autorefs-internal" title="            ropt.components.executors.Task
+    <div class="doc doc-contents ">
+
+        <p>Wait for every work item and pass each finished one to <code>on_result</code>.</p>
+<p>The submission is ended if this returns early, including when
+<code>on_result</code> itself raises, so the executor never keeps delivering to a
+caller that has left.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>on_result</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="collections.abc.Callable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable">Callable</a>[[<a class="autorefs autorefs-internal" title="            ropt.components.executors.WorkItem
 
 
   
       dataclass
-  " href="#ropt.components.executors.Task"><code>Task</code></a>: a <a class="autorefs autorefs-internal" title="            ropt.components.executors.Task
+   (ropt.components.executors.base.WorkItem)" href="#ropt.components.executors.WorkItem">WorkItem</a>], None]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Callback invoked with each finished work item.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
-  
-      dataclass
-  " href="#ropt.components.executors.Task"><code>Task</code></a>
-carries a normal result (including an
-<a class="autorefs autorefs-internal" title="            ExecutorFailure" href="../exceptions/#ropt.exceptions.ExecutorFailure"><code>ExecutorFailure</code></a> as its <code>result</code>), a
-<code>BaseException</code> signals a user-code exception that must abort the
-evaluation, and <code>None</code> is a plain sentinel used to unblock a waiting
-consumer.</p>
-
-
-
-
-
-
-
-
-
-
-
-<div class="doc doc-children">
-
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="ropt.components.executors.ResultsQueue.__init__" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">__init__</span>
-
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Initialize the queue.</p>
-
-
-    </div>
-
-</div>
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="ropt.components.executors.ResultsQueue.close" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">close</span>
-
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">close</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Close the queue.</p>
-
-
-    </div>
-
-</div>
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="ropt.components.executors.ResultsQueue.put" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">put</span>
-
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">put</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">item</span><span class="p">:</span> <span class="n">Task</span> <span class="o">|</span> <span class="ne">BaseException</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Put an item in the queue.</p>
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ExecutorStopped (ropt.exceptions.ExecutorStopped)" href="../exceptions/#ropt.exceptions.ExecutorStopped">ExecutorStopped</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the submission ended before every result was
+             delivered.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
     </div>
@@ -4140,7 +4272,7 @@ consumer.</p>
 
 
 
-        <p>An executor that dispatches tasks to worker threads.</p>
+        <p>An executor that dispatches work items to worker threads.</p>
 
 
 
@@ -4168,7 +4300,7 @@ consumer.</p>
 
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">__init__</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">workers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">queue_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">__init__</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">workers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -4201,22 +4333,6 @@ consumer.</p>
             </td>
             <td>
                   <code>1</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>queue_size</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Maximum size of the tasks queue.</p>
-              </div>
-            </td>
-            <td>
-                  <code>0</code>
             </td>
           </tr>
       </tbody>
@@ -4290,31 +4406,6 @@ consumer.</p>
 
 
 
-
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="ropt.components.executors.ThreadingExecutor.cleanup" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">cleanup</span>
-
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">cleanup</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Clean up the executor.</p>
-
-
-    </div>
-
-</div>
-
-
-
-
   </div>
 
     </div>
@@ -4372,9 +4463,8 @@ point must use.</p>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">__init__</span><span class="p">(</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="o">*</span><span class="p">,</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">workers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">queue_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">max_tasks_per_child</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">max_tasks_per_child</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -4411,22 +4501,6 @@ point must use.</p>
           </tr>
           <tr class="doc-section-item">
             <td>
-                <code>queue_size</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Maximum task queue size (0 = unlimited).</p>
-              </div>
-            </td>
-            <td>
-                  <code>0</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
                 <code>max_tasks_per_child</code>
             </td>
             <td>
@@ -4434,7 +4508,8 @@ point must use.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Restart workers after this many tasks (<code>None</code> = never).</p>
+                <p>Restart workers after this many work items
+                 (<code>None</code> = never).</p>
               </div>
             </td>
             <td>
@@ -4512,31 +4587,6 @@ point must use.</p>
 
 
 
-
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="ropt.components.executors.MultiprocessingExecutor.cleanup" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">cleanup</span>
-
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">cleanup</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Clean up the executor.</p>
-
-
-    </div>
-
-</div>
-
-
-
-
   </div>
 
     </div>
@@ -4596,17 +4646,16 @@ details on configuration and lifecycle.</p>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="o">*</span><span class="p">,</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">workdir</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;./&quot;</span><span class="p">,</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">workers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">queue_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">interval</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">queue_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;slurm&quot;</span><span class="p">,</span>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">template</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="n">config_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    <span class="n">cluster</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    <span class="n">queue</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>    <span class="n">cores</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
-</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>    <span class="n">retries</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">30</span><span class="p">,</span>
-</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>    <span class="n">cleanup</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">interval</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">queue_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;slurm&quot;</span><span class="p">,</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">template</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">config_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="n">cluster</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    <span class="n">queue</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    <span class="n">cores</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>    <span class="n">retries</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">30</span><span class="p">,</span>
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>    <span class="n">cleanup</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -4636,10 +4685,11 @@ configuration details.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Shared-filesystem directory for each task's serialized
-         I/O files; also passed as the job working directory
-         (template-dependent). Task files are never overwritten,
-         so concurrent executors need distinct workdirs.</p>
+                <p>Shared-filesystem directory for each work item's
+         serialized I/O files; also passed as the job working
+         directory (template-dependent). Work item files are
+         never overwritten, so concurrent executors need
+         distinct workdirs.</p>
               </div>
             </td>
             <td>
@@ -4660,22 +4710,6 @@ configuration details.</p>
             </td>
             <td>
                   <code>1</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>queue_size</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Maximum task queue size (0 = unlimited).</p>
-              </div>
-            </td>
-            <td>
-                  <code>0</code>
             </td>
           </tr>
           <tr class="doc-section-item">
@@ -4783,7 +4817,7 @@ configuration details.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>CPUs per task.</p>
+                <p>CPUs per work item.</p>
               </div>
             </td>
             <td>
@@ -4799,7 +4833,8 @@ configuration details.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Number of polling retries before declaring a task failed.</p>
+                <p>Number of extra polls to wait for a work item's result
+         after the first attempt fails (<code>0</code> gives up at once).</p>
               </div>
             </td>
             <td>
@@ -4815,7 +4850,8 @@ configuration details.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Whether to remove task files after result retrieval.</p>
+                <p>Whether to remove work item files once their result is
+         retrieved or their job is cancelled.</p>
               </div>
             </td>
             <td>
@@ -4849,8 +4885,9 @@ this requires exactly one cluster to provide the queue.</p>
                 <p>If neither a <code>template</code> is provided nor a valid
           <code>config_path</code> can be found, if the requested cluster
           is unknown, if the queue is not available on the
-          requested cluster, or if the queue cannot be resolved
-          to exactly one cluster.</p>
+          requested cluster, if the queue cannot be resolved to
+          exactly one cluster, or if <code>workers</code>, <code>interval</code> or
+          <code>retries</code> is out of range.</p>
               </div>
             </td>
           </tr>
@@ -4916,31 +4953,6 @@ this requires exactly one cluster to provide the queue.</p>
           </tr>
       </tbody>
     </table>
-
-
-    </div>
-
-</div>
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="ropt.components.executors.HPCExecutor.cleanup" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">cleanup</span>
-
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">cleanup</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Clean up the executor resources.</p>
 
 
     </div>

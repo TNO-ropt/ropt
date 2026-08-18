@@ -1268,10 +1268,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#task-serialization" class="md-nav__link">
+  <a href="#work-item-serialization" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Task serialization
+        Work item serialization
       
     </span>
   </a>
@@ -1399,6 +1399,28 @@
     <span class="md-ellipsis">
       
         Thread-based dispatch
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#event-throughput" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Event throughput
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#two-rules-for-using-the-low-level-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Two rules for using the low-level API
       
     </span>
   </a>
@@ -2955,10 +2977,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#task-serialization" class="md-nav__link">
+  <a href="#work-item-serialization" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Task serialization
+        Work item serialization
       
     </span>
   </a>
@@ -3092,6 +3114,28 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#event-throughput" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Event throughput
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#two-rules-for-using-the-low-level-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Two rules for using the low-level API
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -3153,10 +3197,11 @@ same pool of workers, the event loop dispatches evaluation tasks as they
 arrive, and results flow back without blocking other work.</p>
 <p>The <a class="autorefs autorefs-internal" title="            ropt.components.evaluators.ParallelEvaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.ParallelEvaluator"><code>ParallelEvaluator</code></a> is the
 evaluator that bridges the synchronous compute-step <code>run()</code> call and the
-asynchronous world. It submits individual evaluation tasks (one per row in the
-variable batch) to an <a class="autorefs autorefs-internal" title="            ropt.components.executors.Executor" href="../../reference/components_executors/#ropt.components.executors.Executor"><code>Executor</code></a> via an
-<code>asyncio.Queue</code>. The executor picks tasks from the queue, runs them on its
-workers, and places results into a results queue that the evaluator collects.</p>
+asynchronous world. It hands the rows of the variable batch to an
+<a class="autorefs autorefs-internal" title="            ropt.components.executors.Executor" href="../../reference/components_executors/#ropt.components.executors.Executor"><code>Executor</code></a> as a single
+<a class="autorefs autorefs-internal" title="            ropt.components.executors.Submission" href="../../reference/components_executors/#ropt.components.executors.Submission"><code>Submission</code></a>. The executor runs the
+submission's work items on its workers and delivers each result back to the
+submission, which the evaluator collects.</p>
 <p>Because compute steps call <code>run()</code> synchronously, the step itself is typically
 dispatched with <code>asyncio.to_thread</code> so the event loop remains free to service
 the executor's workers and other concurrent steps.</p>
@@ -3164,14 +3209,14 @@ the executor's workers and other concurrent steps.</p>
 <p><a class="autorefs autorefs-internal" title="            ropt.components.evaluators.ParallelEvaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.ParallelEvaluator"><code>ParallelEvaluator</code></a> wraps a
 per-realization function — the same kind of callable used by
 <a class="autorefs autorefs-internal" title="            ropt.components.evaluators.FunctionEvaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.FunctionEvaluator"><code>FunctionEvaluator</code></a> — and submits
-the rows of the evaluation batch as <a class="autorefs autorefs-internal" title="            ropt.components.executors.Task
+the rows of the evaluation batch as <a class="autorefs autorefs-internal" title="            ropt.components.executors.WorkItem
 
 
   
       dataclass
-  " href="../../reference/components_executors/#ropt.components.executors.Task"><code>Task</code></a>
-objects to the executor's task queue. It then waits for results to arrive on a
-results queue.</p>
+  " href="../../reference/components_executors/#ropt.components.executors.WorkItem"><code>WorkItem</code></a>
+objects in one <a class="autorefs autorefs-internal" title="            ropt.components.executors.Submission" href="../../reference/components_executors/#ropt.components.executors.Submission"><code>Submission</code></a>. It then waits
+for the submission's results.</p>
 <p>Constructor parameters:</p>
 <table>
 <thead>
@@ -3187,19 +3232,15 @@ results queue.</p>
 </tr>
 <tr>
 <td><code>executor</code></td>
-<td>The <a class="autorefs autorefs-internal" title="            ropt.components.executors.Executor" href="../../reference/components_executors/#ropt.components.executors.Executor"><code>Executor</code></a> to dispatch tasks to.</td>
+<td>The <a class="autorefs autorefs-internal" title="            ropt.components.executors.Executor" href="../../reference/components_executors/#ropt.components.executors.Executor"><code>Executor</code></a> to dispatch work to.</td>
 </tr>
 <tr>
 <td><code>bundle_size</code></td>
-<td>Number of active evaluations to group into a single task (default: <code>1</code>). Use an integer <code>&gt; 1</code> for a fixed maximum bundle size, or <code>0</code> to bundle all active evaluations of a batch into one task.</td>
-</tr>
-<tr>
-<td><code>queue_size</code></td>
-<td>Maximum size of the results queue (0 = unlimited).</td>
+<td>Number of active evaluations to group into a single work item (default: <code>1</code>). Use an integer <code>&gt; 1</code> for a fixed maximum bundle size, or <code>0</code> to bundle all active evaluations of a batch into one work item.</td>
 </tr>
 <tr>
 <td><code>get_name</code></td>
-<td>Optional callable to generate a name for each task.</td>
+<td>Optional callable to generate a name for each work item.</td>
 </tr>
 </tbody>
 </table>
@@ -3228,14 +3269,15 @@ name is stamped onto the <code>name</code> field of every
 <p>If the executor is not running when <code>eval()</code> is called, the evaluator raises an
 <a class="autorefs autorefs-internal" title="            ExecutorStopped" href="../../reference/exceptions/#ropt.exceptions.ExecutorStopped"><code>ExecutorStopped</code></a> exception.</p>
 <h2 id="executors">Executors</h2>
-<p>An <a class="autorefs autorefs-internal" title="            ropt.components.executors.Executor" href="../../reference/components_executors/#ropt.components.executors.Executor"><code>Executor</code></a> manages an <code>asyncio.Queue</code> of
-<a class="autorefs autorefs-internal" title="            ropt.components.executors.Task
+<p>An <a class="autorefs autorefs-internal" title="            ropt.components.executors.Executor" href="../../reference/components_executors/#ropt.components.executors.Executor"><code>Executor</code></a> accepts
+<a class="autorefs autorefs-internal" title="            ropt.components.executors.Submission" href="../../reference/components_executors/#ropt.components.executors.Submission"><code>Submission</code></a> objects and dispatches their
+<a class="autorefs autorefs-internal" title="            ropt.components.executors.WorkItem
 
 
   
       dataclass
-  " href="../../reference/components_executors/#ropt.components.executors.Task"><code>Task</code></a> objects and dispatches them to a pool of
-workers. All executors share the same lifecycle:</p>
+  " href="../../reference/components_executors/#ropt.components.executors.WorkItem"><code>WorkItem</code></a> objects to a pool of workers.
+All executors share the same lifecycle:</p>
 <ol>
 <li>Create the executor instance.</li>
 <li>Start it inside an <code>asyncio.TaskGroup</code> with <code>await executor.start(tg)</code>.</li>
@@ -3260,10 +3302,6 @@ C/Fortran).</p>
 <td><code>workers</code></td>
 <td>Number of concurrent worker threads (default: 1).</td>
 </tr>
-<tr>
-<td><code>queue_size</code></td>
-<td>Maximum task queue size (0 = unlimited).</td>
-</tr>
 </tbody>
 </table>
 <h3 id="multiprocessingexecutor">MultiprocessingExecutor</h3>
@@ -3283,17 +3321,13 @@ evaluations where true parallelism is needed.</p>
 <td>Number of worker processes (default: 1).</td>
 </tr>
 <tr>
-<td><code>queue_size</code></td>
-<td>Maximum task queue size (0 = unlimited).</td>
-</tr>
-<tr>
 <td><code>max_tasks_per_child</code></td>
-<td>Restart workers after this many tasks (default: <code>None</code> = never). Useful if evaluations leak memory, but adds significant overhead.</td>
+<td>Restart workers after this many work items (default: <code>None</code> = never). Useful if evaluations leak memory, but adds significant overhead.</td>
 </tr>
 </tbody>
 </table>
-<h4 id="task-serialization">Task serialization</h4>
-<p>Each task crosses a process boundary, so its function, arguments, and result
+<h4 id="work-item-serialization">Work item serialization</h4>
+<p>Each work item crosses a process boundary, so its function, arguments, and result
 must be serialized. If <a href="https://github.com/cloudpipe/cloudpickle"><code>cloudpickle</code></a>
 is installed (the <code>cloudpickle</code> extra), it is used for both directions: this
 serializes lambdas, closures, and interactively-defined functions (such as those
@@ -3349,7 +3383,12 @@ deserialized back. Requires <code>ropt[hpc]</code> to be installed.</p>
 <li>Submitting the task as a job to the HPC queue.</li>
 <li>Polling the queue for the job's status.</li>
 <li>Retrieving results (or exceptions) once the job completes.</li>
+<li>Cancelling any jobs that are still outstanding when the executor stops.</li>
 </ul>
+<p>Stopping the executor with <code>cancel()</code> asks the scheduler to delete every job it
+has submitted, so an interrupted optimization does not leave orphan jobs behind
+consuming the cluster allocation. Cancellation is best effort: if the scheduler
+cannot be reached the failure is logged and stopping continues.</p>
 <table>
 <thead>
 <tr>
@@ -3360,15 +3399,11 @@ deserialized back. Requires <code>ropt[hpc]</code> to be installed.</p>
 <tbody>
 <tr>
 <td><code>workdir</code></td>
-<td>Shared-filesystem directory for each task's serialized I/O files.</td>
+<td>Shared-filesystem directory for each work item's serialized I/O files.</td>
 </tr>
 <tr>
 <td><code>workers</code></td>
 <td>Maximum concurrent HPC jobs (default: 1).</td>
-</tr>
-<tr>
-<td><code>queue_size</code></td>
-<td>Maximum task queue size (0 = unlimited).</td>
 </tr>
 <tr>
 <td><code>interval</code></td>
@@ -3396,17 +3431,33 @@ deserialized back. Requires <code>ropt[hpc]</code> to be installed.</p>
 </tr>
 <tr>
 <td><code>cores</code></td>
-<td>CPUs per task (default: 1).</td>
+<td>CPUs per work item (default: 1).</td>
+</tr>
+<tr>
+<td><code>retries</code></td>
+<td>Extra polls to wait for a result that is missing or unreadable (default: 30).</td>
+</tr>
+<tr>
+<td><code>cleanup</code></td>
+<td>Whether to remove a work item's files once it settles (default: <code>True</code>).</td>
 </tr>
 </tbody>
 </table>
-<p>The <code>workdir</code> holds each task's serialized <code>.in</code>/<code>.out</code> files (written at
+<p>A finished job's result is not always readable at once: the job may have died
+before writing it, or the file may be caught half-written. <code>retries</code> is how many
+<strong>further</strong> polls to allow before the work item is failed with an
+<a class="autorefs autorefs-internal" title="            ExecutorFailure" href="../../reference/exceptions/#ropt.exceptions.ExecutorFailure"><code>ExecutorFailure</code></a>, so the grace period is
+<code>retries × interval</code> seconds — 30 seconds with the defaults. <code>retries=0</code> gives up
+on the first failed read. The same limit bounds scheduler outages: once querying
+the queue has failed <code>retries + 1</code> times in a row, every outstanding work item is
+failed rather than waited on for ever.</p>
+<p>The <code>workdir</code> holds each work item's serialized <code>.in</code>/<code>.out</code> files (written at
 absolute paths) and its captured stdout. It is also passed to <code>pysqa</code> as the
 job's <code>working_directory</code>, which the standard scheduler templates turn into a
 <code>chdir</code> directive (e.g. <code>#SBATCH --chdir=...</code>) — but whether a job actually runs
-there depends on the submission template, so do not rely on it. Because task
-filenames derive from task names, the executor <strong>refuses to overwrite</strong>
-pre-existing task files; give each concurrently-running executor its own
+there depends on the submission template, so do not rely on it. Because work item
+filenames derive from work item names, the executor <strong>refuses to overwrite</strong>
+pre-existing files; give each concurrently-running executor its own
 <code>workdir</code>.</p>
 <p>Configuration can be provided either via a <code>template</code> string or a <code>config_path</code>
 directory containing <code>pysqa</code> configuration files. If neither is given, the
@@ -3438,7 +3489,7 @@ distinguish two classes of failure, and treat them very differently.</p>
 itself: a worker process is killed (<code>BrokenProcessPool</code>), or an HPC job's output
 file never appears or cannot be deserialized. These are delivered as an ordinary
 result whose value is an <a class="autorefs autorefs-internal" title="            ExecutorFailure" href="../../reference/exceptions/#ropt.exceptions.ExecutorFailure"><code>ExecutorFailure</code></a>
-(via <a class="autorefs autorefs-internal" title="            put_result" href="../../reference/components_executors/#ropt.components.executors.Task.put_result"><code>put_result</code></a>). The evaluator
+(via <a class="autorefs autorefs-internal" title="            deliver" href="../../reference/components_executors/#ropt.components.executors.Submission.deliver"><code>deliver</code></a>). The evaluator
 records the affected rows as failed realizations by writing <code>numpy.nan</code>. Such a
 failure is <em>tolerated</em>: the optimization continues, and only aborts (with
 <code>TOO_FEW_REALIZATIONS</code>) if too many realizations fail to satisfy the configured
@@ -3447,11 +3498,10 @@ minimum.</p>
 <p>A <em>user-code</em> exception is one raised by the evaluation function itself — a bug
 in the objective, a bad configuration, an unexpected input. This must not be
 silently turned into a failed realization; it signals a genuine error the user
-needs to see and fix. When the task function raises, the worker delivers the
-exception on the results queue (via
-<a class="autorefs autorefs-internal" title="            put_error" href="../../reference/components_executors/#ropt.components.executors.Task.put_error"><code>put_error</code></a>, which also closes the
-queue) and returns to serving further tasks. It does <strong>not</strong> tear the executor
-down.</p>
+needs to see and fix. When the work item's function raises, the worker ends the
+submission with the exception (via
+<a class="autorefs autorefs-internal" title="            fail" href="../../reference/components_executors/#ropt.components.executors.Submission.fail"><code>fail</code></a>) and returns to serving
+further work. It does <strong>not</strong> tear the executor down.</p>
 <p>The owning
 <a class="autorefs autorefs-internal" title="            eval" href="../../reference/components_evaluators/#ropt.components.evaluators.ParallelEvaluator.eval"><code>ParallelEvaluator.eval</code></a>
 call receives the exception and <strong>re-raises the original unchanged</strong>, aborting
@@ -3716,6 +3766,52 @@ registering it:</p>
 <code>set_callback</code>) are common cases where this is needed. When multiple handlers
 with <code>run_in_thread=True</code> match the same event they are dispatched <strong>in
 parallel</strong> via <code>asyncio.gather</code> — they do not block each other.</p>
+<h3 id="event-throughput">Event throughput</h3>
+<p>A dispatcher processes its queue <strong>one event at a time</strong>: all handlers for an
+event finish before the next event is taken. <code>run_in_thread=True</code> moves a
+blocking handler off the event loop, but it does not overlap that handler with
+the handlers of any <em>other</em> event — only with the threaded handlers of the same
+event.</p>
+<p>This serialization is deliberate.
+<a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventHandler" href="../../reference/components_event_handlers/#ropt.components.event_handlers.EventHandler"><code>EventHandler</code></a> is not re-entrant,
+and a handler shared by concurrently running optimizations — one accumulating
+results across all of them, say — needs exactly this guarantee to stay
+lock-free.</p>
+<p>The price is that handler cost scales with the <em>total</em> number of events across
+all runs sharing the dispatcher, and is paid on the critical path of every
+event. Measured with eight concurrent runs emitting five events each, sharing
+one dispatcher and one handler that blocks for 50 ms: <strong>2.02 s elapsed</strong>,
+against 2.00 s for fully serial execution and 0.25 s if the handlers had run
+fully concurrently — never more than one handler thread active at a time.</p>
+<p>Runs share a dispatcher when they share a handler scope, which is the normal
+case for <a class="autorefs autorefs-internal" title="            ropt.simple.optimize_many" href="../../reference/simple/#ropt.simple.optimize_many"><code>optimize_many</code></a>: it reads the current
+handler scope once on the calling thread and gives the same one to every job.
+An N-way <code>optimize_many</code> therefore pays its handler cost serially. Keep shared
+handlers cheap; if one must do heavy I/O, buffer in memory and flush once the
+runs have finished.</p>
+<h3 id="two-rules-for-using-the-low-level-api">Two rules for using the low-level API</h3>
+<p><strong>Run a compute step in a worker thread.</strong> <code>step.run()</code> is an ordinary
+synchronous method that runs its evaluator and its handlers <strong>on whatever
+thread called it</strong>. On the event loop thread it blocks the loop, and the
+executors and dispatchers it is waiting for are tasks on that same loop:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1"># Wrong: run() executes here, on the loop thread.</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="n">step</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="n">x0</span><span class="p">)</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="c1"># Right: the loop stays free to service the workers.</span>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">to_thread</span><span class="p">(</span><span class="n">step</span><span class="o">.</span><span class="n">run</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="n">x0</span><span class="p">)</span>
+</span></code></pre></div>
+<p><code>ropt.simple</code> already does this for you; it applies when driving compute steps
+yourself. A step that dispatches to an executor detects the mistake and raises
+<a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a> instead of hanging. A step that
+only forwards events to a dispatcher on that same loop cannot detect it, so the
+rule has to be followed rather than relied upon.</p>
+<p><strong>Do not emit events from an event handler.</strong> Events are processed one at a
+time, so an event dispatched from inside a handler waits for the handler that
+dispatched it. This is enforced, whether the handler runs on the event loop or
+on the dispatcher's thread pool.</p>
+<p>To feed one run's events into a shared dispatcher, register an
+<a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventForwardHandler" href="../../reference/components_event_handlers/#ropt.components.event_handlers.EventForwardHandler"><code>EventForwardHandler</code></a> on a
+<strong>compute step</strong> rather than on a dispatcher.</p>
 <h2 id="nested-workflows-and-process-boundaries">Nested workflows and process boundaries</h2>
 <p>A <em>nested</em> workflow is a compute step whose evaluation function itself runs
 another compute step — for example an outer optimizer whose objective is the

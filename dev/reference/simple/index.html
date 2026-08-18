@@ -4501,8 +4501,8 @@ process or HPC executor.</p>
 
         <p>Report whether <code>offload</code> would dispatch to an executor.</p>
 <p>Returns <code>True</code> when an execution block (<code>threads</code>/<code>processes</code>/<code>hpc</code>) is open
-and the caller can dispatch to it, and <code>False</code> otherwise (no block open, or
-called from a result handler).</p>
+and the caller can dispatch to it, and <code>False</code> otherwise (no block open, the
+block's executor has stopped, or called from a result handler).</p>
 <p>Use it in code that may run with or without an execution block (for example
 a plugin, transform, or custom step) to fall back to a direct call instead
 of letting <code>offload</code> raise:</p>

@@ -2378,39 +2378,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.components.event_handlers.EventHandler.register_dispatcher" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        register_dispatcher
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.components.event_handlers.EventHandler.unregister_dispatcher" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        unregister_dispatcher
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.components.event_handlers.EventHandler.register_compute_step" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        register_compute_step
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ropt.components.event_handlers.EventHandler.claim" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2426,17 +2393,6 @@
     <span class="md-ellipsis">
       
         release
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.components.event_handlers.EventHandler.claimed" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        claimed
       
     </span>
   </a>
@@ -2869,17 +2825,6 @@
     <span class="md-ellipsis">
       
         dispatch_event
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.components.event_handlers.EventDispatcher.is_running" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        is_running
       
     </span>
   </a>
@@ -3276,39 +3221,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.components.event_handlers.EventHandler.register_dispatcher" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        register_dispatcher
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.components.event_handlers.EventHandler.unregister_dispatcher" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        unregister_dispatcher
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.components.event_handlers.EventHandler.register_compute_step" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        register_compute_step
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ropt.components.event_handlers.EventHandler.claim" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3324,17 +3236,6 @@
     <span class="md-ellipsis">
       
         release
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.components.event_handlers.EventHandler.claimed" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        claimed
       
     </span>
   </a>
@@ -3774,17 +3675,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.components.event_handlers.EventDispatcher.is_running" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        is_running
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ropt.components.event_handlers.EventDispatcher.start" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3952,153 +3842,6 @@ and pitfalls.</p>
 <div class="doc doc-object doc-function">
 
 
-<h3 id="ropt.components.event_handlers.EventHandler.register_dispatcher" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">register_dispatcher</span>
-
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">register_dispatcher</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Mark this handler as owned by an event dispatcher.</p>
-
-
-<p><span class="doc-section-title">Raises:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            WorkflowError (ropt.exceptions.WorkflowError)" href="../exceptions/#ropt.exceptions.WorkflowError">WorkflowError</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>If the handler is already registered with a dispatcher
-          or attached to a compute step.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="ropt.components.event_handlers.EventHandler.unregister_dispatcher" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">unregister_dispatcher</span>
-
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">unregister_dispatcher</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Reverse <code>register_dispatcher</code>, releasing the handler.</p>
-<p>After unregistering, the handler is free to be registered with another
-dispatcher or with a compute step.</p>
-
-
-<p><span class="doc-section-title">Raises:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            WorkflowError (ropt.exceptions.WorkflowError)" href="../exceptions/#ropt.exceptions.WorkflowError">WorkflowError</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>If the handler is not registered with a dispatcher.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="ropt.components.event_handlers.EventHandler.register_compute_step" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">register_compute_step</span>
-
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">register_compute_step</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Mark this handler as owned by one or more compute steps.</p>
-
-
-<p><span class="doc-section-title">Raises:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            WorkflowError (ropt.exceptions.WorkflowError)" href="../exceptions/#ropt.exceptions.WorkflowError">WorkflowError</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>If the handler is registered with a dispatcher.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
 <h3 id="ropt.components.event_handlers.EventHandler.claim" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">claim</span>
 
@@ -4119,11 +3862,8 @@ be reused by a later, sequential run, for example to accumulate results.
 Handlers meant to aggregate across <em>concurrent</em> runs are not claimed;
 they are shared explicitly through an
 <a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventDispatcher" href="#ropt.components.event_handlers.EventDispatcher"><code>EventDispatcher</code></a>.</p>
-<p>This claim is independent of the attachment state set by
-<a class="autorefs autorefs-internal" title="            register_compute_step" href="#ropt.components.event_handlers.EventHandler.register_compute_step"><code>register_compute_step</code></a>
-and
-<a class="autorefs autorefs-internal" title="            register_dispatcher" href="#ropt.components.event_handlers.EventHandler.register_dispatcher"><code>register_dispatcher</code></a>,
-and of the transient concurrency guard on <code>handle_event</code>.</p>
+<p>This claim is independent of the attachment to a dispatcher or a compute
+step, and of the transient concurrency guard on <code>handle_event</code>.</p>
 
 
 <p><span class="doc-section-title">Raises:</span></p>
@@ -4174,61 +3914,9 @@ and of the transient concurrency guard on <code>handle_event</code>.</p>
         <p>Release a claim taken with <code>claim</code> so the handler can be reused.</p>
 <p>Clears the exclusive-use flag, letting a later run claim the handler
 again, for example to accumulate results across sequential runs. The
-attachment state set by <code>register_compute_step</code>/<code>register_dispatcher</code> is
-left untouched. Releasing an unclaimed handler is a no-op.</p>
+attachment to a dispatcher or a compute step is left untouched.
+Releasing an unclaimed handler is a no-op.</p>
 
-
-    </div>
-
-</div>
-
-
-
-
-
-
-<div class="doc doc-object doc-attribute">
-
-
-
-<h3 id="ropt.components.event_handlers.EventHandler.claimed" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">claimed</span>
-
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-property"><code>property</code></small>
-  </span>
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">claimed</span><span class="p">:</span> <span class="nb">bool</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Whether this handler has been claimed for exclusive use.</p>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>True if the handler has been claimed.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
 
     </div>
 
@@ -6393,6 +6081,9 @@ tearing down the session task group. See
 
 
         <p>Dispatches events to handlers from the asyncio event loop's thread.</p>
+<p>Handlers added with <code>run_in_thread=True</code> run on a thread pool the
+dispatcher owns and shuts down when it stops, so handler work is isolated
+from the asyncio loop's shared default pool.</p>
 <p>See <a href="../../workflows/parallel/#event-dispatcher">Parallel Evaluation</a> for usage.</p>
 
 
@@ -6432,9 +6123,11 @@ tearing down the session task group. See
 <p>By default the handler is called directly in the event loop's thread,
 which is efficient for handlers that only do in-memory work. Pass
 <code>run_in_thread=True</code> for handlers that perform blocking operations such
-as file I/O, database writes, or network calls. Multiple handlers with
-<code>run_in_thread=True</code> that match the same event are dispatched in
-parallel via <code>asyncio.gather</code>.</p>
+as file I/O, database writes, or network calls. Such handlers run on a
+thread pool the dispatcher owns, so they never compete for the asyncio
+loop's shared default pool. Multiple handlers with <code>run_in_thread=True</code>
+that match the same event are dispatched in parallel via
+<code>asyncio.gather</code>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -6473,8 +6166,8 @@ parallel via <code>asyncio.gather</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If True, dispatch via the thread pool instead of
-           the event loop.</p>
+                <p>If True, dispatch via the dispatcher's thread pool
+           instead of the event loop.</p>
               </div>
             </td>
             <td>
@@ -6577,7 +6270,7 @@ dispatcher or registered with a compute step.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#ValueError">ValueError</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            WorkflowError (ropt.exceptions.WorkflowError)" href="../exceptions/#ropt.exceptions.WorkflowError">WorkflowError</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -6617,7 +6310,7 @@ calling thread until the dispatcher has finished handling it. Events are
 handled in submission order. If a handler raises, the original exception
 is re-raised here — on the caller's own stack — so it surfaces as a
 clean, single exception, mirroring how the executor's
-<a class="autorefs autorefs-internal" title="            put_error" href="../components_executors/#ropt.components.executors.Task.put_error"><code>put_error</code></a> is re-raised by the
+<a class="autorefs autorefs-internal" title="            fail" href="../components_executors/#ropt.components.executors.Submission.fail"><code>fail</code></a> is re-raised by the
 awaiting evaluator.</p>
 
 
@@ -6672,7 +6365,8 @@ awaiting evaluator.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If the dispatcher is not running.</p>
+                <p>If the dispatcher is not running, or if a handler of
+           this dispatcher is dispatching.</p>
               </div>
             </td>
           </tr>
@@ -6683,54 +6377,6 @@ awaiting evaluator.</p>
             <td>
               <div class="doc-md-description">
                 <p>Whatever a handler raised while processing the event.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="ropt.components.event_handlers.EventDispatcher.is_running" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">is_running</span>
-
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">is_running</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">bool</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Check if the dispatcher is running.</p>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>True if the dispatcher is running.</p>
               </div>
             </td>
           </tr>
@@ -6844,6 +6490,7 @@ awaiting evaluator.</p>
     <div class="doc doc-contents ">
 
         <p>Stop the dispatcher.</p>
+<p>May be called from any thread.</p>
 
 
     </div>
