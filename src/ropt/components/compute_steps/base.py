@@ -76,7 +76,7 @@ class ComputeStep(ABC):
             handler: The handler to add.
         """
         if isinstance(handler, EventHandler):
-            handler.register_compute_step()
+            handler._register_compute_step()  # ruff: ignore[private-member-access]
             self._event_handlers.append(handler)
 
     @property

@@ -51,7 +51,9 @@ def main() -> None:
     for vector, result in zip(matrix, batch, strict=True):
         print(f"objective at {vector}: {result.target_objective}")
     assert all(result.target_objective is not None for result in batch)
-    assert np.isclose(batch[1].target_objective, 0.0)
+    optimum = batch[1].target_objective
+    assert optimum is not None
+    assert np.isclose(optimum, 0.0)
 
 
 if __name__ == "__main__":

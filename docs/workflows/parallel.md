@@ -17,10 +17,11 @@ arrive, and results flow back without blocking other work.
 
 The [`ParallelEvaluator`][ropt.components.evaluators.ParallelEvaluator] is the
 evaluator that bridges the synchronous compute-step `run()` call and the
-asynchronous world. It submits individual evaluation tasks (one per row in the
-variable batch) to an [`Executor`][ropt.components.executors.Executor] via an
-`asyncio.Queue`. The executor picks tasks from the queue, runs them on its
-workers, and places results into a results queue that the evaluator collects.
+asynchronous world. It hands the rows of the variable batch to an
+[`Executor`][ropt.components.executors.Executor] as a single
+[`Submission`][ropt.components.executors.Submission]. The executor runs the
+submission's work items on its workers and delivers each result back to the
+submission, which the evaluator collects.
 
 Because compute steps call `run()` synchronously, the step itself is typically
 dispatched with `asyncio.to_thread` so the event loop remains free to service
@@ -31,19 +32,18 @@ the executor's workers and other concurrent steps.
 [`ParallelEvaluator`][ropt.components.evaluators.ParallelEvaluator] wraps a
 per-realization function — the same kind of callable used by
 [`FunctionEvaluator`][ropt.components.evaluators.FunctionEvaluator] — and submits
-the rows of the evaluation batch as [`Task`][ropt.components.executors.Task]
-objects to the executor's task queue. It then waits for results to arrive on a
-results queue.
+the rows of the evaluation batch as [`WorkItem`][ropt.components.executors.WorkItem]
+objects in one [`Submission`][ropt.components.executors.Submission]. It then waits
+for the submission's results.
 
 Constructor parameters:
 
 | Parameter     | Description                                                          |
 | ------------- | -------------------------------------------------------------------- |
 | `function`    | Per-realization callable (same interface as `FunctionEvaluator`).    |
-| `executor`    | The [`Executor`][ropt.components.executors.Executor] to dispatch tasks to. |
-| `bundle_size` | Number of active evaluations to group into a single task (default: `1`). Use an integer `> 1` for a fixed maximum bundle size, or `0` to bundle all active evaluations of a batch into one task. |
-| `queue_size`  | Maximum size of the results queue (0 = unlimited).                   |
-| `get_name`    | Optional callable to generate a name for each task.                  |
+| `executor`    | The [`Executor`][ropt.components.executors.Executor] to dispatch work to. |
+| `bundle_size` | Number of active evaluations to group into a single work item (default: `1`). Use an integer `> 1` for a fixed maximum bundle size, or `0` to bundle all active evaluations of a batch into one work item. |
+| `get_name`    | Optional callable to generate a name for each work item.             |
 
 By default each row of the variable batch is submitted as its own task. The
 `bundle_size` parameter allows several active evaluations to be grouped into a
@@ -69,9 +69,10 @@ If the executor is not running when `eval()` is called, the evaluator raises an
 
 ## Executors
 
-An [`Executor`][ropt.components.executors.Executor] manages an `asyncio.Queue` of
-[`Task`][ropt.components.executors.Task] objects and dispatches them to a pool of
-workers. All executors share the same lifecycle:
+An [`Executor`][ropt.components.executors.Executor] accepts
+[`Submission`][ropt.components.executors.Submission] objects and dispatches their
+[`WorkItem`][ropt.components.executors.WorkItem] objects to a pool of workers.
+All executors share the same lifecycle:
 
 1. Create the executor instance.
 2. Start it inside an `asyncio.TaskGroup` with `await executor.start(tg)`.
@@ -90,7 +91,6 @@ C/Fortran).
 | Parameter    | Description                                       |
 | ------------ | ------------------------------------------------- |
 | `workers`    | Number of concurrent worker threads (default: 1). |
-| `queue_size` | Maximum task queue size (0 = unlimited).          |
 
 ### MultiprocessingExecutor
 
@@ -101,12 +101,11 @@ evaluations where true parallelism is needed.
 | Parameter             | Description                                                    |
 | --------------------- | -------------------------------------------------------------- |
 | `workers`             | Number of worker processes (default: 1).                       |
-| `queue_size`          | Maximum task queue size (0 = unlimited).                       |
-| `max_tasks_per_child` | Restart workers after this many tasks (default: `None` = never). Useful if evaluations leak memory, but adds significant overhead. |
+| `max_tasks_per_child` | Restart workers after this many work items (default: `None` = never). Useful if evaluations leak memory, but adds significant overhead. |
 
-#### Task serialization
+#### Work item serialization
 
-Each task crosses a process boundary, so its function, arguments, and result
+Each work item crosses a process boundary, so its function, arguments, and result
 must be serialized. If [`cloudpickle`](https://github.com/cloudpipe/cloudpickle)
 is installed (the `cloudpickle` extra), it is used for both directions: this
 serializes lambdas, closures, and interactively-defined functions (such as those
@@ -173,27 +172,43 @@ The executor manages the full remote task lifecycle:
 - Submitting the task as a job to the HPC queue.
 - Polling the queue for the job's status.
 - Retrieving results (or exceptions) once the job completes.
+- Cancelling any jobs that are still outstanding when the executor stops.
+
+Stopping the executor with `cancel()` asks the scheduler to delete every job it
+has submitted, so an interrupted optimization does not leave orphan jobs behind
+consuming the cluster allocation. Cancellation is best effort: if the scheduler
+cannot be reached the failure is logged and stopping continues.
 
 | Parameter     | Description                                                              |
 | ------------- | ------------------------------------------------------------------------ |
-| `workdir`     | Shared-filesystem directory for each task's serialized I/O files.        |
+| `workdir`     | Shared-filesystem directory for each work item's serialized I/O files.   |
 | `workers`     | Maximum concurrent HPC jobs (default: 1).                                |
-| `queue_size`  | Maximum task queue size (0 = unlimited).                                 |
 | `interval`    | Polling interval in seconds (default: 1).                                |
 | `queue_type`  | Queueing system type, e.g. `"slurm"` (default).                          |
 | `template`    | Optional submission script template string.                              |
 | `config_path` | Optional path to `pysqa` cluster configuration directory.                |
 | `cluster`     | Optional cluster name (for multi-cluster installations).                 |
 | `queue`       | Optional queue/partition name.                                           |
-| `cores`       | CPUs per task (default: 1).                                              |
+| `cores`       | CPUs per work item (default: 1).                                         |
+| `retries`     | Extra polls to wait for a result that is missing or unreadable (default: 30). |
+| `cleanup`     | Whether to remove a work item's files once it settles (default: `True`). |
 
-The `workdir` holds each task's serialized `.in`/`.out` files (written at
+A finished job's result is not always readable at once: the job may have died
+before writing it, or the file may be caught half-written. `retries` is how many
+**further** polls to allow before the work item is failed with an
+[`ExecutorFailure`][ropt.exceptions.ExecutorFailure], so the grace period is
+`retries × interval` seconds — 30 seconds with the defaults. `retries=0` gives up
+on the first failed read. The same limit bounds scheduler outages: once querying
+the queue has failed `retries + 1` times in a row, every outstanding work item is
+failed rather than waited on for ever.
+
+The `workdir` holds each work item's serialized `.in`/`.out` files (written at
 absolute paths) and its captured stdout. It is also passed to `pysqa` as the
 job's `working_directory`, which the standard scheduler templates turn into a
 `chdir` directive (e.g. `#SBATCH --chdir=...`) — but whether a job actually runs
-there depends on the submission template, so do not rely on it. Because task
-filenames derive from task names, the executor **refuses to overwrite**
-pre-existing task files; give each concurrently-running executor its own
+there depends on the submission template, so do not rely on it. Because work item
+filenames derive from work item names, the executor **refuses to overwrite**
+pre-existing files; give each concurrently-running executor its own
 `workdir`.
 
 Configuration can be provided either via a `template` string or a `config_path`
@@ -236,7 +251,7 @@ An *infrastructure* failure is one that is not caused by the evaluation function
 itself: a worker process is killed (`BrokenProcessPool`), or an HPC job's output
 file never appears or cannot be deserialized. These are delivered as an ordinary
 result whose value is an [`ExecutorFailure`][ropt.exceptions.ExecutorFailure]
-(via [`put_result`][ropt.components.executors.Task.put_result]). The evaluator
+(via [`deliver`][ropt.components.executors.Submission.deliver]). The evaluator
 records the affected rows as failed realizations by writing `numpy.nan`. Such a
 failure is *tolerated*: the optimization continues, and only aborts (with
 `TOO_FEW_REALIZATIONS`) if too many realizations fail to satisfy the configured
@@ -247,11 +262,10 @@ minimum.
 A *user-code* exception is one raised by the evaluation function itself — a bug
 in the objective, a bad configuration, an unexpected input. This must not be
 silently turned into a failed realization; it signals a genuine error the user
-needs to see and fix. When the task function raises, the worker delivers the
-exception on the results queue (via
-[`put_error`][ropt.components.executors.Task.put_error], which also closes the
-queue) and returns to serving further tasks. It does **not** tear the executor
-down.
+needs to see and fix. When the work item's function raises, the worker ends the
+submission with the exception (via
+[`fail`][ropt.components.executors.Submission.fail]) and returns to serving
+further work. It does **not** tear the executor down.
 
 The owning
 [`ParallelEvaluator.eval`][ropt.components.evaluators.ParallelEvaluator.eval]
@@ -510,6 +524,64 @@ event_dispatcher.add_event_handler(my_handler, run_in_thread=True)
 `set_callback`) are common cases where this is needed. When multiple handlers
 with `run_in_thread=True` match the same event they are dispatched **in
 parallel** via `asyncio.gather` — they do not block each other.
+
+### Event throughput
+
+A dispatcher processes its queue **one event at a time**: all handlers for an
+event finish before the next event is taken. `run_in_thread=True` moves a
+blocking handler off the event loop, but it does not overlap that handler with
+the handlers of any *other* event — only with the threaded handlers of the same
+event.
+
+This serialization is deliberate.
+[`EventHandler`][ropt.components.event_handlers.EventHandler] is not re-entrant,
+and a handler shared by concurrently running optimizations — one accumulating
+results across all of them, say — needs exactly this guarantee to stay
+lock-free.
+
+The price is that handler cost scales with the *total* number of events across
+all runs sharing the dispatcher, and is paid on the critical path of every
+event. Measured with eight concurrent runs emitting five events each, sharing
+one dispatcher and one handler that blocks for 50 ms: **2.02 s elapsed**,
+against 2.00 s for fully serial execution and 0.25 s if the handlers had run
+fully concurrently — never more than one handler thread active at a time.
+
+Runs share a dispatcher when they share a handler scope, which is the normal
+case for [`optimize_many`][ropt.simple.optimize_many]: it reads the current
+handler scope once on the calling thread and gives the same one to every job.
+An N-way `optimize_many` therefore pays its handler cost serially. Keep shared
+handlers cheap; if one must do heavy I/O, buffer in memory and flush once the
+runs have finished.
+
+### Two rules for using the low-level API
+
+**Run a compute step in a worker thread.** `step.run()` is an ordinary
+synchronous method that runs its evaluator and its handlers **on whatever
+thread called it**. On the event loop thread it blocks the loop, and the
+executors and dispatchers it is waiting for are tasks on that same loop:
+
+```python
+# Wrong: run() executes here, on the loop thread.
+step.run(context=context, variables=x0)
+
+# Right: the loop stays free to service the workers.
+await asyncio.to_thread(step.run, context=context, variables=x0)
+```
+
+`ropt.simple` already does this for you; it applies when driving compute steps
+yourself. A step that dispatches to an executor detects the mistake and raises
+[`WorkflowError`][ropt.exceptions.WorkflowError] instead of hanging. A step that
+only forwards events to a dispatcher on that same loop cannot detect it, so the
+rule has to be followed rather than relied upon.
+
+**Do not emit events from an event handler.** Events are processed one at a
+time, so an event dispatched from inside a handler waits for the handler that
+dispatched it. This is enforced, whether the handler runs on the event loop or
+on the dispatcher's thread pool.
+
+To feed one run's events into a shared dispatcher, register an
+[`EventForwardHandler`][ropt.components.event_handlers.EventForwardHandler] on a
+**compute step** rather than on a dispatcher.
 
 ## Nested workflows and process boundaries
 

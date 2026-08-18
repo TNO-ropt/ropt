@@ -9,10 +9,9 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 
 from ropt._logging import get_logger
-from ropt.components.executors import Executor, ResultsQueue, Task
-from ropt.components.executors._collect import submit_and_collect
+from ropt.components.executors import Executor, Submission, WorkItem
 from ropt.evaluation import EvaluationBatchContext, EvaluationBatchResult
-from ropt.exceptions import ExecutorFailure, ExecutorStopped
+from ropt.exceptions import ExecutorFailure, WorkflowError
 
 from ._common import _active_evaluations, _scatter_result
 from ._counter import BatchIdCounter
@@ -45,13 +44,12 @@ class ParallelEvaluator(Evaluator):
     details on how this integrates with the asyncio event loop.
     """
 
-    def __init__(  # ruff: ignore[too-many-arguments]
+    def __init__(
         self,
         *,
         function: EvaluationFunctionCallback,
         executor: Executor,
         bundle_size: int = 1,
-        queue_size: int = 0,
         get_name: NameCallback | None = None,
         batch_id_callback: Callable[[], int] | None = None,
     ) -> None:
@@ -73,7 +71,6 @@ class ParallelEvaluator(Evaluator):
             function:          The function used for objectives and constraints.
             executor:          The executor to dispatch tasks to.
             bundle_size:       Number of active evaluations per executor task.
-            queue_size:        Maximum size of the result queue.
             get_name:          Optional callable to generate names for tasks.
             batch_id_callback: Callable that returns the next batch ID each time it is called.
 
@@ -87,7 +84,6 @@ class ParallelEvaluator(Evaluator):
         self._function = function
         self._executor = executor
         self._bundle_size = bundle_size
-        self._queue_size = queue_size
         self._batch_id_callback = (
             batch_id_callback if batch_id_callback is not None else BatchIdCounter()
         )
@@ -105,7 +101,9 @@ class ParallelEvaluator(Evaluator):
         recorded as a failed realization (NaN), while a user-code exception
         arrives on the results queue and aborts the current evaluation by
         re-raising the original exception unchanged. The executor is left
-        running, so a consumer may reuse it for further evaluations.
+        running, so a consumer may reuse it for further evaluations. If the
+        executor cannot run the evaluation,
+        [`ExecutorStopped`][ropt.exceptions.ExecutorStopped] is raised.
 
         Args:
             variables:      The matrix of variables to evaluate.
@@ -115,12 +113,14 @@ class ParallelEvaluator(Evaluator):
             The result of calling the wrapped evaluator function.
 
         Raises:
-            ExecutorStopped: If the executor is not running and no task
-                exception is available to re-raise.
+            WorkflowError: If called on the executor's own event loop thread.
         """
-        if not self._executor.is_running():
-            raise ExecutorStopped
-
+        if self._executor.on_worker_loop():
+            msg = (
+                "A compute step must run in a thread, for example with "
+                "asyncio.to_thread."
+            )
+            raise WorkflowError(msg)
         batch_id = self._batch_id_callback()
 
         no = evaluator_context.context.objectives.weights.size
@@ -130,17 +130,14 @@ class ParallelEvaluator(Evaluator):
             else evaluator_context.context.nonlinear_constraints.lower_bounds.size
         )
 
-        results_queue = ResultsQueue(self._queue_size)
         results = np.zeros((variables.shape[0], no + nc), dtype=np.float64)
         metadata: dict[str, NDArray[Any]] = {}
 
         bundles = self._make_bundles(variables, evaluator_context, batch_id)
-        _logger.debug("Dispatching %d task(s) to executor", len(bundles))
-        submit_and_collect(
-            self._executor,
-            self._put_tasks(bundles, results_queue),
-            results_queue,
-            len(bundles),
+        _logger.debug("Dispatching %d work item(s) to executor", len(bundles))
+        submission = Submission([self._make_work_item(bundle) for bundle in bundles])
+        self._executor.submit(submission)
+        submission.collect(
             partial(
                 _handle_result,
                 results=results,
@@ -156,23 +153,6 @@ class ParallelEvaluator(Evaluator):
             constraints=results[:, no:] if nc > 0 else None,
             metadata=metadata,
         )
-
-    async def _put_tasks(
-        self,
-        bundles: list[list[tuple[NDArray[np.float64], EvaluationFunctionContext]]],
-        results_queue: ResultsQueue,
-    ) -> None:
-        try:
-            for bundle in bundles:
-                if not self._executor.is_running():
-                    break
-                await self._executor.task_queue.put(
-                    self._make_task(bundle, results_queue)
-                )
-        except Exception:
-            results_queue.put(None)
-            results_queue.close()
-            raise
 
     def _make_bundles(
         self,
@@ -191,23 +171,21 @@ class ParallelEvaluator(Evaluator):
             bundles.append(bundle)
         return bundles
 
-    def _make_task(
+    def _make_work_item(
         self,
         bundle: list[tuple[NDArray[np.float64], EvaluationFunctionContext]],
-        results_queue: ResultsQueue,
-    ) -> Task:
-        task_name = (
+    ) -> WorkItem:
+        name = (
             None
             if self._get_name is None
             else self._get_name([function_context for _, function_context in bundle])
         )
         for _, function_context in bundle:
-            function_context.name = task_name
-        return Task(
-            results_queue=results_queue,
+            function_context.name = name
+        return WorkItem(
             function=_run_bundle,
             args=(self._function, bundle),
-            name=task_name,
+            name=name,
         )
 
 
@@ -219,21 +197,32 @@ def _run_bundle(
 
 
 def _handle_result(
-    task: Task,
+    work_item: WorkItem,
     results: NDArray[np.float64],
     metadata: dict[str, NDArray[Any]],
     objective_count: int,
     eval_count: int,
 ) -> None:
-    bundle: list[tuple[NDArray[np.float64], EvaluationFunctionContext]] = task.args[1]
-    if isinstance(task.result, ExecutorFailure):
+    bundle: list[tuple[NDArray[np.float64], EvaluationFunctionContext]] = (
+        work_item.args[1]
+    )
+    if isinstance(work_item.result, ExecutorFailure):
         for _, function_context in bundle:
             results[function_context.eval_idx, :] = np.nan
         return
-    assert isinstance(task.result, list)
-    assert len(task.result) == len(bundle)
-    for (_, function_context), result in zip(bundle, task.result, strict=True):
-        assert isinstance(result, EvaluationFunctionResult)
+    if not isinstance(work_item.result, list) or len(work_item.result) != len(bundle):
+        msg = (
+            f"The evaluation function must return a list of {len(bundle)} "
+            f"EvaluationFunctionResult objects."
+        )
+        raise WorkflowError(msg)
+    for (_, function_context), result in zip(bundle, work_item.result, strict=True):
+        if not isinstance(result, EvaluationFunctionResult):
+            msg = (
+                "The evaluation function must return EvaluationFunctionResult "
+                f"objects, got {type(result).__name__}."
+            )
+            raise WorkflowError(msg)
         _scatter_result(
             function_context.eval_idx,
             result,

@@ -8,22 +8,21 @@ from functools import partial
 
 from ropt._logging import get_logger
 
-from .base import Executor, ExecutorBase, Task
+from .base import ExecutorBase
 
 _logger = get_logger(__name__)
 
 
 class ThreadingExecutor(ExecutorBase):
-    """An executor that dispatches tasks to worker threads."""
+    """An executor that dispatches work items to worker threads."""
 
-    def __init__(self, *, workers: int = 1, queue_size: int = 0) -> None:
+    def __init__(self, *, workers: int = 1) -> None:
         """Initialize the executor.
 
         Args:
-            workers:    The number of workers to use.
-            queue_size: Maximum size of the tasks queue.
+            workers: The number of workers to use.
         """
-        super().__init__(queue_size=queue_size)
+        super().__init__()
         self._workers = workers
         self._worker_tasks: list[asyncio.Task[None]] = []
         self._pool: ThreadPoolExecutor | None = None
@@ -34,50 +33,43 @@ class ThreadingExecutor(ExecutorBase):
         Args:
             task_group: The task group to use.
         """
-        self._pool = ThreadPoolExecutor(max_workers=self._workers)
+        self._begin_start()
+        pool = ThreadPoolExecutor(max_workers=self._workers)
+        self._pool = pool
         _logger.debug("Starting threading executor with %d worker(s)", self._workers)
-        workers = [
-            _Worker(self._task_queue, self, self._pool) for _ in range(self._workers)
-        ]
         self._worker_tasks = [
-            task_group.create_task(worker.run()) for worker in workers
+            task_group.create_task(self._run_worker(pool)) for _ in range(self._workers)
         ]
         await self._finish_start(task_group)
 
-    def cleanup(self) -> None:
+    def _cleanup(self) -> None:
         """Clean up the executor."""
         if self._pool is not None:
-            self._pool.shutdown(wait=False)
+            self._pool.shutdown(wait=False, cancel_futures=True)
             self._pool = None
         for worker_task in self._worker_tasks:
             if not worker_task.done():
                 worker_task.cancel()
         self._worker_tasks = []
-        self._drain_and_kill()
+        self._cleanup_submissions()
 
-
-class _Worker:
-    def __init__(
-        self,
-        task_queue: asyncio.Queue[Task],
-        parent: Executor,
-        pool: ThreadPoolExecutor,
-    ) -> None:
-        self._task_queue = task_queue
-        self._parent = parent
-        self._pool = pool
-
-    async def run(self) -> None:
+    async def _run_worker(self, pool: ThreadPoolExecutor) -> None:
         loop = asyncio.get_running_loop()
-        while self._parent.is_running():
-            task = await self._task_queue.get()
+        while True:
+            submission, work_item = await self._work_queue.get()
+            if submission.is_finished:
+                # Its caller has already left, so running this wastes a worker.
+                continue
             try:
                 result = await loop.run_in_executor(
-                    self._pool, partial(task.function, *task.args, **task.kwargs)
+                    pool,
+                    partial(work_item.function, *work_item.args, **work_item.kwargs),
                 )
-                await asyncio.to_thread(task.put_result, result)
-            except Exception as exc:  # ruff: ignore[blind-except]
-                # Deliver to the evaluator; keep the executor alive (no re-raise).
-                task.put_error(exc)
-            finally:
-                self._task_queue.task_done()
+                self._deliver(submission, work_item, result)
+            except asyncio.CancelledError:
+                self._abort(submission)
+                raise
+            except BaseException as exc:
+                self._fail(submission, exc)
+                if not isinstance(exc, Exception):
+                    raise

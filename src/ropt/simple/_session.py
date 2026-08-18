@@ -27,6 +27,7 @@ from functools import partial
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, TypeVar, cast
 
+from ropt.components._loop import schedule
 from ropt.components.concurrency import run_concurrent
 from ropt.components.executors import (
     Executor,
@@ -37,7 +38,7 @@ from ropt.components.executors import (
 from ropt.exceptions import WorkflowError
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Sequence
+    from collections.abc import Callable, Coroutine, Sequence
 
     from numpy.typing import ArrayLike
 
@@ -48,6 +49,11 @@ if TYPE_CHECKING:
     from ropt.enums import ExitCode
 
 _T = TypeVar("_T")
+
+_STOPPED = (
+    "The block's background session has stopped and cannot be reused; leave "
+    "this block and open a new one."
+)
 
 
 _active_session: ContextVar[Session | None] = ContextVar(
@@ -68,10 +74,12 @@ class Session:
         self._loop: asyncio.AbstractEventLoop | None = None
         self._thread: threading.Thread | None = None
         self._ready = threading.Event()
+        self._stopped = threading.Event()
         self._task_group: asyncio.TaskGroup | None = None
         self._shutdown: asyncio.Event | None = None
         self._executor: Executor | None = None
         self._run_counter = itertools.count()
+        self._failure: BaseException | None = None
 
     def start(self) -> None:
         self._loop = asyncio.new_event_loop()
@@ -80,30 +88,87 @@ class Session:
         self._ready.wait()
 
     def stop(self) -> None:
-        assert self._loop is not None
-        assert self._shutdown is not None
         assert self._thread is not None
-        self._loop.call_soon_threadsafe(self._shutdown.set)
+        if self._shutdown is not None:
+            schedule(self._loop, self._shutdown.set)
         self._thread.join()
+        if self._failure is not None:
+            failure, self._failure = self._failure, None
+            raise failure
 
     def _thread_main(self) -> None:
         assert self._loop is not None
         asyncio.set_event_loop(self._loop)
+        main_task = self._loop.create_task(self._run())
         try:
-            self._loop.run_until_complete(self._run())
+            self._loop.run_until_complete(main_task)
+        except BaseException as exc:  # ruff: ignore[blind-except]
+            # Kept for stop(), so the owning block reports why the session died
+            # instead of losing it on this thread.
+            self._failure = exc
         finally:
-            self._loop.close()
+            # Normally already set by `_run`; this also covers a session that
+            # died before it could get that far.
+            self._stopped.set()
+            self._ready.set()
+            try:
+                self._shut_down(main_task)
+            except BaseException as exc:  # ruff: ignore[blind-except]
+                if self._failure is None:
+                    self._failure = exc
+            finally:
+                self._loop.close()
+
+    def _shut_down(self, main_task: asyncio.Task[None]) -> None:
+        assert self._loop is not None
+        try:
+            if self._shutdown is not None and not self._shutdown.is_set():
+                self._loop.run_until_complete(self._shutdown.wait())
+        finally:
+            unfinished = asyncio.all_tasks(self._loop)
+            for task in unfinished:
+                task.cancel()
+            try:
+                if unfinished:
+                    self._loop.run_until_complete(
+                        asyncio.gather(*unfinished, return_exceptions=True)
+                    )
+            finally:
+                for task in {main_task, *unfinished}:
+                    if task.done() and not task.cancelled():
+                        task.exception()
 
     async def _run(self) -> None:
         self._shutdown = asyncio.Event()
-        async with asyncio.TaskGroup() as task_group:
-            self._task_group = task_group
-            self._ready.set()
-            await self._shutdown.wait()
-            # Defensive: a scope normally removes its executor before the session
-            # stops; cancel a leftover so the task group can exit.
-            if self._executor is not None and self._executor.is_running():
-                self._executor.cancel()
+        try:
+            async with asyncio.TaskGroup() as task_group:
+                self._task_group = task_group
+                self._ready.set()
+                await self._shutdown.wait()
+                # Defensive: a scope normally removes its executor before the
+                # session stops; cancel a leftover so the task group can exit.
+                if self._executor is not None:
+                    self._executor.cancel()
+        finally:
+            # A session is single-use. Marking it here, on the loop thread while
+            # the loop is still serving, means a caller cannot pass the check in
+            # `_start_on_loop` and then hand work to a loop that will not run it.
+            self._stopped.set()
+
+    def _start_on_loop(self, coro: Coroutine[Any, Any, None]) -> None:
+        assert self._loop is not None
+        if self._stopped.is_set():
+            coro.close()
+            raise WorkflowError(_STOPPED)
+        try:
+            asyncio.run_coroutine_threadsafe(coro, self._loop).result()
+        except RuntimeError:
+            # Lost the race with the shutdown: the loop or its task group had
+            # already gone by the time the coroutine ran.
+            coro.close()
+            if self._stopped.is_set():
+                raise WorkflowError(_STOPPED) from None
+            raise
 
     def open_executor(self, make_executor: Callable[[], Executor]) -> None:
         if self._executor is not None:
@@ -112,14 +177,11 @@ class Session:
                 "a time; they cannot be nested."
             )
             raise WorkflowError(msg)
-        assert self._loop is not None
         assert self._task_group is not None
         executor = make_executor()
         # Start on the loop thread and block until ready, surfacing a start
         # failure (e.g. a process pool that cannot spawn) on the caller's stack.
-        asyncio.run_coroutine_threadsafe(
-            executor.start(self._task_group), self._loop
-        ).result()
+        self._start_on_loop(executor.start(self._task_group))
         self._executor = executor
         # Restart run numbering so task names are unique within this executor.
         self._run_counter = itertools.count()
@@ -131,22 +193,17 @@ class Session:
         executor = self._executor
         self._executor = None
         if executor is not None:
-            assert self._loop is not None
-            self._loop.call_soon_threadsafe(executor.cancel)
+            schedule(self._loop, executor.cancel)
 
     def get_executor(self) -> Executor | None:
         return self._executor
 
     def open_dispatcher(self, dispatcher: EventDispatcher) -> None:
-        assert self._loop is not None
         assert self._task_group is not None
-        asyncio.run_coroutine_threadsafe(
-            dispatcher.start(self._task_group), self._loop
-        ).result()
+        self._start_on_loop(dispatcher.start(self._task_group))
 
     def close_dispatcher(self, dispatcher: EventDispatcher) -> None:
-        if self._loop is not None:
-            self._loop.call_soon_threadsafe(dispatcher.cancel)
+        schedule(self._loop, dispatcher.cancel)
 
     def gather_shared(
         self, jobs: Sequence[Callable[[], _T]], limit: int | None
@@ -155,7 +212,9 @@ class Session:
 
         Each job runs on its own thread with this session set active, so
         ``current_executor()``/``offload()`` and a nested ``optimize()`` inside a
-        job resolve to this block's executor and handlers. ``limit`` bounds how
+        job resolve to this block's executor. An open ``handlers`` block is not
+        propagated: read ``current_handlers()`` on the calling thread and pass
+        the scope into each job, as ``optimize_many`` does. ``limit`` bounds how
         many run at once. The first job to raise propagates its error at once
         (fail-fast); pending jobs are then skipped and any already running are
         abandoned.
@@ -189,8 +248,12 @@ def _acquire_session() -> tuple[Session, Token[Session | None] | None]:
 
 def _release_session(session: Session, token: Token[Session | None] | None) -> None:
     if token is not None:
-        session.stop()
-        _active_session.reset(token)
+        try:
+            # Reports a session that died on its own thread, so the context var
+            # must be restored even then.
+            session.stop()
+        finally:
+            _active_session.reset(token)
 
 
 class _ExecutionScope:

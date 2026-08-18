@@ -3,12 +3,12 @@
 import os
 import sys
 import tempfile
-import traceback
 from pathlib import Path
 
 import cloudpickle
 
 from ropt.components._transferred import check_transferred, reset_transferred
+from ropt.components.executors._picklable import picklable_exception
 
 
 def main() -> int:
@@ -33,7 +33,7 @@ def run_task(input_path: str, output_path: str) -> int:
         check_transferred()
         result = function(*args, **kwargs)
         exit_code = 0
-    except Exception as exc:  # ruff: ignore[blind-except]
+    except BaseException as exc:  # ruff: ignore[blind-except]
         result = picklable_exception(exc)
         exit_code = 1
     finally:
@@ -50,30 +50,6 @@ def run_task(input_path: str, output_path: str) -> int:
             tmp_path.unlink(missing_ok=True)
             raise
     return exit_code
-
-
-def picklable_exception(exc: BaseException) -> BaseException:
-    """Attach the worker traceback and return a cloudpickle-safe exception.
-
-    The active traceback is recorded as a note so it survives serialization back
-    to the parent process. If `exc` itself cannot be pickled, it is replaced by
-    a `RuntimeError` carrying its `repr` and notes.
-
-    Args:
-        exc: The exception raised while running the task.
-
-    Returns:
-        A picklable exception with the worker traceback attached as a note.
-    """
-    exc.add_note(traceback.format_exc())
-    try:
-        cloudpickle.loads(cloudpickle.dumps(exc))
-    except Exception:  # ruff: ignore[blind-except]
-        wrapped = RuntimeError(repr(exc))
-        for note in getattr(exc, "__notes__", []):
-            wrapped.add_note(note)
-        return wrapped
-    return exc
 
 
 if __name__ == "__main__":

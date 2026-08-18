@@ -1103,7 +1103,7 @@ def test_event_handler_allows_repeated_use_on_same_thread() -> None:
 
 def test_dispatcher_handler_is_not_thread_pinned() -> None:
     handler = _RecordingHandler()
-    handler.register_dispatcher()
+    handler._register_dispatcher()  # ruff: ignore[private-member-access]
     event = object()
     errors: list[BaseException] = []
 
@@ -1122,9 +1122,9 @@ def test_dispatcher_handler_is_not_thread_pinned() -> None:
 
 def test_register_dispatcher_twice_raises() -> None:
     handler = _RecordingHandler()
-    handler.register_dispatcher()
+    handler._register_dispatcher()  # ruff: ignore[private-member-access]
     with pytest.raises(WorkflowError, match="already registered with a dispatcher"):
-        handler.register_dispatcher()
+        handler._register_dispatcher()  # ruff: ignore[private-member-access]
 
 
 def test_register_dispatcher_via_add_event_handler_twice_raises() -> None:
@@ -1137,29 +1137,29 @@ def test_register_dispatcher_via_add_event_handler_twice_raises() -> None:
 
 def test_dispatcher_then_compute_step_raises() -> None:
     handler = _RecordingHandler()
-    handler.register_dispatcher()
+    handler._register_dispatcher()  # ruff: ignore[private-member-access]
     with pytest.raises(WorkflowError, match="registered with a dispatcher"):
-        handler.register_compute_step()
+        handler._register_compute_step()  # ruff: ignore[private-member-access]
 
 
 def test_compute_step_then_dispatcher_raises() -> None:
     handler = _RecordingHandler()
-    handler.register_compute_step()
+    handler._register_compute_step()  # ruff: ignore[private-member-access]
     with pytest.raises(WorkflowError, match="compute step"):
-        handler.register_dispatcher()
+        handler._register_dispatcher()  # ruff: ignore[private-member-access]
 
 
 def test_handler_may_be_attached_to_multiple_compute_steps() -> None:
     handler = _RecordingHandler()
-    handler.register_compute_step()
-    handler.register_compute_step()  # allowed, no error
+    handler._register_compute_step()  # ruff: ignore[private-member-access]
+    handler._register_compute_step()  # allowed, no error  # ruff: ignore[private-member-access]
 
 
 def test_claim_marks_handler_as_claimed() -> None:
     handler = _RecordingHandler()
-    assert handler.claimed is False
+    assert handler._claimed is False  # ruff: ignore[private-member-access]
     handler.claim()
-    assert handler.claimed is True
+    assert handler._claimed is True  # ruff: ignore[private-member-access]
 
 
 def test_claim_twice_raises() -> None:
@@ -1172,23 +1172,23 @@ def test_claim_twice_raises() -> None:
 def test_claim_is_independent_of_attachment() -> None:
     handler = _RecordingHandler()
     handler.claim()
-    handler.register_compute_step()
-    assert handler.claimed is True
+    handler._register_compute_step()  # ruff: ignore[private-member-access]
+    assert handler._claimed is True  # ruff: ignore[private-member-access]
 
 
 def test_release_allows_reclaiming() -> None:
     handler = _RecordingHandler()
     handler.claim()
     handler.release()
-    assert handler.claimed is False
+    assert handler._claimed is False  # ruff: ignore[private-member-access]
     handler.claim()  # allowed once released
-    assert handler.claimed is True
+    assert handler._claimed is True  # ruff: ignore[private-member-access]
 
 
 def test_release_without_claim_is_a_noop() -> None:
     handler = _RecordingHandler()
     handler.release()
-    assert handler.claimed is False
+    assert handler._claimed is False  # ruff: ignore[private-member-access]
 
 
 def test_check_transferred_is_silent_without_a_transfer() -> None:

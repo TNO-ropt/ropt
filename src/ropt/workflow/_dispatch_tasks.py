@@ -1,6 +1,7 @@
 import asyncio
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any, Literal
 
 from ropt._logging import get_logger
@@ -8,36 +9,34 @@ from ropt.components.executors import (
     Executor,
     HPCExecutor,
     MultiprocessingExecutor,
-    ResultsQueue,
-    Task,
+    Submission,
     ThreadingExecutor,
+    WorkItem,
 )
 
 _logger = get_logger(__name__)
 
 
 @dataclass(kw_only=True)
-class _Task(Task):
+class _IndexedWorkItem(WorkItem):
     id: int
 
 
 def _collect_results(
-    results_queue: ResultsQueue,
+    submission: Submission,
     count: int,
-    finished_event: asyncio.Event,
-    results: dict[int, Any],
-    *,
     report: Callable[[Any], None] | None = None,
-) -> None:
-    for _ in range(count):
-        task = results_queue.get()
-        if task is None:
-            break
-        assert isinstance(task, _Task)
-        results[task.id] = task.result
-        if report is not None and task.result is not None:
-            report(task.result)
-    finished_event.set()
+) -> list[Any]:
+    results: list[Any] = [None] * count
+
+    def _store(work_item: WorkItem) -> None:
+        assert isinstance(work_item, _IndexedWorkItem)
+        results[work_item.id] = work_item.result
+        if report is not None:
+            report(work_item.result)
+
+    submission.collect(_store)
+    return results
 
 
 async def dispatch_tasks(  # ruff: ignore[too-many-arguments]
@@ -61,7 +60,8 @@ async def dispatch_tasks(  # ruff: ignore[too-many-arguments]
         executor:  The type of executor to run the functions.
         report:    Optional report function.
         workers:   The number of workers to run in parallel.
-        workdir:   Working directory used by the HPC executor.
+        workdir:   Working directory used by the HPC executor; a relative path
+                   is resolved against the current directory.
         cluster:   The name of the HPC cluster to use.
         queue:     Optional queue to use on the cluster.
         cores:     Optional number of cores per task.
@@ -82,23 +82,21 @@ async def dispatch_tasks(  # ruff: ignore[too-many-arguments]
         thread affects all threads. In case of the `multiprocessing` and `hpc`
         executors, the current directory can be changed safely if needed.
     """
-    results: dict[int, Any] = {}
-    results_queue = ResultsQueue()
     if isinstance(functions, Mapping):
-        tasks = [
-            _Task(function=function, results_queue=results_queue, id=idx, name=name)
+        work_items = [
+            _IndexedWorkItem(function=function, id=idx, name=name)
             for idx, (name, function) in enumerate(functions.items())
         ]
     else:
-        tasks = [
-            _Task(function=function, results_queue=results_queue, id=idx)
+        work_items = [
+            _IndexedWorkItem(function=function, id=idx)
             for idx, function in enumerate(functions)
         ]
     executor_instance: HPCExecutor | ThreadingExecutor | MultiprocessingExecutor
     match executor:
         case "hpc":
             executor_instance = HPCExecutor(
-                workdir=workdir,
+                workdir=Path(workdir).resolve(),  # ruff: ignore[blocking-path-method-in-async-function]
                 workers=workers,
                 cluster=cluster,
                 queue=queue,
@@ -113,26 +111,17 @@ async def dispatch_tasks(  # ruff: ignore[too-many-arguments]
             raise ValueError(msg)
     assert isinstance(executor_instance, Executor)
     _logger.debug(
-        "Dispatching %d task(s) via %s executor (%d worker(s))",
-        len(tasks),
+        "Dispatching %d work item(s) via %s executor (%d worker(s))",
+        len(work_items),
         executor,
         workers,
     )
-    all_processed = asyncio.Event()
+    submission = Submission(work_items)
     async with asyncio.TaskGroup() as tg:
         await executor_instance.start(tg)
-        tg.create_task(
-            asyncio.to_thread(
-                _collect_results,
-                results_queue,
-                len(tasks),
-                all_processed,
-                results,
-                report=report,
-            ),
+        executor_instance.submit(submission)
+        results = await asyncio.to_thread(
+            _collect_results, submission, len(work_items), report
         )
-        for task in tasks:
-            await executor_instance.task_queue.put(task)
-        await all_processed.wait()
         executor_instance.cancel()
-    return [results[idx] for idx in range(len(results))]
+    return results

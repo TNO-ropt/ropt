@@ -15,13 +15,11 @@ the enclosing optimizer's executor (an evaluation runs detached from it).
 
 from __future__ import annotations
 
-import asyncio
 from dataclasses import dataclass
 from functools import partial
 from typing import TYPE_CHECKING, Any, TypeVar, cast, overload
 
-from ropt.components.executors import ResultsQueue, Task
-from ropt.components.executors._collect import submit_and_collect
+from ropt.components.executors import Submission, WorkItem
 from ropt.exceptions import ExecutorFailure, WorkflowError
 
 from ._session import current_executor
@@ -35,7 +33,7 @@ _T = TypeVar("_T")
 
 
 @dataclass(kw_only=True)
-class _IndexedTask(Task):
+class _IndexedWorkItem(WorkItem):
     index: int
 
 
@@ -86,8 +84,8 @@ def can_offload() -> bool:
     """Report whether `offload` would dispatch to an executor.
 
     Returns `True` when an execution block (`threads`/`processes`/`hpc`) is open
-    and the caller can dispatch to it, and `False` otherwise (no block open, or
-    called from a result handler).
+    and the caller can dispatch to it, and `False` otherwise (no block open, the
+    block's executor has stopped, or called from a result handler).
 
     Use it in code that may run with or without an execution block (for example
     a plugin, transform, or custom step) to fall back to a direct call instead
@@ -104,70 +102,44 @@ def can_offload() -> bool:
     Returns:
         `True` if `offload` would dispatch, `False` otherwise.
     """
-    if _on_event_loop():
-        return False
     executor = current_executor()
-    return executor is not None and executor.is_running()
+    return (
+        executor is not None and executor.is_running() and not executor.on_worker_loop()
+    )
 
 
 def _require_executor() -> Executor:
-    if _on_event_loop():
-        msg = (
-            "offload() cannot be called from a result handler "
-            "(it runs on the session's event loop)."
-        )
-        raise WorkflowError(msg)
     executor = current_executor()
-    if executor is None or not executor.is_running():
+    if executor is None:
         msg = (
             "offload() found no executor to dispatch to here; open an execution "
             "block (threads/processes/hpc), or use can_offload() to run inline."
+        )
+        raise WorkflowError(msg)
+    if executor.on_worker_loop():
+        msg = (
+            "offload() cannot be called from a result handler "
+            "(it runs on the session's event loop)."
         )
         raise WorkflowError(msg)
     return executor
 
 
 def _dispatch(executor: Executor, functions: list[Callable[[], Any]]) -> list[Any]:
-    results_queue = ResultsQueue()
-    tasks = [
-        _IndexedTask(function=function, results_queue=results_queue, index=index)
-        for index, function in enumerate(functions)
-    ]
-    output: list[Any] = [None] * len(tasks)
-    submit_and_collect(
-        executor,
-        _put(executor, tasks, results_queue),
-        results_queue,
-        len(tasks),
-        partial(_store, output),
+    submission = Submission(
+        [
+            _IndexedWorkItem(function=function, index=index)
+            for index, function in enumerate(functions)
+        ]
     )
+    output: list[Any] = [None] * len(functions)
+    executor.submit(submission)
+    submission.collect(partial(_store, output))
     return output
 
 
-async def _put(
-    executor: Executor, tasks: list[_IndexedTask], results_queue: ResultsQueue
-) -> None:
-    try:
-        for task in tasks:
-            if not executor.is_running():
-                break
-            await executor.task_queue.put(task)
-    except Exception:
-        results_queue.put(None)
-        results_queue.close()
-        raise
-
-
-def _store(output: list[Any], task: Task) -> None:
-    assert isinstance(task, _IndexedTask)
-    if isinstance(task.result, ExecutorFailure):
-        raise task.result
-    output[task.index] = task.result
-
-
-def _on_event_loop() -> bool:
-    try:
-        asyncio.get_running_loop()
-    except RuntimeError:
-        return False
-    return True
+def _store(output: list[Any], work_item: WorkItem) -> None:
+    assert isinstance(work_item, _IndexedWorkItem)
+    if isinstance(work_item.result, ExecutorFailure):
+        raise work_item.result
+    output[work_item.index] = work_item.result

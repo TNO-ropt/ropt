@@ -98,7 +98,7 @@ class EventHandler(ABC):
     def __reduce__(self) -> tuple[object, tuple[str]]:  # ruff: ignore[undocumented-magic-method]
         return (_make_placeholder, ("An event handler",))
 
-    def register_dispatcher(self) -> None:
+    def _register_dispatcher(self) -> None:
         """Mark this handler as owned by an event dispatcher.
 
         Raises:
@@ -115,21 +115,10 @@ class EventHandler(ABC):
             raise WorkflowError(msg)
         self._attached_to = _Attachment.DISPATCHER
 
-    def unregister_dispatcher(self) -> None:
-        """Reverse `register_dispatcher`, releasing the handler.
-
-        After unregistering, the handler is free to be registered with another
-        dispatcher or with a compute step.
-
-        Raises:
-            WorkflowError: If the handler is not registered with a dispatcher.
-        """
-        if self._attached_to is not _Attachment.DISPATCHER:
-            msg = "This event handler is not registered with a dispatcher."
-            raise WorkflowError(msg)
+    def _unregister_dispatcher(self) -> None:
         self._attached_to = _Attachment.NONE
 
-    def register_compute_step(self) -> None:
+    def _register_compute_step(self) -> None:
         """Mark this handler as owned by one or more compute steps.
 
         Raises:
@@ -153,11 +142,8 @@ class EventHandler(ABC):
         they are shared explicitly through an
         [`EventDispatcher`][ropt.components.event_handlers.EventDispatcher].
 
-        This claim is independent of the attachment state set by
-        [`register_compute_step`][ropt.components.event_handlers.EventHandler.register_compute_step]
-        and
-        [`register_dispatcher`][ropt.components.event_handlers.EventHandler.register_dispatcher],
-        and of the transient concurrency guard on `handle_event`.
+        This claim is independent of the attachment to a dispatcher or a compute
+        step, and of the transient concurrency guard on `handle_event`.
 
         Raises:
             WorkflowError: If the handler is currently claimed.
@@ -173,20 +159,11 @@ class EventHandler(ABC):
 
         Clears the exclusive-use flag, letting a later run claim the handler
         again, for example to accumulate results across sequential runs. The
-        attachment state set by `register_compute_step`/`register_dispatcher` is
-        left untouched. Releasing an unclaimed handler is a no-op.
+        attachment to a dispatcher or a compute step is left untouched.
+        Releasing an unclaimed handler is a no-op.
         """
         with self._owner_lock:
             self._claimed = False
-
-    @property
-    def claimed(self) -> bool:
-        """Whether this handler has been claimed for exclusive use.
-
-        Returns:
-            True if the handler has been claimed.
-        """
-        return self._claimed
 
     @property
     @abstractmethod

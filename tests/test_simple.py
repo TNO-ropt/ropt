@@ -10,7 +10,7 @@ import numpy as np
 import pytest
 
 from ropt.enums import ExitCode
-from ropt.exceptions import WorkflowError
+from ropt.exceptions import ExecutorStopped, WorkflowError
 from ropt.simple import (
     EvaluateResult,
     EvaluationFunctionContext,
@@ -209,7 +209,7 @@ def test_optimize_local_handler_released_after_run(
 ) -> None:
     history = HistoryHandler()
     optimize(config, initial_values, test_functions[0], handlers=[history])
-    assert history.claimed is False
+    assert history._claimed is False  # ruff: ignore[private-member-access]
 
 
 def test_optimize_local_handler_released_after_error(config: Any) -> None:
@@ -221,7 +221,7 @@ def test_optimize_local_handler_released_after_error(config: Any) -> None:
 
     with pytest.raises(RuntimeError, match="boom"):
         optimize(config, initial_values, _boom, handlers=[history])
-    assert history.claimed is False
+    assert history._claimed is False  # ruff: ignore[private-member-access]
 
 
 def test_optimize_local_handler_claimed_during_run(
@@ -231,7 +231,7 @@ def test_optimize_local_handler_claimed_during_run(
     observed: list[bool] = []
 
     def _report(_: EvaluateResult) -> None:
-        observed.append(history.claimed)
+        observed.append(history._claimed)  # ruff: ignore[private-member-access]
         with pytest.raises(WorkflowError, match="already been claimed"):
             history.claim()
 
@@ -244,7 +244,7 @@ def test_optimize_local_handler_claimed_during_run(
     )
     assert observed
     assert all(observed)
-    assert history.claimed is False
+    assert history._claimed is False  # ruff: ignore[private-member-access]
 
 
 def test_optimize_local_handler_claim_rolls_back_on_failure(
@@ -255,7 +255,7 @@ def test_optimize_local_handler_claim_rolls_back_on_failure(
     second.claim()  # stands in for a handler already in use by another run
     with pytest.raises(WorkflowError, match="already been claimed"):
         optimize(config, initial_values, test_functions[0], handlers=[first, second])
-    assert first.claimed is False
+    assert first._claimed is False  # ruff: ignore[private-member-access]
 
 
 def test_that_report_callback_returning_true_stops_optimization(
@@ -578,6 +578,47 @@ def test_gather_shared_activates_the_session_on_driver_threads() -> None:
         functions = [partial(_square, i) for i in (1, 2, 3)]
         [result] = session.gather_shared([lambda: offload(functions)], limit=1)
     assert result == (1, 4, 9)
+
+
+def test_that_gather_shared_does_not_propagate_the_handler_scope() -> None:
+    # Jobs run on bare threads, which do not inherit context variables. The
+    # documented pattern is to read the scope here and pass it into each job.
+    seen: list[bool] = []
+
+    def _look() -> bool:
+        seen.append(compose.current_handlers() is not None)
+        return True
+
+    with threads(workers=1), handlers(report=lambda _: None):
+        session = current_session()
+        assert session is not None
+        assert compose.current_handlers() is not None
+        assert current_executor() is not None
+        session.gather_shared([_look], limit=1)
+    assert seen == [False]
+
+
+class _FatalWork(BaseException):
+    """Not an Exception, so the worker loops let it reach the task group."""
+
+
+def _fatal_work() -> int:
+    msg = "worker died"
+    raise _FatalWork(msg)
+
+
+def test_that_a_fatal_worker_error_is_reported_when_the_block_exits() -> None:
+    # It tears down the session, closing its loop while the block is still
+    # open. The cause must reach the caller instead of being lost on the
+    # session thread behind a stray "Event loop is closed".
+    def _run_block() -> None:
+        with threads(workers=1), pytest.raises(ExecutorStopped):
+            offload(_fatal_work)
+
+    with pytest.raises(BaseExceptionGroup) as excinfo:
+        _run_block()
+    matched, _ = excinfo.value.split(_FatalWork)
+    assert matched is not None
 
 
 def _double(value: float) -> float:

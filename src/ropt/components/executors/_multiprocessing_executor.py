@@ -14,7 +14,7 @@ from ropt._logging import get_logger
 from ropt.components._transferred import check_transferred, reset_transferred
 from ropt.exceptions import ExecutionError, ExecutorFailure
 
-from .base import Executor, ExecutorBase, Task
+from .base import ExecutorBase, WorkItem
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -24,7 +24,7 @@ _HAVE_CLOUDPICKLE: Final = find_spec("cloudpickle") is not None
 if _HAVE_CLOUDPICKLE:
     import cloudpickle
 
-    from .__main__ import picklable_exception
+    from ._picklable import picklable_exception
 
 _logger = get_logger(__name__)
 
@@ -41,17 +41,16 @@ class MultiprocessingExecutor(ExecutorBase):
         self,
         *,
         workers: int = 1,
-        queue_size: int = 0,
         max_tasks_per_child: int | None = None,
     ) -> None:
         """Initialize the executor.
 
         Args:
             workers:             Number of worker processes.
-            queue_size:          Maximum task queue size (0 = unlimited).
-            max_tasks_per_child: Restart workers after this many tasks (`None` = never).
+            max_tasks_per_child: Restart workers after this many work items
+                                 (`None` = never).
         """
-        super().__init__(queue_size=queue_size)
+        super().__init__()
         self._workers = workers
         self._max_tasks_per_child = max_tasks_per_child
         self._worker_tasks: list[asyncio.Task[None]] = []
@@ -63,21 +62,20 @@ class MultiprocessingExecutor(ExecutorBase):
         Args:
             task_group:          The task group to use.
         """
-        self._executor = ProcessPoolExecutor(
+        self._begin_start()
+        executor = ProcessPoolExecutor(
             max_workers=self._workers,
             mp_context=multiprocessing.get_context("spawn"),
             max_tasks_per_child=self._max_tasks_per_child,
         )
+        self._executor = executor
         _logger.debug(
             "Starting multiprocessing executor with %d worker(s)", self._workers
         )
         await self._check_worker_startup()
-        workers = [
-            _Worker(self._task_queue, self, self._executor)
-            for _ in range(self._workers)
-        ]
         self._worker_tasks = [
-            task_group.create_task(worker.run()) for worker in workers
+            task_group.create_task(self._run_worker(executor))
+            for _ in range(self._workers)
         ]
         await self._finish_start(task_group)
 
@@ -87,7 +85,7 @@ class MultiprocessingExecutor(ExecutorBase):
         try:
             await loop.run_in_executor(self._executor, _canary)
         except BrokenProcessPool as exc:
-            self._executor.shutdown(wait=False)
+            self._executor.shutdown(wait=False, cancel_futures=True)
             self._executor = None
             msg = (
                 "Could not start worker processes; guard the program entry point "
@@ -95,69 +93,65 @@ class MultiprocessingExecutor(ExecutorBase):
             )
             raise ExecutionError(msg) from exc
 
-    def cleanup(self) -> None:
+    def _cleanup(self) -> None:
         """Clean up the executor."""
         if self._executor is not None:
-            self._executor.shutdown(wait=False)
+            self._executor.shutdown(wait=False, cancel_futures=True)
             self._executor = None
         for worker_task in self._worker_tasks:
             if not worker_task.done():
                 worker_task.cancel()
         self._worker_tasks = []
-        self._drain_and_kill()
+        self._cleanup_submissions()
 
-
-class _Worker:
-    def __init__(
-        self,
-        task_queue: asyncio.Queue[Task],
-        parent: Executor,
-        executor: ProcessPoolExecutor,
-    ) -> None:
-        self._task_queue = task_queue
-        self._parent = parent
-        self._executor = executor
-
-    async def run(self) -> None:
+    async def _run_worker(self, executor: ProcessPoolExecutor) -> None:
         while True:
-            task = await self._task_queue.get()
+            submission, work_item = await self._work_queue.get()
+            if submission.is_finished:
+                # Its caller has already left, so running this wastes a worker.
+                continue
             try:
-                result = await self._run_task(task)
-                await asyncio.to_thread(task.put_result, result)
+                result = await _run_work_item(work_item, executor)
+                self._deliver(submission, work_item, result)
             except BrokenProcessPool:
-                _logger.warning("Worker process pool broken; task result lost")
-                await asyncio.to_thread(
-                    task.put_result, ExecutorFailure("Background process was killed")
+                _logger.warning("Worker process pool broken; work item result lost")
+                self._deliver(
+                    submission,
+                    work_item,
+                    ExecutorFailure("Background process was killed"),
                 )
-            except Exception as exc:  # ruff: ignore[blind-except]
-                # Deliver to the evaluator; keep the executor alive (no re-raise).
-                task.put_error(exc)
-            finally:
-                self._task_queue.task_done()
+            except asyncio.CancelledError:
+                self._abort(submission)
+                raise
+            except BaseException as exc:
+                self._fail(submission, exc)
+                if not isinstance(exc, Exception):
+                    raise
 
-    async def _run_task(self, task: Task) -> Any:  # ruff: ignore[any-type]
-        loop = asyncio.get_running_loop()
-        if _HAVE_CLOUDPICKLE:
-            payload = cloudpickle.dumps((task.function, task.args, task.kwargs))
-            ok, blob = await loop.run_in_executor(
-                self._executor, _run_cloudpickled, payload
-            )
-            value = cloudpickle.loads(blob)
-            if not ok:
-                raise value
-            return value
-        try:
-            pickle.dumps(task.function)
-        except Exception as exc:
-            msg = (
-                "The task function could not be sent to a worker process because "
-                "it is not picklable; install ropt[cloudpickle] or make it "
-                "picklable."
-            )
-            raise ExecutionError(msg) from exc
-        return await loop.run_in_executor(
-            self._executor, _run_function, task.function, task.args, task.kwargs
+
+async def _run_work_item(work_item: WorkItem, executor: ProcessPoolExecutor) -> Any:  # ruff: ignore[any-type]
+    loop = asyncio.get_running_loop()
+    if _HAVE_CLOUDPICKLE:
+        payload = cloudpickle.dumps(
+            (work_item.function, work_item.args, work_item.kwargs)
         )
+        ok, blob = await loop.run_in_executor(executor, _run_cloudpickled, payload)
+        value = cloudpickle.loads(blob)
+        if not ok:
+            raise value
+        return value
+    try:
+        pickle.dumps(work_item.function)
+    except Exception as exc:
+        msg = (
+            "The work item function could not be sent to a worker process "
+            "because it is not picklable; install ropt[cloudpickle] or make it "
+            "picklable."
+        )
+        raise ExecutionError(msg) from exc
+    return await loop.run_in_executor(
+        executor, _run_function, work_item.function, work_item.args, work_item.kwargs
+    )
 
 
 def _run_function(

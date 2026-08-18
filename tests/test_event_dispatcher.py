@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import threading
+from concurrent.futures import ThreadPoolExecutor
 from typing import Any
 
 import numpy as np
@@ -42,7 +43,7 @@ def _event(context: EnOptContext) -> EnOptEvent:
 
 
 def test_event_dispatcher_not_running_before_start() -> None:
-    assert not EventDispatcher().is_running()
+    assert not EventDispatcher()._running.is_set()  # ruff: ignore[private-member-access]
 
 
 def test_event_dispatcher_dispatch_before_start_raises(config: dict[str, Any]) -> None:
@@ -60,7 +61,7 @@ async def test_event_dispatcher_dispatch_after_stop_raises(
     async with asyncio.TaskGroup() as tg:
         await dispatcher.start(tg)
         dispatcher.cancel()
-    assert not dispatcher.is_running()
+    assert not dispatcher._running.is_set()  # ruff: ignore[private-member-access]
     with pytest.raises(WorkflowError, match="not running"):
         dispatcher.dispatch_event(event)
 
@@ -70,9 +71,9 @@ async def test_event_dispatcher_running_after_start() -> None:
     dispatcher = EventDispatcher()
     async with asyncio.TaskGroup() as tg:
         await dispatcher.start(tg)
-        assert dispatcher.is_running()
+        assert dispatcher._running.is_set()  # ruff: ignore[private-member-access]
         dispatcher.cancel()
-    assert not dispatcher.is_running()
+    assert not dispatcher._running.is_set()  # ruff: ignore[private-member-access]
 
 
 @pytest.mark.asyncio
@@ -255,6 +256,261 @@ async def test_event_dispatcher_run_in_thread_dispatches(
         dispatcher.cancel()
     assert received_a == [event]
     assert received_b == [event]
+
+
+@pytest.mark.asyncio
+async def test_event_dispatcher_rejects_an_event_handed_over_after_it_stopped(
+    config: dict[str, Any],
+) -> None:
+    context = EnOptContext.model_validate(config)
+    dispatcher = EventDispatcher()
+    async with asyncio.TaskGroup() as tg:
+        await dispatcher.start(tg)
+        dispatcher.cancel()
+    with pytest.raises(WorkflowError, match="stopped"):
+        await dispatcher._dispatch(_event(context))  # ruff: ignore[private-member-access]
+
+
+class _FatalHandlerError(BaseException):
+    pass
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("run_in_thread", [False, True])
+async def test_that_a_handler_dispatching_on_its_own_dispatcher_raises(
+    config: dict[str, Any], *, run_in_thread: bool
+) -> None:
+    # Events are handled one at a time, so a nested dispatch waits for an event
+    # that cannot be processed until the handler returns: a silent deadlock.
+    context = EnOptContext.model_validate(config)
+    dispatcher = EventDispatcher()
+    errors: list[BaseException] = []
+
+    def _dispatch_again(event: EnOptEvent) -> None:  # ruff: ignore[unused-function-argument]
+        try:
+            dispatcher.dispatch_event(_event(context))
+        except BaseException as exc:  # ruff: ignore[blind-except]
+            errors.append(exc)
+
+    dispatcher.add_event_handler(
+        CallbackHandler(
+            event_types={EnOptEventType.FINISHED_EVALUATION},
+            callback=_dispatch_again,
+        ),
+        run_in_thread=run_in_thread,
+    )
+    async with asyncio.TaskGroup() as tg:
+        await dispatcher.start(tg)
+        await asyncio.to_thread(dispatcher.dispatch_event, _event(context))
+        dispatcher.cancel()
+    assert len(errors) == 1
+    assert isinstance(errors[0], WorkflowError)
+    assert "own dispatcher" in str(errors[0])
+
+
+def _blocking_handler(
+    busy: threading.Event, release: threading.Event, seen: list[int]
+) -> CallbackHandler:
+    def _handler(event: EnOptEvent) -> None:  # ruff: ignore[unused-function-argument]
+        seen.append(len(seen))
+        if len(seen) == 1:
+            busy.set()
+            release.wait(timeout=5)
+
+    return CallbackHandler(
+        event_types={EnOptEventType.FINISHED_EVALUATION}, callback=_handler
+    )
+
+
+@pytest.mark.asyncio
+async def test_that_events_queued_when_the_dispatcher_stops_are_still_handled(
+    config: dict[str, Any],
+) -> None:
+    # cancel() queues a sentinel; events that arrive behind it must still be
+    # drained, or their emitters are told the dispatcher stopped instead.
+    context = EnOptContext.model_validate(config)
+    busy, release = threading.Event(), threading.Event()
+    seen: list[int] = []
+    dispatcher = EventDispatcher()
+    dispatcher.add_event_handler(
+        _blocking_handler(busy, release, seen), run_in_thread=True
+    )
+    async with asyncio.TaskGroup() as tg:
+        await dispatcher.start(tg)
+        pending = [asyncio.create_task(dispatcher._dispatch(_event(context)))]  # ruff: ignore[private-member-access]
+        await asyncio.to_thread(busy.wait)
+        dispatcher.cancel()
+        pending += [
+            asyncio.create_task(dispatcher._dispatch(_event(context)))  # ruff: ignore[private-member-access]
+            for _ in range(2)
+        ]
+        # One yield is enough: the cancel callback was queued first, so the
+        # sentinel lands ahead of these two.
+        await asyncio.sleep(0)
+        release.set()
+        await asyncio.gather(*pending)
+    assert len(seen) == 3
+
+
+@pytest.mark.asyncio
+async def test_that_events_still_queued_when_the_dispatcher_fails_are_rejected(
+    config: dict[str, Any],
+) -> None:
+    # The queue cannot simply be dropped when processing dies: every emitter is
+    # blocked on its own event and would otherwise wait forever.
+    context = EnOptContext.model_validate(config)
+    busy, release = threading.Event(), threading.Event()
+    seen: list[int] = []
+
+    def _explode(event: EnOptEvent) -> None:  # ruff: ignore[unused-function-argument]
+        seen.append(len(seen))
+        busy.set()
+        release.wait(timeout=5)
+        msg = "handler exploded"
+        raise _FatalHandlerError(msg)
+
+    dispatcher = EventDispatcher()
+    dispatcher.add_event_handler(
+        CallbackHandler(
+            event_types={EnOptEventType.FINISHED_EVALUATION}, callback=_explode
+        ),
+        run_in_thread=True,
+    )
+    pending: list[asyncio.Task[None]] = []
+    with pytest.raises(BaseExceptionGroup):  # ruff: ignore[pytest-raises-with-multiple-statements]
+        async with asyncio.TaskGroup() as tg:
+            await dispatcher.start(tg)
+            pending.append(asyncio.create_task(dispatcher._dispatch(_event(context))))  # ruff: ignore[private-member-access]
+            await asyncio.to_thread(busy.wait)
+            pending += [
+                asyncio.create_task(dispatcher._dispatch(_event(context)))  # ruff: ignore[private-member-access]
+                for _ in range(2)
+            ]
+            await asyncio.sleep(0)
+            release.set()
+    outcomes = await asyncio.gather(*pending, return_exceptions=True)
+    assert seen == [0]
+    stopped = [exc for exc in outcomes[1:] if isinstance(exc, WorkflowError)]
+    assert len(stopped) == 2
+    assert all("stopped" in str(exc) for exc in stopped)
+
+
+@pytest.mark.asyncio
+async def test_that_a_handler_base_exception_reaches_the_emitter_unmasked(
+    config: dict[str, Any],
+) -> None:
+    # A BaseException is fatal, but reporting it as "dispatcher stopped" would
+    # hide the only description of what actually went wrong.
+    def _raise_fatal(event: EnOptEvent) -> None:  # ruff: ignore[unused-function-argument]
+        msg = "handler exploded"
+        raise _FatalHandlerError(msg)
+
+    context = EnOptContext.model_validate(config)
+    dispatcher = EventDispatcher()
+    dispatcher.add_event_handler(
+        CallbackHandler(
+            event_types={EnOptEventType.FINISHED_EVALUATION}, callback=_raise_fatal
+        )
+    )
+    with pytest.raises(BaseExceptionGroup) as excinfo:  # ruff: ignore[pytest-raises-with-multiple-statements]
+        async with asyncio.TaskGroup() as tg:
+            await dispatcher.start(tg)
+            with pytest.raises(_FatalHandlerError, match="handler exploded"):
+                await asyncio.to_thread(dispatcher.dispatch_event, _event(context))
+    matched, _ = excinfo.value.split(_FatalHandlerError)
+    assert matched is not None
+
+
+def test_event_dispatcher_reports_a_closed_loop_as_a_workflow_error(
+    config: dict[str, Any],
+) -> None:
+    # A caller whose loop is already gone must get the documented error rather
+    # than a bare RuntimeError from asyncio.
+    context = EnOptContext.model_validate(config)
+    dispatcher = EventDispatcher()
+    loop = asyncio.new_event_loop()
+    loop.run_until_complete(asyncio.sleep(0))
+    loop.close()
+    dispatcher._loop = loop  # ruff: ignore[private-member-access]
+    dispatcher._running.set()  # ruff: ignore[private-member-access]
+    with pytest.raises(WorkflowError, match="stopped"):
+        dispatcher.dispatch_event(_event(context))
+
+
+def test_that_cancelling_a_dispatcher_whose_loop_is_gone_does_nothing() -> None:
+    dispatcher = EventDispatcher()
+    loop = asyncio.new_event_loop()
+    loop.run_until_complete(asyncio.sleep(0))
+    loop.close()
+    dispatcher._loop = loop  # ruff: ignore[private-member-access]
+    dispatcher._queue = asyncio.Queue()  # ruff: ignore[private-member-access]
+    dispatcher.cancel()
+
+
+@pytest.mark.asyncio
+async def test_event_dispatcher_threaded_handler_avoids_the_shared_default_pool(
+    config: dict[str, Any],
+) -> None:
+    # Occupy asyncio's shared default executor completely: a threaded handler
+    # dispatched through it (the old behavior) could not run at all.
+    loop = asyncio.get_running_loop()
+    loop.set_default_executor(ThreadPoolExecutor(max_workers=1))
+    release = threading.Event()
+    occupied = loop.run_in_executor(None, release.wait)
+
+    context = EnOptContext.model_validate(config)
+    received: list[EnOptEvent] = []
+    dispatcher = EventDispatcher()
+    dispatcher.add_event_handler(
+        CallbackHandler(
+            event_types={EnOptEventType.FINISHED_EVALUATION},
+            callback=received.append,
+        ),
+        run_in_thread=True,
+    )
+    event = _event(context)
+    finished = asyncio.Event()
+
+    def _dispatch() -> None:
+        dispatcher.dispatch_event(event)
+        loop.call_soon_threadsafe(finished.set)
+
+    async with asyncio.TaskGroup() as tg:
+        await dispatcher.start(tg)
+        threading.Thread(target=_dispatch, daemon=True).start()
+        await finished.wait()
+        dispatcher.cancel()
+    release.set()
+    await occupied
+    assert received == [event]
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("run_in_thread", [True, False])
+async def test_event_dispatcher_handler_pool_is_lazy_and_shut_down(
+    config: dict[str, Any], run_in_thread: Any
+) -> None:
+    context = EnOptContext.model_validate(config)
+    received: list[EnOptEvent] = []
+    dispatcher = EventDispatcher()
+    dispatcher.add_event_handler(
+        CallbackHandler(
+            event_types={EnOptEventType.FINISHED_EVALUATION},
+            callback=received.append,
+        ),
+        run_in_thread=run_in_thread,
+    )
+    event = _event(context)
+    async with asyncio.TaskGroup() as tg:
+        await dispatcher.start(tg)
+        assert dispatcher._thread_pool is None  # ruff: ignore[private-member-access]
+        await asyncio.to_thread(dispatcher.dispatch_event, event)
+        assert (
+            dispatcher._thread_pool is not None  # ruff: ignore[private-member-access]
+        ) is run_in_thread
+        dispatcher.cancel()
+    assert received == [event]
+    assert dispatcher._thread_pool is None  # ruff: ignore[private-member-access]
 
 
 @pytest.mark.asyncio
@@ -490,7 +746,7 @@ def test_event_dispatcher_remove_unknown_handler_raises() -> None:
     handler = CallbackHandler(
         event_types={EnOptEventType.FINISHED_EVALUATION}, callback=received.append
     )
-    with pytest.raises(ValueError, match="not added to the dispatcher"):
+    with pytest.raises(WorkflowError, match="not added to the dispatcher"):
         EventDispatcher().remove_event_handler(handler)
 
 

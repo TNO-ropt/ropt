@@ -9,43 +9,191 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any
 
-from ropt.exceptions import WorkflowError
+from ropt.components._loop import on_loop_thread, schedule
+from ropt.exceptions import ExecutorStopped, WorkflowError
 
 if TYPE_CHECKING:
-    from collections.abc import Callable
+    from collections.abc import Callable, Sequence
+    from typing import NoReturn
+
+
+@dataclass(kw_only=True)
+class WorkItem:
+    """A single unit of work to run on a worker.
+
+    A work item is a plain description of a call. It carries no delivery
+    channel, so it can be handed to a worker process without dragging the
+    submission that owns it along.
+
+    Attributes:
+        function: The function to execute.
+        args:     The arguments to pass to the function.
+        kwargs:   The keyword arguments to pass to the function.
+        result:   The result of the function, only meaningful once the work
+                  item has been delivered.
+        name:     Optional unique name of the work item.
+    """
+
+    function: Callable[..., Any]
+    args: tuple[Any, ...] = field(default_factory=tuple)
+    kwargs: dict[str, Any] = field(default_factory=dict)
+    result: Any = None
+    name: str | None = None
+
+
+class _ResultsQueue(queue.Queue["WorkItem | BaseException | None"]):
+    # Results are delivered from the event loop, so putting must never block:
+    # this queue is deliberately unbounded and cannot be configured otherwise.
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.closed = False
+
+    def close(self) -> None:
+        self.closed = True
+
+    def put(
+        self,
+        item: WorkItem | BaseException | None,
+        *args: Any,  # ruff: ignore[any-type]
+        **kwargs: Any,  # ruff: ignore[any-type]
+    ) -> None:
+        if not self.closed:
+            super().put(item, *args, **kwargs)
+
+
+class Submission:
+    """A group of work items and the channel back to the caller awaiting them.
+
+    A submission owns its results channel, so ending it is one operation on one
+    object. Handing a submission to an executor transfers responsibility: the
+    executor either runs the work items or aborts the submission, so a caller
+    blocked in [`collect`][ropt.components.executors.Submission.collect] is
+    always released.
+
+    Two failure classes are distinguished, following the error contract in
+    [Parallel Evaluation](../workflows/parallel.md#error-handling):
+
+    - An **infrastructure failure** (a killed worker process, or missing or
+      corrupt HPC output) arrives as an ordinary result whose value is an
+      [`ExecutorFailure`][ropt.exceptions.ExecutorFailure]. This is a tolerated
+      per-realization failure.
+    - A **user-code exception** ends the submission via
+      [`fail`][ropt.components.executors.Submission.fail], which re-raises the
+      original exception in `collect`. The executor keeps running.
+    """
+
+    def __init__(self, work_items: Sequence[WorkItem]) -> None:
+        """Initialize the submission.
+
+        Args:
+            work_items: The work items to run.
+        """
+        self._work_items = list(work_items)
+        self._results = _ResultsQueue()
+        self._outstanding = len(self._work_items)
+        self._ended = False
+
+    @property
+    def work_items(self) -> list[WorkItem]:
+        """The work items to run.
+
+        Returns:
+            The work items.
+        """
+        return self._work_items
+
+    @property
+    def is_finished(self) -> bool:
+        """Whether anything more will be delivered.
+
+        Returns:
+            `True` if every work item was delivered, or the submission ended.
+        """
+        return self._ended or self._outstanding <= 0
+
+    def deliver(self, work_item: WorkItem, result: Any) -> None:  # ruff: ignore[any-type]
+        """Deliver the result of a single work item.
+
+        Args:
+            work_item: The work item that ran.
+            result:    The result it produced.
+        """
+        work_item.result = result
+        self._results.put(work_item)
+        self._outstanding -= 1
+
+    def fail(self, exc: BaseException) -> None:
+        """End the submission, re-raising an exception in the caller.
+
+        Args:
+            exc: The exception raised by the work item's function.
+        """
+        self._results.put(exc)
+        self._end()
+
+    def abort(self) -> None:
+        """End the submission, releasing the caller with `ExecutorStopped`."""
+        self._results.put(None)
+        self._end()
+
+    def _end(self) -> None:
+        self._results.close()
+        self._ended = True
+
+    def collect(self, on_result: Callable[[WorkItem], None]) -> None:
+        """Wait for every work item and pass each finished one to `on_result`.
+
+        The submission is ended if this returns early, including when
+        `on_result` itself raises, so the executor never keeps delivering to a
+        caller that has left.
+
+        Args:
+            on_result: Callback invoked with each finished work item.
+
+        Raises:
+            ExecutorStopped: If the submission ended before every result was
+                             delivered.
+        """  # ruff: ignore[docstring-extraneous-exception]
+        try:
+            self._drain(on_result)
+        except BaseException:
+            self._end()
+            raise
+
+    def _drain(self, on_result: Callable[[WorkItem], None]) -> None:
+        for _ in range(len(self._work_items)):
+            item = self._results.get()
+            if item is None:
+                self._raise_stopped()
+            if isinstance(item, BaseException):
+                raise item
+            on_result(item)
+
+    def _raise_stopped(self) -> NoReturn:
+        # Prefer a real exception over the generic abort if one is queued too.
+        while True:
+            try:
+                item = self._results.get_nowait()
+            except queue.Empty:
+                break
+            if isinstance(item, BaseException):
+                raise item
+        msg = "The execution block was closed."
+        raise ExecutorStopped(msg)
 
 
 class Executor(ABC):
     """Abstract base class for executor components within an optimization workflow.
 
-    Subclasses must implement the following abstract methods and properties:
+    Subclasses must implement the following abstract methods:
 
     - [`start`][ropt.components.executors.Executor.start]: Starts the executor.
     - [`cancel`][ropt.components.executors.Executor.cancel]: Stops the executor.
-    - [`task_queue`][ropt.components.executors.Executor.task_queue]: Retrieves the
-      executor's task queue.
-    - [`loop`][ropt.components.executors.Executor.loop]: Retrieves the
-      currently running asyncio loop.
-    - [`task_group`][ropt.components.executors.Executor.task_group]: The asyncio.Taskgroup
-      used by this executor.
-    - [`is_running`][ropt.components.executors.Executor.is_running]: Checks if the
-      executor is running.
+    - [`submit`][ropt.components.executors.Executor.submit]: Hands over a submission.
+    - [`is_running`][ropt.components.executors.Executor.is_running]: Reports
+      whether the executor accepts work.
     """
-
-    @property
-    @abstractmethod
-    def task_queue(self) -> asyncio.Queue[Any]:
-        """The task queue."""
-
-    @property
-    @abstractmethod
-    def loop(self) -> asyncio.AbstractEventLoop | None:
-        """The asyncio loop used by this executor."""
-
-    @property
-    @abstractmethod
-    def task_group(self) -> asyncio.TaskGroup | None:
-        """The task group used by this executor."""
 
     @abstractmethod
     async def start(self, task_group: asyncio.TaskGroup) -> None:
@@ -55,189 +203,179 @@ class Executor(ABC):
             task_group: The task group to use.
 
         Raises:
-            RuntimeError: If the executor is already running or using an
-                          external queue.
+            WorkflowError: If the executor is already running.
         """
 
     @abstractmethod
     def cancel(self) -> None:
-        """Stop the executor."""
+        """Stop the executor.
+
+        May be called from any thread.
+        """
+
+    def on_worker_loop(self) -> bool:  # ruff: ignore[no-self-use]
+        """Report whether the caller is on the event loop that runs the work.
+
+        Blocking that loop starves the work being waited for, so callers use
+        this to refuse rather than deadlock. Implementations that run their
+        work on an event loop must override this; the default `False` is for
+        executors that do not have one.
+
+        Returns:
+            `True` if the calling thread is running the executor's loop.
+        """
+        return False
 
     @abstractmethod
     def is_running(self) -> bool:
-        """Check if the executor is running.
+        """Report whether the executor accepts work.
+
+        May be called from any thread. A `False` result means a submission would
+        be aborted rather than run, so a caller that is able to do the work
+        itself may fall back to doing so.
 
         Returns:
-            True if the executor is running.
+            `True` if the executor accepts work, `False` otherwise.
+        """
+
+    @abstractmethod
+    def submit(self, submission: Submission) -> None:
+        """Hand a submission to the executor.
+
+        May be called from any thread. A submission handed to an executor that
+        is no longer running is aborted rather than queued, so its caller is
+        never left waiting for results that cannot arrive.
+
+        Args:
+            submission: The submission to run.
         """
 
 
 class ExecutorBase(Executor):
-    """A base class for asynchronous executors."""
+    """A base class for asynchronous executors.
 
-    def __init__(self, queue_size: int = 0) -> None:
-        """Initialize the executor.
+    Owns every submission it accepts, so stopping the executor releases all
+    waiting callers from a single place.
 
-        Arguments:
-            queue_size: Maximum size of the task queue.
-        """
+    Implementations must call
+    [`_begin_start`][ropt.components.executors.ExecutorBase._begin_start] before
+    creating any resources, and `_finish_start` once they are in place.
+    """
+
+    def __init__(self) -> None:
+        """Initialize the executor."""
         super().__init__()
-        self._task_queue: asyncio.Queue[Task] = asyncio.Queue(queue_size)
+        self._work_queue: asyncio.Queue[tuple[Submission, WorkItem]] = asyncio.Queue()
         self._loop: asyncio.AbstractEventLoop | None = None
         self._task_group: asyncio.TaskGroup | None = None
         self._running = threading.Event()
         self._ready_event = asyncio.Event()
-        self._wait_event = asyncio.Event()
-        self._wait_task: asyncio.Task[None] | None = None
+        self._stop_event = asyncio.Event()
+        self._submissions: set[Submission] = set()
 
-    @property
-    def loop(self) -> asyncio.AbstractEventLoop | None:
-        """The asyncio loop used by this executor."""
-        return self._loop
+    def submit(self, submission: Submission) -> None:
+        """Hand a submission to the executor.
 
-    @property
-    def task_group(self) -> asyncio.TaskGroup | None:
-        """The task group used by this executor."""
-        return self._task_group
+        Args:
+            submission: The submission to run.
+        """
+        if not self._running.is_set() or not schedule(
+            self._loop, self._accept, submission
+        ):
+            submission.abort()
 
-    @property
-    def task_queue(self) -> asyncio.Queue[Task]:
-        """The task queue."""
-        return self._task_queue
+    def is_running(self) -> bool:
+        """Report whether the executor accepts work.
 
-    async def _finish_start(self, task_group: asyncio.TaskGroup) -> None:
+        Returns:
+            `True` if the executor accepts work, `False` otherwise.
+        """
+        return self._loop is not None and self._running.is_set()
+
+    def on_worker_loop(self) -> bool:
+        """Report whether the caller is on the event loop that runs the work.
+
+        Returns:
+            `True` if the calling thread is running the executor's loop.
+        """
+        return on_loop_thread(self._loop)
+
+    def _accept(self, submission: Submission) -> None:
+        if not self._running.is_set():
+            submission.abort()
+            return
+        if submission in self._submissions:
+            return
+        if submission.is_finished:
+            return
+        self._submissions.add(submission)
+        for work_item in submission.work_items:
+            self._work_queue.put_nowait((submission, work_item))
+
+    def _begin_start(self) -> None:
+        """Guard against starting twice, before any resources are created.
+
+        Raises:
+            WorkflowError: If the executor is already running.
+        """
         if self._running.is_set():
             msg = "The executor is already running."
             raise WorkflowError(msg)
-        self._running.set()
+        self._work_queue = asyncio.Queue()
+        self._ready_event = asyncio.Event()
+        self._stop_event = asyncio.Event()
+
+    async def _finish_start(self, task_group: asyncio.TaskGroup) -> None:
         self._loop = asyncio.get_running_loop()
         self._task_group = task_group
-        self._ready_event.clear()
-        self._wait_event.clear()
-        self._wait_task = task_group.create_task(self._wait_for_cancel())
+        self._running.set()
+        # The task group owns the task; stopping goes through the stop event.
+        task_group.create_task(self._wait_for_cancel())
         await self._ready_event.wait()
 
     async def _wait_for_cancel(self) -> None:
         self._ready_event.set()
         try:
-            await self._wait_event.wait()
+            await self._stop_event.wait()
         finally:
             if self._running.is_set():
                 self._running.clear()
-                self.cleanup()
+                self._cleanup()
+                self._loop = None
+                self._task_group = None
 
     def cancel(self) -> None:
-        """Stop the executor."""
-        if self._wait_task is not None:
-            self._wait_task.cancel()
-            self._wait_task = None
+        """Stop the executor.
+
+        May be called from any thread.
+        """
+        schedule(self._loop, self._stop_event.set)
 
     @abstractmethod
-    def cleanup(self) -> None:
+    def _cleanup(self) -> None:
         """Clean up the executor."""
 
-    def is_running(self) -> bool:
-        """Check if the executor is running.
+    def _deliver(
+        self,
+        submission: Submission,
+        work_item: WorkItem,
+        result: Any,  # ruff: ignore[any-type]
+    ) -> None:
+        submission.deliver(work_item, result)
+        if submission.is_finished:
+            self._submissions.discard(submission)
 
-        Returns:
-            True if the executor is running.
-        """
-        return self._running.is_set()
+    def _fail(self, submission: Submission, exc: BaseException) -> None:
+        submission.fail(exc)
+        self._submissions.discard(submission)
 
-    def _drain_and_kill(self) -> None:
-        """Drain the task queue and kill clients."""
-        while not self._task_queue.empty():
-            try:
-                task = self._task_queue.get_nowait()
-                task.cancel_all()
-                self._task_queue.task_done()
-            except asyncio.QueueEmpty:
-                break
+    def _abort(self, submission: Submission) -> None:
+        submission.abort()
+        self._submissions.discard(submission)
 
-
-@dataclass(kw_only=True)
-class Task(ABC):
-    """A task to be executed by a worker.
-
-    Task results are delivered on the associated
-    [`ResultsQueue`][ropt.components.executors.ResultsQueue]. Two distinct
-    failure classes are distinguished, following the error contract described in
-    [Parallel Evaluation](../workflows/parallel.md#error-handling):
-
-    - An **infrastructure failure** (a killed worker process, or missing/corrupt
-      HPC output) is delivered as an ordinary result whose value is an
-      [`ExecutorFailure`][ropt.exceptions.ExecutorFailure] via
-      [`put_result`][ropt.components.executors.Task.put_result]. This is a
-      tolerated per-realization failure.
-    - A **user-code exception** (the task function itself raises) is delivered
-      via [`put_error`][ropt.components.executors.Task.put_error], which places
-      the exception on the queue and closes it. The owning evaluator re-raises
-      the original exception unchanged, aborting the current evaluation; the
-      executor keeps running.
-
-    Attributes:
-        function:      The function to execute.
-        args:          The arguments to pass to the function.
-        kwargs:        The keyword arguments to pass to the function.
-        results_queue: The queue to put the result in.
-        result:        The result of the function, or None if no result is available.
-        name:          Optional unique name of the task.
-    """
-
-    function: Callable[..., Any]
-    args: tuple[Any, ...] = field(default_factory=tuple)
-    kwargs: dict[str, Any] = field(default_factory=dict)
-    results_queue: ResultsQueue
-    result: Any | None = None
-    name: str | None = None
-
-    def put_result(self, result: Any) -> None:  # ruff: ignore[any-type]
-        """Put the result in the result queue."""
-        self.result = result
-        self.results_queue.put(self)
-
-    def put_error(self, exc: BaseException) -> None:
-        """Deliver a user-code exception on the result queue.
-
-        Places the exception raised by the task's function on the queue and
-        closes it. Like [`cancel_all`][ropt.components.executors.Task.cancel_all]
-        this unblocks the waiting evaluator, but it additionally carries the
-        exception so the evaluator can re-raise the original unchanged.
-
-        Args:
-            exc: The exception raised by the task's function.
-        """
-        self.results_queue.put(exc)
-        self.results_queue.close()
-
-    def cancel_all(self) -> None:
-        """Stop putting results in the result queue."""
-        self.results_queue.put(None)
-        self.results_queue.close()
-
-
-class ResultsQueue(queue.Queue["Task | BaseException | None"]):
-    """A queue that can be closed.
-
-    Items delivered on this queue follow the error contract of
-    [`Task`][ropt.components.executors.Task]: a [`Task`][ropt.components.executors.Task]
-    carries a normal result (including an
-    [`ExecutorFailure`][ropt.exceptions.ExecutorFailure] as its `result`), a
-    `BaseException` signals a user-code exception that must abort the
-    evaluation, and `None` is a plain sentinel used to unblock a waiting
-    consumer.
-    """
-
-    def __init__(self, *args: Any, **kwargs: Any) -> None:  # ruff: ignore[any-type]
-        """Initialize the queue."""
-        super().__init__(*args, **kwargs)
-        self.closed = False
-
-    def close(self) -> None:
-        """Close the queue."""
-        self.closed = True
-
-    def put(self, item: Task | BaseException | None, *args: Any, **kwargs: Any) -> None:  # ruff: ignore[any-type]
-        """Put an item in the queue."""
-        if not self.closed:
-            super().put(item, *args, **kwargs)
+    def _cleanup_submissions(self) -> None:
+        for submission in self._submissions:
+            submission.abort()
+        self._submissions.clear()
+        while not self._work_queue.empty():
+            self._work_queue.get_nowait()
