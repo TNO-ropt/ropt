@@ -59,8 +59,5 @@ mkdocs serve
 ```
 
 All development and documentation tools are declared in `pyproject.toml` as `uv`
-development dependencies and can be installed using the `--dev` flag:
-
-```bash
-uv sync --dev
-```
+development dependencies and are installed by default by `uv`. To be able to run
+the tests, you need to install all extras with `--all-extras`.
