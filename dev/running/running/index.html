@@ -365,6 +365,13 @@
   
     
     
+      
+  
+  
+  
+  
+    
+    
       <li class="md-tabs__item">
         <a href="../../reference/simple/" class="md-tabs__link">
           
@@ -374,6 +381,9 @@
 
         </a>
       </li>
+    
+  
+
     
   
 
@@ -1893,9 +1903,27 @@
   
   
   
-    <li class="md-nav__item">
-      <a href="../../reference/simple/" class="md-nav__link">
+    
+    
+    
+    
+      
+      
         
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_8_1" id="__nav_8_1_label" tabindex="0">
+            
   
   
   <span class="md-ellipsis">
@@ -1909,7 +1937,79 @@
   
   
 
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_8_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Simple API
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/simple/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Optimization Entry Points
+  
+
+    
+  </span>
+  
+  
+
       </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/simple_compose/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Composing Custom Runs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
     </li>
   
 
@@ -3560,10 +3660,16 @@ direct call:</p>
 <p>If you already know a block is open, call <code>offload</code> directly; <code>can_offload</code> is
 only for the uncertain case.</p>
 <div class="admonition note">
-<p class="admonition-title">Not from a result handler</p>
-<p><code>offload</code> cannot be called from a result handler: a handler runs on the
-session's internal event loop, and offloading from there is unsupported (it
-raises). Do parallel work from your optimization code, not from handlers.</p>
+<p class="admonition-title">Not from a handler in a shared block</p>
+<p>A handler in a <a href="#result-handlers"><code>handlers</code></a> block cannot offload: an
+inline one runs on the session's event loop, and a
+<a href="#running-a-handler-in-a-thread"><code>threaded</code></a> one runs on a dispatcher worker
+that has no block of its own. Both raise. A handler passed to a single
+<code>optimize(..., handlers=[...])</code> call is the exception — it runs on the
+thread driving the run and can offload like any other code there.</p>
+<p><code>can_offload</code> reports which of the two you are in, so a handler that might
+offload should guard with it rather than assume. Better still, do parallel
+work from your optimization code and leave handlers to handle results.</p>
 </div>
 <h2 id="result-handlers">Result handlers</h2>
 <p>An <a class="autorefs autorefs-internal" title="            ropt.simple.optimize" href="../../reference/simple/#ropt.simple.optimize"><code>optimize</code></a> call returns only the best result. A
@@ -3609,6 +3715,13 @@ block, move any slow, GIL-releasing (I/O) handler onto a worker thread with
 <a href="#running-a-handler-in-a-thread"><code>threaded</code></a> so it does not stall the shared
 loop for every run.</p>
 </div>
+<div class="admonition warning">
+<p class="admonition-title">A handler is either local or shared, for good</p>
+<p>Passing a handler to <code>optimize</code> as a local handler binds it to that run's
+compute step permanently, and a <code>handlers</code> block will refuse it afterwards.
+Decide per handler which of the two roles it plays; if you need both, use
+two handlers.</p>
+</div>
 <h3 id="built-in-handlers">Built-in handlers</h3>
 <p><code>ropt</code> ships several ready-to-use handlers, all re-exported from <code>ropt.simple</code>.</p>
 <h4 id="resultshandler"><code>ResultsHandler</code></h4>
@@ -3630,8 +3743,9 @@ loop for every run.</p>
 </ul>
 <h4 id="historyhandler"><code>HistoryHandler</code></h4>
 <p><a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.HistoryHandler" href="../../reference/components_event_handlers/#ropt.components.event_handlers.HistoryHandler"><code>HistoryHandler</code></a> keeps <em>every</em> result it receives,
-in order, as a tuple read via <code>handler["results"]</code> (or <code>handler.results</code>). It is
-<code>None</code> until the first result arrives.</p>
+in order, as a tuple. Read it with <code>handler.results</code>, which is an empty tuple
+until the first result arrives, or with <code>handler["results"]</code>, the raw stored
+value, which is <code>None</code> until then.</p>
 <h4 id="dataframehandler"><code>DataFrameHandler</code></h4>
 <p><a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.DataFrameHandler" href="../../reference/components_event_handlers/#ropt.components.event_handlers.DataFrameHandler"><code>DataFrameHandler</code></a> collects results into named
 DataFrames, using either <code>pandas</code> (the default) or <code>polars</code> as its backend; the
@@ -3780,9 +3894,10 @@ process:</p>
 <details class="info">
 <summary>How data crosses the boundary</summary>
 <p>To move work and results between processes, <code>ropt</code> <strong>serializes</strong> them —
-turns the objects into bytes and rebuilds them on the other side. It
-currently uses <strong><code>cloudpickle</code></strong> (an extended form of Python's <code>pickle</code>),
-which is why <code>processes</code> and <code>hpc</code> need the <code>cloudpickle</code> extra; most
+turns the objects into bytes and rebuilds them on the other side. With
+<code>processes</code> this uses Python's standard <code>pickle</code>, so an objective defined at
+module level works as is; a lambda, a closure, or a notebook-defined
+objective needs the <code>cloudpickle</code> extra, which <code>hpc</code> always uses. Most
 functions and data serialize fine, but things like open files, locks, or
 database connections may not.</p>
 <p>With <code>processes</code> the bytes travel over an in-machine channel. With <code>hpc</code> they

@@ -365,6 +365,13 @@
   
     
     
+      
+  
+  
+  
+  
+    
+    
       <li class="md-tabs__item">
         <a href="../../reference/simple/" class="md-tabs__link">
           
@@ -374,6 +381,9 @@
 
         </a>
       </li>
+    
+  
+
     
   
 
@@ -1876,9 +1886,27 @@
   
   
   
-    <li class="md-nav__item">
-      <a href="../../reference/simple/" class="md-nav__link">
+    
+    
+    
+    
+      
+      
         
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_8_1" id="__nav_8_1_label" tabindex="0">
+            
   
   
   <span class="md-ellipsis">
@@ -1892,7 +1920,79 @@
   
   
 
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_8_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Simple API
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/simple/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Optimization Entry Points
+  
+
+    
+  </span>
+  
+  
+
       </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/simple_compose/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Composing Custom Runs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
     </li>
   
 
@@ -3333,8 +3433,8 @@ is installed (the <code>cloudpickle</code> extra), it is used for both direction
 serializes lambdas, closures, and interactively-defined functions (such as those
 written in a notebook cell) by value, so they can be used as task functions and
 returned as results. Without <code>cloudpickle</code>, the executor falls back to the
-standard <code>pickle</code> module, which requires task functions to be importable,
-module-level objects; passing a lambda or closure then raises an
+standard <code>pickle</code> module, which requires the task function and its arguments to
+be importable, module-level objects; passing a lambda or closure then raises an
 <a class="autorefs autorefs-internal" title="            ExecutionError" href="../../reference/exceptions/#ropt.exceptions.ExecutionError"><code>ExecutionError</code></a> suggesting the <code>cloudpickle</code> extra.</p>
 <h4 id="the-__main__-guard">The <code>__main__</code> guard</h4>
 <p>With the <code>"spawn"</code> start method, every worker process starts a fresh interpreter

@@ -365,6 +365,13 @@
   
     
     
+      
+  
+  
+  
+  
+    
+    
       <li class="md-tabs__item">
         <a href="../../reference/simple/" class="md-tabs__link">
           
@@ -374,6 +381,9 @@
 
         </a>
       </li>
+    
+  
+
     
   
 
@@ -1687,9 +1697,27 @@
   
   
   
-    <li class="md-nav__item">
-      <a href="../../reference/simple/" class="md-nav__link">
+    
+    
+    
+    
+      
+      
         
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_8_1" id="__nav_8_1_label" tabindex="0">
+            
   
   
   <span class="md-ellipsis">
@@ -1703,7 +1731,79 @@
   
   
 
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_8_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Simple API
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/simple/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Optimization Entry Points
+  
+
+    
+  </span>
+  
+  
+
       </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/simple_compose/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Composing Custom Runs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
     </li>
   
 
@@ -2840,7 +2940,7 @@ functionality:</p>
 <tr>
 <td><code>cloudpickle</code></td>
 <td><code>cloudpickle</code></td>
-<td>Serializing Python code to run them in external processes.</td>
+<td>Running lambdas, closures, and notebook-defined functions in external processes.</td>
 </tr>
 <tr>
 <td><code>hpc</code></td>
@@ -2849,9 +2949,10 @@ functionality:</p>
 </tr>
 </tbody>
 </table>
-<p>Without the <code>cloudpickle</code> limits the Python code that can be run in external
-processes; installing it adds support for lambdas, closures, and
-notebook-defined functions. The <code>hpc</code> extra already includes <code>cloudpickle</code>.</p>
+<p>Without <code>cloudpickle</code>, code that runs in external processes is serialized with
+the standard <code>pickle</code> module, which requires importable, module-level functions;
+installing it adds support for lambdas, closures, and notebook-defined
+functions. The <code>hpc</code> extra already includes <code>cloudpickle</code>.</p>
 <p>Install with:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;ropt[pandas]&quot;</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;ropt[polars]&quot;</span>

@@ -365,6 +365,13 @@
   
     
     
+      
+  
+  
+  
+  
+    
+    
       <li class="md-tabs__item">
         <a href="../../reference/simple/" class="md-tabs__link">
           
@@ -374,6 +381,9 @@
 
         </a>
       </li>
+    
+  
+
     
   
 
@@ -1715,9 +1725,27 @@
   
   
   
-    <li class="md-nav__item">
-      <a href="../../reference/simple/" class="md-nav__link">
+    
+    
+    
+    
+      
+      
         
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_8_1" id="__nav_8_1_label" tabindex="0">
+            
   
   
   <span class="md-ellipsis">
@@ -1731,7 +1759,79 @@
   
   
 
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_8_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Simple API
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/simple/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Optimization Entry Points
+  
+
+    
+  </span>
+  
+  
+
       </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/simple_compose/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Composing Custom Runs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
     </li>
   
 
@@ -2918,8 +3018,10 @@ up work that is pure Python number-crunching. For that, use <code>processes</cod
 </span></code></pre></div>
 <p>The evaluations run in <strong>separate processes</strong>. This gives real parallel speed for
 heavy Python computations, because each process has its own interpreter.</p>
-<p>Your objective and its data are <strong>copied</strong> to the worker processes, which
-currently requires the <code>cloudpickle</code> extra (see
+<p>Your objective and its data are <strong>copied</strong> to the worker processes, so they must
+be serializable: an objective defined at module level works out of the box, while
+a lambda, a closure, or a function defined in a notebook cell needs the
+<code>cloudpickle</code> extra (see
 <a href="../installation/#optional-extras">Installation</a>).</p>
 <p>Because each worker is a separate process, your objective can only send results
 <strong>back</strong> through its return value; it cannot share memory with your handlers or

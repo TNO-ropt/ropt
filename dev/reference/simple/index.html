@@ -12,7 +12,7 @@
         <link rel="prev" href="../../tutorials/workflow/">
       
       
-        <link rel="next" href="../context/">
+        <link rel="next" href="../simple_compose/">
       
       
         
@@ -23,7 +23,7 @@
     
     
       
-        <title>Simple API - ropt Documentation</title>
+        <title>Optimization Entry Points - ropt Documentation</title>
       
     
     
@@ -118,7 +118,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Simple API
+              Optimization Entry Points
             
           </span>
         </div>
@@ -365,6 +365,15 @@
   
     
     
+      
+  
+  
+  
+    
+  
+  
+    
+    
       <li class="md-tabs__item md-tabs__item--active">
         <a href="./" class="md-tabs__link">
           
@@ -374,6 +383,9 @@
 
         </a>
       </li>
+    
+  
+
     
   
 
@@ -1587,6 +1599,63 @@
   
   
   
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8_1" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_8_1" id="__nav_8_1_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Simple API
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_8_1_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_8_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Simple API
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
     <li class="md-nav__item md-nav__item--active">
       
       <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
@@ -1602,7 +1671,7 @@
   <span class="md-ellipsis">
     
   
-    Simple API
+    Optimization Entry Points
   
 
     
@@ -1620,7 +1689,7 @@
   <span class="md-ellipsis">
     
   
-    Simple API
+    Optimization Entry Points
   
 
     
@@ -1907,6 +1976,42 @@
     </ul>
   
 </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../simple_compose/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Composing Custom Runs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
       
     </li>
   
@@ -3238,6 +3343,12 @@ walkthrough.</p>
 <p>Enumerations used in the configuration and results (for example
 <a class="autorefs autorefs-internal" title="            ExitCode" href="../enums/#ropt.enums.ExitCode"><code>ExitCode</code></a> and <a class="autorefs autorefs-internal" title="            VariableType" href="../enums/#ropt.enums.VariableType"><code>VariableType</code></a>)
 are not part of this module; import them from <a class="autorefs autorefs-internal" title="            ropt.enums" href="../enums/#ropt.enums"><code>ropt.enums</code></a>.</p>
+<p>An execution block (<code>threads</code>, <code>processes</code>, <code>hpc</code>) and a <code>handlers</code> block apply
+to the thread that opens them and to the runs this API starts on their behalf.
+A run started on a thread you spawn yourself sees neither: it falls back to
+evaluating in-process, and its results do not reach the shared handlers. Start
+concurrent runs with <a class="autorefs autorefs-internal" title="            ropt.simple.optimize_many" href="#ropt.simple.optimize_many"><code>optimize_many</code></a> instead, which
+carries the open blocks to each run.</p>
 <h2 id="running-optimizations">Running optimizations</h2>
 
 
@@ -3338,7 +3449,11 @@ are not part of this module; import them from <a class="autorefs autorefs-intern
                 <p>Optional local result handlers, each claimed for
                   the duration of this run. A handler may be reused
                   across sequential <code>optimize</code> calls to accumulate
-                  results, but not shared with a concurrent run.</p>
+                  results, but not shared with a concurrent run, and
+                  not passed to
+                  <a class="autorefs autorefs-internal" title="            ropt.simple.handlers" href="#ropt.simple.handlers"><code>handlers</code></a> afterwards: a
+                  handler used locally stays bound to its run and is
+                  rejected by a shared block.</p>
               </div>
             </td>
             <td>
@@ -3362,7 +3477,9 @@ are not part of this module; import them from <a class="autorefs autorefs-intern
                 <p>An optional callback invoked with an
                   <code>EvaluateResult</code> for each function evaluation;
                   return <code>True</code> from it to stop the optimization
-                  early with <code>USER_ABORT</code>.</p>
+                  early with <code>USER_ABORT</code>. Reporting stops there,
+                  so results after it in the same batch are not
+                  passed on.</p>
               </div>
             </td>
             <td>
@@ -3481,12 +3598,26 @@ are not part of this module; import them from <a class="autorefs autorefs-intern
 <p>Each of <code>config</code>, <code>x0</code>, and <code>function</code> may be a single value (used for
 every run) or a sequence (one per run). Sequences set the number of runs and
 must agree in length; single values are broadcast. A single <code>x0</code> is a 1-D
-vector; a per-run sequence of <code>x0</code>s is a 2-D matrix with one vector per row.</p>
+vector; a per-run sequence of <code>x0</code>s is a 2-D matrix with one vector per row.
+A sequence that is empty gives no runs, and returns no results.</p>
 <p>The runs execute concurrently on driver threads and share the session's
 worker pool, so this must be called inside a <code>threads</code>/<code>processes</code> block.
-<code>limit</code> bounds how many run simultaneously. The first run to raise cancels
-the rest and propagates (fail-fast). See
+<code>limit</code> bounds how many run simultaneously. See
 <a href="../../running/running/">Running Optimizations</a> for a walkthrough.</p>
+<p>The first run to raise propagates its exception immediately (fail-fast).
+Runs that have not started are skipped, but a run already in progress
+cannot be stopped from the outside: it is abandoned, and keeps going until
+its next evaluation finds the block's executor gone. It then stops and
+returns, rather than raising — usually with
+<a class="autorefs autorefs-internal" title="            ExitCode" href="../enums/#ropt.enums.ExitCode"><code>ExitCode.EXECUTOR_STOPPED</code></a>, though a run that ends
+its own optimizer loop first reports that reason instead. Either way its
+result is discarded. So leaving the block after a failure can still take as
+long as one evaluation, and with <code>processes</code> or <code>hpc</code> that is one full
+simulation.</p>
+<p>Unlike <code>optimize</code>, this takes no per-run <code>handlers</code>: a handler is claimed by
+one run at a time and these runs overlap. Collect results across the runs
+with a shared <a class="autorefs autorefs-internal" title="            ropt.simple.handlers" href="#ropt.simple.handlers"><code>handlers</code></a> block, which tags each
+event with its run, or with a per-run <code>report</code> callback.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3723,6 +3854,10 @@ the rest and propagates (fail-fast). See
 <p>Use <a class="autorefs autorefs-internal" title="            ropt.simple.evaluate_many" href="#ropt.simple.evaluate_many"><code>evaluate_many</code></a> to evaluate several
 vectors at once. See <a href="../../running/running/">Running Optimizations</a> for a
 walkthrough.</p>
+<p>Unlike <a class="autorefs autorefs-internal" title="            ropt.simple.optimize" href="#ropt.simple.optimize"><code>optimize</code></a> this takes no <code>handlers</code> or
+<code>report</code>: there is no optimization to stop early, and a single batch has
+nothing to accumulate across. An open <a class="autorefs autorefs-internal" title="            ropt.simple.handlers" href="#ropt.simple.handlers"><code>handlers</code></a>
+block still receives the results, its <code>report</code> callback included.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3893,6 +4028,9 @@ walkthrough.</p>
 <p>Each row of <code>variables</code> is one variable vector; the results are returned in
 the same order. See <a href="../../running/running/">Running Optimizations</a> for a
 walkthrough.</p>
+<p>Like <a class="autorefs autorefs-internal" title="            ropt.simple.evaluate" href="#ropt.simple.evaluate"><code>evaluate</code></a>, this takes no <code>handlers</code> or
+<code>report</code>; an open <a class="autorefs autorefs-internal" title="            ropt.simple.handlers" href="#ropt.simple.handlers"><code>handlers</code></a> block still receives
+the results.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -4100,7 +4238,7 @@ walkthrough.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="ropt.simple._session._ExecutionScope">_ExecutionScope</span></code>
+                  <code><span title="ropt.simple._blocks._ExecutionScope">_ExecutionScope</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -4176,7 +4314,7 @@ walkthrough.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="ropt.simple._session._ExecutionScope">_ExecutionScope</span></code>
+                  <code><span title="ropt.simple._blocks._ExecutionScope">_ExecutionScope</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -4378,7 +4516,7 @@ cluster to use its default queue, or both to be explicit. See
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="ropt.simple._session._ExecutionScope">_ExecutionScope</span></code>
+                  <code><span title="ropt.simple._blocks._ExecutionScope">_ExecutionScope</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -4421,10 +4559,12 @@ one call and return its result, or a sequence of callables to run them
 concurrently (they may be entirely different functions) and return a tuple
 of results in the order of <code>work</code>. Bind arguments with <code>functools.partial</code>.</p>
 <p>It raises a <a class="autorefs autorefs-internal" title="            WorkflowError" href="../exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a> when no block is
-open or when called from a result handler (which runs on the event loop);
-check <a class="autorefs autorefs-internal" title="            ropt.simple.can_offload" href="#ropt.simple.can_offload"><code>can_offload</code></a> first and call the callables
-directly when there is no executor. The callables must be picklable for a
-process or HPC executor.</p>
+open, or when called from a handler in a <code>handlers</code> block; a handler passed
+to a single <code>optimize</code> call runs on the driving thread and can offload.
+Check <a class="autorefs autorefs-internal" title="            ropt.simple.can_offload" href="#ropt.simple.can_offload"><code>can_offload</code></a> first and call the callables
+directly when there is no executor. This holds for an empty sequence too, so
+that a call site is not silently accepted in a context where it cannot
+dispatch. The callables must be picklable for a process or HPC executor.</p>
 <p>See <a href="../../running/running/">Running Optimizations</a> for a walkthrough.</p>
 
 
@@ -4502,7 +4642,8 @@ process or HPC executor.</p>
         <p>Report whether <code>offload</code> would dispatch to an executor.</p>
 <p>Returns <code>True</code> when an execution block (<code>threads</code>/<code>processes</code>/<code>hpc</code>) is open
 and the caller can dispatch to it, and <code>False</code> otherwise (no block open, the
-block's executor has stopped, or called from a result handler).</p>
+block's executor has stopped, or called from a handler in a <code>handlers</code>
+block).</p>
 <p>Use it in code that may run with or without an execution block (for example
 a plugin, transform, or custom step) to fall back to a direct call instead
 of letting <code>offload</code> raise:</p>
@@ -4565,6 +4706,10 @@ block also inherits the enclosing blocks' handlers, so they aggregate the
 nested runs too. Pass <code>inherit=False</code> to include only the handlers the
 nested block lists (re-list an enclosing handler to feed it explicitly).</p>
 <p>See <a href="../../running/running/">Running Optimizations</a> for a walkthrough.</p>
+<p>A block claims each of its handlers for as long as it is open, and one
+<code>HandlerScope</code> object opens one block at a time. A handler that was ever
+passed to <a class="autorefs autorefs-internal" title="            ropt.simple.optimize" href="#ropt.simple.optimize"><code>optimize</code></a> as a local handler cannot join
+a block afterwards; decide per handler whether it is local or shared.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -4669,11 +4814,21 @@ nested block lists (re-list an enclosing handler to feed it explicitly).</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="ropt.simple._handlers.HandlerScope">HandlerScope</span></code>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.simple.compose.HandlerScope (ropt.simple._handlers.HandlerScope)" href="../simple_compose/#ropt.simple.compose.HandlerScope">HandlerScope</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A context manager scoping the shared handlers.</p>
+                <p>A context manager scoping the shared handlers, which binds the</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.simple.compose.HandlerScope (ropt.simple._handlers.HandlerScope)" href="../simple_compose/#ropt.simple.compose.HandlerScope">HandlerScope</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p><code>HandlerScope</code> itself when used with <code>as</code>.</p>
               </div>
             </td>
           </tr>
@@ -5209,13 +5364,13 @@ components:</p>
         
         
           
-          <a href="../context/" class="md-footer__link md-footer__link--next" aria-label="Next: Context Class">
+          <a href="../simple_compose/" class="md-footer__link md-footer__link--next" aria-label="Next: Composing Custom Runs">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Context Class
+                Composing Custom Runs
               </div>
             </div>
             <div class="md-footer__button md-icon">
