@@ -3338,10 +3338,6 @@ for the submission's results.</p>
 <td><code>bundle_size</code></td>
 <td>Number of active evaluations to group into a single work item (default: <code>1</code>). Use an integer <code>&gt; 1</code> for a fixed maximum bundle size, or <code>0</code> to bundle all active evaluations of a batch into one work item.</td>
 </tr>
-<tr>
-<td><code>get_name</code></td>
-<td>Optional callable to generate a name for each work item.</td>
-</tr>
 </tbody>
 </table>
 <p>By default each row of the variable batch is submitted as its own task. The
@@ -3350,22 +3346,15 @@ single task that the worker executes sequentially. This is useful when per-task
 overhead (thread/process startup, HPC job submission) dominates the cost of an
 individual evaluation, or when the total number of active evaluations in a batch
 is much larger than the number of available workers.</p>
-<p>The <code>get_name</code> callable, if provided, is called with the sequence of
-<a class="autorefs autorefs-internal" title="            ropt.components.evaluators.EvaluationFunctionContext
+<p>The work items it submits carry no name, so the <code>HPCExecutor</code> identifies each
+with a generated UUID. Name them yourself by building the
+<a class="autorefs autorefs-internal" title="            ropt.components.executors.WorkItem
 
 
   
       dataclass
-  " href="../../reference/components_evaluators/#ropt.components.evaluators.EvaluationFunctionContext"><code>EvaluationFunctionContext</code></a>
-objects for every evaluation packed into the task (a single-element sequence
-when <code>bundle_size=1</code>) and should return a single task name. When using the
-<code>HPCExecutor</code>, names also serve as task identifiers and as the base of each
-task's filenames, so they must be unique within the executor (and
-filesystem-safe); the executor refuses to overwrite pre-existing task files, so
-distinct executors sharing a <code>workdir</code> also need distinct names. The returned
-name is stamped onto the <code>name</code> field of every
-<code>EvaluationFunctionContext</code> in the task, so the user function can read
-<code>context.name</code> to recover it.</p>
+  " href="../../reference/components_executors/#ropt.components.executors.WorkItem"><code>WorkItem</code></a> objects and submitting them to
+the executor directly.</p>
 <p>If the executor is not running when <code>eval()</code> is called, the evaluator raises an
 <a class="autorefs autorefs-internal" title="            ExecutorStopped" href="../../reference/exceptions/#ropt.exceptions.ExecutorStopped"><code>ExecutorStopped</code></a> exception.</p>
 <h2 id="executors">Executors</h2>

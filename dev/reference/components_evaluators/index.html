@@ -2793,34 +2793,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#ropt.components.evaluators.NameCallback" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        NameCallback
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="NameCallback">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.components.evaluators.NameCallback.__call__" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        __call__
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -3435,34 +3407,6 @@
       
     </span>
   </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#ropt.components.evaluators.NameCallback" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        NameCallback
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="NameCallback">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.components.evaluators.NameCallback.__call__" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        __call__
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -4225,9 +4169,8 @@ details on how this integrates with the asyncio event loop.</p>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">function</span><span class="p">:</span> <span class="n">EvaluationFunctionCallback</span><span class="p">,</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">executor</span><span class="p">:</span> <span class="n">Executor</span><span class="p">,</span>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">bundle_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">get_name</span><span class="p">:</span> <span class="n">NameCallback</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">batch_id_callback</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">batch_id_callback</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -4238,11 +4181,6 @@ its own executor task. Setting <code>bundle_size</code> to an integer <code>&gt;
 up to that many active evaluations into one task that the worker runs
 sequentially; <code>0</code> packs all active evaluations of a batch into a single
 task.</p>
-<p>The <code>get_name</code> callback receives the <code>EvaluationFunctionContext</code> objects
-for every evaluation in a task (a one-element sequence when
-<code>bundle_size=1</code>) and must return a single task name. For the
-<code>HPCExecutor</code> the name is also the task id and filename base, so it must
-be unique within the executor.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -4302,22 +4240,6 @@ be unique within the executor.</p>
             </td>
             <td>
                   <code>1</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>get_name</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.components.evaluators.NameCallback (ropt.components.evaluators.base.NameCallback)" href="#ropt.components.evaluators.NameCallback">NameCallback</a> | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional callable to generate names for tasks.</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
             </td>
           </tr>
           <tr class="doc-section-item">
@@ -5281,17 +5203,6 @@ evaluation results.</p>
               </div>
             </td>
           </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.components.evaluators.EvaluationFunctionContext.name">name</span></code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a> | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional task name set by the evaluator.</p>
-              </div>
-            </td>
-          </tr>
       </tbody>
     </table>
 
@@ -5398,138 +5309,6 @@ evaluation results.</p>
 
 <div class="doc doc-children">
 
-
-
-
-
-  </div>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-class">
-
-
-
-<h2 id="ropt.components.evaluators.NameCallback" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.components.evaluators.NameCallback</span>
-
-
-</h2>
-
-
-    <div class="doc doc-contents first">
-            <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-external" title="typing.Protocol" href="https://docs.python.org/3/library/typing.html#typing.Protocol">Protocol</a></code></p>
-
-
-
-        <p>Defines the call signature for callbacks to get the name of a task.</p>
-
-
-
-
-
-
-
-
-
-
-
-<div class="doc doc-children">
-
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="ropt.components.evaluators.NameCallback.__call__" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">__call__</span>
-
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">__call__</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">contexts</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">EvaluationFunctionContext</span><span class="p">],</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Get the name for a task.</p>
-<p>The task may contain a single evaluation or a bundle of several
-evaluations that the worker runs sequentially. The callback receives
-the <code>EvaluationFunctionContext</code> objects for every evaluation in the
-task, in submission order, and should return a single string used as
-the task name.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>contexts</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" title="collections.abc.Sequence" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence">Sequence</a>[<a class="autorefs autorefs-internal" title="            ropt.components.evaluators.EvaluationFunctionContext
-
-
-  
-      dataclass
-   (ropt.components.evaluators.base.EvaluationFunctionContext)" href="#ropt.components.evaluators.EvaluationFunctionContext">EvaluationFunctionContext</a>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The contexts for every evaluation in the task.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The name of the task.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
 
 
 
