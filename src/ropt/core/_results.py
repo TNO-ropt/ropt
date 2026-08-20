@@ -104,6 +104,7 @@ def _get_function_results(
     evaluator: EvaluationBatchCallback,
     variables: NDArray[np.float64],
     realizations_to_evaluate: NDArray[np.bool_],
+    metadata: dict[str, Any] | None,
 ) -> Generator[tuple[int, _FunctionEvaluatorResults], None, None]:
     realization_num = context.realizations.weights.size
     realizations = np.tile(
@@ -113,6 +114,7 @@ def _get_function_results(
         context=context,
         realizations=realizations,
         active=realizations_to_evaluate[realizations],
+        metadata=metadata,
     )
     for variable_transform in context.variable_transforms:
         variables = variable_transform.from_optimizer(variables)
@@ -153,6 +155,7 @@ def _get_gradient_results(
     evaluator: EvaluationBatchCallback,
     perturbed_variables: NDArray[np.float64],
     realizations_to_evaluate: NDArray[np.bool_],
+    metadata: dict[str, Any] | None,
 ) -> _GradientEvaluatorResults:
     realization_num = context.realizations.weights.size
     perturbation_num = context.gradient.number_of_perturbations
@@ -164,6 +167,7 @@ def _get_gradient_results(
         realizations=realizations,
         perturbations=np.tile(np.arange(perturbation_num), realization_num),
         active=realizations_to_evaluate[realizations],
+        metadata=metadata,
     )
     variables: NDArray[np.float64] = perturbed_variables.reshape(
         -1, perturbed_variables.shape[-1]
@@ -188,12 +192,13 @@ def _get_gradient_results(
     )
 
 
-def _get_function_and_gradient_results(
+def _get_function_and_gradient_results(  # ruff:ignore[too-many-arguments, too-many-positional-arguments]
     context: EnOptContext,
     evaluator: EvaluationBatchCallback,
     variables: NDArray[np.float64],
     perturbed_variables: NDArray[np.float64],
     realizations_to_evaluate: NDArray[np.bool_],
+    metadata: dict[str, Any] | None,
 ) -> tuple[_FunctionEvaluatorResults, _GradientEvaluatorResults]:
     realization_num = context.realizations.weights.size
     perturbation_num = context.gradient.number_of_perturbations
@@ -214,6 +219,7 @@ def _get_function_and_gradient_results(
             )
         ),
         active=realizations_to_evaluate[realizations],
+        metadata=metadata,
     )
     all_variables = np.vstack(
         (

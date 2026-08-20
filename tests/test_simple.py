@@ -663,6 +663,69 @@ def test_batch_ids_restart_for_each_run_without_an_execution_block(
     assert min(second) == 0
 
 
+def _record_metadata(sink: list[Any], lock: threading.Lock) -> Any:
+    def _function(
+        _variables: NDArray[np.float64], context: EvaluationFunctionContext
+    ) -> float:
+        with lock:
+            sink.append(context.metadata)
+        return 0.0
+
+    return _function
+
+
+def test_metadata_reaches_the_evaluation_function(config: Any) -> None:
+    seen: list[Any] = []
+    lock = threading.Lock()
+    optimize(config, initial_values, _record_metadata(seen, lock), metadata={"run": 7})
+    assert seen
+    assert all(item == {"run": 7} for item in seen)
+
+
+def test_metadata_is_none_in_the_evaluation_function_when_not_given(
+    config: Any,
+) -> None:
+    seen: list[Any] = []
+    lock = threading.Lock()
+    optimize(config, initial_values, _record_metadata(seen, lock))
+    assert seen
+    assert all(item is None for item in seen)
+
+
+def test_metadata_reaches_the_evaluation_function_with_threads(config: Any) -> None:
+    seen: list[Any] = []
+    lock = threading.Lock()
+    with threads(workers=2):
+        optimize(
+            config, initial_values, _record_metadata(seen, lock), metadata={"run": 7}
+        )
+    assert seen
+    assert all(item == {"run": 7} for item in seen)
+
+
+def test_metadata_reaches_the_evaluation_function_of_evaluate(config: Any) -> None:
+    seen: list[Any] = []
+    lock = threading.Lock()
+    evaluate(config, initial_values, _record_metadata(seen, lock), metadata={"run": 7})
+    assert seen
+    assert all(item == {"run": 7} for item in seen)
+
+
+def test_metadata_per_run_reaches_each_evaluation_function(config: Any) -> None:
+    first: list[Any] = []
+    second: list[Any] = []
+    lock = threading.Lock()
+    with threads(workers=2):
+        optimize_many(
+            config,
+            initial_values,
+            [_record_metadata(first, lock), _record_metadata(second, lock)],
+            metadata=[{"run": 0}, {"run": 1}],
+        )
+    assert all(item == {"run": 0} for item in first)
+    assert all(item == {"run": 1} for item in second)
+
+
 def test_evaluate_many_with_threads(config: Any, test_functions: Any) -> None:
     matrix = np.array([initial_values, np.zeros(initial_values.size)])
     with threads(workers=2):

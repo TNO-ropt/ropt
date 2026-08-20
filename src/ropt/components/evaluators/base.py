@@ -112,12 +112,14 @@ class EvaluationFunctionContext:
         perturbation: The perturbation index (`-1` when unperturbed).
         batch_id:     Integer identifying the current evaluation batch.
         eval_idx:     Row index within the batch.
+        metadata:     The metadata the run was started with, if any.
     """
 
     realization: int
     perturbation: int
     batch_id: int
     eval_idx: int
+    metadata: dict[str, Any] | None = None
 
 
 @dataclass(slots=True)

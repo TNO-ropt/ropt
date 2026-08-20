@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 from numpy.random import default_rng
@@ -62,6 +62,7 @@ class EnsembleEvaluator:
         self,
         context: EnOptContext,
         evaluator: EvaluationBatchCallback,
+        metadata: dict[str, Any] | None = None,
     ) -> None:
         """Initialize the EnsembleEvaluator.
 
@@ -76,9 +77,11 @@ class EnsembleEvaluator:
         Args:
             context:   The optimization context object.
             evaluator: The callable for evaluating individual functions.
+            metadata:  Optional metadata to pass to the evaluator.
         """
         self._context = context
         self._evaluator = evaluator
+        self._metadata = metadata
         self._realization_filters = self._init_realization_filters()
         self._function_estimators = self._init_function_estimators()
         rng = default_rng(context.variables.seed)
@@ -178,6 +181,7 @@ class EnsembleEvaluator:
                 self._evaluator,
                 variables,
                 realizations_to_evaluate,
+                self._metadata,
             )
         )
 
@@ -273,6 +277,7 @@ class EnsembleEvaluator:
             self._evaluator,
             perturbed_variables,
             realizations_to_evaluate,
+            self._metadata,
         )
 
         assert self._context.gradient.perturbation_min_success is not None
@@ -343,6 +348,7 @@ class EnsembleEvaluator:
             variables,
             perturbed_variables,
             realizations_to_evaluate,
+            self._metadata,
         )
 
         evaluations = FunctionEvaluations.create(

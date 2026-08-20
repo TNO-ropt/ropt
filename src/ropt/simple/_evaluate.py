@@ -48,7 +48,8 @@ def evaluate(
         variables: The variable vector to evaluate.
         function:  The per-realization evaluation function.
         metadata:  An optional dictionary attached to the emitted
-                   [`Results`][ropt.results.Results].
+                   [`Results`][ropt.results.Results]. It also reaches
+                   `function` as `context.metadata`.
 
     Returns:
         An [`EvaluateResult`][ropt.simple.EvaluateResult] for the vector.
@@ -86,7 +87,8 @@ def evaluate_many(
         variables: The variable vectors to evaluate, one per row.
         function:  The per-realization evaluation function.
         metadata:  An optional dictionary attached to every emitted
-                   [`Results`][ropt.results.Results].
+                   [`Results`][ropt.results.Results]. It also reaches
+                   `function` as `context.metadata`.
 
     Returns:
         One [`EvaluateResult`][ropt.simple.EvaluateResult] per input vector.

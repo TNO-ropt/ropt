@@ -40,6 +40,7 @@ def _active_evaluations(
                 perturbation=perturbation,
                 batch_id=batch_id,
                 eval_idx=eval_idx,
+                metadata=evaluator_context.metadata,
             ),
         )
 

@@ -99,7 +99,7 @@ class EvaluationStep(ComputeStep):
         for transform in context.variable_transforms:
             variables = transform.to_optimizer(variables)
 
-        ensemble_evaluator = EnsembleEvaluator(context, self._evaluator.eval)
+        ensemble_evaluator = EnsembleEvaluator(context, self._evaluator.eval, metadata)
 
         self._emit_event(
             EnOptEvent(event_type=EnOptEventType.START_EVALUATION, context=context)

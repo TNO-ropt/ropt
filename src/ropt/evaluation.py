@@ -24,6 +24,7 @@ class EvaluationBatchContext:
         realizations:  Realization index for each row.
         perturbations: Perturbation index for each row (< 0 means unperturbed).
         batch_id:      Integer identifying the current evaluation batch.
+        metadata:      The metadata the run was started with, if any.
     """
 
     context: EnOptContext
@@ -31,6 +32,7 @@ class EvaluationBatchContext:
     realizations: NDArray[np.intc]
     perturbations: NDArray[np.intc] | None = None
     batch_id: int = 0
+    metadata: dict[str, Any] | None = None
 
     def get_active_evaluations(self, array: NDArray[T]) -> NDArray[T]:
         """Return only the rows of `array` where `active` is `True`.

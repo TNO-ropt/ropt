@@ -96,6 +96,7 @@ class OptimizationStep(ComputeStep):
         ensemble_evaluator = EnsembleEvaluator(
             self._context,
             self._evaluator.eval,
+            self._metadata,
         )
         ensemble_optimizer = EnsembleOptimizer(
             context=self._context,

@@ -208,6 +208,13 @@ def my_function(
     | `perturbation` | Perturbation index, or `-1` when unperturbed.
     | `batch_id`     | Integer identifying the current evaluation batch.
     | `eval_idx`     | Row index within the batch.
+    | `metadata`     | The metadata the run was started with, or `None`.
+
+    `metadata` is the dictionary passed to the compute step's `run` method, and
+    is the channel for handing your own per-run data (a run ID, a case name, a
+    path) to the evaluation function. Every evaluation of the run sees the same
+    dictionary, so treat it as read-only; for a process or HPC executor its
+    contents must be picklable.
 
 - The return value is an
   [`EvaluationFunctionResult`][ropt.components.evaluators.EvaluationFunctionResult]

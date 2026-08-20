@@ -71,7 +71,8 @@ def optimize(  # ruff: ignore[too-many-arguments]
                               considered satisfied.
         metadata:             An optional dictionary attached to every
                               [`Results`][ropt.results.Results] this run emits,
-                              for example to tag or identify the run.
+                              for example to tag or identify the run. It also
+                              reaches `function` as `context.metadata`.
 
     Returns:
         A [`OptimizeResult`][ropt.simple.OptimizeResult] describing the outcome.
@@ -215,7 +216,9 @@ def optimize_many(  # ruff: ignore[too-many-arguments]
         metadata:             An optional dictionary attached to every
                               [`Results`][ropt.results.Results] a run emits,
                               shared by all runs or given one per run — for
-                              example to tag each run with `{"run_id": i}`.
+                              example to tag each run with `{"run_id": i}`. It
+                              also reaches each run's `function` as
+                              `context.metadata`.
 
     Returns:
         One [`OptimizeResult`][ropt.simple.OptimizeResult] per run, in order.
