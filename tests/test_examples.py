@@ -29,12 +29,8 @@ async def test_example_parallel_evaluator(
     tmp_path: Path, monkeypatch: Any, multiprocessing: Any
 ) -> None:
     monkeypatch.chdir(tmp_path)
-
-    # We need to do an explicit import, otherwise we get pickling errors:
-    monkeypatch.syspath_prepend(Path(__file__).parent.parent / "examples" / "advanced")
-    import parallel_evaluator  # ruff: ignore[import-outside-top-level]
-
-    await parallel_evaluator.main(multiprocessing=multiprocessing)
+    module = _load_from_file("parallel_evaluator")
+    await module.main(multiprocessing=multiprocessing)
 
 
 @pytest.mark.slow
@@ -47,12 +43,8 @@ def test_example_nested(tmp_path: Path, monkeypatch: Any) -> None:
 @pytest.mark.slow
 def test_example_nested_multiprocess(tmp_path: Path, monkeypatch: Any) -> None:
     monkeypatch.chdir(tmp_path)
-
-    # We need to do an explicit import, otherwise we get pickling errors:
-    monkeypatch.syspath_prepend(Path(__file__).parent.parent / "examples" / "advanced")
-    import nested_multiprocess  # ruff: ignore[import-outside-top-level]
-
-    nested_multiprocess.main()
+    module = _load_from_file("nested_multiprocess")
+    module.main()
 
 
 def test_example_simple_optimize(tmp_path: Path, monkeypatch: Any) -> None:
