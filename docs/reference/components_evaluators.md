@@ -16,4 +16,3 @@ See [Writing Evaluation Callbacks](../workflows/evaluation_callbacks.md) and
 ::: ropt.components.evaluators.EvaluationFunctionCallback
 ::: ropt.components.evaluators.EvaluationFunctionContext
 ::: ropt.components.evaluators.EvaluationFunctionResult
-::: ropt.components.evaluators.NameCallback

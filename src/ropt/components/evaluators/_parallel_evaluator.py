@@ -20,7 +20,6 @@ from .base import (
     EvaluationFunctionContext,
     EvaluationFunctionResult,
     Evaluator,
-    NameCallback,
 )
 
 if TYPE_CHECKING:
@@ -50,7 +49,6 @@ class ParallelEvaluator(Evaluator):
         function: EvaluationFunctionCallback,
         executor: Executor,
         bundle_size: int = 1,
-        get_name: NameCallback | None = None,
         batch_id_callback: Callable[[], int] | None = None,
     ) -> None:
         """Initialize the ParallelEvaluator.
@@ -61,17 +59,10 @@ class ParallelEvaluator(Evaluator):
         sequentially; `0` packs all active evaluations of a batch into a single
         task.
 
-        The `get_name` callback receives the `EvaluationFunctionContext` objects
-        for every evaluation in a task (a one-element sequence when
-        `bundle_size=1`) and must return a single task name. For the
-        `HPCExecutor` the name is also the task id and filename base, so it must
-        be unique within the executor.
-
         Args:
             function:          The function used for objectives and constraints.
             executor:          The executor to dispatch tasks to.
             bundle_size:       Number of active evaluations per executor task.
-            get_name:          Optional callable to generate names for tasks.
             batch_id_callback: Callable that returns the next batch ID each time it is called.
 
         Raises:
@@ -87,7 +78,6 @@ class ParallelEvaluator(Evaluator):
         self._batch_id_callback = (
             batch_id_callback if batch_id_callback is not None else BatchIdCounter()
         )
-        self._get_name = get_name
 
     def eval(
         self, variables: NDArray[np.float64], evaluator_context: EvaluationBatchContext
@@ -135,7 +125,12 @@ class ParallelEvaluator(Evaluator):
 
         bundles = self._make_bundles(variables, evaluator_context, batch_id)
         _logger.debug("Dispatching %d work item(s) to executor", len(bundles))
-        submission = Submission([self._make_work_item(bundle) for bundle in bundles])
+        submission = Submission(
+            [
+                WorkItem(function=_run_bundle, args=(self._function, bundle))
+                for bundle in bundles
+            ]
+        )
         self._executor.submit(submission)
         submission.collect(
             partial(
@@ -170,23 +165,6 @@ class ParallelEvaluator(Evaluator):
         if bundle:
             bundles.append(bundle)
         return bundles
-
-    def _make_work_item(
-        self,
-        bundle: list[tuple[NDArray[np.float64], EvaluationFunctionContext]],
-    ) -> WorkItem:
-        name = (
-            None
-            if self._get_name is None
-            else self._get_name([function_context for _, function_context in bundle])
-        )
-        for _, function_context in bundle:
-            function_context.name = name
-        return WorkItem(
-            function=_run_bundle,
-            args=(self._function, bundle),
-            name=name,
-        )
 
 
 def _run_bundle(

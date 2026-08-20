@@ -208,10 +208,6 @@ def my_function(
     | `perturbation` | Perturbation index, or `-1` when unperturbed.
     | `batch_id`     | Integer identifying the current evaluation batch.
     | `eval_idx`     | Row index within the batch.
-    | `name`         | Optional task name; `None` if unset.
-
-    `name` is set by the evaluator (e.g. via `ParallelEvaluator`'s `get_name`
-    callback) and can be used to associate results with named tasks.
 
 - The return value is an
   [`EvaluationFunctionResult`][ropt.components.evaluators.EvaluationFunctionResult]

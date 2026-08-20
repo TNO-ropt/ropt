@@ -14,7 +14,6 @@ different threads.
 
 import asyncio
 import threading
-from collections.abc import Sequence
 from functools import partial
 from typing import Any
 
@@ -102,7 +101,7 @@ def rosenbrock(
         r = context.realization
         objective += (a[r] - x) ** 2 + b[r] * (y - x * x) ** 2
     return EvaluationFunctionResult(
-        objectives=objective, metadata={"task": context.name}
+        objectives=objective, metadata={"task": f"batch{context.batch_id:04d}"}
     )
 
 
@@ -115,17 +114,6 @@ def report(event: EnOptEvent) -> None:
             print(f"batch: {item.batch_id}  thread: {thread}  tasks: {tasks}")
             print(f"  variables: {item.evaluations.variables}")
             print(f"  objective: {item.functions.target_objective}\n")
-
-
-def _task_name(contexts: Sequence[EvaluationFunctionContext]) -> str:
-    evals = [item.eval_idx for item in contexts]
-    min_eval, max_eval = min(evals), max(evals)
-    suffix = (
-        f"eval{min_eval:0d}"
-        if min_eval == max_eval
-        else f"evals{min_eval:02d}-{max_eval:02d}"
-    )
-    return f"batch{contexts[0].batch_id:04d}-{suffix}"
 
 
 def main() -> None:
@@ -163,7 +151,6 @@ def main() -> None:
             function=partial(rosenbrock, a=a, b=b),
             executor=inner_executor,
             bundle_size=0,
-            get_name=_task_name,
             batch_id_callback=inner_batch_id_counter,
         )
         step = OptimizationStep(evaluator=inner_evaluator)

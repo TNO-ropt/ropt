@@ -43,7 +43,6 @@ Constructor parameters:
 | `function`    | Per-realization callable (same interface as `FunctionEvaluator`).    |
 | `executor`    | The [`Executor`][ropt.components.executors.Executor] to dispatch work to. |
 | `bundle_size` | Number of active evaluations to group into a single work item (default: `1`). Use an integer `> 1` for a fixed maximum bundle size, or `0` to bundle all active evaluations of a batch into one work item. |
-| `get_name`    | Optional callable to generate a name for each work item.             |
 
 By default each row of the variable batch is submitted as its own task. The
 `bundle_size` parameter allows several active evaluations to be grouped into a
@@ -52,17 +51,10 @@ overhead (thread/process startup, HPC job submission) dominates the cost of an
 individual evaluation, or when the total number of active evaluations in a batch
 is much larger than the number of available workers.
 
-The `get_name` callable, if provided, is called with the sequence of
-[`EvaluationFunctionContext`][ropt.components.evaluators.EvaluationFunctionContext]
-objects for every evaluation packed into the task (a single-element sequence
-when `bundle_size=1`) and should return a single task name. When using the
-`HPCExecutor`, names also serve as task identifiers and as the base of each
-task's filenames, so they must be unique within the executor (and
-filesystem-safe); the executor refuses to overwrite pre-existing task files, so
-distinct executors sharing a `workdir` also need distinct names. The returned
-name is stamped onto the `name` field of every
-`EvaluationFunctionContext` in the task, so the user function can read
-`context.name` to recover it.
+The work items it submits carry no name, so the `HPCExecutor` identifies each
+with a generated UUID. Name them yourself by building the
+[`WorkItem`][ropt.components.executors.WorkItem] objects and submitting them to
+the executor directly.
 
 If the executor is not running when `eval()` is called, the evaluator raises an
 [`ExecutorStopped`][ropt.exceptions.ExecutorStopped] exception.

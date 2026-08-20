@@ -20,7 +20,6 @@ high-level entry points run sequentially on the calling thread.
 from __future__ import annotations
 
 import asyncio
-import itertools
 import threading
 from contextvars import ContextVar, Token
 from functools import partial
@@ -28,6 +27,7 @@ from typing import TYPE_CHECKING, Any, TypeVar
 
 from ropt.components._loop import schedule
 from ropt.components.concurrency import run_concurrent
+from ropt.components.evaluators import BatchIdCounter
 from ropt.exceptions import WorkflowError
 
 if TYPE_CHECKING:
@@ -63,7 +63,7 @@ class _Session:
         self._task_group: asyncio.TaskGroup | None = None
         self._shutdown: asyncio.Event | None = None
         self._executor: Executor | None = None
-        self._run_counter = itertools.count()
+        self._batch_counter: BatchIdCounter | None = None
         self._failure: BaseException | None = None
 
     def start(self) -> None:
@@ -167,19 +167,20 @@ class _Session:
         executor = make_executor()
         self._start_on_loop(executor.start(task_group))
         self._executor = executor  # Only set on success.
-        self._run_counter = itertools.count()
-
-    def next_run_id(self) -> int:
-        return next(self._run_counter)
+        self._batch_counter = BatchIdCounter()
 
     def close_executor(self) -> None:
         executor = self._executor
         self._executor = None
+        self._batch_counter = None
         if executor is not None:
             schedule(self._loop, executor.cancel)
 
     def get_executor(self) -> Executor | None:
         return self._executor
+
+    def get_batch_counter(self) -> BatchIdCounter | None:
+        return self._batch_counter
 
     def open_dispatcher(self, dispatcher: EventDispatcher) -> None:
         self._start_on_loop(dispatcher.start(self._require_task_group()))
@@ -253,6 +254,20 @@ def current_executor() -> Executor | None:
     """
     session = _active_session.get()
     return None if session is None else session.get_executor()
+
+
+def current_batch_counter() -> BatchIdCounter | None:
+    """Return the open execution block's batch ID counter.
+
+    Every run in the block draws its batch IDs from this one counter, so runs
+    that share the block's executor never produce the same batch ID. Without a
+    block there is nothing to share with, and each evaluator counts on its own.
+
+    Returns:
+        The block's counter, or `None` when no execution block is open.
+    """
+    session = _active_session.get()
+    return None if session is None else session.get_batch_counter()
 
 
 def gather_shared(

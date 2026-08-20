@@ -45,7 +45,6 @@ from ropt.simple import (
 )
 from ropt.simple._function import adapt_function
 from ropt.simple._handlers import _handler_stack, current_handlers
-from ropt.simple._naming import make_task_namer
 from ropt.simple._session import _Session, current_executor, current_session
 
 if TYPE_CHECKING:
@@ -603,70 +602,65 @@ def test_optimize_with_threads(config: Any, test_functions: Any) -> None:
     assert np.allclose(result.variables, 0.5, atol=0.02)
 
 
-def test_task_name_omits_perturbation_index_for_unperturbed_evaluation() -> None:
-    with threads(workers=1):
-        namer = make_task_namer(current_session(), current_executor())
-        assert namer is not None
-        context = EvaluationFunctionContext(
-            realization=2, perturbation=-1, batch_id=3, eval_idx=0
+def _collect_batch_ids(sink: list[int], lock: threading.Lock) -> Any:
+    def _function(
+        _variables: NDArray[np.float64], context: EvaluationFunctionContext
+    ) -> float:
+        with lock:
+            sink.append(context.batch_id)
+        return 0.0
+
+    return _function
+
+
+def test_batch_ids_are_unique_across_runs_in_an_execution_block(config: Any) -> None:
+    first: list[int] = []
+    second: list[int] = []
+    lock = threading.Lock()
+    with threads(workers=2):
+        optimize(config, initial_values, _collect_batch_ids(first, lock))
+        optimize(config, initial_values, _collect_batch_ids(second, lock))
+    assert first
+    assert second
+    assert not set(first) & set(second)
+
+
+def test_batch_ids_are_unique_across_concurrent_runs(config: Any) -> None:
+    sinks: list[list[int]] = [[], [], []]
+    lock = threading.Lock()
+    with threads(workers=2):
+        optimize_many(
+            config,
+            initial_values,
+            [_collect_batch_ids(sink, lock) for sink in sinks],
         )
-        assert namer([context]) == "run0-b3-r2"
+    for sink in sinks:
+        assert sink
+    assert sum(len(set(sink)) for sink in sinks) == len(set().union(*sinks))
 
 
-def test_task_name_includes_perturbation_index_for_perturbed_evaluation() -> None:
-    with threads(workers=1):
-        namer = make_task_namer(current_session(), current_executor())
-        assert namer is not None
-        context = EvaluationFunctionContext(
-            realization=2, perturbation=5, batch_id=3, eval_idx=0
-        )
-        assert namer([context]) == "run0-b3-r2-p5"
+def test_batch_ids_restart_for_each_execution_block(config: Any) -> None:
+    first: list[int] = []
+    second: list[int] = []
+    lock = threading.Lock()
+    with threads(workers=2):
+        optimize(config, initial_values, _collect_batch_ids(first, lock))
+    with threads(workers=2):
+        optimize(config, initial_values, _collect_batch_ids(second, lock))
+    assert min(first) == 0
+    assert min(second) == 0
 
 
-def test_task_name_uses_the_first_context_of_a_bundle() -> None:
-    with threads(workers=1):
-        namer = make_task_namer(current_session(), current_executor())
-        assert namer is not None
-        contexts = [
-            EvaluationFunctionContext(
-                realization=4, perturbation=-1, batch_id=1, eval_idx=0
-            ),
-            EvaluationFunctionContext(
-                realization=5, perturbation=-1, batch_id=1, eval_idx=1
-            ),
-        ]
-        assert namer(contexts) == "run0-b1-r4"
-
-
-def test_task_run_ids_are_unique_within_an_execution_block() -> None:
-    context = EvaluationFunctionContext(
-        realization=0, perturbation=-1, batch_id=0, eval_idx=0
-    )
-    with threads(workers=1):
-        first = make_task_namer(current_session(), current_executor())
-        second = make_task_namer(current_session(), current_executor())
-        assert first is not None
-        assert second is not None
-        assert first([context]) == "run0-b0-r0"
-        assert second([context]) == "run1-b0-r0"
-
-
-def test_task_run_ids_restart_for_each_execution_block() -> None:
-    context = EvaluationFunctionContext(
-        realization=0, perturbation=-1, batch_id=0, eval_idx=0
-    )
-    with threads(workers=1):
-        first = make_task_namer(current_session(), current_executor())
-    with threads(workers=1):
-        second = make_task_namer(current_session(), current_executor())
-    assert first is not None
-    assert second is not None
-    assert first([context]) == "run0-b0-r0"
-    assert second([context]) == "run0-b0-r0"
-
-
-def test_no_task_namer_without_an_execution_block() -> None:
-    assert make_task_namer(current_session(), current_executor()) is None
+def test_batch_ids_restart_for_each_run_without_an_execution_block(
+    config: Any,
+) -> None:
+    first: list[int] = []
+    second: list[int] = []
+    lock = threading.Lock()
+    optimize(config, initial_values, _collect_batch_ids(first, lock))
+    optimize(config, initial_values, _collect_batch_ids(second, lock))
+    assert min(first) == 0
+    assert min(second) == 0
 
 
 def test_evaluate_many_with_threads(config: Any, test_functions: Any) -> None:

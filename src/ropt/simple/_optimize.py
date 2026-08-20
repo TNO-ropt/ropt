@@ -15,7 +15,6 @@ from ropt.exceptions import WorkflowError
 from ._broadcast import broadcast_metadata, broadcast_reports, broadcast_runs
 from ._evaluator import make_evaluator, run_step
 from ._handlers import current_handlers
-from ._naming import make_task_namer
 from ._report import make_report_handler
 from ._result import OptimizeResult
 from ._session import current_executor, current_session
@@ -26,7 +25,6 @@ if TYPE_CHECKING:
 
     from numpy.typing import ArrayLike
 
-    from ropt.components.evaluators import NameCallback
     from ropt.components.event_handlers import EventHandler
     from ropt.components.executors import Executor
     from ropt.enums import ExitCode
@@ -89,7 +87,6 @@ def optimize(  # ruff: ignore[too-many-arguments]
         constraint_tolerance=constraint_tolerance,
         shared=current_handlers(),
         metadata=metadata,
-        get_name=make_task_namer(current_session(), executor),
     )
 
 
@@ -119,9 +116,8 @@ def _optimize(  # ruff: ignore[too-many-arguments]
     constraint_tolerance: float,
     shared: HandlerScope | None,
     metadata: dict[str, Any] | None = None,
-    get_name: NameCallback | None = None,
 ) -> OptimizeResult:
-    context, evaluator = make_evaluator(config, function, executor, get_name)
+    context, evaluator = make_evaluator(config, function, executor)
     result_handler = ResultsHandler(constraint_tolerance=constraint_tolerance)
     step = OptimizationStep(evaluator=evaluator)
     step.add_event_handler(result_handler)
@@ -252,7 +248,6 @@ def optimize_many(  # ruff: ignore[too-many-arguments]
             constraint_tolerance=constraint_tolerance,
             shared=shared,
             metadata=run_metadata,
-            get_name=make_task_namer(session, executor),
         )
         for (run_config, run_x0, run_function), run_report, run_metadata in zip(
             runs, reports, metadatas, strict=True

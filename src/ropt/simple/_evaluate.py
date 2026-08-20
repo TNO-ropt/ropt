@@ -11,9 +11,8 @@ from ropt.components.event_handlers import HistoryHandler
 
 from ._evaluator import make_evaluator, run_step
 from ._handlers import current_handlers
-from ._naming import make_task_namer
 from ._result import EvaluateResult, _build_evaluate_result
-from ._session import current_executor, current_session
+from ._session import current_executor
 
 if TYPE_CHECKING:
     from typing import Any
@@ -113,9 +112,7 @@ def _run_evaluation(
     function: EvaluationFunction,
     metadata: dict[str, Any] | None = None,
 ) -> tuple[FunctionResults, ...]:
-    context, evaluator = make_evaluator(
-        config, function, executor, make_task_namer(current_session(), executor)
-    )
+    context, evaluator = make_evaluator(config, function, executor)
     history = HistoryHandler()
     step = EvaluationStep(evaluator=evaluator)
     step.add_event_handler(history)

@@ -12,7 +12,6 @@ from .base import (
     EvaluationFunctionContext,
     EvaluationFunctionResult,
     Evaluator,
-    NameCallback,
 )
 
 __all__ = [
@@ -24,6 +23,5 @@ __all__ = [
     "EvaluationFunctionResult",
     "Evaluator",
     "FunctionEvaluator",
-    "NameCallback",
     "ParallelEvaluator",
 ]

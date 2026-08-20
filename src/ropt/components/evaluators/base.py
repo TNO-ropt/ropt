@@ -13,8 +13,6 @@ from ropt.evaluation import EvaluationBatchResult
 from ropt.exceptions import WorkflowError
 
 if TYPE_CHECKING:
-    from collections.abc import Sequence
-
     import numpy as np
     from numpy.typing import NDArray
 
@@ -114,14 +112,12 @@ class EvaluationFunctionContext:
         perturbation: The perturbation index (`-1` when unperturbed).
         batch_id:     Integer identifying the current evaluation batch.
         eval_idx:     Row index within the batch.
-        name:         Optional task name set by the evaluator.
     """
 
     realization: int
     perturbation: int
     batch_id: int
     eval_idx: int
-    name: str | None = None
 
 
 @dataclass(slots=True)
@@ -164,24 +160,4 @@ class EvaluationFunctionCallback(Protocol):
 
         Returns:
             The evaluation result as a `EvaluationFunctionResult` object.
-        """
-
-
-class NameCallback(Protocol):
-    """Defines the call signature for callbacks to get the name of a task."""
-
-    def __call__(self, contexts: Sequence[EvaluationFunctionContext]) -> str:
-        """Get the name for a task.
-
-        The task may contain a single evaluation or a bundle of several
-        evaluations that the worker runs sequentially. The callback receives
-        the `EvaluationFunctionContext` objects for every evaluation in the
-        task, in submission order, and should return a single string used as
-        the task name.
-
-        Args:
-            contexts: The contexts for every evaluation in the task.
-
-        Returns:
-            The name of the task.
         """

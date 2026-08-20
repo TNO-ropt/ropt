@@ -8,6 +8,7 @@ from ropt.components.evaluators import FunctionEvaluator, ParallelEvaluator
 from ropt.context import EnOptContext
 
 from ._function import adapt_function
+from ._session import current_batch_counter
 
 if TYPE_CHECKING:
     from typing import Any
@@ -15,7 +16,7 @@ if TYPE_CHECKING:
     from numpy.typing import ArrayLike
 
     from ropt.components.compute_steps import ComputeStep
-    from ropt.components.evaluators import Evaluator, NameCallback
+    from ropt.components.evaluators import Evaluator
     from ropt.components.executors import Executor
     from ropt.enums import ExitCode
 
@@ -26,7 +27,6 @@ def make_evaluator(
     config: dict[str, Any],
     function: EvaluationFunction,
     executor: Executor | None,
-    get_name: NameCallback | None,
 ) -> tuple[EnOptContext, Evaluator]:
     """Validate a configuration and wire an evaluator for it.
 
@@ -35,11 +35,13 @@ def make_evaluator(
     an executor the evaluations are spread over its workers, without one they
     run in-process on the calling thread.
 
+    Batch IDs come from the open block's counter, so concurrent runs sharing its
+    executor cannot land on the same ID.
+
     Args:
         config:   The optimization configuration.
         function: The user-supplied evaluation function.
         executor: The active executor, or `None` on the sequential floor.
-        get_name: An optional naming callback for the run's tasks.
 
     Returns:
         The validated context and the evaluator to run it with.
@@ -52,10 +54,15 @@ def make_evaluator(
         else context.nonlinear_constraints.lower_bounds.size
     )
     callback = adapt_function(function, n_obj, n_con)
+    batch_id_callback = current_batch_counter()
     if executor is None:
-        return context, FunctionEvaluator(function=callback)
+        return context, FunctionEvaluator(
+            function=callback, batch_id_callback=batch_id_callback
+        )
     return context, ParallelEvaluator(
-        function=callback, executor=executor, get_name=get_name
+        function=callback,
+        executor=executor,
+        batch_id_callback=batch_id_callback,
     )
 
 
