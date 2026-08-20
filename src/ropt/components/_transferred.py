@@ -1,7 +1,8 @@
 """Detection of workflow objects transferred into a worker process.
 
 Workflow objects (compute steps, evaluators, event handlers, the event
-dispatcher, and the batch-id counter) are process-local: they may be pickled as
+dispatcher, the batch-id counter, and the executors themselves) are
+process-local: they may be pickled as
 part of a task payload, but they must not be *used* in a worker. When such an
 object is unpickled it becomes an inert
 [`_Placeholder`][ropt.components._transferred._Placeholder] and records its type

@@ -233,8 +233,8 @@ The built-in [`ResultsHandler`][ropt.components.event_handlers.ResultsHandler],
 [`HistoryHandler`][ropt.components.event_handlers.HistoryHandler], and
 [`DataFrameHandler`][ropt.components.event_handlers.DataFrameHandler] are the same
 objects you meet in [Running Optimizations](../running/running.md#built-in-handlers),
-where they are described in full — there they are attached with a `handlers()`
-block or `optimize(handlers=...)`, here with `add_event_handler`, and they behave
+where they are described in full — there they are attached with
+`optimize(handlers=...)`, here with `add_event_handler`, and they behave
 identically. This section covers the underlying event model and the handlers
 specific to workflows.
 

@@ -282,15 +282,14 @@ async def test_handler_dispatching_on_own_dispatcher_raises(
 ) -> None:
     # Events are handled one at a time, so a nested dispatch waits for an event
     # that cannot be processed until the handler returns: a silent deadlock.
+    # The refusal is left to propagate rather than caught in the handler: a
+    # handler that swallows it also swallows the timeout if the guard ever
+    # regresses, and the test hangs instead of failing.
     context = EnOptContext.model_validate(config)
     dispatcher = EventDispatcher()
-    errors: list[BaseException] = []
 
     def _dispatch_again(event: EnOptEvent) -> None:  # ruff: ignore[unused-function-argument]
-        try:
-            dispatcher.dispatch_event(_event(context))
-        except BaseException as exc:  # ruff: ignore[blind-except]
-            errors.append(exc)
+        dispatcher.dispatch_event(_event(context))
 
     dispatcher.add_event_handler(
         CallbackHandler(
@@ -301,11 +300,31 @@ async def test_handler_dispatching_on_own_dispatcher_raises(
     )
     async with asyncio.TaskGroup() as tg:
         await dispatcher.start(tg)
-        await asyncio.to_thread(dispatcher.dispatch_event, _event(context))
+        with pytest.raises(WorkflowError, match="cannot be used from"):
+            await asyncio.to_thread(dispatcher.dispatch_event, _event(context))
         dispatcher.cancel()
-    assert len(errors) == 1
-    assert isinstance(errors[0], WorkflowError)
-    assert "own dispatcher" in str(errors[0])
+
+
+@pytest.mark.asyncio
+async def test_dispatching_on_another_dispatcher_sharing_the_loop_raises(
+    config: dict[str, Any],
+) -> None:
+    # The refusal is about the loop the call would wait on, not about which
+    # dispatcher owns the handler: forwarding from one to another on a shared
+    # loop blocks that loop just the same. This is the only test that fails if
+    # the check is ever narrowed back to "a handler of *this* dispatcher".
+    context = EnOptContext.model_validate(config)
+    first, second = EventDispatcher(), EventDispatcher()
+    first.add_event_handler(
+        EventForwardHandler(second, event_types={EnOptEventType.FINISHED_EVALUATION})
+    )
+    async with asyncio.TaskGroup() as tg:
+        await first.start(tg)
+        await second.start(tg)
+        with pytest.raises(WorkflowError, match="cannot be used from"):
+            await asyncio.to_thread(first.dispatch_event, _event(context))
+        first.cancel()
+        second.cancel()
 
 
 def _blocking_handler(

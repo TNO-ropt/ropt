@@ -1,17 +1,13 @@
 """Tests for the sequential high-level ``optimize`` API."""
 
-# Two things here are easy to "simplify" and must not be; the other traps in
-# this file are explained where they sit.
-#
-# - test_execution_block_refuses_reentry has to match the message. Asserting
-#   `WorkflowError` alone passes with the guard removed, because
-#   open_executor's "Only one execution block" surfaces instead.
-# - The monkeypatched tests name their target as an attribute and assert it was
-#   used. An earlier version patched a method by string and became a no-op the
-#   day it was renamed, which mypy cannot see.
+# The monkeypatched tests here name their target as an attribute and assert it
+# was used. An earlier version patched a method by string and became a no-op the
+# day it was renamed, which mypy cannot see. The other traps in this file are
+# explained where they sit.
 
 from __future__ import annotations
 
+import os
 import threading
 from functools import partial
 from typing import TYPE_CHECKING, Any
@@ -19,35 +15,34 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 import pytest
 
-from ropt.components.compute_steps import EvaluationStep
+from ropt.components.compute_steps import EvaluationStep, OptimizationStep
+from ropt.components.concurrency import run_concurrent
 from ropt.components.evaluators import FunctionEvaluator
 from ropt.components.event_handlers import EventDispatcher
 from ropt.components.executors import ThreadingExecutor
+from ropt.context import EnOptContext
 from ropt.enums import ExitCode
 from ropt.exceptions import ExecutorStopped, WorkflowError
 from ropt.simple import (
     EvaluateResult,
     EvaluationFunctionContext,
+    EvaluationFunctionResult,
     HistoryHandler,
     OptimizeResult,
-    _blocks,
-    can_offload,
-    compose,
+    SharedHandlers,
+    WorkerPool,
     evaluate,
     evaluate_many,
-    handlers,
-    hpc,
     offload,
     optimize,
     optimize_many,
-    processes,
-    threads,
+    session,
 )
 from ropt.simple._function import adapt_function
-from ropt.simple._handlers import _handler_stack, current_handlers
-from ropt.simple._session import _Session, current_executor, current_session
+from ropt.simple._session import _Session
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
     from pathlib import Path
 
     from numpy.typing import NDArray
@@ -157,191 +152,116 @@ def test_optimize_report_callback_receives_evaluate_results(
     assert any(item.target_objective is not None for item in reported)
 
 
-def test_handlers_report_callback_reports_across_the_block(
+def test_group_report_callback_reports_across_runs(
     config: Any, test_functions: Any
 ) -> None:
     reported: list[EvaluateResult] = []
-    with handlers(report=reported.append):
-        optimize(config, initial_values, test_functions[0])
+    with session() as active:
+        group = active.shared_handlers(report=reported.append)
+        optimize(config, initial_values, test_functions[0], handlers=[group])
         after_first = len(reported)
-        optimize(config, initial_values, test_functions[0])
+        optimize(config, initial_values, test_functions[0], handlers=[group])
     assert after_first > 0
     assert len(reported) > after_first
     assert all(isinstance(item, EvaluateResult) for item in reported)
 
 
-def test_threaded_handlers_run_in_thread() -> None:
+def test_group_threaded_handlers_run_in_thread() -> None:
     loop_handler = HistoryHandler()
     io_handler = HistoryHandler()
-    scope = handlers(loop_handler, threaded=io_handler)
-    with scope:
-        in_thread = dict(scope._running_dispatcher._handlers)  # ruff: ignore[private-member-access]
+    with session() as active:
+        group = active.shared_handlers(loop_handler, threaded=io_handler)
+        in_thread = dict(group._dispatcher._handlers)  # ruff: ignore[private-member-access]
     assert in_thread[loop_handler] is False
     assert in_thread[io_handler] is True
 
 
-def test_threaded_accepts_handler_sequence() -> None:
+def test_group_threaded_accepts_handler_sequence() -> None:
     first = HistoryHandler()
     second = HistoryHandler()
-    scope = handlers(threaded=[first, second])
-    with scope:
-        in_thread = dict(scope._running_dispatcher._handlers)  # ruff: ignore[private-member-access]
+    with session() as active:
+        group = active.shared_handlers(threaded=[first, second])
+        in_thread = dict(group._dispatcher._handlers)  # ruff: ignore[private-member-access]
     assert in_thread[first] is True
     assert in_thread[second] is True
 
 
-def test_threaded_handler_keeps_flag_when_inherited() -> None:
-    io_handler = HistoryHandler()
-    outer = handlers(threaded=io_handler)
-    with outer:
-        inner = handlers()
-        with inner:
-            assert dict(inner._running_dispatcher._handlers)[io_handler] is True  # ruff: ignore[private-member-access]
-        assert dict(outer._running_dispatcher._handlers)[io_handler] is True  # ruff: ignore[private-member-access]
-
-
-def test_relisting_handler_overrides_threaded_flag() -> None:
-    handler = HistoryHandler()
-    outer = handlers(threaded=handler)
-    with outer:
-        inner = handlers(handler)  # re-listed as a loop-thread handler
-        with inner:
-            assert dict(inner._running_dispatcher._handlers)[handler] is False  # ruff: ignore[private-member-access]
-        assert dict(outer._running_dispatcher._handlers)[handler] is True  # ruff: ignore[private-member-access]
-
-
-def test_handlers_block_binds_scope() -> None:
-    handler = HistoryHandler()
-    with handlers(handler) as scope:
-        assert scope is current_handlers()
-
-
-def test_empty_handlers_block_adds_no_forwarding_handler(
+def test_empty_group_adds_no_forwarding_handler(
     config: Any, test_functions: Any
 ) -> None:
-    with handlers() as scope:
+    with session() as active:
+        group = active.shared_handlers()
         step = EvaluationStep(
             evaluator=FunctionEvaluator(
                 function=adapt_function(test_functions[0], 1, 0)
             )
         )
         # Nothing wants events, so the run must not be given a forwarding handler.
-        scope.attach_to(step)
+        group.attach_to(step)
         assert step.event_handlers == []
         result = optimize(config, initial_values, test_functions[0])
     assert result.exit_code == ExitCode.OPTIMIZER_FINISHED
 
 
-def test_handler_reusable_after_scope_closes() -> None:
+def test_hand_assembled_step_runs(config: Any, test_functions: Any) -> None:
+    # A step built by hand runs exactly the way optimize() runs its own: it
+    # takes its context and nothing from its surroundings.
+    step = OptimizationStep(
+        evaluator=FunctionEvaluator(function=adapt_function(test_functions[0], 1, 0))
+    )
+    history = HistoryHandler()
+    step.add_event_handler(history)
+    exit_code = step.run(
+        context=EnOptContext.model_validate(config), variables=initial_values
+    )
+    assert exit_code == ExitCode.OPTIMIZER_FINISHED
+    assert len(history["results"]) > 1
+
+
+def test_handler_reusable_after_group_closes() -> None:
     handler = HistoryHandler()
-    with handlers(handler):
-        pass
-    scope = handlers(handler)
-    with scope:
-        assert set(dict(scope._running_dispatcher._handlers)) == {handler}  # ruff: ignore[private-member-access]
+    with session() as active:
+        active.shared_handlers(handler)
+    # A new session, since a group cannot be reopened once its own has closed.
+    with session() as active:
+        group = active.shared_handlers(handler)
+        assert set(dict(group._dispatcher._handlers)) == {handler}  # ruff: ignore[private-member-access]
 
 
-def test_handler_reusable_after_scope_fails_to_open() -> None:
+def test_handler_reusable_after_group_fails_to_open() -> None:
     good = HistoryHandler()
     bad = HistoryHandler()
-    with (
-        pytest.raises(WorkflowError, match="already registered with a dispatcher"),
-        handlers(good, bad, bad),
-    ):
-        pass
-    scope = handlers(good, bad)
-    with scope:
-        assert set(dict(scope._running_dispatcher._handlers)) == {good, bad}  # ruff: ignore[private-member-access]
+    with session() as active:
+        with pytest.raises(WorkflowError, match="already registered with a dispatcher"):
+            active.shared_handlers(good, bad, bad)
+        group = active.shared_handlers(good, bad)
+        assert set(dict(group._dispatcher._handlers)) == {good, bad}  # ruff: ignore[private-member-access]
 
 
-def test_handlers_block_refuses_reentry(config: Any, test_functions: Any) -> None:
-    handler = HistoryHandler()
-    scope = handlers(handler)
-    with pytest.raises(WorkflowError, match="already open"), scope, scope:
-        pass
-    # The rejected re-entry must leave nothing behind: a scope stranded on the
-    # stack would feed every later run to a dispatcher that no longer runs.
-    assert _handler_stack.get() == ()
-    with handlers(handler):
-        optimize(config, initial_values, test_functions[0])
-    assert len(handler["results"]) > 0
-
-
-def test_execution_block_refuses_reentry(config: Any, test_functions: Any) -> None:
-    scope = threads(workers=1)
-    with pytest.raises(WorkflowError, match="already open"), scope, scope:
-        pass
-    # The rejected re-entry must leave the first block's state alone, so the
-    # scope still releases its session and can be opened again.
-    assert current_session() is None
-    with scope:
-        result = optimize(config, initial_values, test_functions[0])
-    assert result.exit_code == ExitCode.OPTIMIZER_FINISHED
-
-
-def test_execution_block_survives_a_failed_session_acquire(
-    config: Any, test_functions: Any, monkeypatch: Any
-) -> None:
-    # A scope that fails before it acquires anything has nothing to release, and
-    # must not refuse every later block on the strength of an entry that opened
-    # nothing. Reachable: _acquire_session starts a loop and a thread.
-    calls = 0
-
-    def _boom() -> tuple[_Session, None]:
-        nonlocal calls
-        calls += 1
-        msg = "no thread for you"
-        raise RuntimeError(msg)
-
-    scope = threads(workers=1)
-    monkeypatch.setattr(_blocks, "_acquire_session", _boom)
-    with pytest.raises(RuntimeError, match="no thread for you"), scope:
-        pass
-    assert calls == 1
-    monkeypatch.undo()
-    with scope:
-        result = optimize(config, initial_values, test_functions[0])
-    assert result.exit_code == ExitCode.OPTIMIZER_FINISHED
-
-
-def test_closed_execution_block_releases_session() -> None:
-    # A scope that keeps a stopped session keeps its loop and its thread with
-    # it, and would hand a dead one to a second use of the same object.
-    scope = threads(workers=1)
-    with scope:
-        assert scope._session is not None  # ruff: ignore[private-member-access]
-    assert scope._session is None  # ruff: ignore[private-member-access]
-    assert scope._token is None  # ruff: ignore[private-member-access]
-    with scope:
-        assert scope._session is not None  # ruff: ignore[private-member-access]
-
-
-def test_local_handler_refused_by_block(config: Any, test_functions: Any) -> None:
+def test_local_handler_refused_by_group(config: Any, test_functions: Any) -> None:
     handler = HistoryHandler()
     optimize(config, initial_values, test_functions[0], handlers=[handler])
     with (
+        session() as active,
         pytest.raises(WorkflowError, match="already in use") as excinfo,
-        handlers(handler),
     ):
-        pass
+        active.shared_handlers(handler)
     # The low-level refusal names a compute step, which this API never hands
     # out; a reader cannot act on it.
     assert "compute step" not in str(excinfo.value)
     assert "separate handler" in str(excinfo.value)
 
 
-def test_closed_handlers_block_reopens() -> None:
+def test_handler_in_open_group_refused_by_another_group() -> None:
     handler = HistoryHandler()
-    scope = handlers(handler)
-    with scope:
-        assert set(dict(scope._running_dispatcher._handlers)) == {handler}  # ruff: ignore[private-member-access]
-    assert scope._current_handlers == set()  # ruff: ignore[private-member-access]
-    with scope:
-        assert set(dict(scope._running_dispatcher._handlers)) == {handler}  # ruff: ignore[private-member-access]
-    assert scope._current_handlers == set()  # ruff: ignore[private-member-access]
+    with session() as active:
+        active.shared_handlers(handler)
+        with pytest.raises(WorkflowError, match="already in use") as excinfo:
+            active.shared_handlers(handler)
+    assert "compute step" not in str(excinfo.value)
 
 
-def test_handlers_block_releases_session_on_rollback_failure(
+def test_shared_handlers_releases_on_rollback_failure(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     def _failing_remove(*_args: object, **_kwargs: object) -> None:
@@ -351,24 +271,61 @@ def test_handlers_block_releases_session_on_rollback_failure(
     monkeypatch.setattr(EventDispatcher, "remove_event_handler", _failing_remove)
     handler = HistoryHandler()
     with (
+        session() as active,
         pytest.raises(RuntimeError, match="rollback failed"),
-        handlers(handler, handler),
     ):
-        pass
-    assert current_session() is None
+        active.shared_handlers(handler, handler)
 
 
-def test_failing_block_teardown_releases_session(
-    monkeypatch: pytest.MonkeyPatch,
+def test_group_close_is_idempotent() -> None:
+    with session() as active:
+        group = active.shared_handlers(HistoryHandler())
+        group.close()
+        group.close()
+
+
+def test_group_context_manager_closes_the_group() -> None:
+    handler = HistoryHandler()
+    with session() as active:
+        with active.shared_handlers(handler) as group:
+            assert set(dict(group._dispatcher._handlers)) == {handler}  # ruff: ignore[private-member-access]
+        # Released, so a plain dispatcher can claim it again.
+        EventDispatcher().add_event_handler(handler)
+
+
+def test_group_handler_reusable_as_local_after_close(
+    config: Any, test_functions: Any
 ) -> None:
-    def _failing_close(_self: object) -> None:
-        msg = "teardown failed"
-        raise RuntimeError(msg)
+    handler = HistoryHandler()
+    with session() as active:
+        active.shared_handlers(handler).close()
+    optimize(config, initial_values, test_functions[0], handlers=[handler])
+    assert len(handler["results"]) > 0
 
-    monkeypatch.setattr(_Session, "close_executor", _failing_close)
-    with pytest.raises(RuntimeError, match="teardown failed"), threads(workers=1):
-        pass
-    assert current_session() is None
+
+def test_optimize_mixes_local_handler_and_group(
+    config: Any, test_functions: Any
+) -> None:
+    local = HistoryHandler()
+    shared = HistoryHandler()
+    with session() as active:
+        group = active.shared_handlers(shared)
+        optimize(config, initial_values, test_functions[0], handlers=[local, group])
+    assert local["results"]
+    assert shared["results"]
+    assert local._claimed is False  # ruff: ignore[private-member-access]
+
+
+def test_optimize_feeds_two_groups_at_once(config: Any, test_functions: Any) -> None:
+    first = HistoryHandler()
+    second = HistoryHandler()
+    with session() as active:
+        group_a = active.shared_handlers(first)
+        group_b = active.shared_handlers(second)
+        optimize(config, initial_values, test_functions[0], handlers=[group_a, group_b])
+    assert first["results"]
+    assert second["results"]
+    assert len(first["results"]) == len(second["results"])
 
 
 def test_optimize_local_handler_accumulates_across_sequential_calls(
@@ -456,9 +413,13 @@ def test_report_callback_stops_only_own_run(config: Any, test_functions: Any) ->
         return None
 
     x0 = np.array([initial_values, initial_values])
-    with threads(workers=2):
+    with session() as active:
         results = optimize_many(
-            config, x0, test_functions[0], report=[_stop, _continue]
+            config,
+            x0,
+            test_functions[0],
+            report=[_stop, _continue],
+            pool=active.thread_pool(workers=2),
         )
     assert results[0].exit_code == ExitCode.USER_ABORT
     assert results[1].exit_code != ExitCode.USER_ABORT
@@ -504,39 +465,85 @@ def test_evaluate_single_vector(config: Any, test_functions: Any) -> None:
     assert result.results.evaluations.variables.shape == (initial_values.size,)
 
 
-def test_user_thread_does_not_inherit_open_blocks(
+def test_thread_run_sees_only_the_handlers_it_is_given(
     config: Any, test_functions: Any
 ) -> None:
     handler = HistoryHandler()
-    seen: dict[str, Any] = {}
+    with session() as active:
+        group = active.shared_handlers(handler)
 
-    def worker() -> None:
-        seen["session"] = current_session()
-        seen["executor"] = current_executor()
-        seen["handlers"] = current_handlers()
-        optimize(config, initial_values, test_functions[0])
+        def _without_handlers() -> None:
+            optimize(config, initial_values, test_functions[0])
 
-    with threads(workers=2), handlers(handler):
-        assert current_session() is not None
-        assert current_executor() is not None
-        thread = threading.Thread(target=worker)
+        thread = threading.Thread(target=_without_handlers)
         thread.start()
         thread.join()
+        assert handler["results"] is None
 
-    assert seen["session"] is None
-    assert seen["executor"] is None
-    assert seen["handlers"] is None
-    assert handler["results"] is None
+        def _with_handlers() -> None:
+            optimize(config, initial_values, test_functions[0], handlers=[group])
+
+        thread = threading.Thread(target=_with_handlers)
+        thread.start()
+        thread.join()
+    assert handler["results"] is not None
 
 
-def test_evaluate_feeds_a_shared_handlers_block(
+def test_evaluate_feeds_a_shared_group(config: Any, test_functions: Any) -> None:
+    handler = HistoryHandler()
+    with session() as active:
+        group = active.shared_handlers(handler)
+        evaluate(config, initial_values, test_functions[0], handlers=[group])
+        evaluate(
+            config, np.zeros(initial_values.size), test_functions[0], handlers=[group]
+        )
+    assert len(handler["results"]) == 2
+
+
+def test_evaluate_accepts_a_local_handler(config: Any, test_functions: Any) -> None:
+    history = HistoryHandler()
+    evaluate(config, initial_values, test_functions[0], handlers=[history])
+    assert len(history["results"]) == 1
+    assert history._claimed is False  # ruff: ignore[private-member-access]
+
+
+def test_evaluate_many_accepts_a_local_handler(
     config: Any, test_functions: Any
 ) -> None:
-    handler = HistoryHandler()
-    with handlers(handler):
-        evaluate(config, initial_values, test_functions[0])
-        evaluate(config, np.zeros(initial_values.size), test_functions[0])
-    assert len(handler["results"]) == 2
+    history = HistoryHandler()
+    matrix = np.array([initial_values, np.zeros(initial_values.size)])
+    evaluate_many(config, matrix, test_functions[0], handlers=[history])
+    assert len(history["results"]) == 2
+
+
+def test_evaluate_report_return_value_ignored(config: Any, test_functions: Any) -> None:
+    reported: list[EvaluateResult] = []
+
+    def _stop(result: EvaluateResult) -> bool:
+        reported.append(result)
+        return True
+
+    result = evaluate(config, initial_values, test_functions[0], report=_stop)
+    assert len(reported) == 1
+    assert result.target_objective == pytest.approx(0.66)
+
+
+def test_evaluate_many_report_return_value_ignored(
+    config: Any, test_functions: Any
+) -> None:
+    # The callback returns True on the very first result, which stops the
+    # forwarding of further results to it -- but the batch itself already ran
+    # to completion before the event fired, so every row still comes back.
+    reported: list[EvaluateResult] = []
+
+    def _stop(result: EvaluateResult) -> bool:
+        reported.append(result)
+        return True
+
+    matrix = np.array([initial_values, np.zeros(initial_values.size)])
+    results = evaluate_many(config, matrix, test_functions[0], report=_stop)
+    assert len(reported) == 1
+    assert len(results) == 2
 
 
 def test_evaluate_rejects_matrix(config: Any, test_functions: Any) -> None:
@@ -595,9 +602,14 @@ def test_evaluate_many_attaches_metadata_to_every_result(
         assert result.results.metadata["tag"] == "eval"
 
 
-def test_optimize_with_threads(config: Any, test_functions: Any) -> None:
-    with threads(workers=2):
-        result = optimize(config, initial_values, test_functions[0])
+def test_optimize_with_thread_pool(config: Any, test_functions: Any) -> None:
+    with session() as active:
+        result = optimize(
+            config,
+            initial_values,
+            test_functions[0],
+            pool=active.thread_pool(workers=2),
+        )
     assert result.variables is not None
     assert np.allclose(result.variables, 0.5, atol=0.02)
 
@@ -613,13 +625,77 @@ def _collect_batch_ids(sink: list[int], lock: threading.Lock) -> Any:
     return _function
 
 
-def test_batch_ids_are_unique_across_runs_in_an_execution_block(config: Any) -> None:
+def test_optimize_evaluates_on_the_given_pool(config: Any) -> None:
+    # A pool is only ever what a run is handed; proving the evaluation lands on
+    # one of its worker threads, not the caller's, is what distinguishes a run
+    # that really dispatches from one that silently fell back to in-process.
+    seen: list[str] = []
+    lock = threading.Lock()
+
+    def _record_thread(
+        _variables: NDArray[np.float64], _context: EvaluationFunctionContext
+    ) -> float:
+        with lock:
+            seen.append(threading.current_thread().name)
+        return 0.0
+
+    with session() as active:
+        optimize(
+            config, initial_values, _record_thread, pool=active.thread_pool(workers=2)
+        )
+    assert seen
+    assert threading.current_thread().name not in seen
+
+
+def test_optimize_without_a_pool_evaluates_in_process(config: Any) -> None:
+    # The mirror of the above: with no pool passed, a run must evaluate on the
+    # calling thread rather than reaching for some pool from its surroundings.
+    seen: list[str] = []
+    lock = threading.Lock()
+
+    def _record_thread(
+        _variables: NDArray[np.float64], _context: EvaluationFunctionContext
+    ) -> float:
+        with lock:
+            seen.append(threading.current_thread().name)
+        return 0.0
+
+    optimize(config, initial_values, _record_thread)
+    assert seen
+    assert set(seen) == {threading.current_thread().name}
+
+
+def test_batch_ids_are_unique_across_runs_sharing_a_pool(config: Any) -> None:
     first: list[int] = []
     second: list[int] = []
     lock = threading.Lock()
-    with threads(workers=2):
-        optimize(config, initial_values, _collect_batch_ids(first, lock))
-        optimize(config, initial_values, _collect_batch_ids(second, lock))
+    with session() as active:
+        pool = active.thread_pool(workers=2)
+        optimize(config, initial_values, _collect_batch_ids(first, lock), pool=pool)
+        optimize(config, initial_values, _collect_batch_ids(second, lock), pool=pool)
+    assert first
+    assert second
+    assert not set(first) & set(second)
+
+
+def test_concurrent_optimize_calls_sharing_a_pool_get_unique_batch_ids(
+    config: Any,
+) -> None:
+    first: list[int] = []
+    second: list[int] = []
+    lock = threading.Lock()
+    with session() as active:
+        pool = active.thread_pool(workers=4)
+
+        def _run(sink: list[int]) -> None:
+            optimize(config, initial_values, _collect_batch_ids(sink, lock), pool=pool)
+
+        driver_a = threading.Thread(target=_run, args=(first,))
+        driver_b = threading.Thread(target=_run, args=(second,))
+        driver_a.start()
+        driver_b.start()
+        driver_a.join()
+        driver_b.join()
     assert first
     assert second
     assert not set(first) & set(second)
@@ -628,30 +704,56 @@ def test_batch_ids_are_unique_across_runs_in_an_execution_block(config: Any) -> 
 def test_batch_ids_are_unique_across_concurrent_runs(config: Any) -> None:
     sinks: list[list[int]] = [[], [], []]
     lock = threading.Lock()
-    with threads(workers=2):
+    with session() as active:
         optimize_many(
             config,
             initial_values,
             [_collect_batch_ids(sink, lock) for sink in sinks],
+            pool=active.thread_pool(workers=2),
         )
     for sink in sinks:
         assert sink
     assert sum(len(set(sink)) for sink in sinks) == len(set().union(*sinks))
 
 
-def test_batch_ids_restart_for_each_execution_block(config: Any) -> None:
+def test_optimize_many_without_a_pool_gets_unique_batch_ids(config: Any) -> None:
+    # optimize_many builds one private serial pool for the whole call when
+    # given none, shared by every concurrent run, so their batch IDs still
+    # stay apart even though nothing here ever dispatches to a worker.
+    sinks: list[list[int]] = [[], [], []]
+    lock = threading.Lock()
+    optimize_many(
+        config,
+        initial_values,
+        [_collect_batch_ids(sink, lock) for sink in sinks],
+    )
+    for sink in sinks:
+        assert sink
+    assert sum(len(set(sink)) for sink in sinks) == len(set().union(*sinks))
+
+
+def test_batch_ids_restart_for_each_pool(config: Any) -> None:
     first: list[int] = []
     second: list[int] = []
     lock = threading.Lock()
-    with threads(workers=2):
-        optimize(config, initial_values, _collect_batch_ids(first, lock))
-    with threads(workers=2):
-        optimize(config, initial_values, _collect_batch_ids(second, lock))
+    with session() as active:
+        optimize(
+            config,
+            initial_values,
+            _collect_batch_ids(first, lock),
+            pool=active.thread_pool(workers=2),
+        )
+        optimize(
+            config,
+            initial_values,
+            _collect_batch_ids(second, lock),
+            pool=active.thread_pool(workers=2),
+        )
     assert min(first) == 0
     assert min(second) == 0
 
 
-def test_batch_ids_restart_for_each_run_without_an_execution_block(
+def test_batch_ids_restart_for_each_run_without_a_pool(
     config: Any,
 ) -> None:
     first: list[int] = []
@@ -692,12 +794,16 @@ def test_metadata_is_none_in_the_evaluation_function_when_not_given(
     assert all(item is None for item in seen)
 
 
-def test_metadata_reaches_the_evaluation_function_with_threads(config: Any) -> None:
+def test_metadata_reaches_the_evaluation_function_with_a_pool(config: Any) -> None:
     seen: list[Any] = []
     lock = threading.Lock()
-    with threads(workers=2):
+    with session() as active:
         optimize(
-            config, initial_values, _record_metadata(seen, lock), metadata={"run": 7}
+            config,
+            initial_values,
+            _record_metadata(seen, lock),
+            metadata={"run": 7},
+            pool=active.thread_pool(workers=2),
         )
     assert seen
     assert all(item == {"run": 7} for item in seen)
@@ -715,32 +821,37 @@ def test_metadata_per_run_reaches_each_evaluation_function(config: Any) -> None:
     first: list[Any] = []
     second: list[Any] = []
     lock = threading.Lock()
-    with threads(workers=2):
+    with session() as active:
         optimize_many(
             config,
             initial_values,
             [_record_metadata(first, lock), _record_metadata(second, lock)],
             metadata=[{"run": 0}, {"run": 1}],
+            pool=active.thread_pool(workers=2),
         )
     assert all(item == {"run": 0} for item in first)
     assert all(item == {"run": 1} for item in second)
 
 
-def test_evaluate_many_with_threads(config: Any, test_functions: Any) -> None:
+def test_evaluate_many_with_a_thread_pool(config: Any, test_functions: Any) -> None:
     matrix = np.array([initial_values, np.zeros(initial_values.size)])
-    with threads(workers=2):
-        results = evaluate_many(config, matrix, test_functions[0])
+    with session() as active:
+        results = evaluate_many(
+            config, matrix, test_functions[0], pool=active.thread_pool(workers=2)
+        )
     for result, expected in zip(results, [0.66, 0.75], strict=True):
         assert result.target_objective == pytest.approx(expected)
 
 
-def test_nested_execution_blocks_raise() -> None:
-    with (
-        threads(workers=1),
-        pytest.raises(WorkflowError, match="Only one execution block"),
-        threads(workers=1),
-    ):
-        pass
+def test_evaluate_with_a_thread_pool(config: Any, test_functions: Any) -> None:
+    with session() as active:
+        result = evaluate(
+            config,
+            initial_values,
+            test_functions[0],
+            pool=active.thread_pool(workers=2),
+        )
+    assert result.target_objective == pytest.approx(0.66)
 
 
 _INNER_CONFIG: dict[str, Any] = {
@@ -758,8 +869,13 @@ def _sphere(variables: NDArray[np.float64], _context: Any) -> float:
 
 
 def _run_inner_optimization(variables: NDArray[np.float64], _context: Any) -> float:
-    with threads(workers=1):
-        result = optimize(_INNER_CONFIG, variables, _sphere)
+    # A run's evaluation function is plain code: it may open a session and a
+    # pool of its own, nested inside whatever pool is running it. Nothing
+    # ambient needs to be threaded through for that to work.
+    with session() as active:
+        result = optimize(
+            _INNER_CONFIG, variables, _sphere, pool=active.thread_pool(workers=1)
+        )
     assert result.target_objective is not None
     return result.target_objective
 
@@ -772,19 +888,151 @@ def _return_one() -> float:
     return 1.0
 
 
-def test_isolated_nested_block_in_threads_evaluation(config: Any) -> None:
-    with threads(workers=2):
-        result = optimize(config, initial_values, _run_inner_optimization)
+def test_evaluation_function_can_open_its_own_thread_pool(config: Any) -> None:
+    with session() as active:
+        result = optimize(
+            config,
+            initial_values,
+            _run_inner_optimization,
+            pool=active.thread_pool(workers=2),
+        )
     assert result.variables is not None
     assert result.target_objective is not None
 
 
 @pytest.mark.slow
-def test_isolated_nested_block_in_processes_evaluation(config: Any) -> None:
-    with processes(workers=2):
-        result = optimize(config, initial_values, _run_inner_optimization)
+def test_evaluation_function_can_open_its_own_process_pool(config: Any) -> None:
+    with session() as active:
+        result = optimize(
+            config,
+            initial_values,
+            _run_inner_optimization,
+            pool=active.process_pool(workers=2),
+        )
     assert result.variables is not None
     assert result.target_objective is not None
+
+
+_BUNDLE_CONFIG: dict[str, Any] = {
+    "variables": {"variable_count": 2},
+    "realizations": {"weights": [1.0] * 4},
+}
+_BUNDLE_THREADS: set[int] = set()
+
+
+def _record_thread(
+    variables: NDArray[np.float64], _context: EvaluationFunctionContext
+) -> float:
+    _BUNDLE_THREADS.add(threading.get_ident())
+    return float(np.sum(variables**2))
+
+
+def test_negative_bundle_size_refused() -> None:
+    # A serial pool builds no evaluator, so nothing downstream would catch it.
+    with pytest.raises(ValueError, match="bundle_size must be >= 0"):
+        WorkerPool(bundle_size=-1)
+
+
+@pytest.mark.timeout(30)
+def test_bundle_size_sends_the_whole_batch_as_one_task() -> None:
+    # The evaluations in one task run after each other, so a whole-batch bundle
+    # is observable as a single worker doing all four realizations.
+    with session() as active:
+        pool = active.thread_pool(workers=4, bundle_size=0)
+        assert pool.bundle_size == 0
+        _BUNDLE_THREADS.clear()
+        evaluate(_BUNDLE_CONFIG, np.zeros(2), _record_thread, pool=pool)
+    assert len(_BUNDLE_THREADS) == 1
+
+
+_NESTED_INNER: dict[str, Any] = {
+    "variables": {"variable_count": 2, "perturbation_magnitudes": 1e-6},
+    "optimizer": {"max_functions": 2},
+}
+_NESTED_OUTER: dict[str, Any] = {"variables": {"variable_count": 2}}
+# Two points, one batch: exactly two outer evaluations, so the barrier party is
+# known rather than dependent on how the optimizer schedules its batches.
+_NESTED_POINTS = np.array([[0.5, 0.5], [1.5, 1.5]])
+
+
+def _pid_sphere(
+    variables: NDArray[np.float64], _context: EvaluationFunctionContext
+) -> EvaluationFunctionResult:
+    return EvaluationFunctionResult(
+        objectives=float(np.sum(variables**2)), metadata={"pid": os.getpid()}
+    )
+
+
+def _nested_run(
+    variables: NDArray[np.float64],
+    context: EvaluationFunctionContext,
+    *,
+    pool: WorkerPool,
+    group: SharedHandlers,
+    barrier: threading.Barrier,
+) -> float:
+    # Neither outer evaluation can pass until both have arrived, so if they were
+    # run one after the other this breaks the barrier instead of quietly passing.
+    barrier.wait()
+    result = optimize(
+        _NESTED_INNER,
+        variables,
+        _pid_sphere,
+        pool=pool,
+        handlers=[group],
+        metadata={"outer": context.eval_idx},
+    )
+    assert result.target_objective is not None
+    return result.target_objective
+
+
+@pytest.mark.parametrize(
+    "processes",
+    [
+        pytest.param(False, id="threads"),
+        pytest.param(True, id="processes", marks=pytest.mark.slow),
+    ],
+)
+@pytest.mark.timeout(120)
+def test_concurrent_inner_runs_on_a_second_pool_feed_one_group(
+    processes: Any,
+) -> None:
+    history = HistoryHandler()
+    barrier = threading.Barrier(len(_NESTED_POINTS), timeout=30)
+    with session() as active:
+        inner = (
+            active.process_pool(workers=2)
+            if processes
+            else active.thread_pool(workers=2)
+        )
+        outer = active.thread_pool(workers=len(_NESTED_POINTS))
+        group = active.shared_handlers(history)
+        evaluate_many(
+            _NESTED_OUTER,
+            _NESTED_POINTS,
+            partial(_nested_run, pool=inner, group=group, barrier=barrier),
+            pool=outer,
+        )
+
+    batches: dict[int, set[int]] = {}
+    pids: set[int] = set()
+    for item in history["results"]:
+        batches.setdefault(item.metadata["outer"], set()).add(item.batch_id)
+        recorded = item.evaluations.metadata.get("pid")
+        if recorded is not None:
+            pids.update(int(pid) for pid in np.ravel(recorded))
+    # Both inner runs reached the one group, each tagged with the outer
+    # evaluation that started it.
+    assert set(batches) == {0, 1}
+    # They drew from the pool's single counter, so their batches never collided.
+    assert not batches[0] & batches[1]
+    assert pids
+    if processes:
+        # A process pool evaluates in workers of its own.
+        assert os.getpid() not in pids
+    else:
+        # A thread pool evaluates here, so nesting needs no picklable function.
+        assert pids == {os.getpid()}
 
 
 _BILEVEL_CONFIG: dict[str, Any] = {
@@ -803,57 +1051,39 @@ def _inner_objective(
 
 def _bilevel_outer(variables: NDArray[np.float64], _context: Any) -> float:
     a = float(variables[0])
-    with threads(workers=1):
+    with session() as active:
         inner = optimize(
-            _BILEVEL_CONFIG, [0.0], partial(_inner_objective, outer_value=a)
+            _BILEVEL_CONFIG,
+            [0.0],
+            partial(_inner_objective, outer_value=a),
+            pool=active.thread_pool(workers=1),
         )
     assert inner.target_objective is not None
     return inner.target_objective
 
 
-def test_isolated_nested_optimization_on_threads() -> None:
-    with threads(workers=1):
-        result = optimize(_BILEVEL_CONFIG, [0.0], _bilevel_outer)
+def test_nested_optimization_on_a_thread_pool() -> None:
+    with session() as active:
+        result = optimize(
+            _BILEVEL_CONFIG, [0.0], _bilevel_outer, pool=active.thread_pool(workers=1)
+        )
     assert result.variables is not None
     assert result.variables[0] == pytest.approx(2.0, abs=0.05)
     assert result.target_objective == pytest.approx(0.0, abs=1e-2)
 
 
-def test_offload_in_evaluation_finds_no_executor(config: Any) -> None:
-    with (
-        threads(workers=2),
-        pytest.raises(WorkflowError, match="found no executor"),
-    ):
-        optimize(config, initial_values, _offload_from_evaluation)
-
-
-def test_gather_shared_activates_the_session_on_driver_threads() -> None:
-    def _square(value: int) -> int:
-        return value * value
-
-    with threads(workers=2):
-        functions = [partial(_square, i) for i in (1, 2, 3)]
-        [result] = compose.gather_shared([lambda: offload(functions)], limit=1)
-    assert result == (1, 4, 9)
-
-
-def test_gather_shared_requires_execution_block() -> None:
-    with pytest.raises(WorkflowError, match="requires an execution block"):
-        compose.gather_shared([lambda: 1])
-
-
-def test_gather_shared_does_not_propagate_handler_scope() -> None:
-    seen: list[bool] = []
-
-    def _look() -> bool:
-        seen.append(compose.current_handlers() is not None)
-        return True
-
-    with threads(workers=1), handlers(report=lambda _: None):
-        assert compose.current_handlers() is not None
-        assert current_executor() is not None
-        compose.gather_shared([_look], limit=1)
-    assert seen == [False]
+def test_offload_in_evaluation_without_a_pool_runs_inline(config: Any) -> None:
+    # A pool is only ever what is passed to a call, never what is discovered:
+    # `offload` inside the evaluation function is given none, so it runs
+    # inline even though the run itself is evaluating on a thread pool.
+    with session() as active:
+        result = optimize(
+            config,
+            initial_values,
+            _offload_from_evaluation,
+            pool=active.thread_pool(workers=2),
+        )
+    assert result.target_objective is not None
 
 
 class _FatalWork(BaseException):
@@ -865,10 +1095,10 @@ def _fatal_work() -> int:
     raise _FatalWork(msg)
 
 
-def test_fatal_worker_error_reported_on_block_exit() -> None:
+def test_fatal_worker_error_reported_when_the_session_closes() -> None:
     def _run_block() -> None:
-        with threads(workers=1), pytest.raises(ExecutorStopped):
-            offload(_fatal_work)
+        with session() as active, pytest.raises(ExecutorStopped):
+            offload(_fatal_work, pool=active.thread_pool(workers=1))
 
     with pytest.raises(BaseExceptionGroup) as excinfo:
         _run_block()
@@ -880,113 +1110,126 @@ def _double(value: float) -> float:
     return 2.0 * value
 
 
-def _offload_in_own_block(variables: NDArray[np.float64], _context: Any) -> float:
-    with threads(workers=2):
-        doubled = offload([partial(_double, 3.0), partial(_double, 4.0)])
+def _offload_in_own_pool(variables: NDArray[np.float64], _context: Any) -> float:
+    with session() as active:
+        doubled = offload(
+            [partial(_double, 3.0), partial(_double, 4.0)],
+            pool=active.thread_pool(workers=2),
+        )
     assert doubled == (6.0, 8.0)
     return float(variables @ variables)
 
 
-def _assert_cannot_offload(variables: NDArray[np.float64], _context: Any) -> float:
-    assert can_offload() is False
-    return float(variables @ variables)
-
-
 def _own_handlers_in_evaluation(variables: NDArray[np.float64], _context: Any) -> float:
+    # A run's evaluation function is plain code: it may open a session and a
+    # shared handlers group of its own, nested inside whatever pool is running it.
     history = HistoryHandler()
-    with handlers(history):
-        optimize(_INNER_CONFIG, variables, _sphere)
+    with session() as active:
+        group = active.shared_handlers(history)
+        optimize(_INNER_CONFIG, variables, _sphere, handlers=[group])
     assert len(history.results) > 0
     return float(variables @ variables)
 
 
-def test_offload_in_evaluation_uses_its_own_block(config: Any) -> None:
-    with threads(workers=2):
-        result = optimize(config, initial_values, _offload_in_own_block)
+def test_offload_in_evaluation_uses_its_own_pool(config: Any) -> None:
+    with session() as active:
+        result = optimize(
+            config,
+            initial_values,
+            _offload_in_own_pool,
+            pool=active.thread_pool(workers=2),
+        )
     assert result.target_objective is not None
 
 
-def test_can_offload_is_false_in_an_evaluation(config: Any) -> None:
-    with threads(workers=2):
-        result = optimize(config, initial_values, _assert_cannot_offload)
-    assert result.target_objective is not None
-
-
-def test_handlers_block_in_an_evaluation(config: Any) -> None:
-    with threads(workers=2):
-        result = optimize(config, initial_values, _own_handlers_in_evaluation)
+def test_group_in_an_evaluation(config: Any) -> None:
+    with session() as active:
+        result = optimize(
+            config,
+            initial_values,
+            _own_handlers_in_evaluation,
+            pool=active.thread_pool(workers=2),
+        )
     assert result.target_objective is not None
 
 
 @pytest.mark.slow
-def test_sequential_execution_managers_are_allowed(
-    config: Any, test_functions: Any
-) -> None:
-    with threads(workers=2):
-        first = optimize(config, initial_values, test_functions[0])
-    with processes(workers=2):
-        second = optimize(config, initial_values, test_functions[0])
+def test_sequential_pools_are_allowed(config: Any, test_functions: Any) -> None:
+    with session() as active:
+        first = optimize(
+            config,
+            initial_values,
+            test_functions[0],
+            pool=active.thread_pool(workers=2),
+        )
+    with session() as active:
+        second = optimize(
+            config,
+            initial_values,
+            test_functions[0],
+            pool=active.process_pool(workers=2),
+        )
     assert first.exit_code == second.exit_code
     assert first.variables == pytest.approx(second.variables)
 
 
 def test_session_without_task_group_reports_stopped() -> None:
-    session = _Session()
+    sess = _Session()
     with pytest.raises(WorkflowError, match="is not running"):
-        session.open_dispatcher(EventDispatcher())
+        sess.open_dispatcher(EventDispatcher())
     with pytest.raises(WorkflowError, match="is not running"):
-        session.open_executor(lambda: ThreadingExecutor(workers=1))
+        sess.open_pool(lambda: ThreadingExecutor(workers=1))
 
 
-def test_session_clears_after_block(config: Any, test_functions: Any) -> None:
-    with threads(workers=1):
-        pass
-    result = optimize(config, initial_values, test_functions[0])
-    assert result.variables is not None
-    assert np.allclose(result.variables, 0.5, atol=0.02)
-
-
-def test_threads_objective_exception_propagates(config: Any) -> None:
+def test_thread_pool_objective_exception_propagates(config: Any) -> None:
     def boom(_v: Any, _c: Any) -> float:
         msg = "boom"
         raise ValueError(msg)
 
-    with pytest.raises(ValueError, match="boom"), threads(workers=2):
-        optimize(config, initial_values, boom)
+    with pytest.raises(ValueError, match="boom"), session() as active:
+        optimize(config, initial_values, boom, pool=active.thread_pool(workers=2))
 
 
-def test_threads_session_survives_objective_exception(
+def test_thread_pool_survives_objective_exception(
     config: Any, test_functions: Any
 ) -> None:
     def boom(_v: Any, _c: Any) -> float:
         msg = "boom"
         raise ValueError(msg)
 
-    with threads(workers=2):
+    with session() as active:
+        pool = active.thread_pool(workers=2)
         with pytest.raises(ValueError, match="boom"):
-            optimize(config, initial_values, boom)
-        # The session survives; the pool is re-established on the next run.
-        result = optimize(config, initial_values, test_functions[0])
+            optimize(config, initial_values, boom, pool=pool)
+        # The pool survives a failed run and can still be used by the next one.
+        result = optimize(config, initial_values, test_functions[0], pool=pool)
         assert result.variables is not None
         assert np.allclose(result.variables, 0.5, atol=0.02)
 
 
 @pytest.mark.slow
-def test_optimize_with_processes(config: Any, test_functions: Any) -> None:
-    with processes(workers=2):
-        result = optimize(config, initial_values, test_functions[0])
+def test_optimize_with_process_pool(config: Any, test_functions: Any) -> None:
+    with session() as active:
+        result = optimize(
+            config,
+            initial_values,
+            test_functions[0],
+            pool=active.process_pool(workers=2),
+        )
     assert result.variables is not None
     assert np.allclose(result.variables, 0.5, atol=0.02)
 
 
 @pytest.mark.slow
-def test_processes_without_cloudpickle(config: Any, monkeypatch: Any) -> None:
+def test_process_pool_without_cloudpickle(config: Any, monkeypatch: Any) -> None:
     monkeypatch.setattr(
         "ropt.components.executors._multiprocessing_executor._HAVE_CLOUDPICKLE",
         False,
     )
-    with processes(workers=2):
-        result = optimize(config, initial_values, _sphere)
+    with session() as active:
+        result = optimize(
+            config, initial_values, _sphere, pool=active.process_pool(workers=2)
+        )
     assert result.variables is not None
     assert np.allclose(result.variables, 0.0, atol=0.02)
 
@@ -997,8 +1240,10 @@ def test_evaluate_without_cloudpickle(config: Any, monkeypatch: Any) -> None:
         "ropt.components.executors._multiprocessing_executor._HAVE_CLOUDPICKLE",
         False,
     )
-    with processes(workers=2):
-        result = evaluate(config, initial_values, _sphere)
+    with session() as active:
+        result = evaluate(
+            config, initial_values, _sphere, pool=active.process_pool(workers=2)
+        )
     assert result.target_objective == pytest.approx(0.01)
 
 
@@ -1006,8 +1251,10 @@ def test_optimize_many_broadcasts_config_and_objective(
     config: Any, test_functions: Any
 ) -> None:
     starts = np.array([initial_values, np.zeros(initial_values.size)])
-    with threads(workers=2):
-        results = optimize_many(config, starts, test_functions[0])
+    with session() as active:
+        results = optimize_many(
+            config, starts, test_functions[0], pool=active.thread_pool(workers=2)
+        )
     assert len(results) == 2
     assert all(isinstance(result, OptimizeResult) for result in results)
     for result in results:
@@ -1016,9 +1263,12 @@ def test_optimize_many_broadcasts_config_and_objective(
 
 
 def test_optimize_many_per_run_objectives(config: Any, test_functions: Any) -> None:
-    with threads(workers=2):
+    with session() as active:
         results = optimize_many(
-            config, initial_values, [test_functions[0], test_functions[1]]
+            config,
+            initial_values,
+            [test_functions[0], test_functions[1]],
+            pool=active.thread_pool(workers=2),
         )
     assert len(results) == 2
     assert results[0].variables is not None
@@ -1032,8 +1282,14 @@ def test_optimize_many_report_callback_shared_across_runs(
 ) -> None:
     reported: list[EvaluateResult] = []
     starts = np.array([initial_values, np.zeros(initial_values.size)])
-    with threads(workers=2):
-        optimize_many(config, starts, test_functions[0], report=reported.append)
+    with session() as active:
+        optimize_many(
+            config,
+            starts,
+            test_functions[0],
+            report=reported.append,
+            pool=active.thread_pool(workers=2),
+        )
     assert reported
     assert all(isinstance(item, EvaluateResult) for item in reported)
 
@@ -1044,9 +1300,13 @@ def test_optimize_many_accepts_a_report_per_run(
     first: list[EvaluateResult] = []
     second: list[EvaluateResult] = []
     starts = np.array([initial_values, np.zeros(initial_values.size)])
-    with threads(workers=2):
+    with session() as active:
         optimize_many(
-            config, starts, test_functions[0], report=[first.append, second.append]
+            config,
+            starts,
+            test_functions[0],
+            report=[first.append, second.append],
+            pool=active.thread_pool(workers=2),
         )
     assert first
     assert second
@@ -1057,7 +1317,7 @@ def test_optimize_many_rejects_mismatched_report_sequence(
     config: Any, test_functions: Any
 ) -> None:
     starts = np.array([initial_values, np.zeros(initial_values.size)])
-    with threads(workers=2), pytest.raises(ValueError, match="number of runs"):
+    with pytest.raises(ValueError, match="number of runs"):
         optimize_many(config, starts, test_functions[0], report=[lambda _r: None])
 
 
@@ -1065,9 +1325,13 @@ def test_optimize_many_broadcasts_a_single_metadata_dict(
     config: Any, test_functions: Any
 ) -> None:
     starts = np.array([initial_values, np.zeros(initial_values.size)])
-    with threads(workers=2):
+    with session() as active:
         results = optimize_many(
-            config, starts, test_functions[0], metadata={"group": "g"}
+            config,
+            starts,
+            test_functions[0],
+            metadata={"group": "g"},
+            pool=active.thread_pool(workers=2),
         )
     for result in results:
         assert result.results is not None
@@ -1078,12 +1342,13 @@ def test_optimize_many_accepts_metadata_per_run(
     config: Any, test_functions: Any
 ) -> None:
     starts = np.array([initial_values, np.zeros(initial_values.size)])
-    with threads(workers=2):
+    with session() as active:
         results = optimize_many(
             config,
             starts,
             test_functions[0],
             metadata=[{"run_id": 0}, {"run_id": 1}],
+            pool=active.thread_pool(workers=2),
         )
     assert len(results) == 2
     for idx, result in enumerate(results):
@@ -1095,14 +1360,20 @@ def test_optimize_many_rejects_mismatched_metadata_sequence(
     config: Any, test_functions: Any
 ) -> None:
     starts = np.array([initial_values, np.zeros(initial_values.size)])
-    with threads(workers=2), pytest.raises(ValueError, match="number of runs"):
+    with pytest.raises(ValueError, match="number of runs"):
         optimize_many(config, starts, test_functions[0], metadata=[{"run_id": 0}])
 
 
 def test_optimize_many_respects_limit(config: Any, test_functions: Any) -> None:
     starts = np.tile(initial_values, (4, 1))
-    with threads(workers=2):
-        results = optimize_many(config, starts, test_functions[0], limit=2)
+    with session() as active:
+        results = optimize_many(
+            config,
+            starts,
+            test_functions[0],
+            limit=2,
+            pool=active.thread_pool(workers=2),
+        )
     assert len(results) == 4
 
 
@@ -1110,7 +1381,7 @@ def test_optimize_many_mismatched_lengths_raises(
     config: Any, test_functions: Any
 ) -> None:
     starts = np.array([initial_values, np.zeros(initial_values.size)])
-    with threads(workers=2), pytest.raises(ValueError, match="same length"):
+    with pytest.raises(ValueError, match="same length"):
         optimize_many(
             config, starts, [test_functions[0], test_functions[1], test_functions[0]]
         )
@@ -1120,18 +1391,25 @@ def test_optimize_many_rejects_more_than_two_dimensional_starts(
     config: Any, test_functions: Any
 ) -> None:
     starts = np.tile(initial_values, (2, 2, 1))
-    with threads(workers=2), pytest.raises(ValueError, match="vector or a 2-D matrix"):
+    with pytest.raises(ValueError, match="vector or a 2-D matrix"):
         optimize_many(config, starts, test_functions[0])
 
 
 def test_optimize_many_without_runs_returns_nothing(test_functions: Any) -> None:
-    with threads(workers=2):
-        assert optimize_many([], initial_values, test_functions[0]) == ()
+    assert optimize_many([], initial_values, test_functions[0]) == ()
 
 
-def test_optimize_many_requires_session(config: Any, test_functions: Any) -> None:
-    with pytest.raises(WorkflowError, match="requires an execution block"):
-        optimize_many(config, initial_values, test_functions[0])
+def test_optimize_many_without_a_pool_or_session(
+    config: Any, test_functions: Any
+) -> None:
+    # optimize_many no longer requires a session at all: without a pool it
+    # builds its own private serial pool and evaluates on the driver threads.
+    starts = np.array([initial_values, np.zeros(initial_values.size)])
+    results = optimize_many(config, starts, test_functions[0])
+    assert len(results) == 2
+    for result in results:
+        assert result.variables is not None
+        assert np.allclose(result.variables, 0.5, atol=0.02)
 
 
 def test_optimize_many_fail_fast(config: Any, test_functions: Any) -> None:
@@ -1140,8 +1418,13 @@ def test_optimize_many_fail_fast(config: Any, test_functions: Any) -> None:
         raise ValueError(msg)
 
     starts = np.tile(initial_values, (3, 1))
-    with threads(workers=2), pytest.raises(ValueError, match="boom"):
-        optimize_many(config, starts, [test_functions[0], boom, test_functions[0]])
+    with session() as active, pytest.raises(ValueError, match="boom"):
+        optimize_many(
+            config,
+            starts,
+            [test_functions[0], boom, test_functions[0]],
+            pool=active.thread_pool(workers=2),
+        )
 
 
 @pytest.mark.timeout(60)
@@ -1169,16 +1452,17 @@ def test_optimize_many_skips_runs_that_have_not_started(config: Any) -> None:
     # block, while the session is still alive: leaving it first would stop the
     # pending runs by killing the session, which is not the mechanism here.
     starts = np.tile(initial_values, (5, 1))
-    with threads(workers=2):
+    with session() as active:
+        pool = active.thread_pool(workers=2)
         with pytest.raises(ValueError, match="boom"):
-            optimize_many(config, starts, boom, limit=1)
+            optimize_many(config, starts, boom, limit=1, pool=pool)
         assert not ran_again.wait(timeout=0.2)
         with lock:
             assert calls == 1
 
 
 @pytest.mark.timeout(60)
-def test_optimize_many_leaves_the_block_usable_after_a_failure(
+def test_optimize_many_leaves_the_pool_usable_after_a_failure(
     config: Any, test_functions: Any
 ) -> None:
     # Every run reaches its first evaluation before any of them returns, so the
@@ -1206,7 +1490,8 @@ def test_optimize_many_leaves_the_block_usable_after_a_failure(
         return objective
 
     starts = np.tile(initial_values, (4, 1))
-    with threads(workers=4):
+    with session() as active:
+        pool = active.thread_pool(workers=4)
         with pytest.raises(ValueError, match="boom"):
             optimize_many(
                 config,
@@ -1217,27 +1502,26 @@ def test_optimize_many_leaves_the_block_usable_after_a_failure(
                     boom,
                     first_evaluation_waits(),
                 ],
+                pool=pool,
             )
         # Siblings are abandoned, not cancelled, so they may still be running
-        # here; the block must stay usable and must not deadlock against them.
-        # The executor has to still be there: without this check a run that
-        # quietly fell back to evaluating in-process would satisfy the exit
-        # code just as well.
-        assert compose.current_executor() is not None
-        result = optimize(config, initial_values, test_functions[0])
+        # here; the pool must stay usable and must not deadlock against them.
+        assert pool.executor is not None
+        assert pool.executor.is_running()
+        result = optimize(config, initial_values, test_functions[0], pool=pool)
     assert result.exit_code == ExitCode.OPTIMIZER_FINISHED
 
 
 @pytest.mark.timeout(60)
 def test_run_abandoned_by_fail_fast_returns(config: Any, test_functions: Any) -> None:
-    # `gather_shared` is the primitive `optimize_many` runs its drivers on. A
+    # `run_concurrent` is the primitive `optimize_many` runs its drivers on. A
     # run already in flight when a sibling fails cannot be cancelled, so it
-    # keeps going until its next evaluation finds the executor gone. It must
+    # keeps going until its next evaluation finds the pool closed. It must
     # then end by *returning* a result — that is why a fail-fast failure never
     # sprays exceptions out of its driver threads.
     #
     # Which exit code it returns is a race and must not be asserted: usually
-    # the session reports the stop first (EXECUTOR_STOPPED), but the optimizer
+    # the pool reports the stop first (EXECUTOR_STOPPED), but the optimizer
     # sometimes ends its own loop first and reports OPTIMIZER_FINISHED. Over
     # 111 abandoned runs both codes appeared and none ever raised.
     outcomes: list[Any] = []
@@ -1245,10 +1529,10 @@ def test_run_abandoned_by_fail_fast_returns(config: Any, test_functions: Any) ->
     started = threading.Barrier(4)
     finished = threading.Semaphore(0)
 
-    def record() -> None:
+    def record(pool: WorkerPool) -> None:
         started.wait(timeout=30)
         try:
-            result = optimize(config, initial_values, test_functions[0])
+            result = optimize(config, initial_values, test_functions[0], pool=pool)
         except BaseException as exc:  # ruff: ignore[blind-except]
             with lock:
                 outcomes.append(exc)
@@ -1265,8 +1549,19 @@ def test_run_abandoned_by_fail_fast_returns(config: Any, test_functions: Any) ->
         msg = "boom"
         raise ValueError(msg)
 
-    with threads(workers=4), pytest.raises(ValueError, match="boom"):
-        compose.gather_shared([record, record, boom, record], None)
+    # The block exit (a normal one: pytest.raises absorbs the failure before
+    # the session sees it) stops the pool -- which is what lets the abandoned
+    # runs below return instead of hanging forever.
+    with session() as active:
+        pool = active.thread_pool(workers=4)
+        jobs: list[Callable[[], None]] = [
+            partial(record, pool),
+            partial(record, pool),
+            boom,
+            partial(record, pool),
+        ]
+        with pytest.raises(ValueError, match="boom"):
+            run_concurrent(jobs)
 
     # Each abandoned run releases the semaphore as it ends, so this returns as
     # soon as the last one does; the timeout is only a ceiling on a hang.
@@ -1280,18 +1575,20 @@ def test_run_abandoned_by_fail_fast_returns(config: Any, test_functions: Any) ->
 
 def test_shared_handler_aggregates_single_run(config: Any, test_functions: Any) -> None:
     history = HistoryHandler()
-    with handlers(history):
-        optimize(config, initial_values, test_functions[0])
+    with session() as active:
+        group = active.shared_handlers(history)
+        optimize(config, initial_values, test_functions[0], handlers=[group])
     assert history["results"]
 
 
-def test_shared_handler_without_execution_manager_aggregates_runs(
+def test_shared_handler_without_a_pool_aggregates_runs(
     config: Any, test_functions: Any
 ) -> None:
     history = HistoryHandler()
-    with handlers(history):
-        optimize(config, initial_values, test_functions[0])
-        optimize(config, initial_values, test_functions[0])
+    with session() as active:
+        group = active.shared_handlers(history)
+        optimize(config, initial_values, test_functions[0], handlers=[group])
+        optimize(config, initial_values, test_functions[0], handlers=[group])
     assert history["results"]
 
 
@@ -1299,94 +1596,34 @@ def test_shared_handler_aggregates_across_optimize_many(
     config: Any, test_functions: Any
 ) -> None:
     single = HistoryHandler()
-    with handlers(single):
-        optimize(config, initial_values, test_functions[0])
+    with session() as active:
+        group = active.shared_handlers(single)
+        optimize(config, initial_values, test_functions[0], handlers=[group])
 
     shared = HistoryHandler()
     starts = np.tile(initial_values, (3, 1))
-    with threads(workers=2), handlers(shared):
-        optimize_many(config, starts, test_functions[0])
+    with session() as active:
+        group = active.shared_handlers(shared)
+        optimize_many(
+            config,
+            starts,
+            test_functions[0],
+            pool=active.thread_pool(workers=2),
+            handlers=[group],
+        )
 
     assert len(shared["results"]) > len(single["results"])
 
 
-def test_nested_handlers_inherit_by_default(config: Any, test_functions: Any) -> None:
-    outer = HistoryHandler()
-    inner = HistoryHandler()
-    with handlers(outer), handlers(inner):
-        optimize(config, initial_values, test_functions[0])
-    assert inner["results"]
-    assert outer["results"]
-    assert len(outer["results"]) == len(inner["results"])
-
-
-def test_nested_handlers_inherit_false_isolates(
-    config: Any, test_functions: Any
-) -> None:
-    outer = HistoryHandler()
-    inner = HistoryHandler()
-    with handlers(outer), handlers(inner, inherit=False):
-        optimize(config, initial_values, test_functions[0])
-    assert inner["results"]
-    assert outer["results"] is None
-
-
-def test_nested_handlers_inherit_false_with_manual_relist(
-    config: Any, test_functions: Any
-) -> None:
-    outer = HistoryHandler()
-    other = HistoryHandler()
-    inner = HistoryHandler()
-    with handlers(outer, other), handlers(inner, outer, inherit=False):
-        optimize(config, initial_values, test_functions[0])
-    assert inner["results"]
-    assert outer["results"]
-    assert len(outer["results"]) == len(inner["results"])
-    assert other["results"] is None
-
-
-def test_inherit_steals_from_all_enclosing_across_inherit_false(
-    config: Any, test_functions: Any
-) -> None:
-    a = HistoryHandler()
-    b = HistoryHandler()
-    c = HistoryHandler()
-    with handlers(a), handlers(b, inherit=False), handlers(c):
-        optimize(config, initial_values, test_functions[0])
-    assert a["results"]
-    assert b["results"]
-    assert c["results"]
-
-
-def test_inherited_handler_returns_to_enclosing_block_after_nested_exit(
-    config: Any, test_functions: Any
-) -> None:
-    outer = HistoryHandler()
-    with handlers(outer):
-        with handlers(HistoryHandler()):
-            optimize(config, initial_values, test_functions[0])
-        inherited = len(outer["results"])
-        optimize(config, initial_values, test_functions[0])
-    assert len(outer["results"]) > inherited
-
-
-def test_compose_accessors_reflect_open_blocks() -> None:
-    assert compose.current_handlers() is None
-    assert compose.current_executor() is None
-
-    outer = HistoryHandler()
-    inner = HistoryHandler()
-    with threads(workers=1):
-        assert compose.current_executor() is not None
-        assert compose.current_handlers() is None
-        with handlers(outer):
-            outer_scope = compose.current_handlers()
-            assert outer_scope is not None
-            with handlers(inner):
-                assert compose.current_handlers() is not outer_scope
-            assert compose.current_handlers() is outer_scope
-    assert compose.current_handlers() is None
-    assert compose.current_executor() is None
+def test_optimize_many_rejects_bare_handler(config: Any, test_functions: Any) -> None:
+    handler = HistoryHandler()
+    with pytest.raises(WorkflowError, match="takes shared handlers only"):
+        optimize_many(
+            config,
+            initial_values,
+            test_functions[0],
+            handlers=[handler],  # type: ignore[list-item]
+        )
 
 
 if _TEST_HPC:
@@ -1426,6 +1663,11 @@ def test_hpc_evaluates_through_the_simple_api(
         "ropt.components.executors._hpc_executor.pysqa.QueueAdapter",
         lambda *args, **kwargs: _MockedHPCAdapter(tmp_path),  # ruff: ignore[unused-lambda-argument]
     )
-    with hpc(workers=2, workdir=tmp_path, template=""):
-        result = evaluate(config, initial_values, test_functions[0])
+    with session() as active:
+        result = evaluate(
+            config,
+            initial_values,
+            test_functions[0],
+            pool=active.hpc_pool(workers=2, workdir=tmp_path, template=""),
+        )
     assert result.target_objective is not None

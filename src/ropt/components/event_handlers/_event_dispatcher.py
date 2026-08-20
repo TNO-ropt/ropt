@@ -9,7 +9,7 @@ from concurrent.futures import ThreadPoolExecutor
 from functools import partial
 from typing import TYPE_CHECKING, Final
 
-from ropt.components._loop import schedule
+from ropt.components._loop import on_loop_thread, schedule
 from ropt.components._transferred import _make_placeholder
 from ropt.exceptions import WorkflowError
 
@@ -45,9 +45,11 @@ class EventDispatcher:
         self._loop: asyncio.AbstractEventLoop | None = None
         self._running = threading.Event()
         self._thread_pool: ThreadPoolExecutor | None = None
-        # Marks the threads that are currently running a handler, so a nested
-        # dispatch can be told apart from an ordinary one.
-        self._local = threading.local()
+        # Ids of the pool threads, which run handlers and nothing else. A thread
+        # only ever asks about itself, and registered its own id before it could
+        # run anything, so it always sees at least that id without locking.
+        self._handler_ids: frozenset[int] = frozenset()
+        self._handler_ids_lock = threading.Lock()
 
     def __reduce__(self) -> tuple[object, tuple[str]]:
         return (_make_placeholder, ("An event dispatcher",))
@@ -112,15 +114,20 @@ class EventDispatcher:
             event: The event to submit.
 
         Raises:
-            WorkflowError: If the dispatcher is not running, or if a handler of
-                           this dispatcher is dispatching.
+            WorkflowError: If the dispatcher is not running, or if the call is
+                           made from the thread running its event loop, or from
+                           one of its handler threads.
             Exception:    Whatever a handler raised while processing the event.
         """  # ruff: ignore[docstring-extraneous-exception]
         if not self._running.is_set():
             msg = "The event dispatcher is not running."
             raise WorkflowError(msg)
-        if getattr(self._local, "in_handler", False):
-            msg = "A handler cannot dispatch on its own dispatcher."
+        if self._would_deadlock():
+            msg = (
+                "This dispatcher cannot be used from the thread running its "
+                "loop, or from one of its handler threads: the call would wait "
+                "for the loop that has to serve it."
+            )
             raise WorkflowError(msg)
         assert self._loop is not None
         dispatch = self._dispatch(event)
@@ -165,24 +172,33 @@ class EventDispatcher:
         if self._queue is not None:
             schedule(self._loop, self._queue.put_nowait, None)
 
+    def _would_deadlock(self) -> bool:
+        # The two places a handler runs, but stated as what it enforces: any
+        # caller on the loop thread waits for the loop that must serve the
+        # dispatch, whether it is a handler of this dispatcher or not.
+        return on_loop_thread(self._loop) or threading.get_ident() in self._handler_ids
+
     def _handler_pool(self) -> ThreadPoolExecutor:
         if self._thread_pool is None:
             self._thread_pool = ThreadPoolExecutor(
-                max_workers=_MAX_HANDLER_THREADS, thread_name_prefix="ropt-handler"
+                max_workers=_MAX_HANDLER_THREADS,
+                thread_name_prefix="ropt-handler",
+                initializer=self._register_handler_thread,
             )
         return self._thread_pool
+
+    def _register_handler_thread(self) -> None:
+        with self._handler_ids_lock:
+            self._handler_ids |= {threading.get_ident()}
 
     def _shutdown_pool(self) -> None:
         if self._thread_pool is not None:
             self._thread_pool.shutdown(wait=False)
             self._thread_pool = None
-
-    def _invoke(self, handler: EventHandler, event: EnOptEvent) -> None:
-        self._local.in_handler = True
-        try:
-            handler.handle_event(event)
-        finally:
-            self._local.in_handler = False
+        # The ids belong to that pool's threads: a restarted dispatcher builds a
+        # new pool, and the system may reuse the ids of the old one.
+        with self._handler_ids_lock:
+            self._handler_ids = frozenset()
 
     async def _run_handler(
         self, handler: EventHandler, event: EnOptEvent, *, run_in_thread: bool
@@ -191,10 +207,10 @@ class EventDispatcher:
             if run_in_thread:
                 loop = asyncio.get_running_loop()
                 await loop.run_in_executor(
-                    self._handler_pool(), partial(self._invoke, handler, event)
+                    self._handler_pool(), partial(handler.handle_event, event)
                 )
             else:
-                self._invoke(handler, event)
+                handler.handle_event(event)
         except Exception as exc:
             _logger.exception(
                 "Event handler %r failed while handling %s",

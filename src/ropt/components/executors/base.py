@@ -10,6 +10,7 @@ from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any
 
 from ropt.components._loop import on_loop_thread, schedule
+from ropt.components._transferred import _make_placeholder
 from ropt.exceptions import ExecutorStopped, WorkflowError
 
 if TYPE_CHECKING:
@@ -179,7 +180,7 @@ class Submission:
                 break
             if isinstance(item, BaseException):
                 raise item
-        msg = "The execution block was closed."
+        msg = "The worker pool was closed."
         raise ExecutorStopped(msg)
 
 
@@ -194,6 +195,12 @@ class Executor(ABC):
     - [`is_running`][ropt.components.executors.Executor.is_running]: Reports
       whether the executor accepts work.
     """
+
+    def __reduce__(self) -> tuple[object, tuple[str]]:  # ruff: ignore[undocumented-magic-method]
+        # An executor drives workers from the process that started it, so it
+        # cannot follow work into one. It arrives there as a placeholder, which
+        # the worker reports by name.
+        return (_make_placeholder, ("An executor",))
 
     @abstractmethod
     async def start(self, task_group: asyncio.TaskGroup) -> None:
@@ -226,6 +233,20 @@ class Executor(ABC):
         """
         return False
 
+    def on_worker_thread(self) -> bool:  # ruff: ignore[no-self-use]
+        """Report whether the caller is running as one of this executor's workers.
+
+        Such a caller occupies a worker for as long as it waits, so work it
+        submits here can only start once it stops waiting. Implementations whose
+        workers run in this process must override this; the default `False` is
+        for executors whose workers cannot submit back in the first place, and
+        leaves the refusal in `submit` inactive.
+
+        Returns:
+            `True` if the calling thread is running this executor's work.
+        """
+        return False
+
     @abstractmethod
     def is_running(self) -> bool:
         """Report whether the executor accepts work.
@@ -242,12 +263,17 @@ class Executor(ABC):
     def submit(self, submission: Submission) -> None:
         """Hand a submission to the executor.
 
-        May be called from any thread. A submission handed to an executor that
+        May be called from any thread, except one of the executor's own workers:
+        that caller waits for workers it is itself occupying, so it is refused
+        rather than left to deadlock. A submission handed to an executor that
         is no longer running is aborted rather than queued, so its caller is
         never left waiting for results that cannot arrive.
 
         Args:
             submission: The submission to run.
+
+        Raises:
+            WorkflowError: If called from one of this executor's workers.
         """
 
 
@@ -278,7 +304,18 @@ class ExecutorBase(Executor):
 
         Args:
             submission: The submission to run.
+
+        Raises:
+            WorkflowError: If called from one of this executor's workers.
         """
+        if self.on_worker_thread():
+            msg = (
+                "This worker pool cannot be used from work that is already "
+                "running on it: the caller would wait for the workers it is "
+                "itself occupying, which deadlocks once they are all busy. "
+                "Give the inner run its own pool, or a serial pool."
+            )
+            raise WorkflowError(msg)
         if not self._running.is_set() or not schedule(
             self._loop, self._accept, submission
         ):

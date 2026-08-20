@@ -1,9 +1,8 @@
-"""Aggregate results across runs with shared ``handlers()``.
+"""Aggregate results across runs with shared handlers.
 
-A ``handlers()`` block owns result handlers that aggregate across every run in
-the block, sequential or concurrent. Blocks nest, and by default a nested block
-*inherits* the enclosing blocks' handlers, so an outer handler also sees the
-inner runs; pass ``inherit=False`` to isolate a nested block.
+A group built with ``shared_handlers()`` owns result handlers that aggregate
+across every run given the group, sequential or concurrent. A run may feed
+several groups at once, and mix them with handlers of its own.
 """
 
 from typing import Any
@@ -11,7 +10,12 @@ from typing import Any
 import numpy as np
 from numpy.typing import NDArray
 
-from ropt.simple import EvaluationFunctionContext, HistoryHandler, handlers, optimize
+from ropt.simple import (
+    EvaluationFunctionContext,
+    HistoryHandler,
+    optimize,
+    session,
+)
 
 DIM = 5
 CONFIG: dict[str, Any] = {
@@ -43,23 +47,26 @@ def rosenbrock(
 
 
 def main() -> None:
-    """Aggregate across a loop of runs, then show nested inheritance."""
+    """Aggregate across a loop of runs, then feed two groups at once."""
     history = HistoryHandler()
-    with handlers(history):
+    with session() as active:
+        shared = active.shared_handlers(history)
         for start in STARTS:
-            optimize(CONFIG, start, rosenbrock)
+            optimize(CONFIG, start, rosenbrock, handlers=[shared])
     print(f"aggregated results across {len(STARTS)} runs: {len(history['results'])}")
     assert history["results"]
 
-    # A nested block inherits the enclosing block's handler by default, so both
-    # aggregate the nested run.
-    outer = HistoryHandler()
-    inner = HistoryHandler()
-    with handlers(outer), handlers(inner):
-        optimize(CONFIG, INITIAL_VALUES, rosenbrock)
-    assert outer["results"]
-    assert inner["results"]
-    assert len(outer["results"]) == len(inner["results"])
+    # A run feeds every group it is given, so several groups can collect the
+    # same run for different purposes.
+    per_project = HistoryHandler()
+    per_case = HistoryHandler()
+    with session() as active:
+        project = active.shared_handlers(per_project)
+        case = active.shared_handlers(per_case)
+        optimize(CONFIG, INITIAL_VALUES, rosenbrock, handlers=[project, case])
+    assert per_project["results"]
+    assert per_case["results"]
+    assert len(per_project["results"]) == len(per_case["results"])
 
 
 if __name__ == "__main__":

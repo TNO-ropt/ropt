@@ -12,9 +12,6 @@ from ropt.components.evaluators import (
     EvaluationFunctionResult,
 )
 
-from ._handlers import _handler_stack
-from ._session import _active_session
-
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
@@ -74,27 +71,7 @@ class _AdaptedFunction:
     def __call__(
         self, variables: NDArray[np.float64], context: EvaluationFunctionContext
     ) -> EvaluationFunctionResult:
-        return _coerce(
-            _invoke_detached(self._function, variables, context),
-            self._n_obj,
-            self._n_con,
-        )
-
-
-def _invoke_detached(
-    function: EvaluationFunction,
-    variables: NDArray[np.float64],
-    context: EvaluationFunctionContext,
-) -> FunctionValue:
-    # A user evaluation function must not reach the optimizer's executor or
-    # shared handlers; detach the session/handlers so any block is independent.
-    session_token = _active_session.set(None)
-    handler_token = _handler_stack.set(())
-    try:
-        return function(variables, context)
-    finally:
-        _handler_stack.reset(handler_token)
-        _active_session.reset(session_token)
+        return _coerce(self._function(variables, context), self._n_obj, self._n_con)
 
 
 def _coerce(result: FunctionValue, n_obj: int, n_con: int) -> EvaluationFunctionResult:

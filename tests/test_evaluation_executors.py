@@ -216,6 +216,38 @@ async def test_threading_executor_exceeds_the_shared_default_pool() -> None:
     assert set(collected) == set(range(workers))
 
 
+async def test_submitting_from_a_worker_thread_is_refused() -> None:
+    # Waiting here would occupy a worker while waiting for one, so the executor
+    # refuses rather than deadlock once every worker is busy. Two workers for one
+    # work item is deliberate: a regression is served by the spare worker and
+    # fails on the assertion below, instead of deadlocking on the ceiling.
+    executor = ThreadingExecutor(workers=2)
+
+    def _submit_back() -> tuple[bool, str]:
+        try:
+            executor.submit(Submission([WorkItem(function=_function, args=(0,))]))
+        except WorkflowError as exc:
+            return executor.on_worker_thread(), str(exc)
+        return executor.on_worker_thread(), "accepted"
+
+    submission = Submission([WorkItem(function=_submit_back)])
+    collected: list[Any] = []
+    finished, done = _finished_event()
+    consumer = threading.Thread(
+        target=_collect_in_thread, args=(submission, collected, done), daemon=True
+    )
+    async with asyncio.TaskGroup() as tg:
+        await executor.start(tg)
+        assert not executor.on_worker_thread()
+        consumer.start()
+        executor.submit(submission)
+        await finished.wait()
+        executor.cancel()
+    on_worker, message = collected[0]
+    assert on_worker
+    assert "already running on it" in message
+
+
 async def test_threading_executor_delivers_results_without_the_shared_default_pool() -> (
     None
 ):
@@ -1233,7 +1265,7 @@ async def test_cancelling_unstarted_executor() -> None:  # ruff: ignore[unused-a
 async def test_hpc_relative_workdir_rejected(tmp_path: Path) -> None:  # ruff: ignore[unused-async, unused-function-argument]
     # The workdir is shared with the cluster nodes, which do not necessarily
     # share this process's working directory.
-    with pytest.raises(ExecutionError, match="must be an absolute path"):
+    with pytest.raises(ValueError, match="must be an absolute path"):
         HPCExecutor(workdir="relative/path", template="")
 
 
@@ -1266,7 +1298,7 @@ async def test_broken_worker_pool_reported_at_startup(
 
 @pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
 async def test_hpc_missing_workdir_rejected(tmp_path: Path) -> None:  # ruff: ignore[unused-async]
-    with pytest.raises(ExecutionError, match="does not exist"):
+    with pytest.raises(ValueError, match="does not exist"):
         HPCExecutor(workdir=tmp_path / "nowhere", template="")
 
 
@@ -1297,7 +1329,7 @@ async def test_unconfigured_hpc_executor_rejected(  # ruff: ignore[unused-async]
 async def test_hpc_out_of_range_setting_rejected(  # ruff: ignore[unused-async]
     tmp_path: Path, kwargs: dict[str, Any], match: str
 ) -> None:
-    with pytest.raises(ExecutionError, match=match):
+    with pytest.raises(ValueError, match=match):
         HPCExecutor(workdir=tmp_path, template="", **kwargs)
 
 

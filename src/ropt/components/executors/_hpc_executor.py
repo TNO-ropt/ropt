@@ -91,30 +91,31 @@ class HPCExecutor(ExecutorBase):
         this requires exactly one cluster to provide the queue.
 
         Raises:
+            ValueError:     If `workdir` is not an existing absolute path, or if
+                            `workers`, `interval` or `retries` is out of range.
             ExecutionError: If neither a `template` is provided nor a valid
                           `config_path` can be found, if the requested cluster
                           is unknown, if the queue is not available on the
-                          requested cluster, if the queue cannot be resolved to
-                          exactly one cluster, or if `workers`, `interval` or
-                          `retries` is out of range.
+                          requested cluster, or if the queue cannot be resolved
+                          to exactly one cluster.
         """
         super().__init__()
         self._workdir = Path(workdir)
         if not self._workdir.is_absolute():
             msg = f"The HPC working directory must be an absolute path: {self._workdir}"
-            raise ExecutionError(msg)
+            raise ValueError(msg)
         if not self._workdir.exists():
             msg = f"The HPC working directory does not exist: {self._workdir}"
-            raise ExecutionError(msg)
+            raise ValueError(msg)
         if workers < 1:
             msg = f"The number of HPC workers must be at least one: {workers}"
-            raise ExecutionError(msg)
+            raise ValueError(msg)
         if interval < 0:
             msg = f"The HPC polling interval must not be negative: {interval}"
-            raise ExecutionError(msg)
+            raise ValueError(msg)
         if retries < 0:
             msg = f"The number of HPC retries must not be negative: {retries}"
-            raise ExecutionError(msg)
+            raise ValueError(msg)
         self._workers = workers
         self._interval = interval
         self._queue = queue

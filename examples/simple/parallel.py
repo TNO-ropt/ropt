@@ -1,9 +1,8 @@
-"""Run one optimization with parallel evaluation via ``threads`` or ``processes``.
+"""Run one optimization with parallel evaluation on a worker pool.
 
-Opening a ``threads``/``processes`` block fixes a worker pool for the whole
-block; the same `optimize` call then evaluates its realizations and gradient
-perturbations on that pool. Pass ``-m``/``--multiprocessing`` to use a process
-pool instead of threads (needs the ``cloudpickle`` extra).
+A session hands out pools; passing one to `optimize` makes that call evaluate
+its realizations and gradient perturbations on it. Pass ``-m``/``--multiprocessing``
+to use a process pool instead of a thread pool (needs the ``cloudpickle`` extra).
 """
 
 from __future__ import annotations
@@ -13,7 +12,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from ropt.simple import optimize, processes, threads
+from ropt.simple import optimize, session
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray
@@ -54,9 +53,13 @@ def main(*, multiprocessing: bool = False) -> None:
     Args:
         multiprocessing: Use a process pool instead of a thread pool.
     """
-    manager = processes if multiprocessing else threads
-    with manager(workers=4):
-        result = optimize(CONFIG, INITIAL_VALUES, rosenbrock)
+    with session() as active:
+        pool = (
+            active.process_pool(workers=4)
+            if multiprocessing
+            else active.thread_pool(workers=4)
+        )
+        result = optimize(CONFIG, INITIAL_VALUES, rosenbrock, pool=pool)
     print(f"optimal variables: {result.variables}")
     assert result.variables is not None
     assert np.allclose(result.variables, 1.0, atol=1e-2)

@@ -1,23 +1,30 @@
-"""Shared result handlers scoped by ``with ropt.handlers(...)`` blocks.
+"""Result handlers: local to one run, or shared by a group of runs.
 
-A ``handlers()`` block owns one `EventDispatcher` (started on the ambient
-session's task group) holding exactly the handlers listed for that block. Runs
-inside the block deliver their events to the innermost block's dispatcher, which
-serializes the handlers across concurrent runs.
+Every entry point takes `handlers=`, a list that may mix two kinds of item:
 
-Blocks nest. By default a nested block *inherits* the enclosing blocks'
-handlers: it steals them into its own dispatcher for the block's duration and
-gives them back on exit, so those handlers also aggregate the nested runs. Pass
-``inherit=False`` to skip that and re-list only the enclosing handlers you want.
-Because an enclosing block is suspended while a nested block runs, a handler is
-always attached to exactly one dispatcher at a time.
+- an [`EventHandler`][ropt.components.event_handlers.EventHandler] is **local**.
+  It is claimed for the duration of the run, so it belongs to that run alone,
+  and released afterwards, so a later run can reuse it.
+- a [`SharedHandlers`][ropt.simple.SharedHandlers] group is **shared**. The run
+  forwards its events to the group's dispatcher, which serializes them across
+  every run feeding it, so its handlers accumulate results without locking.
+
+A group is built on a session with
+[`shared_handlers`][ropt.simple.Session.shared_handlers] and passed to runs
+explicitly, exactly like a pool.
+
+The two roles are not interchangeable, and the door between them opens one way
+only. A group releases its handlers when it closes, so they can be reused in
+either role afterwards. A handler used locally stays registered with the compute
+step of its run for good, and can never join a group afterwards.
 """
 
 from __future__ import annotations
 
-from contextvars import ContextVar, Token
+from contextlib import contextmanager
 from typing import TYPE_CHECKING, Self
 
+from ropt.components._transferred import _make_placeholder
 from ropt.components.event_handlers import (
     EventDispatcher,
     EventForwardHandler,
@@ -26,10 +33,9 @@ from ropt.components.event_handlers import (
 from ropt.exceptions import WorkflowError
 
 from ._report import make_report_handler
-from ._session import _acquire_session, _release_session
 
 if TYPE_CHECKING:
-    from collections.abc import Sequence
+    from collections.abc import Iterator, Sequence
 
     from ropt.components.compute_steps import ComputeStep
     from ropt.enums import EnOptEventType
@@ -38,252 +44,224 @@ if TYPE_CHECKING:
     from ._session import _Session
 
 
-_handler_stack: ContextVar[tuple[HandlerScope, ...]] = ContextVar(
-    "ropt_simple_handlers", default=()
-)
-
 _IN_USE = (
-    "This handler is already in use and cannot join a handlers() block. A "
-    "handler passed to optimize() as a local handler stays bound to its run, "
-    "and one already held by another open block cannot be shared twice. Use a "
-    "separate handler here."
+    "This handler is already in use and cannot join a group of shared handlers. "
+    "A handler passed to a run in `handlers=` stays bound to that run, and one "
+    "already held by another group cannot be shared twice. Use a separate "
+    "handler here."
 )
 
 
-class HandlerScope:
-    """A block of shared result handlers, opened by `handlers`.
+class SharedHandlers:
+    """A group of result handlers that several runs share.
 
-    Aggregates results across every run in the block. A compute step reaches the
-    active block with `current_handlers` and feeds its events to the shared
-    handlers with `attach_to`, which is the only method meant for callers
-    outside this package.
+    Created by [`shared_handlers`][ropt.simple.Session.shared_handlers] and
+    passed to the runs that should feed it. Each handler in the group sees the
+    results of every one of those runs, sequential or concurrent, and the
+    group's dispatcher serializes them, so a handler that accumulates across
+    runs needs no locking of its own.
+
+    A group lives until its session closes, which releases it and its handlers.
+    Release it earlier with [`close`][ropt.simple.SharedHandlers.close], or by
+    using it as a context manager. See
+    [Running Optimizations](../running/running.md) for a walkthrough.
     """
 
     def __init__(
-        self,
-        scope_handlers: Sequence[tuple[EventHandler, bool]],
-        *,
-        inherit: bool,
+        self, entries: Sequence[tuple[EventHandler, bool]], session: _Session
     ) -> None:
-        self._scope_handlers = tuple(scope_handlers)
-        self._inherit_handlers = inherit
-        self._session: _Session | None = None
-        self._session_token: Token[_Session | None] | None = None
-        self._stack_token: Token[tuple[HandlerScope, ...]] | None = None
-        self._event_dispatcher: EventDispatcher | None = None
-        self._current_handlers: set[EventHandler] = set()
-        self._migrated_handlers: list[tuple[EventHandler, HandlerScope, bool]] = []
-        self._open = False
+        """Initialize the group and start its dispatcher.
+
+        Args:
+            entries: The handlers, each with whether to run it in a thread.
+            session: The session whose event loop the dispatcher runs on.
+        """
+        self._session = session
+        self._dispatcher = EventDispatcher()
+        self._handlers: list[EventHandler] = []
+        self._closed = False
+        try:
+            self._claim(entries)
+            # Registered before starting, so a session that shuts down during
+            # the start still has the group to close.
+            session.add_extra(self)
+            session.open_dispatcher(self._dispatcher)
+        except BaseException:
+            session.discard_extra(self)
+            self._release()
+            raise
+
+    def __reduce__(self) -> tuple[object, tuple[str]]:
+        # A group belongs to the session that built it, so it cannot follow work
+        # into a worker process; it arrives there as an inert placeholder that
+        # the entry points reject by name.
+        return (_make_placeholder, ("Shared handlers",))
+
+    @property
+    def closed(self) -> bool:
+        """Whether the group has been released.
+
+        Returns:
+            `True` once the group, or the session that built it, was closed.
+        """
+        return self._closed
 
     def attach_to(self, step: ComputeStep) -> None:
-        """Forward the events of a run's compute step to this block's handlers.
+        """Forward the events of a run's compute step to this group's handlers.
 
         A fresh forwarding handler is added per step (one handler cannot serve
-        several steps), carrying only the event types the shared handlers want.
+        several steps), carrying only the event types the group's handlers want.
 
         Args:
             step: The compute step whose events feed the shared handlers.
         """
         event_types: set[EnOptEventType] = set()
-        for handler in self._current_handlers:
+        for handler in self._handlers:
             event_types |= handler.event_types
         if event_types:
             step.add_event_handler(
-                EventForwardHandler(self._running_dispatcher, event_types=event_types)
+                EventForwardHandler(self._dispatcher, event_types=event_types)
             )
 
-    @property
-    def _running_dispatcher(self) -> EventDispatcher:
-        assert self._event_dispatcher is not None
-        return self._event_dispatcher
+    def close(self) -> None:
+        """Release the group's handlers without waiting for the session to close.
 
-    def _owns(self, handler: EventHandler) -> bool:
-        return handler in self._current_handlers
+        Closing is final: a group cannot be reopened, and a run still feeding it
+        stops reaching its handlers, failing once the dispatcher has stopped.
+        Closing twice is a no-op. The handlers
+        themselves are released rather than discarded, so the same objects can
+        join a new group, on a new session, or serve as local handlers.
 
-    def _owned(self) -> list[EventHandler]:
-        return list(self._current_handlers)
-
-    def _give_up_handler(self, handler: EventHandler) -> bool:
-        in_thread = self._running_dispatcher.remove_event_handler(handler)
-        self._current_handlers.discard(handler)
-        return in_thread
-
-    def _take_back_handler(self, handler: EventHandler, *, in_thread: bool) -> None:
-        self._running_dispatcher.add_event_handler(handler, run_in_thread=in_thread)
-        self._current_handlers.add(handler)
+        Most code does not need this — a session releases every group it
+        created. It matters when groups are created in a loop within one
+        long-lived session.
+        """
+        if self._closed:
+            return
+        self._closed = True
+        self._session.discard_extra(self)
+        try:
+            # Before cancelling, so the dispatcher is still there to remove them
+            # from; anything queued has already been handled, because
+            # `dispatch_event` blocks its caller until it has.
+            self._release()
+        finally:
+            self._session.close_dispatcher(self._dispatcher)
 
     def __enter__(self) -> Self:
-        # Entering twice would overwrite the first block's contextvar token and
-        # leave this scope on the stack for good, feeding every later run to a
-        # cancelled dispatcher.
-        if self._open:
-            msg = "Handlers() block is already open and cannot be entered again."
-            raise WorkflowError(msg)
-        self._open = True
-        try:
-            self._open_block()
-        except BaseException:
-            self._open = False
-            raise
+        """Enter a block that closes the group on exit.
+
+        Returns:
+            The group itself.
+        """
         return self
 
-    def _open_block(self) -> None:
-        session, session_token = _acquire_session()
-        dispatcher = EventDispatcher()
-        stack = _handler_stack.get()
-        added: set[EventHandler] = set()
-        migrated: list[tuple[EventHandler, HandlerScope, bool]] = []
-        try:
-            self._attach(dispatcher, stack, added, migrated)
-            session.open_dispatcher(dispatcher)
-        except BaseException:
-            try:
-                self._return_handlers(dispatcher, added, migrated)
-            finally:
-                session.close_dispatcher(dispatcher)
-                _release_session(session, session_token)
-            raise
-        self._session = session
-        self._session_token = session_token
-        self._event_dispatcher = dispatcher
-        self._current_handlers = added
-        self._migrated_handlers = migrated
-        self._stack_token = _handler_stack.set((*stack, self))
+    def __exit__(self, *_exc: object) -> None:
+        """Close the group."""
+        self.close()
 
-    def _attach(
-        self,
-        dispatcher: EventDispatcher,
-        stack: tuple[HandlerScope, ...],
-        added: set[EventHandler],
-        migrated: list[tuple[EventHandler, HandlerScope, bool]],
-    ) -> None:
-        for handler, run_in_thread in self._scope_handlers:
-            source = self._find_owner(stack, handler)
-            if source is not None:
-                in_thread = source._give_up_handler(handler)  # ruff: ignore[private-member-access]
-                migrated.append((handler, source, in_thread))
+    def _claim(self, entries: Sequence[tuple[EventHandler, bool]]) -> None:
+        for handler, run_in_thread in entries:
             try:
-                dispatcher.add_event_handler(handler, run_in_thread=run_in_thread)
+                self._dispatcher.add_event_handler(handler, run_in_thread=run_in_thread)
             except WorkflowError as exc:
                 # The low-level refusal is phrased in terms of dispatchers and
-                # compute steps, neither of which this API ever hands out.
-                if handler in added:
+                # compute steps, neither of which this API ever hands out. A
+                # handler listed twice is a different mistake, so it keeps the
+                # original message.
+                if handler in self._handlers:
                     raise
                 raise WorkflowError(_IN_USE) from exc
-            added.add(handler)
-        if self._inherit_handlers:
-            for source in stack:
-                for handler in source._owned():  # ruff: ignore[private-member-access]
-                    in_thread = source._give_up_handler(handler)  # ruff: ignore[private-member-access]
-                    migrated.append((handler, source, in_thread))
-                    dispatcher.add_event_handler(handler, run_in_thread=in_thread)
-                    added.add(handler)
+            self._handlers.append(handler)
 
-    @staticmethod
-    def _find_owner(
-        stack: tuple[HandlerScope, ...], handler: EventHandler
-    ) -> HandlerScope | None:
-        for scope in reversed(stack):
-            if scope._owns(handler):  # ruff: ignore[private-member-access]
-                return scope
-        return None
-
-    @staticmethod
-    def _return_handlers(
-        dispatcher: EventDispatcher,
-        added: set[EventHandler],
-        migrated: list[tuple[EventHandler, HandlerScope, bool]],
-    ) -> None:
-        for handler in added:
-            dispatcher.remove_event_handler(handler)
-        for handler, source, in_thread in migrated:
-            source._take_back_handler(handler, in_thread=in_thread)  # ruff: ignore[private-member-access]
-
-    def __exit__(self, *_exc: object) -> None:
-        assert self._stack_token is not None
-        assert self._session is not None
-        _handler_stack.reset(self._stack_token)
-        try:
-            self._return_handlers(
-                self._running_dispatcher,
-                self._current_handlers,
-                self._migrated_handlers,
-            )
-        finally:
-            try:
-                self._session.close_dispatcher(self._running_dispatcher)
-                _release_session(self._session, self._session_token)
-            finally:
-                self._close_block()
-
-    def _close_block(self) -> None:
-        self._session = None
-        self._session_token = None
-        self._stack_token = None
-        self._event_dispatcher = None
-        self._current_handlers = set()
-        self._migrated_handlers = []
-        self._open = False
+    def _release(self) -> None:
+        # Cancelling a dispatcher does not unregister its handlers, so without
+        # this they would stay marked as attached and could never be used again.
+        handlers, self._handlers = self._handlers, []
+        for handler in handlers:
+            self._dispatcher.remove_event_handler(handler)
 
 
-def handlers(
-    *handler: EventHandler,
-    threaded: EventHandler | Sequence[EventHandler] = (),
-    inherit: bool = True,
-    report: ReportCallback | None = None,
-) -> HandlerScope:
-    """Aggregate results across every optimization run in the block.
-
-    Each handler receives events from all runs in the block (sequential or
-    concurrent) and is serialized across them. Blocks nest: by default a nested
-    block also inherits the enclosing blocks' handlers, so they aggregate the
-    nested runs too. Pass ``inherit=False`` to include only the handlers the
-    nested block lists (re-list an enclosing handler to feed it explicitly).
-
-    See [Running Optimizations](../running/running.md) for a walkthrough.
-
-    A block claims each of its handlers for as long as it is open, and one
-    `HandlerScope` object opens one block at a time. A handler that was ever
-    passed to [`optimize`][ropt.simple.optimize] as a local handler cannot join
-    a block afterwards; decide per handler whether it is local or shared.
+def group_entries(
+    handlers: Sequence[EventHandler],
+    threaded: EventHandler | Sequence[EventHandler],
+    report: ReportCallback | None,
+) -> list[tuple[EventHandler, bool]]:
+    """Pair each handler of a group with whether it runs in a thread.
 
     Args:
-        handler:  The result handlers to share across the block, each run on the
-                  block's event-loop thread.
-        threaded: Handlers (one, or a sequence) to run on a worker thread instead
-                  of the loop. This only helps handlers that spend real time in
-                  blocking, GIL-releasing I/O (files, databases, network); for
-                  in-memory work it gives no benefit under CPython's GIL. See
-                  [Running Optimizations](../running/running.md#running-a-handler-in-a-thread).
-        inherit:  Whether to also inherit the enclosing blocks' handlers.
-        report:   An optional callback invoked with an `EvaluateResult` for each
-                  function evaluation across the block's runs; return `True` from
-                  it to stop the emitting run early with `USER_ABORT`.
+        handlers: The handlers to run on the session's event-loop thread.
+        threaded: The handlers to run on a worker thread instead.
+        report:   An optional callback added to the group as a report handler.
 
     Returns:
-        A context manager scoping the shared handlers, which binds the
-        `HandlerScope` itself when used with `as`.
+        The handlers of the group, each with its threading choice.
     """
     in_thread = (threaded,) if isinstance(threaded, EventHandler) else tuple(threaded)
-    scope_handlers: list[tuple[EventHandler, bool]] = [
-        *((item, False) for item in handler),
+    entries: list[tuple[EventHandler, bool]] = [
+        *((item, False) for item in handlers),
         *((item, True) for item in in_thread),
     ]
     if report is not None:
-        scope_handlers.append((make_report_handler(report), False))
-    return HandlerScope(scope_handlers, inherit=inherit)
+        entries.append((make_report_handler(report), False))
+    return entries
 
 
-def current_handlers() -> HandlerScope | None:
-    """Return the innermost open `handlers` block, if any.
+def split_handlers(
+    handlers: Sequence[EventHandler | SharedHandlers] | None,
+) -> tuple[list[EventHandler], list[SharedHandlers]]:
+    """Separate a run's local handlers from the groups it feeds.
 
-    Call this from a compute step or launcher to reach the shared handlers
-    active in the caller's context, then wire a run with `attach_to`. Read it on
-    the thread that owns the block and pass the scope to each run, so
-    `optimize_many`'s worker threads forward to the same dispatcher.
+    Args:
+        handlers: The mixed list passed to an entry point, if any.
 
     Returns:
-        The innermost block's scope, or `None` when no block is open.
+        The local handlers, and the shared groups, each in the given order.
     """
-    stack = _handler_stack.get()
-    return stack[-1] if stack else None
+    local: list[EventHandler] = []
+    groups: list[SharedHandlers] = []
+    for item in handlers or ():
+        if isinstance(item, SharedHandlers):
+            groups.append(item)
+        else:
+            local.append(item)
+    return local, groups
+
+
+@contextmanager
+def attach_handlers(
+    step: ComputeStep,
+    handlers: Sequence[EventHandler | SharedHandlers] | None,
+    report: ReportCallback | None,
+) -> Iterator[None]:
+    """Wire a run's handlers to its compute step for the duration of the run.
+
+    Local handlers are claimed before any is attached, so a run that cannot have
+    all of them leaves every one of them free, and released again afterwards, so
+    a later run can reuse them. Shared groups are attached instead of claimed,
+    since they are not exclusive to one run.
+
+    Args:
+        step:     The compute step of the run.
+        handlers: The local handlers and shared groups to wire up.
+        report:   An optional callback wired up as a local report handler.
+
+    Yields:
+        Nothing; the handlers stay attached for the body of the block.
+    """
+    local, groups = split_handlers(handlers)
+    if report is not None:
+        local.append(make_report_handler(report))
+    claimed: list[EventHandler] = []
+    try:
+        for handler in local:
+            handler.claim()
+            claimed.append(handler)
+        for handler in local:
+            step.add_event_handler(handler)
+        for group in groups:
+            group.attach_to(step)
+        yield
+    finally:
+        for handler in claimed:
+            handler.release()

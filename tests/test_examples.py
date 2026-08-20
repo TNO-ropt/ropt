@@ -77,6 +77,17 @@ def test_example_simple_handlers(tmp_path: Path, monkeypatch: Any) -> None:
     _load_from_file("handlers", "simple").main()
 
 
+@pytest.mark.slow
+def test_example_simple_nested_optimization(tmp_path: Path, monkeypatch: Any) -> None:
+    pytest.importorskip("polars")
+    # Not the example's own requirement: run as a script its functions live in
+    # `__main__`, which spawn re-imports. Loading it here under a name the
+    # worker cannot import is what defeats pickle-by-reference.
+    pytest.importorskip("cloudpickle")
+    monkeypatch.chdir(tmp_path)
+    _load_from_file("nested_optimization", "simple").main()
+
+
 @pytest.mark.parametrize("merge", [True, False])
 def test_example_simple_ensemble(tmp_path: Path, monkeypatch: Any, merge: Any) -> None:
     monkeypatch.chdir(tmp_path)

@@ -1,8 +1,8 @@
 """A loop-independent primitive for running blocking jobs concurrently.
 
-The coordinators in the high-level API (the ``optimize_many`` drivers and the
-``optimize_nested`` orchestration) must run many blocking calls at once without
-funneling them through the asyncio loop's shared default thread pool: that pool
+The coordinators in the high-level API (the ``optimize_many`` drivers) must run
+many blocking calls at once without funneling them through the asyncio loop's
+shared default thread pool: that pool
 is bounded, and a blocking coordinator that waits there for the leaf work it
 submits to the same pool deadlocks once the pool fills. ``run_concurrent`` runs
 each job on its own dedicated thread instead, so it imposes no shared-pool

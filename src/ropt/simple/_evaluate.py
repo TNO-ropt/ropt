@@ -8,28 +8,36 @@ import numpy as np
 
 from ropt.components.compute_steps import EvaluationStep
 from ropt.components.event_handlers import HistoryHandler
+from ropt.context import EnOptContext
 
-from ._evaluator import make_evaluator, run_step
-from ._handlers import current_handlers
+from ._evaluator import make_evaluator
+from ._guards import check_handlers, check_pool
+from ._handlers import SharedHandlers, attach_handlers
+from ._pool import serial_pool
 from ._result import EvaluateResult, _build_evaluate_result
-from ._session import current_executor
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
     from typing import Any
 
     from numpy.typing import ArrayLike
 
-    from ropt.components.executors import Executor
+    from ropt.components.event_handlers import EventHandler
     from ropt.results import FunctionResults
 
     from ._function import EvaluationFunction
+    from ._pool import WorkerPool
+    from ._report import ReportCallback
 
 
-def evaluate(
+def evaluate(  # ruff: ignore[too-many-arguments]
     config: dict[str, Any],
     variables: ArrayLike,
     function: EvaluationFunction,
     *,
+    pool: WorkerPool | None = None,
+    handlers: Sequence[EventHandler | SharedHandlers] | None = None,
+    report: ReportCallback | None = None,
     metadata: dict[str, Any] | None = None,
 ) -> EvaluateResult:
     """Evaluate a single variable vector without optimizing.
@@ -38,15 +46,32 @@ def evaluate(
     vectors at once. See [Running Optimizations](../running/running.md) for a
     walkthrough.
 
-    Unlike [`optimize`][ropt.simple.optimize] this takes no `handlers` or
-    `report`: there is no optimization to stop early, and a single batch has
-    nothing to accumulate across. An open [`handlers`][ropt.simple.handlers]
-    block still receives the results, its `report` callback included.
+    A pool or group that is closed — because it was closed directly, or
+    because its session ended — is refused here with a
+    [`WorkflowError`][ropt.exceptions.WorkflowError], as is one carried into
+    a worker process, where it cannot work at all.
 
     Args:
         config:    The optimization configuration.
         variables: The variable vector to evaluate.
         function:  The per-realization evaluation function.
+        pool:      The pool to evaluate on, from a session factory such as
+                   [`thread_pool`][ropt.simple.Session.thread_pool]. Without one
+                   the evaluations run in-process, on the calling thread. A run
+                   started from inside an evaluation needs a *different* pool:
+                   the pool it is already running on refuses the work.
+        handlers:  Optional result handlers, mixing local
+                   [`EventHandler`][ropt.components.event_handlers.EventHandler]
+                   objects with shared
+                   [`SharedHandlers`][ropt.simple.SharedHandlers] groups, as
+                   [`optimize`][ropt.simple.optimize] takes them.
+        report:    An optional callback invoked with an `EvaluateResult` for
+                   each evaluation. An evaluation is a single batch that has
+                   already run by the time the callback sees it, and there is no
+                   optimizer loop to interrupt, so unlike on
+                   [`optimize`][ropt.simple.optimize] returning `True` cannot
+                   stop anything: it only ends the reporting, and every result
+                   is still returned.
         metadata:  An optional dictionary attached to the emitted
                    [`Results`][ropt.results.Results]. It also reaches
                    `function` as `context.metadata`.
@@ -57,19 +82,32 @@ def evaluate(
     Raises:
         ValueError: If `variables` is not a single vector.
     """
+    check_pool(pool)
+    check_handlers(handlers)
     array = np.asarray(variables, dtype=np.float64)
     if array.ndim != 1:
         msg = "evaluate() takes a single vector; use evaluate_many() for a batch."
         raise ValueError(msg)
-    results = _run_evaluation(current_executor(), config, array, function, metadata)
+    results = _run_evaluation(
+        pool,
+        config,
+        array,
+        function,
+        handlers=handlers,
+        report=report,
+        metadata=metadata,
+    )
     return _build_evaluate_result(results[0])
 
 
-def evaluate_many(
+def evaluate_many(  # ruff: ignore[too-many-arguments]
     config: dict[str, Any],
     variables: ArrayLike,
     function: EvaluationFunction,
     *,
+    pool: WorkerPool | None = None,
+    handlers: Sequence[EventHandler | SharedHandlers] | None = None,
+    report: ReportCallback | None = None,
     metadata: dict[str, Any] | None = None,
 ) -> tuple[EvaluateResult, ...]:
     """Evaluate a batch of variable vectors without optimizing.
@@ -78,14 +116,32 @@ def evaluate_many(
     the same order. See [Running Optimizations](../running/running.md) for a
     walkthrough.
 
-    Like [`evaluate`][ropt.simple.evaluate], this takes no `handlers` or
-    `report`; an open [`handlers`][ropt.simple.handlers] block still receives
-    the results.
+    A pool or group that is closed — because it was closed directly, or
+    because its session ended — is refused here with a
+    [`WorkflowError`][ropt.exceptions.WorkflowError], as is one carried into
+    a worker process, where it cannot work at all.
 
     Args:
         config:    The optimization configuration.
         variables: The variable vectors to evaluate, one per row.
         function:  The per-realization evaluation function.
+        pool:      The pool to evaluate on, from a session factory such as
+                   [`thread_pool`][ropt.simple.Session.thread_pool]. Without one
+                   the evaluations run in-process, on the calling thread. A run
+                   started from inside an evaluation needs a *different* pool:
+                   the pool it is already running on refuses the work.
+        handlers:  Optional result handlers, mixing local
+                   [`EventHandler`][ropt.components.event_handlers.EventHandler]
+                   objects with shared
+                   [`SharedHandlers`][ropt.simple.SharedHandlers] groups, as
+                   [`optimize`][ropt.simple.optimize] takes them.
+        report:    An optional callback invoked with an `EvaluateResult` for
+                   each evaluation. An evaluation is a single batch that has
+                   already run by the time the callback sees it, and there is no
+                   optimizer loop to interrupt, so unlike on
+                   [`optimize`][ropt.simple.optimize] returning `True` cannot
+                   stop anything: it only ends the reporting, and every result
+                   is still returned.
         metadata:  An optional dictionary attached to every emitted
                    [`Results`][ropt.results.Results]. It also reaches
                    `function` as `context.metadata`.
@@ -96,6 +152,8 @@ def evaluate_many(
     Raises:
         ValueError: If `variables` is not a 2-D matrix.
     """
+    check_pool(pool)
+    check_handlers(handlers)
     array = np.asarray(variables, dtype=np.float64)
     if array.ndim != 2:  # ruff: ignore[magic-value-comparison]
         msg = (
@@ -103,29 +161,39 @@ def evaluate_many(
             "use evaluate() for a single vector."
         )
         raise ValueError(msg)
-    results = _run_evaluation(current_executor(), config, array, function, metadata)
+    results = _run_evaluation(
+        pool,
+        config,
+        array,
+        function,
+        handlers=handlers,
+        report=report,
+        metadata=metadata,
+    )
     return tuple(_build_evaluate_result(result) for result in results)
 
 
-def _run_evaluation(
-    executor: Executor | None,
+def _run_evaluation(  # ruff: ignore[too-many-arguments]
+    pool: WorkerPool | None,
     config: dict[str, Any],
     variables: ArrayLike,
     function: EvaluationFunction,
-    metadata: dict[str, Any] | None = None,
+    *,
+    handlers: Sequence[EventHandler | SharedHandlers] | None,
+    report: ReportCallback | None,
+    metadata: dict[str, Any] | None,
 ) -> tuple[FunctionResults, ...]:
-    context, evaluator = make_evaluator(config, function, executor)
+    context = EnOptContext.model_validate(config)
+    evaluator = make_evaluator(
+        context, function, pool if pool is not None else serial_pool()
+    )
     history = HistoryHandler()
     step = EvaluationStep(evaluator=evaluator)
     step.add_event_handler(history)
-    shared = current_handlers()
-    if shared is not None:
-        shared.attach_to(step)
-
-    run_step(
-        step,
-        context=context,
-        variables=np.asarray(variables, dtype=np.float64),
-        metadata=metadata,
-    )
+    with attach_handlers(step, handlers, report):
+        step.run(
+            context=context,
+            variables=np.asarray(variables, dtype=np.float64),
+            metadata=metadata,
+        )
     return history["results"] or ()

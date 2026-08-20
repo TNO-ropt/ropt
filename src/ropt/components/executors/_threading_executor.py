@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import threading
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
 
@@ -26,6 +27,13 @@ class ThreadingExecutor(ExecutorBase):
         self._workers = workers
         self._worker_tasks: list[asyncio.Task[None]] = []
         self._pool: ThreadPoolExecutor | None = None
+        # Ids of the pool threads. A thread only ever asks about itself, and
+        # registered its own id before it could run anything, so it always sees
+        # at least that id without locking. This marks a thread for its whole
+        # life rather than for one work item: wider than the question asked, and
+        # harmless because the pool runs nothing else.
+        self._worker_ids: frozenset[int] = frozenset()
+        self._worker_ids_lock = threading.Lock()
 
     async def start(self, task_group: asyncio.TaskGroup) -> None:
         """Start the executor.
@@ -34,7 +42,9 @@ class ThreadingExecutor(ExecutorBase):
             task_group: The task group to use.
         """
         self._begin_start()
-        pool = ThreadPoolExecutor(max_workers=self._workers)
+        pool = ThreadPoolExecutor(
+            max_workers=self._workers, initializer=self._register_worker
+        )
         self._pool = pool
         _logger.debug("Starting threading executor with %d worker(s)", self._workers)
         self._worker_tasks = [
@@ -42,11 +52,31 @@ class ThreadingExecutor(ExecutorBase):
         ]
         await self._finish_start(task_group)
 
+    def on_worker_thread(self) -> bool:
+        """Report whether the caller is running as one of this executor's workers.
+
+        A thread started by a work item is not a worker: it holds none of this
+        executor's workers, and is not recognized here.
+
+        Returns:
+            `True` if the calling thread is one of this executor's workers.
+        """
+        return threading.get_ident() in self._worker_ids
+
+    def _register_worker(self) -> None:
+        # Runs once per pool thread, as it is spawned.
+        with self._worker_ids_lock:
+            self._worker_ids |= {threading.get_ident()}
+
     def _cleanup(self) -> None:
         """Clean up the executor."""
         if self._pool is not None:
             self._pool.shutdown(wait=False, cancel_futures=True)
             self._pool = None
+        # The ids belong to that pool's threads: a restarted executor builds a
+        # new pool, and the system may reuse the ids of the old one.
+        with self._worker_ids_lock:
+            self._worker_ids = frozenset()
         for worker_task in self._worker_tasks:
             if not worker_task.done():
                 worker_task.cancel()

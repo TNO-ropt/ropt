@@ -1,58 +1,54 @@
-"""The background session: a loop thread, a task group, and an optional executor.
+"""The background session: a loop thread, a task group, and the pools on it.
 
-Any high-level block (an execution manager such as `threads()`/`processes()`)
-opens a background event loop on its own daemon thread, with a long-lived
-`TaskGroup`. The **session** is that loop and task group; it is established by
-the first block to open and torn down by that same owner when it exits, so
-nested blocks reuse one loop.
+A **session** is a background event loop on its own daemon thread, with a
+long-lived `TaskGroup`. The public [`session`][ropt.simple.session] block opens
+one and hands out the pools built on it; closing the block releases the pools
+and stops the loop. The same holds for the shared-handler groups built on it.
 
-The **executor** is a separate layer: an execution manager installs one on the
-session's task group and removes it on exit. At most one executor is active at a
-time — opening a second execution manager while one is active raises (nested
-executors are not supported). The evaluator for each `optimize()`/`evaluate()`
-call is chosen from whatever executor is active at that moment, or a sequential
-`FunctionEvaluator` when none is.
-
-The active session is held in a single contextvar slot. With no block open, the
-high-level entry points run sequentially on the calling thread.
+Everything a session hands out is passed to a run explicitly, never discovered
+by it, so any number of pools and groups — and any number of sessions — can be
+open at once, and nothing here is ambient.
 """
 
 from __future__ import annotations
 
 import asyncio
 import threading
-from contextvars import ContextVar, Token
-from functools import partial
-from typing import TYPE_CHECKING, Any, TypeVar
+from pathlib import Path
+from typing import TYPE_CHECKING, Any, Protocol, Self
 
 from ropt.components._loop import schedule
-from ropt.components.concurrency import run_concurrent
-from ropt.components.evaluators import BatchIdCounter
+from ropt.components.executors import (
+    HPCExecutor,
+    MultiprocessingExecutor,
+    ThreadingExecutor,
+)
 from ropt.exceptions import WorkflowError
+
+from ._handlers import SharedHandlers, group_entries
+from ._pool import WorkerPool
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Coroutine, Sequence
 
-    from ropt.components.event_handlers import EventDispatcher
+    from ropt.components.event_handlers import EventDispatcher, EventHandler
     from ropt.components.executors import Executor
 
-_T = TypeVar("_T")
+    from ._report import ReportCallback
 
-_STOPPED = "The block's background session is not running; open a new block."
+_STOPPED = "The background session is not running; open a new one."
 
 
-_active_session: ContextVar[_Session | None] = ContextVar(
-    "ropt_simple_session", default=None
-)
+class _Closable(Protocol):
+    def close(self) -> None: ...
 
 
 class _Session:
-    """A background event loop and task group hosting at most one executor.
+    """A background event loop and task group hosting pools and dispatchers.
 
-    The session (loop + task group) is opened by the first high-level block and
-    reused by nested blocks; the owning block tears it down on exit. An execution
-    manager installs an executor via `open_executor` and removes it via
-    `close_executor` — at most one may be active at a time.
+    Whatever the session hands out is registered with it as an *extra*: any
+    number may be open at once, and the session closes every one that is still
+    open when it stops. That is what makes closing a session sufficient cleanup.
     """
 
     def __init__(self) -> None:
@@ -62,9 +58,11 @@ class _Session:
         self._stopped = threading.Event()
         self._task_group: asyncio.TaskGroup | None = None
         self._shutdown: asyncio.Event | None = None
-        self._executor: Executor | None = None
-        self._batch_counter: BatchIdCounter | None = None
         self._failure: BaseException | None = None
+        # Extras are added and closed from any thread: a driver thread may build
+        # its own pool while the loop thread is closing the session down.
+        self._extras_lock = threading.Lock()
+        self._extras: list[_Closable] = []
 
     def start(self) -> None:
         self._loop = asyncio.new_event_loop()
@@ -128,8 +126,9 @@ class _Session:
                 self._task_group = task_group
                 self._ready.set()
                 await self._shutdown.wait()
-                if self._executor is not None:
-                    self._executor.cancel()
+                # Here, on the loop thread while the loop is still serving, so
+                # the cancellations this schedules are actually run.
+                self.close_extras()
         finally:
             # Set here, on the loop thread while the loop is still serving, so a
             # caller cannot pass the check in `_start_on_loop` and then hand work
@@ -156,31 +155,46 @@ class _Session:
             raise WorkflowError(_STOPPED)
         return self._task_group
 
-    def open_executor(self, make_executor: Callable[[], Executor]) -> None:
-        if self._executor is not None:
-            msg = (
-                "Only one execution block (threads/processes/hpc) can be open at "
-                "a time; they cannot be nested."
-            )
-            raise WorkflowError(msg)
+    def open_pool(
+        self, make_executor: Callable[[], Executor], bundle_size: int = 1
+    ) -> WorkerPool:
+        """Start an executor on this session and wrap it in a pool.
+
+        Args:
+            make_executor: Builds the executor once the task group is known.
+            bundle_size:   Evaluations per worker task, `0` for the whole batch.
+
+        Returns:
+            The pool, already running.
+        """
         task_group = self._require_task_group()
         executor = make_executor()
-        self._start_on_loop(executor.start(task_group))
-        self._executor = executor  # Only set on success.
-        self._batch_counter = BatchIdCounter()
+        pool = WorkerPool(executor, self, bundle_size)
+        # Registered before starting, so a session that shuts down during the
+        # start still has the pool to cancel.
+        self.add_extra(pool)
+        try:
+            self._start_on_loop(executor.start(task_group))
+        except BaseException:
+            self.discard_extra(pool)
+            raise
+        return pool
 
-    def close_executor(self) -> None:
-        executor = self._executor
-        self._executor = None
-        self._batch_counter = None
-        if executor is not None:
-            schedule(self._loop, executor.cancel)
+    def add_extra(self, extra: _Closable) -> None:
+        with self._extras_lock:
+            self._extras.append(extra)
 
-    def get_executor(self) -> Executor | None:
-        return self._executor
+    def discard_extra(self, extra: _Closable) -> None:
+        with self._extras_lock:
+            self._extras = [item for item in self._extras if item is not extra]
 
-    def get_batch_counter(self) -> BatchIdCounter | None:
-        return self._batch_counter
+    def close_extras(self) -> None:
+        # Take the list under the lock but close outside it: `close` calls back
+        # into `discard_extra`, which takes the same lock.
+        with self._extras_lock:
+            extras, self._extras = self._extras, []
+        for extra in extras:
+            extra.close()
 
     def open_dispatcher(self, dispatcher: EventDispatcher) -> None:
         self._start_on_loop(dispatcher.start(self._require_task_group()))
@@ -188,121 +202,251 @@ class _Session:
     def close_dispatcher(self, dispatcher: EventDispatcher) -> None:
         schedule(self._loop, dispatcher.cancel)
 
-    def gather_shared(
-        self, jobs: Sequence[Callable[[], _T]], limit: int | None
-    ) -> list[_T]:
-        """Run jobs concurrently with this session shared, and collect results.
 
-        See the module-level `gather_shared`, which is the entry point for
-        callers outside this package.
+class Session:
+    """An open session, and the factories that build on it.
 
-        Args:
-            jobs:  The zero-argument callables to run, one result each.
-            limit: The maximum number to run at once, or ``None`` for no limit.
+    A session owns one background event loop, on its own daemon thread. Pools
+    need that loop to run on, which is why they are built here rather than
+    constructed on their own. Everything a session hands out is returned to the
+    caller and passed on explicitly; nothing is discovered from the surroundings.
+
+    Bind the session with `as` and call its factories inside the block:
+
+    ```python
+    with session() as s:
+        fast = s.thread_pool(workers=8)
+        optimize(config, x0, function, pool=fast)
+    ```
+
+    Sessions are objects, so opening one inside another is unremarkable: each
+    gets its own loop, and pools from different sessions never interact. A
+    session is single use — once closed it cannot be reopened.
+    """
+
+    def __init__(self) -> None:
+        """Initialize the session."""
+        self._session: _Session | None = None
+        self._entered = False
+
+    def __enter__(self) -> Self:
+        """Open the session's event loop.
 
         Returns:
-            The job results, in the order of ``jobs``.
+            The session itself.
+
+        Raises:
+            WorkflowError: If the session was already opened.
         """
+        if self._entered:
+            msg = (
+                "This session was already opened and cannot be entered again; "
+                "open a separate session."
+            )
+            raise WorkflowError(msg)
+        self._entered = True
+        session = _Session()
+        session.start()
+        self._session = session
+        return self
 
-        def _run(job: Callable[[], _T]) -> _T:
-            token = _active_session.set(self)
-            try:
-                return job()
-            finally:
-                _active_session.reset(token)
-
-        return run_concurrent([partial(_run, job) for job in jobs], limit)
-
-
-def _acquire_session() -> tuple[_Session, Token[_Session | None] | None]:
-    session = _active_session.get()
-    if session is not None:
-        return session, None
-    session = _Session()
-    session.start()
-    return session, _active_session.set(session)
-
-
-def _release_session(session: _Session, token: Token[_Session | None] | None) -> None:
-    if token is not None:
-        try:
+    def __exit__(self, *_exc: object) -> None:
+        """Close the session, releasing every pool it created."""
+        session, self._session = self._session, None
+        if session is not None:
             session.stop()
-        finally:
-            _active_session.reset(token)
 
+    def thread_pool(self, *, workers: int = 1, bundle_size: int = 1) -> WorkerPool:
+        """Create a pool that runs evaluations in worker threads.
 
-def current_session() -> _Session | None:
-    """Return the session active in the current context, if any.
+        See [Running Optimizations](../running/running.md) for a walkthrough.
 
-    Returns:
-        The active session, or `None` when running on the sequential floor.
-    """
-    return _active_session.get()
+        Args:
+            workers:     The number of worker threads.
+            bundle_size: How many evaluations go to a worker as one task, `0`
+                         for the whole batch. See
+                         [`process_pool`][ropt.simple.Session.process_pool],
+                         where it matters more.
 
+        Returns:
+            A pool backed by a thread pool.
+        """
+        return self._open_pool(lambda: ThreadingExecutor(workers=workers), bundle_size)
 
-def current_executor() -> Executor | None:
-    """Return the active executor pool, or `None` on the sequential floor.
+    def process_pool(self, *, workers: int = 1, bundle_size: int = 1) -> WorkerPool:
+        """Create a pool that runs evaluations in worker processes.
 
-    Call this from a compute step to build its evaluator: with a pool, wrap it in
-    a `ParallelEvaluator`; a `None` result means evaluate directly in-process
-    with a `FunctionEvaluator`. Read it on the thread that owns the block and
-    pass the result to each run, so `optimize_many`'s worker threads use the same
-    pool.
+        The evaluation function must be picklable. See
+        [Running Optimizations](../running/running.md) for a walkthrough.
 
-    Returns:
-        The active executor pool, or `None` when no execution block is open.
-    """
-    session = _active_session.get()
-    return None if session is None else session.get_executor()
+        Args:
+            workers:     The number of worker processes.
+            bundle_size: How many evaluations go to a worker as one task. Every
+                         task is transferred to a worker separately, and the
+                         evaluations within one run after another, so this is a
+                         trade between spreading a batch and the cost of moving
+                         it. The default of 1 gives every evaluation its own
+                         task, spreading a batch as widely as the workers allow;
+                         a larger value groups that many per task; and `0` sends
+                         the whole batch as a single task, which suits a pool
+                         whose parallelism comes from the runs above it rather
+                         than from within a batch.
 
-
-def current_batch_counter() -> BatchIdCounter | None:
-    """Return the open execution block's batch ID counter.
-
-    Every run in the block draws its batch IDs from this one counter, so runs
-    that share the block's executor never produce the same batch ID. Without a
-    block there is nothing to share with, and each evaluator counts on its own.
-
-    Returns:
-        The block's counter, or `None` when no execution block is open.
-    """
-    session = _active_session.get()
-    return None if session is None else session.get_batch_counter()
-
-
-def gather_shared(
-    jobs: Sequence[Callable[[], _T]], limit: int | None = None
-) -> list[_T]:
-    """Run jobs concurrently on driver threads, sharing the open block.
-
-    Each job runs on its own thread with the block's session set active, so
-    `current_executor`, [`offload`][ropt.simple.offload] and a nested
-    [`optimize`][ropt.simple.optimize] inside a job resolve to this block's
-    executor. This is what [`optimize_many`][ropt.simple.optimize_many] is built
-    on; use it directly to launch runs of your own concurrently.
-
-    An open `handlers` block is not propagated, because a bare thread does not
-    inherit context variables: read `current_handlers` on the calling thread and
-    pass the scope into each job. `limit` bounds how many run at once. The first
-    job to raise propagates its error at once (fail-fast); pending jobs are then
-    skipped and any already running are abandoned, since a Python thread cannot
-    be stopped from the outside.
-
-    Args:
-        jobs:  The zero-argument callables to run, one result each.
-        limit: The maximum number to run at once, or `None` for no limit.
-
-    Returns:
-        The job results, in the order of `jobs`.
-
-    Raises:
-        WorkflowError: If no execution block is open.
-    """
-    session = _active_session.get()
-    if session is None:
-        msg = (
-            "gather_shared() requires an execution block, "
-            "e.g. `with ropt.threads(...):`."
+        Returns:
+            A pool backed by a process pool.
+        """
+        return self._open_pool(
+            lambda: MultiprocessingExecutor(workers=workers), bundle_size
         )
-        raise WorkflowError(msg)
-    return session.gather_shared(jobs, limit)
+
+    def hpc_pool(  # ruff: ignore[too-many-arguments]
+        self,
+        *,
+        workers: int = 1,
+        cores: int = 1,
+        cluster: str | None = None,
+        queue: str | None = None,
+        workdir: Path | str | None = None,
+        config_path: Path | str | None = None,
+        template: str | None = None,
+        queue_type: str = "slurm",
+        bundle_size: int = 1,
+    ) -> WorkerPool:
+        """Create a pool that runs evaluations on an HPC cluster.
+
+        Interfaces with a cluster queue (e.g. Slurm) through `pysqa`; requires
+        the `ropt[hpc]` extra, and the evaluation function must be picklable.
+        The cluster is selected from `cluster`/`queue`: give a queue to search
+        for its cluster, a cluster to use its default queue, or both to be
+        explicit. See [Running Optimizations](../running/running.md) for a
+        walkthrough.
+
+        Args:
+            workers:     The maximum number of concurrent cluster jobs.
+            cores:       The number of CPUs per job.
+            cluster:     The cluster name, when the `pysqa` config defines
+                         several.
+            queue:       The queue or partition name.
+            workdir:     The shared-filesystem working directory (defaults to
+                         the current directory).
+            config_path: The path to the `pysqa` configuration directory.
+            template:    An inline submission-script template, instead of a
+                         config.
+            queue_type:  The queueing system type.
+            bundle_size: How many evaluations go to a worker as one task, `0`
+                         for the whole batch. See
+                         [`process_pool`][ropt.simple.Session.process_pool];
+                         each task here is a cluster job.
+
+        Returns:
+            A pool backed by an HPC cluster.
+        """
+        resolved = Path.cwd() if workdir is None else Path(workdir).resolve()
+        return self._open_pool(
+            lambda: HPCExecutor(
+                workers=workers,
+                cores=cores,
+                cluster=cluster,
+                queue=queue,
+                workdir=resolved,
+                config_path=config_path,
+                template=template,
+                queue_type=queue_type,
+            ),
+            bundle_size,
+        )
+
+    def serial_pool(self) -> WorkerPool:
+        """Create a pool that evaluates in-process, on the calling thread.
+
+        Identical to the free [`serial_pool`][ropt.simple.serial_pool] function,
+        except that this pool is closed when the session closes, so runs cannot
+        keep using it afterwards. Prefer the free function for a pool that
+        should outlive any session.
+
+        Returns:
+            A pool without an executor.
+        """
+        session = self._require_open()
+        pool = WorkerPool(session=session)
+        session.add_extra(pool)
+        return pool
+
+    def shared_handlers(
+        self,
+        *handler: EventHandler,
+        threaded: EventHandler | Sequence[EventHandler] = (),
+        report: ReportCallback | None = None,
+    ) -> SharedHandlers:
+        """Group result handlers that several runs share.
+
+        Pass the group to every run that should feed it, in `handlers=`. Each
+        handler then sees the results of all those runs, serialized across them,
+        which is what makes accumulating over concurrent runs safe. A run may
+        feed several groups, and mix them with handlers of its own.
+
+        A handler joins one group at a time, and a handler that was ever passed
+        to a run as a local handler cannot join a group at all; decide per
+        handler whether it is local or shared. See
+        [Running Optimizations](../running/running.md) for a walkthrough.
+
+        Args:
+            handler:  The result handlers to share, each run on the session's
+                      event-loop thread.
+            threaded: Handlers (one, or a sequence) to run on a worker thread
+                      instead of the loop. This only helps handlers that spend
+                      real time in blocking, GIL-releasing I/O (files,
+                      databases, network); for in-memory work it gives no
+                      benefit under CPython's GIL. See
+                      [Running Optimizations](../running/running.md#running-a-handler-in-a-thread).
+            report:   An optional callback invoked with an `EvaluateResult` for
+                      each function evaluation across the group's runs.
+                      Returning `True` stops the emitting run early with
+                      `USER_ABORT` if it is an optimization; an evaluation has
+                      no optimizer loop to interrupt, so there the return value
+                      is ignored.
+
+        Returns:
+            A [`SharedHandlers`][ropt.simple.SharedHandlers] group.
+        """
+        return SharedHandlers(
+            group_entries(handler, threaded, report), self._require_open()
+        )
+
+    def _open_pool(
+        self, make_executor: Callable[[], Executor], bundle_size: int
+    ) -> WorkerPool:
+        return self._require_open().open_pool(make_executor, bundle_size)
+
+    def _require_open(self) -> _Session:
+        if self._session is None:
+            msg = (
+                "This session is not open; build pools inside its `with` block, "
+                "e.g. `with session() as s: pool = s.thread_pool()`."
+            )
+            raise WorkflowError(msg)
+        return self._session
+
+
+def session() -> Session:
+    """Open a background session that pools and shared handlers run on.
+
+    The session owns one event loop, on a daemon thread, for as long as the
+    block is open. Build pools on it with its factories, and pass them to the
+    runs that should use them:
+
+    ```python
+    with session() as s:
+        fast = s.thread_pool(workers=8)
+        optimize(config, x0, function, pool=fast)
+    ```
+
+    Closing the session releases every pool it created, so most code needs no
+    further cleanup. See [Running Optimizations](../running/running.md) for a
+    walkthrough.
+
+    Returns:
+        A context manager owning the session, which binds the
+        [`Session`][ropt.simple.Session] itself when used with `as`.
+    """
+    return Session()

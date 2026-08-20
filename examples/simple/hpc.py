@@ -1,11 +1,11 @@
 """Ensemble optimization on an HPC cluster with the high-level ``ropt.simple`` API.
 
-Opening an ``hpc`` block fixes an HPC worker pool (through ``pysqa``) for the
-block, so the same ``optimize`` call submits its ensemble evaluations as cluster
-jobs. It uses the default cluster and queue from the ``pysqa`` configuration of
-the ``ropt`` installation; cluster-specific parameters (such as ``cluster``,
-``queue``, and ``cores``) can be passed to ``hpc`` when needed. Running it needs
-the ``ropt[hpc]`` extra and a reachable cluster; pass ``--multiprocessing`` to
+An HPC pool submits evaluations to a cluster queue (through ``pysqa``), so an
+``optimize`` call given one runs its ensemble evaluations as cluster jobs. It
+uses the default cluster and queue from the ``pysqa`` configuration of the
+``ropt`` installation; cluster-specific parameters (such as ``cluster``,
+``queue``, and ``cores``) can be passed to ``hpc_pool`` when needed. Running it
+needs the ``ropt[hpc]`` extra and a reachable cluster; pass ``--multiprocessing`` to
 run the identical optimization on a local process pool instead, which needs no
 cluster and lets the example be exercised anywhere.
 """
@@ -20,9 +20,8 @@ from numpy.typing import NDArray
 from ropt.simple import (
     EvaluateResult,
     EvaluationFunctionContext,
-    hpc,
     optimize,
-    processes,
+    session,
 )
 
 DIM = 2
@@ -88,9 +87,13 @@ def main(*, multiprocessing: bool = False) -> None:
     Args:
         multiprocessing: Run on a local process pool instead of an HPC cluster.
     """
-    manager = processes(workers=WORKERS) if multiprocessing else hpc(workers=WORKERS)
-    with manager:
-        result = optimize(CONFIG, INITIAL_VALUES, rosenbrock, report=report)
+    with session() as active:
+        pool = (
+            active.process_pool(workers=WORKERS)
+            if multiprocessing
+            else active.hpc_pool(workers=WORKERS)
+        )
+        result = optimize(CONFIG, INITIAL_VALUES, rosenbrock, pool=pool, report=report)
     print(f"optimal variables: {result.variables}")
     print(f"optimal objective: {result.target_objective}")
     assert result.variables is not None

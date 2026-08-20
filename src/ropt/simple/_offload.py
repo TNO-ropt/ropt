@@ -1,16 +1,14 @@
-"""Offload arbitrary callables to the active executor.
+"""Offload arbitrary callables to a pool.
 
 `offload` runs a single callable, or a sequence of callables concurrently (which
-may be entirely different functions), on the innermost open execution block
-(`threads`/`processes`/`hpc`). It **requires** an executor: with no block open, or
-from a handler in a `handlers` block (which runs on the session's event loop, or
-on a dispatcher worker that has no block of its own), it raises. Use
-`can_offload` to check first and call the callables directly when no executor is
-available. The callables must be picklable for a process or HPC executor.
+may be entirely different functions), on the pool it is given. Without a pool,
+or with a serial pool, it runs them inline on the calling thread — so a call
+site works the same whether or not the caller has a pool to offer, and needs no
+guard. The callables must be picklable for a process or HPC pool.
 
-Because it targets the innermost open block, `offload` called from within an
-evaluation function dispatches to a block that evaluation opens itself, not to
-the enclosing optimizer's executor (an evaluation runs detached from it).
+Which pool the work lands on is decided entirely by the argument: `offload`
+called from inside an evaluation function dispatches to the pool that evaluation
+was handed, not to the one running the evaluation.
 """
 
 from __future__ import annotations
@@ -22,12 +20,14 @@ from typing import TYPE_CHECKING, Any, TypeVar, cast, overload
 from ropt.components.executors import Submission, WorkItem
 from ropt.exceptions import ExecutorFailure, WorkflowError
 
-from ._session import current_executor
+from ._guards import check_pool
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
 
     from ropt.components.executors import Executor
+
+    from ._pool import WorkerPool
 
 _T = TypeVar("_T")
 
@@ -38,91 +38,70 @@ class _IndexedWorkItem(WorkItem):
 
 
 @overload
-def offload(work: Callable[[], _T]) -> _T: ...
+def offload(work: Callable[[], _T], *, pool: WorkerPool | None = ...) -> _T: ...
 
 
 @overload
-def offload(work: Sequence[Callable[[], _T]]) -> tuple[_T, ...]: ...
+def offload(
+    work: Sequence[Callable[[], _T]], *, pool: WorkerPool | None = ...
+) -> tuple[_T, ...]: ...
 
 
 def offload(
     work: Callable[[], _T] | Sequence[Callable[[], _T]],
+    *,
+    pool: WorkerPool | None = None,
 ) -> _T | tuple[_T, ...]:
-    """Offload one or more callables to the active executor.
+    """Offload one or more callables to a pool.
 
-    Runs `work` on the open execution block's executor
-    (`threads`/`processes`/`hpc`). Pass a single zero-argument callable to run
-    one call and return its result, or a sequence of callables to run them
-    concurrently (they may be entirely different functions) and return a tuple
-    of results in the order of `work`. Bind arguments with `functools.partial`.
+    Pass a single zero-argument callable to run one call and return its result,
+    or a sequence of callables to run them concurrently (they may be entirely
+    different functions) and return a tuple of results in the order of `work`.
+    Bind arguments with `functools.partial`.
 
-    It raises a [`WorkflowError`][ropt.exceptions.WorkflowError] when no block is
-    open, or when called from a handler in a `handlers` block; a handler passed
-    to a single `optimize` call runs on the driving thread and can offload.
-    Check [`can_offload`][ropt.simple.can_offload] first and call the callables
-    directly when there is no executor. This holds for an empty sequence too, so
-    that a call site is not silently accepted in a context where it cannot
-    dispatch. The callables must be picklable for a process or HPC executor.
+    Without a pool, or with a [`serial_pool`][ropt.simple.serial_pool], the
+    callables run inline on the calling thread, one after another. Code that may
+    or may not have a pool to hand therefore needs no fallback: pass whatever it
+    has, including `None`. The callables must be picklable for a process or HPC
+    pool.
 
     See [Running Optimizations](../running/running.md) for a walkthrough.
 
+    A handler in a shared group runs on the pool's own event loop and cannot
+    wait on it; offloading from there raises a
+    [`WorkflowError`][ropt.exceptions.WorkflowError]. So does a pool that is
+    closed, or one carried into a worker process.
+
     Args:
         work: A single zero-argument callable, or a sequence of them.
+        pool: The pool to dispatch to, or `None` to run inline. Work offloaded
+              from inside an evaluation needs a *different* pool: the pool it is
+              already running on refuses it.
 
     Returns:
         The single result, or a tuple of results in the order of `work`.
     """
-    executor = _require_executor()
+    check_pool(pool)
+    executor = _dispatchable(pool)
     if callable(work):
-        return cast("_T", _dispatch(executor, [work])[0])
+        functions = [work]
+        results = _run(executor, functions)
+        return cast("_T", results[0])
     functions = list(work)
     if not functions:
         return ()
-    return tuple(_dispatch(executor, functions))
+    return tuple(_run(executor, functions))
 
 
-def can_offload() -> bool:
-    """Report whether `offload` would dispatch to an executor.
-
-    Returns `True` when an execution block (`threads`/`processes`/`hpc`) is open
-    and the caller can dispatch to it, and `False` otherwise (no block open, the
-    block's executor has stopped, or called from a handler in a `handlers`
-    block).
-
-    Use it in code that may run with or without an execution block (for example
-    a plugin, transform, or custom step) to fall back to a direct call instead
-    of letting `offload` raise:
-
-    ```python
-    result = offload(work) if can_offload() else work()
-    ```
-
-    You do not need it when you know a block is open — call `offload` directly.
-
-    See [Running Optimizations](../running/running.md) for a walkthrough.
-
-    Returns:
-        `True` if `offload` would dispatch, `False` otherwise.
-    """
-    executor = current_executor()
-    return (
-        executor is not None and executor.is_running() and not executor.on_worker_loop()
-    )
-
-
-def _require_executor() -> Executor:
-    executor = current_executor()
+def _run(executor: Executor | None, functions: list[Callable[[], Any]]) -> list[Any]:
     if executor is None:
-        # A threaded handler lands here even inside an open block: it runs on a
-        # dispatcher worker, which carries no session to find the block through.
-        msg = (
-            "offload() found no executor to dispatch to here; open an execution "
-            "block (threads/processes/hpc), or use can_offload() to run inline. "
-            "A handler running in a thread always lands here, because the "
-            "dispatcher worker it runs on carries no block of its own."
-        )
-        raise WorkflowError(msg)
-    if executor.on_worker_loop():
+        return [function() for function in functions]
+    return _dispatch(executor, functions)
+
+
+def _dispatchable(pool: WorkerPool | None) -> Executor | None:
+    executor = None if pool is None else pool.executor
+    if executor is not None and executor.on_worker_loop():
         msg = (
             "offload() cannot be called from a result handler "
             "(it runs on the session's event loop)."
