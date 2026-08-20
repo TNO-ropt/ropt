@@ -3519,7 +3519,8 @@ carries the open blocks to each run.</p>
   
       dataclass
   " href="../results/#ropt.results.Results"><code>Results</code></a> this run emits,
-                  for example to tag or identify the run.</p>
+                  for example to tag or identify the run. It also
+                  reaches <code>function</code> as <code>context.metadata</code>.</p>
               </div>
             </td>
             <td>
@@ -3759,7 +3760,9 @@ event with its run, or with a per-run <code>report</code> callback.</p>
       dataclass
   " href="../results/#ropt.results.Results"><code>Results</code></a> a run emits,
                   shared by all runs or given one per run — for
-                  example to tag each run with <code>{"run_id": i}</code>.</p>
+                  example to tag each run with <code>{"run_id": i}</code>. It
+                  also reaches each run's <code>function</code> as
+                  <code>context.metadata</code>.</p>
               </div>
             </td>
             <td>
@@ -3934,7 +3937,8 @@ block still receives the results, its <code>report</code> callback included.</p>
 
   
       dataclass
-  " href="../results/#ropt.results.Results"><code>Results</code></a>.</p>
+  " href="../results/#ropt.results.Results"><code>Results</code></a>. It also reaches
+       <code>function</code> as <code>context.metadata</code>.</p>
               </div>
             </td>
             <td>
@@ -4107,7 +4111,8 @@ the results.</p>
 
   
       dataclass
-  " href="../results/#ropt.results.Results"><code>Results</code></a>.</p>
+  " href="../results/#ropt.results.Results"><code>Results</code></a>. It also reaches
+       <code>function</code> as <code>context.metadata</code>.</p>
               </div>
             </td>
             <td>

@@ -3302,8 +3302,17 @@ assembly of the final
 <td><code>eval_idx</code></td>
 <td>Row index within the batch.</td>
 </tr>
+<tr>
+<td><code>metadata</code></td>
+<td>The metadata the run was started with, or <code>None</code>.</td>
+</tr>
 </tbody>
 </table>
+<p><code>metadata</code> is the dictionary passed to the compute step's <code>run</code> method, and
+is the channel for handing your own per-run data (a run ID, a case name, a
+path) to the evaluation function. Every evaluation of the run sees the same
+dictionary, so treat it as read-only; for a process or HPC executor its
+contents must be picklable.</p>
 </li>
 <li>
 <p>The return value is an
