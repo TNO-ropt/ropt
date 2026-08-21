@@ -365,15 +365,6 @@
   
     
     
-      
-  
-  
-  
-    
-  
-  
-    
-    
       <li class="md-tabs__item md-tabs__item--active">
         <a href="../simple/" class="md-tabs__link">
           
@@ -383,9 +374,6 @@
 
         </a>
       </li>
-    
-  
-
     
   
 
@@ -1597,63 +1585,6 @@
   
   
   
-    
-    
-    
-    
-      
-      
-        
-          
-          
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8_1" >
-        
-          
-          <label class="md-nav__link" for="__nav_8_1" id="__nav_8_1_label" tabindex="">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Simple API
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_8_1_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_8_1">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Simple API
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
     <li class="md-nav__item">
       <a href="../simple/" class="md-nav__link">
         
@@ -1662,7 +1593,7 @@
   <span class="md-ellipsis">
     
   
-    Optimization Entry Points
+    Simple API
   
 
     
@@ -1671,42 +1602,6 @@
   
 
       </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../simple_compose/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Composing Custom Runs
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
     </li>
   
 
@@ -6470,8 +6365,9 @@ awaiting evaluator.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If the dispatcher is not running, or if a handler of
-           this dispatcher is dispatching.</p>
+                <p>If the dispatcher is not running, or if the call is
+           made from the thread running its event loop, or from
+           one of its handler threads.</p>
               </div>
             </td>
           </tr>

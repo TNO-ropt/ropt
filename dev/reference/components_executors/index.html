@@ -365,15 +365,6 @@
   
     
     
-      
-  
-  
-  
-    
-  
-  
-    
-    
       <li class="md-tabs__item md-tabs__item--active">
         <a href="../simple/" class="md-tabs__link">
           
@@ -383,9 +374,6 @@
 
         </a>
       </li>
-    
-  
-
     
   
 
@@ -1597,63 +1585,6 @@
   
   
   
-    
-    
-    
-    
-      
-      
-        
-          
-          
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8_1" >
-        
-          
-          <label class="md-nav__link" for="__nav_8_1" id="__nav_8_1_label" tabindex="">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Simple API
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_8_1_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_8_1">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Simple API
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
     <li class="md-nav__item">
       <a href="../simple/" class="md-nav__link">
         
@@ -1662,7 +1593,7 @@
   <span class="md-ellipsis">
     
   
-    Optimization Entry Points
+    Simple API
   
 
     
@@ -1671,42 +1602,6 @@
   
 
       </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../simple_compose/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Composing Custom Runs
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
     </li>
   
 
@@ -2561,6 +2456,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#ropt.components.executors.Executor.on_worker_thread" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        on_worker_thread
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ropt.components.executors.Executor.is_running" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2720,6 +2626,17 @@
     <span class="md-ellipsis">
       
         start
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.components.executors.ThreadingExecutor.on_worker_thread" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        on_worker_thread
       
     </span>
   </a>
@@ -3138,6 +3055,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#ropt.components.executors.Executor.on_worker_thread" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        on_worker_thread
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ropt.components.executors.Executor.is_running" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3297,6 +3225,17 @@
     <span class="md-ellipsis">
       
         start
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.components.executors.ThreadingExecutor.on_worker_thread" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        on_worker_thread
       
     </span>
   </a>
@@ -3654,6 +3593,59 @@ executors that do not have one.</p>
 <div class="doc doc-object doc-function">
 
 
+<h3 id="ropt.components.executors.Executor.on_worker_thread" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">on_worker_thread</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">on_worker_thread</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">bool</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Report whether the caller is running as one of this executor's workers.</p>
+<p>Such a caller occupies a worker for as long as it waits, so work it
+submits here can only start once it stops waiting. Implementations whose
+workers run in this process must override this; the default <code>False</code> is
+for executors whose workers cannot submit back in the first place, and
+leaves the refusal in <code>submit</code> inactive.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p><code>True</code> if the calling thread is running this executor's work.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
 <h3 id="ropt.components.executors.Executor.is_running" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">is_running</span>
 
@@ -3724,7 +3716,9 @@ itself may fall back to doing so.</p>
     <div class="doc doc-contents ">
 
         <p>Hand a submission to the executor.</p>
-<p>May be called from any thread. A submission handed to an executor that
+<p>May be called from any thread, except one of the executor's own workers:
+that caller waits for workers it is itself occupying, so it is refused
+rather than left to deadlock. A submission handed to an executor that
 is no longer running is aborted rather than queued, so its caller is
 never left waiting for results that cannot arrive.</p>
 
@@ -3754,6 +3748,29 @@ never left waiting for results that cannot arrive.</p>
             </td>
             <td>
                 <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            WorkflowError (ropt.exceptions.WorkflowError)" href="../exceptions/#ropt.exceptions.WorkflowError">WorkflowError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If called from one of this executor's workers.</p>
+              </div>
             </td>
           </tr>
       </tbody>
@@ -4511,6 +4528,56 @@ caller that has left.</p>
 
 
 
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.components.executors.ThreadingExecutor.on_worker_thread" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">on_worker_thread</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">on_worker_thread</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">bool</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Report whether the caller is running as one of this executor's workers.</p>
+<p>A thread started by a work item is not a worker: it holds none of this
+executor's workers, and is not recognized here.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p><code>True</code> if the calling thread is one of this executor's workers.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+
+
+
   </div>
 
     </div>
@@ -4983,6 +5050,17 @@ this requires exactly one cluster to provide the queue.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#ValueError">ValueError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If <code>workdir</code> is not an existing absolute path, or if
+            <code>workers</code>, <code>interval</code> or <code>retries</code> is out of range.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
                   <code><a class="autorefs autorefs-internal" title="            ExecutionError (ropt.exceptions.ExecutionError)" href="../exceptions/#ropt.exceptions.ExecutionError">ExecutionError</a></code>
             </td>
             <td>
@@ -4990,9 +5068,8 @@ this requires exactly one cluster to provide the queue.</p>
                 <p>If neither a <code>template</code> is provided nor a valid
           <code>config_path</code> can be found, if the requested cluster
           is unknown, if the queue is not available on the
-          requested cluster, if the queue cannot be resolved to
-          exactly one cluster, or if <code>workers</code>, <code>interval</code> or
-          <code>retries</code> is out of range.</p>
+          requested cluster, or if the queue cannot be resolved
+          to exactly one cluster.</p>
               </div>
             </td>
           </tr>

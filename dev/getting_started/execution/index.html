@@ -365,13 +365,6 @@
   
     
     
-      
-  
-  
-  
-  
-    
-    
       <li class="md-tabs__item">
         <a href="../../reference/simple/" class="md-tabs__link">
           
@@ -381,9 +374,6 @@
 
         </a>
       </li>
-    
-  
-
     
   
 
@@ -742,10 +732,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#threads-a-pool-of-threads-in-the-same-process" class="md-nav__link">
+  <a href="#thread_pool-a-pool-of-threads-in-the-same-process" class="md-nav__link">
     <span class="md-ellipsis">
       
-        threads — a pool of threads in the same process
+        thread_pool — a pool of threads in the same process
       
     </span>
   </a>
@@ -753,10 +743,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#processes-a-pool-of-separate-processes" class="md-nav__link">
+  <a href="#process_pool-a-pool-of-separate-processes" class="md-nav__link">
     <span class="md-ellipsis">
       
-        processes — a pool of separate processes
+        process_pool — a pool of separate processes
       
     </span>
   </a>
@@ -764,10 +754,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#hpc-a-pool-of-jobs-on-a-cluster" class="md-nav__link">
+  <a href="#hpc_pool-a-pool-of-jobs-on-a-cluster" class="md-nav__link">
     <span class="md-ellipsis">
       
-        hpc — a pool of jobs on a cluster
+        hpc_pool — a pool of jobs on a cluster
       
     </span>
   </a>
@@ -1725,60 +1715,6 @@
   
   
   
-    
-    
-    
-    
-      
-      
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8_1" >
-        
-          
-          <label class="md-nav__link" for="__nav_8_1" id="__nav_8_1_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Simple API
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_8_1_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_8_1">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Simple API
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
     <li class="md-nav__item">
       <a href="../../reference/simple/" class="md-nav__link">
         
@@ -1787,7 +1723,7 @@
   <span class="md-ellipsis">
     
   
-    Optimization Entry Points
+    Simple API
   
 
     
@@ -1796,42 +1732,6 @@
   
 
       </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../reference/simple_compose/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Composing Custom Runs
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
     </li>
   
 
@@ -2871,10 +2771,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#threads-a-pool-of-threads-in-the-same-process" class="md-nav__link">
+  <a href="#thread_pool-a-pool-of-threads-in-the-same-process" class="md-nav__link">
     <span class="md-ellipsis">
       
-        threads — a pool of threads in the same process
+        thread_pool — a pool of threads in the same process
       
     </span>
   </a>
@@ -2882,10 +2782,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#processes-a-pool-of-separate-processes" class="md-nav__link">
+  <a href="#process_pool-a-pool-of-separate-processes" class="md-nav__link">
     <span class="md-ellipsis">
       
-        processes — a pool of separate processes
+        process_pool — a pool of separate processes
       
     </span>
   </a>
@@ -2893,10 +2793,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#hpc-a-pool-of-jobs-on-a-cluster" class="md-nav__link">
+  <a href="#hpc_pool-a-pool-of-jobs-on-a-cluster" class="md-nav__link">
     <span class="md-ellipsis">
       
-        hpc — a pool of jobs on a cluster
+        hpc_pool — a pool of jobs on a cluster
       
     </span>
   </a>
@@ -2965,31 +2865,32 @@
 <p>An optimization calls your evaluation function many times. By default these calls
 happen one after another, on the same thread that called
 <a class="autorefs autorefs-internal" title="            ropt.simple.optimize" href="../../reference/simple/#ropt.simple.optimize"><code>optimize</code></a>. If each call is slow, you can run several at
-the same time by opening an <strong>execution block</strong> first.</p>
-<p>There are three kinds of block. You pick one with a <code>with</code> statement, and every
-optimization inside it uses that block:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.simple</span><span class="w"> </span><span class="kn">import</span> <span class="n">optimize</span><span class="p">,</span> <span class="n">threads</span>
+the same time by evaluating on a <strong>worker pool</strong>.</p>
+<p>Pools come from a <a class="autorefs autorefs-internal" title="            ropt.simple.session" href="../../reference/simple/#ropt.simple.session"><code>session</code></a>. Open one, ask it for the kind
+of pool you want, and pass that pool to the run:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.simple</span><span class="w"> </span><span class="kn">import</span> <span class="n">optimize</span><span class="p">,</span> <span class="n">session</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="k">with</span> <span class="n">threads</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">):</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">pool</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">thread_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
 </span></code></pre></div>
-<p>The block fixes one worker pool for everything inside it. You cannot open a
-second block inside the first one.</p>
-<p>Where your objective runs depends on which block you open (or none):</p>
+<p>There are three kinds of pool. A session can hand out as many as you like, of any
+kind, and each run uses the one you give it — and only that one. Closing the
+session releases them all.</p>
+<p>Where your objective runs depends on which pool you pass (or none):</p>
 <pre class="mermaid"><code>flowchart TB
     subgraph proc["your Python process"]
         main(["your program&lt;br/&gt;(main thread)"])
-        seq["no block —&lt;br/&gt;one eval at a time"]
-        th["threads —&lt;br/&gt;worker threads&lt;br/&gt;(share memory)"]
+        seq["no pool —&lt;br/&gt;one eval at a time"]
+        th["thread_pool —&lt;br/&gt;worker threads&lt;br/&gt;(share memory)"]
     end
-    wp["processes —&lt;br/&gt;separate processes&lt;br/&gt;(data copied)"]
-    clu["hpc —&lt;br/&gt;cluster jobs&lt;br/&gt;(data copied)"]
+    wp["process_pool —&lt;br/&gt;separate processes&lt;br/&gt;(data copied)"]
+    clu["hpc_pool —&lt;br/&gt;cluster jobs&lt;br/&gt;(data copied)"]
     main --&gt; seq
     main --&gt; th
     main --&gt; wp
     main --&gt; clu</code></pre>
 <p>Threads stay <strong>inside</strong> your Python process and share its memory, so any Python
-function works and nothing is copied. <code>processes</code> and <code>hpc</code> run the work
+function works and nothing is copied. A process or HPC pool runs the work
 <strong>outside</strong> your process, so the objective and its data are copied there.</p>
 <details class="info">
 <summary>New to threads and processes?</summary>
@@ -3002,19 +2903,19 @@ each have their own interpreter and run truly in parallel, but they do not
 share memory, so data has to be copied between them.</p>
 </details>
 <h2 id="the-three-choices">The three choices</h2>
-<h3 id="threads-a-pool-of-threads-in-the-same-process"><code>threads</code> — a pool of threads in the same process</h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.simple</span><span class="w"> </span><span class="kn">import</span> <span class="n">threads</span>
+<h3 id="thread_pool-a-pool-of-threads-in-the-same-process"><code>thread_pool</code> — a pool of threads in the same process</h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">pool</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">thread_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
 </span></code></pre></div>
 <p>The evaluations run on background <strong>threads</strong>, all inside your program. Nothing
 is copied between them, so any Python function works as the objective, and it can
 freely use the data around it.</p>
-<p>Use <code>threads</code> when each evaluation spends most of its time <strong>waiting</strong> — for
+<p>Use a thread pool when each evaluation spends most of its time <strong>waiting</strong> — for
 example when it starts an external program, reads a file, or calls a network
 service. While one evaluation waits, the others can run.</p>
 <p>Threads share one Python interpreter. Because of this, threads do <strong>not</strong> speed
-up work that is pure Python number-crunching. For that, use <code>processes</code>.</p>
-<h3 id="processes-a-pool-of-separate-processes"><code>processes</code> — a pool of separate processes</h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.simple</span><span class="w"> </span><span class="kn">import</span> <span class="n">processes</span>
+up work that is pure Python number-crunching. For that, use a process pool.</p>
+<h3 id="process_pool-a-pool-of-separate-processes"><code>process_pool</code> — a pool of separate processes</h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">pool</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">process_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
 </span></code></pre></div>
 <p>The evaluations run in <strong>separate processes</strong>. This gives real parallel speed for
 heavy Python computations, because each process has its own interpreter.</p>
@@ -3027,28 +2928,28 @@ a lambda, a closure, or a function defined in a notebook cell needs the
 <strong>back</strong> through its return value; it cannot share memory with your handlers or
 the rest of your program. See
 <a href="../../running/running/#handlers-and-the-process-boundary">Handlers and the process boundary</a>.</p>
-<h3 id="hpc-a-pool-of-jobs-on-a-cluster"><code>hpc</code> — a pool of jobs on a cluster</h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.simple</span><span class="w"> </span><span class="kn">import</span> <span class="n">hpc</span>
+<h3 id="hpc_pool-a-pool-of-jobs-on-a-cluster"><code>hpc_pool</code> — a pool of jobs on a cluster</h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">pool</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">hpc_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
 </span></code></pre></div>
 <p>The evaluations are submitted as jobs to an HPC queue (for example Slurm). Use
 this when a single evaluation is a large job that belongs on a cluster. It needs
 the <code>ropt[hpc]</code> extra and a reachable cluster:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">with</span> <span class="n">hpc</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">pool</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">hpc_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">10</span><span class="p">))</span>
 </span></code></pre></div>
-<p>With no further arguments, <code>hpc</code> uses the default cluster and queue from the
+<p>With no further arguments, <code>hpc_pool</code> uses the default cluster and queue from the
 <code>pysqa</code> configuration of your <code>ropt</code> installation. Cluster-specific parameters —
 such as the <code>cluster</code> name, the <code>queue</code>, and the number of <code>cores</code> per job — can
-be passed to <code>hpc</code> when you need them; see
+be passed to <code>hpc_pool</code> when you need them; see
 <a href="../../running/running/#running-on-an-hpc-cluster">Running Optimizations</a> for the full list.</p>
-<p>Like <code>processes</code>, the work is copied to the cluster. This currently uses
+<p>Like a process pool, the work is copied to the cluster. This currently uses
 <code>cloudpickle</code>, which is included in the <code>ropt[hpc]</code> extra (see
 <a href="../installation/#optional-extras">Installation</a>).</p>
 <h2 id="which-one-should-i-use">Which one should I use?</h2>
 <table>
 <thead>
 <tr>
-<th>Block</th>
+<th>Pool</th>
 <th>Where evaluations run</th>
 <th>Data</th>
 <th>Speeds up heavy Python?</th>
@@ -3058,27 +2959,27 @@ be passed to <code>hpc</code> when you need them; see
 <tbody>
 <tr>
 <td>none (default)</td>
-<td>the main thread, one at a time</td>
+<td>the calling thread, one at a time</td>
 <td>shared</td>
 <td>no</td>
 <td>evaluations are fast</td>
 </tr>
 <tr>
-<td><code>threads</code></td>
+<td><code>thread_pool</code></td>
 <td>background threads, one process</td>
 <td>shared</td>
 <td>no — one interpreter</td>
 <td>each evaluation mostly <strong>waits</strong> (external tool, I/O)</td>
 </tr>
 <tr>
-<td><code>processes</code></td>
+<td><code>process_pool</code></td>
 <td>separate processes</td>
 <td>copied</td>
 <td>yes</td>
 <td>each evaluation is heavy <strong>Python computation</strong></td>
 </tr>
 <tr>
-<td><code>hpc</code></td>
+<td><code>hpc_pool</code></td>
 <td>jobs on a cluster</td>
 <td>copied</td>
 <td>yes</td>
@@ -3087,34 +2988,37 @@ be passed to <code>hpc</code> when you need them; see
 </tbody>
 </table>
 <h2 id="running-multiple-optimizations-in-parallel">Running multiple optimizations in parallel</h2>
-<p>The same blocks also power <a class="autorefs autorefs-internal" title="            ropt.simple.optimize_many" href="../../reference/simple/#ropt.simple.optimize_many"><code>optimize_many</code></a>, which
+<p>The same pools also power <a class="autorefs autorefs-internal" title="            ropt.simple.optimize_many" href="../../reference/simple/#ropt.simple.optimize_many"><code>optimize_many</code></a>, which
 runs several optimizations at once:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.simple</span><span class="w"> </span><span class="kn">import</span> <span class="n">optimize_many</span><span class="p">,</span> <span class="n">threads</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.simple</span><span class="w"> </span><span class="kn">import</span> <span class="n">optimize_many</span><span class="p">,</span> <span class="n">session</span>
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="k">with</span> <span class="n">threads</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">):</span>
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>    <span class="n">results</span> <span class="o">=</span> <span class="n">optimize_many</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">start_points</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>    <span class="n">pool</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">thread_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>    <span class="n">results</span> <span class="o">=</span> <span class="n">optimize_many</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">start_points</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">pool</span><span class="o">=</span><span class="n">pool</span><span class="p">)</span>
 </span></code></pre></div>
 <p><code>optimize_many</code> always runs the optimizations themselves concurrently, each on
-its own thread — that part does not depend on the block. The block instead
-decides how the <em>function evaluations</em> inside those runs are parallelized: they
-share its one worker pool. So <code>threads(workers=1)</code> runs the optimizations
-together but evaluates one point at a time, while a larger pool (or <code>processes</code>
-or <code>hpc</code>) evaluates several at once. An execution block is required.</p>
+its own thread — that part does not depend on the pool. The pool instead decides
+how the <em>function evaluations</em> inside those runs are parallelized: they all
+happen on it. So <code>thread_pool(workers=1)</code> runs the optimizations together but
+evaluates one point at a time, while a larger pool (or a process or HPC pool)
+evaluates several at once. Without a pool the runs evaluate on their own driver
+threads, so your objective is then called by several threads at once.</p>
 <p>See <a href="../../running/running/#many-optimizations-at-once">Running Optimizations</a> for more.</p>
 <h2 id="offloading-your-own-functions">Offloading your own functions</h2>
-<p>A block can also run <strong>your own</strong> functions in parallel, not just the optimizer's
+<p>A pool can also run <strong>your own</strong> functions in parallel, not just the optimizer's
 evaluations. Pass a function — or several — to <a class="autorefs autorefs-internal" title="            ropt.simple.offload" href="../../reference/simple/#ropt.simple.offload"><code>offload</code></a>
-and it runs on the same pool:</p>
+together with the pool to run it on:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
 </span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.simple</span><span class="w"> </span><span class="kn">import</span> <span class="n">offload</span><span class="p">,</span> <span class="n">processes</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.simple</span><span class="w"> </span><span class="kn">import</span> <span class="n">offload</span><span class="p">,</span> <span class="n">session</span>
 </span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>
-</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="k">with</span> <span class="n">processes</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">):</span>
-</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">offload</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="n">expensive</span><span class="p">,</span> <span class="n">data</span><span class="p">))</span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">offload</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="n">expensive</span><span class="p">,</span> <span class="n">data</span><span class="p">),</span> <span class="n">pool</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">process_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
 </span></code></pre></div>
 <p>This is for expensive, self-contained work in code you write — a helper, a custom
 step, or a transform. Like the objective, such functions are copied to the
-workers under <code>processes</code>/<code>hpc</code>. See
+workers on a process or HPC pool. Without a pool <code>offload</code> runs them inline, so
+code that may or may not have one to hand needs no fallback. See
 <a href="../../running/running/#offloading-your-own-work">Running Optimizations</a> for
 details.</p>
 
