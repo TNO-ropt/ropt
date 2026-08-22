@@ -95,6 +95,9 @@ extra:
 watch:
   - src
 
+validation:
+  anchors: warn
+
 repo_url: https://github.com/TNO-ropt/ropt
 repo_name: TNO-ropt/ropt
 
@@ -127,6 +130,7 @@ nav:
   - "Utilities":
       - "Logging": utilities/logging.md
       - "Plugin Discovery": utilities/plugin_discovery.md
+      - "Writing a Plugin": utilities/writing_plugins.md
   - "Tutorials":
       - "Overview": tutorials/index.md
       - "Your First Optimization": tutorials/optimize.md

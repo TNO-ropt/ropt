@@ -41,22 +41,22 @@ if TYPE_CHECKING:
 
 _logger = get_logger(__name__)
 
+_SCIPY_METHOD_NAMES: Final = (
+    "Nelder-Mead",
+    "Powell",
+    "CG",
+    "BFGS",
+    "Newton-CG",
+    "L-BFGS-B",
+    "TNC",
+    "COBYLA",
+    "COBYQA",
+    "SLSQP",
+    "trust-constr",
+    "differential_evolution",
+)
 SUPPORTED_SCIPY_METHODS: Final[set[str]] = {
-    name.lower()
-    for name in (
-        "Nelder-Mead",
-        "Powell",
-        "CG",
-        "BFGS",
-        "Newton-CG",
-        "L-BFGS-B",
-        "TNC",
-        "COBYLA",
-        "COBYQA",
-        "SLSQP",
-        "trust-constr",
-        "differential_evolution",
-    )
+    name.lower() for name in _SCIPY_METHOD_NAMES
 }
 DEFAULT_SCIPY_METHOD: Final = "slsqp"
 
@@ -103,6 +103,9 @@ _NO_GRADIENT: Final = {
     for name in ["Nelder-Mead", "Powell", "COBYLA", "COBYQA", "differential_evolution"]
 }
 
+# These methods can handle integer variables:
+_SUPPORT_INTEGER: Final = {"differential_evolution"}
+
 # These methods use constraint objects instead of dicts:
 _USE_CONSTRAINT_OBJECTS: Final = {"differential_evolution", "cobyqa", "trust-constr"}
 
@@ -118,9 +121,21 @@ class SciPyBackend(Backend):
     to `ropt`.
 
     The algorithm is selected via the `method` field of the
-    [`BackendConfig`][ropt.config.BackendConfig] object. Algorithm-specific
-    options are passed through the `options` dictionary. Click on the common
-    options or the method name for the corresponding
+    [`BackendConfig`][ropt.config.BackendConfig] object. Not every algorithm
+    accepts every kind of problem:
+
+    --8<-- "scipy_capabilities.md"
+
+    A method without a gradient asks only for function values, so no
+    perturbations are evaluated for it. Configuring a method with a constraint
+    it does not support raises
+    [`UnsupportedError`][ropt.exceptions.UnsupportedError] when the run starts.
+    `differential_evolution` requires bound constraints on all variables, and
+    is the only method that handles integer variables; the others silently
+    treat them as continuous.
+
+    Algorithm-specific options are passed through the `options` dictionary.
+    Click on the common options or the method name for the corresponding
     [`scipy.optimize`](https://docs.scipy.org/doc/scipy/reference/optimize.html)
     documentation:
 
@@ -602,13 +617,54 @@ class SciPyBackend(Backend):
         if self._context.optimizer.output_dir is not None:
             options["disp"] = True
 
-        if self._method == "differential_evolution" and "integrality" not in options:
+        if self._method in _SUPPORT_INTEGER and "integrality" not in options:
             options["integrality"] = (
                 self._context.variables.types[self._context.variables.mask]
                 == VariableType.INTEGER
             )
 
         return options
+
+
+def _mark(supported: bool) -> str:  # ruff: ignore[boolean-type-hint-positional-argument]
+    icon = "check" if supported else "close"
+    state = "supported" if supported else "unsupported"
+    return f" :material-{icon}:{{ .{state} }} "
+
+
+def _gen_capability_table() -> str:
+    columns = (
+        "Method",
+        "Gradient",
+        "Bounds",
+        "Linear eq.",
+        "Linear ineq.",
+        "Non-linear eq.",
+        "Non-linear ineq.",
+        "Integer",
+    )
+    rows = [
+        "|" + "|".join(columns) + "|",
+        "|" + "|".join([":--"] + [":-:"] * (len(columns) - 1)) + "|",
+    ]
+    for name in _SCIPY_METHOD_NAMES:
+        method = name.lower()
+        bounds = (
+            " *required* "
+            if method in _CONSTRAINT_REQUIRES_BOUNDS
+            else _mark(method in _CONSTRAINT_SUPPORT_BOUNDS)
+        )
+        rows.append(
+            f"|{name}"
+            f"|{_mark(method not in _NO_GRADIENT)}"
+            f"|{bounds}"
+            f"|{_mark(method in _CONSTRAINT_SUPPORT_LINEAR_EQ)}"
+            f"|{_mark(method in _CONSTRAINT_SUPPORT_LINEAR_INEQ)}"
+            f"|{_mark(method in _CONSTRAINT_SUPPORT_NONLINEAR_EQ)}"
+            f"|{_mark(method in _CONSTRAINT_SUPPORT_NONLINEAR_INEQ)}"
+            f"|{_mark(method in _SUPPORT_INTEGER)}|"
+        )
+    return "\n".join(rows) + "\n"
 
 
 SCIPY_OPTIONS_SCHEMA: dict[str, Any] = {
@@ -816,3 +872,4 @@ if __name__ == "__main__":
     Path("scipy.md").write_text(
         gen_options_table(SCIPY_OPTIONS_SCHEMA), encoding="utf-8"
     )
+    Path("scipy_capabilities.md").write_text(_gen_capability_table(), encoding="utf-8")

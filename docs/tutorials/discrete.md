@@ -29,7 +29,10 @@ config = {
 }
 ```
 
-`VariableType` comes from `ropt.enums`, not from `ropt.simple`.
+`VariableType` comes from `ropt.enums`, not from `ropt.simple`. The method
+matters here: `differential_evolution` is the only SciPy method that handles
+integer variables (see [`SciPyBackend`][ropt.backend.scipy.SciPyBackend]), and
+it requires bounds on every variable.
 
 ## Add the constraint
 

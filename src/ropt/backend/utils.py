@@ -35,15 +35,17 @@ def validate_supported_constraints(
     types are identified by the keys `"bounds"`, `"linear:eq"`, `"linear:ineq"`,
     `"nonlinear:eq"`, and `"nonlinear:ineq"`.
 
-    Raises `NotImplementedError` if a constraint present in `context` is not
+    Raises `UnsupportedError` if a constraint present in `context` is not
     supported by the method, or if a constraint required by the method is absent
     from `context`.
 
     Args:
         context:               The optimization context to inspect.
         method:                The name of the optimization method being used.
-        supported_constraints: Maps each constraint type to the supported methods.
-        required_constraints:  Maps each constraint type to  supported methods.
+        supported_constraints: Maps each constraint type to the methods that
+                               support it.
+        required_constraints:  Maps each constraint type to the methods that
+                               require it.
     """
     _validate_bounds(context, method, supported_constraints, required_constraints)
     _validate_linear_constraints(

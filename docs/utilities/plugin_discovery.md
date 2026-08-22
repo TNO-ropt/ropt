@@ -35,6 +35,7 @@ validate_backend_options("scipy/slsqp", {"bogus": 1})       # raises: unknown op
 
 ## Where to next
 
+- Implementing a plugin of your own: [Writing a Plugin](writing_plugins.md).
 - Installing plugin packages: [Installation](../getting_started/installation.md#plugin-packages).
 - The `"plugin/method"` naming convention in full:
   [Method strings](../optimizer_setup/configuration.md#method-strings).

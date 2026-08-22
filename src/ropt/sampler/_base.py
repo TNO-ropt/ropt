@@ -105,7 +105,7 @@ class Sampler(ABC):
             The generated samples represent *unscaled* perturbations. During the
             gradient estimation process, these samples are multiplied
             element-wise by the `perturbation_magnitudes` defined in the
-            [`GradientConfig`][ropt.config.GradientConfig].
+            [`VariablesConfig`][ropt.config.VariablesConfig].
 
             Therefore, it is generally recommended that sampler implementations
             produce samples with a characteristic scale of approximately one

@@ -293,9 +293,8 @@ class ExecutorBase(Executor):
     Owns every submission it accepts, so stopping the executor releases all
     waiting callers from a single place.
 
-    Implementations must call
-    [`_begin_start`][ropt.components.executors.ExecutorBase._begin_start] before
-    creating any resources, and `_finish_start` once they are in place.
+    Implementations must call `_begin_start` before creating any resources, and
+    `_finish_start` once they are in place.
     """
 
     def __init__(self) -> None:

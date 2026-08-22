@@ -37,7 +37,9 @@ the run is started from, including a thread you spawn yourself.
 
 ## Aggregating results across runs
 
-::: ropt.simple.Session.shared_handlers
+[`Session.shared_handlers`][ropt.simple.Session.shared_handlers] builds the
+group; the group itself is a `SharedHandlers` object.
+
 ::: ropt.simple.SharedHandlers
 
 ## Result objects

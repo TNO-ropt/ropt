@@ -28,7 +28,7 @@ class OptionsSchemaModel(BaseModel):
 
     This class defines the structure for describing the methods and options
     available for a plugin. The methods are described in a list of
-    [`MethodSchemaModel][ropt.config.options.MethodSchemaModel`] objects, each
+    [`MethodSchemaModel`][ropt.config.options.MethodSchemaModel] objects, each
     describing a method supported by the plugin.
 
     Attributes:

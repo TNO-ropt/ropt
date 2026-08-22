@@ -2,7 +2,8 @@
 
 These abstract classes define the interface that each plugin area expects.
 Implementing a plugin means subclassing the relevant base class and
-registering it via a Python entry point under `ropt.plugins.<area>`.
+registering it via a Python entry point under `ropt.plugins.<area>`. See
+[Writing a Plugin](../utilities/writing_plugins.md) for a walkthrough.
 
 ::: ropt.plugins.backend.BackendPlugin
 ::: ropt.plugins.function_estimator.FunctionEstimatorPlugin

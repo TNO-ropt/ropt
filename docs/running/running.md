@@ -201,6 +201,47 @@ An [`EvaluateResult`][ropt.simple.EvaluateResult] has the same fields as
 `OptimizeResult`, minus `exit_code` and `variables` (you supplied the point
 yourself; it is still on `result.results.evaluations.variables`).
 
+## When something goes wrong
+
+Not every problem is an exception. An optimization that cannot make progress
+still returns normally, and says why in `result.exit_code`:
+`TOO_FEW_REALIZATIONS` when not enough realizations produced a value,
+`EXECUTOR_STOPPED` when the pool it was evaluating on was closed under it. In
+both cases the result fields are `None`, so check `exit_code` before using
+them. A plain [`evaluate`][ropt.simple.evaluate] has no `exit_code`; there the
+`None` fields are the only sign that nothing usable came back.
+
+What *is* raised falls into three groups:
+
+- **Mistakes in the configuration** surface as a `pydantic.ValidationError`
+  from the `config` dictionary: an unknown field, a value of the wrong type, a
+  method name no installed plugin provides, or a set of options the chosen
+  method does not accept. These are raised at the start of the call, before
+  anything is evaluated.
+
+- **Mistakes in the call itself** raise a `ValueError` — a start point of the
+  wrong shape, an evaluation function returning the wrong number of values —
+  or one of the [`RoptError`][ropt.exceptions.RoptError] types:
+  [`WorkflowError`][ropt.exceptions.WorkflowError] when a pool or handler is
+  used in a way it cannot be (a closed pool, a handler already claimed by
+  another run),
+  [`UnsupportedError`][ropt.exceptions.UnsupportedError] when an optional
+  dependency is missing, or when the chosen method cannot handle the problem
+  as configured — a constraint it does not support, for instance, which is
+  checked as the run starts — and
+  [`ExecutionError`][ropt.exceptions.ExecutionError] when the machinery that
+  runs the evaluations cannot start or breaks down.
+
+- **Exceptions from your own evaluation function** are not caught. They travel
+  back from wherever the evaluation ran — including a worker thread or process
+  — and are re-raised from the `optimize` call. Return `float("nan")` instead
+  if a failed realization should be tolerated rather than fatal.
+
+Catching [`RoptError`][ropt.exceptions.RoptError] catches all of `ropt`'s own
+errors at once. It deliberately does not cover the first and third groups:
+configuration errors belong to pydantic, and errors from your evaluation
+function stay whatever you raised.
+
 ## Optimizing over an ensemble
 
 Many problems are uncertain: the objective depends on parameters that vary

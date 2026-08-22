@@ -160,14 +160,18 @@ All `method` fields use the same naming convention:
   the same name.
 
 The plugin part corresponds to the name under which the plugin is registered
-(via entry points or direct registration); the method part is any string that
-the plugin's `is_supported()` classmethod accepts. For example, the built-in
-SciPy backend plugin is named `scipy` and supports methods like `"default"`,
-`"SLSQP"`, and `"L-BFGS-B"`.
+(via an entry point); the method part is any string that the plugin's
+`is_supported()` classmethod accepts. For example, the built-in SciPy backend
+plugin is named `scipy` and supports methods like `"default"`, `"SLSQP"`, and
+`"L-BFGS-B"`.
 
 Both the plugin name and the method name are case-insensitive, so
 `"SciPy/SLSQP"`, `"scipy/slsqp"`, and `"SCIPY/Slsqp"` all resolve to the
 same backend.
+
+The `backend` field accepts one further form, `"external/..."`, which runs the
+named backend in a separate process; see [Running the optimizer in a separate
+process](#external-backend).
 
 ### Immutability
 
@@ -203,7 +207,10 @@ appropriate sign.
 The optional `types` field allows assigning a
 [`VariableType`][ropt.enums.VariableType] to each variable (continuous or
 integer). If not provided, all variables default to continuous
-([`VariableType.REAL`][ropt.enums.VariableType.REAL]).
+([`VariableType.REAL`][ropt.enums.VariableType.REAL]). Integer variables are
+only honored by methods that support them; in the SciPy backend that is
+`differential_evolution` (see
+[`SciPyBackend`][ropt.backend.scipy.SciPyBackend]).
 
 The optional `mask` field is a boolean array that indicates which variables are
 free to change during optimization (default: all `True`, meaning all variables
@@ -329,6 +336,9 @@ constraints.
 The constraint function values are returned by the evaluator in the same array
 as the objectives (appended after them).
 
+Only some optimization methods accept non-linear constraints; for the SciPy
+backend, see the table in [`SciPyBackend`][ropt.backend.scipy.SciPyBackend].
+
 Like objectives, nonlinear constraints can optionally be processed using
 [realization filters](realization_filters.md),
 [function estimators](function_estimators.md), and
@@ -418,6 +428,48 @@ settings that are forwarded to the backend:
     "options": {"maxiter": 200},
 }
 ```
+
+Which methods a backend supports, which kinds of constraint and variable each
+of them accepts, and which `options` they take, is documented by the backend
+itself. For the built-in SciPy backend, see
+[`SciPyBackend`][ropt.backend.scipy.SciPyBackend]. A method configured with a
+constraint it cannot handle is only rejected when the run starts, with
+[`UnsupportedError`][ropt.exceptions.UnsupportedError], so it is worth checking
+the table before writing the rest of the configuration.
+
+#### Running the optimizer in a separate process { #external-backend }
+
+Prefix the method with `external/` to run the optimization algorithm in a
+process of its own:
+
+```python
+"backend": {"method": "external/scipy/slsqp"}
+```
+
+`ropt` spawns a child process, creates the named backend there, and lets it
+drive the optimization. The function and gradient evaluations still happen in
+the original process: the child sends each set of variables back, the parent
+evaluates it as usual, and the values are passed to the child. An error raised
+in the child is re-raised in the parent.
+
+This is useful when a backend cannot safely share a process with the rest of
+your program — for example one that crashes the interpreter, leaks memory,
+keeps state between runs, or links against native libraries that clash with
+your other dependencies.
+
+Two details differ from the other backends:
+
+- The method must name the delegate in full, as `external/plugin/method` or
+  `external/method`. The `external/` prefix is removed and the rest is resolved
+  like any other method string. `external` is never selected implicitly, so it
+  is used only when you ask for it by name.
+- It needs the `cloudpickle` extra (see
+  [Installation](../getting_started/installation.md#optional-extras)). Without
+  it, building the context raises
+  [`UnsupportedError`][ropt.exceptions.UnsupportedError].
+
+This has nothing to do with evaluating in parallel; for that see [Running in
+Parallel](../getting_started/execution.md).
 
 ### `gradient` — [`GradientConfig`][ropt.config.GradientConfig] { #gradient }
 

@@ -1,4 +1,4 @@
-# Evaluator Classes
+# Evaluation Classes
 
 The `ropt.evaluation` module defines the data structures exchanged between `ropt`
 and user-provided evaluation functions: an input context describing which rows

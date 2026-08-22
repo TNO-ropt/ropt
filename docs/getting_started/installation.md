@@ -33,6 +33,9 @@ functions defined inline (lambdas), functions defined inside other functions
 (closures), and functions defined in a Jupyter notebook can be used too. The
 `hpc` extra already includes `cloudpickle`.
 
+`cloudpickle` is also required to [run the optimizer
+itself in a separate process](../optimizer_setup/configuration.md#external-backend).
+
 Install with:
 
 ```bash

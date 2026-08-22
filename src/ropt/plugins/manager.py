@@ -55,7 +55,7 @@ class PluginManager:
 
     ```toml
     [project.entry-points."ropt.plugins.backend"]
-    my_backend = "my_package.my_module:MyBackend"
+    my_backend = "my_package.my_module:MyBackendPlugin"
     ```
     """
 
