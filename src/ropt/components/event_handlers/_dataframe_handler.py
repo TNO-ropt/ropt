@@ -166,7 +166,7 @@ class DataFrameHandler(EventHandler):
 
         The callback is invoked from `handle_event` after the tables are
         updated, receiving the event that triggered the update. If the callback
-        performs blocking operations (e.g. writing tables to disk), register
+        performs blocking operations (for example writing tables to disk), register
         this handler with `run_in_thread=True` on the
         [`EventDispatcher`][ropt.components.event_handlers.EventDispatcher]:
 

@@ -13,7 +13,15 @@ class DefaultRealizationFilterPlugin(RealizationFilterPlugin):
     """Default realization filter plugin class."""
 
     @classmethod
-    def create(cls, filter_config: RealizationFilterConfig) -> DefaultRealizationFilter:  # ruff: ignore[undocumented-public-method]
+    def create(cls, filter_config: RealizationFilterConfig) -> DefaultRealizationFilter:
+        """Create a DefaultRealizationFilter instance.
+
+        Args:
+            filter_config: The realization filter configuration.
+
+        Returns:
+            A new `DefaultRealizationFilter`.
+        """
         return DefaultRealizationFilter(filter_config)
 
     @classmethod

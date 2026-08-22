@@ -62,7 +62,7 @@ class SciPySampler(Sampler):
 
     The specific sampling method is chosen via the `method` field in the
     [`SamplerConfig`][ropt.config.SamplerConfig]. Additional method-specific
-    parameters (e.g., distribution parameters like `loc`, `scale`, `a`, `b` for
+    parameters (for example distribution parameters like `loc`, `scale`, `a`, `b` for
     `stats` methods, or engine parameters for `qmc` methods) can be passed
     through the `options` dictionary within the `SamplerConfig`. Refer to the
     [`scipy.stats`](https://docs.scipy.org/doc/scipy/reference/stats.html) and

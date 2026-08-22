@@ -72,16 +72,11 @@ class Submission:
     blocked in [`collect`][ropt.components.executors.Submission.collect] is
     always released.
 
-    Two failure classes are distinguished, following the error contract in
-    [Parallel Evaluation](../workflows/parallel.md#error-handling):
-
-    - An **infrastructure failure** (a killed worker process, or missing or
-      corrupt HPC output) arrives as an ordinary result whose value is an
-      [`ExecutorFailure`][ropt.exceptions.ExecutorFailure]. This is a tolerated
-      per-realization failure.
-    - A **user-code exception** ends the submission via
-      [`fail`][ropt.components.executors.Submission.fail], which re-raises the
-      original exception in `collect`. The executor keeps running.
+    See [Error handling](../workflows/parallel.md#error-handling) for how
+    infrastructure failures (delivered via
+    [`deliver`][ropt.components.executors.Submission.deliver]) and user-code
+    exceptions (ended via [`fail`][ropt.components.executors.Submission.fail])
+    are distinguished.
     """
 
     def __init__(self, work_items: Sequence[WorkItem]) -> None:

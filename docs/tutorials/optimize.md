@@ -47,6 +47,7 @@ early by returning `True`. See
 def report(result):
     if result.target_objective is not None:
         print(f"  objective: {result.target_objective}")
+    return None  # returning True instead would stop the run early
 ```
 
 ## Run it and read the result

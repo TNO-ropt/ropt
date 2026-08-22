@@ -17,7 +17,15 @@ class ExternalBackendPlugin(BackendPlugin):
     """The external optimizer plugin class."""
 
     @classmethod
-    def create(cls, backend_config: BackendConfig) -> ExternalBackend:  # ruff: ignore[undocumented-public-method]
+    def create(cls, backend_config: BackendConfig) -> ExternalBackend:
+        """Create an ExternalBackend instance.
+
+        Args:
+            backend_config: The backend configuration.
+
+        Returns:
+            A new `ExternalBackend`.
+        """
         return ExternalBackend(backend_config)
 
     @classmethod

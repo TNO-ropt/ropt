@@ -43,6 +43,7 @@ Constructor parameters:
 | `function`    | Per-realization callable (same interface as `FunctionEvaluator`).    |
 | `executor`    | The [`Executor`][ropt.components.executors.Executor] to dispatch work to. |
 | `bundle_size` | Number of active evaluations to group into a single work item (default: `1`). Use an integer `> 1` for a fixed maximum bundle size, or `0` to bundle all active evaluations of a batch into one work item. |
+| `batch_id_callback` | Callable returning the next batch ID each time it is called (default: an internal [`BatchIdCounter`][ropt.components.evaluators.BatchIdCounter]). |
 
 By default each row of the variable batch is submitted as its own task. The
 `bundle_size` parameter allows several active evaluations to be grouped into a
@@ -545,7 +546,7 @@ An N-way `optimize_many` therefore pays its handler cost serially. Keep shared
 handlers cheap; if one must do heavy I/O, buffer in memory and flush once the
 runs have finished.
 
-### Two rules for using the low-level API
+## Two rules for using the low-level API
 
 **Run a compute step in a worker thread.** `step.run()` is an ordinary
 synchronous method that runs its evaluator and its handlers **on whatever

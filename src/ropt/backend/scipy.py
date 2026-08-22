@@ -138,7 +138,15 @@ class SciPyBackend(Backend):
         "bounds": _CONSTRAINT_REQUIRES_BOUNDS,
     }
 
-    def __init__(self, backend_config: BackendConfig) -> None:  # ruff: ignore[undocumented-public-init]
+    def __init__(self, backend_config: BackendConfig) -> None:
+        """Initialize the SciPy backend.
+
+        Args:
+            backend_config: The backend configuration.
+
+        Raises:
+            UnsupportedError: If the requested method is not supported.
+        """
         self._config = backend_config
         _, _, self._method = backend_config.method.lower().rpartition("/")
         if self._method == "default":

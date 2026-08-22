@@ -45,7 +45,7 @@ Each variable, objective, or constraint is assigned to a transform by its
 },
 ```
 
-Multiple transforms may exists, each handling a different subset of variables or
+Multiple transforms may exist, each handling a different subset of variables or
 objectives/constraints.
 
 At context initialization, each transform's `init(mask)` method is called
@@ -107,8 +107,8 @@ Configuration options:
 
 - **`scales`** — array of per-objective scaling factors.
 
-The `update(scales)` method allows changing scales mid-run (e.g., for adaptive
-normalization when initial magnitudes are unknown).
+The `update(scales)` method allows changing scales mid-run (for example, for
+adaptive normalization when initial magnitudes are unknown).
 
 ### DefaultNonlinearConstraintTransform
 
@@ -164,51 +164,13 @@ Higher-level helpers handle this automatically:
 
 ## Writing a custom transform
 
-Custom transforms are plugins; see the base classes listed under
-[Reference / Plugin Bases](../reference/plugin_bases.md).
-
-### Lifecycle
-
-All three transform types follow the same lifecycle:
-
-1. `__init__(transform_config)` — store configuration (scales, offsets, etc.).
-2. `init(mask)` — called once at context initialization with a boolean mask.
-   For variables the mask is `free AND assigned-to-this-transform`; for
-   objectives/constraints it is `assigned-to-this-transform`. Implementations
-   must ensure that unmasked elements pass through unchanged (e.g., set
-   scale=1, offset=0 for those positions).
-3. `to_optimizer(values)` / `from_optimizer(values)` — called repeatedly to
-   map values between domains.
-4. `update(*args, **kwargs)` (optional) — update internal state mid-run when
-   parameters are not known at initialization.
-
-### VariableTransform methods
-
-[`VariableTransform`][ropt.transforms.VariableTransform] is the most involved
-because variables interact with bounds and constraints. Beyond `to_optimizer`
-and `from_optimizer`, implementations must also provide:
-
-| Method | Purpose |
-| ------ | ------- |
-| `magnitudes_to_optimizer` | Scale perturbation magnitudes consistently with the variable transform. |
-| `bound_constraint_diffs_from_optimizer` | Map bound-violation differences back to user domain for reporting. |
-| `linear_constraints_to_optimizer` | Transform the coefficient matrix and RHS bounds so linear constraints remain valid. |
-| `linear_constraints_diffs_from_optimizer` | Map linear-constraint-violation differences back to user domain. |
-
-All value arrays use the last axis for the element dimension; if the array
-layout differs, reorder axes before and after calling the transform.
-
-### ObjectiveTransform / NonlinearConstraintTransform methods
-
-[`ObjectiveTransform`][ropt.transforms.ObjectiveTransform] requires only
-`to_optimizer` and `from_optimizer`.
-
+Custom transforms are plugins implementing one of the three base classes —
+[`VariableTransform`][ropt.transforms.VariableTransform],
+[`ObjectiveTransform`][ropt.transforms.ObjectiveTransform], or
 [`NonlinearConstraintTransform`][ropt.transforms.NonlinearConstraintTransform]
-additionally requires:
-
-- `bounds_to_optimizer` — transform constraint RHS bounds to optimizer domain.
-- `nonlinear_constraint_diffs_from_optimizer` — map violation differences back
-  to user domain.
+— whose docstrings document the lifecycle and the methods to implement.
+`VariableTransform` is the most involved, since variables also interact with
+bounds and linear constraints.
 
 ## Where to next
 

@@ -129,23 +129,11 @@ class ExitCode(IntEnum):
 class AxisName(StrEnum):
     """Enumerates the semantic meaning of axes in data arrays.
 
-    The optimization workflow includes variables, objectives, constraints,
-    realizations, and the optimizer. Each of these components can have multiple
-    instances, leading to multidimensional data arrays. In particular, the
-    [`Results`][ropt.results.Results] objects store optimization data (like
-    variable values, objective function values, constraint values, etc.) in
-    multidimensional NumPy arrays.
-
-    The `AxisName` enumeration  provides standardized labels to identify what
-    each dimension (axis) of these arrays represents. For example, an array
-    might have dimensions corresponding to different realizations, different
-    objective functions, or different variables.
-
-    This information is stored as metadata within the `Results` object and can
-    be accessed using methods like
-    [`get_axes`][ropt.results.ResultField.get_axes] on result fields. It is
-    used internally, for instance, during data export to correctly label axes
-    or retrieve associated names (like variable names) from the configuration.
+    Labels what each dimension of a [`Results`][ropt.results.Results] field's
+    multidimensional array represents, and is used to look up axis labels via
+    [`get_axes`][ropt.results.ResultField.get_axes]. See
+    [Working with Results](../optimizer_setup/results.md#axes-and-dimensionality)
+    for a full table of fields and their axes.
     """
 
     VARIABLE = "variable"

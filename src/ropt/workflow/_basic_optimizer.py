@@ -86,14 +86,6 @@ class BasicOptimizer:
     ) -> None:
         """Initialize a `BasicOptimizer` object.
 
-        This constructor sets up the necessary components for a single
-        optimization run. It requires an optimization configuration, an
-        evaluator, and optional domain transform, which together define the
-        optimization problem.
-
-        The `constraint_tolerance` is used to check any constraints, if a
-        constraint value is within this tolerance, it is considered satisfied.
-
         Args:
             config:               The configuration for the optimization.
             evaluator:            An
@@ -114,25 +106,13 @@ class BasicOptimizer:
     def results(self) -> FunctionResults | None:
         """The optimal result found during the optimization.
 
-        This property provides access to the best
-        [`FunctionResults`][ropt.results.FunctionResults] object discovered
-        during the optimization process. It encapsulates the objective function
-        value, constraint values, and other relevant information about the
-        optimal solution.
-
         Returns:
-            The optimal result.
+            The optimal result, or `None` if none was found yet.
         """
         return self._results
 
     def run(self, initial_values: ArrayLike) -> ExitCode:
         """Run the optimization process.
-
-        This method initiates and executes the optimization workflow defined by
-        the `BasicOptimizer` object. It manages the optimization, result
-        handling, and event processing. After the optimization is complete, the
-        optimal results, variables, and exit code can be accessed via the
-        corresponding properties.
 
         Args:
             initial_values: The variable vector to start the optimization from.
@@ -165,11 +145,8 @@ class BasicOptimizer:
     def set_results_callback(self, callback: Callable[..., None]) -> None:
         """Set a callback to report new results.
 
-        The provided callback function will be invoked whenever new results
-        become available during the optimization process. This allows for
-        real-time monitoring and analysis of the optimization's progress.
-
-        The required signature of the callback function should be:
+        Invoked with a `tuple[FunctionResults, ...]` whenever new results
+        become available:
 
         ```python
         def callback(results: tuple[FunctionResults, ...]) -> None:

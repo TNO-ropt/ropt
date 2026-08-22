@@ -23,7 +23,12 @@ class DefaultFunctionEstimator(FunctionEstimator):
     See [Function Estimators](../optimizer_setup/function_estimators.md) for usage.
     """
 
-    def __init__(self, estimator_config: FunctionEstimatorConfig) -> None:  # ruff: ignore[undocumented-public-init]
+    def __init__(self, estimator_config: FunctionEstimatorConfig) -> None:
+        """Initialize the function estimator.
+
+        Args:
+            estimator_config: The function estimator configuration.
+        """
         self._estimator_config = estimator_config
         _, _, self._method = self._estimator_config.method.lower().rpartition("/")
         if self._method == "default":

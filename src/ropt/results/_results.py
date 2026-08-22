@@ -100,17 +100,10 @@ class Results(ABC):
         """Export a field to a polars DataFrame.
 
         This is the polars counterpart of
-        [`to_dataframe`][ropt.results.Results.to_dataframe]. Polars has no index,
-        so the frame is returned in long format: `batch_id` and the axis labels
-        become regular columns, followed by one column per sub-field.
-
-        Since polars column names must be strings, the tuple column names that
-        `to_dataframe` produces for unstacked axes are joined into a single
-        string using `sep`: the pandas column `(sub-field, label, ...)` becomes
-        `"sub-field<sep>label<sep>..."`.
-
-        See [Working with Results](../optimizer_setup/results.md#exporting-to-polars) for
-        further details and examples.
+        [`to_dataframe`][ropt.results.Results.to_dataframe], returned in long
+        format with tuple column names joined into a single string using
+        `sep`. See [Exporting to polars](../optimizer_setup/results.md#exporting-to-polars)
+        for details.
 
         Args:
             field_name: The field to export.

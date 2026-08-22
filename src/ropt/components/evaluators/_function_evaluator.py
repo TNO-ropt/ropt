@@ -28,7 +28,7 @@ class FunctionEvaluator(Evaluator):
     objective and constraint.
     """
 
-    # NOTE: A single instance may be reused serially across threads, e.g. by
+    # NOTE: A single instance may be reused serially across threads, for example by
     # optimizers that run one after another on different threads. It must not be
     # used concurrently: the base class raises if two threads call `eval` at the
     # same time. The batch ID is protected by a lock.

@@ -16,7 +16,15 @@ class SciPyBackendPlugin(BackendPlugin):
     """The SciPy backend plugin class."""
 
     @classmethod
-    def create(cls, backend_config: BackendConfig) -> SciPyBackend:  # ruff: ignore[undocumented-public-method]
+    def create(cls, backend_config: BackendConfig) -> SciPyBackend:
+        """Create a SciPyBackend instance.
+
+        Args:
+            backend_config: The backend configuration.
+
+        Returns:
+            A new `SciPyBackend`.
+        """
         return SciPyBackend(backend_config)
 
     @classmethod

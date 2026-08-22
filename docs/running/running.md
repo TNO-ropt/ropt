@@ -56,9 +56,15 @@ def objective(variables: np.ndarray, context: EvaluationFunctionContext) -> floa
 - `variables` is a 1-D NumPy array: one set of variable values to evaluate.
 - `context` is an
   [`EvaluationFunctionContext`][ropt.components.evaluators.EvaluationFunctionContext]
-  that tells you *which* evaluation this is. Its most important field is
-  `context.realization`, the realization number (see
-  [Ensembles](#optimizing-over-an-ensemble) below).
+  that tells you *which* evaluation this is:
+    - `context.realization` — the realization number (see
+      [Ensembles](#optimizing-over-an-ensemble) below); the field you need most
+      often.
+    - `context.metadata` — the `metadata` dict the run was started with, if
+      any (see [Attaching metadata](#attaching-metadata)).
+    - `context.batch_id`, `context.eval_idx`, `context.perturbation` — identify
+      the evaluation batch, its row, and (for a gradient perturbation) which
+      one; rarely needed directly.
 
 The function returns the objective value(s), followed by any constraint values.
 There are three ways to return them:
@@ -128,8 +134,8 @@ result = optimize(config, x0, objective, report=report)
 assert result.exit_code is ExitCode.USER_ABORT
 ```
 
-With `optimize_many` this stops only the run whose callback returned `True`; the
-other runs continue.
+With [`optimize_many`](parallel.md#many-optimizations-at-once) this stops only the run
+whose callback returned `True`; the other runs continue.
 
 !!! note "Nothing to stop on an evaluation"
     [`evaluate`][ropt.simple.evaluate] and
@@ -137,11 +143,6 @@ other runs continue.
     there the return value is **ignored**. An evaluation is a single batch with
     no optimizer loop to interrupt, so the callback reports and nothing more.
     This is the permanent contract, not a gap to be filled later.
-
-A [shared group](#sharing-a-handler-across-concurrent-runs) takes `report=` too,
-where the callback covers every run feeding the group instead of a single call.
-Either way `report=` is only shorthand: it adds a handler where you could have
-added one by hand, with the sharing behaviour of the place it is given.
 
 ## Attaching metadata
 
@@ -156,17 +157,11 @@ You can attach arbitrary **metadata** to a run, from two sources:
   print(result.results.metadata["run_id"])   # 7
   ```
 
-  With `optimize_many`, give one dict (shared by all runs) or a list with one
-  dict per run:
-
-  ```python
-  results = optimize_many(
-      config,
-      start_points,
-      objective,
-      metadata=[{"run_id": i} for i in range(len(start_points))],
-  )
-  ```
+  The same dict also reaches the evaluation function itself, as
+  `context.metadata` — handy when the evaluation needs to know which run it is
+  part of. With `optimize_many`, this is the natural way to tell runs apart:
+  give one dict (shared by all runs) or a list with one dict per run; see
+  [Give each run an ID](parallel.md#many-optimizations-at-once).
 
 - **Per evaluation** — return an
   [`EvaluationFunctionResult`][ropt.components.evaluators.EvaluationFunctionResult]
@@ -184,7 +179,7 @@ You can attach arbitrary **metadata** to a run, from two sources:
 Neither kind is interpreted by `ropt`. Constant metadata ends up on
 `result.results.metadata`; per-evaluation metadata on
 `result.results.evaluations.metadata` (one entry per realization). Both kinds can
-be tabulated as columns by the [`DataFrameHandler`](#dataframehandler). See
+be tabulated as columns by the [`DataFrameHandler`](handlers.md#dataframehandler). See
 [Working with Results](../optimizer_setup/results.md#metadata) for how
 each appears in the pandas export. The full runnable script is
 [examples/simple/metadata.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/metadata.py).
@@ -226,559 +221,6 @@ def objective(variables, context):
 
 `optimize` then minimizes the weighted average objective over all realizations.
 
-## Running in parallel
-
-By default `optimize` runs on the calling thread, one evaluation at a time. To
-run the evaluations in parallel, open a [`session`][ropt.simple.session], ask it
-for a **pool**, and pass that pool to the run. See
-[Running in Parallel](../getting_started/execution.md) for a full explanation of the three choices
-and their trade-offs:
-
-```python
-from ropt.simple import session
-
-with session() as s:
-    result = optimize(config, x0, objective, pool=s.thread_pool(workers=8))
-```
-
-A session is a background event loop that the pools run on. Closing it releases
-every pool it created, so that is normally all the cleanup you need. Nothing is
-implicit: a run evaluates on the pool you hand it, and on no other. A run given
-no pool evaluates in-process, wherever it is called from — including from a
-thread you started yourself.
-
-!!! tip "How a batch is split across workers"
-    Each evaluation in a batch is transferred to a worker as its own task by
-    default, which spreads the batch as widely as the pool allows. Every
-    transfer costs something, though, so when the evaluations are cheap the
-    transfers can dominate. Set `bundle_size=` on the pool to group several
-    evaluations into one task, or `bundle_size=0` to send the whole batch as a
-    single task. The evaluations within a task run one after another, so `0`
-    gives up parallelism inside the batch entirely: it is for a pool whose
-    parallelism comes from the runs above it, as in the note below.
-
-You can keep several pools open at once and choose per run:
-
-```python
-with session() as s:
-    fast = s.thread_pool(workers=8)
-    heavy = s.process_pool(workers=4)
-    cheap = optimize(config, x0, objective, pool=fast)
-    costly = optimize(config, x0, expensive_objective, pool=heavy)
-```
-
-!!! note "Pools inside an evaluation"
-    An evaluation function may start a run of its own and give it a pool, on two
-    conditions.
-
-    It must be a **different** pool. A nested run waits for its own evaluations
-    to finish, so one handed the pool it is already running on would wait for
-    the workers it is itself occupying — a deadlock as soon as they are all
-    busy, which is the normal case, since a run fills its pool with one work
-    item per realization. Rather than hang, the pool refuses work submitted by
-    the evaluation itself with a
-    [`WorkflowError`][ropt.exceptions.WorkflowError]. A thread the evaluation
-    starts is on its own: it is not recognized as a worker, so it can still
-    deadlock on the pool. Give the inner run its own pool, or a
-    [`serial_pool`][ropt.simple.serial_pool], which evaluates inline and can
-    always be reused.
-
-    The evaluation must stay **in your process**, so on a thread pool or a
-    serial pool. On a process or HPC pool the evaluation function is copied into
-    a worker, and a pool cannot be copied with it: build the inner pool inside
-    the worker, from a session opened there, or run the inner optimization
-    without one. An evaluation function that carries a pool along anyway is
-    stopped in the worker, which names what it was handed instead of failing
-    somewhere deep inside the run.
-
-!!! tip "Releasing a pool early"
-    A pool holds its workers until the session closes. That is usually fine, but
-    if you build pools in a loop inside one long-lived session — above all
-    process pools, which hold worker interpreters — release each one when you
-    are done with it, either with `pool.close()` or by using it as a context
-    manager:
-
-    ```python
-    with session() as s:
-        for case in cases:
-            with s.process_pool(workers=4) as pool:
-                optimize(config, case, objective, pool=pool)
-    ```
-
-    A closed pool cannot be reopened, and a run still using it stops with
-    [`ExecutorStopped`][ropt.exceptions.ExecutorStopped]. Starting a *new* run
-    on it is refused before anything runs, with a
-    [`WorkflowError`][ropt.exceptions.WorkflowError] saying the pool is closed —
-    which is what you get if a pool outlives the `with session()` block that
-    created it.
-
-### Running on an HPC cluster
-
-An [`hpc_pool`][ropt.simple.Session.hpc_pool] submits each evaluation as a job to
-an HPC queue (through `pysqa`); it needs the `ropt[hpc]` extra. With no further
-arguments it uses the default cluster and queue from the `pysqa` configuration of
-your `ropt` installation:
-
-```python
-from ropt.simple import session
-
-with session() as s:
-    result = optimize(config, x0, objective, pool=s.hpc_pool(workers=10))
-```
-
-`hpc_pool` accepts the following parameters:
-
-| Parameter     | Description                                                                |
-| ------------- | ------------------------------------------------------------------------- |
-| `workers`     | Maximum number of concurrent cluster jobs (default: 1).                   |
-| `cores`       | Number of CPUs per job (default: 1).                                      |
-| `cluster`     | Cluster name, when the `pysqa` config defines several.                    |
-| `queue`       | Queue or partition name.                                                  |
-| `workdir`     | Shared-filesystem working directory (defaults to the current directory).  |
-| `config_path` | Path to the `pysqa` configuration directory.                              |
-| `template`    | Inline submission-script template, used instead of a config.              |
-| `queue_type`  | Queueing system type (default: `"slurm"`).                                |
-
-### Evaluating in-process, on purpose
-
-[`serial_pool`][ropt.simple.serial_pool] is a pool with no workers: it carries
-only the batch-ID counter that the runs sharing it draw from, and their
-evaluations happen in-process on the calling thread. It needs no session, and
-needs no releasing.
-
-Use it to give several runs one continuous batch-ID sequence without running
-their evaluations in parallel, or simply to say in the code that a run is meant
-to evaluate in-process.
-
-## Many optimizations at once
-
-To run several optimizations together, use
-[`optimize_many`][ropt.simple.optimize_many]. Any of `config`, `x0`, or
-`objective` may be a single value (used for every run) or a list (one per run):
-
-```python
-from ropt.simple import optimize_many, session
-
-with session() as s:
-    pool = s.thread_pool(workers=4)
-    results = optimize_many(config, start_points, objective, pool=pool)  # one run per start
-```
-
-!!! tip "Give each run an ID"
-    Pass a per-run `metadata` list to tag every run with a user-defined
-    identifier that travels with its results (and shows up in a
-    [`DataFrameHandler`](#dataframehandler)'s tables):
-
-    ```python
-    labels = ["low", "mid", "high"]
-    results = optimize_many(
-        config, start_points, objective, metadata=[{"run_id": x} for x in labels]
-    )
-    for result in results:
-        print(result.results.metadata["run_id"])
-    ```
-
-    See [Attaching metadata](#attaching-metadata) for details.
-
-There are two independent levels of concurrency here:
-
-- **The optimizations** always run concurrently, each on its own driver thread.
-  This is built into `optimize_many` and does not depend on the pool;
-  the `limit` argument caps how many run at the same time.
-- **The function evaluations** inside those runs all happen on the one pool you
-  pass, and the pool decides how they are parallelized. With
-  `thread_pool(workers=1)` the runs still progress together, but their
-  evaluations are executed one at a time. A larger pool — `thread_pool(workers=n)`,
-  `process_pool`, or `hpc_pool` — runs several evaluations at once.
-
-Sharing one pool is also what keeps the runs' batch IDs apart, since they draw
-from its single counter.
-
-The two callback arguments differ in the same way. `report=` is **per run**: one
-callback watches every run, or pass a list with one callback per run. `handlers=`
-is **shared**: one list of groups that all runs feed together, which is why a
-plain handler is refused there — see [Sharing a handler across concurrent
-runs](#sharing-a-handler-across-concurrent-runs).
-
-!!! warning "Without a pool the driver threads do the evaluating"
-    `optimize_many` needs no session and no pool. Without one, the runs still
-    execute concurrently, but each evaluates in-process on its own driver
-    thread — so your evaluation function is called by several threads at once
-    and must tolerate that. Give the call a pool, or a
-    [`serial_pool`][ropt.simple.serial_pool] if you want one shared batch-ID
-    sequence, when it must not be.
-
-## Offloading your own work
-
-You can hand **your own** functions to a pool with
-[`offload`][ropt.simple.offload]. It is useful when code you control — a custom
-step, a domain transform, or a helper you call between optimizations — has an
-expensive, self-contained piece of work you want to run on a pool instead of
-inline.
-
-Pass a single callable to run one call and get its result back:
-
-```python
-from functools import partial
-
-from ropt.simple import offload, session
-
-with session() as s:
-    result = offload(partial(expensive, data), pool=s.process_pool(workers=4))
-```
-
-`offload` takes **zero-argument** callables — bind arguments with
-`functools.partial` (or a closure). Pass a **sequence** of callables to run them
-concurrently and get a tuple of results in order; they may be entirely different
-functions:
-
-```python
-with session() as s:
-    pool = s.process_pool(workers=4)
-    first, second = offload([partial(expensive, x), partial(other, y)], pool=pool)
-```
-
-As with the evaluation function on a process or HPC pool, the callables and their
-arguments are **copied to the workers**, since they run in separate processes.
-
-### Without a pool
-
-`offload` with no pool — or with a [`serial_pool`][ropt.simple.serial_pool] —
-runs the callables inline, on the calling thread. So code that may or may not
-have a pool to hand needs no guard and no fallback: pass along whatever it has,
-including `None`.
-
-```python
-def transform(x, pool=None):
-    return offload(partial(expensive, x), pool=pool)
-```
-
-!!! note "Not from an inline handler in a shared group"
-    A handler in a [shared group](#sharing-a-handler-across-concurrent-runs)
-    that runs inline runs on the session's event loop; offloading to a pool on
-    that same session would starve the very loop it is waiting on, so it raises
-    a [`WorkflowError`][ropt.exceptions.WorkflowError]. A
-    [`threaded`](#running-a-handler-in-a-thread) handler runs on a dispatcher
-    worker instead and can offload, as can a local handler, which runs on the
-    thread driving the run.
-
-    Better still, do parallel work from your optimization code and leave
-    handlers to handle results.
-
-## Result handlers
-
-An [`optimize`][ropt.simple.optimize] call returns only the best result. A
-**handler** lets you collect or react to *every* result instead: it is an object
-that observes an optimization and processes its results as they arrive — keeping
-them, tabulating them, or invoking a callback.
-
-Attach handlers to a run with the `handlers` argument. The same handler can be
-passed to several **sequential** `optimize` calls, accumulating the results of
-each in turn:
-
-```python
-from ropt.simple import HistoryHandler, optimize
-
-history = HistoryHandler()
-
-optimize(config, x0, objective, handlers=[history])       # a single run
-for x0 in start_points:                                   # ...or reused to
-    optimize(config, x0, objective, handlers=[history])   # accumulate in turn
-
-print(history.results)   # every result collected, across all the runs above
-```
-
-Handlers that store results expose them through `handler["results"]` (and, for
-`HistoryHandler`, the `history.results` shortcut).
-
-### Sharing a handler across concurrent runs
-
-A local handler belongs to one run at a time, so it cannot collect from
-optimizations that run **concurrently** — the runs of an `optimize_many`. Put it
-in a **shared group** instead, built on the session with
-[`shared_handlers`][ropt.simple.Session.shared_handlers], and pass the group
-where you would pass the handler:
-
-```python
-from ropt.simple import HistoryHandler, optimize_many, session
-
-history = HistoryHandler()
-with session() as s:
-    pool = s.thread_pool(workers=4)
-    collected = s.shared_handlers(history)
-    optimize_many(config, start_points, objective, pool=pool, handlers=[collected])
-
-print(history.results)
-```
-
-A group is passed around exactly like a pool: it is an object, so a run can feed
-several groups at once, mix them with local handlers of its own, and nothing is
-picked up from the surrounding code. `optimize_many` accepts *only* groups in
-`handlers=` — a bare handler there is rejected, because its runs overlap.
-
-Like a pool, a group lives until its session closes, which releases it and hands
-its handlers back; the same handler objects can then join a group on a later
-session. Release a group earlier with
-[`close`][ropt.simple.SharedHandlers.close] or by using it as a context manager,
-which matters when groups are built in a loop inside one long-lived session. A
-closed group is refused like a closed pool: a run given one stops immediately
-with a [`WorkflowError`][ropt.exceptions.WorkflowError], rather than running to
-completion while its results go nowhere.
-
-!!! warning "Reach for a shared group only for real concurrency"
-    A group routes every run's events through a single, serialized
-    `EventDispatcher` on a background loop. That serialization is what makes a
-    handler safe to share across *concurrent* runs — but around a plain
-    **sequential** loop it is pure overhead (a background loop plus a cross-thread
-    hand-off per result) and buys nothing. Prefer a reused local handler for
-    sequential accumulation, and keep groups for genuinely concurrent runs. When
-    you do share a group, move any slow, GIL-releasing (I/O) handler onto a
-    worker thread with [`threaded`](#running-a-handler-in-a-thread) so it does
-    not stall the shared loop for every run.
-
-!!! warning "Local first, shared never after"
-    The two roles are not interchangeable, and the door between them opens one
-    way only. A group releases its handlers when it closes, so a handler that
-    has only ever been shared can afterwards be used either way. But passing a
-    handler to a run as a local handler binds it to that run's compute step
-    permanently, and `shared_handlers` will refuse it from then on. Decide per
-    handler which of the two roles it plays; if you need both, use two handlers.
-
-### Built-in handlers
-
-`ropt` ships several ready-to-use handlers, all re-exported from `ropt.simple`.
-
-#### `ResultsHandler`
-
-[`ResultsHandler`][ropt.simple.ResultsHandler] keeps a single result, read via
-`handler["results"]`:
-
-- `what="best"` (default) keeps the result with the lowest weighted objective
-  seen so far; `what="last"` keeps the most recent valid result.
-- `constraint_tolerance` (optional) discards results that violate a constraint
-  by more than the given tolerance.
-- `filter` (optional) is a callable that receives each
-  [`Results`][ropt.results.Results] and returns `True` to keep it or `False` to
-  drop it.
-
-#### `HistoryHandler`
-
-[`HistoryHandler`][ropt.simple.HistoryHandler] keeps *every* result it receives,
-in order, as a tuple. Read it with `handler.results`, which is an empty tuple
-until the first result arrives, or with `handler["results"]`, the raw stored
-value, which is `None` until then.
-
-#### `DataFrameHandler`
-
-[`DataFrameHandler`][ropt.simple.DataFrameHandler] collects results into named
-DataFrames, using either `pandas` (the default) or `polars` as its backend; the
-corresponding package must be installed. Define a table with
-`add_table(name, table_type, columns)`, where `table_type` is `"functions"` or
-`"gradients"` and `columns` maps result-field names (dotted attribute syntax) to
-column titles:
-
-```python
-from ropt.simple import DataFrameHandler
-
-tables = DataFrameHandler()
-tables.add_table(
-    "summary",
-    "functions",
-    {
-        "batch_id": "Batch",
-        "functions.objectives": "Objective",
-        "evaluations.variables": "Variable",
-    },
-)
-optimize(config, x0, objective, handlers=[tables])
-df = tables["summary"]
-```
-
-Read one table with `tables["summary"]`, or all of them with `get_tables()`. A
-field whose value is a vector or matrix expands to several columns; the extra
-column levels come from the field's axis labels (or indices), joined to the
-title with a separator (`,` by default, set with `sep=`). For example, a
-length-2 `evaluations.variables` gives `Variable,v0` and `Variable,v1`. Because
-the column names follow
-[`results_to_dataframe`](../optimizer_setup/results.md#metadata-columns),
-both result-level and per-realization metadata can be included and renamed.
-
-Pass `backend="polars"` to get polars DataFrames instead:
-
-```python
-tables = DataFrameHandler(backend="polars")
-```
-
-The tables carry the same columns under the same titles. As explained in
-[Exporting to polars](../optimizer_setup/results.md#exporting-to-polars), polars
-has no index, so the key columns (`batch_id`, `realization`, and the other axis
-names) appear as ordinary leading columns rather than in the index. This also
-means the polars backend can build tables that mix per-batch and
-per-realization fields, which the pandas backend cannot.
-
-Convenience methods:
-
-- `set_default_tables()` registers a standard set of tables (`functions`,
-  `evaluations`, `constraints` for function results; `gradients`,
-  `perturbations` for gradient results).
-- `add_column(table, name, title)` adds one column to an existing table.
-- `set_callback(fn)` calls `fn(event)` whenever the tables are updated.
-
-!!! tip "Write the tables to a file as they update"
-    `set_callback` fires on every update, so it is a convenient hook for saving
-    the tables — to watch progress live or to write a final report. Pandas'
-    `to_string()` gives aligned, human-readable columns with no extra
-    dependencies; use `to_csv()` for machine-readable data, or `to_markdown()`
-    if you have `tabulate` installed:
-
-    ```python
-    def dump(_event):
-        with open("progress.txt", "w") as fh:
-            for name, df in tables.get_tables().items():
-                fh.write(f"# {name}\n{df.to_string()}\n\n")
-
-    tables.set_callback(dump)
-    optimize(config, x0, objective, handlers=[tables])
-    ```
-
-    Because this writes to disk on every update, it is a good candidate for
-    [running on a worker thread](#running-a-handler-in-a-thread).
-
-### Custom handlers
-
-Handlers are not limited to the built-ins: you — or another package — can
-provide your own by implementing `ropt`'s event-handler interface. The
-[Low-Level API](../workflows/workflows.md#event-handlers) describes the event
-model, the handler protocol, and how to write one.
-
-A custom handler can also **stop its own optimization**: every event carries the
-compute step that emitted it, so calling `event.source.stop()` from `handle_event`
-ends that run gracefully with `USER_ABORT` (the [`report`](#stopping-early-from-the-callback)
-callback above is just a convenience wrapper around this). Only the run that owns
-the emitting step is affected, so concurrent runs continue. See
-[Aborting a run](../workflows/workflows.md#exit-codes) in the low-level docs.
-
-### Running a handler in a thread
-
-By default every handler runs **inline**, on the thread that drives the
-optimization: each result is delivered to the handlers one after another, and the
-run waits for `handle_event` to return before it continues. That is exactly what
-you want for handlers that only touch memory — storing results, updating a
-DataFrame, keeping a running statistic — because the work is fast and there is no
-reason to hand it off.
-
-A [shared group](#sharing-a-handler-across-concurrent-runs) can instead run one
-or more handlers on a **worker thread** with the `threaded` keyword. Pass it a
-single handler or a sequence of handlers; those handlers run off the driving
-thread, while positional handlers stay inline:
-
-```python
-from ropt.simple import DataFrameHandler, HistoryHandler, optimize, session
-
-history = HistoryHandler()          # cheap, in-memory  -> inline
-tables = DataFrameHandler()         # writes a report to disk -> worker thread
-tables.set_default_tables()
-tables.set_callback(dump_to_disk)   # some function that writes a file
-
-with session() as s:
-    collected = s.shared_handlers(history, threaded=tables)
-    for x0 in start_points:
-        optimize(config, x0, objective, handlers=[collected])
-```
-
-Moving a handler to a thread changes **where** its code runs, nothing else: the
-run still waits for every handler to finish before delivering the next result,
-results still arrive in order, and an exception raised by a threaded handler is
-re-raised on the run's own stack, so early stops and fatal errors propagate
-exactly as they do for an inline handler.
-
-!!! warning "Only I/O-bound handlers benefit"
-    `threaded` helps in **one** situation: a handler that spends most of its time
-    waiting on an operation that *releases* CPython's global interpreter lock
-    (GIL) — writing to a file, a socket or a database, or a NumPy/C routine that
-    drops the lock. Only then can the optimization make progress while that work
-    is in flight.
-
-    Under the GIL only one thread runs Python bytecode at a time. A handler that
-    stays in Python — building DataFrames, accumulating results, doing numerical
-    work in pure Python — therefore gets **no** speed-up from `threaded`. It
-    merely pays the small cost of handing work to another thread, which makes it
-    marginally *slower*, never faster. When in doubt, leave a handler inline; only
-    reach for `threaded` when you know it is busy with interruptible I/O.
-
-`threaded` is only available on a shared group; a local handler always runs
-inline. To run a blocking handler on a thread for just one optimization, give it
-a group of its own:
-
-```python
-with session() as s:
-    optimize(config, x0, objective, handlers=[s.shared_handlers(threaded=slow_writer)])
-```
-
-## Handlers and the process boundary
-
-On a thread pool (or with no pool) your objective and your handlers run in the
-**same process** and share memory: a handler can see anything the objective left
-behind — a global it set, a list it appended to, an object it mutated.
-
-A process or HPC pool breaks that. The objective runs in a **separate worker
-process**, while the optimizer, your handlers, and the rest of your program stay
-in the **main process**. They cannot share memory. The objective's *only* way to
-send information back is through what it **returns** — the objective and
-constraint values, and the result's `metadata` — all copied back to the main
-process:
-
-```mermaid
-flowchart LR
-    subgraph main["your main process"]
-        opt["optimizer"]
-        hand["handlers +<br/>your code"]
-        opt --> hand
-    end
-    subgraph worker["worker process (process / HPC pool)"]
-        obj["objective"]
-    end
-    opt -->|"variables"| obj
-    obj -->|"result + metadata<br/>(copied back)"| opt
-```
-
-??? info "How data crosses the boundary"
-    To move work and results between processes, `ropt` **serializes** them —
-    turns the objects into bytes and rebuilds them on the other side. A process
-    pool uses Python's standard `pickle`, so an objective defined at module level
-    works as is; a lambda, a closure, or a notebook-defined objective needs the
-    `cloudpickle` extra, which an HPC pool always uses. Most functions and data
-    serialize fine, but things like open files, locks, or database connections
-    may not.
-
-    On a process pool the bytes travel over an in-machine channel. On an HPC pool
-    they are written as **files on a shared filesystem** that the cluster nodes
-    read, so an HPC pool needs such a shared filesystem (its `workdir`).
-
-    Serialization is only the mechanism `ropt` uses today; the essential
-    requirement is that the data can be *carried across the boundary*, so a
-    future version could use a different transport — for example one that works
-    over a network.
-
-Handlers see those returned results and nothing else. Anything the objective did
-only in memory — setting a module global, appending to a shared list, updating an
-object — happened **inside the worker** and is discarded when it finishes; your
-handlers and your main program never see it.
-
-!!! note "Sessions stay in the main process"
-    A pool, a shared group, and the session behind them are tied to the main
-    process, so they are not usable in a worker. An objective that closes over
-    one — to offload work, or to start an inner run on it — is stopped in the
-    worker, which reports the object by name. Do that work in the objective
-    itself, or return what you need and act on it in the main process.
-
-So to get extra information from an evaluation to a handler (or to a later part
-of your program), **return it** instead of stashing it in shared state: attach it
-to the result's `metadata` (see [Attaching metadata](#attaching-metadata)), which
-travels back with the result. Relying on shared state happens to work on a
-thread pool, but breaks the moment you switch to a process pool; returning the
-data works everywhere.
-
 ## A note on enums
 
 A few config values and result fields use enumerations, such as
@@ -789,3 +231,10 @@ of `ropt.simple`; import them from [`ropt.enums`][ropt.enums]:
 ```python
 from ropt.enums import ExitCode, VariableType
 ```
+
+## Where to next
+
+- Run evaluations in parallel, or several optimizations at once:
+  [Parallel Execution and Many Runs](parallel.md).
+- Collect or react to every result, not just the best one:
+  [Result Handlers](handlers.md).

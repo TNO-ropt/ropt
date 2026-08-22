@@ -9,7 +9,7 @@ class Plugin(ABC):
     """Abstract base class for all `ropt` plugins.
 
     This class serves as the fundamental building block for all plugins within
-    the `ropt` framework. Any class intended to function as a plugin (e.g., an
+    the `ropt` framework. Any class intended to function as a plugin (for example an
     optimizer, sampler, or event handler) must inherit from this base class.
 
     It defines the core interface that all plugins must adhere to, ensuring
@@ -48,10 +48,10 @@ class Plugin(ABC):
 
         By default (`True`), plugins can be found by the
         [`PluginManager`][ropt.plugins.manager.PluginManager] when a user
-        provides only a method name (without specifying the plugin, e.g.,
+        provides only a method name (without specifying the plugin, for example
         `"method-name"`).
 
-        If a plugin should *only* be used when explicitly named (e.g.,
+        If a plugin should *only* be used when explicitly named (for example
         `"plugin-name/method-name"`), it must override this class method to
         return `False`.
 

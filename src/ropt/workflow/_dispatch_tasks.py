@@ -53,7 +53,9 @@ async def dispatch_tasks(  # ruff: ignore[too-many-arguments]
     """Dispatch a list of functions to run in parallel.
 
     The dispatched functions will run either in threads, in a multiprocessing pool,
-    or on an HPC executor.
+    or on an HPC executor. See
+    [Dispatching arbitrary tasks](../workflows/parallel.md#dispatching-arbitrary-tasks)
+    for usage and the current-working-directory caveat.
 
     Args:
         functions: The functions to run.
@@ -71,16 +73,6 @@ async def dispatch_tasks(  # ruff: ignore[too-many-arguments]
 
     Raises:
         ValueError: If `executor` has an invalid value.
-
-    Note: Current working directory.
-        The functions to run cannot rely on the current directory to be set
-        consistently. Assume that the current directory is unknown and use
-        absolute paths to read or write files.
-
-        ALso, note that setting the current directory may not have the desired
-        effect when using the `threading` executor, since changing it in one
-        thread affects all threads. In case of the `multiprocessing` and `hpc`
-        executors, the current directory can be changed safely if needed.
     """
     if isinstance(functions, Mapping):
         work_items = [

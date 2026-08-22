@@ -16,7 +16,7 @@ Samplers are accessed via an [`EnOptContext`][ropt.context.EnOptContext] object
 through its `samplers` field, a tuple of sampler instances. Samplers are
 instantiated either directly as objects or via
 [`SamplerConfig`][ropt.config.SamplerConfig] objects, which are used by the
-plugin system to create instances based on the configured method string (e.g.,
+plugin system to create instances based on the configured method string (for example
 `"default"` or `"sobol"`).
 
 **Built-in and Custom Samplers**

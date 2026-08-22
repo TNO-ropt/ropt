@@ -84,16 +84,12 @@ class ParallelEvaluator(Evaluator):
     ) -> EvaluationBatchResult:
         """Evaluate all objective and constraints.
 
-        Results are collected following the two-class error contract described
-        in [Parallel Evaluation](../workflows/parallel.md#error-handling). An
-        infrastructure failure arrives as an
-        [`ExecutorFailure`][ropt.exceptions.ExecutorFailure] result and is
-        recorded as a failed realization (NaN), while a user-code exception
-        arrives on the results queue and aborts the current evaluation by
-        re-raising the original exception unchanged. The executor is left
-        running, so a consumer may reuse it for further evaluations. If the
-        executor cannot run the evaluation,
-        [`ExecutorStopped`][ropt.exceptions.ExecutorStopped] is raised.
+        An infrastructure failure is recorded as a failed realization (NaN); a
+        user-code exception is re-raised, leaving the executor running. Raises
+        [`ExecutorStopped`][ropt.exceptions.ExecutorStopped] if the executor
+        cannot run the evaluation. See
+        [error handling](../workflows/parallel.md#error-handling) for the full
+        contract.
 
         Args:
             variables:      The matrix of variables to evaluate.

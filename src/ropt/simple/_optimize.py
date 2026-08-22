@@ -184,17 +184,9 @@ def optimize_many(  # ruff: ignore[too-many-arguments]
     same `pool`, so its workers are shared between them; `limit` bounds how
     many run simultaneously. Without a `pool` the runs still overlap, but each
     evaluation runs in-process on its own driver thread. See
-    [Running Optimizations](../running/running.md) for a walkthrough.
-
-    The first run to raise propagates its exception immediately (fail-fast).
-    Runs that have not started are skipped, but a run already in progress
-    cannot be stopped from the outside: it is abandoned, and keeps going until
-    it finishes on its own. So returning after a failure can still take as long
-    as a full optimization. Closing the pool cuts that short: the abandoned run
-    then stops at its next evaluation and returns rather than raising — usually
-    with [`ExitCode.EXECUTOR_STOPPED`][ropt.enums.ExitCode], though a run that
-    ends its own optimizer loop first reports that reason instead. Either way
-    its result is discarded.
+    [Parallel Execution and Many Runs](../running/parallel.md#many-optimizations-at-once)
+    for a walkthrough, and [Failure in one run](../running/parallel.md#failure-in-one-run)
+    for what happens when one raises.
 
     Unlike `optimize`, this takes no *local* handlers: a local handler belongs
     to one run at a time and these runs overlap, so `handlers=` accepts only

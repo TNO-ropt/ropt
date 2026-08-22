@@ -117,14 +117,8 @@ class WorkerPool:
     def close(self) -> None:
         """Release the pool's workers without waiting for the session to close.
 
-        Closing is final: a pool cannot be reopened, and a run still using it
-        ends with [`ExecutorStopped`][ropt.exceptions.ExecutorStopped]. Closing
-        twice is a no-op, and closing a serial pool releases nothing, since it
-        holds nothing.
-
-        Most code does not need this — a session releases every pool it created.
-        It matters when pools are created in a loop within one long-lived
-        session, above all process pools, which hold worker interpreters.
+        See [Releasing a pool early](../running/parallel.md#running-in-parallel)
+        for when this matters and the resulting lifecycle.
         """
         if self._closed:
             return

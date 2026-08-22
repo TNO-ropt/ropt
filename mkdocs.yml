@@ -106,6 +106,7 @@ nav:
       - "Quickstart": getting_started/quickstart.md
       - "Deterministic Optimization": getting_started/deterministic.md
       - "Ensemble-Based Optimization": getting_started/ensemble.md
+      - "Collecting Results with Handlers": getting_started/handlers.md
       - "Running in Parallel": getting_started/execution.md
   - "Optimizer Setup":
       - "Key Concepts": optimizer_setup/key_concepts.md
@@ -117,6 +118,8 @@ nav:
       - "Working with Results": optimizer_setup/results.md
   - "Running":
       - "Running Optimizations": running/running.md
+      - "Parallel Execution and Many Runs": running/parallel.md
+      - "Result Handlers": running/handlers.md
   - "Workflows":
       - "Optimization Workflows": workflows/workflows.md
       - "Writing Evaluation Callbacks": workflows/evaluation_callbacks.md
@@ -130,6 +133,7 @@ nav:
       - "Ensemble Optimization": tutorials/ensemble.md
       - "Constrained Optimization": tutorials/constrained.md
       - "Mixed-Integer Optimization": tutorials/discrete.md
+      - "Restarting from the Best Point": tutorials/restart.md
       - "Building a Workflow": tutorials/workflow.md
   - "Reference":
       - "Simple API": reference/simple.md

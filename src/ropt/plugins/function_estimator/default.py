@@ -19,9 +19,17 @@ class DefaultFunctionEstimatorPlugin(FunctionEstimatorPlugin):
     """Default filter estimator plugin class."""
 
     @classmethod
-    def create(  # ruff: ignore[undocumented-public-method]
+    def create(
         cls, estimator_config: FunctionEstimatorConfig
     ) -> DefaultFunctionEstimator:
+        """Create a DefaultFunctionEstimator instance.
+
+        Args:
+            estimator_config: The function estimator configuration.
+
+        Returns:
+            A new `DefaultFunctionEstimator`.
+        """
         return DefaultFunctionEstimator(estimator_config)
 
     @classmethod

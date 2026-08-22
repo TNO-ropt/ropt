@@ -102,28 +102,12 @@ def results_to_polars(
     """Aggregate multiple results into a single polars DataFrame.
 
     This is the polars counterpart of
-    [`results_to_dataframe`][ropt.results.results_to_dataframe]. It concatenates the
-    specified fields from a sequence of
-    [`FunctionResults`][ropt.results.FunctionResults] or
-    [`GradientResults`][ropt.results.GradientResults] objects. Fields are
-    selected using dot notation (e.g., `evaluations.variables`); nested
-    `metadata` entries are accessed as `evaluations.metadata.key`.
-    Multi-dimensional fields are automatically unstacked into columns.
-
-    Polars has no index and its column names must be strings, so the frame is
-    returned in long format and the tuple column names produced by
-    `results_to_dataframe` are joined into a single string using `sep`.
-
-    Note:
-        Fields with different granularities (e.g. `gradients.objectives`, which
-        varies only per batch, and `evaluations.perturbed_objectives`, which
-        also varies per realization and perturbation) are joined on their shared
-        key columns, so coarser values are repeated across the finer rows. The
-        pandas export cannot align such fields and returns them as separate
-        blocks of rows padded with missing values instead.
-
-    See [Working with Results](../optimizer_setup/results.md#exporting-to-polars) for
-    further details and examples.
+    [`results_to_dataframe`][ropt.results.results_to_dataframe], returned in
+    long format with tuple column names joined into a single string using
+    `sep`. Unlike the pandas export, fields with different granularities are
+    aligned into one table rather than kept as separate blocks. See
+    [Exporting to polars](../optimizer_setup/results.md#exporting-to-polars)
+    for details.
 
     Args:
         results:     A sequence of [`Results`][ropt.results.Results] objects.

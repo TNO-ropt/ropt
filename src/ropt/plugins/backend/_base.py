@@ -1,4 +1,4 @@
-"""Base class for optimzers."""
+"""Base class for optimizers."""
 
 from __future__ import annotations
 
@@ -13,31 +13,24 @@ if TYPE_CHECKING:
 
 
 class BackendPlugin(Plugin):
-    """Abstract Base Class for Backend Plugins (Factories).
+    """Abstract base class for backend plugins (factories).
 
-    This class defines the interface for plugins responsible for creating
-    [`Backend`][ropt.backend.Backend] instances. These plugins
-    act as factories for specific optimization algorithms or backends.
+    Creates [`Backend`][ropt.backend.Backend] instances; concrete plugins
+    implement `create` as a factory for their own `Backend` subclass.
     """
 
     @classmethod
     @abstractmethod
     def create(cls, backend_config: BackendConfig) -> Backend:
-        """Create an Backend instance.
+        """Create a Backend instance.
 
-        This abstract class method serves as a factory for creating concrete
-        [`Backend`][ropt.backend.Backend] objects. Plugin
-        implementations must override this method to return an instance of  their
-        specific `Backend` subclass.
-
-        The [`PluginManager`][ropt.plugins.manager.PluginManager] calls this
-        method when an optimization workflow requires an optimizer provided by
-        this plugin.
+        Called by the [`PluginManager`][ropt.plugins.manager.PluginManager]
+        when an optimization workflow requires an optimizer from this plugin.
 
         Args:
             backend_config: The configuration object containing the
                             backend settings.
 
         Returns:
-            An initialized instance of an `Backend` subclass.
+            An initialized instance of a `Backend` subclass.
         """

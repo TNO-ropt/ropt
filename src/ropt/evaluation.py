@@ -77,18 +77,8 @@ class EvaluationBatchResult:
     variable vectors. Inactive rows should be set to zero; failed active rows
     should be set to `numpy.nan`.
 
-    The `batch_id` field defaults to `0`. If you do not need to distinguish
-    between batches, leave it unset — all results will be labelled batch `0`.
-    To get auto-incrementing IDs managed by the framework, pass a
-    [`BatchIdCounter`][ropt.components.evaluators.BatchIdCounter] (or any
-    `Callable[[], int]`) to the `batch_id_callback` argument of
-    [`FunctionEvaluator`][ropt.components.evaluators.FunctionEvaluator] or
-    [`ParallelEvaluator`][ropt.components.evaluators.ParallelEvaluator]. For raw
-    [`BatchEvaluator`][ropt.components.evaluators.BatchEvaluator] callbacks,
-    set `batch_id` yourself.
-
     See [Writing Evaluation Callbacks](../workflows/evaluation_callbacks.md) for
-    detailed conventions and examples.
+    `batch_id` management and other conventions.
 
     Args:
         objectives:  Objective values, shape `(n_rows, n_objectives)`.

@@ -107,9 +107,12 @@ class DefaultRealizationFilter(RealizationFilter):
     See [Realization Filters](../optimizer_setup/realization_filters.md) for usage.
     """
 
-    def __init__(  # ruff: ignore[undocumented-public-init]
-        self, filter_config: RealizationFilterConfig
-    ) -> None:  # D107
+    def __init__(self, filter_config: RealizationFilterConfig) -> None:
+        """Initialize the realization filter.
+
+        Args:
+            filter_config: The realization filter configuration.
+        """
         self._filter_config = filter_config
         self._filter_options: (
             SortObjectiveOptions

@@ -46,16 +46,10 @@ _logger = get_logger(__name__)
 class EnsembleEvaluator:
     """Construct functions and gradients from an ensemble of functions.
 
-    The `EnsembleEvaluator` class is responsible for calculating functions and
-    gradients from an ensemble of functions. It leverages the settings defined
-    in an [`EnOptContext`][ropt.context.EnOptContext] context object to guide
-    the calculations.
-
-    The core functionality relies on an evaluator callable, (usually provided by
-    an [`Evaluator`][ropt.components.evaluators.Evaluator] object), which is used to
-    evaluate the individual functions within the ensemble. The evaluator
-    provides the raw function values, which are then processed by the
-    `EnsembleEvaluator` to produce the final function and gradient estimates.
+    Uses the settings in an [`EnOptContext`][ropt.context.EnOptContext] to turn
+    the raw values from an evaluator callable, usually provided by an
+    [`Evaluator`][ropt.components.evaluators.Evaluator], into function and
+    gradient estimates.
     """
 
     def __init__(
@@ -65,14 +59,6 @@ class EnsembleEvaluator:
         metadata: dict[str, Any] | None = None,
     ) -> None:
         """Initialize the EnsembleEvaluator.
-
-        This method sets up the `EnsembleEvaluator` with the necessary
-        optimization context object and evaluator callable.
-
-        The `context` object contains all the settings required for the ensemble
-        evaluation, such as the number of realizations, the function estimators,
-        and the gradient settings. The `evaluator` callable is usually provide
-        by a [`Evaluator`][ropt.components.evaluators.Evaluator] object.
 
         Args:
             context:   The optimization context object.

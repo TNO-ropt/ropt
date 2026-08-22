@@ -14,10 +14,10 @@ reported via [`EnOptEvent`][ropt.events.EnOptEvent] objects passed to callbacks.
 Each [`Results`][ropt.results.Results] object represents the outcome of the
 calculation for a **single variable vector** — that is, the objective and
 gradient values computed at one point in variable space. However, the optimizer
-may request evaluations at multiple variable vectors in a single batch (e.g.,
-multiple perturbations or multiple candidates in a gradient-free method). In
-that case, the event payload contains a *sequence* of `Results` objects, one per
-variable vector evaluated in that batch.
+may request evaluations at multiple variable vectors in a single batch (for
+example, multiple perturbations or multiple candidates in a gradient-free
+method). In that case, the event payload contains a *sequence* of `Results`
+objects, one per variable vector evaluated in that batch.
 
 Two concrete subclasses exist:
 
@@ -58,7 +58,7 @@ Each carries nested [`ResultField`][ropt.results.ResultField] objects:
     - `evaluated_realizations`: boolean array indicating which realizations were
       evaluated, shape $(n_r,)$.
     - `objective_weights`: per-realization objective weights, shape
-      $(n_o, n_r)$. May change during optimization (e.g., when realization
+      $(n_o, n_r)$. May change during optimization (for example, when realization
       filters are active).
     - `constraint_weights`: per-realization constraint weights, shape
       $(n_c, n_r)$ (if constraints are configured).
@@ -130,7 +130,7 @@ result.functions.constraints       # per-constraint values
 ```
 
 If `functions` is `None`, the result represents a request that produced no
-valid values (e.g. all realizations failed). Always guard accesses:
+valid values (for example, all realizations failed). Always guard accesses:
 
 ```python
 if result.functions is not None:
@@ -241,7 +241,7 @@ This requires the `pandas` optional extra (see [Installation](../getting_started
 
     The `to_dataframe` and `results_to_dataframe` functions shown here are the
     low-level export primitives. Most users do not call them directly: the
-    [`DataFrameHandler`](../running/running.md#dataframehandler) builds and updates
+    [`DataFrameHandler`](../running/handlers.md#dataframehandler) builds and updates
     these tables automatically as an optimization runs. This section explains
     what that handler produces under the hood.
 
@@ -347,7 +347,7 @@ batch_id
 ```
 
 Each column is a `(field, label)` pair, and each row is one result identified by
-its `batch_id`. Field names use dot notation for nested sub-fields (e.g.,
+its `batch_id`. Field names use dot notation for nested sub-fields (for example,
 `evaluations.variables`, `functions.target_objective`). The `result_type`
 argument selects which results to process: `"functions"` for
 [`FunctionResults`][ropt.results.FunctionResults] only, `"gradients"` for
@@ -397,7 +397,7 @@ batch_id
 ### Labels and the index
 
 Every axis of an exported field becomes an index level, named after its
-[`AxisName`][ropt.enums.AxisName] value (e.g. `"variable"`, `"realization"`,
+[`AxisName`][ropt.enums.AxisName] value (for example `"variable"`, `"realization"`,
 `"objective"`), and `batch_id` is always prepended so results from different
 batches stay distinct. The label on each level — and on each unstacked column —
 comes from the [`names`](configuration.md#names) mapping in the configuration, a

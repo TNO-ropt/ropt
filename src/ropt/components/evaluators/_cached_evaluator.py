@@ -29,8 +29,8 @@ class CachedEvaluator(Evaluator):
     Wraps another evaluator, retrieving previously computed results from
     `EventHandler` sources before delegating uncached evaluations.
 
-    See [Optimization Workflows](../workflows/workflows.md#evaluators) for full
-    details on cache matching, realization name handling, and source
+    See [Using CachedEvaluator](../workflows/evaluation_callbacks.md#using-cachedevaluator)
+    for full details on cache matching, realization name handling, and source
     management.
     """
 
@@ -62,24 +62,16 @@ class CachedEvaluator(Evaluator):
     ) -> tuple[EvaluationBatchResult, dict[int, tuple[int, FunctionResults]]]:
         """Evaluate using cache, returning both results and cache-hit info.
 
-        Returns the evaluation results together with a dictionary of cache
-        hits. The dictionary keys are evaluation indices found in cache;
-        values are tuples of (realization index, cached FunctionResults).
-
         Derived classes can override `eval` and call this method to access
         cache-hit information for populating `metadata`.
-
-        Note:
-            If realization names are configured, they are used for matching
-            (allowing cache hits across runs). Otherwise realization indices
-            are used.
 
         Args:
             variables:         Matrix of variables to evaluate.
             evaluator_context: The evaluation context.
 
         Returns:
-            An `EvaluationBatchResult` and the cache hits.
+            An `EvaluationBatchResult` and the cache hits, keyed by evaluation
+            index, of `(realization index, cached FunctionResults)`.
         """
         cached: dict[int, tuple[int, FunctionResults]] = {}
 

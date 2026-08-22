@@ -314,7 +314,7 @@ class Session:
     ) -> WorkerPool:
         """Create a pool that runs evaluations on an HPC cluster.
 
-        Interfaces with a cluster queue (e.g. Slurm) through `pysqa`; requires
+        Interfaces with a cluster queue (for example Slurm) through `pysqa`; requires
         the `ropt[hpc]` extra, and the evaluation function must be picklable.
         The cluster is selected from `cluster`/`queue`: give a queue to search
         for its cluster, a cluster to use its default queue, or both to be
@@ -422,7 +422,7 @@ class Session:
         if self._session is None:
             msg = (
                 "This session is not open; build pools inside its `with` block, "
-                "e.g. `with session() as s: pool = s.thread_pool()`."
+                "for example `with session() as s: pool = s.thread_pool()`."
             )
             raise WorkflowError(msg)
         return self._session

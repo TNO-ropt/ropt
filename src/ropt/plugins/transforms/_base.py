@@ -21,12 +21,11 @@ if TYPE_CHECKING:
 
 
 class VariableTransformPlugin(Plugin):
-    """Abstract Base Class for Variable Transform Plugins (Factories).
+    """Abstract base class for variable transform plugins (factories).
 
-    This class defines the interface for plugins responsible for creating
-    [`VariableTransform`][ropt.transforms.VariableTransform] instances. These
-    plugins act as factories for specific variable transformation algorithms or
-    strategies.
+    Creates [`VariableTransform`][ropt.transforms.VariableTransform] instances;
+    concrete plugins implement `create` as a factory for their own
+    `VariableTransform` subclass.
     """
 
     @classmethod
@@ -35,15 +34,10 @@ class VariableTransformPlugin(Plugin):
         cls,
         config: VariableTransformConfig,
     ) -> VariableTransform:
-        """Factory method to create a concrete VariableTransform instance.
+        """Create a VariableTransform instance.
 
-        This abstract class method serves as a factory for creating concrete
-        [`VariableTransform`][ropt.transforms.VariableTransform] objects. Plugin
-        implementations must override this method to return an instance of their
-        specific `VariableTransform` subclass.
-
-        The [`PluginManager`][ropt.plugins.manager.PluginManager] calls this
-        method when an optimization requires variable transformations provided by this plugin.
+        Called by the [`PluginManager`][ropt.plugins.manager.PluginManager]
+        when an optimization requires variable transformations from this plugin.
 
         Args:
             config: The variable transform configuration object.
@@ -54,12 +48,11 @@ class VariableTransformPlugin(Plugin):
 
 
 class ObjectiveTransformPlugin(Plugin):
-    """Abstract Base Class for Objective Transform Plugins (Factories).
+    """Abstract base class for objective transform plugins (factories).
 
-    This class defines the interface for plugins responsible for creating
-    [`ObjectiveTransform`][ropt.transforms.ObjectiveTransform] instances. These
-    plugins act as factories for specific objective transformation algorithms or
-    strategies.
+    Creates [`ObjectiveTransform`][ropt.transforms.ObjectiveTransform]
+    instances; concrete plugins implement `create` as a factory for their own
+    `ObjectiveTransform` subclass.
     """
 
     @classmethod
@@ -68,16 +61,10 @@ class ObjectiveTransformPlugin(Plugin):
         cls,
         config: ObjectiveTransformConfig,
     ) -> ObjectiveTransform:
-        """Factory method to create a concrete ObjectiveTransform instance.
+        """Create an ObjectiveTransform instance.
 
-        This abstract class method serves as a factory for creating concrete
-        [`ObjectiveTransform`][ropt.transforms.ObjectiveTransform] objects. Plugin
-        implementations must override this method to return an instance of their
-        specific `ObjectiveTransform` subclass.
-
-        The [`PluginManager`][ropt.plugins.manager.PluginManager] calls this
-        method when an optimization requires objective transformations provided
-        by this plugin.
+        Called by the [`PluginManager`][ropt.plugins.manager.PluginManager]
+        when an optimization requires objective transformations from this plugin.
 
         Args:
             config: The objective transform configuration object.
@@ -88,12 +75,12 @@ class ObjectiveTransformPlugin(Plugin):
 
 
 class NonlinearConstraintTransformPlugin(Plugin):
-    """Abstract Base Class for Nonlinear Constraint Transform Plugins (Factories).
+    """Abstract base class for nonlinear constraint transform plugins (factories).
 
-    This class defines the interface for plugins responsible for creating
+    Creates
     [`NonlinearConstraintTransform`][ropt.transforms.NonlinearConstraintTransform]
-    instances. These plugins act as factories for specific nonlinear constraint
-    transformation algorithms or strategies.
+    instances; concrete plugins implement `create` as a factory for their own
+    `NonlinearConstraintTransform` subclass.
     """
 
     @classmethod
@@ -102,16 +89,11 @@ class NonlinearConstraintTransformPlugin(Plugin):
         cls,
         config: NonlinearConstraintTransformConfig,
     ) -> NonlinearConstraintTransform:
-        """Factory method to create a concrete NonlinearConstraintTransform instance.
+        """Create a NonlinearConstraintTransform instance.
 
-        This abstract class method serves as a factory for creating concrete
-        [`NonlinearConstraintTransform`][ropt.transforms.NonlinearConstraintTransform]
-        objects. Plugin implementations must override this method to return an
-        instance of their specific `NonlinearConstraintTransform` subclass.
-
-        The [`PluginManager`][ropt.plugins.manager.PluginManager] calls this
-        method when an optimization requires nonlinear constraint
-        transformations provided by this plugin.
+        Called by the [`PluginManager`][ropt.plugins.manager.PluginManager]
+        when an optimization requires nonlinear constraint transformations from
+        this plugin.
 
         Args:
             config:   The nonlinear constraint transform configuration object.

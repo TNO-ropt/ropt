@@ -32,3 +32,10 @@ from ropt.workflow import validate_backend_options
 validate_backend_options("scipy/slsqp", {"maxiter": 200})   # ok
 validate_backend_options("scipy/slsqp", {"bogus": 1})       # raises: unknown option
 ```
+
+## Where to next
+
+- Installing plugin packages: [Installation](../getting_started/installation.md#plugin-packages).
+- The `"plugin/method"` naming convention in full:
+  [Method strings](../optimizer_setup/configuration.md#method-strings).
+- Tracing what `ropt` is doing at runtime: [Logging](logging.md).

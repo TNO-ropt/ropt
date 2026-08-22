@@ -13,10 +13,8 @@ A group is built on a session with
 [`shared_handlers`][ropt.simple.Session.shared_handlers] and passed to runs
 explicitly, exactly like a pool.
 
-The two roles are not interchangeable, and the door between them opens one way
-only. A group releases its handlers when it closes, so they can be reused in
-either role afterwards. A handler used locally stays registered with the compute
-step of its run for good, and can never join a group afterwards.
+See [Result Handlers](../running/handlers.md) for the local-vs-shared
+distinction and lifecycle.
 """
 
 from __future__ import annotations
@@ -126,15 +124,8 @@ class SharedHandlers:
     def close(self) -> None:
         """Release the group's handlers without waiting for the session to close.
 
-        Closing is final: a group cannot be reopened, and a run still feeding it
-        stops reaching its handlers, failing once the dispatcher has stopped.
-        Closing twice is a no-op. The handlers
-        themselves are released rather than discarded, so the same objects can
-        join a new group, on a new session, or serve as local handlers.
-
-        Most code does not need this — a session releases every group it
-        created. It matters when groups are created in a loop within one
-        long-lived session.
+        See [Sharing a handler across concurrent runs](../running/handlers.md#sharing-a-handler-across-concurrent-runs)
+        for when this matters and the resulting lifecycle.
         """
         if self._closed:
             return

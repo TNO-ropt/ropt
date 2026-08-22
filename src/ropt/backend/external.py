@@ -71,7 +71,16 @@ class ExternalBackend(Backend):
         instantiation raises `NotImplementedError`.
     """
 
-    def __init__(self, backend_config: BackendConfig) -> None:  # ruff: ignore[undocumented-public-init]
+    def __init__(self, backend_config: BackendConfig) -> None:
+        """Initialize the external backend.
+
+        Args:
+            backend_config: The backend configuration; its `method` field must
+                            be prefixed with `external/`.
+
+        Raises:
+            UnsupportedError: If `cloudpickle` is not installed.
+        """
         if not _HAVE_CLOUDPICKLE:
             msg = "ExternalBackend requires the cloudpickle module; install ropt[cloudpickle]."
             raise UnsupportedError(msg)

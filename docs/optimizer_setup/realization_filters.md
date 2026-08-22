@@ -2,8 +2,8 @@
 
 A realization filter selects, for each evaluation batch, which realizations
 contribute to the combined function or gradient value. Filters enable
-risk-aware optimization (e.g., focus on the worst-performing realizations) and
-common variance-reduction tricks.
+risk-aware optimization (for example, focusing on the worst-performing
+realizations) and common variance-reduction techniques.
 
 `ropt` ships with two default filters in the
 `ropt.realization_filter.default` module:
@@ -121,23 +121,12 @@ side when the optimizer requests gradients separately from functions. Set
 
 ## Writing a custom filter
 
-Custom filters are implemented as plugins. See the
-[`RealizationFilter`][ropt.realization_filter.RealizationFilter] base class.
-
-A filter subclass must implement three methods:
-
-1. `__init__(filter_config)` — store the configuration; keep setup lightweight.
-2. `init(context)` — called once with the
-   [`EnOptContext`][ropt.context.EnOptContext] after all configuration is
-   finalized. Perform validation and precomputation here.
-3. `get_realization_weights(objectives, constraints)` — called at each
-   evaluation. Return a 1-D array of non-negative weights (one per
-   realization).
-
-Registering a filter with the plugin system is only required when the filter
-should be selectable via
-[`RealizationFilterConfig`][ropt.config.RealizationFilterConfig]. Otherwise,
-filter instances can be passed directly in the `realization_filters` field of
+Custom filters are plugins implementing the
+[`RealizationFilter`][ropt.realization_filter.RealizationFilter] base class,
+whose docstring documents the methods to implement. Registering a filter with
+the plugin system is only required when it should be selectable via
+[`RealizationFilterConfig`][ropt.config.RealizationFilterConfig]; otherwise, an
+instance can be passed directly in the `realization_filters` field of
 [`EnOptContext`][ropt.context.EnOptContext].
 
 ## Where to next

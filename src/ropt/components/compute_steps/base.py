@@ -15,10 +15,8 @@ from ropt.exceptions import WorkflowError
 class ComputeStep(ABC):
     """Abstract base class for optimization compute steps.
 
-    This class defines the fundamental interface for all executable compute steps
-    within an optimization workflow. Concrete implementations, which perform
-    specific actions like running an optimizer or evaluating functions, must
-    inherit from this base class.
+    A concrete step performs a specific action, such as running an optimizer or
+    evaluating functions.
 
     A compute step instance may only have one active `run` at a time. The guard
     is applied automatically to every subclass's `run` method, which raises a
@@ -64,13 +62,7 @@ class ComputeStep(ABC):
         return (_make_placeholder, ("A compute step",))
 
     def add_event_handler(self, handler: EventHandler) -> None:
-        """Add an event handler.
-
-        Compute steps emit [`events`][ropt.events.EnOptEvent] to report on the
-        calculations they perform. These events are processed by independently
-        created [`event handlers`][ropt.components.event_handlers.EventHandler].
-        Use the `add_event_handler` method to attach these handlers to the
-        compute step.
+        """Attach an event handler to receive this step's events.
 
         Args:
             handler: The handler to add.

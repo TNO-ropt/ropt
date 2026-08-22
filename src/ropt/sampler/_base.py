@@ -109,7 +109,7 @@ class Sampler(ABC):
 
             Therefore, it is generally recommended that sampler implementations
             produce samples with a characteristic scale of approximately one
-            (e.g., drawn from a distribution with a standard deviation of 1, or
+            (for example drawn from a distribution with a standard deviation of 1, or
             uniformly distributed within `[-1, 1]`). This allows the
             `perturbation_magnitudes` to directly control the effective size of
             the perturbations applied to the variables.

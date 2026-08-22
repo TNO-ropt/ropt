@@ -82,14 +82,9 @@ def results_to_dataframe(
 
     Concatenates the specified fields from a sequence of
     [`FunctionResults`][ropt.results.FunctionResults] or
-    [`GradientResults`][ropt.results.GradientResults] objects. Fields are
-    selected using dot notation (e.g., `evaluations.variables`); nested
-    `metadata` entries are accessed as `evaluations.metadata.key`.
-    Multi-dimensional fields are automatically unstacked into tuple-named
-    columns.
-
-    See [Working with Results](../optimizer_setup/results.md#exporting-to-pandas) for
-    further details and examples.
+    [`GradientResults`][ropt.results.GradientResults] objects, one row per
+    result. See [Aggregating multiple results](../optimizer_setup/results.md#aggregating-multiple-results)
+    for field selection and unstacking.
 
     Args:
         results:     A sequence of [`Results`][ropt.results.Results] objects.

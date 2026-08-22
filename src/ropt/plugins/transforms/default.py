@@ -25,10 +25,18 @@ class DefaultVariableTransformPlugin(VariableTransformPlugin):
     """Default variable transform plugin class."""
 
     @classmethod
-    def create(  # ruff: ignore[undocumented-public-method]
+    def create(
         cls,
         config: VariableTransformConfig,
     ) -> DefaultVariableTransform:
+        """Create a DefaultVariableTransform instance.
+
+        Args:
+            config: The variable transform configuration.
+
+        Returns:
+            A new `DefaultVariableTransform`.
+        """
         return DefaultVariableTransform(config)
 
     @classmethod
@@ -40,10 +48,18 @@ class DefaultObjectiveTransformPlugin(ObjectiveTransformPlugin):
     """Default objective transform plugin class."""
 
     @classmethod
-    def create(  # ruff: ignore[undocumented-public-method]
+    def create(
         cls,
         config: ObjectiveTransformConfig,
     ) -> DefaultObjectiveTransform:
+        """Create a DefaultObjectiveTransform instance.
+
+        Args:
+            config: The objective transform configuration.
+
+        Returns:
+            A new `DefaultObjectiveTransform`.
+        """
         return DefaultObjectiveTransform(config)
 
     @classmethod
@@ -55,10 +71,18 @@ class DefaultNonlinearConstraintTransformPlugin(NonlinearConstraintTransformPlug
     """Default nonlinear constraint transform plugin class."""
 
     @classmethod
-    def create(  # ruff: ignore[undocumented-public-method]
+    def create(
         cls,
         config: NonlinearConstraintTransformConfig,
     ) -> DefaultNonlinearConstraintTransform:
+        """Create a DefaultNonlinearConstraintTransform instance.
+
+        Args:
+            config: The nonlinear constraint transform configuration.
+
+        Returns:
+            A new `DefaultNonlinearConstraintTransform`.
+        """
         return DefaultNonlinearConstraintTransform(config)
 
     @classmethod

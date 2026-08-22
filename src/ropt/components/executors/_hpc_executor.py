@@ -38,7 +38,7 @@ if _HAVE_HPC:
 class HPCExecutor(ExecutorBase):
     """An executor for submitting tasks to an HPC cluster.
 
-    Interfaces with an HPC queueing system (e.g. Slurm) via `pysqa`.
+    Interfaces with an HPC queueing system (for example Slurm) via `pysqa`.
     Requires `ropt[hpc]` to be installed.
 
     See [Parallel Evaluation](../workflows/parallel.md#hpcexecutor) for full
@@ -73,7 +73,7 @@ class HPCExecutor(ExecutorBase):
                          distinct workdirs.
             workers:     Maximum concurrent HPC jobs.
             interval:    Polling interval in seconds.
-            queue_type:  Queueing system type (e.g. `"slurm"`).
+            queue_type:  Queueing system type (for example `"slurm"`).
             template:    Optional submission script template string.
             config_path: Optional path to `pysqa` configuration directory.
             cluster:     Optional cluster name.
@@ -83,12 +83,6 @@ class HPCExecutor(ExecutorBase):
                          after the first attempt fails (`0` gives up at once).
             cleanup:     Whether to remove work item files once their result is
                          retrieved or their job is cancelled.
-
-        For multi-cluster `pysqa` configurations the cluster is resolved as
-        follows: if `cluster` is given it is selected directly, and if `queue`
-        is also given it is verified to be available on that cluster. If only
-        `queue` is given the cluster that provides it is derived automatically;
-        this requires exactly one cluster to provide the queue.
 
         Raises:
             ValueError:     If `workdir` is not an existing absolute path, or if

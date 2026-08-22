@@ -17,24 +17,10 @@ DEFAULT_NONLINEAR_CONSTRAINT_TRANSFORM_METHODS = {"scaler"}
 
 
 class DefaultVariableTransform(VariableTransform):
-    r"""Linearly scales and shifts variables between domains.
+    """Linearly scales and shifts variables between domains.
 
-    This class implements a linear transformation for variables, allowing
-    for scaling and shifting between the user-defined domain and the
-    optimizer's internal domain. The transformation is defined by a scaling
-    factor and an offset for each variable.
-
-    The transformation from the user domain to the optimizer domain is given by:
-
-    $$x_{opt} = \frac{(x_{\textrm{user}} - \textrm{offset})}{\textrm{scale}}$$
-
-    The transformation from the optimizer domain back to the user domain is:
-
-    $$x_{user} = x_{\textrm{opt}} * {\textrm{scale}} + {\textrm{offset}}$$
-
-    This transformation can be used to improve the performance of the
-    optimizer by working with variables that are scaled to a more suitable
-    range or centered around a specific value.
+    See [Transforms](../optimizer_setup/transforms.md#defaultvariabletransform)
+    for the formulas and configuration options.
     """
 
     def __init__(

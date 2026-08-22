@@ -185,7 +185,7 @@ def create_output_path(
     """Construct a unique output path, appending an index if necessary.
 
     Builds a path from the provided components. If the resulting path already
-    exists on disk, a three-digit counter suffix (e.g. `-001`, `-002`) is
+    exists on disk, a three-digit counter suffix (for example `-001`, `-002`) is
     appended or incremented until a non-existing path is found.
 
     The path is assembled as:
@@ -491,7 +491,7 @@ def get_masked_linear_constraints(
     optimization involving only the active variables.
 
     Additionally, any constraint rows that originally involved *only* masked
-    variables (i.e., all coefficients for active variables in that row are zero)
+    variables (all coefficients for active variables in that row are zero)
     are removed entirely, as they become trivial constants.
 
     Args:

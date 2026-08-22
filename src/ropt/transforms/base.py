@@ -91,7 +91,7 @@ class VariableTransform(ABC):
     ) -> NDArray[np.float64]:
         """Transform perturbation magnitudes to the optimizer domain.
 
-        Must be consistent with the variable transform (e.g., if variables
+        Must be consistent with the variable transform (for example, if variables
         are divided by scale, magnitudes should be too).
 
         Args:
@@ -128,6 +128,10 @@ class VariableTransform(ABC):
         Adjusts the coefficient matrix and RHS bounds so that linear constraints
         remain valid after the variable transformation.
 
+        Overriding this method is optional: implement it only if the transform
+        must support linear constraints. The base implementation raises
+        `NotImplementedError`.
+
         Args:
             coefficients: Coefficient matrix `A`.
             lower_bounds: Lower RHS bounds.
@@ -135,6 +139,10 @@ class VariableTransform(ABC):
 
         Returns:
             Tuple of (coefficients, lower_bounds, upper_bounds) in optimizer domain.
+
+        Raises:
+            NotImplementedError: If the transform does not support linear
+                constraints.
         """  # ruff: ignore[docstring-extraneous-returns]
         msg = "This transformer does not support linear constraints."
         raise NotImplementedError(msg)
@@ -146,12 +154,20 @@ class VariableTransform(ABC):
 
         Used for reporting constraint violations in user-domain units.
 
+        Overriding this method is optional: implement it only if the transform
+        must support linear constraints. The base implementation raises
+        `NotImplementedError`.
+
         Args:
             lower_diffs: Constraint value minus lower bound.
             upper_diffs: Constraint value minus upper bound.
 
         Returns:
             Tuple of (lower_diffs, upper_diffs) in user domain.
+
+        Raises:
+            NotImplementedError: If the transform does not support linear
+                constraints.
         """  # ruff: ignore[docstring-extraneous-returns]
         msg = "This transformer does not support linear constraints."
         raise NotImplementedError(msg)
@@ -229,6 +245,9 @@ class ObjectiveTransform(ABC):
 
     def update(self, *args: Any, **kwargs: Any) -> None:  # ruff: ignore[any-type, empty-method-without-abstract-decorator]
         """Update internal state mid-run (optional).
+
+        Override to support runtime parameter changes when values are not
+        known at initialization.
 
         Args:
             args:   Positional arguments.
@@ -332,6 +351,9 @@ class NonlinearConstraintTransform(ABC):
 
     def update(self, *args: Any, **kwargs: Any) -> None:  # ruff: ignore[any-type, empty-method-without-abstract-decorator]
         """Update internal state mid-run (optional).
+
+        Override to support runtime parameter changes when values are not
+        known at initialization.
 
         Args:
             args:   Positional arguments.

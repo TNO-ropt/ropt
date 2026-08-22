@@ -12,13 +12,12 @@ Using `pip`:
 pip install ropt
 ```
 
-The core install includes the SciPy-based optimizer and sampler backends, which
-are sufficient for most basic optimization tasks.
+The core install includes the built-in SciPy-based optimizers and samplers,
+which are enough for most basic optimization tasks.
 
 ## Optional extras
 
-`ropt` exposes a few optional dependency groups that enable additional
-functionality:
+`ropt` offers a few optional dependency groups that add extra functionality:
 
 | Extra          | Pulls in                | Enables                                                    |
 | -------------- | ----------------------- | ---------------------------------------------------------- |
@@ -27,10 +26,12 @@ functionality:
 | `cloudpickle`  | `cloudpickle`           | Running lambdas, closures, and notebook-defined functions in external processes. |
 | `hpc`          | `pysqa`, `cloudpickle`  | Running evaluations on HPC clusters.                       |
 
-Without `cloudpickle`, code that runs in external processes is serialized with
-the standard `pickle` module, which requires importable, module-level functions;
-installing it adds support for lambdas, closures, and notebook-defined
-functions. The `hpc` extra already includes `cloudpickle`.
+Without `cloudpickle`, code that runs in external processes is transferred using
+Python's standard `pickle` module, which only supports plain, named functions
+imported from a module. Installing `cloudpickle` lifts that restriction, so
+functions defined inline (lambdas), functions defined inside other functions
+(closures), and functions defined in a Jupyter notebook can be used too. The
+`hpc` extra already includes `cloudpickle`.
 
 Install with:
 
@@ -42,9 +43,8 @@ pip install "ropt[pandas,hpc,cloudpickle]"
 
 ## Plugin packages
 
-Additional optimization backends are provided as standalone packages that
-register themselves through Python entry points. Once installed they become
-available to `ropt` automatically:
+Additional optimization backends are provided as standalone packages. Once
+installed alongside `ropt`, they are picked up automatically:
 
 | Package                                                                  | Adds                                                                           |
 | ------------------------------------------------------------------------ | ------------------------------------------------------------------------------ |
@@ -59,15 +59,9 @@ pip install ropt ropt-pymoo
 ```
 
 After installation, the plugin's methods become available through the
-`backend.method` field in your configuration. This field accepts two forms:
-
-- **Explicit** — `"plugin/method"` names both the plugin and the method, for
-  example `"pymoo/nelder-mead"`.
-- **Implicit** — a bare `"method"` (for example `"nelder-mead"`) lets `ropt`
-  search the installed plugins for one that provides it. This is unambiguous
-  only when a single plugin exposes that method name.
-
-Both the plugin name and the method name are case-insensitive. See the
+`backend.method` field in your configuration, either as `"plugin/method"`
+(for example `"pymoo/nelder-mead"`) or, if the method name is unique among
+your installed plugins, just `"method"` (for example `"nelder-mead"`). See the
 [method strings](../optimizer_setup/configuration.md#method-strings) section of the
 configuration guide for the full details.
 

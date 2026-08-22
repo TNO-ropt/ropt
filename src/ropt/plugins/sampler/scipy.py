@@ -10,10 +10,18 @@ class SciPySamplerPlugin(SamplerPlugin):
     """Default sampler plugin class."""
 
     @classmethod
-    def create(  # ruff: ignore[undocumented-public-method]
+    def create(
         cls,
         sampler_config: SamplerConfig,
     ) -> SciPySampler:
+        """Create a SciPySampler instance.
+
+        Args:
+            sampler_config: The sampler configuration.
+
+        Returns:
+            A new `SciPySampler`.
+        """
         return SciPySampler(sampler_config)
 
     @classmethod

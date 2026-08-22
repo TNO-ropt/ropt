@@ -13,27 +13,20 @@ if TYPE_CHECKING:
 
 
 class RealizationFilterPlugin(Plugin):
-    """Abstract Base Class for Realization Filter Plugins (Factories).
+    """Abstract base class for realization filter plugins (factories).
 
-    This class defines the interface for plugins responsible for creating
-    [`RealizationFilter`][ropt.realization_filter.RealizationFilter]
-    instances. These plugins act as factories for specific realization filtering
-    strategies.
+    Creates [`RealizationFilter`][ropt.realization_filter.RealizationFilter]
+    instances; concrete plugins implement `create` as a factory for their own
+    `RealizationFilter` subclass.
     """
 
     @classmethod
     @abstractmethod
     def create(cls, filter_config: RealizationFilterConfig) -> RealizationFilter:
-        """Factory method to create a concrete RealizationFilter instance.
+        """Create a RealizationFilter instance.
 
-        This abstract class method serves as a factory for creating concrete
-        [`RealizationFilter`][ropt.realization_filter.RealizationFilter]
-        objects. Plugin implementations must override this method to return an
-        instance of their specific `RealizationFilter` subclass.
-
-        The [`PluginManager`][ropt.plugins.manager.PluginManager] calls this
-        method when an optimization requires realization weights calculated by
-        this plugin.
+        Called by the [`PluginManager`][ropt.plugins.manager.PluginManager]
+        when an optimization requires realization weights from this plugin.
 
         Args:
             filter_config: The configuration object for this realization filter.

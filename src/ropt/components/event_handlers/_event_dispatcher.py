@@ -59,14 +59,9 @@ class EventDispatcher:
     ) -> None:
         """Add an event handler.
 
-        By default the handler is called directly in the event loop's thread,
-        which is efficient for handlers that only do in-memory work. Pass
-        `run_in_thread=True` for handlers that perform blocking operations such
-        as file I/O, database writes, or network calls. Such handlers run on a
-        thread pool the dispatcher owns, so they never compete for the asyncio
-        loop's shared default pool. Multiple handlers with `run_in_thread=True`
-        that match the same event are dispatched in parallel via
-        `asyncio.gather`.
+        By default the handler is called directly on the event loop's thread.
+        Pass `run_in_thread=True` for handlers that perform blocking I/O; see
+        [Thread-based dispatch](../workflows/parallel.md#thread-based-dispatch).
 
         Args:
             handler:       The handler to add.
@@ -102,13 +97,9 @@ class EventDispatcher:
     def dispatch_event(self, event: EnOptEvent) -> None:
         """Submit an event and block until every handler has processed it.
 
-        The event is queued to the dispatcher and this call blocks on the
-        calling thread until the dispatcher has finished handling it. Events are
-        handled in submission order. If a handler raises, the original exception
-        is re-raised here — on the caller's own stack — so it surfaces as a
-        clean, single exception, mirroring how the executor's
-        [`fail`][ropt.components.executors.Submission.fail] is re-raised by the
-        awaiting evaluator.
+        Events are handled in submission order. A handler exception is
+        re-raised here, on the caller's own stack. See
+        [Handler failures](../workflows/parallel.md#handler-failures).
 
         Args:
             event: The event to submit.

@@ -52,7 +52,7 @@ class EnOptContext(BaseModel):
 
     Warning:
         `EnOptContext` objects are immutable after construction. Do not attempt
-        to serialize and round-trip them (e.g., to/from JSON): `numpy` arrays
+        to serialize and round-trip them (for example to and from JSON): `numpy` arrays
         and plugin instances cannot survive a round-trip faithfully. Persist the
         raw input dicts instead.
 
