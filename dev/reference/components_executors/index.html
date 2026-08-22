@@ -4039,17 +4039,11 @@ object. Handing a submission to an executor transfers responsibility: the
 executor either runs the work items or aborts the submission, so a caller
 blocked in <a class="autorefs autorefs-internal" title="            collect" href="#ropt.components.executors.Submission.collect"><code>collect</code></a> is
 always released.</p>
-<p>Two failure classes are distinguished, following the error contract in
-<a href="../../workflows/parallel/#error-handling">Parallel Evaluation</a>:</p>
-<ul>
-<li>An <strong>infrastructure failure</strong> (a killed worker process, or missing or
-  corrupt HPC output) arrives as an ordinary result whose value is an
-  <a class="autorefs autorefs-internal" title="            ExecutorFailure" href="../exceptions/#ropt.exceptions.ExecutorFailure"><code>ExecutorFailure</code></a>. This is a tolerated
-  per-realization failure.</li>
-<li>A <strong>user-code exception</strong> ends the submission via
-  <a class="autorefs autorefs-internal" title="            fail" href="#ropt.components.executors.Submission.fail"><code>fail</code></a>, which re-raises the
-  original exception in <code>collect</code>. The executor keeps running.</li>
-</ul>
+<p>See <a href="../../workflows/parallel/#error-handling">Error handling</a> for how
+infrastructure failures (delivered via
+<a class="autorefs autorefs-internal" title="            deliver" href="#ropt.components.executors.Submission.deliver"><code>deliver</code></a>) and user-code
+exceptions (ended via <a class="autorefs autorefs-internal" title="            fail" href="#ropt.components.executors.Submission.fail"><code>fail</code></a>)
+are distinguished.</p>
 
 
 
@@ -4895,7 +4889,7 @@ point must use.</p>
 
 
         <p>An executor for submitting tasks to an HPC cluster.</p>
-<p>Interfaces with an HPC queueing system (e.g. Slurm) via <code>pysqa</code>.
+<p>Interfaces with an HPC queueing system (for example Slurm) via <code>pysqa</code>.
 Requires <code>ropt[hpc]</code> to be installed.</p>
 <p>See <a href="../../workflows/parallel/#hpcexecutor">Parallel Evaluation</a> for full
 details on configuration and lifecycle.</p>
@@ -5021,7 +5015,7 @@ configuration details.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Queueing system type (e.g. <code>"slurm"</code>).</p>
+                <p>Queueing system type (for example <code>"slurm"</code>).</p>
               </div>
             </td>
             <td>
@@ -5144,11 +5138,6 @@ configuration details.</p>
           </tr>
       </tbody>
     </table>
-        <p>For multi-cluster <code>pysqa</code> configurations the cluster is resolved as
-follows: if <code>cluster</code> is given it is selected directly, and if <code>queue</code>
-is also given it is verified to be available on that cluster. If only
-<code>queue</code> is given the cluster that provides it is derived automatically;
-this requires exactly one cluster to provide the queue.</p>
 
 
 <p><span class="doc-section-title">Raises:</span></p>

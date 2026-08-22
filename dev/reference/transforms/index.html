@@ -5995,7 +5995,7 @@ supported.</p>
     <div class="doc doc-contents ">
 
         <p>Transform perturbation magnitudes to the optimizer domain.</p>
-<p>Must be consistent with the variable transform (e.g., if variables
+<p>Must be consistent with the variable transform (for example, if variables
 are divided by scale, magnitudes should be too).</p>
 
 
@@ -6899,7 +6899,7 @@ supported.</p>
     <div class="doc doc-contents ">
 
         <p>Transform perturbation magnitudes to the optimizer domain.</p>
-<p>Must be consistent with the variable transform (e.g., if variables
+<p>Must be consistent with the variable transform (for example, if variables
 are divided by scale, magnitudes should be too).</p>
 
 
@@ -8481,17 +8481,8 @@ known at initialization.</p>
 
 
         <p>Linearly scales and shifts variables between domains.</p>
-<p>This class implements a linear transformation for variables, allowing
-for scaling and shifting between the user-defined domain and the
-optimizer's internal domain. The transformation is defined by a scaling
-factor and an offset for each variable.</p>
-<p>The transformation from the user domain to the optimizer domain is given by:</p>
-<div class="arithmatex">\[x_{opt} = \frac{(x_{\textrm{user}} - \textrm{offset})}{\textrm{scale}}\]</div>
-<p>The transformation from the optimizer domain back to the user domain is:</p>
-<div class="arithmatex">\[x_{user} = x_{\textrm{opt}} * {\textrm{scale}} + {\textrm{offset}}\]</div>
-<p>This transformation can be used to improve the performance of the
-optimizer by working with variables that are scaled to a more suitable
-range or centered around a specific value.</p>
+<p>See <a href="../../optimizer_setup/transforms/#defaultvariabletransform">Transforms</a>
+for the formulas and configuration options.</p>
 
 
 

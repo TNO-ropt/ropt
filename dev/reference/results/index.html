@@ -3808,15 +3808,10 @@ further details and examples.</p>
 
         <p>Export a field to a polars DataFrame.</p>
 <p>This is the polars counterpart of
-<a class="autorefs autorefs-internal" title="            to_dataframe" href="#ropt.results.Results.to_dataframe"><code>to_dataframe</code></a>. Polars has no index,
-so the frame is returned in long format: <code>batch_id</code> and the axis labels
-become regular columns, followed by one column per sub-field.</p>
-<p>Since polars column names must be strings, the tuple column names that
-<code>to_dataframe</code> produces for unstacked axes are joined into a single
-string using <code>sep</code>: the pandas column <code>(sub-field, label, ...)</code> becomes
-<code>"sub-field&lt;sep&gt;label&lt;sep&gt;..."</code>.</p>
-<p>See <a href="../../optimizer_setup/results/#exporting-to-polars">Working with Results</a> for
-further details and examples.</p>
+<a class="autorefs autorefs-internal" title="            to_dataframe" href="#ropt.results.Results.to_dataframe"><code>to_dataframe</code></a>, returned in long
+format with tuple column names joined into a single string using
+<code>sep</code>. See <a href="../../optimizer_setup/results/#exporting-to-polars">Exporting to polars</a>
+for details.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -6638,13 +6633,9 @@ default to <code>None</code> and are only populated if bounds are present and fi
 
   
       dataclass
-  " href="#ropt.results.GradientResults"><code>GradientResults</code></a> objects. Fields are
-selected using dot notation (e.g., <code>evaluations.variables</code>); nested
-<code>metadata</code> entries are accessed as <code>evaluations.metadata.key</code>.
-Multi-dimensional fields are automatically unstacked into tuple-named
-columns.</p>
-<p>See <a href="../../optimizer_setup/results/#exporting-to-pandas">Working with Results</a> for
-further details and examples.</p>
+  " href="#ropt.results.GradientResults"><code>GradientResults</code></a> objects, one row per
+result. See <a href="../../optimizer_setup/results/#aggregating-multiple-results">Aggregating multiple results</a>
+for field selection and unstacking.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -6801,38 +6792,12 @@ further details and examples.</p>
 
         <p>Aggregate multiple results into a single polars DataFrame.</p>
 <p>This is the polars counterpart of
-<a class="autorefs autorefs-internal" title="            ropt.results.results_to_dataframe" href="#ropt.results.results_to_dataframe"><code>results_to_dataframe</code></a>. It concatenates the
-specified fields from a sequence of
-<a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
-
-
-  
-      dataclass
-  " href="#ropt.results.FunctionResults"><code>FunctionResults</code></a> or
-<a class="autorefs autorefs-internal" title="            ropt.results.GradientResults
-
-
-  
-      dataclass
-  " href="#ropt.results.GradientResults"><code>GradientResults</code></a> objects. Fields are
-selected using dot notation (e.g., <code>evaluations.variables</code>); nested
-<code>metadata</code> entries are accessed as <code>evaluations.metadata.key</code>.
-Multi-dimensional fields are automatically unstacked into columns.</p>
-<p>Polars has no index and its column names must be strings, so the frame is
-returned in long format and the tuple column names produced by
-<code>results_to_dataframe</code> are joined into a single string using <code>sep</code>.</p>
-
-
-<details class="note" open>
-  <summary>Note</summary>
-  <p>Fields with different granularities (e.g. <code>gradients.objectives</code>, which
-varies only per batch, and <code>evaluations.perturbed_objectives</code>, which
-also varies per realization and perturbation) are joined on their shared
-key columns, so coarser values are repeated across the finer rows. The
-pandas export cannot align such fields and returns them as separate
-blocks of rows padded with missing values instead.</p>
-</details>        <p>See <a href="../../optimizer_setup/results/#exporting-to-polars">Working with Results</a> for
-further details and examples.</p>
+<a class="autorefs autorefs-internal" title="            ropt.results.results_to_dataframe" href="#ropt.results.results_to_dataframe"><code>results_to_dataframe</code></a>, returned in
+long format with tuple column names joined into a single string using
+<code>sep</code>. Unlike the pandas export, fields with different granularities are
+aligned into one table rather than kept as separate blocks. See
+<a href="../../optimizer_setup/results/#exporting-to-polars">Exporting to polars</a>
+for details.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>

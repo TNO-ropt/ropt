@@ -2986,7 +2986,7 @@ plugin instances.</p>
 <details class="warning" open>
   <summary>Warning</summary>
   <p><code>EnOptContext</code> objects are immutable after construction. Do not attempt
-to serialize and round-trip them (e.g., to/from JSON): <code>numpy</code> arrays
+to serialize and round-trip them (for example to and from JSON): <code>numpy</code> arrays
 and plugin instances cannot survive a round-trip faithfully. Persist the
 raw input dicts instead.</p>
 </details>

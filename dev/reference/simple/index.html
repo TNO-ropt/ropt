@@ -4184,16 +4184,9 @@ A sequence that is empty gives no runs, and returns no results.</p>
 same <code>pool</code>, so its workers are shared between them; <code>limit</code> bounds how
 many run simultaneously. Without a <code>pool</code> the runs still overlap, but each
 evaluation runs in-process on its own driver thread. See
-<a href="../../running/running/">Running Optimizations</a> for a walkthrough.</p>
-<p>The first run to raise propagates its exception immediately (fail-fast).
-Runs that have not started are skipped, but a run already in progress
-cannot be stopped from the outside: it is abandoned, and keeps going until
-it finishes on its own. So returning after a failure can still take as long
-as a full optimization. Closing the pool cuts that short: the abandoned run
-then stops at its next evaluation and returns rather than raising — usually
-with <a class="autorefs autorefs-internal" title="            ExitCode" href="../enums/#ropt.enums.ExitCode"><code>ExitCode.EXECUTOR_STOPPED</code></a>, though a run that
-ends its own optimizer loop first reports that reason instead. Either way
-its result is discarded.</p>
+<a href="../../running/parallel/#many-optimizations-at-once">Parallel Execution and Many Runs</a>
+for a walkthrough, and <a href="../../running/parallel/#failure-in-one-run">Failure in one run</a>
+for what happens when one raises.</p>
 <p>Unlike <code>optimize</code>, this takes no <em>local</em> handlers: a local handler belongs
 to one run at a time and these runs overlap, so <code>handlers=</code> accepts only
 <a class="autorefs autorefs-internal" title="            ropt.simple.SharedHandlers" href="#ropt.simple.SharedHandlers"><code>SharedHandlers</code></a> groups, which every run feeds
@@ -5416,7 +5409,7 @@ session is single use — once closed it cannot be reopened.</p>
     <div class="doc doc-contents ">
 
         <p>Create a pool that runs evaluations on an HPC cluster.</p>
-<p>Interfaces with a cluster queue (e.g. Slurm) through <code>pysqa</code>; requires
+<p>Interfaces with a cluster queue (for example Slurm) through <code>pysqa</code>; requires
 the <code>ropt[hpc]</code> extra, and the evaluation function must be picklable.
 The cluster is selected from <code>cluster</code>/<code>queue</code>: give a queue to search
 for its cluster, a cluster to use its default queue, or both to be
@@ -6199,13 +6192,8 @@ can say so, whether or not they run in parallel.</p>
     <div class="doc doc-contents ">
 
         <p>Release the pool's workers without waiting for the session to close.</p>
-<p>Closing is final: a pool cannot be reopened, and a run still using it
-ends with <a class="autorefs autorefs-internal" title="            ExecutorStopped" href="../exceptions/#ropt.exceptions.ExecutorStopped"><code>ExecutorStopped</code></a>. Closing
-twice is a no-op, and closing a serial pool releases nothing, since it
-holds nothing.</p>
-<p>Most code does not need this — a session releases every pool it created.
-It matters when pools are created in a loop within one long-lived
-session, above all process pools, which hold worker interpreters.</p>
+<p>See <a href="../../running/parallel/#running-in-parallel">Releasing a pool early</a>
+for when this matters and the resulting lifecycle.</p>
 
 
     </div>
@@ -6841,14 +6829,8 @@ several steps), carrying only the event types the group's handlers want.</p>
     <div class="doc doc-contents ">
 
         <p>Release the group's handlers without waiting for the session to close.</p>
-<p>Closing is final: a group cannot be reopened, and a run still feeding it
-stops reaching its handlers, failing once the dispatcher has stopped.
-Closing twice is a no-op. The handlers
-themselves are released rather than discarded, so the same objects can
-join a new group, on a new session, or serve as local handlers.</p>
-<p>Most code does not need this — a session releases every group it
-created. It matters when groups are created in a loop within one
-long-lived session.</p>
+<p>See <a href="../../running/handlers/#sharing-a-handler-across-concurrent-runs">Sharing a handler across concurrent runs</a>
+for when this matters and the resulting lifecycle.</p>
 
 
     </div>

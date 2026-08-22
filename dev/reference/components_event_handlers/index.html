@@ -3872,40 +3872,27 @@ handlers shared across concurrent compute steps need no locking.</p>
 
 
         <p>Abstract base class for event handlers.</p>
-<p>This class defines the fundamental interface for all event handlers within
-an optimization workflow. Concrete handler implementations, (e.g., tracking
-results, storing data, logging), must inherit from this base class.</p>
-<p>Handlers may store state using dictionary-like access (<code>[]</code>), allowing
-them to accumulate information or make data available to other components in
-an optimization workflow.</p>
-<p>Subclasses must implement the abstract
+<p>A concrete handler reacts to the events emitted by a
+<a class="autorefs autorefs-internal" title="            ropt.components.compute_steps.ComputeStep" href="../components_compute_steps/#ropt.components.compute_steps.ComputeStep"><code>ComputeStep</code></a> it is attached to,
+by implementing
 <a class="autorefs autorefs-internal" title="            handle_event
 
 
   
       abstractmethod
-  " href="#ropt.components.event_handlers.EventHandler.handle_event"><code>handle_event</code></a>
-method to define their specific event processing logic.</p>
-<p>Event handlers are attached to a
-<a class="autorefs autorefs-internal" title="            ropt.components.compute_steps.ComputeStep" href="../components_compute_steps/#ropt.components.compute_steps.ComputeStep"><code>ComputeStep</code></a> using its
-<a class="autorefs autorefs-internal" title="            add_event_handler" href="../components_compute_steps/#ropt.components.compute_steps.ComputeStep.add_event_handler"><code>add_event_handler</code></a>
-method. When the compute step emits an event, the <code>handle_event</code> method of
-each attached handler is invoked, allowing it to process the event.</p>
+  " href="#ropt.components.event_handlers.EventHandler.handle_event"><code>handle_event</code></a>.
+Handlers may store state using dictionary-like access (<code>[]</code>).</p>
 
 
 <details class="note" open>
   <summary>Note</summary>
-  <p>Event handlers are not safe for concurrent use. A handler attached to
-compute steps raises a <code>WorkflowError</code> if two threads execute its
-<code>handle_event</code> method at the same time. Serial reuse across threads is
-allowed, as long as each call completes before the next begins. A
-handler must not run a compute step or otherwise cause new events to be
-emitted while processing an event: <code>handle_event</code> is not re-entrant. To
-receive events from multiple threads concurrently, register it with an
-<a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventDispatcher" href="#ropt.components.event_handlers.EventDispatcher"><code>EventDispatcher</code></a>, which
-serializes the calls. A handler may be owned by at most one dispatcher,
-or by one or more compute steps, but not both. See
-<a href="../../workflows/workflows/#event-handlers">Optimization Workflows</a> for usage
+  <p>A handler's <code>handle_event</code> is not re-entrant, and not safe to call from
+two threads at once: both raise <code>WorkflowError</code>. Register a handler
+shared across concurrently running steps with an
+<a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventDispatcher" href="#ropt.components.event_handlers.EventDispatcher"><code>EventDispatcher</code></a>
+instead, which serializes the calls. See
+<a href="../../workflows/workflows/#event-handlers">Optimization Workflows</a> and
+<a href="../../workflows/parallel/#event-dispatcher">Parallel Evaluation</a> for usage
 and pitfalls.</p>
 </details>
 
@@ -4109,19 +4096,7 @@ Releasing an unclaimed handler is a no-op.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Process an event.</p>
-<p>This abstract method must be implemented by concrete <code>EventHandler</code>
-subclasses. It defines the event handler's core logic for reacting to
-<a class="autorefs autorefs-internal" title="            EnOptEvent
-
-
-  
-      dataclass
-  " href="../events/#ropt.events.EnOptEvent"><code>EnOptEvent</code></a> objects emitted in the
-optimization workflow.</p>
-<p>Implementations should inspect the <code>event</code> object (its <code>event_type</code> and
-<code>data</code>) and perform computations accordingly, such as storing results,
-logging information, or updating internal state.</p>
+        <p>React to an emitted event.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -4182,11 +4157,7 @@ logging information, or updating internal state.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Retrieve a value from the event handler's internal state.</p>
-<p>This method enables dictionary-like access (<code>handler[key]</code>) to the
-values stored within the event handler's internal state dictionary. This
-allows handlers to store and retrieve data accumulated during workflow
-execution.</p>
+        <p>Retrieve a stored value by key (<code>handler[key]</code>).</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -4258,8 +4229,7 @@ execution.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If the provided <code>key</code> does not exist in the
-            event handler's stored values.</p>
+                <p>If <code>key</code> does not exist in the stored values.</p>
               </div>
             </td>
           </tr>
@@ -4289,12 +4259,7 @@ execution.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Store or update a value in the event handler's internal state.</p>
-<p>This method enables dictionary-like assignment (<code>handler[key] = value</code>)
-to store arbitrary data within the event handler's internal state
-dictionary. This allows event handlers to accumulate information or make
-data available to other components of the workflow.</p>
-<p>The key must be a valid Python identifier.</p>
+        <p>Store or update a value in the internal state (<code>handler[key] = value</code>).</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -4359,7 +4324,7 @@ data available to other components of the workflow.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If the provided <code>key</code> is not a valid identifier.</p>
+                <p>If <code>key</code> is not a valid identifier.</p>
               </div>
             </td>
           </tr>
@@ -5189,7 +5154,7 @@ from. The <code>"user"</code> domain reports values as seen by the user;
         <p>Set the callback function.</p>
 <p>The callback is invoked from <code>handle_event</code> after the tables are
 updated, receiving the event that triggered the update. If the callback
-performs blocking operations (e.g. writing tables to disk), register
+performs blocking operations (for example writing tables to disk), register
 this handler with <code>run_in_thread=True</code> on the
 <a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventDispatcher" href="#ropt.components.event_handlers.EventDispatcher"><code>EventDispatcher</code></a>:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">event_dispatcher</span><span class="o">.</span><span class="n">add_event_handler</span><span class="p">(</span><span class="n">table_handler</span><span class="p">,</span> <span class="n">run_in_thread</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -6232,14 +6197,9 @@ from the asyncio loop's shared default pool.</p>
     <div class="doc doc-contents ">
 
         <p>Add an event handler.</p>
-<p>By default the handler is called directly in the event loop's thread,
-which is efficient for handlers that only do in-memory work. Pass
-<code>run_in_thread=True</code> for handlers that perform blocking operations such
-as file I/O, database writes, or network calls. Such handlers run on a
-thread pool the dispatcher owns, so they never compete for the asyncio
-loop's shared default pool. Multiple handlers with <code>run_in_thread=True</code>
-that match the same event are dispatched in parallel via
-<code>asyncio.gather</code>.</p>
+<p>By default the handler is called directly on the event loop's thread.
+Pass <code>run_in_thread=True</code> for handlers that perform blocking I/O; see
+<a href="../../workflows/parallel/#thread-based-dispatch">Thread-based dispatch</a>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -6417,13 +6377,9 @@ dispatcher or registered with a compute step.</p>
     <div class="doc doc-contents ">
 
         <p>Submit an event and block until every handler has processed it.</p>
-<p>The event is queued to the dispatcher and this call blocks on the
-calling thread until the dispatcher has finished handling it. Events are
-handled in submission order. If a handler raises, the original exception
-is re-raised here — on the caller's own stack — so it surfaces as a
-clean, single exception, mirroring how the executor's
-<a class="autorefs autorefs-internal" title="            fail" href="../components_executors/#ropt.components.executors.Submission.fail"><code>fail</code></a> is re-raised by the
-awaiting evaluator.</p>
+<p>Events are handled in submission order. A handler exception is
+re-raised here, on the caller's own stack. See
+<a href="../../workflows/parallel/#handler-failures">Handler failures</a>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>

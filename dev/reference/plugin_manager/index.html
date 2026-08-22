@@ -3049,7 +3049,7 @@ registered through Python entry points and looks them up by method name.</p>
 
         <p>Abstract base class for all <code>ropt</code> plugins.</p>
 <p>This class serves as the fundamental building block for all plugins within
-the <code>ropt</code> framework. Any class intended to function as a plugin (e.g., an
+the <code>ropt</code> framework. Any class intended to function as a plugin (for example an
 optimizer, sampler, or event handler) must inherit from this base class.</p>
 <p>It defines the core interface that all plugins must adhere to, ensuring
 consistency and enabling the
@@ -3188,9 +3188,9 @@ associated with the given <code>method</code> name.</p>
         <p>Determine if the plugin allows implicit discovery by method name.</p>
 <p>By default (<code>True</code>), plugins can be found by the
 <a class="autorefs autorefs-internal" title="            ropt.plugins.manager.PluginManager" href="#ropt.plugins.manager.PluginManager"><code>PluginManager</code></a> when a user
-provides only a method name (without specifying the plugin, e.g.,
+provides only a method name (without specifying the plugin, for example
 <code>"method-name"</code>).</p>
-<p>If a plugin should <em>only</em> be used when explicitly named (e.g.,
+<p>If a plugin should <em>only</em> be used when explicitly named (for example
 <code>"plugin-name/method-name"</code>), it must override this class method to
 return <code>False</code>.</p>
 <p>For instance, the
@@ -3252,31 +3252,17 @@ requested, so it overrides this method to return <code>False</code>.</p>
 
 
         <p>Manages the discovery and retrieval of <code>ropt</code> plugins.</p>
-<p>The <code>PluginManager</code> is responsible for finding available plugins based on
-Python's entry points mechanism and providing access to them. It serves as
-a central registry for different types of plugins used within <code>ropt</code>, such
-as optimizers, samplers, and workflow components.</p>
-<p>Upon initialization, the manager scans for entry points defined under the
-<code>ropt.plugins.*</code> groups (e.g., <code>ropt.plugins.backend</code>). Plugins found
-this way are loaded and stored internally, categorized by their type.</p>
-<p>The primary way to interact with the manager is through the
-<a class="autorefs autorefs-internal" title="            get_plugin" href="#ropt.plugins.manager.PluginManager.get_plugin"><code>get_plugin</code></a> method, which
-retrieves a specific plugin class based on its type and a method name it
-supports. The
-<a class="autorefs autorefs-internal" title="            get_plugin_name" href="#ropt.plugins.manager.PluginManager.get_plugin_name"><code>get_plugin_name</code></a>
-method can be used to find the name of a plugin that supports a given
-method.</p>
-<p><strong>Example: Registering a Custom Backend Plugin</strong></p>
-<p>To make a custom optimization backend plugin available to <code>ropt</code>, you would
-typically define an entry point in your package's <code>pyproject.toml</code>:</p>
+<p>On initialization, scans the <code>ropt.plugins.*</code> entry-point groups (for
+example <code>ropt.plugins.backend</code>) and registers what it finds, alongside the
+plugins built into <code>ropt</code>. Retrieve a plugin class with
+<a class="autorefs autorefs-internal" title="            get_plugin" href="#ropt.plugins.manager.PluginManager.get_plugin"><code>get_plugin</code></a>, or just its
+name with
+<a class="autorefs autorefs-internal" title="            get_plugin_name" href="#ropt.plugins.manager.PluginManager.get_plugin_name"><code>get_plugin_name</code></a>.</p>
+<p>A third-party plugin registers itself under the relevant group in its own
+<code>pyproject.toml</code>, for example:</p>
 <div class="language-toml highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">[project.entry-points.</span><span class="s2">&quot;ropt.plugins.backend&quot;</span><span class="k">]</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">my_backend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;my_package.my_module:MyBackend&quot;</span>
 </span></code></pre></div>
-<p>When <code>ropt</code> initializes the <code>PluginManager</code>, it will discover and load
-<code>MyBackend</code> from <code>my_package.my_module</code>, making it accessible via
-<code>plugin_manager.get_plugin("backend", "my_backend/some_method")</code> or
-potentially <code>plugin_manager.get_plugin("backend", "some_method")</code> if
-discovery is allowed and the method is unique.</p>
 
 
 
@@ -3335,26 +3321,9 @@ discovery is allowed and the method is unique.</p>
     <div class="doc doc-contents ">
 
         <p>Retrieve a plugin class by its type and a supported method name.</p>
-<p>This method finds and returns the class of a plugin that matches the
-specified <code>plugin_type</code> and supports the given <code>method</code>.</p>
-<p>The <code>method</code> argument can be specified in two ways:</p>
-<ol>
-<li><strong>Explicit Plugin:</strong> Use the format <code>"plugin-name/method-name"</code>.
-    This directly requests the <code>method-name</code> from the plugin named
-    <code>plugin-name</code>.</li>
-<li><strong>Implicit Plugin:</strong> Provide only the <code>method-name</code>. The manager
-    will search through all registered plugins of the specified
-    <code>plugin_type</code> that allow discovery (see
-    <a class="autorefs autorefs-internal" title="            allows_discovery
-
-
-  
-      classmethod
-  " href="#ropt.plugins.Plugin.allows_discovery"><code>Plugin.allows_discovery</code></a>).
-    If the method is found in the default plugin of <code>ropt</code>, that plugin
-    is used. Otherwise it returns the first plugin found that supports
-    the <code>method-name</code>.</li>
-</ol>
+<p><code>method</code> is either <code>"plugin-name/method-name"</code> to request a specific
+plugin, or just <code>"method-name"</code> to search discoverable plugins of
+<code>plugin_type</code> for one that supports it (preferring the default plugin).</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3382,7 +3351,7 @@ specified <code>plugin_type</code> and supports the given <code>method</code>.</
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The category of the plugin (e.g., "backend", "sampler").</p>
+                <p>The category of the plugin (for example "backend", "sampler").</p>
               </div>
             </td>
             <td>
@@ -3483,20 +3452,10 @@ specified <code>plugin_type</code> and supports the given <code>method</code>.</
     <div class="doc doc-contents ">
 
         <p>Return the name of the plugin that supports a given method.</p>
-<p>Verifies whether a plugin of the specified <code>plugin_type</code> supports the
-given <code>method</code>. This is useful for checking availability before
-attempting to retrieve a plugin with
-<a class="autorefs autorefs-internal" title="            get_plugin" href="#ropt.plugins.manager.PluginManager.get_plugin"><code>get_plugin</code></a>.</p>
-<p>The <code>method</code> argument can be specified in two ways:</p>
-<ol>
-<li><strong>Explicit Plugin:</strong> <code>"plugin-name/method-name"</code> checks if the specific
-    plugin named <code>plugin-name</code> supports <code>method-name</code>.</li>
-<li><strong>Implicit Plugin:</strong> <code>"method-name"</code> searches through all discoverable
-    plugins of the given <code>plugin_type</code> to see if any support <code>method-name</code>.
-    If the method is found in the default plugin of <code>ropt</code>, that plugin
-    is used. Otherwise it returns the first plugin found that supports
-    the <code>method-name</code>.</li>
-</ol>
+<p>Useful for checking availability before calling
+<a class="autorefs autorefs-internal" title="            get_plugin" href="#ropt.plugins.manager.PluginManager.get_plugin"><code>get_plugin</code></a>, which
+takes <code>method</code> in the same two forms (<code>"plugin-name/method-name"</code> or
+just <code>"method-name"</code>).</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3524,7 +3483,7 @@ attempting to retrieve a plugin with
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The category of the plugin (e.g., "backend", "sampler").</p>
+                <p>The category of the plugin (for example "backend", "sampler").</p>
               </div>
             </td>
             <td>

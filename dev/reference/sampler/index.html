@@ -3115,7 +3115,7 @@ required sample generation method (<code>generate_samples</code>).</p>
 through its <code>samplers</code> field, a tuple of sampler instances. Samplers are
 instantiated either directly as objects or via
 <a class="autorefs autorefs-internal" title="            SamplerConfig" href="../config/#ropt.config.SamplerConfig"><code>SamplerConfig</code></a> objects, which are used by the
-plugin system to create instances based on the configured method string (e.g.,
+plugin system to create instances based on the configured method string (for example
 <code>"default"</code> or <code>"sobol"</code>).</p>
 <p><strong>Built-in and Custom Samplers</strong></p>
 <p>The <a class="autorefs autorefs-internal" title="            ropt.sampler.scipy.SciPySampler" href="#ropt.sampler.scipy.SciPySampler"><code>SciPySampler</code></a> class provides sampling
@@ -3414,7 +3414,7 @@ element-wise by the <code>perturbation_magnitudes</code> defined in the
 <a class="autorefs autorefs-internal" title="            GradientConfig" href="../config/#ropt.config.GradientConfig"><code>GradientConfig</code></a>.</p>
 <p>Therefore, it is generally recommended that sampler implementations
 produce samples with a characteristic scale of approximately one
-(e.g., drawn from a distribution with a standard deviation of 1, or
+(for example drawn from a distribution with a standard deviation of 1, or
 uniformly distributed within <code>[-1, 1]</code>). This allows the
 <code>perturbation_magnitudes</code> to directly control the effective size of
 the perturbations applied to the variables.</p>
@@ -3739,7 +3739,7 @@ element-wise by the <code>perturbation_magnitudes</code> defined in the
 <a class="autorefs autorefs-internal" title="            GradientConfig" href="../config/#ropt.config.GradientConfig"><code>GradientConfig</code></a>.</p>
 <p>Therefore, it is generally recommended that sampler implementations
 produce samples with a characteristic scale of approximately one
-(e.g., drawn from a distribution with a standard deviation of 1, or
+(for example drawn from a distribution with a standard deviation of 1, or
 uniformly distributed within <code>[-1, 1]</code>). This allows the
 <code>perturbation_magnitudes</code> to directly control the effective size of
 the perturbations applied to the variables.</p>
@@ -3831,7 +3831,7 @@ then scaled to the hypercube <code>[-1, 1]^d</code>)</em></li>
 <p><strong>Configuration:</strong></p>
 <p>The specific sampling method is chosen via the <code>method</code> field in the
 <a class="autorefs autorefs-internal" title="            SamplerConfig" href="../config/#ropt.config.SamplerConfig"><code>SamplerConfig</code></a>. Additional method-specific
-parameters (e.g., distribution parameters like <code>loc</code>, <code>scale</code>, <code>a</code>, <code>b</code> for
+parameters (for example distribution parameters like <code>loc</code>, <code>scale</code>, <code>a</code>, <code>b</code> for
 <code>stats</code> methods, or engine parameters for <code>qmc</code> methods) can be passed
 through the <code>options</code> dictionary within the <code>SamplerConfig</code>. Refer to the
 <a href="https://docs.scipy.org/doc/scipy/reference/stats.html"><code>scipy.stats</code></a> and

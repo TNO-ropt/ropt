@@ -3175,10 +3175,8 @@ single ensemble evaluation.</p>
 
 
         <p>Abstract base class for optimization compute steps.</p>
-<p>This class defines the fundamental interface for all executable compute steps
-within an optimization workflow. Concrete implementations, which perform
-specific actions like running an optimizer or evaluating functions, must
-inherit from this base class.</p>
+<p>A concrete step performs a specific action, such as running an optimizer or
+evaluating functions.</p>
 <p>A compute step instance may only have one active <code>run</code> at a time. The guard
 is applied automatically to every subclass's <code>run</code> method, which raises a
 <code>WorkflowError</code> if the same instance is already running on another thread.</p>
@@ -3239,17 +3237,7 @@ is applied automatically to every subclass's <code>run</code> method, which rais
 
     <div class="doc doc-contents ">
 
-        <p>Add an event handler.</p>
-<p>Compute steps emit <a class="autorefs autorefs-internal" title="            EnOptEvent
-
-
-  
-      dataclass
-  " href="../events/#ropt.events.EnOptEvent"><code>events</code></a> to report on the
-calculations they perform. These events are processed by independently
-created <a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventHandler" href="../components_event_handlers/#ropt.components.event_handlers.EventHandler"><code>event handlers</code></a>.
-Use the <code>add_event_handler</code> method to attach these handlers to the
-compute step.</p>
+        <p>Attach an event handler to receive this step's events.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>

@@ -3318,17 +3318,8 @@ the array to its original number of rows.</p>
 <p>Stores objective values (and optional constraint values) for a batch of
 variable vectors. Inactive rows should be set to zero; failed active rows
 should be set to <code>numpy.nan</code>.</p>
-<p>The <code>batch_id</code> field defaults to <code>0</code>. If you do not need to distinguish
-between batches, leave it unset — all results will be labelled batch <code>0</code>.
-To get auto-incrementing IDs managed by the framework, pass a
-<a class="autorefs autorefs-internal" title="            ropt.components.evaluators.BatchIdCounter" href="../components_evaluators/#ropt.components.evaluators.BatchIdCounter"><code>BatchIdCounter</code></a> (or any
-<code>Callable[[], int]</code>) to the <code>batch_id_callback</code> argument of
-<a class="autorefs autorefs-internal" title="            ropt.components.evaluators.FunctionEvaluator" href="../components_evaluators/#ropt.components.evaluators.FunctionEvaluator"><code>FunctionEvaluator</code></a> or
-<a class="autorefs autorefs-internal" title="            ropt.components.evaluators.ParallelEvaluator" href="../components_evaluators/#ropt.components.evaluators.ParallelEvaluator"><code>ParallelEvaluator</code></a>. For raw
-<a class="autorefs autorefs-internal" title="            ropt.components.evaluators.BatchEvaluator" href="../components_evaluators/#ropt.components.evaluators.BatchEvaluator"><code>BatchEvaluator</code></a> callbacks,
-set <code>batch_id</code> yourself.</p>
 <p>See <a href="../../workflows/evaluation_callbacks/">Writing Evaluation Callbacks</a> for
-detailed conventions and examples.</p>
+<code>batch_id</code> management and other conventions.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>

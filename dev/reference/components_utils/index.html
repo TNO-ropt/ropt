@@ -3008,13 +3008,8 @@ executor.</p>
     <div class="doc doc-contents ">
 
         <p>Find an optimizer plugin for a given method.</p>
-<p>The <code>method</code> argument can be specified in two ways:</p>
-<ol>
-<li><strong>Explicit Plugin:</strong> <code>"plugin-name/method-name"</code> checks if the specific
-    plugin named <code>plugin-name</code> supports <code>method-name</code>.</li>
-<li><strong>Implicit Plugin:</strong> <code>"method-name"</code> searches through all discoverable
-    plugins to see if any support <code>method-name</code>.</li>
-</ol>
+<p><code>method</code> is either <code>"plugin-name/method-name"</code> or just <code>"method-name"</code>; see
+<a href="../../utilities/plugin_discovery/">Plugin Discovery</a> for both forms.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3094,13 +3089,8 @@ executor.</p>
     <div class="doc doc-contents ">
 
         <p>Find a sampler plugin for a given method.</p>
-<p>The <code>method</code> argument can be specified in two ways:</p>
-<ol>
-<li><strong>Explicit Plugin:</strong> <code>"plugin-name/method-name"</code> checks if the specific
-    plugin named <code>plugin-name</code> supports <code>method-name</code>.</li>
-<li><strong>Implicit Plugin:</strong> <code>"method-name"</code> searches through all discoverable
-    plugins to see if any support <code>method-name</code>.</li>
-</ol>
+<p><code>method</code> is either <code>"plugin-name/method-name"</code> or just <code>"method-name"</code>; see
+<a href="../../utilities/plugin_discovery/">Plugin Discovery</a> for both forms.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3182,13 +3172,8 @@ executor.</p>
     <div class="doc doc-contents ">
 
         <p>Validate the optimizer-specific options for a given method.</p>
-<p>The <code>method</code> argument can be specified in two ways:</p>
-<ol>
-<li><strong>Explicit Plugin:</strong> <code>"plugin-name/method-name"</code> checks if the specific
-    plugin named <code>plugin-name</code> supports <code>method-name</code>.</li>
-<li><strong>Implicit Plugin:</strong> <code>"method-name"</code> searches through all discoverable
-    plugins to see if any support <code>method-name</code>.</li>
-</ol>
+<p><code>method</code> is either <code>"plugin-name/method-name"</code> or just <code>"method-name"</code>; see
+<a href="../../utilities/plugin_discovery/">Plugin Discovery</a> for both forms.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3279,7 +3264,9 @@ executor.</p>
 
         <p>Dispatch a list of functions to run in parallel.</p>
 <p>The dispatched functions will run either in threads, in a multiprocessing pool,
-or on an HPC executor.</p>
+or on an HPC executor. See
+<a href="../../workflows/parallel/#dispatching-arbitrary-tasks">Dispatching arbitrary tasks</a>
+for usage and the current-working-directory caveat.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3471,17 +3458,6 @@ or on an HPC executor.</p>
       </tbody>
     </table>
 
-
-<details class="note" open>
-  <summary>Current working directory.</summary>
-  <p>The functions to run cannot rely on the current directory to be set
-consistently. Assume that the current directory is unknown and use
-absolute paths to read or write files.</p>
-<p>ALso, note that setting the current directory may not have the desired
-effect when using the <code>threading</code> executor, since changing it in one
-thread affects all threads. In case of the <code>multiprocessing</code> and <code>hpc</code>
-executors, the current directory can be changed safely if needed.</p>
-</details>
 
     </div>
 

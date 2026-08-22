@@ -4318,16 +4318,12 @@ task.</p>
     <div class="doc doc-contents ">
 
         <p>Evaluate all objective and constraints.</p>
-<p>Results are collected following the two-class error contract described
-in <a href="../../workflows/parallel/#error-handling">Parallel Evaluation</a>. An
-infrastructure failure arrives as an
-<a class="autorefs autorefs-internal" title="            ExecutorFailure" href="../exceptions/#ropt.exceptions.ExecutorFailure"><code>ExecutorFailure</code></a> result and is
-recorded as a failed realization (NaN), while a user-code exception
-arrives on the results queue and aborts the current evaluation by
-re-raising the original exception unchanged. The executor is left
-running, so a consumer may reuse it for further evaluations. If the
-executor cannot run the evaluation,
-<a class="autorefs autorefs-internal" title="            ExecutorStopped" href="../exceptions/#ropt.exceptions.ExecutorStopped"><code>ExecutorStopped</code></a> is raised.</p>
+<p>An infrastructure failure is recorded as a failed realization (NaN); a
+user-code exception is re-raised, leaving the executor running. Raises
+<a class="autorefs autorefs-internal" title="            ExecutorStopped" href="../exceptions/#ropt.exceptions.ExecutorStopped"><code>ExecutorStopped</code></a> if the executor
+cannot run the evaluation. See
+<a href="../../workflows/parallel/#error-handling">error handling</a> for the full
+contract.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -4466,8 +4462,8 @@ executor cannot run the evaluation,
         <p>An evaluator that caches results to avoid redundant computations.</p>
 <p>Wraps another evaluator, retrieving previously computed results from
 <code>EventHandler</code> sources before delegating uncached evaluations.</p>
-<p>See <a href="../../workflows/workflows/#evaluators">Optimization Workflows</a> for full
-details on cache matching, realization name handling, and source
+<p>See <a href="../../workflows/evaluation_callbacks/#using-cachedevaluator">Using CachedEvaluator</a>
+for full details on cache matching, realization name handling, and source
 management.</p>
 
 
@@ -4606,19 +4602,9 @@ These handlers are expected to store <code>FunctionResults</code> in their
     <div class="doc doc-contents ">
 
         <p>Evaluate using cache, returning both results and cache-hit info.</p>
-<p>Returns the evaluation results together with a dictionary of cache
-hits. The dictionary keys are evaluation indices found in cache;
-values are tuples of (realization index, cached FunctionResults).</p>
 <p>Derived classes can override <code>eval</code> and call this method to access
 cache-hit information for populating <code>metadata</code>.</p>
 
-
-<details class="note" open>
-  <summary>Note</summary>
-  <p>If realization names are configured, they are used for matching
-(allowing cache hits across runs). Otherwise realization indices
-are used.</p>
-</details>
 
 <p><span class="doc-section-title">Parameters:</span></p>
     <table>
@@ -4683,21 +4669,31 @@ are used.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a>[<a class="autorefs autorefs-internal" title="            ropt.evaluation.EvaluationBatchResult
+                  <code><a class="autorefs autorefs-internal" title="            ropt.evaluation.EvaluationBatchResult
 
 
   
       dataclass
-  " href="../evaluation/#ropt.evaluation.EvaluationBatchResult">EvaluationBatchResult</a>, <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a>, <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a>, <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
-
-
-  
-      dataclass
-  " href="../results/#ropt.results.FunctionResults">FunctionResults</a>]]]</code>
+  " href="../evaluation/#ropt.evaluation.EvaluationBatchResult">EvaluationBatchResult</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>An <code>EvaluationBatchResult</code> and the cache hits.</p>
+                <p>An <code>EvaluationBatchResult</code> and the cache hits, keyed by evaluation</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a>, <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a>, <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="../results/#ropt.results.FunctionResults">FunctionResults</a>]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>index, of <code>(realization index, cached FunctionResults)</code>.</p>
               </div>
             </td>
           </tr>

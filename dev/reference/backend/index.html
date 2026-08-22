@@ -2387,6 +2387,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="SciPyBackend">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.backend.scipy.SciPyBackend.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        __init__
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -2397,6 +2414,23 @@
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="ExternalBackend">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.backend.external.ExternalBackend.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        __init__
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -3169,6 +3203,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="SciPyBackend">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.backend.scipy.SciPyBackend.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        __init__
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -3179,6 +3230,23 @@
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="ExternalBackend">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.backend.external.ExternalBackend.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        __init__
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -4000,6 +4068,85 @@ method.</p>
 
 
 
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.backend.scipy.SciPyBackend.__init__" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">__init__</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">__init__</span><span class="p">(</span><span class="n">backend_config</span><span class="p">:</span> <span class="n">BackendConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Initialize the SciPy backend.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>backend_config</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            BackendConfig (ropt.config.BackendConfig)" href="../config/#ropt.config.BackendConfig">BackendConfig</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The backend configuration.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            UnsupportedError (ropt.exceptions.UnsupportedError)" href="../exceptions/#ropt.exceptions.UnsupportedError">UnsupportedError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the requested method is not supported.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+
+
+
   </div>
 
     </div>
@@ -4058,6 +4205,86 @@ instantiation raises <code>NotImplementedError</code>.</p>
 
 <div class="doc doc-children">
 
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.backend.external.ExternalBackend.__init__" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">__init__</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">__init__</span><span class="p">(</span><span class="n">backend_config</span><span class="p">:</span> <span class="n">BackendConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Initialize the external backend.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>backend_config</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            BackendConfig (ropt.config.BackendConfig)" href="../config/#ropt.config.BackendConfig">BackendConfig</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The backend configuration; its <code>method</code> field must
+            be prefixed with <code>external/</code>.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            UnsupportedError (ropt.exceptions.UnsupportedError)" href="../exceptions/#ropt.exceptions.UnsupportedError">UnsupportedError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If <code>cloudpickle</code> is not installed.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
 
 
 
@@ -4246,7 +4473,7 @@ from <code>context</code>.</p>
 
         <p>Construct a unique output path, appending an index if necessary.</p>
 <p>Builds a path from the provided components. If the resulting path already
-exists on disk, a three-digit counter suffix (e.g. <code>-001</code>, <code>-002</code>) is
+exists on disk, a three-digit counter suffix (for example <code>-001</code>, <code>-002</code>) is
 appended or incremented until a non-existing path is found.</p>
 <p>The path is assembled as:
 <code>&lt;base_dir&gt;/&lt;base_name&gt;[-&lt;name&gt;][-&lt;index&gt;][&lt;suffix&gt;]</code></p>
@@ -4977,7 +5204,7 @@ and upper bounds (<code>context.linear_constraints.lower_bounds</code>,
 <code>context.linear_constraints.upper_bounds</code>) to produce adjusted bounds for the
 optimization involving only the active variables.</p>
 <p>Additionally, any constraint rows that originally involved <em>only</em> masked
-variables (i.e., all coefficients for active variables in that row are zero)
+variables (all coefficients for active variables in that row are zero)
 are removed entirely, as they become trivial constants.</p>
 
 

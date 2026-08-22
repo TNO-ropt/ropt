@@ -3240,10 +3240,9 @@ registering it via a Python entry point under <code>ropt.plugins.&lt;area&gt;</c
 
 
 
-        <p>Abstract Base Class for Backend Plugins (Factories).</p>
-<p>This class defines the interface for plugins responsible for creating
-<a class="autorefs autorefs-internal" title="            Backend" href="../backend/#ropt.backend.Backend"><code>Backend</code></a> instances. These plugins
-act as factories for specific optimization algorithms or backends.</p>
+        <p>Abstract base class for backend plugins (factories).</p>
+<p>Creates <a class="autorefs autorefs-internal" title="            Backend" href="../backend/#ropt.backend.Backend"><code>Backend</code></a> instances; concrete plugins
+implement <code>create</code> as a factory for their own <code>Backend</code> subclass.</p>
 
 
 
@@ -3281,14 +3280,9 @@ act as factories for specific optimization algorithms or backends.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Create an Backend instance.</p>
-<p>This abstract class method serves as a factory for creating concrete
-<a class="autorefs autorefs-internal" title="            Backend" href="../backend/#ropt.backend.Backend"><code>Backend</code></a> objects. Plugin
-implementations must override this method to return an instance of  their
-specific <code>Backend</code> subclass.</p>
-<p>The <a class="autorefs autorefs-internal" title="            ropt.plugins.manager.PluginManager" href="../plugin_manager/#ropt.plugins.manager.PluginManager"><code>PluginManager</code></a> calls this
-method when an optimization workflow requires an optimizer provided by
-this plugin.</p>
+        <p>Create a Backend instance.</p>
+<p>Called by the <a class="autorefs autorefs-internal" title="            ropt.plugins.manager.PluginManager" href="../plugin_manager/#ropt.plugins.manager.PluginManager"><code>PluginManager</code></a>
+when an optimization workflow requires an optimizer from this plugin.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3338,7 +3332,7 @@ this plugin.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>An initialized instance of an <code>Backend</code> subclass.</p>
+                <p>An initialized instance of a <code>Backend</code> subclass.</p>
               </div>
             </td>
           </tr>
@@ -3376,17 +3370,10 @@ this plugin.</p>
 
 
 
-        <p>Abstract Base Class for Function Estimator Plugins (Factories).</p>
-<p>This class defines the interface for plugins responsible for creating
-<a class="autorefs autorefs-internal" title="            ropt.function_estimator.FunctionEstimator" href="../function_estimator/#ropt.function_estimator.FunctionEstimator"><code>FunctionEstimator</code></a>
-instances. These plugins act as factories for specific function estimation
-strategies.</p>
-<p>During optimization execution, the
-<a class="autorefs autorefs-internal" title="            ropt.plugins.manager.PluginManager" href="../plugin_manager/#ropt.plugins.manager.PluginManager"><code>PluginManager</code></a> identifies the
-appropriate function estimator plugin based on the configuration and uses
-its <code>create</code> class method to instantiate the actual <code>FunctionEstimator</code>
-object that will perform the aggregation of ensemble results (function
-values and gradients).</p>
+        <p>Abstract base class for function estimator plugins (factories).</p>
+<p>Creates <a class="autorefs autorefs-internal" title="            ropt.function_estimator.FunctionEstimator" href="../function_estimator/#ropt.function_estimator.FunctionEstimator"><code>FunctionEstimator</code></a>
+instances; concrete plugins implement <code>create</code> as a factory for their own
+<code>FunctionEstimator</code> subclass.</p>
 
 
 
@@ -3426,14 +3413,9 @@ values and gradients).</p>
 
     <div class="doc doc-contents ">
 
-        <p>Factory method to create a concrete FunctionEstimator instance.</p>
-<p>This abstract class method serves as a factory for creating concrete
-<a class="autorefs autorefs-internal" title="            ropt.function_estimator.FunctionEstimator" href="../function_estimator/#ropt.function_estimator.FunctionEstimator"><code>FunctionEstimator</code></a>
-objects. Plugin implementations must override this method to return an
-instance of their specific <code>FunctionEstimator</code> subclass.</p>
-<p>The <a class="autorefs autorefs-internal" title="            ropt.plugins.manager.PluginManager" href="../plugin_manager/#ropt.plugins.manager.PluginManager"><code>PluginManager</code></a> calls this
-method when the optimization requires a function estimator provided by
-this plugin.</p>
+        <p>Create a FunctionEstimator instance.</p>
+<p>Called by the <a class="autorefs autorefs-internal" title="            ropt.plugins.manager.PluginManager" href="../plugin_manager/#ropt.plugins.manager.PluginManager"><code>PluginManager</code></a>
+when the optimization requires a function estimator from this plugin.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3520,11 +3502,10 @@ this plugin.</p>
 
 
 
-        <p>Abstract Base Class for Realization Filter Plugins (Factories).</p>
-<p>This class defines the interface for plugins responsible for creating
-<a class="autorefs autorefs-internal" title="            ropt.realization_filter.RealizationFilter" href="../realization_filter/#ropt.realization_filter.RealizationFilter"><code>RealizationFilter</code></a>
-instances. These plugins act as factories for specific realization filtering
-strategies.</p>
+        <p>Abstract base class for realization filter plugins (factories).</p>
+<p>Creates <a class="autorefs autorefs-internal" title="            ropt.realization_filter.RealizationFilter" href="../realization_filter/#ropt.realization_filter.RealizationFilter"><code>RealizationFilter</code></a>
+instances; concrete plugins implement <code>create</code> as a factory for their own
+<code>RealizationFilter</code> subclass.</p>
 
 
 
@@ -3564,14 +3545,9 @@ strategies.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Factory method to create a concrete RealizationFilter instance.</p>
-<p>This abstract class method serves as a factory for creating concrete
-<a class="autorefs autorefs-internal" title="            ropt.realization_filter.RealizationFilter" href="../realization_filter/#ropt.realization_filter.RealizationFilter"><code>RealizationFilter</code></a>
-objects. Plugin implementations must override this method to return an
-instance of their specific <code>RealizationFilter</code> subclass.</p>
-<p>The <a class="autorefs autorefs-internal" title="            ropt.plugins.manager.PluginManager" href="../plugin_manager/#ropt.plugins.manager.PluginManager"><code>PluginManager</code></a> calls this
-method when an optimization requires realization weights calculated by
-this plugin.</p>
+        <p>Create a RealizationFilter instance.</p>
+<p>Called by the <a class="autorefs autorefs-internal" title="            ropt.plugins.manager.PluginManager" href="../plugin_manager/#ropt.plugins.manager.PluginManager"><code>PluginManager</code></a>
+when an optimization requires realization weights from this plugin.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3658,10 +3634,9 @@ this plugin.</p>
 
 
 
-        <p>Abstract Base Class for Sampler Plugins (Factories).</p>
-<p>This class defines the interface for plugins responsible for creating
-<a class="autorefs autorefs-internal" title="            Sampler" href="../sampler/#ropt.sampler.Sampler"><code>Sampler</code></a> instances. These plugins act as factories
-for specific sampling algorithms or strategies.</p>
+        <p>Abstract base class for sampler plugins (factories).</p>
+<p>Creates <a class="autorefs autorefs-internal" title="            Sampler" href="../sampler/#ropt.sampler.Sampler"><code>Sampler</code></a> instances; concrete plugins
+implement <code>create</code> as a factory for their own <code>Sampler</code> subclass.</p>
 
 
 
@@ -3699,13 +3674,9 @@ for specific sampling algorithms or strategies.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Factory method to create a concrete Sampler instance.</p>
-<p>This abstract class method serves as a factory for creating concrete
-<a class="autorefs autorefs-internal" title="            Sampler" href="../sampler/#ropt.sampler.Sampler"><code>Sampler</code></a> objects. Plugin implementations must
-override this method to return an instance of their specific <code>Sampler</code>
-subclass.</p>
-<p>The <a class="autorefs autorefs-internal" title="            ropt.plugins.manager.PluginManager" href="../plugin_manager/#ropt.plugins.manager.PluginManager"><code>PluginManager</code></a> calls this
-method when an optimization requires samples generated by this plugin.</p>
+        <p>Create a Sampler instance.</p>
+<p>Called by the <a class="autorefs autorefs-internal" title="            ropt.plugins.manager.PluginManager" href="../plugin_manager/#ropt.plugins.manager.PluginManager"><code>PluginManager</code></a>
+when an optimization requires samples generated by this plugin.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3792,11 +3763,10 @@ method when an optimization requires samples generated by this plugin.</p>
 
 
 
-        <p>Abstract Base Class for Variable Transform Plugins (Factories).</p>
-<p>This class defines the interface for plugins responsible for creating
-<a class="autorefs autorefs-internal" title="            VariableTransform" href="../transforms/#ropt.transforms.VariableTransform"><code>VariableTransform</code></a> instances. These
-plugins act as factories for specific variable transformation algorithms or
-strategies.</p>
+        <p>Abstract base class for variable transform plugins (factories).</p>
+<p>Creates <a class="autorefs autorefs-internal" title="            VariableTransform" href="../transforms/#ropt.transforms.VariableTransform"><code>VariableTransform</code></a> instances;
+concrete plugins implement <code>create</code> as a factory for their own
+<code>VariableTransform</code> subclass.</p>
 
 
 
@@ -3836,13 +3806,9 @@ strategies.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Factory method to create a concrete VariableTransform instance.</p>
-<p>This abstract class method serves as a factory for creating concrete
-<a class="autorefs autorefs-internal" title="            VariableTransform" href="../transforms/#ropt.transforms.VariableTransform"><code>VariableTransform</code></a> objects. Plugin
-implementations must override this method to return an instance of their
-specific <code>VariableTransform</code> subclass.</p>
-<p>The <a class="autorefs autorefs-internal" title="            ropt.plugins.manager.PluginManager" href="../plugin_manager/#ropt.plugins.manager.PluginManager"><code>PluginManager</code></a> calls this
-method when an optimization requires variable transformations provided by this plugin.</p>
+        <p>Create a VariableTransform instance.</p>
+<p>Called by the <a class="autorefs autorefs-internal" title="            ropt.plugins.manager.PluginManager" href="../plugin_manager/#ropt.plugins.manager.PluginManager"><code>PluginManager</code></a>
+when an optimization requires variable transformations from this plugin.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3929,11 +3895,10 @@ method when an optimization requires variable transformations provided by this p
 
 
 
-        <p>Abstract Base Class for Objective Transform Plugins (Factories).</p>
-<p>This class defines the interface for plugins responsible for creating
-<a class="autorefs autorefs-internal" title="            ObjectiveTransform" href="../transforms/#ropt.transforms.ObjectiveTransform"><code>ObjectiveTransform</code></a> instances. These
-plugins act as factories for specific objective transformation algorithms or
-strategies.</p>
+        <p>Abstract base class for objective transform plugins (factories).</p>
+<p>Creates <a class="autorefs autorefs-internal" title="            ObjectiveTransform" href="../transforms/#ropt.transforms.ObjectiveTransform"><code>ObjectiveTransform</code></a>
+instances; concrete plugins implement <code>create</code> as a factory for their own
+<code>ObjectiveTransform</code> subclass.</p>
 
 
 
@@ -3973,14 +3938,9 @@ strategies.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Factory method to create a concrete ObjectiveTransform instance.</p>
-<p>This abstract class method serves as a factory for creating concrete
-<a class="autorefs autorefs-internal" title="            ObjectiveTransform" href="../transforms/#ropt.transforms.ObjectiveTransform"><code>ObjectiveTransform</code></a> objects. Plugin
-implementations must override this method to return an instance of their
-specific <code>ObjectiveTransform</code> subclass.</p>
-<p>The <a class="autorefs autorefs-internal" title="            ropt.plugins.manager.PluginManager" href="../plugin_manager/#ropt.plugins.manager.PluginManager"><code>PluginManager</code></a> calls this
-method when an optimization requires objective transformations provided
-by this plugin.</p>
+        <p>Create an ObjectiveTransform instance.</p>
+<p>Called by the <a class="autorefs autorefs-internal" title="            ropt.plugins.manager.PluginManager" href="../plugin_manager/#ropt.plugins.manager.PluginManager"><code>PluginManager</code></a>
+when an optimization requires objective transformations from this plugin.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -4067,11 +4027,11 @@ by this plugin.</p>
 
 
 
-        <p>Abstract Base Class for Nonlinear Constraint Transform Plugins (Factories).</p>
-<p>This class defines the interface for plugins responsible for creating
+        <p>Abstract base class for nonlinear constraint transform plugins (factories).</p>
+<p>Creates
 <a class="autorefs autorefs-internal" title="            NonlinearConstraintTransform" href="../transforms/#ropt.transforms.NonlinearConstraintTransform"><code>NonlinearConstraintTransform</code></a>
-instances. These plugins act as factories for specific nonlinear constraint
-transformation algorithms or strategies.</p>
+instances; concrete plugins implement <code>create</code> as a factory for their own
+<code>NonlinearConstraintTransform</code> subclass.</p>
 
 
 
@@ -4111,14 +4071,10 @@ transformation algorithms or strategies.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Factory method to create a concrete NonlinearConstraintTransform instance.</p>
-<p>This abstract class method serves as a factory for creating concrete
-<a class="autorefs autorefs-internal" title="            NonlinearConstraintTransform" href="../transforms/#ropt.transforms.NonlinearConstraintTransform"><code>NonlinearConstraintTransform</code></a>
-objects. Plugin implementations must override this method to return an
-instance of their specific <code>NonlinearConstraintTransform</code> subclass.</p>
-<p>The <a class="autorefs autorefs-internal" title="            ropt.plugins.manager.PluginManager" href="../plugin_manager/#ropt.plugins.manager.PluginManager"><code>PluginManager</code></a> calls this
-method when an optimization requires nonlinear constraint
-transformations provided by this plugin.</p>
+        <p>Create a NonlinearConstraintTransform instance.</p>
+<p>Called by the <a class="autorefs autorefs-internal" title="            ropt.plugins.manager.PluginManager" href="../plugin_manager/#ropt.plugins.manager.PluginManager"><code>PluginManager</code></a>
+when an optimization requires nonlinear constraint transformations from
+this plugin.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
