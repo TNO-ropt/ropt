@@ -2970,9 +2970,14 @@
 
 
 <h1 id="basic-optimization-workflow">Basic Optimization Workflow</h1>
-<p><a class="autorefs autorefs-internal" title="            ropt.workflow.BasicOptimizer" href="#ropt.workflow.BasicOptimizer"><code>BasicOptimizer</code></a> is a low-level driver for
-running a single optimization. New code should prefer the
-<a href="../../running/running/">simple API</a>; <code>BasicOptimizer</code> remains for existing code.</p>
+<p><a class="autorefs autorefs-internal" title="            ropt.workflow.BasicOptimizer" href="#ropt.workflow.BasicOptimizer"><code>BasicOptimizer</code></a> is a ready-made single-run
+driver for applications that embed <code>ropt</code> and already have their own
+batch-oriented evaluation infrastructure — for example dispatching a whole
+ensemble of runs to an external scheduler at once. It wraps an
+<a class="autorefs autorefs-internal" title="            ropt.components.compute_steps.OptimizationStep" href="../components_compute_steps/#ropt.components.compute_steps.OptimizationStep"><code>OptimizationStep</code></a> and a
+<a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.ResultsHandler" href="../components_event_handlers/#ropt.components.event_handlers.ResultsHandler"><code>ResultsHandler</code></a> into a
+single class that takes a batch evaluator directly. For a Python script,
+prefer the <a href="../../running/running/">simple API</a> instead.</p>
 
 
 <div class="doc doc-object doc-module">

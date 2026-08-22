@@ -3145,6 +3145,17 @@ responsible for respecting the concurrency and process-boundary rules spelled ou
 on these pages. Those rules are real limitations, not incidental detail: ignore
 them and a workflow will raise rather than silently misbehave. In return you get
 control that the simple API deliberately hides.</p>
+<div class="admonition note">
+<p class="admonition-title">Embedding <code>ropt</code> in a host application</p>
+<p>If you are building an application that already has its own batch-oriented
+evaluation infrastructure — for example dispatching a whole ensemble of
+runs to an external scheduler at once, the way <a href="https://github.com/equinor/everest">Everest</a>
+does — assembling these components by hand is not the only option.
+<a class="autorefs autorefs-internal" title="            ropt.workflow.BasicOptimizer" href="../../reference/basic_optimizer/#ropt.workflow.BasicOptimizer"><code>BasicOptimizer</code></a> wraps a single
+<code>OptimizationStep</code> and a <code>ResultsHandler</code> into a ready-made, run-once driver
+that takes a batch evaluator directly. See the
+<a href="../../reference/basic_optimizer/">reference</a> for details.</p>
+</div>
 <p>There are four core workflow components:</p>
 <table>
 <thead>
