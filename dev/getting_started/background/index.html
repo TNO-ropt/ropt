@@ -718,6 +718,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../handlers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Collecting Results with Handlers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../execution/" class="md-nav__link">
         
   
@@ -1535,6 +1563,34 @@
     
   
     Mixed-Integer Optimization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/restart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Restarting from the Best Point
   
 
     
@@ -2726,50 +2782,44 @@ bounds (<span class="arithmatex">\(\mathbf{x}^L\)</span>, <span class="arithmate
 \textrm{subject to} \quad &amp; g_j(\mathbf{x}) \le 0, \quad \quad j=1, \ldots, J \\ &amp;
 h_k(\mathbf{x}) = 0, \quad \quad k=1, \ldots, K \\
 &amp; \mathbf{x}^L \le \mathbf{x} \le \mathbf{x}^U \end{align*} \]</div>
-<p>In this context, the function <span class="arithmatex">\(f(\mathbf{x})\)</span> is assumed to have a deterministic
-nature, meaning it is well-defined for given parameters. However, in realistic
-scenarios, <span class="arithmatex">\(f(\mathbf{x})\)</span> may be part of a larger set of functions, especially
-if it depends on uncertain parameters drawn from some, possibly unknown,
-probability distribution.</p>
-<p>Ensemble-based robust optimization aims to optimize an ensemble of functions
-<span class="arithmatex">\(f_i(\mathbf{x})\)</span> with respect to <span class="arithmatex">\(\mathbf{x}\)</span>. The set of <em>realizations</em> <span class="arithmatex">\(f_i\)</span>
-captures the uncertainty that may exist in the model, which can be, for
-instance, constructed by varying some parameters according to a given
-probability distribution. When given a set of realizations, ensemble-based
-optimization proceeds by combining the functions <span class="arithmatex">\(f_i(\mathbf{x})\)</span> into a single
-objective function. For example, using a weighted sum, the problem becomes
-(ignoring constraints):</p>
+<p>Here, <span class="arithmatex">\(f(\mathbf{x})\)</span> is deterministic: for a given <span class="arithmatex">\(\mathbf{x}\)</span> it always
+returns the same value. In practice, however, <span class="arithmatex">\(f(\mathbf{x})\)</span> often depends on
+uncertain parameters drawn from some — possibly unknown — probability
+distribution. In that case, a single evaluation of <span class="arithmatex">\(f(\mathbf{x})\)</span> is really
+just one member of a larger set of possible functions.</p>
+<p>Ensemble-based robust optimization optimizes such a set, or <em>ensemble</em>, of
+functions <span class="arithmatex">\(f_i(\mathbf{x})\)</span> at once. Each <span class="arithmatex">\(f_i\)</span> is called a <em>realization</em>: one
+possible version of the function, for instance obtained by drawing a set of
+values for the uncertain parameters from their probability distribution.
+Given a set of realizations, ensemble-based optimization combines the
+functions <span class="arithmatex">\(f_i(\mathbf{x})\)</span> into a single objective function. Using a weighted
+sum, for example, the problem becomes (ignoring constraints):</p>
 <div class="arithmatex">\[ \textrm{minimize} \quad \sum_i w_i f_i(\mathbf{x}), \]</div>
-<p>where <span class="arithmatex">\(w_i\)</span> represents the weights assigned to the different realizations. In
-more complex settings, the realizations may also be combined in different ways,
-and the set of realizations may be modified during optimization. For instance,
-risk-aware objectives may be constructed by adding a term involving the standard
-deviation of the functions or by selecting some of the worst-performing
-realizations at each iteration.</p>
-<p>In practice, the optimization task often becomes complex due to additional
-factors. The evaluation of functions might be computationally expensive, and
-calculating their gradients analytically can be challenging or even impossible.
-For example, the functions may involve lengthy simulations of a physical process
-with numerous variables, utilizing numerical calculations that preclude
-straightforward analytical differentiation.</p>
-<p><code>ropt</code> leverages standard optimization algorithms, such as those available in
-the <a href="https://www.scipy.org">SciPy</a> package. These methods typically follow an
-iterative approach, necessitating repeated assessments of the objective function
-and, in many cases, its gradient. Currently, it is assumed that the functions
-are not easily differentiated analytically. One of the core functions of <code>ropt</code>
-is to calculate gradients efficiently using stochastic methods.</p>
-<p><code>ropt</code> is responsible for configuring and executing the optimization algorithm,
-building the overall function and gradient values from individual realizations,
-and monitoring both intermediate and final optimization results. It delegates
-the actual calculations of functions to external code that is provided by the
-user.</p>
-<p>While many optimization scenarios involve a single run of a particular
-method, there are cases where it proves beneficial to conduct multiple runs
-using the same or different algorithms. For example, when dealing with a mix of
-continuous and discrete variables, it might be advantageous to employ different
-methods for each variable type. <code>ropt</code> facilitates this by offering a
-mechanism to run a workflow containing multiple optimizers, potentially of
-different types, in an alternating or nested fashion.</p>
+<p>where <span class="arithmatex">\(w_i\)</span> is the weight given to realization <span class="arithmatex">\(i\)</span>. The realizations can also
+be combined in other ways, and the set of realizations used can even change
+during the optimization. For example, a risk-aware objective may add a term
+based on the standard deviation of the <span class="arithmatex">\(f_i\)</span>, or use only the
+worst-performing realizations at each iteration.</p>
+<p>In practice, evaluating <span class="arithmatex">\(f_i(\mathbf{x})\)</span> is often expensive, and calculating
+its gradient analytically can be difficult or impossible — for instance when
+<span class="arithmatex">\(f_i(\mathbf{x})\)</span> comes from a long numerical simulation of a physical
+process.</p>
+<p><code>ropt</code> builds on standard optimization algorithms, such as those in the
+<a href="https://www.scipy.org">SciPy</a> package. These algorithms work iteratively,
+evaluating the objective function — and usually its gradient — many times
+over the course of the optimization. <code>ropt</code> assumes that gradients cannot be
+calculated analytically, and one of its core features is estimating them
+efficiently using stochastic methods.</p>
+<p><code>ropt</code> sets up and runs the optimization algorithm, combines the individual
+realizations into overall function and gradient values, and keeps track of
+intermediate and final results. Calculating the functions themselves — for
+example, running a simulation — is left to code that you provide.</p>
+<p>Most optimization problems only need a single run of one method. Sometimes,
+though, it helps to combine several runs, possibly with different algorithms
+— for example, when a problem mixes continuous and discrete variables, each
+kind may be best handled by its own method. <code>ropt</code> supports this too: several
+optimization runs can be combined sequentially, in parallel, or nested within
+each other.</p>
 <h2 id="where-to-next">Where to next</h2>
 <ul>
 <li>Install and run your first optimization: <a href="../installation/">Installation</a> and

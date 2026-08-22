@@ -657,6 +657,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../getting_started/handlers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Collecting Results with Handlers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../getting_started/execution/" class="md-nav__link">
         
   
@@ -1679,6 +1707,34 @@
     
   
     Mixed-Integer Optimization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/restart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Restarting from the Best Point
   
 
     
@@ -3018,13 +3074,14 @@ it.</p>
 call: one optimization run, one evaluator, results returned when it finishes. The
 workflow components documented here are the layer beneath it — the same building
 blocks the simple API is assembled from, exposed directly.</p>
-<p><strong>When to use them.</strong> Reach for the workflow components when the single-run model
-of the simple API is too rigid: to chain several optimizers, nest optimizations
-inside one another, react to results as they arrive through custom event
-handlers, or drive evaluations across threads, processes, or an HPC cluster.
-Wiring a workflow together by hand takes more code, but that code is where the
-extra flexibility lives — these components can express applications the simple
-API cannot.</p>
+<p><strong>When to use them.</strong> Parallel execution, nested optimization, composing
+several runs, and custom event handlers are all already available through the
+simple API's convenience functions (<code>optimize</code>, <code>optimize_many</code>, <code>evaluate</code>,
+<code>evaluate_many</code>). The workflow components are the underlying building blocks
+those functions are assembled from — compute steps, event handlers, executors
+— exposed directly for full flexibility. Wiring one together by hand takes
+more code, but that code is where the extra flexibility lives: these
+components can express applications the simple API cannot.</p>
 <p><strong>Who this is for.</strong> This is the low-level API, and it assumes you are
 comfortable with <code>asyncio</code> and threads. Parallel execution runs on an event
 loop, event handlers may be invoked from several threads at once, and you are

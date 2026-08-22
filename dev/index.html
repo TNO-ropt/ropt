@@ -494,10 +494,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#getting-started" class="md-nav__link">
+  <a href="#overview" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Getting started
+        Overview
       
     </span>
   </a>
@@ -505,10 +505,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#overview" class="md-nav__link">
+  <a href="#getting-started" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Overview
+        Getting started
       
     </span>
   </a>
@@ -743,6 +743,34 @@
     
   
     Ensemble-Based Optimization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="getting_started/handlers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Collecting Results with Handlers
   
 
     
@@ -1580,6 +1608,34 @@
     
   
     Mixed-Integer Optimization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="tutorials/restart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Restarting from the Best Point
   
 
     
@@ -2732,10 +2788,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#getting-started" class="md-nav__link">
+  <a href="#overview" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Getting started
+        Overview
       
     </span>
   </a>
@@ -2743,10 +2799,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#overview" class="md-nav__link">
+  <a href="#getting-started" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Overview
+        Getting started
       
     </span>
   </a>
@@ -2813,20 +2869,8 @@
 
 
 <h1 id="ropt-a-python-module-for-robust-optimization"><code>ropt</code>: A Python module for robust optimization</h1>
-<h2 id="getting-started">Getting started</h2>
-<ul>
-<li>Read the <a href="getting_started/background/">Background</a> for the ideas behind
-  <code>ropt</code>, then work through <a href="getting_started/installation/">Installation</a> and
-  the <a href="getting_started/quickstart/">Quickstart</a>.</li>
-<li><a href="running/running/">Running Optimizations</a> is the recommended starting point
-  for running an optimization and covers most cases.</li>
-<li>The <a href="optimizer_setup/key_concepts/">Key Concepts</a> page introduces the terms used
-  throughout the documentation.</li>
-<li>The <a href="tutorials/">Tutorials</a> show <code>ropt</code> in action through worked
-  examples.</li>
-<li>The <a href="optimizer_setup/configuration/">Configuration</a> page describes the
-  configuration format in detail.</li>
-</ul>
+<p><code>ropt</code> is developed by the Netherlands Organisation for Applied Scientific
+Research (TNO) and released under the GNU General Public License v3.0.</p>
 <h2 id="overview">Overview</h2>
 <p><code>ropt</code> is a module designed for implementing and executing robust optimization
 workflows. In classical optimization problems, a deterministic function is
@@ -2835,29 +2879,6 @@ a stochastic nature and is represented by an ensemble of functions
 (realizations) for different values of some (possibly unknown) random
 parameters. The optimal solution is then determined by optimizing the value of a
 statistic, such as the mean, over the ensemble.</p>
-<p><code>ropt</code> can be employed to construct optimization workflows directly in Python
-scripts or as a building block in optimization applications. At a minimum, the
-user needs to provide additional code to calculate the values for each function
-realization in the ensemble. This can range from simply calling a Python
-function that returns the objective values to initiating a long-running
-simulation on an HPC cluster and reading the results. Furthermore, <code>ropt</code>
-exposes all intermediate results of the optimization, such as objective and
-gradient values, but functionality to report or store any of these values must
-be added by the user. Optional functionality to assist with this is included
-with <code>ropt</code>.</p>
-<p><code>ropt</code> separates two concerns. The optimizer setup describes <em>what</em> to
-solve — the variables, objectives, constraints, and the components that drive
-the optimization — and is the same no matter how you run it; it is covered in
-the <a href="optimizer_setup/key_concepts/">Optimizer Setup</a> section. There are two options
-covering <em>how</em> to run a configured optimization:</p>
-<ol>
-<li><a href="running/running/">Running Optimizations</a> is the recommended starting
-   point: a handful of functions cover most optimization tasks with very little
-   code.</li>
-<li>For full control — custom workflows, nested optimizations, or your own event
-   handling — the <a href="workflows/workflows/">Optimization Workflows</a> expose the
-   individual building blocks.</li>
-</ol>
 <p><code>ropt</code> provides several features for efficiently solving complex robust
 optimization problems:</p>
 <ul>
@@ -2868,9 +2889,9 @@ optimization problems:</p>
 <li>Support for black-box optimization of arbitrary functions.</li>
 <li>Support for running complex optimization workflows, such as multiple runs with
   different optimization settings or even different optimization methods.</li>
-<li>Support for nested optimization, allowing sub-sets of the variables to be
-  optimized by optimization workflows that run as part of the black-box function
-  to be optimized.</li>
+<li>Support for nested optimization: an evaluation function can run an
+  optimization of its own — for example to optimize a sub-set of the
+  variables as part of a black-box function.</li>
 <li>An interface for running various continuous and discrete optimization methods.
   By default, optimizers from the
   <a href="https://docs.scipy.org/doc/scipy/tutorial/optimize.html"><code>scipy.optimize</code></a>
@@ -2888,7 +2909,47 @@ optimization problems:</p>
 <li>Support for tracking and processing optimization results generated during the
   optimization process.</li>
 <li>Optional support for exporting results as
-  <a href="https://pandas.pydata.org/"><code>pandas</code></a> data frames.</li>
+  <a href="https://pandas.pydata.org/"><code>pandas</code></a> or <a href="https://pola.rs/"><code>polars</code></a> data
+  frames.</li>
+</ul>
+<p><code>ropt</code> can be employed to construct optimization workflows directly in Python
+scripts or as a building block in optimization applications. At a minimum, the
+user needs to provide additional code to calculate the values for each function
+realization in the ensemble. This can range from simply calling a Python
+function that returns the objective values to initiating a long-running
+simulation on an HPC cluster and reading the results. Furthermore, <code>ropt</code>
+exposes all intermediate results of the optimization, such as objective and
+gradient values, but functionality to report or store any of these values must
+be added by the user. Optional functionality to assist with this is included
+with <code>ropt</code>.</p>
+<p><code>ropt</code> separates two concerns. The optimizer setup describes <em>what</em> to
+solve — the variables, objectives, constraints, and the components that drive
+the optimization — and is the same no matter how you run it; it is covered in
+the <a href="optimizer_setup/key_concepts/">Optimizer Setup</a> section. There are two options
+covering <em>how</em> to run a configured optimization:</p>
+<ol>
+<li><a href="running/running/">Running Optimizations</a> is the recommended starting
+   point: a single function call covers most optimization tasks, including
+   parallel evaluation across threads, processes, or an HPC cluster, custom
+   result handling, and running multiple optimization steps sequentially or
+   in parallel, possibly nested within each other.</li>
+<li><a href="workflows/workflows/">Optimization Workflows</a> expose the individual
+   building blocks — compute steps, event handlers, executors — directly, for
+   full flexibility.</li>
+</ol>
+<h2 id="getting-started">Getting started</h2>
+<ul>
+<li>Read the <a href="getting_started/background/">Background</a> for the ideas behind
+  <code>ropt</code>, then work through <a href="getting_started/installation/">Installation</a> and
+  the <a href="getting_started/quickstart/">Quickstart</a>.</li>
+<li><a href="running/running/">Running Optimizations</a> is the recommended starting point
+  for running an optimization and covers most cases.</li>
+<li>The <a href="optimizer_setup/key_concepts/">Key Concepts</a> page introduces the terms used
+  throughout the documentation.</li>
+<li>The <a href="tutorials/">Tutorials</a> show <code>ropt</code> in action through worked
+  examples.</li>
+<li>The <a href="optimizer_setup/configuration/">Configuration</a> page describes the
+  configuration format in detail.</li>
 </ul>
 <h2 id="related-packages">Related packages</h2>
 <h3 id="plugins">Plugins</h3>

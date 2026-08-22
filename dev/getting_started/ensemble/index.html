@@ -12,7 +12,7 @@
         <link rel="prev" href="../deterministic/">
       
       
-        <link rel="next" href="../execution/">
+        <link rel="next" href="../handlers/">
       
       
         
@@ -761,6 +761,34 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../handlers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Collecting Results with Handlers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -1590,6 +1618,34 @@
     
   
     Mixed-Integer Optimization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/restart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Restarting from the Best Point
   
 
     
@@ -2840,6 +2896,15 @@ script is
 Minimizing the average yields a solution that performs well across the whole set
 rather than for one particular case. We minimize the Rosenbrock function again,
 but now its two coefficients vary between realizations.</p>
+<p>For realization <span class="arithmatex">\(i\)</span>, with coefficients <span class="arithmatex">\(a_i\)</span> and <span class="arithmatex">\(b_i\)</span>, the per-realization
+objective is:</p>
+<div class="arithmatex">\[ f_i(\mathbf{x}) = \sum_{k=1}^{n-1} \left[ (a_i - x_k)^2 + b_i \left(
+x_{k+1} - x_k^2 \right)^2 \right] \]</div>
+<p>which reduces to the deterministic Rosenbrock function when <span class="arithmatex">\(a_i = 1\)</span> and
+<span class="arithmatex">\(b_i = 100\)</span> for every realization. <code>ropt</code> combines the realizations into the
+robust objective:</p>
+<div class="arithmatex">\[ f(\mathbf{x}) = \sum_i w_i f_i(\mathbf{x}), \]</div>
+<p>with weights <span class="arithmatex">\(w_i\)</span> that we set in the configuration below.</p>
 <h2 id="1-describe-the-problem">1. Describe the problem</h2>
 <p>The config adds a <code>realizations</code> section next to the variables. The <code>weights</code>
 list has one entry per realization and sets how much each contributes to the
@@ -2910,10 +2975,12 @@ in the deterministic case:</p>
 </span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;optimal objective: </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">target_objective</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </span></code></pre></div>
 <p>Because the coefficients are centered on the deterministic values, the robust
-optimum still lies near all ones — but it minimizes the <em>average</em> over the
-uncertain coefficients rather than any single realization.</p>
+optimum still lies close to where all variables equal 1 — but it minimizes the
+<em>average</em> over the uncertain coefficients rather than any single realization.</p>
 <h2 id="where-to-next">Where to next</h2>
 <ul>
+<li>Collect every result, not just the best one:
+  <a href="../handlers/">Collecting Results with Handlers</a>.</li>
 <li>The complete simple API: <a href="../../running/running/">Running Optimizations</a>.</li>
 <li>All realization settings: <a href="../../optimizer_setup/configuration/">Configuration</a>.</li>
 <li>The ideas and terms behind ensembles:
@@ -2971,13 +3038,13 @@ uncertain coefficients rather than any single realization.</p>
         
         
           
-          <a href="../execution/" class="md-footer__link md-footer__link--next" aria-label="Next: Running in Parallel">
+          <a href="../handlers/" class="md-footer__link md-footer__link--next" aria-label="Next: Collecting Results with Handlers">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Running in Parallel
+                Collecting Results with Handlers
               </div>
             </div>
             <div class="md-footer__button md-icon">
