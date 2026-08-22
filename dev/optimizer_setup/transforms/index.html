@@ -1218,6 +1218,62 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../running/parallel/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Parallel Execution and Many Runs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../running/handlers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Result Handlers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -3039,7 +3095,7 @@ domain</strong> (the values actually presented to the optimization algorithm).</
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="s2">&quot;transforms&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>   <span class="c1"># all three variables use transform 0</span>
 </span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">},</span>
 </span></code></pre></div>
-<p>Multiple transforms may exists, each handling a different subset of variables or
+<p>Multiple transforms may exist, each handling a different subset of variables or
 objectives/constraints.</p>
 <p>At context initialization, each transform's <code>init(mask)</code> method is called
 with a boolean mask combining:</p>
@@ -3089,8 +3145,8 @@ multiplies when returning:</p>
 <ul>
 <li><strong><code>scales</code></strong> — array of per-objective scaling factors.</li>
 </ul>
-<p>The <code>update(scales)</code> method allows changing scales mid-run (e.g., for adaptive
-normalization when initial magnitudes are unknown).</p>
+<p>The <code>update(scales)</code> method allows changing scales mid-run (for example, for
+adaptive normalization when initial magnitudes are unknown).</p>
 <h3 id="defaultnonlinearconstrainttransform">DefaultNonlinearConstraintTransform</h3>
 <p><a class="autorefs autorefs-internal" title="            ropt.transforms.default.DefaultNonlinearConstraintTransform" href="../../reference/transforms/#ropt.transforms.default.DefaultNonlinearConstraintTransform"><code>DefaultNonlinearConstraintTransform</code></a>
 divides constraint values <em>and</em> their RHS bounds by <code>scales</code>:</p>

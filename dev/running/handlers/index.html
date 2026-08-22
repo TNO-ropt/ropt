@@ -9,10 +9,10 @@
       
       
       
-        <link rel="prev" href="../handlers/">
+        <link rel="prev" href="../parallel/">
       
       
-        <link rel="next" href="../../optimizer_setup/key_concepts/">
+        <link rel="next" href="../../workflows/workflows/">
       
       
         
@@ -23,7 +23,7 @@
     
     
       
-        <title>Running in Parallel - ropt Documentation</title>
+        <title>Result Handlers - ropt Documentation</title>
       
     
     
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#running-in-parallel" class="md-skip">
+        <a href="#result-handlers" class="md-skip">
           Skip to content
         </a>
       
@@ -118,7 +118,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Running in Parallel
+              Result Handlers
             
           </span>
         </div>
@@ -240,13 +240,11 @@
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="../background/" class="md-tabs__link">
+      <li class="md-tabs__item">
+        <a href="../../getting_started/background/" class="md-tabs__link">
           
   
   
@@ -282,11 +280,13 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="../../running/running/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../running/" class="md-tabs__link">
           
   
   
@@ -460,31 +460,28 @@
       
   
   
-    
   
   
-  
     
     
     
     
-      
-        
-        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
         
           
-          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
             
   
   
@@ -502,7 +499,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_2">
             <span class="md-nav__icon md-icon"></span>
             
@@ -520,7 +517,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../background/" class="md-nav__link">
+      <a href="../../getting_started/background/" class="md-nav__link">
         
   
   
@@ -548,7 +545,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../installation/" class="md-nav__link">
+      <a href="../../getting_started/installation/" class="md-nav__link">
         
   
   
@@ -576,7 +573,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../quickstart/" class="md-nav__link">
+      <a href="../../getting_started/quickstart/" class="md-nav__link">
         
   
   
@@ -604,7 +601,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../deterministic/" class="md-nav__link">
+      <a href="../../getting_started/deterministic/" class="md-nav__link">
         
   
   
@@ -632,7 +629,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../ensemble/" class="md-nav__link">
+      <a href="../../getting_started/ensemble/" class="md-nav__link">
         
   
   
@@ -660,7 +657,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../handlers/" class="md-nav__link">
+      <a href="../../getting_started/handlers/" class="md-nav__link">
         
   
   
@@ -685,37 +682,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Running in Parallel
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../getting_started/execution/" class="md-nav__link">
         
   
   
@@ -731,126 +701,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#the-three-choices" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        The three choices
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="The three choices">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#thread_pool-a-pool-of-threads-in-the-same-process" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        thread_pool — a pool of threads in the same process
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#process_pool-a-pool-of-separate-processes" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        process_pool — a pool of separate processes
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#hpc_pool-a-pool-of-jobs-on-a-cluster" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        hpc_pool — a pool of jobs on a cluster
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#which-one-should-i-use" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Which one should I use?
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#running-multiple-optimizations-in-parallel" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Running multiple optimizations in parallel
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Running multiple optimizations in parallel">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#collecting-results-from-concurrent-runs" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Collecting results from concurrent runs
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#offloading-your-own-functions" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Offloading your own functions
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1124,28 +974,31 @@
       
   
   
+    
   
   
+  
     
     
     
     
+      
+        
+        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
         
           
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
-        
-          
-          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
             
   
   
@@ -1163,7 +1016,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_4">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1181,7 +1034,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../running/running/" class="md-nav__link">
+      <a href="../running/" class="md-nav__link">
         
   
   
@@ -1209,7 +1062,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../running/parallel/" class="md-nav__link">
+      <a href="../parallel/" class="md-nav__link">
         
   
   
@@ -1234,10 +1087,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../../running/handlers/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Result Handlers
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -1253,6 +1133,148 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#result-handlers_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Result handlers
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Result handlers">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#sharing-a-handler-across-concurrent-runs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sharing a handler across concurrent runs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#built-in-handlers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Built-in handlers
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Built-in handlers">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#resultshandler" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ResultsHandler
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#historyhandler" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HistoryHandler
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dataframehandler" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DataFrameHandler
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#custom-handlers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Custom handlers
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#running-a-handler-in-a-thread" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Running a handler in a thread
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#handlers-and-the-process-boundary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Handlers and the process boundary
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#where-to-next" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Where to next
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -2888,22 +2910,22 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#the-three-choices" class="md-nav__link">
+  <a href="#result-handlers_1" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The three choices
+        Result handlers
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="The three choices">
+    <nav class="md-nav" aria-label="Result handlers">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#thread_pool-a-pool-of-threads-in-the-same-process" class="md-nav__link">
+  <a href="#sharing-a-handler-across-concurrent-runs" class="md-nav__link">
     <span class="md-ellipsis">
       
-        thread_pool — a pool of threads in the same process
+        Sharing a handler across concurrent runs
       
     </span>
   </a>
@@ -2911,10 +2933,22 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#process_pool-a-pool-of-separate-processes" class="md-nav__link">
+  <a href="#built-in-handlers" class="md-nav__link">
     <span class="md-ellipsis">
       
-        process_pool — a pool of separate processes
+        Built-in handlers
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Built-in handlers">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#resultshandler" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ResultsHandler
       
     </span>
   </a>
@@ -2922,10 +2956,48 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#hpc_pool-a-pool-of-jobs-on-a-cluster" class="md-nav__link">
+  <a href="#historyhandler" class="md-nav__link">
     <span class="md-ellipsis">
       
-        hpc_pool — a pool of jobs on a cluster
+        HistoryHandler
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dataframehandler" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DataFrameHandler
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#custom-handlers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Custom handlers
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#running-a-handler-in-a-thread" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Running a handler in a thread
       
     </span>
   </a>
@@ -2938,10 +3010,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#which-one-should-i-use" class="md-nav__link">
+  <a href="#handlers-and-the-process-boundary" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Which one should I use?
+        Handlers and the process boundary
       
     </span>
   </a>
@@ -2949,38 +3021,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#running-multiple-optimizations-in-parallel" class="md-nav__link">
+  <a href="#where-to-next" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Running multiple optimizations in parallel
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Running multiple optimizations in parallel">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#collecting-results-from-concurrent-runs" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Collecting results from concurrent runs
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#offloading-your-own-functions" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Offloading your own functions
+        Where to next
       
     </span>
   </a>
@@ -3007,190 +3051,299 @@
   
 
 
-<h1 id="running-in-parallel">Running in Parallel</h1>
-<p>An optimization calls your evaluation function many times. By default these calls
-happen one after another, on the same thread that called
-<a class="autorefs autorefs-internal" title="            ropt.simple.optimize" href="../../reference/simple/#ropt.simple.optimize"><code>optimize</code></a>. If each call is slow, you can run several at
-the same time by evaluating on a <strong>worker pool</strong>.</p>
-<p>Pools come from a <a class="autorefs autorefs-internal" title="            ropt.simple.session" href="../../reference/simple/#ropt.simple.session"><code>session</code></a>. Open one, ask it for the kind
-of pool you want, and pass that pool to the run:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.simple</span><span class="w"> </span><span class="kn">import</span> <span class="n">optimize</span><span class="p">,</span> <span class="n">session</span>
+<h1 id="result-handlers">Result Handlers</h1>
+<p>This page continues <a href="../running/">Running Optimizations</a>: collecting or
+reacting to every result an optimization produces, not just the best one.</p>
+<h2 id="result-handlers_1">Result handlers</h2>
+<p>An <a class="autorefs autorefs-internal" title="            ropt.simple.optimize" href="../../reference/simple/#ropt.simple.optimize"><code>optimize</code></a> call returns only the best result. A
+<strong>handler</strong> lets you collect or react to <em>every</em> result instead: it is an object
+that observes an optimization and processes its results as they arrive — keeping
+them, tabulating them, or invoking a callback.</p>
+<p>The <a href="../running/#reporting-progress"><code>report</code></a> callback you may already be using
+is only shorthand for this: passing <code>report=</code> adds a handler for you behind the
+scenes, with the sharing behavior of wherever you passed it — a local handler
+for a single run, or one that feeds a
+<a href="#sharing-a-handler-across-concurrent-runs">shared group</a> when given to one.</p>
+<p>Attach handlers to a run with the <code>handlers</code> argument. The same handler can be
+passed to several <strong>sequential</strong> <code>optimize</code> calls, accumulating the results of
+each in turn:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.simple</span><span class="w"> </span><span class="kn">import</span> <span class="n">HistoryHandler</span><span class="p">,</span> <span class="n">optimize</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">pool</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">thread_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">history</span> <span class="o">=</span> <span class="n">HistoryHandler</span><span class="p">()</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">handlers</span><span class="o">=</span><span class="p">[</span><span class="n">history</span><span class="p">])</span>       <span class="c1"># a single run</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="k">for</span> <span class="n">x0</span> <span class="ow">in</span> <span class="n">start_points</span><span class="p">:</span>                                   <span class="c1"># ...or reused to</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">handlers</span><span class="o">=</span><span class="p">[</span><span class="n">history</span><span class="p">])</span>   <span class="c1"># accumulate in turn</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="nb">print</span><span class="p">(</span><span class="n">history</span><span class="o">.</span><span class="n">results</span><span class="p">)</span>   <span class="c1"># every result collected, across all the runs above</span>
 </span></code></pre></div>
-<p>There are three kinds of pool. A session can hand out as many as you like, of any
-kind, and each run uses the one you give it — and only that one. Closing the
-session releases them all.</p>
-<p>Where your objective runs depends on which pool you pass (or none):</p>
-<pre class="mermaid"><code>flowchart TB
-    subgraph proc["your Python process"]
-        main(["your program&lt;br/&gt;(main thread)"])
-        seq["no pool —&lt;br/&gt;one eval at a time"]
-        th["thread_pool —&lt;br/&gt;worker threads&lt;br/&gt;(share memory)"]
-    end
-    wp["process_pool —&lt;br/&gt;separate processes&lt;br/&gt;(data copied)"]
-    clu["hpc_pool —&lt;br/&gt;cluster jobs&lt;br/&gt;(data copied)"]
-    main --&gt; seq
-    main --&gt; th
-    main --&gt; wp
-    main --&gt; clu</code></pre>
-<p>Threads stay <strong>inside</strong> your Python process and share its memory, so any Python
-function works and nothing is copied. A process or HPC pool runs the work
-<strong>outside</strong> your process, so the objective and its data are copied there.</p>
-<details class="info">
-<summary>New to threads and processes?</summary>
-<p>A <strong>process</strong> is a running program with its own private memory. A <strong>thread</strong>
-is a worker inside a process, and all threads in a process share that memory.
-Threads are cheap and share data for free, but Python runs only one thread's
-code at a time, so threads do not speed up pure computation — only work that
-waits (for a file, a network reply, an external tool). Separate <strong>processes</strong>
-each have their own interpreter and run truly in parallel, but they do not
-share memory, so data has to be copied between them.</p>
-</details>
-<h2 id="the-three-choices">The three choices</h2>
-<h3 id="thread_pool-a-pool-of-threads-in-the-same-process"><code>thread_pool</code> — a pool of threads in the same process</h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">pool</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">thread_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<p>Handlers that store results expose them through <code>handler["results"]</code> (and, for
+<code>HistoryHandler</code>, the <code>history.results</code> shortcut).</p>
+<h3 id="sharing-a-handler-across-concurrent-runs">Sharing a handler across concurrent runs</h3>
+<p>A local handler belongs to one run at a time, so it cannot collect from
+optimizations that run <strong>concurrently</strong> — the runs of an <code>optimize_many</code>. Put it
+in a <strong>shared group</strong> instead, built on the session with
+<a class="autorefs autorefs-internal" title="            shared_handlers" href="../../reference/simple/#ropt.simple.Session.shared_handlers"><code>shared_handlers</code></a>, and pass the group
+where you would pass the handler:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.simple</span><span class="w"> </span><span class="kn">import</span> <span class="n">HistoryHandler</span><span class="p">,</span> <span class="n">optimize_many</span><span class="p">,</span> <span class="n">session</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">history</span> <span class="o">=</span> <span class="n">HistoryHandler</span><span class="p">()</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    <span class="n">pool</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">thread_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    <span class="n">collected</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">shared_handlers</span><span class="p">(</span><span class="n">history</span><span class="p">)</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>    <span class="n">optimize_many</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">start_points</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">pool</span><span class="o">=</span><span class="n">pool</span><span class="p">,</span> <span class="n">handlers</span><span class="o">=</span><span class="p">[</span><span class="n">collected</span><span class="p">])</span>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="nb">print</span><span class="p">(</span><span class="n">history</span><span class="o">.</span><span class="n">results</span><span class="p">)</span>
 </span></code></pre></div>
-<p>The evaluations run on background <strong>threads</strong>, all inside your program. Nothing
-is copied between them, so any Python function works as the objective, and it can
-freely use the data around it.</p>
-<p>Use a thread pool when each evaluation spends most of its time <strong>waiting</strong> — for
-example when it starts an external program, reads a file, or calls a network
-service. While one evaluation waits, the others can run.</p>
-<p>Threads share one Python interpreter. Because of this, threads do <strong>not</strong> speed
-up work that is pure Python number-crunching. For that, use a process pool.</p>
-<h3 id="process_pool-a-pool-of-separate-processes"><code>process_pool</code> — a pool of separate processes</h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">pool</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">process_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<p>A group is passed around exactly like a pool: it is an object, so a run can feed
+several groups at once, mix them with local handlers of its own, and nothing is
+picked up from the surrounding code. <code>optimize_many</code> accepts <em>only</em> groups in
+<code>handlers=</code> — a bare handler there is rejected, because its runs overlap.</p>
+<p>Like a pool, a group lives until its session closes, which releases it and hands
+its handlers back; the same handler objects can then join a group on a later
+session. Release a group earlier with
+<a class="autorefs autorefs-internal" title="            close" href="../../reference/simple/#ropt.simple.SharedHandlers.close"><code>close</code></a> or by using it as a context manager,
+which matters when groups are built in a loop inside one long-lived session. A
+closed group is refused like a closed pool: a run given one stops immediately
+with a <a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a>, rather than running to
+completion while its results go nowhere.</p>
+<div class="admonition warning">
+<p class="admonition-title">Reach for a shared group only for real concurrency</p>
+<p>A group routes every run's events through a single, serialized
+<code>EventDispatcher</code> on a background loop. That serialization is what makes a
+handler safe to share across <em>concurrent</em> runs — but around a plain
+<strong>sequential</strong> loop it is pure overhead (a background loop plus a cross-thread
+hand-off per result) and buys nothing. Prefer a reused local handler for
+sequential accumulation, and keep groups for genuinely concurrent runs. When
+you do share a group, move any slow, GIL-releasing (I/O) handler onto a
+worker thread with <a href="#running-a-handler-in-a-thread"><code>threaded</code></a> so it does
+not stall the shared loop for every run.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Local first, shared never after</p>
+<p>The two roles are not interchangeable, and the door between them opens one
+way only. A group releases its handlers when it closes, so a handler that
+has only ever been shared can afterwards be used either way. But passing a
+handler to a run as a local handler binds it to that run's compute step
+permanently, and <code>shared_handlers</code> will refuse it from then on. Decide per
+handler which of the two roles it plays; if you need both, use two handlers.</p>
+</div>
+<h3 id="built-in-handlers">Built-in handlers</h3>
+<p><code>ropt</code> ships several ready-to-use handlers, all re-exported from <code>ropt.simple</code>.</p>
+<h4 id="resultshandler"><code>ResultsHandler</code></h4>
+<p><a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.ResultsHandler" href="../../reference/components_event_handlers/#ropt.components.event_handlers.ResultsHandler"><code>ResultsHandler</code></a> keeps a single result, read via
+<code>handler["results"]</code>:</p>
+<ul>
+<li><code>what="best"</code> (default) keeps the result with the lowest weighted objective
+  seen so far; <code>what="last"</code> keeps the most recent valid result.</li>
+<li><code>constraint_tolerance</code> (optional) discards results that violate a constraint
+  by more than the given tolerance.</li>
+<li><code>filter</code> (optional) is a callable that receives each
+  <a class="autorefs autorefs-internal" title="            ropt.results.Results
+
+
+  
+      dataclass
+  " href="../../reference/results/#ropt.results.Results"><code>Results</code></a> and returns <code>True</code> to keep it or <code>False</code> to
+  drop it.</li>
+<li><code>domain="user"</code> (default) or <code>domain="optimizer"</code> chooses which of the two
+  the stored result is in; see
+  <a href="../../optimizer_setup/results/#domain-transforms-on-results">Domain transforms on results</a>.</li>
+</ul>
+<h4 id="historyhandler"><code>HistoryHandler</code></h4>
+<p><a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.HistoryHandler" href="../../reference/components_event_handlers/#ropt.components.event_handlers.HistoryHandler"><code>HistoryHandler</code></a> keeps <em>every</em> result it receives,
+in order, as a tuple. Read it with <code>handler.results</code>, which is an empty tuple
+until the first result arrives, or with <code>handler["results"]</code>, the raw stored
+value, which is <code>None</code> until then. It takes the same <code>domain=</code> keyword as
+<code>ResultsHandler</code>.</p>
+<h4 id="dataframehandler"><code>DataFrameHandler</code></h4>
+<p><a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.DataFrameHandler" href="../../reference/components_event_handlers/#ropt.components.event_handlers.DataFrameHandler"><code>DataFrameHandler</code></a> collects results into named
+DataFrames, using either <code>pandas</code> (the default) or <code>polars</code> as its backend; the
+corresponding package must be installed. Define a table with
+<code>add_table(name, table_type, columns, domain="user")</code>, where <code>table_type</code> is
+<code>"functions"</code> or <code>"gradients"</code>, <code>columns</code> maps result-field names (dotted
+attribute syntax) to column titles, and <code>domain</code> (<code>"user"</code> or <code>"optimizer"</code>,
+per table) chooses which domain that table is filled from; see
+<a href="../../optimizer_setup/results/#domain-transforms-on-results">Domain transforms on results</a>:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.simple</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataFrameHandler</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">tables</span> <span class="o">=</span> <span class="n">DataFrameHandler</span><span class="p">()</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="n">tables</span><span class="o">.</span><span class="n">add_table</span><span class="p">(</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    <span class="s2">&quot;summary&quot;</span><span class="p">,</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>    <span class="s2">&quot;functions&quot;</span><span class="p">,</span>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>    <span class="p">{</span>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>        <span class="s2">&quot;batch_id&quot;</span><span class="p">:</span> <span class="s2">&quot;Batch&quot;</span><span class="p">,</span>
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>        <span class="s2">&quot;functions.objectives&quot;</span><span class="p">:</span> <span class="s2">&quot;Objective&quot;</span><span class="p">,</span>
+</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>        <span class="s2">&quot;evaluations.variables&quot;</span><span class="p">:</span> <span class="s2">&quot;Variable&quot;</span><span class="p">,</span>
+</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>    <span class="p">},</span>
+</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="p">)</span>
+</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">handlers</span><span class="o">=</span><span class="p">[</span><span class="n">tables</span><span class="p">])</span>
+</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="n">df</span> <span class="o">=</span> <span class="n">tables</span><span class="p">[</span><span class="s2">&quot;summary&quot;</span><span class="p">]</span>
 </span></code></pre></div>
-<p>The evaluations run in <strong>separate processes</strong>. This gives real parallel speed for
-heavy Python computations, because each process has its own interpreter.</p>
-<p>Your objective and its data are <strong>copied</strong> to the worker processes, so they must
-be serializable: an objective defined at module level works out of the box, while
-a lambda (a one-line, unnamed function), a closure (a function defined inside
-another function), or a function defined in a notebook cell needs the
-<code>cloudpickle</code> extra (see
-<a href="../installation/#optional-extras">Installation</a>).</p>
-<p>Because each worker is a separate process, your objective can only send results
-<strong>back</strong> through its return value; it cannot share memory with your handlers or
-the rest of your program. See
-<a href="../../running/handlers/#handlers-and-the-process-boundary">Handlers and the process boundary</a>.</p>
-<h3 id="hpc_pool-a-pool-of-jobs-on-a-cluster"><code>hpc_pool</code> — a pool of jobs on a cluster</h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">pool</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">hpc_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<p>Read one table with <code>tables["summary"]</code>, or all of them with <code>get_tables()</code>. A
+field whose value is a vector or matrix expands to several columns; the extra
+column levels come from the field's axis labels (or indices), joined to the
+title with a separator (<code>,</code> by default, set with <code>sep=</code>). For example, a
+length-2 <code>evaluations.variables</code> gives <code>Variable,v0</code> and <code>Variable,v1</code>. Because
+the column names follow
+<a href="../../optimizer_setup/results/#metadata-columns"><code>results_to_dataframe</code></a>,
+both result-level and per-realization metadata can be included and renamed.</p>
+<p>Pass <code>backend="polars"</code> to get polars DataFrames instead:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">tables</span> <span class="o">=</span> <span class="n">DataFrameHandler</span><span class="p">(</span><span class="n">backend</span><span class="o">=</span><span class="s2">&quot;polars&quot;</span><span class="p">)</span>
 </span></code></pre></div>
-<p>The evaluations are submitted as jobs to an HPC queue (for example Slurm). Use
-this when a single evaluation is a large job that belongs on a cluster. It needs
-the <code>ropt[hpc]</code> extra and a reachable cluster:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">pool</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">hpc_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">10</span><span class="p">))</span>
+<p>The tables carry the same columns under the same titles. As explained in
+<a href="../../optimizer_setup/results/#exporting-to-polars">Exporting to polars</a>, polars
+has no index, so the key columns (<code>batch_id</code>, <code>realization</code>, and the other axis
+names) appear as ordinary leading columns rather than in the index. This also
+means the polars backend can build tables that mix per-batch and
+per-realization fields, which the pandas backend cannot.</p>
+<p>Convenience methods:</p>
+<ul>
+<li><code>set_default_tables(domain="user")</code> registers a standard set of tables
+  (<code>functions</code>, <code>evaluations</code>, <code>constraints</code> for function results; <code>gradients</code>,
+  <code>perturbations</code> for gradient results), all filled from the given domain.</li>
+<li><code>add_column(table, name, title)</code> adds one column to an existing table.</li>
+<li><code>set_callback(fn)</code> calls <code>fn(event)</code> whenever the tables are updated.</li>
+</ul>
+<div class="admonition tip">
+<p class="admonition-title">Write the tables to a file as they update</p>
+<p><code>set_callback</code> fires on every update, so it is a convenient hook for saving
+the tables — to watch progress live or to write a final report. Pandas'
+<code>to_string()</code> gives aligned, human-readable columns with no extra
+dependencies; use <code>to_csv()</code> for machine-readable data, or <code>to_markdown()</code>
+if you have <code>tabulate</code> installed:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">dump</span><span class="p">(</span><span class="n">_event</span><span class="p">):</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;progress.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">df</span> <span class="ow">in</span> <span class="n">tables</span><span class="o">.</span><span class="n">get_tables</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>            <span class="n">fh</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;# </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="n">df</span><span class="o">.</span><span class="n">to_string</span><span class="p">()</span><span class="si">}</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="n">tables</span><span class="o">.</span><span class="n">set_callback</span><span class="p">(</span><span class="n">dump</span><span class="p">)</span>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">handlers</span><span class="o">=</span><span class="p">[</span><span class="n">tables</span><span class="p">])</span>
 </span></code></pre></div>
-<p>With no further arguments, <code>hpc_pool</code> uses the default cluster and queue from the
-<code>pysqa</code> configuration of your <code>ropt</code> installation — <code>pysqa</code> is the package <code>ropt</code>
-uses to submit and track cluster jobs. Cluster-specific parameters —
-such as the <code>cluster</code> name, the <code>queue</code>, and the number of <code>cores</code> per job — can
-be passed to <code>hpc_pool</code> when you need them; see
-<a href="../../running/parallel/#running-on-an-hpc-cluster">Parallel Execution and Many Runs</a> for the full list.</p>
-<p>Like a process pool, the work is copied to the cluster. This currently uses
-<code>cloudpickle</code>, which is included in the <code>ropt[hpc]</code> extra (see
-<a href="../installation/#optional-extras">Installation</a>).</p>
-<h2 id="which-one-should-i-use">Which one should I use?</h2>
-<table>
-<thead>
-<tr>
-<th>Pool</th>
-<th>Where evaluations run</th>
-<th>Data</th>
-<th>Speeds up heavy Python?</th>
-<th>Use when</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>none (default)</td>
-<td>the calling thread, one at a time</td>
-<td>shared</td>
-<td>no</td>
-<td>evaluations are fast</td>
-</tr>
-<tr>
-<td><code>thread_pool</code></td>
-<td>background threads, one process</td>
-<td>shared</td>
-<td>no — one interpreter</td>
-<td>each evaluation mostly <strong>waits</strong> (external tool, I/O)</td>
-</tr>
-<tr>
-<td><code>process_pool</code></td>
-<td>separate processes</td>
-<td>copied</td>
-<td>yes</td>
-<td>each evaluation is heavy <strong>Python computation</strong></td>
-</tr>
-<tr>
-<td><code>hpc_pool</code></td>
-<td>jobs on a cluster</td>
-<td>copied</td>
-<td>yes</td>
-<td>each evaluation is a big <strong>cluster job</strong></td>
-</tr>
-</tbody>
-</table>
-<h2 id="running-multiple-optimizations-in-parallel">Running multiple optimizations in parallel</h2>
-<p>The same pools also power <a class="autorefs autorefs-internal" title="            ropt.simple.optimize_many" href="../../reference/simple/#ropt.simple.optimize_many"><code>optimize_many</code></a>, which
-runs several optimizations at once:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.simple</span><span class="w"> </span><span class="kn">import</span> <span class="n">optimize_many</span><span class="p">,</span> <span class="n">session</span>
+<p>Because this writes to disk on every update, it is a good candidate for
+<a href="#running-a-handler-in-a-thread">running on a worker thread</a>.</p>
+</div>
+<h3 id="custom-handlers">Custom handlers</h3>
+<p>Handlers are not limited to the built-ins: you — or another package — can
+provide your own by implementing <code>ropt</code>'s event-handler interface. The
+<a href="../../workflows/workflows/#event-handlers">Low-Level API</a> describes the event
+model, the handler protocol, and how to write one.</p>
+<p>A custom handler can also <strong>stop its own optimization</strong>: every event carries the
+compute step that emitted it, so calling <code>event.source.stop()</code> from <code>handle_event</code>
+ends that run gracefully with <code>USER_ABORT</code> (the <a href="../running/#stopping-early-from-the-callback"><code>report</code></a>
+callback above is just a convenience wrapper around this). Only the run that owns
+the emitting step is affected, so concurrent runs continue. See
+<a href="../../workflows/workflows/#exit-codes">Aborting a run</a> in the low-level docs.</p>
+<h3 id="running-a-handler-in-a-thread">Running a handler in a thread</h3>
+<p>By default every handler runs <strong>inline</strong>, on the thread that drives the
+optimization: each result is delivered to the handlers one after another, and the
+run waits for <code>handle_event</code> to return before it continues. That is exactly what
+you want for handlers that only touch memory — storing results, updating a
+DataFrame, keeping a running statistic — because the work is fast and there is no
+reason to hand it off.</p>
+<p>A <a href="#sharing-a-handler-across-concurrent-runs">shared group</a> can instead run one
+or more handlers on a <strong>worker thread</strong> with the <code>threaded</code> keyword. Pass it a
+single handler or a sequence of handlers; those handlers run off the driving
+thread, while positional handlers stay inline:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.simple</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataFrameHandler</span><span class="p">,</span> <span class="n">HistoryHandler</span><span class="p">,</span> <span class="n">optimize</span><span class="p">,</span> <span class="n">session</span>
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>    <span class="n">pool</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">thread_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
-</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>    <span class="n">results</span> <span class="o">=</span> <span class="n">optimize_many</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">start_points</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">pool</span><span class="o">=</span><span class="n">pool</span><span class="p">)</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="n">history</span> <span class="o">=</span> <span class="n">HistoryHandler</span><span class="p">()</span>          <span class="c1"># cheap, in-memory  -&gt; inline</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="n">tables</span> <span class="o">=</span> <span class="n">DataFrameHandler</span><span class="p">()</span>         <span class="c1"># writes a report to disk -&gt; worker thread</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="n">tables</span><span class="o">.</span><span class="n">set_default_tables</span><span class="p">()</span>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="n">tables</span><span class="o">.</span><span class="n">set_callback</span><span class="p">(</span><span class="n">dump_to_disk</span><span class="p">)</span>   <span class="c1"># some function that writes a file</span>
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
+</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>    <span class="n">collected</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">shared_handlers</span><span class="p">(</span><span class="n">history</span><span class="p">,</span> <span class="n">threaded</span><span class="o">=</span><span class="n">tables</span><span class="p">)</span>
+</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>    <span class="k">for</span> <span class="n">x0</span> <span class="ow">in</span> <span class="n">start_points</span><span class="p">:</span>
+</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>        <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">handlers</span><span class="o">=</span><span class="p">[</span><span class="n">collected</span><span class="p">])</span>
 </span></code></pre></div>
-<p><code>optimize_many</code> always runs the optimizations themselves concurrently, each on
-its own thread — that part does not depend on the pool. The pool instead decides
-how the <em>function evaluations</em> inside those runs are parallelized: they all
-happen on it. So <code>thread_pool(workers=1)</code> runs the optimizations together but
-evaluates one point at a time, while a larger pool (or a process or HPC pool)
-evaluates several at once. Without a pool the runs evaluate on their own driver
-threads, so your objective is then called by several threads at once.</p>
-<h3 id="collecting-results-from-concurrent-runs">Collecting results from concurrent runs</h3>
-<p><a href="../handlers/">Collecting Results with Handlers</a> showed a handler reused across
-a <strong>sequential</strong> loop, accumulating one run's results after another. That does
-not work here: the runs of <code>optimize_many</code> overlap in time, and a plain
-handler cannot safely collect from several runs at once. Instead, build a
-<strong>shared handler group</strong> on the session with <code>shared_handlers</code>, and pass the
-group where you would pass the handler:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.simple</span><span class="w"> </span><span class="kn">import</span> <span class="n">HistoryHandler</span><span class="p">,</span> <span class="n">optimize_many</span><span class="p">,</span> <span class="n">session</span>
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="n">history</span> <span class="o">=</span> <span class="n">HistoryHandler</span><span class="p">()</span>
-</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
-</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>    <span class="n">pool</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">thread_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
-</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>    <span class="n">collected</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">shared_handlers</span><span class="p">(</span><span class="n">history</span><span class="p">)</span>
-</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>    <span class="n">results</span> <span class="o">=</span> <span class="n">optimize_many</span><span class="p">(</span>
-</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>        <span class="n">config</span><span class="p">,</span> <span class="n">start_points</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">pool</span><span class="o">=</span><span class="n">pool</span><span class="p">,</span> <span class="n">handlers</span><span class="o">=</span><span class="p">[</span><span class="n">collected</span><span class="p">]</span>
-</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>    <span class="p">)</span>
-</span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a>
-</span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="nb">print</span><span class="p">(</span><span class="n">history</span><span class="o">.</span><span class="n">results</span><span class="p">)</span>   <span class="c1"># every result, from every run, safely collected</span>
+<p>Moving a handler to a thread changes <strong>where</strong> its code runs, nothing else: the
+run still waits for every handler to finish before delivering the next result,
+results still arrive in order, and an exception raised by a threaded handler is
+re-raised on the run's own stack, so early stops and fatal errors propagate
+exactly as they do for an inline handler.</p>
+<div class="admonition warning">
+<p class="admonition-title">Only I/O-bound handlers benefit</p>
+<p><code>threaded</code> helps in <strong>one</strong> situation: a handler that spends most of its time
+waiting on an operation that <em>releases</em> CPython's global interpreter lock
+(GIL) — writing to a file, a socket or a database, or a NumPy/C routine that
+drops the lock. Only then can the optimization make progress while that work
+is in flight.</p>
+<p>Under the GIL only one thread runs Python bytecode at a time. A handler that
+stays in Python — building DataFrames, accumulating results, doing numerical
+work in pure Python — therefore gets <strong>no</strong> speed-up from <code>threaded</code>. It
+merely pays the small cost of handing work to another thread, which makes it
+marginally <em>slower</em>, never faster. When in doubt, leave a handler inline; only
+reach for <code>threaded</code> when you know it is busy with interruptible I/O.</p>
+</div>
+<p><code>threaded</code> is only available on a shared group; a local handler always runs
+inline. To run a blocking handler on a thread for just one optimization, give it
+a group of its own:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>    <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">handlers</span><span class="o">=</span><span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">shared_handlers</span><span class="p">(</span><span class="n">threaded</span><span class="o">=</span><span class="n">slow_writer</span><span class="p">)])</span>
 </span></code></pre></div>
-<p><code>optimize_many</code> only accepts groups in <code>handlers=</code> — a bare handler is rejected
-there, because its runs overlap.</p>
-<p>See <a href="../../running/parallel/#many-optimizations-at-once">Parallel Execution and Many Runs</a> for more.</p>
-<h2 id="offloading-your-own-functions">Offloading your own functions</h2>
-<p>A pool can also run <strong>your own</strong> functions in parallel, not just the optimizer's
-evaluations. Pass a function — or several — to <a class="autorefs autorefs-internal" title="            ropt.simple.offload" href="../../reference/simple/#ropt.simple.offload"><code>offload</code></a>,
-along with the pool you want to run it on:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.simple</span><span class="w"> </span><span class="kn">import</span> <span class="n">offload</span><span class="p">,</span> <span class="n">session</span>
-</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>
-</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
-</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">offload</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="n">expensive</span><span class="p">,</span> <span class="n">data</span><span class="p">),</span> <span class="n">pool</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">process_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
-</span></code></pre></div>
-<p>This is for expensive, self-contained work in code you write — a helper, a custom
-step, or a transform. Like the objective, such functions are copied to the
-workers on a process or HPC pool. Without a pool, <code>offload</code> simply runs the
-function inline instead, so your code never needs a separate fallback for the
-case where no pool is available. See
-<a href="../../running/parallel/#offloading-your-own-work">Parallel Execution and Many Runs</a> for
-details.</p>
+<h2 id="handlers-and-the-process-boundary">Handlers and the process boundary</h2>
+<p>On a thread pool (or with no pool) your objective and your handlers run in the
+<strong>same process</strong> and share memory: a handler can see anything the objective left
+behind — a global it set, a list it appended to, an object it mutated.</p>
+<p>A process or HPC pool breaks that. The objective runs in a <strong>separate worker
+process</strong>, while the optimizer, your handlers, and the rest of your program stay
+in the <strong>main process</strong>. They cannot share memory. The objective's <em>only</em> way to
+send information back is through what it <strong>returns</strong> — the objective and
+constraint values, and the result's <code>metadata</code> — all copied back to the main
+process:</p>
+<pre class="mermaid"><code>flowchart LR
+    subgraph main["your main process"]
+        opt["optimizer"]
+        hand["handlers +&lt;br/&gt;your code"]
+        opt --&gt; hand
+    end
+    subgraph worker["worker process (process / HPC pool)"]
+        obj["objective"]
+    end
+    opt --&gt;|"variables"| obj
+    obj --&gt;|"result + metadata&lt;br/&gt;(copied back)"| opt</code></pre>
+<details class="info">
+<summary>How data crosses the boundary</summary>
+<p>To move work and results between processes, <code>ropt</code> <strong>serializes</strong> them —
+turns the objects into bytes and rebuilds them on the other side. A process
+pool uses Python's standard <code>pickle</code>, so an objective defined at module level
+works as is; a lambda, a closure, or a notebook-defined objective needs the
+<code>cloudpickle</code> extra, which an HPC pool always uses. Most functions and data
+serialize fine, but things like open files, locks, or database connections
+may not.</p>
+<p>On a process pool the bytes travel over an in-machine channel. On an HPC pool
+they are written as <strong>files on a shared filesystem</strong> that the cluster nodes
+read, so an HPC pool needs such a shared filesystem (its <code>workdir</code>).</p>
+<p>Serialization is only the mechanism <code>ropt</code> uses today; the essential
+requirement is that the data can be <em>carried across the boundary</em>, so a
+future version could use a different transport — for example one that works
+over a network.</p>
+</details>
+<p>Handlers see those returned results and nothing else. Anything the objective did
+only in memory — setting a module global, appending to a shared list, updating an
+object — happened <strong>inside the worker</strong> and is discarded when it finishes; your
+handlers and your main program never see it.</p>
+<div class="admonition note">
+<p class="admonition-title">Sessions stay in the main process</p>
+<p>A pool, a shared group, and the session behind them are tied to the main
+process, so they are not usable in a worker. An objective that closes over
+one — to offload work, or to start an inner run on it — is stopped in the
+worker, which reports the object by name. Do that work in the objective
+itself, or return what you need and act on it in the main process.</p>
+</div>
+<p>So to get extra information from an evaluation to a handler (or to a later part
+of your program), <strong>return it</strong> instead of stashing it in shared state: attach it
+to the result's <code>metadata</code> (see <a href="../running/#attaching-metadata">Attaching metadata</a>), which
+travels back with the result. Relying on shared state happens to work on a
+thread pool, but breaks the moment you switch to a process pool; returning the
+data works everywhere.</p>
+<h2 id="where-to-next">Where to next</h2>
+<ul>
+<li>The full result object model: <a href="../../optimizer_setup/results/">Working with Results</a>.</li>
+<li>Full control over compute steps and events, beyond the built-in handlers:
+  <a href="../../workflows/workflows/">Optimization Workflows</a>.</li>
+</ul>
 
 
 
@@ -3226,7 +3379,7 @@ details.</p>
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../handlers/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Collecting Results with Handlers">
+          <a href="../parallel/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Parallel Execution and Many Runs">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -3236,20 +3389,20 @@ details.</p>
                 Previous
               </span>
               <div class="md-ellipsis">
-                Collecting Results with Handlers
+                Parallel Execution and Many Runs
               </div>
             </div>
           </a>
         
         
           
-          <a href="../../optimizer_setup/key_concepts/" class="md-footer__link md-footer__link--next" aria-label="Next: Key Concepts">
+          <a href="../../workflows/workflows/" class="md-footer__link md-footer__link--next" aria-label="Next: Optimization Workflows">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Key Concepts
+                Optimization Workflows
               </div>
             </div>
             <div class="md-footer__button md-icon">

@@ -1052,6 +1052,62 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../running/parallel/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Parallel Execution and Many Runs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../running/handlers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Result Handlers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1444,7 +1500,12 @@
   
 </li>
         
-          <li class="md-nav__item">
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#two-rules-for-using-the-low-level-api" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1452,11 +1513,6 @@
       
     </span>
   </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -3181,7 +3237,12 @@
   
 </li>
         
-          <li class="md-nav__item">
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#two-rules-for-using-the-low-level-api" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3189,11 +3250,6 @@
       
     </span>
   </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -3293,6 +3349,10 @@ for the submission's results.</p>
 <tr>
 <td><code>bundle_size</code></td>
 <td>Number of active evaluations to group into a single work item (default: <code>1</code>). Use an integer <code>&gt; 1</code> for a fixed maximum bundle size, or <code>0</code> to bundle all active evaluations of a batch into one work item.</td>
+</tr>
+<tr>
+<td><code>batch_id_callback</code></td>
+<td>Callable returning the next batch ID each time it is called (default: an internal <a class="autorefs autorefs-internal" title="            ropt.components.evaluators.BatchIdCounter" href="../../reference/components_evaluators/#ropt.components.evaluators.BatchIdCounter"><code>BatchIdCounter</code></a>).</td>
 </tr>
 </tbody>
 </table>
@@ -3834,7 +3894,7 @@ handler scope once on the calling thread and gives the same one to every job.
 An N-way <code>optimize_many</code> therefore pays its handler cost serially. Keep shared
 handlers cheap; if one must do heavy I/O, buffer in memory and flush once the
 runs have finished.</p>
-<h3 id="two-rules-for-using-the-low-level-api">Two rules for using the low-level API</h3>
+<h2 id="two-rules-for-using-the-low-level-api">Two rules for using the low-level API</h2>
 <p><strong>Run a compute step in a worker thread.</strong> <code>step.run()</code> is an ordinary
 synchronous method that runs its evaluator and its handlers <strong>on whatever
 thread called it</strong>. On the event loop thread it blocks the loop, and the

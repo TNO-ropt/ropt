@@ -1052,6 +1052,62 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../running/parallel/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Parallel Execution and Many Runs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../running/handlers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Result Handlers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -2857,7 +2913,7 @@ just the final result — attach a <strong>handler</strong>. A handler is an obj
 with <code>handlers=</code> that observes every result an optimization produces; unlike
 the <code>report</code> callback (see <a href="../optimize/">Your First Optimization</a>), the same
 handler can be reused across several calls to <code>optimize</code>, accumulating results
-as it goes. See <a href="../../running/running/#result-handlers">Result handlers</a> for
+as it goes. See <a href="../../running/handlers/#result-handlers">Result handlers</a> for
 the full explanation.</p>
 <p>Here we use <a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.HistoryHandler" href="../../reference/components_event_handlers/#ropt.components.event_handlers.HistoryHandler"><code>HistoryHandler</code></a>, which keeps every
 result it sees, in order:</p>
@@ -2882,7 +2938,7 @@ every evaluation from every restart, not just the last run's:</p>
 <h2 id="next">Next</h2>
 <ul>
 <li>The full simple API, including other built-in handlers:
-  <a href="../../running/running/#result-handlers">Running Optimizations</a>.</li>
+  <a href="../../running/handlers/#result-handlers">Result Handlers</a>.</li>
 <li>Restarting concurrent, rather than sequential, runs needs a <strong>shared</strong>
   handler group instead of a reused one:
   <a href="../../getting_started/execution/#collecting-results-from-concurrent-runs">Running in Parallel</a>.</li>

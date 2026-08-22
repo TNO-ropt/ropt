@@ -1423,6 +1423,62 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../running/parallel/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Parallel Execution and Many Runs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../running/handlers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Result Handlers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -3436,7 +3492,7 @@ fields in <code>objectives</code> and <code>realizations</code> are normalized t
 </span></code></pre></div>
 <h3 id="broadcasting">Broadcasting</h3>
 <p>Many per-variable, per-objective, or per-constraint fields are NumPy arrays. A
-size-1 value is broadcast to match the relevant count, e.g.:</p>
+size-1 value is broadcast to match the relevant count, for example:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="s2">&quot;variables&quot;</span><span class="p">:</span> <span class="p">{</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    <span class="s2">&quot;variable_count&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
 </span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    <span class="s2">&quot;lower_bounds&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>        <span class="c1"># broadcast to [0, 0, 0, 0, 0]</span>
@@ -3521,14 +3577,14 @@ the required object:</p>
 discovery) and builds the object, applying any <code>options</code>.</p>
 </li>
 <li>
-<p><strong>A typed config object</strong>, e.g.
+<p><strong>A typed config object</strong>, for example
    <a class="autorefs autorefs-internal" title="            SamplerConfig" href="../../reference/config/#ropt.config.SamplerConfig"><code>SamplerConfig</code></a>. This is the same as the dict
    form — the dict is validated into exactly this object — but lets you build it
    explicitly in Python.</p>
 </li>
 <li>
 <p><strong>An already-constructed object</strong> — <em>advanced</em>. Pass an instance of a built-in
-   class (e.g. a <code>SciPySampler</code> from <code>ropt.sampler.scipy</code>) or of your own
+   class (for example a <code>SciPySampler</code> from <code>ropt.sampler.scipy</code>) or of your own
    <code>Sampler</code> subclass, and it is used as-is. This is mainly for when you write
    the Python object yourself and want to provide it directly, without
    registering it as a plugin.</p>
@@ -3564,12 +3620,13 @@ same backend.</p>
 change settings, build a new context from a modified dict.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p><code>EnOptContext</code> objects are immutable after construction. Do not attempt to
-serialize and round-trip them (e.g., to/from JSON). Some parameters are
-transformed during construction in an irreversible manner. Constructing a
-<code>EnOptContext</code> object from serialized values may incorrectly transform those
-parameters again. Moreover, NumPy arrays and plugin instances may not survive a
-round-trip faithfully. Persist the raw input dicts instead if you intend to
+<p><code>EnOptContext</code> objects are immutable after construction. Do not try to
+serialize and round-trip them (for example, to/from JSON). Some parameters
+are transformed during construction in a way that cannot be undone, so
+building an <code>EnOptContext</code> from those serialized values would transform
+them again, incorrectly. NumPy arrays and plugin instances may also not
+come back unchanged from a round-trip. Persist the raw input dicts instead
+if you intend to
 modify the values.</p>
 </div>
 <h2 id="section-reference">Section reference</h2>
@@ -3593,8 +3650,8 @@ integer). If not provided, all variables default to continuous
       instance-attribute
   " href="../../reference/enums/#ropt.enums.VariableType.REAL"><code>VariableType.REAL</code></a>).</p>
 <p>The optional <code>mask</code> field is a boolean array that indicates which variables are
-free to change during optimization (default: all <code>True</code>, i.e. all variables are
-free). <code>True</code> means the variable is free; <code>False</code> means it is fixed.</p>
+free to change during optimization (default: all <code>True</code>, meaning all variables
+are free). <code>True</code> means the variable is free; <code>False</code> means it is fixed.</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="s2">&quot;variables&quot;</span><span class="p">:</span> <span class="p">{</span>
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>    <span class="s2">&quot;variable_count&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
 </span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>    <span class="s2">&quot;lower_bounds&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
@@ -3612,7 +3669,7 @@ Gradients</a>).</p>
 configured in the
 <a href="#function_estimators-realization_filters-samplers-transforms"><code>samplers</code></a>
 tuple. The <code>samplers</code> field of <code>variables</code> assigns each variable to a sampler by
-its index into that tuple (default: <code>0</code>, i.e. the first sampler). Unless
+its index into that tuple (default: <code>0</code>, meaning the first sampler). Unless
 explicitly configured otherwise, the default sampler method is
 <code>"scipy/default"</code>, which draws perturbations from a standard normal distribution
 <span class="arithmatex">\(N(0, 1)\)</span>.</p>
@@ -3688,8 +3745,8 @@ to a <a href="../transforms/">variable transform</a> by index. An out-of-range i
 <p><code>ropt</code> supports multi-objective optimization. Multiple objectives are combined
 into a single value by summing them after weighting. The <code>weights</code> field
 determines the weight of each objective function, and its length defines the
-number of objectives (default: <code>[1.0]</code>, i.e. a single objective). The weights
-are automatically normalized to sum to 1 (e.g., <code>[1, 1]</code> becomes <code>[0.5, 0.5]</code>).</p>
+number of objectives (default: <code>[1.0]</code>, meaning a single objective). The weights
+are automatically normalized to sum to 1 (for example, <code>[1, 1]</code> becomes <code>[0.5, 0.5]</code>).</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="s2">&quot;objectives&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;weights&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.6</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">]}</span>
 </span></code></pre></div>
 <p>Objective functions can optionally be processed using
@@ -3750,10 +3807,10 @@ realization and then combined into a single value. Typically, this combination i
 a weighted sum, but other methods are possible (see
 <a href="../function_estimators/">function estimators</a>).</p>
 <p>The <code>weights</code> field determines the weight of each realization, and its length
-defines the ensemble size (default: <code>[1.0]</code>, i.e. a single realization). The
-weights are automatically normalized to sum to 1 (e.g., <code>[1, 1]</code> becomes
+defines the ensemble size (default: <code>[1.0]</code>, meaning a single realization). The
+weights are automatically normalized to sum to 1 (for example, <code>[1, 1]</code> becomes
 <code>[0.5, 0.5]</code>).</p>
-<p>If function evaluations for some realizations fail (e.g., due to a simulation
+<p>If function evaluations for some realizations fail (for example, due to a simulation
 error), the total function and gradient values can still be calculated by
 excluding the missing values. The <code>realization_min_success</code> field specifies the
 minimum number of successful realizations required (default: equal to the number
@@ -3774,16 +3831,16 @@ redirection):</p>
 <p><strong><code>max_batches</code></strong>: Limits the total number of <em>calls</em> made to the evaluation
   function. An optimizer might request a batch containing multiple function
   and/or gradient evaluations within a single call. This is particularly useful
-  for managing resource usage when batches are evaluated in parallel (e.g., on
+  for managing resource usage when batches are evaluated in parallel (for example, on
   an HPC cluster), as it controls the number of sequential submission steps. The
   number of batches does not necessarily correspond directly to the number of
   optimizer iterations.</p>
 </li>
 <li>
-<p><strong><code>max_functions</code></strong>: Imposes a hard limit on the total <em>number</em> of individual
+<p><strong><code>max_functions</code></strong>: Sets a hard limit on the total <em>number</em> of individual
   objective function evaluations performed across all batches. Since a single
-  batch can involve multiple function evaluations, this provides more granular
-  control over total computational effort. Note that exceeding this limit might
+  batch can involve multiple function evaluations, this gives finer control
+  over total computational effort. Note that exceeding this limit might
   cause the optimization to terminate mid-batch.</p>
 </li>
 <li>
@@ -3851,7 +3908,7 @@ objective functions and gradients are calculated:</p>
   improve load balancing on HPC clusters by initiating gradient work earlier.</li>
 <li><strong><code>"separate"</code></strong>: Always launch function and gradient evaluations as distinct
   operations, even if the optimizer requests both simultaneously. Useful when
-  employing <a href="../realization_filters/">realization filters</a> that might disable
+  using <a href="../realization_filters/">realization filters</a> that might disable
   certain realizations, as it can reduce the number of gradient evaluations
   needed based on information obtained from the function evaluations.</li>
 </ul>
@@ -3864,7 +3921,7 @@ objects are referenced by index). Each entry configures a plugin instance via a
 <p><a href="../function_estimators/">Function estimators</a> control how objective and
 constraint function values (and their gradients) are combined across
 realizations. By default, a weighted average over realizations is used; function
-estimators allow replacing that with a different combination method (e.g.,
+estimators allow replacing that with a different combination method (for example,
 standard deviation).</p>
 <p>Fields:</p>
 <ul>

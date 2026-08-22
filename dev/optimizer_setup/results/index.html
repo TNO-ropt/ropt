@@ -1296,6 +1296,62 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../running/parallel/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Parallel Execution and Many Runs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../running/handlers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Result Handlers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -3166,10 +3222,10 @@ reported via <a class="autorefs autorefs-internal" title="            EnOptEvent
   " href="../../reference/results/#ropt.results.Results"><code>Results</code></a> object represents the outcome of the
 calculation for a <strong>single variable vector</strong> — that is, the objective and
 gradient values computed at one point in variable space. However, the optimizer
-may request evaluations at multiple variable vectors in a single batch (e.g.,
-multiple perturbations or multiple candidates in a gradient-free method). In
-that case, the event payload contains a <em>sequence</em> of <code>Results</code> objects, one per
-variable vector evaluated in that batch.</p>
+may request evaluations at multiple variable vectors in a single batch (for
+example, multiple perturbations or multiple candidates in a gradient-free
+method). In that case, the event payload contains a <em>sequence</em> of <code>Results</code>
+objects, one per variable vector evaluated in that batch.</p>
 <p>Two concrete subclasses exist:</p>
 <ul>
 <li><a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
@@ -3284,7 +3340,7 @@ variable vector evaluated in that batch.</p>
 <li><code>evaluated_realizations</code>: boolean array indicating which realizations were
   evaluated, shape <span class="arithmatex">\((n_r,)\)</span>.</li>
 <li><code>objective_weights</code>: per-realization objective weights, shape
-  <span class="arithmatex">\((n_o, n_r)\)</span>. May change during optimization (e.g., when realization
+  <span class="arithmatex">\((n_o, n_r)\)</span>. May change during optimization (for example, when realization
   filters are active).</li>
 <li><code>constraint_weights</code>: per-realization constraint weights, shape
   <span class="arithmatex">\((n_c, n_r)\)</span> (if constraints are configured).</li>
@@ -3388,7 +3444,7 @@ the full list of fields.</p>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">result</span><span class="o">.</span><span class="n">functions</span><span class="o">.</span><span class="n">constraints</span>       <span class="c1"># per-constraint values</span>
 </span></code></pre></div>
 <p>If <code>functions</code> is <code>None</code>, the result represents a request that produced no
-valid values (e.g. all realizations failed). Always guard accesses:</p>
+valid values (for example, all realizations failed). Always guard accesses:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">functions</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">functions</span><span class="o">.</span><span class="n">target_objective</span><span class="p">)</span>
 </span></code></pre></div>
@@ -3535,7 +3591,7 @@ This requires the <code>pandas</code> optional extra (see <a href="../../getting
 <p class="admonition-title">Note</p>
 <p>The <code>to_dataframe</code> and <code>results_to_dataframe</code> functions shown here are the
 low-level export primitives. Most users do not call them directly: the
-<a href="../../running/running/#dataframehandler"><code>DataFrameHandler</code></a> builds and updates
+<a href="../../running/handlers/#dataframehandler"><code>DataFrameHandler</code></a> builds and updates
 these tables automatically as an optimization runs. This section explains
 what that handler produces under the hood.</p>
 </div>
@@ -3619,7 +3675,7 @@ row per result. It automatically unstacks the most common axes (<code>VARIABLE</
 </span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>3                                0.61                         0.50                         0.10
 </span></code></pre></div>
 <p>Each column is a <code>(field, label)</code> pair, and each row is one result identified by
-its <code>batch_id</code>. Field names use dot notation for nested sub-fields (e.g.,
+its <code>batch_id</code>. Field names use dot notation for nested sub-fields (for example,
 <code>evaluations.variables</code>, <code>functions.target_objective</code>). The <code>result_type</code>
 argument selects which results to process: <code>"functions"</code> for
 <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
@@ -3665,7 +3721,7 @@ run tag:</p>
 </span></code></pre></div>
 <h3 id="labels-and-the-index">Labels and the index</h3>
 <p>Every axis of an exported field becomes an index level, named after its
-<a class="autorefs autorefs-internal" title="            AxisName" href="../../reference/enums/#ropt.enums.AxisName"><code>AxisName</code></a> value (e.g. <code>"variable"</code>, <code>"realization"</code>,
+<a class="autorefs autorefs-internal" title="            AxisName" href="../../reference/enums/#ropt.enums.AxisName"><code>AxisName</code></a> value (for example <code>"variable"</code>, <code>"realization"</code>,
 <code>"objective"</code>), and <code>batch_id</code> is always prepended so results from different
 batches stay distinct. The label on each level — and on each unstacked column —
 comes from the <a href="../configuration/#names"><code>names</code></a> mapping in the configuration, a

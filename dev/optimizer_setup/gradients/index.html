@@ -1229,6 +1229,62 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../running/parallel/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Parallel Execution and Many Runs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../running/handlers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Result Handlers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -3121,7 +3177,7 @@ with <code>merge_realizations=True</code> all realizations are pooled before est
 which lets you use a much smaller <code>number_of_perturbations</code> (down to 1) at the
 cost of losing per-realization signal.</p>
 <h2 id="tolerating-failures">Tolerating failures</h2>
-<p>If an evaluator returns NaN for some perturbed rows (e.g. simulator
+<p>If an evaluator returns NaN for some perturbed rows (for example, simulator
 crashes), the gradient can still be computed when at least
 <code>perturbation_min_success</code> rows succeeded. Combine with the <code>realization_min_success</code> field of
 <a class="autorefs autorefs-internal" title="            RealizationsConfig" href="../../reference/config/#ropt.config.RealizationsConfig"><code>RealizationsConfig</code></a>

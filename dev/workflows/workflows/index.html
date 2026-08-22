@@ -9,7 +9,7 @@
       
       
       
-        <link rel="prev" href="../../running/running/">
+        <link rel="prev" href="../../running/handlers/">
       
       
         <link rel="next" href="../evaluation_callbacks/">
@@ -1039,6 +1039,62 @@
     
   
     Running Optimizations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../running/parallel/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Parallel Execution and Many Runs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../running/handlers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Result Handlers
   
 
     
@@ -3461,7 +3517,7 @@ method. Once attached, the handler receives every event the step emits.</p>
 <p>The built-in <a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.ResultsHandler" href="../../reference/components_event_handlers/#ropt.components.event_handlers.ResultsHandler"><code>ResultsHandler</code></a>,
 <a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.HistoryHandler" href="../../reference/components_event_handlers/#ropt.components.event_handlers.HistoryHandler"><code>HistoryHandler</code></a>, and
 <a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.DataFrameHandler" href="../../reference/components_event_handlers/#ropt.components.event_handlers.DataFrameHandler"><code>DataFrameHandler</code></a> are the same
-objects you meet in <a href="../../running/running/#built-in-handlers">Running Optimizations</a>,
+objects you meet in <a href="../../running/handlers/#built-in-handlers">Result Handlers</a>,
 where they are described in full — there they are attached with
 <code>optimize(handlers=...)</code>, here with <code>add_event_handler</code>, and they behave
 identically. This section covers the underlying event model and the handlers
@@ -3546,7 +3602,7 @@ pushed each event) rather than polling another handler's state.</p>
 <a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.ResultsHandler" href="../../reference/components_event_handlers/#ropt.components.event_handlers.ResultsHandler"><code>ResultsHandler</code></a>,
 <a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.HistoryHandler" href="../../reference/components_event_handlers/#ropt.components.event_handlers.HistoryHandler"><code>HistoryHandler</code></a>, and
 <a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.DataFrameHandler" href="../../reference/components_event_handlers/#ropt.components.event_handlers.DataFrameHandler"><code>DataFrameHandler</code></a> — are
-described in full in <a href="../../running/running/#built-in-handlers">Running Optimizations</a>.
+described in full in <a href="../../running/handlers/#built-in-handlers">Result Handlers</a>.
 They expose their state through dictionary access (<code>handler[key]</code>);
 <code>ResultsHandler</code> and <code>HistoryHandler</code> use the key <code>"results"</code>, while
 <code>DataFrameHandler</code> uses the table name. At this level each also accepts a
@@ -3642,7 +3698,7 @@ process-based, or HPC evaluation, see
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../../running/running/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Running Optimizations">
+          <a href="../../running/handlers/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Result Handlers">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -3652,7 +3708,7 @@ process-based, or HPC evaluation, see
                 Previous
               </span>
               <div class="md-ellipsis">
-                Running Optimizations
+                Result Handlers
               </div>
             </div>
           </a>
