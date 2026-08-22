@@ -149,3 +149,12 @@ optimization as implemented by `ropt`.
 :   A component that converts values between the units you work in and the scaled
     values the optimizer sees, such as rescaling variables, objectives, or
     constraints. See [Transforms](transforms.md).
+
+## Where to next
+
+- The full configuration schema: [Configuration](configuration.md).
+- How gradients are estimated: [Stochastic Gradients](gradients.md).
+- Selecting or reweighting realizations: [Realization Filters](realization_filters.md).
+- Combining realizations into a single value: [Function Estimators](function_estimators.md).
+- Rescaling values between domains: [Transforms](transforms.md).
+- Reading the optimization output: [Working with Results](results.md).

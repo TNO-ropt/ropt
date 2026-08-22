@@ -76,7 +76,11 @@ class FunctionEstimator(ABC):
         When `merge_realizations` is `False` (default), `gradient` has shape
         `(n_realizations, n_variables)` and must be combined using `weights`.
         When `True`, a single pre-merged gradient of shape `(n_variables,)` is
-        passed. Incompatible estimators should raise `ValueError` from `init`.
+        passed instead — suitable only for estimators that aggregate by a
+        simple weighted combination (e.g. the mean). Estimators that need each
+        realization's own gradient (e.g. standard deviation, via the chain
+        rule) are incompatible with merging and should raise `ValueError` from
+        `init`.
 
         Args:
             functions: Shape `(n_realizations,)` — needed for chain-rule

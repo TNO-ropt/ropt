@@ -78,7 +78,7 @@ cost of losing per-realization signal.
 
 ## Tolerating failures
 
-If an evaluator returns NaN for some perturbed rows (e.g. simulator
+If an evaluator returns NaN for some perturbed rows (for example, simulator
 crashes), the gradient can still be computed when at least
 `perturbation_min_success` rows succeeded. Combine with the `realization_min_success` field of
 [`RealizationsConfig`][ropt.config.RealizationsConfig]

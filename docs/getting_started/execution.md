@@ -79,14 +79,15 @@ heavy Python computations, because each process has its own interpreter.
 
 Your objective and its data are **copied** to the worker processes, so they must
 be serializable: an objective defined at module level works out of the box, while
-a lambda, a closure, or a function defined in a notebook cell needs the
+a lambda (a one-line, unnamed function), a closure (a function defined inside
+another function), or a function defined in a notebook cell needs the
 `cloudpickle` extra (see
 [Installation](installation.md#optional-extras)).
 
 Because each worker is a separate process, your objective can only send results
 **back** through its return value; it cannot share memory with your handlers or
 the rest of your program. See
-[Handlers and the process boundary](../running/running.md#handlers-and-the-process-boundary).
+[Handlers and the process boundary](../running/handlers.md#handlers-and-the-process-boundary).
 
 ### `hpc_pool` — a pool of jobs on a cluster
 
@@ -104,10 +105,11 @@ with session() as s:
 ```
 
 With no further arguments, `hpc_pool` uses the default cluster and queue from the
-`pysqa` configuration of your `ropt` installation. Cluster-specific parameters —
+`pysqa` configuration of your `ropt` installation — `pysqa` is the package `ropt`
+uses to submit and track cluster jobs. Cluster-specific parameters —
 such as the `cluster` name, the `queue`, and the number of `cores` per job — can
 be passed to `hpc_pool` when you need them; see
-[Running Optimizations](../running/running.md#running-on-an-hpc-cluster) for the full list.
+[Parallel Execution and Many Runs](../running/parallel.md#running-on-an-hpc-cluster) for the full list.
 
 Like a process pool, the work is copied to the cluster. This currently uses
 `cloudpickle`, which is included in the `ropt[hpc]` extra (see
@@ -143,13 +145,39 @@ evaluates one point at a time, while a larger pool (or a process or HPC pool)
 evaluates several at once. Without a pool the runs evaluate on their own driver
 threads, so your objective is then called by several threads at once.
 
-See [Running Optimizations](../running/running.md#many-optimizations-at-once) for more.
+### Collecting results from concurrent runs
+
+[Collecting Results with Handlers](handlers.md) showed a handler reused across
+a **sequential** loop, accumulating one run's results after another. That does
+not work here: the runs of `optimize_many` overlap in time, and a plain
+handler cannot safely collect from several runs at once. Instead, build a
+**shared handler group** on the session with `shared_handlers`, and pass the
+group where you would pass the handler:
+
+```python
+from ropt.simple import HistoryHandler, optimize_many, session
+
+history = HistoryHandler()
+with session() as s:
+    pool = s.thread_pool(workers=4)
+    collected = s.shared_handlers(history)
+    results = optimize_many(
+        config, start_points, objective, pool=pool, handlers=[collected]
+    )
+
+print(history.results)   # every result, from every run, safely collected
+```
+
+`optimize_many` only accepts groups in `handlers=` — a bare handler is rejected
+there, because its runs overlap.
+
+See [Parallel Execution and Many Runs](../running/parallel.md#many-optimizations-at-once) for more.
 
 ## Offloading your own functions
 
 A pool can also run **your own** functions in parallel, not just the optimizer's
-evaluations. Pass a function — or several — to [`offload`][ropt.simple.offload]
-together with the pool to run it on:
+evaluations. Pass a function — or several — to [`offload`][ropt.simple.offload],
+along with the pool you want to run it on:
 
 ```python
 from functools import partial
@@ -162,7 +190,8 @@ with session() as s:
 
 This is for expensive, self-contained work in code you write — a helper, a custom
 step, or a transform. Like the objective, such functions are copied to the
-workers on a process or HPC pool. Without a pool `offload` runs them inline, so
-code that may or may not have one to hand needs no fallback. See
-[Running Optimizations](../running/running.md#offloading-your-own-work) for
+workers on a process or HPC pool. Without a pool, `offload` simply runs the
+function inline instead, so your code never needs a separate fallback for the
+case where no pool is available. See
+[Parallel Execution and Many Runs](../running/parallel.md#offloading-your-own-work) for
 details.

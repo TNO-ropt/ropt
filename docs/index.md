@@ -1,18 +1,7 @@
 # `ropt`: A Python module for robust optimization
 
-## Getting started
-
-- Read the [Background](getting_started/background.md) for the ideas behind
-  `ropt`, then work through [Installation](getting_started/installation.md) and
-  the [Quickstart](getting_started/quickstart.md).
-- [Running Optimizations](running/running.md) is the recommended starting point
-  for running an optimization and covers most cases.
-- The [Key Concepts](optimizer_setup/key_concepts.md) page introduces the terms used
-  throughout the documentation.
-- The [Tutorials](tutorials/index.md) show `ropt` in action through worked
-  examples.
-- The [Configuration](optimizer_setup/configuration.md) page describes the
-  configuration format in detail.
+`ropt` is developed by the Netherlands Organisation for Applied Scientific
+Research (TNO) and released under the GNU General Public License v3.0.
 
 ## Overview
 
@@ -23,6 +12,39 @@ a stochastic nature and is represented by an ensemble of functions
 (realizations) for different values of some (possibly unknown) random
 parameters. The optimal solution is then determined by optimizing the value of a
 statistic, such as the mean, over the ensemble.
+
+`ropt` provides several features for efficiently solving complex robust
+optimization problems:
+
+- Robust optimization over an ensemble of models, i.e., optimizing the average
+  of a set of objective functions. Alternative objectives can be implemented
+  using plugins, for instance, to implement risk-aware optimization, such as
+  Conditional Value at Risk (CVaR) or standard-deviation-based functions.
+- Support for black-box optimization of arbitrary functions.
+- Support for running complex optimization workflows, such as multiple runs with
+  different optimization settings or even different optimization methods.
+- Support for nested optimization: an evaluation function can run an
+  optimization of its own — for example to optimize a sub-set of the
+  variables as part of a black-box function.
+- An interface for running various continuous and discrete optimization methods.
+  By default, optimizers from the
+  [`scipy.optimize`](https://docs.scipy.org/doc/scipy/tutorial/optimize.html)
+  package are included, but additional optimizers can be added via a plugin
+  mechanism. The most common options of these optimizers can be configured in a
+  uniform manner, although algorithm- or package-specific options can still be
+  passed.
+- Efficient estimation of gradients using a Stochastic Simplex Approximate
+  Gradient (StoSAG) approach. Additional samplers for generating perturbed
+  values for gradient estimation can be added via a plugin mechanism.
+- Support for linear and non-linear constraints, if supported by the chosen
+  optimizer.
+- Flexible configuration of the optimization process using
+  [`pydantic`](https://docs.pydantic.dev/).
+- Support for tracking and processing optimization results generated during the
+  optimization process.
+- Optional support for exporting results as
+  [`pandas`](https://pandas.pydata.org/) or [`polars`](https://pola.rs/) data
+  frames.
 
 `ropt` can be employed to construct optimization workflows directly in Python
 scripts or as a building block in optimization applications. At a minimum, the
@@ -42,44 +64,27 @@ the [Optimizer Setup](optimizer_setup/key_concepts.md) section. There are two op
 covering *how* to run a configured optimization:
 
 1. [Running Optimizations](running/running.md) is the recommended starting
-   point: a handful of functions cover most optimization tasks with very little
-   code.
-2. For full control — custom workflows, nested optimizations, or your own event
-   handling — the [Optimization Workflows](workflows/workflows.md) expose the
-   individual building blocks.
+   point: a single function call covers most optimization tasks, including
+   parallel evaluation across threads, processes, or an HPC cluster, custom
+   result handling, and running multiple optimization steps sequentially or
+   in parallel, possibly nested within each other.
+2. [Optimization Workflows](workflows/workflows.md) expose the individual
+   building blocks — compute steps, event handlers, executors — directly, for
+   full flexibility.
 
-`ropt` provides several features for efficiently solving complex robust
-optimization problems:
+## Getting started
 
-- Robust optimization over an ensemble of models, i.e., optimizing the average
-  of a set of objective functions. Alternative objectives can be implemented
-  using plugins, for instance, to implement risk-aware optimization, such as
-  Conditional Value at Risk (CVaR) or standard-deviation-based functions.
-- Support for black-box optimization of arbitrary functions.
-- Support for running complex optimization workflows, such as multiple runs with
-  different optimization settings or even different optimization methods.
-- Support for nested optimization, allowing sub-sets of the variables to be
-  optimized by optimization workflows that run as part of the black-box function
-  to be optimized.
-- An interface for running various continuous and discrete optimization methods.
-  By default, optimizers from the
-  [`scipy.optimize`](https://docs.scipy.org/doc/scipy/tutorial/optimize.html)
-  package are included, but additional optimizers can be added via a plugin
-  mechanism. The most common options of these optimizers can be configured in a
-  uniform manner, although algorithm- or package-specific options can still be
-  passed.
-- Efficient estimation of gradients using a Stochastic Simplex Approximate
-  Gradient (StoSAG) approach. Additional samplers for generating perturbed
-  values for gradient estimation can be added via a plugin mechanism.
-- Support for linear and non-linear constraints, if supported by the chosen
-  optimizer.
-- Flexible configuration of the optimization process using
-  [`pydantic`](https://docs.pydantic.dev/).
-- Support for tracking and processing optimization results generated during the
-  optimization process.
-- Optional support for exporting results as
-  [`pandas`](https://pandas.pydata.org/) data frames.
-
+- Read the [Background](getting_started/background.md) for the ideas behind
+  `ropt`, then work through [Installation](getting_started/installation.md) and
+  the [Quickstart](getting_started/quickstart.md).
+- [Running Optimizations](running/running.md) is the recommended starting point
+  for running an optimization and covers most cases.
+- The [Key Concepts](optimizer_setup/key_concepts.md) page introduces the terms used
+  throughout the documentation.
+- The [Tutorials](tutorials/index.md) show `ropt` in action through worked
+  examples.
+- The [Configuration](optimizer_setup/configuration.md) page describes the
+  configuration format in detail.
 
 ## Related packages
 

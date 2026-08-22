@@ -4,10 +4,17 @@ This page walks through a complete deterministic optimization with the simple
 API, one step at a time. The full runnable script is
 [examples/simple/optimize.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/optimize.py).
 
-We minimize the Rosenbrock function in five dimensions; its minimum is at all
-ones. The objective is *deterministic*: the same variables always produce the
-same value. [Ensemble-Based Optimization](ensemble.md) covers the case where the
-objective is uncertain.
+We minimize the Rosenbrock function in five dimensions; its minimum is where
+all five variables equal 1. The objective is *deterministic*: the same
+variables always produce the same value.
+[Ensemble-Based Optimization](ensemble.md) covers the case where the objective
+is uncertain.
+
+For a vector $\mathbf{x} = (x_1, \ldots, x_n)$, the (generalized) Rosenbrock
+function is:
+
+$$ f(\mathbf{x}) = \sum_{i=1}^{n-1} \left[ (1 - x_i)^2 + 100 \left( x_{i+1} -
+x_i^2 \right)^2 \right] $$
 
 ## 1. Describe the problem
 
@@ -37,7 +44,7 @@ values and returns the number to minimize:
 import numpy as np
 
 
-def rosenbrock(variables: np.ndarray, _) -> float:
+def rosenbrock(variables: np.ndarray, _context) -> float:
     objective = 0.0
     for i in range(DIM - 1):
         x, y = variables[i : i + 2]
@@ -56,15 +63,18 @@ first, then constraints) or attach metadata; see
 ## 3. Follow the progress (optional)
 
 To watch the run, write a small `report` function. It is called after every
-evaluation with an [`EvaluateResult`][ropt.simple.EvaluateResult]:
+evaluation with an [`EvaluateResult`][ropt.simple.EvaluateResult]. It can also
+stop the run early by returning `True`; see
+[Stopping early from the callback](../running/running.md#stopping-early-from-the-callback):
 
 ```python
 from ropt.simple import EvaluateResult
 
 
-def report(result: EvaluateResult) -> None:
+def report(result: EvaluateResult) -> bool | None:
     if result.target_objective is not None:
         print(f"  objective: {result.target_objective}")
+    return None  # returning True instead would stop the run early
 ```
 
 ## 4. Run it

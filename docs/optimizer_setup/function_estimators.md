@@ -68,48 +68,14 @@ Note:
 
 ## Writing a custom estimator
 
-Custom estimators are implemented as plugins. See the
-[`FunctionEstimator`][ropt.function_estimator.FunctionEstimator] base class for
-the interface you need to implement.
-
-A subclass must implement four methods:
-
-1. `__init__(estimator_config)` — store the configuration; keep setup
-   lightweight.
-2. `init(context)` — called once with the
-   [`EnOptContext`][ropt.context.EnOptContext] after configuration is
-   finalized. Validate settings (e.g., check compatibility with
-   `merge_realizations`) and pre-compute any state here.
-3. `calculate_function(functions, weights)` — aggregate per-realization
-   function values into a single representative value.
-    - `functions`: shape `(n_realizations,)`.
-    - `weights`: shape `(n_realizations,)`.
-    - Returns: a scalar or 1-D array.
-4. `calculate_gradient(functions, gradient, weights)` — aggregate
-   per-realization gradients into a single gradient vector.
-    - `functions`: shape `(n_realizations,)` — needed for chain-rule estimators.
-    - `gradient`: shape `(n_realizations, n_variables)` (or `(n_variables,)` when
-      `merge_realizations=True`).
-    - `weights`: shape `(n_realizations,)`.
-    - Returns: 1-D array of shape `(n_variables,)`.
-
-### The `merge_realizations` setting
-
-The [`GradientConfig.merge_realizations`][ropt.config.GradientConfig] flag
-controls how gradients are presented to the estimator:
-
-- `False` (default): `ropt` estimates a separate gradient per realization. The
-  estimator combines them using weights.
-- `True`: `ropt` estimates a single merged gradient from all perturbations
-  collectively. Suitable only for averaging-type estimators. If your estimator
-  is incompatible (e.g., `stddev` needs per-realization gradients), raise
-  `ValueError` from `init`.
-
-Registering the estimator with the plugin system is only required when it
-should be selectable via
-[`FunctionEstimatorConfig`][ropt.config.FunctionEstimatorConfig]. Otherwise,
-instances can be passed directly in the `function_estimators` field of
-[`EnOptContext`][ropt.context.EnOptContext].
+Custom estimators are plugins implementing the
+[`FunctionEstimator`][ropt.function_estimator.FunctionEstimator] base class,
+whose docstring documents the methods to implement, including how
+`merge_realizations` changes what `calculate_gradient` receives. Registering
+an estimator with the plugin system is only required when it should be
+selectable via [`FunctionEstimatorConfig`][ropt.config.FunctionEstimatorConfig];
+otherwise, an instance can be passed directly in the `function_estimators`
+field of [`EnOptContext`][ropt.context.EnOptContext].
 
 ## Where to next
 

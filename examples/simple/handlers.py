@@ -1,8 +1,11 @@
-"""Aggregate results across runs with shared handlers.
+"""Aggregate results from concurrent runs with shared handler groups.
 
-A group built with ``shared_handlers()`` owns result handlers that aggregate
-across every run given the group, sequential or concurrent. A run may feed
-several groups at once, and mix them with handlers of its own.
+A local handler belongs to one run at a time, so it cannot safely collect
+results from optimizations that run concurrently -- the runs of
+``optimize_many``. A group built with ``shared_handlers()`` can: it routes
+every run's results through one dispatcher, so several concurrent runs can
+feed it safely. A run may feed several groups at once, for different
+purposes.
 """
 
 from typing import Any
@@ -13,7 +16,7 @@ from numpy.typing import NDArray
 from ropt.simple import (
     EvaluationFunctionContext,
     HistoryHandler,
-    optimize,
+    optimize_many,
     session,
 )
 
@@ -25,7 +28,7 @@ CONFIG: dict[str, Any] = {
     },
 }
 INITIAL_VALUES = 2 * np.arange(DIM) / DIM + 0.5
-STARTS = np.array([INITIAL_VALUES, INITIAL_VALUES + 0.1])
+STARTS = np.array([INITIAL_VALUES, INITIAL_VALUES + 0.1, INITIAL_VALUES - 0.1])
 
 
 def rosenbrock(
@@ -47,26 +50,21 @@ def rosenbrock(
 
 
 def main() -> None:
-    """Aggregate across a loop of runs, then feed two groups at once."""
+    """Collect every result from concurrent runs, in two groups at once."""
     history = HistoryHandler()
+    per_run = HistoryHandler()
     with session() as active:
+        pool = active.thread_pool(workers=len(STARTS))
         shared = active.shared_handlers(history)
-        for start in STARTS:
-            optimize(CONFIG, start, rosenbrock, handlers=[shared])
-    print(f"aggregated results across {len(STARTS)} runs: {len(history['results'])}")
+        tagged = active.shared_handlers(per_run)
+        optimize_many(CONFIG, STARTS, rosenbrock, pool=pool, handlers=[shared, tagged])
+    print(
+        f"collected results across {len(STARTS)} concurrent runs: "
+        f"{len(history['results'])}"
+    )
     assert history["results"]
-
-    # A run feeds every group it is given, so several groups can collect the
-    # same run for different purposes.
-    per_project = HistoryHandler()
-    per_case = HistoryHandler()
-    with session() as active:
-        project = active.shared_handlers(per_project)
-        case = active.shared_handlers(per_case)
-        optimize(CONFIG, INITIAL_VALUES, rosenbrock, handlers=[project, case])
-    assert per_project["results"]
-    assert per_case["results"]
-    assert len(per_project["results"]) == len(per_case["results"])
+    assert per_run["results"]
+    assert len(history["results"]) == len(per_run["results"])
 
 
 if __name__ == "__main__":

@@ -13,13 +13,14 @@ call: one optimization run, one evaluator, results returned when it finishes. Th
 workflow components documented here are the layer beneath it — the same building
 blocks the simple API is assembled from, exposed directly.
 
-**When to use them.** Reach for the workflow components when the single-run model
-of the simple API is too rigid: to chain several optimizers, nest optimizations
-inside one another, react to results as they arrive through custom event
-handlers, or drive evaluations across threads, processes, or an HPC cluster.
-Wiring a workflow together by hand takes more code, but that code is where the
-extra flexibility lives — these components can express applications the simple
-API cannot.
+**When to use them.** Parallel execution, nested optimization, composing
+several runs, and custom event handlers are all already available through the
+simple API's convenience functions (`optimize`, `optimize_many`, `evaluate`,
+`evaluate_many`). The workflow components are the underlying building blocks
+those functions are assembled from — compute steps, event handlers, executors
+— exposed directly for full flexibility. Wiring one together by hand takes
+more code, but that code is where the extra flexibility lives: these
+components can express applications the simple API cannot.
 
 **Who this is for.** This is the low-level API, and it assumes you are
 comfortable with `asyncio` and threads. Parallel execution runs on an event
@@ -28,6 +29,17 @@ responsible for respecting the concurrency and process-boundary rules spelled ou
 on these pages. Those rules are real limitations, not incidental detail: ignore
 them and a workflow will raise rather than silently misbehave. In return you get
 control that the simple API deliberately hides.
+
+!!! note "Embedding `ropt` in a host application"
+
+    If you are building an application that already has its own batch-oriented
+    evaluation infrastructure — for example dispatching a whole ensemble of
+    runs to an external scheduler at once, the way [Everest](https://github.com/equinor/everest)
+    does — assembling these components by hand is not the only option.
+    [`BasicOptimizer`][ropt.workflow.BasicOptimizer] wraps a single
+    `OptimizationStep` and a `ResultsHandler` into a ready-made, run-once driver
+    that takes a batch evaluator directly. See the
+    [reference](../reference/basic_optimizer.md) for details.
 
 There are four core workflow components:
 
@@ -232,7 +244,7 @@ method. Once attached, the handler receives every event the step emits.
 The built-in [`ResultsHandler`][ropt.components.event_handlers.ResultsHandler],
 [`HistoryHandler`][ropt.components.event_handlers.HistoryHandler], and
 [`DataFrameHandler`][ropt.components.event_handlers.DataFrameHandler] are the same
-objects you meet in [Running Optimizations](../running/running.md#built-in-handlers),
+objects you meet in [Result Handlers](../running/handlers.md#built-in-handlers),
 where they are described in full — there they are attached with
 `optimize(handlers=...)`, here with `add_event_handler`, and they behave
 identically. This section covers the underlying event model and the handlers
@@ -319,7 +331,7 @@ The result-collecting built-ins —
 [`ResultsHandler`][ropt.components.event_handlers.ResultsHandler],
 [`HistoryHandler`][ropt.components.event_handlers.HistoryHandler], and
 [`DataFrameHandler`][ropt.components.event_handlers.DataFrameHandler] — are
-described in full in [Running Optimizations](../running/running.md#built-in-handlers).
+described in full in [Result Handlers](../running/handlers.md#built-in-handlers).
 They expose their state through dictionary access (`handler[key]`);
 `ResultsHandler` and `HistoryHandler` use the key `"results"`, while
 `DataFrameHandler` uses the table name. At this level each also accepts a

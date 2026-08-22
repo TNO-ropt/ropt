@@ -8,7 +8,7 @@ explicitly enables them.
 
 Logging gives a human-readable *trace* of a run. To *react* to results
 programmatically — collect them, tabulate them, or stop early — use
-[result handlers](../running/running.md#result-handlers) instead.
+[result handlers](../running/handlers.md#result-handlers) instead.
 
 ## Logger hierarchy
 
@@ -17,15 +17,22 @@ public package path:
 
 ```
 ropt
+├── ropt.backend                         ← backend-specific messages (SciPy, external)
 ├── ropt.components
-│   └── ropt.components.compute_steps    ← OptimizationStep, EvaluationStep
-├── ropt.core                          ← EnsembleOptimizer, EnsembleEvaluator
-└── ropt.plugins
-    └── ropt.plugins.manager           ← PluginManager
+│   ├── ropt.components.compute_steps    ← OptimizationStep, EvaluationStep
+│   ├── ropt.components.evaluators       ← CachedEvaluator, ParallelEvaluator
+│   ├── ropt.components.event_handlers   ← ResultsHandler
+│   └── ropt.components.executors        ← Threading/Multiprocessing/HPCExecutor
+├── ropt.core                            ← EnsembleOptimizer, EnsembleEvaluator
+├── ropt.plugins
+│   └── ropt.plugins.manager             ← PluginManager
+└── ropt.workflow                        ← dispatch_tasks
 ```
 
 This means you can enable logging for the entire library by configuring the
-`ropt` logger, or limit output to a sub-tree such as `ropt.core`.
+`ropt` logger, or limit output to a sub-tree such as `ropt.core` or
+`ropt.components.executors` (useful when debugging HPC job submission without
+the noise of per-batch statistics).
 
 ## What is logged
 
@@ -36,30 +43,58 @@ These messages tell you what the optimization is doing at a human level.
 | Source | Example message |
 |--------|----------------|
 | `OptimizationStep`  | `Starting optimization` |
-| `OptimizationStep`  | `Optimization finished: Optimization finished successfully` |
+| `OptimizationStep`  | `Optimization finished: OPTIMIZER_FINISHED` (the [`ExitCode`][ropt.enums.ExitCode] name) |
 | `EvaluationStep`    | `Starting evaluation` |
-| `EvaluationStep`    | `Evaluation finished: Ensemble evaluation finished successfully` |
+| `EvaluationStep`    | `Evaluation finished` |
 | `EnsembleOptimizer` | `Stopping: Maximum number of function evaluations reached (500)` |
-| `EnsembleOptimizer` | `Stopping: Too few realizations were evaluated successfully` |
+| `EnsembleOptimizer` | `Stopping: Maximum number of evaluation batches reached (50)` |
 | `EnsembleEvaluator` | `Function evaluation: 9/10 realizations succeeded` |
 | `EnsembleEvaluator` | `Gradient evaluation: 8/10 realizations succeeded` |
+| `ResultsHandler`    | `New best objective: 1.23456` |
+| `HPCExecutor`       | `Starting HPC executor (4 max workers, 1.0s poll interval)` |
+| `external` (backend) | `Starting external optimization in subprocess` |
 
 The batch statistics after each evaluation are especially useful for monitoring
-realization failures without having to write a custom event handler.
+realization failures without having to write a custom event handler. Note that
+a run stopped by [`TooFewRealizations`][ropt.exceptions.TooFewRealizations]
+(exit code `TOO_FEW_REALIZATIONS`) logs no separate "stopping" message of its
+own — only the final `Optimization finished: TOO_FEW_REALIZATIONS` line.
 
-### `DEBUG` — per-callback trace
+### `WARNING` — recoverable problems
 
-These messages are emitted once per optimizer callback invocation and are
-useful for detailed diagnostics. They can be **verbose**: a gradient-based
-optimizer typically calls the evaluation callback once for functions and once
-for gradients per iteration.
+These signal something went wrong that `ropt` could recover from (a retry, a
+dropped job, a lost worker) — usually worth surfacing even when you otherwise
+run at `INFO` or above.
 
 | Source | Example message |
 |--------|----------------|
-| `EnsembleOptimizer` | `Optimizer callback: requesting functions` |
-| `EnsembleOptimizer` | `Optimizer callback: requesting gradients` |
-| `EnsembleOptimizer` | `Optimizer callback: requesting functions and gradients` |
-| `PluginManager`     | `Registering plugin: backend/scipy` |
+| `HPCExecutor`               | `HPC work item <id> failed: output file never appeared` |
+| `HPCExecutor`               | `HPC work item <id> failed: no valid result after 30 retries` |
+| `HPCExecutor`               | `Querying the HPC scheduler failed (2/31): <error>` |
+| `HPCExecutor`               | `Could not cancel HPC job <id> (job id: <job>): <error>` |
+| `MultiprocessingExecutor`   | `Worker process pool broken; work item result lost` |
+| `external` (backend)        | `External backend subprocess died unexpectedly (exit code <code>)` |
+
+### `DEBUG` — per-callback and per-task trace
+
+These messages are emitted once per optimizer callback invocation, or once per
+dispatched task, and are useful for detailed diagnostics. They can be
+**verbose**: a gradient-based optimizer typically calls the evaluation
+callback once for functions and once for gradients per iteration.
+
+| Source | Example message |
+|--------|----------------|
+| `EnsembleOptimizer`         | `Optimizer callback: requesting functions` |
+| `EnsembleOptimizer`         | `Optimizer callback: requesting gradients` |
+| `EnsembleOptimizer`         | `Optimizer callback: requesting functions and gradients` |
+| `PluginManager`             | `Registering plugin: backend/scipy` |
+| `scipy` (backend)           | `Using SciPy optimizer: SLSQP` |
+| `ThreadingExecutor`         | `Starting threading executor with 4 worker(s)` |
+| `MultiprocessingExecutor`   | `Starting multiprocessing executor with 4 worker(s)` |
+| `HPCExecutor`               | `Submitted HPC job <id> (job id: <job>)` |
+| `ParallelEvaluator`         | `Dispatching 10 work item(s) to executor` |
+| `CachedEvaluator`           | `Cache: 4/10 evaluations served from cache` |
+| `dispatch_tasks`            | `Dispatching 8 work item(s) via multiprocessing executor (4 worker(s))` |
 
 ## Enabling logging
 
@@ -166,3 +201,11 @@ ropt_logger.addHandler(console)
 ropt_logger.addHandler(file_handler)
 ropt_logger.propagate = False
 ```
+
+## Where to next
+
+- React to results programmatically instead of just tracing them:
+  [Result Handlers](../running/handlers.md).
+- HPC job submission, polling, and retries in depth:
+  [Parallel Evaluation](../workflows/parallel.md).
+- Query installed plugins at runtime: [Plugin Discovery](plugin_discovery.md).

@@ -16,6 +16,8 @@ These use the [simple API](../running/running.md) and are the best place to star
 - [Constrained Optimization](constrained.md) — add constraints.
 - [Mixed-Integer Optimization](discrete.md) — integer variables with
   differential evolution.
+- [Restarting from the Best Point](restart.md) — restart from the previous
+  best point, collecting every result with a handler.
 
 ## Low-level API
 

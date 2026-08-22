@@ -29,6 +29,7 @@ config = {
 
 # 2. The objective: the value to minimize.
 def objective(variables, context):
+    # `context` identifies which evaluation this is; not needed here.
     return float(np.sum((variables - 1.0) ** 2))
 
 
@@ -54,7 +55,7 @@ Every `ropt` optimization needs three things:
    [Running Optimizations](../running/running.md#the-evaluation-function).
 3. **A start point** — the variable values to start from.
 
-[`optimize`][ropt.simple.optimize] wires these together, runs the optimization,
+[`optimize`][ropt.simple.optimize] combines these three, runs the optimization,
 and returns an [`OptimizeResult`][ropt.simple.OptimizeResult] with the best
 values it found.
 

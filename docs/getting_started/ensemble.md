@@ -14,6 +14,20 @@ Minimizing the average yields a solution that performs well across the whole set
 rather than for one particular case. We minimize the Rosenbrock function again,
 but now its two coefficients vary between realizations.
 
+For realization $i$, with coefficients $a_i$ and $b_i$, the per-realization
+objective is:
+
+$$ f_i(\mathbf{x}) = \sum_{k=1}^{n-1} \left[ (a_i - x_k)^2 + b_i \left(
+x_{k+1} - x_k^2 \right)^2 \right] $$
+
+which reduces to the deterministic Rosenbrock function when $a_i = 1$ and
+$b_i = 100$ for every realization. `ropt` combines the realizations into the
+robust objective:
+
+$$ f(\mathbf{x}) = \sum_i w_i f_i(\mathbf{x}), $$
+
+with weights $w_i$ that we set in the configuration below.
+
 ## 1. Describe the problem
 
 The config adds a `realizations` section next to the variables. The `weights`
@@ -102,11 +116,13 @@ print(f"optimal objective: {result.target_objective}")
 ```
 
 Because the coefficients are centered on the deterministic values, the robust
-optimum still lies near all ones — but it minimizes the *average* over the
-uncertain coefficients rather than any single realization.
+optimum still lies close to where all variables equal 1 — but it minimizes the
+*average* over the uncertain coefficients rather than any single realization.
 
 ## Where to next
 
+- Collect every result, not just the best one:
+  [Collecting Results with Handlers](handlers.md).
 - The complete simple API: [Running Optimizations](../running/running.md).
 - All realization settings: [Configuration](../optimizer_setup/configuration.md).
 - The ideas and terms behind ensembles:
