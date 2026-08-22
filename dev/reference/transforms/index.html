@@ -5084,6 +5084,8 @@ supported.</p>
     <div class="doc doc-contents ">
 
         <p>Update internal state mid-run (optional).</p>
+<p>Override to support runtime parameter changes when values are not
+known at initialization.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -5503,6 +5505,8 @@ supported.</p>
     <div class="doc doc-contents ">
 
         <p>Update internal state mid-run (optional).</p>
+<p>Override to support runtime parameter changes when values are not
+known at initialization.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -6129,6 +6133,9 @@ are divided by scale, magnitudes should be too).</p>
         <p>Transform linear constraint coefficients and bounds to optimizer domain.</p>
 <p>Adjusts the coefficient matrix and RHS bounds so that linear constraints
 remain valid after the variable transformation.</p>
+<p>Overriding this method is optional: implement it only if the transform
+must support linear constraints. The base implementation raises
+<code>NotImplementedError</code>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -6217,6 +6224,30 @@ remain valid after the variable transformation.</p>
     </table>
 
 
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#NotImplementedError">NotImplementedError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the transform does not support linear
+constraints.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
     </div>
 
 </div>
@@ -6244,6 +6275,9 @@ remain valid after the variable transformation.</p>
 
         <p>Transform linear-constraint-violation differences to user domain.</p>
 <p>Used for reporting constraint violations in user-domain units.</p>
+<p>Overriding this method is optional: implement it only if the transform
+must support linear constraints. The base implementation raises
+<code>NotImplementedError</code>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -6309,6 +6343,30 @@ remain valid after the variable transformation.</p>
             <td>
               <div class="doc-md-description">
                 <p>Tuple of (lower_diffs, upper_diffs) in user domain.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#NotImplementedError">NotImplementedError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the transform does not support linear
+constraints.</p>
               </div>
             </td>
           </tr>
@@ -6979,6 +7037,9 @@ are divided by scale, magnitudes should be too).</p>
         <p>Transform linear constraint coefficients and bounds to optimizer domain.</p>
 <p>Adjusts the coefficient matrix and RHS bounds so that linear constraints
 remain valid after the variable transformation.</p>
+<p>Overriding this method is optional: implement it only if the transform
+must support linear constraints. The base implementation raises
+<code>NotImplementedError</code>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -7067,6 +7128,30 @@ remain valid after the variable transformation.</p>
     </table>
 
 
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#NotImplementedError">NotImplementedError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the transform does not support linear
+constraints.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
     </div>
 
 </div>
@@ -7094,6 +7179,9 @@ remain valid after the variable transformation.</p>
 
         <p>Transform linear-constraint-violation differences to user domain.</p>
 <p>Used for reporting constraint violations in user-domain units.</p>
+<p>Overriding this method is optional: implement it only if the transform
+must support linear constraints. The base implementation raises
+<code>NotImplementedError</code>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -7159,6 +7247,30 @@ remain valid after the variable transformation.</p>
             <td>
               <div class="doc-md-description">
                 <p>Tuple of (lower_diffs, upper_diffs) in user domain.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#NotImplementedError">NotImplementedError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the transform does not support linear
+constraints.</p>
               </div>
             </td>
           </tr>
@@ -7605,6 +7717,8 @@ supported.</p>
     <div class="doc doc-contents ">
 
         <p>Update internal state mid-run (optional).</p>
+<p>Override to support runtime parameter changes when values are not
+known at initialization.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -8229,6 +8343,8 @@ supported.</p>
     <div class="doc doc-contents ">
 
         <p>Update internal state mid-run (optional).</p>
+<p>Override to support runtime parameter changes when values are not
+known at initialization.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>

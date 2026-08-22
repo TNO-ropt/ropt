@@ -1079,45 +1079,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Writing a custom transform">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#lifecycle" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Lifecycle
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#variabletransform-methods" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        VariableTransform methods
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#objectivetransform-nonlinearconstrainttransform-methods" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        ObjectiveTransform / NonlinearConstraintTransform methods
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
       
         <li class="md-nav__item">
@@ -2989,45 +2950,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Writing a custom transform">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#lifecycle" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Lifecycle
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#variabletransform-methods" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        VariableTransform methods
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#objectivetransform-nonlinearconstrainttransform-methods" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        ObjectiveTransform / NonlinearConstraintTransform methods
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
       
         <li class="md-nav__item">
@@ -3218,64 +3140,13 @@ values (including bound/constraint violation differences).</p>
   stored result lives in.</li>
 </ul>
 <h2 id="writing-a-custom-transform">Writing a custom transform</h2>
-<p>Custom transforms are plugins; see the base classes listed under
-<a href="../../reference/plugin_bases/">Reference / Plugin Bases</a>.</p>
-<h3 id="lifecycle">Lifecycle</h3>
-<p>All three transform types follow the same lifecycle:</p>
-<ol>
-<li><code>__init__(transform_config)</code> — store configuration (scales, offsets, etc.).</li>
-<li><code>init(mask)</code> — called once at context initialization with a boolean mask.
-   For variables the mask is <code>free AND assigned-to-this-transform</code>; for
-   objectives/constraints it is <code>assigned-to-this-transform</code>. Implementations
-   must ensure that unmasked elements pass through unchanged (e.g., set
-   scale=1, offset=0 for those positions).</li>
-<li><code>to_optimizer(values)</code> / <code>from_optimizer(values)</code> — called repeatedly to
-   map values between domains.</li>
-<li><code>update(*args, **kwargs)</code> (optional) — update internal state mid-run when
-   parameters are not known at initialization.</li>
-</ol>
-<h3 id="variabletransform-methods">VariableTransform methods</h3>
-<p><a class="autorefs autorefs-internal" title="            VariableTransform" href="../../reference/transforms/#ropt.transforms.VariableTransform"><code>VariableTransform</code></a> is the most involved
-because variables interact with bounds and constraints. Beyond <code>to_optimizer</code>
-and <code>from_optimizer</code>, implementations must also provide:</p>
-<table>
-<thead>
-<tr>
-<th>Method</th>
-<th>Purpose</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>magnitudes_to_optimizer</code></td>
-<td>Scale perturbation magnitudes consistently with the variable transform.</td>
-</tr>
-<tr>
-<td><code>bound_constraint_diffs_from_optimizer</code></td>
-<td>Map bound-violation differences back to user domain for reporting.</td>
-</tr>
-<tr>
-<td><code>linear_constraints_to_optimizer</code></td>
-<td>Transform the coefficient matrix and RHS bounds so linear constraints remain valid.</td>
-</tr>
-<tr>
-<td><code>linear_constraints_diffs_from_optimizer</code></td>
-<td>Map linear-constraint-violation differences back to user domain.</td>
-</tr>
-</tbody>
-</table>
-<p>All value arrays use the last axis for the element dimension; if the array
-layout differs, reorder axes before and after calling the transform.</p>
-<h3 id="objectivetransform-nonlinearconstrainttransform-methods">ObjectiveTransform / NonlinearConstraintTransform methods</h3>
-<p><a class="autorefs autorefs-internal" title="            ObjectiveTransform" href="../../reference/transforms/#ropt.transforms.ObjectiveTransform"><code>ObjectiveTransform</code></a> requires only
-<code>to_optimizer</code> and <code>from_optimizer</code>.</p>
-<p><a class="autorefs autorefs-internal" title="            NonlinearConstraintTransform" href="../../reference/transforms/#ropt.transforms.NonlinearConstraintTransform"><code>NonlinearConstraintTransform</code></a>
-additionally requires:</p>
-<ul>
-<li><code>bounds_to_optimizer</code> — transform constraint RHS bounds to optimizer domain.</li>
-<li><code>nonlinear_constraint_diffs_from_optimizer</code> — map violation differences back
-  to user domain.</li>
-</ul>
+<p>Custom transforms are plugins implementing one of the three base classes —
+<a class="autorefs autorefs-internal" title="            VariableTransform" href="../../reference/transforms/#ropt.transforms.VariableTransform"><code>VariableTransform</code></a>,
+<a class="autorefs autorefs-internal" title="            ObjectiveTransform" href="../../reference/transforms/#ropt.transforms.ObjectiveTransform"><code>ObjectiveTransform</code></a>, or
+<a class="autorefs autorefs-internal" title="            NonlinearConstraintTransform" href="../../reference/transforms/#ropt.transforms.NonlinearConstraintTransform"><code>NonlinearConstraintTransform</code></a>
+— whose docstrings document the lifecycle and the methods to implement.
+<code>VariableTransform</code> is the most involved, since variables also interact with
+bounds and linear constraints.</p>
 <h2 id="where-to-next">Where to next</h2>
 <ul>
 <li><a href="../realization_filters/">Realization Filters</a> — also configured via

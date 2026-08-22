@@ -3055,22 +3055,12 @@ side when the optimizer requests gradients separately from functions. Set
 <code>gradient.evaluation_policy = "separate"</code> (see
 <a href="../gradients/">Stochastic Gradients</a>) to maximize that benefit.</p>
 <h2 id="writing-a-custom-filter">Writing a custom filter</h2>
-<p>Custom filters are implemented as plugins. See the
-<a class="autorefs autorefs-internal" title="            ropt.realization_filter.RealizationFilter" href="../../reference/realization_filter/#ropt.realization_filter.RealizationFilter"><code>RealizationFilter</code></a> base class.</p>
-<p>A filter subclass must implement three methods:</p>
-<ol>
-<li><code>__init__(filter_config)</code> — store the configuration; keep setup lightweight.</li>
-<li><code>init(context)</code> — called once with the
-   <a class="autorefs autorefs-internal" title="            EnOptContext" href="../../reference/context/#ropt.context.EnOptContext"><code>EnOptContext</code></a> after all configuration is
-   finalized. Perform validation and precomputation here.</li>
-<li><code>get_realization_weights(objectives, constraints)</code> — called at each
-   evaluation. Return a 1-D array of non-negative weights (one per
-   realization).</li>
-</ol>
-<p>Registering a filter with the plugin system is only required when the filter
-should be selectable via
-<a class="autorefs autorefs-internal" title="            RealizationFilterConfig" href="../../reference/config/#ropt.config.RealizationFilterConfig"><code>RealizationFilterConfig</code></a>. Otherwise,
-filter instances can be passed directly in the <code>realization_filters</code> field of
+<p>Custom filters are plugins implementing the
+<a class="autorefs autorefs-internal" title="            ropt.realization_filter.RealizationFilter" href="../../reference/realization_filter/#ropt.realization_filter.RealizationFilter"><code>RealizationFilter</code></a> base class,
+whose docstring documents the methods to implement. Registering a filter with
+the plugin system is only required when it should be selectable via
+<a class="autorefs autorefs-internal" title="            RealizationFilterConfig" href="../../reference/config/#ropt.config.RealizationFilterConfig"><code>RealizationFilterConfig</code></a>; otherwise, an
+instance can be passed directly in the <code>realization_filters</code> field of
 <a class="autorefs autorefs-internal" title="            EnOptContext" href="../../reference/context/#ropt.context.EnOptContext"><code>EnOptContext</code></a>.</p>
 <h2 id="where-to-next">Where to next</h2>
 <ul>

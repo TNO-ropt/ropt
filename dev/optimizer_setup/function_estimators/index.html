@@ -990,23 +990,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Writing a custom estimator">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#the-merge_realizations-setting" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        The merge_realizations setting
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
       
         <li class="md-nav__item">
@@ -2845,23 +2828,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Writing a custom estimator">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#the-merge_realizations-setting" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        The merge_realizations setting
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
       
         <li class="md-nav__item">
@@ -2952,50 +2918,14 @@ entirely when weighted-average aggregation is all you need.</p>
   per-realization gradients must be available.</li>
 </ul>
 <h2 id="writing-a-custom-estimator">Writing a custom estimator</h2>
-<p>Custom estimators are implemented as plugins. See the
-<a class="autorefs autorefs-internal" title="            ropt.function_estimator.FunctionEstimator" href="../../reference/function_estimator/#ropt.function_estimator.FunctionEstimator"><code>FunctionEstimator</code></a> base class for
-the interface you need to implement.</p>
-<p>A subclass must implement four methods:</p>
-<ol>
-<li><code>__init__(estimator_config)</code> — store the configuration; keep setup
-   lightweight.</li>
-<li><code>init(context)</code> — called once with the
-   <a class="autorefs autorefs-internal" title="            EnOptContext" href="../../reference/context/#ropt.context.EnOptContext"><code>EnOptContext</code></a> after configuration is
-   finalized. Validate settings (e.g., check compatibility with
-   <code>merge_realizations</code>) and pre-compute any state here.</li>
-<li><code>calculate_function(functions, weights)</code> — aggregate per-realization
-   function values into a single representative value.<ul>
-<li><code>functions</code>: shape <code>(n_realizations,)</code>.</li>
-<li><code>weights</code>: shape <code>(n_realizations,)</code>.</li>
-<li>Returns: a scalar or 1-D array.</li>
-</ul>
-</li>
-<li><code>calculate_gradient(functions, gradient, weights)</code> — aggregate
-   per-realization gradients into a single gradient vector.<ul>
-<li><code>functions</code>: shape <code>(n_realizations,)</code> — needed for chain-rule estimators.</li>
-<li><code>gradient</code>: shape <code>(n_realizations, n_variables)</code> (or <code>(n_variables,)</code> when
-  <code>merge_realizations=True</code>).</li>
-<li><code>weights</code>: shape <code>(n_realizations,)</code>.</li>
-<li>Returns: 1-D array of shape <code>(n_variables,)</code>.</li>
-</ul>
-</li>
-</ol>
-<h3 id="the-merge_realizations-setting">The <code>merge_realizations</code> setting</h3>
-<p>The <a class="autorefs autorefs-internal" title="            GradientConfig" href="../../reference/config/#ropt.config.GradientConfig"><code>GradientConfig.merge_realizations</code></a> flag
-controls how gradients are presented to the estimator:</p>
-<ul>
-<li><code>False</code> (default): <code>ropt</code> estimates a separate gradient per realization. The
-  estimator combines them using weights.</li>
-<li><code>True</code>: <code>ropt</code> estimates a single merged gradient from all perturbations
-  collectively. Suitable only for averaging-type estimators. If your estimator
-  is incompatible (e.g., <code>stddev</code> needs per-realization gradients), raise
-  <code>ValueError</code> from <code>init</code>.</li>
-</ul>
-<p>Registering the estimator with the plugin system is only required when it
-should be selectable via
-<a class="autorefs autorefs-internal" title="            FunctionEstimatorConfig" href="../../reference/config/#ropt.config.FunctionEstimatorConfig"><code>FunctionEstimatorConfig</code></a>. Otherwise,
-instances can be passed directly in the <code>function_estimators</code> field of
-<a class="autorefs autorefs-internal" title="            EnOptContext" href="../../reference/context/#ropt.context.EnOptContext"><code>EnOptContext</code></a>.</p>
+<p>Custom estimators are plugins implementing the
+<a class="autorefs autorefs-internal" title="            ropt.function_estimator.FunctionEstimator" href="../../reference/function_estimator/#ropt.function_estimator.FunctionEstimator"><code>FunctionEstimator</code></a> base class,
+whose docstring documents the methods to implement, including how
+<code>merge_realizations</code> changes what <code>calculate_gradient</code> receives. Registering
+an estimator with the plugin system is only required when it should be
+selectable via <a class="autorefs autorefs-internal" title="            FunctionEstimatorConfig" href="../../reference/config/#ropt.config.FunctionEstimatorConfig"><code>FunctionEstimatorConfig</code></a>;
+otherwise, an instance can be passed directly in the <code>function_estimators</code>
+field of <a class="autorefs autorefs-internal" title="            EnOptContext" href="../../reference/context/#ropt.context.EnOptContext"><code>EnOptContext</code></a>.</p>
 <h2 id="where-to-next">Where to next</h2>
 <ul>
 <li>Filter realizations before aggregation:

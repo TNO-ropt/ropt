@@ -3276,7 +3276,11 @@ Context-dependent setup belongs in <code>init</code>.</p>
 <p>When <code>merge_realizations</code> is <code>False</code> (default), <code>gradient</code> has shape
 <code>(n_realizations, n_variables)</code> and must be combined using <code>weights</code>.
 When <code>True</code>, a single pre-merged gradient of shape <code>(n_variables,)</code> is
-passed. Incompatible estimators should raise <code>ValueError</code> from <code>init</code>.</p>
+passed instead — suitable only for estimators that aggregate by a
+simple weighted combination (e.g. the mean). Estimators that need each
+realization's own gradient (e.g. standard deviation, via the chain
+rule) are incompatible with merging and should raise <code>ValueError</code> from
+<code>init</code>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
