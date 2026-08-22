@@ -1166,6 +1166,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#when-something-goes-wrong" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        When something goes wrong
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#optimizing-over-an-ensemble" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1512,6 +1523,34 @@
     
   
     Plugin Discovery
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../utilities/writing_plugins/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Writing a Plugin
   
 
     
@@ -2965,6 +3004,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#when-something-goes-wrong" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        When something goes wrong
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#optimizing-over-an-ensemble" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3222,6 +3272,48 @@ optimizer. Use <a class="autorefs autorefs-internal" title="            ropt.sim
   " href="../../reference/simple/#ropt.simple.EvaluateResult"><code>EvaluateResult</code></a> has the same fields as
 <code>OptimizeResult</code>, minus <code>exit_code</code> and <code>variables</code> (you supplied the point
 yourself; it is still on <code>result.results.evaluations.variables</code>).</p>
+<h2 id="when-something-goes-wrong">When something goes wrong</h2>
+<p>Not every problem is an exception. An optimization that cannot make progress
+still returns normally, and says why in <code>result.exit_code</code>:
+<code>TOO_FEW_REALIZATIONS</code> when not enough realizations produced a value,
+<code>EXECUTOR_STOPPED</code> when the pool it was evaluating on was closed under it. In
+both cases the result fields are <code>None</code>, so check <code>exit_code</code> before using
+them. A plain <a class="autorefs autorefs-internal" title="            ropt.simple.evaluate" href="../../reference/simple/#ropt.simple.evaluate"><code>evaluate</code></a> has no <code>exit_code</code>; there the
+<code>None</code> fields are the only sign that nothing usable came back.</p>
+<p>What <em>is</em> raised falls into three groups:</p>
+<ul>
+<li>
+<p><strong>Mistakes in the configuration</strong> surface as a <code>pydantic.ValidationError</code>
+  from the <code>config</code> dictionary: an unknown field, a value of the wrong type, a
+  method name no installed plugin provides, or a set of options the chosen
+  method does not accept. These are raised at the start of the call, before
+  anything is evaluated.</p>
+</li>
+<li>
+<p><strong>Mistakes in the call itself</strong> raise a <code>ValueError</code> — a start point of the
+  wrong shape, an evaluation function returning the wrong number of values —
+  or one of the <a class="autorefs autorefs-internal" title="            RoptError" href="../../reference/exceptions/#ropt.exceptions.RoptError"><code>RoptError</code></a> types:
+  <a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a> when a pool or handler is
+  used in a way it cannot be (a closed pool, a handler already claimed by
+  another run),
+  <a class="autorefs autorefs-internal" title="            UnsupportedError" href="../../reference/exceptions/#ropt.exceptions.UnsupportedError"><code>UnsupportedError</code></a> when an optional
+  dependency is missing, or when the chosen method cannot handle the problem
+  as configured — a constraint it does not support, for instance, which is
+  checked as the run starts — and
+  <a class="autorefs autorefs-internal" title="            ExecutionError" href="../../reference/exceptions/#ropt.exceptions.ExecutionError"><code>ExecutionError</code></a> when the machinery that
+  runs the evaluations cannot start or breaks down.</p>
+</li>
+<li>
+<p><strong>Exceptions from your own evaluation function</strong> are not caught. They travel
+  back from wherever the evaluation ran — including a worker thread or process
+  — and are re-raised from the <code>optimize</code> call. Return <code>float("nan")</code> instead
+  if a failed realization should be tolerated rather than fatal.</p>
+</li>
+</ul>
+<p>Catching <a class="autorefs autorefs-internal" title="            RoptError" href="../../reference/exceptions/#ropt.exceptions.RoptError"><code>RoptError</code></a> catches all of <code>ropt</code>'s own
+errors at once. It deliberately does not cover the first and third groups:
+configuration errors belong to pydantic, and errors from your evaluation
+function stay whatever you raised.</p>
 <h2 id="optimizing-over-an-ensemble">Optimizing over an ensemble</h2>
 <p>Many problems are uncertain: the objective depends on parameters that vary
 across a set of <em>realizations</em>. You add a <code>realizations</code> section to the config

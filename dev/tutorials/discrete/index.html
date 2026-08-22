@@ -1370,6 +1370,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../utilities/writing_plugins/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Writing a Plugin
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -2920,7 +2948,10 @@ integer-valued. The <code>backend</code> section chooses the differential evolut
 </span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>    <span class="p">},</span>
 </span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="p">}</span>
 </span></code></pre></div>
-<p><code>VariableType</code> comes from <code>ropt.enums</code>, not from <code>ropt.simple</code>.</p>
+<p><code>VariableType</code> comes from <code>ropt.enums</code>, not from <code>ropt.simple</code>. The method
+matters here: <code>differential_evolution</code> is the only SciPy method that handles
+integer variables (see <a class="autorefs autorefs-internal" title="            ropt.backend.scipy.SciPyBackend" href="../../reference/backend/#ropt.backend.scipy.SciPyBackend"><code>SciPyBackend</code></a>), and
+it requires bounds on every variable.</p>
 <h2 id="add-the-constraint">Add the constraint</h2>
 <p>The problem keeps <code>x + y</code> at or below <code>10</code>. Declare the bound in the config under
 <code>nonlinear_constraints</code>, and have the evaluation function return the constraint

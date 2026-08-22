@@ -1370,6 +1370,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../utilities/writing_plugins/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Writing a Plugin
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -2093,17 +2121,6 @@
     <span class="md-ellipsis">
       
         Aggregating results across runs
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#ropt.simple.Session.shared_handlers" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        shared_handlers
       
     </span>
   </a>
@@ -3671,17 +3688,6 @@
     <span class="md-ellipsis">
       
         Aggregating results across runs
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#ropt.simple.Session.shared_handlers" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        shared_handlers
       
     </span>
   </a>
@@ -6450,141 +6456,9 @@ closed, or one carried into a worker process.</p>
     </div>
 
 </div><h2 id="aggregating-results-across-runs">Aggregating results across runs</h2>
+<p><a class="autorefs autorefs-internal" title="            shared_handlers" href="#ropt.simple.Session.shared_handlers"><code>Session.shared_handlers</code></a> builds the
+group; the group itself is a <code>SharedHandlers</code> object.</p>
 
-
-<div class="doc doc-object doc-function">
-
-
-<h2 id="ropt.simple.Session.shared_handlers" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">ropt.simple.Session.shared_handlers</span>
-
-
-</h2>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">shared_handlers</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="o">*</span><span class="n">handler</span><span class="p">:</span> <span class="n">EventHandler</span><span class="p">,</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">threaded</span><span class="p">:</span> <span class="n">EventHandler</span> <span class="o">|</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">EventHandler</span><span class="p">]</span> <span class="o">=</span> <span class="p">(),</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">report</span><span class="p">:</span> <span class="n">ReportCallback</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SharedHandlers</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents first">
-
-        <p>Group result handlers that several runs share.</p>
-<p>Pass the group to every run that should feed it, in <code>handlers=</code>. Each
-handler then sees the results of all those runs, serialized across them,
-which is what makes accumulating over concurrent runs safe. A run may
-feed several groups, and mix them with handlers of its own.</p>
-<p>A handler joins one group at a time, and a handler that was ever passed
-to a run as a local handler cannot join a group at all; decide per
-handler whether it is local or shared. See
-<a href="../../running/running/">Running Optimizations</a> for a walkthrough.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>handler</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventHandler" href="../components_event_handlers/#ropt.components.event_handlers.EventHandler">EventHandler</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The result handlers to share, each run on the session's
-      event-loop thread.</p>
-              </div>
-            </td>
-            <td>
-                  <code>()</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>threaded</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventHandler" href="../components_event_handlers/#ropt.components.event_handlers.EventHandler">EventHandler</a> | <a class="autorefs autorefs-external" title="collections.abc.Sequence" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence">Sequence</a>[<a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventHandler" href="../components_event_handlers/#ropt.components.event_handlers.EventHandler">EventHandler</a>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Handlers (one, or a sequence) to run on a worker thread
-      instead of the loop. This only helps handlers that spend
-      real time in blocking, GIL-releasing I/O (files,
-      databases, network); for in-memory work it gives no
-      benefit under CPython's GIL. See
-      <a href="../../running/running/#running-a-handler-in-a-thread">Running Optimizations</a>.</p>
-              </div>
-            </td>
-            <td>
-                  <code>()</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>report</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.simple.ReportCallback
-
-
-  
-      module-attribute
-   (ropt.simple._report.ReportCallback)" href="#ropt.simple.ReportCallback">ReportCallback</a> | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>An optional callback invoked with an <code>EvaluateResult</code> for
-      each function evaluation across the group's runs.
-      Returning <code>True</code> stops the emitting run early with
-      <code>USER_ABORT</code> if it is an optimization; an evaluation has
-      no optimizer loop to interrupt, so there the return value
-      is ignored.</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.simple.SharedHandlers (ropt.simple._handlers.SharedHandlers)" href="#ropt.simple.SharedHandlers">SharedHandlers</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>A <a class="autorefs autorefs-internal" title="            ropt.simple.SharedHandlers" href="#ropt.simple.SharedHandlers"><code>SharedHandlers</code></a> group.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
 
 <div class="doc doc-object doc-class">
 

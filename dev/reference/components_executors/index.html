@@ -1370,6 +1370,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../utilities/writing_plugins/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Writing a Plugin
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -2606,6 +2634,78 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#ropt.components.executors.ExecutorBase" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ExecutorBase
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ExecutorBase">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.components.executors.ExecutorBase.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        __init__
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.components.executors.ExecutorBase.submit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        submit
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.components.executors.ExecutorBase.is_running" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        is_running
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.components.executors.ExecutorBase.on_worker_loop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        on_worker_loop
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.components.executors.ExecutorBase.cancel" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        cancel
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#ropt.components.executors.WorkItem" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3205,6 +3305,78 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#ropt.components.executors.ExecutorBase" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ExecutorBase
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ExecutorBase">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.components.executors.ExecutorBase.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        __init__
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.components.executors.ExecutorBase.submit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        submit
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.components.executors.ExecutorBase.is_running" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        is_running
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.components.executors.ExecutorBase.on_worker_loop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        on_worker_loop
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.components.executors.ExecutorBase.cancel" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        cancel
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#ropt.components.executors.WorkItem" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3468,6 +3640,10 @@
 <a class="autorefs autorefs-internal" title="            ropt.components.evaluators.ParallelEvaluator" href="../components_evaluators/#ropt.components.evaluators.ParallelEvaluator"><code>ParallelEvaluator</code></a>, on a concrete
 execution mechanism (threads, processes, or an HPC cluster).</p>
 <p>See <a href="../../workflows/parallel/">Parallel Evaluation</a> for usage.</p>
+<p><a class="autorefs autorefs-internal" title="            ropt.components.executors.Executor" href="#ropt.components.executors.Executor"><code>Executor</code></a> is the interface a compute step
+sees; <a class="autorefs autorefs-internal" title="            ropt.components.executors.ExecutorBase" href="#ropt.components.executors.ExecutorBase"><code>ExecutorBase</code></a> implements the
+submission bookkeeping shared by the built-in executors and is the class to
+subclass when adding a new execution mechanism.</p>
 
 
 <div class="doc doc-object doc-class">
@@ -3887,6 +4063,277 @@ never left waiting for results that cannot arrive.</p>
           </tr>
       </tbody>
     </table>
+
+
+    </div>
+
+</div>
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="ropt.components.executors.ExecutorBase" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.components.executors.ExecutorBase</span>
+
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="            ropt.components.executors.Executor (ropt.components.executors.base.Executor)" href="#ropt.components.executors.Executor">Executor</a></code></p>
+
+
+
+        <p>A base class for asynchronous executors.</p>
+<p>Owns every submission it accepts, so stopping the executor releases all
+waiting callers from a single place.</p>
+<p>Implementations must call <code>_begin_start</code> before creating any resources, and
+<code>_finish_start</code> once they are in place.</p>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.components.executors.ExecutorBase.__init__" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">__init__</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">__init__</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Initialize the executor.</p>
+
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.components.executors.ExecutorBase.submit" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">submit</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">submit</span><span class="p">(</span><span class="n">submission</span><span class="p">:</span> <span class="n">Submission</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Hand a submission to the executor.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>submission</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.components.executors.Submission (ropt.components.executors.base.Submission)" href="#ropt.components.executors.Submission">Submission</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The submission to run.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            WorkflowError (ropt.exceptions.WorkflowError)" href="../exceptions/#ropt.exceptions.WorkflowError">WorkflowError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If called from one of this executor's workers.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.components.executors.ExecutorBase.is_running" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">is_running</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">is_running</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">bool</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Report whether the executor accepts work.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p><code>True</code> if the executor accepts work, <code>False</code> otherwise.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.components.executors.ExecutorBase.on_worker_loop" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">on_worker_loop</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">on_worker_loop</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">bool</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Report whether the caller is on the event loop that runs the work.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p><code>True</code> if the calling thread is running the executor's loop.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.components.executors.ExecutorBase.cancel" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">cancel</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">cancel</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Stop the executor.</p>
+<p>May be called from any thread.</p>
 
 
     </div>
@@ -4496,7 +4943,7 @@ caller that has left.</p>
 
     <div class="doc doc-contents first">
             <p class="doc doc-class-bases">
-              Bases: <code><span title="ropt.components.executors.base.ExecutorBase">ExecutorBase</span></code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="            ropt.components.executors.ExecutorBase (ropt.components.executors.base.ExecutorBase)" href="#ropt.components.executors.ExecutorBase">ExecutorBase</a></code></p>
 
 
 
@@ -4703,7 +5150,7 @@ executor's workers, and is not recognized here.</p>
 
     <div class="doc doc-contents first">
             <p class="doc doc-class-bases">
-              Bases: <code><span title="ropt.components.executors.base.ExecutorBase">ExecutorBase</span></code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="            ropt.components.executors.ExecutorBase (ropt.components.executors.base.ExecutorBase)" href="#ropt.components.executors.ExecutorBase">ExecutorBase</a></code></p>
 
 
 
@@ -4884,7 +5331,7 @@ point must use.</p>
 
     <div class="doc doc-contents first">
             <p class="doc doc-class-bases">
-              Bases: <code><span title="ropt.components.executors.base.ExecutorBase">ExecutorBase</span></code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="            ropt.components.executors.ExecutorBase (ropt.components.executors.base.ExecutorBase)" href="#ropt.components.executors.ExecutorBase">ExecutorBase</a></code></p>
 
 
 
