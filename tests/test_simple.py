@@ -1522,17 +1522,36 @@ def test_run_abandoned_by_fail_fast_returns(config: Any, test_functions: Any) ->
     #
     # Which exit code it returns is a race and must not be asserted: usually
     # the pool reports the stop first (EXECUTOR_STOPPED), but the optimizer
-    # sometimes ends its own loop first and reports OPTIMIZER_FINISHED. Over
-    # 111 abandoned runs both codes appeared and none ever raised.
+    # sometimes ends its own loop first and reports OPTIMIZER_FINISHED. Both
+    # codes have been observed; neither run ever raised.
     outcomes: list[Any] = []
     lock = threading.Lock()
     started = threading.Barrier(4)
     finished = threading.Semaphore(0)
 
+    def first_evaluation_waits() -> Any:
+        # The rendezvous sits inside the run, not on the driver thread before
+        # it: reaching it proves the run is past the entry check that refuses a
+        # closed pool. Waiting outside only proves the run is about to start,
+        # and the closing session below can beat it there -- the run is then
+        # refused with a `WorkflowError` instead of abandoned in flight, which
+        # is a different case and made this test flaky.
+        waited = False
+
+        def objective(variables: Any, context: Any) -> float:
+            nonlocal waited
+            if not waited:
+                waited = True
+                started.wait(timeout=30)
+            return float(test_functions[0](variables, context))
+
+        return objective
+
     def record(pool: WorkerPool) -> None:
-        started.wait(timeout=30)
         try:
-            result = optimize(config, initial_values, test_functions[0], pool=pool)
+            result = optimize(
+                config, initial_values, first_evaluation_waits(), pool=pool
+            )
         except BaseException as exc:  # ruff: ignore[blind-except]
             with lock:
                 outcomes.append(exc)
@@ -1543,8 +1562,9 @@ def test_run_abandoned_by_fail_fast_returns(config: Any, test_functions: Any) ->
             finished.release()
 
     def boom() -> None:
-        # The rendezvous puts every sibling past the point where it could be
-        # skipped, so all three are genuinely abandoned rather than never run.
+        # Every sibling is inside its first evaluation by the time this passes
+        # the barrier, so all three are genuinely abandoned rather than never
+        # run. One worker per run, so the rendezvous cannot starve on the pool.
         started.wait(timeout=30)
         msg = "boom"
         raise ValueError(msg)
