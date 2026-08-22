@@ -47,6 +47,8 @@ class ThreadingExecutor(ExecutorBase):
         )
         self._pool = pool
         _logger.debug("Starting threading executor with %d worker(s)", self._workers)
+        # One task per pool thread: each pulls work items and awaits its own,
+        # so the number of tasks is what limits how many run at once.
         self._worker_tasks = [
             task_group.create_task(self._run_worker(pool)) for _ in range(self._workers)
         ]
@@ -100,6 +102,9 @@ class ThreadingExecutor(ExecutorBase):
                 self._abort(submission)
                 raise
             except BaseException as exc:
+                # The caller is told either way, but an exception that is not an
+                # `Exception` (SystemExit, KeyboardInterrupt) is not this run's
+                # to swallow: it keeps unwinding into the task group.
                 self._fail(submission, exc)
                 if not isinstance(exc, Exception):
                     raise

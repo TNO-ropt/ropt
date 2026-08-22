@@ -1,4 +1,16 @@
-"""Defines a class for running evaluations on a HPC cluster."""
+"""Defines a class for running evaluations on a HPC cluster.
+
+Unlike the thread and process executors, there is no channel back from a job:
+work travels over a shared filesystem, as a cloudpickled `<id>.in` file the job
+reads and an `<id>.out` file it writes (with `<id>.txt` for its output). The job
+itself is `python -m ropt.components.executors`, run through `pysqa`.
+
+So there is nothing to await, only a queue to ask. One thread does all the
+blocking `pysqa` work — submitting and polling — while the async worker loop
+alternates between handing it work and waiting for more. A job that disappeared
+from the queue without leaving a readable result is retried a bounded number of
+times, because a shared filesystem may take a while to show it.
+"""
 
 from __future__ import annotations
 
@@ -137,6 +149,9 @@ class HPCExecutor(ExecutorBase):
         self._jobs: dict[str | UUID, int] = {}
         self._retries: dict[str | UUID, int] = {}
         self._poll_failures = 0
+        # The submitted jobs are reached from the poll thread and from cleanup
+        # on the loop thread; `_jobs_closed` closes the door between them, so a
+        # job cannot be submitted after cleanup has passed it by.
         self._jobs_lock = threading.Lock()
         self._jobs_closed = False
         self._work_arrived = asyncio.Event()
@@ -151,6 +166,8 @@ class HPCExecutor(ExecutorBase):
         self._work_arrived = asyncio.Event()
         with self._jobs_lock:
             self._jobs_closed = False
+        # A single thread, because it is the only one that talks to `pysqa`:
+        # submitting and polling stay in one order, and off the loop thread.
         self._pool = ThreadPoolExecutor(
             max_workers=1, thread_name_prefix="ropt-hpc-poll"
         )
@@ -163,6 +180,8 @@ class HPCExecutor(ExecutorBase):
         await self._finish_start(task_group)
 
     async def _worker(self, pool: ThreadPoolExecutor) -> None:
+        # Every `pysqa` call blocks, so the whole submit-and-poll round trip is
+        # handed to the single poll thread; this loop only decides when.
         loop = asyncio.get_running_loop()
         while self._running.is_set():
             pending = self._take_work_items()
@@ -175,8 +194,11 @@ class HPCExecutor(ExecutorBase):
 
     async def _wait_for_work(self) -> None:
         self._work_arrived.clear()
+        # There is room and work waiting: go round again without pausing.
         if len(self._items) < self._workers and not self._work_queue.empty():
             return
+        # Poll while jobs are out, but wait indefinitely when there is nothing
+        # to poll for, so an idle executor costs nothing.
         idle = not self._items and self._work_queue.empty()
         timeout = None if idle else self._interval
         with contextlib.suppress(TimeoutError):
@@ -187,6 +209,8 @@ class HPCExecutor(ExecutorBase):
         self._work_arrived.set()
 
     def _take_work_items(self) -> list[tuple[str | UUID, WorkItem]]:
+        # Takes no more than there is room for: `_items` holds the jobs that are
+        # out, so `workers` caps how many run on the cluster at once.
         pending: list[tuple[str | UUID, WorkItem]] = []
         while len(self._items) < self._workers:
             try:
@@ -206,6 +230,8 @@ class HPCExecutor(ExecutorBase):
         return pending
 
     def _register(self, submission: Submission, work_item: WorkItem) -> str | UUID:
+        # The ID is the file name the job reads and writes, so a caller-given
+        # name is refused if it is already in flight, rather than overwritten.
         item_id = work_item.name or uuid4()
         if item_id in self._items:
             msg = f"Work item ID '{item_id}' is already in use; names must be unique."
@@ -263,10 +289,13 @@ class HPCExecutor(ExecutorBase):
     def _run_work_items(
         self, pending: list[tuple[str | UUID, WorkItem]]
     ) -> dict[str | UUID, Any]:
+        # Runs on the poll thread: submit what was taken, then ask the queue
+        # about everything that is out.
         results: dict[str | UUID, Any] = {}
         for item_id, work_item in pending:
             try:
                 if not self._submit(item_id, work_item):
+                    # Shutting down: leave the rest, cleanup releases them.
                     return results
             except Exception as exc:  # ruff: ignore[blind-except]
                 results[item_id] = exc
@@ -288,6 +317,9 @@ class HPCExecutor(ExecutorBase):
             raise ExecutionError(msg)
         input_file = self._workdir / f"{item_id}.in"
         output_file = self._workdir / f"{item_id}.out"
+        # Written to a temporary file and renamed, so the job can never observe
+        # a half-written input: on a shared filesystem the rename is what makes
+        # it visible, and fsync is what makes the content precede it.
         tmp_fd, tmp_path_str = tempfile.mkstemp(dir=self._workdir)
         tmp_path = Path(tmp_path_str)
         try:
@@ -320,6 +352,8 @@ class HPCExecutor(ExecutorBase):
             if not stopped:
                 self._jobs[item_id] = job_id
         if stopped:
+            # Cleanup ran while this job was being submitted, so it never made
+            # the list it would have been cancelled from: cancel it here.
             self._delete_job(item_id, job_id)
             return False
         _logger.debug("Submitted HPC job %s (job id: %s)", item_id, job_id)
@@ -330,11 +364,15 @@ class HPCExecutor(ExecutorBase):
         try:
             jobs = set(self._queue_adapter.get_status_of_my_jobs()["jobid"].tolist())
         except Exception as exc:  # ruff: ignore[blind-except]
+            # A scheduler that cannot be reached looks exactly like "nothing has
+            # finished", so failed queries are counted rather than ignored.
             return self._handle_query_failure(exc)
         self._poll_failures = 0
         with self._jobs_lock:
             submitted = dict(self._jobs)
         for item_id, job_id in submitted.items():
+            # Gone from the queue is the only sign that a job has ended; what
+            # became of it has to be read from its output file.
             if job_id in jobs:
                 continue
             output_file = self._workdir / f"{item_id}.out"
@@ -344,6 +382,8 @@ class HPCExecutor(ExecutorBase):
                 self._retries.pop(item_id, None)
                 self._drop_job(item_id)
             except FileNotFoundError:
+                # The file may simply not be visible yet, so give the shared
+                # filesystem a bounded number of further polls to show it.
                 self._retries[item_id] = self._retries.get(item_id, 0) + 1
                 if self._retries[item_id] > self._retries_limit:
                     self._retries.pop(item_id, None)
@@ -354,6 +394,8 @@ class HPCExecutor(ExecutorBase):
                     )
                     results[item_id] = ExecutorFailure(msg)
             except (OSError, EOFError, UnpicklingError):
+                # Present but unreadable, which a partially visible file also
+                # looks like: retried on the same budget before giving up.
                 retry_count = self._retries.get(item_id, 0) + 1
                 self._retries[item_id] = retry_count
                 if retry_count > self._retries_limit:
@@ -372,6 +414,8 @@ class HPCExecutor(ExecutorBase):
         return results
 
     def _handle_query_failure(self, exc: BaseException) -> dict[str | UUID, Any]:
+        # Only a run of failures is fatal: a single one may be a hiccup, and
+        # giving up at the first would end runs the cluster is still working on.
         results: dict[str | UUID, Any] = {}
         self._poll_failures += 1
         _logger.warning(
@@ -407,6 +451,8 @@ class HPCExecutor(ExecutorBase):
 
 def _get_config_path(config_path: Path | str | None) -> Path | None:
     if config_path is None:
+        # Falls back to a site-wide configuration installed alongside ropt, so
+        # that users on a configured cluster need not point at it themselves.
         path = Path(sysconfig.get_paths()["data"]) / "share" / "ropt" / "pysqa"
         if path.exists():
             return path

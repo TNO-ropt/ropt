@@ -116,6 +116,8 @@ class SharedHandlers:
         event_types: set[EnOptEventType] = set()
         for handler in self._handlers:
             event_types |= handler.event_types
+        # Only what some handler in the group asked for: forwarding blocks the
+        # run until the dispatcher is done, so events nobody wants cost it time.
         if event_types:
             step.add_event_handler(
                 EventForwardHandler(self._dispatcher, event_types=event_types)
@@ -245,9 +247,13 @@ def attach_handlers(
         local.append(make_report_handler(report))
     claimed: list[EventHandler] = []
     try:
+        # Claimed first, all of them, before anything is attached: a run that
+        # cannot have every handler it asked for must leave them all free.
         for handler in local:
             handler.claim()
             claimed.append(handler)
+        # Attaching is what binds a handler to compute steps for good, which is
+        # why a handler used locally can never join a shared group afterwards.
         for handler in local:
             step.add_event_handler(handler)
         for group in groups:

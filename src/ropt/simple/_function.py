@@ -75,6 +75,8 @@ class _AdaptedFunction:
 
 
 def _coerce(result: FunctionValue, n_obj: int, n_con: int) -> EvaluationFunctionResult:
+    # The shapes the configuration expects are known here, so a function may
+    # return a bare number or a flat sequence and still be checked properly.
     if isinstance(result, EvaluationFunctionResult):
         return result
 

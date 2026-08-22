@@ -16,6 +16,9 @@ from __future__ import annotations
 
 from ropt.exceptions import TransferError
 
+# Process-global, because unpickling happens deep inside the pickle machinery,
+# out of reach of the code that wants to know about it. The worker runners
+# bracket each task with `reset_transferred`/`check_transferred`.
 _transferred_subjects: list[str] = []
 
 
@@ -35,6 +38,8 @@ class _Placeholder:
         return _Placeholder(self._subject)
 
     def __reduce__(self) -> tuple[type[_Placeholder], tuple[str]]:
+        # Stays a placeholder if it travels on, without recording a second
+        # transfer: the one that matters was recorded where it happened.
         return (_Placeholder, (self._subject,))
 
 

@@ -25,6 +25,9 @@ class ComputeStep(ABC):
 
     def __init_subclass__(cls, **kwargs: object) -> None:  # ruff: ignore[undocumented-magic-method]
         super().__init_subclass__(**kwargs)
+        # Wrapped here rather than left to each `run`, so that a step written
+        # outside this package cannot forget the guard. `__wrapped__` marks an
+        # already wrapped `run`, so inheriting one does not stack guards.
         if "run" in cls.__dict__ and not getattr(
             cls.__dict__["run"], "__wrapped__", None
         ):
@@ -42,6 +45,7 @@ class ComputeStep(ABC):
                         msg = "The compute step is already running on another thread."
                         raise WorkflowError(msg)
                     self._running = True
+                # A step reused after a stopped run must not start out stopped.
                 self._stop_flag.clear()
                 try:
                     return _orig(self, *args, **kwargs)
@@ -59,6 +63,9 @@ class ComputeStep(ABC):
         self._stop_flag = threading.Event()
 
     def __reduce__(self) -> tuple[object, tuple[str]]:  # ruff: ignore[undocumented-magic-method]
+        # A step drives its run, and its handlers, from the process it was
+        # started in, so it cannot follow work into a worker; it arrives there
+        # as a placeholder, which the worker reports by name.
         return (_make_placeholder, ("A compute step",))
 
     def add_event_handler(self, handler: EventHandler) -> None:
@@ -67,6 +74,8 @@ class ComputeStep(ABC):
         Args:
             handler: The handler to add.
         """
+        # Registering marks the handler as owned by a compute step for good,
+        # which is what bars it from ever joining an event dispatcher.
         if isinstance(handler, EventHandler):
             handler._register_compute_step()  # ruff: ignore[private-member-access]
             self._event_handlers.append(handler)

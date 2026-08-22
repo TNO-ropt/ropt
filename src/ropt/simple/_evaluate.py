@@ -1,4 +1,10 @@
-"""The high-level ``evaluate`` and ``evaluate_many`` entry points."""
+"""The high-level ``evaluate`` and ``evaluate_many`` entry points.
+
+The same shape as `optimize`, with an evaluation step in place of the optimizer:
+one batch of variable vectors, evaluated once, with no loop around it. The two
+functions differ only in what they accept and return — one vector or a matrix of
+them — so that neither has to guess which was meant.
+"""
 
 from __future__ import annotations
 
@@ -187,6 +193,8 @@ def _run_evaluation(  # ruff: ignore[too-many-arguments]
     evaluator = make_evaluator(
         context, function, pool if pool is not None else serial_pool()
     )
+    # The results are collected by this run's own handler, in the order the
+    # vectors were given, which is the order they are returned in.
     history = HistoryHandler()
     step = EvaluationStep(evaluator=evaluator)
     step.add_event_handler(history)

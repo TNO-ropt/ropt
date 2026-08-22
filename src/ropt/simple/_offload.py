@@ -34,6 +34,8 @@ _T = TypeVar("_T")
 
 @dataclass(kw_only=True)
 class _IndexedWorkItem(WorkItem):
+    # Results come back as they finish, so each item carries the position its
+    # result belongs in.
     index: int
 
 
@@ -125,6 +127,8 @@ def _dispatch(executor: Executor, functions: list[Callable[[], Any]]) -> list[An
 
 def _store(output: list[Any], work_item: WorkItem) -> None:
     assert isinstance(work_item, _IndexedWorkItem)
+    # Unlike an evaluation, a lost work item has no NaN to fall back on: there
+    # is a result to return, or there is nothing.
     if isinstance(work_item.result, ExecutorFailure):
         raise work_item.result
     output[work_item.index] = work_item.result

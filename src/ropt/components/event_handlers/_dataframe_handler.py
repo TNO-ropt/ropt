@@ -283,6 +283,10 @@ class DataFrameHandler(EventHandler):
 
 
 class _ResultsTable:
+    # One frame is built per batch of results and only concatenated on access,
+    # so a long run does not rebuild a growing table on every event. The lock is
+    # for the handler running behind a dispatcher thread while the tables are
+    # read from another.
     def __init__(
         self,
         columns: dict[str, str],

@@ -54,6 +54,9 @@ class _Session:
     def __init__(self) -> None:
         self._loop: asyncio.AbstractEventLoop | None = None
         self._thread: threading.Thread | None = None
+        # Two events, not one: `start` waits on `_ready` and must be released
+        # however startup ends, while `_stopped` marks the loop as no longer
+        # usable. Clearing `_ready` to mean that would deadlock `start`.
         self._ready = threading.Event()
         self._stopped = threading.Event()
         self._task_group: asyncio.TaskGroup | None = None
@@ -75,6 +78,8 @@ class _Session:
         if self._shutdown is not None:
             schedule(self._loop, self._shutdown.set)
         self._thread.join()
+        # A session that died carries its failure to whoever closes it, since
+        # nothing else is watching the loop thread.
         if self._failure is not None:
             failure, self._failure = self._failure, None
             raise failure
@@ -103,6 +108,9 @@ class _Session:
     def _shut_down(self, main_task: asyncio.Task[None]) -> None:
         assert self._loop is not None
         try:
+            # Keeps the loop serving until `stop` asks for shutdown. A loop that
+            # has stopped but is not closed still accepts cross-thread work and
+            # then never runs it, so a waiting caller would hang forever.
             if self._shutdown is not None and not self._shutdown.is_set():
                 self._loop.run_until_complete(self._shutdown.wait())
         finally:
@@ -115,11 +123,17 @@ class _Session:
                         asyncio.gather(*unfinished, return_exceptions=True)
                     )
             finally:
+                # Retrieved so asyncio does not report them as never retrieved;
+                # from a `finally`, because a task carrying a SystemExit would
+                # otherwise abort the drain and skip this.
                 for task in {main_task, *unfinished}:
                     if task.done() and not task.cancelled():
                         task.exception()
 
     async def _run(self) -> None:
+        # The task group lives for as long as the session does: everything the
+        # session hands out is started into it, which is why they all end when
+        # the session does.
         self._shutdown = asyncio.Event()
         try:
             async with asyncio.TaskGroup() as task_group:
@@ -136,6 +150,8 @@ class _Session:
             self._stopped.set()
 
     def _start_on_loop(self, coro: Coroutine[Any, Any, None]) -> None:
+        # Waits for the coroutine to finish, so what is handed back is already
+        # running and a failure to start is raised at the factory call.
         assert self._loop is not None
         if self._stopped.is_set():
             coro.close()

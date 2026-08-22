@@ -1,4 +1,14 @@
-"""This module implements the event dispatcher."""
+"""This module implements the event dispatcher.
+
+A dispatcher is what lets one handler serve runs on several threads: the events
+are queued to its event loop and processed one at a time, so a handler never
+sees two at once and needs no locking of its own.
+
+The emitting run does not go on in the meantime. `dispatch_event` blocks it
+until the event has been handled, which keeps the ordering a handler sees
+meaningful and keeps a handler's exception on the stack of the run that caused
+it, instead of tearing down the task group the dispatcher runs in.
+"""
 
 from __future__ import annotations
 
@@ -52,6 +62,8 @@ class EventDispatcher:
         self._handler_ids_lock = threading.Lock()
 
     def __reduce__(self) -> tuple[object, tuple[str]]:
+        # A dispatcher serves the loop it was started on, so it cannot follow
+        # work into a worker; it arrives there as an inert placeholder.
         return (_make_placeholder, ("An event dispatcher",))
 
     def add_event_handler(
@@ -69,6 +81,9 @@ class EventDispatcher:
                            instead of the event loop.
         """
         handler._register_dispatcher()  # ruff: ignore[private-member-access]
+        # Replaced rather than appended to: the loop thread iterates this list
+        # while another thread may be adding to it, and a new list leaves any
+        # iteration in progress on the one it started with.
         self._handlers = [*self._handlers, (handler, run_in_thread)]
 
     def remove_event_handler(self, handler: EventHandler) -> bool:
@@ -125,12 +140,17 @@ class EventDispatcher:
         try:
             future = asyncio.run_coroutine_threadsafe(dispatch, self._loop)
         except RuntimeError as exc:
+            # The loop went away between the check above and the handover.
             dispatch.close()
             msg = "The event dispatcher stopped."
             raise WorkflowError(msg) from exc
+        # Blocks the emitting run until every handler is done with the event,
+        # and re-raises whatever a handler raised.
         future.result()
 
     async def _dispatch(self, event: EnOptEvent) -> None:
+        # A future per event, resolved once its handlers have finished: that is
+        # what the caller in `dispatch_event` is waiting on.
         if not self._running.is_set() or self._queue is None:
             msg = "The event dispatcher stopped."
             raise WorkflowError(msg)
@@ -160,6 +180,8 @@ class EventDispatcher:
 
         May be called from any thread.
         """
+        # A `None` through the queue, rather than a cancellation: it stops the
+        # processing loop only after the events already queued are handled.
         if self._queue is not None:
             schedule(self._loop, self._queue.put_nowait, None)
 
@@ -194,6 +216,8 @@ class EventDispatcher:
     async def _run_handler(
         self, handler: EventHandler, event: EnOptEvent, *, run_in_thread: bool
     ) -> Exception | None:
+        # Returns the exception instead of raising it, so one failing handler
+        # does not keep the others from seeing the event.
         try:
             if run_in_thread:
                 loop = asyncio.get_running_loop()
@@ -223,6 +247,8 @@ class EventDispatcher:
         )
         if future.done():
             return
+        # One event, one outcome for its caller: the first failure is the one
+        # reported, the rest are only logged.
         error = next((result for result in results if result is not None), None)
         if error is None:
             future.set_result(None)
@@ -258,6 +284,8 @@ class EventDispatcher:
                 item = await self._queue.get()
                 self._queue.task_done()
                 if item is None:
+                    # Stop requested: mark it stopped so nothing new is queued,
+                    # then still handle what is already in the queue.
                     self._running.clear()
                     await self._drain()
                     break
@@ -275,6 +303,8 @@ class EventDispatcher:
                 pending.set_exception(exc)
             raise
         finally:
+            # However this ends, no caller may be left waiting on a future that
+            # nothing will resolve any more.
             self._running.clear()
             self._reject_queued()
             self._shutdown_pool()

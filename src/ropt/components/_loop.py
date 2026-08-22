@@ -26,6 +26,9 @@ if TYPE_CHECKING:
     from collections.abc import Callable
 
 
+# Reports whether the callback was accepted, rather than raising: a loop that is
+# gone is the normal end of a teardown race, and every caller has a fallback for
+# it (abort the submission, skip the cancel).
 def schedule(
     loop: asyncio.AbstractEventLoop | None,
     callback: Callable[..., object],
@@ -44,4 +47,5 @@ def on_loop_thread(loop: asyncio.AbstractEventLoop | None) -> bool:
     try:
         return asyncio.get_running_loop() is loop
     except RuntimeError:
+        # No loop running on this thread at all, so it cannot be that one.
         return False

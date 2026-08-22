@@ -95,6 +95,9 @@ class CachedEvaluator(Evaluator):
                 len(cached),
                 variables.shape[0],
             )
+            # Deactivate the cached rows instead of dropping them, so the
+            # wrapped evaluator still sees the batch with its original shape
+            # and the results land on the rows they belong to.
             active = evaluator_context.active.copy()
             active[list(cached.keys())] = False
             evaluator_context = replace(evaluator_context, active=active)
@@ -153,6 +156,8 @@ def _get_from_cache(
 ) -> tuple[FunctionResults | None, int]:
     for results in _get_results(sources):
         if realization_name is not None:
+            # Matching by name, so a hit also works across runs that order
+            # their realizations differently.
             names: tuple[str | int, ...] = results.names.get("realization", ())
             realization_index = list(names).index(realization_name)
             if realization_index < 0:

@@ -67,10 +67,13 @@ class EvaluationStep(ComputeStep):
         Raises:
             ValueError: If the input variables have the wrong shape.
         """
+        # A single vector is accepted as a batch of one, so everything below
+        # works on a matrix.
         variables = np.array(np.asarray(variables, dtype=np.float64), ndmin=2)
         if variables.shape[-1] != context.variables.variable_count:
             msg = "The input variables have the wrong shape"
             raise ValueError(msg)
+        # Claim the context: it is single use, so two runs cannot share one.
         context.lock()
 
         _logger.info("Starting evaluation")
@@ -126,6 +129,9 @@ class EvaluationStep(ComputeStep):
         return results
 
     def _emit_event(self, event: EnOptEvent) -> None:
+        # Handlers run inline, on this run's own stack: a local handler that
+        # raises unwinds this run, and one behind a dispatcher blocks here until
+        # the dispatcher has finished with the event.
         event.source = self
         for handler in self.event_handlers:
             if event.event_type in handler.event_types:

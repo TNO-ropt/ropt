@@ -1,4 +1,10 @@
-"""Script for running functions with pickled arguments and return values."""
+"""Script for running functions with pickled arguments and return values.
+
+The other end of [`HPCExecutor`][ropt.components.executors.HPCExecutor]: this is
+what a cluster job runs. It has no channel back to the executor, so the outcome
+travels as the result file alone, and a failure is written to it as an exception
+rather than being raised into a void.
+"""
 
 import os
 import sys
@@ -34,9 +40,13 @@ def run_task(input_path: str, output_path: str) -> int:
         result = function(*args, **kwargs)
         exit_code = 0
     except BaseException as exc:  # ruff: ignore[blind-except]
+        # Anything at all, including SystemExit: this process exists only to run
+        # the task, and the executor needs to hear how it went.
         result = picklable_exception(exc)
         exit_code = 1
     finally:
+        # Written and renamed into place, so the executor polling for the file
+        # never reads a partial result.
         out_path = Path(output_path)
         tmp_fd, tmp_path_str = tempfile.mkstemp(dir=out_path.parent)
         tmp_path = Path(tmp_path_str)

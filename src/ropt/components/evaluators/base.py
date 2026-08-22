@@ -44,6 +44,10 @@ class Evaluator(ABC):
 
     def __init_subclass__(cls, **kwargs: object) -> None:  # ruff: ignore[undocumented-magic-method]
         super().__init_subclass__(**kwargs)
+        # Wrapped here rather than left to each `eval`, so that an evaluator
+        # written outside this package cannot forget the guard. `__wrapped__`
+        # marks an already wrapped `eval`, so inheriting one does not stack
+        # guards.
         if "eval" in cls.__dict__ and not getattr(
             cls.__dict__["eval"], "__wrapped__", None
         ):
@@ -67,6 +71,8 @@ class Evaluator(ABC):
                 finally:
                     with self._owner_lock:
                         self._in_use = False
+                # The protocol is untyped at the boundary, so a wrong return
+                # value is caught here rather than deep in the ensemble code.
                 assert isinstance(result, EvaluationBatchResult)
                 return result
 
@@ -78,6 +84,9 @@ class Evaluator(ABC):
         self._owner_lock = threading.Lock()
 
     def __reduce__(self) -> tuple[object, tuple[str]]:  # ruff: ignore[undocumented-magic-method]
+        # An evaluator hands work to the executor of the process it was built
+        # in, so it cannot follow that work into a worker; it arrives there as
+        # a placeholder, which the worker reports by name.
         return (_make_placeholder, ("An evaluator",))
 
     @abstractmethod

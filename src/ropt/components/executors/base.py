@@ -1,4 +1,15 @@
-"""Defines base classes for asynchronous executors."""
+"""Defines base classes for asynchronous executors.
+
+An executor runs on an event loop, while the code waiting for its results sits
+in a thread. The two meet on a [`Submission`][ropt.components.executors.Submission]:
+the caller blocks on its results queue, and everything the executor itself does
+runs on the loop thread, which is why its bookkeeping needs no locking. The few
+flags that do cross the boundary are `threading.Event`s.
+
+Handing over a submission transfers responsibility for it: whatever happens, the
+executor either runs its work items or ends the submission, so the caller is
+released.
+"""
 
 from __future__ import annotations
 
@@ -59,6 +70,8 @@ class _ResultsQueue(queue.Queue["WorkItem | BaseException | None"]):
         *args: Any,  # ruff: ignore[any-type]
         **kwargs: Any,  # ruff: ignore[any-type]
     ) -> None:
+        # Silently dropped once closed, which makes ending a submission twice
+        # harmless: the first end is the one the caller sees.
         if not self.closed:
             super().put(item, *args, **kwargs)
 
@@ -158,6 +171,8 @@ class Submission:
             raise
 
     def _drain(self, on_result: Callable[[WorkItem], None]) -> None:
+        # One `get` per work item: the count is what ends the loop, since a
+        # finished submission sends no sentinel of its own.
         for _ in range(len(self._work_items)):
             item = self._results.get()
             if item is None:
@@ -289,9 +304,12 @@ class ExecutorBase(Executor):
         self._work_queue: asyncio.Queue[tuple[Submission, WorkItem]] = asyncio.Queue()
         self._loop: asyncio.AbstractEventLoop | None = None
         self._task_group: asyncio.TaskGroup | None = None
+        # An Event, not a bool: read from whatever thread submits, asks whether
+        # the executor runs, or cancels it.
         self._running = threading.Event()
         self._ready_event = asyncio.Event()
         self._stop_event = asyncio.Event()
+        # Touched only on the loop thread, so it needs no lock.
         self._submissions: set[Submission] = set()
 
     def submit(self, submission: Submission) -> None:
@@ -314,6 +332,9 @@ class ExecutorBase(Executor):
         if not self._running.is_set() or not schedule(
             self._loop, self._accept, submission
         ):
+            # Either already stopped, or the loop refused the callback while
+            # stopping. `_accept` checks again on the loop thread, which is the
+            # check that settles the race.
             submission.abort()
 
     def is_running(self) -> bool:
@@ -333,12 +354,14 @@ class ExecutorBase(Executor):
         return on_loop_thread(self._loop)
 
     def _accept(self, submission: Submission) -> None:
+        # On the loop thread.
         if not self._running.is_set():
             submission.abort()
             return
         if submission in self._submissions:
             return
         if submission.is_finished:
+            # Its caller has already left, so there is nothing to deliver to.
             return
         self._submissions.add(submission)
         for work_item in submission.work_items:
@@ -353,6 +376,8 @@ class ExecutorBase(Executor):
         if self._running.is_set():
             msg = "The executor is already running."
             raise WorkflowError(msg)
+        # Recreated per start: asyncio primitives bind to the loop that first
+        # uses them, and a restart may well be on a different loop.
         self._work_queue = asyncio.Queue()
         self._ready_event = asyncio.Event()
         self._stop_event = asyncio.Event()
@@ -366,6 +391,8 @@ class ExecutorBase(Executor):
         await self._ready_event.wait()
 
     async def _wait_for_cancel(self) -> None:
+        # Cleanup belongs on the loop thread, and this task is where it runs:
+        # `cancel` only sets the event, from wherever it is called.
         self._ready_event.set()
         try:
             await self._stop_event.wait()
@@ -409,5 +436,7 @@ class ExecutorBase(Executor):
         for submission in self._submissions:
             submission.abort()
         self._submissions.clear()
+        # Drop the queued work too: its submissions have just been released,
+        # and a restart begins with a fresh queue anyway.
         while not self._work_queue.empty():
             self._work_queue.get_nowait()

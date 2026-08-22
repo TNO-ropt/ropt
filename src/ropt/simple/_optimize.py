@@ -1,4 +1,14 @@
-"""The high-level ``optimize`` entry point."""
+"""The high-level ``optimize`` entry point.
+
+One call builds a whole workflow and throws it away again: a context from the
+configuration, an evaluator wired to the pool, an optimization step, and the
+handlers around it. Nothing survives the call, which is what lets these
+functions be called concurrently without any coordination between them.
+
+``optimize_many`` is the same thing run several times over, on driver threads,
+sharing one pool. Sharing the pool is what makes its runs cooperate: they draw
+their batch IDs from one counter and send their evaluations to the same workers.
+"""
 
 from __future__ import annotations
 
@@ -126,6 +136,8 @@ def _optimize(  # ruff: ignore[too-many-arguments]
 ) -> OptimizeResult:
     context = EnOptContext.model_validate(config)
     evaluator = make_evaluator(context, function, pool)
+    # This run's own handler, tracking the result the call returns; it is added
+    # directly, so it stays out of the handlers the caller manages.
     result_handler = ResultsHandler(constraint_tolerance=constraint_tolerance)
     step = OptimizationStep(evaluator=evaluator)
     step.add_event_handler(result_handler)
@@ -263,4 +275,6 @@ def optimize_many(  # ruff: ignore[too-many-arguments]
             runs, reports, metadatas, strict=True
         )
     ]
+    # Dedicated threads, not a shared thread pool: each run blocks its thread
+    # while waiting for evaluations that would queue behind it in such a pool.
     return tuple(run_concurrent(jobs, limit))

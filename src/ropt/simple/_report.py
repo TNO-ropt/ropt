@@ -1,4 +1,9 @@
-"""Progress reporting for the high-level API."""
+"""Progress reporting for the high-level API.
+
+A report callback is the small counterpart of a result handler: it is wired up
+as an ordinary handler, but as one belonging to a single run, which is why it is
+given per run even where `handlers=` only takes shared groups.
+"""
 
 from __future__ import annotations
 
@@ -43,6 +48,8 @@ def make_report_handler(report: ReportCallback) -> EventHandler:
                 and report(_build_evaluate_result(transformed))
                 and event.source is not None
             ):
+                # A truthy return asks the emitting run to stop; the break is
+                # what makes reporting end there rather than run out the batch.
                 event.source.stop()
                 break
 

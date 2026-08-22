@@ -101,6 +101,8 @@ class ParallelEvaluator(Evaluator):
         Raises:
             WorkflowError: If called on the executor's own event loop thread.
         """
+        # This call blocks until every work item is back, so running it on the
+        # loop would starve the very tasks it waits for.
         if self._executor.on_worker_loop():
             msg = (
                 "A compute step must run in a thread, for example with "
@@ -121,6 +123,8 @@ class ParallelEvaluator(Evaluator):
 
         bundles = self._make_bundles(variables, evaluator_context, batch_id)
         _logger.debug("Dispatching %d work item(s) to executor", len(bundles))
+        # Only the function and the bundle cross to the worker; the delivery
+        # channel stays here, on the submission.
         submission = Submission(
             [
                 WorkItem(function=_run_bundle, args=(self._function, bundle))
@@ -128,6 +132,8 @@ class ParallelEvaluator(Evaluator):
             ]
         )
         self._executor.submit(submission)
+        # Blocks until every work item is delivered; a user-code exception from
+        # a worker is re-raised here, unchanged, ending this evaluation.
         submission.collect(
             partial(
                 _handle_result,
@@ -181,6 +187,8 @@ def _handle_result(
         work_item.args[1]
     )
     if isinstance(work_item.result, ExecutorFailure):
+        # Infrastructure failure: the whole bundle counts as failed
+        # realizations, which the ensemble machinery handles as NaN.
         for _, function_context in bundle:
             results[function_context.eval_idx, :] = np.nan
         return

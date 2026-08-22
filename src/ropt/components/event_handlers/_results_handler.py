@@ -76,6 +76,8 @@ class ResultsHandler(EventHandler):
         if not results:
             return
 
+        # Clearing the stored result is how a consumer restarts the tracking,
+        # so the best seen so far must go with it.
         if self["results"] is None:
             self._best_results = None
 
@@ -92,6 +94,9 @@ class ResultsHandler(EventHandler):
 
         match self._what:
             case "best":
+                # The best so far competes with the new batch, so it is only
+                # replaced by something better, and kept untransformed to stay
+                # comparable with what arrives next.
                 if self._best_results is not None:
                     results = (self._best_results, *results)
                 best = min(results, key=_get_target_objective)

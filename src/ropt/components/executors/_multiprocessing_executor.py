@@ -65,6 +65,8 @@ class MultiprocessingExecutor(ExecutorBase):
         self._begin_start()
         executor = ProcessPoolExecutor(
             max_workers=self._workers,
+            # Spawn rather than fork: the parent runs an event loop and threads,
+            # which a forked child does not inherit in a usable state.
             mp_context=multiprocessing.get_context("spawn"),
             max_tasks_per_child=self._max_tasks_per_child,
         )
@@ -80,6 +82,9 @@ class MultiprocessingExecutor(ExecutorBase):
         await self._finish_start(task_group)
 
     async def _check_worker_startup(self) -> None:
+        # A missing `__main__` guard only shows up when a worker actually
+        # starts, so a trivial task is run first: the failure then names its
+        # cause, instead of surfacing on whichever work item came first.
         assert self._executor is not None
         loop = asyncio.get_running_loop()
         try:
@@ -114,6 +119,9 @@ class MultiprocessingExecutor(ExecutorBase):
                 result = await _run_work_item(work_item, executor)
                 self._deliver(submission, work_item, result)
             except BrokenProcessPool:
+                # A killed worker is infrastructure, not user code: it is
+                # delivered as a failed result and the pool keeps going, since
+                # the process pool replaces the worker on its own.
                 _logger.warning("Worker process pool broken; work item result lost")
                 self._deliver(
                     submission,
@@ -124,6 +132,9 @@ class MultiprocessingExecutor(ExecutorBase):
                 self._abort(submission)
                 raise
             except BaseException as exc:
+                # The caller is told either way, but an exception that is not an
+                # `Exception` (SystemExit, KeyboardInterrupt) is not this run's
+                # to swallow: it keeps unwinding into the task group.
                 self._fail(submission, exc)
                 if not isinstance(exc, Exception):
                     raise
@@ -132,6 +143,8 @@ class MultiprocessingExecutor(ExecutorBase):
 async def _run_work_item(work_item: WorkItem, executor: ProcessPoolExecutor) -> Any:  # ruff: ignore[any-type]
     loop = asyncio.get_running_loop()
     if _HAVE_CLOUDPICKLE:
+        # Serialized here rather than by the pool, so that closures, lambdas and
+        # locally defined functions can be sent as well.
         payload = cloudpickle.dumps(
             (work_item.function, work_item.args, work_item.kwargs)
         )
@@ -140,6 +153,8 @@ async def _run_work_item(work_item: WorkItem, executor: ProcessPoolExecutor) -> 
         if not ok:
             raise value
         return value
+    # Without cloudpickle the pool does the pickling, and reports a failure from
+    # inside its own machinery. Checking first turns that into a clear message.
     try:
         pickle.dumps((work_item.function, work_item.args, work_item.kwargs))
     except Exception as exc:
@@ -157,6 +172,8 @@ async def _run_work_item(work_item: WorkItem, executor: ProcessPoolExecutor) -> 
 def _run_function(
     function: Callable[..., Any], args: tuple[Any, ...], kwargs: dict[str, Any]
 ) -> Any:  # ruff: ignore[any-type]
+    # The pool unpickled the arguments before this call, so any workflow object
+    # among them has already been recorded.
     check_transferred()
     return function(*args, **kwargs)
 
@@ -168,8 +185,11 @@ def _run_cloudpickled(payload: bytes) -> tuple[bool, bytes]:
         check_transferred()
         return True, cloudpickle.dumps(function(*args, **kwargs))
     except Exception as exc:  # ruff: ignore[blind-except]
+        # Returned rather than raised: the pool sends an exception back with the
+        # standard pickle module, which not every exception survives.
         return False, cloudpickle.dumps(picklable_exception(exc))
 
 
+# Trivial by design: it proves a worker can start, nothing more.
 def _canary() -> None:
     pass

@@ -22,12 +22,16 @@ def _active_evaluations(
     evaluator_context: EvaluationBatchContext,
     batch_id: int,
 ) -> Iterator[tuple[int, EvaluationFunctionContext]]:
+    # Yields only the rows that must be evaluated. Inactive rows keep their
+    # index, so results still scatter back to the row they came from.
     for eval_idx, realization in enumerate(evaluator_context.realizations):
         if (
             evaluator_context.active is not None
             and not evaluator_context.active[eval_idx]
         ):
             continue
+        # An unperturbed evaluation is marked with -1, so the function can tell
+        # it apart from perturbation 0.
         perturbation = (
             -1
             if evaluator_context.perturbations is None
@@ -59,6 +63,8 @@ def _scatter_result(  # ruff:ignore[too-many-arguments, too-many-positional-argu
     if result.metadata is not None:
         for key, value in result.metadata.items():
             if key not in metadata:
+                # A key may first appear on any row, so the column is created
+                # for the whole batch and left at zero for the rows before it.
                 metadata[key] = np.zeros(
                     eval_count,
                     dtype=(

@@ -1,4 +1,13 @@
-"""Base classes for event handler plugins and event handlers."""
+"""Base classes for event handler plugins and event handlers.
+
+A handler is guarded on two different timescales, which are easy to confuse.
+`_in_use` covers one call to `handle_event`, and refuses a second one from
+another thread. `claim`/`release` cover a whole run, and are what a caller uses
+to say that a handler belongs to that run alone. `_attached_to` is neither: it
+records which side owns the handler, and only ever grows more restrictive — a
+handler attached to a compute step cannot join a dispatcher afterwards, since
+nothing detaches it again.
+"""
 
 from __future__ import annotations
 
@@ -46,6 +55,10 @@ class EventHandler(ABC):
 
     def __init_subclass__(cls, **kwargs: object) -> None:  # ruff: ignore[undocumented-magic-method]
         super().__init_subclass__(**kwargs)
+        # Wrapped here rather than left to each `handle_event`, so that a
+        # handler written outside this package cannot forget the guard.
+        # `__wrapped__` marks an already wrapped method, so inheriting one does
+        # not stack guards.
         if "handle_event" in cls.__dict__ and not getattr(
             cls.__dict__["handle_event"], "__wrapped__", None
         ):
@@ -73,6 +86,8 @@ class EventHandler(ABC):
 
     def __init__(self) -> None:
         """Initialize the EventHandler."""
+        # Name-mangled, so a subclass cannot reach it by accident and the `[]`
+        # access stays the only way in.
         self.__stored_values: dict[str, Any] = {}
         self._attached_to: _Attachment = _Attachment.NONE
         self._in_use = False
@@ -80,6 +95,9 @@ class EventHandler(ABC):
         self._owner_lock = threading.Lock()
 
     def __reduce__(self) -> tuple[object, tuple[str]]:  # ruff: ignore[undocumented-magic-method]
+        # A handler collects what a run produces, in the process that run is in,
+        # so it cannot follow work into a worker; it arrives there as a
+        # placeholder, which the worker reports by name.
         return (_make_placeholder, ("An event handler",))
 
     def _register_dispatcher(self) -> None:
@@ -108,6 +126,8 @@ class EventHandler(ABC):
         Raises:
             WorkflowError: If the handler is registered with a dispatcher.
         """
+        # There is no matching unregister: a step keeps its handlers for good,
+        # so this is the one-way half of the attachment.
         if self._attached_to is _Attachment.DISPATCHER:
             msg = "This event handler is already registered with a dispatcher."
             raise WorkflowError(msg)
