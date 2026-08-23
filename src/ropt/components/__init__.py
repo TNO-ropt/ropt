@@ -12,5 +12,5 @@ around for the parts it needs.
 
 None of these objects can be used across a process boundary. They may be pickled
 as part of a payload, but arrive in a worker as inert placeholders, which the
-worker reports rather than silently using (see `_transferred`).
+worker reports rather than silently using.
 """

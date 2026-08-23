@@ -1,37 +1,16 @@
-"""Framework and Implementations for Backend Plugins.
+"""Plugin support for optimizer backends.
 
-This module provides the necessary components for integrating optimization
-algorithms into `ropt` via its plugin system. Backend plugins allow `ropt` to
-utilize various optimization techniques, either built-in or provided by
-third-party packages.
+A backend wraps one or more optimization algorithms. A
+[`BackendPlugin`][ropt.plugins.backend.BackendPlugin] is a factory that creates
+the [`Backend`][ropt.backend.Backend] objects doing the actual work, which the
+[`PluginManager`][ropt.plugins.manager.PluginManager] discovers through the
+`ropt.plugins.backend` entry point group.
 
-**Built-in Backends:**
+`ropt` ships [`SciPyBackend`][ropt.backend.scipy.SciPyBackend], and
+[`ExternalBackend`][ropt.backend.external.ExternalBackend], which runs another
+backend in a separate process.
 
-`ropt` includes the following backends by default:
-
-* [`SciPyBackend`][ropt.backend.scipy.SciPyBackend]: Provides
-  access to various algorithms from the `scipy.optimize` library.
-* [`ExternalBackend`][ropt.backend.external.ExternalBackend]:
-  Enables running other backend plugins in a separate external process, useful
-  for isolation or specific execution environments.
-
-**Core Concepts:**
-
-* **Plugin Interface:** Backend plugins must inherit from the
-  [`BackendPlugin`][ropt.plugins.backend.BackendPlugin] base class.
-  This class acts as a factory, defining a `create` method to instantiate
-  backend objects.
-* **Backend Implementation:** The actual optimization logic resides in classes
-  that inherit from the [`Backend`][ropt.backend.Backend] abstract base
-  class. These classes are initialized with the optimization configuration
-  ([`EnOptContext`][ropt.context.EnOptContext]) and an
-  [`OptimizerCallback`][ropt.core.OptimizerCallback]. The callback is used by
-  the backend to request function and gradient evaluations from `ropt`. The
-  optimization process is initiated by calling the backend's `start` method.
-* **Discovery:** The [`PluginManager`][ropt.plugins.manager.PluginManager]
-  discovers available `BackendPlugin` implementations (typically via entry
-  points) and uses them to create `Backend` instances as needed during
-  workflow execution.
+See [Writing a Plugin](../utilities/writing_plugins.md) for a walkthrough.
 """
 
 from ._base import BackendPlugin

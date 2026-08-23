@@ -144,7 +144,6 @@ nav:
       - "Configuration":
         - "Context Class": reference/context.md
         - "Configuration Classes": reference/config.md
-      - "Basic Optimizer": reference/basic_optimizer.md
       - "Results & Events":
         - "Evaluation Results": reference/results.md
         - "Optimization Events": reference/events.md
@@ -158,6 +157,7 @@ nav:
         - "Samplers": reference/sampler.md
         - "Transforms": reference/transforms.md
       - "Workflow Components":
+        - "Overview": reference/components.md
         - "Compute Steps": reference/components_compute_steps.md
         - "Event Handlers": reference/components_event_handlers.md
         - "Evaluators": reference/components_evaluators.md
@@ -169,6 +169,7 @@ nav:
         - "Default Plugins": reference/default_plugins.md
       - "Enumerations": reference/enums.md
       - "Exceptions": reference/exceptions.md
+      - "Basic Optimizer": reference/basic_optimizer.md
 
 exclude_docs: |
   /snippets/

@@ -1,36 +1,19 @@
-"""Provides plugin functionality for adding function estimators.
+"""Plugin support for function estimators.
 
-Function estimators are used by the optimization process to combine the results
-(objective function values and gradients) from a set of realizations into a
-single representative value. This module allows for the extension of `ropt` with
-custom strategies for aggregating ensemble results.
+A function estimator combines the objective and gradient values of a set of
+realizations into a single value. A
+[`FunctionEstimatorPlugin`][ropt.plugins.function_estimator.FunctionEstimatorPlugin]
+is a factory that creates the
+[`FunctionEstimator`][ropt.function_estimator.FunctionEstimator] objects doing
+the actual work, which the
+[`PluginManager`][ropt.plugins.manager.PluginManager] discovers through the
+`ropt.plugins.function_estimator` entry point group.
 
-**Built-in Function Estimator Plugins:**
+`ropt` ships
+[`DefaultFunctionEstimator`][ropt.function_estimator.default.DefaultFunctionEstimator],
+which calculates the weighted mean or standard deviation of the realizations.
 
-The default
-[`DefaultFunctionEstimator`][ropt.function_estimator.default.DefaultFunctionEstimator]
-class provides methods for calculating the weighted mean (`mean`) and standard
-deviation (`stddev`) of the realization results.
-
-**Core Concepts:**
-
-* **Plugin Interface:** Function estimator plugins must inherit from the
-  [`FunctionEstimatorPlugin`][ropt.plugins.function_estimator.FunctionEstimatorPlugin]
-  base class. This class acts as a factory, defining a `create` method to
-  instantiate estimator objects.
-* **Estimator Implementation:** The actual aggregation logic resides in classes
-  that inherit from the
-  [`FunctionEstimator`][ropt.function_estimator.FunctionEstimator]
-  abstract base class. These classes are initialized with the optimization
-  configuration ([`EnOptContext`][ropt.context.EnOptContext]) and the index of the
-  specific estimator configuration to use (`estimator_index`). The core
-  functionality is provided by the `calculate_function` and `calculate_gradient`
-  methods, which combine the function values and gradients from multiple
-  realizations, respectively, using realization weights.
-* **Discovery:** The [`PluginManager`][ropt.plugins.manager.PluginManager]
-  discovers available `FunctionEstimatorPlugin` implementations (typically via
-  entry points) and uses them to create `FunctionEstimator` instances as needed
-  during workflow execution.
+See [Writing a Plugin](../utilities/writing_plugins.md) for a walkthrough.
 """
 
 from ._base import FunctionEstimatorPlugin

@@ -1,36 +1,20 @@
-"""Provides plugin functionality for adding realization filters.
+"""Plugin support for realization filters.
 
-Realization filters are used by the optimization process to determine how the
-results from a set of realizations should be weighted when evaluating the
-overall objective and constraint functions. This module allows for the extension
-of `ropt` with custom realization filtering strategies.
+A realization filter sets the weight of each realization whenever objective and
+constraint functions are evaluated. A
+[`RealizationFilterPlugin`][ropt.plugins.realization_filter.RealizationFilterPlugin]
+is a factory that creates the
+[`RealizationFilter`][ropt.realization_filter.RealizationFilter] objects doing
+the actual work, which the
+[`PluginManager`][ropt.plugins.manager.PluginManager] discovers through the
+`ropt.plugins.realization_filter` entry point group.
 
-**Built-in Realization Filter Plugins:**
+`ropt` ships
+[`DefaultRealizationFilter`][ropt.realization_filter.default.DefaultRealizationFilter],
+which provides sorting and CVaR based methods.
 
-The default
-[`DefaultRealizationFilter`][ropt.realization_filter.default.DefaultRealizationFilter]
-class provides several filtering methods, including sorting by
-objective/constraint values and Conditional Value-at-Risk (CVaR) based
-weighting.
-
-**Core Concepts:**
-
-* **Plugin Interface:** Realization filter plugins must inherit from the
-  [`RealizationFilterPlugin`][ropt.plugins.realization_filter.RealizationFilterPlugin]
-  base class. This class acts as a factory, defining a `create` method to
-  instantiate filter objects.
-* **Filter Implementation:** The actual filtering logic resides in classes that
-  inherit from the
-  [`RealizationFilter`][ropt.realization_filter.RealizationFilter]
-  abstract base class. These classes are initialized with their
-  [`RealizationFilterConfig`][ropt.config.RealizationFilterConfig], and receive
-  the [`EnOptContext`][ropt.context.EnOptContext] via their `init` method. The
-  core functionality is provided by the `get_realization_weights` method, which
-  calculates and returns weights for each realization based on their objective
-  and constraint values.
-* **Discovery:** The [`PluginManager`][ropt.plugins.manager.PluginManager]
-  discovers available `RealizationFilterPlugin` implementations (typically via
-  entry points) and uses them to create `RealizationFilter` instances as needed.
+See [Realization Filters](../optimizer_setup/realization_filters.md) for usage,
+and [Writing a Plugin](../utilities/writing_plugins.md) for a walkthrough.
 """
 
 from ._base import RealizationFilterPlugin

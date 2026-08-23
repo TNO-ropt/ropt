@@ -1,18 +1,8 @@
 # Simple API
 
-The `ropt.simple` module is the high-level, convenience interface
-for running optimizations. See [Running Optimizations](../running/running.md) for a
-walkthrough.
-
-Enumerations used in the configuration and results (for example
-[`ExitCode`][ropt.enums.ExitCode] and [`VariableType`][ropt.enums.VariableType])
-are not part of this module; import them from [`ropt.enums`][ropt.enums].
-
-Nothing about a run depends on where it is called from. Where its evaluations
-happen is decided by the pool it is given with `pool=`, and which handlers see
-its results by the `handlers=` it is given. A [`session`][ropt.simple.session]
-hands out both; a run given no pool evaluates in-process. This holds wherever
-the run is started from, including a thread you spawn yourself.
+::: ropt.simple
+    options:
+        members: []
 
 ## Running optimizations
 
