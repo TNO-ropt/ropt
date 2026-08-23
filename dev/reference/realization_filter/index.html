@@ -3290,8 +3290,10 @@ Context-dependent setup belongs in <code>init</code>.</p>
     <div class="doc doc-contents ">
 
         <p>Finalize initialization with the optimization context.</p>
-<p>Called once after configuration is finalized. Use for validation,
-internal state setup, or precomputation.</p>
+<p>Called once at the start of a run, for every configured filter, also
+for those that no objective or constraint refers to. Use for
+validation, internal state setup, or precomputation. The number of
+realizations is available as <code>context.realizations.weights.size</code>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3355,8 +3357,23 @@ internal state setup, or precomputation.</p>
     <div class="doc doc-contents ">
 
         <p>Compute one weight per realization from current evaluation results.</p>
-<p>Return a non-negative weight for each realization. The optimizer
-normalizes weights to sum to one before use.</p>
+<p>Called once per function evaluation, and only if at least one objective
+or nonlinear constraint refers to this filter. The weights returned by
+a single call are applied to all of them, and are reused for the
+gradients derived from that evaluation.</p>
+<p>Both arguments are two-dimensional arrays with one row per realization
+and one column per objective or per nonlinear constraint, in the order
+in which they are configured: <code>objectives[i, j]</code> is the value of
+objective <code>j</code> for realization <code>i</code>. The values are in the optimizer
+domain, i.e. after any objective or nonlinear constraint transforms.</p>
+<p>A realization that failed to evaluate carries <code>nan</code> values. The filter
+should check for these and handle them, for instance by assigning such
+realizations a weight of zero.</p>
+<p>The returned weights replace the weights configured in the
+<code>realizations</code> section, and are normalized to sum to one before use. If
+no realization can be given a positive weight, raise
+<a class="autorefs autorefs-internal" title="            TooFewRealizations" href="../exceptions/#ropt.exceptions.TooFewRealizations"><code>TooFewRealizations</code></a> to record
+the evaluation as failed.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3379,7 +3396,7 @@ normalizes weights to sum to one before use.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Shape <code>(n_realizations, n_objectives)</code>.</p>
+                <p>Objectives, shape <code>(n_realizations, n_objectives)</code>.</p>
               </div>
             </td>
             <td>
@@ -3395,7 +3412,9 @@ normalizes weights to sum to one before use.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Shape <code>(n_realizations, n_constraints)</code>, or <code>None</code>.</p>
+                <p>Nonlinear constraints, shape
+         <code>(n_realizations, n_constraints)</code>, or <code>None</code> if no
+         nonlinear constraints are configured.</p>
               </div>
             </td>
             <td>
@@ -3421,7 +3440,7 @@ normalizes weights to sum to one before use.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>1-D array of shape <code>(n_realizations,)</code>.</p>
+                <p>The non-negative weights, shape <code>(n_realizations,)</code>.</p>
               </div>
             </td>
           </tr>
