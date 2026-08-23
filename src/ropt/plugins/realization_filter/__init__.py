@@ -22,12 +22,12 @@ weighting.
 * **Filter Implementation:** The actual filtering logic resides in classes that
   inherit from the
   [`RealizationFilter`][ropt.realization_filter.RealizationFilter]
-  abstract base class. These classes are initialized with the optimization
-  configuration ([`EnOptContext`][ropt.context.EnOptContext]) and the index of the
-  specific filter configuration to use (`filter_index`). The core functionality
-  is provided by the `get_realization_weights` method, which calculates and
-  returns weights for each realization based on their objective and constraint
-  values.
+  abstract base class. These classes are initialized with their
+  [`RealizationFilterConfig`][ropt.config.RealizationFilterConfig], and receive
+  the [`EnOptContext`][ropt.context.EnOptContext] via their `init` method. The
+  core functionality is provided by the `get_realization_weights` method, which
+  calculates and returns weights for each realization based on their objective
+  and constraint values.
 * **Discovery:** The [`PluginManager`][ropt.plugins.manager.PluginManager]
   discovers available `RealizationFilterPlugin` implementations (typically via
   entry points) and uses them to create `RealizationFilter` instances as needed.

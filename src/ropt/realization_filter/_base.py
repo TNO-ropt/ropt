@@ -43,8 +43,10 @@ class RealizationFilter(ABC):
     def init(self, context: EnOptContext) -> None:
         """Finalize initialization with the optimization context.
 
-        Called once after configuration is finalized. Use for validation,
-        internal state setup, or precomputation.
+        Called once at the start of a run, for every configured filter, also
+        for those that no objective or constraint refers to. Use for
+        validation, internal state setup, or precomputation. The number of
+        realizations is available as `context.realizations.weights.size`.
 
         Args:
             context: The optimization context.
@@ -58,13 +60,33 @@ class RealizationFilter(ABC):
     ) -> NDArray[np.float64]:
         """Compute one weight per realization from current evaluation results.
 
-        Return a non-negative weight for each realization. The optimizer
-        normalizes weights to sum to one before use.
+        Called once per function evaluation, and only if at least one objective
+        or nonlinear constraint refers to this filter. The weights returned by
+        a single call are applied to all of them, and are reused for the
+        gradients derived from that evaluation.
+
+        Both arguments are two-dimensional arrays with one row per realization
+        and one column per objective or per nonlinear constraint, in the order
+        in which they are configured: `objectives[i, j]` is the value of
+        objective `j` for realization `i`. The values are in the optimizer
+        domain, i.e. after any objective or nonlinear constraint transforms.
+
+        A realization that failed to evaluate carries `nan` values. The filter
+        should check for these and handle them, for instance by assigning such
+        realizations a weight of zero.
+
+        The returned weights replace the weights configured in the
+        `realizations` section, and are normalized to sum to one before use. If
+        no realization can be given a positive weight, raise
+        [`TooFewRealizations`][ropt.exceptions.TooFewRealizations] to record
+        the evaluation as failed.
 
         Args:
-            objectives:  Shape `(n_realizations, n_objectives)`.
-            constraints: Shape `(n_realizations, n_constraints)`, or `None`.
+            objectives:  Objectives, shape `(n_realizations, n_objectives)`.
+            constraints: Nonlinear constraints, shape
+                         `(n_realizations, n_constraints)`, or `None` if no
+                         nonlinear constraints are configured.
 
         Returns:
-            1-D array of shape `(n_realizations,)`.
+            The non-negative weights, shape `(n_realizations,)`.
         """

@@ -99,6 +99,11 @@ def test_example_simple_ensemble(tmp_path: Path, monkeypatch: Any, merge: Any) -
     _load_from_file("ensemble", "simple").main(merge=merge)
 
 
+def test_example_simple_realization_filter(tmp_path: Path, monkeypatch: Any) -> None:
+    monkeypatch.chdir(tmp_path)
+    _load_from_file("realization_filter", "simple").main()
+
+
 @pytest.mark.parametrize("linear", [True, False])
 def test_example_simple_constrained(
     tmp_path: Path, monkeypatch: Any, linear: Any
