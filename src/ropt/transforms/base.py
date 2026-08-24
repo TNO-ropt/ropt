@@ -19,13 +19,17 @@ if TYPE_CHECKING:
 class VariableTransform(ABC):
     """Abstract base class for variable transformations.
 
+    Variable transforms are configured as an ordered chain. A transform defines
+    a single step of that chain; `ropt` applies it by calling `to_optimizer` on
+    each transform in turn, and `from_optimizer` on each in reverse order.
+
     Subclasses must implement methods to transform variables and related
     quantities between user and optimizer domains:
 
     - `to_optimizer` / `from_optimizer`: map variable values.
     - `magnitudes_to_optimizer`: map perturbation magnitudes.
     - `bound_constraint_diffs_from_optimizer`: map bound-violation differences.
-    - `init`: apply a mask selecting which variables this transform affects.
+    - `set_free_mask`: restrict the transform to the free variables.
 
     Override `linear_constraints_to_optimizer` and
     `linear_constraints_diffs_from_optimizer` if linear constraints are used.
@@ -47,14 +51,15 @@ class VariableTransform(ABC):
         """
 
     @abstractmethod
-    def init(self, mask: NDArray[np.bool_]) -> None:
-        """Apply a mask selecting which variables this transform affects.
+    def set_free_mask(self, mask: NDArray[np.bool_]) -> None:
+        """Restrict the transform to the free variables.
 
-        The mask combines the free-variable mask with the per-transform
-        assignment. Unmasked positions must pass through unchanged.
+        Called once when the context is built. Implementations must act as the
+        identity where `mask` is `False`, so that fixed variables keep their
+        user-domain values and bounds.
 
         Args:
-            mask: Boolean array (`True` = this transform applies).
+            mask: Boolean array (`True` = the variable is free).
         """
 
     @abstractmethod
@@ -187,9 +192,12 @@ class VariableTransform(ABC):
 class ObjectiveTransform(ABC):
     """Abstract base class for objective transformations.
 
+    Objective transforms are configured as an ordered chain. A transform defines
+    a single step of that chain; `ropt` applies it by calling `to_optimizer` on
+    each transform in turn, and `from_optimizer` on each in reverse order.
+
     Subclasses must implement `to_optimizer` and `from_optimizer` to map
-    objective values between user and optimizer domains, plus `init` to
-    apply a mask selecting which objectives this transform affects.
+    objective values between user and optimizer domains.
 
     All arrays use the last axis for the objective dimension.
     """
@@ -203,16 +211,6 @@ class ObjectiveTransform(ABC):
 
         Args:
             transform_config: The transform configuration.
-        """
-
-    @abstractmethod
-    def init(self, mask: NDArray[np.bool_]) -> None:
-        """Apply a mask selecting which objectives this transform affects.
-
-        Unmasked positions must pass through unchanged.
-
-        Args:
-            mask: Boolean array (`True` = this transform applies).
         """
 
     @abstractmethod
@@ -258,12 +256,16 @@ class ObjectiveTransform(ABC):
 class NonlinearConstraintTransform(ABC):
     """Abstract base class for nonlinear constraint transformations.
 
+    Constraint transforms are configured as an ordered chain. A transform
+    defines a single step of that chain; `ropt` applies it by calling
+    `to_optimizer` on each transform in turn, and `from_optimizer` on each in
+    reverse order.
+
     Subclasses must implement:
 
     - `to_optimizer` / `from_optimizer`: map constraint values.
     - `bounds_to_optimizer`: map constraint RHS bounds.
     - `nonlinear_constraint_diffs_from_optimizer`: map violation differences.
-    - `init`: apply a mask selecting which constraints this transform affects.
 
     All arrays use the last axis for the constraint dimension.
     """
@@ -277,16 +279,6 @@ class NonlinearConstraintTransform(ABC):
 
         Args:
             transform_config: The transform configuration.
-        """
-
-    @abstractmethod
-    def init(self, mask: NDArray[np.bool_]) -> None:
-        """Apply a mask selecting which constraints this transform affects.
-
-        Unmasked positions must pass through unchanged.
-
-        Args:
-            mask: Boolean array (`True` = this transform applies).
         """
 
     @abstractmethod

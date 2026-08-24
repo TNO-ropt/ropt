@@ -240,7 +240,6 @@ def test_objective_with_scaler(
     init1 = test_functions[1](initial_values, None)
 
     config["backend"]["method"] = f"{external}{_SLSQP}"
-    config["objectives"]["transforms"] = [0]
     config["objective_transforms"] = [
         {"method": "scaler", "options": {"scales": [init1, init1]}}
         if use_plugin
@@ -302,7 +301,6 @@ def test_objective_with_lazy_scaler(
     assert np.allclose(objectives1, [0.5, 4.5], atol=0.02)
 
     config["backend"]["method"] = f"{external}{_SLSQP}"
-    config["objectives"]["transforms"] = [0]
     config["objective_transforms"] = [
         {"method": "scaler"}
         if use_plugin
@@ -387,7 +385,6 @@ def test_nonlinear_constraint_with_scaler(
     assert result1.variables[[0, 2]].sum() > 0.0 - 1e-5
     assert result1.variables[[0, 2]].sum() < 0.4 + 1e-5
 
-    config["nonlinear_constraints"]["transforms"] = [0]
     config["nonlinear_constraint_transforms"] = [
         {"method": "scaler", "options": {"scales": scales}}
         if use_plugin
@@ -470,7 +467,6 @@ def test_nonlinear_constraint_with_lazy_scaler(
     assert result1.variables[[0, 2]].sum() > 0.0 - 1e-5
     assert result1.variables[[0, 2]].sum() < 0.4 + 1e-5
 
-    config["nonlinear_constraints"]["transforms"] = [0]
     config["nonlinear_constraint_transforms"] = [
         {"method": "scaler"}
         if use_plugin
@@ -557,7 +553,6 @@ def test_variables_scale_with_scaler(  # ruff: ignore[too-many-positional-argume
     config["backend"]["max_iterations"] = 20
     config["variables"]["lower_bounds"] = lower_bounds
     config["variables"]["upper_bounds"] = upper_bounds
-    config["variables"]["transforms"] = [0]
     config["variable_transforms"] = [
         {"method": "scaler", "options": {"scales": scales, "offsets": offsets}}
         if use_plugin
@@ -601,7 +596,6 @@ def test_variables_scale_linear_constraints_with_scaler(
 
     offsets = np.array([1.0, 1.1, 1.2])
     scales = np.array([2.0, 2.1, 2.2])
-    config["variables"]["transforms"] = [0]
     config["variable_transforms"] = [
         {"method": "scaler", "options": {"scales": scales, "offsets": offsets}}
         if use_plugin

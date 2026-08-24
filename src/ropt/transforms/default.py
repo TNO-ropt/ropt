@@ -42,6 +42,7 @@ class DefaultVariableTransform(VariableTransform):
         self._scales: NDArray[np.float64] | None = scales
         self._offsets: NDArray[np.float64] | None = offsets
         self._equation_scaling: NDArray[np.float64] | None = None
+        self._mask: NDArray[np.bool_] | None = transform_config.mask
 
     def to_optimizer(self, values: NDArray[np.float64]) -> NDArray[np.float64]:
         """Apply `(values - offset) / scale`.
@@ -171,12 +172,14 @@ class DefaultVariableTransform(VariableTransform):
             upper_diffs = upper_diffs.copy() * self._equation_scaling
         return lower_diffs, upper_diffs
 
-    def init(self, mask: NDArray[np.bool_]) -> None:
-        """Apply mask: set scales to 1 and offsets to 0 for unmasked variables.
+    def set_free_mask(self, mask: NDArray[np.bool_]) -> None:
+        """Neutralize scales and offsets outside the configured mask and free variables.
 
         Args:
-            mask: Boolean array (`True` = this transform applies).
+            mask: Boolean array (`True` = the variable is free).
         """
+        if self._mask is not None:
+            mask = np.logical_and(mask, self._mask)
         if self._scales is not None:
             self._scales = np.where(mask, self._scales, 1.0)
         if self._offsets is not None:
@@ -204,7 +207,9 @@ class DefaultObjectiveTransform(ObjectiveTransform):
         self._scales: NDArray[np.float64] | None = transform_config.options.get(
             "scales", None
         )
-        self._mask: NDArray[np.bool_] | None = None
+        self._mask: NDArray[np.bool_] | None = transform_config.mask
+        if self._scales is not None and self._mask is not None:
+            self._scales = np.where(self._mask, self._scales, 1.0)
 
     def to_optimizer(self, objectives: NDArray[np.float64]) -> NDArray[np.float64]:
         """Apply `objectives / scales`.
@@ -233,7 +238,7 @@ class DefaultObjectiveTransform(ObjectiveTransform):
         return objectives
 
     def update(self, scales: ArrayLike) -> None:
-        """Set new scaling factors (applies mask if previously initialized).
+        """Set new scaling factors.
 
         Args:
             scales: The new scaling factors.
@@ -241,16 +246,6 @@ class DefaultObjectiveTransform(ObjectiveTransform):
         self._scales = np.asarray(scales, dtype=np.float64)
         if self._mask is not None:
             self._scales = np.where(self._mask, self._scales, 1.0)
-
-    def init(self, mask: NDArray[np.bool_]) -> None:
-        """Apply mask: set scales to 1 for unmasked objectives.
-
-        Args:
-            mask: Boolean array (`True` = this transform applies).
-        """
-        if self._scales is not None:
-            self._scales = np.where(mask, self._scales, 1.0)
-        self._mask = mask
 
 
 class DefaultNonlinearConstraintTransform(NonlinearConstraintTransform):
@@ -274,7 +269,9 @@ class DefaultNonlinearConstraintTransform(NonlinearConstraintTransform):
         self._scales: NDArray[np.float64] | None = transform_config.options.get(
             "scales", None
         )
-        self._mask: NDArray[np.bool_] | None = None
+        self._mask: NDArray[np.bool_] | None = transform_config.mask
+        if self._scales is not None and self._mask is not None:
+            self._scales = np.where(self._mask, self._scales, 1.0)
 
     def to_optimizer(self, constraints: NDArray[np.float64]) -> NDArray[np.float64]:
         """Apply `constraints / scales`.
@@ -335,7 +332,7 @@ class DefaultNonlinearConstraintTransform(NonlinearConstraintTransform):
         return lower_diffs, upper_diffs
 
     def update(self, scales: ArrayLike) -> None:
-        """Set new scaling factors (applies mask if previously initialized).
+        """Set new scaling factors.
 
         Args:
             scales: The new scaling factors.
@@ -343,13 +340,3 @@ class DefaultNonlinearConstraintTransform(NonlinearConstraintTransform):
         self._scales = np.asarray(scales, dtype=np.float64)
         if self._mask is not None:
             self._scales = np.where(self._mask, self._scales, 1.0)
-
-    def init(self, mask: NDArray[np.bool_]) -> None:
-        """Apply mask: set scales to 1 for unmasked constraints.
-
-        Args:
-            mask: Boolean array (`True` = this transform applies).
-        """
-        if self._scales is not None:
-            self._scales = np.where(mask, self._scales, 1.0)
-        self._mask = mask

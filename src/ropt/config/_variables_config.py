@@ -55,7 +55,6 @@ class VariablesConfig(BaseModel):
             [`DEFAULT_PERTURBATION_BOUNDARY_TYPE`][ropt.config.constants.DEFAULT_PERTURBATION_BOUNDARY_TYPE]).
         samplers:                 Indices of the samplers to use for each variable.
         seed:                     Seed for the random number generator used by the samplers.
-        transforms:               Indices of the variable transforms to apply for each variable.
     """
 
     variable_count: int
@@ -68,7 +67,6 @@ class VariablesConfig(BaseModel):
     boundary_types: ArrayEnum = np.array(DEFAULT_PERTURBATION_BOUNDARY_TYPE)
     samplers: Array1DInt = np.array(0)
     seed: ItemOrTuple[int] = (DEFAULT_SEED,)
-    transforms: Array1DInt = np.array(-1)
 
     model_config = ConfigDict(
         arbitrary_types_allowed=True,
@@ -110,7 +108,6 @@ class VariablesConfig(BaseModel):
         )
         boundary_types = broadcast_1d_array(self.boundary_types, "boundary_types", dim)
         samplers = broadcast_1d_array(self.samplers, "samplers", dim)
-        transforms = broadcast_1d_array(self.transforms, "transforms", dim)
 
         if np.any(lower_bounds > upper_bounds):
             msg = "The lower bounds are larger than the upper bounds."
@@ -135,6 +132,5 @@ class VariablesConfig(BaseModel):
                 "perturbation_types": perturbation_types,
                 "boundary_types": boundary_types,
                 "samplers": samplers,
-                "transforms": transforms,
             }
         )

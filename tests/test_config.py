@@ -197,7 +197,6 @@ def test_perturbation_types_with_scaler(config: Any) -> None:
     config["variables"]["variable_count"] = 3
     config["variables"]["lower_bounds"] = [0.0, 100.0, 0.0]
     config["variables"]["upper_bounds"] = [np.inf, 600.0, 1.0]
-    config["variables"]["transforms"] = [0]
     config["variable_transforms"] = [
         {"method": "scaler", "options": {"scales": [1.0, 1.0, 50.0]}},
     ]

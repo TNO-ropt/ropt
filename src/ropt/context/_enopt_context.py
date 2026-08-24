@@ -111,6 +111,14 @@ class EnOptContext(BaseModel):
         return self
 
     @model_validator(mode="after")
+    def _check_nonlinear_constraint_transforms(self) -> Self:
+        # `variables` and `objectives` always exist, so only this chain can be orphaned.
+        if self.nonlinear_constraint_transforms and self.nonlinear_constraints is None:
+            msg = "nonlinear constraint transforms need nonlinear constraints"
+            raise ValueError(msg)
+        return self
+
+    @model_validator(mode="after")
     def _defaults(self) -> Self:
         updates: dict[str, Any] = {}
         if not self.function_estimators:
@@ -133,10 +141,8 @@ class EnOptContext(BaseModel):
 
     @model_validator(mode="after")
     def _initialize_variable_transforms(self) -> Self:
-        for idx, item in enumerate(self.variable_transforms):
-            item.init(
-                np.asarray(self.variables.mask & (self.variables.transforms == idx))
-            )
+        for item in self.variable_transforms:
+            item.set_free_mask(self.variables.mask)
 
         if self.variable_transforms:
             lower_bounds = self.variables.lower_bounds
@@ -185,21 +191,6 @@ class EnOptContext(BaseModel):
                     self, "linear_constraints", updated_linear_constraints
                 )
 
-        return self
-
-    @model_validator(mode="after")
-    def _initialize_objective_transforms(self) -> Self:
-        for idx, item in enumerate(self.objective_transforms):
-            mask = np.asarray(self.objectives.transforms == idx)
-            item.init(mask)
-        return self
-
-    @model_validator(mode="after")
-    def _initialize_nonlinear_constraint_transforms(self) -> Self:
-        if self.nonlinear_constraints is not None:
-            for idx, item in enumerate(self.nonlinear_constraint_transforms):
-                mask = np.asarray(self.nonlinear_constraints.transforms == idx)
-                item.init(mask)
         return self
 
     @model_validator(mode="wrap")  # type: ignore[arg-type]

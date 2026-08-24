@@ -206,15 +206,17 @@ class GradientEvaluations(ResultField):
         perturbed_objectives = self.perturbed_objectives
         perturbed_constraints = self.perturbed_constraints
 
-        for variable_transform in context.variable_transforms:
+        for variable_transform in reversed(context.variable_transforms):
             variables = variable_transform.from_optimizer(variables)
             perturbed_variables = variable_transform.from_optimizer(perturbed_variables)
-        for objective_transform in context.objective_transforms:
+        for objective_transform in reversed(context.objective_transforms):
             perturbed_objectives = objective_transform.from_optimizer(
                 perturbed_objectives
             )
         if perturbed_constraints is not None:
-            for constraint_transform in context.nonlinear_constraint_transforms:
+            for constraint_transform in reversed(
+                context.nonlinear_constraint_transforms
+            ):
                 perturbed_constraints = constraint_transform.from_optimizer(
                     perturbed_constraints
                 )

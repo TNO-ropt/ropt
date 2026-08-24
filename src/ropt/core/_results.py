@@ -116,7 +116,7 @@ def _get_function_results(
         active=realizations_to_evaluate[realizations],
         metadata=metadata,
     )
-    for variable_transform in context.variable_transforms:
+    for variable_transform in reversed(context.variable_transforms):
         variables = variable_transform.from_optimizer(variables)
     evaluator_result = evaluator(
         np.repeat(variables, realization_num, axis=0), evaluator_context
@@ -172,7 +172,7 @@ def _get_gradient_results(
     variables: NDArray[np.float64] = perturbed_variables.reshape(
         -1, perturbed_variables.shape[-1]
     )
-    for variable_transform in context.variable_transforms:
+    for variable_transform in reversed(context.variable_transforms):
         variables = variable_transform.from_optimizer(variables)
     evaluator_result = evaluator(variables, evaluator_context)
     objectives = evaluator_result.objectives
@@ -227,7 +227,7 @@ def _get_function_and_gradient_results(  # ruff:ignore[too-many-arguments, too-m
             perturbed_variables.reshape(-1, perturbed_variables.shape[-1]),
         ),
     )
-    for variable_transform in context.variable_transforms:
+    for variable_transform in reversed(context.variable_transforms):
         all_variables = variable_transform.from_optimizer(all_variables)
     evaluator_result = evaluator(all_variables, evaluator_context)
     objectives = evaluator_result.objectives

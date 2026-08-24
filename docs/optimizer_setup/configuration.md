@@ -102,9 +102,12 @@ field that is an integer array indexing into `EnOptContext.samplers`:
 Use all zeros to share a single component across all elements;
 thanks to broadcasting, a single `0` (the default) is sufficient.
 
-For optional fields like `realization_filters` and the transform fields, an
-index of `-1` (the default) or any other out-of-range value leaves the
-corresponding element unfiltered/untransformed.
+For optional fields like `realization_filters`, an index of `-1` (the default)
+or any other out-of-range value leaves the corresponding element unfiltered.
+
+The three transform tuples are the exception: nothing indexes into them. Each
+is an ordered [chain](transforms.md) applied to every variable, objective, or
+constraint, in order towards the optimizer domain and in reverse coming back.
 
 ### Providing optimizer components
 
@@ -262,10 +265,6 @@ To obtain unique results for each optimization run, modify the seed. A common
 approach is to use a tuple with a unique ID as the first
 element, ensuring reproducibility across nested and parallel evaluations.
 
-The optional `transforms` field is an integer array that assigns each variable
-to a [variable transform](transforms.md) by index. An out-of-range index
-(default `-1`) means no transform is applied.
-
 !!! tip "Named constants"
 
     The defaults above are defined as named constants in
@@ -288,21 +287,21 @@ are automatically normalized to sum to 1 (for example, `[1, 1]` becomes `[0.5, 0
 ```
 
 Objective functions can optionally be processed using
-[realization filters](realization_filters.md),
-[function estimators](function_estimators.md), and
-[transforms](transforms.md). The `realization_filters`,
-`function_estimators`, and `transforms` fields are integer index arrays: each
-entry selects an object by its position in the corresponding tuple defined in
-[`EnOptContext`][ropt.context.EnOptContext].
+[realization filters](realization_filters.md) and
+[function estimators](function_estimators.md). Both fields are integer index
+arrays: each entry selects an object by its position in the corresponding tuple
+defined in [`EnOptContext`][ropt.context.EnOptContext].
 
 - `realization_filters`: default `-1` (no filter applied).
 - `function_estimators`: default `0` (the first function estimator). Unless
   explicitly configured otherwise, the default function estimator method is
   `"default/default"`, which computes a weighted average of the per-realization
   values.
-- `transforms`: default `-1` (no transform applied).
 
 An out-of-range index means no object is applied to that objective.
+
+[Objective transforms](transforms.md) are not selected per objective: the
+`objective_transforms` tuple is a chain applied to every objective.
 
 ### `linear_constraints` — [`LinearConstraintsConfig`][ropt.config.LinearConstraintsConfig] { #linear_constraints }
 
@@ -340,14 +339,16 @@ Only some optimization methods accept non-linear constraints; for the SciPy
 backend, see the table in [`SciPyBackend`][ropt.backend.scipy.SciPyBackend].
 
 Like objectives, nonlinear constraints can optionally be processed using
-[realization filters](realization_filters.md),
-[function estimators](function_estimators.md), and
-[transforms](transforms.md) via index arrays:
+[realization filters](realization_filters.md) and
+[function estimators](function_estimators.md) via index arrays:
 
 - `realization_filters`: default `-1` (no filter applied).
 - `function_estimators`: default `0` (the first function estimator, which by
   default computes a weighted average of per-realization values).
-- `transforms`: default `-1` (no transform applied).
+
+The `nonlinear_constraint_transforms` tuple is a
+[chain](transforms.md) applied to every constraint, not selected per
+constraint.
 
 ### `realizations` — [`RealizationsConfig`][ropt.config.RealizationsConfig] { #realizations }
 
@@ -508,10 +509,14 @@ objective functions and gradients are calculated:
 
 ### `function_estimators`, `realization_filters`, `samplers`, `transforms`
 
-These are lists of optimizer component configurations (see [Index-based sharing of
-optimizer components](#index-based-sharing-of-optimizer-components) above for how
-objects are referenced by index). Each entry configures a plugin instance via a
-`method` field and an optional `options` dict.
+These are lists of optimizer component configurations. Each entry configures a
+plugin instance via a `method` field and an optional `options` dict.
+
+`function_estimators`, `realization_filters`, and `samplers` are referenced by
+index from the sections that use them (see [Index-based sharing of optimizer
+components](#index-based-sharing-of-optimizer-components) above). The three
+transform tuples are not: each is an ordered [chain](transforms.md) applied to
+every variable, objective, or constraint.
 
 #### Function estimators — [`FunctionEstimatorConfig`][ropt.config.FunctionEstimatorConfig] { #function-estimators }
 
@@ -563,7 +568,10 @@ domain and the optimizer's domain. Three types exist:
 - [`NonlinearConstraintTransformConfig`][ropt.config.NonlinearConstraintTransformConfig]:
   transforms constraint values (default method: `"default/default"`).
 
-Each has a `method` field and an `options` dict (default: `{}`).
+Each has a `method` field, an `options` dict (default: `{}`), and an optional
+boolean `mask` (default: `None`) selecting the variables, objectives or
+constraints the transform applies to. `None` means all of them. The transform
+decides how to honour its mask; see [Transforms](transforms.md#restricting-a-transform-to-a-subset).
 
 ### `names`
 
@@ -648,13 +656,11 @@ Expand the block below to see every field and its default value.
             "boundary_types": BoundaryType.MIRROR_BOTH,
             "samplers": 0,                                    # default: use first sampler for all
             "seed": 1,
-            "transforms": -1,                                 # default: no transform
         },
         "objectives": {
             "weights": [1.0],                                 # default: single objective, weight 1.0
             "realization_filters": -1,                        # default: no filter
             "function_estimators": 0,                         # default: use first estimator for all
-            "transforms": -1,                                 # default: no transform
         },
         "linear_constraints": None,                           # No linear constraints
         "nonlinear_constraints": None,                        # No non-linear constraints
@@ -722,7 +728,6 @@ Expand the block below to see every field and its default value.
         "upper_bounds": ...,                      # required: 1D array (one per constraint)
         "realization_filters": -1,                # default: no filter
         "function_estimators": 0,                 # default: use first estimator
-        "transforms": -1,                         # default: no transform
     }
 
     # realization_filters entries (method is required):
@@ -738,6 +743,7 @@ Expand the block below to see every field and its default value.
         {
             "method": "default/default",
             "options": {},
+            "mask": None,                     # default: applies to all variables
         },
     ]
 
@@ -746,6 +752,7 @@ Expand the block below to see every field and its default value.
         {
             "method": "default/default",
             "options": {},
+            "mask": None,                     # default: applies to all objectives
         },
     ]
 
@@ -754,6 +761,7 @@ Expand the block below to see every field and its default value.
         {
             "method": "default/default",
             "options": {},
+            "mask": None,                     # default: applies to all constraints
         },
     ]
     ```

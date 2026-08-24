@@ -123,12 +123,14 @@ class Gradients(ResultField):
 
         objectives = self.objectives
         constraints = self.constraints
-        for objective_transform in context.objective_transforms:
+        for objective_transform in reversed(context.objective_transforms):
             objectives = np.moveaxis(objectives, 0, -1)
             objectives = objective_transform.from_optimizer(objectives)
             objectives = np.moveaxis(objectives, 0, -1)
         if constraints is not None:
-            for constraint_transform in context.nonlinear_constraint_transforms:
+            for constraint_transform in reversed(
+                context.nonlinear_constraint_transforms
+            ):
                 constraints = np.moveaxis(constraints, 0, -1)
                 constraints = constraint_transform.from_optimizer(constraints)
                 constraints = np.moveaxis(constraints, 0, -1)

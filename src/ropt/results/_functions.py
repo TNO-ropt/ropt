@@ -111,10 +111,12 @@ class Functions(ResultField):
 
         objectives = self.objectives
         constraints = self.constraints
-        for objective_transform in context.objective_transforms:
+        for objective_transform in reversed(context.objective_transforms):
             objectives = objective_transform.from_optimizer(objectives)
         if constraints is not None:
-            for constraint_transform in context.nonlinear_constraint_transforms:
+            for constraint_transform in reversed(
+                context.nonlinear_constraint_transforms
+            ):
                 constraints = constraint_transform.from_optimizer(constraints)
 
         return Functions(
