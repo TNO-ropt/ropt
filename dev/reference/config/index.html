@@ -3710,17 +3710,6 @@ conditions (see <a class="autorefs autorefs-internal" title="            Boundar
               </div>
             </td>
           </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.config.VariablesConfig.transforms">transforms</span></code></td>
-            <td>
-                  <code><span title="ropt.config._validated_types.Array1DInt">Array1DInt</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Indices of the variable transforms to apply for each variable.</p>
-              </div>
-            </td>
-          </tr>
       </tbody>
     </table>
 
@@ -3813,17 +3802,6 @@ detailed descriptions and usage examples.</p>
             <td>
               <div class="doc-md-description">
                 <p>Optional indices of function estimators.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.config.ObjectiveFunctionsConfig.transforms">transforms</span></code></td>
-            <td>
-                  <code><span title="ropt.config._validated_types.Array1DInt">Array1DInt</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional indices of objective transforms.</p>
               </div>
             </td>
           </tr>
@@ -4029,17 +4007,6 @@ descriptions and usage examples.</p>
             <td>
               <div class="doc-md-description">
                 <p>Optional indices of function estimators.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.config.NonlinearConstraintsConfig.transforms">transforms</span></code></td>
-            <td>
-                  <code><span title="ropt.config._validated_types.Array1DInt">Array1DInt</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional indices of constraint transforms.</p>
               </div>
             </td>
           </tr>
@@ -4830,6 +4797,18 @@ detailed descriptions and usage examples.</p>
               </div>
             </td>
           </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.VariableTransformConfig.mask">mask</span></code></td>
+            <td>
+                  <code><span title="ropt.config._validated_types.Array1DBool">Array1DBool</span> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional boolean array selecting the variables this transform
+     applies to (default: all).</p>
+              </div>
+            </td>
+          </tr>
       </tbody>
     </table>
 
@@ -4915,6 +4894,18 @@ detailed descriptions and usage examples.</p>
               </div>
             </td>
           </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.ObjectiveTransformConfig.mask">mask</span></code></td>
+            <td>
+                  <code><span title="ropt.config._validated_types.Array1DBool">Array1DBool</span> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional boolean array selecting the objectives this transform
+     applies to (default: all).</p>
+              </div>
+            </td>
+          </tr>
       </tbody>
     </table>
 
@@ -4997,6 +4988,18 @@ detailed descriptions and usage examples.</p>
             <td>
               <div class="doc-md-description">
                 <p>Dictionary of options for the nonlinear constraint transform method.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.NonlinearConstraintTransformConfig.mask">mask</span></code></td>
+            <td>
+                  <code><span title="ropt.config._validated_types.Array1DBool">Array1DBool</span> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional boolean array selecting the constraints this transform
+     applies to (default: all).</p>
               </div>
             </td>
           </tr>

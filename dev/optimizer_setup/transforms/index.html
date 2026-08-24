@@ -996,6 +996,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="How they plug in">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#restricting-a-transform-to-a-subset" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Restricting a transform to a subset
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -2979,6 +2996,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="How they plug in">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#restricting-a-transform-to-a-subset" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Restricting a transform to a subset
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -3139,32 +3173,46 @@ domain</strong> (the values actually presented to the optimization algorithm).</
 <li><code>objective_transforms</code></li>
 <li><code>nonlinear_constraint_transforms</code></li>
 </ul>
-<p>Each variable, objective, or constraint is assigned to a transform by its
-<strong>index</strong> in the corresponding <code>transforms</code> array inside <code>VariablesConfig</code>,
-<code>ObjectiveFunctionsConfig</code>, or <code>NonlinearConstraintsConfig</code>. An index of <code>-1</code>
-(the default) means no transform applies.</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="s2">&quot;variable_transforms&quot;</span><span class="p">:</span> <span class="p">[</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="p">{</span><span class="s2">&quot;method&quot;</span><span class="p">:</span> <span class="s2">&quot;default/scaler&quot;</span><span class="p">,</span> <span class="s2">&quot;options&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;scales&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1e3</span><span class="p">,</span> <span class="mf">1e-3</span><span class="p">]}},</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">],</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="s2">&quot;variables&quot;</span><span class="p">:</span> <span class="p">{</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="s2">&quot;variable_count&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="s2">&quot;transforms&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>   <span class="c1"># all three variables use transform 0</span>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">},</span>
+<p>Each tuple is an ordered <strong>chain</strong> applied to <em>all</em> variables, objectives, or
+constraints. Going to the optimizer domain the chain runs in order; coming back
+it runs in reverse:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>user domain  --[ A ]--&gt;--[ B ]--&gt;--[ C ]--&gt;  optimizer domain
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>user domain  &lt;--[ A ]--&lt;--[ B ]--&lt;--[ C ]--  optimizer domain
 </span></code></pre></div>
-<p>Multiple transforms may exist, each handling a different subset of variables or
-objectives/constraints.</p>
-<p>At context initialization, each transform's <code>init(mask)</code> method is called
-with a boolean mask combining:</p>
-<ul>
-<li>For variables: which variables are free (<code>variables.mask</code>) <strong>and</strong> assigned
-  to this transform (<code>variables.transforms == idx</code>).</li>
-<li>For objectives/constraints: which objectives or constraints are assigned to
-  this transform.</li>
-</ul>
-<p>The transform must treat unmasked elements as identity (pass through
-unchanged).</p>
-<p>See <a href="../configuration/">Configuration</a> for the broadcasting and index-sharing
-rules.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="s2">&quot;variable_transforms&quot;</span><span class="p">:</span> <span class="p">[</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    <span class="p">{</span><span class="s2">&quot;method&quot;</span><span class="p">:</span> <span class="s2">&quot;default/scaler&quot;</span><span class="p">,</span> <span class="s2">&quot;options&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;offsets&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">10.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]}},</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    <span class="p">{</span><span class="s2">&quot;method&quot;</span><span class="p">:</span> <span class="s2">&quot;default/scaler&quot;</span><span class="p">,</span> <span class="s2">&quot;options&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;scales&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1e3</span><span class="p">,</span> <span class="mf">1e-3</span><span class="p">]}},</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="p">],</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="s2">&quot;variables&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;variable_count&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">},</span>
+</span></code></pre></div>
+<p>Here every variable is first shifted, then scaled. Reading results back, the
+values are unscaled first and unshifted second.</p>
+<p>Because a chain applies to everything, order matters whenever the transforms do
+not commute — as in the example above, where shifting and scaling give
+different answers depending on which comes first.</p>
+<p>Variables held fixed through the <code>mask</code> field of <code>variables</code> are never passed
+to the optimizer, and the chain leaves them unchanged.</p>
+<h3 id="restricting-a-transform-to-a-subset">Restricting a transform to a subset</h3>
+<p>Each transform config takes an optional boolean <code>mask</code> selecting the elements
+it applies to. It defaults to <code>None</code>, meaning the whole set:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="s2">&quot;objective_transforms&quot;</span><span class="p">:</span> <span class="p">[</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    <span class="p">{</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>        <span class="s2">&quot;method&quot;</span><span class="p">:</span> <span class="s2">&quot;default/scaler&quot;</span><span class="p">,</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>        <span class="s2">&quot;options&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;scales&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1e6</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]},</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>        <span class="s2">&quot;mask&quot;</span><span class="p">:</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">],</span>   <span class="c1"># only the first objective is scaled</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>    <span class="p">},</span>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="p">],</span>
+</span></code></pre></div>
+<p>Unlike the chain itself, masks of different transforms need not be disjoint: an
+element is acted on by every chain member whose mask selects it, in order. A
+mask is therefore a filter, not a partition.</p>
+<p>Masks are available on all three transform configs, and the transform decides
+what to do with them — the core does not apply them for you. The built-in
+scalers implement a mask by neutralizing their scale and offset on the excluded
+positions, which leaves those values untouched in both directions.</p>
+<p>For variable transforms the mask is combined with the free-variable mask by a
+logical <em>and</em>, so a variable is transformed only when it is both free and
+selected.</p>
 <h2 id="default-transforms">Default transforms</h2>
 <p>The <code>ropt.plugins.transforms.default</code> package provides built-in linear scaling
 transforms, exposed as the <code>default/scaler</code> method.</p>
@@ -3216,8 +3264,8 @@ divides constraint values <em>and</em> their RHS bounds by <code>scales</code>:<
 changes. Constraint-violation differences are multiplied by <code>scales</code> when
 converting back to user domain.</p>
 <h2 id="effects-on-bounds-and-constraints">Effects on bounds and constraints</h2>
-<p>During context initialization, <code>ropt</code> automatically applies variable transforms
-to:</p>
+<p>During context initialization, <code>ropt</code> automatically applies the variable
+transform chain to:</p>
 <ul>
 <li>Variable <strong>lower and upper bounds</strong> (via <code>to_optimizer</code>).</li>
 <li><strong>Perturbation magnitudes</strong> (via <code>magnitudes_to_optimizer</code>).</li>
@@ -3257,12 +3305,16 @@ values (including bound/constraint violation differences).</p>
 <a class="autorefs autorefs-internal" title="            ObjectiveTransform" href="../../reference/transforms/#ropt.transforms.ObjectiveTransform"><code>ObjectiveTransform</code></a>, or
 <a class="autorefs autorefs-internal" title="            NonlinearConstraintTransform" href="../../reference/transforms/#ropt.transforms.NonlinearConstraintTransform"><code>NonlinearConstraintTransform</code></a>
 — whose docstrings document the lifecycle and the methods to implement.
-<code>VariableTransform</code> is the most involved, since variables also interact with
-bounds and linear constraints.</p>
+<code>VariableTransform</code> is the most involved: variables also interact with bounds
+and linear constraints, and it is the only one that receives the free-variable
+mask, through <code>set_free_mask</code>.</p>
+<p>A transform only needs to describe its own step; <code>ropt</code> takes care of running
+the chain in the right order in each direction. <code>to_optimizer</code> and
+<code>from_optimizer</code> must be inverses, otherwise results cannot be mapped back.</p>
 <h2 id="where-to-next">Where to next</h2>
 <ul>
-<li><a href="../realization_filters/">Realization Filters</a> — also configured via
-  index-sharing.</li>
+<li><a href="../realization_filters/">Realization Filters</a> — selecting realizations per
+  objective or constraint.</li>
 <li><a href="../configuration/">Configuration</a> — broadcasting and index-sharing rules in
   context.</li>
 </ul>
