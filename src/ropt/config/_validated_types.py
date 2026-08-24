@@ -2,7 +2,6 @@
 
 from collections.abc import Sequence
 from collections.abc import Sequence as AbstractSequence
-from collections.abc import Set as AbstractSet
 from typing import Annotated, TypeVar
 
 import numpy as np
@@ -46,12 +45,6 @@ def _convert_enum_array(array: ArrayLike | None) -> NDArray[np.ubyte] | None:
     return immutable_array(array, dtype=np.ubyte, ndmin=1)
 
 
-def _convert_set(value: T | set[T] | Sequence[T]) -> set[T]:
-    if isinstance(value, str):
-        return {value}
-    return set(value) if isinstance(value, AbstractSequence | AbstractSet) else {value}
-
-
 def _convert_tuple(value: T | Sequence[T]) -> tuple[T, ...]:
     if isinstance(value, str):
         return (value,)
@@ -72,9 +65,6 @@ Array1DInt = Annotated[NDArray[np.intc], BeforeValidator(_convert_1d_array_intc)
 
 Array1DBool = Annotated[NDArray[np.bool_], BeforeValidator(_convert_1d_array_bool)]
 """Convert to an immutable 1D numpy array of boolean values."""
-
-ItemOrSet = Annotated[set[T], BeforeValidator(_convert_set)]
-"""Convert to single value to a set containing that value, passes sets unchanged."""
 
 ItemOrTuple = Annotated[tuple[T, ...], BeforeValidator(_convert_tuple)]
 """Convert to single value to a tuple containing that value, passes sets unchanged."""
