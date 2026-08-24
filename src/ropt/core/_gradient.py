@@ -158,7 +158,9 @@ def _calculate_estimated_gradients(  # ruff: ignore[too-many-arguments, too-many
     *,
     merge_realizations: bool,
 ) -> NDArray[np.float64]:
-    gradients = np.zeros((functions.shape[-1], variables.shape[-1]), dtype=np.float64)
+    gradients = np.full(
+        (functions.shape[-1], variables.shape[-1]), np.nan, dtype=np.float64
+    )
     delta_variables = perturbed_variables - np.expand_dims(variables, axis=1)
     delta_functions = perturbed_functions - np.expand_dims(functions, axis=1)
 

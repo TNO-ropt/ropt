@@ -11,7 +11,7 @@ def _calculate_estimated_functions(
     realization_weights: NDArray[np.float64],
     failed_realizations: NDArray[np.bool_],
 ) -> NDArray[np.float64]:
-    result: NDArray[np.float64] = np.empty(functions.shape[-1], dtype=np.float64)
+    result: NDArray[np.float64] = np.full(functions.shape[-1], np.nan, dtype=np.float64)
 
     if estimator_indices is None:
         estimator_indices = np.zeros(functions.shape[1], dtype=np.intc)
