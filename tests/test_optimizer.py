@@ -10,6 +10,7 @@ from pydantic import ValidationError
 
 from ropt.components.event_handlers import CallbackHandler
 from ropt.config import (
+    LinearConstraintsConfig,
     NonlinearConstraintTransformConfig,
     ObjectiveTransformConfig,
     VariableTransformConfig,
@@ -607,7 +608,7 @@ def test_variables_scale_linear_constraints_with_scaler(
     ]
 
     context = EnOptContext.model_validate(config)
-    assert context.linear_constraints is not None
+    assert isinstance(context.linear_constraints, LinearConstraintsConfig)
     transformed_coefficients = coefficients * scales
     transformed_scales = np.max(np.abs(transformed_coefficients), axis=-1)
     assert np.allclose(

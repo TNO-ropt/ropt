@@ -63,6 +63,7 @@ def function_result_fixture(config: dict[str, Any]) -> FunctionResults:
         batch_id=1,
         metadata={},
         names=context.names,
+        evaluation_point=evaluations.variables,
         evaluations=evaluations,
         realizations=realizations,
         functions=functions,
@@ -86,6 +87,7 @@ def gradient_result_fixture(config: dict[str, Any]) -> GradientResults:
         batch_id=1,
         metadata={},
         names=context.names,
+        evaluation_point=evaluations.variables,
         evaluations=evaluations,
         realizations=Realizations(
             evaluated_realizations=np.ones(36, dtype=np.bool_),

@@ -16,6 +16,7 @@ class _FunctionEvaluatorResults:
     objectives: NDArray[np.float64]
     constraints: NDArray[np.float64] | None
     metadata: dict[str, NDArray[Any]]
+    evaluation_point: NDArray[np.float64]
 
     def __post_init__(self) -> None:
         self.objectives, self.constraints = _propagate_nan_values(
@@ -146,6 +147,7 @@ def _get_function_results(
                 objectives=objectives,
                 constraints=constraints,
                 metadata={key: value[idx] for key, value in split_infos.items()},
+                evaluation_point=variables[idx],
             ),
         )
 
@@ -246,6 +248,8 @@ def _get_function_and_gradient_results(  # ruff:ignore[too-many-arguments, too-m
                 key: value[:realization_num]
                 for key, value in evaluator_result.metadata.items()
             },
+            # The first `realization_num` rows are all the same base point.
+            evaluation_point=all_variables[0],
         ),
         _GradientEvaluatorResults(
             batch_id=evaluator_result.batch_id,

@@ -25,8 +25,11 @@ from ropt.results import (
     ConstraintInfo,
     FunctionEvaluations,
     FunctionResults,
+    GradientEvaluations,
+    GradientResults,
     Realizations,
 )
+from ropt.simple import EvaluationFunctionContext, evaluate
 from ropt.transforms import (
     NonlinearConstraintTransform,
     ObjectiveTransform,
@@ -166,11 +169,13 @@ def _function_results(
     objectives: NDArray[np.float64] | None = None,
     constraints: NDArray[np.float64] | None = None,
     constraint_info: ConstraintInfo | None = None,
+    evaluation_point: NDArray[np.float64] | None = None,
 ) -> FunctionResults:
     return FunctionResults(
         batch_id=0,
         metadata={},
         names={},
+        evaluation_point=variables if evaluation_point is None else evaluation_point,
         evaluations=FunctionEvaluations(
             variables=variables,
             objectives=np.zeros((1, 2)) if objectives is None else objectives,
@@ -277,16 +282,36 @@ def test_relative_perturbation_magnitudes_are_left_untransformed() -> None:
     )
 
 
-def test_variable_chain_from_optimizer_restores_user_values() -> None:
+class _LossyVariableTransform(_AffineVariableTransform):
+    """Affine forward map with a deliberately wrong inverse.
+
+    Reporting must not depend on `from_optimizer` for variables: the evaluation
+    point is a record of what was evaluated, not a reconstruction.
+    """
+
+    def from_optimizer(self, values: NDArray[np.float64]) -> NDArray[np.float64]:  # ruff: ignore[no-self-use]
+        return np.full_like(values, np.nan)
+
+
+def test_reported_variables_come_from_the_evaluation_point() -> None:
+    user_variables = np.array([0.5, 1.5, 2.5])
+    transform = _LossyVariableTransform(2.0, 1.0, 0.5)
+    context = _context(variable_transforms=[transform])
+    transformed = _function_results(
+        transform.to_optimizer(user_variables), evaluation_point=user_variables
+    ).transform_from_optimizer(context)
+    assert np.allclose(transformed.evaluations.variables, user_variables)
+
+
+def test_transform_from_optimizer_preserves_the_evaluation_point() -> None:
     user_variables = np.array([0.5, 1.5, 2.5])
     first, second = _variable_chain()
-    optimizer_variables = second.to_optimizer(first.to_optimizer(user_variables))
-
     context = _context(variable_transforms=_variable_chain())
-    transformed = _function_results(optimizer_variables).transform_from_optimizer(
-        context
-    )
-    assert np.allclose(transformed.evaluations.variables, user_variables)
+    transformed = _function_results(
+        second.to_optimizer(first.to_optimizer(user_variables)),
+        evaluation_point=user_variables,
+    ).transform_from_optimizer(context)
+    assert np.allclose(transformed.evaluation_point, user_variables)
 
 
 def test_objective_chain_from_optimizer_restores_user_values() -> None:
@@ -393,20 +418,53 @@ def test_constraint_transforms_without_constraints_are_rejected() -> None:
         _context(nonlinear_constraint_transforms=_constraint_chain())
 
 
-def test_single_variable_transform_round_trips() -> None:
-    def scaler() -> DefaultVariableTransform:
-        return DefaultVariableTransform(
-            VariableTransformConfig.model_validate(
-                {"method": "scaler", "options": {"scales": [2.0, 4.0, 5.0]}}
-            )
-        )
+def test_evaluator_is_called_at_the_reverse_chained_point() -> None:
+    seen: list[NDArray[np.float64]] = []
+
+    def objective(
+        variables: NDArray[np.float64], _context: EvaluationFunctionContext
+    ) -> float:
+        seen.append(np.asarray(variables, dtype=np.float64).copy())
+        return 0.0
 
     user_variables = np.array([0.5, 1.5, 2.5])
-    context = _context(variable_transforms=[scaler()])
-    transformed = _function_results(
-        scaler().to_optimizer(user_variables)
-    ).transform_from_optimizer(context)
+
+    evaluate(
+        {
+            "variables": {"variable_count": 3},
+            "variable_transforms": _variable_chain(),
+        },
+        user_variables,
+        objective,
+    )
+
+    # to_optimizer runs the chain in order; the point handed to the evaluator is
+    # rebuilt by running it in reverse, so a wrong order shows up here.
+    assert seen
+    assert np.allclose(seen[0], user_variables)
+
+
+def test_gradient_results_report_the_evaluation_point() -> None:
+    user_variables = np.array([0.5, 1.5, 2.5])
+    transform = _LossyVariableTransform(2.0, 1.0, 0.5)
+    context = _context(variable_transforms=[transform])
+    results = GradientResults(
+        batch_id=0,
+        metadata={},
+        names={},
+        evaluation_point=user_variables,
+        evaluations=GradientEvaluations(
+            variables=transform.to_optimizer(user_variables),
+            perturbed_variables=np.zeros((1, 1, 3)),
+            perturbed_objectives=np.zeros((1, 1, 2)),
+            metadata={},
+        ),
+        realizations=Realizations(evaluated_realizations=np.array([True])),
+        gradients=None,
+    )
+    transformed = results.transform_from_optimizer(context)
     assert np.allclose(transformed.evaluations.variables, user_variables)
+    assert np.allclose(transformed.evaluation_point, user_variables)
 
 
 @pytest.mark.parametrize("mask", [[True, False, True], [False, False, True]])
@@ -501,3 +559,45 @@ def test_constraint_transform_mask_survives_update() -> None:
 def test_transform_without_mask_applies_everywhere() -> None:
     scaler = _default_objective_scaler([2.0, 2.0])
     assert np.allclose(scaler.to_optimizer(np.array([2.0, 2.0])), [1.0, 1.0])
+
+
+def test_variable_transform_mask_larger_than_scales_is_rejected() -> None:
+    with pytest.raises(
+        ValueError, match=r"transform mask size \(3\) does not match scales \(2\)"
+    ):
+        _default_variable_scaler([2.0, 2.0], mask=[True, False, True])
+
+
+def test_objective_transform_mask_larger_than_scales_is_rejected() -> None:
+    with pytest.raises(
+        ValueError, match=r"transform mask size \(3\) does not match scales \(2\)"
+    ):
+        _default_objective_scaler([2.0, 2.0], mask=[True, False, True])
+
+
+def test_constraint_transform_mask_larger_than_scales_is_rejected() -> None:
+    with pytest.raises(
+        ValueError, match=r"transform mask size \(3\) does not match scales \(2\)"
+    ):
+        _default_constraint_scaler([2.0, 2.0], mask=[True, False, True])
+
+
+def test_single_entry_transform_mask_is_rejected() -> None:
+    # Without the size check this broadcasts over every objective instead.
+    with pytest.raises(
+        ValueError, match=r"transform mask size \(1\) does not match scales \(2\)"
+    ):
+        _default_objective_scaler([2.0, 2.0], mask=[False])
+
+
+def test_variable_transform_mask_not_matching_the_variable_count_is_rejected() -> None:
+    with pytest.raises(
+        ValidationError,
+        match=r"transform mask size \(2\) does not match the number of variables \(3\)",
+    ):
+        _context(
+            variables={"variable_count": 3},
+            variable_transforms=[
+                _default_variable_scaler([2.0, 2.0], mask=[True, False])
+            ],
+        )

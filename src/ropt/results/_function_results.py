@@ -48,7 +48,9 @@ class FunctionResults(Results):
         Returns:
             The transformed results.
         """
-        evaluations = self.evaluations._transform_from_optimizer(context)  # ruff: ignore[private-member-access]
+        evaluations = self.evaluations._transform_from_optimizer(  # ruff: ignore[private-member-access]
+            context, self.evaluation_point
+        )
         functions: Functions | None = None
         if self.functions is not None:
             functions = self.functions._transform_from_optimizer(context)  # ruff: ignore[private-member-access]
@@ -65,6 +67,7 @@ class FunctionResults(Results):
             batch_id=self.batch_id,
             metadata=self.metadata,
             names=self.names,
+            evaluation_point=self.evaluation_point,
             evaluations=self.evaluations if evaluations is None else evaluations,
             realizations=self.realizations,
             functions=self.functions if functions is None else functions,

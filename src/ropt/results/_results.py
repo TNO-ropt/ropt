@@ -10,6 +10,9 @@ from ropt.exceptions import UnsupportedError
 if TYPE_CHECKING:
     from collections.abc import Iterable
 
+    import numpy as np
+    from numpy.typing import NDArray
+
     from ropt.context import EnOptContext
     from ropt.enums import AxisName
 
@@ -39,15 +42,19 @@ class Results(ABC):
     See [Working with Results](../optimizer_setup/results.md) for a narrative overview.
 
     Attributes:
-        batch_id: Identifier for the evaluation batch.
-        metadata: Dictionary of additional information (not used internally).
-        names:    Mapping from [`AxisName`][ropt.enums.AxisName] to label tuples
-                  for DataFrame export.
+        batch_id:         Identifier for the evaluation batch.
+        metadata:         Dictionary of additional information (not used internally).
+        names:            Mapping from [`AxisName`][ropt.enums.AxisName] to label tuples
+                          for DataFrame export.
+        evaluation_point: The variables this result was produced at, in the user
+                          domain. Never transformed, so it identifies the result
+                          regardless of the domain its other fields are in.
     """
 
     batch_id: int
     metadata: dict[str, Any]
     names: dict[str, tuple[str | int, ...]]
+    evaluation_point: NDArray[np.float64]
 
     def to_dataframe(
         self,

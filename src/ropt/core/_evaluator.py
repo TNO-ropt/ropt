@@ -220,6 +220,7 @@ class EnsembleEvaluator:
             batch_id=f_eval_results.batch_id,
             metadata={},
             names=self._context.names,
+            evaluation_point=f_eval_results.evaluation_point,
             evaluations=evaluations,
             realizations=Realizations(
                 evaluated_realizations=realizations_to_evaluate,
@@ -303,6 +304,7 @@ class EnsembleEvaluator:
                 batch_id=g_eval_results.batch_id,
                 metadata={},
                 names=self._context.names,
+                evaluation_point=cached_function.evaluation_point,
                 evaluations=GradientEvaluations.create(
                     variables=variables,
                     perturbed_variables=perturbed_variables,
@@ -375,6 +377,7 @@ class EnsembleEvaluator:
             batch_id=f_eval_results.batch_id,
             metadata={},
             names=self._context.names,
+            evaluation_point=f_eval_results.evaluation_point,
             evaluations=evaluations,
             realizations=Realizations(
                 evaluated_realizations=realizations_to_evaluate,
@@ -424,6 +427,8 @@ class EnsembleEvaluator:
             batch_id=g_eval_results.batch_id,
             metadata={},
             names=self._context.names,
+            # Same base point as the function results computed alongside it.
+            evaluation_point=f_eval_results.evaluation_point,
             evaluations=GradientEvaluations.create(
                 variables=variables,
                 perturbed_variables=perturbed_variables,

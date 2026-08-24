@@ -16,6 +16,13 @@ DEFAULT_OBJECTIVE_TRANSFORM_METHODS = {"scaler"}
 DEFAULT_NONLINEAR_CONSTRAINT_TRANSFORM_METHODS = {"scaler"}
 
 
+def _check_mask_size(mask: NDArray[np.bool_], size: int, what: str) -> None:
+    # A mismatched mask would otherwise broadcast silently or raise a bare numpy error.
+    if mask.size != size:
+        msg = f"transform mask size ({mask.size}) does not match {what} ({size})"
+        raise ValueError(msg)
+
+
 class DefaultVariableTransform(VariableTransform):
     """Linearly scales and shifts variables between domains.
 
@@ -39,10 +46,19 @@ class DefaultVariableTransform(VariableTransform):
         offsets = transform_config.options.get("offsets", None)
         if scales is not None and offsets is not None:
             scales, offsets = np.broadcast_arrays(scales, offsets)
-        self._scales: NDArray[np.float64] | None = scales
-        self._offsets: NDArray[np.float64] | None = offsets
+        self._scales: NDArray[np.float64] | None = (
+            None if scales is None else np.asarray(scales, dtype=np.float64)
+        )
+        self._offsets: NDArray[np.float64] | None = (
+            None if offsets is None else np.asarray(offsets, dtype=np.float64)
+        )
         self._equation_scaling: NDArray[np.float64] | None = None
         self._mask: NDArray[np.bool_] | None = transform_config.mask
+        if self._mask is not None:
+            if self._scales is not None:
+                _check_mask_size(self._mask, self._scales.size, "scales")
+            if self._offsets is not None:
+                _check_mask_size(self._mask, self._offsets.size, "offsets")
 
     def to_optimizer(self, values: NDArray[np.float64]) -> NDArray[np.float64]:
         """Apply `(values - offset) / scale`.
@@ -179,6 +195,7 @@ class DefaultVariableTransform(VariableTransform):
             mask: Boolean array (`True` = the variable is free).
         """
         if self._mask is not None:
+            _check_mask_size(self._mask, mask.size, "the number of variables")
             mask = np.logical_and(mask, self._mask)
         if self._scales is not None:
             self._scales = np.where(mask, self._scales, 1.0)
@@ -204,11 +221,13 @@ class DefaultObjectiveTransform(ObjectiveTransform):
         Args:
             transform_config: The transform configuration.
         """
-        self._scales: NDArray[np.float64] | None = transform_config.options.get(
-            "scales", None
+        scales = transform_config.options.get("scales", None)
+        self._scales: NDArray[np.float64] | None = (
+            None if scales is None else np.asarray(scales, dtype=np.float64)
         )
         self._mask: NDArray[np.bool_] | None = transform_config.mask
         if self._scales is not None and self._mask is not None:
+            _check_mask_size(self._mask, self._scales.size, "scales")
             self._scales = np.where(self._mask, self._scales, 1.0)
 
     def to_optimizer(self, objectives: NDArray[np.float64]) -> NDArray[np.float64]:
@@ -266,11 +285,13 @@ class DefaultNonlinearConstraintTransform(NonlinearConstraintTransform):
         Args:
             transform_config: The transform configuration.
         """
-        self._scales: NDArray[np.float64] | None = transform_config.options.get(
-            "scales", None
+        scales = transform_config.options.get("scales", None)
+        self._scales: NDArray[np.float64] | None = (
+            None if scales is None else np.asarray(scales, dtype=np.float64)
         )
         self._mask: NDArray[np.bool_] | None = transform_config.mask
         if self._scales is not None and self._mask is not None:
+            _check_mask_size(self._mask, self._scales.size, "scales")
             self._scales = np.where(self._mask, self._scales, 1.0)
 
     def to_optimizer(self, constraints: NDArray[np.float64]) -> NDArray[np.float64]:

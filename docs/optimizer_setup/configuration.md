@@ -298,7 +298,9 @@ defined in [`EnOptContext`][ropt.context.EnOptContext].
   `"default/default"`, which computes a weighted average of the per-realization
   values.
 
-An out-of-range index means no object is applied to that objective.
+An out-of-range `realization_filters` index means no filter is applied to that
+objective. An out-of-range `function_estimators` index leaves that objective
+unestimated, and its value is reported as `NaN`.
 
 [Objective transforms](transforms.md) are not selected per objective: the
 `objective_transforms` tuple is a chain applied to every objective.

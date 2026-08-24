@@ -62,6 +62,7 @@ def _make_result(batch_id: int, objective: float = 1.0) -> FunctionResults:
         batch_id=batch_id,
         metadata={},
         names=context.names,
+        evaluation_point=evaluations.variables,
         evaluations=evaluations,
         realizations=Realizations(
             evaluated_realizations=np.ones(1, dtype=np.bool_),
@@ -94,6 +95,7 @@ def _make_result_two_realizations(batch_id: int) -> FunctionResults:
         batch_id=batch_id,
         metadata={},
         names=context.names,
+        evaluation_point=evaluations.variables,
         evaluations=evaluations,
         realizations=Realizations(
             evaluated_realizations=np.ones(2, dtype=np.bool_),

@@ -149,7 +149,9 @@ class FunctionEvaluations(ResultField):
             metadata={} if metadata is None else metadata,
         )
 
-    def _transform_from_optimizer(self, context: EnOptContext) -> FunctionEvaluations:
+    def _transform_from_optimizer(
+        self, context: EnOptContext, evaluation_point: NDArray[np.float64]
+    ) -> FunctionEvaluations:
         if (
             not context.variable_transforms
             and not context.objective_transforms
@@ -157,12 +159,9 @@ class FunctionEvaluations(ResultField):
         ):
             return self
 
-        variables = self.variables
         objectives = self.objectives
         constraints = self.constraints
 
-        for variable_transform in reversed(context.variable_transforms):
-            variables = variable_transform.from_optimizer(variables)
         for objective_transform in reversed(context.objective_transforms):
             objectives = objective_transform.from_optimizer(objectives)
         if constraints is not None:
@@ -172,7 +171,7 @@ class FunctionEvaluations(ResultField):
                 constraints = constraint_transform.from_optimizer(constraints)
 
         return FunctionEvaluations(
-            variables=variables,
+            variables=evaluation_point,
             objectives=objectives,
             constraints=constraints,
             metadata=self.metadata,

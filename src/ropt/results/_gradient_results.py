@@ -44,7 +44,9 @@ class GradientResults(Results):
         Returns:
             The transformed results.
         """
-        evaluations = self.evaluations._transform_from_optimizer(context)  # ruff: ignore[private-member-access]
+        evaluations = self.evaluations._transform_from_optimizer(  # ruff: ignore[private-member-access]
+            context, self.evaluation_point
+        )
         gradients: Gradients | None = self.gradients
         if self.gradients is not None:
             gradients = self.gradients._transform_from_optimizer(context)  # ruff: ignore[private-member-access]
@@ -56,6 +58,7 @@ class GradientResults(Results):
             batch_id=self.batch_id,
             metadata=self.metadata,
             names=self.names,
+            evaluation_point=self.evaluation_point,
             evaluations=self.evaluations if evaluations is None else evaluations,
             realizations=self.realizations,
             gradients=self.gradients if gradients is None else gradients,
