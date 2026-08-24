@@ -173,7 +173,7 @@ class EnOptContext(BaseModel):
                             coefficients, lower_bounds, upper_bounds
                         )
                     )
-                updated_linear_constraints = self.model_copy(
+                updated_linear_constraints = self.linear_constraints.model_copy(
                     update={
                         "coefficients": immutable_array(coefficients),
                         "lower_bounds": immutable_array(lower_bounds),
