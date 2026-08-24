@@ -3684,7 +3684,20 @@ the result hierarchy, axis metadata, domain transforms, and pandas/polars export
             <td>
               <div class="doc-md-description">
                 <p>Mapping from <a class="autorefs autorefs-internal" title="            AxisName" href="../enums/#ropt.enums.AxisName"><code>AxisName</code></a> to label tuples
-      for DataFrame export.</p>
+              for DataFrame export.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.results.Results.evaluation_point">evaluation_point</span></code></td>
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The variables this result was produced at, in the user
+              domain. Never transformed, so it identifies the result
+              regardless of the domain its other fields are in.</p>
               </div>
             </td>
           </tr>
