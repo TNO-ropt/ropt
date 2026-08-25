@@ -3,7 +3,8 @@
 Unlike the thread and process executors, there is no channel back from a job:
 work travels over a shared filesystem, as a cloudpickled `<id>.in` file the job
 reads and an `<id>.out` file it writes (with `<id>.txt` for its output). The job
-itself is `python -m ropt.components.executors`, run through `pysqa`.
+itself runs `ropt.components.executors` as a module through `pysqa`, with the
+interpreter that submitted it, which is the one `ropt` is installed in.
 
 So there is nothing to await, only a queue to ask. One thread does all the
 blocking `pysqa` work — submitting and polling — while the async worker loop
@@ -17,6 +18,7 @@ from __future__ import annotations
 import asyncio
 import contextlib
 import os
+import sys
 import sysconfig
 import tempfile
 import threading
@@ -37,6 +39,8 @@ if TYPE_CHECKING:
 
 _logger = get_logger(__name__)
 
+# How much of a failed job's captured output travels with its failure.
+_OUTPUT_TAIL_LINES: Final = 20
 
 _HAVE_HPC: Final = (
     find_spec("cloudpickle") is not None and find_spec("pysqa") is not None
@@ -94,7 +98,9 @@ class HPCExecutor(ExecutorBase):
             retries:     Number of extra polls to wait for a work item's result
                          after the first attempt fails (`0` gives up at once).
             cleanup:     Whether to remove work item files once their result is
-                         retrieved or their job is cancelled.
+                         retrieved or their job is cancelled. A work item that
+                         failed keeps its captured output, which is the only
+                         record of why.
 
         Raises:
             ValueError:     If `workdir` is not an existing absolute path, or if
@@ -338,7 +344,12 @@ class HPCExecutor(ExecutorBase):
                 job_name=item_id,
                 output=f"{item_id}.txt",
                 working_directory=str(self._workdir),
-                command=f"python -m ropt.components.executors {input_file} {output_file}",
+                # The submitting interpreter, not whatever `python` the job's
+                # PATH resolves to: only this one is known to import `ropt`.
+                command=(
+                    f"{sys.executable} -m ropt.components.executors "
+                    f"{input_file} {output_file}"
+                ),
                 submission_template=self._template,
                 queue=self._queue,
                 cores=self._cores,
@@ -392,7 +403,7 @@ class HPCExecutor(ExecutorBase):
                     _logger.warning(
                         "HPC work item %s failed: output file never appeared", item_id
                     )
-                    results[item_id] = ExecutorFailure(msg)
+                    results[item_id] = ExecutorFailure(msg + self._job_output(item_id))
             except (OSError, EOFError, UnpicklingError):
                 # Present but unreadable, which a partially visible file also
                 # looks like: retried on the same budget before giving up.
@@ -407,11 +418,27 @@ class HPCExecutor(ExecutorBase):
                         item_id,
                         self._retries_limit,
                     )
-                    results[item_id] = ExecutorFailure(msg)
+                    results[item_id] = ExecutorFailure(msg + self._job_output(item_id))
         if self._remove_files:
-            for item_id in results:
-                self._cleanup_files(item_id)
+            for item_id, result in results.items():
+                self._cleanup_files(
+                    item_id, keep_output=isinstance(result, ExecutorFailure)
+                )
         return results
+
+    def _job_output(self, item_id: str | UUID) -> str:
+        # A job that died before writing a result left its only trace here, so
+        # the tail travels with the failure and the file itself is kept.
+        output_file = self._workdir / f"{item_id}.txt"
+        try:
+            lines = output_file.read_text(errors="replace").splitlines()
+        except OSError:
+            return ""
+        tail = [line for line in lines if line.strip()][-_OUTPUT_TAIL_LINES:]
+        if not tail:
+            return ""
+        body = "\n".join(tail)
+        return f"; the job wrote to {output_file}:\n{body}"
 
     def _handle_query_failure(self, exc: BaseException) -> dict[str | UUID, Any]:
         # Only a run of failures is fatal: a single one may be a hiccup, and
@@ -442,8 +469,9 @@ class HPCExecutor(ExecutorBase):
         with self._jobs_lock:
             self._jobs.pop(item_id, None)
 
-    def _cleanup_files(self, item_id: str | UUID) -> None:
-        for suffix in (".in", ".out", ".txt"):
+    def _cleanup_files(self, item_id: str | UUID, *, keep_output: bool = False) -> None:
+        suffixes = (".in", ".out") if keep_output else (".in", ".out", ".txt")
+        for suffix in suffixes:
             path = self._workdir / f"{item_id}{suffix}"
             with contextlib.suppress(OSError):
                 path.unlink(missing_ok=True)

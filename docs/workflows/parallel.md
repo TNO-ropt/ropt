@@ -184,7 +184,7 @@ cannot be reached the failure is logged and stopping continues.
 | `queue`       | Optional queue/partition name.                                           |
 | `cores`       | CPUs per work item (default: 1).                                         |
 | `retries`     | Extra polls to wait for a result that is missing or unreadable (default: 30). |
-| `cleanup`     | Whether to remove a work item's files once it settles (default: `True`). |
+| `cleanup`     | Whether to remove a work item's files once it settles (default: `True`). A failed work item keeps its captured output. |
 
 A finished job's result is not always readable at once: the job may have died
 before writing it, or the file may be caught half-written. `retries` is how many
@@ -194,6 +194,19 @@ before writing it, or the file may be caught half-written. `retries` is how many
 on the first failed read. The same limit bounds scheduler outages: once querying
 the queue has failed `retries + 1` times in a row, every outstanding work item is
 failed rather than waited on for ever.
+
+A job that died before writing a result leaves its only trace in the `.txt` file
+holding its captured output. That file is therefore **kept** when a work item
+fails, even under `cleanup=True`, and its last lines are appended to the
+`ExecutorFailure` message. This is what makes an error in the job itself — a
+missing module, an unreadable input file, a scheduler rejection — visible at all,
+since nothing else about it reaches the host process.
+
+The job command runs `ropt.components.executors` as a module with
+`sys.executable`, the interpreter that submitted it, rather than whatever
+`python` the job's `PATH` happens to resolve to. Submitting from a virtual
+environment therefore works without that environment being activated on the
+compute node, provided the interpreter's path is valid there.
 
 The `workdir` holds each work item's serialized `.in`/`.out` files (written at
 absolute paths) and its captured stdout. It is also passed to `pysqa` as the
@@ -249,6 +262,13 @@ records the affected rows as failed realizations by writing `numpy.nan`. Such a
 failure is *tolerated*: the optimization continues, and only aborts (with
 `TOO_FEW_REALIZATIONS`) if too many realizations fail to satisfy the configured
 minimum.
+
+Only the `numpy.nan` survives that step — the `ExecutorFailure` and its message
+do not reach the optimizer, so an aborted run reports `TOO_FEW_REALIZATIONS`
+without saying why. The reason is logged instead, once per failed work item, at
+`WARNING` from the `ropt.components.evaluators` logger; see
+[Logging](../utilities/logging.md). Because `realization_min_success` defaults to
+*all* realizations, a single failed work item is enough to end the run this way.
 
 ### User-code exception (raised)
 

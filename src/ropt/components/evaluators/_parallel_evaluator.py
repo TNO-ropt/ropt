@@ -188,7 +188,11 @@ def _handle_result(
     )
     if isinstance(work_item.result, ExecutorFailure):
         # Infrastructure failure: the whole bundle counts as failed
-        # realizations, which the ensemble machinery handles as NaN.
+        # realizations, which the ensemble machinery handles as NaN. NaN is all
+        # that reaches the optimizer, so the reason is only reported here.
+        _logger.warning(
+            "Recording %d evaluation(s) as failed: %s", len(bundle), work_item.result
+        )
         for _, function_context in bundle:
             results[function_context.eval_idx, :] = np.nan
         return

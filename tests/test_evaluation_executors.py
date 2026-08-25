@@ -5,6 +5,7 @@
 from __future__ import annotations
 
 import asyncio
+import logging
 import os
 import sys
 import threading
@@ -455,6 +456,71 @@ async def test_hpc_unreadable_output_file_fails_work(
     assert len(collected) == 1
     assert isinstance(collected[0], ExecutorFailure)
     assert "No valid result" in str(collected[0])
+
+
+@pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
+async def test_hpc_job_command_uses_submitting_interpreter(
+    tmp_path: Path, monkeypatch: Any
+) -> None:
+    # A bare `python` resolves through the job's PATH, which need not be the
+    # environment ropt is installed in.
+    commands: list[str] = []
+
+    class _RecordingAdapter(MockedHPCAdapter):
+        def submit_job(self, job_name: str, command: str, **kwargs: Any) -> int:
+            commands.append(command)
+            return super().submit_job(job_name, command, **kwargs)
+
+    monkeypatch.setattr(
+        "ropt.components.executors._hpc_executor.pysqa.QueueAdapter",
+        lambda *args, **kwargs: _RecordingAdapter(tmp_path),  # ruff: ignore[unused-lambda-argument]
+    )
+    submission = Submission([WorkItem(function=_function, args=(0,))])
+    executor = HPCExecutor(workdir=tmp_path, workers=1, interval=0, template="")
+    async with asyncio.TaskGroup() as tg:
+        await executor.start(tg)
+        executor.submit(submission)
+        assert await asyncio.to_thread(_collect, submission) == [1]
+        executor.cancel()
+    assert commands
+    assert commands[0].startswith(f"{sys.executable} -m ropt.components.executors ")
+
+
+@pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
+async def test_hpc_failed_work_keeps_job_output(
+    tmp_path: Path, monkeypatch: Any
+) -> None:
+    # A job that died before writing a result left its reason in the captured
+    # output alone, so cleanup must not take that away with the rest.
+    class _CrashingJob(MockedHPCAdapter):
+        def submit_job(self, job_name: str, command: str, **kwargs: Any) -> int:  # ruff: ignore[unused-method-argument]
+            self._job_id += 1
+            self._jobs[self._job_id] = job_name
+            (self._path / f"{job_name}.txt").write_text(
+                "ModuleNotFoundError: No module named 'ropt'\n"
+            )
+            return self._job_id
+
+        def get_status_of_my_jobs(self) -> pd.DataFrame:  # ruff: ignore[no-self-use]
+            return pd.DataFrame([], columns=["jobid"])
+
+    monkeypatch.setattr(
+        "ropt.components.executors._hpc_executor.pysqa.QueueAdapter",
+        lambda *args, **kwargs: _CrashingJob(tmp_path),  # ruff: ignore[unused-lambda-argument]
+    )
+    submission = Submission([WorkItem(function=_function, args=(0,), name="item")])
+    executor = HPCExecutor(
+        workdir=tmp_path, workers=1, interval=0, retries=2, template=""
+    )
+    async with asyncio.TaskGroup() as tg:
+        await executor.start(tg)
+        executor.submit(submission)
+        collected = await asyncio.to_thread(_collect, submission)
+        executor.cancel()
+    assert isinstance(collected[0], ExecutorFailure)
+    assert "No module named 'ropt'" in str(collected[0])
+    assert (tmp_path / "item.txt").exists()
+    assert not (tmp_path / "item.in").exists()
 
 
 @pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
@@ -1746,6 +1812,30 @@ async def test_handle_result_records_executor_failure_as_nan() -> None:  # ruff:
     )
     _handle_result(work_item, results, {}, objective_count=1, eval_count=2)
     assert np.all(np.isnan(results))
+
+
+async def test_handle_result_logs_executor_failure_reason(  # ruff: ignore[unused-async]
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    # NaN is all that reaches the optimizer, so the log is the only place the
+    # reason for a failed realization is stated.
+    results = np.zeros((1, 1), dtype=np.float64)
+    bundle = [
+        (
+            np.zeros(2, dtype=np.float64),
+            EvaluationFunctionContext(
+                realization=0, perturbation=-1, batch_id=0, eval_idx=0
+            ),
+        )
+    ]
+    work_item = WorkItem(
+        function=_function,
+        args=(None, bundle),
+        result=ExecutorFailure("the job wrote to item.txt"),
+    )
+    with caplog.at_level(logging.WARNING, logger="ropt"):
+        _handle_result(work_item, results, {}, objective_count=1, eval_count=1)
+    assert "the job wrote to item.txt" in caplog.text
 
 
 @pytest.mark.parametrize(

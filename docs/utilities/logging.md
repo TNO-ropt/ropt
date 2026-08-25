@@ -72,8 +72,13 @@ run at `INFO` or above.
 | `HPCExecutor`               | `HPC work item <id> failed: no valid result after 30 retries` |
 | `HPCExecutor`               | `Querying the HPC scheduler failed (2/31): <error>` |
 | `HPCExecutor`               | `Could not cancel HPC job <id> (job id: <job>): <error>` |
+| `ParallelEvaluator`         | `Recording 1 evaluation(s) as failed: <reason>` |
 | `MultiprocessingExecutor`   | `Worker process pool broken; work item result lost` |
 | `external` (backend)        | `External backend subprocess died unexpectedly (exit code <code>)` |
+
+The `ParallelEvaluator` message is the only place an infrastructure failure
+states its reason: the optimizer sees nothing but `numpy.nan`, so a run that
+ends in `TOO_FEW_REALIZATIONS` explains itself here and nowhere else.
 
 ### `DEBUG` — per-callback and per-task trace
 
