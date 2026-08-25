@@ -2233,10 +2233,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.simple.OptimizeResult" class="md-nav__link">
+  <a href="#ropt.simple.EvaluateResult" class="md-nav__link">
     <span class="md-ellipsis">
       
-        OptimizeResult
+        EvaluateResult
       
     </span>
   </a>
@@ -2244,10 +2244,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.simple.EvaluateResult" class="md-nav__link">
+  <a href="#ropt.simple.OptimizeResult" class="md-nav__link">
     <span class="md-ellipsis">
       
-        EvaluateResult
+        OptimizeResult
       
     </span>
   </a>
@@ -3839,10 +3839,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.simple.OptimizeResult" class="md-nav__link">
+  <a href="#ropt.simple.EvaluateResult" class="md-nav__link">
     <span class="md-ellipsis">
       
-        OptimizeResult
+        EvaluateResult
       
     </span>
   </a>
@@ -3850,10 +3850,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.simple.EvaluateResult" class="md-nav__link">
+  <a href="#ropt.simple.OptimizeResult" class="md-nav__link">
     <span class="md-ellipsis">
       
-        EvaluateResult
+        OptimizeResult
       
     </span>
   </a>
@@ -6883,146 +6883,6 @@ for when this matters and the resulting lifecycle.</p>
 
 
 
-<h2 id="ropt.simple.OptimizeResult" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.simple.OptimizeResult</span>
-
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
-  </span>
-
-</h2>
-
-
-    <div class="doc doc-contents first">
-            <p class="doc doc-class-bases">
-              Bases: <code><span title="ropt.simple._result._ResultBase">_ResultBase</span></code></p>
-
-
-
-        <p>The outcome of a single optimization run.</p>
-<p>See <a href="../../running/running/">Running Optimizations</a> for a walkthrough.</p>
-
-
-<p><span class="doc-section-title">Attributes:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.simple.OptimizeResult.target_objective">target_objective</span></code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a> | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The weighted objective at the optimum, or <code>None</code>.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.simple.OptimizeResult.objectives">objectives</span></code></td>
-            <td>
-                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>] | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The individual objective values at the optimum, shape
-              <code>(n_obj,)</code>, or <code>None</code>.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.simple.OptimizeResult.constraints">constraints</span></code></td>
-            <td>
-                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>] | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The nonlinear constraint values at the optimum, or <code>None</code>.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.simple.OptimizeResult.exit_code">exit_code</span></code></td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            ExitCode (ropt.enums.ExitCode)" href="../enums/#ropt.enums.ExitCode">ExitCode</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The exit code describing how the optimization terminated.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.simple.OptimizeResult.variables">variables</span></code></td>
-            <td>
-                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>] | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The optimal variable vector, or <code>None</code> if no valid
-              result was found.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.simple.OptimizeResult.results">results</span></code></td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
-
-
-  
-      dataclass
-  " href="../results/#ropt.results.FunctionResults">FunctionResults</a> | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The full low-level
-              <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
-
-
-  
-      dataclass
-  " href="../results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> object
-              for the optimum, or <code>None</code>.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-
-
-
-
-
-
-
-
-
-<div class="doc doc-children">
-
-
-
-
-
-  </div>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-class">
-
-
-
 <h2 id="ropt.simple.EvaluateResult" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.simple.EvaluateResult</span>
 
@@ -7035,20 +6895,13 @@ for when this matters and the resulting lifecycle.</p>
 
 
     <div class="doc doc-contents first">
-            <p class="doc doc-class-bases">
-              Bases: <code><span title="ropt.simple._result._ResultBase">_ResultBase</span></code></p>
 
 
 
-        <p>The outcome of evaluating a single variable vector.</p>
-<p><a class="autorefs autorefs-internal" title="            ropt.simple.evaluate_many" href="#ropt.simple.evaluate_many"><code>evaluate_many</code></a> returns one of these per
-input vector. Each shared field has the same shape as its counterpart on
-<a class="autorefs autorefs-internal" title="            ropt.simple.OptimizeResult
-
-
-  
-      dataclass
-  " href="#ropt.simple.OptimizeResult"><code>OptimizeResult</code></a>. See
+        <p>The values one variable vector produced.</p>
+<p>Returned by <a class="autorefs autorefs-internal" title="            ropt.simple.evaluate" href="#ropt.simple.evaluate"><code>evaluate</code></a>, once per input vector by
+<a class="autorefs autorefs-internal" title="            ropt.simple.evaluate_many" href="#ropt.simple.evaluate_many"><code>evaluate_many</code></a>, and handed to a <code>report</code>
+callback once per function evaluation of a run. See
 <a href="../../running/running/">Running Optimizations</a> for a walkthrough.</p>
 
 
@@ -7062,6 +6915,17 @@ input vector. Each shared field has the same shape as its counterpart on
         </tr>
       </thead>
       <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.simple.EvaluateResult.variables">variables</span></code></td>
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The variable vector these values belong to, or <code>None</code>.</p>
+              </div>
+            </td>
+          </tr>
           <tr class="doc-section-item">
             <td><code><span title="ropt.simple.EvaluateResult.target_objective">target_objective</span></code></td>
             <td>
@@ -7107,7 +6971,7 @@ input vector. Each shared field has the same shape as its counterpart on
 
   
       dataclass
-  " href="../results/#ropt.results.FunctionResults">FunctionResults</a></code>
+  " href="../results/#ropt.results.FunctionResults">FunctionResults</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -7117,7 +6981,163 @@ input vector. Each shared field has the same shape as its counterpart on
 
   
       dataclass
-  " href="../results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> object.</p>
+  " href="../results/#ropt.results.FunctionResults"><code>FunctionResults</code></a>
+              object, or <code>None</code>. Only an optimization that reached
+              no valid result leaves this empty; an evaluation and a
+              <code>report</code> callback always have one.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="ropt.simple.OptimizeResult" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.simple.OptimizeResult</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="            ropt.simple.EvaluateResult
+
+
+  
+      dataclass
+   (ropt.simple._result.EvaluateResult)" href="#ropt.simple.EvaluateResult">EvaluateResult</a></code></p>
+
+
+
+        <p>The outcome of a single optimization run.</p>
+<p>An optimization ends at one evaluation, the best one it found, so this is
+that evaluation's <a class="autorefs autorefs-internal" title="            ropt.simple.EvaluateResult
+
+
+  
+      dataclass
+  " href="#ropt.simple.EvaluateResult"><code>EvaluateResult</code></a> together
+with the exit code of the run that reached it. See
+<a href="../../running/running/">Running Optimizations</a> for a walkthrough.</p>
+
+
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.simple.OptimizeResult.variables">variables</span></code></td>
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The optimal variable vector, or <code>None</code> if no valid
+              result was found.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.simple.OptimizeResult.target_objective">target_objective</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The weighted objective at the optimum, or <code>None</code>.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.simple.OptimizeResult.objectives">objectives</span></code></td>
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The individual objective values at the optimum, shape
+              <code>(n_obj,)</code>, or <code>None</code>.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.simple.OptimizeResult.constraints">constraints</span></code></td>
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The nonlinear constraint values at the optimum, or <code>None</code>.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.simple.OptimizeResult.results">results</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="../results/#ropt.results.FunctionResults">FunctionResults</a> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The full low-level
+              <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="../results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> object
+              for the optimum, or <code>None</code>.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.simple.OptimizeResult.exit_code">exit_code</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ExitCode (ropt.enums.ExitCode)" href="../enums/#ropt.enums.ExitCode">ExitCode</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The exit code describing how the optimization terminated.</p>
               </div>
             </td>
           </tr>

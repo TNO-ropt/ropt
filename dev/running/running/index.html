@@ -3212,11 +3212,13 @@ for every function evaluation, with an <a class="autorefs autorefs-internal" tit
       dataclass
   " href="../../reference/simple/#ropt.simple.EvaluateResult"><code>EvaluateResult</code></a>:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">report</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>    <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">target_objective</span><span class="p">)</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>    <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">variables</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">target_objective</span><span class="p">)</span>
 </span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
 </span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>
 </span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">report</span><span class="o">=</span><span class="n">report</span><span class="p">)</span>
 </span></code></pre></div>
+<p><code>result.variables</code> is the point that was evaluated. During an optimization the
+optimizer chose it, so this is how you follow the path a run takes.</p>
 <h3 id="stopping-early-from-the-callback">Stopping early from the callback</h3>
 <p>The <code>report</code> callback doubles as a <strong>user-defined stopping criterion</strong>: return
 <code>True</code> and the optimization stops gracefully after the current evaluation, with
@@ -3297,9 +3299,11 @@ optimizer. Use <a class="autorefs autorefs-internal" title="            ropt.sim
 
   
       dataclass
-  " href="../../reference/simple/#ropt.simple.EvaluateResult"><code>EvaluateResult</code></a> has the same fields as
-<code>OptimizeResult</code>, minus <code>exit_code</code> and <code>variables</code> (you supplied the point
-yourself; it is still on <code>result.results.evaluations.variables</code>).</p>
+  " href="../../reference/simple/#ropt.simple.EvaluateResult"><code>EvaluateResult</code></a> is what one point produced.
+<code>OptimizeResult</code> <strong>is</strong> one of these, with <code>exit_code</code> added: a run ends at its
+best evaluation, so the two read the same way. Here <code>result.variables</code> is just
+the point you supplied; it earns its place in a <code>report</code> callback, where the
+optimizer picked the point instead.</p>
 <h2 id="when-something-goes-wrong">When something goes wrong</h2>
 <p>Not every problem is an exception. An optimization that cannot make progress
 still returns normally, and says why in <code>result.exit_code</code>:
