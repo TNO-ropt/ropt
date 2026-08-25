@@ -172,7 +172,7 @@ Convenience methods:
   (`functions`, `evaluations`, `constraints` for function results; `gradients`,
   `perturbations` for gradient results), all filled from the given domain.
 - `add_column(table, name, title)` adds one column to an existing table.
-- `set_callback(fn)` calls `fn(event)` whenever the tables are updated.
+- `set_callback(fn)` calls `fn()` whenever the tables are updated.
 
 !!! tip "Write the tables to a file as they update"
     `set_callback` fires on every update, so it is a convenient hook for saving
@@ -182,7 +182,7 @@ Convenience methods:
     if you have `tabulate` installed:
 
     ```python
-    def dump(_event):
+    def dump():
         with open("progress.txt", "w") as fh:
             for name, df in tables.get_tables().items():
                 fh.write(f"# {name}\n{df.to_string()}\n\n")

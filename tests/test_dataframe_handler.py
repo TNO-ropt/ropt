@@ -307,6 +307,40 @@ def test_table_handler_invalid_backend() -> None:
         DataFrameHandler(backend="nonsense")  # type: ignore[arg-type]
 
 
+def test_table_handler_callback_runs_on_every_update(backend: Backend) -> None:
+    # Taking no arguments is the contract: the callback is told that the tables
+    # changed, and reads them from the handler it was registered on.
+    handler = DataFrameHandler(backend=backend)
+    handler.add_table("t", "functions", {"functions.target_objective": "Obj"})
+    calls = 0
+
+    def _record() -> None:
+        nonlocal calls
+        calls += 1
+
+    handler.set_callback(_record)
+    handler.handle_event(_make_event(1))
+    handler.handle_event(_make_event(2))
+    assert calls == 2
+
+
+def test_table_handler_callback_skipped_when_no_table_grew(backend: Backend) -> None:
+    # Function results leave a gradients table untouched, so a callback that
+    # persists the tables has nothing to persist.
+    handler = DataFrameHandler(backend=backend)
+    handler.add_table("t", "gradients", {"gradients.target_objective": "Grad"})
+    called = False
+
+    def _record() -> None:
+        nonlocal called
+        called = True
+
+    handler.set_callback(_record)
+    handler.handle_event(_make_event(1))
+    assert not called
+    assert _is_empty(handler["t"])
+
+
 def test_table_handler_backend_property(backend: Backend) -> None:
     assert DataFrameHandler(backend=backend).backend == backend
 

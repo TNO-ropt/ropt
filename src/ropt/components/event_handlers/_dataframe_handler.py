@@ -132,7 +132,7 @@ class DataFrameHandler(EventHandler):
         super().__init__()
         self._backend: Backend = backend
         self._sep = sep
-        self._callback: Callable[[EnOptEvent], None] | None = None
+        self._callback: Callable[[], None] | None = None
         self._tables: dict[str, _ResultsTable] = {}
 
     @property
@@ -161,13 +161,12 @@ class DataFrameHandler(EventHandler):
         for name, columns in _GRADIENT_TABLES.items():
             self.add_table(name, "gradients", columns, domain=domain)
 
-    def set_callback(self, callback: Callable[[EnOptEvent], None]) -> None:
-        """Set the callback function.
+    def set_callback(self, callback: Callable[[], None]) -> None:
+        """Set a function to call whenever the tables are updated.
 
-        The callback is invoked from `handle_event` after the tables are
-        updated, receiving the event that triggered the update. If the callback
-        performs blocking operations (for example writing tables to disk), register
-        this handler with `run_in_thread=True` on the
+        The callback takes no arguments; it reads the tables from this handler.
+        If it performs blocking operations (for example writing tables to disk),
+        register this handler with `run_in_thread=True` on the
         [`EventDispatcher`][ropt.components.event_handlers.EventDispatcher]:
 
         ```python
@@ -238,7 +237,7 @@ class DataFrameHandler(EventHandler):
                 for table in self._tables.values()
             ]
             if any(done) and self._callback is not None:
-                self._callback(event)
+                self._callback()
 
     @property
     def event_types(self) -> set[EnOptEventType]:
