@@ -3259,7 +3259,7 @@ per-realization fields, which the pandas backend cannot.</p>
   (<code>functions</code>, <code>evaluations</code>, <code>constraints</code> for function results; <code>gradients</code>,
   <code>perturbations</code> for gradient results), all filled from the given domain.</li>
 <li><code>add_column(table, name, title)</code> adds one column to an existing table.</li>
-<li><code>set_callback(fn)</code> calls <code>fn(event)</code> whenever the tables are updated.</li>
+<li><code>set_callback(fn)</code> calls <code>fn()</code> whenever the tables are updated.</li>
 </ul>
 <div class="admonition tip">
 <p class="admonition-title">Write the tables to a file as they update</p>
@@ -3268,7 +3268,7 @@ the tables — to watch progress live or to write a final report. Pandas'
 <code>to_string()</code> gives aligned, human-readable columns with no extra
 dependencies; use <code>to_csv()</code> for machine-readable data, or <code>to_markdown()</code>
 if you have <code>tabulate</code> installed:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">dump</span><span class="p">(</span><span class="n">_event</span><span class="p">):</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">dump</span><span class="p">():</span>
 </span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;progress.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
 </span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">df</span> <span class="ow">in</span> <span class="n">tables</span><span class="o">.</span><span class="n">get_tables</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
 </span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>            <span class="n">fh</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;# </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="n">df</span><span class="o">.</span><span class="n">to_string</span><span class="p">()</span><span class="si">}</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">)</span>
