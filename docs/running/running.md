@@ -107,11 +107,14 @@ for every function evaluation, with an [`EvaluateResult`][ropt.simple.EvaluateRe
 
 ```python
 def report(result):
-    print(result.target_objective)
+    print(result.variables, result.target_objective)
 
 
 optimize(config, x0, objective, report=report)
 ```
+
+`result.variables` is the point that was evaluated. During an optimization the
+optimizer chose it, so this is how you follow the path a run takes.
 
 ### Stopping early from the callback
 
@@ -197,9 +200,11 @@ single = evaluate(config, x, objective)             # one EvaluateResult
 batch = evaluate_many(config, matrix, objective)    # one per row of the matrix
 ```
 
-An [`EvaluateResult`][ropt.simple.EvaluateResult] has the same fields as
-`OptimizeResult`, minus `exit_code` and `variables` (you supplied the point
-yourself; it is still on `result.results.evaluations.variables`).
+An [`EvaluateResult`][ropt.simple.EvaluateResult] is what one point produced.
+`OptimizeResult` **is** one of these, with `exit_code` added: a run ends at its
+best evaluation, so the two read the same way. Here `result.variables` is just
+the point you supplied; it earns its place in a `report` callback, where the
+optimizer picked the point instead.
 
 ## When something goes wrong
 

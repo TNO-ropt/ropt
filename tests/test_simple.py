@@ -152,6 +152,31 @@ def test_optimize_report_callback_receives_evaluate_results(
     assert any(item.target_objective is not None for item in reported)
 
 
+def test_report_callback_receives_evaluated_variables(
+    config: Any, test_functions: Any
+) -> None:
+    # The optimizer chooses these points, so the caller has no other way to
+    # learn which one an evaluation belongs to.
+    reported: list[EvaluateResult] = []
+    optimize(config, initial_values, test_functions[0], report=reported.append)
+    variables = [item.variables for item in reported]
+    assert variables
+    assert all(
+        item is not None and item.shape == initial_values.shape for item in variables
+    )
+    assert any(not np.array_equal(item, initial_values) for item in variables)
+
+
+def test_optimize_result_is_an_evaluate_result(
+    config: Any, test_functions: Any
+) -> None:
+    # A run ends at one evaluation, so its result carries that evaluation's
+    # fields and adds only the exit code.
+    result = optimize(config, initial_values, test_functions[0])
+    assert isinstance(result, EvaluateResult)
+    assert result.variables is not None
+
+
 def test_group_report_callback_reports_across_runs(
     config: Any, test_functions: Any
 ) -> None:
@@ -463,6 +488,12 @@ def test_evaluate_single_vector(config: Any, test_functions: Any) -> None:
     assert result.objectives.shape == (1,)
     assert result.constraints is None
     assert result.results.evaluations.variables.shape == (initial_values.size,)
+
+
+def test_evaluate_reports_the_evaluated_point(config: Any, test_functions: Any) -> None:
+    result = evaluate(config, initial_values, test_functions[0])
+    assert result.variables is not None
+    assert np.array_equal(result.variables, initial_values)
 
 
 def test_thread_run_sees_only_the_handlers_it_is_given(

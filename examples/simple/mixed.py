@@ -76,7 +76,7 @@ def report(result: EvaluateResult) -> None:
         result: The result of a single function evaluation.
     """
     if result.target_objective is not None:
-        print(f"  variables: {result.results.evaluations.variables}")
+        print(f"  variables: {result.variables}")
         print(f"  objective: {result.target_objective}")
 
 

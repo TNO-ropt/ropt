@@ -67,7 +67,7 @@ def rosenbrock(
 
 
 def report(result: EvaluateResult) -> None:
-    """Print any constraint violation detected in an evaluation.
+    """Print any constraint violation, and the point that caused it.
 
     Args:
         result: The result of a single function evaluation.
@@ -79,6 +79,7 @@ def report(result: EvaluateResult) -> None:
         and np.any(info.nonlinear_violation > 0)
     ):
         print(f"  constraint violation: {info.nonlinear_violation}")
+        print(f"  at variables: {result.variables}")
 
 
 def main(*, linear: bool = False) -> None:
