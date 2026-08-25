@@ -3270,6 +3270,10 @@ run at <code>INFO</code> or above.</p>
 <td><code>Could not cancel HPC job &lt;id&gt; (job id: &lt;job&gt;): &lt;error&gt;</code></td>
 </tr>
 <tr>
+<td><code>ParallelEvaluator</code></td>
+<td><code>Recording 1 evaluation(s) as failed: &lt;reason&gt;</code></td>
+</tr>
+<tr>
 <td><code>MultiprocessingExecutor</code></td>
 <td><code>Worker process pool broken; work item result lost</code></td>
 </tr>
@@ -3279,6 +3283,9 @@ run at <code>INFO</code> or above.</p>
 </tr>
 </tbody>
 </table>
+<p>The <code>ParallelEvaluator</code> message is the only place an infrastructure failure
+states its reason: the optimizer sees nothing but <code>numpy.nan</code>, so a run that
+ends in <code>TOO_FEW_REALIZATIONS</code> explains itself here and nowhere else.</p>
 <h3 id="debug-per-callback-and-per-task-trace"><code>DEBUG</code> — per-callback and per-task trace</h3>
 <p>These messages are emitted once per optimizer callback invocation, or once per
 dispatched task, and are useful for detailed diagnostics. They can be

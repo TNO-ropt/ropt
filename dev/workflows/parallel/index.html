@@ -3600,7 +3600,7 @@ cannot be reached the failure is logged and stopping continues.</p>
 </tr>
 <tr>
 <td><code>cleanup</code></td>
-<td>Whether to remove a work item's files once it settles (default: <code>True</code>).</td>
+<td>Whether to remove a work item's files once it settles (default: <code>True</code>). A failed work item keeps its captured output.</td>
 </tr>
 </tbody>
 </table>
@@ -3612,6 +3612,17 @@ before writing it, or the file may be caught half-written. <code>retries</code> 
 on the first failed read. The same limit bounds scheduler outages: once querying
 the queue has failed <code>retries + 1</code> times in a row, every outstanding work item is
 failed rather than waited on for ever.</p>
+<p>A job that died before writing a result leaves its only trace in the <code>.txt</code> file
+holding its captured output. That file is therefore <strong>kept</strong> when a work item
+fails, even under <code>cleanup=True</code>, and its last lines are appended to the
+<code>ExecutorFailure</code> message. This is what makes an error in the job itself — a
+missing module, an unreadable input file, a scheduler rejection — visible at all,
+since nothing else about it reaches the host process.</p>
+<p>The job command runs <code>ropt.components.executors</code> as a module with
+<code>sys.executable</code>, the interpreter that submitted it, rather than whatever
+<code>python</code> the job's <code>PATH</code> happens to resolve to. Submitting from a virtual
+environment therefore works without that environment being activated on the
+compute node, provided the interpreter's path is valid there.</p>
 <p>The <code>workdir</code> holds each work item's serialized <code>.in</code>/<code>.out</code> files (written at
 absolute paths) and its captured stdout. It is also passed to <code>pysqa</code> as the
 job's <code>working_directory</code>, which the standard scheduler templates turn into a
@@ -3655,6 +3666,12 @@ records the affected rows as failed realizations by writing <code>numpy.nan</cod
 failure is <em>tolerated</em>: the optimization continues, and only aborts (with
 <code>TOO_FEW_REALIZATIONS</code>) if too many realizations fail to satisfy the configured
 minimum.</p>
+<p>Only the <code>numpy.nan</code> survives that step — the <code>ExecutorFailure</code> and its message
+do not reach the optimizer, so an aborted run reports <code>TOO_FEW_REALIZATIONS</code>
+without saying why. The reason is logged instead, once per failed work item, at
+<code>WARNING</code> from the <code>ropt.components.evaluators</code> logger; see
+<a href="../../utilities/logging/">Logging</a>. Because <code>realization_min_success</code> defaults to
+<em>all</em> realizations, a single failed work item is enough to end the run this way.</p>
 <h3 id="user-code-exception-raised">User-code exception (raised)</h3>
 <p>A <em>user-code</em> exception is one raised by the evaluation function itself — a bug
 in the objective, a bad configuration, an unexpected input. This must not be
