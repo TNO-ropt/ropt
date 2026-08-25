@@ -3597,10 +3597,12 @@ this optimizer domain.</p>
       abstractmethod
   " href="../../reference/results/#ropt.results.Results.transform_from_optimizer"><code>transform_from_optimizer</code></a>
 method reverses these transforms, mapping results back to the <em>user domain</em>.</p>
-<p>Variables are an exception: they are not reconstructed by inverting the chain but
-taken from <code>evaluation_point</code>, the record of the point that was evaluated. A
-transform therefore does not have to be exactly invertible for reported
-variables to be correct.</p>
+<p>The <code>variables</code> field is an exception: it is not reconstructed by inverting the
+chain but taken from <code>evaluation_point</code>, the record of the point that was
+evaluated. A transform therefore does not have to be exactly invertible for the
+reported variables to be correct. This does not extend to
+<code>GradientEvaluations.perturbed_variables</code>, which is still recovered by inverting
+the chain.</p>
 <p>In the <a href="../../running/running/">simple API</a>, results are always transformed to the user
 domain automatically.</p>
 <p>In <a href="../../workflows/workflows/">workflows</a>, event handlers determine how results are returned,

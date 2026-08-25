@@ -3856,7 +3856,9 @@ defined in <a class="autorefs autorefs-internal" title="            EnOptContext
   <code>"default/default"</code>, which computes a weighted average of the per-realization
   values.</li>
 </ul>
-<p>An out-of-range index means no object is applied to that objective.</p>
+<p>An out-of-range <code>realization_filters</code> index means no filter is applied to that
+objective. An out-of-range <code>function_estimators</code> index leaves that objective
+unestimated, and its value is reported as <code>NaN</code>.</p>
 <p><a href="../transforms/">Objective transforms</a> are not selected per objective: the
 <code>objective_transforms</code> tuple is a chain applied to every objective.</p>
 <h3 id="linear_constraints"><code>linear_constraints</code> — <a class="autorefs autorefs-internal" title="            LinearConstraintsConfig" href="../../reference/config/#ropt.config.LinearConstraintsConfig"><code>LinearConstraintsConfig</code></a></h3>
