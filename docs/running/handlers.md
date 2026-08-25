@@ -172,7 +172,10 @@ Convenience methods:
   (`functions`, `evaluations`, `constraints` for function results; `gradients`,
   `perturbations` for gradient results), all filled from the given domain.
 - `add_column(table, name, title)` adds one column to an existing table.
-- `set_callback(fn)` calls `fn()` whenever the tables are updated.
+- `set_callback(fn)` calls `fn(output_dir)` whenever the tables are updated,
+  where `output_dir` is the run's configured
+  [`output_dir`](../optimizer_setup/configuration.md#optimizer) (`None` if it is
+  not set).
 
 !!! tip "Write the tables to a file as they update"
     `set_callback` fires on every update, so it is a convenient hook for saving
@@ -182,8 +185,9 @@ Convenience methods:
     if you have `tabulate` installed:
 
     ```python
-    def dump():
-        with open("progress.txt", "w") as fh:
+    def dump(output_dir):
+        path = Path("progress.txt") if output_dir is None else output_dir / "progress.txt"
+        with path.open("w") as fh:
             for name, df in tables.get_tables().items():
                 fh.write(f"# {name}\n{df.to_string()}\n\n")
 

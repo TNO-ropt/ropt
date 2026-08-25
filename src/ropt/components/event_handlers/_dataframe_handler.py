@@ -17,6 +17,7 @@ from .base import EventHandler
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
+    from pathlib import Path
 
     from ropt.events import EnOptEvent
 
@@ -132,7 +133,7 @@ class DataFrameHandler(EventHandler):
         super().__init__()
         self._backend: Backend = backend
         self._sep = sep
-        self._callback: Callable[[], None] | None = None
+        self._callback: Callable[[Path | None], None] | None = None
         self._tables: dict[str, _ResultsTable] = {}
 
     @property
@@ -161,12 +162,14 @@ class DataFrameHandler(EventHandler):
         for name, columns in _GRADIENT_TABLES.items():
             self.add_table(name, "gradients", columns, domain=domain)
 
-    def set_callback(self, callback: Callable[[], None]) -> None:
+    def set_callback(self, callback: Callable[[Path | None], None]) -> None:
         """Set a function to call whenever the tables are updated.
 
-        The callback takes no arguments; it reads the tables from this handler.
-        If it performs blocking operations (for example writing tables to disk),
-        register this handler with `run_in_thread=True` on the
+        The callback receives the output directory configured for the run
+        ([`OptimizerConfig.output_dir`][ropt.config.OptimizerConfig], `None` if
+        it is not set), and reads the tables from this handler. If it performs
+        blocking operations (for example writing tables to disk), register this
+        handler with `run_in_thread=True` on the
         [`EventDispatcher`][ropt.components.event_handlers.EventDispatcher]:
 
         ```python
@@ -237,7 +240,7 @@ class DataFrameHandler(EventHandler):
                 for table in self._tables.values()
             ]
             if any(done) and self._callback is not None:
-                self._callback()
+                self._callback(event.context.optimizer.output_dir)
 
     @property
     def event_types(self) -> set[EnOptEventType]:

@@ -22,6 +22,8 @@ from ropt.components.event_handlers import DataFrameHandler
 from ropt.context import EnOptContext
 
 if TYPE_CHECKING:
+    from pathlib import Path
+
     from ropt.components.event_handlers._dataframe_handler import Backend
 
 _CONFIG: dict[str, Any] = {
@@ -72,8 +74,14 @@ def _make_result(batch_id: int, objective: float = 1.0) -> FunctionResults:
     )
 
 
-def _make_event(batch_id: int, objective: float = 1.0) -> EnOptEvent:
-    context = EnOptContext.model_validate(_CONFIG)
+def _make_event(
+    batch_id: int, objective: float = 1.0, output_dir: Path | None = None
+) -> EnOptEvent:
+    context = EnOptContext.model_validate(
+        _CONFIG
+        if output_dir is None
+        else _CONFIG | {"optimizer": {"output_dir": output_dir}}
+    )
     return EnOptEvent(
         event_type=EnOptEventType.FINISHED_EVALUATION,
         context=context,
@@ -308,13 +316,11 @@ def test_table_handler_invalid_backend() -> None:
 
 
 def test_table_handler_callback_runs_on_every_update(backend: Backend) -> None:
-    # Taking no arguments is the contract: the callback is told that the tables
-    # changed, and reads them from the handler it was registered on.
     handler = DataFrameHandler(backend=backend)
     handler.add_table("t", "functions", {"functions.target_objective": "Obj"})
     calls = 0
 
-    def _record() -> None:
+    def _record(_: Path | None) -> None:
         nonlocal calls
         calls += 1
 
@@ -324,6 +330,21 @@ def test_table_handler_callback_runs_on_every_update(backend: Backend) -> None:
     assert calls == 2
 
 
+def test_table_handler_callback_receives_configured_output_dir(
+    backend: Backend, tmp_path: Path
+) -> None:
+    # The callback typically persists the tables, so it is passed the output
+    # directory of the run rather than having to dig it out of the context.
+    handler = DataFrameHandler(backend=backend)
+    handler.add_table("t", "functions", {"functions.target_objective": "Obj"})
+    received: list[Path | None] = []
+
+    handler.set_callback(received.append)
+    handler.handle_event(_make_event(1))
+    handler.handle_event(_make_event(2, output_dir=tmp_path))
+    assert received == [None, tmp_path]
+
+
 def test_table_handler_callback_skipped_when_no_table_grew(backend: Backend) -> None:
     # Function results leave a gradients table untouched, so a callback that
     # persists the tables has nothing to persist.
@@ -331,7 +352,7 @@ def test_table_handler_callback_skipped_when_no_table_grew(backend: Backend) -> 
     handler.add_table("t", "gradients", {"gradients.target_objective": "Grad"})
     called = False
 
-    def _record() -> None:
+    def _record(_: Path | None) -> None:
         nonlocal called
         called = True
 
