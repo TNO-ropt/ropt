@@ -1445,17 +1445,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#dispatching-arbitrary-tasks" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Dispatching arbitrary tasks
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#event-dispatcher" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3238,17 +3227,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#dispatching-arbitrary-tasks" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Dispatching arbitrary tasks
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#event-dispatcher" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3442,9 +3420,26 @@ All executors share the same lifecycle:</p>
 <ol>
 <li>Create the executor instance.</li>
 <li>Start it inside an <code>asyncio.TaskGroup</code> with <code>await executor.start(tg)</code>.</li>
-<li>Use it (via <code>ParallelEvaluator</code> or <code>dispatch_tasks</code>).</li>
+<li>Use it (via <code>ParallelEvaluator</code>, or by submitting
+   <a class="autorefs autorefs-internal" title="            ropt.components.executors.Submission" href="../../reference/components_executors/#ropt.components.executors.Submission"><code>Submission</code></a> objects directly).</li>
 <li>Shut it down with <code>executor.cancel()</code>.</li>
 </ol>
+<div class="admonition note">
+<p class="admonition-title">Working directory</p>
+<p>Work items cannot rely on the current directory being set consistently.
+Use absolute paths to read or write files. Setting the current directory
+in a <code>ThreadingExecutor</code> affects all threads; in a
+<code>MultiprocessingExecutor</code> or an <code>HPCExecutor</code> it can be changed safely per
+work item.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">No event handling across process boundaries</p>
+<p>A work item sent to a <code>MultiprocessingExecutor</code> or an <code>HPCExecutor</code> runs in
+a separate process. If such a work item runs a compute step, that step's
+event handlers stay in the worker process and cannot deliver events to a
+dispatcher or handler in the host process — return results as data instead.
+See <a href="#event-dispatcher">Event handling is a single-process mechanism</a>.</p>
+</div>
 <p>Three implementations are provided:</p>
 <h3 id="threadingexecutor">ThreadingExecutor</h3>
 <p><a class="autorefs autorefs-internal" title="            ropt.components.executors.ThreadingExecutor" href="../../reference/components_executors/#ropt.components.executors.ThreadingExecutor"><code>ThreadingExecutor</code></a> dispatches
@@ -3507,17 +3502,22 @@ workers never start, and <code>MultiprocessingExecutor</code> raises an
 <a class="autorefs autorefs-internal" title="            ExecutionError" href="../../reference/exceptions/#ropt.exceptions.ExecutionError"><code>ExecutionError</code></a> at startup.</p>
 <p>The fix is to keep the code that creates and runs the executor behind an
 <code>if __name__ == "__main__":</code> guard (or inside a function called from there):</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Wrong: created at module top level. Each worker re-imports this and fails.</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">dispatch_tasks</span><span class="p">(</span><span class="n">functions</span><span class="p">,</span> <span class="n">executor</span><span class="o">=</span><span class="s2">&quot;multiprocessing&quot;</span><span class="p">))</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">executor</span> <span class="o">=</span> <span class="n">MultiprocessingExecutor</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="k">async</span> <span class="k">with</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">TaskGroup</span><span class="p">()</span> <span class="k">as</span> <span class="n">tg</span><span class="p">:</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>        <span class="k">await</span> <span class="n">executor</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="n">tg</span><span class="p">)</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>        <span class="o">...</span>  <span class="c1"># submit work here</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>        <span class="n">executor</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
 </span></code></pre></div>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Right: the guarded block is skipped during the worker re-import.</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">dispatch_tasks</span><span class="p">(</span><span class="n">functions</span><span class="p">,</span> <span class="n">executor</span><span class="o">=</span><span class="s2">&quot;multiprocessing&quot;</span><span class="p">))</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Wrong: run at module top level. Each worker re-imports this and fails.</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
+</span></code></pre></div>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># Right: the guarded block is skipped during the worker re-import.</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
 </span></code></pre></div>
 <p>This is the standard "safe importing of main module" contract of Python's
-<code>multiprocessing</code>; it applies equally to
-<a href="#dispatching-arbitrary-tasks"><code>dispatch_tasks</code></a> with
-<code>executor="multiprocessing"</code>. Interactive sessions (Jupyter/IPython) and test
+<code>multiprocessing</code>. Interactive sessions (Jupyter/IPython) and test
 runners such as <code>pytest</code> are unaffected, because their entry module is
 import-safe and is not re-executed on re-import.</p>
 <p>A few less common issues cause the same startup error:</p>
@@ -3634,12 +3634,12 @@ pre-existing files; give each concurrently-running executor its own
 <p>Configuration can be provided either via a <code>template</code> string or a <code>config_path</code>
 directory containing <code>pysqa</code> configuration files. If neither is given, the
 executor looks for a default configuration at:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>&lt;prefix&gt;/share/ropt/pysqa/&lt;queue_type&gt;/
+<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>&lt;prefix&gt;/share/ropt/pysqa/&lt;queue_type&gt;/
 </span></code></pre></div>
 <p>where <code>&lt;prefix&gt;</code> is the Python installation prefix (or system data prefix).
 Find it with:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">sysconfig</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_paths</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="nb">print</span><span class="p">(</span><span class="n">get_paths</span><span class="p">()[</span><span class="s2">&quot;data&quot;</span><span class="p">])</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">sysconfig</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_paths</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="nb">print</span><span class="p">(</span><span class="n">get_paths</span><span class="p">()[</span><span class="s2">&quot;data&quot;</span><span class="p">])</span>
 </span></code></pre></div>
 <p>This allows deployments to ship pre-configured cluster definitions by
 installing them into <code>share/ropt/pysqa/</code> — no explicit <code>config_path</code>
@@ -3739,8 +3739,7 @@ process</strong>. A different <em>thread</em> is fine; a different <em>process</
 <li><strong>Dispatching functions to workers.</strong> A function sent to a process or HPC
   worker cannot use handlers or a dispatcher that live in the host process. If
   it runs an optimization there, that optimization must be self-contained and
-  return its outcome as data. See
-  <a href="#dispatching-arbitrary-tasks">Dispatching arbitrary tasks</a>.</li>
+  return its outcome as data. See <a href="#executors">Executors</a>.</li>
 </ul>
 <p><code>ropt</code> enforces this at the process boundary. The workflow objects that hold
 in-process state or a process-local communication channel — compute steps,
@@ -3754,96 +3753,6 @@ placeholder was transferred and, if so, raises a
 against a disconnected copy. See
 <a href="#nested-workflows-and-process-boundaries">Nested workflows and process boundaries</a>
 for what belongs where.</p>
-<h2 id="dispatching-arbitrary-tasks">Dispatching arbitrary tasks</h2>
-<p><a class="autorefs autorefs-internal" title="            dispatch_tasks
-
-
-  
-      async
-  " href="../../reference/components_utils/#ropt.workflow.dispatch_tasks"><code>dispatch_tasks</code></a> is a utility function built on
-top of the executor infrastructure. It runs an arbitrary collection of Python
-callables in parallel — not necessarily as part of an optimization workflow. Use
-it for one-off parallel work such as post-processing, ensemble replay, or any
-batch computation that benefits from threading, multiprocessing, or HPC
-submission.</p>
-<p>It creates an executor internally based on the <code>executor</code> argument
-(<code>"threading"</code>, <code>"multiprocessing"</code>, or <code>"hpc"</code>), submits all functions, and
-returns the collected results.</p>
-<p><code>dispatch_tasks</code> is an <code>async</code> function — call it with <code>await</code> from an
-asyncio context, or use <code>asyncio.run(dispatch_tasks(...))</code>:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.workflow</span><span class="w"> </span><span class="kn">import</span> <span class="n">dispatch_tasks</span>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="k">def</span><span class="w"> </span><span class="nf">task_a</span><span class="p">():</span>
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>    <span class="k">return</span> <span class="s2">&quot;result_a&quot;</span>
-</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>
-</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="k">def</span><span class="w"> </span><span class="nf">task_b</span><span class="p">():</span>
-</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>    <span class="k">return</span> <span class="s2">&quot;result_b&quot;</span>
-</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>
-</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="n">results</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">dispatch_tasks</span><span class="p">([</span><span class="n">task_a</span><span class="p">,</span> <span class="n">task_b</span><span class="p">],</span> <span class="n">executor</span><span class="o">=</span><span class="s2">&quot;threading&quot;</span><span class="p">))</span>
-</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="nb">print</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>  <span class="c1"># [&quot;result_a&quot;, &quot;result_b&quot;]</span>
-</span></code></pre></div>
-<p>The <code>functions</code> argument can be either a sequence of callables or a mapping
-from name to callable. When a mapping is used, the keys serve as task names
-(useful for identifying jobs on the HPC cluster).</p>
-<table>
-<thead>
-<tr>
-<th>Parameter</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>functions</code></td>
-<td>Sequence or mapping of callables to execute.</td>
-</tr>
-<tr>
-<td><code>executor</code></td>
-<td>Executor type: <code>"threading"</code>, <code>"multiprocessing"</code>, or <code>"hpc"</code>.</td>
-</tr>
-<tr>
-<td><code>report</code></td>
-<td>Optional callback invoked with each task result as it completes.</td>
-</tr>
-<tr>
-<td><code>workers</code></td>
-<td>Number of parallel workers (default: 4).</td>
-</tr>
-<tr>
-<td><code>workdir</code></td>
-<td>Working directory for the HPC executor.</td>
-</tr>
-<tr>
-<td><code>cluster</code></td>
-<td>Optional HPC cluster name.</td>
-</tr>
-<tr>
-<td><code>queue</code></td>
-<td>Optional HPC queue/partition name.</td>
-</tr>
-<tr>
-<td><code>cores</code></td>
-<td>CPUs per task for HPC (default: 1).</td>
-</tr>
-</tbody>
-</table>
-<div class="admonition note">
-<p class="admonition-title">Working directory</p>
-<p>The dispatched functions cannot rely on the current directory being set
-consistently. Use absolute paths to read or write files. Setting the
-current directory in a <code>"threading"</code> executor affects all threads; in
-<code>"multiprocessing"</code> and <code>"hpc"</code> executors it can be changed safely per
-task.</p>
-</div>
-<div class="admonition note">
-<p class="admonition-title">No event handling across process boundaries</p>
-<p>Functions dispatched to a <code>"multiprocessing"</code> or <code>"hpc"</code> executor run in a
-separate process. If such a function runs a compute step, that step's event
-handlers stay in the worker process and cannot deliver events to a
-dispatcher or handler in the host process — return results as data instead.
-See <a href="#event-dispatcher">Event handling is a single-process mechanism</a>.</p>
-</div>
 <h2 id="event-dispatcher">Event dispatcher</h2>
 <p>When multiple compute steps run concurrently in worker threads, their event
 handlers are called from multiple threads simultaneously. <strong>Event handlers must
@@ -3900,8 +3809,8 @@ loop, so a forwarded event cannot arrive.</p>
 process</strong>. Any compute step executed out-of-process — for example a whole
 optimization sent to a
 <a class="autorefs autorefs-internal" title="            ropt.components.executors.MultiprocessingExecutor" href="../../reference/components_executors/#ropt.components.executors.MultiprocessingExecutor"><code>MultiprocessingExecutor</code></a>
-or <a class="autorefs autorefs-internal" title="            ropt.components.executors.HPCExecutor" href="../../reference/components_executors/#ropt.components.executors.HPCExecutor"><code>HPCExecutor</code></a>, whether via
-<a href="#dispatching-arbitrary-tasks"><code>dispatch_tasks</code></a> or as the enclosing layer
+or <a class="autorefs autorefs-internal" title="            ropt.components.executors.HPCExecutor" href="../../reference/components_executors/#ropt.components.executors.HPCExecutor"><code>HPCExecutor</code></a>, whether as a work
+item of its own or as the enclosing layer
 of a nested workflow — may attach handlers local to that worker process,
 but those handlers cannot deliver events to a dispatcher or handler in the
 host process. To collect information from out-of-process steps, return it as
