@@ -71,32 +71,57 @@ All executors share the same lifecycle:
 2. Start it inside an `asyncio.TaskGroup` with `await executor.start(tg)`.
 3. Use it (via `ParallelEvaluator`, or by submitting
    [`Submission`][ropt.components.executors.Submission] objects directly).
-4. Shut it down with `executor.cancel()`.
+4. Shut it down with `executor.cancel()` — see
+   [Stopping an executor](#stopping-an-executor) for what that does to work
+   that is already running.
+
+One rule covers every executor that leaves the process: **out-of-process work
+needs importable, module-level callables.** A work item's function and arguments
+are serialized, and the standard `pickle` module can only send what it can look
+up by name — so a lambda, a closure, or a function defined in a notebook cell is
+refused with an [`ExecutionError`][ropt.exceptions.ExecutionError]. Installing
+`ropt[cloudpickle]` lifts that restriction, and lifts it for the process, local
+and HPC executors alike. `ThreadExecutor` serializes nothing and is never
+affected.
 
 !!! note "Working directory"
 
     Work items cannot rely on the current directory being set consistently.
     Use absolute paths to read or write files. Setting the current directory
-    in a `ThreadExecutor` affects all threads; in a
-    `ProcessExecutor` or an `HPCExecutor` it can be changed safely per
-    work item.
+    in a `ThreadExecutor` affects all threads; in any of the executors that run
+    work in a process of its own it can be changed safely per work item.
 
 !!! note "No event handling across process boundaries"
 
-    A work item sent to a `ProcessExecutor` or an `HPCExecutor` runs in
+    A work item sent to a `ProcessExecutor`, a `LocalJobExecutor` or an
+    `HPCExecutor` runs in
     a separate process. If such a work item runs a compute step, that step's
     event handlers stay in the worker process and cannot deliver events to a
     dispatcher or handler in the host process — return results as data instead.
     See [Event handling is a single-process mechanism](#event-dispatcher).
 
-Three implementations are provided:
+Four implementations are provided:
 
 ### ThreadExecutor
 
-[`ThreadExecutor`][ropt.components.executors.ThreadExecutor] dispatches
-tasks to worker threads via `asyncio.to_thread`. Use this for I/O-bound
-evaluations or when the evaluation function releases the GIL (e.g. calls into
-C/Fortran).
+[`ThreadExecutor`][ropt.components.executors.ThreadExecutor] owns a
+`ThreadPoolExecutor` of its own and dispatches tasks to it with
+`loop.run_in_executor`. Use this for I/O-bound evaluations or when the
+evaluation function releases the GIL (e.g. calls into C/Fortran).
+
+The private pool is the point: `asyncio.to_thread` would use the event loop's
+*shared* default executor, the same one every other `to_thread` call in the
+process draws from — including the one that dispatches each compute step's
+`run()`. Filling it with evaluations would starve the steps waiting on them,
+which is precisely the deadlock
+[`run_concurrent`][ropt.components.concurrency.run_concurrent] exists to avoid.
+
+Threads are not a lesser form of parallelism here. Python runs one thread's
+*bytecode* at a time, but a thread that is **waiting** holds nothing: the GIL is
+released around blocking calls, and extension code may release it too. So
+several optimizations sharing a `ThreadExecutor` genuinely overlap whenever
+their evaluations wait — on a subprocess, a file, a socket — or spend their time
+inside a library that has let the GIL go.
 
 | Parameter    | Description                                       |
 | ------------ | ------------------------------------------------- |
@@ -107,6 +132,16 @@ C/Fortran).
 [`ProcessExecutor`][ropt.components.executors.ProcessExecutor]
 uses a `ProcessPoolExecutor` with a `"spawn"` context. Use this for CPU-bound
 evaluations where true parallelism is needed.
+
+It is a narrow tool, not a general execution mode. It earns its cost in exactly
+two cases: **pure-Python computation**, which threads cannot speed up, and
+**isolating process-global state**, where each evaluation needs its own copy of
+something a library keeps in module scope. Everything else it does — copying
+arguments and results, re-importing the entry module in every worker, losing all
+contact with the host process — is a price paid, not a feature. An evaluation
+that mostly runs an external program gets no benefit from it whatsoever, and is
+better served by a thread pool or by
+[`LocalJobExecutor`][ropt.components.executors.LocalJobExecutor].
 
 | Parameter             | Description                                                    |
 | --------------------- | -------------------------------------------------------------- |
@@ -324,6 +359,98 @@ the `cluster` and `queue` arguments:
   automatically. This requires exactly one cluster to provide the queue;
   otherwise (no match or multiple matches) an error is raised.
 
+## Stopping an executor
+
+`executor.cancel()` stops the executor and returns immediately; it never waits
+for work that is already running. Callers see the same thing whichever executor
+they used — a submission still in progress ends with
+[`ExecutorStopped`][ropt.exceptions.ExecutorStopped]. What differs is what keeps
+running afterwards, because what *can* be done to running work differs:
+
+| Executor | Work already running | Work not yet started |
+| --- | --- | --- |
+| `ThreadExecutor` | **runs to completion** | dropped |
+| `ProcessExecutor` | the worker processes are **killed** | dropped |
+| `LocalJobExecutor` | each job's **process group is killed** | dropped |
+| `HPCExecutor` | the jobs are **deleted from the queue** | dropped |
+
+**Threads run to completion because a thread cannot be cancelled.** Python
+offers no way to interrupt one from outside, so an evaluation on a
+`ThreadExecutor` decides for itself when it stops. `cancel()` returns at once,
+but the program cannot leave until those evaluations return — the pool joins its
+threads at interpreter shutdown. Rather than let that look like a hang, the
+executor logs a `WARNING` naming how many are still running. An evaluation that
+may run long and has to be interruptible belongs on one of the other three.
+
+**The kill is a `SIGTERM`, and the guarantee is partial.** In each of the other
+three cases the target is *asked* to end and is not waited for, so a process
+that blocks or ignores `SIGTERM`, or that sits in an uninterruptible system
+call, outlives the request. Stopping is a strong best effort — enough that an
+interrupted program exits instead of waiting for the current batch — not a
+promise that nothing of the run survives it.
+
+!!! warning "A process pool orphans whatever an evaluation launched itself"
+
+    [`ProcessExecutor`][ropt.components.executors.ProcessExecutor] terminates
+    its own worker processes and nothing else. It installs no process groups, so
+    a subprocess an evaluation started — a simulator, a solver, a shell
+    pipeline — is never signalled: it keeps running, and is re-parented when the
+    worker holding it dies. Nothing reports this, and the work simply continues
+    after the program that asked for it has gone.
+
+    [`LocalJobExecutor`][ropt.components.executors.LocalJobExecutor] is the
+    backend that handles this, by giving each work item a session of its own and
+    signalling the whole group. Use it when an evaluation launches external
+    programs and stopping has to mean stopping.
+
+### Ctrl-C
+
+Ctrl-C raises `SIGINT`, which CPython turns into `KeyboardInterrupt` — but only
+once the interrupted thread returns to the interpreter. A thread parked in
+`Queue.get`, `Event.wait`, `Thread.join`, `Future.result` or `Lock.acquire` is
+not there while it waits, and whether the signal breaks the wait depends on a
+process-global flag, `SA_RESTART`.
+
+CPython leaves that flag clear, so waits are interruptible. Some third-party
+extension modules install their own `SIGINT` handler with the flag **set**, and
+because it is process-global the effect is not confined to whoever set it: from
+then on Ctrl-C appears to do nothing at all, for the entire program. The
+symptom is identical on every backend, since the thread that fails to wake is
+the one waiting for results rather than the one producing them.
+
+`ropt` does not touch the flag. It is process-global state that belongs to the
+program, and a library that quietly changes it decides for every other part of
+that program as well — including the parts that wanted the handler they
+installed. Nor would clearing it once be enough: any import that happens later
+can set it again.
+
+So this is left to the application, and only matters if it happens to you.
+Clearing the flag is one line, at the top of a script and after the imports:
+
+```python
+import signal
+
+signal.siginterrupt(signal.SIGINT, True)
+```
+
+That clears the flag and does nothing else — the installed handler stays in
+place, so a package that chained its own keeps working. It is a no-op on
+Windows, which has no such flag.
+
+### Platforms
+
+[`LocalJobExecutor`][ropt.components.executors.LocalJobExecutor] needs process
+groups and is **POSIX only**: constructing it anywhere else raises an
+[`ExecutionError`][ropt.exceptions.ExecutionError] rather than quietly offering
+a weaker kill.
+
+The other three are not *known* to be broken on Windows, but they are not tested
+there either. Two differences are certain: there are no process groups, so the
+containment above does not exist, and there is no `SA_RESTART`, so the Ctrl-C
+problem does not exist.
+
+Free-threaded (no-GIL) builds of CPython are **untested and unsupported**.
+
 ## Error handling
 
 Executors and the [`ParallelEvaluator`][ropt.components.evaluators.ParallelEvaluator]
@@ -391,7 +518,7 @@ with the exception. Exceptions that cannot be serialized at all are wrapped in a
 
 ## Threads vs. processes: what crosses the boundary
 
-The three executor types are not interchangeable: the choice does not only
+The executor types are not interchangeable: the choice does not only
 affect performance, it determines what a dispatched compute step can still
 *do*. One principle governs the difference.
 
@@ -401,7 +528,8 @@ affect performance, it determines what a dispatched compute step can still
   on — all keep working across threads within one process.
 - A **process** — a
   [`ProcessExecutor`][ropt.components.executors.ProcessExecutor]
-  worker or an [`HPCExecutor`][ropt.components.executors.HPCExecutor] job — shares
+  worker, a [`LocalJobExecutor`][ropt.components.executors.LocalJobExecutor] job
+  or an [`HPCExecutor`][ropt.components.executors.HPCExecutor] job — shares
   none of that. It is **input/output only**: a task is serialized in and a
   result is serialized out, and nothing in between can reach back into the host
   process. This is deliberate, and it is enough for the common case — running an

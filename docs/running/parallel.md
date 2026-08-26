@@ -9,8 +9,8 @@ work to a pool.
 By default `optimize` runs on the calling thread, one evaluation at a time. To
 run the evaluations in parallel, open a [`session`][ropt.simple.session], ask it
 for a **pool**, and pass that pool to the run. See
-[Running in Parallel](../getting_started/execution.md) for a full explanation of the three choices
-and their trade-offs:
+[Running in Parallel](../getting_started/execution.md) for a full explanation of the
+choices and their trade-offs:
 
 ```python
 from ropt.simple import session
@@ -25,6 +25,33 @@ implicit: a run evaluates on the pool you hand it, and on no other. A run given
 no pool evaluates in-process, wherever it is called from — including from a
 thread you started yourself.
 
+### How many workers?
+
+`ropt` parallelizes two things, and only these two: the **evaluations within one
+optimization batch**, and whole **optimizations against each other**. Nothing
+else overlaps — a single optimization is a sequence of batches, and the next one
+cannot start before the current one is complete.
+
+So the number of workers worth asking for is roughly
+
+```
+batch size  ×  optimizations running at once
+```
+
+capped by what the machine or the queue will actually give you. Beyond that
+figure the extra workers have nothing to do and sit idle.
+
+Batch size follows from the problem, not from a setting: it is how many
+evaluations the optimizer asks for at once. For a gradient-based run over an
+ensemble that is one per realization, plus their perturbations on the batches
+where a gradient is estimated. The second factor is `1` unless you use
+[`optimize_many`][ropt.simple.optimize_many], where it is the `limit` argument
+(or the number of runs, if you set no limit).
+
+A worker is not free, so this is an upper bound rather than a target. Ask for
+what the work needs; the interesting number is usually a good deal smaller than
+the machine's core count.
+
 !!! tip "How a batch is split across workers"
     Each evaluation in a batch is transferred to a worker as its own task by
     default, which spreads the batch as widely as the pool allows. Every
@@ -34,6 +61,17 @@ thread you started yourself.
     single task. The evaluations within a task run one after another, so `0`
     gives up parallelism inside the batch entirely: it is for a pool whose
     parallelism comes from the runs above it, as in the note below.
+
+    `workers` and `bundle_size` are the two halves of matching work to capacity.
+    `workers` says how many tasks may be in flight; `bundle_size` says how much
+    work one task is worth carrying. With a batch of 100 cheap evaluations and
+    8 workers, the default sends 100 separate tasks and pays 100 transfer costs
+    to keep 8 workers busy; `bundle_size=13` sends 8 and pays 8. Raise it when
+    the evaluations are cheap relative to a transfer — above all on a
+    `process_pool`, a `local_pool` or an `hpc_pool`, where a transfer means
+    copying data and starting something. Leave it at `1` when they are
+    expensive, or when they vary in cost and bundling would leave one worker
+    holding all the slow ones.
 
 You can keep several pools open at once and choose per run:
 
@@ -62,12 +100,12 @@ with session() as s:
     always be reused.
 
     The evaluation must stay **in your process**, so on a thread pool or a
-    serial pool. On a process or HPC pool the evaluation function is copied into
-    a worker, and a pool cannot be copied with it: build the inner pool inside
-    the worker, from a session opened there, or run the inner optimization
-    without one. An evaluation function that carries a pool along anyway is
-    stopped in the worker, which names what it was handed instead of failing
-    somewhere deep inside the run.
+    serial pool. On a process, local, or HPC pool the evaluation function is
+    copied into a worker, and a pool cannot be copied with it: build the inner
+    pool inside the worker, from a session opened there, or run the inner
+    optimization without one. An evaluation function that carries a pool along
+    anyway is stopped in the worker, which names what it was handed instead of
+    failing somewhere deep inside the run.
 
 !!! tip "Releasing a pool early"
     A pool holds its workers until the session closes. That is usually fine, but
@@ -84,11 +122,72 @@ with session() as s:
     ```
 
     A closed pool cannot be reopened, and a run still using it stops with
-    [`ExecutorStopped`][ropt.exceptions.ExecutorStopped]. Starting a *new* run
+    [`ExecutorStopped`][ropt.exceptions.ExecutorStopped] — though on a thread
+    pool the evaluations already running still finish first, since a thread
+    cannot be interrupted; see
+    [Stopping a run](../getting_started/execution.md#stopping-a-run). Starting a *new* run
     on it is refused before anything runs, with a
     [`WorkflowError`][ropt.exceptions.WorkflowError] saying the pool is closed —
     which is what you get if a pool outlives the `with session()` block that
     created it.
+
+### Running each evaluation as a local job
+
+A [`local_pool`][ropt.simple.Session.local_pool] runs each evaluation as a
+separate process on this machine, with its output captured to a file. It needs
+no extras and no configuration, and it is the same shape as an `hpc_pool` minus
+the scheduler — so an objective that works on one works on the other:
+
+```python
+from ropt.simple import session
+
+with session() as s:
+    result = optimize(config, x0, objective, pool=s.local_pool(workers=4))
+```
+
+| Parameter     | Description                                                                |
+| ------------- | ------------------------------------------------------------------------- |
+| `workers`     | Maximum number of concurrent local jobs (default: 1).                     |
+| `workdir`     | Directory holding each evaluation's files. Defaults to a temporary directory the pool removes again, unless something is left in it to read. |
+| `retries`     | Extra polls to wait for a result (default: 0, which is enough).           |
+| `bundle_size` | Evaluations bundled into one local process, `0` for the whole batch as one (default: 1). See [How a batch is split across workers](#how-many-workers) above. |
+
+Two things distinguish it from a `process_pool`, and both matter when an
+evaluation is a job rather than a function call:
+
+- **Stopping reaches what the evaluation started.** Each job runs in a process
+  group of its own, so cancelling one signals the simulator or solver it
+  launched as well. A `process_pool` kills only its own workers and orphans the
+  rest.
+- **Output survives failure.** Whatever the evaluation printed is captured, and
+  the last lines are attached to the error, which is often the only trace a job
+  that died before returning anything leaves behind.
+
+!!! note "Where the working directory goes"
+    With no `workdir`, the pool works in a temporary directory of its own and
+    removes it when it closes — but only when there is nothing left in it worth
+    reading. If an evaluation **failed**, its captured output is kept, so the
+    directory is kept with it and its path is logged:
+
+    ```
+    WARNING  ropt.components.executors: Keeping the local working directory
+             /tmp/ropt-local-8f3a1c: a work item failed.
+    ```
+
+    A `workdir` you pass yourself is never removed, which is the way to choose
+    the location rather than be told it:
+
+    ```python
+    pool = s.local_pool(workers=4, workdir="/scratch/my-run")
+    ```
+
+    Give each pool that runs at the same time a directory of its own; files are
+    named after the evaluations, and the pool refuses to overwrite one that
+    already exists.
+
+This pool needs process groups and is therefore **POSIX only**: creating it on
+another platform raises an [`ExecutionError`][ropt.exceptions.ExecutionError]
+rather than quietly giving a weaker guarantee.
 
 ### Running on an HPC cluster
 
@@ -116,7 +215,8 @@ with session() as s:
 | `config_path` | Path to the `pysqa` configuration directory.                              |
 | `template`    | Inline submission-script template, used instead of a config.              |
 | `queue_type`  | Queueing system type (default: `"slurm"`).                                |
-| `bundle_size` | Evaluations bundled into one cluster job, `0` for the whole batch as one job (default: 1). See [How a batch is split across workers](#running-in-parallel) above. |
+| `retries`     | Extra polls to wait for a result that is missing or unreadable (default: 30). |
+| `bundle_size` | Evaluations bundled into one cluster job, `0` for the whole batch as one job (default: 1). See [How a batch is split across workers](#how-many-workers) above. |
 
 ### Evaluating in-process, on purpose
 
@@ -168,7 +268,8 @@ There are two independent levels of concurrency here:
   pass, and the pool decides how they are parallelized. With
   `thread_pool(workers=1)` the runs still progress together, but their
   evaluations are executed one at a time. A larger pool — `thread_pool(workers=n)`,
-  `process_pool`, or `hpc_pool` — runs several evaluations at once.
+  `process_pool`, `local_pool`, or `hpc_pool` — runs several evaluations at
+  once.
 
 Sharing one pool is also what keeps the runs' batch IDs apart, since they draw
 from its single counter.
@@ -229,8 +330,9 @@ with session() as s:
     first, second = offload([partial(expensive, x), partial(other, y)], pool=pool)
 ```
 
-As with the evaluation function on a process or HPC pool, the callables and their
-arguments are **copied to the workers**, since they run in separate processes.
+As with the evaluation function on a process, local, or HPC pool, the callables
+and their arguments are **copied to the workers**, since they run in separate
+processes.
 
 ### Without a pool
 

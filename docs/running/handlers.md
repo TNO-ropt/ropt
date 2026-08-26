@@ -275,8 +275,9 @@ On a thread pool (or with no pool) your objective and your handlers run in the
 **same process** and share memory: a handler can see anything the objective left
 behind — a global it set, a list it appended to, an object it mutated.
 
-A process or HPC pool breaks that. The objective runs in a **separate worker
-process**, while the optimizer, your handlers, and the rest of your program stay
+A process, local, or HPC pool breaks that. The objective runs in a **separate
+worker process**, while the optimizer, your handlers, and the rest of your
+program stay
 in the **main process**. They cannot share memory. The objective's *only* way to
 send information back is through what it **returns** — the objective and
 constraint values, and the result's `metadata` — all copied back to the main
