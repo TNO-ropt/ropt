@@ -24,9 +24,8 @@ ropt
 │   ├── ropt.components.event_handlers   ← ResultsHandler
 │   └── ropt.components.executors        ← Threading/Multiprocessing/HPCExecutor
 ├── ropt.core                            ← EnsembleOptimizer, EnsembleEvaluator
-├── ropt.plugins
-│   └── ropt.plugins.manager             ← PluginManager
-└── ropt.workflow                        ← dispatch_tasks
+└── ropt.plugins
+    └── ropt.plugins.manager             ← PluginManager
 ```
 
 This means you can enable logging for the entire library by configuring the
@@ -99,7 +98,6 @@ callback once for functions and once for gradients per iteration.
 | `HPCExecutor`               | `Submitted HPC job <id> (job id: <job>)` |
 | `ParallelEvaluator`         | `Dispatching 10 work item(s) to executor` |
 | `CachedEvaluator`           | `Cache: 4/10 evaluations served from cache` |
-| `dispatch_tasks`            | `Dispatching 8 work item(s) via multiprocessing executor (4 worker(s))` |
 
 ## Enabling logging
 

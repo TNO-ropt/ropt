@@ -12,7 +12,6 @@ import threading
 from concurrent.futures import ThreadPoolExecutor
 from concurrent.futures.process import BrokenProcessPool
 from functools import partial
-from pathlib import Path
 from typing import TYPE_CHECKING, Any, cast
 
 import numpy as np
@@ -47,10 +46,10 @@ from ropt.exceptions import (
     TransferError,
     WorkflowError,
 )
-from ropt.workflow import dispatch_tasks
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
+    from pathlib import Path
 
     from numpy.typing import NDArray
 
@@ -1505,74 +1504,6 @@ def _give_up(work_item: WorkItem) -> None:  # ruff: ignore[unused-function-argum
     raise ValueError(msg)
 
 
-def _returns_none() -> None:
-    return None
-
-
-async def test_dispatch_tasks_results_in_order() -> None:
-    functions = [partial(_function, idx) for idx in range(4)]
-    assert await dispatch_tasks(functions, "threading", workers=2) == [1, 2, 3, 4]
-
-
-async def test_dispatch_tasks_named_functions() -> None:
-    functions = {f"job{idx}": partial(_function, idx) for idx in range(3)}
-    assert await dispatch_tasks(functions, "threading", workers=2) == [1, 2, 3]
-
-
-async def test_dispatch_tasks_reports_every_result() -> None:
-    reported: list[Any] = []
-    functions = [partial(_function, idx) for idx in range(3)]
-    results = await dispatch_tasks(
-        functions, "threading", workers=2, report=reported.append
-    )
-    assert results == [1, 2, 3]
-    assert sorted(reported) == [1, 2, 3]
-
-
-async def test_dispatch_tasks_keeps_none_result() -> None:
-    # None is a legitimate result, not a marker for "nothing was delivered".
-    results = await dispatch_tasks(
-        [_returns_none, partial(_function, 0)], "threading", workers=2
-    )
-    assert results == [None, 1]
-
-
-async def test_dispatch_tasks_unknown_executor() -> None:
-    with pytest.raises(ValueError, match="Invalid executor"):
-        await dispatch_tasks([partial(_function, 0)], "bogus")  # type: ignore[arg-type]
-
-
-async def test_dispatch_tasks_default_hpc_workdir(
-    monkeypatch: Any,
-) -> None:
-    captured: dict[str, Any] = {}
-
-    def _capture(**kwargs: Any) -> ThreadingExecutor:
-        captured.update(kwargs)
-        return ThreadingExecutor(workers=kwargs["workers"])
-
-    monkeypatch.setattr("ropt.workflow._dispatch_tasks.HPCExecutor", _capture)
-    functions = [partial(_function, idx) for idx in range(2)]
-    assert await dispatch_tasks(functions, "hpc", workers=2) == [1, 2]
-    assert Path(captured["workdir"]).is_absolute()
-
-
-@pytest.mark.slow
-@pytest.mark.timeout(60)
-async def test_dispatch_tasks_multiprocessing() -> None:
-    functions = [partial(_function, idx) for idx in range(2)]
-    assert await dispatch_tasks(functions, "multiprocessing", workers=1) == [1, 2]
-
-
-async def test_dispatch_tasks_reraises_failing_function() -> None:
-    functions = [partial(_function, 0, raise_error=True)]
-    with pytest.raises(ExceptionGroup) as excinfo:
-        await dispatch_tasks(functions, "threading", workers=2)
-    matched, _ = excinfo.value.split(ValueError)
-    assert matched is not None
-    assert "Test error in function" in str(matched.exceptions[0])
-
-
 @pytest.mark.parametrize(
     "executor_name",
     [
@@ -1895,10 +1826,13 @@ async def test_multiprocessing_unguarded_main_reports_startup_error(
     script = tmp_path / "unguarded.py"
     script.write_text(
         "import asyncio\n\n"
-        "from ropt.workflow import dispatch_tasks\n\n\n"
-        "def work() -> int:\n"
-        "    return 1\n\n\n"
-        'asyncio.run(dispatch_tasks([work], executor="multiprocessing"))\n'
+        "from ropt.components.executors import MultiprocessingExecutor\n\n\n"
+        "async def main() -> None:\n"
+        "    executor = MultiprocessingExecutor(workers=1)\n"
+        "    async with asyncio.TaskGroup() as tg:\n"
+        "        await executor.start(tg)\n"
+        "        executor.cancel()\n\n\n"
+        "asyncio.run(main())\n"
     )
     proc = await asyncio.create_subprocess_exec(
         sys.executable,

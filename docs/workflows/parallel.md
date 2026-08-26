@@ -69,8 +69,25 @@ All executors share the same lifecycle:
 
 1. Create the executor instance.
 2. Start it inside an `asyncio.TaskGroup` with `await executor.start(tg)`.
-3. Use it (via `ParallelEvaluator` or `dispatch_tasks`).
+3. Use it (via `ParallelEvaluator`, or by submitting
+   [`Submission`][ropt.components.executors.Submission] objects directly).
 4. Shut it down with `executor.cancel()`.
+
+!!! note "Working directory"
+
+    Work items cannot rely on the current directory being set consistently.
+    Use absolute paths to read or write files. Setting the current directory
+    in a `ThreadingExecutor` affects all threads; in a
+    `MultiprocessingExecutor` or an `HPCExecutor` it can be changed safely per
+    work item.
+
+!!! note "No event handling across process boundaries"
+
+    A work item sent to a `MultiprocessingExecutor` or an `HPCExecutor` runs in
+    a separate process. If such a work item runs a compute step, that step's
+    event handlers stay in the worker process and cannot deliver events to a
+    dispatcher or handler in the host process — return results as data instead.
+    See [Event handling is a single-process mechanism](#event-dispatcher).
 
 Three implementations are provided:
 
@@ -122,20 +139,27 @@ The fix is to keep the code that creates and runs the executor behind an
 `if __name__ == "__main__":` guard (or inside a function called from there):
 
 ```python
-# Wrong: created at module top level. Each worker re-imports this and fails.
-asyncio.run(dispatch_tasks(functions, executor="multiprocessing"))
+async def main():
+    executor = MultiprocessingExecutor(workers=4)
+    async with asyncio.TaskGroup() as tg:
+        await executor.start(tg)
+        ...  # submit work here
+        executor.cancel()
+```
+
+```python
+# Wrong: run at module top level. Each worker re-imports this and fails.
+asyncio.run(main())
 ```
 
 ```python
 # Right: the guarded block is skipped during the worker re-import.
 if __name__ == "__main__":
-    asyncio.run(dispatch_tasks(functions, executor="multiprocessing"))
+    asyncio.run(main())
 ```
 
 This is the standard "safe importing of main module" contract of Python's
-`multiprocessing`; it applies equally to
-[`dispatch_tasks`](#dispatching-arbitrary-tasks) with
-`executor="multiprocessing"`. Interactive sessions (Jupyter/IPython) and test
+`multiprocessing`. Interactive sessions (Jupyter/IPython) and test
 runners such as `pytest` are unaffected, because their entry module is
 import-safe and is not re-executed on re-import.
 
@@ -344,8 +368,7 @@ Two places where this matters in practice:
 - **Dispatching functions to workers.** A function sent to a process or HPC
   worker cannot use handlers or a dispatcher that live in the host process. If
   it runs an optimization there, that optimization must be self-contained and
-  return its outcome as data. See
-  [Dispatching arbitrary tasks](#dispatching-arbitrary-tasks).
+  return its outcome as data. See [Executors](#executors).
 
 `ropt` enforces this at the process boundary. The workflow objects that hold
 in-process state or a process-local communication channel — compute steps,
@@ -359,67 +382,6 @@ placeholder was transferred and, if so, raises a
 against a disconnected copy. See
 [Nested workflows and process boundaries](#nested-workflows-and-process-boundaries)
 for what belongs where.
-
-## Dispatching arbitrary tasks
-
-[`dispatch_tasks`][ropt.workflow.dispatch_tasks] is a utility function built on
-top of the executor infrastructure. It runs an arbitrary collection of Python
-callables in parallel — not necessarily as part of an optimization workflow. Use
-it for one-off parallel work such as post-processing, ensemble replay, or any
-batch computation that benefits from threading, multiprocessing, or HPC
-submission.
-
-It creates an executor internally based on the `executor` argument
-(`"threading"`, `"multiprocessing"`, or `"hpc"`), submits all functions, and
-returns the collected results.
-
-`dispatch_tasks` is an `async` function — call it with `await` from an
-asyncio context, or use `asyncio.run(dispatch_tasks(...))`:
-
-```python
-import asyncio
-from ropt.workflow import dispatch_tasks
-
-def task_a():
-    return "result_a"
-
-def task_b():
-    return "result_b"
-
-results = asyncio.run(dispatch_tasks([task_a, task_b], executor="threading"))
-print(results)  # ["result_a", "result_b"]
-```
-
-The `functions` argument can be either a sequence of callables or a mapping
-from name to callable. When a mapping is used, the keys serve as task names
-(useful for identifying jobs on the HPC cluster).
-
-| Parameter   | Description                                                         |
-| ----------- | ------------------------------------------------------------------- |
-| `functions` | Sequence or mapping of callables to execute.                        |
-| `executor`  | Executor type: `"threading"`, `"multiprocessing"`, or `"hpc"`.      |
-| `report`    | Optional callback invoked with each task result as it completes.    |
-| `workers`   | Number of parallel workers (default: 4).                            |
-| `workdir`   | Working directory for the HPC executor.                             |
-| `cluster`   | Optional HPC cluster name.                                          |
-| `queue`     | Optional HPC queue/partition name.                                  |
-| `cores`     | CPUs per task for HPC (default: 1).                                 |
-
-!!! note "Working directory"
-
-    The dispatched functions cannot rely on the current directory being set
-    consistently. Use absolute paths to read or write files. Setting the
-    current directory in a `"threading"` executor affects all threads; in
-    `"multiprocessing"` and `"hpc"` executors it can be changed safely per
-    task.
-
-!!! note "No event handling across process boundaries"
-
-    Functions dispatched to a `"multiprocessing"` or `"hpc"` executor run in a
-    separate process. If such a function runs a compute step, that step's event
-    handlers stay in the worker process and cannot deliver events to a
-    dispatcher or handler in the host process — return results as data instead.
-    See [Event handling is a single-process mechanism](#event-dispatcher).
 
 ## Event dispatcher
 
@@ -486,8 +448,8 @@ is re-raised there, on the run's stack (see [Handler failures](#handler-failures
     process**. Any compute step executed out-of-process — for example a whole
     optimization sent to a
     [`MultiprocessingExecutor`][ropt.components.executors.MultiprocessingExecutor]
-    or [`HPCExecutor`][ropt.components.executors.HPCExecutor], whether via
-    [`dispatch_tasks`](#dispatching-arbitrary-tasks) or as the enclosing layer
+    or [`HPCExecutor`][ropt.components.executors.HPCExecutor], whether as a work
+    item of its own or as the enclosing layer
     of a nested workflow — may attach handlers local to that worker process,
     but those handlers cannot deliver events to a dispatcher or handler in the
     host process. To collect information from out-of-process steps, return it as

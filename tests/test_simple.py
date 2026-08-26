@@ -159,11 +159,10 @@ def test_report_callback_receives_evaluated_variables(
     # learn which one an evaluation belongs to.
     reported: list[EvaluateResult] = []
     optimize(config, initial_values, test_functions[0], report=reported.append)
-    variables = [item.variables for item in reported]
+    variables = [item.variables for item in reported if item.variables is not None]
     assert variables
-    assert all(
-        item is not None and item.shape == initial_values.shape for item in variables
-    )
+    assert len(variables) == len(reported)
+    assert all(item.shape == initial_values.shape for item in variables)
     assert any(not np.array_equal(item, initial_values) for item in variables)
 
 
@@ -487,6 +486,7 @@ def test_evaluate_single_vector(config: Any, test_functions: Any) -> None:
     assert result.objectives is not None
     assert result.objectives.shape == (1,)
     assert result.constraints is None
+    assert result.results is not None
     assert result.results.evaluations.variables.shape == (initial_values.size,)
 
 
