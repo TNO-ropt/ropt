@@ -1,57 +1,24 @@
 """Defines a class for running evaluations on a HPC cluster.
 
-Unlike the thread and process executors, there is no channel back from a job:
-work travels over a shared filesystem, as a serialized `<id>.in` file the job
-reads and an `<id>.out` file it writes (with `<id>.txt` for its output). The job
-itself runs `ropt.components.executors` as a module through `pysqa`, with the
-interpreter that submitted it, which is the one `ropt` is installed in.
-
-So there is nothing to await, only a queue to ask. One thread does all the
-blocking `pysqa` work — submitting and polling — while the async worker loop
-alternates between handing it work and waiting for more. A job that disappeared
-from the queue without leaving a readable result is retried a bounded number of
-times, because a shared filesystem may take a while to show it.
-
-Two threads reach the queueing system, and which one matters. `_submit` and
-`_poll`, and so `_live_job_ids`, run on the single poll thread, one after the
-other. `_cancel_jobs` runs on the loop thread, because `_cleanup` does. Anything
-kept between those calls is therefore shared by two threads and needs its own
-lock: `_jobs_closed` is this module's instance of that problem.
+A cluster job is what [`JobExecutorBase`][] calls a job: this module supplies the
+three answers it needs — how to submit one through `pysqa`, how to ask the
+scheduler which are still queued or running, and how to cancel one — plus the
+cluster-specific configuration that goes with them.
 """
 
 from __future__ import annotations
 
-import asyncio
-import contextlib
-import os
-import sys
 import sysconfig
-import tempfile
-import threading
-from concurrent.futures import ThreadPoolExecutor
 from importlib.util import find_spec
 from pathlib import Path
-from pickle import UnpicklingError  # ruff: ignore[suspicious-pickle-import]
-from typing import TYPE_CHECKING, Any, Final
-from uuid import uuid4
+from typing import TYPE_CHECKING, Final
 
-from ropt._logging import get_logger
-from ropt.exceptions import ExecutionError, ExecutorFailure, WorkflowError
+from ropt.exceptions import ExecutionError
 
-from ._serialize import CANNOT_SERIALIZE, dump, load
-from .base import ExecutorBase, Submission, WorkItem
+from ._job_executor import JobExecutorBase
 
 if TYPE_CHECKING:
     from uuid import UUID
-
-_logger = get_logger(__name__)
-
-# How much of a failed job's captured output travels with its failure.
-_OUTPUT_TAIL_LINES: Final = 20
-
-# Returned for a work item that has not settled: its result is either not there
-# yet, or not whole yet with budget left to wait for the rest of it.
-_PENDING: Final = object()
 
 # `cloudpickle` is not required: without it, jobs may only be given functions
 # the standard library can send, which is what `_serialize` falls back to.
@@ -61,7 +28,7 @@ if _HAVE_HPC:
     import pysqa
 
 
-class HPCExecutor(ExecutorBase):
+class HPCExecutor(JobExecutorBase):
     """An executor for submitting tasks to an HPC cluster.
 
     Interfaces with an HPC queueing system (for example Slurm) via `pysqa`.
@@ -70,6 +37,9 @@ class HPCExecutor(ExecutorBase):
     See [Parallel Evaluation](../workflows/parallel.md#hpcexecutor) for full
     details on configuration and lifecycle.
     """
+
+    _kind = "HPC"
+    _backend = "HPC scheduler"
 
     def __init__(  # ruff: ignore[too-many-arguments]
         self,
@@ -84,6 +54,7 @@ class HPCExecutor(ExecutorBase):
         queue: str | None = None,
         cores: int = 1,
         retries: int = 30,
+        query_retries: int = 30,
         cleanup: bool = True,
     ) -> None:
         """Initialize the HPC executor.
@@ -92,62 +63,66 @@ class HPCExecutor(ExecutorBase):
         configuration details.
 
         Args:
-            workdir:     Shared-filesystem directory for each work item's
-                         serialized I/O files; also passed as the job working
-                         directory (template-dependent). Must be an existing
-                         absolute path: there is no default, because only the
-                         caller knows which directory the cluster shares. Work
-                         item files are never overwritten, so concurrent
-                         executors need distinct workdirs.
-            workers:     Maximum concurrent HPC jobs.
-            interval:    Polling interval in seconds.
-            queue_type:  Queueing system type (for example `"slurm"`).
-            template:    Optional submission script template string.
-            config_path: Optional path to `pysqa` configuration directory.
-            cluster:     Optional cluster name.
-            queue:       Optional queue/partition name.
-            cores:       CPUs per work item.
-            retries:     Number of extra polls to wait for a work item's result
-                         after the first attempt fails (`0` gives up at once).
-            cleanup:     Whether to remove work item files once their result is
-                         retrieved or their job is cancelled. A work item that
-                         failed keeps its captured output, which is the only
-                         record of why.
+            workdir:       Shared-filesystem directory for each work item's
+                           serialized I/O files; also passed as the job working
+                           directory (template-dependent). Must be an existing
+                           absolute path: there is no default, because only the
+                           caller knows which directory the cluster shares. Work
+                           item files are never overwritten, so concurrent
+                           executors need distinct workdirs.
+            workers:       Maximum concurrent HPC jobs.
+            interval:      Polling interval in seconds.
+            queue_type:    Queueing system type (for example `"slurm"`).
+            template:      Optional submission script template string.
+            config_path:   Optional path to `pysqa` configuration directory.
+            cluster:       Optional cluster name.
+            queue:         Optional queue/partition name.
+            cores:         CPUs per work item.
+            retries:       Number of extra polls to wait for a work item's
+                           result after the first attempt fails (`0` gives up at
+                           once). This is about the shared filesystem, not about
+                           the scheduler.
+            query_retries: Number of extra attempts to query the scheduler after
+                           one fails (`0` gives up at once). A run this long
+                           fails every job that is out, because nothing can be
+                           said about a job that cannot be asked after.
+            cleanup:       Whether to remove work item files once their result is
+                           retrieved or their job is cancelled. A work item that
+                           failed keeps its captured output, which is the only
+                           record of why.
 
         Raises:
             ValueError:     If `workdir` is not an existing absolute path, or if
-                            `workers`, `interval` or `retries` is out of range.
+                            `workers`, `interval`, `retries` or `query_retries`
+                            is out of range.
             ExecutionError: If neither a `template` is provided nor a valid
                           `config_path` can be found, if the requested cluster
                           is unknown, if the queue is not available on the
                           requested cluster, or if the queue cannot be resolved
                           to exactly one cluster.
         """
-        super().__init__()
-        self._workdir = Path(workdir)
-        if not self._workdir.is_absolute():
-            msg = f"The HPC working directory must be an absolute path: {self._workdir}"
+        workdir = Path(workdir)
+        if not workdir.is_absolute():
+            msg = f"The HPC working directory must be an absolute path: {workdir}"
             raise ValueError(msg)
-        if not self._workdir.exists():
-            msg = f"The HPC working directory does not exist: {self._workdir}"
+        if not workdir.exists():
+            msg = f"The HPC working directory does not exist: {workdir}"
             raise ValueError(msg)
-        if workers < 1:
-            msg = f"The number of HPC workers must be at least one: {workers}"
+        if query_retries < 0:
+            msg = (
+                f"The number of HPC query retries must not be negative: {query_retries}"
+            )
             raise ValueError(msg)
-        if interval < 0:
-            msg = f"The HPC polling interval must not be negative: {interval}"
-            raise ValueError(msg)
-        if retries < 0:
-            msg = f"The number of HPC retries must not be negative: {retries}"
-            raise ValueError(msg)
-        self._workers = workers
-        self._interval = interval
+        super().__init__(
+            workdir=workdir,
+            workers=workers,
+            interval=interval,
+            retries=retries,
+            cleanup=cleanup,
+        )
         self._queue = queue
         self._cores = cores
-        self._retries_limit = retries
-        self._remove_files = cleanup
-        self._worker_task: asyncio.Task[None] | None = None
-        self._pool: ThreadPoolExecutor | None = None
+        self._query_retries = query_retries
 
         self._template = template
         config_path = _get_config_path(config_path)
@@ -163,373 +138,27 @@ class HPCExecutor(ExecutorBase):
             )
             _select_cluster(self._queue_adapter, cluster, queue)
 
-        self._items: dict[str | UUID, tuple[Submission, WorkItem]] = {}
-        self._jobs: dict[str | UUID, int] = {}
-        self._retries: dict[str | UUID, int] = {}
-        self._poll_failures = 0
-        # The submitted jobs are reached from the poll thread and from cleanup
-        # on the loop thread; `_jobs_closed` closes the door between them, so a
-        # job cannot be submitted after cleanup has passed it by.
-        self._jobs_lock = threading.Lock()
-        self._jobs_closed = False
-        self._work_arrived = asyncio.Event()
-
-    async def start(self, task_group: asyncio.TaskGroup) -> None:
-        """Start the executor.
-
-        Args:
-            task_group: The task group to use.
-        """
-        self._begin_start()
-        self._work_arrived = asyncio.Event()
-        with self._jobs_lock:
-            self._jobs_closed = False
-        # A single thread, because it is the only one that talks to `pysqa`:
-        # submitting and polling stay in one order, and off the loop thread.
-        self._pool = ThreadPoolExecutor(
-            max_workers=1, thread_name_prefix="ropt-hpc-poll"
-        )
-        self._worker_task = task_group.create_task(self._worker(self._pool))
-        _logger.info(
-            "Starting HPC executor (%d max workers, %.1fs poll interval)",
-            self._workers,
-            self._interval,
-        )
-        await self._finish_start(task_group)
-
-    async def _worker(self, pool: ThreadPoolExecutor) -> None:
-        # Every `pysqa` call blocks, so the whole submit-and-poll round trip is
-        # handed to the single poll thread; this loop only decides when.
-        loop = asyncio.get_running_loop()
-        while self._running.is_set():
-            pending = self._take_work_items()
-            if self._items:
-                results = await loop.run_in_executor(
-                    pool, self._run_work_items, pending
-                )
-                self._deliver_results(results)
-            await self._wait_for_work()
-
-    async def _wait_for_work(self) -> None:
-        self._work_arrived.clear()
-        # There is room and work waiting: go round again without pausing.
-        if len(self._items) < self._workers and not self._work_queue.empty():
-            return
-        # Poll while jobs are out, but wait indefinitely when there is nothing
-        # to poll for, so an idle executor costs nothing.
-        idle = not self._items and self._work_queue.empty()
-        timeout = None if idle else self._interval
-        with contextlib.suppress(TimeoutError):
-            await asyncio.wait_for(self._work_arrived.wait(), timeout)
-
-    def _accept(self, submission: Submission) -> None:
-        super()._accept(submission)
-        self._work_arrived.set()
-
-    def _take_work_items(self) -> list[tuple[str | UUID, WorkItem]]:
-        # Takes no more than there is room for: `_items` holds the jobs that are
-        # out, so `workers` caps how many run on the cluster at once.
-        pending: list[tuple[str | UUID, WorkItem]] = []
-        while len(self._items) < self._workers:
-            try:
-                submission, work_item = self._work_queue.get_nowait()
-            except asyncio.QueueEmpty:
-                break
-            if submission.is_finished:
-                # Its caller has already left, so this would be a cluster job
-                # whose result nobody reads.
-                continue
-            try:
-                item_id = self._register(submission, work_item)
-            except WorkflowError as exc:
-                self._fail(submission, exc)
-                continue
-            pending.append((item_id, work_item))
-        return pending
-
-    def _register(self, submission: Submission, work_item: WorkItem) -> str | UUID:
-        # The ID is the file name the job reads and writes, so a caller-given
-        # name is refused if it is already in flight, rather than overwritten.
-        item_id = work_item.name or uuid4()
-        if item_id in self._items:
-            msg = f"Work item ID '{item_id}' is already in use; names must be unique."
-            raise WorkflowError(msg)
-        self._items[item_id] = (submission, work_item)
-        return item_id
-
-    def _deliver_results(self, results: dict[str | UUID, Any]) -> None:
-        for item_id, result in results.items():
-            entry = self._items.pop(item_id, None)
-            if entry is None:
-                continue
-            submission, work_item = entry
-            if isinstance(result, Exception) and not isinstance(
-                result, ExecutorFailure
-            ):
-                # Deliver to the evaluator; keep the executor alive (no raise).
-                self._fail(submission, result)
-            else:
-                self._deliver(submission, work_item, result)
-
-    def _cleanup(self) -> None:
-        """Clean up the executor resources."""
-        if self._pool is not None:
-            self._pool.shutdown(wait=False, cancel_futures=True)
-            self._pool = None
-        if self._worker_task is not None and not self._worker_task.done():
-            self._worker_task.cancel()
-        self._worker_task = None
-        self._cancel_jobs()
-        self._items.clear()
-        self._cleanup_submissions()
-
-    def _cancel_jobs(self) -> None:
-        with self._jobs_lock:
-            self._jobs_closed = True
-            jobs = dict(self._jobs)
-            self._jobs.clear()
-        for item_id, job_id in jobs.items():
-            self._delete_job(item_id, job_id)
-
-    def _delete_job(self, item_id: str | UUID, job_id: int) -> None:
-        try:
-            self._queue_adapter.delete_job(job_id)
-        except Exception as exc:  # ruff: ignore[blind-except]
-            _logger.warning(
-                "Could not cancel HPC job %s (job id: %s): %s", item_id, job_id, exc
-            )
-        else:
-            _logger.debug("Cancelled HPC job %s (job id: %s)", item_id, job_id)
-        self._retries.pop(item_id, None)
-        if self._remove_files:
-            self._cleanup_files(item_id)
-
-    def _run_work_items(
-        self, pending: list[tuple[str | UUID, WorkItem]]
-    ) -> dict[str | UUID, Any]:
-        # Runs on the poll thread: submit what was taken, then ask the queue
-        # about everything that is out.
-        results: dict[str | UUID, Any] = {}
-        for item_id, work_item in pending:
-            try:
-                if not self._submit(item_id, work_item):
-                    # Shutting down: leave the rest, cleanup releases them.
-                    return results
-            except Exception as exc:  # ruff: ignore[blind-except]
-                results[item_id] = exc
-        return results | self._poll()
-
-    def _submit(self, item_id: str | UUID, work_item: WorkItem) -> bool:
-        with self._jobs_lock:
-            if self._jobs_closed:
-                return False
-        existing = any(
-            (self._workdir / f"{item_id}{suffix}").exists()
-            for suffix in (".in", ".out", ".txt")
-        )
-        if existing:
-            msg = (
-                f"Work item files for '{item_id}' already exist in {self._workdir}; "
-                "give each executor its own working directory."
-            )
-            raise ExecutionError(msg)
-        input_file = self._workdir / f"{item_id}.in"
-        output_file = self._workdir / f"{item_id}.out"
-        # Written to a temporary file and renamed, so the job can never observe
-        # a half-written input: on a shared filesystem the rename is what makes
-        # it visible, and fsync is what makes the content precede it.
-        tmp_fd, tmp_path_str = tempfile.mkstemp(dir=self._workdir)
-        tmp_path = Path(tmp_path_str)
-        try:
-            with os.fdopen(tmp_fd, "wb") as fp:
-                dump((work_item.function, work_item.args, work_item.kwargs), fp)
-                fp.flush()
-                os.fsync(fp.fileno())
-            tmp_path.rename(input_file)
-        except Exception as exc:
-            tmp_path.unlink(missing_ok=True)
-            msg = (
-                f"Work item '{item_id}' could not be sent to a job: {CANNOT_SERIALIZE}."
-            )
-            raise ExecutionError(msg) from exc
-        except BaseException:
-            tmp_path.unlink(missing_ok=True)
-            raise
-        try:
-            job_id = self._queue_adapter.submit_job(
+    def _start_job(self, item_id: str | UUID, command: list[str]) -> int:
+        return int(
+            self._queue_adapter.submit_job(
                 job_name=item_id,
                 output=f"{item_id}.txt",
                 working_directory=str(self._workdir),
-                # The submitting interpreter, not whatever `python` the job's
-                # PATH resolves to: only this one is known to import `ropt`.
-                command=(
-                    f"{sys.executable} -m ropt.components.executors "
-                    f"{input_file} {output_file}"
-                ),
+                command=" ".join(command),
                 submission_template=self._template,
                 queue=self._queue,
                 cores=self._cores,
             )
-        except BaseException:
-            if self._remove_files:
-                self._cleanup_files(item_id)
-            raise
-        with self._jobs_lock:
-            stopped = self._jobs_closed
-            if not stopped:
-                self._jobs[item_id] = job_id
-        if stopped:
-            # Cleanup ran while this job was being submitted, so it never made
-            # the list it would have been cancelled from: cancel it here.
-            self._delete_job(item_id, job_id)
-            return False
-        _logger.debug("Submitted HPC job %s (job id: %s)", item_id, job_id)
-        return True
+        )
 
     def _live_job_ids(self) -> set[int]:
-        # Runs on the poll thread. The only place that knows the scheduler
-        # answers with a table: above this line a queueing system is a source of
-        # job ids and nothing else, so `pandas` stays `pysqa`'s dependency
-        # rather than becoming one of ropt's.
+        # The only place that knows the scheduler answers with a table: above
+        # this line a queueing system is a source of job ids and nothing else,
+        # so `pandas` stays `pysqa`'s dependency rather than becoming ropt's.
         return set(self._queue_adapter.get_status_of_my_jobs()["jobid"].tolist())
 
-    def _poll(self) -> dict[str | UUID, Any]:
-        results: dict[str | UUID, Any] = {}
-        try:
-            jobs = self._live_job_ids()
-        except Exception as exc:  # ruff: ignore[blind-except]
-            # A scheduler that cannot be reached looks exactly like "nothing has
-            # finished", so failed queries are counted rather than ignored.
-            return self._handle_query_failure(exc)
-        self._poll_failures = 0
-        with self._jobs_lock:
-            submitted = dict(self._jobs)
-        for item_id, job_id in submitted.items():
-            # Gone from the queue is the only sign that a job has ended; what
-            # became of it has to be read from its output file.
-            if job_id in jobs:
-                continue
-            result = self._read_result(item_id)
-            if result is not _PENDING:
-                results[item_id] = result
-        if self._remove_files:
-            for item_id, result in results.items():
-                self._cleanup_files(
-                    item_id, keep_output=isinstance(result, ExecutorFailure)
-                )
-        return results
-
-    def _read_result(self, item_id: str | UUID) -> Any:  # ruff: ignore[any-type]
-        output_file = self._workdir / f"{item_id}.out"
-        try:
-            with output_file.open("rb") as fp:
-                result = load(fp)
-        except FileNotFoundError:
-            # The file may simply not be visible yet, so give the shared
-            # filesystem a bounded number of further polls to show it.
-            return self._retry_or_fail(
-                item_id,
-                f"Output file for work item {item_id} never appeared",
-                "output file never appeared",
-            )
-        except (OSError, EOFError, UnpicklingError):
-            # Present but unreadable, which a partially visible file also looks
-            # like: retried on the same budget before giving up.
-            return self._retry_or_fail(
-                item_id,
-                f"No valid result for work item {item_id} after {self._retries_limit} retries",
-                f"no valid result after {self._retries_limit} retries",
-            )
-        except (ImportError, AttributeError) as exc:
-            # The unpickler got as far as looking a name up, so the bytes were
-            # already complete: reading them again cannot change the answer, and
-            # spending the retry budget here would only delay the failure and
-            # then blame the filesystem, which is the one thing not at fault.
-            msg = (
-                f"The result of work item {item_id} could not be reconstructed: "
-                f"{exc}. This process must be able to import whatever the job "
-                "returned."
-            )
-            return self._fail_item(item_id, msg, exc)
-        except Exception as exc:  # ruff: ignore[blind-except]
-            # Unpickling runs the code that rebuilds the object, and that can
-            # raise anything at all. Whatever it was belongs to this work item
-            # rather than to the executor, which anything escaping here would
-            # take down: `_poll` runs outside `_run_work_items`' own guard.
-            msg = f"The result of work item {item_id} could not be read: {exc}"
-            return self._fail_item(item_id, msg, exc)
-        self._retries.pop(item_id, None)
-        self._drop_job(item_id)
-        return result
-
-    def _retry_or_fail(self, item_id: str | UUID, msg: str, reason: str) -> Any:  # ruff: ignore[any-type]
-        # A shared filesystem may take a while to show a finished job's result,
-        # so the same bounded budget covers "not there yet" and "not whole yet".
-        retry_count = self._retries.get(item_id, 0) + 1
-        self._retries[item_id] = retry_count
-        if retry_count <= self._retries_limit:
-            return _PENDING
-        return self._fail_item(item_id, msg, reason)
-
-    def _fail_item(
-        self, item_id: str | UUID, msg: str, reason: object
-    ) -> ExecutorFailure:
-        # Give up on this work item: its retry budget is either spent or beside
-        # the point, and its job is no longer something to wait for.
-        self._retries.pop(item_id, None)
-        self._drop_job(item_id)
-        _logger.warning("HPC work item %s failed: %s", item_id, reason)
-        return ExecutorFailure(msg + self._job_output(item_id))
-
-    def _job_output(self, item_id: str | UUID) -> str:
-        # A job that died before writing a result left its only trace here, so
-        # the tail travels with the failure and the file itself is kept.
-        output_file = self._workdir / f"{item_id}.txt"
-        try:
-            lines = output_file.read_text(errors="replace").splitlines()
-        except OSError:
-            return ""
-        tail = [line for line in lines if line.strip()][-_OUTPUT_TAIL_LINES:]
-        if not tail:
-            return ""
-        body = "\n".join(tail)
-        return f"; the job wrote to {output_file}:\n{body}"
-
-    def _handle_query_failure(self, exc: BaseException) -> dict[str | UUID, Any]:
-        # Only a run of failures is fatal: a single one may be a hiccup, and
-        # giving up at the first would end runs the cluster is still working on.
-        results: dict[str | UUID, Any] = {}
-        self._poll_failures += 1
-        _logger.warning(
-            "Querying the HPC scheduler failed (%d/%d): %s",
-            self._poll_failures,
-            self._retries_limit + 1,
-            exc,
-        )
-        if self._poll_failures > self._retries_limit:
-            msg = (
-                "The HPC scheduler could not be queried after "
-                f"{self._retries_limit + 1} attempts: {exc}"
-            )
-            with self._jobs_lock:
-                submitted = list(self._jobs)
-            for item_id in submitted:
-                self._drop_job(item_id)
-                self._retries.pop(item_id, None)
-                results[item_id] = ExecutorFailure(msg)
-            self._poll_failures = 0
-        return results
-
-    def _drop_job(self, item_id: str | UUID) -> None:
-        with self._jobs_lock:
-            self._jobs.pop(item_id, None)
-
-    def _cleanup_files(self, item_id: str | UUID, *, keep_output: bool = False) -> None:
-        suffixes = (".in", ".out") if keep_output else (".in", ".out", ".txt")
-        for suffix in suffixes:
-            path = self._workdir / f"{item_id}{suffix}"
-            with contextlib.suppress(OSError):
-                path.unlink(missing_ok=True)
+    def _cancel_job(self, job_id: int) -> None:
+        self._queue_adapter.delete_job(job_id)
 
 
 def _get_config_path(config_path: Path | str | None) -> Path | None:

@@ -209,6 +209,7 @@ cannot be reached the failure is logged and stopping continues.
 | `queue`       | Optional queue/partition name.                                           |
 | `cores`       | CPUs per work item (default: 1).                                         |
 | `retries`     | Extra polls to wait for a result that is missing or unreadable (default: 30). |
+| `query_retries` | Extra attempts to query the scheduler after one fails (default: 30). |
 | `cleanup`     | Whether to remove a work item's files once it settles (default: `True`). A failed work item keeps its captured output. |
 
 A finished job's result is not always readable at once: the job may have died
@@ -216,9 +217,14 @@ before writing it, or the file may be caught half-written. `retries` is how many
 **further** polls to allow before the work item is failed with an
 [`ExecutorFailure`][ropt.exceptions.ExecutorFailure], so the grace period is
 `retries × interval` seconds — 30 seconds with the defaults. `retries=0` gives up
-on the first failed read. The same limit bounds scheduler outages: once querying
-the queue has failed `retries + 1` times in a row, every outstanding work item is
-failed rather than waited on for ever.
+on the first failed read.
+
+`query_retries` bounds a separate failure: the scheduler itself being
+unreachable. Once querying the queue has failed `query_retries + 1` times **in a
+row**, every outstanding work item is failed rather than waited on for ever; an
+answer in between starts the count again, so an occasional bad moment costs
+nothing. The two are separate numbers because they are separate problems — a
+shared filesystem that lags has nothing to do with a scheduler that is down.
 
 A job that died before writing a result leaves its only trace in the `.txt` file
 holding its captured output. That file is therefore **kept** when a work item

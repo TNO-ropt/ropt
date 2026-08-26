@@ -489,14 +489,24 @@ async def test_hpc_scheduler_query_fails_after_retry_limit(
     # A scheduler that cannot be queried must not look like "nothing finished
     # yet": without a bound on the failures the caller waits forever.
     class _UnreachableScheduler(MockedHPCAdapter):
-        def live_job_ids(self) -> set[int]:  # ruff: ignore[no-self-use]
+        queries = 0
+
+        def live_job_ids(self) -> set[int]:
+            type(self).queries += 1
             msg = "squeue: error: Unable to contact slurm controller"
             raise RuntimeError(msg)
 
     _mock_scheduler(monkeypatch, _UnreachableScheduler(tmp_path))
     submission = Submission([WorkItem(function=_function, args=(0,))])
+    # `retries=0` gives up on a missing result at once, and has nothing to say
+    # about a scheduler that will not answer: the two budgets are separate.
     executor = HPCExecutor(
-        workdir=tmp_path, workers=1, interval=0, retries=2, template=""
+        workdir=tmp_path,
+        workers=1,
+        interval=0,
+        retries=0,
+        query_retries=2,
+        template="",
     )
     async with asyncio.TaskGroup() as tg:
         await executor.start(tg)
@@ -506,6 +516,43 @@ async def test_hpc_scheduler_query_fails_after_retry_limit(
     assert len(collected) == 1
     assert isinstance(collected[0], ExecutorFailure)
     assert "could not be queried" in str(collected[0])
+    assert "after 3 attempts" in str(collected[0])
+    assert _UnreachableScheduler.queries == 3
+
+
+@pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
+async def test_hpc_scheduler_query_budget_resets_after_an_answer(
+    tmp_path: Path, monkeypatch: Any
+) -> None:
+    # The budget is for a run of failures, not for failures in total: a cluster
+    # that has a bad moment every so often would otherwise fail a long run for
+    # no reason at all.
+    class _FlakyScheduler(MockedHPCAdapter):
+        calls = 0
+
+        def live_job_ids(self) -> set[int]:
+            type(self).calls += 1
+            if type(self).calls in {1, 3}:
+                msg = "squeue: error: Unable to contact slurm controller"
+                raise RuntimeError(msg)
+            if type(self).calls == 2:
+                return set(self._jobs)  # answered, and the job is still out
+            return super().live_job_ids()
+
+    _mock_scheduler(monkeypatch, _FlakyScheduler(tmp_path))
+    submission = Submission([WorkItem(function=_function, args=(0,))])
+    # One failure is survivable; two in a row are not. The answer in between is
+    # what makes the second failure a first one again.
+    executor = HPCExecutor(
+        workdir=tmp_path, workers=1, interval=0, query_retries=1, template=""
+    )
+    async with asyncio.TaskGroup() as tg:
+        await executor.start(tg)
+        executor.submit(submission)
+        collected = await asyncio.to_thread(_collect, submission)
+        executor.cancel()
+    assert collected == [1]
+    assert _FlakyScheduler.calls >= 4
 
 
 @pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
