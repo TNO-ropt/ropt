@@ -2,12 +2,15 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import multiprocessing
 import os
+import signal
 import sys
 import threading
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
 from concurrent.futures.process import BrokenProcessPool
 from functools import partial
+from multiprocessing.connection import Client, Listener
 from typing import TYPE_CHECKING, Any, cast
 
 import numpy as np
@@ -131,6 +134,29 @@ def _wait_at_barrier(barrier: threading.Barrier, value: int) -> int:
 def _blocked_work(started: threading.Event, release: threading.Event) -> int:
     started.set()
     release.wait(timeout=5.0)
+    return 0
+
+
+def _blocked_work_at_barrier(
+    barrier: threading.Barrier, release: threading.Event
+) -> int:
+    barrier.wait(timeout=4.0)
+    release.wait(timeout=5.0)
+    return 0
+
+
+def _block_until_disconnected(address: str) -> int:
+    # A synchronization primitive cannot be sent to a worker process, but the
+    # address of a listening socket can. Reporting the pid over it says the work
+    # item is running, and the read that follows never returns on its own.
+    connection = Client(address)
+    connection.send(os.getpid())
+    connection.recv()
+    return 0
+
+
+def _kill_own_process() -> int:
+    os.kill(os.getpid(), signal.SIGKILL)
     return 0
 
 
@@ -289,6 +315,48 @@ async def test_work_in_flight_aborted_on_stop() -> None:
     release.set()
     with pytest.raises(ExecutorStopped):
         _collect(submission)
+
+
+async def test_stopping_thread_executor_reports_running_work(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    # Nothing can take a work item away from a thread, so the only help the user
+    # gets is being told what the program is waiting for. Three work items and
+    # two workers: the third is still queued, and waiting for it is not what
+    # holds the program up.
+    barrier = threading.Barrier(3)
+    release = threading.Event()
+    submission = Submission(
+        [
+            WorkItem(function=_blocked_work_at_barrier, args=(barrier, release))
+            for _ in range(3)
+        ]
+    )
+    executor = ThreadExecutor(workers=2)
+    with caplog.at_level(logging.WARNING, logger="ropt"):
+        async with asyncio.TaskGroup() as tg:
+            await executor.start(tg)
+            executor.submit(submission)
+            await asyncio.to_thread(barrier.wait, 4.0)
+            executor.cancel()
+        release.set()
+    assert "Stopping with 2 evaluation(s) still running" in caplog.text
+
+
+async def test_stopping_thread_executor_after_work_reports_nothing(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    # A work item that already returned is not something to wait for.
+    submission = Submission([WorkItem(function=_function, args=(0,))])
+    executor = ThreadExecutor(workers=1)
+    with caplog.at_level(logging.WARNING, logger="ropt"):
+        async with asyncio.TaskGroup() as tg:
+            await executor.start(tg)
+            executor.submit(submission)
+            collected = await asyncio.to_thread(_collect, submission)
+            executor.cancel()
+    assert collected == [1]
+    assert "still running" not in caplog.text
 
 
 async def test_stopping_aborts_queued_submission() -> None:
@@ -845,6 +913,88 @@ async def test_max_tasks_per_child_restarts_worker() -> None:
         collected = await asyncio.to_thread(_collect, submission)
         executor.cancel()
     assert len(set(collected)) == 3
+
+
+@pytest.mark.slow
+@pytest.mark.timeout(30)
+@pytest.mark.parametrize("public_api", [True, False])
+async def test_stopping_kills_a_busy_worker(
+    tmp_path: Path, monkeypatch: Any, *, public_api: bool
+) -> None:
+    # An idle worker leaves on its own when the pool shuts down, so only a
+    # worker busy with work that never ends shows whether stopping stops it.
+    if not public_api:
+        # Python 3.11 to 3.13 have no `terminate_workers`, and the hand-rolled
+        # path has to be covered whichever version the tests run on.
+        monkeypatch.delattr(ProcessPoolExecutor, "terminate_workers", raising=False)
+    listener = Listener(str(tmp_path / "worker"))
+    submission = Submission(
+        [WorkItem(function=_block_until_disconnected, args=(listener.address,))]
+    )
+    executor = ProcessExecutor(workers=1)
+    connection = None
+    try:
+        async with asyncio.TaskGroup() as tg:
+            await executor.start(tg)
+            executor.submit(submission)
+            connection = await asyncio.to_thread(listener.accept)
+            worker_pid = await asyncio.to_thread(connection.recv)
+            # Held from before the stop: shutting the pool down drops its own
+            # references to the worker processes.
+            workers = [
+                process
+                for process in multiprocessing.active_children()
+                if process.pid == worker_pid
+            ]
+            executor.cancel()
+        assert len(workers) == 1
+        # The exit code, not the pid: a terminated child still answers
+        # `os.kill(pid, 0)` until it is reaped. The timeout is a ceiling, not a
+        # wait, since `join` returns as soon as the process is gone.
+        await asyncio.to_thread(workers[0].join, 10.0)
+        assert workers[0].exitcode == -signal.SIGTERM
+    finally:
+        if connection is not None:
+            connection.close()
+        listener.close()
+
+
+@pytest.mark.slow
+@pytest.mark.timeout(30)
+async def test_stopped_process_executor_starts_a_fresh_pool() -> None:
+    # Stopping breaks the pool for good, so starting again has to build a new
+    # one instead of handing back the pool whose workers were just killed.
+    executor = ProcessExecutor(workers=1)
+    async with asyncio.TaskGroup() as tg:
+        await executor.start(tg)
+        executor.cancel()
+    submission = Submission([WorkItem(function=_function, args=(1,))])
+    async with asyncio.TaskGroup() as tg:
+        await executor.start(tg)
+        executor.submit(submission)
+        collected = await asyncio.to_thread(_collect, submission)
+        executor.cancel()
+    assert collected == [2]
+
+
+@pytest.mark.slow
+@pytest.mark.timeout(30)
+async def test_dying_worker_reported_as_infrastructure_failure(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    # A worker lost while the executor is running is not something it asked for,
+    # so it is reported, unlike the workers a stop kills on purpose.
+    submission = Submission([WorkItem(function=_kill_own_process)])
+    executor = ProcessExecutor(workers=1)
+    with caplog.at_level(logging.WARNING, logger="ropt"):
+        async with asyncio.TaskGroup() as tg:
+            await executor.start(tg)
+            executor.submit(submission)
+            collected = await asyncio.to_thread(_collect, submission)
+            executor.cancel()
+    assert len(collected) == 1
+    assert isinstance(collected[0], ExecutorFailure)
+    assert "Worker process pool broken" in caplog.text
 
 
 @pytest.mark.parametrize(

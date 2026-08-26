@@ -99,7 +99,10 @@ class ProcessExecutor(ExecutorBase):
     def _cleanup(self) -> None:
         """Clean up the executor."""
         if self._executor is not None:
-            self._executor.shutdown(wait=False, cancel_futures=True)
+            # Stopping means stopping: without this the pool waits for whatever
+            # the workers are busy with, which is the whole reason an
+            # interrupted program appears to hang.
+            _terminate_workers(self._executor)
             self._executor = None
         for worker_task in self._worker_tasks:
             if not worker_task.done():
@@ -117,10 +120,20 @@ class ProcessExecutor(ExecutorBase):
                 result = await _run_work_item(work_item, executor)
                 self._deliver(submission, work_item, result)
             except BrokenProcessPool:
-                # A killed worker is infrastructure, not user code: it is
-                # delivered as a failed result and the pool keeps going, since
-                # the process pool replaces the worker on its own.
-                _logger.warning("Worker process pool broken; work item result lost")
+                if self._running.is_set():
+                    # A killed worker is infrastructure, not user code: it is
+                    # delivered as a failed result and the pool keeps going,
+                    # since the process pool replaces the worker on its own.
+                    _logger.warning("Worker process pool broken; work item result lost")
+                else:
+                    # A stop usually ends in `CancelledError` instead, but the
+                    # two race: `task.cancel()` only schedules the error, while
+                    # the killed future may already have its exception set.
+                    # `_wait_for_cancel` clears `_running` before `_cleanup`
+                    # kills the workers, so whenever this arm does win, the
+                    # dead worker is one we killed on purpose rather than an
+                    # infrastructure failure worth a warning per busy worker.
+                    _logger.debug("Work item dropped: the executor was stopped")
                 self._deliver(
                     submission,
                     work_item,
@@ -136,6 +149,44 @@ class ProcessExecutor(ExecutorBase):
                 self._fail(submission, exc)
                 if not isinstance(exc, Exception):
                     raise
+
+
+def _terminate_workers(executor: ProcessPoolExecutor) -> None:
+    # Deliberately narrow: no process groups, no grandchildren, no output
+    # capture. This stops the pool's own workers, nothing else, and the only
+    # reason it is a function is that how to do it depends on the version.
+    terminate_workers = getattr(executor, "terminate_workers", None)
+    if terminate_workers is not None:
+        # Python 3.14 and later. This shuts the pool down as part of its job.
+        terminate_workers()
+        return
+
+    # The same algorithm by hand. The lock is taken for one thing only: reading
+    # `_processes` without racing a concurrent mutation. It must be released
+    # before `shutdown`, which acquires the same non-reentrant lock itself.
+    with executor._shutdown_lock:  # ruff: ignore[private-member-access]
+        processes = list((executor._processes or {}).values())  # ruff: ignore[private-member-access]
+
+    # Never wait: a worker that decides not to exit would deadlock the caller,
+    # which is what CPython refuses to risk here too. `shutdown` invalidates
+    # `_processes`, hence the copy above.
+    executor.shutdown(wait=False, cancel_futures=True)
+
+    # A worker started between the snapshot and here is not signalled. That gap
+    # is CPython's gh-152967 and is not guarded on these versions: closing it
+    # needs the internal "force shutting down" flag that only 3.14 and later
+    # have, so the alternative would be a wait, which is what this removes.
+    for process in processes:
+        try:
+            if not process.is_alive():
+                continue
+            # SIGTERM only. Escalating to SIGKILL after a timeout would put a
+            # wait back on the stopping path; a process that ignores SIGTERM or
+            # sits in uninterruptible sleep is not helped by it anyway.
+            process.terminate()
+        except (ValueError, ProcessLookupError):
+            # Already exited, closed out, or gone between the two calls.
+            continue
 
 
 async def _run_work_item(work_item: WorkItem, executor: ProcessPoolExecutor) -> Any:  # ruff: ignore[any-type]
