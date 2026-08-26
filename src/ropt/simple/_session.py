@@ -20,8 +20,8 @@ from typing import TYPE_CHECKING, Any, Protocol, Self
 from ropt.components._loop import schedule
 from ropt.components.executors import (
     HPCExecutor,
-    MultiprocessingExecutor,
-    ThreadingExecutor,
+    ProcessExecutor,
+    ThreadExecutor,
 )
 from ropt.exceptions import WorkflowError
 
@@ -287,7 +287,7 @@ class Session:
         Returns:
             A pool backed by a thread pool.
         """
-        return self._open_pool(lambda: ThreadingExecutor(workers=workers), bundle_size)
+        return self._open_pool(lambda: ThreadExecutor(workers=workers), bundle_size)
 
     def process_pool(self, *, workers: int = 1, bundle_size: int = 1) -> WorkerPool:
         """Create a pool that runs evaluations in worker processes.
@@ -311,9 +311,7 @@ class Session:
         Returns:
             A pool backed by a process pool.
         """
-        return self._open_pool(
-            lambda: MultiprocessingExecutor(workers=workers), bundle_size
-        )
+        return self._open_pool(lambda: ProcessExecutor(workers=workers), bundle_size)
 
     def hpc_pool(  # ruff: ignore[too-many-arguments]
         self,

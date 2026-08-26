@@ -14,7 +14,7 @@ from .base import ExecutorBase
 _logger = get_logger(__name__)
 
 
-class ThreadingExecutor(ExecutorBase):
+class ThreadExecutor(ExecutorBase):
     """An executor that dispatches work items to worker threads."""
 
     def __init__(self, *, workers: int = 1) -> None:
@@ -46,7 +46,7 @@ class ThreadingExecutor(ExecutorBase):
             max_workers=self._workers, initializer=self._register_worker
         )
         self._pool = pool
-        _logger.debug("Starting threading executor with %d worker(s)", self._workers)
+        _logger.debug("Starting thread executor with %d worker(s)", self._workers)
         # One task per pool thread: each pulls work items and awaits its own,
         # so the number of tasks is what limits how many run at once.
         self._worker_tasks = [

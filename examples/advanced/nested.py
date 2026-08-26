@@ -6,7 +6,7 @@ the real variables in an inner loop, both running sequentially in the main
 process via `FunctionEvaluator`.
 
 See Also: - `nested_multiprocess.py` — same flow with inner evaluations on a
-  `MultiprocessingExecutor` and outer evaluations on a `ThreadingExecutor`.
+  `ProcessExecutor` and outer evaluations on a `ThreadExecutor`.
 - `nested_hpc.py` — same flow with inner evaluations submitted as HPC queue jobs
   via `HPCExecutor`.
 """

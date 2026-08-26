@@ -77,13 +77,13 @@ All executors share the same lifecycle:
 
     Work items cannot rely on the current directory being set consistently.
     Use absolute paths to read or write files. Setting the current directory
-    in a `ThreadingExecutor` affects all threads; in a
-    `MultiprocessingExecutor` or an `HPCExecutor` it can be changed safely per
+    in a `ThreadExecutor` affects all threads; in a
+    `ProcessExecutor` or an `HPCExecutor` it can be changed safely per
     work item.
 
 !!! note "No event handling across process boundaries"
 
-    A work item sent to a `MultiprocessingExecutor` or an `HPCExecutor` runs in
+    A work item sent to a `ProcessExecutor` or an `HPCExecutor` runs in
     a separate process. If such a work item runs a compute step, that step's
     event handlers stay in the worker process and cannot deliver events to a
     dispatcher or handler in the host process — return results as data instead.
@@ -91,9 +91,9 @@ All executors share the same lifecycle:
 
 Three implementations are provided:
 
-### ThreadingExecutor
+### ThreadExecutor
 
-[`ThreadingExecutor`][ropt.components.executors.ThreadingExecutor] dispatches
+[`ThreadExecutor`][ropt.components.executors.ThreadExecutor] dispatches
 tasks to worker threads via `asyncio.to_thread`. Use this for I/O-bound
 evaluations or when the evaluation function releases the GIL (e.g. calls into
 C/Fortran).
@@ -102,9 +102,9 @@ C/Fortran).
 | ------------ | ------------------------------------------------- |
 | `workers`    | Number of concurrent worker threads (default: 1). |
 
-### MultiprocessingExecutor
+### ProcessExecutor
 
-[`MultiprocessingExecutor`][ropt.components.executors.MultiprocessingExecutor]
+[`ProcessExecutor`][ropt.components.executors.ProcessExecutor]
 uses a `ProcessPoolExecutor` with a `"spawn"` context. Use this for CPU-bound
 evaluations where true parallelism is needed.
 
@@ -132,7 +132,7 @@ that **re-imports the program's entry module** to rebuild its environment. If th
 entry script creates or starts the executor at module top level, that re-import
 runs the same code again in each worker, which tries to start yet more processes
 before the interpreter has finished bootstrapping. Python aborts this, the
-workers never start, and `MultiprocessingExecutor` raises an
+workers never start, and `ProcessExecutor` raises an
 [`ExecutionError`][ropt.exceptions.ExecutionError] at startup.
 
 The fix is to keep the code that creates and runs the executor behind an
@@ -140,7 +140,7 @@ The fix is to keep the code that creates and runs the executor behind an
 
 ```python
 async def main():
-    executor = MultiprocessingExecutor(workers=4)
+    executor = ProcessExecutor(workers=4)
     async with asyncio.TaskGroup() as tg:
         await executor.start(tg)
         ...  # submit work here
@@ -346,7 +346,7 @@ affect performance, it determines what a dispatched compute step can still
   and [`EventDispatcher`][ropt.components.event_handlers.EventDispatcher] it relies
   on — all keep working across threads within one process.
 - A **process** — a
-  [`MultiprocessingExecutor`][ropt.components.executors.MultiprocessingExecutor]
+  [`ProcessExecutor`][ropt.components.executors.ProcessExecutor]
   worker or an [`HPCExecutor`][ropt.components.executors.HPCExecutor] job — shares
   none of that. It is **input/output only**: a task is serialized in and a
   result is serialized out, and nothing in between can reach back into the host
@@ -362,7 +362,7 @@ Two places where this matters in practice:
 
 - **Nested optimization.** A step that runs an inner workflow must run
   in-process — sequentially or on a
-  [`ThreadingExecutor`][ropt.components.executors.ThreadingExecutor] — while only
+  [`ThreadExecutor`][ropt.components.executors.ThreadExecutor] — while only
   the innermost leaf evaluations may go to a process or HPC worker. See
   [Nested workflows and process boundaries](#nested-workflows-and-process-boundaries).
 - **Dispatching functions to workers.** A function sent to a process or HPC
@@ -403,7 +403,7 @@ from multiple concurrent compute steps.
 
 ```python
 async with asyncio.TaskGroup() as tg:
-    executor = ThreadingExecutor(workers=4)
+    executor = ThreadExecutor(workers=4)
     await executor.start(tg)
 
     event_dispatcher = EventDispatcher()
@@ -447,7 +447,7 @@ is re-raised there, on the run's stack (see [Handler failures](#handler-failures
     Event handlers can therefore only observe events emitted **within their own
     process**. Any compute step executed out-of-process — for example a whole
     optimization sent to a
-    [`MultiprocessingExecutor`][ropt.components.executors.MultiprocessingExecutor]
+    [`ProcessExecutor`][ropt.components.executors.ProcessExecutor]
     or [`HPCExecutor`][ropt.components.executors.HPCExecutor], whether as a work
     item of its own or as the enclosing layer
     of a nested workflow — may attach handlers local to that worker process,
@@ -576,9 +576,9 @@ hard constraint on where each layer of a nested workflow may run:
 
     The step that *runs* an inner workflow must execute in the same process as
     the shared event loop — dispatch it via a
-    [`ThreadingExecutor`][ropt.components.executors.ThreadingExecutor], or run it
+    [`ThreadExecutor`][ropt.components.executors.ThreadExecutor], or run it
     synchronously. It cannot run inside a
-    [`MultiprocessingExecutor`][ropt.components.executors.MultiprocessingExecutor]
+    [`ProcessExecutor`][ropt.components.executors.ProcessExecutor]
     or [`HPCExecutor`][ropt.components.executors.HPCExecutor] worker, because a
     subprocess or HPC job has no access to the live loop, executors, or
     dispatcher. An inner
@@ -595,11 +595,11 @@ created." Concretely:
 - **Across threads (allowed).** A step may be created on one thread and run on
   another within the same process — for example created on the main thread and
   driven with `asyncio.to_thread` or a
-  [`ThreadingExecutor`][ropt.components.executors.ThreadingExecutor] while a
+  [`ThreadExecutor`][ropt.components.executors.ThreadExecutor] while a
   main-thread [`EventDispatcher`][ropt.components.event_handlers.EventDispatcher]
   collects its events. Event handling keeps working because memory is shared.
 - **Across processes (forbidden).** A step must not be *transferred* into a
-  [`MultiprocessingExecutor`][ropt.components.executors.MultiprocessingExecutor]
+  [`ProcessExecutor`][ropt.components.executors.ProcessExecutor]
   or [`HPCExecutor`][ropt.components.executors.HPCExecutor] worker. Serializing one
   — for example when a dispatched task captures it — reconstructs it in the
   worker as an inert placeholder rather than a working copy whose events reach
@@ -623,8 +623,8 @@ nested workflow. The nested examples follow exactly this shape:
   — outer and inner optimizations run sequentially in the main process via
   `FunctionEvaluator`.
 - [`examples/advanced/nested_multiprocess.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/advanced/nested_multiprocess.py)
-  — outer optimizations run on a `ThreadingExecutor` (in-process); only the
-  inner leaf evaluations run on a `MultiprocessingExecutor`.
+  — outer optimizations run on a `ThreadExecutor` (in-process); only the
+  inner leaf evaluations run on a `ProcessExecutor`.
 - [`examples/advanced/nested_hpc.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/advanced/nested_hpc.py)
   — same pattern, with the inner leaf evaluations submitted to the cluster via
   `HPCExecutor`.

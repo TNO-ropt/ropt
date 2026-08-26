@@ -14,7 +14,7 @@ from typing import Any
 
 import pytest
 
-from ropt.components.executors import Submission, ThreadingExecutor, WorkItem
+from ropt.components.executors import Submission, ThreadExecutor, WorkItem
 from ropt.exceptions import ExecutorStopped, WorkflowError
 from ropt.simple import Session, WorkerPool, serial_pool, session
 
@@ -111,7 +111,7 @@ def test_failed_pool_start_leaves_nothing_registered(
         msg = "no workers for you"
         raise RuntimeError(msg)
 
-    monkeypatch.setattr(ThreadingExecutor, "start", _boom)
+    monkeypatch.setattr(ThreadExecutor, "start", _boom)
     with session() as active:
         with pytest.raises(RuntimeError, match="no workers for you"):
             active.thread_pool(workers=1)

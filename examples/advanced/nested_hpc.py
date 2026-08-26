@@ -1,7 +1,7 @@
 """Nested Rosenbrock example using an HPC queue for the inner evaluations.
 
 Variant of [nested.py][] that submits each inner evaluation to an HPC queue
-(e.g. Slurm) via `HPCExecutor`. The outer step still runs on a `ThreadingExecutor`
+(e.g. Slurm) via `HPCExecutor`. The outer step still runs on a `ThreadExecutor`
 so multiple inner jobs can be in flight at once.
 """
 
@@ -31,7 +31,7 @@ from ropt.components.event_handlers import (
     HistoryHandler,
     ResultsHandler,
 )
-from ropt.components.executors import HPCExecutor, ThreadingExecutor
+from ropt.components.executors import HPCExecutor, ThreadExecutor
 from ropt.context import EnOptContext
 from ropt.enums import EnOptEventType, VariableType
 from ropt.events import EnOptEvent
@@ -187,7 +187,7 @@ def main(*, hpc_workdir: Path) -> None:
     # Outer evaluator: thread pool so multiple inner optimizations are in
     # flight at once. Cached so repeated discrete-variable combinations are
     # not re-submitted to the queue.
-    outer_executor = ThreadingExecutor(workers=THREAD_WORKERS)
+    outer_executor = ThreadExecutor(workers=THREAD_WORKERS)
     outer_evaluator = ParallelEvaluator(function=_optimize, executor=outer_executor)
     history = HistoryHandler()
     cache = CachedEvaluator(

@@ -1,8 +1,8 @@
 """Nested Rosenbrock example using async multiprocessing.
 
 Variant of [nested.py][] that runs the inner evaluations on a
-`MultiprocessingExecutor` (one subprocess per worker) and the outer evaluations on
-a `ThreadingExecutor` (one worker thread per concurrent outer evaluation). Both
+`ProcessExecutor` (one subprocess per worker) and the outer evaluations on
+a `ThreadExecutor` (one worker thread per concurrent outer evaluation). Both
 are driven through `ParallelEvaluator`.
 
 Each `FunctionResults` is tagged with the OS pid of the worker that computed it
@@ -36,7 +36,7 @@ from ropt.components.event_handlers import (
     HistoryHandler,
     ResultsHandler,
 )
-from ropt.components.executors import MultiprocessingExecutor, ThreadingExecutor
+from ropt.components.executors import ProcessExecutor, ThreadExecutor
 from ropt.context import EnOptContext
 from ropt.enums import EnOptEventType, VariableType
 from ropt.events import EnOptEvent
@@ -136,7 +136,7 @@ def main() -> None:
     )
 
     # Subprocess pool, shared across all outer evaluations.
-    inner_executor = MultiprocessingExecutor(workers=2)
+    inner_executor = ProcessExecutor(workers=2)
     # Shared counter keeps batch IDs unique across all concurrent inner runs.
     inner_batch_id_counter = BatchIdCounter()
 
@@ -181,7 +181,7 @@ def main() -> None:
     # Outer evaluator: thread pool so multiple inner optimizations are in
     # flight at once. Cached so the discrete-variable combinations seen by the
     # differential evolution optimizer are not re-evaluated.
-    outer_executor = ThreadingExecutor(workers=2)
+    outer_executor = ThreadExecutor(workers=2)
     outer_evaluator = ParallelEvaluator(function=_optimize, executor=outer_executor)
     history = HistoryHandler()
     cache = CachedEvaluator(

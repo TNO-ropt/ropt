@@ -45,8 +45,8 @@ from ropt.components.evaluators import (
 from ropt.components.event_handlers import ResultsHandler
 from ropt.components.executors import (
     Executor,
-    MultiprocessingExecutor,
-    ThreadingExecutor,
+    ProcessExecutor,
+    ThreadExecutor,
 )
 from ropt.context import EnOptContext
 from ropt.results import FunctionResults
@@ -143,9 +143,9 @@ async def async_run(  # ruff: ignore[too-many-arguments]
         The optimal results.
     """
     executor = (
-        MultiprocessingExecutor(workers=workers)
+        ProcessExecutor(workers=workers)
         if multiprocessing
-        else ThreadingExecutor(workers=workers)
+        else ThreadExecutor(workers=workers)
     )
     assert isinstance(executor, Executor)
     async with asyncio.TaskGroup() as tg:

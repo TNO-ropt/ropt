@@ -1,6 +1,6 @@
 """Utilities for handing work to an event loop from another thread.
 
-These, with the worker-id sets in `ThreadingExecutor` and `EventDispatcher`, are
+These, with the worker-id sets in `ThreadExecutor` and `EventDispatcher`, are
 how this package answers "where am I running?" — deliberately, rather than with
 `threading.local` or `contextvars`.
 

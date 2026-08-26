@@ -1,4 +1,4 @@
-"""This module implements the default multiprocessing executor."""
+"""This module implements the process-based executor."""
 
 from __future__ import annotations
 
@@ -29,10 +29,10 @@ if _HAVE_CLOUDPICKLE:
 _logger = get_logger(__name__)
 
 
-class MultiprocessingExecutor(ExecutorBase):
+class ProcessExecutor(ExecutorBase):
     """An executor that employs a pool of multiprocessing workers.
 
-    See [Parallel Evaluation](../workflows/parallel.md#multiprocessingexecutor) for
+    See [Parallel Evaluation](../workflows/parallel.md#processexecutor) for
     details, including the `if __name__ == "__main__":` guard that the entry
     point must use.
     """
@@ -71,9 +71,7 @@ class MultiprocessingExecutor(ExecutorBase):
             max_tasks_per_child=self._max_tasks_per_child,
         )
         self._executor = executor
-        _logger.debug(
-            "Starting multiprocessing executor with %d worker(s)", self._workers
-        )
+        _logger.debug("Starting process executor with %d worker(s)", self._workers)
         await self._check_worker_startup()
         self._worker_tasks = [
             task_group.create_task(self._run_worker(executor))

@@ -72,7 +72,7 @@ run at `INFO` or above.
 | `HPCExecutor`               | `Querying the HPC scheduler failed (2/31): <error>` |
 | `HPCExecutor`               | `Could not cancel HPC job <id> (job id: <job>): <error>` |
 | `ParallelEvaluator`         | `Recording 1 evaluation(s) as failed: <reason>` |
-| `MultiprocessingExecutor`   | `Worker process pool broken; work item result lost` |
+| `ProcessExecutor`   | `Worker process pool broken; work item result lost` |
 | `external` (backend)        | `External backend subprocess died unexpectedly (exit code <code>)` |
 
 The `ParallelEvaluator` message is the only place an infrastructure failure
@@ -93,8 +93,8 @@ callback once for functions and once for gradients per iteration.
 | `EnsembleOptimizer`         | `Optimizer callback: requesting functions and gradients` |
 | `PluginManager`             | `Registering plugin: backend/scipy` |
 | `scipy` (backend)           | `Using SciPy optimizer: SLSQP` |
-| `ThreadingExecutor`         | `Starting threading executor with 4 worker(s)` |
-| `MultiprocessingExecutor`   | `Starting multiprocessing executor with 4 worker(s)` |
+| `ThreadExecutor`            | `Starting thread executor with 4 worker(s)` |
+| `ProcessExecutor`           | `Starting process executor with 4 worker(s)` |
 | `HPCExecutor`               | `Submitted HPC job <id> (job id: <job>)` |
 | `ParallelEvaluator`         | `Dispatching 10 work item(s) to executor` |
 | `CachedEvaluator`           | `Cache: 4/10 evaluations served from cache` |

@@ -265,7 +265,7 @@ There are two ways to drive one, and they are mutually exclusive:
 - **Registered with an
   [`EventDispatcher`][ropt.components.event_handlers.EventDispatcher].** When work
   runs on several threads at once (for example, `ParallelEvaluator` with a
-  multi-worker `ThreadingExecutor`), route events through a dispatcher. It
+  multi-worker `ThreadExecutor`), route events through a dispatcher. It
   receives events from any thread and delivers them to its handlers one at a
   time, so a single handler can safely aggregate results produced on many
   threads. See [Event Dispatcher](parallel.md#event-dispatcher) for the pattern.

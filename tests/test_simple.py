@@ -19,7 +19,7 @@ from ropt.components.compute_steps import EvaluationStep, OptimizationStep
 from ropt.components.concurrency import run_concurrent
 from ropt.components.evaluators import FunctionEvaluator
 from ropt.components.event_handlers import EventDispatcher
-from ropt.components.executors import ThreadingExecutor
+from ropt.components.executors import ThreadExecutor
 from ropt.context import EnOptContext
 from ropt.enums import ExitCode
 from ropt.exceptions import ExecutorStopped, WorkflowError
@@ -1209,7 +1209,7 @@ def test_session_without_task_group_reports_stopped() -> None:
     with pytest.raises(WorkflowError, match="is not running"):
         sess.open_dispatcher(EventDispatcher())
     with pytest.raises(WorkflowError, match="is not running"):
-        sess.open_pool(lambda: ThreadingExecutor(workers=1))
+        sess.open_pool(lambda: ThreadExecutor(workers=1))
 
 
 def test_thread_pool_objective_exception_propagates(config: Any) -> None:
@@ -1254,7 +1254,7 @@ def test_optimize_with_process_pool(config: Any, test_functions: Any) -> None:
 @pytest.mark.slow
 def test_process_pool_without_cloudpickle(config: Any, monkeypatch: Any) -> None:
     monkeypatch.setattr(
-        "ropt.components.executors._multiprocessing_executor._HAVE_CLOUDPICKLE",
+        "ropt.components.executors._process_executor._HAVE_CLOUDPICKLE",
         False,
     )
     with session() as active:
@@ -1268,7 +1268,7 @@ def test_process_pool_without_cloudpickle(config: Any, monkeypatch: Any) -> None
 @pytest.mark.slow
 def test_evaluate_without_cloudpickle(config: Any, monkeypatch: Any) -> None:
     monkeypatch.setattr(
-        "ropt.components.executors._multiprocessing_executor._HAVE_CLOUDPICKLE",
+        "ropt.components.executors._process_executor._HAVE_CLOUDPICKLE",
         False,
     )
     with session() as active:

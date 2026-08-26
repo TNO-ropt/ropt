@@ -24,12 +24,12 @@ from ropt.components.evaluators._parallel_evaluator import _handle_result
 from ropt.components.event_handlers import ResultsHandler
 from ropt.components.executors import (
     HPCExecutor,
-    MultiprocessingExecutor,
+    ProcessExecutor,
     Submission,
-    ThreadingExecutor,
+    ThreadExecutor,
     WorkItem,
 )
-from ropt.components.executors._multiprocessing_executor import (
+from ropt.components.executors._process_executor import (
     _HAVE_CLOUDPICKLE,
     _run_cloudpickled,
 )
@@ -167,9 +167,9 @@ async def test_executor_ok(
                 workdir=tmp_path, workers=2, interval=0, template=""
             )
         case "threading":
-            executor = ThreadingExecutor(workers=2)
+            executor = ThreadExecutor(workers=2)
         case "multiprocessing":
-            executor = MultiprocessingExecutor(workers=2)
+            executor = ProcessExecutor(workers=2)
     assert not executor._running.is_set()  # ruff: ignore[private-member-access]
     async with asyncio.TaskGroup() as tg:
         await executor.start(tg)
@@ -181,7 +181,7 @@ async def test_executor_ok(
     assert not executor._running.is_set()  # ruff: ignore[private-member-access]
 
 
-async def test_threading_executor_exceeds_the_shared_default_pool() -> None:
+async def test_thread_executor_exceeds_the_shared_default_pool() -> None:
     # Shrink asyncio's shared default executor (the pool the old code dispatched
     # work through) and configure more workers: all work items reach the barrier
     # at once only if the executor uses its own pool of that size.
@@ -197,7 +197,7 @@ async def test_threading_executor_exceeds_the_shared_default_pool() -> None:
             for idx in range(workers)
         ]
     )
-    executor = ThreadingExecutor(workers=workers)
+    executor = ThreadExecutor(workers=workers)
     collected: list[Any] = []
     finished, done = _finished_event()
     consumer = threading.Thread(
@@ -217,7 +217,7 @@ async def test_submitting_from_a_worker_thread_is_refused() -> None:
     # refuses rather than deadlock once every worker is busy. Two workers for one
     # work item is deliberate: a regression is served by the spare worker and
     # fails on the assertion below, instead of deadlocking on the ceiling.
-    executor = ThreadingExecutor(workers=2)
+    executor = ThreadExecutor(workers=2)
 
     def _submit_back() -> tuple[bool, str]:
         try:
@@ -244,7 +244,7 @@ async def test_submitting_from_a_worker_thread_is_refused() -> None:
     assert "already running on it" in message
 
 
-async def test_threading_executor_delivers_results_without_the_shared_default_pool() -> (
+async def test_thread_executor_delivers_results_without_the_shared_default_pool() -> (
     None
 ):
     # Occupy asyncio's shared default executor completely. Delivering results
@@ -264,7 +264,7 @@ async def test_threading_executor_delivers_results_without_the_shared_default_po
     consumer = threading.Thread(
         target=_collect_in_thread, args=(submission, collected, done), daemon=True
     )
-    executor = ThreadingExecutor(workers=2)
+    executor = ThreadExecutor(workers=2)
     async with asyncio.TaskGroup() as tg:
         await executor.start(tg)
         consumer.start()
@@ -280,7 +280,7 @@ async def test_work_in_flight_aborted_on_stop() -> None:
     started = threading.Event()
     release = threading.Event()
     submission = Submission([WorkItem(function=_blocked_work, args=(started, release))])
-    executor = ThreadingExecutor(workers=1)
+    executor = ThreadExecutor(workers=1)
     async with asyncio.TaskGroup() as tg:
         await executor.start(tg)
         executor.submit(submission)
@@ -299,7 +299,7 @@ async def test_stopping_aborts_queued_submission() -> None:
     submission = Submission(
         [WorkItem(function=_blocked_work, args=(started, release)) for _ in range(5)]
     )
-    executor = ThreadingExecutor(workers=1)
+    executor = ThreadExecutor(workers=1)
     async with asyncio.TaskGroup() as tg:
         await executor.start(tg)
         executor.submit(submission)
@@ -313,7 +313,7 @@ async def test_stopping_aborts_queued_submission() -> None:
 async def test_submitting_to_stopped_executor_aborts() -> None:  # ruff: ignore[unused-async]
     # The caller is released by the executor rather than left waiting for
     # results that can never arrive.
-    executor = ThreadingExecutor(workers=1)
+    executor = ThreadExecutor(workers=1)
     submission = Submission([WorkItem(function=_function, args=(0,))])
     executor.submit(submission)
     with pytest.raises(ExecutorStopped):
@@ -823,7 +823,7 @@ async def test_worker_may_construct_workflow_objects() -> None:
     submission = Submission(
         [WorkItem(function=_construct_handler_in_worker, args=(0,))]
     )
-    executor = MultiprocessingExecutor(workers=1)
+    executor = ProcessExecutor(workers=1)
     async with asyncio.TaskGroup() as tg:
         await executor.start(tg)
         executor.submit(submission)
@@ -838,7 +838,7 @@ async def test_max_tasks_per_child_restarts_worker() -> None:
     submission = Submission(
         [WorkItem(function=_worker_pid, args=(index,)) for index in range(3)]
     )
-    executor = MultiprocessingExecutor(workers=1, max_tasks_per_child=1)
+    executor = ProcessExecutor(workers=1, max_tasks_per_child=1)
     async with asyncio.TaskGroup() as tg:
         await executor.start(tg)
         executor.submit(submission)
@@ -883,9 +883,9 @@ async def test_executor_error(
                 workdir=tmp_path, workers=2, interval=0, template=""
             )
         case "threading":
-            executor = ThreadingExecutor(workers=2)
+            executor = ThreadExecutor(workers=2)
         case "multiprocessing":
-            executor = MultiprocessingExecutor(workers=2)
+            executor = ProcessExecutor(workers=2)
     assert not executor._running.is_set()  # ruff: ignore[private-member-access]
     async with asyncio.TaskGroup() as tg:
         await executor.start(tg)
@@ -1029,9 +1029,9 @@ async def test_executor_evaluator_ok(
                 workdir=tmp_path, workers=2, interval=0, template=""
             )
         case "threading":
-            executor = ThreadingExecutor(workers=2)
+            executor = ThreadExecutor(workers=2)
         case "multiprocessing":
-            executor = MultiprocessingExecutor(workers=2)
+            executor = ProcessExecutor(workers=2)
     assert not executor._running.is_set()  # ruff: ignore[private-member-access]
     async with asyncio.TaskGroup() as tg:
         await executor.start(tg)
@@ -1083,9 +1083,9 @@ async def test_executor_evaluator_error(
                 workdir=tmp_path, workers=2, interval=0, template=""
             )
         case "threading":
-            executor = ThreadingExecutor(workers=2)
+            executor = ThreadExecutor(workers=2)
         case "multiprocessing":
-            executor = MultiprocessingExecutor(workers=2)
+            executor = ProcessExecutor(workers=2)
     assert not executor._running.is_set()  # ruff: ignore[private-member-access]
     with pytest.raises(ExceptionGroup) as excinfo:  # ruff: ignore[pytest-raises-with-multiple-statements]
         async with asyncio.TaskGroup() as tg:
@@ -1121,9 +1121,9 @@ async def test_executor_survives_user_code_error_and_is_reusable(
 ) -> None:
     match executor_name:
         case "threading":
-            executor: ExecutorBase = ThreadingExecutor(workers=2)
+            executor: ExecutorBase = ThreadExecutor(workers=2)
         case "multiprocessing":
-            executor = MultiprocessingExecutor(workers=2)
+            executor = ProcessExecutor(workers=2)
     async with asyncio.TaskGroup() as tg:
         await executor.start(tg)
         # A user-code error aborts only its own evaluation; the executor keeps
@@ -1149,7 +1149,7 @@ async def test_error_escaping_the_body_closes_the_executor(
 ) -> None:
     # No explicit executor.cancel(): an error escaping the block must still
     # close the executor through the task group's teardown.
-    executor = ThreadingExecutor(workers=2)
+    executor = ThreadExecutor(workers=2)
     with pytest.raises(ExceptionGroup):  # ruff: ignore[pytest-raises-with-multiple-statements]
         async with asyncio.TaskGroup() as tg:
             await executor.start(tg)
@@ -1196,9 +1196,9 @@ async def test_executor_evaluator_two_optimizations(
                 workdir=tmp_path, workers=2, interval=0, template=""
             )
         case "threading":
-            executor = ThreadingExecutor(workers=2)
+            executor = ThreadExecutor(workers=2)
         case "multiprocessing":
-            executor = MultiprocessingExecutor(workers=2)
+            executor = ProcessExecutor(workers=2)
     assert not executor._running.is_set()  # ruff: ignore[private-member-access]
     async with asyncio.TaskGroup() as tg:
         await executor.start(tg)
@@ -1239,9 +1239,9 @@ async def test_groups_work_items(
 ) -> None:
     match executor_name:
         case "threading":
-            executor: Executor = ThreadingExecutor(workers=2)
+            executor: Executor = ThreadExecutor(workers=2)
         case "multiprocessing":
-            executor = MultiprocessingExecutor(workers=2)
+            executor = ProcessExecutor(workers=2)
 
     bundle_sizes: list[int] = []
     original_submit = executor.submit
@@ -1281,7 +1281,7 @@ async def test_groups_work_items(
 
 
 async def test_invalid_bundle_size() -> None:  # ruff: ignore[unused-async]
-    executor = ThreadingExecutor(workers=1)
+    executor = ThreadExecutor(workers=1)
     with pytest.raises(ValueError, match="bundle_size"):
         ParallelEvaluator(
             function=lambda variables, context: EvaluationFunctionResult(  # ruff: ignore[unused-lambda-argument]
@@ -1304,7 +1304,7 @@ async def test_failing_submission_reraises() -> None:  # ruff: ignore[unused-asy
 async def test_submitting_to_closed_loop_aborts() -> None:  # ruff: ignore[unused-async]
     # The executor still looks running, but its loop is gone, so handing the
     # submission over cannot succeed and the caller must not be left waiting.
-    executor = ThreadingExecutor(workers=1)
+    executor = ThreadExecutor(workers=1)
     loop = asyncio.new_event_loop()
     loop.close()
     executor._loop = loop  # ruff: ignore[private-member-access]
@@ -1316,7 +1316,7 @@ async def test_submitting_to_closed_loop_aborts() -> None:  # ruff: ignore[unuse
 
 
 async def test_cancelling_unstarted_executor() -> None:  # ruff: ignore[unused-async]
-    executor = ThreadingExecutor(workers=1)
+    executor = ThreadExecutor(workers=1)
     executor.cancel()
     assert not executor._running.is_set()  # ruff: ignore[private-member-access]
 
@@ -1344,10 +1344,10 @@ async def test_broken_worker_pool_reported_at_startup(
         def shutdown(self, *_args: Any, **_kwargs: Any) -> None: ...
 
     monkeypatch.setattr(
-        "ropt.components.executors._multiprocessing_executor.ProcessPoolExecutor",
+        "ropt.components.executors._process_executor.ProcessPoolExecutor",
         _BrokenPool,
     )
-    executor = MultiprocessingExecutor(workers=1)
+    executor = ProcessExecutor(workers=1)
     with pytest.raises(ExceptionGroup) as excinfo:
         async with asyncio.TaskGroup() as tg:
             await executor.start(tg)
@@ -1422,7 +1422,7 @@ async def test_finished_submission_delivers_nothing_more() -> None:  # ruff: ign
 
 
 async def test_empty_submission_not_retained() -> None:  # ruff: ignore[unused-async]
-    executor = ThreadingExecutor(workers=1)
+    executor = ThreadExecutor(workers=1)
     executor._running.set()  # ruff: ignore[private-member-access]
     for _ in range(100):
         executor._accept(Submission([]))  # ruff: ignore[private-member-access]
@@ -1436,7 +1436,7 @@ async def test_accepting_submission_twice_queues_work_once() -> None:  # ruff: i
     submission = Submission(
         [WorkItem(function=_function, args=(idx,)) for idx in range(3)]
     )
-    executor = ThreadingExecutor(workers=1)
+    executor = ThreadExecutor(workers=1)
     executor._running.set()  # ruff: ignore[private-member-access]
     executor._accept(submission)  # ruff: ignore[private-member-access]
     executor._accept(submission)  # ruff: ignore[private-member-access]
@@ -1447,7 +1447,7 @@ async def test_submission_after_stopping_is_aborted() -> None:
     # submit() hands over on the loop, where stopping is decided; this is the
     # guard that makes "every submission settles" hold when the two race.
     submission = Submission([WorkItem(function=_function, args=(0,))])
-    executor = ThreadingExecutor(workers=1)
+    executor = ThreadExecutor(workers=1)
     async with asyncio.TaskGroup() as tg:
         await executor.start(tg)
         executor.cancel()
@@ -1460,7 +1460,7 @@ async def test_submission_after_stopping_is_aborted() -> None:
 
 
 async def test_cancelling_from_another_thread() -> None:
-    executor = ThreadingExecutor(workers=1)
+    executor = ThreadExecutor(workers=1)
     loop_is_idle = threading.Event()
 
     def _cancel_once_idle() -> None:
@@ -1529,9 +1529,9 @@ async def test_stopped_executor_restarts(
                 workdir=tmp_path, workers=1, interval=0, template=""
             )
         case "threading":
-            executor = ThreadingExecutor(workers=1)
+            executor = ThreadExecutor(workers=1)
         case "multiprocessing":
-            executor = MultiprocessingExecutor(workers=1)
+            executor = ProcessExecutor(workers=1)
 
     async def _run_once() -> list[Any]:
         submission = Submission([WorkItem(function=_function, args=(0,))])
@@ -1554,7 +1554,7 @@ async def test_stopped_executor_restarts(
 
 
 async def test_starting_running_executor_refused() -> None:
-    executor = ThreadingExecutor(workers=1)
+    executor = ThreadExecutor(workers=1)
     async with asyncio.TaskGroup() as tg:
         await executor.start(tg)
         with pytest.raises(WorkflowError, match="already running"):
@@ -1569,7 +1569,7 @@ async def test_queued_work_for_ended_submission_not_run() -> None:
     submission = Submission(
         [WorkItem(function=partial(_record, executed), args=(idx,)) for idx in range(6)]
     )
-    executor = ThreadingExecutor(workers=1)
+    executor = ThreadExecutor(workers=1)
     async with asyncio.TaskGroup() as tg:
         await executor.start(tg)
         executor.submit(submission)
@@ -1622,7 +1622,7 @@ async def test_no_hpc_jobs_for_ended_submission(
 
 
 async def test_starting_running_executor_leaves_it_untouched() -> None:
-    executor = ThreadingExecutor(workers=1)
+    executor = ThreadExecutor(workers=1)
     async with asyncio.TaskGroup() as tg:
         await executor.start(tg)
         pool = executor._pool  # ruff: ignore[private-member-access]
@@ -1639,7 +1639,7 @@ async def test_starting_running_executor_leaves_it_untouched() -> None:
 async def test_evaluating_on_executor_loop_raises(
     config: dict[str, Any], eval_func: Any
 ) -> None:
-    executor = ThreadingExecutor(workers=1)
+    executor = ThreadExecutor(workers=1)
     evaluator = ParallelEvaluator(function=eval_func(), executor=executor)
     batch_context = EvaluationBatchContext(
         context=EnOptContext.model_validate(config),
@@ -1657,7 +1657,7 @@ async def test_evaluating_on_executor_loop_raises(
 async def test_eval_raises_executor_stopped_for_an_unusable_executor(
     config: dict[str, Any], eval_func: Any, start_first: Any
 ) -> None:
-    executor = ThreadingExecutor(workers=1)
+    executor = ThreadExecutor(workers=1)
     if start_first:
         async with asyncio.TaskGroup() as tg:
             await executor.start(tg)
@@ -1681,7 +1681,7 @@ async def test_worker_base_exception_propagates_into_task_group() -> None:
         msg = "fatal"
         raise _FatalError(msg)
 
-    executor = ThreadingExecutor(workers=1)
+    executor = ThreadExecutor(workers=1)
     submission = Submission([WorkItem(function=_raise_fatal, args=(0,))])
     with pytest.raises(BaseExceptionGroup) as excinfo:  # ruff: ignore[pytest-raises-with-multiple-statements]
         async with asyncio.TaskGroup() as tg:
@@ -1699,7 +1699,7 @@ async def test_fatal_work_item_error_reaches_caller() -> None:
         msg = "fatal"
         raise _FatalError(msg)
 
-    executor = ThreadingExecutor(workers=1)
+    executor = ThreadExecutor(workers=1)
     submission = Submission([WorkItem(function=_raise_fatal, args=(0,))])
     outcome: list[BaseException] = []
 
@@ -1821,9 +1821,9 @@ async def test_multiprocessing_unguarded_main_reports_startup_error(
     script = tmp_path / "unguarded.py"
     script.write_text(
         "import asyncio\n\n"
-        "from ropt.components.executors import MultiprocessingExecutor\n\n\n"
+        "from ropt.components.executors import ProcessExecutor\n\n\n"
         "async def main() -> None:\n"
-        "    executor = MultiprocessingExecutor(workers=1)\n"
+        "    executor = ProcessExecutor(workers=1)\n"
         "    async with asyncio.TaskGroup() as tg:\n"
         "        await executor.start(tg)\n"
         "        executor.cancel()\n\n\n"
@@ -1863,7 +1863,7 @@ async def test_multiprocessing_cloudpickles_functions_and_results() -> None:
             WorkItem(function=make_callable, args=(42,)),
         ]
     )
-    executor = MultiprocessingExecutor(workers=2)
+    executor = ProcessExecutor(workers=2)
     async with asyncio.TaskGroup() as tg:
         await executor.start(tg)
         executor.submit(submission)
@@ -1883,7 +1883,7 @@ async def test_multiprocessing_unserializable_payload_reports_error() -> None:
         return lock
 
     submission = Submission([WorkItem(function=use_lock)])
-    executor = MultiprocessingExecutor(workers=1)
+    executor = ProcessExecutor(workers=1)
     async with asyncio.TaskGroup() as tg:
         await executor.start(tg)
         executor.submit(submission)
@@ -1900,11 +1900,11 @@ async def test_multiprocessing_without_cloudpickle_rejects_lambda(
     monkeypatch: Any,
 ) -> None:
     monkeypatch.setattr(
-        "ropt.components.executors._multiprocessing_executor._HAVE_CLOUDPICKLE",
+        "ropt.components.executors._process_executor._HAVE_CLOUDPICKLE",
         False,
     )
     submission = Submission([WorkItem(function=lambda: 1)])
-    executor = MultiprocessingExecutor(workers=1)
+    executor = ProcessExecutor(workers=1)
     async with asyncio.TaskGroup() as tg:
         await executor.start(tg)
         executor.submit(submission)
@@ -1922,11 +1922,11 @@ async def test_multiprocessing_without_cloudpickle_rejects_an_unpicklable_argume
     # ParallelEvaluator submits a picklable module-level function and passes the
     # user callback as an argument, so the arguments must be checked too.
     monkeypatch.setattr(
-        "ropt.components.executors._multiprocessing_executor._HAVE_CLOUDPICKLE",
+        "ropt.components.executors._process_executor._HAVE_CLOUDPICKLE",
         False,
     )
     submission = Submission([WorkItem(function=_call, args=(lambda: 1,))])
-    executor = MultiprocessingExecutor(workers=1)
+    executor = ProcessExecutor(workers=1)
     async with asyncio.TaskGroup() as tg:
         await executor.start(tg)
         executor.submit(submission)
@@ -1958,7 +1958,7 @@ async def test_work_item_capturing_a_workflow_object_raises_transfer_error() -> 
     submission = Submission(
         [WorkItem(function=_return_captured, args=(ResultsHandler(),))]
     )
-    executor = MultiprocessingExecutor(workers=1)
+    executor = ProcessExecutor(workers=1)
     async with asyncio.TaskGroup() as tg:
         await executor.start(tg)
         executor.submit(submission)
@@ -1975,7 +1975,7 @@ async def test_transfer_error_from_parallel_evaluation_bubbles_up(
     config: dict[str, Any],
     test_functions: Sequence[Callable[[NDArray[np.float64], int], float]],
 ) -> None:
-    executor = MultiprocessingExecutor(workers=1)
+    executor = ProcessExecutor(workers=1)
     with pytest.raises(ExceptionGroup) as excinfo:  # ruff: ignore[pytest-raises-with-multiple-statements]
         async with asyncio.TaskGroup() as tg:
             await executor.start(tg)

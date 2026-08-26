@@ -16,7 +16,7 @@ subclass when adding a new execution mechanism.
 ::: ropt.components.executors.ExecutorBase
 ::: ropt.components.executors.WorkItem
 ::: ropt.components.executors.Submission
-::: ropt.components.executors.ThreadingExecutor
-::: ropt.components.executors.MultiprocessingExecutor
+::: ropt.components.executors.ThreadExecutor
+::: ropt.components.executors.ProcessExecutor
 ::: ropt.components.executors.HPCExecutor
 
