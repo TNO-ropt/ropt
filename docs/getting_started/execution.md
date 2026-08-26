@@ -111,8 +111,8 @@ such as the `cluster` name, the `queue`, and the number of `cores` per job — c
 be passed to `hpc_pool` when you need them; see
 [Parallel Execution and Many Runs](../running/parallel.md#running-on-an-hpc-cluster) for the full list.
 
-Like a process pool, the work is copied to the cluster. This currently uses
-`cloudpickle`, which is included in the `ropt[hpc]` extra (see
+Like a process pool, the work is copied to the cluster, so the same rule about
+which functions can be sent applies; add `ropt[cloudpickle]` to lift it (see
 [Installation](installation.md#optional-extras)).
 
 ## Which one should I use?

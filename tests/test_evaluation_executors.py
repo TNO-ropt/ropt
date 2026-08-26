@@ -57,15 +57,19 @@ if TYPE_CHECKING:
     from ropt.components.executors.base import ExecutorBase
     from ropt.results import FunctionResults
 
-try:
-    import cloudpickle
-    import pysqa  # ruff: ignore[unused-import]
+# The job entry point needs no extras of its own, so its tests run either way.
+from ropt.components.executors.__main__ import run_task
+from ropt.components.executors._picklable import picklable_exception
 
-    from ropt.components.executors.__main__ import run_task
+try:
+    import pysqa  # ruff: ignore[unused-import]
 
     _TEST_HPC = True
 except ImportError:
     _TEST_HPC = False
+
+if _HAVE_CLOUDPICKLE:
+    import cloudpickle
 
 
 pytestmark = [pytest.mark.asyncio, pytest.mark.timeout(5)]
@@ -143,6 +147,14 @@ def _blocked_work_at_barrier(
     barrier.wait(timeout=4.0)
     release.wait(timeout=5.0)
     return 0
+
+
+def _raise_locally_defined_error() -> None:
+    class _LocalError(Exception):
+        pass
+
+    msg = "raised by a class the standard library cannot name"
+    raise _LocalError(msg)
 
 
 def _explode() -> Any:
@@ -966,6 +978,60 @@ async def test_hpc_job_exit_writes_output_file(
     await asyncio.sleep(0)  # this module runs tests on the event loop
     assert run_task(str(input_file), str(output_file)) == 1
     assert isinstance(cloudpickle.loads(output_file.read_bytes()), SystemExit)
+
+
+async def test_job_wraps_an_exception_the_standard_library_cannot_send(
+    tmp_path: Path, monkeypatch: Any
+) -> None:
+    # `cloudpickle` is optional on the job path, so whether an exception can
+    # travel has to be decided with the serializer that will do the sending.
+    # Standing in for a job running without it: the failure still has to come
+    # back, wrapped rather than lost.
+    monkeypatch.setattr("ropt.components.executors._picklable.dumps", pickle.dumps)
+    monkeypatch.setattr("ropt.components.executors.__main__.dump", pickle.dump)
+    input_file = tmp_path / "job.in"
+    output_file = tmp_path / "job.out"
+    input_file.write_bytes(pickle.dumps((_raise_locally_defined_error, (), {})))
+    await asyncio.sleep(0)  # this module runs tests on the event loop
+    assert run_task(str(input_file), str(output_file)) == 1
+    result = pickle.loads(output_file.read_bytes())  # ruff: ignore[suspicious-pickle-usage]
+    assert isinstance(result, RuntimeError)
+    assert "_LocalError" in str(result)
+    assert any("Traceback" in note for note in result.__notes__)
+
+
+@pytest.mark.skipif(not _HAVE_CLOUDPICKLE, reason="cloudpickle is not installed")
+async def test_job_sends_an_exception_the_standard_library_cannot_send() -> None:
+    # The same exception, with `cloudpickle` present: it survives as itself, so
+    # the wrapping above is a fallback rather than what always happens.
+    await asyncio.sleep(0)  # this module runs tests on the event loop
+    try:
+        _raise_locally_defined_error()
+    except Exception as exc:  # ruff: ignore[blind-except]
+        result = picklable_exception(exc)
+    assert type(result).__name__ == "_LocalError"
+
+
+@pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
+async def test_hpc_unserializable_work_item_fails_work(
+    tmp_path: Path, monkeypatch: Any
+) -> None:
+    # Serializing happens before the job exists, so this failure belongs to the
+    # work item, and it says what to install rather than what broke inside.
+    _mock_scheduler(monkeypatch, MockedHPCAdapter(tmp_path))
+    submission = Submission(
+        [WorkItem(function=_function, args=(threading.Lock(),), name="job1")]
+    )
+    executor = HPCExecutor(workdir=tmp_path, workers=1, interval=0, template="")
+    async with asyncio.TaskGroup() as tg:
+        await executor.start(tg)
+        executor.submit(submission)
+        with pytest.raises(ExecutionError, match="could not be sent to a job"):
+            await asyncio.to_thread(_collect, submission)
+        executor.cancel()
+    # Nothing was left behind: no job was submitted, so nothing would ever come
+    # along to cancel it or to clean up after it.
+    assert not await asyncio.to_thread(lambda: list(tmp_path.iterdir()))
 
 
 @pytest.mark.slow

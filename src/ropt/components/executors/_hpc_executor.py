@@ -1,7 +1,7 @@
 """Defines a class for running evaluations on a HPC cluster.
 
 Unlike the thread and process executors, there is no channel back from a job:
-work travels over a shared filesystem, as a cloudpickled `<id>.in` file the job
+work travels over a shared filesystem, as a serialized `<id>.in` file the job
 reads and an `<id>.out` file it writes (with `<id>.txt` for its output). The job
 itself runs `ropt.components.executors` as a module through `pysqa`, with the
 interpreter that submitted it, which is the one `ropt` is installed in.
@@ -38,6 +38,7 @@ from uuid import uuid4
 from ropt._logging import get_logger
 from ropt.exceptions import ExecutionError, ExecutorFailure, WorkflowError
 
+from ._serialize import CANNOT_SERIALIZE, dump, load
 from .base import ExecutorBase, Submission, WorkItem
 
 if TYPE_CHECKING:
@@ -52,12 +53,11 @@ _OUTPUT_TAIL_LINES: Final = 20
 # yet, or not whole yet with budget left to wait for the rest of it.
 _PENDING: Final = object()
 
-_HAVE_HPC: Final = (
-    find_spec("cloudpickle") is not None and find_spec("pysqa") is not None
-)
+# `cloudpickle` is not required: without it, jobs may only be given functions
+# the standard library can send, which is what `_serialize` falls back to.
+_HAVE_HPC: Final = find_spec("pysqa") is not None
 
 if _HAVE_HPC:
-    import cloudpickle
     import pysqa
 
 
@@ -342,12 +342,16 @@ class HPCExecutor(ExecutorBase):
         tmp_path = Path(tmp_path_str)
         try:
             with os.fdopen(tmp_fd, "wb") as fp:
-                cloudpickle.dump(
-                    (work_item.function, work_item.args, work_item.kwargs), fp
-                )
+                dump((work_item.function, work_item.args, work_item.kwargs), fp)
                 fp.flush()
                 os.fsync(fp.fileno())
             tmp_path.rename(input_file)
+        except Exception as exc:
+            tmp_path.unlink(missing_ok=True)
+            msg = (
+                f"Work item '{item_id}' could not be sent to a job: {CANNOT_SERIALIZE}."
+            )
+            raise ExecutionError(msg) from exc
         except BaseException:
             tmp_path.unlink(missing_ok=True)
             raise
@@ -419,7 +423,7 @@ class HPCExecutor(ExecutorBase):
         output_file = self._workdir / f"{item_id}.out"
         try:
             with output_file.open("rb") as fp:
-                result = cloudpickle.load(fp)
+                result = load(fp)
         except FileNotFoundError:
             # The file may simply not be visible yet, so give the shared
             # filesystem a bounded number of further polls to show it.

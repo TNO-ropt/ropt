@@ -181,7 +181,8 @@ A few less common issues cause the same startup error:
 [`HPCExecutor`][ropt.components.executors.HPCExecutor] submits tasks as jobs to an
 HPC scheduler (e.g. Slurm) via the `pysqa` library. Each task is serialized to
 disk, submitted to the queue, polled for completion, and its result is
-deserialized back. Requires `ropt[hpc]` to be installed.
+deserialized back. Requires `ropt[hpc]` to be installed. Add `ropt[cloudpickle]`
+to send functions the standard `pickle` module cannot.
 
 The executor manages the full remote task lifecycle:
 
@@ -328,12 +329,12 @@ worker directly, tearing the executor down — that is the intended teardown
 signal and is left untouched.
 
 For the [`HPCExecutor`][ropt.components.executors.HPCExecutor] the exception
-crosses a process boundary. It is serialized with `cloudpickle`, which can
-handle exception objects that the standard `pickle` module cannot, but does not
-serialize tracebacks. The worker therefore attaches the formatted traceback as a
-note (`exc.add_note(...)`) before serializing, so the originating traceback
-travels with the exception. Exceptions that cannot be serialized at all are
-wrapped in a `RuntimeError` carrying their `repr` and notes.
+crosses a process boundary. It is serialized with `cloudpickle` when that is
+installed and with the standard `pickle` module otherwise; neither serializes
+tracebacks. The job therefore attaches the formatted traceback as a note
+(`exc.add_note(...)`) before serializing, so the originating traceback travels
+with the exception. Exceptions that cannot be serialized at all are wrapped in a
+`RuntimeError` carrying their `repr` and notes.
 
 ## Threads vs. processes: what crosses the boundary
 

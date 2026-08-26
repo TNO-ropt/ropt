@@ -24,14 +24,15 @@ which are enough for most basic optimization tasks.
 | `pandas`       | `pandas`                | Exporting results to pandas data frames.                   |
 | `polars`       | `polars`                | Exporting results to polars data frames.                   |
 | `cloudpickle`  | `cloudpickle`           | Running lambdas, closures, and notebook-defined functions in external processes. |
-| `hpc`          | `pysqa`, `cloudpickle`  | Running evaluations on HPC clusters.                       |
+| `hpc`          | `pysqa`                 | Running evaluations on HPC clusters.                       |
 
 Without `cloudpickle`, code that runs in external processes is transferred using
 Python's standard `pickle` module, which only supports plain, named functions
 imported from a module. Installing `cloudpickle` lifts that restriction, so
 functions defined inline (lambdas), functions defined inside other functions
 (closures), and functions defined in a Jupyter notebook can be used too. The
-`hpc` extra already includes `cloudpickle`.
+same rule applies wherever the work leaves your process: process pools, local
+jobs and cluster jobs alike.
 
 `cloudpickle` is also required to [run the optimizer
 itself in a separate process](../optimizer_setup/configuration.md#external-backend).

@@ -31,7 +31,7 @@ dependencies = ["numpy", "pydantic", "scipy>=1.15"]
 pandas = ["pandas"]
 polars = ["polars"]
 cloudpickle = ["cloudpickle"]
-hpc = ["pysqa", "cloudpickle"]
+hpc = ["pysqa"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
