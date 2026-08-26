@@ -11,6 +11,12 @@ blocking `pysqa` work — submitting and polling — while the async worker loop
 alternates between handing it work and waiting for more. A job that disappeared
 from the queue without leaving a readable result is retried a bounded number of
 times, because a shared filesystem may take a while to show it.
+
+Two threads reach the queueing system, and which one matters. `_submit` and
+`_poll`, and so `_live_job_ids`, run on the single poll thread, one after the
+other. `_cancel_jobs` runs on the loop thread, because `_cleanup` does. Anything
+kept between those calls is therefore shared by two threads and needs its own
+lock: `_jobs_closed` is this module's instance of that problem.
 """
 
 from __future__ import annotations
@@ -42,6 +48,10 @@ _logger = get_logger(__name__)
 # How much of a failed job's captured output travels with its failure.
 _OUTPUT_TAIL_LINES: Final = 20
 
+# Returned for a work item that has not settled: its result is either not there
+# yet, or not whole yet with budget left to wait for the rest of it.
+_PENDING: Final = object()
+
 _HAVE_HPC: Final = (
     find_spec("cloudpickle") is not None and find_spec("pysqa") is not None
 )
@@ -64,7 +74,7 @@ class HPCExecutor(ExecutorBase):
     def __init__(  # ruff: ignore[too-many-arguments]
         self,
         *,
-        workdir: Path | str = "./",
+        workdir: Path | str,
         workers: int = 1,
         interval: float = 1,
         queue_type: str = "slurm",
@@ -84,9 +94,11 @@ class HPCExecutor(ExecutorBase):
         Args:
             workdir:     Shared-filesystem directory for each work item's
                          serialized I/O files; also passed as the job working
-                         directory (template-dependent). Work item files are
-                         never overwritten, so concurrent executors need
-                         distinct workdirs.
+                         directory (template-dependent). Must be an existing
+                         absolute path: there is no default, because only the
+                         caller knows which directory the cluster shares. Work
+                         item files are never overwritten, so concurrent
+                         executors need distinct workdirs.
             workers:     Maximum concurrent HPC jobs.
             interval:    Polling interval in seconds.
             queue_type:  Queueing system type (for example `"slurm"`).
@@ -370,10 +382,17 @@ class HPCExecutor(ExecutorBase):
         _logger.debug("Submitted HPC job %s (job id: %s)", item_id, job_id)
         return True
 
+    def _live_job_ids(self) -> set[int]:
+        # Runs on the poll thread. The only place that knows the scheduler
+        # answers with a table: above this line a queueing system is a source of
+        # job ids and nothing else, so `pandas` stays `pysqa`'s dependency
+        # rather than becoming one of ropt's.
+        return set(self._queue_adapter.get_status_of_my_jobs()["jobid"].tolist())
+
     def _poll(self) -> dict[str | UUID, Any]:
         results: dict[str | UUID, Any] = {}
         try:
-            jobs = set(self._queue_adapter.get_status_of_my_jobs()["jobid"].tolist())
+            jobs = self._live_job_ids()
         except Exception as exc:  # ruff: ignore[blind-except]
             # A scheduler that cannot be reached looks exactly like "nothing has
             # finished", so failed queries are counted rather than ignored.
@@ -386,45 +405,77 @@ class HPCExecutor(ExecutorBase):
             # became of it has to be read from its output file.
             if job_id in jobs:
                 continue
-            output_file = self._workdir / f"{item_id}.out"
-            try:
-                with output_file.open("rb") as fp:
-                    results[item_id] = cloudpickle.load(fp)
-                self._retries.pop(item_id, None)
-                self._drop_job(item_id)
-            except FileNotFoundError:
-                # The file may simply not be visible yet, so give the shared
-                # filesystem a bounded number of further polls to show it.
-                self._retries[item_id] = self._retries.get(item_id, 0) + 1
-                if self._retries[item_id] > self._retries_limit:
-                    self._retries.pop(item_id, None)
-                    self._drop_job(item_id)
-                    msg = f"Output file for work item {item_id} never appeared"
-                    _logger.warning(
-                        "HPC work item %s failed: output file never appeared", item_id
-                    )
-                    results[item_id] = ExecutorFailure(msg + self._job_output(item_id))
-            except (OSError, EOFError, UnpicklingError):
-                # Present but unreadable, which a partially visible file also
-                # looks like: retried on the same budget before giving up.
-                retry_count = self._retries.get(item_id, 0) + 1
-                self._retries[item_id] = retry_count
-                if retry_count > self._retries_limit:
-                    self._retries.pop(item_id, None)
-                    self._drop_job(item_id)
-                    msg = f"No valid result for work item {item_id} after {self._retries_limit} retries"
-                    _logger.warning(
-                        "HPC work item %s failed: no valid result after %d retries",
-                        item_id,
-                        self._retries_limit,
-                    )
-                    results[item_id] = ExecutorFailure(msg + self._job_output(item_id))
+            result = self._read_result(item_id)
+            if result is not _PENDING:
+                results[item_id] = result
         if self._remove_files:
             for item_id, result in results.items():
                 self._cleanup_files(
                     item_id, keep_output=isinstance(result, ExecutorFailure)
                 )
         return results
+
+    def _read_result(self, item_id: str | UUID) -> Any:  # ruff: ignore[any-type]
+        output_file = self._workdir / f"{item_id}.out"
+        try:
+            with output_file.open("rb") as fp:
+                result = cloudpickle.load(fp)
+        except FileNotFoundError:
+            # The file may simply not be visible yet, so give the shared
+            # filesystem a bounded number of further polls to show it.
+            return self._retry_or_fail(
+                item_id,
+                f"Output file for work item {item_id} never appeared",
+                "output file never appeared",
+            )
+        except (OSError, EOFError, UnpicklingError):
+            # Present but unreadable, which a partially visible file also looks
+            # like: retried on the same budget before giving up.
+            return self._retry_or_fail(
+                item_id,
+                f"No valid result for work item {item_id} after {self._retries_limit} retries",
+                f"no valid result after {self._retries_limit} retries",
+            )
+        except (ImportError, AttributeError) as exc:
+            # The unpickler got as far as looking a name up, so the bytes were
+            # already complete: reading them again cannot change the answer, and
+            # spending the retry budget here would only delay the failure and
+            # then blame the filesystem, which is the one thing not at fault.
+            msg = (
+                f"The result of work item {item_id} could not be reconstructed: "
+                f"{exc}. This process must be able to import whatever the job "
+                "returned."
+            )
+            return self._fail_item(item_id, msg, exc)
+        except Exception as exc:  # ruff: ignore[blind-except]
+            # Unpickling runs the code that rebuilds the object, and that can
+            # raise anything at all. Whatever it was belongs to this work item
+            # rather than to the executor, which anything escaping here would
+            # take down: `_poll` runs outside `_run_work_items`' own guard.
+            msg = f"The result of work item {item_id} could not be read: {exc}"
+            return self._fail_item(item_id, msg, exc)
+        self._retries.pop(item_id, None)
+        self._drop_job(item_id)
+        return result
+
+    def _retry_or_fail(self, item_id: str | UUID, msg: str, reason: str) -> Any:  # ruff: ignore[any-type]
+        # A shared filesystem may take a while to show a finished job's result,
+        # so the same bounded budget covers "not there yet" and "not whole yet".
+        retry_count = self._retries.get(item_id, 0) + 1
+        self._retries[item_id] = retry_count
+        if retry_count <= self._retries_limit:
+            return _PENDING
+        return self._fail_item(item_id, msg, reason)
+
+    def _fail_item(
+        self, item_id: str | UUID, msg: str, reason: object
+    ) -> ExecutorFailure:
+        # Give up on this work item: its retry budget is either spent or beside
+        # the point, and its job is no longer something to wait for.
+        self._retries.pop(item_id, None)
+        self._drop_job(item_id)
+        _logger.warning("HPC work item %s failed: %s", item_id, reason)
+        return ExecutorFailure(msg + self._job_output(item_id))
 
     def _job_output(self, item_id: str | UUID) -> str:
         # A job that died before writing a result left its only trace here, so

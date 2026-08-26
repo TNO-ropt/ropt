@@ -19,7 +19,7 @@ from ropt.components.compute_steps import EvaluationStep, OptimizationStep
 from ropt.components.concurrency import run_concurrent
 from ropt.components.evaluators import FunctionEvaluator
 from ropt.components.event_handlers import EventDispatcher
-from ropt.components.executors import ThreadExecutor
+from ropt.components.executors import HPCExecutor, ThreadExecutor
 from ropt.context import EnOptContext
 from ropt.enums import ExitCode
 from ropt.exceptions import ExecutorStopped, WorkflowError
@@ -49,7 +49,6 @@ if TYPE_CHECKING:
 
 try:
     import cloudpickle  # ruff: ignore[unused-import]
-    import pandas as pd
     import pysqa  # ruff: ignore[unused-import]
 
     from ropt.components.executors.__main__ import run_task
@@ -1694,14 +1693,26 @@ if _TEST_HPC:
             self._jobs[self._job_id] = job_name
             return self._job_id
 
-        def get_status_of_my_jobs(self) -> pd.DataFrame:
+        def live_job_ids(self) -> set[int]:
             running = [
                 job_id
                 for job_id, job_name in self._jobs.items()
                 if not (self._path / f"{job_name}.out").exists()
             ]
             self._jobs = {job_id: self._jobs[job_id] for job_id in running}
-            return pd.DataFrame(list(self._jobs.keys()), columns=["jobid"])
+            return set(self._jobs)
+
+    def _mock_scheduler(monkeypatch: Any, adapter: _MockedHPCAdapter) -> None:
+        # `ropt` asks the scheduler for the ids of the jobs that are still
+        # there; that the real one answers with a table is `pysqa`'s business,
+        # so the mocks never build one.
+        monkeypatch.setattr(
+            "ropt.components.executors._hpc_executor.pysqa.QueueAdapter",
+            lambda *args, **kwargs: adapter,  # ruff: ignore[unused-lambda-argument]
+        )
+        monkeypatch.setattr(
+            HPCExecutor, "_live_job_ids", lambda _self: adapter.live_job_ids()
+        )
 
 
 @pytest.mark.slow
@@ -1710,10 +1721,7 @@ if _TEST_HPC:
 def test_hpc_evaluates_through_the_simple_api(
     config: Any, test_functions: Any, monkeypatch: Any, tmp_path: Path
 ) -> None:
-    monkeypatch.setattr(
-        "ropt.components.executors._hpc_executor.pysqa.QueueAdapter",
-        lambda *args, **kwargs: _MockedHPCAdapter(tmp_path),  # ruff: ignore[unused-lambda-argument]
-    )
+    _mock_scheduler(monkeypatch, _MockedHPCAdapter(tmp_path))
     with session() as active:
         result = evaluate(
             config,

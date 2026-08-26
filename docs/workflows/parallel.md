@@ -198,7 +198,7 @@ cannot be reached the failure is logged and stopping continues.
 
 | Parameter     | Description                                                              |
 | ------------- | ------------------------------------------------------------------------ |
-| `workdir`     | Shared-filesystem directory for each work item's serialized I/O files.   |
+| `workdir`     | Shared-filesystem directory for each work item's serialized I/O files. Required, and must be an absolute path. |
 | `workers`     | Maximum concurrent HPC jobs (default: 1).                                |
 | `interval`    | Polling interval in seconds (default: 1).                                |
 | `queue_type`  | Queueing system type, e.g. `"slurm"` (default).                          |

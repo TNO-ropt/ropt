@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 import asyncio
+import collections
 import logging
-import multiprocessing
 import os
+import pickle  # ruff: ignore[suspicious-pickle-import]
 import signal
 import sys
 import threading
@@ -58,7 +59,6 @@ if TYPE_CHECKING:
 
 try:
     import cloudpickle
-    import pandas as pd
     import pysqa  # ruff: ignore[unused-import]
 
     from ropt.components.executors.__main__ import run_task
@@ -145,12 +145,23 @@ def _blocked_work_at_barrier(
     return 0
 
 
+def _explode() -> Any:
+    msg = "this result cannot be rebuilt"
+    raise ValueError(msg)
+
+
+class _Unrebuildable:
+    # Pickles into a call to `_explode`, so reading it back raises rather than
+    # returning an object.
+    def __reduce__(self) -> tuple[Any, ...]:
+        return (_explode, ())
+
+
 def _block_until_disconnected(address: str) -> int:
     # A synchronization primitive cannot be sent to a worker process, but the
-    # address of a listening socket can. Reporting the pid over it says the work
-    # item is running, and the read that follows never returns on its own.
+    # address of a listening socket can. Connecting says the work item is
+    # running, and the read that follows never returns on its own.
     connection = Client(address)
-    connection.send(os.getpid())
     connection.recv()
     return 0
 
@@ -185,10 +196,7 @@ async def test_executor_ok(
     )
     match executor_name:
         case "hpc":
-            monkeypatch.setattr(
-                "ropt.components.executors._hpc_executor.pysqa.QueueAdapter",
-                lambda *args, **kwargs: MockedHPCAdapter(tmp_path),  # ruff: ignore[unused-lambda-argument]
-            )
+            _mock_scheduler(monkeypatch, MockedHPCAdapter(tmp_path))
             executor: ExecutorBase = HPCExecutor(
                 workdir=tmp_path, workers=2, interval=0, template=""
             )
@@ -395,10 +403,7 @@ async def test_hpc_executor_polls_without_the_shared_default_pool(
 ) -> None:
     # Occupy asyncio's shared default executor completely: a poll loop that
     # borrows a thread from it (the old behavior) never gets to run.
-    monkeypatch.setattr(
-        "ropt.components.executors._hpc_executor.pysqa.QueueAdapter",
-        lambda *args, **kwargs: MockedHPCAdapter(tmp_path),  # ruff: ignore[unused-lambda-argument]
-    )
+    _mock_scheduler(monkeypatch, MockedHPCAdapter(tmp_path))
     loop = asyncio.get_running_loop()
     loop.set_default_executor(ThreadPoolExecutor(max_workers=1))
     release = threading.Event()
@@ -426,20 +431,57 @@ async def test_hpc_executor_polls_without_the_shared_default_pool(
 
 
 @pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
+async def test_hpc_reads_job_ids_from_the_scheduler_table(
+    tmp_path: Path, monkeypatch: Any
+) -> None:
+    # `pysqa` answers with a table, and exactly one line in ropt unwraps it.
+    # This is where that line is held to the shape, which is what lets every
+    # other mock deal in job ids alone.
+    class _Column:
+        def __init__(self, values: list[int]) -> None:
+            self._values = values
+
+        def tolist(self) -> list[int]:
+            return self._values
+
+    class _Table:
+        def __init__(self, job_ids: list[int]) -> None:
+            self._job_ids = job_ids
+
+        def __getitem__(self, column: str) -> _Column:
+            assert column == "jobid"
+            return _Column(self._job_ids)
+
+    class _TableScheduler(MockedHPCAdapter):
+        def get_status_of_my_jobs(self) -> _Table:
+            return _Table(sorted(self.live_job_ids()))
+
+    monkeypatch.setattr(
+        "ropt.components.executors._hpc_executor.pysqa.QueueAdapter",
+        lambda *args, **kwargs: _TableScheduler(tmp_path),  # ruff: ignore[unused-lambda-argument]
+    )
+    submission = Submission([WorkItem(function=_function, args=(0,))])
+    executor = HPCExecutor(workdir=tmp_path, workers=1, interval=0, template="")
+    async with asyncio.TaskGroup() as tg:
+        await executor.start(tg)
+        executor.submit(submission)
+        collected = await asyncio.to_thread(_collect, submission)
+        executor.cancel()
+    assert collected == [1]
+
+
+@pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
 async def test_hpc_scheduler_query_fails_after_retry_limit(
     tmp_path: Path, monkeypatch: Any
 ) -> None:
     # A scheduler that cannot be queried must not look like "nothing finished
     # yet": without a bound on the failures the caller waits forever.
     class _UnreachableScheduler(MockedHPCAdapter):
-        def get_status_of_my_jobs(self) -> pd.DataFrame:  # ruff: ignore[no-self-use]
+        def live_job_ids(self) -> set[int]:  # ruff: ignore[no-self-use]
             msg = "squeue: error: Unable to contact slurm controller"
             raise RuntimeError(msg)
 
-    monkeypatch.setattr(
-        "ropt.components.executors._hpc_executor.pysqa.QueueAdapter",
-        lambda *args, **kwargs: _UnreachableScheduler(tmp_path),  # ruff: ignore[unused-lambda-argument]
-    )
+    _mock_scheduler(monkeypatch, _UnreachableScheduler(tmp_path))
     submission = Submission([WorkItem(function=_function, args=(0,))])
     executor = HPCExecutor(
         workdir=tmp_path, workers=1, interval=0, retries=2, template=""
@@ -466,13 +508,10 @@ async def test_hpc_missing_output_file_fails_work(
             self._jobs[self._job_id] = job_name
             return self._job_id
 
-        def get_status_of_my_jobs(self) -> pd.DataFrame:  # ruff: ignore[no-self-use]
-            return pd.DataFrame([], columns=["jobid"])
+        def live_job_ids(self) -> set[int]:  # ruff: ignore[no-self-use]
+            return set()
 
-    monkeypatch.setattr(
-        "ropt.components.executors._hpc_executor.pysqa.QueueAdapter",
-        lambda *args, **kwargs: _VanishingJob(tmp_path),  # ruff: ignore[unused-lambda-argument]
-    )
+    _mock_scheduler(monkeypatch, _VanishingJob(tmp_path))
     submission = Submission([WorkItem(function=_function, args=(0,))])
     executor = HPCExecutor(
         workdir=tmp_path, workers=1, interval=0, retries=2, template=""
@@ -500,13 +539,10 @@ async def test_hpc_unreadable_output_file_fails_work(
             (self._path / f"{job_name}.out").write_bytes(b"half a pickle")
             return self._job_id
 
-        def get_status_of_my_jobs(self) -> pd.DataFrame:  # ruff: ignore[no-self-use]
-            return pd.DataFrame([], columns=["jobid"])
+        def live_job_ids(self) -> set[int]:  # ruff: ignore[no-self-use]
+            return set()
 
-    monkeypatch.setattr(
-        "ropt.components.executors._hpc_executor.pysqa.QueueAdapter",
-        lambda *args, **kwargs: _CorruptResult(tmp_path),  # ruff: ignore[unused-lambda-argument]
-    )
+    _mock_scheduler(monkeypatch, _CorruptResult(tmp_path))
     submission = Submission([WorkItem(function=_function, args=(0,))])
     executor = HPCExecutor(
         workdir=tmp_path, workers=1, interval=0, retries=2, template=""
@@ -522,6 +558,89 @@ async def test_hpc_unreadable_output_file_fails_work(
 
 
 @pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
+async def test_hpc_result_of_an_unknown_type_fails_work(
+    tmp_path: Path, monkeypatch: Any
+) -> None:
+    # A result naming something this process cannot import is whole and correct;
+    # it is only unreadable here. Retrying would postpone the same failure and
+    # then blame the shared filesystem, which is the one thing not at fault.
+    class _AlienResult(MockedHPCAdapter):
+        polls = 0
+
+        def submit_job(self, job_name: str, command: str, **kwargs: Any) -> int:  # ruff: ignore[unused-method-argument]
+            self._job_id += 1
+            self._jobs[self._job_id] = job_name
+            # A valid pickle of a name from a module that does not exist. The
+            # replacement is the same length as the original, so the frame and
+            # length prefixes in the pickle stay right.
+            payload = pickle.dumps(collections.OrderedDict, protocol=4)
+            (self._path / f"{job_name}.out").write_bytes(
+                payload.replace(b"collections", b"collectionx")
+            )
+            return self._job_id
+
+        def live_job_ids(self) -> set[int]:
+            type(self).polls += 1
+            return set()
+
+    _mock_scheduler(monkeypatch, _AlienResult(tmp_path))
+    submission = Submission([WorkItem(function=_function, args=(0,))])
+    executor = HPCExecutor(
+        workdir=tmp_path, workers=1, interval=3600, retries=30, template=""
+    )
+    async with asyncio.TaskGroup() as tg:
+        await executor.start(tg)
+        executor.submit(submission)
+        collected = await asyncio.to_thread(_collect, submission)
+        executor.cancel()
+    assert len(collected) == 1
+    assert isinstance(collected[0], ExecutorFailure)
+    assert "could not be reconstructed" in str(collected[0])
+    assert "collectionx" in str(collected[0])
+    # An hour between polls: had this spent a retry, the answer would have come
+    # an hour later at best, and the timeout on this test long before that.
+    assert _AlienResult.polls == 1
+
+
+@pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
+async def test_hpc_result_that_cannot_be_rebuilt_fails_work(
+    tmp_path: Path, monkeypatch: Any
+) -> None:
+    # Reading a result runs the code that rebuilds it, and that code can raise
+    # anything at all. It belongs to the work item; the executor has to survive.
+    class _UnrebuildableResult(MockedHPCAdapter):
+        polls = 0
+
+        def submit_job(self, job_name: str, command: str, **kwargs: Any) -> int:  # ruff: ignore[unused-method-argument]
+            self._job_id += 1
+            self._jobs[self._job_id] = job_name
+            (self._path / f"{job_name}.out").write_bytes(pickle.dumps(_Unrebuildable()))
+            return self._job_id
+
+        def live_job_ids(self) -> set[int]:
+            type(self).polls += 1
+            return set()
+
+    _mock_scheduler(monkeypatch, _UnrebuildableResult(tmp_path))
+    submission = Submission([WorkItem(function=_function, args=(0,))])
+    executor = HPCExecutor(
+        workdir=tmp_path, workers=1, interval=3600, retries=30, template=""
+    )
+    async with asyncio.TaskGroup() as tg:
+        await executor.start(tg)
+        executor.submit(submission)
+        collected = await asyncio.to_thread(_collect, submission)
+        executor.cancel()
+    # Collecting at all is half the point: had the error escaped `_poll`, the
+    # executor would have gone down with it and nothing would arrive.
+    assert len(collected) == 1
+    assert isinstance(collected[0], ExecutorFailure)
+    assert "could not be read" in str(collected[0])
+    assert "this result cannot be rebuilt" in str(collected[0])
+    assert _UnrebuildableResult.polls == 1
+
+
+@pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
 async def test_hpc_job_command_uses_submitting_interpreter(
     tmp_path: Path, monkeypatch: Any
 ) -> None:
@@ -534,10 +653,7 @@ async def test_hpc_job_command_uses_submitting_interpreter(
             commands.append(command)
             return super().submit_job(job_name, command, **kwargs)
 
-    monkeypatch.setattr(
-        "ropt.components.executors._hpc_executor.pysqa.QueueAdapter",
-        lambda *args, **kwargs: _RecordingAdapter(tmp_path),  # ruff: ignore[unused-lambda-argument]
-    )
+    _mock_scheduler(monkeypatch, _RecordingAdapter(tmp_path))
     submission = Submission([WorkItem(function=_function, args=(0,))])
     executor = HPCExecutor(workdir=tmp_path, workers=1, interval=0, template="")
     async with asyncio.TaskGroup() as tg:
@@ -564,13 +680,10 @@ async def test_hpc_failed_work_keeps_job_output(
             )
             return self._job_id
 
-        def get_status_of_my_jobs(self) -> pd.DataFrame:  # ruff: ignore[no-self-use]
-            return pd.DataFrame([], columns=["jobid"])
+        def live_job_ids(self) -> set[int]:  # ruff: ignore[no-self-use]
+            return set()
 
-    monkeypatch.setattr(
-        "ropt.components.executors._hpc_executor.pysqa.QueueAdapter",
-        lambda *args, **kwargs: _CrashingJob(tmp_path),  # ruff: ignore[unused-lambda-argument]
-    )
+    _mock_scheduler(monkeypatch, _CrashingJob(tmp_path))
     submission = Submission([WorkItem(function=_function, args=(0,), name="item")])
     executor = HPCExecutor(
         workdir=tmp_path, workers=1, interval=0, retries=2, template=""
@@ -600,10 +713,7 @@ async def test_hpc_outstanding_work_aborted_on_stop(
             submitted.set()
             return self._job_id
 
-    monkeypatch.setattr(
-        "ropt.components.executors._hpc_executor.pysqa.QueueAdapter",
-        lambda *args, **kwargs: _StuckAdapter(tmp_path),  # ruff: ignore[unused-lambda-argument]
-    )
+    _mock_scheduler(monkeypatch, _StuckAdapter(tmp_path))
     submission = Submission([WorkItem(function=_function, args=(0,))])
     executor = HPCExecutor(workdir=tmp_path, workers=1, interval=0, template="")
     async with asyncio.TaskGroup() as tg:
@@ -635,10 +745,7 @@ async def test_stopping_hpc_executor_cancels_jobs(
             return deleted
 
     adapter = _StuckAdapter(tmp_path)
-    monkeypatch.setattr(
-        "ropt.components.executors._hpc_executor.pysqa.QueueAdapter",
-        lambda *args, **kwargs: adapter,  # ruff: ignore[unused-lambda-argument]
-    )
+    _mock_scheduler(monkeypatch, adapter)
     submission = Submission([WorkItem(function=_function, args=(0,), name="job1")])
     executor = HPCExecutor(workdir=tmp_path, workers=1, interval=0, template="")
     async with asyncio.TaskGroup() as tg:
@@ -667,10 +774,7 @@ async def test_hpc_job_submitted_during_stop_is_cancelled(
             return self._job_id
 
     adapter = _SlowAdapter(tmp_path)
-    monkeypatch.setattr(
-        "ropt.components.executors._hpc_executor.pysqa.QueueAdapter",
-        lambda *args, **kwargs: adapter,  # ruff: ignore[unused-lambda-argument]
-    )
+    _mock_scheduler(monkeypatch, adapter)
     submission = Submission([WorkItem(function=_function, args=(0,), name="job1")])
     executor = HPCExecutor(workdir=tmp_path, workers=1, interval=0, template="")
     async with asyncio.TaskGroup() as tg:
@@ -696,14 +800,11 @@ async def test_idle_hpc_executor_does_not_query_scheduler(
     class _CountingScheduler(MockedHPCAdapter):
         queries = 0
 
-        def get_status_of_my_jobs(self) -> pd.DataFrame:
+        def live_job_ids(self) -> set[int]:
             type(self).queries += 1
-            return super().get_status_of_my_jobs()
+            return super().live_job_ids()
 
-    monkeypatch.setattr(
-        "ropt.components.executors._hpc_executor.pysqa.QueueAdapter",
-        lambda *args, **kwargs: _CountingScheduler(tmp_path),  # ruff: ignore[unused-lambda-argument]
-    )
+    _mock_scheduler(monkeypatch, _CountingScheduler(tmp_path))
     executor = HPCExecutor(workdir=tmp_path, workers=1, interval=0, template="")
     async with asyncio.TaskGroup() as tg:
         await executor.start(tg)
@@ -721,10 +822,7 @@ async def test_idle_hpc_executor_does_not_query_scheduler(
 async def test_hpc_poll_loop_honours_interval_when_busy(
     tmp_path: Path, monkeypatch: Any
 ) -> None:
-    monkeypatch.setattr(
-        "ropt.components.executors._hpc_executor.pysqa.QueueAdapter",
-        lambda *args, **kwargs: MockedHPCAdapter(tmp_path),  # ruff: ignore[unused-lambda-argument]
-    )
+    _mock_scheduler(monkeypatch, MockedHPCAdapter(tmp_path))
     executor = HPCExecutor(workdir=tmp_path, workers=1, interval=3600, template="")
     work_item = WorkItem(function=_function, args=(0,))
     submission = Submission([work_item])
@@ -748,10 +846,7 @@ async def test_hpc_poll_loop_honours_interval_when_busy(
 async def test_queued_hpc_work_resumes_on_free_worker(
     tmp_path: Path, monkeypatch: Any
 ) -> None:
-    monkeypatch.setattr(
-        "ropt.components.executors._hpc_executor.pysqa.QueueAdapter",
-        lambda *args, **kwargs: MockedHPCAdapter(tmp_path),  # ruff: ignore[unused-lambda-argument]
-    )
+    _mock_scheduler(monkeypatch, MockedHPCAdapter(tmp_path))
     submission = Submission(
         [WorkItem(function=_function, args=(idx,)) for idx in range(4)]
     )
@@ -768,10 +863,7 @@ async def test_queued_hpc_work_resumes_on_free_worker(
 async def test_hpc_executor_refuses_to_overwrite_existing_work_item_files(
     tmp_path: Path, monkeypatch: Any
 ) -> None:
-    monkeypatch.setattr(
-        "ropt.components.executors._hpc_executor.pysqa.QueueAdapter",
-        lambda *args, **kwargs: MockedHPCAdapter(tmp_path),  # ruff: ignore[unused-lambda-argument]
-    )
+    _mock_scheduler(monkeypatch, MockedHPCAdapter(tmp_path))
     executor = HPCExecutor(workdir=tmp_path, workers=1, interval=0, template="")
     (tmp_path / "job1.out").touch()  # a stale file, e.g. from another executor
     work_item = WorkItem(function=_function, args=(0,), name="job1")
@@ -784,10 +876,7 @@ async def test_hpc_executor_refuses_to_overwrite_existing_work_item_files(
 async def test_hpc_failing_submission_fails_own_work(
     tmp_path: Path, monkeypatch: Any
 ) -> None:
-    monkeypatch.setattr(
-        "ropt.components.executors._hpc_executor.pysqa.QueueAdapter",
-        lambda *args, **kwargs: MockedHPCAdapter(tmp_path),  # ruff: ignore[unused-lambda-argument]
-    )
+    _mock_scheduler(monkeypatch, MockedHPCAdapter(tmp_path))
     (tmp_path / "job1.out").touch()  # a stale file blocks submission of job1
     blocked = Submission([WorkItem(function=_function, args=(0,), name="job1")])
     executor = HPCExecutor(workdir=tmp_path, workers=1, interval=0, template="")
@@ -814,10 +903,7 @@ async def test_rejected_hpc_submission_leaves_no_input_file(
             msg = "sbatch: error: Batch job submission failed"
             raise RuntimeError(msg)
 
-    monkeypatch.setattr(
-        "ropt.components.executors._hpc_executor.pysqa.QueueAdapter",
-        lambda *args, **kwargs: _RejectingScheduler(tmp_path),  # ruff: ignore[unused-lambda-argument]
-    )
+    _mock_scheduler(monkeypatch, _RejectingScheduler(tmp_path))
     submission = Submission([WorkItem(function=_function, args=(0,), name="job1")])
     executor = HPCExecutor(workdir=tmp_path, workers=1, interval=0, template="")
     async with asyncio.TaskGroup() as tg:
@@ -835,10 +921,7 @@ async def test_hpc_duplicate_name_fails_own_submission(
 ) -> None:
     # A name clash must abort the offending submission rather than tear down
     # the session, and must not leave its caller waiting.
-    monkeypatch.setattr(
-        "ropt.components.executors._hpc_executor.pysqa.QueueAdapter",
-        lambda *args, **kwargs: MockedHPCAdapter(tmp_path),  # ruff: ignore[unused-lambda-argument]
-    )
+    _mock_scheduler(monkeypatch, MockedHPCAdapter(tmp_path))
     submission = Submission(
         [WorkItem(function=_function, args=(idx,), name="same") for idx in range(2)]
     )
@@ -938,21 +1021,16 @@ async def test_stopping_kills_a_busy_worker(
             await executor.start(tg)
             executor.submit(submission)
             connection = await asyncio.to_thread(listener.accept)
-            worker_pid = await asyncio.to_thread(connection.recv)
-            # Held from before the stop: shutting the pool down drops its own
-            # references to the worker processes.
-            workers = [
-                process
-                for process in multiprocessing.active_children()
-                if process.pid == worker_pid
-            ]
             executor.cancel()
-        assert len(workers) == 1
-        # The exit code, not the pid: a terminated child still answers
-        # `os.kill(pid, 0)` until it is reaped. The timeout is a ceiling, not a
-        # wait, since `join` returns as soon as the process is gone.
-        await asyncio.to_thread(workers[0].join, 10.0)
-        assert workers[0].exitcode == -signal.SIGTERM
+        # The worker's end of this connection closes when it dies, and it can
+        # only die by being killed: its work item is waiting for a message that
+        # is never sent. Its own `Process` object cannot be asked, because the
+        # pool's manager thread may reap it first and leave `exitcode` unset.
+        # The timeout is a ceiling rather than a wait: without it, a worker that
+        # survives would hang here and then hang the interpreter on the way out.
+        assert await asyncio.to_thread(connection.poll, 10.0)
+        with pytest.raises(EOFError):
+            connection.recv()
     finally:
         if connection is not None:
             connection.close()
@@ -1025,10 +1103,7 @@ async def test_executor_error(
     )
     match executor_name:
         case "hpc":
-            monkeypatch.setattr(
-                "ropt.components.executors._hpc_executor.pysqa.QueueAdapter",
-                lambda *args, **kwargs: MockedHPCAdapter(tmp_path),  # ruff: ignore[unused-lambda-argument]
-            )
+            _mock_scheduler(monkeypatch, MockedHPCAdapter(tmp_path))
             executor: ExecutorBase = HPCExecutor(
                 workdir=tmp_path, workers=2, interval=0, template=""
             )
@@ -1135,14 +1210,26 @@ if _TEST_HPC:
             self._jobs.pop(process_id, None)
             return ""
 
-        def get_status_of_my_jobs(self) -> pd.DataFrame:
+        def live_job_ids(self) -> set[int]:
             running = [
                 job_id
                 for job_id, job_name in self._jobs.items()
                 if not (self._path / f"{job_name}.out").exists()
             ]
             self._jobs = {job_id: self._jobs[job_id] for job_id in running}
-            return pd.DataFrame(list(self._jobs.keys()), columns=["jobid"])
+            return set(self._jobs)
+
+    def _mock_scheduler(monkeypatch: Any, adapter: MockedHPCAdapter) -> None:
+        # `ropt` asks the scheduler for the ids of the jobs that are still
+        # there; that the real one answers with a table is `pysqa`'s business,
+        # so the mocks never build one.
+        monkeypatch.setattr(
+            "ropt.components.executors._hpc_executor.pysqa.QueueAdapter",
+            lambda *args, **kwargs: adapter,  # ruff: ignore[unused-lambda-argument]
+        )
+        monkeypatch.setattr(
+            HPCExecutor, "_live_job_ids", lambda _self: adapter.live_job_ids()
+        )
 
 
 @pytest.mark.parametrize(
@@ -1171,10 +1258,7 @@ async def test_executor_evaluator_ok(
 ) -> None:
     match executor_name:
         case "hpc":
-            monkeypatch.setattr(
-                "ropt.components.executors._hpc_executor.pysqa.QueueAdapter",
-                lambda *args, **kwargs: MockedHPCAdapter(tmp_path),  # ruff: ignore[unused-lambda-argument]
-            )
+            _mock_scheduler(monkeypatch, MockedHPCAdapter(tmp_path))
             executor: ExecutorBase = HPCExecutor(
                 workdir=tmp_path, workers=2, interval=0, template=""
             )
@@ -1225,10 +1309,7 @@ async def test_executor_evaluator_error(
 ) -> None:
     match executor_name:
         case "hpc":
-            monkeypatch.setattr(
-                "ropt.components.executors._hpc_executor.pysqa.QueueAdapter",
-                lambda *args, **kwargs: MockedHPCAdapter(tmp_path),  # ruff: ignore[unused-lambda-argument]
-            )
+            _mock_scheduler(monkeypatch, MockedHPCAdapter(tmp_path))
             executor: ExecutorBase = HPCExecutor(
                 workdir=tmp_path, workers=2, interval=0, template=""
             )
@@ -1338,10 +1419,7 @@ async def test_executor_evaluator_two_optimizations(
 ) -> None:
     match executor_name:
         case "hpc":
-            monkeypatch.setattr(
-                "ropt.components.executors._hpc_executor.pysqa.QueueAdapter",
-                lambda *args, **kwargs: MockedHPCAdapter(tmp_path),  # ruff: ignore[unused-lambda-argument]
-            )
+            _mock_scheduler(monkeypatch, MockedHPCAdapter(tmp_path))
             executor: ExecutorBase = HPCExecutor(
                 workdir=tmp_path, workers=2, interval=0, template=""
             )
@@ -1671,10 +1749,7 @@ async def test_stopped_executor_restarts(
 ) -> None:
     match executor_name:
         case "hpc":
-            monkeypatch.setattr(
-                "ropt.components.executors._hpc_executor.pysqa.QueueAdapter",
-                lambda *args, **kwargs: MockedHPCAdapter(tmp_path),  # ruff: ignore[unused-lambda-argument]
-            )
+            _mock_scheduler(monkeypatch, MockedHPCAdapter(tmp_path))
             executor: ExecutorBase = HPCExecutor(
                 workdir=tmp_path, workers=1, interval=0, template=""
             )
@@ -1747,10 +1822,7 @@ async def test_no_hpc_jobs_for_ended_submission(
             type(self).names.append(job_name)
             return super().submit_job(job_name, command, **kwargs)
 
-    monkeypatch.setattr(
-        "ropt.components.executors._hpc_executor.pysqa.QueueAdapter",
-        lambda *args, **kwargs: _NamingAdapter(tmp_path),  # ruff: ignore[unused-lambda-argument]
-    )
+    _mock_scheduler(monkeypatch, _NamingAdapter(tmp_path))
     submission = Submission(
         [
             WorkItem(function=_function, args=(idx,), name=f"item{idx}")
