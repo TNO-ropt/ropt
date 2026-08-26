@@ -1,7 +1,3 @@
-# test_hpc_job_submitted_during_stop_is_cancelled is sensitive to what runs
-# before it: it has failed under a mutation it does not detect, while passing
-# 3/3 in isolation. Re-run it alone before believing a failure here.
-
 from __future__ import annotations
 
 import asyncio
@@ -593,7 +589,6 @@ async def test_hpc_job_submitted_during_stop_is_cancelled(
 ) -> None:
     submitting = threading.Event()
     stopped = threading.Event()
-    cancelled = threading.Event()
 
     class _SlowAdapter(MockedHPCAdapter):
         def submit_job(self, job_name: str, command: str, **kwargs: Any) -> int:  # ruff: ignore[unused-method-argument]
@@ -602,11 +597,6 @@ async def test_hpc_job_submitted_during_stop_is_cancelled(
             self._job_id += 1
             self._jobs[self._job_id] = job_name
             return self._job_id
-
-        def delete_job(self, process_id: int) -> str:
-            deleted = super().delete_job(process_id)
-            cancelled.set()
-            return deleted
 
     adapter = _SlowAdapter(tmp_path)
     monkeypatch.setattr(
@@ -617,11 +607,16 @@ async def test_hpc_job_submitted_during_stop_is_cancelled(
     executor = HPCExecutor(workdir=tmp_path, workers=1, interval=0, template="")
     async with asyncio.TaskGroup() as tg:
         await executor.start(tg)
+        pool = executor._pool  # ruff: ignore[private-member-access]
         executor.submit(submission)
         await asyncio.to_thread(submitting.wait)
         executor.cancel()
     stopped.set()
-    assert await asyncio.to_thread(cancelled.wait, 5)
+    # Submitting, cancelling and deleting the files all happen on the poll
+    # thread, which outlives the executor: join it, or the cancellation is
+    # observable before the cleanup that follows it.
+    assert pool is not None
+    await asyncio.to_thread(pool.shutdown, wait=True)
     assert adapter.deleted == [1]
     assert not await asyncio.to_thread(lambda: list(tmp_path.glob("job1.*")))
 
