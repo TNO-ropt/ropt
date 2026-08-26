@@ -123,6 +123,10 @@ class JobExecutorBase(ExecutorBase):
         self._jobs_closed = False
         self._work_arrived = asyncio.Event()
         self._query_failures = 0
+        # Set once a work item's captured output has been kept for the user to
+        # read. A subclass that owns its working directory needs to know, since
+        # removing the directory would take that output with it.
+        self._output_kept = False
 
     @abstractmethod
     def _start_job(self, item_id: str | UUID, command: list[str]) -> int:
@@ -174,6 +178,9 @@ class JobExecutorBase(ExecutorBase):
         self._work_arrived = asyncio.Event()
         with self._jobs_lock:
             self._jobs_closed = False
+        # A new run answers this question again from scratch; the previous run's
+        # verdict says nothing about the files this one will write.
+        self._output_kept = False
         # A single thread, because it is the only one that talks to the backend:
         # starting and polling stay in one order, and off the loop thread.
         self._pool = ThreadPoolExecutor(
@@ -471,6 +478,7 @@ class JobExecutorBase(ExecutorBase):
         # the point, and its job is no longer something to wait for.
         self._retries.pop(item_id, None)
         self._drop_job(item_id)
+        self._output_kept = True
         _logger.warning("%s work item %s failed: %s", self._kind, item_id, reason)
         return ExecutorFailure(msg + self._job_output(item_id))
 
@@ -513,6 +521,11 @@ class JobExecutorBase(ExecutorBase):
                 self._drop_job(item_id)
                 self._retries.pop(item_id, None)
                 results[item_id] = ExecutorFailure(msg)
+            if submitted:
+                # These items never reach the cleanup pass in `_poll`, so their
+                # output survives here too, and a directory holding it must not
+                # be removed.
+                self._output_kept = True
             self._query_failures = 0
         return results
 

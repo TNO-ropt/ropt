@@ -176,6 +176,53 @@ A few less common issues cause the same startup error:
   example due to process, file-descriptor, or memory limits, or a container
   without shared-memory/semaphore support — will also fail this startup check.
 
+### LocalJobExecutor
+
+[`LocalJobExecutor`][ropt.components.executors.LocalJobExecutor] runs each work
+item as a separate process on the machine `ropt` is running on. It needs no
+extras and no configuration.
+
+It shares all of its machinery with
+[`HPCExecutor`][ropt.components.executors.HPCExecutor] — the same `.in`/`.out`
+files, the same poll loop, the same failure reporting — and differs only in what
+starts a job. Where the HPC executor hands a command to a scheduler, this one
+starts it directly.
+
+| Parameter  | Description                                                                 |
+| ---------- | --------------------------------------------------------------------------- |
+| `workdir`  | Directory for each work item's files. The default is a temporary directory that this executor creates and removes again, unless there is something left in it to read. |
+| `workers`  | Maximum concurrent local jobs (default: 1).                                 |
+| `interval` | Polling interval in seconds (default: 0.1).                                 |
+| `retries`  | Extra polls to wait for a result (default: 0).                              |
+| `cleanup`  | Whether to remove a work item's files once it settles (default: `True`).    |
+
+The defaults differ from the HPC ones for reasons that follow from where the
+jobs run. `interval` is small because a local process is finished the moment it
+exits, so waiting is dead time rather than politeness towards a scheduler.
+`retries` is `0` because a job writes and renames its result before exiting, so
+there is no shared filesystem that might not have caught up yet.
+
+**Stopping kills the job's whole process group.** Each job is started in a
+session of its own, so `cancel()` reaches whatever the job started itself,
+rather than leaving those orphaned. This needs process groups, so the executor
+is **POSIX only** and refuses to be constructed elsewhere.
+
+Waiting for a killed job to actually die happens on a thread of its own, never
+on the event loop: a Ctrl-C that has to wait for cancellation to finish is the
+thing this arrangement avoids. That same thread removes a working directory this
+executor created, once the jobs writing to it are gone.
+
+It removes it only when there is nothing left in it to read, though. A work item
+that failed keeps its captured output, and `cleanup=False` keeps everything, so
+in either case the directory is **kept** and its path logged at `WARNING` — a
+temporary directory has a random name, and one that is kept without being named
+is one nobody can find. A directory you passed yourself is never removed.
+
+Each run gets a directory of its own: an executor restarted after keeping one
+creates another, rather than writing into the files it just handed over. Ask
+[`workdir`][ropt.components.executors.LocalJobExecutor.workdir] for the current
+one.
+
 ### HPCExecutor
 
 [`HPCExecutor`][ropt.components.executors.HPCExecutor] submits tasks as jobs to an

@@ -3,7 +3,7 @@
 Executors run the [`WorkItem`][ropt.components.executors.WorkItem] objects of a
 [`Submission`][ropt.components.executors.Submission], produced by a
 [`ParallelEvaluator`][ropt.components.evaluators.ParallelEvaluator], on a concrete
-execution mechanism (threads, processes, or an HPC cluster).
+execution mechanism (threads, processes, local jobs, or an HPC cluster).
 
 See [Parallel Evaluation](../workflows/parallel.md) for usage.
 
@@ -18,5 +18,6 @@ subclass when adding a new execution mechanism.
 ::: ropt.components.executors.Submission
 ::: ropt.components.executors.ThreadExecutor
 ::: ropt.components.executors.ProcessExecutor
+::: ropt.components.executors.LocalJobExecutor
 ::: ropt.components.executors.HPCExecutor
 

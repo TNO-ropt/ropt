@@ -20,6 +20,7 @@ from typing import TYPE_CHECKING, Any, Protocol, Self
 from ropt.components._loop import schedule
 from ropt.components.executors import (
     HPCExecutor,
+    LocalJobExecutor,
     ProcessExecutor,
     ThreadExecutor,
 )
@@ -313,6 +314,46 @@ class Session:
         """
         return self._open_pool(lambda: ProcessExecutor(workers=workers), bundle_size)
 
+    def local_pool(
+        self,
+        *,
+        workers: int = 1,
+        workdir: Path | str | None = None,
+        retries: int = 0,
+        bundle_size: int = 1,
+    ) -> WorkerPool:
+        """Create a pool that runs each evaluation as a separate local process.
+
+        Between a process pool and a cluster: every evaluation gets an
+        interpreter of its own, which can be stopped outright and whose output
+        is captured to a file, but there is no queueing system and nothing to
+        install. Needs no extras; the evaluation function must be picklable.
+
+        POSIX only. See [Running Optimizations](../running/running.md) for a
+        walkthrough.
+
+        Args:
+            workers:     The maximum number of concurrent local jobs.
+            workdir:     The directory holding each evaluation's files. The
+                         default is a temporary directory that is removed when
+                         the pool closes — unless an evaluation failed, in which
+                         case it is kept, with that evaluation's output in it,
+                         and its path logged.
+            retries:     Extra polls to wait for a result. The default of `0` is
+                         enough: a local job writes its result before it exits.
+            bundle_size: How many evaluations go to a worker as one task, `0`
+                         for the whole batch. See
+                         [`process_pool`][ropt.simple.Session.process_pool];
+                         each task here is a local process.
+
+        Returns:
+            A pool backed by local processes.
+        """
+        return self._open_pool(
+            lambda: LocalJobExecutor(workers=workers, workdir=workdir, retries=retries),
+            bundle_size,
+        )
+
     def hpc_pool(  # ruff: ignore[too-many-arguments]
         self,
         *,
@@ -324,6 +365,7 @@ class Session:
         config_path: Path | str | None = None,
         template: str | None = None,
         queue_type: str = "slurm",
+        retries: int = 30,
         bundle_size: int = 1,
     ) -> WorkerPool:
         """Create a pool that runs evaluations on an HPC cluster.
@@ -347,6 +389,8 @@ class Session:
             template:    An inline submission-script template, instead of a
                          config.
             queue_type:  The queueing system type.
+            retries:     Extra polls to wait for a result that a shared
+                         filesystem has not shown yet.
             bundle_size: How many evaluations go to a worker as one task, `0`
                          for the whole batch. See
                          [`process_pool`][ropt.simple.Session.process_pool];
@@ -366,6 +410,7 @@ class Session:
                 config_path=config_path,
                 template=template,
                 queue_type=queue_type,
+                retries=retries,
             ),
             bundle_size,
         )

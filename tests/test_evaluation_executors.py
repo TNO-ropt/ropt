@@ -5,7 +5,9 @@ import collections
 import logging
 import os
 import pickle  # ruff: ignore[suspicious-pickle-import]
+import shutil
 import signal
+import subprocess  # ruff: ignore[suspicious-subprocess-import]
 import sys
 import threading
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
@@ -28,6 +30,7 @@ from ropt.components.evaluators._parallel_evaluator import _handle_result
 from ropt.components.event_handlers import ResultsHandler
 from ropt.components.executors import (
     HPCExecutor,
+    LocalJobExecutor,
     ProcessExecutor,
     Submission,
     ThreadExecutor,
@@ -155,6 +158,46 @@ def _raise_locally_defined_error() -> None:
 
     msg = "raised by a class the standard library cannot name"
     raise _LocalError(msg)
+
+
+# Run by `_spawn_child_and_block` as a process of its own. It is a grandchild of
+# the executor, in the job's process group, so only killing the group reaches it.
+_GRANDCHILD_SOURCE = """
+import sys
+from multiprocessing.connection import Client
+
+Client(sys.argv[1]).recv()
+"""
+
+
+def _spawn_child_and_block(address: str) -> int:
+    child = subprocess.Popen(  # ruff: ignore[subprocess-without-shell-equals-true]
+        [sys.executable, "-c", _GRANDCHILD_SOURCE, address]
+    )
+    child.wait()
+    return 0
+
+
+def _print_and_die(value: int) -> int:
+    # Killed outright, so nothing is written back and the print is the only
+    # account of what the job was doing.
+    print("about to be killed", flush=True)  # ruff: ignore[print]
+    os.kill(os.getpid(), signal.SIGKILL)
+    return value
+
+
+async def _wait_for_local_cleanup(executor: LocalJobExecutor) -> None:
+    # The teardown thread waits for the jobs and then takes the directory away,
+    # off the loop thread on purpose: nothing else can say when it has finished.
+    thread = executor._teardown_thread  # ruff: ignore[private-member-access]
+    assert thread is not None
+    await asyncio.to_thread(thread.join, 10.0)
+
+
+def _start_blocking_process() -> subprocess.Popen[bytes]:
+    return subprocess.Popen(
+        [sys.executable, "-c", "import sys; sys.stdin.read()"], stdin=subprocess.PIPE
+    )
 
 
 def _explode() -> Any:
@@ -2326,3 +2369,277 @@ async def test_transfer_error_from_parallel_evaluation_bubbles_up(
             )
             executor.cancel()
     assert any(isinstance(err, TransferError) for err in excinfo.value.exceptions)
+
+
+@pytest.mark.slow
+@pytest.mark.timeout(30)
+async def test_local_jobs_evaluate_work() -> None:
+    submission = Submission([WorkItem(function=_function, args=(i,)) for i in range(4)])
+    executor = LocalJobExecutor(workers=2)
+    workdir = executor.workdir
+    async with asyncio.TaskGroup() as tg:
+        await executor.start(tg)
+        executor.submit(submission)
+        collected = await asyncio.to_thread(_collect, submission)
+        executor.cancel()
+    assert sorted(collected) == [1, 2, 3, 4]
+    await _wait_for_local_cleanup(executor)
+    # Nothing failed and cleanup is on, so there is nothing in there to read:
+    # a temporary directory with no reason to stay is taken away again.
+    assert not workdir.exists()
+
+
+@pytest.mark.slow
+@pytest.mark.timeout(30)
+async def test_local_job_error_carries_its_traceback(tmp_path: Path) -> None:
+    # The job is the only place the traceback existed, and it left no channel
+    # back: it travels as a note on the exception or not at all.
+    submission = Submission(
+        [WorkItem(function=_function, args=(0,), kwargs={"raise_error": True})]
+    )
+    executor = LocalJobExecutor(workdir=tmp_path, workers=1)
+    async with asyncio.TaskGroup() as tg:
+        await executor.start(tg)
+        executor.submit(submission)
+        with pytest.raises(ValueError, match="Test error") as info:
+            await asyncio.to_thread(_collect, submission)
+        executor.cancel()
+    assert any("Traceback" in note for note in info.value.__notes__)
+
+
+@pytest.mark.slow
+@pytest.mark.timeout(30)
+async def test_local_jobs_run_in_separate_processes() -> None:
+    # The point of a job over a thread: its own interpreter, which is also what
+    # makes it killable.
+    submission = Submission([WorkItem(function=os.getpid, args=()) for _ in range(2)])
+    executor = LocalJobExecutor(workers=2)
+    async with asyncio.TaskGroup() as tg:
+        await executor.start(tg)
+        executor.submit(submission)
+        collected = await asyncio.to_thread(_collect, submission)
+        executor.cancel()
+    assert len(set(collected)) == 2
+    assert os.getpid() not in collected
+    await _wait_for_local_cleanup(executor)
+
+
+@pytest.mark.slow
+@pytest.mark.timeout(30)
+async def test_stopping_kills_a_local_job_and_its_children(tmp_path: Path) -> None:
+    # A job that started a process of its own: stopping has to reach that too,
+    # or it is orphaned and outlives the run that asked for it.
+    listener = Listener(str(tmp_path / "job"))
+    submission = Submission(
+        [WorkItem(function=_spawn_child_and_block, args=(listener.address,))]
+    )
+    executor = LocalJobExecutor(workdir=tmp_path, workers=1)
+    connection = None
+    try:
+        async with asyncio.TaskGroup() as tg:
+            await executor.start(tg)
+            executor.submit(submission)
+            # Accepting proves the grandchild is up and the job is waiting on it.
+            connection = await asyncio.to_thread(listener.accept)
+            executor.cancel()
+        # This end belongs to the grandchild, which is only reachable by killing
+        # the group: end of file here is that process being gone.
+        assert await asyncio.to_thread(connection.poll, 10.0)
+        with pytest.raises(EOFError):
+            connection.recv()
+    finally:
+        if connection is not None:
+            connection.close()
+        listener.close()
+
+
+@pytest.mark.slow
+@pytest.mark.timeout(30)
+async def test_local_job_that_dies_without_a_result_fails_work(tmp_path: Path) -> None:
+    # Killed outright, so nothing was written: the only account of the job is
+    # what it printed, and that has to reach the caller.
+    submission = Submission([WorkItem(function=_print_and_die, args=(0,))])
+    executor = LocalJobExecutor(workdir=tmp_path, workers=1)
+    async with asyncio.TaskGroup() as tg:
+        await executor.start(tg)
+        executor.submit(submission)
+        collected = await asyncio.to_thread(_collect, submission)
+        executor.cancel()
+    assert len(collected) == 1
+    assert isinstance(collected[0], ExecutorFailure)
+    assert "never appeared" in str(collected[0])
+    assert "about to be killed" in str(collected[0])
+
+
+@pytest.mark.slow
+@pytest.mark.timeout(30)
+async def test_local_job_ids_are_not_pids(caplog: pytest.LogCaptureFixture) -> None:
+    # Pids come round again, and job ids that were pids would come round with
+    # them, letting a finished job be mistaken for one that is still running.
+    executor = LocalJobExecutor(workers=1)
+    with caplog.at_level(logging.DEBUG, logger="ropt"):
+        async with asyncio.TaskGroup() as tg:
+            await executor.start(tg)
+            for value in range(3):
+                submission = Submission([WorkItem(function=_function, args=(value,))])
+                executor.submit(submission)
+                assert await asyncio.to_thread(_collect, submission) == [value + 1]
+            executor.cancel()
+    started = [line for line in caplog.messages if line.startswith("Started local job")]
+    assert [line.rsplit(" ", 1)[-1] for line in started] == ["1)", "2)", "3)"]
+    await _wait_for_local_cleanup(executor)
+
+
+async def test_local_executor_keeps_a_directory_it_was_given(tmp_path: Path) -> None:
+    executor = LocalJobExecutor(workdir=tmp_path, workers=1, cleanup=False)
+    await asyncio.sleep(0)  # this module runs tests on the event loop
+    executor.cancel()
+    assert await asyncio.to_thread(tmp_path.exists)
+
+
+@pytest.mark.slow
+@pytest.mark.timeout(30)
+async def test_local_executor_keeps_its_directory_when_a_job_fails(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    # Removing the directory would take the failed job's captured output with
+    # it, which is the only account of why it failed.
+    submission = Submission([WorkItem(function=_print_and_die, args=(0,))])
+    executor = LocalJobExecutor(workers=1)
+    workdir = executor.workdir
+    with caplog.at_level(logging.WARNING, logger="ropt"):
+        async with asyncio.TaskGroup() as tg:
+            await executor.start(tg)
+            executor.submit(submission)
+            assert isinstance(
+                (await asyncio.to_thread(_collect, submission))[0], ExecutorFailure
+            )
+            executor.cancel()
+        await _wait_for_local_cleanup(executor)
+    assert await asyncio.to_thread(workdir.exists)
+    output = workdir / "".join(str(path.name) for path in workdir.glob("*.txt"))
+    assert "about to be killed" in await asyncio.to_thread(output.read_text)
+    # A random name kept and never mentioned is a directory nobody can find.
+    assert any(
+        str(workdir) in message and "a work item failed" in message
+        for message in caplog.messages
+    )
+    shutil.rmtree(workdir)
+
+
+@pytest.mark.slow
+@pytest.mark.timeout(30)
+async def test_local_executor_keeps_its_directory_when_polling_gives_up() -> None:
+    # Giving up on polling fails whatever was out, and those items never reach
+    # the pass that removes their files, so this route has to keep the
+    # directory too. Contrived for a local backend, and the code is shared.
+    submission = Submission([WorkItem(function=_function, args=(0,))])
+    executor = LocalJobExecutor(workers=1)
+    workdir = executor.workdir
+
+    def _unreachable() -> set[int]:
+        msg = "cannot tell whether the job is alive"
+        raise RuntimeError(msg)
+
+    async with asyncio.TaskGroup() as tg:
+        await executor.start(tg)
+        executor._live_job_ids = _unreachable  # ruff: ignore[private-member-access]
+        executor.submit(submission)
+        collected = await asyncio.to_thread(_collect, submission)
+        executor.cancel()
+    await _wait_for_local_cleanup(executor)
+    assert isinstance(collected[0], ExecutorFailure)
+    assert "could not be queried" in str(collected[0])
+    assert await asyncio.to_thread(workdir.exists)
+    # Dropped by the base along with the job, and still a process of ours.
+    assert executor._processes == {}  # ruff: ignore[private-member-access]
+    shutil.rmtree(workdir)
+
+
+@pytest.mark.slow
+@pytest.mark.timeout(30)
+async def test_local_executor_keeps_its_directory_when_cleanup_is_off() -> None:
+    # `cleanup=False` means nothing here is removed; a directory that removed
+    # itself anyway would make the flag mean the opposite of what it says.
+    submission = Submission([WorkItem(function=_function, args=(0,))])
+    executor = LocalJobExecutor(workers=1, cleanup=False)
+    workdir = executor.workdir
+    async with asyncio.TaskGroup() as tg:
+        await executor.start(tg)
+        executor.submit(submission)
+        assert await asyncio.to_thread(_collect, submission) == [1]
+        executor.cancel()
+    await _wait_for_local_cleanup(executor)
+    assert await asyncio.to_thread(workdir.exists)
+    assert await asyncio.to_thread(lambda: list(workdir.glob("*.out"))) != []
+    shutil.rmtree(workdir)
+
+
+@pytest.mark.slow
+@pytest.mark.timeout(30)
+async def test_local_executor_restarts_in_a_new_directory() -> None:
+    # The kept directory was handed to the user to read; writing a second run's
+    # files into it would undo that.
+    submission = Submission([WorkItem(function=_function, args=(0,))])
+    executor = LocalJobExecutor(workers=1, cleanup=False)
+    first = executor.workdir
+    async with asyncio.TaskGroup() as tg:
+        await executor.start(tg)
+        executor.submit(submission)
+        assert await asyncio.to_thread(_collect, submission) == [1]
+        executor.cancel()
+    await _wait_for_local_cleanup(executor)
+    async with asyncio.TaskGroup() as tg:
+        await executor.start(tg)
+        second = executor.workdir
+        executor.cancel()
+    await _wait_for_local_cleanup(executor)
+    assert second != first
+    assert await asyncio.to_thread(first.exists)
+    shutil.rmtree(first)
+    shutil.rmtree(second, ignore_errors=True)
+
+
+@pytest.mark.timeout(30)
+async def test_local_executor_restarts_while_the_previous_teardown_waits() -> None:
+    # A restart replaces the queue and the directory while the previous teardown
+    # thread may still be waiting on a job that is slow to die. That thread must
+    # finish its own run: taking either from the executor would leave it stuck on
+    # a queue whose sentinel is gone, holding a directory that never goes, and
+    # would hand the run that follows a directory that is about to be removed.
+    executor = LocalJobExecutor(workers=1)
+    async with asyncio.TaskGroup() as tg:
+        await executor.start(tg)
+        first = executor.workdir
+        # Stands in for a job that outlives the signal that cancelled it: it
+        # exits when its stdin is closed, so the test says when it dies.
+        blocker = await asyncio.to_thread(_start_blocking_process)
+        executor._teardown_queue.put(blocker)  # ruff: ignore[private-member-access]
+        executor.cancel()
+    waiting = executor._teardown_thread  # ruff: ignore[private-member-access]
+    assert waiting is not None
+    async with asyncio.TaskGroup() as tg:
+        await executor.start(tg)
+        second = executor.workdir
+        executor.cancel()
+    await _wait_for_local_cleanup(executor)
+    assert second != first
+    assert await asyncio.to_thread(first.exists)
+    assert blocker.stdin is not None
+    blocker.stdin.close()
+    await asyncio.to_thread(waiting.join, 10.0)
+    assert not waiting.is_alive()
+    assert not await asyncio.to_thread(first.exists)
+
+
+async def test_local_executor_refuses_a_missing_directory(tmp_path: Path) -> None:
+    await asyncio.sleep(0)  # this module runs tests on the event loop
+    with pytest.raises(ValueError, match="does not exist"):
+        LocalJobExecutor(workdir=tmp_path / "nowhere")
+
+
+async def test_local_executor_refuses_a_non_posix_system(monkeypatch: Any) -> None:
+    monkeypatch.setattr(os, "name", "nt")
+    await asyncio.sleep(0)  # this module runs tests on the event loop
+    with pytest.raises(ExecutionError, match="POSIX"):
+        LocalJobExecutor()

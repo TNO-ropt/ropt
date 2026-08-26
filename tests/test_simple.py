@@ -19,7 +19,7 @@ from ropt.components.compute_steps import EvaluationStep, OptimizationStep
 from ropt.components.concurrency import run_concurrent
 from ropt.components.evaluators import FunctionEvaluator
 from ropt.components.event_handlers import EventDispatcher
-from ropt.components.executors import HPCExecutor, ThreadExecutor
+from ropt.components.executors import HPCExecutor, LocalJobExecutor, ThreadExecutor
 from ropt.context import EnOptContext
 from ropt.enums import ExitCode
 from ropt.exceptions import ExecutorStopped, WorkflowError
@@ -1730,3 +1730,32 @@ def test_hpc_evaluates_through_the_simple_api(
             pool=active.hpc_pool(workers=2, workdir=tmp_path, template=""),
         )
     assert result.target_objective is not None
+
+
+@pytest.mark.slow
+@pytest.mark.timeout(60)
+def test_local_jobs_evaluate_through_the_simple_api(
+    config: Any, test_functions: Any, tmp_path: Path
+) -> None:
+    with session() as active:
+        result = evaluate(
+            config,
+            initial_values,
+            test_functions[0],
+            pool=active.local_pool(workers=2, workdir=tmp_path),
+        )
+    assert result.target_objective is not None
+
+
+def test_local_pool_closes_with_its_session() -> None:
+    # The directory belongs to the pool, so it goes when the session does. It is
+    # the teardown thread that removes it, once the jobs it waits for are gone.
+    with session() as active:
+        executor = active.local_pool().executor
+        assert isinstance(executor, LocalJobExecutor)
+        workdir = executor.workdir
+        assert workdir.exists()
+    thread = executor._teardown_thread  # ruff: ignore[private-member-access]
+    assert thread is not None
+    thread.join(10.0)
+    assert not workdir.exists()
