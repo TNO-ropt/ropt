@@ -129,6 +129,7 @@ nav:
       - "Parallel Evaluation": workflows/parallel.md
   - "Utilities":
       - "Logging": utilities/logging.md
+      - "Keyboard Interrupts": utilities/keyboard_interrupt.md
       - "Plugin Discovery": utilities/plugin_discovery.md
       - "Writing a Plugin": utilities/writing_plugins.md
   - "Tutorials":
@@ -141,6 +142,7 @@ nav:
       - "Building a Workflow": tutorials/workflow.md
   - "Reference":
       - "Simple API": reference/simple.md
+      - "Utility Functions": reference/utils.md
       - "Configuration":
         - "Context Class": reference/context.md
         - "Configuration Classes": reference/config.md

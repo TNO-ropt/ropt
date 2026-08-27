@@ -308,13 +308,15 @@ batch, which is the point — but "stopped" does not mean "nothing of it is left
     it happens to use.
 
     You do not need to do anything about this unless it bites you. If it does,
-    one optional line at the top of your script, after the imports, undoes it:
+    one optional line at the top of your script undoes it:
 
     ```python
-    import signal
+    from ropt.utils import restore_keyboard_interrupt
 
-    signal.siginterrupt(signal.SIGINT, True)
+    restore_keyboard_interrupt()
     ```
+
+    See [Keyboard Interrupts](../utilities/keyboard_interrupt.md).
 
 !!! note "Platforms"
     `local_pool` is **POSIX only** and refuses to be created elsewhere. The rest

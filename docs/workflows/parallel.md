@@ -424,18 +424,18 @@ that program as well — including the parts that wanted the handler they
 installed. Nor would clearing it once be enough: any import that happens later
 can set it again.
 
-So this is left to the application, and only matters if it happens to you.
-Clearing the flag is one line, at the top of a script and after the imports:
+So this is left to you, and only if it happens to you. When it does,
+[`restore_keyboard_interrupt`][ropt.utils.restore_keyboard_interrupt] clears the
+flag, at the top of your script and after the imports:
 
 ```python
-import signal
+from ropt.utils import restore_keyboard_interrupt
 
-signal.siginterrupt(signal.SIGINT, True)
+restore_keyboard_interrupt()
 ```
 
-That clears the flag and does nothing else — the installed handler stays in
-place, so a package that chained its own keeps working. It is a no-op on
-Windows, which has no such flag.
+See [Keyboard Interrupts](../utilities/keyboard_interrupt.md) for the whole
+story.
 
 ### Platforms
 
