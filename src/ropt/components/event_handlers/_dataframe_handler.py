@@ -100,7 +100,7 @@ class DataFrameHandler(EventHandler):
         in this way. When multiple accesses are needed, it is more efficient to
         first store them in a variable.
 
-    See [The Simple API](../running/running.md#dataframehandler) for the column
+    See [Result Handlers](../running/handlers.md#dataframehandler) for the column
     specification, default tables, and callback details.
     """
 

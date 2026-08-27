@@ -457,7 +457,7 @@ class Session:
                       real time in blocking, GIL-releasing I/O (files,
                       databases, network); for in-memory work it gives no
                       benefit under CPython's GIL. See
-                      [Running Optimizations](../running/running.md#running-a-handler-in-a-thread).
+                      [Result Handlers](../running/handlers.md#running-a-handler-in-a-thread).
             report:   An optional callback invoked with an `EvaluateResult` for
                       each function evaluation across the group's runs.
                       Returning `True` stops the emitting run early with
