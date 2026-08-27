@@ -78,9 +78,13 @@ All executors share the same lifecycle:
 One rule covers every executor that leaves the process: **out-of-process work
 needs importable, module-level callables.** A work item's function and arguments
 are serialized, and the standard `pickle` module can only send what it can look
-up by name — so a lambda, a closure, or a function defined in a notebook cell is
-refused with an [`ExecutionError`][ropt.exceptions.ExecutionError]. Installing
-`ropt[cloudpickle]` lifts that restriction, and lifts it for the process, local
+up by name. A lambda or a closure cannot be looked up at all, so it is refused
+before it is sent, with an
+[`ExecutionError`][ropt.exceptions.ExecutionError]. A function defined in a
+notebook cell is different: it *can* be looked up here, so it is sent by name,
+and the failure comes back from the worker — which reports the name it could
+not find, and what would have let it be sent by value instead. Installing
+`ropt[cloudpickle]` lifts the restriction, and lifts it for the process, local
 and HPC executors alike. `ThreadExecutor` serializes nothing and is never
 affected.
 
@@ -152,13 +156,30 @@ better served by a thread pool or by
 
 Each work item crosses a process boundary, so its function, arguments, and result
 must be serialized. If [`cloudpickle`](https://github.com/cloudpipe/cloudpickle)
-is installed (the `cloudpickle` extra), it is used for both directions: this
-serializes lambdas, closures, and interactively-defined functions (such as those
-written in a notebook cell) by value, so they can be used as task functions and
-returned as results. Without `cloudpickle`, the executor falls back to the
-standard `pickle` module, which requires the task function and its arguments to
-be importable, module-level objects; passing a lambda or closure then raises an
-[`ExecutionError`][ropt.exceptions.ExecutionError] suggesting the `cloudpickle` extra.
+is installed (the `cloudpickle` extra), it is used to *write*: this serializes
+lambdas, closures, and interactively-defined functions (such as those written in
+a notebook cell) by value, so they can be used as task functions and returned as
+results. Only writing has to choose. Reading is always the standard library's,
+which is what `cloudpickle` itself uses.
+
+Without `cloudpickle`, writing falls back to the standard `pickle` module, which
+requires the task function and its arguments to be importable, module-level
+objects. The two ways that can fail are worth telling apart:
+
+- A lambda or a closure cannot be written at all, so it is refused before it is
+  sent, with an [`ExecutionError`][ropt.exceptions.ExecutionError] naming the
+  extra.
+- A notebook-defined function *can* be written, because it is stored by name and
+  the name exists in your session. It fails in the worker, where that name does
+  not resolve. The worker reports it as the error it is, with a note saying what
+  could not be rebuilt.
+
+!!! note "What a worker cannot report"
+
+    The worker can only report a failure it survives to report. Anything that
+    goes wrong before it reaches your work item — the worker failing to start,
+    `ropt` failing to import, the entry module failing to re-import — still
+    surfaces as a lost worker rather than a described error.
 
 #### The `__main__` guard
 

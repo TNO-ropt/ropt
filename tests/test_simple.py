@@ -8,6 +8,7 @@
 from __future__ import annotations
 
 import os
+import pickle  # ruff: ignore[suspicious-pickle-import]
 import threading
 from functools import partial
 from typing import TYPE_CHECKING, Any
@@ -48,7 +49,7 @@ if TYPE_CHECKING:
     from numpy.typing import NDArray
 
 try:
-    import cloudpickle  # ruff: ignore[unused-import]
+    # The job path needs no extras of its own, so these tests run either way.
     import pysqa  # ruff: ignore[unused-import]
 
     from ropt.components.executors.__main__ import run_task
@@ -1253,8 +1254,8 @@ def test_optimize_with_process_pool(config: Any, test_functions: Any) -> None:
 @pytest.mark.slow
 def test_process_pool_without_cloudpickle(config: Any, monkeypatch: Any) -> None:
     monkeypatch.setattr(
-        "ropt.components.executors._process_executor._HAVE_CLOUDPICKLE",
-        False,
+        "ropt.components.executors._process_executor.dumps",
+        pickle.dumps,
     )
     with session() as active:
         result = optimize(
@@ -1267,8 +1268,8 @@ def test_process_pool_without_cloudpickle(config: Any, monkeypatch: Any) -> None
 @pytest.mark.slow
 def test_evaluate_without_cloudpickle(config: Any, monkeypatch: Any) -> None:
     monkeypatch.setattr(
-        "ropt.components.executors._process_executor._HAVE_CLOUDPICKLE",
-        False,
+        "ropt.components.executors._process_executor.dumps",
+        pickle.dumps,
     )
     with session() as active:
         result = evaluate(

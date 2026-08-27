@@ -9,11 +9,39 @@ being raised into a void.
 import os
 import sys
 import tempfile
+from collections.abc import Callable
 from pathlib import Path
+from typing import Any
 
+from ropt._serialize import CANNOT_DESERIALIZE, CANNOT_SERIALIZE, dump, load
 from ropt.components._transferred import check_transferred, reset_transferred
 from ropt.components.executors._picklable import picklable_exception
-from ropt.components.executors._serialize import dump, load
+
+
+def _load_task(
+    input_path: str,
+) -> tuple[Callable[..., Any], tuple[Any, ...], dict[str, Any]]:
+    try:
+        with Path(input_path).open("rb") as fp:
+            function, args, kwargs = load(fp)
+    except Exception as exc:
+        exc.add_note(f"Could not rebuild the task: {CANNOT_DESERIALIZE}.")
+        raise
+    return function, args, kwargs
+
+
+def _write_result(result: object, out_path: Path) -> None:
+    tmp_fd, tmp_path_str = tempfile.mkstemp(dir=out_path.parent)
+    tmp_path = Path(tmp_path_str)
+    try:
+        with os.fdopen(tmp_fd, "wb") as fp:
+            dump(result, fp)
+            fp.flush()
+            os.fsync(fp.fileno())
+        tmp_path.rename(out_path)
+    except BaseException:
+        tmp_path.unlink(missing_ok=True)
+        raise
 
 
 def main() -> int:
@@ -29,35 +57,26 @@ def run_task(input_path: str, output_path: str) -> int:
         output_path: File the serialized result is written to.
 
     Returns:
-        `0` if the task succeeded, `1` if the task function raised.
+        `0` if the task succeeded, `1` if it raised or its result could not be
+            written.
     """
     reset_transferred()
     try:
-        with Path(input_path).open("rb") as fp:
-            function, args, kwargs = load(fp)
+        function, args, kwargs = _load_task(input_path)
         check_transferred()
         result = function(*args, **kwargs)
         exit_code = 0
     except BaseException as exc:  # ruff: ignore[blind-except]
-        # Anything at all, including SystemExit: this process exists only to run
-        # the task, and the executor needs to hear how it went.
         result = picklable_exception(exc)
         exit_code = 1
     finally:
-        # Written and renamed into place, so the executor polling for the file
-        # never reads a partial result.
         out_path = Path(output_path)
-        tmp_fd, tmp_path_str = tempfile.mkstemp(dir=out_path.parent)
-        tmp_path = Path(tmp_path_str)
         try:
-            with os.fdopen(tmp_fd, "wb") as fp:
-                dump(result, fp)
-                fp.flush()
-                os.fsync(fp.fileno())
-            tmp_path.rename(out_path)
-        except BaseException:
-            tmp_path.unlink(missing_ok=True)
-            raise
+            _write_result(result, out_path)
+        except Exception as exc:  # ruff: ignore[blind-except]
+            exc.add_note(f"Could not send the result back: {CANNOT_SERIALIZE}.")
+            _write_result(picklable_exception(exc), out_path)
+            exit_code = 1
     return exit_code
 
 

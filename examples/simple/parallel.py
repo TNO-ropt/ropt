@@ -2,7 +2,7 @@
 
 A session hands out pools; passing one to `optimize` makes that call evaluate
 its realizations and gradient perturbations on it. Pass ``-m``/``--multiprocessing``
-to use a process pool instead of a thread pool (needs the ``cloudpickle`` extra).
+to use a process pool instead of a thread pool.
 """
 
 from __future__ import annotations

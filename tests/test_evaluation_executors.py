@@ -2,9 +2,12 @@ from __future__ import annotations
 
 import asyncio
 import collections
+import importlib
+import inspect
 import logging
 import os
 import pickle  # ruff: ignore[suspicious-pickle-import]
+import pkgutil
 import shutil
 import signal
 import subprocess  # ruff: ignore[suspicious-subprocess-import]
@@ -19,6 +22,7 @@ from typing import TYPE_CHECKING, Any, cast
 import numpy as np
 import pytest
 
+from ropt._serialize import HAVE_CLOUDPICKLE, dumps, loads
 from ropt.components.compute_steps import OptimizationStep
 from ropt.components.evaluators import (
     EvaluationFunctionCallback,
@@ -37,8 +41,7 @@ from ropt.components.executors import (
     WorkItem,
 )
 from ropt.components.executors._process_executor import (
-    _HAVE_CLOUDPICKLE,
-    _run_cloudpickled,
+    _run_payload,
 )
 from ropt.context import EnOptContext
 from ropt.evaluation import EvaluationBatchContext
@@ -65,14 +68,12 @@ from ropt.components.executors.__main__ import run_task
 from ropt.components.executors._picklable import picklable_exception
 
 try:
-    import pysqa  # ruff: ignore[unused-import]
+    import pysqa
+    from pysqa.wrapper.abstract import SchedulerCommands
 
     _TEST_HPC = True
 except ImportError:
     _TEST_HPC = False
-
-if _HAVE_CLOUDPICKLE:
-    import cloudpickle
 
 
 pytestmark = [pytest.mark.asyncio, pytest.mark.timeout(5)]
@@ -115,6 +116,10 @@ def _function(input_value: int, *, raise_error: bool = False) -> int:
 
 def _raise_unpicklable_error(_input: int) -> int:
     raise ValueError(threading.Lock())  # a lock cannot be (cloud)pickled
+
+
+def _return_unpicklable() -> Any:
+    return threading.Lock()  # a lock cannot be (cloud)pickled
 
 
 def _call(function: Callable[[], Any]) -> Any:
@@ -1036,26 +1041,36 @@ async def test_hpc_duplicate_name_fails_own_submission(
         executor.cancel()
 
 
-@pytest.mark.skipif(not _HAVE_CLOUDPICKLE, reason="cloudpickle is not installed")
-async def test_cloudpickled_worker_records_the_worker_traceback_as_a_note() -> None:
-    payload = cloudpickle.dumps((partial(_function, 0, raise_error=True), (), {}))
+async def test_worker_records_the_worker_traceback_as_a_note() -> None:
+    payload = dumps((partial(_function, 0, raise_error=True), (), {}))
     await asyncio.sleep(0)  # this module runs tests on the event loop
-    ok, blob = _run_cloudpickled(payload)
+    ok, blob = _run_payload(payload)
     assert not ok
-    exc = cloudpickle.loads(blob)
+    exc = loads(blob)
     assert isinstance(exc, ValueError)
     assert any("Traceback" in note for note in exc.__notes__)
 
 
-@pytest.mark.skipif(not _HAVE_CLOUDPICKLE, reason="cloudpickle is not installed")
-async def test_cloudpickled_worker_wraps_an_unpicklable_exception() -> None:
-    payload = cloudpickle.dumps((_raise_unpicklable_error, (0,), {}))
+async def test_worker_wraps_an_unpicklable_exception() -> None:
+    payload = dumps((_raise_unpicklable_error, (0,), {}))
     await asyncio.sleep(0)  # this module runs tests on the event loop
-    ok, blob = _run_cloudpickled(payload)
+    ok, blob = _run_payload(payload)
     assert not ok
-    exc = cloudpickle.loads(blob)
+    exc = loads(blob)
     assert isinstance(exc, RuntimeError)
     assert any("Traceback" in note for note in exc.__notes__)
+
+
+async def test_a_result_that_cannot_be_sent_is_not_blamed_on_the_function() -> None:
+    # The call itself succeeded and only its result could not be serialized.
+    # Reporting that as the function raising is the misdiagnosis the second
+    # `try` exists to remove, so the note has to name the result, not the call.
+    payload = dumps((_return_unpicklable, (), {}))
+    await asyncio.sleep(0)  # this module runs tests on the event loop
+    ok, blob = _run_payload(payload)
+    assert not ok
+    exc = loads(blob)
+    assert any("Could not send the result back" in note for note in exc.__notes__)
 
 
 @pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
@@ -1064,10 +1079,12 @@ async def test_hpc_job_exit_writes_output_file(
 ) -> None:
     input_file = tmp_path / "job.in"
     output_file = tmp_path / "job.out"
-    input_file.write_bytes(cloudpickle.dumps((_exit_task, (), {})))
+    # Serialized with the shim, which is what the job path itself uses: the
+    # task is a module-level function, so this runs with or without the extra.
+    input_file.write_bytes(dumps((_exit_task, (), {})))
     await asyncio.sleep(0)  # this module runs tests on the event loop
     assert run_task(str(input_file), str(output_file)) == 1
-    assert isinstance(cloudpickle.loads(output_file.read_bytes()), SystemExit)
+    assert isinstance(loads(output_file.read_bytes()), SystemExit)
 
 
 async def test_job_wraps_an_exception_the_standard_library_cannot_send(
@@ -1090,7 +1107,80 @@ async def test_job_wraps_an_exception_the_standard_library_cannot_send(
     assert any("Traceback" in note for note in result.__notes__)
 
 
-@pytest.mark.skipif(not _HAVE_CLOUDPICKLE, reason="cloudpickle is not installed")
+def _vanishing_work_item() -> int:
+    return 1
+
+
+def _vanishing_job_task() -> int:
+    return 1
+
+
+async def test_a_work_item_the_worker_cannot_rebuild_reports_why(
+    monkeypatch: Any,
+) -> None:
+    # It pickles, because the name resolves here. The worker is where it does
+    # not, which is why no send-side check can catch this and why the load has
+    # to happen somewhere the failure can be reported.
+    payload = pickle.dumps((_vanishing_work_item, (), {}))
+    monkeypatch.delattr(sys.modules[__name__], "_vanishing_work_item")
+    await asyncio.sleep(0)  # this module runs tests on the event loop
+    ok, blob = _run_payload(payload)
+    assert not ok
+    exc = loads(blob)
+    assert isinstance(exc, AttributeError)
+    assert any("Could not rebuild the work item" in note for note in exc.__notes__)
+
+
+async def test_a_task_the_job_cannot_rebuild_reports_why(
+    tmp_path: Path, monkeypatch: Any
+) -> None:
+    # The same failure on the job path, where it matters most: the job has no
+    # channel back, so the note in the result file is the whole diagnosis.
+    input_file = tmp_path / "job.in"
+    output_file = tmp_path / "job.out"
+    input_file.write_bytes(pickle.dumps((_vanishing_job_task, (), {})))
+    monkeypatch.delattr(sys.modules[__name__], "_vanishing_job_task")
+    await asyncio.sleep(0)  # this module runs tests on the event loop
+    assert run_task(str(input_file), str(output_file)) == 1
+    result = loads(output_file.read_bytes())
+    assert isinstance(result, AttributeError)
+    assert any("Could not rebuild the task" in note for note in result.__notes__)
+
+
+async def test_the_hint_stays_off_the_task_s_own_exception(
+    tmp_path: Path,
+) -> None:
+    # The load and the call are separated precisely so this exception, which is
+    # the task's own, carries no advice about rebuilding it.
+    input_file = tmp_path / "job.in"
+    output_file = tmp_path / "job.out"
+    input_file.write_bytes(dumps((partial(_function, 0, raise_error=True), (), {})))
+    await asyncio.sleep(0)  # this module runs tests on the event loop
+    assert run_task(str(input_file), str(output_file)) == 1
+    result = loads(output_file.read_bytes())
+    assert isinstance(result, ValueError)
+    assert not any("Could not rebuild" in note for note in result.__notes__)
+
+
+async def test_a_result_that_cannot_be_written_still_reaches_the_executor(
+    tmp_path: Path,
+) -> None:
+    # The task ran to completion; only its result could not be written. Letting
+    # that escape leaves no file at all, and a missing file is reported as a job
+    # that produced nothing -- the same misdiagnosis in a different disguise.
+    input_file = tmp_path / "job.in"
+    output_file = tmp_path / "job.out"
+    input_file.write_bytes(dumps((_return_unpicklable, (), {})))
+    await asyncio.sleep(0)  # this module runs tests on the event loop
+    assert run_task(str(input_file), str(output_file)) == 1
+    result = loads(output_file.read_bytes())
+    assert any("Could not send the result back" in note for note in result.__notes__)
+    # The abandoned first attempt takes its temporary file with it.
+    names = await asyncio.to_thread(lambda: sorted(p.name for p in tmp_path.iterdir()))
+    assert names == ["job.in", "job.out"]
+
+
+@pytest.mark.skipif(not HAVE_CLOUDPICKLE, reason="cloudpickle is not installed")
 async def test_job_sends_an_exception_the_standard_library_cannot_send() -> None:
     # The same exception, with `cloudpickle` present: it survives as itself, so
     # the wrapping above is a fallback rather than what always happens.
@@ -1277,9 +1367,7 @@ async def test_executor_error(
         with pytest.raises(ValueError, match="Test error in function") as excinfo:
             await asyncio.to_thread(_collect, submission)
         assert executor._running.is_set()  # ruff: ignore[private-member-access]
-        expects_notes = executor_name == "hpc" or (
-            executor_name == "multiprocessing" and _HAVE_CLOUDPICKLE
-        )
+        expects_notes = executor_name in {"hpc", "multiprocessing"}
         if expects_notes:
             notes = getattr(excinfo.value, "__notes__", [])
             assert any("Test error in function" in note for note in notes)
@@ -1777,6 +1865,149 @@ async def test_hpc_out_of_range_setting_rejected(  # ruff: ignore[unused-async]
         HPCExecutor(workdir=tmp_path, template="", **kwargs)
 
 
+@pytest.fixture
+def pysqa_config(tmp_path: Path) -> Path:
+    """A `pysqa` configuration with two clusters and no scheduler behind it.
+
+    `HPCExecutor` looks for `<config_path>/<queue_type>`, so the tree is built
+    to match. Nothing here needs a queueing system to exist: `pysqa` only reads
+    these files, which is what makes the whole cluster-selection path testable
+    on a machine that has no scheduler at all.
+
+    Returns:
+        The directory to pass as `config_path`, holding a `slurm` subdirectory.
+    """
+    root = tmp_path / "pysqa" / "slurm"
+    root.mkdir(parents=True)
+    (root / "job.sh").write_text(
+        "#!/bin/bash\n#SBATCH --job-name={{job_name}}\n"
+        "#SBATCH --output={{output}}\n{{command}}\n"
+    )
+    (root / "cluster_a.yaml").write_text(
+        "queue_type: SLURM\nqueue_primary: fast\nqueues:\n"
+        "  fast: {cores_max: 4, cores_min: 1, run_time_max: 3600, script: job.sh}\n"
+        "  shared: {cores_max: 8, cores_min: 1, run_time_max: 3600, script: job.sh}\n"
+    )
+    (root / "cluster_b.yaml").write_text(
+        "queue_type: SLURM\nqueue_primary: bulk\nqueues:\n"
+        "  bulk: {cores_max: 16, cores_min: 1, run_time_max: 7200, script: job.sh}\n"
+        "  shared: {cores_max: 8, cores_min: 1, run_time_max: 7200, script: job.sh}\n"
+    )
+    (root / "clusters.yaml").write_text(
+        "cluster_primary: cluster_a\ncluster:\n"
+        "  cluster_a: cluster_a.yaml\n  cluster_b: cluster_b.yaml\n"
+    )
+    return tmp_path / "pysqa"
+
+
+@pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
+async def test_hpc_executor_builds_from_a_configuration_directory(  # ruff: ignore[unused-async]
+    tmp_path: Path, pysqa_config: Path
+) -> None:
+    # The other branch of the constructor: every other test passes a template,
+    # so this one was never built by a test at all.
+    executor = HPCExecutor(
+        workdir=tmp_path, config_path=pysqa_config, cluster="cluster_b"
+    )
+    adapter = executor._queue_adapter  # ruff: ignore[private-member-access]
+    assert adapter.list_clusters() == ["cluster_a", "cluster_b"]
+    assert adapter.queue_list == ["bulk", "shared"]
+
+
+@pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
+async def test_hpc_executor_selects_the_cluster_holding_the_queue(  # ruff: ignore[unused-async]
+    tmp_path: Path, pysqa_config: Path
+) -> None:
+    executor = HPCExecutor(workdir=tmp_path, config_path=pysqa_config, queue="bulk")
+    assert executor._queue_adapter.queue_list == ["bulk", "shared"]  # ruff: ignore[private-member-access]
+
+
+@pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
+@pytest.mark.parametrize(
+    ("kwargs", "match"),
+    [
+        ({"cluster": "nowhere"}, "Unknown HPC cluster"),
+        ({"queue": "nowhere"}, "not available on any HPC cluster"),
+        ({"cluster": "cluster_a", "queue": "bulk"}, "not available on HPC cluster"),
+        ({"queue": "shared"}, "available on multiple HPC clusters"),
+    ],
+)
+async def test_hpc_cluster_selection_rejects_what_it_cannot_resolve(  # ruff: ignore[unused-async]
+    tmp_path: Path, pysqa_config: Path, kwargs: dict[str, Any], match: str
+) -> None:
+    with pytest.raises(ExecutionError, match=match):
+        HPCExecutor(workdir=tmp_path, config_path=pysqa_config, **kwargs)
+
+
+@pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
+async def test_pysqa_still_accepts_what_the_executor_passes_by_name() -> None:  # ruff: ignore[unused-async]
+    # Hand-written rather than `create_autospec`, deliberately: a spec'd mock
+    # accepts arbitrary keywords, so it would wave through exactly the change
+    # this is here to catch.
+    signature = inspect.signature(pysqa.QueueAdapter.submit_job)
+    for name in (
+        "job_name",
+        "working_directory",
+        "command",
+        "submission_template",
+        "queue",
+        "cores",
+    ):
+        assert name in signature.parameters, name
+
+    # `output` is not one of them: it is a jinja2 variable for the submission
+    # template, which reaches it through `**kwargs`. Removing that catch-all
+    # would turn the executor's `output=` into a `TypeError` at submit time,
+    # so both halves have to be pinned.
+    assert "output" not in signature.parameters
+    assert any(
+        parameter.kind is inspect.Parameter.VAR_KEYWORD
+        for parameter in signature.parameters.values()
+    )
+
+
+def _scheduler_wrappers() -> dict[str, Any]:
+    package = importlib.import_module("pysqa.wrapper")
+    wrappers: dict[str, Any] = {}
+    for info in pkgutil.iter_modules(package.__path__):
+        try:
+            module = importlib.import_module(f"pysqa.wrapper.{info.name}")
+        except ImportError:
+            # Some wrappers need their scheduler's own Python package.
+            continue
+        for _, cls in inspect.getmembers(module, inspect.isclass):
+            if (
+                issubclass(cls, SchedulerCommands)
+                and cls is not SchedulerCommands
+                and cls.__module__ == module.__name__
+            ):
+                wrappers[info.name] = cls
+    return wrappers
+
+
+@pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
+async def test_pysqa_names_the_job_id_column_jobid() -> None:  # ruff: ignore[unused-async]
+    # `_live_job_ids` indexes the result with `"jobid"`, so the name is a
+    # contract. It holds for every wrapper that implements the conversion at
+    # all -- but only for those, which is why the claim is scoped rather than
+    # made about "all wrappers".
+    checked = []
+    for name, cls in _scheduler_wrappers().items():
+        if "convert_queue_status" not in vars(cls):
+            continue
+        try:
+            frame = cls.convert_queue_status("")
+        except Exception:  # ruff: ignore[blind-except, try-except-continue]
+            # Its parser expects a header this test would have to fabricate
+            # per scheduler, which is a coupling worse than the one it checks.
+            continue
+        assert "jobid" in frame.columns, name
+        checked.append(name)
+
+    # Without this the loop above passes by checking nothing at all.
+    assert "slurm" in checked, checked
+
+
 async def test_aborting_submission_raises_executor_stopped() -> None:  # ruff: ignore[unused-async]
     submission = Submission([WorkItem(function=_function, args=(0,))])
     submission.abort()
@@ -2219,7 +2450,7 @@ async def test_multiprocessing_unguarded_main_reports_startup_error(
 
 
 @pytest.mark.slow
-@pytest.mark.skipif(not _HAVE_CLOUDPICKLE, reason="cloudpickle is not installed")
+@pytest.mark.skipif(not HAVE_CLOUDPICKLE, reason="cloudpickle is not installed")
 async def test_multiprocessing_cloudpickles_functions_and_results() -> None:
     def make_adder(offset: int) -> Callable[[int], int]:
         def add(value: int) -> int:
@@ -2265,8 +2496,10 @@ async def test_multiprocessing_unserializable_payload_reports_error() -> None:
     async with asyncio.TaskGroup() as tg:
         await executor.start(tg)
         executor.submit(submission)
-        # The serialization failure is delivered as the exception, not a teardown.
-        with pytest.raises(Exception, match=r"(?i)pickle"):
+        # The serialization failure is delivered as the exception, not a
+        # teardown, and as ours: this path used to let the serializer's own
+        # error through untouched, whatever it happened to say.
+        with pytest.raises(ExecutionError, match="could not be sent"):
             await asyncio.to_thread(_collect, submission)
         assert executor._running.is_set()  # ruff: ignore[private-member-access]
         executor.cancel()
@@ -2278,15 +2511,18 @@ async def test_multiprocessing_without_cloudpickle_rejects_lambda(
     monkeypatch: Any,
 ) -> None:
     monkeypatch.setattr(
-        "ropt.components.executors._process_executor._HAVE_CLOUDPICKLE",
-        False,
+        "ropt.components.executors._process_executor.dumps",
+        pickle.dumps,
     )
     submission = Submission([WorkItem(function=lambda: 1)])
     executor = ProcessExecutor(workers=1)
     async with asyncio.TaskGroup() as tg:
         await executor.start(tg)
         executor.submit(submission)
-        with pytest.raises(ExecutionError, match=r"ropt\[cloudpickle\]"):
+        # The stable half of the message. What follows the colon depends on
+        # whether the extra is installed, and this test forces the standard
+        # library rather than uninstalling it.
+        with pytest.raises(ExecutionError, match="could not be sent"):
             await asyncio.to_thread(_collect, submission)
         assert executor._running.is_set()  # ruff: ignore[private-member-access]
         executor.cancel()
@@ -2300,15 +2536,15 @@ async def test_multiprocessing_without_cloudpickle_rejects_an_unpicklable_argume
     # ParallelEvaluator submits a picklable module-level function and passes the
     # user callback as an argument, so the arguments must be checked too.
     monkeypatch.setattr(
-        "ropt.components.executors._process_executor._HAVE_CLOUDPICKLE",
-        False,
+        "ropt.components.executors._process_executor.dumps",
+        pickle.dumps,
     )
     submission = Submission([WorkItem(function=_call, args=(lambda: 1,))])
     executor = ProcessExecutor(workers=1)
     async with asyncio.TaskGroup() as tg:
         await executor.start(tg)
         executor.submit(submission)
-        with pytest.raises(ExecutionError, match=r"ropt\[cloudpickle\]"):
+        with pytest.raises(ExecutionError, match="could not be sent"):
             await asyncio.to_thread(_collect, submission)
         executor.cancel()
 

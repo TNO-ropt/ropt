@@ -19,7 +19,7 @@ from ropt.exceptions import ExecutorStopped, WorkflowError
 from ropt.simple import Session, WorkerPool, serial_pool, session
 
 try:
-    import cloudpickle  # ruff: ignore[unused-import]
+    # The job path needs no extras of its own, so these tests run either way.
     import pysqa  # ruff: ignore[unused-import]
 
     _TEST_HPC = True
@@ -197,7 +197,7 @@ def test_process_pool_runs_work() -> None:
         assert _run_on(pool, partial(_double, 21)) == 42
 
 
-@pytest.mark.skipif(not _TEST_HPC, reason="pysqa or cloudpickle not installed")
+@pytest.mark.skipif(not _TEST_HPC, reason="pysqa is not installed")
 def test_hpc_pool_starts_and_stops(tmp_path: Any) -> None:
     with session() as active:
         pool = active.hpc_pool(workers=1, workdir=tmp_path, template="#!/bin/bash\n")

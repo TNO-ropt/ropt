@@ -97,7 +97,7 @@ and its kin do their work outside Python and let the other threads run
 meanwhile. "My objective computes" is therefore not on its own a reason to reach
 past this pool — see [Which one should I use?](#which-one-should-i-use).
 
-### `process_pool` — a pool of separate processes
+### `process_pool` — a pool of separate processes { #process-pool }
 
 ```python
 pool = s.process_pool(workers=4)
@@ -132,7 +132,7 @@ the rest of your program. See
     warns you. If your objective launches external programs, use `local_pool`
     below, which was built for exactly this.
 
-### `local_pool` — one process per evaluation, on this machine
+### `local_pool` — one process per evaluation, on this machine { #local-pool }
 
 ```python
 pool = s.local_pool(workers=4)
