@@ -1,18 +1,29 @@
-from importlib.util import module_from_spec, spec_from_file_location
+import importlib
+import sys
 from pathlib import Path
 from typing import Any
 
 import pytest
 
+_EXAMPLES = Path(__file__).parent.parent / "examples"
+
+
+@pytest.fixture(autouse=True)
+def _examples_importable(monkeypatch: Any) -> None:
+    # Run as scripts, the examples' functions live in `__main__`, which `spawn`
+    # re-imports, so a worker rebuilds them by name and no example needs
+    # `cloudpickle`. Executing the file here under a name nothing can import
+    # would break that and make the tests demand an extra the examples do not.
+    for sub_path in ("advanced", "simple"):
+        monkeypatch.syspath_prepend(str(_EXAMPLES / sub_path))
+
 
 def _load_from_file(name: str, sub_path: str = "advanced") -> Any:
-    path = Path(__file__).parent.parent / "examples" / sub_path / f"{name}.py"
-    spec = spec_from_file_location(name, path)
-    assert spec is not None
-    module = module_from_spec(spec)
-    assert spec.loader is not None
-    spec.loader.exec_module(module)
-    return module
+    assert (_EXAMPLES / sub_path / f"{name}.py").exists()
+    # Popped rather than reused: a parametrized test loads the same example
+    # again, and it should start from the top as a script would.
+    sys.modules.pop(name, None)
+    return importlib.import_module(name)
 
 
 @pytest.mark.parametrize("merge", [True, False])
@@ -85,10 +96,6 @@ def test_example_simple_restart(tmp_path: Path, monkeypatch: Any) -> None:
 @pytest.mark.slow
 def test_example_simple_nested_optimization(tmp_path: Path, monkeypatch: Any) -> None:
     pytest.importorskip("polars")
-    # Not the example's own requirement: run as a script its functions live in
-    # `__main__`, which spawn re-imports. Loading it here under a name the
-    # worker cannot import is what defeats pickle-by-reference.
-    pytest.importorskip("cloudpickle")
     monkeypatch.chdir(tmp_path)
     _load_from_file("nested_optimization", "simple").main()
 
