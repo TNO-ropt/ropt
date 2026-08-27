@@ -299,12 +299,12 @@ flowchart LR
 
 ??? info "How data crosses the boundary"
     To move work and results between processes, `ropt` **serializes** them —
-    turns the objects into bytes and rebuilds them on the other side. A process
-    pool uses Python's standard `pickle`, so an objective defined at module level
-    works as is; a lambda, a closure, or a notebook-defined objective needs the
-    `cloudpickle` extra, which an HPC pool always uses. Most functions and data
-    serialize fine, but things like open files, locks, or database connections
-    may not.
+    turns the objects into bytes and rebuilds them on the other side. Both a
+    process pool and an HPC pool use Python's standard `pickle` by default, so
+    an objective defined at module level works as is; a lambda, a closure, or a
+    notebook-defined objective needs the optional `cloudpickle` extra. Most
+    functions and data serialize fine, but things like open files, locks, or
+    database connections may not.
 
     On a process pool the bytes travel over an in-machine channel. On an HPC pool
     they are written as **files on a shared filesystem** that the cluster nodes

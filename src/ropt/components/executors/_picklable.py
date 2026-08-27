@@ -2,7 +2,7 @@
 
 import traceback
 
-from ._serialize import dumps, loads
+from ropt._serialize import dumps, loads
 
 
 def picklable_exception(exc: BaseException) -> BaseException:

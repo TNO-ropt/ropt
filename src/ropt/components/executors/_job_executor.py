@@ -36,9 +36,9 @@ from typing import TYPE_CHECKING, Any, Final
 from uuid import uuid4
 
 from ropt._logging import get_logger
+from ropt._serialize import CANNOT_SERIALIZE, dump, load
 from ropt.exceptions import ExecutionError, ExecutorFailure, WorkflowError
 
-from ._serialize import CANNOT_SERIALIZE, dump, load
 from .base import ExecutorBase, Submission, WorkItem
 
 if TYPE_CHECKING:

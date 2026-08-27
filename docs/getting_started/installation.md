@@ -23,19 +23,25 @@ which are enough for most basic optimization tasks.
 | -------------- | ----------------------- | ---------------------------------------------------------- |
 | `pandas`       | `pandas`                | Exporting results to pandas data frames.                   |
 | `polars`       | `polars`                | Exporting results to polars data frames.                   |
-| `cloudpickle`  | `cloudpickle`           | Running lambdas, closures, and notebook-defined functions in external processes. |
+| `cloudpickle`  | `cloudpickle`           | Optional everywhere: lets lambdas, closures, and notebook-defined code cross a process boundary. |
 | `hpc`          | `pysqa`                 | Running evaluations on HPC clusters.                       |
 
-Without `cloudpickle`, code that runs in external processes is transferred using
-Python's standard `pickle` module, which only supports plain, named functions
-imported from a module. Installing `cloudpickle` lifts that restriction, so
-functions defined inline (lambdas), functions defined inside other functions
-(closures), and functions defined in a Jupyter notebook can be used too. The
-same rule applies wherever the work leaves your process: process pools, local
-jobs and cluster jobs alike.
+Without `cloudpickle`, anything that crosses a process boundary is transferred
+using Python's standard `pickle` module, which only handles functions and
+classes it can look up by name — those defined at the top level of an importable
+module. Installing `cloudpickle` lifts that restriction, so code defined inline
+(lambdas), inside another function (closures), or in a Jupyter notebook can
+cross as well.
 
-`cloudpickle` is also required to [run the optimizer
-itself in a separate process](../optimizer_setup/configuration.md#external-backend).
+`cloudpickle` is optional in every case. It never changes what `ropt` can do,
+only where you are free to define the code it carries, and each place it applies
+works without it:
+
+| Where | Works without `cloudpickle` | What `cloudpickle` adds |
+| ----- | --------------------------- | ----------------------- |
+| [Process pools](../getting_started/execution.md#process-pool) | Module-level evaluation functions | Lambdas, closures, and notebook-defined evaluation functions |
+| [Local and cluster jobs](../getting_started/execution.md#local-pool) | Module-level evaluation functions | The same, plus results built from locally defined classes |
+| [The external backend](../optimizer_setup/configuration.md#external-backend) | The built-in plugins, and any plugin class in an importable module | Plugin instances of classes defined in a function or a notebook |
 
 Install with:
 

@@ -8,8 +8,10 @@ import pytest
 _EXAMPLES = Path(__file__).parent.parent / "examples"
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture(autouse=True)  # ruff: ignore[pytest-fixture-autouse]
 def _examples_importable(monkeypatch: Any) -> None:
+    # Autouse because every test in this module loads an example by bare name,
+    # so requesting it explicitly would add an unused argument to all of them.
     # Run as scripts, the examples' functions live in `__main__`, which `spawn`
     # re-imports, so a worker rebuilds them by name and no example needs
     # `cloudpickle`. Executing the file here under a name nothing can import

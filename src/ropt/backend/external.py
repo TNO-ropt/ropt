@@ -2,18 +2,19 @@
 
 from __future__ import annotations
 
+import contextlib
 import multiprocessing
 import queue
 import traceback
 from functools import partial
-from importlib.util import find_spec
 from typing import TYPE_CHECKING, Any, Final
 
 import numpy as np
 
 from ropt._logging import get_logger
+from ropt._serialize import CANNOT_DESERIALIZE, CANNOT_SERIALIZE, dumps, loads
 from ropt.backend import Backend
-from ropt.exceptions import OptimizerStop, UnsupportedError
+from ropt.exceptions import ExecutionError, OptimizerStop
 from ropt.plugins.manager import get_plugin
 
 if TYPE_CHECKING:
@@ -26,12 +27,6 @@ if TYPE_CHECKING:
     from ropt.core import OptimizerCallback, OptimizerCallbackResult
 
 _logger = get_logger(__name__)
-
-_HAVE_CLOUDPICKLE: Final = find_spec("cloudpickle") is not None
-
-if _HAVE_CLOUDPICKLE:
-    import cloudpickle
-
 
 _PROCESS_TIMEOUT: Final = 10
 _QUEUE_POLL_INTERVAL: Final = 1.0
@@ -67,8 +62,13 @@ class ExternalBackend(Backend):
     the prefix is not supported by this backend.
 
     Note:
-        The `cloudpickle` package must be installed. If it is absent,
-        instantiation raises `NotImplementedError`.
+        The problem is sent to the child process by serializing it, so
+        everything the delegate needs must be serializable. The standard
+        library can send anything that can be looked up by name, which covers
+        the built-in plugins and any plugin class defined in an importable
+        module. Installing the optional `cloudpickle` extra lifts that
+        restriction, so plugin instances of classes defined inside a function
+        or a notebook can be sent as well.
     """
 
     def __init__(self, backend_config: BackendConfig) -> None:
@@ -77,14 +77,7 @@ class ExternalBackend(Backend):
         Args:
             backend_config: The backend configuration; its `method` field must
                             be prefixed with `external/`.
-
-        Raises:
-            UnsupportedError: If `cloudpickle` is not installed.
         """
-        if not _HAVE_CLOUDPICKLE:
-            msg = "ExternalBackend requires the cloudpickle module; install ropt[cloudpickle]."
-            raise UnsupportedError(msg)
-
         self._backend_config = backend_config.model_copy(
             update={"method": backend_config.method.split("/", maxsplit=1)[1]}
         )
@@ -104,23 +97,15 @@ class ExternalBackend(Backend):
     def start(  # ruff: ignore[undocumented-public-method]
         self, initial_values: NDArray[np.float64]
     ) -> None:
+        payload = self._serialize(initial_values)
+
         context = multiprocessing.get_context("spawn")
         request_queue = context.Queue()
         result_queue = context.Queue()
 
         process = context.Process(
             target=_run,
-            args=(
-                cloudpickle.dumps(
-                    {
-                        "config": self._backend_config,
-                        "context": self._context,
-                        "initial_values": initial_values,
-                    }
-                ),
-                request_queue,
-                result_queue,
-            ),
+            args=(payload, request_queue, result_queue),
         )
 
         result: OptimizerCallbackResult | None
@@ -175,6 +160,22 @@ class ExternalBackend(Backend):
     def is_parallel(self) -> bool:  # ruff: ignore[undocumented-public-method]
         return self._is_parallel
 
+    def _serialize(self, initial_values: NDArray[np.float64]) -> bytes:
+        try:
+            return dumps(
+                {
+                    "config": self._backend_config,
+                    "context": self._context,
+                    "initial_values": initial_values,
+                }
+            )
+        except Exception as exc:
+            msg = (
+                "The optimization could not be sent to an external process: "
+                f"{CANNOT_SERIALIZE}."
+            )
+            raise ExecutionError(msg) from exc
+
 
 def _shutdown(
     process: BaseProcess,
@@ -202,29 +203,43 @@ def _run(
     request_queue: multiprocessing.Queue[dict[str, Any] | None],
     result_queue: multiprocessing.Queue[OptimizerCallbackResult | None],
 ) -> None:
-    data_dict = cloudpickle.loads(data)
-    config = data_dict["config"]
-    context = data_dict["context"]
-    initial_values = data_dict["initial_values"]
-
-    backend_plugin = get_plugin("backend", method=config.method)
-    backend = backend_plugin.create(config)
-    context = context.model_copy(update={"backend": backend})
-    backend.init(
-        context,
-        partial(_callback, request_queue=request_queue, result_queue=result_queue),
-    )
-
     try:
-        backend.start(np.asarray(initial_values, dtype=np.float64))
-    except _DriverStopped:
-        pass  # the driver already holds the real error; nothing to report
+        backend, initial_values = _prepare(data, request_queue, result_queue)
+        # Suppressed rather than handled, and deliberately not spanning
+        # `_prepare`: this arm reports nothing while the `finally` queues the
+        # sentinel either way, so letting it cover setup would turn a setup
+        # failure into a run that ends with no error and no result.
+        # `backend.start` is also the only place it is raised from.
+        with contextlib.suppress(_DriverStopped):
+            backend.start(initial_values)
     except OptimizerStop as exc:
         request_queue.put({"stop": True, "exit_code": exc.exit_code})
     except Exception as exc:  # ruff: ignore[blind-except]
         request_queue.put(_encode_child_exception(exc))
     finally:
         request_queue.put(None)
+
+
+def _prepare(
+    data: bytes,
+    request_queue: multiprocessing.Queue[dict[str, Any] | None],
+    result_queue: multiprocessing.Queue[OptimizerCallbackResult | None],
+) -> tuple[Backend, NDArray[np.float64]]:
+    # Workflow objects arrive as inert placeholders and are never used here.
+    try:
+        data_dict = loads(data)
+    except Exception as exc:
+        exc.add_note(f"Could not rebuild the optimization: {CANNOT_DESERIALIZE}.")
+        raise
+
+    config = data_dict["config"]
+    backend = get_plugin("backend", method=config.method).create(config)
+    context = data_dict["context"].model_copy(update={"backend": backend})
+    backend.init(
+        context,
+        partial(_callback, request_queue=request_queue, result_queue=result_queue),
+    )
+    return backend, np.asarray(data_dict["initial_values"], dtype=np.float64)
 
 
 def _callback(
@@ -244,8 +259,7 @@ def _callback(
     )
     result = result_queue.get()
     if result is None:
-        # The driver's evaluation callback failed; unwind this optimizer. The
-        # driver re-raises the real exception, so nothing is reported back here.
+        # The evaluation callback failed. The driver re-raises the exception.
         raise _DriverStopped
     return result
 
@@ -268,11 +282,12 @@ def _handle_request(
 def _encode_child_exception(exc: BaseException) -> dict[str, Any]:
     tb_str = traceback.format_exc()
     try:
-        pickled = cloudpickle.dumps(exc)
+        pickled = dumps(exc)
     except Exception:  # ruff: ignore[blind-except]
+        notes = "".join(f"\n{note}" for note in getattr(exc, "__notes__", []))
         return {
             "error": type(exc).__name__,
-            "message": str(exc),
+            "message": f"{exc}{notes}",
             "traceback": tb_str,
         }
     return {"exception": pickled, "traceback": tb_str}
@@ -281,7 +296,7 @@ def _encode_child_exception(exc: BaseException) -> dict[str, Any]:
 def _decode_child_exception(request: dict[str, Any]) -> Exception:
     tb_str = request.get("traceback", "")
     try:
-        original = cloudpickle.loads(request["exception"])
+        original = loads(request["exception"])
     except Exception:  # ruff: ignore[blind-except]
         return _wrap_with_traceback(
             "External backend exception could not be deserialized", tb_str

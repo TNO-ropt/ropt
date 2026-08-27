@@ -466,10 +466,18 @@ Two details differ from the other backends:
   `external/method`. The `external/` prefix is removed and the rest is resolved
   like any other method string. `external` is never selected implicitly, so it
   is used only when you ask for it by name.
-- It needs the `cloudpickle` extra (see
+- The problem is sent to the child process, so everything describing it must be
+  serializable. The built-in plugins are, and so is any plugin class defined in
+  a module that can be imported. Only if you pass a plugin instance of a class
+  defined inside a function or a notebook do you need the optional
+  `cloudpickle` extra (see
   [Installation](../getting_started/installation.md#optional-extras)). Without
-  it, building the context raises
-  [`UnsupportedError`][ropt.exceptions.UnsupportedError].
+  it the two differ in *where* they fail: a class defined inside a function
+  cannot be sent at all, and is refused here with an
+  [`ExecutionError`][ropt.exceptions.ExecutionError]; a class defined in a
+  notebook is sent by name, and the failure arrives from the child, which
+  reports the name it could not find. Your objective function is never
+  affected: it stays in this process.
 
 This has nothing to do with evaluating in parallel; for that see [Running in
 Parallel](../getting_started/execution.md).

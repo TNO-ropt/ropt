@@ -36,8 +36,8 @@ class ExecutionError(RoptError):
 class UnsupportedError(RoptError):
     """An optional dependency is missing or a requested feature is unsupported.
 
-    For example a required extra (such as pandas or cloudpickle) is not
-    installed, or the selected plugin does not support the requested method.
+    For example a required extra (such as pandas or polars) is not installed,
+    or the selected plugin does not support the requested method.
     """
 
 

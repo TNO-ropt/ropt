@@ -204,11 +204,11 @@ class SciPyBackend(Backend):
                 self._options["updating"] = "deferred"
                 self._options["workers"] = 1
             assert self._bounds is not None
-            differential_evolution(
-                func=self._function,  # type: ignore[arg-type]
+            differential_evolution(  # type: ignore[call-overload]
+                func=self._function,
                 x0=initial_values[self._context.variables.mask],
                 bounds=self._bounds,
-                constraints=self._constraints,  # type: ignore[arg-type]
+                constraints=self._constraints,
                 polish=False,
                 vectorized=self._parallel,
                 **self._options,
