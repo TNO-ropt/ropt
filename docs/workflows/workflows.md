@@ -302,10 +302,10 @@ Mixing the two, or registering with a second dispatcher, raises a
 
 !!! note "Handlers are process-local"
 
-    An event handler cannot be transferred to another process. Serializing one
-    (for example when a task dispatched to a worker captures it) reconstructs it
-    in the worker as an inert placeholder; `ropt` detects this and raises a
-    [`TransferError`][ropt.exceptions.TransferError] before the task runs.
+    An event handler cannot be transferred to another process. It holds a lock,
+    so serializing one — for example when a task dispatched to a worker
+    captures it — fails, and the submission is refused with an
+    [`ExecutionError`][ropt.exceptions.ExecutionError].
     Create handlers inside the worker and return their results
     as data. See
     [Nested workflows and process boundaries](parallel.md#nested-workflows-and-process-boundaries).

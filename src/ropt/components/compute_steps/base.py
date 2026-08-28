@@ -7,7 +7,6 @@ import threading
 from abc import ABC, abstractmethod
 from typing import Any
 
-from ropt.components._transferred import _make_placeholder
 from ropt.components.event_handlers import EventHandler
 from ropt.exceptions import WorkflowError
 
@@ -61,12 +60,6 @@ class ComputeStep(ABC):
         self._running = False
         self._run_lock = threading.Lock()
         self._stop_flag = threading.Event()
-
-    def __reduce__(self) -> tuple[object, tuple[str]]:  # ruff: ignore[undocumented-magic-method]
-        # A step drives its run, and its handlers, from the process it was
-        # started in, so it cannot follow work into a worker; it arrives there
-        # as a placeholder, which the worker reports by name.
-        return (_make_placeholder, ("A compute step",))
 
     def add_event_handler(self, handler: EventHandler) -> None:
         """Attach an event handler to receive this step's events.

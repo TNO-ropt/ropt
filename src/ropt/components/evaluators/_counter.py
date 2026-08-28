@@ -4,8 +4,6 @@ from __future__ import annotations
 
 import threading
 
-from ropt.components._transferred import _make_placeholder
-
 
 class BatchIdCounter:
     """A thread-safe counter for generating sequential batch IDs.
@@ -32,8 +30,3 @@ class BatchIdCounter:
             value = self._value
             self._value += 1
             return value
-
-    def __reduce__(self) -> tuple[object, tuple[str]]:
-        # Handing out IDs only means anything in the process that keeps the
-        # count; a copy in a worker would restart from its own value.
-        return (_make_placeholder, ("A batch ID counter",))

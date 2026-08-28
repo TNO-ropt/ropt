@@ -20,7 +20,6 @@ from functools import partial
 from typing import TYPE_CHECKING, Final
 
 from ropt.components._loop import on_loop_thread, schedule
-from ropt.components._transferred import _make_placeholder
 from ropt.exceptions import WorkflowError
 
 if TYPE_CHECKING:
@@ -60,11 +59,6 @@ class EventDispatcher:
         # run anything, so it always sees at least that id without locking.
         self._handler_ids: frozenset[int] = frozenset()
         self._handler_ids_lock = threading.Lock()
-
-    def __reduce__(self) -> tuple[object, tuple[str]]:
-        # A dispatcher serves the loop it was started on, so it cannot follow
-        # work into a worker; it arrives there as an inert placeholder.
-        return (_make_placeholder, ("An event dispatcher",))
 
     def add_event_handler(
         self, handler: EventHandler, *, run_in_thread: bool = False

@@ -22,7 +22,6 @@ from __future__ import annotations
 from contextlib import contextmanager
 from typing import TYPE_CHECKING, Self
 
-from ropt.components._transferred import _make_placeholder
 from ropt.components.event_handlers import (
     EventDispatcher,
     EventForwardHandler,
@@ -88,12 +87,6 @@ class SharedHandlers:
             session.discard_extra(self)
             self._release()
             raise
-
-    def __reduce__(self) -> tuple[object, tuple[str]]:
-        # A group belongs to the session that built it, so it cannot follow work
-        # into a worker process; it arrives there as an inert placeholder that
-        # the entry points reject by name.
-        return (_make_placeholder, ("Shared handlers",))
 
     @property
     def closed(self) -> bool:

@@ -37,9 +37,9 @@ work to an [`Executor`][ropt.components.executors.Executor] and is described in
     [`ParallelEvaluator`][ropt.components.evaluators.ParallelEvaluator] happens
     *below* `eval` — it dispatches tasks to an executor, so its own `eval` is
     still called on a single thread. An evaluator cannot be transferred to
-    another process; serializing one reconstructs it as an inert placeholder in
-    the worker, and `ropt` raises a
-    [`TransferError`][ropt.exceptions.TransferError] before the task runs.
+    another process: it holds a lock, so serializing one fails and the
+    submission is refused with an
+    [`ExecutionError`][ropt.exceptions.ExecutionError].
 
 You write evaluation code for two of them.
 [`BatchEvaluator`][ropt.components.evaluators.BatchEvaluator] takes a callback

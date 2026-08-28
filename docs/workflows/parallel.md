@@ -631,13 +631,12 @@ Two places where this matters in practice:
 `ropt` enforces this at the process boundary. The workflow objects that hold
 in-process state or a process-local communication channel — compute steps,
 evaluators, event handlers, and the
-[`EventDispatcher`][ropt.components.event_handlers.EventDispatcher] — may still be
-serialized, but they do not survive the trip: on the worker side they are
-reconstructed as inert placeholders that discard their original state. Before a
-process or HPC worker runs a dispatched task, `ropt` checks whether such a
-placeholder was transferred and, if so, raises a
-[`TransferError`][ropt.exceptions.TransferError] instead of running the task
-against a disconnected copy. See
+[`EventDispatcher`][ropt.components.event_handlers.EventDispatcher] — each own a
+lock, so none of them can be serialized at all. A task that captures one is
+refused when it is submitted, with an
+[`ExecutionError`][ropt.exceptions.ExecutionError] that names the object rather
+than the lock it was caught on. The failure happens in the process that
+submitted the work, before any worker sees it. See
 [Nested workflows and process boundaries](#nested-workflows-and-process-boundaries)
 for what belongs where.
 
@@ -858,11 +857,10 @@ created." Concretely:
   collects its events. Event handling keeps working because memory is shared.
 - **Across processes (forbidden).** A step must not be *transferred* into a
   [`ProcessExecutor`][ropt.components.executors.ProcessExecutor]
-  or [`HPCExecutor`][ropt.components.executors.HPCExecutor] worker. Serializing one
-  — for example when a dispatched task captures it — reconstructs it in the
-  worker as an inert placeholder rather than a working copy whose events reach
-  the host. `ropt` detects the transferred placeholder and raises a
-  [`TransferError`][ropt.exceptions.TransferError] before running the task.
+  or [`HPCExecutor`][ropt.components.executors.HPCExecutor] worker. A step owns a
+  lock, so serializing one — for example when a dispatched task captures it —
+  fails, and the submission is refused with an
+  [`ExecutionError`][ropt.exceptions.ExecutionError].
   Create the step **inside** the worker instead — a self-contained
   optimization that returns its result as data. A step created there is unknown
   to the host process and needs no cross-process communication.

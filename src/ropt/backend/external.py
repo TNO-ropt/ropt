@@ -161,6 +161,16 @@ class ExternalBackend(Backend):
         return self._is_parallel
 
     def _serialize(self, initial_values: NDArray[np.float64]) -> bytes:
+        # The context points back at this backend, which holds the optimizer
+        # callback, so the entire ensemble graph would travel with it. The child
+        # replaces the backend and the callback both, so that edge is cut here
+        # rather than sent.
+        #
+        # Cut on the context itself, not on a copy: plugin instances store the
+        # context in their `init`, so a copy leaves the original reachable
+        # through them and both end up in the payload.
+        backend = self._context.backend
+        object.__setattr__(self._context, "backend", None)  # ruff: ignore[unnecessary-dunder-call]
         try:
             return dumps(
                 {
@@ -175,6 +185,8 @@ class ExternalBackend(Backend):
                 f"{CANNOT_SERIALIZE}."
             )
             raise ExecutionError(msg) from exc
+        finally:
+            object.__setattr__(self._context, "backend", backend)  # ruff: ignore[unnecessary-dunder-call]
 
 
 def _shutdown(
