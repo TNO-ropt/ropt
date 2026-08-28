@@ -8,7 +8,6 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Protocol
 
-from ropt.components._transferred import _make_placeholder
 from ropt.evaluation import EvaluationBatchResult
 from ropt.exceptions import WorkflowError
 
@@ -82,12 +81,6 @@ class Evaluator(ABC):
         """Initialize the Evaluator."""
         self._in_use = False
         self._owner_lock = threading.Lock()
-
-    def __reduce__(self) -> tuple[object, tuple[str]]:  # ruff: ignore[undocumented-magic-method]
-        # An evaluator hands work to the executor of the process it was built
-        # in, so it cannot follow that work into a worker; it arrives there as
-        # a placeholder, which the worker reports by name.
-        return (_make_placeholder, ("An evaluator",))
 
     @abstractmethod
     def eval(

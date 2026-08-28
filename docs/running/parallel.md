@@ -104,8 +104,8 @@ with session() as s:
     copied into a worker, and a pool cannot be copied with it: build the inner
     pool inside the worker, from a session opened there, or run the inner
     optimization without one. An evaluation function that carries a pool along
-    anyway is stopped in the worker, which names what it was handed instead of
-    failing somewhere deep inside the run.
+    anyway is refused when the work item is sent, rather than failing somewhere
+    deep inside the run.
 
 !!! tip "Releasing a pool early"
     A pool holds its workers until the session closes. That is usually fine, but

@@ -6,24 +6,20 @@
 # visible. test_live_pool_accepted is the control: without it a refusal test
 # would still pass if the entry point had stopped working for any pool at all.
 #
-# The transferred cases here pickle by hand rather than go through a worker
-# process. A worker is what produces a placeholder in practice, but pickling is
-# the whole of the mechanism, and doing it in-process keeps the failure
-# readable. test_carrying_a_session_object_into_a_worker covers the real path,
-# where the executor's own check reports the object before the run even starts.
+# Carrying a session object into a worker is not checked at the entry point at
+# all: it cannot be serialized, so the submission that carried it fails first.
+# test_carrying_a_session_object_into_a_worker covers that path.
 
 from __future__ import annotations
 
-import pickle  # ruff: ignore[suspicious-pickle-import]
 from functools import partial
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
 import pytest
 
-from ropt.components._transferred import reset_transferred
 from ropt.enums import ExitCode
-from ropt.exceptions import TransferError, WorkflowError
+from ropt.exceptions import ExecutionError, WorkflowError
 from ropt.simple import (
     HistoryHandler,
     evaluate,
@@ -118,14 +114,6 @@ def test_pool_from_a_closed_session_refused(entry_point: Callable[..., None]) ->
         entry_point(pool=pool)
 
 
-@_TAKES_A_POOL
-def test_transferred_pool_refused(entry_point: Callable[..., None]) -> None:
-    with session() as active:
-        pool = _round_trip(active.thread_pool(workers=1))
-        with pytest.raises(WorkflowError, match="A worker pool cannot be used"):
-            entry_point(pool=pool)
-
-
 @_TAKES_HANDLERS
 def test_closed_group_refused(entry_point: Callable[..., None]) -> None:
     with session() as active:
@@ -141,23 +129,6 @@ def test_group_from_a_closed_session_refused(entry_point: Callable[..., None]) -
         group = active.shared_handlers(HistoryHandler())
     with pytest.raises(WorkflowError, match="closed"):
         entry_point(handlers=[group])
-
-
-@_TAKES_HANDLERS
-def test_transferred_group_refused(entry_point: Callable[..., None]) -> None:
-    with session() as active:
-        group = _round_trip(active.shared_handlers(HistoryHandler()))
-        with pytest.raises(WorkflowError, match="Shared handlers cannot be used"):
-            entry_point(handlers=[group])
-
-
-def _round_trip(obj: Any) -> Any:
-    # What a worker process does to an object it receives, without the worker.
-    placeholder = pickle.loads(pickle.dumps(obj))  # ruff: ignore[suspicious-pickle-usage]
-    # Unpickling records the transfer in a process-global registry that a real
-    # worker would act on; this is the main process, so leave it as it was.
-    reset_transferred()
-    return placeholder
 
 
 def _offload_again(pool: WorkerPool) -> int:
@@ -240,20 +211,19 @@ def _group_of(active: Session) -> Any:
 
 @pytest.mark.slow
 @pytest.mark.parametrize(
-    ("carry", "subject"),
+    "carry",
     [
-        pytest.param(_pool_of, "A worker pool", id="pool"),
-        pytest.param(_executor_of, "An executor", id="executor"),
-        pytest.param(_group_of, "Shared handlers", id="handlers"),
+        pytest.param(_pool_of, id="pool"),
+        pytest.param(_executor_of, id="executor"),
+        pytest.param(_group_of, id="handlers"),
     ],
 )
 def test_carrying_a_session_object_into_a_worker(
-    carry: Callable[[Session], Any], subject: str
+    carry: Callable[[Session], Any],
 ) -> None:
-    # An evaluation function that closes over a session object drags it into
-    # the worker process. The worker reports it by name as soon as it unpacks
-    # the work, so the run fails before the function is ever called.
+    # An evaluation function that closes over a session object cannot be sent:
+    # the object holds a lock, so serializing the work item fails.
     with session() as active:
         function = partial(_evaluate_with, carry(active))
-        with pytest.raises(TransferError, match=subject):
+        with pytest.raises(ExecutionError, match="could not be sent to a worker"):
             optimize(_CONFIG, _INITIAL, function, pool=active.process_pool(workers=2))

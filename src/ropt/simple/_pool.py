@@ -19,7 +19,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Self
 
-from ropt.components._transferred import _make_placeholder
 from ropt.components.evaluators import BatchIdCounter
 
 if TYPE_CHECKING:
@@ -71,12 +70,6 @@ class WorkerPool:
         self._bundle_size = bundle_size
         self._batch_ids = BatchIdCounter()
         self._closed = False
-
-    def __reduce__(self) -> tuple[object, tuple[str]]:
-        # A pool belongs to the session that built it, so it cannot follow work
-        # into a worker process; it arrives there as an inert placeholder that
-        # the entry points reject by name.
-        return (_make_placeholder, ("A worker pool",))
 
     @property
     def closed(self) -> bool:

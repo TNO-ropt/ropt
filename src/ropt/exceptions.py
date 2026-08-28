@@ -76,15 +76,3 @@ class ExecutorStopped(Exception):  # ruff: ignore[error-suffix-on-exception-name
 
 class ExecutorFailure(Exception):  # ruff: ignore[error-suffix-on-exception-name]
     """Raised when an executor fails to execute a task."""
-
-
-class TransferError(WorkflowError):
-    """Raised when a workflow object is used in a worker process.
-
-    Workflow objects such as compute steps, evaluators, and event handlers are
-    process-local. They may be pickled as part of a task payload, but they must
-    not be used in a worker: if a task dispatched to a
-    [`ProcessExecutor`][ropt.components.executors.ProcessExecutor]
-    or [`HPCExecutor`][ropt.components.executors.HPCExecutor] worker captures one,
-    the worker detects it and raises this error before running the task.
-    """

@@ -17,7 +17,6 @@ from abc import ABC, abstractmethod
 from enum import Enum, auto
 from typing import TYPE_CHECKING, Any
 
-from ropt.components._transferred import _make_placeholder
 from ropt.exceptions import WorkflowError
 
 if TYPE_CHECKING:
@@ -93,12 +92,6 @@ class EventHandler(ABC):
         self._in_use = False
         self._claimed = False
         self._owner_lock = threading.Lock()
-
-    def __reduce__(self) -> tuple[object, tuple[str]]:  # ruff: ignore[undocumented-magic-method]
-        # A handler collects what a run produces, in the process that run is in,
-        # so it cannot follow work into a worker; it arrives there as a
-        # placeholder, which the worker reports by name.
-        return (_make_placeholder, ("An event handler",))
 
     def _register_dispatcher(self) -> None:
         """Mark this handler as owned by an event dispatcher.

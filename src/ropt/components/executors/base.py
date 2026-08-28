@@ -21,7 +21,6 @@ from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any
 
 from ropt.components._loop import on_loop_thread, schedule
-from ropt.components._transferred import _make_placeholder
 from ropt.exceptions import ExecutorStopped, WorkflowError
 
 if TYPE_CHECKING:
@@ -205,12 +204,6 @@ class Executor(ABC):
     - [`is_running`][ropt.components.executors.Executor.is_running]: Reports
       whether the executor accepts work.
     """
-
-    def __reduce__(self) -> tuple[object, tuple[str]]:  # ruff: ignore[undocumented-magic-method]
-        # An executor drives workers from the process that started it, so it
-        # cannot follow work into one. It arrives there as a placeholder, which
-        # the worker reports by name.
-        return (_make_placeholder, ("An executor",))
 
     @abstractmethod
     async def start(self, task_group: asyncio.TaskGroup) -> None:

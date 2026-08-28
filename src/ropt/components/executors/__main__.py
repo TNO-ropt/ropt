@@ -14,7 +14,6 @@ from pathlib import Path
 from typing import Any
 
 from ropt._serialize import CANNOT_DESERIALIZE, CANNOT_SERIALIZE, dump, load
-from ropt.components._transferred import check_transferred, reset_transferred
 from ropt.components.executors._picklable import picklable_exception
 
 
@@ -60,10 +59,8 @@ def run_task(input_path: str, output_path: str) -> int:
         `0` if the task succeeded, `1` if it raised or its result could not be
             written.
     """
-    reset_transferred()
     try:
         function, args, kwargs = _load_task(input_path)
-        check_transferred()
         result = function(*args, **kwargs)
         exit_code = 0
     except BaseException as exc:  # ruff: ignore[blind-except]

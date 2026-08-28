@@ -49,7 +49,6 @@ from ropt.exceptions import (
     ExecutionError,
     ExecutorFailure,
     ExecutorStopped,
-    TransferError,
     WorkflowError,
 )
 
@@ -2048,10 +2047,10 @@ async def test_queued_exception_preferred_over_abort() -> None:  # ruff: ignore[
     submission = Submission(
         [WorkItem(function=_function, args=(idx,)) for idx in range(2)]
     )
-    error = TransferError("Workflow objects cannot be used in a worker process: X.")
+    error = ExecutionError("the queued error wins over the abort")
     submission._results.put(None)  # ruff: ignore[private-member-access]
     submission._results.put(error)  # ruff: ignore[private-member-access]
-    with pytest.raises(TransferError):
+    with pytest.raises(ExecutionError):
         _collect(submission)
 
 
@@ -2641,7 +2640,8 @@ def _opt_function_capturing_handler(
 
 @pytest.mark.slow
 @pytest.mark.timeout(30)
-async def test_work_item_capturing_a_workflow_object_raises_transfer_error() -> None:
+async def test_work_item_capturing_a_workflow_object_is_refused() -> None:
+    # The handler holds a lock, so the work item cannot be serialized at all.
     submission = Submission(
         [WorkItem(function=_return_captured, args=(ResultsHandler(),))]
     )
@@ -2649,7 +2649,7 @@ async def test_work_item_capturing_a_workflow_object_raises_transfer_error() -> 
     async with asyncio.TaskGroup() as tg:
         await executor.start(tg)
         executor.submit(submission)
-        with pytest.raises(TransferError):
+        with pytest.raises(ExecutionError, match="could not be sent to a worker"):
             await asyncio.to_thread(_collect, submission)
         assert executor._running.is_set()  # ruff: ignore[private-member-access]
         executor.cancel()
@@ -2677,7 +2677,7 @@ async def test_transfer_error_from_parallel_evaluation_bubbles_up(
                 ),
             )
             executor.cancel()
-    assert any(isinstance(err, TransferError) for err in excinfo.value.exceptions)
+    assert any(isinstance(err, ExecutionError) for err in excinfo.value.exceptions)
 
 
 @pytest.mark.slow

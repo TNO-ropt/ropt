@@ -290,6 +290,10 @@ def test_the_advice_names_the_extra_only_when_it_is_missing() -> None:
 
 def test_unserializable_problem_reports_how_to_send_it() -> None:
     class _Unserializable:
+        # `_serialize` cuts the backend edge before dumping, so the stand-in
+        # needs the field even though nothing reads it.
+        backend = None
+
         def __reduce__(self) -> tuple[Any, ...]:
             msg = "cannot be sent"
             raise TypeError(msg)

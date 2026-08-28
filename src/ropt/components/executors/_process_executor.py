@@ -10,7 +10,6 @@ from typing import Any
 
 from ropt._logging import get_logger
 from ropt._serialize import CANNOT_DESERIALIZE, CANNOT_SERIALIZE, dumps, loads
-from ropt.components._transferred import check_transferred, reset_transferred
 from ropt.exceptions import ExecutionError, ExecutorFailure
 
 from ._picklable import picklable_exception
@@ -160,14 +159,12 @@ async def _run_work_item(work_item: WorkItem, executor: ProcessPoolExecutor) -> 
 
 
 def _run_payload(payload: bytes) -> tuple[bool, bytes]:
-    reset_transferred()
     try:
         function, args, kwargs = loads(payload)
     except Exception as exc:  # ruff: ignore[blind-except]
         exc.add_note(f"Could not rebuild the work item: {CANNOT_DESERIALIZE}.")
         return False, dumps(picklable_exception(exc))
     try:
-        check_transferred()
         value = function(*args, **kwargs)
     except Exception as exc:  # ruff: ignore[blind-except]
         # Return exception rather than raising it, so it can be sent back to the caller.
