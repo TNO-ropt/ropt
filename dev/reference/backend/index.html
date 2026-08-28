@@ -4449,8 +4449,13 @@ the prefix is not supported by this backend.</p>
 
 <details class="note" open>
   <summary>Note</summary>
-  <p>The <code>cloudpickle</code> package must be installed. If it is absent,
-instantiation raises <code>NotImplementedError</code>.</p>
+  <p>The problem is sent to the child process by serializing it, so
+everything the delegate needs must be serializable. The standard
+library can send anything that can be looked up by name, which covers
+the built-in plugins and any plugin class defined in an importable
+module. Installing the optional <code>cloudpickle</code> extra lifts that
+restriction, so plugin instances of classes defined inside a function
+or a notebook can be sent as well.</p>
 </details>
 
 
@@ -4512,29 +4517,6 @@ instantiation raises <code>NotImplementedError</code>.</p>
             </td>
             <td>
                 <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-<p><span class="doc-section-title">Raises:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            UnsupportedError (ropt.exceptions.UnsupportedError)" href="../exceptions/#ropt.exceptions.UnsupportedError">UnsupportedError</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>If <code>cloudpickle</code> is not installed.</p>
-              </div>
             </td>
           </tr>
       </tbody>

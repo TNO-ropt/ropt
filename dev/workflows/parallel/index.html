@@ -3585,9 +3585,13 @@ All executors share the same lifecycle:</p>
 <p>One rule covers every executor that leaves the process: <strong>out-of-process work
 needs importable, module-level callables.</strong> A work item's function and arguments
 are serialized, and the standard <code>pickle</code> module can only send what it can look
-up by name — so a lambda, a closure, or a function defined in a notebook cell is
-refused with an <a class="autorefs autorefs-internal" title="            ExecutionError" href="../../reference/exceptions/#ropt.exceptions.ExecutionError"><code>ExecutionError</code></a>. Installing
-<code>ropt[cloudpickle]</code> lifts that restriction, and lifts it for the process, local
+up by name. A lambda or a closure cannot be looked up at all, so it is refused
+before it is sent, with an
+<a class="autorefs autorefs-internal" title="            ExecutionError" href="../../reference/exceptions/#ropt.exceptions.ExecutionError"><code>ExecutionError</code></a>. A function defined in a
+notebook cell is different: it <em>can</em> be looked up here, so it is sent by name,
+and the failure comes back from the worker — which reports the name it could
+not find, and what would have let it be sent by value instead. Installing
+<code>ropt[cloudpickle]</code> lifts the restriction, and lifts it for the process, local
 and HPC executors alike. <code>ThreadExecutor</code> serializes nothing and is never
 affected.</p>
 <div class="admonition note">
@@ -3672,13 +3676,30 @@ better served by a thread pool or by
 <h4 id="work-item-serialization">Work item serialization</h4>
 <p>Each work item crosses a process boundary, so its function, arguments, and result
 must be serialized. If <a href="https://github.com/cloudpipe/cloudpickle"><code>cloudpickle</code></a>
-is installed (the <code>cloudpickle</code> extra), it is used for both directions: this
-serializes lambdas, closures, and interactively-defined functions (such as those
-written in a notebook cell) by value, so they can be used as task functions and
-returned as results. Without <code>cloudpickle</code>, the executor falls back to the
-standard <code>pickle</code> module, which requires the task function and its arguments to
-be importable, module-level objects; passing a lambda or closure then raises an
-<a class="autorefs autorefs-internal" title="            ExecutionError" href="../../reference/exceptions/#ropt.exceptions.ExecutionError"><code>ExecutionError</code></a> suggesting the <code>cloudpickle</code> extra.</p>
+is installed (the <code>cloudpickle</code> extra), it is used to <em>write</em>: this serializes
+lambdas, closures, and interactively-defined functions (such as those written in
+a notebook cell) by value, so they can be used as task functions and returned as
+results. Only writing has to choose. Reading is always the standard library's,
+which is what <code>cloudpickle</code> itself uses.</p>
+<p>Without <code>cloudpickle</code>, writing falls back to the standard <code>pickle</code> module, which
+requires the task function and its arguments to be importable, module-level
+objects. The two ways that can fail are worth telling apart:</p>
+<ul>
+<li>A lambda or a closure cannot be written at all, so it is refused before it is
+  sent, with an <a class="autorefs autorefs-internal" title="            ExecutionError" href="../../reference/exceptions/#ropt.exceptions.ExecutionError"><code>ExecutionError</code></a> naming the
+  extra.</li>
+<li>A notebook-defined function <em>can</em> be written, because it is stored by name and
+  the name exists in your session. It fails in the worker, where that name does
+  not resolve. The worker reports it as the error it is, with a note saying what
+  could not be rebuilt.</li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">What a worker cannot report</p>
+<p>The worker can only report a failure it survives to report. Anything that
+goes wrong before it reaches your work item — the worker failing to start,
+<code>ropt</code> failing to import, the entry module failing to re-import — still
+surfaces as a lost worker rather than a described error.</p>
+</div>
 <h4 id="the-__main__-guard">The <code>__main__</code> guard</h4>
 <p>With the <code>"spawn"</code> start method, every worker process starts a fresh interpreter
 that <strong>re-imports the program's entry module</strong> to rebuild its environment. If the
@@ -3700,7 +3721,7 @@ workers never start, and <code>ProcessExecutor</code> raises an
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
 </span></code></pre></div>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># Right: the guarded block is skipped during the worker re-import.</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
 </span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
 </span></code></pre></div>
 <p>This is the standard "safe importing of main module" contract of Python's
@@ -3901,7 +3922,7 @@ executor looks for a default configuration at:</p>
 <p>where <code>&lt;prefix&gt;</code> is the Python installation prefix (or system data prefix).
 Find it with:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">sysconfig</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_paths</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="nb">print</span><span class="p">(</span><span class="n">get_paths</span><span class="p">()[</span><span class="s2">&quot;data&quot;</span><span class="p">])</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="nb">print</span><span class="p">(</span><span class="n">get_paths</span><span class="p">()[</span><span class="s2">"data"</span><span class="p">])</span>
 </span></code></pre></div>
 <p>This allows deployments to ship pre-configured cluster definitions by
 installing them into <code>share/ropt/pysqa/</code> — no explicit <code>config_path</code>

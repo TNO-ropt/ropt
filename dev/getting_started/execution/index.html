@@ -782,7 +782,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#process_pool-a-pool-of-separate-processes" class="md-nav__link">
+  <a href="#process-pool" class="md-nav__link">
     <span class="md-ellipsis">
       
         process_pool — a pool of separate processes
@@ -793,7 +793,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#local_pool-one-process-per-evaluation-on-this-machine" class="md-nav__link">
+  <a href="#local-pool" class="md-nav__link">
     <span class="md-ellipsis">
       
         local_pool — one process per evaluation, on this machine
@@ -3067,7 +3067,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#process_pool-a-pool-of-separate-processes" class="md-nav__link">
+  <a href="#process-pool" class="md-nav__link">
     <span class="md-ellipsis">
       
         process_pool — a pool of separate processes
@@ -3078,7 +3078,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#local_pool-one-process-per-evaluation-on-this-machine" class="md-nav__link">
+  <a href="#local-pool" class="md-nav__link">
     <span class="md-ellipsis">
       
         local_pool — one process per evaluation, on this machine
@@ -3262,7 +3262,7 @@ not get faster on more threads. Array libraries are a different matter: <code>nu
 and its kin do their work outside Python and let the other threads run
 meanwhile. "My objective computes" is therefore not on its own a reason to reach
 past this pool — see <a href="#which-one-should-i-use">Which one should I use?</a>.</p>
-<h3 id="process_pool-a-pool-of-separate-processes"><code>process_pool</code> — a pool of separate processes</h3>
+<h3 id="process-pool"><code>process_pool</code> — a pool of separate processes</h3>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">pool</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">process_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
 </span></code></pre></div>
 <p>The evaluations run in <strong>separate processes</strong>. This gives real parallel speed for
@@ -3290,7 +3290,7 @@ objective keeps running, unattached, after your program is gone. Nothing
 warns you. If your objective launches external programs, use <code>local_pool</code>
 below, which was built for exactly this.</p>
 </div>
-<h3 id="local_pool-one-process-per-evaluation-on-this-machine"><code>local_pool</code> — one process per evaluation, on this machine</h3>
+<h3 id="local-pool"><code>local_pool</code> — one process per evaluation, on this machine</h3>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">pool</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">local_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
 </span></code></pre></div>
 <p>Each evaluation gets a <strong>process of its own</strong>, started fresh and thrown away
@@ -3310,7 +3310,7 @@ enough that starting a process for it is noise. Two things it gives that
 unless an evaluation failed, in which case the directory stays, with that
 evaluation's output in it, and <code>ropt</code> logs where it is. To choose the location
 yourself, pass one; a directory you passed is yours, and is never removed:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">pool</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">local_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">workdir</span><span class="o">=</span><span class="s2">&quot;/scratch/my-run&quot;</span><span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">pool</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">local_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">workdir</span><span class="o">=</span><span class="s2">"/scratch/my-run"</span><span class="p">)</span>
 </span></code></pre></div>
 <p>This pool is <strong>POSIX only</strong> — on Windows, creating it fails rather than quietly
 offering less. As with a process pool, the objective and its data are copied,

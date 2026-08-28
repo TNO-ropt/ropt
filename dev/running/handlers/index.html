@@ -3281,16 +3281,16 @@ per table) chooses which domain that table is filled from; see
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
 </span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">tables</span> <span class="o">=</span> <span class="n">DataFrameHandler</span><span class="p">()</span>
 </span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="n">tables</span><span class="o">.</span><span class="n">add_table</span><span class="p">(</span>
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    <span class="s2">&quot;summary&quot;</span><span class="p">,</span>
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>    <span class="s2">&quot;functions&quot;</span><span class="p">,</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    <span class="s2">"summary"</span><span class="p">,</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>    <span class="s2">"functions"</span><span class="p">,</span>
 </span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>    <span class="p">{</span>
-</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>        <span class="s2">&quot;batch_id&quot;</span><span class="p">:</span> <span class="s2">&quot;Batch&quot;</span><span class="p">,</span>
-</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>        <span class="s2">&quot;functions.objectives&quot;</span><span class="p">:</span> <span class="s2">&quot;Objective&quot;</span><span class="p">,</span>
-</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>        <span class="s2">&quot;evaluations.variables&quot;</span><span class="p">:</span> <span class="s2">&quot;Variable&quot;</span><span class="p">,</span>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>        <span class="s2">"batch_id"</span><span class="p">:</span> <span class="s2">"Batch"</span><span class="p">,</span>
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>        <span class="s2">"functions.objectives"</span><span class="p">:</span> <span class="s2">"Objective"</span><span class="p">,</span>
+</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>        <span class="s2">"evaluations.variables"</span><span class="p">:</span> <span class="s2">"Variable"</span><span class="p">,</span>
 </span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>    <span class="p">},</span>
 </span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="p">)</span>
 </span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">handlers</span><span class="o">=</span><span class="p">[</span><span class="n">tables</span><span class="p">])</span>
-</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="n">df</span> <span class="o">=</span> <span class="n">tables</span><span class="p">[</span><span class="s2">&quot;summary&quot;</span><span class="p">]</span>
+</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="n">df</span> <span class="o">=</span> <span class="n">tables</span><span class="p">[</span><span class="s2">"summary"</span><span class="p">]</span>
 </span></code></pre></div>
 <p>Read one table with <code>tables["summary"]</code>, or all of them with <code>get_tables()</code>. A
 field whose value is a vector or matrix expands to several columns; the extra
@@ -3301,7 +3301,7 @@ the column names follow
 <a href="../../optimizer_setup/results/#metadata-columns"><code>results_to_dataframe</code></a>,
 both result-level and per-realization metadata can be included and renamed.</p>
 <p>Pass <code>backend="polars"</code> to get polars DataFrames instead:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">tables</span> <span class="o">=</span> <span class="n">DataFrameHandler</span><span class="p">(</span><span class="n">backend</span><span class="o">=</span><span class="s2">&quot;polars&quot;</span><span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">tables</span> <span class="o">=</span> <span class="n">DataFrameHandler</span><span class="p">(</span><span class="n">backend</span><span class="o">=</span><span class="s2">"polars"</span><span class="p">)</span>
 </span></code></pre></div>
 <p>The tables carry the same columns under the same titles. As explained in
 <a href="../../optimizer_setup/results/#exporting-to-polars">Exporting to polars</a>, polars
@@ -3328,10 +3328,10 @@ the tables — to watch progress live or to write a final report. Pandas'
 dependencies; use <code>to_csv()</code> for machine-readable data, or <code>to_markdown()</code>
 if you have <code>tabulate</code> installed:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">dump</span><span class="p">(</span><span class="n">output_dir</span><span class="p">):</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>    <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;progress.txt&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">output_dir</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">output_dir</span> <span class="o">/</span> <span class="s2">&quot;progress.txt&quot;</span>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    <span class="k">with</span> <span class="n">path</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>    <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">"progress.txt"</span><span class="p">)</span> <span class="k">if</span> <span class="n">output_dir</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">output_dir</span> <span class="o">/</span> <span class="s2">"progress.txt"</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    <span class="k">with</span> <span class="n">path</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
 </span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">df</span> <span class="ow">in</span> <span class="n">tables</span><span class="o">.</span><span class="n">get_tables</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>            <span class="n">fh</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;# </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="n">df</span><span class="o">.</span><span class="n">to_string</span><span class="p">()</span><span class="si">}</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>            <span class="n">fh</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">"# </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="n">df</span><span class="o">.</span><span class="n">to_string</span><span class="p">()</span><span class="si">}</span><span class="se">\n\n</span><span class="s2">"</span><span class="p">)</span>
 </span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>
 </span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="n">tables</span><span class="o">.</span><span class="n">set_callback</span><span class="p">(</span><span class="n">dump</span><span class="p">)</span>
 </span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">handlers</span><span class="o">=</span><span class="p">[</span><span class="n">tables</span><span class="p">])</span>
@@ -3423,12 +3423,12 @@ process:</p>
 <details class="info">
 <summary>How data crosses the boundary</summary>
 <p>To move work and results between processes, <code>ropt</code> <strong>serializes</strong> them —
-turns the objects into bytes and rebuilds them on the other side. A process
-pool uses Python's standard <code>pickle</code>, so an objective defined at module level
-works as is; a lambda, a closure, or a notebook-defined objective needs the
-<code>cloudpickle</code> extra, which an HPC pool always uses. Most functions and data
-serialize fine, but things like open files, locks, or database connections
-may not.</p>
+turns the objects into bytes and rebuilds them on the other side. Both a
+process pool and an HPC pool use Python's standard <code>pickle</code> by default, so
+an objective defined at module level works as is; a lambda, a closure, or a
+notebook-defined objective needs the optional <code>cloudpickle</code> extra. Most
+functions and data serialize fine, but things like open files, locks, or
+database connections may not.</p>
 <p>On a process pool the bytes travel over an in-machine channel. On an HPC pool
 they are written as <strong>files on a shared filesystem</strong> that the cluster nodes
 read, so an HPC pool needs such a shared filesystem (its <code>workdir</code>).</p>
