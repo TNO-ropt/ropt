@@ -2779,7 +2779,7 @@ async def test_local_executor_keeps_its_directory_when_polling_gives_up() -> Non
 
     async with asyncio.TaskGroup() as tg:
         await executor.start(tg)
-        executor._live_job_ids = _unreachable  # ruff: ignore[private-member-access]
+        executor._live_job_ids = _unreachable  # type: ignore[method-assign]  # ruff: ignore[private-member-access]
         executor.submit(submission)
         collected = await asyncio.to_thread(_collect, submission)
         executor.cancel()

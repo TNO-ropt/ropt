@@ -9,6 +9,10 @@ on:
   schedule:
     - cron: "43 1 * * 1"
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.event_name == 'schedule' && 'cron' || 'shared' }}
+  cancel-in-progress: ${{ github.event_name != 'schedule' }}
+
 jobs:
   run-tests:
     runs-on: ubuntu-latest
@@ -16,18 +20,23 @@ jobs:
       fail-fast: false
       matrix:
         python-version: ["3.11", "3.12", "3.13", "3.14"]
+        extras: ["all"]
+        include:
+          - python-version: "3.12"
+            extras: "none"
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v7.0.0
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install uv
-        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d  # v10.0.1
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
         with:
           enable-cache: true
           cache-dependency-glob: "**/pyproject.toml"
+          cache-suffix: ${{ matrix.extras }}
       - name: Install ropt
-        run: uv sync --all-extras --dev
+        run: uv sync ${{ matrix.extras == 'all' && '--all-extras' || '' }} --dev
       - name: Run pytest
         run: uv run pytest tests --run-slow --run-external

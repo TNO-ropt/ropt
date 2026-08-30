@@ -8,7 +8,7 @@ import pytest
 _EXAMPLES = Path(__file__).parent.parent / "examples"
 
 
-@pytest.fixture(autouse=True)  # ruff: ignore[pytest-fixture-autouse]
+@pytest.fixture(autouse=True)
 def _examples_importable(monkeypatch: Any) -> None:
     # Autouse because every test in this module loads an example by bare name,
     # so requesting it explicitly would add an unused argument to all of them.
