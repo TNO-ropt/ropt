@@ -7,6 +7,8 @@ from typing import TYPE_CHECKING, Any, cast
 import numpy as np
 import pytest
 
+from ropt.components.event_handlers import DataFrameHandler
+from ropt.context import EnOptContext
 from ropt.enums import EnOptEventType
 from ropt.events import EnOptEvent
 from ropt.results import (
@@ -15,11 +17,6 @@ from ropt.results import (
     Functions,
     Realizations,
 )
-
-pytest.importorskip("pandas")
-
-from ropt.components.event_handlers import DataFrameHandler
-from ropt.context import EnOptContext
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -41,8 +38,8 @@ _CONFIG_TWO_REALIZATIONS: dict[str, Any] = {
 
 @pytest.fixture(name="backend", params=["pandas", "polars"])
 def backend_fixture(request: pytest.FixtureRequest) -> Backend:
-    if request.param == "polars":
-        pytest.importorskip("polars")
+    # The parameters are the module names, so each one skips on its own install.
+    pytest.importorskip(request.param)
     return cast("Backend", request.param)
 
 
@@ -374,6 +371,7 @@ def test_table_handler_sep(backend: Backend) -> None:
 
 
 def test_table_handler_backend_parity() -> None:
+    pytest.importorskip("pandas")
     pytest.importorskip("polars")
 
     handlers = {
@@ -402,6 +400,7 @@ def test_table_handler_backend_parity() -> None:
 
 
 def test_table_handler_polars_keeps_keys_for_mixed_granularity() -> None:
+    pytest.importorskip("pandas")
     pytest.importorskip("polars")
 
     columns = {

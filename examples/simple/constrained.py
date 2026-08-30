@@ -72,6 +72,7 @@ def report(result: EvaluateResult) -> None:
     Args:
         result: The result of a single function evaluation.
     """
+    assert result.results is not None
     info = result.results.constraint_info
     if (
         info is not None

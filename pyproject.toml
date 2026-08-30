@@ -63,6 +63,7 @@ ignore = ["missing-trailing-comma", "CPY", "line-too-long", "assert"]
     "any-type",
     "import-private-name",
     "magic-value-comparison",
+    "pytest-fixture-autouse",
     "too-many-arguments",
 ]
 "examples/*" = ["implicit-namespace-package", "print"]
