@@ -3959,6 +3959,11 @@ fails, even under <code>cleanup=True</code>, and its last lines are appended to 
 <code>ExecutorFailure</code> message. This is what makes an error in the job itself — a
 missing module, an unreadable input file, a scheduler rejection — visible at all,
 since nothing else about it reaches the host process.</p>
+<p>The failure always names that file, even when its contents cannot be read. A
+shared filesystem need not show them yet at the moment the work item is failed,
+and a submission script that does not redirect the job's output — with
+<code>#SBATCH --output={{output}}</code> or its equivalent — never writes them at all. The
+message therefore points at the file whether or not it could quote from it.</p>
 <p>The job command runs <code>ropt.components.executors</code> as a module with
 <code>sys.executable</code>, the interpreter that submitted it, rather than whatever
 <code>python</code> the job's <code>PATH</code> happens to resolve to. Submitting from a virtual
