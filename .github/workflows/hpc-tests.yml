@@ -1,0 +1,86 @@
+name: Run HPC tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+  schedule:
+    - cron: "43 1 * * 1"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.event_name == 'schedule' && 'cron' || 'shared' }}
+  cancel-in-progress: ${{ github.event_name != 'schedule' }}
+
+env:
+  SLURM_VERSION: 26.05.2
+
+jobs:
+  run-hpc-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out ropt
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Check out the Slurm cluster
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: giovtorres/slurm-docker-cluster
+          path: slurm-cluster
+
+      - name: Start the cluster
+        working-directory: slurm-cluster
+        run: |
+          docker pull "giovtorres/slurm-docker-cluster:$SLURM_VERSION"
+          docker tag "giovtorres/slurm-docker-cluster:$SLURM_VERSION" \
+            "slurm-docker-cluster:$SLURM_VERSION"
+          make up
+
+      - name: Wait for the compute nodes to register
+        run: |
+          for _ in $(seq 1 120); do
+            idle=$(docker exec slurmctld sinfo -h -p cpu -t idle -o '%D' 2>/dev/null || true)
+            if [ "${idle:-0}" -ge 2 ] 2>/dev/null; then
+              docker exec slurmctld sinfo
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "::error::compute nodes did not reach the idle state"
+          docker exec slurmctld sinfo || true
+          exit 1
+
+      - name: Install ropt in the cluster
+        run: |
+          docker exec slurmctld mkdir -p /data/src
+          tar -cf - --exclude=.git --exclude=slurm-cluster . \
+            | docker exec -i slurmctld tar -xf - -C /data/src
+          docker exec slurmctld sh -c '
+            python3 -m venv /data/venv
+            /data/venv/bin/pip install --quiet --upgrade pip
+            /data/venv/bin/pip install --quiet "/data/src[hpc]" \
+              pytest pytest-asyncio pytest-timeout
+          '
+
+      - name: Install the pysqa configuration
+        run: |
+          # The site-wide location the executor reads when given no config_path.
+          docker exec slurmctld mkdir -p /data/venv/share/ropt/pysqa
+          docker cp .github/slurm/queue.yaml slurmctld:/data/venv/share/ropt/pysqa/queue.yaml
+          docker cp .github/slurm/cpu.sh slurmctld:/data/venv/share/ropt/pysqa/cpu.sh
+
+      - name: Run pytest
+        run: |
+          docker exec -w /data/src slurmctld \
+            /data/venv/bin/python -m pytest tests/test_hpc_cluster.py \
+            --hpc=cpu --tmp=/data/hpc-tmp -v
+
+      - name: Report cluster state on failure
+        if: failure()
+        run: |
+          docker exec slurmctld sinfo -N -l || true
+          docker exec slurmctld squeue --all || true
+          docker exec slurmctld tail -n 50 /var/log/slurm/slurmctld.log || true
+          docker compose -f slurm-cluster/docker-compose.yml logs --tail=50 || true
