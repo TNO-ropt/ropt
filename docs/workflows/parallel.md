@@ -305,15 +305,32 @@ cannot be reached the failure is logged and stopping continues.
 | `workdir`     | Shared-filesystem directory for each work item's serialized I/O files. Required, and must be an absolute path. |
 | `workers`     | Maximum concurrent HPC jobs (default: 1).                                |
 | `interval`    | Polling interval in seconds (default: 1).                                |
-| `queue_type`  | Queueing system type, e.g. `"slurm"` (default).                          |
-| `template`    | Optional submission script template string.                              |
-| `config_path` | Optional path to `pysqa` cluster configuration directory.                |
-| `cluster`     | Optional cluster name (for multi-cluster installations).                 |
-| `queue`       | Optional queue/partition name.                                           |
+| `config_path` | The `pysqa` configuration directory. Defaults to the site-wide one installed alongside ropt. |
+| `cluster`     | Optional cluster name (for multi-cluster installations). Defaults to the configured primary. |
+| `queue`       | Optional name of a queue defined in the configuration. Defaults to the configured primary. |
+| `template`    | A submission script template, submitted instead of any configuration.    |
+| `scheduler`   | The queueing system a `template` is written for, e.g. `"slurm"` (default). Only meaningful with a `template`.|
 | `cores`       | CPUs per work item (default: 1).                                         |
+| `memory_max`  | Memory per work item. Rendered by the submission script, and clamped to the queue's limit when there is a configuration. |
+| `run_time_max` | Run time per work item, typically in seconds. Defaults to the queue's own limit. |
+| `submit_options` | Extra variables for the submission script, for whatever it declares beyond the standard names. `None` entries are dropped. |
 | `retries`     | Extra polls to wait for a result that is missing or unreadable (default: 30). |
 | `query_retries` | Extra attempts to query the scheduler after one fails (default: 30). |
 | `cleanup`     | Whether to remove a work item's files once it settles (default: `True`). A failed work item keeps its captured output. |
+
+Jobs are described either by a `pysqa` configuration or by a `template`, and the
+two are mutually exclusive. A `template` submits without a configuration, so it
+cannot be combined with `config_path`, `cluster` or `queue`, and `scheduler` is
+what tells `pysqa` which scheduler the script is written for; combining the two
+raises a `ValueError` at construction. Note that `queue` names a queue **defined
+in the configuration**, not necessarily the scheduler's partition: it selects
+that entry's script and resource limits, and the partition is written in the
+script. Both are laid out [below](#configuring-the-scheduler).
+
+See [Running on an HPC cluster](../running/parallel.md#running-on-an-hpc-cluster)
+for the same ground from the high-level API, and the
+[`pysqa` documentation](https://pysqa.readthedocs.io/en/latest/queue.html) for
+the file formats in full.
 
 A finished job's result is not always readable at once: the job may have died
 before writing it, or the file may be caught half-written. `retries` is how many
@@ -351,34 +368,72 @@ filenames derive from work item names, the executor **refuses to overwrite**
 pre-existing files; give each concurrently-running executor its own
 `workdir`.
 
-Configuration can be provided either via a `template` string or a `config_path`
-directory containing `pysqa` configuration files. If neither is given, the
-executor looks for a default configuration at:
+#### Configuring the scheduler
 
-```
-<prefix>/share/ropt/pysqa/<queue_type>/
-```
-
-where `<prefix>` is the Python installation prefix (or system data prefix).
-Find it with:
+`config_path` is the directory `pysqa` reads. Without it the executor uses the
+site-wide configuration installed alongside ropt, at `<prefix>/share/ropt/pysqa/`,
+where `<prefix>` is the Python installation prefix — deployments ship
+pre-configured clusters by installing them there. Find it with:
 
 ```python
 from sysconfig import get_paths
 print(get_paths()["data"])
 ```
 
-This allows deployments to ship pre-configured cluster definitions by
-installing them into `share/ropt/pysqa/` — no explicit `config_path`
-argument is needed at runtime.
+The directory holds a `queue.yaml` listing the queues, plus one submission
+script per queue. A minimal Slurm configuration:
 
-For multi-cluster `pysqa` configurations, the target cluster is resolved from
-the `cluster` and `queue` arguments:
+```yaml title="queue.yaml"
+queue_type: SLURM
+queue_primary: normal
+queues:
+  normal: {cores_max: 32, cores_min: 1, run_time_max: 3600, script: normal.sh}
+  long:   {cores_max: 32, cores_min: 1, run_time_max: 86400, script: long.sh}
+```
+
+```jinja title="normal.sh"
+#!/bin/bash
+#SBATCH --partition=normal
+#SBATCH --job-name={{job_name}}
+#SBATCH --output={{output}}
+#SBATCH --chdir={{working_directory}}
+#SBATCH --ntasks={{cores}}
+{%- if run_time_max %}
+#SBATCH --time={{ [1, run_time_max // 60]|max }}
+{%- endif %}
+{%- if memory_max %}
+#SBATCH --mem={{memory_max}}G
+{%- endif %}
+
+{{command}}
+```
+
+The scripts are
+[Jinja](https://jinja.palletsprojects.com/en/stable/templates/) templates, which
+`pysqa` renders through the `jinja2` package with `job_name`, `output`,
+`working_directory`, `cores`, `memory_max`, `run_time_max` and `command`, plus
+whatever the caller passes in
+`submit_options`. A variable the caller does not supply renders as empty, which
+is why optional directives are wrapped in `{% if %}`. The partition is *not* one
+of these variables: it is written literally, which is why each queue normally
+needs its own script.
+
+Sites with more than one cluster use a `clusters.yaml` naming a `queue.yaml` per
+cluster, each declaring its own `queue_type`; see the
+[`pysqa` documentation](https://pysqa.readthedocs.io/en/latest/advanced.html#access-to-multiple-hpcs).
+The target is resolved from `cluster` and `queue`:
 
 - If `cluster` is given, it is selected directly. When `queue` is also given,
   it must be available on that cluster.
-- If only `queue` is given, the cluster that provides it is derived
-  automatically. This requires exactly one cluster to provide the queue;
-  otherwise (no match or multiple matches) an error is raised.
+- If only `queue` is given, the cluster providing it is derived automatically,
+  which requires exactly one cluster to provide it; no match, or several, is an
+  error.
+- If neither is given, the configuration's own primaries apply.
+
+A `template` replaces all of this with a script supplied directly, in which case
+`scheduler` states the queueing system, since no configuration is read to
+declare it. It is `pysqa`'s `queue_type` under a name that does not collide with
+ropt's `queue`.
 
 ## Stopping an executor
 

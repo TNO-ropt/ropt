@@ -69,7 +69,6 @@ from ropt.components.executors._picklable import picklable_exception
 
 try:
     import pysqa
-    from pysqa.wrapper.abstract import SchedulerCommands
 
     _TEST_HPC = True
 except ImportError:
@@ -1869,15 +1868,10 @@ async def test_hpc_out_of_range_setting_rejected(  # ruff: ignore[unused-async]
 def pysqa_config(tmp_path: Path) -> Path:
     """A `pysqa` configuration with two clusters and no scheduler behind it.
 
-    `HPCExecutor` looks for `<config_path>/<queue_type>`, so the tree is built
-    to match. Nothing here needs a queueing system to exist: `pysqa` only reads
-    these files, which is what makes the whole cluster-selection path testable
-    on a machine that has no scheduler at all.
-
     Returns:
-        The directory to pass as `config_path`, holding a `slurm` subdirectory.
+        The directory to pass as `config_path`.
     """
-    root = tmp_path / "pysqa" / "slurm"
+    root = tmp_path / "pysqa"
     root.mkdir(parents=True)
     (root / "job.sh").write_text(
         "#!/bin/bash\n#SBATCH --job-name={{job_name}}\n"
@@ -1897,7 +1891,7 @@ def pysqa_config(tmp_path: Path) -> Path:
         "cluster_primary: cluster_a\ncluster:\n"
         "  cluster_a: cluster_a.yaml\n  cluster_b: cluster_b.yaml\n"
     )
-    return tmp_path / "pysqa"
+    return root
 
 
 @pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
@@ -1940,6 +1934,35 @@ async def test_hpc_cluster_selection_rejects_what_it_cannot_resolve(  # ruff: ig
 
 
 @pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
+@pytest.mark.parametrize("name", ["config_path", "cluster", "queue"])
+async def test_hpc_template_rejects_configuration_arguments(  # ruff: ignore[unused-async]
+    tmp_path: Path, pysqa_config: Path, name: str
+) -> None:
+    kwargs: dict[str, Any] = {
+        name: pysqa_config if name == "config_path" else "cluster_a"
+    }
+    with pytest.raises(ValueError, match=f"cannot be combined with: {name}"):
+        HPCExecutor(workdir=tmp_path, template="", **kwargs)
+
+
+@pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
+async def test_hpc_configuration_rejects_a_scheduler(  # ruff: ignore[unused-async]
+    tmp_path: Path, pysqa_config: Path
+) -> None:
+    with pytest.raises(ValueError, match="applies to a template only"):
+        HPCExecutor(workdir=tmp_path, config_path=pysqa_config, scheduler="slurm")
+
+
+@pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
+async def test_hpc_template_uses_the_scheduler_it_is_given(  # ruff: ignore[unused-async]
+    tmp_path: Path,
+) -> None:
+    executor = HPCExecutor(workdir=tmp_path, template="", scheduler="lsf")
+    adapter = executor._queue_adapter._adapter  # ruff: ignore[private-member-access]
+    assert type(adapter._commands).__name__.lower().startswith("lsf")  # ruff: ignore[private-member-access]
+
+
+@pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
 async def test_pysqa_still_accepts_what_the_executor_passes_by_name() -> None:  # ruff: ignore[unused-async]
     # Hand-written rather than `create_autospec`, deliberately: a spec'd mock
     # accepts arbitrary keywords, so it would wave through exactly the change
@@ -1952,6 +1975,8 @@ async def test_pysqa_still_accepts_what_the_executor_passes_by_name() -> None:  
         "submission_template",
         "queue",
         "cores",
+        "memory_max",
+        "run_time_max",
     ):
         assert name in signature.parameters, name
 
@@ -1967,6 +1992,9 @@ async def test_pysqa_still_accepts_what_the_executor_passes_by_name() -> None:  
 
 
 def _scheduler_wrappers() -> dict[str, Any]:
+    # Imported here because it depends on pysqa internals.
+    from pysqa.wrapper import abstract  # ruff: ignore[import-outside-top-level]
+
     package = importlib.import_module("pysqa.wrapper")
     wrappers: dict[str, Any] = {}
     for info in pkgutil.iter_modules(package.__path__):
@@ -1977,8 +2005,8 @@ def _scheduler_wrappers() -> dict[str, Any]:
             continue
         for _, cls in inspect.getmembers(module, inspect.isclass):
             if (
-                issubclass(cls, SchedulerCommands)
-                and cls is not SchedulerCommands
+                issubclass(cls, abstract.SchedulerCommands)
+                and cls is not abstract.SchedulerCommands
                 and cls.__module__ == module.__name__
             ):
                 wrappers[info.name] = cls
@@ -2194,6 +2222,51 @@ async def test_queued_work_for_ended_submission_not_run() -> None:
         assert await asyncio.to_thread(_collect, sentinel) == [99]
         executor.cancel()
     assert len([value for value in executed if value < 6]) < 6
+
+
+@pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
+async def test_hpc_submit_options_reach_the_submission(
+    tmp_path: Path, monkeypatch: Any
+) -> None:
+    class _RecordingKwargs(MockedHPCAdapter):
+        seen: dict[str, Any] = {}  # ruff: ignore[mutable-class-default]
+
+        def submit_job(self, job_name: str, command: str, **kwargs: Any) -> int:
+            type(self).seen = kwargs
+            return super().submit_job(job_name, command, **kwargs)
+
+    _mock_scheduler(monkeypatch, _RecordingKwargs(tmp_path))
+    executor = HPCExecutor(
+        workdir=tmp_path,
+        workers=1,
+        interval=0,
+        template="",
+        memory_max=8,
+        run_time_max=600,
+        submit_options={"account": "proj", "reservation": None},
+    )
+    submission = Submission([WorkItem(function=_function, args=(1,), name="item")])
+    async with asyncio.TaskGroup() as tg:
+        await executor.start(tg)
+        executor.submit(submission)
+        assert await asyncio.to_thread(_collect, submission) == [2]
+        executor.cancel()
+    assert _RecordingKwargs.seen["memory_max"] == 8
+    assert _RecordingKwargs.seen["run_time_max"] == 600
+    assert _RecordingKwargs.seen["account"] == "proj"
+    assert "reservation" not in _RecordingKwargs.seen
+
+
+@pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
+async def test_hpc_submit_options_refuse_what_the_executor_sets(  # ruff: ignore[unused-async]
+    tmp_path: Path,
+) -> None:
+    with pytest.raises(ValueError, match="set by the executor itself: cores, queue"):
+        HPCExecutor(
+            workdir=tmp_path,
+            template="",
+            submit_options={"cores": 4, "queue": "fast", "account": "proj"},
+        )
 
 
 @pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
