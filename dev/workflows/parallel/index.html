@@ -1398,6 +1398,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="HPCExecutor">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#configuring-the-scheduler" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuring the scheduler
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
       </ul>
@@ -3286,6 +3303,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="HPCExecutor">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#configuring-the-scheduler" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuring the scheduler
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
       </ul>
@@ -3862,7 +3896,7 @@ cannot be reached the failure is logged and stopping continues.</p>
 <td>A submission script template, submitted instead of any configuration.</td>
 </tr>
 <tr>
-<td><code>queue_type</code></td>
+<td><code>scheduler</code></td>
 <td>The queueing system a <code>template</code> is written for, e.g. <code>"slurm"</code> (default). Only meaningful with a <code>template</code>.</td>
 </tr>
 <tr>
@@ -3895,17 +3929,18 @@ cannot be reached the failure is logged and stopping continues.</p>
 </tr>
 </tbody>
 </table>
-<p>There are two mutually exclusive ways to say how jobs are submitted. Either a
-<code>pysqa</code> configuration supplies the clusters, the queues and their submission
-scripts, or a <code>template</code> supplies the submission script directly. A <code>template</code>
-submits without a configuration, so it cannot be combined with <code>config_path</code>,
-<code>cluster</code> or <code>queue</code>, and <code>queue_type</code> is what tells <code>pysqa</code> which scheduler the
-script is written for. Combining the two raises a <code>ValueError</code> at construction.</p>
-<p>Note that <code>queue</code> names a queue <strong>defined in the configuration</strong>, which is not
-necessarily the scheduler's partition name. Selecting a queue chooses that
-entry's submission script and its resource limits; the partition itself is
-written in the script. Two queue entries sharing one script therefore submit to
-the same partition, differing only in the limits <code>pysqa</code> clamps to.</p>
+<p>Jobs are described either by a <code>pysqa</code> configuration or by a <code>template</code>, and the
+two are mutually exclusive. A <code>template</code> submits without a configuration, so it
+cannot be combined with <code>config_path</code>, <code>cluster</code> or <code>queue</code>, and <code>scheduler</code> is
+what tells <code>pysqa</code> which scheduler the script is written for; combining the two
+raises a <code>ValueError</code> at construction. Note that <code>queue</code> names a queue <strong>defined
+in the configuration</strong>, not necessarily the scheduler's partition: it selects
+that entry's script and resource limits, and the partition is written in the
+script. Both are laid out <a href="#configuring-the-scheduler">below</a>.</p>
+<p>See <a href="../../running/parallel/#running-on-an-hpc-cluster">Running on an HPC cluster</a>
+for the same ground from the high-level API, and the
+<a href="https://pysqa.readthedocs.io/en/latest/queue.html"><code>pysqa</code> documentation</a> for
+the file formats in full.</p>
 <p>A finished job's result is not always readable at once: the job may have died
 before writing it, or the file may be caught half-written. <code>retries</code> is how many
 <strong>further</strong> polls to allow before the work item is failed with an
@@ -3937,28 +3972,62 @@ there depends on the submission template, so do not rely on it. Because work ite
 filenames derive from work item names, the executor <strong>refuses to overwrite</strong>
 pre-existing files; give each concurrently-running executor its own
 <code>workdir</code>.</p>
-<p><code>config_path</code> is the directory <code>pysqa</code> reads, the one holding <code>queue.yaml</code> or
-<code>clusters.yaml</code>. If it is not given, the executor looks for a site-wide
-configuration at:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>&lt;prefix&gt;/share/ropt/pysqa/
+<h4 id="configuring-the-scheduler">Configuring the scheduler</h4>
+<p><code>config_path</code> is the directory <code>pysqa</code> reads. Without it the executor uses the
+site-wide configuration installed alongside ropt, at <code>&lt;prefix&gt;/share/ropt/pysqa/</code>,
+where <code>&lt;prefix&gt;</code> is the Python installation prefix — deployments ship
+pre-configured clusters by installing them there. Find it with:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">sysconfig</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_paths</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="nb">print</span><span class="p">(</span><span class="n">get_paths</span><span class="p">()[</span><span class="s2">"data"</span><span class="p">])</span>
 </span></code></pre></div>
-<p>where <code>&lt;prefix&gt;</code> is the Python installation prefix (or system data prefix).
-Find it with:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">sysconfig</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_paths</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="nb">print</span><span class="p">(</span><span class="n">get_paths</span><span class="p">()[</span><span class="s2">"data"</span><span class="p">])</span>
+<p>The directory holds a <code>queue.yaml</code> listing the queues, plus one submission
+script per queue. A minimal Slurm configuration:</p>
+<div class="language-yaml highlight"><span class="filename">queue.yaml</span><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nt">queue_type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SLURM</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="nt">queue_primary</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">normal</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="nt">queues</span><span class="p">:</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">  </span><span class="nt">normal</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">cores_max</span><span class="p">:</span><span class="w"> </span><span class="nv">32</span><span class="p p-Indicator">,</span><span class="nt"> cores_min</span><span class="p">:</span><span class="w"> </span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="nt"> run_time_max</span><span class="p">:</span><span class="w"> </span><span class="nv">3600</span><span class="p p-Indicator">,</span><span class="nt"> script</span><span class="p">:</span><span class="w"> </span><span class="nv">normal.sh</span><span class="p p-Indicator">}</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">  </span><span class="nt">long</span><span class="p">:</span><span class="w">   </span><span class="p p-Indicator">{</span><span class="nt">cores_max</span><span class="p">:</span><span class="w"> </span><span class="nv">32</span><span class="p p-Indicator">,</span><span class="nt"> cores_min</span><span class="p">:</span><span class="w"> </span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="nt"> run_time_max</span><span class="p">:</span><span class="w"> </span><span class="nv">86400</span><span class="p p-Indicator">,</span><span class="nt"> script</span><span class="p">:</span><span class="w"> </span><span class="nv">long.sh</span><span class="p p-Indicator">}</span>
 </span></code></pre></div>
-<p>This allows deployments to ship pre-configured cluster definitions by
-installing them into <code>share/ropt/pysqa/</code> — no explicit <code>config_path</code>
-argument is needed at runtime.</p>
-<p>For multi-cluster <code>pysqa</code> configurations, the target cluster is resolved from
-the <code>cluster</code> and <code>queue</code> arguments:</p>
+<div class="language-jinja highlight"><span class="filename">normal.sh</span><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="x">#!/bin/bash</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="x">#SBATCH --partition=normal</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="x">#SBATCH --job-name=</span><span class="cp">{{</span><span class="nv">job_name</span><span class="cp">}}</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="x">#SBATCH --output=</span><span class="cp">{{</span><span class="nv">output</span><span class="cp">}}</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="x">#SBATCH --chdir=</span><span class="cp">{{</span><span class="nv">working_directory</span><span class="cp">}}</span>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="x">#SBATCH --ntasks=</span><span class="cp">{{</span><span class="nv">cores</span><span class="cp">}}</span>
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="cp">{%</span>- <span class="k">if</span> <span class="nv">run_time_max</span> <span class="cp">%}</span>
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="x">#SBATCH --time=</span><span class="cp">{{</span> <span class="o">[</span><span class="m">1</span><span class="o">,</span> <span class="nv">run_time_max</span> <span class="o">//</span> <span class="m">60</span><span class="o">]|</span><span class="nf">max</span> <span class="cp">}}</span>
+</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="cp">{%</span>- <span class="k">endif</span> <span class="cp">%}</span>
+</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="cp">{%</span>- <span class="k">if</span> <span class="nv">memory_max</span> <span class="cp">%}</span>
+</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="x">#SBATCH --mem=</span><span class="cp">{{</span><span class="nv">memory_max</span><span class="cp">}}</span><span class="x">G</span>
+</span><span id="__span-5-12"><a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a><span class="cp">{%</span>- <span class="k">endif</span> <span class="cp">%}</span>
+</span><span id="__span-5-13"><a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a>
+</span><span id="__span-5-14"><a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a><span class="cp">{{</span><span class="nv">command</span><span class="cp">}}</span>
+</span></code></pre></div>
+<p>The scripts are
+<a href="https://jinja.palletsprojects.com/en/stable/templates/">Jinja</a> templates, which
+<code>pysqa</code> renders through the <code>jinja2</code> package with <code>job_name</code>, <code>output</code>,
+<code>working_directory</code>, <code>cores</code>, <code>memory_max</code>, <code>run_time_max</code> and <code>command</code>, plus
+whatever the caller passes in
+<code>submit_options</code>. A variable the caller does not supply renders as empty, which
+is why optional directives are wrapped in <code>{% if %}</code>. The partition is <em>not</em> one
+of these variables: it is written literally, which is why each queue normally
+needs its own script.</p>
+<p>Sites with more than one cluster use a <code>clusters.yaml</code> naming a <code>queue.yaml</code> per
+cluster, each declaring its own <code>queue_type</code>; see the
+<a href="https://pysqa.readthedocs.io/en/latest/advanced.html#access-to-multiple-hpcs"><code>pysqa</code> documentation</a>.
+The target is resolved from <code>cluster</code> and <code>queue</code>:</p>
 <ul>
 <li>If <code>cluster</code> is given, it is selected directly. When <code>queue</code> is also given,
   it must be available on that cluster.</li>
-<li>If only <code>queue</code> is given, the cluster that provides it is derived
-  automatically. This requires exactly one cluster to provide the queue;
-  otherwise (no match or multiple matches) an error is raised.</li>
+<li>If only <code>queue</code> is given, the cluster providing it is derived automatically,
+  which requires exactly one cluster to provide it; no match, or several, is an
+  error.</li>
+<li>If neither is given, the configuration's own primaries apply.</li>
 </ul>
+<p>A <code>template</code> replaces all of this with a script supplied directly, in which case
+<code>scheduler</code> states the queueing system, since no configuration is read to
+declare it. It is <code>pysqa</code>'s <code>queue_type</code> under a name that does not collide with
+ropt's <code>queue</code>.</p>
 <h2 id="stopping-an-executor">Stopping an executor</h2>
 <p><code>executor.cancel()</code> stops the executor and returns immediately; it never waits
 for work that is already running. Callers see the same thing whichever executor
@@ -4042,9 +4111,9 @@ can set it again.</p>
 <p>So this is left to you, and only if it happens to you. When it does,
 <a class="autorefs autorefs-internal" title="            restore_keyboard_interrupt" href="../../reference/utils/#ropt.utils.restore_keyboard_interrupt"><code>restore_keyboard_interrupt</code></a> clears the
 flag, at the top of your script and after the imports:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">restore_keyboard_interrupt</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="n">restore_keyboard_interrupt</span><span class="p">()</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">restore_keyboard_interrupt</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="n">restore_keyboard_interrupt</span><span class="p">()</span>
 </span></code></pre></div>
 <p>See <a href="../../utilities/keyboard_interrupt/">Keyboard Interrupts</a> for the whole
 story.</p>
@@ -4172,29 +4241,29 @@ events arrive from multiple concurrent steps.</p>
 <p>This is especially useful when one set of handlers needs to aggregate results
 from multiple concurrent compute steps.</p>
 <p><code>EventDispatcher</code> follows the same lifecycle as executors:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">async</span> <span class="k">with</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">TaskGroup</span><span class="p">()</span> <span class="k">as</span> <span class="n">tg</span><span class="p">:</span>
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>    <span class="n">executor</span> <span class="o">=</span> <span class="n">ThreadExecutor</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>    <span class="k">await</span> <span class="n">executor</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="n">tg</span><span class="p">)</span>
-</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>
-</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>    <span class="n">event_dispatcher</span> <span class="o">=</span> <span class="n">EventDispatcher</span><span class="p">()</span>
-</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>    <span class="k">await</span> <span class="n">event_dispatcher</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="n">tg</span><span class="p">)</span>
-</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>
-</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>    <span class="c1"># Attach an EventForwardHandler to the compute step.</span>
-</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>    <span class="n">step</span><span class="o">.</span><span class="n">add_event_handler</span><span class="p">(</span>
-</span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a>        <span class="n">EventForwardHandler</span><span class="p">(</span>
-</span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a>            <span class="n">event_dispatcher</span><span class="p">,</span>
-</span><span id="__span-6-12"><a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a>            <span class="n">event_types</span><span class="o">=</span><span class="p">{</span><span class="n">EnOptEventType</span><span class="o">.</span><span class="n">FINISHED_EVALUATION</span><span class="p">},</span>
-</span><span id="__span-6-13"><a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a>        <span class="p">)</span>
-</span><span id="__span-6-14"><a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a>    <span class="p">)</span>
-</span><span id="__span-6-15"><a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a>
-</span><span id="__span-6-16"><a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a>    <span class="c1"># Handlers registered on the dispatcher need no locking.</span>
-</span><span id="__span-6-17"><a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a>    <span class="n">result_handler</span> <span class="o">=</span> <span class="n">ResultsHandler</span><span class="p">()</span>
-</span><span id="__span-6-18"><a id="__codelineno-6-18" name="__codelineno-6-18" href="#__codelineno-6-18"></a>    <span class="n">event_dispatcher</span><span class="o">.</span><span class="n">add_event_handler</span><span class="p">(</span><span class="n">result_handler</span><span class="p">)</span>
-</span><span id="__span-6-19"><a id="__codelineno-6-19" name="__codelineno-6-19" href="#__codelineno-6-19"></a>
-</span><span id="__span-6-20"><a id="__codelineno-6-20" name="__codelineno-6-20" href="#__codelineno-6-20"></a>    <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">to_thread</span><span class="p">(</span><span class="n">step</span><span class="o">.</span><span class="n">run</span><span class="p">,</span> <span class="n">variables</span><span class="o">=...</span><span class="p">,</span> <span class="n">context</span><span class="o">=...</span><span class="p">)</span>
-</span><span id="__span-6-21"><a id="__codelineno-6-21" name="__codelineno-6-21" href="#__codelineno-6-21"></a>
-</span><span id="__span-6-22"><a id="__codelineno-6-22" name="__codelineno-6-22" href="#__codelineno-6-22"></a>    <span class="n">event_dispatcher</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
-</span><span id="__span-6-23"><a id="__codelineno-6-23" name="__codelineno-6-23" href="#__codelineno-6-23"></a>    <span class="n">executor</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">async</span> <span class="k">with</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">TaskGroup</span><span class="p">()</span> <span class="k">as</span> <span class="n">tg</span><span class="p">:</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>    <span class="n">executor</span> <span class="o">=</span> <span class="n">ThreadExecutor</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>    <span class="k">await</span> <span class="n">executor</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="n">tg</span><span class="p">)</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>    <span class="n">event_dispatcher</span> <span class="o">=</span> <span class="n">EventDispatcher</span><span class="p">()</span>
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>    <span class="k">await</span> <span class="n">event_dispatcher</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="n">tg</span><span class="p">)</span>
+</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>
+</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>    <span class="c1"># Attach an EventForwardHandler to the compute step.</span>
+</span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>    <span class="n">step</span><span class="o">.</span><span class="n">add_event_handler</span><span class="p">(</span>
+</span><span id="__span-7-10"><a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a>        <span class="n">EventForwardHandler</span><span class="p">(</span>
+</span><span id="__span-7-11"><a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a>            <span class="n">event_dispatcher</span><span class="p">,</span>
+</span><span id="__span-7-12"><a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a>            <span class="n">event_types</span><span class="o">=</span><span class="p">{</span><span class="n">EnOptEventType</span><span class="o">.</span><span class="n">FINISHED_EVALUATION</span><span class="p">},</span>
+</span><span id="__span-7-13"><a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a>        <span class="p">)</span>
+</span><span id="__span-7-14"><a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a>    <span class="p">)</span>
+</span><span id="__span-7-15"><a id="__codelineno-7-15" name="__codelineno-7-15" href="#__codelineno-7-15"></a>
+</span><span id="__span-7-16"><a id="__codelineno-7-16" name="__codelineno-7-16" href="#__codelineno-7-16"></a>    <span class="c1"># Handlers registered on the dispatcher need no locking.</span>
+</span><span id="__span-7-17"><a id="__codelineno-7-17" name="__codelineno-7-17" href="#__codelineno-7-17"></a>    <span class="n">result_handler</span> <span class="o">=</span> <span class="n">ResultsHandler</span><span class="p">()</span>
+</span><span id="__span-7-18"><a id="__codelineno-7-18" name="__codelineno-7-18" href="#__codelineno-7-18"></a>    <span class="n">event_dispatcher</span><span class="o">.</span><span class="n">add_event_handler</span><span class="p">(</span><span class="n">result_handler</span><span class="p">)</span>
+</span><span id="__span-7-19"><a id="__codelineno-7-19" name="__codelineno-7-19" href="#__codelineno-7-19"></a>
+</span><span id="__span-7-20"><a id="__codelineno-7-20" name="__codelineno-7-20" href="#__codelineno-7-20"></a>    <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">to_thread</span><span class="p">(</span><span class="n">step</span><span class="o">.</span><span class="n">run</span><span class="p">,</span> <span class="n">variables</span><span class="o">=...</span><span class="p">,</span> <span class="n">context</span><span class="o">=...</span><span class="p">)</span>
+</span><span id="__span-7-21"><a id="__codelineno-7-21" name="__codelineno-7-21" href="#__codelineno-7-21"></a>
+</span><span id="__span-7-22"><a id="__codelineno-7-22" name="__codelineno-7-22" href="#__codelineno-7-22"></a>    <span class="n">event_dispatcher</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
+</span><span id="__span-7-23"><a id="__codelineno-7-23" name="__codelineno-7-23" href="#__codelineno-7-23"></a>    <span class="n">executor</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
 </span></code></pre></div>
 <p><a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventForwardHandler" href="../../reference/components_event_handlers/#ropt.components.event_handlers.EventForwardHandler"><code>EventForwardHandler</code></a> is a
 regular event handler that can be attached to a compute step. When the step
@@ -4253,7 +4322,7 @@ in-memory work, such as <code>ResultsHandler</code> or <code>HistoryHandler</cod
 <p>If a handler performs blocking operations — writing results to a file, pushing
 data to a database, sending over a network — pass <code>run_in_thread=True</code> when
 registering it:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">event_dispatcher</span><span class="o">.</span><span class="n">add_event_handler</span><span class="p">(</span><span class="n">my_handler</span><span class="p">,</span> <span class="n">run_in_thread</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">event_dispatcher</span><span class="o">.</span><span class="n">add_event_handler</span><span class="p">(</span><span class="n">my_handler</span><span class="p">,</span> <span class="n">run_in_thread</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </span></code></pre></div>
 <p><code>CallbackHandler</code> and <code>DataFrameHandler</code> (when a slow callback is set via
 <code>set_callback</code>) are common cases where this is needed. When multiple handlers
@@ -4287,11 +4356,11 @@ runs have finished.</p>
 synchronous method that runs its evaluator and its handlers <strong>on whatever
 thread called it</strong>. On the event loop thread it blocks the loop, and the
 executors and dispatchers it is waiting for are tasks on that same loop:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="c1"># Wrong: run() executes here, on the loop thread.</span>
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="n">step</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="n">x0</span><span class="p">)</span>
-</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>
-</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="c1"># Right: the loop stays free to service the workers.</span>
-</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">to_thread</span><span class="p">(</span><span class="n">step</span><span class="o">.</span><span class="n">run</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="n">x0</span><span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="c1"># Wrong: run() executes here, on the loop thread.</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="n">step</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="n">x0</span><span class="p">)</span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="c1"># Right: the loop stays free to service the workers.</span>
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">to_thread</span><span class="p">(</span><span class="n">step</span><span class="o">.</span><span class="n">run</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="n">x0</span><span class="p">)</span>
 </span></code></pre></div>
 <p><code>ropt.simple</code> already does this for you; it applies when driving compute steps
 yourself. A step that dispatches to an executor detects the mistake and raises
