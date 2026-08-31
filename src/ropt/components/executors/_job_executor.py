@@ -484,15 +484,18 @@ class JobExecutorBase(ExecutorBase):
 
     def _job_output(self, item_id: str | UUID) -> str:
         # A job that died before writing a result left its only trace here, so
-        # the tail travels with the failure and the file itself is kept.
+        # the tail travels with the failure and the file itself is kept. A
+        # shared filesystem may not show the content yet, and a submission
+        # script may not have redirected the job's output at all, so the path is
+        # named either way: it is the one place left to look.
         output_file = self._workdir / f"{item_id}.txt"
         try:
             lines = output_file.read_text(errors="replace").splitlines()
         except OSError:
-            return ""
+            return f"; no job output could be read from {output_file}"
         tail = [line for line in lines if line.strip()][-_OUTPUT_TAIL_LINES:]
         if not tail:
-            return ""
+            return f"; the job wrote nothing to {output_file}"
         body = "\n".join(tail)
         return f"; the job wrote to {output_file}:\n{body}"
 

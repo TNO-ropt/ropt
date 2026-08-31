@@ -805,6 +805,39 @@ async def test_hpc_failed_work_keeps_job_output(
 
 
 @pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
+@pytest.mark.parametrize("captured", ["", "   \n\n"], ids=["absent", "blank"])
+async def test_hpc_failure_names_the_output_file_it_could_not_quote(
+    tmp_path: Path, monkeypatch: Any, captured: str
+) -> None:
+    # A shared filesystem need not show the output yet, and a submission script
+    # may never have redirected it. Saying nothing would leave the one place
+    # worth looking unnamed.
+    class _SilentJob(MockedHPCAdapter):
+        def submit_job(self, job_name: str, command: str, **kwargs: Any) -> int:  # ruff: ignore[unused-method-argument]
+            self._job_id += 1
+            self._jobs[self._job_id] = job_name
+            if captured:
+                (self._path / f"{job_name}.txt").write_text(captured)
+            return self._job_id
+
+        def live_job_ids(self) -> set[int]:  # ruff: ignore[no-self-use]
+            return set()
+
+    _mock_scheduler(monkeypatch, _SilentJob(tmp_path))
+    submission = Submission([WorkItem(function=_function, args=(0,), name="item")])
+    executor = HPCExecutor(
+        workdir=tmp_path, workers=1, interval=0, retries=0, template=""
+    )
+    async with asyncio.TaskGroup() as tg:
+        await executor.start(tg)
+        executor.submit(submission)
+        collected = await asyncio.to_thread(_collect, submission)
+        executor.cancel()
+    assert isinstance(collected[0], ExecutorFailure)
+    assert str(tmp_path / "item.txt") in str(collected[0])
+
+
+@pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
 async def test_hpc_outstanding_work_aborted_on_stop(
     tmp_path: Path, monkeypatch: Any
 ) -> None:
