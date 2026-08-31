@@ -32,13 +32,13 @@ def pytest_collection_modifyitems(config: Any, items: Sequence[Any]) -> None:
     if not config.getoption("--run-slow"):
         skip_slow = pytest.mark.skip(reason="need --run-slow option to run")
         for item in items:
-            if "slow" in item.keywords:
+            if item.get_closest_marker("slow") is not None:
                 item.add_marker(skip_slow)
 
     if not config.getoption("--run-external"):
         skip_external = pytest.mark.skip(reason="need --run-external option to run")
         for item in items:
-            if "external" in item.keywords:
+            if item.get_closest_marker("external") is not None:
                 item.add_marker(skip_external)
 
 
