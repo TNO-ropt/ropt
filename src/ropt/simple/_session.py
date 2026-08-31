@@ -364,37 +364,44 @@ class Session:
         workdir: Path | str | None = None,
         config_path: Path | str | None = None,
         template: str | None = None,
-        queue_type: str = "slurm",
+        scheduler: str | None = None,
+        memory_max: int | str | None = None,
+        run_time_max: int | None = None,
+        submit_options: dict[str, Any] | None = None,
         retries: int = 30,
         bundle_size: int = 1,
     ) -> WorkerPool:
         """Create a pool that runs evaluations on an HPC cluster.
 
-        Interfaces with a cluster queue (for example Slurm) through `pysqa`; requires
-        the `ropt[hpc]` extra, and the evaluation function must be picklable.
-        The cluster is selected from `cluster`/`queue`: give a queue to search
-        for its cluster, a cluster to use its default queue, or both to be
-        explicit. See [Running Optimizations](../running/running.md) for a
-        walkthrough.
+        Interfaces with a cluster queue (for example Slurm) through `pysqa`;
+        requires the `ropt[hpc]` extra, and the evaluation function must be
+        picklable. The cluster is selected from `cluster`/`queue`: give a queue
+        to search for its cluster, a cluster to use its default queue, or both
+        to be explicit.
+
+        A `template` is the alternative to all of that: it submits without a
+        configuration, so it cannot be combined with `config_path`, `cluster` or
+        `queue`. See [Running on an HPC
+        cluster](../running/parallel.md#running-on-an-hpc-cluster) for the
+        configuration layout and Slurm examples.
 
         Args:
-            workers:     The maximum number of concurrent cluster jobs.
-            cores:       The number of CPUs per job.
-            cluster:     The cluster name, when the `pysqa` config defines
-                         several.
-            queue:       The queue or partition name.
-            workdir:     The shared-filesystem working directory (defaults to
-                         the current directory).
-            config_path: The path to the `pysqa` configuration directory.
-            template:    An inline submission-script template, instead of a
-                         config.
-            queue_type:  The queueing system type.
-            retries:     Extra polls to wait for a result that a shared
-                         filesystem has not shown yet.
-            bundle_size: How many evaluations go to a worker as one task, `0`
-                         for the whole batch. See
-                         [`process_pool`][ropt.simple.Session.process_pool];
-                         each task here is a cluster job.
+            workers:        The maximum number of concurrent cluster jobs.
+            cores:          The number of CPUs per job.
+            cluster:        The cluster name.
+            queue:          The queue name.
+            workdir:        The shared-filesystem working directory.
+            config_path:    The `pysqa` configuration directory.
+            template:       A submission-script template.
+            scheduler:      The queueing system a `template` is written for.
+            memory_max:     The memory per job.
+            run_time_max:   The run time per job.
+            submit_options: Extra variables for the submission script.
+            retries:        Number of retries for polling the cluster for results.
+            bundle_size:    How many evaluations go to a worker as one task, `0`
+                            for the whole batch. See
+                            [`process_pool`][ropt.simple.Session.process_pool];
+                            each task here is a cluster job.
 
         Returns:
             A pool backed by an HPC cluster.
@@ -409,7 +416,10 @@ class Session:
                 workdir=resolved,
                 config_path=config_path,
                 template=template,
-                queue_type=queue_type,
+                scheduler=scheduler,
+                memory_max=memory_max,
+                run_time_max=run_time_max,
+                submit_options=submit_options,
                 retries=retries,
             ),
             bundle_size,

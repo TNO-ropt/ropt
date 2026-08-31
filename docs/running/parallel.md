@@ -192,9 +192,9 @@ rather than quietly giving a weaker guarantee.
 ### Running on an HPC cluster
 
 An [`hpc_pool`][ropt.simple.Session.hpc_pool] submits each evaluation as a job to
-an HPC queue (through `pysqa`); it needs the `ropt[hpc]` extra. With no further
-arguments it uses the default cluster and queue from the `pysqa` configuration of
-your `ropt` installation:
+an HPC queue through [`pysqa`](https://pysqa.readthedocs.io/); it needs the
+`ropt[hpc]` extra. With no further arguments it uses the default cluster and
+queue from the `pysqa` configuration of your `ropt` installation:
 
 ```python
 from ropt.simple import session
@@ -203,6 +203,110 @@ with session() as s:
     result = optimize(config, x0, objective, pool=s.hpc_pool(workers=10))
 ```
 
+A job is nothing more than a submission script with your evaluation command in
+it, and there are **two mutually exclusive ways** to say what that script should
+be: a `pysqa` configuration, or a `template` you write yourself.
+
+#### Using an installed configuration
+
+This is the usual case. The configuration already describes the clusters and
+their queues, so all you do is pick one and say how much of it you want:
+
+```python
+pool = s.hpc_pool(workers=10, queue="long", cores=4)
+```
+
+`queue` names a queue **defined in the configuration**, which is not necessarily
+your scheduler's partition name — it selects a configured entry, and that
+entry's script decides which partition the job lands on. Ask your site which
+queues exist, or read them off the configuration.
+
+When the configuration defines several clusters, `cluster` picks one:
+
+- Give `cluster` to select it directly; adding `queue` requires that queue to
+  exist on it.
+- Give only `queue` and the cluster providing it is found automatically, which
+  needs exactly one cluster to provide it — no match, or several, is an error.
+- Give neither and the configuration's own defaults apply.
+
+`config_path` points at a configuration other than the installed one. See
+[HPCExecutor](../workflows/parallel.md#hpcexecutor) for how such a directory is
+laid out and where the installed one lives.
+
+#### Asking for resources
+
+`cores`, `memory_max` and `run_time_max` are passed to the submission script,
+and `submit_options` carries anything else that script declares:
+
+```python
+pool = s.hpc_pool(
+    workers=10,
+    queue="long",
+    cores=4,
+    memory_max=16,
+    run_time_max=7200,
+    submit_options={"account": "my-project"},
+)
+```
+
+For `account` to have any effect the script must reference it. A variable a
+script never mentions is simply ignored, and one the script mentions but nobody
+supplies renders as empty — so a misspelling on either side drops the directive
+silently rather than failing. Entries that are `None` are dropped, so omitting a
+key and passing `None` mean the same thing.
+
+With a configuration, `cores` and `run_time_max` are also **clamped** to the
+selected queue's limits rather than rejected: asking for more cores than the
+queue allows quietly gets you the queue's maximum.
+
+#### Submitting with your own template
+
+A `template` is simply the script that gets run on the cluster, written by you
+instead of taken from a configuration. Since there is no configuration to say
+what kind of cluster this is, `scheduler` tells ropt which queueing system to
+submit to — that is what decides whether it runs `sbatch` or `bsub`. It defaults
+to `"slurm"`.
+
+Nothing else is resolved for you: **the queue is not an argument here**, it has
+to be written into the script, along with everything else the scheduler needs.
+For Slurm that looks like this — other systems use entirely different
+directives:
+
+```python
+TEMPLATE = """\
+#!/bin/bash
+#SBATCH --partition=long
+#SBATCH --job-name={{job_name}}
+#SBATCH --output={{output}}
+#SBATCH --chdir={{working_directory}}
+#SBATCH --ntasks={{cores}}
+{%- if memory_max %}
+#SBATCH --mem={{memory_max}}G
+{%- endif %}
+
+{{command}}
+"""
+
+pool = s.hpc_pool(workers=10, template=TEMPLATE, scheduler="slurm", cores=4)
+```
+
+The script is a [Jinja](https://jinja.palletsprojects.com/en/stable/templates/)
+template, rendered by `pysqa` through the `jinja2` package. `{{name}}`
+inserts a value and `{% if name %}...{% endif %}` leaves a line out when none was
+given, which is how the memory directive above disappears unless `memory_max` is
+set. The values available are the arguments described above — `job_name`,
+`output`, `working_directory`, `cores`, `memory_max`, `run_time_max`, `command`
+— plus whatever you pass in `submit_options`.
+
+Two of them are worth getting right: `{{command}}` is your evaluation and the
+script does nothing without it, and `{{output}}` is the file ropt reads back to
+explain a failed job. A script that omits `--output={{output}}` still runs, but a
+job that dies takes the only explanation with it.
+
+Because a template submits without a configuration, it **cannot be combined**
+with `config_path`, `cluster` or `queue`; passing them together raises a
+`ValueError` when the pool is created.
+
 `hpc_pool` accepts the following parameters:
 
 | Parameter     | Description                                                                |
@@ -210,11 +314,14 @@ with session() as s:
 | `workers`     | Maximum number of concurrent cluster jobs (default: 1).                   |
 | `cores`       | Number of CPUs per job (default: 1).                                      |
 | `cluster`     | Cluster name, when the `pysqa` config defines several.                    |
-| `queue`       | Queue or partition name.                                                  |
+| `queue`       | Name of a queue defined in the configuration.                             |
 | `workdir`     | Shared-filesystem working directory (defaults to the current directory).  |
-| `config_path` | Path to the `pysqa` configuration directory.                              |
-| `template`    | Inline submission-script template, used instead of a config.              |
-| `queue_type`  | Queueing system type (default: `"slurm"`).                                |
+| `config_path` | The `pysqa` configuration directory.                                      |
+| `template`    | A submission-script template, used instead of a configuration.            |
+| `scheduler`   | The queueing system a `template` is written for; only meaningful with one. |
+| `memory_max`  | Memory per job.                                                           |
+| `run_time_max` | Run time per job, typically in seconds.                                  |
+| `submit_options` | Extra variables for the submission script. `None` entries are dropped. |
 | `retries`     | Extra polls to wait for a result that is missing or unreadable (default: 30). |
 | `bundle_size` | Evaluations bundled into one cluster job, `0` for the whole batch as one job (default: 1). See [How a batch is split across workers](#how-many-workers) above. |
 
