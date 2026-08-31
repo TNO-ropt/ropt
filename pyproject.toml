@@ -44,7 +44,11 @@ version_file = "src/ropt/version.py"
 fallback_version = "0.0.0.dev0"
 
 [tool.pytest.ini_options]
-markers = ["slow: slow test marker", "external: external optimizer marker"]
+markers = [
+    "slow: slow test marker",
+    "external: external optimizer marker",
+    "hpc: submits to a real HPC cluster",
+]
 filterwarnings = [
     'ignore:numpy.ndarray size changed, may indicate binary incompatibility.*:RuntimeWarning',
 ]

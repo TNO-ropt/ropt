@@ -26,6 +26,23 @@ def pytest_addoption(parser: Any) -> Any:
         default=False,
         help="run tests with external optimizers",
     )
+    parser.addoption(
+        "--hpc",
+        action="store",
+        default=None,
+        metavar="QUEUE",
+        help="run tests against the installed HPC cluster, submitting to QUEUE",
+    )
+    parser.addoption(
+        "--tmp",
+        action="store",
+        default="hpc-tmp",
+        metavar="DIR",
+        help=(
+            "directory for HPC job files, on a filesystem the compute nodes "
+            "share; must not exist, and is removed afterwards"
+        ),
+    )
 
 
 def pytest_collection_modifyitems(config: Any, items: Sequence[Any]) -> None:
@@ -40,6 +57,12 @@ def pytest_collection_modifyitems(config: Any, items: Sequence[Any]) -> None:
         for item in items:
             if item.get_closest_marker("external") is not None:
                 item.add_marker(skip_external)
+
+    if config.getoption("--hpc") is None:
+        skip_hpc = pytest.mark.skip(reason="need --hpc=QUEUE option to run")
+        for item in items:
+            if item.get_closest_marker("hpc") is not None:
+                item.add_marker(skip_hpc)
 
 
 def _compute_distance_squared(

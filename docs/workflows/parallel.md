@@ -353,6 +353,12 @@ fails, even under `cleanup=True`, and its last lines are appended to the
 missing module, an unreadable input file, a scheduler rejection — visible at all,
 since nothing else about it reaches the host process.
 
+The failure always names that file, even when its contents cannot be read. A
+shared filesystem need not show them yet at the moment the work item is failed,
+and a submission script that does not redirect the job's output — with
+`#SBATCH --output={{output}}` or its equivalent — never writes them at all. The
+message therefore points at the file whether or not it could quote from it.
+
 The job command runs `ropt.components.executors` as a module with
 `sys.executable`, the interpreter that submitted it, rather than whatever
 `python` the job's `PATH` happens to resolve to. Submitting from a virtual
