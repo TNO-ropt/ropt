@@ -4219,13 +4219,12 @@ process</strong>. A different <em>thread</em> is fine; a different <em>process</
 <p><code>ropt</code> enforces this at the process boundary. The workflow objects that hold
 in-process state or a process-local communication channel — compute steps,
 evaluators, event handlers, and the
-<a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventDispatcher" href="../../reference/components_event_handlers/#ropt.components.event_handlers.EventDispatcher"><code>EventDispatcher</code></a> — may still be
-serialized, but they do not survive the trip: on the worker side they are
-reconstructed as inert placeholders that discard their original state. Before a
-process or HPC worker runs a dispatched task, <code>ropt</code> checks whether such a
-placeholder was transferred and, if so, raises a
-<a class="autorefs autorefs-internal" title="            TransferError" href="../../reference/exceptions/#ropt.exceptions.TransferError"><code>TransferError</code></a> instead of running the task
-against a disconnected copy. See
+<a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventDispatcher" href="../../reference/components_event_handlers/#ropt.components.event_handlers.EventDispatcher"><code>EventDispatcher</code></a> — each own a
+lock, so none of them can be serialized at all. A task that captures one is
+refused when it is submitted, with an
+<a class="autorefs autorefs-internal" title="            ExecutionError" href="../../reference/exceptions/#ropt.exceptions.ExecutionError"><code>ExecutionError</code></a> that names the object rather
+than the lock it was caught on. The failure happens in the process that
+submitted the work, before any worker sees it. See
 <a href="#nested-workflows-and-process-boundaries">Nested workflows and process boundaries</a>
 for what belongs where.</p>
 <h2 id="event-dispatcher">Event dispatcher</h2>
@@ -4413,11 +4412,10 @@ created." Concretely:</p>
   collects its events. Event handling keeps working because memory is shared.</li>
 <li><strong>Across processes (forbidden).</strong> A step must not be <em>transferred</em> into a
   <a class="autorefs autorefs-internal" title="            ropt.components.executors.ProcessExecutor" href="../../reference/components_executors/#ropt.components.executors.ProcessExecutor"><code>ProcessExecutor</code></a>
-  or <a class="autorefs autorefs-internal" title="            ropt.components.executors.HPCExecutor" href="../../reference/components_executors/#ropt.components.executors.HPCExecutor"><code>HPCExecutor</code></a> worker. Serializing one
-  — for example when a dispatched task captures it — reconstructs it in the
-  worker as an inert placeholder rather than a working copy whose events reach
-  the host. <code>ropt</code> detects the transferred placeholder and raises a
-  <a class="autorefs autorefs-internal" title="            TransferError" href="../../reference/exceptions/#ropt.exceptions.TransferError"><code>TransferError</code></a> before running the task.
+  or <a class="autorefs autorefs-internal" title="            ropt.components.executors.HPCExecutor" href="../../reference/components_executors/#ropt.components.executors.HPCExecutor"><code>HPCExecutor</code></a> worker. A step owns a
+  lock, so serializing one — for example when a dispatched task captures it —
+  fails, and the submission is refused with an
+  <a class="autorefs autorefs-internal" title="            ExecutionError" href="../../reference/exceptions/#ropt.exceptions.ExecutionError"><code>ExecutionError</code></a>.
   Create the step <strong>inside</strong> the worker instead — a self-contained
   optimization that returns its result as data. A step created there is unknown
   to the host process and needs no cross-process communication.</li>

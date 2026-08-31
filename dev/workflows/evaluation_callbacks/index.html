@@ -3193,9 +3193,9 @@ Note that the parallelism of
 <a class="autorefs autorefs-internal" title="            ropt.components.evaluators.ParallelEvaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.ParallelEvaluator"><code>ParallelEvaluator</code></a> happens
 <em>below</em> <code>eval</code> — it dispatches tasks to an executor, so its own <code>eval</code> is
 still called on a single thread. An evaluator cannot be transferred to
-another process; serializing one reconstructs it as an inert placeholder in
-the worker, and <code>ropt</code> raises a
-<a class="autorefs autorefs-internal" title="            TransferError" href="../../reference/exceptions/#ropt.exceptions.TransferError"><code>TransferError</code></a> before the task runs.</p>
+another process: it holds a lock, so serializing one fails and the
+submission is refused with an
+<a class="autorefs autorefs-internal" title="            ExecutionError" href="../../reference/exceptions/#ropt.exceptions.ExecutionError"><code>ExecutionError</code></a>.</p>
 </div>
 <p>You write evaluation code for two of them.
 <a class="autorefs autorefs-internal" title="            ropt.components.evaluators.BatchEvaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.BatchEvaluator"><code>BatchEvaluator</code></a> takes a callback

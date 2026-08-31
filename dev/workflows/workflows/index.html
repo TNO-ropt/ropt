@@ -3697,10 +3697,10 @@ never overlap.</p>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Handlers are process-local</p>
-<p>An event handler cannot be transferred to another process. Serializing one
-(for example when a task dispatched to a worker captures it) reconstructs it
-in the worker as an inert placeholder; <code>ropt</code> detects this and raises a
-<a class="autorefs autorefs-internal" title="            TransferError" href="../../reference/exceptions/#ropt.exceptions.TransferError"><code>TransferError</code></a> before the task runs.
+<p>An event handler cannot be transferred to another process. It holds a lock,
+so serializing one — for example when a task dispatched to a worker
+captures it — fails, and the submission is refused with an
+<a class="autorefs autorefs-internal" title="            ExecutionError" href="../../reference/exceptions/#ropt.exceptions.ExecutionError"><code>ExecutionError</code></a>.
 Create handlers inside the worker and return their results
 as data. See
 <a href="../parallel/#nested-workflows-and-process-boundaries">Nested workflows and process boundaries</a>.</p>
