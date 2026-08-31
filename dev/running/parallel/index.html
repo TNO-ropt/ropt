@@ -3387,7 +3387,7 @@ your <code>ropt</code> installation:</p>
 </tr>
 <tr>
 <td><code>queue</code></td>
-<td>Queue or partition name.</td>
+<td>Name of a queue defined in the configuration.</td>
 </tr>
 <tr>
 <td><code>workdir</code></td>
@@ -3395,15 +3395,27 @@ your <code>ropt</code> installation:</p>
 </tr>
 <tr>
 <td><code>config_path</code></td>
-<td>Path to the <code>pysqa</code> configuration directory.</td>
+<td>The <code>pysqa</code> configuration directory.</td>
 </tr>
 <tr>
 <td><code>template</code></td>
-<td>Inline submission-script template, used instead of a config.</td>
+<td>A submission-script template, used instead of a configuration.</td>
 </tr>
 <tr>
 <td><code>queue_type</code></td>
-<td>Queueing system type (default: <code>"slurm"</code>).</td>
+<td>The queueing system a <code>template</code> is written for; only meaningful with one.</td>
+</tr>
+<tr>
+<td><code>memory_max</code></td>
+<td>Memory per job.</td>
+</tr>
+<tr>
+<td><code>run_time_max</code></td>
+<td>Run time per job, typically in seconds.</td>
+</tr>
+<tr>
+<td><code>submit_options</code></td>
+<td>Extra variables for the submission script. <code>None</code> entries are dropped.</td>
 </tr>
 <tr>
 <td><code>retries</code></td>

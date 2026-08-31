@@ -3846,28 +3846,40 @@ cannot be reached the failure is logged and stopping continues.</p>
 <td>Polling interval in seconds (default: 1).</td>
 </tr>
 <tr>
-<td><code>queue_type</code></td>
-<td>Queueing system type, e.g. <code>"slurm"</code> (default).</td>
-</tr>
-<tr>
-<td><code>template</code></td>
-<td>Optional submission script template string.</td>
-</tr>
-<tr>
 <td><code>config_path</code></td>
-<td>Optional path to <code>pysqa</code> cluster configuration directory.</td>
+<td>The <code>pysqa</code> configuration directory. Defaults to the site-wide one installed alongside ropt.</td>
 </tr>
 <tr>
 <td><code>cluster</code></td>
-<td>Optional cluster name (for multi-cluster installations).</td>
+<td>Optional cluster name (for multi-cluster installations). Defaults to the configured primary.</td>
 </tr>
 <tr>
 <td><code>queue</code></td>
-<td>Optional queue/partition name.</td>
+<td>Optional name of a queue defined in the configuration. Defaults to the configured primary.</td>
+</tr>
+<tr>
+<td><code>template</code></td>
+<td>A submission script template, submitted instead of any configuration.</td>
+</tr>
+<tr>
+<td><code>queue_type</code></td>
+<td>The queueing system a <code>template</code> is written for, e.g. <code>"slurm"</code> (default). Only meaningful with a <code>template</code>.</td>
 </tr>
 <tr>
 <td><code>cores</code></td>
 <td>CPUs per work item (default: 1).</td>
+</tr>
+<tr>
+<td><code>memory_max</code></td>
+<td>Memory per work item. Rendered by the submission script, and clamped to the queue's limit when there is a configuration.</td>
+</tr>
+<tr>
+<td><code>run_time_max</code></td>
+<td>Run time per work item, typically in seconds. Defaults to the queue's own limit.</td>
+</tr>
+<tr>
+<td><code>submit_options</code></td>
+<td>Extra variables for the submission script, for whatever it declares beyond the standard names. <code>None</code> entries are dropped.</td>
 </tr>
 <tr>
 <td><code>retries</code></td>
@@ -3883,6 +3895,17 @@ cannot be reached the failure is logged and stopping continues.</p>
 </tr>
 </tbody>
 </table>
+<p>There are two mutually exclusive ways to say how jobs are submitted. Either a
+<code>pysqa</code> configuration supplies the clusters, the queues and their submission
+scripts, or a <code>template</code> supplies the submission script directly. A <code>template</code>
+submits without a configuration, so it cannot be combined with <code>config_path</code>,
+<code>cluster</code> or <code>queue</code>, and <code>queue_type</code> is what tells <code>pysqa</code> which scheduler the
+script is written for. Combining the two raises a <code>ValueError</code> at construction.</p>
+<p>Note that <code>queue</code> names a queue <strong>defined in the configuration</strong>, which is not
+necessarily the scheduler's partition name. Selecting a queue chooses that
+entry's submission script and its resource limits; the partition itself is
+written in the script. Two queue entries sharing one script therefore submit to
+the same partition, differing only in the limits <code>pysqa</code> clamps to.</p>
 <p>A finished job's result is not always readable at once: the job may have died
 before writing it, or the file may be caught half-written. <code>retries</code> is how many
 <strong>further</strong> polls to allow before the work item is failed with an
@@ -3914,10 +3937,10 @@ there depends on the submission template, so do not rely on it. Because work ite
 filenames derive from work item names, the executor <strong>refuses to overwrite</strong>
 pre-existing files; give each concurrently-running executor its own
 <code>workdir</code>.</p>
-<p>Configuration can be provided either via a <code>template</code> string or a <code>config_path</code>
-directory containing <code>pysqa</code> configuration files. If neither is given, the
-executor looks for a default configuration at:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>&lt;prefix&gt;/share/ropt/pysqa/&lt;queue_type&gt;/
+<p><code>config_path</code> is the directory <code>pysqa</code> reads, the one holding <code>queue.yaml</code> or
+<code>clusters.yaml</code>. If it is not given, the executor looks for a site-wide
+configuration at:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>&lt;prefix&gt;/share/ropt/pysqa/
 </span></code></pre></div>
 <p>where <code>&lt;prefix&gt;</code> is the Python installation prefix (or system data prefix).
 Find it with:</p>

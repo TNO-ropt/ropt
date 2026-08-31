@@ -5717,21 +5717,27 @@ walkthrough.</p>
 </span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">workdir</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">config_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="n">template</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    <span class="n">queue_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"slurm"</span><span class="p">,</span>
-</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    <span class="n">retries</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">30</span><span class="p">,</span>
-</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>    <span class="n">bundle_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
-</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WorkerPool</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    <span class="n">queue_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    <span class="n">memory_max</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>    <span class="n">run_time_max</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>    <span class="n">submit_options</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>    <span class="n">retries</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">30</span><span class="p">,</span>
+</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>    <span class="n">bundle_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WorkerPool</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
 
         <p>Create a pool that runs evaluations on an HPC cluster.</p>
-<p>Interfaces with a cluster queue (for example Slurm) through <code>pysqa</code>; requires
-the <code>ropt[hpc]</code> extra, and the evaluation function must be picklable.
-The cluster is selected from <code>cluster</code>/<code>queue</code>: give a queue to search
-for its cluster, a cluster to use its default queue, or both to be
-explicit. See <a href="../../running/running/">Running Optimizations</a> for a
+<p>Interfaces with a cluster queue (for example Slurm) through <code>pysqa</code>;
+requires the <code>ropt[hpc]</code> extra, and the evaluation function must be
+picklable. The cluster is selected from <code>cluster</code>/<code>queue</code>: give a queue
+to search for its cluster, a cluster to use its default queue, or both
+to be explicit. See <a href="../../running/running/">Running Optimizations</a> for a
 walkthrough.</p>
+<p>A <code>template</code> is the alternative to all of that: it submits without a
+configuration, so it cannot be combined with <code>config_path</code>, <code>cluster</code> or
+<code>queue</code>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -5786,8 +5792,7 @@ walkthrough.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The cluster name, when the <code>pysqa</code> config defines
-         several.</p>
+                <p>The cluster name.</p>
               </div>
             </td>
             <td>
@@ -5803,7 +5808,7 @@ walkthrough.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The queue or partition name.</p>
+                <p>The queue name.</p>
               </div>
             </td>
             <td>
@@ -5819,8 +5824,7 @@ walkthrough.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The shared-filesystem working directory (defaults to
-         the current directory).</p>
+                <p>The shared-filesystem working directory.</p>
               </div>
             </td>
             <td>
@@ -5836,7 +5840,7 @@ walkthrough.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The path to the <code>pysqa</code> configuration directory.</p>
+                <p>The <code>pysqa</code> configuration directory.</p>
               </div>
             </td>
             <td>
@@ -5852,8 +5856,7 @@ walkthrough.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>An inline submission-script template, instead of a
-         config.</p>
+                <p>A submission-script template.</p>
               </div>
             </td>
             <td>
@@ -5865,15 +5868,63 @@ walkthrough.</p>
                 <code>queue_type</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The queueing system type.</p>
+                <p>The queueing system used with a <code>template</code> is written for.</p>
               </div>
             </td>
             <td>
-                  <code>&#39;slurm&#39;</code>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>memory_max</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a> | <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The memory per job.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>run_time_max</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The run time per job.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>submit_options</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a>] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Extra variables for the submission script.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
             </td>
           </tr>
           <tr class="doc-section-item">
@@ -5885,8 +5936,7 @@ walkthrough.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Extra polls to wait for a result that a shared
-         filesystem has not shown yet.</p>
+                <p>Number of retries for polling the cluster for results.</p>
               </div>
             </td>
             <td>
@@ -5903,9 +5953,9 @@ walkthrough.</p>
             <td>
               <div class="doc-md-description">
                 <p>How many evaluations go to a worker as one task, <code>0</code>
-         for the whole batch. See
-         <a class="autorefs autorefs-internal" title="            process_pool" href="#ropt.simple.Session.process_pool"><code>process_pool</code></a>;
-         each task here is a cluster job.</p>
+            for the whole batch. See
+            <a class="autorefs autorefs-internal" title="            process_pool" href="#ropt.simple.Session.process_pool"><code>process_pool</code></a>;
+            each task here is a cluster job.</p>
               </div>
             </td>
             <td>
