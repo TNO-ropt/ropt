@@ -15,6 +15,7 @@ concurrency:
 
 env:
   SLURM_VERSION: 26.05.2
+  CPU_WORKER_COUNT: 1
 
 jobs:
   run-hpc-tests:
@@ -42,15 +43,15 @@ jobs:
         run: |
           deadline=$(( $(date +%s) + 600 ))
           while [ "$(date +%s)" -lt "$deadline" ]; do
-            idle=$(docker exec slurmctld sinfo -h -p cpu -t idle -o '%D' 2>/dev/null || true)
-            if [ "${idle:-0}" -ge 2 ] 2>/dev/null; then
+            idle=$(docker exec slurmctld sinfo -h -p cpu -t idle -o '%D' 2>/dev/null | tr -cd '0-9')
+            if [ "${idle:-0}" -ge "$CPU_WORKER_COUNT" ]; then
               docker exec slurmctld sinfo
               exit 0
             fi
             sleep 2
           done
           echo "::error::compute nodes did not reach the idle state"
-          docker exec slurmctld sinfo || true
+          docker exec slurmctld sinfo -N -l || true
           exit 1
 
       - name: Install ropt in the cluster
