@@ -3621,12 +3621,15 @@ needs importable, module-level callables.</strong> A work item's function and ar
 are serialized, and the standard <code>pickle</code> module can only send what it can look
 up by name. A lambda or a closure cannot be looked up at all, so it is refused
 before it is sent, with an
-<a class="autorefs autorefs-internal" title="            ExecutionError" href="../../reference/exceptions/#ropt.exceptions.ExecutionError"><code>ExecutionError</code></a>. A function defined in a
-notebook cell is different: it <em>can</em> be looked up here, so it is sent by name,
-and the failure comes back from the worker — which reports the name it could
-not find, and what would have let it be sent by value instead. Installing
-<code>ropt[cloudpickle]</code> lifts the restriction, and lifts it for the process, local
-and HPC executors alike. <code>ThreadExecutor</code> serializes nothing and is never
+<a class="autorefs autorefs-internal" title="            ExecutionError" href="../../reference/exceptions/#ropt.exceptions.ExecutionError"><code>ExecutionError</code></a>. Code defined in <code>__main__</code> —
+a script you ran, a notebook cell, an interactive session — is different: it
+<em>can</em> be looked up here, so it is sent by name, and the failure comes back from
+the worker, which reports the name it could not find. Whether that name resolves
+depends on the worker: <code>ProcessExecutor</code> re-imports <code>__main__</code>, so a script's
+functions are found again, while the local and HPC executors run a fresh command
+whose <code>__main__</code> is ropt's own, so they are not. Installing
+<code>ropt[cloudpickle]</code> lifts the restriction for all of them, and is recommended
+whenever work runs as a job. <code>ThreadExecutor</code> serializes nothing and is never
 affected.</p>
 <div class="admonition note">
 <p class="admonition-title">Working directory</p>

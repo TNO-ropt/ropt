@@ -3313,8 +3313,13 @@ yourself, pass one; a directory you passed is yours, and is never removed:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">pool</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">local_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">workdir</span><span class="o">=</span><span class="s2">"/scratch/my-run"</span><span class="p">)</span>
 </span></code></pre></div>
 <p>This pool is <strong>POSIX only</strong> — on Windows, creating it fails rather than quietly
-offering less. As with a process pool, the objective and its data are copied,
-so the same rule about which functions can be sent applies.</p>
+offering less. The objective and its data are copied, but the rule about which
+functions can be sent is <strong>stricter than a process pool's</strong>: each evaluation is
+a fresh command, not a re-import of your script, so an objective defined in the
+script you ran cannot be looked up by name. Either keep it in a module the
+worker can import, or install <code>ropt[cloudpickle]</code> — which is the simpler answer,
+and the recommended one (see
+<a href="../installation/#optional-extras">Installation</a>).</p>
 <h3 id="hpc_pool-a-pool-of-jobs-on-a-cluster"><code>hpc_pool</code> — a pool of jobs on a cluster</h3>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">pool</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">hpc_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
 </span></code></pre></div>
@@ -3325,18 +3330,22 @@ the <code>ropt[hpc]</code> extra and a reachable cluster:</p>
 </span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">pool</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">hpc_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">10</span><span class="p">))</span>
 </span></code></pre></div>
 <p>This is <code>local_pool</code> with a scheduler in front of it: the same shape of one
-process per evaluation, the same captured output, the same cancellation — only
-the process now starts on a compute node instead of this machine. So an
-objective that already works on a <code>local_pool</code> will work here, and the step up
-to a cluster is a change of pool rather than a change of objective.</p>
+process per evaluation, the same captured output, the same cancellation, and the
+same rule about which functions can be sent — only the process now starts on a
+compute node instead of this machine. So an objective that already works on a
+<code>local_pool</code> will work here, and the step up to a cluster is a change of pool
+rather than a change of objective. That makes <code>local_pool</code> the way to develop
+and debug an objective before a cluster is involved.</p>
 <p>With no further arguments, <code>hpc_pool</code> uses the default cluster and queue from the
 <code>pysqa</code> configuration of your <code>ropt</code> installation — <code>pysqa</code> is the package <code>ropt</code>
 uses to submit and track cluster jobs. Cluster-specific parameters —
 such as the <code>cluster</code> name, the <code>queue</code>, and the number of <code>cores</code> per job — can
 be passed to <code>hpc_pool</code> when you need them; see
 <a href="../../running/parallel/#running-on-an-hpc-cluster">Parallel Execution and Many Runs</a> for the full list.</p>
-<p>Like a process pool, the work is copied to the cluster, so the same rule about
-which functions can be sent applies; add <code>ropt[cloudpickle]</code> to lift it (see
+<p>Like a local pool, the work is copied to the cluster, so the same stricter rule
+about which functions can be sent applies — and here the module a worker must
+import has to be installed on the compute nodes. Adding <code>ropt[cloudpickle]</code>
+lifts that requirement and is recommended (see
 <a href="../installation/#optional-extras">Installation</a>).</p>
 <h2 id="which-one-should-i-use">Which one should I use?</h2>
 <p>Start with the question that rules choices <em>out</em>, because it is the only one you

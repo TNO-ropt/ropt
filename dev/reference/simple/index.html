@@ -5576,7 +5576,13 @@ session is single use — once closed it cannot be reopened.</p>
 <p>Between a process pool and a cluster: every evaluation gets an
 interpreter of its own, which can be stopped outright and whose output
 is captured to a file, but there is no queueing system and nothing to
-install. Needs no extras; the evaluation function must be picklable.</p>
+install. This is the local stand-in for
+<a class="autorefs autorefs-internal" title="            hpc_pool" href="#ropt.simple.Session.hpc_pool"><code>hpc_pool</code></a>: the same job shape, so an
+evaluation function that works here works there.</p>
+<p>Each job is a fresh command rather than a re-import of your script, so
+the evaluation function must live in a module the job can import, or
+the <code>ropt[cloudpickle]</code> extra must be installed — which is the
+recommended way to use this pool.</p>
 <p>POSIX only. See <a href="../../running/running/">Running Optimizations</a> for a
 walkthrough.</p>
 
@@ -5730,10 +5736,14 @@ walkthrough.</p>
 
         <p>Create a pool that runs evaluations on an HPC cluster.</p>
 <p>Interfaces with a cluster queue (for example Slurm) through <code>pysqa</code>;
-requires the <code>ropt[hpc]</code> extra, and the evaluation function must be
-picklable. The cluster is selected from <code>cluster</code>/<code>queue</code>: give a queue
-to search for its cluster, a cluster to use its default queue, or both
-to be explicit.</p>
+requires the <code>ropt[hpc]</code> extra. Each evaluation is a job started as its
+own command, so the evaluation function must live in a module the
+compute nodes can import, or the <code>ropt[cloudpickle]</code> extra must be
+installed — which is the recommended way to use this pool. Develop
+against <a class="autorefs autorefs-internal" title="            local_pool" href="#ropt.simple.Session.local_pool"><code>local_pool</code></a> first: it has the
+same shape and the same rule, without a cluster. The cluster is selected
+from <code>cluster</code>/<code>queue</code>: give a queue to search for its cluster, a
+cluster to use its default queue, or both to be explicit.</p>
 <p>A <code>template</code> is the alternative to all of that: it submits without a
 configuration, so it cannot be combined with <code>config_path</code>, <code>cluster</code> or
 <code>queue</code>. See <a href="../../running/parallel/#running-on-an-hpc-cluster">Running on an HPC
