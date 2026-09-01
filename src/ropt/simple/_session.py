@@ -327,7 +327,14 @@ class Session:
         Between a process pool and a cluster: every evaluation gets an
         interpreter of its own, which can be stopped outright and whose output
         is captured to a file, but there is no queueing system and nothing to
-        install. Needs no extras; the evaluation function must be picklable.
+        install. This is the local stand-in for
+        [`hpc_pool`][ropt.simple.Session.hpc_pool]: the same job shape, so an
+        evaluation function that works here works there.
+
+        Each job is a fresh command rather than a re-import of your script, so
+        the evaluation function must live in a module the job can import, or
+        the `ropt[cloudpickle]` extra must be installed — which is the
+        recommended way to use this pool.
 
         POSIX only. See [Running Optimizations](../running/running.md) for a
         walkthrough.
@@ -374,10 +381,14 @@ class Session:
         """Create a pool that runs evaluations on an HPC cluster.
 
         Interfaces with a cluster queue (for example Slurm) through `pysqa`;
-        requires the `ropt[hpc]` extra, and the evaluation function must be
-        picklable. The cluster is selected from `cluster`/`queue`: give a queue
-        to search for its cluster, a cluster to use its default queue, or both
-        to be explicit.
+        requires the `ropt[hpc]` extra. Each evaluation is a job started as its
+        own command, so the evaluation function must live in a module the
+        compute nodes can import, or the `ropt[cloudpickle]` extra must be
+        installed — which is the recommended way to use this pool. Develop
+        against [`local_pool`][ropt.simple.Session.local_pool] first: it has the
+        same shape and the same rule, without a cluster. The cluster is selected
+        from `cluster`/`queue`: give a queue to search for its cluster, a
+        cluster to use its default queue, or both to be explicit.
 
         A `template` is the alternative to all of that: it submits without a
         configuration, so it cannot be combined with `config_path`, `cluster` or

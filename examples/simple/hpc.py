@@ -1,16 +1,24 @@
 """Ensemble optimization on an HPC cluster with the high-level ``ropt.simple`` API.
 
 An HPC pool submits evaluations to a cluster queue (through ``pysqa``), so an
-``optimize`` call given one runs its ensemble evaluations as cluster jobs. It
-uses the default cluster and queue from the ``pysqa`` configuration of the
-``ropt`` installation; cluster-specific parameters (such as ``cluster``,
-``queue``, and ``cores``) can be passed to ``hpc_pool`` when needed. Running it
-needs the ``ropt[hpc]`` extra and a reachable cluster; pass ``--multiprocessing`` to
-run the identical optimization on a local process pool instead, which needs no
-cluster and lets the example be exercised anywhere.
+``optimize`` call given one runs its ensemble evaluations as cluster jobs. This
+is what the example does by default; it needs the ``ropt[hpc]`` extra and a
+reachable cluster. The cluster and queue come from the ``pysqa`` configuration
+of the ``ropt`` installation unless ``--queue`` names one; other cluster
+parameters (such as ``cluster`` and ``cores``) can be passed to ``hpc_pool``
+when needed.
+
+If you have no cluster available, pass ``--local`` to run the identical
+optimization on a local pool instead. That pool runs each evaluation as its own
+process, exactly as a cluster job does, so it is the local stand-in for
+``hpc_pool`` and lets the example be exercised anywhere.
+
+Both pools send the evaluation function to a separate interpreter that cannot
+import this script, so this example needs the ``ropt[cloudpickle]`` extra.
 """
 
 import argparse
+from pathlib import Path
 from typing import Any
 
 import numpy as np
@@ -81,17 +89,25 @@ def report(result: EvaluateResult) -> None:
         print(f"  objective: {result.target_objective}")
 
 
-def main(*, multiprocessing: bool = False) -> None:
-    """Run the optimization on the cluster (or a local process pool).
+def main(
+    *,
+    local: bool = False,
+    queue: str | None = None,
+    workdir: Path | None = None,
+) -> None:
+    """Run the optimization on the cluster, or on a local pool.
 
     Args:
-        multiprocessing: Run on a local process pool instead of an HPC cluster.
+        local:   Run on a local pool instead of submitting to a cluster.
+        queue:   The cluster queue to submit to; the configured default if None.
+        workdir: Directory for the job files. On a cluster it must be on a
+                 filesystem the compute nodes share.
     """
     with session() as active:
         pool = (
-            active.process_pool(workers=WORKERS)
-            if multiprocessing
-            else active.hpc_pool(workers=WORKERS)
+            active.local_pool(workers=WORKERS, workdir=workdir, bundle_size=0)
+            if local
+            else active.hpc_pool(workers=WORKERS, queue=queue, workdir=workdir)
         )
         result = optimize(CONFIG, INITIAL_VALUES, rosenbrock, pool=pool, report=report)
     print(f"optimal variables: {result.variables}")
@@ -103,8 +119,19 @@ def main(*, multiprocessing: bool = False) -> None:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--multiprocessing",
+        "--local",
         action="store_true",
-        help="run on a local process pool instead of an HPC cluster",
+        help="run on a local pool instead of submitting to a cluster",
+    )
+    parser.add_argument(
+        "--queue",
+        default=None,
+        help="the cluster queue to submit to (default: the configured queue)",
+    )
+    parser.add_argument(
+        "--workdir",
+        type=Path,
+        default=None,
+        help="directory for the job files, shared by the compute nodes",
     )
     main(**vars(parser.parse_args()))

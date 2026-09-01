@@ -39,9 +39,18 @@ works without it:
 
 | Where | Works without `cloudpickle` | What `cloudpickle` adds |
 | ----- | --------------------------- | ----------------------- |
-| [Process pools](../getting_started/execution.md#process-pool) | Module-level evaluation functions | Lambdas, closures, and notebook-defined evaluation functions |
-| [Local and cluster jobs](../getting_started/execution.md#local-pool) | Module-level evaluation functions | The same, plus results built from locally defined classes |
+| [Process pools](../getting_started/execution.md#process-pool) | Evaluation functions at the top level of a module *or of the script you ran* | Lambdas, closures, and notebook-defined evaluation functions |
+| [Local and cluster jobs](../getting_started/execution.md#local-pool) | Evaluation functions at the top level of a module the worker can **import** | The same, plus functions defined in the script you ran, and results built from locally defined classes |
 | [The external backend](../optimizer_setup/configuration.md#external-backend) | The built-in plugins, and any plugin class in an importable module | Plugin instances of classes defined in a function or a notebook |
+
+The two pool rows differ, and the difference bites in practice. A process pool
+starts its workers with `spawn`, which re-imports the script you launched, so a
+function defined there can be looked up again. A local or cluster job is a fresh
+command whose `__main__` is `ropt`'s own worker module, so a function defined in
+your script cannot be found by name — it has to live in a module the worker can
+import, which on a cluster means installed on the compute nodes. **Installing
+`cloudpickle` is the recommended way to use local and cluster jobs**, unless
+your evaluation function already lives in such a module.
 
 Install with:
 

@@ -1,4 +1,5 @@
 import importlib
+import os
 import sys
 from pathlib import Path
 from typing import Any
@@ -10,20 +11,16 @@ _EXAMPLES = Path(__file__).parent.parent / "examples"
 
 @pytest.fixture(autouse=True)
 def _examples_importable(monkeypatch: Any) -> None:
-    # Autouse because every test in this module loads an example by bare name,
-    # so requesting it explicitly would add an unused argument to all of them.
-    # Run as scripts, the examples' functions live in `__main__`, which `spawn`
-    # re-imports, so a worker rebuilds them by name and no example needs
-    # `cloudpickle`. Executing the file here under a name nothing can import
-    # would break that and make the tests demand an extra the examples do not.
     for sub_path in ("advanced", "simple"):
         monkeypatch.syspath_prepend(str(_EXAMPLES / sub_path))
+    monkeypatch.setenv(
+        "PYTHONPATH",
+        os.pathsep.join(str(_EXAMPLES / p) for p in ("advanced", "simple")),
+    )
 
 
 def _load_from_file(name: str, sub_path: str = "advanced") -> Any:
     assert (_EXAMPLES / sub_path / f"{name}.py").exists()
-    # Popped rather than reused: a parametrized test loads the same example
-    # again, and it should start from the top as a script would.
     sys.modules.pop(name, None)
     return importlib.import_module(name)
 
@@ -54,9 +51,9 @@ def test_example_nested(tmp_path: Path, monkeypatch: Any) -> None:
 
 
 @pytest.mark.slow
-def test_example_nested_multiprocess(tmp_path: Path, monkeypatch: Any) -> None:
+def test_example_nested_parallel(tmp_path: Path, monkeypatch: Any) -> None:
     monkeypatch.chdir(tmp_path)
-    module = _load_from_file("nested_multiprocess")
+    module = _load_from_file("nested_parallel")
     module.main()
 
 
@@ -131,3 +128,15 @@ def test_example_simple_discrete(tmp_path: Path, monkeypatch: Any, linear: Any) 
 def test_example_simple_mixed(tmp_path: Path, monkeypatch: Any) -> None:
     monkeypatch.chdir(tmp_path)
     _load_from_file("mixed", "simple").main()
+
+
+@pytest.mark.slow
+def test_example_simple_hpc_on_a_local_pool(tmp_path: Path, monkeypatch: Any) -> None:
+    monkeypatch.chdir(tmp_path)
+    _load_from_file("hpc", "simple").main(local=True, workdir=tmp_path)
+
+
+@pytest.mark.slow
+def test_example_advanced_hpc_on_a_local_pool(tmp_path: Path, monkeypatch: Any) -> None:
+    monkeypatch.chdir(tmp_path)
+    _load_from_file("hpc_executor").main(workdir=tmp_path, local=True)

@@ -1,15 +1,14 @@
-"""Nested Rosenbrock example using async multiprocessing.
+"""Nested Rosenbrock example with parallel inner and outer evaluations.
 
 Variant of [nested.py][] that runs the inner evaluations on a
 `ProcessExecutor` (one subprocess per worker) and the outer evaluations on
 a `ThreadExecutor` (one worker thread per concurrent outer evaluation). Both
 are driven through `ParallelEvaluator`.
 
-Each `FunctionResults` is tagged with the OS pid of the worker that computed it
-(via `metadata["worker"]`) and the name of the outer worker thread (via
-`metadata["thread"]`), so the report can show that inner evaluations are really
-running in different subprocesses and that the outer step dispatches them from
-different threads.
+Each inner evaluation is tagged with the batch it belongs to (via
+`metadata["task"]`) and each inner result with the outer worker thread that ran
+it (via `metadata["thread"]`), so the report can show the outer step dispatching
+inner optimizations from several threads at once.
 """
 
 import asyncio
@@ -111,13 +110,17 @@ def report(event: EnOptEvent) -> None:
         if isinstance(item, FunctionResults) and item.functions is not None:
             tasks = {str(w) for w in item.evaluations.metadata.get("task", [])}
             thread = item.metadata.get("thread")
-            print(f"batch: {item.batch_id}  thread: {thread}  tasks: {tasks}")
-            print(f"  variables: {item.evaluations.variables}")
-            print(f"  objective: {item.functions.target_objective}\n")
+            msg = (
+                f"batch: {item.batch_id}  thread: {thread}  tasks: {tasks}\n"
+                f"  variables: {item.evaluations.variables}\n"
+                f"  objective: {item.functions.target_objective}\n\n"
+            )
+            # Single msg with flush to prevent interleaving from threads:
+            print(msg, end="", flush=True)
 
 
 def main() -> None:
-    """Run the nested optimization example using async multiprocessing."""
+    """Run the nested optimization example with parallel evaluations."""
     rng = default_rng(seed=123)
     a = rng.normal(loc=1.0, scale=UNCERTAINTY, size=REALIZATIONS)
     b = rng.normal(loc=100.0, scale=100 * UNCERTAINTY, size=REALIZATIONS)
@@ -208,9 +211,11 @@ def main() -> None:
     optimal_result = global_results["results"]
     assert optimal_result is not None
     assert optimal_result.functions is not None
-    print(f"Optimal batch: {optimal_result.batch_id}")
-    print(f"Optimal variables: {optimal_result.evaluations.variables}")
-    print(f"Optimal objective: {optimal_result.functions.target_objective}\n")
+    print(f"Optimal batch: {optimal_result.batch_id}", flush=True)
+    print(f"Optimal variables: {optimal_result.evaluations.variables}", flush=True)
+    print(
+        f"Optimal objective: {optimal_result.functions.target_objective}\n", flush=True
+    )
     assert np.allclose(optimal_result.functions.target_objective, 0, atol=1e-1)
     assert np.allclose(optimal_result.evaluations.variables, [1, 2, 3, 4], atol=1e-1)
 
