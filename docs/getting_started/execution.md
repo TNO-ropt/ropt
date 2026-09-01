@@ -162,8 +162,13 @@ pool = s.local_pool(workers=4, workdir="/scratch/my-run")
 ```
 
 This pool is **POSIX only** — on Windows, creating it fails rather than quietly
-offering less. As with a process pool, the objective and its data are copied,
-so the same rule about which functions can be sent applies.
+offering less. The objective and its data are copied, but the rule about which
+functions can be sent is **stricter than a process pool's**: each evaluation is
+a fresh command, not a re-import of your script, so an objective defined in the
+script you ran cannot be looked up by name. Either keep it in a module the
+worker can import, or install `ropt[cloudpickle]` — which is the simpler answer,
+and the recommended one (see
+[Installation](installation.md#optional-extras)).
 
 ### `hpc_pool` — a pool of jobs on a cluster
 
@@ -181,10 +186,12 @@ with session() as s:
 ```
 
 This is `local_pool` with a scheduler in front of it: the same shape of one
-process per evaluation, the same captured output, the same cancellation — only
-the process now starts on a compute node instead of this machine. So an
-objective that already works on a `local_pool` will work here, and the step up
-to a cluster is a change of pool rather than a change of objective.
+process per evaluation, the same captured output, the same cancellation, and the
+same rule about which functions can be sent — only the process now starts on a
+compute node instead of this machine. So an objective that already works on a
+`local_pool` will work here, and the step up to a cluster is a change of pool
+rather than a change of objective. That makes `local_pool` the way to develop
+and debug an objective before a cluster is involved.
 
 With no further arguments, `hpc_pool` uses the default cluster and queue from the
 `pysqa` configuration of your `ropt` installation — `pysqa` is the package `ropt`
@@ -193,8 +200,10 @@ such as the `cluster` name, the `queue`, and the number of `cores` per job — c
 be passed to `hpc_pool` when you need them; see
 [Parallel Execution and Many Runs](../running/parallel.md#running-on-an-hpc-cluster) for the full list.
 
-Like a process pool, the work is copied to the cluster, so the same rule about
-which functions can be sent applies; add `ropt[cloudpickle]` to lift it (see
+Like a local pool, the work is copied to the cluster, so the same stricter rule
+about which functions can be sent applies — and here the module a worker must
+import has to be installed on the compute nodes. Adding `ropt[cloudpickle]`
+lifts that requirement and is recommended (see
 [Installation](installation.md#optional-extras)).
 
 ## Which one should I use?

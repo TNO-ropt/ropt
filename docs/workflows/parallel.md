@@ -80,12 +80,15 @@ needs importable, module-level callables.** A work item's function and arguments
 are serialized, and the standard `pickle` module can only send what it can look
 up by name. A lambda or a closure cannot be looked up at all, so it is refused
 before it is sent, with an
-[`ExecutionError`][ropt.exceptions.ExecutionError]. A function defined in a
-notebook cell is different: it *can* be looked up here, so it is sent by name,
-and the failure comes back from the worker — which reports the name it could
-not find, and what would have let it be sent by value instead. Installing
-`ropt[cloudpickle]` lifts the restriction, and lifts it for the process, local
-and HPC executors alike. `ThreadExecutor` serializes nothing and is never
+[`ExecutionError`][ropt.exceptions.ExecutionError]. Code defined in `__main__` —
+a script you ran, a notebook cell, an interactive session — is different: it
+*can* be looked up here, so it is sent by name, and the failure comes back from
+the worker, which reports the name it could not find. Whether that name resolves
+depends on the worker: `ProcessExecutor` re-imports `__main__`, so a script's
+functions are found again, while the local and HPC executors run a fresh command
+whose `__main__` is ropt's own, so they are not. Installing
+`ropt[cloudpickle]` lifts the restriction for all of them, and is recommended
+whenever work runs as a job. `ThreadExecutor` serializes nothing and is never
 affected.
 
 !!! note "Working directory"
@@ -884,12 +887,11 @@ nested workflow. The nested examples follow exactly this shape:
 - [`examples/advanced/nested.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/advanced/nested.py)
   — outer and inner optimizations run sequentially in the main process via
   `FunctionEvaluator`.
-- [`examples/advanced/nested_multiprocess.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/advanced/nested_multiprocess.py)
+- [`examples/advanced/nested_parallel.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/advanced/nested_parallel.py)
   — outer optimizations run on a `ThreadExecutor` (in-process); only the
-  inner leaf evaluations run on a `ProcessExecutor`.
-- [`examples/advanced/nested_hpc.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/advanced/nested_hpc.py)
-  — same pattern, with the inner leaf evaluations submitted to the cluster via
-  `HPCExecutor`.
+  inner leaf evaluations run on a `ProcessExecutor`. Submitting those leaf
+  evaluations to a cluster instead is the same shape, with `HPCExecutor` in
+  place of `ProcessExecutor`.
 
 ## Where to next
 

@@ -5,10 +5,8 @@ discrete variables. The discrete variables are optimized in an outer loop and
 the real variables in an inner loop, both running sequentially in the main
 process via `FunctionEvaluator`.
 
-See Also: - `nested_multiprocess.py` — same flow with inner evaluations on a
+See Also: - `nested_parallel.py` — same flow with inner evaluations on a
   `ProcessExecutor` and outer evaluations on a `ThreadExecutor`.
-- `nested_hpc.py` — same flow with inner evaluations submitted as HPC queue jobs
-  via `HPCExecutor`.
 """
 
 import argparse

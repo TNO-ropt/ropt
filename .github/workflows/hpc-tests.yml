@@ -19,7 +19,7 @@ env:
 jobs:
   run-hpc-tests:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - name: Check out ropt
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -40,7 +40,8 @@ jobs:
 
       - name: Wait for the compute nodes to register
         run: |
-          for _ in $(seq 1 120); do
+          deadline=$(( $(date +%s) + 600 ))
+          while [ "$(date +%s)" -lt "$deadline" ]; do
             idle=$(docker exec slurmctld sinfo -h -p cpu -t idle -o '%D' 2>/dev/null || true)
             if [ "${idle:-0}" -ge 2 ] 2>/dev/null; then
               docker exec slurmctld sinfo
@@ -60,7 +61,7 @@ jobs:
           docker exec slurmctld sh -c '
             python3 -m venv /data/venv
             /data/venv/bin/pip install --quiet --upgrade pip
-            /data/venv/bin/pip install --quiet "/data/src[hpc]" \
+            /data/venv/bin/pip install --quiet "/data/src[hpc,cloudpickle]" \
               pytest pytest-asyncio pytest-timeout
           '
 

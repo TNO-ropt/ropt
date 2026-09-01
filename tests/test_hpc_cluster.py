@@ -15,14 +15,19 @@ stays in the mocked tests, where it is deterministic and fast.
 
 The submitted callables are all resolvable from the standard library, because a
 compute node runs `sys.executable -m ropt.components.executors` and cannot
-import this test module.
+import this test module. The tests that run the HPC examples are the exception:
+they put the example directories on `PYTHONPATH`, which the scheduler passes to
+the job, so a compute node can import them by name.
 """
 
 from __future__ import annotations
 
 import asyncio
+import importlib
 import operator
+import os
 import shutil
+import sys
 import time
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
@@ -36,6 +41,8 @@ if TYPE_CHECKING:
     from collections.abc import Iterator
 
 pytestmark = [pytest.mark.hpc, pytest.mark.asyncio, pytest.mark.timeout(600)]
+
+_EXAMPLES = Path(__file__).parent.parent / "examples"
 
 _SLEEP_SECONDS = 60
 
@@ -94,6 +101,20 @@ def executor_fixture(workdir: Path, hpc_queue: str) -> Iterator[Any]:
     finally:
         for executor in executors:
             executor.cancel()
+
+
+@pytest.fixture(name="example")
+def example_fixture(monkeypatch: pytest.MonkeyPatch) -> Any:
+    paths = [str(_EXAMPLES / name) for name in ("advanced", "simple")]
+    for path in paths:
+        monkeypatch.syspath_prepend(path)
+    monkeypatch.setenv("PYTHONPATH", os.pathsep.join(paths))
+
+    def _load(name: str) -> Any:
+        sys.modules.pop(name, None)
+        return importlib.import_module(name)
+
+    return _load
 
 
 async def test_hpc_cluster_resolves_the_requested_queue(  # ruff: ignore[unused-async]
@@ -199,6 +220,21 @@ async def test_hpc_cluster_failed_job_reports_where_its_output_is(
         "installed submission script must direct the job's output there with "
         "'#SBATCH --output={{output}}' (pysqa's own example template hardcodes "
         f"a name instead, and will not do).\nworkdir holds: {_listing(workdir)}"
+    )
+
+
+async def test_hpc_cluster_runs_the_simple_example(
+    example: Any, hpc_queue: str, workdir: Path
+) -> None:
+    # `main` drives its own event loop, so it cannot be called on this one.
+    await asyncio.to_thread(example("hpc").main, queue=hpc_queue, workdir=workdir)
+
+
+async def test_hpc_cluster_runs_the_advanced_example(
+    example: Any, hpc_queue: str, workdir: Path
+) -> None:
+    await asyncio.to_thread(
+        example("hpc_executor").main, workdir=workdir, queue=hpc_queue
     )
 
 

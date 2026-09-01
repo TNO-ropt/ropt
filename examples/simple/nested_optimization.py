@@ -32,7 +32,7 @@ from ropt.simple import (
 )
 
 DIM = 4
-REALIZATIONS = 10
+REALIZATIONS = 5
 MASK = [True, True, False, False]
 INNER_CONFIG: dict[str, Any] = {
     "variables": {
@@ -43,7 +43,7 @@ INNER_CONFIG: dict[str, Any] = {
         "upper_bounds": 10.0,
     },
     "realizations": {"weights": [1.0] * REALIZATIONS},
-    "optimizer": {"max_functions": 10},
+    "optimizer": {"max_functions": 8},
 }
 
 OUTER_CONFIG: dict[str, Any] = {
@@ -59,11 +59,11 @@ OUTER_CONFIG: dict[str, Any] = {
         "method": "differential_evolution",
         "options": {"rng": 4},
         "parallel": True,
-        "max_iterations": 10,
+        "max_iterations": 4,
     },
 }
 INITIAL_VALUES = [1.0, 1.0, 1.0, 1.0]
-UNCERTAINTY = 0.1
+UNCERTAINTY = 0.01
 
 
 def rosenbrock(
