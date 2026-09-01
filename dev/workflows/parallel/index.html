@@ -4438,12 +4438,11 @@ nested workflow. The nested examples follow exactly this shape:</p>
 <li><a href="https://github.com/TNO-ropt/ropt/blob/main/examples/advanced/nested.py"><code>examples/advanced/nested.py</code></a>
   — outer and inner optimizations run sequentially in the main process via
   <code>FunctionEvaluator</code>.</li>
-<li><a href="https://github.com/TNO-ropt/ropt/blob/main/examples/advanced/nested_multiprocess.py"><code>examples/advanced/nested_multiprocess.py</code></a>
+<li><a href="https://github.com/TNO-ropt/ropt/blob/main/examples/advanced/nested_parallel.py"><code>examples/advanced/nested_parallel.py</code></a>
   — outer optimizations run on a <code>ThreadExecutor</code> (in-process); only the
-  inner leaf evaluations run on a <code>ProcessExecutor</code>.</li>
-<li><a href="https://github.com/TNO-ropt/ropt/blob/main/examples/advanced/nested_hpc.py"><code>examples/advanced/nested_hpc.py</code></a>
-  — same pattern, with the inner leaf evaluations submitted to the cluster via
-  <code>HPCExecutor</code>.</li>
+  inner leaf evaluations run on a <code>ProcessExecutor</code>. Submitting those leaf
+  evaluations to a cluster instead is the same shape, with <code>HPCExecutor</code> in
+  place of <code>ProcessExecutor</code>.</li>
 </ul>
 <h2 id="where-to-next">Where to next</h2>
 <ul>
