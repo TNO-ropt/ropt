@@ -196,6 +196,15 @@ class Submission:
 class Executor(ABC):
     """Abstract base class for executor components within an optimization workflow.
 
+    Handing a submission to an executor transfers responsibility for it: the
+    executor either runs its work items or ends the submission, so a caller
+    waiting in [`collect`][ropt.components.executors.Submission.collect] is
+    always released. That holds for a submission still queued, one whose work is
+    in flight, and one accepted before the executor was stopped.
+
+    A submission that is already finished when it reaches a worker needs no work
+    done: its caller has left, so running its work items only occupies a worker.
+
     Subclasses must implement the following abstract methods:
 
     - [`start`][ropt.components.executors.Executor.start]: Starts the executor.
@@ -203,6 +212,12 @@ class Executor(ABC):
     - [`submit`][ropt.components.executors.Executor.submit]: Hands over a submission.
     - [`is_running`][ropt.components.executors.Executor.is_running]: Reports
       whether the executor accepts work.
+
+    See [Error handling](../workflows/parallel.md#error-handling) for the
+    distinction an implementation must make between an infrastructure failure,
+    delivered as an [`ExecutorFailure`][ropt.exceptions.ExecutorFailure] result,
+    and an exception from the work item's own function, which ends the
+    submission.
     """
 
     @abstractmethod
@@ -219,6 +234,10 @@ class Executor(ABC):
     @abstractmethod
     def cancel(self) -> None:
         """Stop the executor.
+
+        Every submission that was accepted and has not finished must be ended,
+        so that its caller is released rather than left waiting for results that
+        can no longer arrive.
 
         May be called from any thread.
         """
