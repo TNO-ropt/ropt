@@ -3707,6 +3707,19 @@ context-dependent setup should usually be deferred to <code>validate_options</co
 and <code>init</code>.</p>
 
 
+<details class="warning" open>
+  <summary>Method name with prefix</summary>
+  <p><code>backend_config.method</code> may be prefixed in the form
+<code>"backend/method"</code>. Implementations should account for this when
+parsing the method name.</p>
+</details>
+
+<details class="warning" open>
+  <summary>Handling the default method</summary>
+  <p><code>backend_config.method</code> may be set to <code>"default"</code>, in which case it
+should be mapped to the backend's actual default method.</p>
+</details>
+
 <p><span class="doc-section-title">Parameters:</span></p>
     <table>
       <thead>
@@ -3989,19 +4002,6 @@ Pydantic.</p>
 depending on the backend. This method should verify that the type
 matches what the backend expects and raise a <code>ValueError</code> with a
 clear message when it does not.</p>
-</details>
-
-<details class="warning" open>
-  <summary>Method name with prefix</summary>
-  <p>The method string may be prefixed in the form <code>"backend/method"</code>.
-Implementations should account for this when parsing the method
-name.</p>
-</details>
-
-<details class="warning" open>
-  <summary>Handling the default method</summary>
-  <p>The method string may be set to <code>"default"</code>, in which case it
-should be mapped to the backend's actual default method.</p>
 </details>
 
 <p><span class="doc-section-title">Raises:</span></p>
