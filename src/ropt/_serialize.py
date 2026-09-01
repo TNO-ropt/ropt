@@ -61,9 +61,12 @@ CANNOT_SERIALIZE: Final = (
 # resolve on the far side shows up, so the advice is about the far side, and
 # `cloudpickle` is only the most likely of several answers.
 CANNOT_DESERIALIZE: Final = (
-    "it names something the worker cannot look up — code defined in a notebook "
-    "or an interactive session, which ropt[cloudpickle] would send by value "
-    "instead of by name, or a package the worker's environment does not have"
+    "it names something the worker cannot look up — code defined in "
+    "'__main__' (a script, a notebook or an interactive session): a worker "
+    "process re-imports '__main__' and can rebuild it, but a job started as "
+    "its own command cannot. ropt[cloudpickle] sends such code by value "
+    "instead of by name. It may also name a package the worker's environment "
+    "does not have"
     if not HAVE_CLOUDPICKLE
     else "it names something the worker cannot look up — code the worker cannot "
     "import, or a package its environment does not have"
