@@ -66,12 +66,15 @@ class ComputeStep(ABC):
 
         Args:
             handler: The handler to add.
+
+        Raises:
+            TypeError: If `handler` is not an event handler.
         """
-        # Registering marks the handler as owned by a compute step for good,
-        # which is what bars it from ever joining an event dispatcher.
-        if isinstance(handler, EventHandler):
-            handler._register_compute_step()  # ruff: ignore[private-member-access]
-            self._event_handlers.append(handler)
+        if not isinstance(handler, EventHandler):
+            msg = f"Not an event handler: {type(handler).__name__}"
+            raise TypeError(msg)
+        handler._register_compute_step()  # ruff: ignore[private-member-access]
+        self._event_handlers.append(handler)
 
     @property
     def event_handlers(self) -> list[EventHandler]:

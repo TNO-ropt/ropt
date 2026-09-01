@@ -27,12 +27,12 @@ class OptionsSchemaModel(BaseModel):
     """Represents the overall schema for plugin options.
 
     This class defines the structure for describing the methods and options
-    available for a plugin. The methods are described in a list of
-    [`MethodSchemaModel`][ropt.config.options.MethodSchemaModel] objects, each
-    describing a method supported by the plugin.
+    available for a plugin. The methods are described by a mapping of method
+    names to [`MethodSchemaModel`][ropt.config.options.MethodSchemaModel]
+    objects, each describing a method supported by the plugin.
 
     Attributes:
-        methods: A list of method schemas.
+        methods: A mapping of method names to their schemas.
         common:  An optional list of method schemas that define common options
                  shared by all methods.
 
@@ -42,14 +42,9 @@ class OptionsSchemaModel(BaseModel):
 
     schema = OptionsSchemaModel.model_validate(
         {
-            "methods": [
-                {
-                    "options": {"a": float}
-                },
-                {
-                    "options": {"b": int | str},
-                },
-            ]
+            "methods": {
+                "method": {"options": {"a": float, "b": int | str}},
+            }
         }
     )
 
@@ -79,10 +74,10 @@ class OptionsSchemaModel(BaseModel):
         """Creates a Pydantic model for validating options of a specific method.
 
         This method dynamically generates a Pydantic model tailored to validate
-        the options associated with a given method. It iterates through the
-        defined methods, collecting option schemas from those matching the
-        specified `method` name. The resulting model can then be used to
-        validate dictionaries of options against the defined schema.
+        the options associated with a given method. The method is looked up by
+        name, case-insensitively, and its options are combined with the common
+        options that it does not exclude. The resulting model can then be used
+        to validate dictionaries of options against the defined schema.
 
         Args:
             method: The name of the method for which to create the options model.
@@ -93,19 +88,22 @@ class OptionsSchemaModel(BaseModel):
         Raises:
             ValueError: If the specified method is not found in the schema.
         """
-        options: dict[str, Any] | None = None
-        for method_name, method_schema in self.methods.items():
-            options = {
-                option: (type_ | None, None)
-                for option, type_ in method_schema.options.items()
-            }
-            if method_name.lower() == method.lower():
-                break
-
-        if options is None:
+        method_schema = next(
+            (
+                schema
+                for name, schema in self.methods.items()
+                if name.lower() == method.lower()
+            ),
+            None,
+        )
+        if method_schema is None:
             msg = f"Method `{method}` not found in schema."
             raise ValueError(msg)
 
+        options: dict[str, Any] = {
+            option: (type_ | None, None)
+            for option, type_ in method_schema.options.items()
+        }
         for common_options in self.common:
             options.update(
                 {
