@@ -239,9 +239,8 @@ class SciPyBackend(Backend):
             if not isinstance(self._config.options, dict):
                 msg = "SciPy backend options must be a dictionary"
                 raise ValueError(msg)
-            *_, method = self._method.rpartition("/")
             OptionsSchemaModel.model_validate(SCIPY_OPTIONS_SCHEMA).get_options_model(
-                DEFAULT_SCIPY_METHOD if method == "default" else method
+                self._method
             ).model_validate(self._config.options)
 
     def _initialize_bounds(self) -> Bounds | None:

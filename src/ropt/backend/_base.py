@@ -70,6 +70,15 @@ class Backend(ABC):
         context-dependent setup should usually be deferred to `validate_options`
         and `init`.
 
+        Warning: Method name with prefix
+            `backend_config.method` may be prefixed in the form
+            `"backend/method"`. Implementations should account for this when
+            parsing the method name.
+
+        Warning: Handling the default method
+            `backend_config.method` may be set to `"default"`, in which case it
+            should be mapped to the backend's actual default method.
+
         Args:
             backend_config: Configuration object specifying the backend method
                 and any method-specific options.
@@ -143,15 +152,6 @@ class Backend(ABC):
             depending on the backend. This method should verify that the type
             matches what the backend expects and raise a `ValueError` with a
             clear message when it does not.
-
-        Warning: Method name with prefix
-            The method string may be prefixed in the form `"backend/method"`.
-            Implementations should account for this when parsing the method
-            name.
-
-        Warning: Handling the default method
-            The method string may be set to `"default"`, in which case it
-            should be mapped to the backend's actual default method.
 
         Raises:
             ValueError: If the provided options are invalid.

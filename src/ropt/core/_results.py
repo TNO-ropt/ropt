@@ -62,23 +62,13 @@ def _propagate_nan_values(
     objective_results: NDArray[np.float64],
     constraint_results: NDArray[np.float64] | None,
 ) -> tuple[NDArray[np.float64], NDArray[np.float64] | None]:
-    failures = None
-    if objective_results is not None:
-        failures = np.logical_or.reduce(np.isnan(objective_results), axis=-1)
+    failures = np.logical_or.reduce(np.isnan(objective_results), axis=-1)
     if constraint_results is not None:
-        constraint_failures = np.logical_or.reduce(
-            np.isnan(constraint_results), axis=-1
-        )
-        if failures is None:
-            failures = constraint_failures
-        else:
-            failures |= constraint_failures
-    if objective_results is not None:
-        objective_results = objective_results.copy()
-        objective_results[failures, :] = np.nan
-    if constraint_results is not None:
-        constraint_failures = constraint_failures.copy()
+        failures |= np.logical_or.reduce(np.isnan(constraint_results), axis=-1)
+        constraint_results = constraint_results.copy()
         constraint_results[failures, :] = np.nan
+    objective_results = objective_results.copy()
+    objective_results[failures, :] = np.nan
     return objective_results, constraint_results
 
 
