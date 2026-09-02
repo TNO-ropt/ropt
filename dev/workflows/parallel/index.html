@@ -4163,7 +4163,7 @@ submission with the exception (via
 <a class="autorefs autorefs-internal" title="            fail" href="../../reference/components_executors/#ropt.components.executors.Submission.fail"><code>fail</code></a>) and returns to serving
 further work. It does <strong>not</strong> tear the executor down.</p>
 <p>The owning
-<a class="autorefs autorefs-internal" title="            eval" href="../../reference/components_evaluators/#ropt.components.evaluators.ParallelEvaluator.eval"><code>ParallelEvaluator.eval</code></a>
+<a class="autorefs autorefs-internal" title="            eval" href="../../reference/components_evaluators/#ropt.components.evaluators.Evaluator.eval"><code>ParallelEvaluator.eval</code></a>
 call receives the exception and <strong>re-raises the original unchanged</strong>, aborting
 the current evaluation. This is deliberately identical to the sequential
 <a class="autorefs autorefs-internal" title="            ropt.components.evaluators.FunctionEvaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.FunctionEvaluator"><code>FunctionEvaluator</code></a>: whichever
@@ -4429,7 +4429,7 @@ created." Concretely:</p>
   to the host process and needs no cross-process communication.</li>
 <li><strong>Concurrently (forbidden).</strong> A single step must not run more than once at a
   time: calling
-  <a class="autorefs autorefs-internal" title="            run" href="../../reference/components_compute_steps/#ropt.components.compute_steps.OptimizationStep.run"><code>run</code></a> on a step that is
+  <a class="autorefs autorefs-internal" title="            run" href="../../reference/components_compute_steps/#ropt.components.compute_steps.ComputeStep.run"><code>run</code></a> on a step that is
   already running — for example from two threads — raises a
   <a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a>. Give
   each concurrent optimization its own step; serial reuse of one step is fine.</li>

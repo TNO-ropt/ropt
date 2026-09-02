@@ -2729,17 +2729,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.components.event_handlers.HistoryHandler.handle_event" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        handle_event
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ropt.components.event_handlers.HistoryHandler.event_types" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2834,17 +2823,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.components.event_handlers.DataFrameHandler.handle_event" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        handle_event
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ropt.components.event_handlers.DataFrameHandler.event_types" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2906,17 +2884,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.components.event_handlers.CallbackHandler.handle_event" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        handle_event
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ropt.components.event_handlers.CallbackHandler.event_types" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2949,17 +2916,6 @@
     <span class="md-ellipsis">
       
         __init__
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.components.event_handlers.EventForwardHandler.handle_event" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        handle_event
       
     </span>
   </a>
@@ -3600,17 +3556,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.components.event_handlers.HistoryHandler.handle_event" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        handle_event
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ropt.components.event_handlers.HistoryHandler.event_types" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3705,17 +3650,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.components.event_handlers.DataFrameHandler.handle_event" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        handle_event
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ropt.components.event_handlers.DataFrameHandler.event_types" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3777,17 +3711,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.components.event_handlers.CallbackHandler.handle_event" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        handle_event
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ropt.components.event_handlers.CallbackHandler.event_types" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3820,17 +3743,6 @@
     <span class="md-ellipsis">
       
         __init__
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.components.event_handlers.EventForwardHandler.handle_event" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        handle_event
       
     </span>
   </a>
@@ -3987,12 +3899,7 @@ handlers shared across concurrent compute steps need no locking.</p>
 <p>A concrete handler reacts to the events emitted by a
 <a class="autorefs autorefs-internal" title="            ropt.components.compute_steps.ComputeStep" href="../components_compute_steps/#ropt.components.compute_steps.ComputeStep"><code>ComputeStep</code></a> it is attached to,
 by implementing
-<a class="autorefs autorefs-internal" title="            handle_event
-
-
-  
-      abstractmethod
-  " href="#ropt.components.event_handlers.EventHandler.handle_event"><code>handle_event</code></a>.
+<a class="autorefs autorefs-internal" title="            handle_event" href="#ropt.components.event_handlers.EventHandler.handle_event"><code>handle_event</code></a>.
 Handlers may store state using dictionary-like access (<code>[]</code>).</p>
 
 
@@ -4198,10 +4105,6 @@ Releasing an unclaimed handler is a no-op.</p>
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">handle_event</span>
 
 
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
-  </span>
-
 </h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">handle_event</span><span class="p">(</span><span class="n">event</span><span class="p">:</span> <span class="n">EnOptEvent</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
@@ -4241,6 +4144,29 @@ Releasing an unclaimed handler is a no-op.</p>
             </td>
             <td>
                 <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            WorkflowError (ropt.exceptions.WorkflowError)" href="../exceptions/#ropt.exceptions.WorkflowError">WorkflowError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If this handler is already running on another thread.</p>
+              </div>
             </td>
           </tr>
       </tbody>
@@ -4854,69 +4780,6 @@ details on domain handling and accumulation behavior.</p>
 
 
 
-<div class="doc doc-object doc-function">
-
-
-<h3 id="ropt.components.event_handlers.HistoryHandler.handle_event" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">handle_event</span>
-
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">handle_event</span><span class="p">(</span><span class="n">event</span><span class="p">:</span> <span class="n">EnOptEvent</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Handle incoming events.</p>
-<p>Processes <code>FINISHED_EVALUATION</code> events, optionally transforms results
-to the user domain, and appends them to <code>self["results"]</code>.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>event</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            EnOptEvent
-
-
-  
-      dataclass
-   (ropt.events.EnOptEvent)" href="../events/#ropt.events.EnOptEvent">EnOptEvent</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The event object.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
-
-
-
-
-
-
 <div class="doc doc-object doc-attribute">
 
 
@@ -5501,67 +5364,6 @@ variable.</p>
 
 
 
-<div class="doc doc-object doc-function">
-
-
-<h3 id="ropt.components.event_handlers.DataFrameHandler.handle_event" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">handle_event</span>
-
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">handle_event</span><span class="p">(</span><span class="n">event</span><span class="p">:</span> <span class="n">EnOptEvent</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Handle incoming events.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>event</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            EnOptEvent
-
-
-  
-      dataclass
-   (ropt.events.EnOptEvent)" href="../events/#ropt.events.EnOptEvent">EnOptEvent</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The event object.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
-
-
-
-
-
-
 <div class="doc doc-object doc-attribute">
 
 
@@ -5940,67 +5742,6 @@ etc.), register this handler with <code>run_in_thread=True</code> on the
 
 
 
-<div class="doc doc-object doc-function">
-
-
-<h3 id="ropt.components.event_handlers.CallbackHandler.handle_event" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">handle_event</span>
-
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">handle_event</span><span class="p">(</span><span class="n">event</span><span class="p">:</span> <span class="n">EnOptEvent</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Handle incoming events.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>event</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            EnOptEvent
-
-
-  
-      dataclass
-   (ropt.events.EnOptEvent)" href="../events/#ropt.events.EnOptEvent">EnOptEvent</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The event object.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
-
-
-
-
-
-
 <div class="doc doc-object doc-attribute">
 
 
@@ -6152,72 +5893,6 @@ etc.), register this handler with <code>run_in_thread=True</code> on the
             <td>
               <div class="doc-md-description">
                 <p>The set of event types to forward.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="ropt.components.event_handlers.EventForwardHandler.handle_event" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">handle_event</span>
-
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">handle_event</span><span class="p">(</span><span class="n">event</span><span class="p">:</span> <span class="n">EnOptEvent</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Forward the event to the EventDispatcher and wait for it.</p>
-<p>Submits the event to the dispatcher and blocks on the emitting run's own
-call stack until every handler has processed it. A handler fault is
-re-raised here as a clean exception with a normal exit code, instead of
-tearing down the session task group. See
-<a class="autorefs autorefs-internal" title="            dispatch_event" href="#ropt.components.event_handlers.EventDispatcher.dispatch_event"><code>dispatch_event</code></a>.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>event</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            EnOptEvent
-
-
-  
-      dataclass
-   (ropt.events.EnOptEvent)" href="../events/#ropt.events.EnOptEvent">EnOptEvent</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The event to forward.</p>
               </div>
             </td>
             <td>
