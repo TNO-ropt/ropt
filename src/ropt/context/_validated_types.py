@@ -1,6 +1,7 @@
 """Annotated types for Pydantic models providing input conversion and validation."""
 
-from typing import Annotated, Any, TypeVar
+from collections.abc import Callable
+from typing import Annotated, Any, Protocol, Self, TypeVar
 
 from pydantic import PlainValidator
 
@@ -15,7 +16,7 @@ from ropt.config import (
     VariableTransformConfig,
 )
 from ropt.function_estimator import FunctionEstimator
-from ropt.plugins.manager import get_plugin
+from ropt.plugins.manager import PluginType, get_plugin
 from ropt.realization_filter import RealizationFilter
 from ropt.sampler import Sampler
 from ropt.transforms import (
@@ -24,186 +25,116 @@ from ropt.transforms import (
     VariableTransform,
 )
 
-T = TypeVar("T")
+
+class _PluginConfig(Protocol):
+    method: str
+
+    @classmethod
+    def model_validate(cls, obj: Any, /) -> Self:  # ruff: ignore[any-type]
+        ...
 
 
-def _convert_backend(value: Backend | BackendConfig | dict[str, Any]) -> Backend:
-    if isinstance(value, Backend):
-        value.validate_options()
-        return value
-    if isinstance(value, BackendConfig):
-        plugin = get_plugin("backend", method=value.method)
-        result = plugin.create(value)
-        assert isinstance(result, Backend)
-        result.validate_options()
+_ConfigT = TypeVar("_ConfigT", bound=_PluginConfig)
+_InstanceT = TypeVar("_InstanceT")
+
+
+def _make_validator(
+    plugin_type: PluginType,
+    config_type: type[_ConfigT],
+    instance_type: type[_InstanceT],
+    extra: Callable[[_InstanceT], None] | None = None,
+) -> Callable[[Any], _InstanceT]:
+    article = "an" if instance_type.__name__[0] in "AEIOU" else "a"
+
+    def _convert(value: Any) -> _InstanceT:  # ruff: ignore[any-type]
+        if isinstance(value, instance_type):
+            result = value
+        elif isinstance(value, (config_type, dict)):
+            config = (
+                value
+                if isinstance(value, config_type)
+                else config_type.model_validate(value)
+            )
+            result = get_plugin(plugin_type, method=config.method).create(config)
+            assert isinstance(result, instance_type)
+        else:
+            msg = (
+                f"Value must be {article} {instance_type.__name__}, "
+                f"{config_type.__name__}, or dict."
+            )
+            raise ValueError(msg)  # ruff: ignore[type-check-without-type-error]
+        if extra is not None:
+            extra(result)
         return result
-    if isinstance(value, dict):
-        backend_config = BackendConfig.model_validate(value)
-        plugin = get_plugin("backend", method=backend_config.method)
-        result = plugin.create(backend_config)
-        assert isinstance(result, Backend)
-        result.validate_options()
-        return result
-    msg = "Value must be a Backend, BackendConfig, or dict."
-    raise ValueError(msg)
+
+    return _convert
 
 
-def _convert_sampler(value: Sampler | SamplerConfig | dict[str, Any]) -> Sampler:
-    if isinstance(value, Sampler):
-        return value
-    if isinstance(value, SamplerConfig):
-        result = get_plugin("sampler", method=value.method).create(value)
-        assert isinstance(result, Sampler)
-        return result
-    if isinstance(value, dict):
-        sampler_config = SamplerConfig.model_validate(value)
-        result = get_plugin("sampler", method=sampler_config.method).create(
-            sampler_config
-        )
-        assert isinstance(result, Sampler)
-        return result
-    msg = "Value must be a Sampler, SamplerConfig, or dict."
-    raise ValueError(msg)
+def _validate_backend_options(backend: Backend) -> None:
+    backend.validate_options()
 
 
-def _convert_realization_filter(
-    value: RealizationFilter | RealizationFilterConfig | dict[str, Any],
-) -> RealizationFilter:
-    if isinstance(value, RealizationFilter):
-        return value
-    if isinstance(value, RealizationFilterConfig):
-        result = get_plugin("realization_filter", method=value.method).create(value)
-        assert isinstance(result, RealizationFilter)
-        return result
-    if isinstance(value, dict):
-        realization_filter_config = RealizationFilterConfig.model_validate(value)
-        result = get_plugin(
-            "realization_filter", method=realization_filter_config.method
-        ).create(realization_filter_config)
-        assert isinstance(result, RealizationFilter)
-        return result
-    msg = "Value must be a RealizationFilter, RealizationFilterConfig, or dict."
-    raise ValueError(msg)
-
-
-def _convert_function_estimator(
-    value: FunctionEstimator | FunctionEstimatorConfig | dict[str, Any],
-) -> FunctionEstimator:
-    if isinstance(value, FunctionEstimator):
-        return value
-    if isinstance(value, FunctionEstimatorConfig):
-        result = get_plugin("function_estimator", method=value.method).create(value)
-        assert isinstance(result, FunctionEstimator)
-        return result
-    if isinstance(value, dict):
-        function_estimator_config = FunctionEstimatorConfig.model_validate(value)
-        result = get_plugin(
-            "function_estimator", method=function_estimator_config.method
-        ).create(function_estimator_config)
-        assert isinstance(result, FunctionEstimator)
-        return result
-    msg = "Value must be a FunctionEstimator, FunctionEstimatorConfig, or dict."
-    raise ValueError(msg)
-
-
-def _convert_variable_transform(
-    value: VariableTransform | VariableTransformConfig | dict[str, Any],
-) -> VariableTransform:
-    if isinstance(value, VariableTransform):
-        return value
-    if isinstance(value, VariableTransformConfig):
-        result = get_plugin("variable_transform", method=value.method).create(value)
-        assert isinstance(result, VariableTransform)
-        return result
-    if isinstance(value, dict):
-        variable_transform_config = VariableTransformConfig.model_validate(value)
-        result = get_plugin(
-            "variable_transform", method=variable_transform_config.method
-        ).create(variable_transform_config)
-        assert isinstance(result, VariableTransform)
-        return result
-    msg = "Value must be a VariableTransform, VariableTransformConfig, or dict."
-    raise ValueError(msg)
-
-
-def _convert_objective_transform(
-    value: ObjectiveTransform | ObjectiveTransformConfig | dict[str, Any],
-) -> ObjectiveTransform:
-    if isinstance(value, ObjectiveTransform):
-        return value
-    if isinstance(value, ObjectiveTransformConfig):
-        result = get_plugin("objective_transform", method=value.method).create(value)
-        assert isinstance(result, ObjectiveTransform)
-        return result
-    if isinstance(value, dict):
-        objective_transform_config = ObjectiveTransformConfig.model_validate(value)
-        result = get_plugin(
-            "objective_transform", method=objective_transform_config.method
-        ).create(objective_transform_config)
-        assert isinstance(result, ObjectiveTransform)
-        return result
-    msg = "Value must be an ObjectiveTransform, ObjectiveTransformConfig, or dict."
-    raise ValueError(msg)
-
-
-def _convert_nonlinear_constraint_transform(
-    value: NonlinearConstraintTransform
-    | NonlinearConstraintTransformConfig
-    | dict[str, Any],
-) -> NonlinearConstraintTransform:
-    if isinstance(value, NonlinearConstraintTransform):
-        return value
-    if isinstance(value, NonlinearConstraintTransformConfig):
-        result = get_plugin(
-            "nonlinear_constraint_transform", method=value.method
-        ).create(value)
-        assert isinstance(result, NonlinearConstraintTransform)
-        return result
-    if isinstance(value, dict):
-        nonlinear_constraint_transform_config = (
-            NonlinearConstraintTransformConfig.model_validate(value)
-        )
-        result = get_plugin(
-            "nonlinear_constraint_transform",
-            method=nonlinear_constraint_transform_config.method,
-        ).create(nonlinear_constraint_transform_config)
-        assert isinstance(result, NonlinearConstraintTransform)
-        return result
-    msg = (
-        "Value must be a NonlinearConstraintTransform, "
-        "NonlinearConstraintTransformConfig, or dict."
-    )
-    raise ValueError(msg)
-
-
-BackendInstance = Annotated[Backend, PlainValidator(_convert_backend)]
+BackendInstance = Annotated[
+    Backend,
+    PlainValidator(
+        _make_validator("backend", BackendConfig, Backend, _validate_backend_options)
+    ),
+]
 """Validate that the value is an instance of a Backend."""
 
-SamplerInstance = Annotated[Sampler, PlainValidator(_convert_sampler)]
+SamplerInstance = Annotated[
+    Sampler, PlainValidator(_make_validator("sampler", SamplerConfig, Sampler))
+]
 """Validate that the value is an instance of a Sampler."""
 
 RealizationFilterInstance = Annotated[
-    RealizationFilter, PlainValidator(_convert_realization_filter)
+    RealizationFilter,
+    PlainValidator(
+        _make_validator(
+            "realization_filter", RealizationFilterConfig, RealizationFilter
+        )
+    ),
 ]
 """Validate that the value is an instance of a RealizationFilter."""
 
 FunctionEstimatorInstance = Annotated[
-    FunctionEstimator, PlainValidator(_convert_function_estimator)
+    FunctionEstimator,
+    PlainValidator(
+        _make_validator(
+            "function_estimator", FunctionEstimatorConfig, FunctionEstimator
+        )
+    ),
 ]
 """Validate that the value is an instance of a FunctionEstimator."""
 
 VariableTransformInstance = Annotated[
-    VariableTransform, PlainValidator(_convert_variable_transform)
+    VariableTransform,
+    PlainValidator(
+        _make_validator(
+            "variable_transform", VariableTransformConfig, VariableTransform
+        )
+    ),
 ]
 """Validate that the value is an instance of a VariableTransform."""
 
 ObjectiveTransformInstance = Annotated[
-    ObjectiveTransform, PlainValidator(_convert_objective_transform)
+    ObjectiveTransform,
+    PlainValidator(
+        _make_validator(
+            "objective_transform", ObjectiveTransformConfig, ObjectiveTransform
+        )
+    ),
 ]
 """Validate that the value is an instance of an ObjectiveTransform."""
 
 NonlinearConstraintTransformInstance = Annotated[
     NonlinearConstraintTransform,
-    PlainValidator(_convert_nonlinear_constraint_transform),
+    PlainValidator(
+        _make_validator(
+            "nonlinear_constraint_transform",
+            NonlinearConstraintTransformConfig,
+            NonlinearConstraintTransform,
+        )
+    ),
 ]
 """Validate that the value is an instance of a NonlinearConstraintTransform."""
