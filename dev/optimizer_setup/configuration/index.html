@@ -3932,6 +3932,19 @@ number of constraints.</p>
 </ul>
 <p>All three fields (<code>coefficients</code>, <code>lower_bounds</code>, <code>upper_bounds</code>) are required;
 there are no defaults.</p>
+<p>Coefficients refer to all variables, including those fixed by the <code>mask</code> field
+of <a href="#variables"><code>variables</code></a>. Before the constraints are passed to the
+optimizer, the contribution of the fixed variables, evaluated at their initial
+values, is subtracted from the bounds. Constraints that only involve fixed
+variables reduce to a constant and are dropped. Dropping applies only to the
+optimizer: results are checked against the full set of constraints, so a
+constant that violates its bounds is reported in every result through
+<a class="autorefs autorefs-internal" title="            ropt.results.ConstraintInfo
+
+
+  
+      dataclass
+  " href="../../reference/results/#ropt.results.ConstraintInfo"><code>ConstraintInfo</code></a>.</p>
 <h3 id="nonlinear_constraints"><code>nonlinear_constraints</code> — <a class="autorefs autorefs-internal" title="            NonlinearConstraintsConfig" href="../../reference/config/#ropt.config.NonlinearConstraintsConfig"><code>NonlinearConstraintsConfig</code></a></h3>
 <p>Nonlinear constraints are defined by comparing a constraint function to
 right-hand-side bounds. The <code>lower_bounds</code> and <code>upper_bounds</code> fields specify

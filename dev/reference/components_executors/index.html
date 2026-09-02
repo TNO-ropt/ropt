@@ -3826,6 +3826,13 @@ subclass when adding a new execution mechanism.</p>
 
 
         <p>Abstract base class for executor components within an optimization workflow.</p>
+<p>Handing a submission to an executor transfers responsibility for it: the
+executor either runs its work items or ends the submission, so a caller
+waiting in <a class="autorefs autorefs-internal" title="            collect" href="#ropt.components.executors.Submission.collect"><code>collect</code></a> is
+always released. That holds for a submission still queued, one whose work is
+in flight, and one accepted before the executor was stopped.</p>
+<p>A submission that is already finished when it reaches a worker needs no work
+done: its caller has left, so running its work items only occupies a worker.</p>
 <p>Subclasses must implement the following abstract methods:</p>
 <ul>
 <li><a class="autorefs autorefs-internal" title="            start
@@ -3855,6 +3862,11 @@ subclass when adding a new execution mechanism.</p>
   " href="#ropt.components.executors.Executor.is_running"><code>is_running</code></a>: Reports
   whether the executor accepts work.</li>
 </ul>
+<p>See <a href="../../workflows/parallel/#error-handling">Error handling</a> for the
+distinction an implementation must make between an infrastructure failure,
+delivered as an <a class="autorefs autorefs-internal" title="            ExecutorFailure" href="../exceptions/#ropt.exceptions.ExecutorFailure"><code>ExecutorFailure</code></a> result,
+and an exception from the work item's own function, which ends the
+submission.</p>
 
 
 
@@ -3976,6 +3988,9 @@ subclass when adding a new execution mechanism.</p>
     <div class="doc doc-contents ">
 
         <p>Stop the executor.</p>
+<p>Every submission that was accepted and has not finished must be ended,
+so that its caller is released rather than left waiting for results that
+can no longer arrive.</p>
 <p>May be called from any thread.</p>
 
 
