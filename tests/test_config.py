@@ -1,8 +1,10 @@
 import copy
+import re
 from typing import Any
 
 import numpy as np
 import pytest
+from pydantic import ValidationError
 
 from ropt.config import LinearConstraintsConfig, VariablesConfig
 from ropt.context import EnOptContext
@@ -213,3 +215,46 @@ def test_perturbation_types_with_scaler(config: Any) -> None:
     )
     context = EnOptContext.model_validate(config)
     assert np.allclose(context.variables.perturbation_magnitudes, [0.1, 0.01, 0.02])
+
+
+@pytest.mark.parametrize(
+    ("field", "value", "message"),
+    [
+        ("backend", object(), "Value must be a Backend, BackendConfig, or dict."),
+        ("samplers", (object(),), "Value must be a Sampler, SamplerConfig, or dict."),
+        (
+            "realization_filters",
+            (object(),),
+            "Value must be a RealizationFilter, RealizationFilterConfig, or dict.",
+        ),
+        (
+            "function_estimators",
+            (object(),),
+            "Value must be a FunctionEstimator, FunctionEstimatorConfig, or dict.",
+        ),
+        (
+            "variable_transforms",
+            (object(),),
+            "Value must be a VariableTransform, VariableTransformConfig, or dict.",
+        ),
+        (
+            "objective_transforms",
+            (object(),),
+            "Value must be an ObjectiveTransform, ObjectiveTransformConfig, or dict.",
+        ),
+        (
+            "nonlinear_constraint_transforms",
+            (object(),),
+            (
+                "Value must be a NonlinearConstraintTransform, "
+                "NonlinearConstraintTransformConfig, or dict."
+            ),
+        ),
+    ],
+)
+def test_plugin_field_rejects_unknown_value(
+    config: dict[str, Any], field: str, value: Any, message: str
+) -> None:
+    config[field] = value
+    with pytest.raises(ValidationError, match=re.escape(message)):
+        EnOptContext.model_validate(config)
