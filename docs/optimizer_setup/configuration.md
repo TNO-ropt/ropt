@@ -323,6 +323,15 @@ number of constraints.
 All three fields (`coefficients`, `lower_bounds`, `upper_bounds`) are required;
 there are no defaults.
 
+Coefficients refer to all variables, including those fixed by the `mask` field
+of [`variables`](#variables). Before the constraints are passed to the
+optimizer, the contribution of the fixed variables, evaluated at their initial
+values, is subtracted from the bounds. Constraints that only involve fixed
+variables reduce to a constant and are dropped. Dropping applies only to the
+optimizer: results are checked against the full set of constraints, so a
+constant that violates its bounds is reported in every result through
+[`ConstraintInfo`][ropt.results.ConstraintInfo].
+
 ### `nonlinear_constraints` — [`NonlinearConstraintsConfig`][ropt.config.NonlinearConstraintsConfig] { #nonlinear_constraints }
 
 Nonlinear constraints are defined by comparing a constraint function to

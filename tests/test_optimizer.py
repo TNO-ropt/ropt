@@ -721,20 +721,33 @@ def test_optimizer_variables_subset_linear_constraints(
     config: Any, eval_func: Any, external: str
 ) -> None:
     config["backend"]["method"] = f"{external}{_SLSQP}"
-    # Set the second variable a constant value, this will not affect the
-    # optimization of the other variables in this particular test problem. The
-    # second and third constraints are dropped because they involve variables
-    # that are not optimized.
+    # The second constraint only involves the fixed variable.
     config["linear_constraints"] = {
-        "coefficients": [[1, 0, 1], [0, 1, 0], [1, 1, 1]],
-        "lower_bounds": [1.0, 1.0, 2.0],
-        "upper_bounds": [1.0, 1.0, 2.0],
+        "coefficients": [[1, 0, 1], [0, 1, 0]],
+        "lower_bounds": [1.0, 1.0],
+        "upper_bounds": [1.0, 1.0],
     }
     config["variables"]["mask"] = [True, False, True]
 
     result = optimize(config, [0.0, 1.0, 0.1], eval_func())
     assert result.variables is not None
     assert np.allclose(result.variables, [0.25, 1.0, 0.75], atol=0.02)
+
+
+def test_optimizer_variables_subset_linear_constraints_offset(
+    config: Any, eval_func: Any, external: str
+) -> None:
+    config["backend"]["method"] = f"{external}{_SLSQP}"
+    config["linear_constraints"] = {
+        "coefficients": [[1, 0, 1], [1, 1, 0]],
+        "lower_bounds": [1.0, -np.inf],
+        "upper_bounds": [1.0, 1.15],
+    }
+    config["variables"]["mask"] = [True, False, True]
+
+    result = optimize(config, [0.0, 1.0, 0.1], eval_func())
+    assert result.variables is not None
+    assert np.allclose(result.variables, [0.15, 1.0, 0.85], atol=0.02)
 
 
 def test_parallelize(config: Any, eval_func: Any, external: str) -> None:
