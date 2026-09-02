@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from ._results import Results
 
 
-def _to_dataframe(
+def _to_pandas_frame(
     results: Results,
     field_name: str,
     select: Iterable[str],

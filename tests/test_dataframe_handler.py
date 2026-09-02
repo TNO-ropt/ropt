@@ -21,7 +21,7 @@ from ropt.results import (
 if TYPE_CHECKING:
     from pathlib import Path
 
-    from ropt.components.event_handlers._dataframe_handler import Backend
+    from ropt.results._frame_support import DataFrameEngine
 
 _CONFIG: dict[str, Any] = {
     "variables": {"variable_count": 2},
@@ -36,11 +36,11 @@ _CONFIG_TWO_REALIZATIONS: dict[str, Any] = {
 }
 
 
-@pytest.fixture(name="backend", params=["pandas", "polars"])
-def backend_fixture(request: pytest.FixtureRequest) -> Backend:
+@pytest.fixture(name="engine", params=["pandas", "polars"])
+def engine_fixture(request: pytest.FixtureRequest) -> DataFrameEngine:
     # The parameters are the module names, so each one skips on its own install.
     pytest.importorskip(request.param)
-    return cast("Backend", request.param)
+    return cast("DataFrameEngine", request.param)
 
 
 def _is_empty(frame: Any) -> bool:
@@ -119,8 +119,8 @@ def _make_event_two_realizations(batch_id: int) -> EnOptEvent:
     )
 
 
-def test_table_handler_populates_table_from_events(backend: Backend) -> None:
-    handler = DataFrameHandler(backend=backend)
+def test_table_handler_populates_table_from_events(engine: DataFrameEngine) -> None:
+    handler = DataFrameHandler(engine=engine)
     handler.add_table("t", "functions", {"functions.target_objective": "Obj"})
     handler.handle_event(_make_event(1))
     df = handler["t"]
@@ -129,15 +129,15 @@ def test_table_handler_populates_table_from_events(backend: Backend) -> None:
 
 
 def test_table_handler_returns_empty_dataframe_before_any_event(
-    backend: Backend,
+    engine: DataFrameEngine,
 ) -> None:
-    handler = DataFrameHandler(backend=backend)
+    handler = DataFrameHandler(engine=engine)
     handler.add_table("t", "functions", {"functions.target_objective": "Obj"})
     assert _is_empty(handler["t"])
 
 
-def test_table_handler_accumulates_multiple_events(backend: Backend) -> None:
-    handler = DataFrameHandler(backend=backend)
+def test_table_handler_accumulates_multiple_events(engine: DataFrameEngine) -> None:
+    handler = DataFrameHandler(engine=engine)
     handler.add_table("t", "functions", {"functions.target_objective": "Obj"})
     handler.handle_event(_make_event(1, objective=1.0))
     handler.handle_event(_make_event(2, objective=2.0))
@@ -146,8 +146,10 @@ def test_table_handler_accumulates_multiple_events(backend: Backend) -> None:
     assert list(df["Obj"]) == [1.0, 2.0]
 
 
-def test_table_handler_uses_display_title_not_field_name(backend: Backend) -> None:
-    handler = DataFrameHandler(backend=backend)
+def test_table_handler_uses_display_title_not_field_name(
+    engine: DataFrameEngine,
+) -> None:
+    handler = DataFrameHandler(engine=engine)
     handler.add_table(
         "t",
         "functions",
@@ -159,8 +161,8 @@ def test_table_handler_uses_display_title_not_field_name(backend: Backend) -> No
     assert "functions.target_objective" not in df.columns
 
 
-def test_table_handler_renames_batch_id_column(backend: Backend) -> None:
-    handler = DataFrameHandler(backend=backend)
+def test_table_handler_renames_batch_id_column(engine: DataFrameEngine) -> None:
+    handler = DataFrameHandler(engine=engine)
     handler.add_table(
         "t",
         "functions",
@@ -175,8 +177,8 @@ def test_table_handler_renames_batch_id_column(backend: Backend) -> None:
     assert "batch_id" not in df.columns
 
 
-def test_table_handler_batch_id_value(backend: Backend) -> None:
-    handler = DataFrameHandler(backend=backend)
+def test_table_handler_batch_id_value(engine: DataFrameEngine) -> None:
+    handler = DataFrameHandler(engine=engine)
     handler.add_table(
         "t",
         "functions",
@@ -190,8 +192,10 @@ def test_table_handler_batch_id_value(backend: Backend) -> None:
     assert int(next(iter(df["Batch"]))) == 7
 
 
-def test_table_handler_column_order_objective_before_batch(backend: Backend) -> None:
-    handler = DataFrameHandler(backend=backend)
+def test_table_handler_column_order_objective_before_batch(
+    engine: DataFrameEngine,
+) -> None:
+    handler = DataFrameHandler(engine=engine)
     handler.add_table(
         "t",
         "functions",
@@ -205,8 +209,10 @@ def test_table_handler_column_order_objective_before_batch(backend: Backend) -> 
     assert cols.index("Obj") < cols.index("Batch")
 
 
-def test_table_handler_column_order_batch_before_objective(backend: Backend) -> None:
-    handler = DataFrameHandler(backend=backend)
+def test_table_handler_column_order_batch_before_objective(
+    engine: DataFrameEngine,
+) -> None:
+    handler = DataFrameHandler(engine=engine)
     handler.add_table(
         "t",
         "functions",
@@ -220,8 +226,10 @@ def test_table_handler_column_order_batch_before_objective(backend: Backend) -> 
     assert cols.index("Batch") < cols.index("Obj")
 
 
-def test_table_handler_omits_batch_id_when_not_in_columns(backend: Backend) -> None:
-    handler = DataFrameHandler(backend=backend)
+def test_table_handler_omits_batch_id_when_not_in_columns(
+    engine: DataFrameEngine,
+) -> None:
+    handler = DataFrameHandler(engine=engine)
     handler.add_table(
         "t",
         "functions",
@@ -233,8 +241,10 @@ def test_table_handler_omits_batch_id_when_not_in_columns(backend: Backend) -> N
     assert "Obj" in df.columns
 
 
-def test_table_handler_includes_realization_when_requested(backend: Backend) -> None:
-    handler = DataFrameHandler(backend=backend)
+def test_table_handler_includes_realization_when_requested(
+    engine: DataFrameEngine,
+) -> None:
+    handler = DataFrameHandler(engine=engine)
     handler.add_table(
         "t",
         "functions",
@@ -248,8 +258,8 @@ def test_table_handler_includes_realization_when_requested(backend: Backend) -> 
     assert "Realization" in df.columns
 
 
-def test_table_handler_renames_realization_column(backend: Backend) -> None:
-    handler = DataFrameHandler(backend=backend)
+def test_table_handler_renames_realization_column(engine: DataFrameEngine) -> None:
+    handler = DataFrameHandler(engine=engine)
     handler.add_table(
         "t",
         "functions",
@@ -264,8 +274,10 @@ def test_table_handler_renames_realization_column(backend: Backend) -> None:
     assert "realization" not in df.columns
 
 
-def test_table_handler_omits_realization_when_not_in_columns(backend: Backend) -> None:
-    handler = DataFrameHandler(backend=backend)
+def test_table_handler_omits_realization_when_not_in_columns(
+    engine: DataFrameEngine,
+) -> None:
+    handler = DataFrameHandler(engine=engine)
     handler.add_table(
         "t",
         "functions",
@@ -277,8 +289,8 @@ def test_table_handler_omits_realization_when_not_in_columns(backend: Backend) -
     assert "Obj,0" in df.columns
 
 
-def test_table_handler_realization_column_order(backend: Backend) -> None:
-    handler = DataFrameHandler(backend=backend)
+def test_table_handler_realization_column_order(engine: DataFrameEngine) -> None:
+    handler = DataFrameHandler(engine=engine)
     handler.add_table(
         "t",
         "functions",
@@ -292,8 +304,8 @@ def test_table_handler_realization_column_order(backend: Backend) -> None:
     assert cols.index("Obj,0") < cols.index("Run")
 
 
-def test_table_handler_realization_column_order_first(backend: Backend) -> None:
-    handler = DataFrameHandler(backend=backend)
+def test_table_handler_realization_column_order_first(engine: DataFrameEngine) -> None:
+    handler = DataFrameHandler(engine=engine)
     handler.add_table(
         "t",
         "functions",
@@ -307,13 +319,13 @@ def test_table_handler_realization_column_order_first(backend: Backend) -> None:
     assert cols.index("Run") < cols.index("Obj,0")
 
 
-def test_table_handler_invalid_backend() -> None:
-    with pytest.raises(ValueError, match="Invalid backend: nonsense"):
-        DataFrameHandler(backend="nonsense")  # type: ignore[arg-type]
+def test_table_handler_invalid_engine() -> None:
+    with pytest.raises(ValueError, match="Invalid frame engine: nonsense"):
+        DataFrameHandler(engine="nonsense")  # type: ignore[arg-type]
 
 
-def test_table_handler_callback_runs_on_every_update(backend: Backend) -> None:
-    handler = DataFrameHandler(backend=backend)
+def test_table_handler_callback_runs_on_every_update(engine: DataFrameEngine) -> None:
+    handler = DataFrameHandler(engine=engine)
     handler.add_table("t", "functions", {"functions.target_objective": "Obj"})
     calls = 0
 
@@ -328,11 +340,11 @@ def test_table_handler_callback_runs_on_every_update(backend: Backend) -> None:
 
 
 def test_table_handler_callback_receives_configured_output_dir(
-    backend: Backend, tmp_path: Path
+    engine: DataFrameEngine, tmp_path: Path
 ) -> None:
     # The callback typically persists the tables, so it is passed the output
     # directory of the run rather than having to dig it out of the context.
-    handler = DataFrameHandler(backend=backend)
+    handler = DataFrameHandler(engine=engine)
     handler.add_table("t", "functions", {"functions.target_objective": "Obj"})
     received: list[Path | None] = []
 
@@ -342,10 +354,12 @@ def test_table_handler_callback_receives_configured_output_dir(
     assert received == [None, tmp_path]
 
 
-def test_table_handler_callback_skipped_when_no_table_grew(backend: Backend) -> None:
+def test_table_handler_callback_skipped_when_no_table_grew(
+    engine: DataFrameEngine,
+) -> None:
     # Function results leave a gradients table untouched, so a callback that
     # persists the tables has nothing to persist.
-    handler = DataFrameHandler(backend=backend)
+    handler = DataFrameHandler(engine=engine)
     handler.add_table("t", "gradients", {"gradients.target_objective": "Grad"})
     called = False
 
@@ -359,23 +373,23 @@ def test_table_handler_callback_skipped_when_no_table_grew(backend: Backend) -> 
     assert _is_empty(handler["t"])
 
 
-def test_table_handler_backend_property(backend: Backend) -> None:
-    assert DataFrameHandler(backend=backend).backend == backend
+def test_table_handler_engine_property(engine: DataFrameEngine) -> None:
+    assert DataFrameHandler(engine=engine).engine == engine
 
 
-def test_table_handler_sep(backend: Backend) -> None:
-    handler = DataFrameHandler(backend=backend, sep="::")
+def test_table_handler_sep(engine: DataFrameEngine) -> None:
+    handler = DataFrameHandler(engine=engine, sep="::")
     handler.add_table("t", "functions", {"evaluations.objectives": "Obj"})
     handler.handle_event(_make_event_two_realizations(1))
     assert "Obj::0" in list(handler["t"].columns)
 
 
-def test_table_handler_backend_parity() -> None:
+def test_table_handler_engine_parity() -> None:
     pytest.importorskip("pandas")
     pytest.importorskip("polars")
 
     handlers = {
-        backend: DataFrameHandler(backend=backend) for backend in ("pandas", "polars")
+        engine: DataFrameHandler(engine=engine) for engine in ("pandas", "polars")
     }
     for handler in handlers.values():
         handler.add_table(
@@ -410,11 +424,11 @@ def test_table_handler_polars_keeps_keys_for_mixed_granularity() -> None:
         "functions.target_objective": "Total",
     }
     tables = {}
-    for backend in ("pandas", "polars"):
-        handler = DataFrameHandler(backend=backend)
+    for engine in ("pandas", "polars"):
+        handler = DataFrameHandler(engine=engine)
         handler.add_table("t", "functions", dict(columns))
         handler.handle_event(_make_event_two_realizations(1))
-        tables[backend] = handler["t"]
+        tables[engine] = handler["t"]
 
     # Pandas cannot align the per-batch and per-realization fields, so it loses
     # the key columns entirely; polars joins them and keeps every column.

@@ -7,7 +7,7 @@ import pytest
 from ropt.components.event_handlers import CallbackHandler
 from ropt.enums import AxisName, EnOptEventType
 from ropt.events import EnOptEvent
-from ropt.results import results_to_dataframe, results_to_polars
+from ropt.results import results_to_pandas, results_to_polars
 from ropt.simple import optimize
 
 pytest.importorskip("polars")
@@ -252,7 +252,7 @@ def test_polars_results_pandas_parity(
     )
     assert collected
 
-    pandas_frame = results_to_dataframe(
+    pandas_frame = results_to_pandas(
         collected, fields, result_type=result_type
     ).reset_index()
     pandas_frame.columns = [

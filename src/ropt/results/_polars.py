@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     from ._results import Results
 
 
-def _to_frame(
+def _to_polars_frame(
     results: Results,
     field_name: str,
     select: Iterable[str],

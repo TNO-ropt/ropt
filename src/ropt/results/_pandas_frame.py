@@ -3,12 +3,12 @@
 from __future__ import annotations
 
 from functools import partial
-from importlib.util import find_spec
-from typing import TYPE_CHECKING, Final, Literal
+from typing import TYPE_CHECKING, Literal
 
 from ropt.exceptions import UnsupportedError
 
 from ._frame_core import FRAME_SPECS, _get_select, _get_value, _has_results
+from ._frame_support import HAVE_PANDAS, missing_engine_message
 from ._function_results import FunctionResults
 from ._gradient_results import GradientResults
 
@@ -17,9 +17,7 @@ if TYPE_CHECKING:
 
     from ropt.results import Results
 
-_HAVE_PANDAS: Final = find_spec("pandas") is not None
-
-if _HAVE_PANDAS:
+if HAVE_PANDAS:
     import pandas as pd
 
 
@@ -33,7 +31,7 @@ def _get_results(
 
     return _join_frames(
         *(
-            results.to_dataframe(
+            results.to_pandas(
                 spec.field,
                 select=_get_select(spec.field, sub_fields),
                 unstack=spec.unstack,
@@ -73,7 +71,7 @@ def _add_metadata(
     return data_frame
 
 
-def results_to_dataframe(
+def results_to_pandas(
     results: Sequence[Results],
     fields: set[str],
     result_type: Literal["functions", "gradients"],
@@ -99,8 +97,10 @@ def results_to_dataframe(
                           unexpected types.
         UnsupportedError: If the `pandas` module is not installed.
     """
-    if not _HAVE_PANDAS:
-        msg = "results_to_dataframe requires the pandas module; install ropt[pandas]."
+    if not HAVE_PANDAS:
+        msg = missing_engine_message(
+            "pandas", "results_to_pandas", "use results_to_polars"
+        )
         raise UnsupportedError(msg)
 
     if result_type not in {"functions", "gradients"}:

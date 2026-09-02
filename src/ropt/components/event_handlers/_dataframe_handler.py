@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import threading
-from importlib.util import find_spec
 from typing import TYPE_CHECKING, Any, Final, Literal, cast
 
 from ropt.enums import EnOptEventType
@@ -9,8 +8,15 @@ from ropt.exceptions import UnsupportedError
 from ropt.results import (
     DomainType,
     Results,
-    results_to_dataframe,
+    results_to_pandas,
     results_to_polars,
+)
+from ropt.results._frame_support import (
+    HAVE_PANDAS,
+    HAVE_POLARS,
+    DataFrameEngine,
+    engine_available,
+    missing_engine_message,
 )
 
 from .base import EventHandler
@@ -21,16 +27,11 @@ if TYPE_CHECKING:
 
     from ropt.events import EnOptEvent
 
-_HAVE_PANDAS: Final = find_spec("pandas") is not None
-_HAVE_POLARS: Final = find_spec("polars") is not None
-
-if _HAVE_PANDAS:
+if HAVE_PANDAS:
     import pandas as pd
 
-if _HAVE_POLARS:
+if HAVE_POLARS:
     import polars as pl
-
-Backend = Literal["pandas", "polars"]
 
 
 _FUNCTION_TABLES: Final[dict[str, dict[str, str]]] = {
@@ -88,10 +89,10 @@ class DataFrameHandler(EventHandler):
     Tables are defined via `add_table` with a column specification, or
     registered in bulk with `set_default_tables`.
 
-    The frame library is chosen with the `backend` argument. The `"pandas"`
-    backend produces tables indexed by batch and axis labels, the `"polars"`
-    backend produces long-format tables in which those become ordinary leading
-    columns.
+    The frame library is chosen with the `engine` argument. The `"polars"`
+    engine, the default, produces long-format tables in which batch and axis
+    labels are ordinary leading columns; the `"pandas"` engine produces tables
+    indexed by those instead.
 
     Access tables via dictionary syntax: `handler["functions"]`.
 
@@ -107,43 +108,43 @@ class DataFrameHandler(EventHandler):
     def __init__(
         self,
         *,
-        backend: Backend = "pandas",
+        engine: DataFrameEngine = "polars",
         sep: str = ",",
     ) -> None:
         """Initialize a default table event handler.
 
         Args:
-            backend:   Frame library used to build the tables.
+            engine:    Frame library used to build the tables.
             sep:       Separator used in column names.
 
         Raises:
-            ValueError:       If `backend` is not `"pandas"` or `"polars"`.
-            UnsupportedError: If the selected backend module is not installed.
+            ValueError:       If `engine` is not `"pandas"` or `"polars"`.
+            UnsupportedError: If the selected frame library is not installed.
         """
-        if backend not in {"pandas", "polars"}:
-            msg = f"Invalid backend: {backend}"
+        if engine not in {"pandas", "polars"}:
+            msg = f"Invalid frame engine: {engine}"
             raise ValueError(msg)
-        if backend == "pandas" and not _HAVE_PANDAS:
-            msg = "DataFrameHandler requires the pandas module; install ropt[pandas]."
-            raise UnsupportedError(msg)
-        if backend == "polars" and not _HAVE_POLARS:
-            msg = "DataFrameHandler requires the polars module; install ropt[polars]."
+        if not engine_available(engine):
+            other = "polars" if engine == "pandas" else "pandas"
+            msg = missing_engine_message(
+                engine, "DataFrameHandler", f"pass engine='{other}'"
+            )
             raise UnsupportedError(msg)
 
         super().__init__()
-        self._backend: Backend = backend
+        self._engine: DataFrameEngine = engine
         self._sep = sep
         self._callback: Callable[[Path | None], None] | None = None
         self._tables: dict[str, _ResultsTable] = {}
 
     @property
-    def backend(self) -> Backend:
+    def engine(self) -> DataFrameEngine:
         """The frame library used to build the tables.
 
         Returns:
             Either `"pandas"` or `"polars"`.
         """
-        return self._backend
+        return self._engine
 
     def set_default_tables(self, *, domain: DomainType = "user") -> None:
         """Register a standard set of result tables.
@@ -203,7 +204,7 @@ class DataFrameHandler(EventHandler):
             columns,
             table_type=table_type,
             domain=domain,
-            backend=self._backend,
+            engine=self._engine,
             sep=self._sep,
         )
 
@@ -295,13 +296,13 @@ class _ResultsTable:
         table_type: Literal["functions", "gradients"],
         *,
         domain: DomainType = "user",
-        backend: Backend = "pandas",
+        engine: DataFrameEngine = "polars",
         sep: str = ",",
     ) -> None:
         self._columns = columns
         self._results_type = table_type
         self._domain = domain
-        self._backend = backend
+        self._engine = engine
         self._sep = sep
         self._frames: list[pd.DataFrame | pl.DataFrame] = []
         self._lock = threading.Lock()
@@ -317,7 +318,7 @@ class _ResultsTable:
     def add_results(self, results: Sequence[Results]) -> bool:
         with self._lock:
             columns = set(self._columns)
-        if self._backend == "polars":
+        if self._engine == "polars":
             polars_frame = results_to_polars(
                 results, columns, result_type=self._results_type, sep=self._sep
             )
@@ -325,7 +326,7 @@ class _ResultsTable:
                 return False
             frame: pd.DataFrame | pl.DataFrame = polars_frame
         else:
-            pandas_frame = results_to_dataframe(
+            pandas_frame = results_to_pandas(
                 results, columns, result_type=self._results_type
             )
             if pandas_frame.empty:
@@ -339,7 +340,7 @@ class _ResultsTable:
         with self._lock:
             frames = list(self._frames)
             columns = dict(self._columns)
-        if self._backend == "polars":
+        if self._engine == "polars":
             if not frames:
                 return pl.DataFrame()
             return _build_polars_table(

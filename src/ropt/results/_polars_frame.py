@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-from importlib.util import find_spec
-from typing import TYPE_CHECKING, Final, Literal
+from typing import TYPE_CHECKING, Literal
 
 from ropt.exceptions import UnsupportedError
 
 from ._frame_core import FRAME_SPECS, _get_select, _get_value, _has_results
+from ._frame_support import HAVE_POLARS, missing_engine_message
 from ._function_results import FunctionResults
 from ._gradient_results import GradientResults
 
@@ -16,12 +16,10 @@ if TYPE_CHECKING:
 
     from ropt.results import Results
 
-_HAVE_POLARS: Final = find_spec("polars") is not None
-
-if _HAVE_POLARS:
+if HAVE_POLARS:
     import polars as pl
 
-    from ._polars import _to_frame
+    from ._polars import _to_polars_frame
 
 
 def _get_results(
@@ -38,7 +36,7 @@ def _get_results(
     for spec in FRAME_SPECS[result_type]:
         if getattr(results, spec.field, None) is None:
             continue
-        frame, key_columns = _to_frame(
+        frame, key_columns = _to_polars_frame(
             results,
             spec.field,
             _get_select(spec.field, sub_fields),
@@ -102,7 +100,7 @@ def results_to_polars(
     """Aggregate multiple results into a single polars DataFrame.
 
     This is the polars counterpart of
-    [`results_to_dataframe`][ropt.results.results_to_dataframe], returned in
+    [`results_to_pandas`][ropt.results.results_to_pandas], returned in
     long format with tuple column names joined into a single string using
     `sep`. Unlike the pandas export, fields with different granularities are
     aligned into one table rather than kept as separate blocks. See
@@ -123,8 +121,10 @@ def results_to_polars(
                           unexpected types.
         UnsupportedError: If the `polars` module is not installed.
     """
-    if not _HAVE_POLARS:
-        msg = "results_to_polars requires the polars module; install ropt[polars]."
+    if not HAVE_POLARS:
+        msg = missing_engine_message(
+            "polars", "results_to_polars", "use results_to_pandas"
+        )
         raise UnsupportedError(msg)
 
     if result_type not in {"functions", "gradients"}:

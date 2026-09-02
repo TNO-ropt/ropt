@@ -35,7 +35,7 @@ patterns.
 ::: ropt.results.ConstraintInfo
     options:
         members: [create]
-::: ropt.results.results_to_dataframe
+::: ropt.results.results_to_pandas
 ::: ropt.results.results_to_polars
 ::: ropt.results.DomainType
 

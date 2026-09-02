@@ -5,13 +5,13 @@ the result hierarchy, axis metadata, domain transforms, and pandas/polars export
 """
 
 from ._constraint_info import ConstraintInfo
-from ._data_frame import results_to_dataframe
 from ._function_evaluations import FunctionEvaluations
 from ._function_results import FunctionResults
 from ._functions import Functions
 from ._gradient_evaluations import GradientEvaluations
 from ._gradient_results import GradientResults
 from ._gradients import Gradients
+from ._pandas_frame import results_to_pandas
 from ._polars_frame import results_to_polars
 from ._realizations import Realizations
 from ._result_field import ResultField
@@ -30,6 +30,6 @@ __all__ = [
     "Realizations",
     "ResultField",
     "Results",
-    "results_to_dataframe",
+    "results_to_pandas",
     "results_to_polars",
 ]
