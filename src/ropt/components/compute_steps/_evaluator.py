@@ -26,7 +26,7 @@ if TYPE_CHECKING:
 _logger = get_logger(__name__)
 
 
-class EvaluationStep(ComputeStep):
+class EvaluationStep(ComputeStep[None]):
     """The default evaluation step compute step.
 
     Evaluates a batch of variable vectors (a single vector or a 2-D matrix
@@ -48,7 +48,7 @@ class EvaluationStep(ComputeStep):
         super().__init__()
         self._evaluator = evaluator
 
-    def run(
+    def _run(
         self,
         context: EnOptContext,
         variables: ArrayLike,

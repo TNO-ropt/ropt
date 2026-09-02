@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import functools
 import threading
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
@@ -21,12 +20,13 @@ if TYPE_CHECKING:
 class Evaluator(ABC):
     """Abstract base class for evaluator components within an optimization workflow.
 
-    Subclasses must implement the abstract
-    [`eval`][ropt.components.evaluators.Evaluator.eval] method, which is
-    responsible for performing the actual evaluation of variables using an
+    Subclasses must implement the abstract `_eval` method, which performs the
+    actual evaluation of variables using an
     [`EvaluationBatchContext`][ropt.evaluation.EvaluationBatchContext] and
-    returning an
-    [`EvaluationBatchResult`][ropt.evaluation.EvaluationBatchResult].
+    returns an
+    [`EvaluationBatchResult`][ropt.evaluation.EvaluationBatchResult]. Callers use
+    [`eval`][ropt.components.evaluators.Evaluator.eval], which adds the
+    concurrency guard.
 
     Note:
         Evaluators are not safe for concurrent use. An evaluator raises a
@@ -41,48 +41,30 @@ class Evaluator(ABC):
         for usage and pitfalls.
     """
 
-    def __init_subclass__(cls, **kwargs: object) -> None:  # ruff: ignore[undocumented-magic-method]
-        super().__init_subclass__(**kwargs)
-        # Wrapped here rather than left to each `eval`, so that an evaluator
-        # written outside this package cannot forget the guard. `__wrapped__`
-        # marks an already wrapped `eval`, so inheriting one does not stack
-        # guards.
-        if "eval" in cls.__dict__ and not getattr(
-            cls.__dict__["eval"], "__wrapped__", None
-        ):
-            original = cls.__dict__["eval"]
-
-            @functools.wraps(original)
-            def _guarded(
-                self: Evaluator,
-                variables: NDArray[np.float64],
-                context: EvaluationBatchContext,
-                *,
-                _orig: Any = original,  # ruff: ignore[any-type]
-            ) -> EvaluationBatchResult:
-                with self._owner_lock:
-                    if self._in_use:
-                        msg = "The evaluator is already running on another thread."
-                        raise WorkflowError(msg)
-                    self._in_use = True
-                try:
-                    result = _orig(self, variables, context)
-                finally:
-                    with self._owner_lock:
-                        self._in_use = False
-                # The protocol is untyped at the boundary, so a wrong return
-                # value is caught here rather than deep in the ensemble code.
-                assert isinstance(result, EvaluationBatchResult)
-                return result
-
-            cls.eval = _guarded  # type: ignore[method-assign]
-
     def __init__(self) -> None:
         """Initialize the Evaluator."""
         self._in_use = False
         self._owner_lock = threading.Lock()
 
     @abstractmethod
+    def _eval(
+        self, variables: NDArray[np.float64], context: EvaluationBatchContext
+    ) -> EvaluationBatchResult:
+        """Evaluate objective and constraint functions for given variables.
+
+        Implemented by concrete subclasses; callers use `eval`, which adds the
+        concurrency guard.
+
+        Args:
+            variables: The matrix of variables to evaluate. Each row represents
+                       a variable vector.
+            context:   The evaluation context, providing additional information
+                       about the evaluation.
+
+        Returns:
+            An evaluation results object containing the calculated values.
+        """
+
     def eval(
         self, variables: NDArray[np.float64], context: EvaluationBatchContext
     ) -> EvaluationBatchResult:
@@ -103,6 +85,20 @@ class Evaluator(ABC):
             WorkflowError: If another thread is executing this evaluator's `eval`
                           method at the same time.
         """
+        with self._owner_lock:
+            if self._in_use:
+                msg = "The evaluator is already running on another thread."
+                raise WorkflowError(msg)
+            self._in_use = True
+        try:
+            result = self._eval(variables, context)
+        finally:
+            with self._owner_lock:
+                self._in_use = False
+        # The protocol is untyped at the boundary, so a wrong return value is
+        # caught here rather than deep in the ensemble code.
+        assert isinstance(result, EvaluationBatchResult)
+        return result
 
 
 @dataclass(slots=True)

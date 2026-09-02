@@ -11,7 +11,6 @@ nothing detaches it again.
 
 from __future__ import annotations
 
-import functools
 import threading
 from abc import ABC, abstractmethod
 from enum import Enum, auto
@@ -51,37 +50,6 @@ class EventHandler(ABC):
         [Parallel Evaluation](../workflows/parallel.md#event-dispatcher) for usage
         and pitfalls.
     """
-
-    def __init_subclass__(cls, **kwargs: object) -> None:  # ruff: ignore[undocumented-magic-method]
-        super().__init_subclass__(**kwargs)
-        # Wrapped here rather than left to each `handle_event`, so that a
-        # handler written outside this package cannot forget the guard.
-        # `__wrapped__` marks an already wrapped method, so inheriting one does
-        # not stack guards.
-        if "handle_event" in cls.__dict__ and not getattr(
-            cls.__dict__["handle_event"], "__wrapped__", None
-        ):
-            original = cls.__dict__["handle_event"]
-
-            @functools.wraps(original)
-            def _guarded(
-                self: EventHandler,
-                event: EnOptEvent,
-                *,
-                _orig: Any = original,  # ruff: ignore[any-type]
-            ) -> None:
-                with self._owner_lock:
-                    if self._in_use:
-                        msg = "The event handler is already running on another thread."
-                        raise WorkflowError(msg)
-                    self._in_use = True
-                try:
-                    _orig(self, event)
-                finally:
-                    with self._owner_lock:
-                        self._in_use = False
-
-            cls.handle_event = _guarded  # type: ignore[method-assign]
 
     def __init__(self) -> None:
         """Initialize the EventHandler."""
@@ -172,12 +140,35 @@ class EventHandler(ABC):
         """
 
     @abstractmethod
+    def _handle_event(self, event: EnOptEvent) -> None:
+        """React to an emitted event.
+
+        Implemented by concrete subclasses; callers use `handle_event`, which
+        adds the concurrency guard.
+
+        Args:
+            event: The event object.
+        """
+
     def handle_event(self, event: EnOptEvent) -> None:
         """React to an emitted event.
 
         Args:
             event: The event object.
+
+        Raises:
+            WorkflowError: If this handler is already running on another thread.
         """
+        with self._owner_lock:
+            if self._in_use:
+                msg = "The event handler is already running on another thread."
+                raise WorkflowError(msg)
+            self._in_use = True
+        try:
+            self._handle_event(event)
+        finally:
+            with self._owner_lock:
+                self._in_use = False
 
     def __getitem__(self, key: str) -> Any:  # ruff: ignore[any-type]
         """Retrieve a stored value by key (`handler[key]`).

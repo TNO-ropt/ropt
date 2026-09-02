@@ -64,7 +64,7 @@ class ResultsHandler(EventHandler):
         selected: FunctionResults | None = self["results"]
         return selected
 
-    def handle_event(self, event: EnOptEvent) -> None:
+    def _handle_event(self, event: EnOptEvent) -> None:
         results: tuple[FunctionResults, ...] = tuple(
             item
             for item in event.results

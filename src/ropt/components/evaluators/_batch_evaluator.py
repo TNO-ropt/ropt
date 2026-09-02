@@ -38,7 +38,7 @@ class BatchEvaluator(Evaluator):
         super().__init__()
         self._callback = callback
 
-    def eval(
+    def _eval(
         self, variables: NDArray[np.float64], context: EvaluationBatchContext
     ) -> EvaluationBatchResult:
         """Call the stored callback with the given variables and context.

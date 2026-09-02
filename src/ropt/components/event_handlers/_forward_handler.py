@@ -35,7 +35,7 @@ class EventForwardHandler(EventHandler):
         self._dispatcher = dispatcher
         self._event_types = event_types
 
-    def handle_event(self, event: EnOptEvent) -> None:
+    def _handle_event(self, event: EnOptEvent) -> None:
         """Forward the event to the EventDispatcher and wait for it.
 
         Submits the event to the dispatcher and blocks on the emitting run's own
