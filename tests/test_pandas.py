@@ -138,8 +138,8 @@ def test__get_field_data_metadata(gradient_result: GradientResults) -> None:
             assert values[real, pert] == info[r_idx, pert]
 
 
-def test_to_dataframe_function(function_result: FunctionResults) -> None:
-    frame = function_result.to_dataframe(
+def test_to_pandas_function(function_result: FunctionResults) -> None:
+    frame = function_result.to_pandas(
         "functions",
         [
             "target_objective",
@@ -152,8 +152,8 @@ def test_to_dataframe_function(function_result: FunctionResults) -> None:
     assert frame.index[1] == (1, "fb")
 
 
-def test_to_dataframe_gradient(gradient_result: GradientResults) -> None:
-    frame = gradient_result.to_dataframe(
+def test_to_pandas_gradient(gradient_result: GradientResults) -> None:
+    frame = gradient_result.to_pandas(
         "evaluations",
         [
             "variables",
@@ -179,8 +179,8 @@ def test_to_dataframe_gradient(gradient_result: GradientResults) -> None:
                     idx += 1
 
 
-def test_to_dataframe_unstack1(gradient_result: GradientResults) -> None:
-    frame = gradient_result.to_dataframe(
+def test_to_pandas_unstack1(gradient_result: GradientResults) -> None:
+    frame = gradient_result.to_pandas(
         "evaluations",
         select=["perturbed_variables"],
         unstack=[AxisName.REALIZATION, AxisName.VARIABLE],
@@ -196,9 +196,9 @@ def test_to_dataframe_unstack1(gradient_result: GradientResults) -> None:
     ]
 
 
-def test_to_dataframe_unstack2(gradient_result: GradientResults) -> None:
+def test_to_pandas_unstack2(gradient_result: GradientResults) -> None:
     assert gradient_result.gradients is not None
-    frame = gradient_result.to_dataframe(
+    frame = gradient_result.to_pandas(
         "gradients",
         select=["objectives", "target_objective"],
         unstack=[AxisName.OBJECTIVE, AxisName.VARIABLE],
@@ -213,8 +213,8 @@ def test_to_dataframe_unstack2(gradient_result: GradientResults) -> None:
     ]
 
 
-def test_to_dataframe_unstack_only_variable(gradient_result: GradientResults) -> None:
-    frame = gradient_result.to_dataframe(
+def test_to_pandas_unstack_only_variable(gradient_result: GradientResults) -> None:
+    frame = gradient_result.to_pandas(
         "evaluations",
         select=["perturbed_objectives", "perturbed_variables"],
         unstack=[AxisName.VARIABLE],
@@ -232,11 +232,9 @@ def test_to_dataframe_unstack_only_variable(gradient_result: GradientResults) ->
     ]
 
 
-def test_to_dataframe_join(function_result: FunctionResults) -> None:
-    frame1 = function_result.to_dataframe("evaluations", ["variables", "objectives"])
-    frame2 = function_result.to_dataframe(
-        "functions", ["target_objective", "objectives"]
-    )
+def test_to_pandas_join(function_result: FunctionResults) -> None:
+    frame1 = function_result.to_pandas("evaluations", ["variables", "objectives"])
+    frame2 = function_result.to_pandas("functions", ["target_objective", "objectives"])
     frame1.columns = pandas.Index(
         "_".join(column) if isinstance(column, tuple) else column
         for column in frame1.columns.to_numpy()

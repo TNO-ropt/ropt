@@ -2,10 +2,15 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from importlib.util import find_spec
-from typing import TYPE_CHECKING, Any, Final, TypeVar
+from typing import TYPE_CHECKING, Any, TypeVar
 
 from ropt.exceptions import UnsupportedError
+
+from ._frame_support import (
+    HAVE_PANDAS,
+    HAVE_POLARS,
+    missing_engine_message,
+)
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
@@ -17,17 +22,14 @@ if TYPE_CHECKING:
     from ropt.enums import AxisName
 
 
-_HAVE_PANDAS: Final = find_spec("pandas") is not None
-_HAVE_POLARS: Final = find_spec("polars") is not None
-
-if TYPE_CHECKING and _HAVE_PANDAS:
+if TYPE_CHECKING and HAVE_PANDAS:
     import pandas as pd  # ruff: ignore[typing-only-third-party-import]
-if TYPE_CHECKING and _HAVE_POLARS:
+if TYPE_CHECKING and HAVE_POLARS:
     import polars as pl  # ruff: ignore[typing-only-third-party-import]
-if _HAVE_PANDAS:
-    from ._pandas import _to_dataframe as _to_pandas_frame
-if _HAVE_POLARS:
-    from ._polars import _to_frame as _to_polars_frame
+if HAVE_PANDAS:
+    from ._pandas import _to_pandas_frame
+if HAVE_POLARS:
+    from ._polars import _to_polars_frame
 
 TypeResults = TypeVar("TypeResults", bound="Results")
 
@@ -56,7 +58,7 @@ class Results(ABC):
     names: dict[str, tuple[str | int, ...]]
     evaluation_point: NDArray[np.float64]
 
-    def to_dataframe(
+    def to_pandas(
         self,
         field_name: str,
         select: Iterable[str],
@@ -87,8 +89,8 @@ class Results(ABC):
             UnsupportedError: If the `pandas` module is not installed.
             AttributeError:      If the field name is invalid.
         """
-        if not _HAVE_PANDAS:
-            msg = "to_dataframe requires the pandas module; install ropt[pandas]."
+        if not HAVE_PANDAS:
+            msg = missing_engine_message("pandas", "to_pandas", "use to_polars")
             raise UnsupportedError(msg)
 
         if getattr(self, field_name, None) is None:
@@ -107,7 +109,7 @@ class Results(ABC):
         """Export a field to a polars DataFrame.
 
         This is the polars counterpart of
-        [`to_dataframe`][ropt.results.Results.to_dataframe], returned in long
+        [`to_pandas`][ropt.results.Results.to_pandas], returned in long
         format with tuple column names joined into a single string using
         `sep`. See [Exporting to polars](../optimizer_setup/results.md#exporting-to-polars)
         for details.
@@ -125,8 +127,8 @@ class Results(ABC):
             UnsupportedError: If the `polars` module is not installed.
             AttributeError:      If the field name is invalid.
         """
-        if not _HAVE_POLARS:
-            msg = "to_polars requires the polars module; install ropt[polars]."
+        if not HAVE_POLARS:
+            msg = missing_engine_message("polars", "to_polars", "use to_pandas")
             raise UnsupportedError(msg)
 
         if getattr(self, field_name, None) is None:

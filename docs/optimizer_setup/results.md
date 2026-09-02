@@ -250,7 +250,7 @@ This requires the `pandas` optional extra (see [Installation](../getting_started
 
 !!! note
 
-    The `to_dataframe` and `results_to_dataframe` functions shown here are the
+    The `to_pandas` and `results_to_pandas` functions shown here are the
     low-level export primitives. Most users do not call them directly: the
     [`DataFrameHandler`](../running/handlers.md#dataframehandler) builds and updates
     these tables automatically as an optimization runs. This section explains
@@ -263,7 +263,7 @@ exporting the objectives of a single result **without** any `names` gives plain
 numbers for both the realization and the objective axes:
 
 ```python
-df = result.to_dataframe("evaluations", select=["objectives"])
+df = result.to_pandas("evaluations", select=["objectives"])
 ```
 
 ```
@@ -281,11 +281,11 @@ examples below assume the realizations are named `"r0"`/`"r1"` and the objective
 
 ### Exporting a single result field
 
-The [`to_dataframe`][ropt.results.Results.to_dataframe] method on an individual
+The [`to_pandas`][ropt.results.Results.to_pandas] method on an individual
 result exports one field (or a subset of its sub-fields):
 
 ```python
-df = result.to_dataframe("evaluations", select=["variables", "objectives"])
+df = result.to_pandas("evaluations", select=["variables", "objectives"])
 ```
 
 By default, every axis of the exported sub-fields becomes a level in a
@@ -295,7 +295,7 @@ multi-index. For example, `objectives` in
 with the configured names:
 
 ```python
-df = result.to_dataframe("evaluations", select=["objectives"])
+df = result.to_pandas("evaluations", select=["objectives"])
 ```
 
 ```
@@ -313,7 +313,7 @@ the `OBJECTIVE` axis is unstacked:
 ```python
 from ropt.enums import AxisName
 
-df = result.to_dataframe(
+df = result.to_pandas(
     "evaluations",
     select=["objectives"],
     unstack=[AxisName.OBJECTIVE],
@@ -334,15 +334,15 @@ tuples; unstacking every axis leaves a flat table with one row per result.
 
 ### Aggregating multiple results
 
-[`results_to_dataframe`][ropt.results.results_to_dataframe] builds on
-`to_dataframe` to convert a *sequence* of results into a single DataFrame, one
+[`results_to_pandas`][ropt.results.results_to_pandas] builds on
+`to_pandas` to convert a *sequence* of results into a single DataFrame, one
 row per result. It automatically unstacks the most common axes (`VARIABLE`,
 `OBJECTIVE`, `NONLINEAR_CONSTRAINT`) into columns:
 
 ```python
-from ropt.results import results_to_dataframe
+from ropt.results import results_to_pandas
 
-df = results_to_dataframe(
+df = results_to_pandas(
     all_results,
     fields={"evaluations.variables"},
     result_type="functions",
@@ -369,13 +369,13 @@ argument selects which results to process: `"functions"` for
 The two kinds of [metadata](#metadata) are exported differently, and the two
 functions are **not** symmetric.
 
-`to_dataframe` works on a single result field, so it reaches that field's
+`to_pandas` works on a single result field, so it reaches that field's
 **per-realization metadata** (named `metadata.<key>`), which keeps the
 `realization` axis. For example, if the objective attached a per-realization
 `shift`:
 
 ```python
-df = result.to_dataframe("evaluations", select=["metadata.shift"])
+df = result.to_pandas("evaluations", select=["metadata.shift"])
 ```
 
 ```
@@ -385,13 +385,13 @@ batch_id realization
          r1                     1.1
 ```
 
-`to_dataframe` **cannot** reach the run-level **result metadata**, because it is
-not part of any single field. Use `results_to_dataframe` for that: name it with a
+`to_pandas` **cannot** reach the run-level **result metadata**, because it is
+not part of any single field. Use `results_to_pandas` for that: name it with a
 top-level `metadata.` prefix to get one value per result — handy for pulling in a
 run tag:
 
 ```python
-df = results_to_dataframe(
+df = results_to_pandas(
     all_results,
     fields={"metadata.run_id", "functions.target_objective"},
     result_type="functions",

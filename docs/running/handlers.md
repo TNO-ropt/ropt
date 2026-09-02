@@ -150,13 +150,14 @@ column levels come from the field's axis labels (or indices), joined to the
 title with a separator (`,` by default, set with `sep=`). For example, a
 length-2 `evaluations.variables` gives `Variable,v0` and `Variable,v1`. Because
 the column names follow
-[`results_to_dataframe`](../optimizer_setup/results.md#metadata-columns),
+[`results_to_pandas`](../optimizer_setup/results.md#metadata-columns),
 both result-level and per-realization metadata can be included and renamed.
 
-Pass `backend="polars"` to get polars DataFrames instead:
+Tables are built with polars by default. Pass `engine="pandas"` to get pandas
+DataFrames instead:
 
 ```python
-tables = DataFrameHandler(backend="polars")
+tables = DataFrameHandler(engine="pandas")
 ```
 
 The tables carry the same columns under the same titles. As explained in

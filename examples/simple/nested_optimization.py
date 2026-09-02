@@ -140,7 +140,7 @@ def main() -> None:
 
     # polars keeps the key columns as ordinary columns instead of an index, so
     # the frame can be filtered by outer evaluation directly.
-    tables = DataFrameHandler(backend="polars")
+    tables = DataFrameHandler()
     tables.add_table(
         "inner",
         "functions",

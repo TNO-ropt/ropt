@@ -6,7 +6,7 @@ import pytest
 from ropt.components.event_handlers import CallbackHandler
 from ropt.enums import AxisName, EnOptEventType
 from ropt.events import EnOptEvent
-from ropt.results import results_to_dataframe
+from ropt.results import results_to_pandas
 from ropt.simple import optimize
 
 # Requires pandas:
@@ -55,7 +55,7 @@ def _handle_results(
     if metadata is not None:
         for item in results:
             item.metadata = metadata
-    frame = results_to_dataframe(results, fields, result_type=result_type)
+    frame = results_to_pandas(results, fields, result_type=result_type)
     if not frame.empty:
         frames.append(frame)
 
@@ -197,4 +197,4 @@ def test_dataframe_results_metadata(config: Any, eval_func: Any) -> None:
 
 
 def test_pandas_results_empty_input() -> None:
-    assert results_to_dataframe((), set(), result_type="functions").empty
+    assert results_to_pandas((), set(), result_type="functions").empty

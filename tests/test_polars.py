@@ -332,7 +332,7 @@ def test_to_polars_pandas_parity(
 
     fixture, field, select, unstack = case
     result: Results = request.getfixturevalue(fixture)
-    pandas_frame = result.to_dataframe(field, select, unstack).reset_index()
+    pandas_frame = result.to_pandas(field, select, unstack).reset_index()
     pandas_frame.columns = [
         sep.join(str(part) for part in column)
         if isinstance(column, tuple)
