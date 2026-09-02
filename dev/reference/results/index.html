@@ -2071,10 +2071,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.results.Results.to_dataframe" class="md-nav__link">
+  <a href="#ropt.results.Results.to_pandas" class="md-nav__link">
     <span class="md-ellipsis">
       
-        to_dataframe
+        to_pandas
       
     </span>
   </a>
@@ -2344,10 +2344,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.results.results_to_dataframe" class="md-nav__link">
+  <a href="#ropt.results.results_to_pandas" class="md-nav__link">
     <span class="md-ellipsis">
       
-        results_to_dataframe
+        results_to_pandas
       
     </span>
   </a>
@@ -3270,10 +3270,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.results.Results.to_dataframe" class="md-nav__link">
+  <a href="#ropt.results.Results.to_pandas" class="md-nav__link">
     <span class="md-ellipsis">
       
-        to_dataframe
+        to_pandas
       
     </span>
   </a>
@@ -3543,10 +3543,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.results.results_to_dataframe" class="md-nav__link">
+  <a href="#ropt.results.results_to_pandas" class="md-nav__link">
     <span class="md-ellipsis">
       
-        results_to_dataframe
+        results_to_pandas
       
     </span>
   </a>
@@ -3781,12 +3781,12 @@ the result hierarchy, axis metadata, domain transforms, and pandas/polars export
 <div class="doc doc-object doc-function">
 
 
-<h3 id="ropt.results.Results.to_dataframe" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">to_dataframe</span>
+<h3 id="ropt.results.Results.to_pandas" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">to_pandas</span>
 
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">to_dataframe</span><span class="p">(</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">to_pandas</span><span class="p">(</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">field_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">select</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">unstack</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">AxisName</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -3955,7 +3955,7 @@ further details and examples.</p>
 
         <p>Export a field to a polars DataFrame.</p>
 <p>This is the polars counterpart of
-<a class="autorefs autorefs-internal" title="            to_dataframe" href="#ropt.results.Results.to_dataframe"><code>to_dataframe</code></a>, returned in long
+<a class="autorefs autorefs-internal" title="            to_pandas" href="#ropt.results.Results.to_pandas"><code>to_pandas</code></a>, returned in long
 format with tuple column names joined into a single string using
 <code>sep</code>. See <a href="../../optimizer_setup/results/#exporting-to-polars">Exporting to polars</a>
 for details.</p>
@@ -6753,12 +6753,12 @@ default to <code>None</code> and are only populated if bounds are present and fi
 <div class="doc doc-object doc-function">
 
 
-<h2 id="ropt.results.results_to_dataframe" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">ropt.results.results_to_dataframe</span>
+<h2 id="ropt.results.results_to_pandas" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">ropt.results.results_to_pandas</span>
 
 
 </h2>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">results_to_dataframe</span><span class="p">(</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">results_to_pandas</span><span class="p">(</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">results</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Results</span><span class="p">],</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">fields</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">result_type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"functions"</span><span class="p">,</span> <span class="s2">"gradients"</span><span class="p">],</span>
@@ -6939,7 +6939,7 @@ for field selection and unstacking.</p>
 
         <p>Aggregate multiple results into a single polars DataFrame.</p>
 <p>This is the polars counterpart of
-<a class="autorefs autorefs-internal" title="            ropt.results.results_to_dataframe" href="#ropt.results.results_to_dataframe"><code>results_to_dataframe</code></a>, returned in
+<a class="autorefs autorefs-internal" title="            ropt.results.results_to_pandas" href="#ropt.results.results_to_pandas"><code>results_to_pandas</code></a>, returned in
 long format with tuple column names joined into a single string using
 <code>sep</code>. Unlike the pandas export, fields with different granularities are
 aligned into one table rather than kept as separate blocks. See

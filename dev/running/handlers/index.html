@@ -3298,10 +3298,11 @@ column levels come from the field's axis labels (or indices), joined to the
 title with a separator (<code>,</code> by default, set with <code>sep=</code>). For example, a
 length-2 <code>evaluations.variables</code> gives <code>Variable,v0</code> and <code>Variable,v1</code>. Because
 the column names follow
-<a href="../../optimizer_setup/results/#metadata-columns"><code>results_to_dataframe</code></a>,
+<a href="../../optimizer_setup/results/#metadata-columns"><code>results_to_pandas</code></a>,
 both result-level and per-realization metadata can be included and renamed.</p>
-<p>Pass <code>backend="polars"</code> to get polars DataFrames instead:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">tables</span> <span class="o">=</span> <span class="n">DataFrameHandler</span><span class="p">(</span><span class="n">backend</span><span class="o">=</span><span class="s2">"polars"</span><span class="p">)</span>
+<p>Tables are built with polars by default. Pass <code>engine="pandas"</code> to get pandas
+DataFrames instead:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">tables</span> <span class="o">=</span> <span class="n">DataFrameHandler</span><span class="p">(</span><span class="n">engine</span><span class="o">=</span><span class="s2">"pandas"</span><span class="p">)</span>
 </span></code></pre></div>
 <p>The tables carry the same columns under the same titles. As explained in
 <a href="../../optimizer_setup/results/#exporting-to-polars">Exporting to polars</a>, polars
