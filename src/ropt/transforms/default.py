@@ -8,6 +8,11 @@ from ropt.config import (
     ObjectiveTransformConfig,
     VariableTransformConfig,
 )
+from ropt.plugins.transforms import (
+    NonlinearConstraintTransformPlugin,
+    ObjectiveTransformPlugin,
+    VariableTransformPlugin,
+)
 
 from .base import NonlinearConstraintTransform, ObjectiveTransform, VariableTransform
 
@@ -361,3 +366,74 @@ class DefaultNonlinearConstraintTransform(NonlinearConstraintTransform):
         self._scales = np.asarray(scales, dtype=np.float64)
         if self._mask is not None:
             self._scales = np.where(self._mask, self._scales, 1.0)
+
+
+class DefaultVariableTransformPlugin(VariableTransformPlugin):
+    """Default variable transform plugin class."""
+
+    @classmethod
+    def create(
+        cls,
+        config: VariableTransformConfig,
+    ) -> DefaultVariableTransform:
+        """Create a DefaultVariableTransform instance.
+
+        Args:
+            config: The variable transform configuration.
+
+        Returns:
+            A new `DefaultVariableTransform`.
+        """
+        return DefaultVariableTransform(config)
+
+    @classmethod
+    def is_supported(cls, method: str) -> bool:  # ruff: ignore[undocumented-public-method]
+        return method.lower() in (DEFAULT_VARIABLE_TRANSFORM_METHODS | {"default"})
+
+
+class DefaultObjectiveTransformPlugin(ObjectiveTransformPlugin):
+    """Default objective transform plugin class."""
+
+    @classmethod
+    def create(
+        cls,
+        config: ObjectiveTransformConfig,
+    ) -> DefaultObjectiveTransform:
+        """Create a DefaultObjectiveTransform instance.
+
+        Args:
+            config: The objective transform configuration.
+
+        Returns:
+            A new `DefaultObjectiveTransform`.
+        """
+        return DefaultObjectiveTransform(config)
+
+    @classmethod
+    def is_supported(cls, method: str) -> bool:  # ruff: ignore[undocumented-public-method]
+        return method.lower() in (DEFAULT_OBJECTIVE_TRANSFORM_METHODS | {"default"})
+
+
+class DefaultNonlinearConstraintTransformPlugin(NonlinearConstraintTransformPlugin):
+    """Default nonlinear constraint transform plugin class."""
+
+    @classmethod
+    def create(
+        cls,
+        config: NonlinearConstraintTransformConfig,
+    ) -> DefaultNonlinearConstraintTransform:
+        """Create a DefaultNonlinearConstraintTransform instance.
+
+        Args:
+            config: The nonlinear constraint transform configuration.
+
+        Returns:
+            A new `DefaultNonlinearConstraintTransform`.
+        """
+        return DefaultNonlinearConstraintTransform(config)
+
+    @classmethod
+    def is_supported(cls, method: str) -> bool:  # ruff: ignore[undocumented-public-method]
+        return method.lower() in (
+            DEFAULT_NONLINEAR_CONSTRAINT_TRANSFORM_METHODS | {"default"}
+        )

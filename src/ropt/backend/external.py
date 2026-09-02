@@ -15,7 +15,8 @@ from ropt._logging import get_logger
 from ropt._serialize import CANNOT_DESERIALIZE, CANNOT_SERIALIZE, dumps, loads
 from ropt.backend import Backend
 from ropt.exceptions import ExecutionError, OptimizerStop
-from ropt.plugins.manager import get_plugin
+from ropt.plugins.backend import BackendPlugin
+from ropt.plugins.manager import get_plugin, get_plugin_name
 
 if TYPE_CHECKING:
     from multiprocessing.process import BaseProcess
@@ -330,3 +331,27 @@ def _wrap_with_traceback(message: str, tb_str: str) -> RuntimeError:
     if tb_str:
         err.add_note(f"Child traceback:\n{tb_str}")
     return err
+
+
+class ExternalBackendPlugin(BackendPlugin):
+    """The external optimizer plugin class."""
+
+    @classmethod
+    def create(cls, backend_config: BackendConfig) -> ExternalBackend:
+        """Create an ExternalBackend instance.
+
+        Args:
+            backend_config: The backend configuration.
+
+        Returns:
+            A new `ExternalBackend`.
+        """
+        return ExternalBackend(backend_config)
+
+    @classmethod
+    def is_supported(cls, method: str) -> bool:  # ruff: ignore[undocumented-public-method]
+        return get_plugin_name("backend", method) is not None
+
+    @classmethod
+    def allows_discovery(cls) -> bool:  # ruff: ignore[undocumented-public-method]
+        return False

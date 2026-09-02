@@ -13,6 +13,7 @@ from scipy.stats.qmc import Halton, LatinHypercube, QMCEngine, Sobol, scale
 from ropt.config import SamplerConfig
 from ropt.context import EnOptContext
 from ropt.exceptions import UnsupportedError
+from ropt.plugins.sampler import SamplerPlugin
 from ropt.sampler import Sampler
 
 _STATS_SAMPLERS: Final[dict[str, Any]] = {
@@ -183,3 +184,26 @@ class SciPySampler(Sampler):
                 return _run_qmc_engine()
         else:
             return _run_qmc_engine()
+
+
+class SciPySamplerPlugin(SamplerPlugin):
+    """Default sampler plugin class."""
+
+    @classmethod
+    def create(
+        cls,
+        sampler_config: SamplerConfig,
+    ) -> SciPySampler:
+        """Create a SciPySampler instance.
+
+        Args:
+            sampler_config: The sampler configuration.
+
+        Returns:
+            A new `SciPySampler`.
+        """
+        return SciPySampler(sampler_config)
+
+    @classmethod
+    def is_supported(cls, method: str) -> bool:  # ruff: ignore[undocumented-public-method]
+        return method.lower() in (SCIPY_SAMPLER_SUPPORTED_METHODS | {"default"})

@@ -87,7 +87,7 @@ selected.
 
 ## Default transforms
 
-The `ropt.plugins.transforms.default` package provides built-in linear scaling
+The `ropt.transforms.default` package provides built-in linear scaling
 transforms, exposed as the `default/scaler` method.
 
 ### DefaultVariableTransform

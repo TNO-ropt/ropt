@@ -10,5 +10,5 @@ algorithm descriptions.
     options:
         members: []
 ::: ropt.function_estimator.FunctionEstimator
-::: ropt.plugins.function_estimator.default.DefaultFunctionEstimator
+::: ropt.function_estimator.default.DefaultFunctionEstimator
 
