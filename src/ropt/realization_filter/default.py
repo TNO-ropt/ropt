@@ -9,6 +9,7 @@ from pydantic import BaseModel, ConfigDict, Field, NonNegativeInt
 from ropt.config import RealizationFilterConfig
 from ropt.context import EnOptContext
 from ropt.exceptions import TooFewRealizations
+from ropt.plugins.realization_filter import RealizationFilterPlugin
 from ropt.realization_filter import RealizationFilter
 
 DEFAULT_REALIZATION_FILTER_METHODS = {
@@ -280,3 +281,23 @@ def _get_cvar_weights_from_percentile(
     if n_var < indices.size:
         weights[indices[n_var]] = p_var
     return weights
+
+
+class DefaultRealizationFilterPlugin(RealizationFilterPlugin):
+    """Default realization filter plugin class."""
+
+    @classmethod
+    def create(cls, filter_config: RealizationFilterConfig) -> DefaultRealizationFilter:
+        """Create a DefaultRealizationFilter instance.
+
+        Args:
+            filter_config: The realization filter configuration.
+
+        Returns:
+            A new `DefaultRealizationFilter`.
+        """
+        return DefaultRealizationFilter(filter_config)
+
+    @classmethod
+    def is_supported(cls, method: str) -> bool:  # ruff: ignore[undocumented-public-method]
+        return method.lower() in DEFAULT_REALIZATION_FILTER_METHODS

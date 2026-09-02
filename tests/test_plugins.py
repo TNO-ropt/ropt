@@ -6,9 +6,9 @@ from typing import TYPE_CHECKING, Any, Literal
 import pytest
 from pydantic import ValidationError
 
+from ropt.backend.scipy import SciPyBackendPlugin
 from ropt.config.options import OptionsSchemaModel
 from ropt.plugins.backend import BackendPlugin
-from ropt.plugins.backend.scipy import SciPyBackendPlugin
 from ropt.plugins.manager import PluginManager, get_plugin
 
 if TYPE_CHECKING:

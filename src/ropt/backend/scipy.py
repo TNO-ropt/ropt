@@ -33,6 +33,7 @@ from ropt.backend.utils import (
 from ropt.config.options import OptionsSchemaModel
 from ropt.enums import VariableType
 from ropt.exceptions import UnsupportedError
+from ropt.plugins.backend import BackendPlugin
 
 if TYPE_CHECKING:
     from ropt.config import BackendConfig
@@ -863,6 +864,26 @@ SCIPY_OPTIONS_SCHEMA: dict[str, Any] = {
         },
     },
 }
+
+
+class SciPyBackendPlugin(BackendPlugin):
+    """The SciPy backend plugin class."""
+
+    @classmethod
+    def create(cls, backend_config: BackendConfig) -> SciPyBackend:
+        """Create a SciPyBackend instance.
+
+        Args:
+            backend_config: The backend configuration.
+
+        Returns:
+            A new `SciPyBackend`.
+        """
+        return SciPyBackend(backend_config)
+
+    @classmethod
+    def is_supported(cls, method: str) -> bool:  # ruff: ignore[undocumented-public-method]
+        return method.lower() in (SUPPORTED_SCIPY_METHODS | {"default"})
 
 
 if __name__ == "__main__":

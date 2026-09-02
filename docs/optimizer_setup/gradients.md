@@ -129,7 +129,7 @@ realizations.
 A function estimator decides how the gradient samples (and the function
 samples for non-default estimators) are combined into the final estimate.
 The default
-[`DefaultFunctionEstimator`][ropt.plugins.function_estimator.default.DefaultFunctionEstimator]
+[`DefaultFunctionEstimator`][ropt.function_estimator.default.DefaultFunctionEstimator]
 uses the mean of the functions and gradients. Alternative estimators are configured via the
 `function_estimators` tuple and selected per-objective in
 [`ObjectiveFunctionsConfig.function_estimators`][ropt.config.ObjectiveFunctionsConfig].

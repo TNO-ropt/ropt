@@ -9,6 +9,7 @@ from ropt.config import FunctionEstimatorConfig
 from ropt.context import EnOptContext
 from ropt.exceptions import TooFewRealizations
 from ropt.function_estimator import FunctionEstimator
+from ropt.plugins.function_estimator import FunctionEstimatorPlugin
 
 _MIN_STDDEV_REALIZATIONS: Final = 2
 
@@ -140,3 +141,25 @@ def _mean_stddev(
     mean = np.dot(functions, weights)
     stddev = np.sqrt(norm * np.dot((functions - mean[..., np.newaxis]) ** 2, weights))
     return norm, mean, stddev
+
+
+class DefaultFunctionEstimatorPlugin(FunctionEstimatorPlugin):
+    """Default filter estimator plugin class."""
+
+    @classmethod
+    def create(
+        cls, estimator_config: FunctionEstimatorConfig
+    ) -> DefaultFunctionEstimator:
+        """Create a DefaultFunctionEstimator instance.
+
+        Args:
+            estimator_config: The function estimator configuration.
+
+        Returns:
+            A new `DefaultFunctionEstimator`.
+        """
+        return DefaultFunctionEstimator(estimator_config)
+
+    @classmethod
+    def is_supported(cls, method: str) -> bool:  # ruff: ignore[undocumented-public-method]
+        return method.lower() in DEFAULT_FUNCTION_ESTIMATOR_METHODS

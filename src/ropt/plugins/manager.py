@@ -91,12 +91,12 @@ class PluginManager:
         if self._plugins:
             return
 
-        from .sampler.scipy import SciPySamplerPlugin
-        from .realization_filter.default import DefaultRealizationFilterPlugin
-        from .function_estimator.default import DefaultFunctionEstimatorPlugin
-        from .backend.external import ExternalBackendPlugin
-        from .backend.scipy import SciPyBackendPlugin
-        from .transforms.default import (
+        from ropt.sampler.scipy import SciPySamplerPlugin
+        from ropt.realization_filter.default import DefaultRealizationFilterPlugin
+        from ropt.function_estimator.default import DefaultFunctionEstimatorPlugin
+        from ropt.backend.external import ExternalBackendPlugin
+        from ropt.backend.scipy import SciPyBackendPlugin
+        from ropt.transforms.default import (
             DefaultVariableTransformPlugin,
             DefaultObjectiveTransformPlugin,
             DefaultNonlinearConstraintTransformPlugin,
