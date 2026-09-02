@@ -3190,11 +3190,10 @@ as <code>"uniform"</code> if no other installed plugin claims that name:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="s2">"samplers"</span><span class="p">:</span> <span class="p">[{</span><span class="s2">"method"</span><span class="p">:</span> <span class="s2">"my_package/uniform"</span><span class="p">}],</span>
 </span></code></pre></div>
 <p>Check that the plugin is found with
-<a class="autorefs autorefs-internal" title="            find_sampler_plugin" href="../../reference/components_utils/#ropt.workflow.find_sampler_plugin"><code>find_sampler_plugin</code></a> or
-<a class="autorefs autorefs-internal" title="            find_backend_plugin" href="../../reference/components_utils/#ropt.workflow.find_backend_plugin"><code>find_backend_plugin</code></a>:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.workflow</span><span class="w"> </span><span class="kn">import</span> <span class="n">find_sampler_plugin</span>
+<a class="autorefs autorefs-internal" title="            ropt.plugins.manager.get_plugin_name" href="../../reference/plugin_manager/#ropt.plugins.manager.get_plugin_name"><code>get_plugin_name</code></a>:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_plugin_name</span>
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="n">find_sampler_plugin</span><span class="p">(</span><span class="s2">"my_package/uniform"</span><span class="p">)</span>   <span class="c1"># "my_package"</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="n">get_plugin_name</span><span class="p">(</span><span class="s2">"sampler"</span><span class="p">,</span> <span class="s2">"my_package/uniform"</span><span class="p">)</span>   <span class="c1"># "my_package"</span>
 </span></code></pre></div>
 <p>Plugins are discovered once: the shared plugin manager scans the entry points
 the first time a method is looked up. A package installed while the program is
@@ -3204,7 +3203,7 @@ running is not picked up.</p>
 <a class="autorefs autorefs-internal" title="            BackendConfig" href="../../reference/config/#ropt.config.BackendConfig"><code>BackendConfig</code></a>, which <code>ropt</code> passes through
 unchecked. A backend reports what it accepts by implementing
 <code>validate_options</code>, which is what
-<a class="autorefs autorefs-internal" title="            validate_backend_options" href="../../reference/components_utils/#ropt.workflow.validate_backend_options"><code>validate_backend_options</code></a> calls so
+<a class="autorefs autorefs-internal" title="            validate_backend_options" href="../../reference/utils/#ropt.utils.validate_backend_options"><code>validate_backend_options</code></a> calls so
 that users can catch mistakes before starting a long run.</p>
 <p><a class="autorefs autorefs-internal" title="            OptionsSchemaModel" href="../../reference/config/#ropt.config.options.OptionsSchemaModel"><code>OptionsSchemaModel</code></a> describes the
 options of each method in one place, and both validates them and generates the

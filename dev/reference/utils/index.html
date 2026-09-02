@@ -1854,6 +1854,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#ropt.utils.validate_backend_options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        validate_backend_options
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ropt.utils.restore_keyboard_interrupt" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2958,6 +2969,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#ropt.utils.validate_backend_options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        validate_backend_options
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ropt.utils.restore_keyboard_interrupt" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2994,9 +3016,13 @@
 
 
 <h1 id="utility-functions">Utility Functions</h1>
-<p>Optional helpers for scripts and applications that use <code>ropt</code>. Nothing in
-<code>ropt</code> calls these; see <a href="../../utilities/keyboard_interrupt/">Keyboard Interrupts</a>
-for when the one below is worth reaching for.</p>
+<p>Optional helpers for scripts and applications that use <code>ropt</code>. Nothing in <code>ropt</code>
+calls these. See <a href="../../utilities/plugin_discovery/">Plugin Discovery</a> for the
+plugin queries, and <a href="../../utilities/keyboard_interrupt/">Keyboard Interrupts</a>
+for when the escape hatch is worth reaching for.</p>
+<p><code>ropt.utils</code> also re-exports
+<a class="autorefs autorefs-internal" title="            ropt.plugins.manager.get_plugin_name" href="../plugin_manager/#ropt.plugins.manager.get_plugin_name"><code>get_plugin_name</code></a>, documented with the
+<a href="../plugin_manager/">Plugin Manager</a>.</p>
 
 
 <div class="doc doc-object doc-module">
@@ -3012,9 +3038,11 @@ for when the one below is worth reaching for.</p>
     <div class="doc doc-contents first">
 
         <p>Optional helpers for scripts and applications that use <code>ropt</code>.</p>
-<p>Nothing in <code>ropt</code> calls anything here. These are escape hatches for problems
-that come from outside the library, offered because the fix is easy to get
-wrong and hard to find.</p>
+<p>Nothing in <code>ropt</code> calls anything here. Two kinds of helper live here: queries
+about the installed plugins, for code that builds configurations dynamically or
+checks them before starting a long run; and escape hatches for problems that
+come from outside the library, offered because the fix is easy to get wrong and
+hard to find.</p>
 
 
 
@@ -3027,6 +3055,82 @@ wrong and hard to find.</p>
 
 <div class="doc doc-children">
 
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.utils.validate_backend_options" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">validate_backend_options</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">validate_backend_options</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">options</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Validate the optimizer-specific options for a given method.</p>
+<p><code>method</code> is either <code>"plugin-name/method-name"</code> or just <code>"method-name"</code>; see
+<a href="../../utilities/plugin_discovery/">Plugin Discovery</a> for both forms.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>method</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The specific optimization method name.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>options</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a>] | <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#list">list</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The dictionary or a list of strings of options.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
 
 
 
