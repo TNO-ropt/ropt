@@ -1,15 +1,42 @@
 """Optional helpers for scripts and applications that use `ropt`.
 
-Nothing in `ropt` calls anything here. These are escape hatches for problems
-that come from outside the library, offered because the fix is easy to get
-wrong and hard to find.
+Nothing in `ropt` calls anything here. Two kinds of helper live here: queries
+about the installed plugins, for code that builds configurations dynamically or
+checks them before starting a long run; and escape hatches for problems that
+come from outside the library, offered because the fix is easy to get wrong and
+hard to find.
 """
 
 from __future__ import annotations
 
 import signal
+from typing import Any
 
-__all__ = ["restore_keyboard_interrupt"]
+from ropt.config import BackendConfig
+from ropt.plugins.manager import get_plugin, get_plugin_name
+
+__all__ = [
+    "get_plugin_name",
+    "restore_keyboard_interrupt",
+    "validate_backend_options",
+]
+
+
+def validate_backend_options(method: str, options: dict[str, Any] | list[str]) -> None:
+    """Validate the optimizer-specific options for a given method.
+
+    `method` is either `"plugin-name/method-name"` or just `"method-name"`; see
+    [Plugin Discovery](../utilities/plugin_discovery.md) for both forms.
+
+    Args:
+        method:  The specific optimization method name.
+        options: The dictionary or a list of strings of options.
+    """
+    plugin = get_plugin("backend", method)
+    backend_config = BackendConfig.model_validate(
+        {"method": method, "options": options}
+    )
+    plugin.create(backend_config).validate_options()
 
 
 def restore_keyboard_interrupt() -> None:

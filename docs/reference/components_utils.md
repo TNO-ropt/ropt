@@ -1,14 +1,7 @@
 # Utilities
 
-Plugin-discovery helpers (`find_backend_plugin`, `find_sampler_plugin`,
-`validate_backend_options`) live in `ropt.workflow`.
-
-::: ropt.workflow
-    options:
-        members:
-            - find_backend_plugin
-            - find_sampler_plugin
-            - validate_backend_options
+Helpers for scripts and applications that use `ropt` live in
+[`ropt.utils`](utils.md). This page covers the lower-level component utilities.
 
 ## Concurrency
 

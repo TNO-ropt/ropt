@@ -25,7 +25,7 @@ from ropt.transforms.default import (
     DefaultObjectiveTransform,
     DefaultVariableTransform,
 )
-from ropt.workflow import validate_backend_options
+from ropt.utils import validate_backend_options
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray
