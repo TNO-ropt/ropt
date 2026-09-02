@@ -512,8 +512,8 @@ def get_masked_linear_constraints(
     lower_bounds = context.linear_constraints.lower_bounds
     upper_bounds = context.linear_constraints.upper_bounds
     if not np.all(mask):
-        # Keep rows that only contain non-zero values for the active variables:
-        keep_rows = np.all(coefficients[:, ~mask] == 0, axis=1)
+        # keep rows that involve active variables:
+        keep_rows = np.any(coefficients[:, mask] != 0, axis=1)
         coefficients = coefficients[keep_rows, :]
         lower_bounds = lower_bounds[keep_rows]
         upper_bounds = upper_bounds[keep_rows]
