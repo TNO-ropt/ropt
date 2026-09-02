@@ -113,15 +113,6 @@ class OptimizationStep(ComputeStep):
 
         return exit_code
 
-    def _emit_event(self, event: EnOptEvent) -> None:
-        # Handlers run inline, on this run's own stack: a local handler that
-        # raises unwinds the optimizer, and one behind a dispatcher blocks here
-        # until the dispatcher has finished with the event.
-        event.source = self
-        for handler in self.event_handlers:
-            if event.event_type in handler.event_types:
-                handler.handle_event(event)
-
     def _signal_evaluation(self, results: tuple[Results, ...] | None = None) -> None:
         # Called by the ensemble optimizer around every evaluation: without
         # results before one starts, with them once it has finished.
