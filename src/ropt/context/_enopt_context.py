@@ -34,6 +34,8 @@ from ._validated_types import (  # ruff: ignore[typing-only-first-party-import]
     VariableTransformInstance,
 )
 
+# Module-global rather than per-instance: a lock stored on the model would make
+# the context unpicklable, and the external backend pickles it to the child.
 _global_lock = threading.Lock()
 
 

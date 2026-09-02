@@ -5,10 +5,13 @@ from __future__ import annotations
 import functools
 import threading
 from abc import ABC, abstractmethod
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from ropt.components.event_handlers import EventHandler
 from ropt.exceptions import WorkflowError
+
+if TYPE_CHECKING:
+    from ropt.events import EnOptEvent
 
 
 class ComputeStep(ABC):
@@ -84,6 +87,15 @@ class ComputeStep(ABC):
             A list of handlers.
         """
         return self._event_handlers
+
+    def _emit_event(self, event: EnOptEvent) -> None:
+        # Handlers run inline, on this run's own stack: a local handler that
+        # raises unwinds this run, and one behind a dispatcher blocks here until
+        # the dispatcher has finished with the event.
+        event.source = self
+        for handler in self.event_handlers:
+            if event.event_type in handler.event_types:
+                handler.handle_event(event)
 
     def stop(self) -> None:
         """Request that this run stop gracefully at the next safe point.
