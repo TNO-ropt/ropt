@@ -20,7 +20,7 @@ distinction and lifecycle.
 from __future__ import annotations
 
 from contextlib import contextmanager
-from typing import TYPE_CHECKING, Self
+from typing import TYPE_CHECKING, Any, Self
 
 from ropt.components.event_handlers import (
     EventDispatcher,
@@ -97,7 +97,7 @@ class SharedHandlers:
         """
         return self._closed
 
-    def attach_to(self, step: ComputeStep) -> None:
+    def attach_to(self, step: ComputeStep[Any]) -> None:
         """Forward the events of a run's compute step to this group's handlers.
 
         A fresh forwarding handler is added per step (one handler cannot serve
@@ -216,7 +216,7 @@ def split_handlers(
 
 @contextmanager
 def attach_handlers(
-    step: ComputeStep,
+    step: ComputeStep[Any],
     handlers: Sequence[EventHandler | SharedHandlers] | None,
     report: ReportCallback | None,
 ) -> Iterator[None]:

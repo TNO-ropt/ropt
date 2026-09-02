@@ -44,7 +44,7 @@ class CallbackHandler(EventHandler):
         self._event_types = event_types
         self._callback = callback
 
-    def handle_event(self, event: EnOptEvent) -> None:
+    def _handle_event(self, event: EnOptEvent) -> None:
         """Handle incoming events.
 
         Args:

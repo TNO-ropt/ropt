@@ -119,7 +119,7 @@ class CachedEvaluator(Evaluator):
 
         return evaluator_result, cached
 
-    def eval(
+    def _eval(
         self, variables: NDArray[np.float64], context: EvaluationBatchContext
     ) -> EvaluationBatchResult:
         """Evaluate using cache, delegating uncached evaluations.

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from ropt.components.compute_steps.base import ComputeStep
@@ -30,4 +30,4 @@ class EnOptEvent:
     event_type: EnOptEventType
     context: EnOptContext
     results: tuple[Results, ...] = field(default_factory=tuple)
-    source: ComputeStep | None = None
+    source: ComputeStep[Any] | None = None

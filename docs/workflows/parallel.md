@@ -571,7 +571,7 @@ submission with the exception (via
 further work. It does **not** tear the executor down.
 
 The owning
-[`ParallelEvaluator.eval`][ropt.components.evaluators.ParallelEvaluator.eval]
+[`ParallelEvaluator.eval`][ropt.components.evaluators.Evaluator.eval]
 call receives the exception and **re-raises the original unchanged**, aborting
 the current evaluation. This is deliberately identical to the sequential
 [`FunctionEvaluator`][ropt.components.evaluators.FunctionEvaluator]: whichever
@@ -875,7 +875,7 @@ created." Concretely:
   to the host process and needs no cross-process communication.
 - **Concurrently (forbidden).** A single step must not run more than once at a
   time: calling
-  [`run`][ropt.components.compute_steps.OptimizationStep.run] on a step that is
+  [`run`][ropt.components.compute_steps.ComputeStep.run] on a step that is
   already running — for example from two threads — raises a
   [`WorkflowError`][ropt.exceptions.WorkflowError]. Give
   each concurrent optimization its own step; serial reuse of one step is fine.

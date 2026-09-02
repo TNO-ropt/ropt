@@ -254,7 +254,7 @@ class _OffloadingHandler(EventHandler):
     def event_types(self) -> set[EnOptEventType]:
         return {EnOptEventType.FINISHED_EVALUATION}
 
-    def handle_event(self, event: EnOptEvent) -> None:  # ruff: ignore[unused-method-argument]
+    def _handle_event(self, event: EnOptEvent) -> None:  # ruff: ignore[unused-method-argument]
         if self.outcome is not None:
             return
         try:

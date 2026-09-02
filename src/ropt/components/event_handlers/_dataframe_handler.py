@@ -221,7 +221,7 @@ class DataFrameHandler(EventHandler):
         """
         return {key: table.get_table() for key, table in self._tables.items()}
 
-    def handle_event(self, event: EnOptEvent) -> None:
+    def _handle_event(self, event: EnOptEvent) -> None:
         """Handle incoming events.
 
         Args:

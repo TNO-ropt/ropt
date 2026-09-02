@@ -43,7 +43,7 @@ class HistoryHandler(EventHandler):
         collected: tuple[Results, ...] | None = self["results"]
         return () if collected is None else collected
 
-    def handle_event(self, event: EnOptEvent) -> None:
+    def _handle_event(self, event: EnOptEvent) -> None:
         """Handle incoming events.
 
         Processes `FINISHED_EVALUATION` events, optionally transforms results

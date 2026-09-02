@@ -26,7 +26,7 @@ from ropt.components.event_handlers import (
 )
 from ropt.context import EnOptContext
 from ropt.enums import EnOptEventType, ExitCode
-from ropt.evaluation import EvaluationBatchResult
+from ropt.evaluation import EvaluationBatchContext, EvaluationBatchResult
 from ropt.exceptions import OptimizerStop, WorkflowError
 from ropt.results import FunctionResults
 
@@ -35,7 +35,6 @@ if TYPE_CHECKING:
 
     from numpy.typing import NDArray
 
-    from ropt.evaluation import EvaluationBatchContext
     from ropt.events import EnOptEvent
 
 
@@ -939,13 +938,25 @@ def test_evaluator_cache_with_store(
     assert completed_test_functions == 2
 
 
+def _eval_args() -> tuple[NDArray[np.float64], EvaluationBatchContext]:
+    # The guard tests below ignore both arguments; they only have to be valid.
+    return (
+        np.zeros((1, 1), dtype=np.float64),
+        EvaluationBatchContext(
+            context=EnOptContext.model_validate({"variables": {"variable_count": 1}}),
+            active=np.ones(1, dtype=np.bool_),
+            realizations=np.zeros(1, dtype=np.intc),
+        ),
+    )
+
+
 def test_evaluator_raises_on_concurrent_use() -> None:
     in_eval = threading.Event()
     can_finish = threading.Event()
     thread2_error: list[BaseException | None] = [None]
 
     class _BlockingEvaluator(Evaluator):
-        def eval(self, _variables: Any, _context: Any) -> EvaluationBatchResult:  # ruff: ignore[no-self-use]
+        def _eval(self, _variables: Any, _context: Any) -> EvaluationBatchResult:  # ruff: ignore[no-self-use]
             in_eval.set()
             can_finish.wait()
             return EvaluationBatchResult(objectives=np.zeros((1, 1), dtype=np.float64))
@@ -953,12 +964,12 @@ def test_evaluator_raises_on_concurrent_use() -> None:
     ev = _BlockingEvaluator()
 
     def _thread1() -> None:
-        ev.eval(None, None)
+        ev.eval(*_eval_args())
 
     def _thread2() -> None:
         in_eval.wait()
         try:
-            ev.eval(None, None)
+            ev.eval(*_eval_args())
         except WorkflowError as exc:
             thread2_error[0] = exc
 
@@ -979,7 +990,7 @@ class _RecordingEvaluator(Evaluator):
         super().__init__()
         self.threads: list[int] = []
 
-    def eval(self, _variables: Any, _context: Any) -> EvaluationBatchResult:
+    def _eval(self, _variables: Any, _context: Any) -> EvaluationBatchResult:
         self.threads.append(threading.get_ident())
         return EvaluationBatchResult(objectives=np.zeros((1, 1), dtype=np.float64))
 
@@ -989,8 +1000,8 @@ def test_evaluator_allows_staggered_use_on_different_threads() -> None:
 
     # First use finishes on a worker thread; a later, non-overlapping call from
     # a different thread is allowed because the two calls never overlap.
-    _run_in_thread(lambda: evaluator.eval(None, None))
-    evaluator.eval(None, None)
+    _run_in_thread(lambda: evaluator.eval(*_eval_args()))
+    evaluator.eval(*_eval_args())
 
     assert len(evaluator.threads) == 2
 
@@ -998,8 +1009,8 @@ def test_evaluator_allows_staggered_use_on_different_threads() -> None:
 def test_evaluator_allows_repeated_use_on_same_thread() -> None:
     evaluator = _RecordingEvaluator()
 
-    evaluator.eval(None, None)
-    evaluator.eval(None, None)
+    evaluator.eval(*_eval_args())
+    evaluator.eval(*_eval_args())
 
     assert len(evaluator.threads) == 2
 
@@ -1014,7 +1025,7 @@ def test_event_handler_raises_on_concurrent_use() -> None:
         def event_types(self) -> set[EnOptEventType]:
             return {EnOptEventType.FINISHED_EVALUATION}
 
-        def handle_event(self, _event: EnOptEvent) -> None:  # ruff: ignore[no-self-use]
+        def _handle_event(self, _event: EnOptEvent) -> None:  # ruff: ignore[no-self-use]
             in_handle.set()
             can_finish.wait()
 
@@ -1052,7 +1063,7 @@ class _RecordingHandler(EventHandler):
     def event_types(self) -> set[EnOptEventType]:
         return {EnOptEventType.FINISHED_EVALUATION}
 
-    def handle_event(self, _event: EnOptEvent) -> None:
+    def _handle_event(self, _event: EnOptEvent) -> None:
         self.threads.append(threading.get_ident())
 
 

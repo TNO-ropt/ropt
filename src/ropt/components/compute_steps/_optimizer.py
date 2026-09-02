@@ -28,7 +28,7 @@ _logger = get_logger(__name__)
 MetaDataType = dict[str, int | float | bool | str]
 
 
-class OptimizationStep(ComputeStep):
+class OptimizationStep(ComputeStep[ExitCode]):
     """The default optimizer compute step.
 
     Executes an optimization algorithm, iteratively performing function and
@@ -48,7 +48,7 @@ class OptimizationStep(ComputeStep):
         super().__init__()
         self._evaluator = evaluator
 
-    def run(
+    def _run(
         self,
         context: EnOptContext,
         variables: ArrayLike,

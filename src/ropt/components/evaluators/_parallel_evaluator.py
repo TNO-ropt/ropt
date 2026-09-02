@@ -79,7 +79,7 @@ class ParallelEvaluator(Evaluator):
             batch_id_callback if batch_id_callback is not None else BatchIdCounter()
         )
 
-    def eval(
+    def _eval(
         self, variables: NDArray[np.float64], evaluator_context: EvaluationBatchContext
     ) -> EvaluationBatchResult:
         """Evaluate all objective and constraints.
