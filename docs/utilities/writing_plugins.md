@@ -124,13 +124,12 @@ as `"uniform"` if no other installed plugin claims that name:
 ```
 
 Check that the plugin is found with
-[`find_sampler_plugin`][ropt.workflow.find_sampler_plugin] or
-[`find_backend_plugin`][ropt.workflow.find_backend_plugin]:
+[`get_plugin_name`][ropt.plugins.manager.get_plugin_name]:
 
 ```python
-from ropt.workflow import find_sampler_plugin
+from ropt.utils import get_plugin_name
 
-find_sampler_plugin("my_package/uniform")   # "my_package"
+get_plugin_name("sampler", "my_package/uniform")   # "my_package"
 ```
 
 Plugins are discovered once: the shared plugin manager scans the entry points
@@ -143,7 +142,7 @@ Backends receive their method-specific settings through the `options` field of
 [`BackendConfig`][ropt.config.BackendConfig], which `ropt` passes through
 unchecked. A backend reports what it accepts by implementing
 `validate_options`, which is what
-[`validate_backend_options`][ropt.workflow.validate_backend_options] calls so
+[`validate_backend_options`][ropt.utils.validate_backend_options] calls so
 that users can catch mistakes before starting a long run.
 
 [`OptionsSchemaModel`][ropt.config.options.OptionsSchemaModel] describes the

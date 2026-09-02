@@ -95,8 +95,8 @@ from ropt.version import __version__
 print(__version__)
 
 # Verify the SciPy backend is available:
-from ropt.workflow import find_backend_plugin
-print(find_backend_plugin("slsqp"))  # should print "scipy"
+from ropt.utils import get_plugin_name
+print(get_plugin_name("backend", "slsqp"))  # should print "scipy"
 ```
 
 If `scipy` is printed, the default backend plugin is working. Any additional

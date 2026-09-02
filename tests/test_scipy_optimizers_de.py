@@ -7,7 +7,7 @@ import pytest
 
 from ropt.exceptions import UnsupportedError
 from ropt.simple import optimize
-from ropt.workflow import validate_backend_options
+from ropt.utils import validate_backend_options
 
 pytestmark = [pytest.mark.slow]
 
