@@ -3767,11 +3767,16 @@ same backend.</p>
 named backend in a separate process; see <a href="#external-backend">Running the optimizer in a separate
 process</a>.</p>
 <h3 id="immutability">Immutability</h3>
-<p>Once built, an <a class="autorefs autorefs-internal" title="            EnOptContext" href="../../reference/context/#ropt.context.EnOptContext"><code>EnOptContext</code></a> is frozen. To
-change settings, build a new context from a modified dict.</p>
+<p>The configuration objects an <a class="autorefs autorefs-internal" title="            EnOptContext" href="../../reference/context/#ropt.context.EnOptContext"><code>EnOptContext</code></a> holds
+are frozen, so an individual setting cannot be changed in place. The context
+itself is not: replacing one of its fields wholesale is not prevented, but
+nothing re-runs the work construction did — bounds, perturbation magnitudes and
+linear constraints are all converted to the optimizer domain at that point — so
+the result is inconsistent. To change settings, build a new context from a
+modified dict.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p><code>EnOptContext</code> objects are immutable after construction. Do not try to
+<p>Treat an <code>EnOptContext</code> as read-only after construction. Do not try to
 serialize and round-trip them (for example, to/from JSON). Some parameters
 are transformed during construction in a way that cannot be undone, so
 building an <code>EnOptContext</code> from those serialized values would transform
