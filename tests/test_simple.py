@@ -256,7 +256,7 @@ def test_handler_reusable_after_group_fails_to_open() -> None:
     good = HistoryHandler()
     bad = HistoryHandler()
     with session() as active:
-        with pytest.raises(WorkflowError, match="already registered with a dispatcher"):
+        with pytest.raises(WorkflowError, match="listed more than once"):
             active.shared_handlers(good, bad, bad)
         group = active.shared_handlers(good, bad)
         assert set(dict(group._dispatcher._handlers)) == {good, bad}  # ruff: ignore[private-member-access]

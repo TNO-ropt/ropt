@@ -1,12 +1,16 @@
 """Base classes for event handler plugins and event handlers.
 
-A handler is guarded on two different timescales, which are easy to confuse.
-`_in_use` covers one call to `handle_event`, and refuses a second one from
-another thread. `claim`/`release` cover a whole run, and are what a caller uses
-to say that a handler belongs to that run alone. `_attached_to` is neither: it
-records which side owns the handler, and only ever grows more restrictive — a
-handler attached to a compute step cannot join a dispatcher afterwards, since
-nothing detaches it again.
+A handler carries three separate pieces of state, which are easy to confuse
+because all three refuse something:
+
+- `_in_use` covers one call to `handle_event`, and refuses a second one from
+  another thread.
+- `claim`/`release` cover a whole run, and are what a caller uses to say that a
+  handler belongs to that run alone. A released handler can be claimed again,
+  by a later run and by a different compute step.
+- `_attached_to` is neither a lock nor an owner: it records whether the handler
+  is fed by a dispatcher or by compute steps, and the compute-step half never
+  resets. That is what makes local-or-shared a once-per-handler decision.
 """
 
 from __future__ import annotations
