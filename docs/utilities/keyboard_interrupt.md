@@ -29,7 +29,10 @@ confined to whoever set it: from that import onwards, Ctrl-C cannot break into
 any wait anywhere in the program.
 
 This is why the symptom looks so strange. Nothing in your code changed, no
-error is reported, and the culprit may be a package you never imported directly.
+error is reported, and you need not have imported the culprit yourself — a
+package `ropt` imports on your behalf is enough. Importing `ropt.simple` alone
+sets the flag (at the time of writing by way of polars, which `ropt` loads
+whenever it is installed).
 
 ## The fix
 
