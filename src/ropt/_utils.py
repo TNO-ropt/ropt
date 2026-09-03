@@ -1,4 +1,4 @@
-"""Utilities for checking and converting configuration values."""
+"""Utilities for checking and converting configuration and result values."""
 
 from enum import IntEnum
 from typing import Any
@@ -12,6 +12,11 @@ def normalize(array: NDArray[np.float64]) -> NDArray[np.float64]:
         msg = "The sum of weights is not positive"
         raise ValueError(msg)
     return immutable_array(array / array.sum())
+
+
+def zero_failures(values: NDArray[np.float64]) -> NDArray[np.float64]:
+    # Only NaN marks a failure; an infinity is a value and must survive.
+    return np.nan_to_num(values, posinf=np.inf, neginf=-np.inf)
 
 
 def immutable_array(

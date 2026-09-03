@@ -6,6 +6,7 @@ import numpy as np
 from numpy.typing import NDArray
 from pydantic import BaseModel, ConfigDict, Field, NonNegativeInt
 
+from ropt._utils import zero_failures
 from ropt.config import RealizationFilterConfig
 from ropt.context import EnOptContext
 from ropt.exceptions import TooFewRealizations
@@ -191,7 +192,7 @@ class DefaultRealizationFilter(RealizationFilter):
         assert isinstance(self._filter_options, SortObjectiveOptions)
         objective_config = self._context.objectives
         failed_realizations = np.isnan(objectives[..., 0])
-        objectives = np.nan_to_num(objectives[..., self._filter_options.sort])
+        objectives = zero_failures(objectives[..., self._filter_options.sort])
         if objective_config.weights.size > 1:
             objectives = np.dot(
                 objectives, objective_config.weights[self._filter_options.sort]
@@ -211,7 +212,7 @@ class DefaultRealizationFilter(RealizationFilter):
     ) -> NDArray[np.float64]:
         assert isinstance(self._filter_options, SortConstraintOptions)
         failed_realizations = np.isnan(constraints[..., 0])
-        constraints = np.nan_to_num(constraints[..., self._filter_options.sort])
+        constraints = zero_failures(constraints[..., self._filter_options.sort])
         return _sort_and_select(
             constraints,
             self._context.realizations.weights,
@@ -224,7 +225,7 @@ class DefaultRealizationFilter(RealizationFilter):
         assert isinstance(self._filter_options, CVaRObjectiveOptions)
         objective_config = self._context.objectives
         failed_realizations = np.isnan(objectives[..., 0])
-        objectives = np.nan_to_num(objectives[..., self._filter_options.sort])
+        objectives = zero_failures(objectives[..., self._filter_options.sort])
         if objective_config.weights.size > 1:
             objectives = np.dot(
                 objectives, objective_config.weights[self._filter_options.sort]
@@ -237,7 +238,7 @@ class DefaultRealizationFilter(RealizationFilter):
     def _cvar_constraint(self, constraints: NDArray[np.float64]) -> NDArray[np.float64]:
         assert isinstance(self._filter_options, CVaRConstraintOptions)
         failed_realizations = np.isnan(constraints[..., 0])
-        constraints = np.nan_to_num(constraints[..., self._filter_options.sort])
+        constraints = zero_failures(constraints[..., self._filter_options.sort])
         assert self._context.nonlinear_constraints is not None
         return _get_cvar_weights_from_percentile(
             -constraints, failed_realizations, self._filter_options.percentile
