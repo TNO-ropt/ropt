@@ -22,8 +22,14 @@ jobs:
         python-version: ["3.11", "3.12", "3.13", "3.14"]
         extras: ["all"]
         include:
+          - extras: "all"
+            sync-args: "--all-extras"
           - python-version: "3.12"
             extras: "none"
+            sync-args: ""
+          - python-version: "3.12"
+            extras: "hpc"
+            sync-args: "--extra hpc"
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Set up Python ${{ matrix.python-version }}
@@ -37,6 +43,6 @@ jobs:
           cache-dependency-glob: "**/pyproject.toml"
           cache-suffix: ${{ matrix.extras }}
       - name: Install ropt
-        run: uv sync ${{ matrix.extras == 'all' && '--all-extras' || '' }} --dev
+        run: uv sync ${{ matrix.sync-args }} --dev
       - name: Run pytest
         run: uv run pytest tests --run-slow --run-external
