@@ -3052,7 +3052,10 @@ they are imported. Because the flag is process-global, the effect is not
 confined to whoever set it: from that import onwards, Ctrl-C cannot break into
 any wait anywhere in the program.</p>
 <p>This is why the symptom looks so strange. Nothing in your code changed, no
-error is reported, and the culprit may be a package you never imported directly.</p>
+error is reported, and you need not have imported the culprit yourself — a
+package <code>ropt</code> imports on your behalf is enough. Importing <code>ropt.simple</code> alone
+sets the flag (at the time of writing by way of polars, which <code>ropt</code> loads
+whenever it is installed).</p>
 <h2 id="the-fix">The fix</h2>
 <p>One line, at the top of your script, <strong>after</strong> the imports:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">restore_keyboard_interrupt</span>
