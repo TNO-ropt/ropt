@@ -312,9 +312,10 @@ batch, which is the point — but "stopped" does not mean "nothing of it is left
 !!! tip "If Ctrl-C seems to do nothing at all"
     A handful of third-party packages, when imported, change a process-wide
     setting that stops Ctrl-C from breaking into a program that is *waiting* —
-    and it then affects your whole program, not just `ropt`. `ropt` leaves that
-    setting alone, because it belongs to your program rather than to a library
-    it happens to use.
+    and it then affects your whole program, not just `ropt`. You need not have
+    imported one yourself: importing `ropt.simple` is enough (at the time of
+    writing by way of polars). `ropt` leaves that setting alone, because it
+    belongs to your program rather than to a library it happens to use.
 
     You do not need to do anything about this unless it bites you. If it does,
     one optional line at the top of your script undoes it:
