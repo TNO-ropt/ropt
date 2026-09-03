@@ -5,6 +5,13 @@ They coordinate the optimizer lifecycle, request objective/constraint and
 gradient evaluations through the core callback interface, and advance the
 optimization from an initial variable vector toward a solution. This module
 defines the interface that all concrete backend implementations must follow.
+
+Everything a backend sees is in the **optimizer domain**. The arrays on the
+context it is given — bounds, perturbation magnitudes, linear constraints — were
+converted when the context was built, and the values delivered through the
+callback are converted before they arrive. A backend therefore neither applies
+nor undoes a transform: `ropt` converts results back to the user domain for
+reporting.
 """
 
 from __future__ import annotations

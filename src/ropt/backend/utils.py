@@ -3,6 +3,9 @@
 This module provides helpers for constraint validation, linear constraint
 adjustment based on variable masks, unique output path construction, and
 normalization of non-linear constraints into a standard form.
+
+Every array these helpers accept or return is in the optimizer domain, as is
+everything else a backend sees; see [`Backend`][ropt.backend.Backend].
 """
 
 from pathlib import Path
