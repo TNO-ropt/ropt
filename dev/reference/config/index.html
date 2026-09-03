@@ -3747,11 +3747,12 @@ conditions (see <a class="autorefs autorefs-internal" title="            Boundar
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.VariablesConfig.samplers">samplers</span></code></td>
             <td>
-                  <code><span title="ropt.config._validated_types.Array1DInt">Array1DInt</span></code>
+                  <code><span title="ropt.config._validated_types.Keys">Keys</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Indices of the samplers to use for each variable.</p>
+                <p>Sampler to apply to each variable, by key
+                      (default: <code>"0"</code>).</p>
               </div>
             </td>
           </tr>
@@ -3842,22 +3843,24 @@ detailed descriptions and usage examples.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.ObjectiveFunctionsConfig.realization_filters">realization_filters</span></code></td>
             <td>
-                  <code><span title="ropt.config._validated_types.Array1DInt">Array1DInt</span></code>
+                  <code><span title="ropt.config._validated_types.Keys">Keys</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional indices of realization filters.</p>
+                <p>Realization filter to apply to each objective, by key,
+                <code>None</code> to apply none (default: <code>None</code>).</p>
               </div>
             </td>
           </tr>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.ObjectiveFunctionsConfig.function_estimators">function_estimators</span></code></td>
             <td>
-                  <code><span title="ropt.config._validated_types.Array1DInt">Array1DInt</span></code>
+                  <code><span title="ropt.config._validated_types.Keys">Keys</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional indices of function estimators.</p>
+                <p>Function estimator to apply to each objective, by key
+                 (default: <code>"0"</code>).</p>
               </div>
             </td>
           </tr>
@@ -4047,22 +4050,24 @@ descriptions and usage examples.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.NonlinearConstraintsConfig.realization_filters">realization_filters</span></code></td>
             <td>
-                  <code><span title="ropt.config._validated_types.Array1DInt">Array1DInt</span></code>
+                  <code><span title="ropt.config._validated_types.Keys">Keys</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional indices of realization filters.</p>
+                <p>Realization filter to apply to each constraint, by key,
+                <code>None</code> to apply none (default: <code>None</code>).</p>
               </div>
             </td>
           </tr>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.NonlinearConstraintsConfig.function_estimators">function_estimators</span></code></td>
             <td>
-                  <code><span title="ropt.config._validated_types.Array1DInt">Array1DInt</span></code>
+                  <code><span title="ropt.config._validated_types.Keys">Keys</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional indices of function estimators.</p>
+                <p>Function estimator to apply to each constraint, by key
+                 (default: <code>"0"</code>).</p>
               </div>
             </td>
           </tr>

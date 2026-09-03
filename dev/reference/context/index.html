@@ -3204,33 +3204,36 @@ raw input dicts instead.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.context.EnOptContext.realization_filters">realization_filters</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a>[<span title="ropt.context._validated_types.RealizationFilterInstance">RealizationFilterInstance</span>, ...]</code>
+                  <code><span title="ropt.context._validated_types.RealizationFilterInstances">RealizationFilterInstances</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Tuple of realization filter plugin instances.</p>
+                <p>Realization filter plugin instances, by key.
+                             A sequence is keyed by position.</p>
               </div>
             </td>
           </tr>
           <tr class="doc-section-item">
             <td><code><span title="ropt.context.EnOptContext.function_estimators">function_estimators</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a>[<span title="ropt.context._validated_types.FunctionEstimatorInstance">FunctionEstimatorInstance</span>, ...]</code>
+                  <code><span title="ropt.context._validated_types.FunctionEstimatorInstances">FunctionEstimatorInstances</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Tuple of function estimator plugin instances.</p>
+                <p>Function estimator plugin instances, by key.
+                             A sequence is keyed by position.</p>
               </div>
             </td>
           </tr>
           <tr class="doc-section-item">
             <td><code><span title="ropt.context.EnOptContext.samplers">samplers</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a>[<span title="ropt.context._validated_types.SamplerInstance">SamplerInstance</span>, ...]</code>
+                  <code><span title="ropt.context._validated_types.SamplerInstances">SamplerInstances</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Tuple of sampler plugin instances.</p>
+                <p>Sampler plugin instances, by key. A sequence
+                             is keyed by position.</p>
               </div>
             </td>
           </tr>
