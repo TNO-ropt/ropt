@@ -48,6 +48,11 @@ _IN_USE = (
     "handler here."
 )
 
+_LISTED_TWICE = (
+    "This handler is listed more than once in the same group of shared "
+    "handlers. List it once."
+)
+
 
 class SharedHandlers:
     """A group of result handlers that several runs share.
@@ -152,12 +157,10 @@ class SharedHandlers:
                 self._dispatcher.add_event_handler(handler, run_in_thread=run_in_thread)
             except WorkflowError as exc:
                 # The low-level refusal is phrased in terms of dispatchers and
-                # compute steps, neither of which this API ever hands out. A
-                # handler listed twice is a different mistake, so it keeps the
-                # original message.
-                if handler in self._handlers:
-                    raise
-                raise WorkflowError(_IN_USE) from exc
+                # compute steps, neither of which this API ever hands out, so
+                # both causes are restated here in its own vocabulary.
+                message = _LISTED_TWICE if handler in self._handlers else _IN_USE
+                raise WorkflowError(message) from exc
             self._handlers.append(handler)
 
     def _release(self) -> None:
