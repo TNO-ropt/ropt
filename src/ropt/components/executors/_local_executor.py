@@ -21,6 +21,7 @@ import signal
 import subprocess  # ruff: ignore[suspicious-subprocess-import]
 import tempfile
 import threading
+import weakref
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -52,6 +53,16 @@ def _run_teardown(jobs: queue.Queue[subprocess.Popen[bytes] | Path | None]) -> N
     if workdir is not None:
         shutil.rmtree(workdir, ignore_errors=True)
         _logger.debug("Removed the local working directory %s", workdir)
+
+
+def _remove_unused_workdir(workdir: Path) -> None:
+    # For an executor that is never started: nothing else would remove its
+    # directory. `rmdir` refuses a directory with anything in it, which is what
+    # limits this to the unused case -- a started executor either had its
+    # directory removed by the teardown thread already, or is keeping it
+    # deliberately because there is output in it to read.
+    with contextlib.suppress(OSError):
+        workdir.rmdir()
 
 
 class LocalJobExecutor(JobExecutorBase):
@@ -112,6 +123,7 @@ class LocalJobExecutor(JobExecutorBase):
         self._own_workdir = workdir is None
         if workdir is None:
             resolved = Path(tempfile.mkdtemp(prefix="ropt-local-"))
+            weakref.finalize(self, _remove_unused_workdir, resolved)
         else:
             resolved = Path(workdir).resolve()
             if not resolved.is_dir():

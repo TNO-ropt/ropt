@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import collections
+import gc
 import importlib
 import inspect
 import logging
@@ -2978,6 +2979,26 @@ async def test_local_executor_refuses_a_missing_directory(tmp_path: Path) -> Non
     await asyncio.sleep(0)  # this module runs tests on the event loop
     with pytest.raises(ValueError, match="does not exist"):
         LocalJobExecutor(workdir=tmp_path / "nowhere")
+
+
+async def test_local_executor_that_never_starts_removes_its_directory() -> None:
+    await asyncio.sleep(0)  # this module runs tests on the event loop
+    executor = LocalJobExecutor()
+    workdir = executor.workdir
+    assert await asyncio.to_thread(workdir.is_dir)
+    del executor
+    gc.collect()  # the directory goes with the executor, so it must be gone first
+    assert not await asyncio.to_thread(workdir.exists)
+
+
+async def test_local_executor_that_never_starts_keeps_a_directory_given_to_it(
+    tmp_path: Path,
+) -> None:
+    await asyncio.sleep(0)  # this module runs tests on the event loop
+    executor = LocalJobExecutor(workdir=tmp_path)
+    del executor
+    gc.collect()
+    assert await asyncio.to_thread(tmp_path.is_dir)
 
 
 async def test_local_executor_refuses_a_non_posix_system(monkeypatch: Any) -> None:
