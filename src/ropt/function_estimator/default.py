@@ -5,6 +5,7 @@ from typing import Final
 import numpy as np
 from numpy.typing import NDArray
 
+from ropt._utils import zero_failures
 from ropt.config import FunctionEstimatorConfig
 from ropt.context import EnOptContext
 from ropt.exceptions import TooFewRealizations
@@ -86,7 +87,7 @@ class DefaultFunctionEstimator(FunctionEstimator):
     def _calculate_function_mean(
         functions: NDArray[np.float64], weights: NDArray[np.float64]
     ) -> NDArray[np.float64]:
-        functions = np.nan_to_num(functions)
+        functions = _contributing(functions, weights)
         return np.dot(functions, weights)  # type: ignore[no-any-return]
 
     @staticmethod
@@ -107,7 +108,10 @@ def _calculate_function_stddev(
 ) -> NDArray[np.float64]:
     if np.count_nonzero(weights) < _MIN_STDDEV_REALIZATIONS:
         raise TooFewRealizations
-    functions = np.nan_to_num(functions)
+    functions = _contributing(functions, weights)
+    # Subtracting the equally infinite mean would give NaN, which marks a failure.
+    if np.any(np.isinf(functions)):
+        return np.array(np.inf, dtype=np.float64)
     *_, stddev = _mean_stddev(functions, weights)
     return stddev
 
@@ -119,7 +123,9 @@ def _calculate_gradient_stddev(
 ) -> NDArray[np.float64]:
     if np.count_nonzero(weights) < _MIN_STDDEV_REALIZATIONS:
         raise TooFewRealizations
-    functions = np.nan_to_num(functions)
+    functions = _contributing(functions, weights)
+    if np.any(np.isinf(functions)):
+        return np.full(gradient.shape[:-1], np.inf, dtype=np.float64)
     norm, mean, stddev = _mean_stddev(functions, weights)
     mean_gradient = np.dot(gradient, weights)
     return (
@@ -130,6 +136,14 @@ def _calculate_gradient_stddev(
             * (np.dot(gradient, functions * weights) - mean * mean_gradient)
         )
     )
+
+
+def _contributing(
+    functions: NDArray[np.float64], weights: NDArray[np.float64]
+) -> NDArray[np.float64]:
+    # A zero weight contributes nothing, but inf * 0 is NaN, so such a value has
+    # to be dropped rather than multiplied out.
+    return np.where(weights != 0, zero_failures(functions), 0.0)
 
 
 def _mean_stddev(

@@ -15,6 +15,7 @@ from ropt.enums import EnOptEventType
 from ropt.events import EnOptEvent
 from ropt.realization_filter import RealizationFilter
 from ropt.realization_filter.default import (
+    DefaultRealizationFilter,
     _get_cvar_weights_from_percentile,
     _sort_and_select,
 )
@@ -88,6 +89,25 @@ def test__get_cvar_weights_from_percentile(
         percentile,
     )
     assert np.allclose(estimated_weights, weights)
+
+
+def test_sort_filter_ranks_an_infinite_objective_last() -> None:
+    context = EnOptContext.model_validate(
+        {
+            "variables": {"variable_count": 2},
+            "realizations": {"weights": 3 * [1.0]},
+        }
+    )
+    realization_filter = DefaultRealizationFilter(
+        RealizationFilterConfig(
+            method="sort-objective", options={"sort": [0], "first": 0, "last": 1}
+        )
+    )
+    realization_filter.init(context)
+    weights = realization_filter.get_realization_weights(
+        np.array([[1.0], [np.inf], [3.0]]), None
+    )
+    assert np.allclose(weights, [1 / 3, 0.0, 1 / 3])
 
 
 def _objective_function(
