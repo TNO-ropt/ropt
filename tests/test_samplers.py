@@ -108,7 +108,7 @@ def test_sampler_simple(config: Any) -> None:
     perturbed_variables = _perturb_variables(
         context,
         np.array([0.0, 0.0, 0.0]),
-        (sampler,),
+        context.samplers,
     )
     assert np.allclose(perturbed_variables, 0.01 * np.eye(3))
 
@@ -125,7 +125,7 @@ def test_sampler_use_options(config: Any) -> None:
     perturbed_variables = _perturb_variables(
         context,
         np.array([0.0, 0.0, 0.0]),
-        (sampler,),
+        context.samplers,
     )
     assert np.allclose(perturbed_variables, np.eye(3))
 
@@ -149,7 +149,7 @@ def test_sampler_indexed(config: Any) -> None:
     perturbed_variables = _perturb_variables(
         context,
         np.array([0.0, 0.0, 0.0]),
-        (sampler0, sampler1),
+        context.samplers,
     )
     assert np.allclose(perturbed_variables[0, ...], np.diag([0.01, -0.01, -0.01]))
 

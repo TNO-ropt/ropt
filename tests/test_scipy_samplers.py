@@ -47,7 +47,7 @@ def test_scipy_samplers_unconstrained(config: Any, method: str, eval_func: Any) 
 def test_scipy_indexed_sampler(config: Any, eval_func: Any) -> None:
     # Removing the second variable will fix its value, since it will not be
     # perturbed and its gradient will always be zero.
-    config["variables"]["samplers"] = [0, -1, 0]
+    config["variables"]["samplers"] = [0, None, 0]
 
     initial = initial_values.copy()
     initial[1] = 0.1

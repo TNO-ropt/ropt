@@ -4,14 +4,13 @@ from __future__ import annotations
 
 from typing import Self
 
-import numpy as np
 from pydantic import BaseModel, ConfigDict, model_validator
 
-from ropt._utils import broadcast_1d_array, broadcast_arrays
+from ropt._utils import broadcast_arrays, broadcast_keys
 
 from ._validated_types import (  # ruff: ignore[typing-only-first-party-import]
     Array1D,
-    Array1DInt,
+    Keys,
 )
 
 
@@ -29,14 +28,16 @@ class NonlinearConstraintsConfig(BaseModel):
     Attributes:
         lower_bounds:        Lower bounds for the right-hand-side values.
         upper_bounds:        Upper bounds for the right-hand-side values.
-        realization_filters: Optional indices of realization filters.
-        function_estimators: Optional indices of function estimators.
+        realization_filters: Realization filter to apply to each constraint, by key,
+                            `None` to apply none (default: `None`).
+        function_estimators: Function estimator to apply to each constraint, by key
+                             (default: `"0"`).
     """
 
     lower_bounds: Array1D
     upper_bounds: Array1D
-    realization_filters: Array1DInt = np.array(-1)
-    function_estimators: Array1DInt = np.array(0)
+    realization_filters: Keys = (None,)
+    function_estimators: Keys = ("0",)
 
     model_config = ConfigDict(
         arbitrary_types_allowed=True,
@@ -54,10 +55,10 @@ class NonlinearConstraintsConfig(BaseModel):
             update={
                 "lower_bounds": lower_bounds,
                 "upper_bounds": upper_bounds,
-                "realization_filters": broadcast_1d_array(
+                "realization_filters": broadcast_keys(
                     self.realization_filters, "realization_filters", lower_bounds.size
                 ),
-                "function_estimators": broadcast_1d_array(
+                "function_estimators": broadcast_keys(
                     self.function_estimators, "function_estimators", lower_bounds.size
                 ),
             }

@@ -609,12 +609,16 @@ class EnsembleEvaluator:
             else self._context.nonlinear_constraints.realization_filters
         )
 
-        for idx, realization_filter in enumerate(self._realization_filters):
+        for key, realization_filter in self._realization_filters.items():
             apply_to_objectives = (
-                None if objective_filters is None else objective_filters == idx
+                None
+                if objective_filters is None
+                else np.array([item == key for item in objective_filters])
             )
             apply_to_constraints = (
-                None if constraint_filters is None else constraint_filters == idx
+                None
+                if constraint_filters is None
+                else np.array([item == key for item in constraint_filters])
             )
             if (apply_to_objectives is None or not np.any(apply_to_objectives)) and (
                 apply_to_constraints is None or not np.any(apply_to_constraints)
@@ -645,20 +649,23 @@ class EnsembleEvaluator:
                 constraint_weights[apply_to_constraints, :] = weights
         return objective_weights, constraint_weights
 
-    def _init_realization_filters(self) -> tuple[RealizationFilter, ...]:
-        for realization_filter in self._context.realization_filters:
+    def _init_realization_filters(self) -> dict[str, RealizationFilter]:
+        for realization_filter in self._context.realization_filters.values():
             realization_filter.init(self._context)
         return self._context.realization_filters
 
-    def _init_function_estimators(self) -> tuple[FunctionEstimator, ...]:
-        for function_estimator in self._context.function_estimators:
+    def _init_function_estimators(self) -> dict[str, FunctionEstimator]:
+        for function_estimator in self._context.function_estimators.values():
             function_estimator.init(self._context)
         return self._context.function_estimators
 
-    def _init_samplers(self, rng: Generator) -> tuple[Sampler, ...]:
-        for idx, item in enumerate(self._context.samplers):
+    def _init_samplers(self, rng: Generator) -> dict[str, Sampler]:
+        for key, item in self._context.samplers.items():
             mask = np.asarray(
-                self._context.variables.mask & (self._context.variables.samplers == idx)
+                self._context.variables.mask
+                & np.array(
+                    [sampler == key for sampler in self._context.variables.samplers]
+                )
             )
             item.init(self._context, mask, rng)
         return self._context.samplers

@@ -43,6 +43,19 @@ def broadcast_1d_array(array: NDArray[Any], name: str, size: int) -> NDArray[Any
         raise ValueError(msg) from err
 
 
+def broadcast_keys(
+    keys: tuple[str | None, ...], name: str, size: int
+) -> tuple[str | None, ...]:
+    if size == 0:
+        return ()
+    if len(keys) == 1:
+        return keys * size
+    if len(keys) != size:
+        msg = f"{name} cannot be broadcasted to a length of {size}"
+        raise ValueError(msg)
+    return keys
+
+
 def check_enum_values(value: NDArray[np.ubyte], enum_type: type[IntEnum]) -> None:
     min_enum = min(item.value for item in enum_type)
     max_enum = max(item.value for item in enum_type)

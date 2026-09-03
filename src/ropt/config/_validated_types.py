@@ -2,7 +2,7 @@
 
 from collections.abc import Sequence
 from collections.abc import Sequence as AbstractSequence
-from typing import Annotated, TypeVar
+from typing import Annotated, Any, TypeVar
 
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
@@ -51,6 +51,16 @@ def _convert_tuple(value: T | Sequence[T]) -> tuple[T, ...]:
     return tuple(value) if isinstance(value, AbstractSequence) else (value,)
 
 
+def _convert_keys(value: Any) -> tuple[str | None, ...]:  # ruff: ignore[any-type]
+    if isinstance(value, np.ndarray):
+        items: Any = value.tolist()
+    elif isinstance(value, AbstractSequence) and not isinstance(value, str):
+        items = value
+    else:
+        items = (value,)
+    return tuple(None if item is None else str(item) for item in items)
+
+
 Array1D = Annotated[NDArray[np.float64], BeforeValidator(_convert_1d_array)]
 """Convert to an immutable 1D numpy array of floating point values."""
 
@@ -68,3 +78,6 @@ Array1DBool = Annotated[NDArray[np.bool_], BeforeValidator(_convert_1d_array_boo
 
 ItemOrTuple = Annotated[tuple[T, ...], BeforeValidator(_convert_tuple)]
 """Convert to single value to a tuple containing that value, passes sets unchanged."""
+
+Keys = Annotated[tuple[str | None, ...], BeforeValidator(_convert_keys)]
+"""Convert a single key or a sequence of keys to a tuple of string keys."""

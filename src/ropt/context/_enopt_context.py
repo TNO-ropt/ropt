@@ -26,11 +26,11 @@ from ropt.plugins.manager import get_plugin
 
 from ._validated_types import (  # ruff: ignore[typing-only-first-party-import]
     BackendInstance,
-    FunctionEstimatorInstance,
+    FunctionEstimatorInstances,
     NonlinearConstraintTransformInstance,
     ObjectiveTransformInstance,
-    RealizationFilterInstance,
-    SamplerInstance,
+    RealizationFilterInstances,
+    SamplerInstances,
     VariableTransformInstance,
 )
 
@@ -67,9 +67,12 @@ class EnOptContext(BaseModel):
         optimizer:                       Optimizer settings.
         backend:                         Backend plugin instance used for function evaluations.
         gradient:                        Gradient estimation settings.
-        realization_filters:             Tuple of realization filter plugin instances.
-        function_estimators:             Tuple of function estimator plugin instances.
-        samplers:                        Tuple of sampler plugin instances.
+        realization_filters:             Realization filter plugin instances, by key.
+                                         A sequence is keyed by position.
+        function_estimators:             Function estimator plugin instances, by key.
+                                         A sequence is keyed by position.
+        samplers:                        Sampler plugin instances, by key. A sequence
+                                         is keyed by position.
         variable_transforms:             Tuple of variable transform plugin instances.
         objective_transforms:            Tuple of objective transform plugin instances.
         nonlinear_constraint_transforms: Tuple of nonlinear constraint transform plugin instances.
@@ -84,9 +87,9 @@ class EnOptContext(BaseModel):
     optimizer: OptimizerConfig = OptimizerConfig.model_validate({})
     backend: BackendInstance = {}  # type: ignore[assignment]
     gradient: GradientConfig = GradientConfig.model_validate({})
-    realization_filters: tuple[RealizationFilterInstance, ...] = ()
-    function_estimators: tuple[FunctionEstimatorInstance, ...] = ()
-    samplers: tuple[SamplerInstance, ...] = ()
+    realization_filters: RealizationFilterInstances = {}
+    function_estimators: FunctionEstimatorInstances = {}
+    samplers: SamplerInstances = {}
     variable_transforms: tuple[VariableTransformInstance, ...] = ()
     objective_transforms: tuple[ObjectiveTransformInstance, ...] = ()
     nonlinear_constraint_transforms: tuple[
@@ -125,20 +128,53 @@ class EnOptContext(BaseModel):
         updates: dict[str, Any] = {}
         if not self.function_estimators:
             function_estimator_config = FunctionEstimatorConfig.model_validate({})
-            updates["function_estimators"] = (
-                get_plugin(
+            updates["function_estimators"] = {
+                "0": get_plugin(
                     "function_estimator", method=function_estimator_config.method
-                ).create(function_estimator_config),
-            )
+                ).create(function_estimator_config)
+            }
         if not self.samplers:
             sampler_config = SamplerConfig.model_validate({})
-            updates["samplers"] = (
-                get_plugin("sampler", method=sampler_config.method).create(
+            updates["samplers"] = {
+                "0": get_plugin("sampler", method=sampler_config.method).create(
                     sampler_config
-                ),
-            )
+                )
+            }
         if updates:
             return self.model_copy(update=updates)
+        return self
+
+    @model_validator(mode="after")
+    def _check_references(self) -> Self:
+        sections = [
+            ("variables", self.variables, ("samplers",)),
+            (
+                "objectives",
+                self.objectives,
+                ("realization_filters", "function_estimators"),
+            ),
+        ]
+        if self.nonlinear_constraints is not None:
+            sections.append(
+                (
+                    "nonlinear_constraints",
+                    self.nonlinear_constraints,
+                    ("realization_filters", "function_estimators"),
+                )
+            )
+        for section, config, fields in sections:
+            for field in fields:
+                defined = getattr(self, field)
+                for key in getattr(config, field):
+                    if key is not None and key not in defined:
+                        known = (
+                            "defined keys are "
+                            + ", ".join(repr(item) for item in defined)
+                            if defined
+                            else "no keys are defined"
+                        )
+                        msg = f"{section}.{field}: unknown key {key!r}; {known}"
+                        raise ValueError(msg)
         return self
 
     @model_validator(mode="after")

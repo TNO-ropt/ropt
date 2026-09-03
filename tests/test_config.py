@@ -258,3 +258,55 @@ def test_plugin_field_rejects_unknown_value(
     config[field] = value
     with pytest.raises(ValidationError, match=re.escape(message)):
         EnOptContext.model_validate(config)
+
+
+def test_components_given_as_a_list_are_keyed_by_position(
+    config: dict[str, Any],
+) -> None:
+    config["samplers"] = [{}, {}]
+    config["variables"]["samplers"] = [0, 1]
+    context = EnOptContext.model_validate(config)
+    assert list(context.samplers) == ["0", "1"]
+    assert context.variables.samplers == ("0", "1")
+
+
+def test_components_can_be_selected_by_name(config: dict[str, Any]) -> None:
+    config["samplers"] = {"coarse": {}, "fine": {}}
+    config["variables"]["samplers"] = ["fine", "coarse"]
+    context = EnOptContext.model_validate(config)
+    assert list(context.samplers) == ["coarse", "fine"]
+    assert context.variables.samplers == ("fine", "coarse")
+
+
+def test_a_single_key_is_broadcast_over_the_elements(config: dict[str, Any]) -> None:
+    config["samplers"] = {"only": {}}
+    config["variables"]["samplers"] = "only"
+    context = EnOptContext.model_validate(config)
+    assert context.variables.samplers == ("only", "only")
+
+
+def test_a_null_reference_selects_no_realization_filter(
+    config: dict[str, Any],
+) -> None:
+    config["objectives"]["realization_filters"] = None
+    context = EnOptContext.model_validate(config)
+    assert context.objectives.realization_filters == (None,)
+
+
+def test_an_unknown_key_names_the_defined_keys(config: dict[str, Any]) -> None:
+    config["samplers"] = {"coarse": {}}
+    config["variables"]["samplers"] = "fine"
+    with pytest.raises(
+        ValidationError,
+        match=re.escape("variables.samplers: unknown key 'fine'; defined keys are"),
+    ):
+        EnOptContext.model_validate(config)
+
+
+def test_the_former_sentinel_is_now_an_unknown_key(config: dict[str, Any]) -> None:
+    config["objectives"]["realization_filters"] = -1
+    with pytest.raises(
+        ValidationError,
+        match=re.escape("objectives.realization_filters: unknown key '-1'"),
+    ):
+        EnOptContext.model_validate(config)
