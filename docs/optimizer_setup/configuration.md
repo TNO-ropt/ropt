@@ -178,12 +178,17 @@ process](#external-backend).
 
 ### Immutability
 
-Once built, an [`EnOptContext`][ropt.context.EnOptContext] is frozen. To
-change settings, build a new context from a modified dict.
+The configuration objects an [`EnOptContext`][ropt.context.EnOptContext] holds
+are frozen, so an individual setting cannot be changed in place. The context
+itself is not: replacing one of its fields wholesale is not prevented, but
+nothing re-runs the work construction did — bounds, perturbation magnitudes and
+linear constraints are all converted to the optimizer domain at that point — so
+the result is inconsistent. To change settings, build a new context from a
+modified dict.
 
 !!! warning
 
-    `EnOptContext` objects are immutable after construction. Do not try to
+    Treat an `EnOptContext` as read-only after construction. Do not try to
     serialize and round-trip them (for example, to/from JSON). Some parameters
     are transformed during construction in a way that cannot be undone, so
     building an `EnOptContext` from those serialized values would transform
