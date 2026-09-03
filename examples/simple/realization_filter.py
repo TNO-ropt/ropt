@@ -5,7 +5,7 @@ evaluation, letting the optimizer target a robust statistic instead of the mean.
 This example implements ``MedianFilter``, which puts all weight on the
 realization with the median objective. Since the filter is passed as an
 instance, it needs no plugin registration: it is added to the top-level
-``realization_filters`` list and referenced by index from the ``objectives``
+``realization_filters`` and referenced by key from the ``objectives``
 section.
 """
 

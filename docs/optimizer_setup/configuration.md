@@ -84,9 +84,11 @@ kind:
 You usually specify each component with a small config dict; see
 [Providing optimizer components](#providing-optimizer-components) below.
 
-Other config sections refer to the entries in these tuples by integer index.
-For example, [`VariablesConfig`][ropt.config.VariablesConfig] has a `samplers`
-field that is an integer array indexing into `EnOptContext.samplers`:
+Other config sections refer to these components **by key**. Give them as a
+mapping to choose the keys yourself, or as a list, which is keyed by position —
+so a list entry is reached by the integer that used to index it. For example,
+[`VariablesConfig`][ropt.config.VariablesConfig] has a `samplers` field that
+selects a sampler for each variable:
 
 ```python
 "samplers": [
@@ -99,13 +101,25 @@ field that is an integer array indexing into `EnOptContext.samplers`:
 },
 ```
 
-Use all zeros to share a single component across all elements;
-thanks to broadcasting, a single `0` (the default) is sufficient.
+The same thing written with names:
 
-For optional fields like `realization_filters`, an index of `-1` (the default)
-or any other out-of-range value leaves the corresponding element unfiltered.
+```python
+{
+    "samplers": {"coarse": {...}, "fine": {...}},
+    "variables": {
+        "samplers": ["coarse", "coarse", "fine", "fine"],
+    },
+}
+```
 
-The three transform tuples are the exception: nothing indexes into them. Each
+Use a single key to share one component across all elements; thanks to
+broadcasting, a single value (the default `"0"`) is sufficient.
+
+For optional fields like `realization_filters`, `None` (the default) leaves the
+corresponding element unfiltered. Any other key must exist, or building the
+context fails with an error naming the unknown key.
+
+The three transform tuples are the exception: nothing selects from them. Each
 is an ordered [chain](transforms.md) applied to every variable, objective, or
 constraint, in order towards the optimizer domain and in reverse coming back.
 
@@ -293,12 +307,12 @@ are automatically normalized to sum to 1 (for example, `[1, 1]` becomes `[0.5, 0
 
 Objective functions can optionally be processed using
 [realization filters](realization_filters.md) and
-[function estimators](function_estimators.md). Both fields are integer index
-arrays: each entry selects an object by its position in the corresponding tuple
-defined in [`EnOptContext`][ropt.context.EnOptContext].
+[function estimators](function_estimators.md). Both fields select an object by
+its key in the corresponding mapping defined in
+[`EnOptContext`][ropt.context.EnOptContext].
 
-- `realization_filters`: default `-1` (no filter applied).
-- `function_estimators`: default `0` (the first function estimator). Unless
+- `realization_filters`: default `None` (no filter applied).
+- `function_estimators`: default `"0"` (the first function estimator). Unless
   explicitly configured otherwise, the default function estimator method is
   `"default/default"`, which computes a weighted average of the per-realization
   values.
@@ -356,10 +370,10 @@ backend, see the table in [`SciPyBackend`][ropt.backend.scipy.SciPyBackend].
 
 Like objectives, nonlinear constraints can optionally be processed using
 [realization filters](realization_filters.md) and
-[function estimators](function_estimators.md) via index arrays:
+[function estimators](function_estimators.md), selected by key:
 
-- `realization_filters`: default `-1` (no filter applied).
-- `function_estimators`: default `0` (the first function estimator, which by
+- `realization_filters`: default `None` (no filter applied).
+- `function_estimators`: default `"0"` (the first function estimator, which by
   default computes a weighted average of per-realization values).
 
 The `nonlinear_constraint_transforms` tuple is a
@@ -683,7 +697,7 @@ Expand the block below to see every field and its default value.
         },
         "objectives": {
             "weights": [1.0],                                 # default: single objective, weight 1.0
-            "realization_filters": -1,                        # default: no filter
+            "realization_filters": None,                       # default: no filter
             "function_estimators": 0,                         # default: use first estimator for all
         },
         "linear_constraints": None,                           # No linear constraints
@@ -750,7 +764,7 @@ Expand the block below to see every field and its default value.
     "nonlinear_constraints": {
         "lower_bounds": ...,                      # required: 1D array (one per constraint)
         "upper_bounds": ...,                      # required: 1D array (one per constraint)
-        "realization_filters": -1,                # default: no filter
+        "realization_filters": None,               # default: no filter
         "function_estimators": 0,                 # default: use first estimator
     }
 

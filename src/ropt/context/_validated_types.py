@@ -1,9 +1,9 @@
 """Annotated types for Pydantic models providing input conversion and validation."""
 
-from collections.abc import Callable
+from collections.abc import Callable, Mapping, Sequence
 from typing import Annotated, Any, Protocol, Self, TypeVar
 
-from pydantic import PlainValidator
+from pydantic import BeforeValidator, PlainValidator
 
 from ropt.backend import Backend
 from ropt.config import (
@@ -74,6 +74,16 @@ def _validate_backend_options(backend: Backend) -> None:
     backend.validate_options()
 
 
+def _convert_to_mapping(value: Any) -> Any:  # ruff: ignore[any-type]
+    # A sequence is keyed by position, so the integers that used to index it
+    # keep selecting the same entry.
+    if isinstance(value, Mapping):
+        return {str(key): item for key, item in value.items()}
+    if isinstance(value, Sequence) and not isinstance(value, (str, bytes)):
+        return {str(index): item for index, item in enumerate(value)}
+    return value
+
+
 BackendInstance = Annotated[
     Backend,
     PlainValidator(
@@ -87,6 +97,11 @@ SamplerInstance = Annotated[
 ]
 """Validate that the value is an instance of a Sampler."""
 
+SamplerInstances = Annotated[
+    dict[str, SamplerInstance], BeforeValidator(_convert_to_mapping)
+]
+"""Validate a mapping of keys to Sampler instances; a sequence is keyed by position."""
+
 RealizationFilterInstance = Annotated[
     RealizationFilter,
     PlainValidator(
@@ -97,6 +112,11 @@ RealizationFilterInstance = Annotated[
 ]
 """Validate that the value is an instance of a RealizationFilter."""
 
+RealizationFilterInstances = Annotated[
+    dict[str, RealizationFilterInstance], BeforeValidator(_convert_to_mapping)
+]
+"""Validate a mapping of keys to RealizationFilters; a sequence is keyed by position."""
+
 FunctionEstimatorInstance = Annotated[
     FunctionEstimator,
     PlainValidator(
@@ -106,6 +126,11 @@ FunctionEstimatorInstance = Annotated[
     ),
 ]
 """Validate that the value is an instance of a FunctionEstimator."""
+
+FunctionEstimatorInstances = Annotated[
+    dict[str, FunctionEstimatorInstance], BeforeValidator(_convert_to_mapping)
+]
+"""Validate a mapping of keys to FunctionEstimators; a sequence is keyed by position."""
 
 VariableTransformInstance = Annotated[
     VariableTransform,

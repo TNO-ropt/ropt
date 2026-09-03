@@ -7,18 +7,15 @@ from typing import Self
 import numpy as np
 from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 
-from ropt._utils import (
-    broadcast_1d_array,
-    check_enum_values,
-)
+from ropt._utils import broadcast_1d_array, broadcast_keys, check_enum_values
 from ropt.enums import BoundaryType, PerturbationType, VariableType
 
 from ._validated_types import (  # ruff: ignore[typing-only-first-party-import]
     Array1D,
     Array1DBool,
-    Array1DInt,
     ArrayEnum,
     ItemOrTuple,
+    Keys,
 )
 from .constants import (
     DEFAULT_PERTURBATION_BOUNDARY_TYPE,
@@ -53,7 +50,8 @@ class VariablesConfig(BaseModel):
         boundary_types:           How to handle perturbations that violate boundary
             conditions (see [`BoundaryType`][ropt.enums.BoundaryType], default:
             [`DEFAULT_PERTURBATION_BOUNDARY_TYPE`][ropt.config.constants.DEFAULT_PERTURBATION_BOUNDARY_TYPE]).
-        samplers:                 Indices of the samplers to use for each variable.
+        samplers:                 Sampler to apply to each variable, by key
+                                  (default: `"0"`).
         seed:                     Seed for the random number generator used by the samplers.
     """
 
@@ -65,7 +63,7 @@ class VariablesConfig(BaseModel):
     perturbation_magnitudes: Array1D = np.array(DEFAULT_PERTURBATION_MAGNITUDE)
     perturbation_types: ArrayEnum = np.array(DEFAULT_PERTURBATION_TYPE)
     boundary_types: ArrayEnum = np.array(DEFAULT_PERTURBATION_BOUNDARY_TYPE)
-    samplers: Array1DInt = np.array(0)
+    samplers: Keys = ("0",)
     seed: ItemOrTuple[int] = (DEFAULT_SEED,)
 
     model_config = ConfigDict(
@@ -107,7 +105,7 @@ class VariablesConfig(BaseModel):
             self.perturbation_types, "perturbation_types", dim
         )
         boundary_types = broadcast_1d_array(self.boundary_types, "boundary_types", dim)
-        samplers = broadcast_1d_array(self.samplers, "samplers", dim)
+        samplers = broadcast_keys(self.samplers, "samplers", dim)
 
         if np.any(lower_bounds > upper_bounds):
             msg = "The lower bounds are larger than the upper bounds."

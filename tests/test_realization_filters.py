@@ -419,7 +419,7 @@ def test_sort_filter_mixed(
             },
         },
     ]
-    config["objectives"]["realization_filters"] = [0, 0, -1, -1]
+    config["objectives"]["realization_filters"] = [0, 0, None, None]
 
     result_list = []
     opt_result = optimize(
@@ -720,7 +720,7 @@ def test_cvar_filter_mixed(
             },
         },
     ]
-    config["objectives"]["realization_filters"] = [0, 0, -1, -1]
+    config["objectives"]["realization_filters"] = [0, 0, None, None]
 
     result_list = []
     opt_result = optimize(

@@ -62,20 +62,18 @@ def _invert_linear_equations(
 def _perturb_variables(
     context: EnOptContext,
     variables: NDArray[np.float64],
-    samplers: tuple[Sampler, ...],
+    samplers: dict[str, Sampler],
 ) -> NDArray[np.float64]:
     # The results should be independent of the order of the samplers,
     # reordering would affect the random numbers they are based on. We
     # obtain a consistent order by running multiple samplers in the order
     # that they appear in the config.variables.samplers array:
-    unique, indices = np.unique(
-        np.compress(context.variables.samplers >= 0, context.variables.samplers),
-        return_index=True,
+    keys = list(
+        dict.fromkeys(key for key in context.variables.samplers if key is not None)
     )
-    sampler_indices = unique[np.argsort(indices)]
-    samples = samplers[sampler_indices[0]].generate_samples()
-    for sampler_idx in sampler_indices[1:]:
-        samples += samplers[sampler_idx].generate_samples()
+    samples = samplers[keys[0]].generate_samples()
+    for key in keys[1:]:
+        samples += samplers[key].generate_samples()
     magnitudes = np.where(
         context.variables.perturbation_types == PerturbationType.RELATIVE,
         (context.variables.upper_bounds - context.variables.lower_bounds)
@@ -147,8 +145,8 @@ def _calculate_gradient(  # ruff: ignore[too-many-arguments, too-many-positional
 
 
 def _calculate_estimated_gradients(  # ruff: ignore[too-many-arguments, too-many-positional-arguments]
-    function_estimators: tuple[FunctionEstimator, ...],
-    estimator_indices: NDArray[np.intc] | None,
+    function_estimators: dict[str, FunctionEstimator],
+    estimator_keys: tuple[str | None, ...] | None,
     variables: NDArray[np.float64],
     functions: NDArray[np.float64],
     perturbed_variables: NDArray[np.float64],
@@ -164,15 +162,15 @@ def _calculate_estimated_gradients(  # ruff: ignore[too-many-arguments, too-many
     delta_variables = perturbed_variables - np.expand_dims(variables, axis=1)
     delta_functions = perturbed_functions - np.expand_dims(functions, axis=1)
 
-    if estimator_indices is None:
-        estimator_indices = np.zeros(functions.shape[1], dtype=np.intc)
+    if estimator_keys is None:
+        estimator_keys = ("0",) * functions.shape[1]
 
     realization_weights = np.broadcast_to(
         realization_weights, (functions.shape[1], realization_weights.shape[-1])
     )
 
-    for estimator_idx, estimator in enumerate(function_estimators):
-        mask = estimator_indices == estimator_idx
+    for key, estimator in function_estimators.items():
+        mask = np.array([item == key for item in estimator_keys])
         for idx in np.where(mask)[0]:
             gradients[idx, ...] = _calculate_gradient(
                 functions[..., idx],
