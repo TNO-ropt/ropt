@@ -127,12 +127,21 @@ def _terminate_workers(executor: ProcessPoolExecutor) -> None:
         terminate_workers()
         return
 
-    # Get a snapshot of the current worker processes.
+    # The same algorithm by hand. The lock is taken for one thing only: reading
+    # `_processes` without racing a concurrent mutation. It must be released
+    # before `shutdown`, which acquires the same non-reentrant lock itself.
     with executor._shutdown_lock:  # ruff: ignore[private-member-access]
         processes = list((executor._processes or {}).values())  # ruff: ignore[private-member-access]
 
-    # Shut down the pool without waiting, then terminate any remaining processes manually.
+    # Never wait: a worker that decides not to exit would deadlock the caller,
+    # which is what CPython refuses to risk here too. `shutdown` invalidates
+    # `_processes`, hence the copy above.
     executor.shutdown(wait=False, cancel_futures=True)
+
+    # A worker started between the snapshot and here is not signalled. That gap
+    # is CPython's gh-152967 and is not guarded on these versions: closing it
+    # needs the internal "force shutting down" flag that only 3.14 and later
+    # have, so the alternative would be a wait, which is what this removes.
     for process in processes:
         try:
             if not process.is_alive():
