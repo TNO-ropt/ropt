@@ -12,5 +12,4 @@ See the [Plugin Base Classes](plugin_bases.md) reference for the interfaces.
 ::: ropt.function_estimator.default.DefaultFunctionEstimatorPlugin
 ::: ropt.realization_filter.default.DefaultRealizationFilterPlugin
 ::: ropt.sampler.scipy.SciPySamplerPlugin
-::: ropt.transforms.default.DefaultVariableTransformPlugin
 

@@ -141,6 +141,54 @@ def test_constraint_scales_must_be_positive(scale: float) -> None:
         )
 
 
+def test_variable_scales_and_offsets_default_to_the_identity() -> None:
+    variables = VariablesConfig.model_validate({"variable_count": 3})
+    assert np.allclose(variables.scales, 1.0)
+    assert np.allclose(variables.offsets, 0.0)
+    assert variables.scales.shape == (3,)
+    assert variables.offsets.shape == (3,)
+
+
+def test_variable_scales_and_offsets_broadcast() -> None:
+    variables = VariablesConfig.model_validate(
+        {"variable_count": 3, "scales": 2.0, "offsets": [1.0, 2.0, 3.0]}
+    )
+    assert np.allclose(variables.scales, 2.0)
+    assert np.allclose(variables.offsets, [1.0, 2.0, 3.0])
+
+
+@pytest.mark.parametrize("scale", [0.0, -2.0])
+def test_variable_scales_must_be_positive(scale: float) -> None:
+    with pytest.raises(ValueError, match="scales must be positive"):
+        VariablesConfig.model_validate({"variable_count": 2, "scales": [1.0, scale]})
+
+
+def test_linear_constraint_scales_default_to_one() -> None:
+    linear_constraints = LinearConstraintsConfig.model_validate(
+        {
+            "coefficients": [[1.0, 1.0], [1.0, 0.0]],
+            "lower_bounds": 0.0,
+            "upper_bounds": 1.0,
+        }
+    )
+    assert np.allclose(linear_constraints.scales, 1.0)
+    assert linear_constraints.scales.shape == (2,)
+    assert not linear_constraints.auto_scale
+
+
+@pytest.mark.parametrize("scale", [0.0, -2.0])
+def test_linear_constraint_scales_must_be_positive(scale: float) -> None:
+    with pytest.raises(ValueError, match="scales must be positive"):
+        LinearConstraintsConfig.model_validate(
+            {
+                "coefficients": [[1.0, 1.0]],
+                "lower_bounds": 0.0,
+                "upper_bounds": 1.0,
+                "scales": scale,
+            }
+        )
+
+
 def test_objective_maximize_defaults_and_broadcasts() -> None:
     objectives = ObjectiveFunctionsConfig.model_validate({"weights": [1.0, 1.0]})
     assert objectives.maximize.shape == (2,)
@@ -279,7 +327,7 @@ def test_perturbation_types(config: Any) -> None:
     assert np.allclose(context.variables.perturbation_magnitudes, [0.1, 0.01, 1.0])
 
 
-def test_perturbation_types_with_scaler(config: Any) -> None:
+def test_perturbation_types_with_scaled_variables(config: Any) -> None:
     config["variables"].update(
         {
             "perturbation_magnitudes": [0.1, 0.01],
@@ -300,9 +348,7 @@ def test_perturbation_types_with_scaler(config: Any) -> None:
     config["variables"]["variable_count"] = 3
     config["variables"]["lower_bounds"] = [0.0, 100.0, 0.0]
     config["variables"]["upper_bounds"] = [np.inf, 600.0, 1.0]
-    config["variable_transforms"] = [
-        {"method": "scaler", "options": {"scales": [1.0, 1.0, 50.0]}},
-    ]
+    config["variables"]["scales"] = [1.0, 1.0, 50.0]
 
     config["variables"].update(
         {
@@ -332,11 +378,6 @@ def test_perturbation_types_with_scaler(config: Any) -> None:
             "function_estimators",
             (object(),),
             "Value must be a FunctionEstimator, FunctionEstimatorConfig, or dict.",
-        ),
-        (
-            "variable_transforms",
-            (object(),),
-            "Value must be a VariableTransform, VariableTransformConfig, or dict.",
         ),
     ],
 )

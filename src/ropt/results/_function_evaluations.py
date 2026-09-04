@@ -150,9 +150,10 @@ class FunctionEvaluations(ResultField):
             metadata={} if metadata is None else metadata,
         )
 
-    def _transform_from_optimizer(
-        self, context: EnOptContext, evaluation_point: NDArray[np.float64]
-    ) -> FunctionEvaluations:
+    def _transform_from_optimizer(self, context: EnOptContext) -> FunctionEvaluations:
+        variables = value_from_optimizer(
+            self.variables, context.variables.scales, context.variables.offsets
+        )
         objectives = value_from_optimizer(
             self.objectives, context.get_objective_scales()
         )
@@ -163,7 +164,7 @@ class FunctionEvaluations(ResultField):
             constraints = value_from_optimizer(constraints, constraint_scales)
 
         return FunctionEvaluations(
-            variables=evaluation_point,
+            variables=variables,
             objectives=objectives,
             constraints=constraints,
             metadata=self.metadata,

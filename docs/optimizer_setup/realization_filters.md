@@ -141,7 +141,7 @@ instance can be passed directly in the `realization_filters` field of
 
 ## Where to next
 
-- Combine filters with transforms:
-  [Transforms](variable_transforms.md).
+- Combine filters with function estimators:
+  [Function Estimators](function_estimators.md).
 - Inspect per-realization output:
   [Working with Results](results.md).

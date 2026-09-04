@@ -30,7 +30,6 @@ from ._validated_types import (  # ruff: ignore[typing-only-first-party-import]
     FunctionEstimatorInstances,
     RealizationFilterInstances,
     SamplerInstances,
-    VariableTransformInstance,
 )
 
 if TYPE_CHECKING:
@@ -75,7 +74,6 @@ class EnOptContext(BaseModel):
                                          A sequence is keyed by position.
         samplers:                        Sampler plugin instances, by key. A sequence
                                          is keyed by position.
-        variable_transforms:             Tuple of variable transform plugin instances.
         names:                           Optional mapping of axis names to label sequences.
     """
 
@@ -90,7 +88,6 @@ class EnOptContext(BaseModel):
     realization_filters: RealizationFilterInstances = {}
     function_estimators: FunctionEstimatorInstances = {}
     samplers: SamplerInstances = {}
-    variable_transforms: tuple[VariableTransformInstance, ...] = ()
     names: dict[str, tuple[str | int, ...]] = {}
 
     _locked: bool = PrivateAttr(default=False)
@@ -255,56 +252,41 @@ class EnOptContext(BaseModel):
         return self
 
     @model_validator(mode="after")
-    def _initialize_variable_transforms(self) -> Self:
-        for item in self.variable_transforms:
-            item.set_free_mask(self.variables.mask)
+    def _scale_variables_and_constraints(self) -> Self:
+        scales = self.variables.scales
+        offsets = self.variables.offsets
 
-        if self.variable_transforms:
-            lower_bounds = self.variables.lower_bounds
-            upper_bounds = self.variables.upper_bounds
-            magnitudes = self.variables.perturbation_magnitudes
-            for transform in self.variable_transforms:
-                lower_bounds = transform.to_optimizer(lower_bounds)
-                upper_bounds = transform.to_optimizer(upper_bounds)
-                magnitudes = transform.magnitudes_to_optimizer(magnitudes)
-            absolute = self.variables.perturbation_types == PerturbationType.ABSOLUTE
-            updated_variables = self.variables.model_copy(
-                update={
-                    "lower_bounds": immutable_array(lower_bounds),
-                    "upper_bounds": immutable_array(upper_bounds),
-                    "perturbation_magnitudes": immutable_array(
-                        np.where(
-                            absolute,
-                            magnitudes,
-                            self.variables.perturbation_magnitudes,
-                        )
-                    ),
-                }
+        # The bounds and the absolute perturbation magnitudes describe the
+        # variables, so they move to the optimizer domain with them. A relative
+        # magnitude is a fraction of the bound range, which the affine map
+        # leaves alone.
+        absolute = self.variables.perturbation_types == PerturbationType.ABSOLUTE
+        magnitudes = np.where(
+            absolute,
+            self.variables.perturbation_magnitudes / scales,
+            self.variables.perturbation_magnitudes,
+        )
+        updated_variables = self.variables.model_copy(
+            update={
+                "lower_bounds": immutable_array(
+                    to_optimizer(self.variables.lower_bounds, scales, offsets)
+                ),
+                "upper_bounds": immutable_array(
+                    to_optimizer(self.variables.upper_bounds, scales, offsets)
+                ),
+                "perturbation_magnitudes": immutable_array(magnitudes),
+            }
+        )
+        object.__setattr__(self, "variables", updated_variables)  # ruff: ignore[unnecessary-dunder-call]
+
+        if self.linear_constraints is not None:
+            object.__setattr__(  # ruff: ignore[unnecessary-dunder-call]
+                self,
+                "linear_constraints",
+                _scale_linear_constraints(
+                    self.linear_constraints, scales, offsets, self.variables.mask
+                ),
             )
-            object.__setattr__(self, "variables", updated_variables)  # ruff: ignore[unnecessary-dunder-call]
-
-            if self.linear_constraints is not None:
-                coefficients = self.linear_constraints.coefficients
-                lower_bounds = self.linear_constraints.lower_bounds
-                upper_bounds = self.linear_constraints.upper_bounds
-
-                for transform in self.variable_transforms:
-                    coefficients, lower_bounds, upper_bounds = (
-                        transform.linear_constraints_to_optimizer(
-                            coefficients, lower_bounds, upper_bounds
-                        )
-                    )
-                updated_linear_constraints = self.linear_constraints.model_copy(
-                    update={
-                        "coefficients": immutable_array(coefficients),
-                        "lower_bounds": immutable_array(lower_bounds),
-                        "upper_bounds": immutable_array(upper_bounds),
-                    }
-                )
-
-                object.__setattr__(  # ruff: ignore[unnecessary-dunder-call]
-                    self, "linear_constraints", updated_linear_constraints
-                )
 
         return self
 
@@ -325,3 +307,54 @@ class EnOptContext(BaseModel):
                 msg = "The EnOptContext object has already been used."
                 raise WorkflowError(msg)
             object.__setattr__(self, "_locked", True)  # ruff: ignore[unnecessary-dunder-call]
+
+
+def _scale_linear_constraints(
+    config: LinearConstraintsConfig,
+    scales: NDArray[np.float64],
+    offsets: NDArray[np.float64],
+    mask: NDArray[np.bool_],
+) -> LinearConstraintsConfig:
+    # Substituting x = scale * y + offset is a change of variables rather than a
+    # rescaling: it leaves the distance from a point to each bound unchanged.
+    coefficients = config.coefficients * scales
+    shift = np.matmul(config.coefficients, offsets)
+    lower_bounds = config.lower_bounds - shift
+    upper_bounds = config.upper_bounds - shift
+
+    # Scaling the equations is a separate step, and it comes second: the
+    # estimate below is only meaningful once the change of variables has been
+    # made.
+    row_scales = (
+        config.scales
+        * _estimate_equation_scales(coefficients, lower_bounds, upper_bounds, mask)
+        if config.auto_scale
+        else config.scales
+    )
+
+    return config.model_copy(
+        update={
+            "coefficients": immutable_array(coefficients / row_scales[:, np.newaxis]),
+            "lower_bounds": immutable_array(lower_bounds / row_scales),
+            "upper_bounds": immutable_array(upper_bounds / row_scales),
+            "scales": immutable_array(row_scales),
+        }
+    )
+
+
+def _estimate_equation_scales(
+    coefficients: NDArray[np.float64],
+    lower_bounds: NDArray[np.float64],
+    upper_bounds: NDArray[np.float64],
+    mask: NDArray[np.bool_],
+) -> NDArray[np.float64]:
+    # Fixed variables are eliminated before the optimizer sees the problem, so
+    # their coefficients must not inflate the estimate.
+    largest = np.max(np.abs(coefficients[:, mask]), axis=-1, initial=0.0)
+    for bounds in (lower_bounds, upper_bounds):
+        largest = np.maximum(
+            largest, np.where(np.isfinite(bounds), np.abs(bounds), 0.0)
+        )
+    # An all-zero equation is one that `get_masked_linear_constraints` drops.
+    # Dividing it by its own estimate would turn its coefficients into NaN.
+    return np.where(largest > 0.0, largest, 1.0)

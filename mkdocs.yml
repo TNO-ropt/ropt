@@ -117,7 +117,6 @@ nav:
       - "Stochastic Gradients": optimizer_setup/gradients.md
       - "Realization Filters": optimizer_setup/realization_filters.md
       - "Function Estimators": optimizer_setup/function_estimators.md
-      - "Variable Transforms": optimizer_setup/variable_transforms.md
       - "Working with Results": optimizer_setup/results.md
   - "Running":
       - "Running Optimizations": running/running.md
@@ -157,7 +156,6 @@ nav:
         - "Realization Filters": reference/realization_filter.md
         - "Optimizer Backends": reference/backend.md
         - "Samplers": reference/sampler.md
-        - "Transforms": reference/transforms.md
       - "Workflow Components":
         - "Overview": reference/components.md
         - "Compute Steps": reference/components_compute_steps.md

@@ -7,7 +7,12 @@ from typing import Self
 import numpy as np
 from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 
-from ropt._utils import broadcast_1d_array, broadcast_keys, check_enum_values
+from ropt._utils import (
+    broadcast_1d_array,
+    broadcast_keys,
+    check_enum_values,
+    check_scales,
+)
 from ropt.enums import BoundaryType, PerturbationType, VariableType
 
 from ._validated_types import (  # ruff: ignore[typing-only-first-party-import]
@@ -41,6 +46,8 @@ class VariablesConfig(BaseModel):
         upper_bounds:             Upper bounds for the variables (default: $+\infty$).
         types:                    Optional variable types.
         mask:                     Optional boolean mask indicating free variables.
+        scales:                   Scale factors for the variables (default: 1.0).
+        offsets:                  Offsets for the variables (default: 0.0).
         perturbation_magnitudes:  Magnitudes of the perturbations for each variable
             (default:
             [`DEFAULT_PERTURBATION_MAGNITUDE`][ropt.config.constants.DEFAULT_PERTURBATION_MAGNITUDE]).
@@ -60,6 +67,8 @@ class VariablesConfig(BaseModel):
     upper_bounds: Array1D = np.array(np.inf)
     types: ArrayEnum = np.array(VariableType.REAL)
     mask: Array1DBool = np.array(1)
+    scales: Array1D = np.array(1.0)
+    offsets: Array1D = np.array(0.0)
     perturbation_magnitudes: Array1D = np.array(DEFAULT_PERTURBATION_MAGNITUDE)
     perturbation_types: ArrayEnum = np.array(DEFAULT_PERTURBATION_TYPE)
     boundary_types: ArrayEnum = np.array(DEFAULT_PERTURBATION_BOUNDARY_TYPE)
@@ -98,6 +107,8 @@ class VariablesConfig(BaseModel):
         upper_bounds = broadcast_1d_array(self.upper_bounds, "upper_bounds", dim)
         types = broadcast_1d_array(self.types, "types", dim)
         mask = broadcast_1d_array(self.mask, "mask", dim)
+        scales = check_scales(self.scales, "scales", dim)
+        offsets = broadcast_1d_array(self.offsets, "offsets", dim)
         perturbation_magnitudes = broadcast_1d_array(
             self.perturbation_magnitudes, "perturbation_magnitudes", dim
         )
@@ -126,6 +137,8 @@ class VariablesConfig(BaseModel):
                 "lower_bounds": lower_bounds,
                 "upper_bounds": upper_bounds,
                 "mask": mask,
+                "scales": scales,
+                "offsets": offsets,
                 "perturbation_magnitudes": perturbation_magnitudes,
                 "perturbation_types": perturbation_types,
                 "boundary_types": boundary_types,

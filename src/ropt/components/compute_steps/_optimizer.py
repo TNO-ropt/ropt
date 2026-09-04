@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 
 from ropt._logging import get_logger
+from ropt._scaling import to_optimizer
 from ropt.core import EnsembleEvaluator, EnsembleOptimizer
 from ropt.enums import EnOptEventType, ExitCode
 from ropt.events import EnOptEvent
@@ -91,8 +92,9 @@ class OptimizationStep(ComputeStep[ExitCode]):
             EnOptEvent(event_type=EnOptEventType.START_OPTIMIZER, context=context)
         )
 
-        for transform in context.variable_transforms:
-            variables = transform.to_optimizer(variables)
+        variables = to_optimizer(
+            variables, context.variables.scales, context.variables.offsets
+        )
 
         ensemble_evaluator = EnsembleEvaluator(
             self._context,

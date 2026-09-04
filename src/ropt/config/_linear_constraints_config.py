@@ -7,7 +7,7 @@ from typing import Self
 import numpy as np
 from pydantic import BaseModel, ConfigDict, model_validator
 
-from ropt._utils import broadcast_1d_array
+from ropt._utils import broadcast_1d_array, check_scales
 from ropt.config._validated_types import (  # ruff: ignore[typing-only-first-party-import]
     Array1D,
     Array2D,
@@ -29,11 +29,15 @@ class LinearConstraintsConfig(BaseModel):
         coefficients: Matrix of coefficients for the linear constraints.
         lower_bounds: Lower bounds for the right-hand side of the constraint equations.
         upper_bounds: Upper bounds for the right-hand side of the constraint equations.
+        scales:       Scale factors for the constraint equations (default: 1.0).
+        auto_scale:   Estimate an additional scale for each equation.
     """
 
     coefficients: Array2D
     lower_bounds: Array1D
     upper_bounds: Array1D
+    scales: Array1D = np.array(1.0)
+    auto_scale: bool = False
 
     model_config = ConfigDict(
         arbitrary_types_allowed=True,
@@ -48,6 +52,7 @@ class LinearConstraintsConfig(BaseModel):
         size = 0 if coefficients is None else coefficients.shape[0]
         lower_bounds = broadcast_1d_array(self.lower_bounds, "lower_bounds", size)
         upper_bounds = broadcast_1d_array(self.upper_bounds, "upper_bounds", size)
+        scales = check_scales(self.scales, "scales", size)
 
         if np.any(lower_bounds > upper_bounds):
             msg = "The lower bounds are larger than the upper bounds."
@@ -58,5 +63,6 @@ class LinearConstraintsConfig(BaseModel):
                 "coefficients": coefficients,
                 "lower_bounds": lower_bounds,
                 "upper_bounds": upper_bounds,
+                "scales": scales,
             }
         )

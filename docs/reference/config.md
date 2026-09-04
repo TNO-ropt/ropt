@@ -23,7 +23,6 @@ page.
             - FunctionEstimatorConfig
             - RealizationFilterConfig
             - SamplerConfig
-            - VariableTransformConfig
         group_by_category: false
         show_bases: false
 

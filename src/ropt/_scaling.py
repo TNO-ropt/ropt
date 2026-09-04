@@ -5,14 +5,16 @@ it on the way back. Scales are positive, so the map preserves order and sign;
 whether an objective is minimized or maximized is a separate setting, applied to
 aggregated objectives only.
 
-Two kinds of quantity map back, and they are kept apart deliberately: they
-coincide today, but would diverge if an offset were ever added, and collapsing
-them into a single multiplication is what would make that change expensive.
+Variables also carry an offset, so the map is affine rather than a pure
+change of units. That is why two kinds of quantity map back separately:
 
-- A *value* is a quantity in its own right, such as an objective. An offset
-  would apply to it.
+- A *value* is a quantity in its own right, such as a variable or an
+  objective. The offset applies to it.
 - A *difference* is the distance between two values, such as a gradient or the
-  gap between a constraint and its bound. An offset cancels out.
+  gap between a variable and its bound. The offset cancels out, so a difference
+  is only ever multiplied by the scale.
+
+Objectives and constraints have no offset and pass none.
 """
 
 from __future__ import annotations
@@ -25,33 +27,43 @@ if TYPE_CHECKING:
 
 
 def to_optimizer(
-    values: NDArray[np.float64], scales: NDArray[np.float64]
+    values: NDArray[np.float64],
+    scales: NDArray[np.float64],
+    offsets: NDArray[np.float64] | None = None,
 ) -> NDArray[np.float64]:
     """Map values from the user domain to the optimizer domain.
 
     Args:
-        values: The values in the user domain.
-        scales: The scales to apply.
+        values:  The values in the user domain.
+        scales:  The scales to apply.
+        offsets: The offsets to subtract, if any.
 
     Returns:
         The values in the optimizer domain.
     """
-    return values / scales
+    if offsets is None:
+        return values / scales
+    return (values - offsets) / scales
 
 
 def value_from_optimizer(
-    values: NDArray[np.float64], scales: NDArray[np.float64]
+    values: NDArray[np.float64],
+    scales: NDArray[np.float64],
+    offsets: NDArray[np.float64] | None = None,
 ) -> NDArray[np.float64]:
     """Map values from the optimizer domain back to the user domain.
 
     Args:
-        values: The values in the optimizer domain.
-        scales: The scales to apply.
+        values:  The values in the optimizer domain.
+        scales:  The scales to apply.
+        offsets: The offsets to add back, if any.
 
     Returns:
         The values in the user domain.
     """
-    return values * scales
+    if offsets is None:
+        return values * scales
+    return values * scales + offsets
 
 
 def diff_from_optimizer(

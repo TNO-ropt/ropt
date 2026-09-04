@@ -1,7 +1,7 @@
 # Writing a Plugin
 
-A plugin makes your own optimizer, sampler, filter, estimator, or transform
-selectable from a configuration by name, in the same way the built-in ones are:
+A plugin makes your own optimizer, sampler, filter, or estimator selectable
+from a configuration by name, in the same way the built-in ones are:
 
 ```python
 "backend": {"method": "my_package/my_method"}
@@ -31,7 +31,6 @@ its own factory base class, and the base class of the object it creates:
 | `ropt.plugins.sampler` | [`SamplerPlugin`][ropt.plugins.sampler.SamplerPlugin] | [`Sampler`][ropt.sampler.Sampler] |
 | `ropt.plugins.realization_filter` | [`RealizationFilterPlugin`][ropt.plugins.realization_filter.RealizationFilterPlugin] | [`RealizationFilter`][ropt.realization_filter.RealizationFilter] |
 | `ropt.plugins.function_estimator` | [`FunctionEstimatorPlugin`][ropt.plugins.function_estimator.FunctionEstimatorPlugin] | [`FunctionEstimator`][ropt.function_estimator.FunctionEstimator] |
-| `ropt.plugins.variable_transform` | [`VariableTransformPlugin`][ropt.plugins.transforms.VariableTransformPlugin] | [`VariableTransform`][ropt.transforms.VariableTransform] |
 
 ## What a plugin must implement
 

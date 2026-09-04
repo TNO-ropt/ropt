@@ -209,22 +209,17 @@ class ConstraintInfo(ResultField):
         bound_upper: NDArray[np.float64] | None = self.bound_upper
         if bound_lower is not None:
             assert bound_upper is not None
-            for variable_transform in reversed(context.variable_transforms):
-                bound_lower, bound_upper = (
-                    variable_transform.bound_constraint_diffs_from_optimizer(
-                        bound_lower, bound_upper
-                    )
-                )
+            variable_scales = context.variables.scales
+            bound_lower = diff_from_optimizer(bound_lower, variable_scales)
+            bound_upper = diff_from_optimizer(bound_upper, variable_scales)
         linear_lower: NDArray[np.float64] | None = self.linear_lower
         linear_upper: NDArray[np.float64] | None = self.linear_upper
         if linear_lower is not None:
             assert linear_upper is not None
-            for variable_transform in reversed(context.variable_transforms):
-                linear_lower, linear_upper = (
-                    variable_transform.linear_constraints_diffs_from_optimizer(
-                        linear_lower, linear_upper
-                    )
-                )
+            assert context.linear_constraints is not None
+            equation_scales = context.linear_constraints.scales
+            linear_lower = diff_from_optimizer(linear_lower, equation_scales)
+            linear_upper = diff_from_optimizer(linear_upper, equation_scales)
 
         nonlinear_lower: NDArray[np.float64] | None = self.nonlinear_lower
         nonlinear_upper: NDArray[np.float64] | None = self.nonlinear_upper

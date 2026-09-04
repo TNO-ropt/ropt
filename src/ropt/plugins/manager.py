@@ -16,7 +16,6 @@ PluginType = Literal[
     "sampler",
     "realization_filter",
     "function_estimator",
-    "variable_transform",
 ]
 """Represents the valid types of plugins supported by `ropt`.
 
@@ -30,7 +29,6 @@ _DEFAULT_PLUGINS: Final = {
     "backend": "scipy",
     "sampler": "scipy",
     "realization_filter": "default",
-    "variable_transform": "default",
 }
 
 _logger = get_logger(__name__)
@@ -62,9 +60,6 @@ class PluginManager:
         from .function_estimator import FunctionEstimatorPlugin
         from .realization_filter import RealizationFilterPlugin
         from .sampler import SamplerPlugin
-        from .transforms import (
-            VariableTransformPlugin,
-        )
         # ruff: enable[import-outside-top-level]
 
         self._PLUGIN_TYPES: Final = {
@@ -72,7 +67,6 @@ class PluginManager:
             "backend": BackendPlugin,
             "sampler": SamplerPlugin,
             "realization_filter": RealizationFilterPlugin,
-            "variable_transform": VariableTransformPlugin,
         }
 
         self._plugins: dict[PluginType, dict[str, type[Plugin]]] = {}
@@ -88,7 +82,6 @@ class PluginManager:
         from ropt.function_estimator.default import DefaultFunctionEstimatorPlugin
         from ropt.backend.external import ExternalBackendPlugin
         from ropt.backend.scipy import SciPyBackendPlugin
-        from ropt.transforms.default import DefaultVariableTransformPlugin
 
         self._add_plugin("backend", "scipy", SciPyBackendPlugin)
         self._add_plugin("backend", "external", ExternalBackendPlugin)
@@ -98,9 +91,6 @@ class PluginManager:
         )
         self._add_plugin(
             "function_estimator", "default", DefaultFunctionEstimatorPlugin
-        )
-        self._add_plugin(
-            "variable_transform", "default", DefaultVariableTransformPlugin
         )
 
         for plugin_type in self._PLUGIN_TYPES:

@@ -117,20 +117,27 @@ class Gradients(ResultField):
         )
 
     def _transform_from_optimizer(self, context: EnOptContext) -> Gradients | None:
-        # The objective and constraint axis comes first here, so the scales are
-        # given a trailing axis to broadcast against the variables.
-        objectives = diff_from_optimizer(
-            apply_direction(
-                self.objectives, context.objectives.maximize[:, np.newaxis]
-            ),
-            context.get_objective_scales()[:, np.newaxis],
+        # A gradient carries a function in its numerator and a variable in its
+        # denominator, so both axes must be undone: the function axis comes
+        # first here and takes a trailing axis to broadcast against the
+        # variables, while the variable scales divide along the last axis.
+        variable_scales = context.variables.scales
+        objectives = (
+            diff_from_optimizer(
+                apply_direction(
+                    self.objectives, context.objectives.maximize[:, np.newaxis]
+                ),
+                context.get_objective_scales()[:, np.newaxis],
+            )
+            / variable_scales
         )
         constraints = self.constraints
         if constraints is not None:
             constraint_scales = context.get_constraint_scales()
             assert constraint_scales is not None
-            constraints = diff_from_optimizer(
-                constraints, constraint_scales[:, np.newaxis]
+            constraints = (
+                diff_from_optimizer(constraints, constraint_scales[:, np.newaxis])
+                / variable_scales
             )
 
         return Gradients(
