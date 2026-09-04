@@ -24,8 +24,6 @@ page.
             - RealizationFilterConfig
             - SamplerConfig
             - VariableTransformConfig
-            - ObjectiveTransformConfig
-            - NonlinearConstraintTransformConfig
         group_by_category: false
         show_bases: false
 

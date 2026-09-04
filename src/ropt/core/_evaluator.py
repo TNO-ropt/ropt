@@ -6,6 +6,7 @@ import numpy as np
 from numpy.random import default_rng
 
 from ropt._logging import get_logger
+from ropt._utils import apply_direction
 from ropt.exceptions import TooFewRealizations
 from ropt.results import (
     ConstraintInfo,
@@ -495,6 +496,12 @@ class EnsembleEvaluator:
                     failed_realizations,
                 )
 
+            # Maximizing an objective is minimizing its negation. The flip
+            # belongs here, on the aggregate, and not on the values that went
+            # into it: aggregation does not commute with negation, since a
+            # spread is positive whatever the sign of its inputs.
+            objectives = apply_direction(objectives, self._context.objectives.maximize)
+
             target_objective = np.array(
                 (self._context.objectives.weights * objectives).sum()
             )
@@ -563,6 +570,10 @@ class EnsembleEvaluator:
             )
         else:
             constraint_gradients = None
+
+        objective_gradients = apply_direction(
+            objective_gradients, self._context.objectives.maximize[:, np.newaxis]
+        )
 
         target_objective_gradient = np.array(
             (self._context.objectives.weights[:, np.newaxis] * objective_gradients).sum(

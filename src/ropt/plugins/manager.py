@@ -17,8 +17,6 @@ PluginType = Literal[
     "realization_filter",
     "function_estimator",
     "variable_transform",
-    "objective_transform",
-    "nonlinear_constraint_transform",
 ]
 """Represents the valid types of plugins supported by `ropt`.
 
@@ -33,8 +31,6 @@ _DEFAULT_PLUGINS: Final = {
     "sampler": "scipy",
     "realization_filter": "default",
     "variable_transform": "default",
-    "objective_transform": "default",
-    "nonlinear_constraint_transform": "default",
 }
 
 _logger = get_logger(__name__)
@@ -67,8 +63,6 @@ class PluginManager:
         from .realization_filter import RealizationFilterPlugin
         from .sampler import SamplerPlugin
         from .transforms import (
-            NonlinearConstraintTransformPlugin,
-            ObjectiveTransformPlugin,
             VariableTransformPlugin,
         )
         # ruff: enable[import-outside-top-level]
@@ -79,8 +73,6 @@ class PluginManager:
             "sampler": SamplerPlugin,
             "realization_filter": RealizationFilterPlugin,
             "variable_transform": VariableTransformPlugin,
-            "objective_transform": ObjectiveTransformPlugin,
-            "nonlinear_constraint_transform": NonlinearConstraintTransformPlugin,
         }
 
         self._plugins: dict[PluginType, dict[str, type[Plugin]]] = {}
@@ -96,11 +88,7 @@ class PluginManager:
         from ropt.function_estimator.default import DefaultFunctionEstimatorPlugin
         from ropt.backend.external import ExternalBackendPlugin
         from ropt.backend.scipy import SciPyBackendPlugin
-        from ropt.transforms.default import (
-            DefaultVariableTransformPlugin,
-            DefaultObjectiveTransformPlugin,
-            DefaultNonlinearConstraintTransformPlugin,
-        )
+        from ropt.transforms.default import DefaultVariableTransformPlugin
 
         self._add_plugin("backend", "scipy", SciPyBackendPlugin)
         self._add_plugin("backend", "external", ExternalBackendPlugin)
@@ -113,14 +101,6 @@ class PluginManager:
         )
         self._add_plugin(
             "variable_transform", "default", DefaultVariableTransformPlugin
-        )
-        self._add_plugin(
-            "objective_transform", "default", DefaultObjectiveTransformPlugin
-        )
-        self._add_plugin(
-            "nonlinear_constraint_transform",
-            "default",
-            DefaultNonlinearConstraintTransformPlugin,
         )
 
         for plugin_type in self._PLUGIN_TYPES:

@@ -1,20 +1,16 @@
 """This module defines a basic variable scaling transform."""
 
 import numpy as np
-from numpy.typing import ArrayLike, NDArray
+from numpy.typing import NDArray
 
 from ropt.config import (
-    NonlinearConstraintTransformConfig,
-    ObjectiveTransformConfig,
     VariableTransformConfig,
 )
 from ropt.plugins.transforms import (
-    NonlinearConstraintTransformPlugin,
-    ObjectiveTransformPlugin,
     VariableTransformPlugin,
 )
 
-from .base import NonlinearConstraintTransform, ObjectiveTransform, VariableTransform
+from .base import VariableTransform
 
 DEFAULT_VARIABLE_TRANSFORM_METHODS = {"scaler"}
 DEFAULT_OBJECTIVE_TRANSFORM_METHODS = {"scaler"}
@@ -31,7 +27,7 @@ def _check_mask_size(mask: NDArray[np.bool_], size: int, what: str) -> None:
 class DefaultVariableTransform(VariableTransform):
     """Linearly scales and shifts variables between domains.
 
-    See [Transforms](../optimizer_setup/transforms.md#defaultvariabletransform)
+    See [Transforms](../optimizer_setup/variable_transforms.md#defaultvariabletransform)
     for the formulas and configuration options.
     """
 
@@ -208,166 +204,6 @@ class DefaultVariableTransform(VariableTransform):
             self._offsets = np.where(mask, self._offsets, 0.0)
 
 
-class DefaultObjectiveTransform(ObjectiveTransform):
-    r"""Linearly scales objectives between domains.
-
-    Divides by `scales` when going to the optimizer domain, multiplies when
-    returning to the user domain.
-    """
-
-    def __init__(
-        self,
-        transform_config: ObjectiveTransformConfig,
-    ) -> None:
-        """Initialize the objective scaler.
-
-        Reads `scales` from the transform configuration options.
-
-        Args:
-            transform_config: The transform configuration.
-        """
-        scales = transform_config.options.get("scales", None)
-        self._scales: NDArray[np.float64] | None = (
-            None if scales is None else np.asarray(scales, dtype=np.float64)
-        )
-        self._mask: NDArray[np.bool_] | None = transform_config.mask
-        if self._scales is not None and self._mask is not None:
-            _check_mask_size(self._mask, self._scales.size, "scales")
-            self._scales = np.where(self._mask, self._scales, 1.0)
-
-    def to_optimizer(self, objectives: NDArray[np.float64]) -> NDArray[np.float64]:
-        """Apply `objectives / scales`.
-
-        Args:
-            objectives: Objective values in the user domain.
-
-        Returns:
-            Transformed objectives in the optimizer domain.
-        """
-        if self._scales is not None:
-            return objectives / self._scales
-        return objectives
-
-    def from_optimizer(self, objectives: NDArray[np.float64]) -> NDArray[np.float64]:
-        """Apply `objectives * scales`.
-
-        Args:
-            objectives: Objective values in the optimizer domain.
-
-        Returns:
-            Transformed objectives in the user domain.
-        """
-        if self._scales is not None:
-            return objectives * self._scales
-        return objectives
-
-    def update(self, scales: ArrayLike) -> None:
-        """Set new scaling factors.
-
-        Args:
-            scales: The new scaling factors.
-        """
-        self._scales = np.asarray(scales, dtype=np.float64)
-        if self._mask is not None:
-            self._scales = np.where(self._mask, self._scales, 1.0)
-
-
-class DefaultNonlinearConstraintTransform(NonlinearConstraintTransform):
-    r"""Linearly scales constraints between domains.
-
-    Divides by `scales` when going to the optimizer domain, multiplies when
-    returning to the user domain. Also scales RHS bounds consistently.
-    """
-
-    def __init__(
-        self,
-        transform_config: NonlinearConstraintTransformConfig,
-    ) -> None:
-        """Initialize the constraint scaler.
-
-        Reads `scales` from the transform configuration options.
-
-        Args:
-            transform_config: The transform configuration.
-        """
-        scales = transform_config.options.get("scales", None)
-        self._scales: NDArray[np.float64] | None = (
-            None if scales is None else np.asarray(scales, dtype=np.float64)
-        )
-        self._mask: NDArray[np.bool_] | None = transform_config.mask
-        if self._scales is not None and self._mask is not None:
-            _check_mask_size(self._mask, self._scales.size, "scales")
-            self._scales = np.where(self._mask, self._scales, 1.0)
-
-    def to_optimizer(self, constraints: NDArray[np.float64]) -> NDArray[np.float64]:
-        """Apply `constraints / scales`.
-
-        Args:
-            constraints: Constraint values in the user domain.
-
-        Returns:
-            Transformed constraint values in the optimizer domain.
-        """
-        if self._scales is not None:
-            return constraints / self._scales
-        return constraints
-
-    def from_optimizer(self, constraints: NDArray[np.float64]) -> NDArray[np.float64]:
-        """Apply `constraints * scales`.
-
-        Args:
-            constraints: Constraint values in the optimizer domain.
-
-        Returns:
-            Transformed constraint values in the user domain.
-        """
-        if self._scales is not None:
-            return constraints * self._scales
-        return constraints
-
-    def bounds_to_optimizer(
-        self, lower_bounds: NDArray[np.float64], upper_bounds: NDArray[np.float64]
-    ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
-        """Apply `bounds / scales`.
-
-        Args:
-            lower_bounds: Lower RHS bounds in user domain.
-            upper_bounds: Upper RHS bounds in user domain.
-
-        Returns:
-            Tuple of (lower_bounds, upper_bounds) in optimizer domain.
-        """
-        if self._scales is not None:
-            return lower_bounds / self._scales, upper_bounds / self._scales
-        return lower_bounds, upper_bounds
-
-    def nonlinear_constraint_diffs_from_optimizer(
-        self, lower_diffs: NDArray[np.float64], upper_diffs: NDArray[np.float64]
-    ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
-        """Apply `diffs * scales`.
-
-        Args:
-            lower_diffs: Constraint value minus lower bound (optimizer domain).
-            upper_diffs: Constraint value minus upper bound (optimizer domain).
-
-        Returns:
-            Tuple of (lower_diffs, upper_diffs) in user domain.
-        """
-        if self._scales is not None:
-            return lower_diffs * self._scales, upper_diffs * self._scales
-        return lower_diffs, upper_diffs
-
-    def update(self, scales: ArrayLike) -> None:
-        """Set new scaling factors.
-
-        Args:
-            scales: The new scaling factors.
-        """
-        self._scales = np.asarray(scales, dtype=np.float64)
-        if self._mask is not None:
-            self._scales = np.where(self._mask, self._scales, 1.0)
-
-
 class DefaultVariableTransformPlugin(VariableTransformPlugin):
     """Default variable transform plugin class."""
 
@@ -389,51 +225,3 @@ class DefaultVariableTransformPlugin(VariableTransformPlugin):
     @classmethod
     def is_supported(cls, method: str) -> bool:  # ruff: ignore[undocumented-public-method]
         return method.lower() in (DEFAULT_VARIABLE_TRANSFORM_METHODS | {"default"})
-
-
-class DefaultObjectiveTransformPlugin(ObjectiveTransformPlugin):
-    """Default objective transform plugin class."""
-
-    @classmethod
-    def create(
-        cls,
-        config: ObjectiveTransformConfig,
-    ) -> DefaultObjectiveTransform:
-        """Create a DefaultObjectiveTransform instance.
-
-        Args:
-            config: The objective transform configuration.
-
-        Returns:
-            A new `DefaultObjectiveTransform`.
-        """
-        return DefaultObjectiveTransform(config)
-
-    @classmethod
-    def is_supported(cls, method: str) -> bool:  # ruff: ignore[undocumented-public-method]
-        return method.lower() in (DEFAULT_OBJECTIVE_TRANSFORM_METHODS | {"default"})
-
-
-class DefaultNonlinearConstraintTransformPlugin(NonlinearConstraintTransformPlugin):
-    """Default nonlinear constraint transform plugin class."""
-
-    @classmethod
-    def create(
-        cls,
-        config: NonlinearConstraintTransformConfig,
-    ) -> DefaultNonlinearConstraintTransform:
-        """Create a DefaultNonlinearConstraintTransform instance.
-
-        Args:
-            config: The nonlinear constraint transform configuration.
-
-        Returns:
-            A new `DefaultNonlinearConstraintTransform`.
-        """
-        return DefaultNonlinearConstraintTransform(config)
-
-    @classmethod
-    def is_supported(cls, method: str) -> bool:  # ruff: ignore[undocumented-public-method]
-        return method.lower() in (
-            DEFAULT_NONLINEAR_CONSTRAINT_TRANSFORM_METHODS | {"default"}
-        )

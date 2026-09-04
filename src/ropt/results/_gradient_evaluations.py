@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any
 
+from ropt._scaling import value_from_optimizer
 from ropt.enums import AxisName
 
 from ._result_field import ResultField
@@ -194,30 +195,19 @@ class GradientEvaluations(ResultField):
     def _transform_from_optimizer(
         self, context: EnOptContext, evaluation_point: NDArray[np.float64]
     ) -> GradientEvaluations | None:
-        if (
-            not context.variable_transforms
-            and not context.objective_transforms
-            and not context.nonlinear_constraint_transforms
-        ):
-            return None
-
         perturbed_variables = self.perturbed_variables
-        perturbed_objectives = self.perturbed_objectives
-        perturbed_constraints = self.perturbed_constraints
-
         for variable_transform in reversed(context.variable_transforms):
             perturbed_variables = variable_transform.from_optimizer(perturbed_variables)
-        for objective_transform in reversed(context.objective_transforms):
-            perturbed_objectives = objective_transform.from_optimizer(
-                perturbed_objectives
-            )
+        perturbed_objectives = value_from_optimizer(
+            self.perturbed_objectives, context.get_objective_scales()
+        )
+        perturbed_constraints = self.perturbed_constraints
         if perturbed_constraints is not None:
-            for constraint_transform in reversed(
-                context.nonlinear_constraint_transforms
-            ):
-                perturbed_constraints = constraint_transform.from_optimizer(
-                    perturbed_constraints
-                )
+            constraint_scales = context.get_constraint_scales()
+            assert constraint_scales is not None
+            perturbed_constraints = value_from_optimizer(
+                perturbed_constraints, constraint_scales
+            )
 
         return GradientEvaluations(
             variables=evaluation_point,

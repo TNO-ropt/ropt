@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any
 
+from ropt._scaling import value_from_optimizer
 from ropt.enums import AxisName
 
 from ._result_field import ResultField
@@ -152,23 +153,14 @@ class FunctionEvaluations(ResultField):
     def _transform_from_optimizer(
         self, context: EnOptContext, evaluation_point: NDArray[np.float64]
     ) -> FunctionEvaluations:
-        if (
-            not context.variable_transforms
-            and not context.objective_transforms
-            and not context.nonlinear_constraint_transforms
-        ):
-            return self
-
-        objectives = self.objectives
+        objectives = value_from_optimizer(
+            self.objectives, context.get_objective_scales()
+        )
         constraints = self.constraints
-
-        for objective_transform in reversed(context.objective_transforms):
-            objectives = objective_transform.from_optimizer(objectives)
         if constraints is not None:
-            for constraint_transform in reversed(
-                context.nonlinear_constraint_transforms
-            ):
-                constraints = constraint_transform.from_optimizer(constraints)
+            constraint_scales = context.get_constraint_scales()
+            assert constraint_scales is not None
+            constraints = value_from_optimizer(constraints, constraint_scales)
 
         return FunctionEvaluations(
             variables=evaluation_point,

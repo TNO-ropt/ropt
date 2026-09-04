@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 
+from ropt._scaling import diff_from_optimizer
 from ropt.enums import AxisName
 
 from ._result_field import ResultField
@@ -184,7 +185,9 @@ class ConstraintInfo(ResultField):
 
         if constraints is not None:
             assert context.nonlinear_constraints is not None
-            lower_bounds, upper_bounds = _get_nonlinear_constraint_bounds(context)
+            bounds = context.get_nonlinear_constraint_bounds()
+            assert bounds is not None
+            lower_bounds, upper_bounds = bounds
             nonlinear_lower = constraints - lower_bounds
             nonlinear_upper = constraints - upper_bounds
             have_constraint_info = True
@@ -202,12 +205,6 @@ class ConstraintInfo(ResultField):
         return None
 
     def _transform_from_optimizer(self, context: EnOptContext) -> ConstraintInfo | None:
-        if (
-            not context.variable_transforms
-            and not context.nonlinear_constraint_transforms
-        ):
-            return None
-
         bound_lower: NDArray[np.float64] | None = self.bound_lower
         bound_upper: NDArray[np.float64] | None = self.bound_upper
         if bound_lower is not None:
@@ -233,14 +230,10 @@ class ConstraintInfo(ResultField):
         nonlinear_upper: NDArray[np.float64] | None = self.nonlinear_upper
         if nonlinear_lower is not None:
             assert nonlinear_upper is not None
-            for constraint_transform in reversed(
-                context.nonlinear_constraint_transforms
-            ):
-                nonlinear_lower, nonlinear_upper = (
-                    constraint_transform.nonlinear_constraint_diffs_from_optimizer(
-                        nonlinear_lower, nonlinear_upper
-                    )
-                )
+            scales = context.get_constraint_scales()
+            assert scales is not None
+            nonlinear_lower = diff_from_optimizer(nonlinear_lower, scales)
+            nonlinear_upper = diff_from_optimizer(nonlinear_upper, scales)
 
         return ConstraintInfo(
             bound_lower=bound_lower,
@@ -250,16 +243,3 @@ class ConstraintInfo(ResultField):
             nonlinear_lower=nonlinear_lower,
             nonlinear_upper=nonlinear_upper,
         )
-
-
-def _get_nonlinear_constraint_bounds(
-    context: EnOptContext,
-) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
-    assert context.nonlinear_constraints is not None
-    lower_bounds = context.nonlinear_constraints.lower_bounds
-    upper_bounds = context.nonlinear_constraints.upper_bounds
-    for constraint_transform in context.nonlinear_constraint_transforms:
-        lower_bounds, upper_bounds = constraint_transform.bounds_to_optimizer(
-            lower_bounds, upper_bounds
-        )
-    return lower_bounds, upper_bounds

@@ -117,7 +117,7 @@ nav:
       - "Stochastic Gradients": optimizer_setup/gradients.md
       - "Realization Filters": optimizer_setup/realization_filters.md
       - "Function Estimators": optimizer_setup/function_estimators.md
-      - "Transforms": optimizer_setup/transforms.md
+      - "Variable Transforms": optimizer_setup/variable_transforms.md
       - "Working with Results": optimizer_setup/results.md
   - "Running":
       - "Running Optimizations": running/running.md

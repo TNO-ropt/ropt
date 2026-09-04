@@ -1,6 +1,6 @@
-"""Tests for chained transforms.
+"""Tests for chained variable transforms.
 
-Transforms are configured as an ordered chain applied to all elements: the
+Transforms are configured as an ordered chain applied to all variables: the
 forward direction runs the chain in order, the inverse direction runs it in
 reverse. Every chain here uses affine transforms with *both* a scale and a
 shift, because pure scaling commutes and would make the order assertions
@@ -14,11 +14,7 @@ import pytest
 from numpy.typing import NDArray
 from pydantic import ValidationError
 
-from ropt.config import (
-    NonlinearConstraintTransformConfig,
-    ObjectiveTransformConfig,
-    VariableTransformConfig,
-)
+from ropt.config import VariableTransformConfig
 from ropt.context import EnOptContext
 from ropt.enums import PerturbationType
 from ropt.results import (
@@ -30,16 +26,8 @@ from ropt.results import (
     Realizations,
 )
 from ropt.simple import EvaluationFunctionContext, evaluate
-from ropt.transforms import (
-    NonlinearConstraintTransform,
-    ObjectiveTransform,
-    VariableTransform,
-)
-from ropt.transforms.default import (
-    DefaultNonlinearConstraintTransform,
-    DefaultObjectiveTransform,
-    DefaultVariableTransform,
-)
+from ropt.transforms import VariableTransform
+from ropt.transforms.default import DefaultVariableTransform
 
 
 class _AffineVariableTransform(VariableTransform):
@@ -105,59 +93,11 @@ class _AffineVariableTransform(VariableTransform):
         )
 
 
-class _AffineObjectiveTransform(ObjectiveTransform):
-    def __init__(self, scale: float, shift: float) -> None:
-        self._scale = scale
-        self._shift = shift
-
-    def to_optimizer(self, objectives: NDArray[np.float64]) -> NDArray[np.float64]:
-        return (objectives - self._shift) / self._scale
-
-    def from_optimizer(self, objectives: NDArray[np.float64]) -> NDArray[np.float64]:
-        return objectives * self._scale + self._shift
-
-
-class _AffineConstraintTransform(NonlinearConstraintTransform):
-    def __init__(self, scale: float, shift: float) -> None:
-        self._scale = scale
-        self._shift = shift
-
-    def to_optimizer(self, constraints: NDArray[np.float64]) -> NDArray[np.float64]:
-        return (constraints - self._shift) / self._scale
-
-    def from_optimizer(self, constraints: NDArray[np.float64]) -> NDArray[np.float64]:
-        return constraints * self._scale + self._shift
-
-    def bounds_to_optimizer(
-        self, lower_bounds: NDArray[np.float64], upper_bounds: NDArray[np.float64]
-    ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
-        return (
-            (lower_bounds - self._shift) / self._scale,
-            (upper_bounds - self._shift) / self._scale,
-        )
-
-    def nonlinear_constraint_diffs_from_optimizer(
-        self, lower_diffs: NDArray[np.float64], upper_diffs: NDArray[np.float64]
-    ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
-        return (
-            lower_diffs * self._scale + self._shift,
-            upper_diffs * self._scale + self._shift,
-        )
-
-
 def _variable_chain() -> list[_AffineVariableTransform]:
     return [
         _AffineVariableTransform(2.0, 1.0, 0.5),
         _AffineVariableTransform(3.0, 13.0, 7.0),
     ]
-
-
-def _objective_chain() -> list[_AffineObjectiveTransform]:
-    return [_AffineObjectiveTransform(2.0, 1.0), _AffineObjectiveTransform(3.0, 13.0)]
-
-
-def _constraint_chain() -> list[_AffineConstraintTransform]:
-    return [_AffineConstraintTransform(2.0, 1.0), _AffineConstraintTransform(3.0, 13.0)]
 
 
 def _context(**fields: Any) -> EnOptContext:
@@ -202,24 +142,6 @@ def test_chained_variable_transforms_do_not_commute() -> None:
         second.bound_constraint_diffs_from_optimizer(
             *first.bound_constraint_diffs_from_optimizer(diffs, diffs)
         )[0],
-    )
-
-
-def test_chained_objective_transforms_do_not_commute() -> None:
-    first, second = _objective_chain()
-    values = np.array([[3.0, 5.0]])
-    assert not np.allclose(
-        second.to_optimizer(first.to_optimizer(values)),
-        first.to_optimizer(second.to_optimizer(values)),
-    )
-
-
-def test_chained_constraint_transforms_do_not_commute() -> None:
-    first, second = _constraint_chain()
-    values = np.array([[3.0, 5.0]])
-    assert not np.allclose(
-        second.to_optimizer(first.to_optimizer(values)),
-        first.to_optimizer(second.to_optimizer(values)),
     )
 
 
@@ -314,36 +236,6 @@ def test_transform_from_optimizer_preserves_the_evaluation_point() -> None:
     assert np.allclose(transformed.evaluation_point, user_variables)
 
 
-def test_objective_chain_from_optimizer_restores_user_values() -> None:
-    user_objectives = np.array([[3.0, 5.0]])
-    first, second = _objective_chain()
-    optimizer_objectives = second.to_optimizer(first.to_optimizer(user_objectives))
-
-    context = _context(
-        objectives={"weights": [0.5, 0.5]}, objective_transforms=_objective_chain()
-    )
-    transformed = _function_results(
-        np.zeros(3), objectives=optimizer_objectives
-    ).transform_from_optimizer(context)
-    assert np.allclose(transformed.evaluations.objectives, user_objectives)
-
-
-def test_nonlinear_constraint_chain_from_optimizer_restores_user_values() -> None:
-    user_constraints = np.array([[3.0, 5.0]])
-    first, second = _constraint_chain()
-    optimizer_constraints = second.to_optimizer(first.to_optimizer(user_constraints))
-
-    context = _context(
-        nonlinear_constraints={"lower_bounds": [0.0, 0.0], "upper_bounds": [1.0, 1.0]},
-        nonlinear_constraint_transforms=_constraint_chain(),
-    )
-    transformed = _function_results(
-        np.zeros(3), constraints=optimizer_constraints
-    ).transform_from_optimizer(context)
-    assert transformed.evaluations.constraints is not None
-    assert np.allclose(transformed.evaluations.constraints, user_constraints)
-
-
 def test_bound_constraint_diffs_are_inverted_in_reverse_chain_order() -> None:
     lower_diffs = np.array([0.25, 0.5, 0.75])
     upper_diffs = np.array([-0.25, -0.5, -0.75])
@@ -386,36 +278,6 @@ def test_linear_constraint_diffs_are_inverted_in_reverse_chain_order() -> None:
     assert transformed.constraint_info.linear_upper is not None
     assert np.allclose(transformed.constraint_info.linear_lower, expected[0])
     assert np.allclose(transformed.constraint_info.linear_upper, expected[1])
-
-
-def test_nonlinear_constraint_diffs_are_inverted_in_reverse_chain_order() -> None:
-    lower_diffs = np.array([0.25, 0.5])
-    upper_diffs = np.array([-0.25, -0.5])
-    context = _context(
-        nonlinear_constraints={"lower_bounds": [0.0, 0.0], "upper_bounds": [1.0, 1.0]},
-        nonlinear_constraint_transforms=_constraint_chain(),
-    )
-    transformed = _function_results(
-        np.zeros(3),
-        constraint_info=ConstraintInfo(
-            nonlinear_lower=lower_diffs, nonlinear_upper=upper_diffs
-        ),
-    ).transform_from_optimizer(context)
-
-    first, second = _constraint_chain()
-    expected = first.nonlinear_constraint_diffs_from_optimizer(
-        *second.nonlinear_constraint_diffs_from_optimizer(lower_diffs, upper_diffs)
-    )
-    assert transformed.constraint_info is not None
-    assert transformed.constraint_info.nonlinear_lower is not None
-    assert transformed.constraint_info.nonlinear_upper is not None
-    assert np.allclose(transformed.constraint_info.nonlinear_lower, expected[0])
-    assert np.allclose(transformed.constraint_info.nonlinear_upper, expected[1])
-
-
-def test_constraint_transforms_without_constraints_are_rejected() -> None:
-    with pytest.raises(ValidationError, match="nonlinear constraint transforms need"):
-        _context(nonlinear_constraint_transforms=_constraint_chain())
 
 
 def test_evaluator_is_called_at_the_reverse_chained_point() -> None:
@@ -490,26 +352,6 @@ def _default_variable_scaler(scales: Any, mask: Any = None) -> DefaultVariableTr
     )
 
 
-def _default_objective_scaler(
-    scales: Any, mask: Any = None
-) -> DefaultObjectiveTransform:
-    return DefaultObjectiveTransform(
-        ObjectiveTransformConfig.model_validate(
-            {"method": "scaler", "options": {"scales": scales}, "mask": mask}
-        )
-    )
-
-
-def _default_constraint_scaler(
-    scales: Any, mask: Any = None
-) -> DefaultNonlinearConstraintTransform:
-    return DefaultNonlinearConstraintTransform(
-        NonlinearConstraintTransformConfig.model_validate(
-            {"method": "scaler", "options": {"scales": scales}, "mask": mask}
-        )
-    )
-
-
 def test_variable_transform_mask_excludes_masked_variables() -> None:
     context = _context(
         variable_transforms=[
@@ -532,32 +374,8 @@ def test_variable_transform_mask_is_combined_with_free_mask() -> None:
     assert np.allclose(scaled, [1.0, 2.0, 2.0])
 
 
-def test_objective_transform_mask_excludes_masked_objectives() -> None:
-    scaler = _default_objective_scaler([2.0, 2.0], mask=[True, False])
-    assert np.allclose(scaler.to_optimizer(np.array([2.0, 2.0])), [1.0, 2.0])
-    assert np.allclose(scaler.from_optimizer(np.array([1.0, 2.0])), [2.0, 2.0])
-
-
-def test_constraint_transform_mask_excludes_masked_constraints() -> None:
-    scaler = _default_constraint_scaler([2.0, 2.0], mask=[True, False])
-    assert np.allclose(scaler.to_optimizer(np.array([2.0, 2.0])), [1.0, 2.0])
-    assert np.allclose(scaler.from_optimizer(np.array([1.0, 2.0])), [2.0, 2.0])
-
-
-def test_objective_transform_mask_survives_update() -> None:
-    scaler = _default_objective_scaler([2.0, 2.0], mask=[True, False])
-    scaler.update([4.0, 4.0])
-    assert np.allclose(scaler.to_optimizer(np.array([4.0, 4.0])), [1.0, 4.0])
-
-
-def test_constraint_transform_mask_survives_update() -> None:
-    scaler = _default_constraint_scaler([2.0, 2.0], mask=[True, False])
-    scaler.update([4.0, 4.0])
-    assert np.allclose(scaler.to_optimizer(np.array([4.0, 4.0])), [1.0, 4.0])
-
-
 def test_transform_without_mask_applies_everywhere() -> None:
-    scaler = _default_objective_scaler([2.0, 2.0])
+    scaler = _default_variable_scaler([2.0, 2.0])
     assert np.allclose(scaler.to_optimizer(np.array([2.0, 2.0])), [1.0, 1.0])
 
 
@@ -568,26 +386,12 @@ def test_variable_transform_mask_larger_than_scales_is_rejected() -> None:
         _default_variable_scaler([2.0, 2.0], mask=[True, False, True])
 
 
-def test_objective_transform_mask_larger_than_scales_is_rejected() -> None:
-    with pytest.raises(
-        ValueError, match=r"transform mask size \(3\) does not match scales \(2\)"
-    ):
-        _default_objective_scaler([2.0, 2.0], mask=[True, False, True])
-
-
-def test_constraint_transform_mask_larger_than_scales_is_rejected() -> None:
-    with pytest.raises(
-        ValueError, match=r"transform mask size \(3\) does not match scales \(2\)"
-    ):
-        _default_constraint_scaler([2.0, 2.0], mask=[True, False, True])
-
-
 def test_single_entry_transform_mask_is_rejected() -> None:
-    # Without the size check this broadcasts over every objective instead.
+    # Without the size check this broadcasts over every variable instead.
     with pytest.raises(
         ValueError, match=r"transform mask size \(1\) does not match scales \(2\)"
     ):
-        _default_objective_scaler([2.0, 2.0], mask=[False])
+        _default_variable_scaler([2.0, 2.0], mask=[False])
 
 
 def test_variable_transform_mask_not_matching_the_variable_count_is_rejected() -> None:

@@ -9,22 +9,13 @@ import pytest
 from pydantic import ValidationError
 
 from ropt.components.event_handlers import CallbackHandler
-from ropt.config import (
-    LinearConstraintsConfig,
-    NonlinearConstraintTransformConfig,
-    ObjectiveTransformConfig,
-    VariableTransformConfig,
-)
+from ropt.config import LinearConstraintsConfig, VariableTransformConfig
 from ropt.config.constants import DEFAULT_SEED
 from ropt.context import EnOptContext
 from ropt.enums import EnOptEventType, ExitCode
 from ropt.results import FunctionResults, GradientResults
 from ropt.simple import EvaluateResult, optimize
-from ropt.transforms.default import (
-    DefaultNonlinearConstraintTransform,
-    DefaultObjectiveTransform,
-    DefaultVariableTransform,
-)
+from ropt.transforms.default import DefaultVariableTransform
 from ropt.utils import validate_backend_options
 
 if TYPE_CHECKING:
@@ -216,13 +207,11 @@ def test_external_error(config: Any, eval_func: Any, external: str) -> None:
         optimize(config, initial_values, eval_func())
 
 
-@pytest.mark.parametrize("use_plugin", [False, True])
-def test_objective_with_scaler(
+def test_objective_with_scales(
     config: Any,
     eval_func: Any,
     test_functions: Any,
     external: str,
-    use_plugin: Any,
 ) -> None:
     result1 = optimize(config, initial_values, eval_func())
     assert result1.variables is not None
@@ -241,15 +230,7 @@ def test_objective_with_scaler(
     init1 = test_functions[1](initial_values, None)
 
     config["backend"]["method"] = f"{external}{_SLSQP}"
-    config["objective_transforms"] = [
-        {"method": "scaler", "options": {"scales": [init1, init1]}}
-        if use_plugin
-        else DefaultObjectiveTransform(
-            ObjectiveTransformConfig.model_validate(
-                {"method": "scaler", "options": {"scales": [init1, init1]}}
-            )
-        )
-    ]
+    config["objectives"]["scales"] = [init1, init1]
 
     checked = False
 
@@ -277,19 +258,18 @@ def test_objective_with_scaler(
             )
         ],
     )
+    assert checked
     assert result2.variables is not None
     assert np.allclose(result2.variables, variables1, atol=0.02)
     assert result2.objectives is not None
     assert np.allclose(objectives1, result2.objectives, atol=0.025)
 
 
-@pytest.mark.parametrize("use_plugin", [False, True])
-def test_objective_with_lazy_scaler(
+def test_objective_with_auto_scale(
     config: Any,
     eval_func: Any,
     test_functions: Any,
     external: str,
-    use_plugin: Any,
 ) -> None:
     config["backend"]["method"] = f"{external}{_SLSQP}"
 
@@ -301,16 +281,7 @@ def test_objective_with_lazy_scaler(
     assert np.allclose(variables1, [0.0, 0.0, 0.5], atol=0.02)
     assert np.allclose(objectives1, [0.5, 4.5], atol=0.02)
 
-    config["backend"]["method"] = f"{external}{_SLSQP}"
-    config["objective_transforms"] = [
-        {"method": "scaler"}
-        if use_plugin
-        else DefaultObjectiveTransform(
-            ObjectiveTransformConfig.model_validate({"method": "scaler"})
-        )
-    ]
-
-    init1 = test_functions[1](initial_values, None)
+    config["objectives"]["auto_scale"] = True
 
     def function1(variables: NDArray[np.float64], _: Any) -> float:
         return float(test_functions[0](variables, None))
@@ -318,11 +289,13 @@ def test_objective_with_lazy_scaler(
     def function2(variables: NDArray[np.float64], _: Any) -> float:
         return float(test_functions[1](variables, None))
 
-    checked = False
+    # A single scale, the weighted total of the objectives at the initial point.
+    weights = np.array(config["objectives"]["weights"])
+    weights /= weights.sum()
+    initial = np.array([f(initial_values, None) for f in test_functions])
+    scale = abs(np.dot(initial, weights))
 
-    def set_scales(event: EnOptEvent) -> None:
-        transform = event.context.objective_transforms[0]
-        transform.update([init1, init1])
+    checked = False
 
     def check_value(event: EnOptEvent) -> None:
         nonlocal checked
@@ -330,13 +303,15 @@ def test_objective_with_lazy_scaler(
         for item in results:
             if isinstance(item, FunctionResults) and not checked:
                 checked = True
+                assert np.allclose(event.context.get_objective_scales(), scale)
                 assert item.functions is not None
                 assert item.functions.objectives is not None
-                assert np.allclose(item.functions.objectives[-1], 1.0)
+                assert np.allclose(item.functions.objectives, initial / scale)
+                assert np.allclose(item.functions.target_objective, 1.0)
                 transformed = item.transform_from_optimizer(event.context)
                 assert transformed.functions is not None
                 assert transformed.functions.objectives is not None
-                assert np.allclose(transformed.functions.objectives[-1], init1)
+                assert np.allclose(transformed.functions.objectives, initial)
 
     result2 = optimize(
         config,
@@ -346,24 +321,22 @@ def test_objective_with_lazy_scaler(
             CallbackHandler(
                 event_types={EnOptEventType.FINISHED_EVALUATION}, callback=check_value
             ),
-            CallbackHandler(
-                event_types={EnOptEventType.START_EVALUATION}, callback=set_scales
-            ),
         ],
     )
+    assert checked
     assert result2.variables is not None
     assert np.allclose(result2.variables, variables1, atol=0.02)
     assert result2.objectives is not None
-    assert np.allclose(objectives1, result2.objectives, atol=0.025)
+    # Rescaling the objective changes the steps the optimizer takes, so within
+    # the same budget it stops at a slightly different point.
+    assert np.allclose(objectives1, result2.objectives, atol=0.05)
 
 
-@pytest.mark.parametrize("use_plugin", [False, True])
-def test_nonlinear_constraint_with_scaler(
+def test_nonlinear_constraint_with_scales(
     config: Any,
     eval_func: Any,
     test_functions: Any,
     external: str,
-    use_plugin: Any,
 ) -> None:
     config["backend"]["method"] = f"{external}{_SLSQP}"
 
@@ -386,23 +359,13 @@ def test_nonlinear_constraint_with_scaler(
     assert result1.variables[[0, 2]].sum() > 0.0 - 1e-5
     assert result1.variables[[0, 2]].sum() < 0.4 + 1e-5
 
-    config["nonlinear_constraint_transforms"] = [
-        {"method": "scaler", "options": {"scales": scales}}
-        if use_plugin
-        else DefaultNonlinearConstraintTransform(
-            NonlinearConstraintTransformConfig.model_validate(
-                {"method": "scaler", "options": {"scales": scales}}
-            )
-        )
-    ]
+    config["nonlinear_constraints"]["scales"] = scales
 
     context = EnOptContext.model_validate(config)
     assert context.nonlinear_constraints is not None
     assert context.nonlinear_constraints.upper_bounds == 0.4
-    bounds = context.nonlinear_constraint_transforms[0].bounds_to_optimizer(
-        context.nonlinear_constraints.lower_bounds,
-        context.nonlinear_constraints.upper_bounds,
-    )
+    bounds = context.get_nonlinear_constraint_bounds()
+    assert bounds is not None
     assert bounds[1] == 0.4 / scales
 
     check = True
@@ -432,6 +395,7 @@ def test_nonlinear_constraint_with_scaler(
             )
         ],
     )
+    assert not check
     assert result2.variables is not None
     assert np.allclose(result2.variables, result1.variables, atol=0.02)
     assert result1.objectives is not None
@@ -439,13 +403,11 @@ def test_nonlinear_constraint_with_scaler(
     assert np.allclose(result1.objectives, result2.objectives, atol=0.025)
 
 
-@pytest.mark.parametrize("use_plugin", [False, True])
-def test_nonlinear_constraint_with_lazy_scaler(
+def test_nonlinear_constraint_with_auto_scale(
     config: Any,
     eval_func: Any,
     test_functions: Any,
     external: str,
-    use_plugin: Any,
 ) -> None:
     config["backend"]["method"] = f"{external}{_SLSQP}"
 
@@ -468,28 +430,17 @@ def test_nonlinear_constraint_with_lazy_scaler(
     assert result1.variables[[0, 2]].sum() > 0.0 - 1e-5
     assert result1.variables[[0, 2]].sum() < 0.4 + 1e-5
 
-    config["nonlinear_constraint_transforms"] = [
-        {"method": "scaler"}
-        if use_plugin
-        else DefaultNonlinearConstraintTransform(
-            NonlinearConstraintTransformConfig.model_validate({"method": "scaler"})
-        )
-    ]
+    config["nonlinear_constraints"]["auto_scale"] = True
 
     context = EnOptContext.model_validate(config)
     assert context.nonlinear_constraints is not None
     assert context.nonlinear_constraints.upper_bounds == 0.4
-    bounds = context.nonlinear_constraint_transforms[0].bounds_to_optimizer(
-        context.nonlinear_constraints.lower_bounds,
-        context.nonlinear_constraints.upper_bounds,
-    )
+    # Before the first batch the scales are still one.
+    bounds = context.get_nonlinear_constraint_bounds()
+    assert bounds is not None
     assert bounds[1] == 0.4
 
     check = True
-
-    def set_scales(event: EnOptEvent) -> None:
-        transform = event.context.nonlinear_constraint_transforms[0]
-        transform.update(scales)
 
     def check_constraints(event: EnOptEvent) -> None:
         nonlocal check
@@ -498,14 +449,12 @@ def test_nonlinear_constraint_with_lazy_scaler(
         for item in results:
             if isinstance(item, FunctionResults) and check:
                 check = False
-                assert context.nonlinear_constraints is not None
-                _, upper_bounds = context.nonlinear_constraint_transforms[
-                    0
-                ].bounds_to_optimizer(
-                    context.nonlinear_constraints.lower_bounds,
-                    context.nonlinear_constraints.upper_bounds,
-                )
-                assert np.allclose(upper_bounds, 0.4 / scales)
+                constraint_scales = context.get_constraint_scales()
+                assert constraint_scales is not None
+                assert np.allclose(constraint_scales, scales)
+                bounds = context.get_nonlinear_constraint_bounds()
+                assert bounds is not None
+                assert np.allclose(bounds[1], 0.4 / scales)
                 assert item.functions is not None
                 assert item.functions.constraints is not None
                 assert np.allclose(item.functions.constraints, 1.0)
@@ -523,11 +472,9 @@ def test_nonlinear_constraint_with_lazy_scaler(
                 event_types={EnOptEventType.FINISHED_EVALUATION},
                 callback=check_constraints,
             ),
-            CallbackHandler(
-                event_types={EnOptEventType.START_EVALUATION}, callback=set_scales
-            ),
         ],
     )
+    assert not check
     assert result2.variables is not None
     assert np.allclose(result2.variables, result1.variables, atol=0.02)
     assert result1.objectives is not None
@@ -789,7 +736,7 @@ def test_rng(config: Any, eval_func: Any, external: str) -> None:
     assert not np.all(result3.variables == result1.variables)
 
 
-def test_arbitrary_objective_weights(
+def test_zero_objective_weight_disables_an_objective(
     config: Any, eval_func: Any, external: str, test_functions: Any
 ) -> None:
     config["backend"]["method"] = f"{external}{_SLSQP}"
@@ -798,21 +745,7 @@ def test_arbitrary_objective_weights(
         lambda variables, _: test_functions[1](variables, None),
     )
 
-    config["objectives"]["weights"] = [0.75, 0.25, -0.25]
-    result = optimize(config, initial_values, eval_func(new_functions))
-    assert result.variables is not None
-    assert not np.allclose(result.variables, [0, 0, 0.5], atol=0.02)
-
     config["objectives"]["weights"] = [0.75, 0.25, 0.0]
     result = optimize(config, initial_values, eval_func(new_functions))
     assert result.variables is not None
     assert np.allclose(result.variables, [0, 0, 0.5], atol=0.02)
-
-    config["objectives"]["weights"] = [0.75, 0.5, -0.25]
-    result = optimize(config, initial_values, eval_func(new_functions))
-    assert result.variables is not None
-    assert np.allclose(result.variables, [0, 0, 0.5], atol=0.02)
-
-    config["objectives"]["weights"] = [-0.75, -0.25]
-    with pytest.raises(ValidationError, match="The sum of weights is not positive"):
-        EnOptContext.model_validate(config)

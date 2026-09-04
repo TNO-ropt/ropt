@@ -32,8 +32,6 @@ its own factory base class, and the base class of the object it creates:
 | `ropt.plugins.realization_filter` | [`RealizationFilterPlugin`][ropt.plugins.realization_filter.RealizationFilterPlugin] | [`RealizationFilter`][ropt.realization_filter.RealizationFilter] |
 | `ropt.plugins.function_estimator` | [`FunctionEstimatorPlugin`][ropt.plugins.function_estimator.FunctionEstimatorPlugin] | [`FunctionEstimator`][ropt.function_estimator.FunctionEstimator] |
 | `ropt.plugins.variable_transform` | [`VariableTransformPlugin`][ropt.plugins.transforms.VariableTransformPlugin] | [`VariableTransform`][ropt.transforms.VariableTransform] |
-| `ropt.plugins.objective_transform` | [`ObjectiveTransformPlugin`][ropt.plugins.transforms.ObjectiveTransformPlugin] | [`ObjectiveTransform`][ropt.transforms.ObjectiveTransform] |
-| `ropt.plugins.nonlinear_constraint_transform` | [`NonlinearConstraintTransformPlugin`][ropt.plugins.transforms.NonlinearConstraintTransformPlugin] | [`NonlinearConstraintTransform`][ropt.transforms.NonlinearConstraintTransform] |
 
 ## What a plugin must implement
 

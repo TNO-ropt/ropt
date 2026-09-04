@@ -18,7 +18,10 @@ class OptimizerCallbackResult:
     non-linear constraint bounds returned by an
     [`OptimizerCallback`][ropt.core.OptimizerCallback] evaluation. `functions`
     and `gradients` are `None` unless requested and successfully computed;
-    `nonlinear_constraint_bounds` is `None` unless the callback updated them.
+    `nonlinear_constraint_bounds` is `None` if the run has no non-linear
+    constraints, and otherwise holds their bounds in the optimizer domain. The
+    bounds are reported after every evaluation because auto-scaling can change
+    them once, when the scales are estimated from the first batch.
 
     `functions` and `gradients` follow a fixed shape:
 

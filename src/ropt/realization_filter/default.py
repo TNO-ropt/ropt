@@ -6,7 +6,7 @@ import numpy as np
 from numpy.typing import NDArray
 from pydantic import BaseModel, ConfigDict, Field, NonNegativeInt
 
-from ropt._utils import zero_failures
+from ropt._utils import apply_direction, zero_failures
 from ropt.config import RealizationFilterConfig
 from ropt.context import EnOptContext
 from ropt.exceptions import TooFewRealizations
@@ -44,7 +44,7 @@ class SortObjectiveOptions(_ConfigBaseModel):
         last:  Ending rank (0-based, inclusive) of selected realizations.
     """
 
-    sort: tuple[NonNegativeInt]
+    sort: tuple[NonNegativeInt, ...]
     first: NonNegativeInt
     last: NonNegativeInt
 
@@ -80,7 +80,7 @@ class CVaRObjectiveOptions(_ConfigBaseModel):
         percentile: Fraction (0, 1] of worst realizations to include.
     """
 
-    sort: tuple[NonNegativeInt]
+    sort: tuple[NonNegativeInt, ...]
     percentile: Annotated[float, Field(gt=0.0, le=1.0)] = 0.5
 
 
@@ -190,21 +190,29 @@ class DefaultRealizationFilter(RealizationFilter):
 
     def _sort_objectives(self, objectives: NDArray[np.float64]) -> NDArray[np.float64]:
         assert isinstance(self._filter_options, SortObjectiveOptions)
-        objective_config = self._context.objectives
         failed_realizations = np.isnan(objectives[..., 0])
-        objectives = zero_failures(objectives[..., self._filter_options.sort])
-        if objective_config.weights.size > 1:
-            objectives = np.dot(
-                objectives, objective_config.weights[self._filter_options.sort]
-            )
-        objectives = objectives.flatten()
         return _sort_and_select(
-            objectives,
+            self._rank_by(objectives, self._filter_options.sort),
             self._context.realizations.weights,
             failed_realizations,
             self._filter_options.first,
             self._filter_options.last,
         )
+
+    def _rank_by(
+        self, objectives: NDArray[np.float64], sort: tuple[int, ...]
+    ) -> NDArray[np.float64]:
+        # The values arrive scaled but not flipped, since direction applies to
+        # aggregates and these are per-realization. Ranking is a comparison of
+        # what the optimizer is trying to make small, so apply the direction
+        # here, per objective and before the weighted sum: one sign cannot
+        # stand in for several.
+        objective_config = self._context.objectives
+        values = zero_failures(objectives[..., sort])
+        values = apply_direction(values, objective_config.maximize[sort,])
+        if objective_config.weights.size > 1:
+            values = np.dot(values, objective_config.weights[sort,])
+        return values.flatten()
 
     def _sort_constraint(
         self,
@@ -223,16 +231,11 @@ class DefaultRealizationFilter(RealizationFilter):
 
     def _cvar_objectives(self, objectives: NDArray[np.float64]) -> NDArray[np.float64]:
         assert isinstance(self._filter_options, CVaRObjectiveOptions)
-        objective_config = self._context.objectives
         failed_realizations = np.isnan(objectives[..., 0])
-        objectives = zero_failures(objectives[..., self._filter_options.sort])
-        if objective_config.weights.size > 1:
-            objectives = np.dot(
-                objectives, objective_config.weights[self._filter_options.sort]
-            )
-        objectives = -objectives.flatten()
         return _get_cvar_weights_from_percentile(
-            objectives, failed_realizations, self._filter_options.percentile
+            -self._rank_by(objectives, self._filter_options.sort),
+            failed_realizations,
+            self._filter_options.percentile,
         )
 
     def _cvar_constraint(self, constraints: NDArray[np.float64]) -> NDArray[np.float64]:

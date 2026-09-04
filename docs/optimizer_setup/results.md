@@ -181,20 +181,35 @@ in the "Result descriptions" section of each class in the
 
 ## Domain transforms on results
 
-When [transforms](transforms.md) are configured, optimization internally
-operates in the *optimizer domain* — variables, objectives, and constraints may
-be scaled or shifted for numerical stability. Results attached to events are in
-this optimizer domain.
+Optimization internally operates in the *optimizer domain*: variables may be
+scaled or shifted by a [transform](variable_transforms.md), objectives and nonlinear
+constraints are divided by their
+[scales](configuration.md#objective-scales), and objectives marked
+[`maximize`](configuration.md#objective-direction) are negated once they have
+been combined across realizations. Results attached to events are in this
+optimizer domain.
 
 The [`transform_from_optimizer`][ropt.results.Results.transform_from_optimizer]
-method reverses these transforms, mapping results back to the *user domain*.
+method undoes both, mapping results back to the *user domain*.
 
 The `variables` field is an exception: it is not reconstructed by inverting the
-chain but taken from `evaluation_point`, the record of the point that was
-evaluated. A transform therefore does not have to be exactly invertible for the
-reported variables to be correct. This does not extend to
+transform chain but taken from `evaluation_point`, the record of the point that
+was evaluated. A transform therefore does not have to be exactly invertible for
+the reported variables to be correct. This does not extend to
 `GradientEvaluations.perturbed_variables`, which is still recovered by inverting
 the chain.
+
+The `target_objective` field of `Functions` and `Gradients` is the second
+exception: it is the quantity the optimizer minimizes and it stays in the
+optimizer domain in both directions. It is a weighted total over objectives that
+may differ in both scale and direction, so there is no single factor to undo; if
+you need it in user terms, combine the objectives yourself using
+[`get_objective_scales`][ropt.context.EnOptContext.get_objective_scales] and the
+directions on `objectives.maximize`.
+
+Because the direction is undone when reporting, a combined objective agrees in
+sign with the per-realization values it summarizes, whether it is an average or
+a spread.
 
 In the [simple API](../running/running.md), results are always transformed to the user
 domain automatically.
