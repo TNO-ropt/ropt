@@ -17,8 +17,6 @@ from ._realization_filter_config import RealizationFilterConfig
 from ._realizations_config import RealizationsConfig
 from ._sampler_config import SamplerConfig
 from ._transform_config import (
-    NonlinearConstraintTransformConfig,
-    ObjectiveTransformConfig,
     VariableTransformConfig,
 )
 from ._variables_config import VariablesConfig
@@ -28,10 +26,8 @@ __all__ = [
     "FunctionEstimatorConfig",
     "GradientConfig",
     "LinearConstraintsConfig",
-    "NonlinearConstraintTransformConfig",
     "NonlinearConstraintsConfig",
     "ObjectiveFunctionsConfig",
-    "ObjectiveTransformConfig",
     "OptimizerConfig",
     "RealizationFilterConfig",
     "RealizationsConfig",

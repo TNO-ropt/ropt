@@ -6,8 +6,11 @@ from typing import Any
 import numpy as np
 from numpy.typing import NDArray
 
+from ropt._scaling import to_optimizer
 from ropt.context import EnOptContext
 from ropt.evaluation import EvaluationBatchCallback, EvaluationBatchContext
+
+from ._auto_scale import set_auto_scales
 
 
 @dataclass(slots=True)
@@ -112,13 +115,15 @@ def _get_function_results(
     evaluator_result = evaluator(
         np.repeat(variables, realization_num, axis=0), evaluator_context
     )
-    objectives = evaluator_result.objectives
+    set_auto_scales(context, evaluator_context, evaluator_result)
+    objectives = to_optimizer(
+        evaluator_result.objectives, context.get_objective_scales()
+    )
     constraints = evaluator_result.constraints
-    for objective_transform in context.objective_transforms:
-        objectives = objective_transform.to_optimizer(objectives)
     if constraints is not None:
-        for constraint_transform in context.nonlinear_constraint_transforms:
-            constraints = constraint_transform.to_optimizer(constraints)
+        constraint_scales = context.get_constraint_scales()
+        assert constraint_scales is not None
+        constraints = to_optimizer(constraints, constraint_scales)
     split_objectives = np.vsplit(objectives, variables.shape[0])
     split_constraints = (
         [] if constraints is None else np.vsplit(constraints, variables.shape[0])
@@ -167,13 +172,15 @@ def _get_gradient_results(
     for variable_transform in reversed(context.variable_transforms):
         variables = variable_transform.from_optimizer(variables)
     evaluator_result = evaluator(variables, evaluator_context)
-    objectives = evaluator_result.objectives
+    set_auto_scales(context, evaluator_context, evaluator_result)
+    objectives = to_optimizer(
+        evaluator_result.objectives, context.get_objective_scales()
+    )
     constraints = evaluator_result.constraints
-    for objective_transform in context.objective_transforms:
-        objectives = objective_transform.to_optimizer(objectives)
     if constraints is not None:
-        for constraint_transform in context.nonlinear_constraint_transforms:
-            constraints = constraint_transform.to_optimizer(constraints)
+        constraint_scales = context.get_constraint_scales()
+        assert constraint_scales is not None
+        constraints = to_optimizer(constraints, constraint_scales)
     return _GradientEvaluatorResults(
         batch_id=evaluator_result.batch_id,
         perturbed_objectives=objectives,
@@ -222,13 +229,15 @@ def _get_function_and_gradient_results(  # ruff:ignore[too-many-arguments, too-m
     for variable_transform in reversed(context.variable_transforms):
         all_variables = variable_transform.from_optimizer(all_variables)
     evaluator_result = evaluator(all_variables, evaluator_context)
-    objectives = evaluator_result.objectives
+    set_auto_scales(context, evaluator_context, evaluator_result)
+    objectives = to_optimizer(
+        evaluator_result.objectives, context.get_objective_scales()
+    )
     constraints = evaluator_result.constraints
-    for objective_transform in context.objective_transforms:
-        objectives = objective_transform.to_optimizer(objectives)
     if constraints is not None:
-        for constraint_transform in context.nonlinear_constraint_transforms:
-            constraints = constraint_transform.to_optimizer(constraints)
+        constraint_scales = context.get_constraint_scales()
+        assert constraint_scales is not None
+        constraints = to_optimizer(constraints, constraint_scales)
     return (
         _FunctionEvaluatorResults(
             batch_id=evaluator_result.batch_id,

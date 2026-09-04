@@ -110,6 +110,88 @@ def test_sort_filter_ranks_an_infinite_objective_last() -> None:
     assert np.allclose(weights, [1 / 3, 0.0, 1 / 3])
 
 
+def _filter_context(**objectives: Any) -> EnOptContext:
+    return EnOptContext.model_validate(
+        {
+            "variables": {"variable_count": 2},
+            "realizations": {"weights": 3 * [1.0]},
+            "objectives": objectives or {"weights": [1.0]},
+        }
+    )
+
+
+def test_sort_filter_ranks_a_maximized_objective_the_other_way() -> None:
+    values = np.array([[1.0], [2.0], [3.0]])
+    realization_filter = DefaultRealizationFilter(
+        RealizationFilterConfig(
+            method="sort-objective", options={"sort": [0], "first": 0, "last": 1}
+        )
+    )
+
+    realization_filter.init(_filter_context(weights=[1.0]))
+    minimized = realization_filter.get_realization_weights(values, None)
+    # Sorting keeps the smallest two of a minimized objective.
+    assert np.allclose(minimized, [1 / 3, 1 / 3, 0.0])
+
+    realization_filter.init(_filter_context(weights=[1.0], maximize=True))
+    maximized = realization_filter.get_realization_weights(values, None)
+    # Maximizing reverses what "best" means, so the largest two are kept.
+    assert np.allclose(maximized, [0.0, 1 / 3, 1 / 3])
+
+
+def test_cvar_filter_ranks_a_maximized_objective_the_other_way() -> None:
+    values = np.array([[1.0], [2.0], [3.0]])
+    realization_filter = DefaultRealizationFilter(
+        RealizationFilterConfig(
+            method="cvar-objective", options={"sort": [0], "percentile": 1 / 3}
+        )
+    )
+
+    realization_filter.init(_filter_context(weights=[1.0]))
+    minimized = realization_filter.get_realization_weights(values, None)
+    # CVaR keeps the worst, which for a minimized objective is the largest.
+    assert np.allclose(minimized, [0.0, 0.0, 1 / 3])
+
+    realization_filter.init(_filter_context(weights=[1.0], maximize=True))
+    maximized = realization_filter.get_realization_weights(values, None)
+    assert np.allclose(maximized, [1 / 3, 0.0, 0.0])
+
+
+def test_sort_filter_takes_the_direction_of_the_objective_it_sorts_by() -> None:
+    # Two objectives with different directions, ranking by the maximized one.
+    realization_filter = DefaultRealizationFilter(
+        RealizationFilterConfig(
+            method="sort-objective", options={"sort": [1], "first": 0, "last": 0}
+        )
+    )
+    realization_filter.init(
+        _filter_context(weights=[0.25, 0.75], maximize=[False, True])
+    )
+    weights = realization_filter.get_realization_weights(
+        np.array([[9.0, 1.0], [9.0, 2.0], [9.0, 3.0]]), None
+    )
+    # The direction of objective 1, not of objective 0, decides the ranking.
+    assert np.allclose(weights, [0.0, 0.0, 1 / 3])
+
+
+def test_sort_filter_applies_direction_before_the_weighted_sum() -> None:
+    # Two objectives pulling in opposite directions, both in the sum. Applying
+    # one sign to the combined value could not express this.
+    realization_filter = DefaultRealizationFilter(
+        RealizationFilterConfig(
+            method="sort-objective", options={"sort": [0, 1], "first": 0, "last": 0}
+        )
+    )
+    realization_filter.init(_filter_context(weights=[0.5, 0.5], maximize=[False, True]))
+    weights = realization_filter.get_realization_weights(
+        np.array([[1.0, 1.0], [2.0, 5.0], [3.0, 2.0]]), None
+    )
+    # Ranks are 0.5 * f0 - 0.5 * f1: 0.0, -1.5 and 0.5, so realization 1 wins.
+    # Flipping the combined sum instead would rank 1.0, 3.5 and 2.5, and pick
+    # realization 0.
+    assert np.allclose(weights, [0.0, 1 / 3, 0.0])
+
+
 def _objective_function(
     variables: NDArray[np.float64],
     context: EvaluationFunctionContext,

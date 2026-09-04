@@ -7,10 +7,16 @@ from typing import Self
 import numpy as np
 from pydantic import BaseModel, ConfigDict, model_validator
 
-from ropt._utils import broadcast_keys, normalize
+from ropt._utils import (
+    broadcast_1d_array,
+    broadcast_keys,
+    check_scales,
+    normalize,
+)
 
 from ._validated_types import (  # ruff: ignore[typing-only-first-party-import]
     Array1D,
+    Array1DBool,
     Keys,
 )
 
@@ -26,6 +32,9 @@ class ObjectiveFunctionsConfig(BaseModel):
 
     Attributes:
         weights:             Weights for the objective functions (default: 1.0).
+        scales:              Scale factors for the objective functions (default: 1.0).
+        auto_scale:          Estimate additional scales from the first batch.
+        maximize:            Which objectives to maximize (default: `False`).
         realization_filters: Realization filter to apply to each objective, by key,
                             `None` to apply none (default: `None`).
         function_estimators: Function estimator to apply to each objective, by key
@@ -33,6 +42,9 @@ class ObjectiveFunctionsConfig(BaseModel):
     """
 
     weights: Array1D = np.array(1.0)
+    scales: Array1D = np.array(1.0)
+    auto_scale: bool = False
+    maximize: Array1DBool = np.array(0)
     realization_filters: Keys = (None,)
     function_estimators: Keys = ("0",)
 
@@ -49,6 +61,8 @@ class ObjectiveFunctionsConfig(BaseModel):
         return self.model_copy(
             update={
                 "weights": normalize(self.weights),
+                "scales": check_scales(self.scales, "scales", weights.size),
+                "maximize": broadcast_1d_array(self.maximize, "maximize", weights.size),
                 "realization_filters": broadcast_keys(
                     self.realization_filters, "realization_filters", weights.size
                 ),

@@ -5,6 +5,8 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 
+from ropt._scaling import diff_from_optimizer
+from ropt._utils import apply_direction
 from ropt.enums import AxisName
 
 from ._result_field import ResultField
@@ -115,25 +117,21 @@ class Gradients(ResultField):
         )
 
     def _transform_from_optimizer(self, context: EnOptContext) -> Gradients | None:
-        if (
-            not context.objective_transforms
-            and not context.nonlinear_constraint_transforms
-        ):
-            return None
-
-        objectives = self.objectives
+        # The objective and constraint axis comes first here, so the scales are
+        # given a trailing axis to broadcast against the variables.
+        objectives = diff_from_optimizer(
+            apply_direction(
+                self.objectives, context.objectives.maximize[:, np.newaxis]
+            ),
+            context.get_objective_scales()[:, np.newaxis],
+        )
         constraints = self.constraints
-        for objective_transform in reversed(context.objective_transforms):
-            objectives = np.moveaxis(objectives, 0, -1)
-            objectives = objective_transform.from_optimizer(objectives)
-            objectives = np.moveaxis(objectives, 0, -1)
         if constraints is not None:
-            for constraint_transform in reversed(
-                context.nonlinear_constraint_transforms
-            ):
-                constraints = np.moveaxis(constraints, 0, -1)
-                constraints = constraint_transform.from_optimizer(constraints)
-                constraints = np.moveaxis(constraints, 0, -1)
+            constraint_scales = context.get_constraint_scales()
+            assert constraint_scales is not None
+            constraints = diff_from_optimizer(
+                constraints, constraint_scales[:, np.newaxis]
+            )
 
         return Gradients(
             target_objective=self.target_objective,

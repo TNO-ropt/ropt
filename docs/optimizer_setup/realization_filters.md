@@ -40,7 +40,7 @@ CONFIG = {
     "realization_filters": [
         {
             "method": "default/sort-objective",
-            "options": {"sort": "descending", "first": 0, "last": 2},
+            "options": {"sort": [0], "first": 0, "last": 2},
         },
     ],
     "gradient": {"number_of_perturbations": 5},
@@ -57,8 +57,11 @@ The `sort-objective` method:
 1. Computes a weighted sum of the objective values specified by the `sort`
    indices for each realization (using the objective weights from the
    configuration). If a single objective index is given, no weighting is
-   applied.
-2. Sorts realizations by that value.
+   applied. Objectives marked in
+   [`maximize`](configuration.md#objective-direction) have their sign flipped
+   first, per objective, so that the sum ranks realizations the way the
+   optimizer would.
+2. Sorts realizations by that value, lowest first.
 3. Selects realizations whose rank falls in the inclusive range
    \[`first`, `last`\].
 4. Retains the original realization weights for selected realizations; all
@@ -69,6 +72,13 @@ The `sort-constraint` variant
 ([`SortConstraintOptions`][ropt.realization_filter.default.SortConstraintOptions])
 works identically but sorts on a single constraint function value.
 
+!!! note
+    Realizations reach a filter with their objectives already scaled but not
+    yet flipped for direction: the flip belongs to the aggregate, and these are
+    per-realization values. The filters apply it themselves when ranking.
+    Constraint filters need no such step, since a constraint is a bound and has
+    no direction.
+
 ## CVaR example
 
 Optimize the conditional expectation of the worst 30% of realizations:
@@ -77,7 +87,7 @@ Optimize the conditional expectation of the worst 30% of realizations:
 "realization_filters": [
     {
         "method": "default/cvar-objective",
-        "options": {"percentile": 0.3},
+        "options": {"sort": [0], "percentile": 0.3},
     },
 ],
 "objectives": {"weights": [1.0], "realization_filters": [0]},
@@ -91,9 +101,9 @@ for the parameters. The corresponding constraint variant is
 
 The `cvar-objective` method:
 
-1. Computes a weighted sum of objectives (same as the sorting filter).
-2. Conceptually sorts realizations by that value (ascending, assuming
-   minimization).
+1. Computes a weighted sum of objectives (same as the sorting filter, and
+   including the sign flip for maximized objectives).
+2. Conceptually sorts realizations by that value, ascending.
 3. Identifies the subset corresponding to the `percentile` worst outcomes
    (highest weighted values).
 4. Assigns CVaR-derived weights to those realizations. When the percentile
@@ -132,6 +142,6 @@ instance can be passed directly in the `realization_filters` field of
 ## Where to next
 
 - Combine filters with transforms:
-  [Transforms](transforms.md).
+  [Transforms](variable_transforms.md).
 - Inspect per-realization output:
   [Working with Results](results.md).

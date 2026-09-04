@@ -6,7 +6,12 @@ import numpy as np
 import pytest
 from pydantic import ValidationError
 
-from ropt.config import LinearConstraintsConfig, VariablesConfig
+from ropt.config import (
+    LinearConstraintsConfig,
+    NonlinearConstraintsConfig,
+    ObjectiveFunctionsConfig,
+    VariablesConfig,
+)
 from ropt.context import EnOptContext
 from ropt.enums import BoundaryType, PerturbationType
 
@@ -63,6 +68,102 @@ def test_check_linear_constraints_vector_shapes() -> None:
         match="lower_bounds cannot be broadcasted to a length of 2",
     ):
         LinearConstraintsConfig.model_validate(config_copy)
+
+
+def test_negative_weights_are_rejected(config: Any) -> None:
+    # A negative weight used to be a back door to maximization; direction is
+    # now set by the `maximize` field instead.
+    config["objectives"]["weights"] = [0.75, -0.25]
+    with pytest.raises(ValidationError, match="Weights must not be negative"):
+        EnOptContext.model_validate(config)
+
+    config["objectives"]["weights"] = [1.0, 1.0]
+    config["realizations"] = {"weights": [1.0, -1.0]}
+    with pytest.raises(ValidationError, match="Weights must not be negative"):
+        EnOptContext.model_validate(config)
+
+
+def test_weights_summing_to_zero_are_rejected(config: Any) -> None:
+    config["objectives"]["weights"] = [0.0, 0.0]
+    with pytest.raises(ValidationError, match="The sum of weights is not positive"):
+        EnOptContext.model_validate(config)
+
+
+def test_objective_scales() -> None:
+    objectives = ObjectiveFunctionsConfig.model_validate({"weights": [1.0, 1.0]})
+    assert np.allclose(objectives.scales, 1.0)
+    assert objectives.scales.shape == (2,)
+    assert not objectives.auto_scale
+
+    objectives = ObjectiveFunctionsConfig.model_validate(
+        {"weights": [1.0, 1.0], "scales": [2.0, 3.0]}
+    )
+    assert np.allclose(objectives.scales, [2.0, 3.0])
+
+
+@pytest.mark.parametrize("scale", [0.0, -2.0])
+def test_objective_scales_must_be_positive(scale: float) -> None:
+    with pytest.raises(ValueError, match="scales must be positive"):
+        ObjectiveFunctionsConfig.model_validate(
+            {"weights": [1.0, 1.0], "scales": [1.0, scale]}
+        )
+
+
+def test_objective_scales_broadcast() -> None:
+    with pytest.raises(
+        ValueError, match="scales cannot be broadcasted to a length of 2"
+    ):
+        ObjectiveFunctionsConfig.model_validate(
+            {"weights": [1.0, 1.0], "scales": [1.0, 2.0, 3.0]}
+        )
+
+
+def test_constraint_scales() -> None:
+    constraints = NonlinearConstraintsConfig.model_validate(
+        {"lower_bounds": [0.0, 0.0], "upper_bounds": [1.0, 1.0]}
+    )
+    assert np.allclose(constraints.scales, 1.0)
+    assert constraints.scales.shape == (2,)
+    assert not constraints.auto_scale.any()
+    assert constraints.auto_scale.shape == (2,)
+
+    constraints = NonlinearConstraintsConfig.model_validate(
+        {"lower_bounds": [0.0, 0.0], "upper_bounds": [1.0, 1.0], "scales": 2.0}
+    )
+    assert np.allclose(constraints.scales, 2.0)
+
+
+@pytest.mark.parametrize("scale", [0.0, -2.0])
+def test_constraint_scales_must_be_positive(scale: float) -> None:
+    with pytest.raises(ValueError, match="scales must be positive"):
+        NonlinearConstraintsConfig.model_validate(
+            {"lower_bounds": [0.0], "upper_bounds": [1.0], "scales": scale}
+        )
+
+
+def test_objective_maximize_defaults_and_broadcasts() -> None:
+    objectives = ObjectiveFunctionsConfig.model_validate({"weights": [1.0, 1.0]})
+    assert objectives.maximize.shape == (2,)
+    assert not objectives.maximize.any()
+
+    objectives = ObjectiveFunctionsConfig.model_validate(
+        {"weights": [1.0, 1.0], "maximize": True}
+    )
+    assert objectives.maximize.tolist() == [True, True]
+
+    objectives = ObjectiveFunctionsConfig.model_validate(
+        {"weights": [1.0, 1.0], "maximize": [True, False]}
+    )
+    assert objectives.maximize.tolist() == [True, False]
+
+
+def test_objective_maximize_broadcast_error() -> None:
+    with pytest.raises(
+        ValueError, match="maximize cannot be broadcasted to a length of 2"
+    ):
+        ObjectiveFunctionsConfig.model_validate(
+            {"weights": [1.0, 1.0], "maximize": [True, False, True]}
+        )
 
 
 def test_check_perturbations() -> None:
@@ -236,19 +337,6 @@ def test_perturbation_types_with_scaler(config: Any) -> None:
             "variable_transforms",
             (object(),),
             "Value must be a VariableTransform, VariableTransformConfig, or dict.",
-        ),
-        (
-            "objective_transforms",
-            (object(),),
-            "Value must be an ObjectiveTransform, ObjectiveTransformConfig, or dict.",
-        ),
-        (
-            "nonlinear_constraint_transforms",
-            (object(),),
-            (
-                "Value must be a NonlinearConstraintTransform, "
-                "NonlinearConstraintTransformConfig, or dict."
-            ),
         ),
     ],
 )

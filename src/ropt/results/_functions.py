@@ -3,6 +3,8 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
 
+from ropt._scaling import value_from_optimizer
+from ropt._utils import apply_direction
 from ropt.enums import AxisName
 
 from ._result_field import ResultField
@@ -103,21 +105,18 @@ class Functions(ResultField):
         )
 
     def _transform_from_optimizer(self, context: EnOptContext) -> Functions | None:
-        if (
-            not context.objective_transforms
-            and not context.nonlinear_constraint_transforms
-        ):
-            return None
-
-        objectives = self.objectives
+        # Undo the flip that made a maximized objective something to minimize,
+        # so that the reported aggregate agrees in sign with the values it
+        # summarizes.
+        objectives = value_from_optimizer(
+            apply_direction(self.objectives, context.objectives.maximize),
+            context.get_objective_scales(),
+        )
         constraints = self.constraints
-        for objective_transform in reversed(context.objective_transforms):
-            objectives = objective_transform.from_optimizer(objectives)
         if constraints is not None:
-            for constraint_transform in reversed(
-                context.nonlinear_constraint_transforms
-            ):
-                constraints = constraint_transform.from_optimizer(constraints)
+            constraint_scales = context.get_constraint_scales()
+            assert constraint_scales is not None
+            constraints = value_from_optimizer(constraints, constraint_scales)
 
         return Functions(
             target_objective=self.target_objective,

@@ -65,6 +65,10 @@ Note:
 - At least two realizations with non-zero weight are required.
 - The `stddev` method is incompatible with `gradient.merge_realizations = True`;
   per-realization gradients must be available.
+- A standard deviation is always positive. To *maximize* variability, set
+  [`maximize`](configuration.md#objective-direction) on the objective; the sign
+  is flipped after the spread has been computed, which is the only point at
+  which flipping it has any effect.
 
 ## Writing a custom estimator
 
@@ -82,4 +86,4 @@ field of [`EnOptContext`][ropt.context.EnOptContext].
 - Filter realizations before aggregation:
   [Realization Filters](realization_filters.md).
 - Transform aggregated values:
-  [Transforms](transforms.md).
+  [Transforms](variable_transforms.md).

@@ -205,7 +205,7 @@ class EnsembleOptimizer:
         return OptimizerCallbackResult(
             functions=functions,
             gradients=gradients,
-            nonlinear_constraint_bounds=self._get_nonlinear_constraint_bounds(),
+            nonlinear_constraint_bounds=self._context.get_nonlinear_constraint_bounds(),
         )
 
     def _get_completed_variables(
@@ -305,19 +305,6 @@ class EnsembleOptimizer:
             if constraint_gradients is None
             else np.vstack((target_objective_gradient, constraint_gradients))
         )
-
-    def _get_nonlinear_constraint_bounds(
-        self,
-    ) -> tuple[NDArray[np.float64], NDArray[np.float64]] | None:
-        if self._context.nonlinear_constraints is None:
-            return None
-        lower_bounds = self._context.nonlinear_constraints.lower_bounds
-        upper_bounds = self._context.nonlinear_constraints.upper_bounds
-        for transform in self._context.nonlinear_constraint_transforms:
-            lower_bounds, upper_bounds = transform.bounds_to_optimizer(
-                lower_bounds, upper_bounds
-            )
-        return lower_bounds, upper_bounds
 
 
 class _Redirector:

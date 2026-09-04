@@ -3,11 +3,12 @@
 from __future__ import annotations
 
 import threading
-from typing import Any, Self
+from typing import TYPE_CHECKING, Any, Self
 
 import numpy as np
 from pydantic import BaseModel, ConfigDict, PrivateAttr, model_validator
 
+from ropt._scaling import to_optimizer
 from ropt._utils import immutable_array
 from ropt.config import (
     FunctionEstimatorConfig,
@@ -27,12 +28,13 @@ from ropt.plugins.manager import get_plugin
 from ._validated_types import (  # ruff: ignore[typing-only-first-party-import]
     BackendInstance,
     FunctionEstimatorInstances,
-    NonlinearConstraintTransformInstance,
-    ObjectiveTransformInstance,
     RealizationFilterInstances,
     SamplerInstances,
     VariableTransformInstance,
 )
+
+if TYPE_CHECKING:
+    from numpy.typing import NDArray
 
 # Module-global rather than per-instance: a lock stored on the model would make
 # the context unpicklable, and the external backend pickles it to the child.
@@ -74,8 +76,6 @@ class EnOptContext(BaseModel):
         samplers:                        Sampler plugin instances, by key. A sequence
                                          is keyed by position.
         variable_transforms:             Tuple of variable transform plugin instances.
-        objective_transforms:            Tuple of objective transform plugin instances.
-        nonlinear_constraint_transforms: Tuple of nonlinear constraint transform plugin instances.
         names:                           Optional mapping of axis names to label sequences.
     """
 
@@ -91,18 +91,93 @@ class EnOptContext(BaseModel):
     function_estimators: FunctionEstimatorInstances = {}
     samplers: SamplerInstances = {}
     variable_transforms: tuple[VariableTransformInstance, ...] = ()
-    objective_transforms: tuple[ObjectiveTransformInstance, ...] = ()
-    nonlinear_constraint_transforms: tuple[
-        NonlinearConstraintTransformInstance, ...
-    ] = ()
     names: dict[str, tuple[str | int, ...]] = {}
 
     _locked: bool = PrivateAttr(default=False)
+
+    # The scales that are actually applied: the configured `scales`, multiplied
+    # by an estimated factor once auto-scaling has run.
+    _objective_scales: NDArray[np.float64] = PrivateAttr()
+    _constraint_scales: NDArray[np.float64] | None = PrivateAttr()
+    _auto_scales_set: bool = PrivateAttr(default=False)
 
     model_config = ConfigDict(
         extra="forbid",
         validate_default=True,
     )
+
+    def get_objective_scales(self) -> NDArray[np.float64]:
+        """Return the scale applied to each objective.
+
+        Objectives are divided by their scale before they reach the optimizer,
+        and multiplied by it again before they are reported. The scales are the
+        configured `scales`, multiplied by an estimated factor if auto-scaling
+        is enabled and has run.
+
+        Returns:
+            The objective scales.
+        """
+        return self._objective_scales
+
+    def get_constraint_scales(self) -> NDArray[np.float64] | None:
+        """Return the scale applied to each nonlinear constraint.
+
+        Returns:
+            The constraint scales, or `None` if there are no constraints.
+        """
+        return self._constraint_scales
+
+    def get_nonlinear_constraint_bounds(
+        self,
+    ) -> tuple[NDArray[np.float64], NDArray[np.float64]] | None:
+        """Return the nonlinear constraint bounds in the optimizer domain.
+
+        The bounds are scaled together with the constraint values, so that the
+        configured constraint is the constraint that is solved. Scales are
+        positive, so the bounds keep their order.
+
+        Returns:
+            The lower and upper bounds, or `None` if there are no constraints.
+        """
+        if self.nonlinear_constraints is None:
+            return None
+        scales = self._constraint_scales
+        assert scales is not None
+        return (
+            to_optimizer(self.nonlinear_constraints.lower_bounds, scales),
+            to_optimizer(self.nonlinear_constraints.upper_bounds, scales),
+        )
+
+    def _needs_auto_scales(self) -> bool:
+        return not self._auto_scales_set and (
+            self.objectives.auto_scale
+            or (
+                self.nonlinear_constraints is not None
+                and bool(self.nonlinear_constraints.auto_scale.any())
+            )
+        )
+
+    def _set_auto_scales(
+        self,
+        objectives: NDArray[np.float64] | None,
+        constraints: NDArray[np.float64] | None,
+    ) -> None:
+        # The estimated factors are filled in once and then fixed for the rest
+        # of the run, so that every batch is scaled the same way and results
+        # stay comparable.
+        if self._auto_scales_set:
+            msg = "The estimated scales have already been set."
+            raise RuntimeError(msg)
+        if objectives is not None:
+            self._objective_scales = immutable_array(
+                self._objective_scales * objectives
+            )
+        if constraints is not None:
+            assert self._constraint_scales is not None
+            self._constraint_scales = immutable_array(
+                self._constraint_scales * constraints
+            )
+        self._auto_scales_set = True
 
     @model_validator(mode="after")
     def _check_linear_constraints(self) -> Self:
@@ -112,14 +187,6 @@ class EnOptContext(BaseModel):
             != self.variables.variable_count
         ):
             msg = f"the coefficients matrix should have {self.variables.variable_count} columns"
-            raise ValueError(msg)
-        return self
-
-    @model_validator(mode="after")
-    def _check_nonlinear_constraint_transforms(self) -> Self:
-        # `variables` and `objectives` always exist, so only this chain can be orphaned.
-        if self.nonlinear_constraint_transforms and self.nonlinear_constraints is None:
-            msg = "nonlinear constraint transforms need nonlinear constraints"
             raise ValueError(msg)
         return self
 
@@ -175,6 +242,16 @@ class EnOptContext(BaseModel):
                         )
                         msg = f"{section}.{field}: unknown key {key!r}; {known}"
                         raise ValueError(msg)
+        return self
+
+    @model_validator(mode="after")
+    def _create_scales(self) -> Self:
+        self._objective_scales = immutable_array(self.objectives.scales)
+        self._constraint_scales = (
+            None
+            if self.nonlinear_constraints is None
+            else immutable_array(self.nonlinear_constraints.scales)
+        )
         return self
 
     @model_validator(mode="after")

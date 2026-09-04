@@ -1,20 +1,16 @@
 """Public API for domain transforms.
 
-Provides base classes for transforming variables, objectives, and constraints
-between user-defined domains and the optimizer's internal domain:
+Provides the base class for transforming variables between a user-defined
+domain and the optimizer's internal domain:
 
 - [`VariableTransform`][ropt.transforms.VariableTransform]
-- [`ObjectiveTransform`][ropt.transforms.ObjectiveTransform]
-- [`NonlinearConstraintTransform`][ropt.transforms.NonlinearConstraintTransform]
 
-See [Transforms](../optimizer_setup/transforms.md) for usage, configuration, and
-implementation guidance.
+See [Variable Transforms](../optimizer_setup/variable_transforms.md) for usage,
+configuration, and implementation guidance.
 """
 
-from .base import NonlinearConstraintTransform, ObjectiveTransform, VariableTransform
+from .base import VariableTransform
 
 __all__ = [
-    "NonlinearConstraintTransform",
-    "ObjectiveTransform",
     "VariableTransform",
 ]

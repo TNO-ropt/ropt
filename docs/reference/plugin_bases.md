@@ -25,6 +25,4 @@ registering it via a Python entry point under `ropt.plugins.<area>`. See
     options:
         members: []
 ::: ropt.plugins.transforms.VariableTransformPlugin
-::: ropt.plugins.transforms.ObjectiveTransformPlugin
-::: ropt.plugins.transforms.NonlinearConstraintTransformPlugin
 

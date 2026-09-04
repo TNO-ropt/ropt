@@ -9,8 +9,6 @@ from ropt.backend import Backend
 from ropt.config import (
     BackendConfig,
     FunctionEstimatorConfig,
-    NonlinearConstraintTransformConfig,
-    ObjectiveTransformConfig,
     RealizationFilterConfig,
     SamplerConfig,
     VariableTransformConfig,
@@ -19,11 +17,7 @@ from ropt.function_estimator import FunctionEstimator
 from ropt.plugins.manager import PluginType, get_plugin
 from ropt.realization_filter import RealizationFilter
 from ropt.sampler import Sampler
-from ropt.transforms import (
-    NonlinearConstraintTransform,
-    ObjectiveTransform,
-    VariableTransform,
-)
+from ropt.transforms import VariableTransform
 
 
 class _PluginConfig(Protocol):
@@ -141,25 +135,3 @@ VariableTransformInstance = Annotated[
     ),
 ]
 """Validate that the value is an instance of a VariableTransform."""
-
-ObjectiveTransformInstance = Annotated[
-    ObjectiveTransform,
-    PlainValidator(
-        _make_validator(
-            "objective_transform", ObjectiveTransformConfig, ObjectiveTransform
-        )
-    ),
-]
-"""Validate that the value is an instance of an ObjectiveTransform."""
-
-NonlinearConstraintTransformInstance = Annotated[
-    NonlinearConstraintTransform,
-    PlainValidator(
-        _make_validator(
-            "nonlinear_constraint_transform",
-            NonlinearConstraintTransformConfig,
-            NonlinearConstraintTransform,
-        )
-    ),
-]
-"""Validate that the value is an instance of a NonlinearConstraintTransform."""

@@ -65,7 +65,7 @@ exact syntax, the `method` naming convention (see
 described in [Configuration](configuration.md); the dedicated pages
 [Realization Filters](realization_filters.md),
 [Function Estimators](function_estimators.md),
-[samplers](gradients.md), and [Transforms](transforms.md) cover each component in
+[samplers](gradients.md), and [Transforms](variable_transforms.md) cover each component in
 depth.
 
 The glossary below defines these terms precisely.
@@ -146,9 +146,10 @@ optimization as implemented by `ropt`.
     [Realization Filters](realization_filters.md).
 
 **Transform**
-:   A component that converts values between the units you work in and the scaled
-    values the optimizer sees, such as rescaling variables, objectives, or
-    constraints. See [Transforms](transforms.md).
+:   A component that converts variables between the units you work in and the
+    values the optimizer sees, such as rescaling or shifting them. Objectives
+    and nonlinear constraints are not transformed by a plugin; they are divided
+    by their `scales`. See [Transforms](variable_transforms.md).
 
 ## Where to next
 
@@ -156,5 +157,5 @@ optimization as implemented by `ropt`.
 - How gradients are estimated: [Stochastic Gradients](gradients.md).
 - Selecting or reweighting realizations: [Realization Filters](realization_filters.md).
 - Combining realizations into a single value: [Function Estimators](function_estimators.md).
-- Rescaling values between domains: [Transforms](transforms.md).
+- Rescaling values between domains: [Transforms](variable_transforms.md).
 - Reading the optimization output: [Working with Results](results.md).
