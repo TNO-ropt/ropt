@@ -9,7 +9,7 @@
       
       
       
-        <link rel="prev" href="../variable_transforms/">
+        <link rel="prev" href="../function_estimators/">
       
       
         <link rel="next" href="../../running/running/">
@@ -897,34 +897,6 @@
     
   
     Function Estimators
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../variable_transforms/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Variable Transforms
   
 
     
@@ -2564,34 +2536,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../reference/transforms/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Transforms
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -3643,8 +3587,9 @@ include an <code>OBJECTIVE</code> axis of length one.</p>
 </div>
 <h2 id="domain-transforms-on-results">Domain transforms on results</h2>
 <p>Optimization internally operates in the <em>optimizer domain</em>: variables may be
-scaled or shifted by a <a href="../variable_transforms/">transform</a>, objectives and nonlinear
-constraints are divided by their
+variables are scaled and shifted by their
+<a href="../configuration/#variable-scales"><code>scales</code> and <code>offsets</code></a>, objectives and
+nonlinear constraints are divided by their
 <a href="../configuration/#objective-scales">scales</a>, and objectives marked
 <a href="../configuration/#objective-direction"><code>maximize</code></a> are negated once they have
 been combined across realizations. Results attached to events are in this
@@ -3657,11 +3602,10 @@ optimizer domain.</p>
   " href="../../reference/results/#ropt.results.Results.transform_from_optimizer"><code>transform_from_optimizer</code></a>
 method undoes both, mapping results back to the <em>user domain</em>.</p>
 <p>The <code>variables</code> field is an exception: it is not reconstructed by inverting the
-transform chain but taken from <code>evaluation_point</code>, the record of the point that
-was evaluated. A transform therefore does not have to be exactly invertible for
-the reported variables to be correct. This does not extend to
-<code>GradientEvaluations.perturbed_variables</code>, which is still recovered by inverting
-the chain.</p>
+map but taken from <code>evaluation_point</code>, the record of the point that was
+evaluated, so the reported variables are the exact values the evaluator saw.
+This does not extend to <code>GradientEvaluations.perturbed_variables</code>, which is
+recovered by inverting the map.</p>
 <p>The <code>target_objective</code> field of <code>Functions</code> and <code>Gradients</code> is the second
 exception: it is the quantity the optimizer minimizes and it stays in the
 optimizer domain in both directions. It is a weighted total over objectives that
@@ -3996,7 +3940,7 @@ single table has to mix granularities.</p>
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../variable_transforms/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Variable Transforms">
+          <a href="../function_estimators/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Function Estimators">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -4006,7 +3950,7 @@ single table has to mix granularities.</p>
                 Previous
               </span>
               <div class="md-ellipsis">
-                Variable Transforms
+                Function Estimators
               </div>
             </div>
           </a>

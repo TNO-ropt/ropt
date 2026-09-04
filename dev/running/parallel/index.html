@@ -914,34 +914,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../optimizer_setup/variable_transforms/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Variable Transforms
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../optimizer_setup/results/" class="md-nav__link">
         
   
@@ -2537,34 +2509,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../reference/transforms/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Transforms
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -3661,7 +3605,7 @@ discarded.</p>
 <h2 id="offloading-your-own-work">Offloading your own work</h2>
 <p>You can hand <strong>your own</strong> functions to a pool with
 <a class="autorefs autorefs-internal" title="            ropt.simple.offload" href="../../reference/simple/#ropt.simple.offload"><code>offload</code></a>. It is useful when code you control — a custom
-step, a domain transform, or a helper you call between optimizations — has an
+step, a custom component, or a helper you call between optimizations — has an
 expensive, self-contained piece of work you want to run on a pool instead of
 inline.</p>
 <p>Pass a single callable to run one call and get its result back:</p>

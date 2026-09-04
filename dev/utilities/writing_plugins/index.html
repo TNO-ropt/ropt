@@ -914,34 +914,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../optimizer_setup/variable_transforms/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Variable Transforms
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../optimizer_setup/results/" class="md-nav__link">
         
   
@@ -2436,34 +2408,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../reference/transforms/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Transforms
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -3052,8 +2996,8 @@
 
 
 <h1 id="writing-a-plugin">Writing a Plugin</h1>
-<p>A plugin makes your own optimizer, sampler, filter, estimator, or transform
-selectable from a configuration by name, in the same way the built-in ones are:</p>
+<p>A plugin makes your own optimizer, sampler, filter, or estimator selectable
+from a configuration by name, in the same way the built-in ones are:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="s2">"backend"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"method"</span><span class="p">:</span> <span class="s2">"my_package/my_method"</span><span class="p">}</span>
 </span></code></pre></div>
 <p>A plugin is a small factory class. It answers which method names it provides,
@@ -3099,11 +3043,6 @@ its own factory base class, and the base class of the object it creates:</p>
 <td><code>ropt.plugins.function_estimator</code></td>
 <td><a class="autorefs autorefs-internal" title="            ropt.plugins.function_estimator.FunctionEstimatorPlugin" href="../../reference/plugin_bases/#ropt.plugins.function_estimator.FunctionEstimatorPlugin"><code>FunctionEstimatorPlugin</code></a></td>
 <td><a class="autorefs autorefs-internal" title="            ropt.function_estimator.FunctionEstimator" href="../../reference/function_estimator/#ropt.function_estimator.FunctionEstimator"><code>FunctionEstimator</code></a></td>
-</tr>
-<tr>
-<td><code>ropt.plugins.variable_transform</code></td>
-<td><a class="autorefs autorefs-internal" title="            ropt.plugins.transforms.VariableTransformPlugin" href="../../reference/plugin_bases/#ropt.plugins.transforms.VariableTransformPlugin"><code>VariableTransformPlugin</code></a></td>
-<td><a class="autorefs autorefs-internal" title="            VariableTransform" href="../../reference/transforms/#ropt.transforms.VariableTransform"><code>VariableTransform</code></a></td>
 </tr>
 </tbody>
 </table>

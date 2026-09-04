@@ -1097,34 +1097,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../optimizer_setup/variable_transforms/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Variable Transforms
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../optimizer_setup/results/" class="md-nav__link">
         
   
@@ -2503,34 +2475,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../reference/transforms/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Transforms
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -3573,7 +3517,7 @@ along with the pool you want to run it on:</p>
 </span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">offload</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="n">expensive</span><span class="p">,</span> <span class="n">data</span><span class="p">),</span> <span class="n">pool</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">process_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
 </span></code></pre></div>
 <p>This is for expensive, self-contained work in code you write — a helper, a custom
-step, or a transform. Like the objective, such functions are copied to the
+step, or a custom component. Like the objective, such functions are copied to the
 workers on a process, local, or HPC pool. Without a pool, <code>offload</code> simply runs
 the function inline instead, so your code never needs a separate fallback for
 the case where no pool is available. See

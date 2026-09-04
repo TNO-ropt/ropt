@@ -914,34 +914,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../optimizer_setup/variable_transforms/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Variable Transforms
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../optimizer_setup/results/" class="md-nav__link">
         
   
@@ -2087,17 +2059,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#ropt.config.VariableTransformConfig" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        VariableTransformConfig
-      
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -2657,34 +2618,6 @@
     
   
     Samplers
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../transforms/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Transforms
   
 
     
@@ -3338,17 +3271,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#ropt.config.VariableTransformConfig" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        VariableTransformConfig
-      
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -3643,6 +3565,28 @@ detailed descriptions and usage examples.</p>
             <td>
               <div class="doc-md-description">
                 <p>Optional boolean mask indicating free variables.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.VariablesConfig.scales">scales</span></code></td>
+            <td>
+                  <code><span title="ropt.config._validated_types.Array1D">Array1D</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Scale factors for the variables (default: 1.0).</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.VariablesConfig.offsets">offsets</span></code></td>
+            <td>
+                  <code><span title="ropt.config._validated_types.Array1D">Array1D</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Offsets for the variables (default: 0.0).</p>
               </div>
             </td>
           </tr>
@@ -3947,6 +3891,28 @@ descriptions and usage examples.</p>
             <td>
               <div class="doc-md-description">
                 <p>Upper bounds for the right-hand side of the constraint equations.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.LinearConstraintsConfig.scales">scales</span></code></td>
+            <td>
+                  <code><span title="ropt.config._validated_types.Array1D">Array1D</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Scale factors for the constraint equations (default: 1.0).</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.LinearConstraintsConfig.auto_scale">auto_scale</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Estimate an additional scale for each equation.</p>
               </div>
             </td>
           </tr>
@@ -4782,103 +4748,6 @@ detailed descriptions and usage examples.</p>
             <td>
               <div class="doc-md-description">
                 <p>Whether to share perturbation values between realizations (default: <code>False</code>).</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-
-
-
-
-
-
-
-
-
-<div class="doc doc-children">
-
-
-
-
-
-  </div>
-
-    </div>
-
-</div>
-
-
-
-
-
-
-<div class="doc doc-object doc-class">
-
-
-
-<h3 id="ropt.config.VariableTransformConfig" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">VariableTransformConfig</span>
-
-
-</h3>
-
-
-    <div class="doc doc-contents ">
-
-
-
-        <p>Configuration class for variable transforms.</p>
-<p><code>VariableTransformConfig</code> configures a
-<a class="autorefs autorefs-internal" title="            VariableTransform" href="../transforms/#ropt.transforms.VariableTransform"><code>VariableTransform</code></a> plugin that
-transforms variables to the optimizer's domain.</p>
-<p>See the <a href="../../optimizer_setup/configuration/#transforms">Configuration guide</a> for
-detailed descriptions and usage examples.</p>
-
-
-<p><span class="doc-section-title">Attributes:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.config.VariableTransformConfig.method">method</span></code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Name of the variable transform method.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.config.VariableTransformConfig.options">options</span></code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Dictionary of options for the variable transform method.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.config.VariableTransformConfig.mask">mask</span></code></td>
-            <td>
-                  <code><span title="ropt.config._validated_types.Array1DBool">Array1DBool</span> | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional boolean array selecting the variables this transform
-     applies to (default: all).</p>
               </div>
             </td>
           </tr>

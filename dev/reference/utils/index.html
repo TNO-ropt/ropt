@@ -914,34 +914,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../optimizer_setup/variable_transforms/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Variable Transforms
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../optimizer_setup/results/" class="md-nav__link">
         
   
@@ -1865,6 +1837,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#ropt.utils.scales_and_offsets_from_bounds" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        scales_and_offsets_from_bounds
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ropt.utils.restore_keyboard_interrupt" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2421,34 +2404,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../transforms/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Transforms
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -2980,6 +2935,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#ropt.utils.scales_and_offsets_from_bounds" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        scales_and_offsets_from_bounds
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ropt.utils.restore_keyboard_interrupt" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3018,8 +2984,10 @@
 <h1 id="utility-functions">Utility Functions</h1>
 <p>Optional helpers for scripts and applications that use <code>ropt</code>. Nothing in <code>ropt</code>
 calls these. See <a href="../../utilities/plugin_discovery/">Plugin Discovery</a> for the
-plugin queries, and <a href="../../utilities/keyboard_interrupt/">Keyboard Interrupts</a>
-for when the escape hatch is worth reaching for.</p>
+plugin queries, <a href="../../optimizer_setup/configuration/#variable-scales">Variable scaling</a>
+for the bounds converter, and <a href="../../utilities/keyboard_interrupt/">Keyboard
+Interrupts</a> for when the escape hatch is
+worth reaching for.</p>
 <p><code>ropt.utils</code> also re-exports
 <a class="autorefs autorefs-internal" title="            ropt.plugins.manager.get_plugin_name" href="../plugin_manager/#ropt.plugins.manager.get_plugin_name"><code>get_plugin_name</code></a>, documented with the
 <a href="../plugin_manager/">Plugin Manager</a>.</p>
@@ -3038,11 +3006,12 @@ for when the escape hatch is worth reaching for.</p>
     <div class="doc doc-contents first">
 
         <p>Optional helpers for scripts and applications that use <code>ropt</code>.</p>
-<p>Nothing in <code>ropt</code> calls anything here. Two kinds of helper live here: queries
+<p>Nothing in <code>ropt</code> calls anything here. Three kinds of helper live here: queries
 about the installed plugins, for code that builds configurations dynamically or
-checks them before starting a long run; and escape hatches for problems that
-come from outside the library, offered because the fix is easy to get wrong and
-hard to find.</p>
+checks them before starting a long run; a converter from variable bounds to the
+scales and offsets that a configuration expects; and escape hatches for problems
+that come from outside the library, offered because the fix is easy to get wrong
+and hard to find.</p>
 
 
 
@@ -3122,6 +3091,152 @@ hard to find.</p>
             </td>
             <td>
                 <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.utils.scales_and_offsets_from_bounds" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">scales_and_offsets_from_bounds</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">scales_and_offsets_from_bounds</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">lower_bounds</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">upper_bounds</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">target_range</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Derive variable scales and offsets that map bounds onto a target range.</p>
+<p>The scales and offsets returned here can be passed straight to the <code>scales</code>
+and <code>offsets</code> fields of a
+<a class="autorefs autorefs-internal" title="            VariablesConfig" href="../config/#ropt.config.VariablesConfig"><code>VariablesConfig</code></a> object. They define the map
+<span class="arithmatex">\(y = (x - o)/s\)</span> that sends <code>lower_bounds</code> to the start of <code>target_range</code> and
+<code>upper_bounds</code> to its end, which puts variables of wildly different
+magnitudes on a common footing for the optimizer.</p>
+<p>The bounds must be finite and the ranges must not be empty, since a variable
+that cannot vary has no scale.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>lower_bounds</code>
+            </td>
+            <td>
+                  <code><span title="numpy.typing.ArrayLike">ArrayLike</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The lower bounds of the variables.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>upper_bounds</code>
+            </td>
+            <td>
+                  <code><span title="numpy.typing.ArrayLike">ArrayLike</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The upper bounds of the variables.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>target_range</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a>, <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The range to map the bounds onto (default: 0 to 1).</p>
+              </div>
+            </td>
+            <td>
+                  <code>(0.0, 1.0)</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>], <span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The scales and the offsets.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#ValueError">ValueError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the bounds are not finite, or if either range is empty.</p>
+              </div>
             </td>
           </tr>
       </tbody>
