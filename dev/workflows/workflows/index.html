@@ -3673,9 +3673,8 @@ described in full in <a href="../../running/handlers/#built-in-handlers">Result 
 They expose their state through dictionary access (<code>handler[key]</code>);
 <code>ResultsHandler</code> and <code>HistoryHandler</code> use the key <code>"results"</code>, while
 <code>DataFrameHandler</code> uses the table name. At this level each also accepts a
-<code>domain</code> argument (<code>"user"</code> — the default — or <code>"optimizer"</code>) that selects
-whether results are transformed to the user domain before being stored; the
-Simple API always uses the user domain.</p>
+<code>scaled</code> argument (<code>False</code> by default) that selects whether results are unscaled
+before being stored; the Simple API always unscales.</p>
 <p>Two more handlers exist only at this level, for wiring events:</p>
 <table>
 <thead>

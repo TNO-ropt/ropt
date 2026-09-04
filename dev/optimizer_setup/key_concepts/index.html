@@ -3049,13 +3049,13 @@ term. See <a href="../function_estimators/">Function Estimators</a>.</dd>
 <dd>A component that selects or reweights a subset of the realizations, for
 example to focus on the worst-performing ones. See
 <a href="../realization_filters/">Realization Filters</a>.</dd>
-<dt><strong>Optimizer domain</strong></dt>
+<dt><strong>Scaling</strong></dt>
 <dd>The units the optimizer works in, as opposed to the ones you configure the
-problem in. Variables reach it through the affine map given by their
+problem in. Variables are scaled by the affine map given by their
 <a href="../configuration/#variable-scales"><code>scales</code> and <code>offsets</code></a>; objectives and
 nonlinear constraints are divided by their
-<a href="../configuration/#objective-scales"><code>scales</code></a>. Results are reported in your
-own units unless stated otherwise.</dd>
+<a href="../configuration/#objective-scales"><code>scales</code></a>. Results are unscaled before
+being reported, unless stated otherwise.</dd>
 </dl>
 <h2 id="where-to-next">Where to next</h2>
 <ul>

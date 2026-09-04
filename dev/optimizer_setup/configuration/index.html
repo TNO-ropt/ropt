@@ -3832,15 +3832,15 @@ process</a>.</p>
 are frozen, so an individual setting cannot be changed in place. The context
 itself is not: replacing one of its fields wholesale is not prevented, but
 nothing re-runs the work construction did — bounds, perturbation magnitudes and
-linear constraints are all converted to the optimizer domain at that point — so
+linear constraints are all scaled at that point — so
 the result is inconsistent. To change settings, build a new context from a
 modified dict.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>Treat an <code>EnOptContext</code> as read-only after construction. Do not try to
 serialize and round-trip them (for example, to/from JSON). Some parameters
-are transformed during construction in a way that cannot be undone, so
-building an <code>EnOptContext</code> from those serialized values would transform
+are scaled during construction in a way that cannot be undone, so
+building an <code>EnOptContext</code> from those serialized values would scale
 them again, incorrectly. NumPy arrays and plugin instances may also not
 come back unchanged from a round-trip. Persist the raw input dicts instead
 if you intend to
@@ -3994,11 +3994,11 @@ applies to it, not the offset. <code>RELATIVE</code> magnitudes are a fraction o
 range and are already dimensionless, so they are left alone. Linear constraints
 follow the variables too, as described <a href="#linear-constraint-scales">below</a>.</p>
 <p>The scales and offsets apply to every variable, including the ones fixed by
-<code>mask</code>. This keeps the optimizer domain uniform, and a fixed variable maps back
+<code>mask</code>. This keeps the scaling uniform, and a fixed variable maps back
 to exactly the value you gave it.</p>
 <p>What you see in the results follows from that:</p>
 <ul>
-<li>Variables and perturbed variables are reported in your own domain.</li>
+<li>Variables and perturbed variables are reported unscaled.</li>
 <li>Distances to the variable bounds, in
   <a class="autorefs autorefs-internal" title="            ropt.results.ConstraintInfo
 
@@ -4145,7 +4145,7 @@ of an estimated one.</p>
 <p>Unlike <code>auto_scale</code> for nonlinear constraints, this is a single boolean rather
 than one per equation: the rows form one matrix equation and are scaled together
 or not at all.</p>
-<p>Distances to the constraint bounds are reported in your own domain, with both
+<p>Distances to the constraint bounds are reported unscaled, with both
 steps undone.</p>
 <h3 id="nonlinear_constraints"><code>nonlinear_constraints</code> — <a class="autorefs autorefs-internal" title="            NonlinearConstraintsConfig" href="../../reference/config/#ropt.config.NonlinearConstraintsConfig"><code>NonlinearConstraintsConfig</code></a></h3>
 <p>Nonlinear constraints are defined by comparing a constraint function to

@@ -4356,7 +4356,7 @@ filters by constraint tolerance. The selected result is accessible via the
   " href="#ropt.components.event_handlers.ResultsHandler.result"><code>result</code></a> property or
 <code>handler["results"]</code>.</p>
 <p>See <a href="../../running/handlers/#resultshandler">Result Handlers</a> for full
-details on selection criteria and domain handling.</p>
+details on selection criteria and scaling.</p>
 
 
 
@@ -4388,7 +4388,7 @@ details on selection criteria and domain handling.</p>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="o">*</span><span class="p">,</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">what</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"best"</span><span class="p">,</span> <span class="s2">"last"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"best"</span><span class="p">,</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">constraint_tolerance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">domain</span><span class="p">:</span> <span class="n">DomainType</span> <span class="o">=</span> <span class="s2">"user"</span><span class="p">,</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">scaled</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="nb">filter</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Results</span><span class="p">],</span> <span class="nb">bool</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
@@ -4443,23 +4443,22 @@ details on selection criteria and domain handling.</p>
           </tr>
           <tr class="doc-section-item">
             <td>
-                <code>domain</code>
+                <code>scaled</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.results.DomainType
-
-
-  
-      module-attribute
-  " href="../results/#ropt.results.DomainType">DomainType</a></code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Domain in which to store the results ('user' or 'optimizer').</p>
+                <p>If <code>True</code>, store the value as the optimizer works
+                  with it: scaled and offset, with objectives and
+                  gradients negated where <code>maximize</code> is set. By
+                  default the value is unscaled first, restoring the
+                  quantities as configured.</p>
               </div>
             </td>
             <td>
-                  <code>&#39;user&#39;</code>
+                  <code>False</code>
             </td>
           </tr>
           <tr class="doc-section-item">
@@ -4614,7 +4613,7 @@ via the <a class="autorefs autorefs-internal" title="            results
   " href="#ropt.components.event_handlers.HistoryHandler.results"><code>results</code></a>
 property or <code>handler["results"]</code>.</p>
 <p>See <a href="../../running/handlers/#historyhandler">Result Handlers</a> for full
-details on domain handling and accumulation behavior.</p>
+details on scaling and accumulation behavior.</p>
 
 
 
@@ -4642,7 +4641,7 @@ details on domain handling and accumulation behavior.</p>
 
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">__init__</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">domain</span><span class="p">:</span> <span class="n">DomainType</span> <span class="o">=</span> <span class="s1">'user'</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">__init__</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">scaled</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -4663,23 +4662,21 @@ details on domain handling and accumulation behavior.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                <code>domain</code>
+                <code>scaled</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.results.DomainType
-
-
-  
-      module-attribute
-  " href="../results/#ropt.results.DomainType">DomainType</a></code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Domain in which to store results ('user' or 'optimizer').</p>
+                <p>If <code>True</code>, store the values as the optimizer works with
+them: scaled and offset, with objectives and gradients negated
+where <code>maximize</code> is set. By default the values are unscaled
+first, restoring the quantities as configured.</p>
               </div>
             </td>
             <td>
-                  <code>&#39;user&#39;</code>
+                  <code>False</code>
             </td>
           </tr>
       </tbody>
@@ -5012,7 +5009,7 @@ specification, default tables, and callback details.</p>
 
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">set_default_tables</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">domain</span><span class="p">:</span> <span class="n">DomainType</span> <span class="o">=</span> <span class="s1">'user'</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">set_default_tables</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">scaled</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -5036,25 +5033,22 @@ tables for gradient results.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                <code>domain</code>
+                <code>scaled</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.results.DomainType
-
-
-  
-      module-attribute
-  " href="../results/#ropt.results.DomainType">DomainType</a></code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Domain (<code>"user"</code> or <code>"optimizer"</code>) the tables are filled
-from. The <code>"user"</code> domain reports values as seen by the user;
-<code>"optimizer"</code> reports them in the optimizer's transformed space.</p>
+                <p>If <code>True</code>, fill the tables with the values as the optimizer
+works with them: scaled and offset, with objectives and
+gradients negated where <code>maximize</code> is set. By default the
+values are unscaled first, restoring the quantities as
+configured.</p>
               </div>
             </td>
             <td>
-                  <code>&#39;user&#39;</code>
+                  <code>False</code>
             </td>
           </tr>
       </tbody>
@@ -5148,8 +5142,9 @@ handler with <code>run_in_thread=True</code> on the
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">table_type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"functions"</span><span class="p">,</span> <span class="s2">"gradients"</span><span class="p">],</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">columns</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">domain</span><span class="p">:</span> <span class="n">DomainType</span> <span class="o">=</span> <span class="s2">"user"</span><span class="p">,</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="o">*</span><span class="p">,</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">scaled</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -5220,24 +5215,21 @@ handler with <code>run_in_thread=True</code> on the
           </tr>
           <tr class="doc-section-item">
             <td>
-                <code>domain</code>
+                <code>scaled</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.results.DomainType
-
-
-  
-      module-attribute
-  " href="../results/#ropt.results.DomainType">DomainType</a></code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Domain (<code>"user"</code> or <code>"optimizer"</code>) the table is filled
-        from.</p>
+                <p>If <code>True</code>, fill this table with the values as the
+        optimizer works with them: scaled and offset, with
+        objectives and gradients negated where <code>maximize</code> is
+        set. By default the values are unscaled first.</p>
               </div>
             </td>
             <td>
-                  <code>&#39;user&#39;</code>
+                  <code>False</code>
             </td>
           </tr>
       </tbody>

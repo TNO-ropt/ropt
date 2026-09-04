@@ -2065,10 +2065,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.results.Results.transform_from_optimizer" class="md-nav__link">
+  <a href="#ropt.results.Results.unscale" class="md-nav__link">
     <span class="md-ellipsis">
       
-        transform_from_optimizer
+        unscale
       
     </span>
   </a>
@@ -2121,10 +2121,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.results.FunctionResults.transform_from_optimizer" class="md-nav__link">
+  <a href="#ropt.results.FunctionResults.unscale" class="md-nav__link">
     <span class="md-ellipsis">
       
-        transform_from_optimizer
+        unscale
       
     </span>
   </a>
@@ -2149,10 +2149,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.results.GradientResults.transform_from_optimizer" class="md-nav__link">
+  <a href="#ropt.results.GradientResults.unscale" class="md-nav__link">
     <span class="md-ellipsis">
       
-        transform_from_optimizer
+        unscale
       
     </span>
   </a>
@@ -2331,17 +2331,6 @@
     <span class="md-ellipsis">
       
         results_to_polars
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#ropt.results.DomainType" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        DomainType
       
     </span>
   </a>
@@ -3236,10 +3225,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.results.Results.transform_from_optimizer" class="md-nav__link">
+  <a href="#ropt.results.Results.unscale" class="md-nav__link">
     <span class="md-ellipsis">
       
-        transform_from_optimizer
+        unscale
       
     </span>
   </a>
@@ -3292,10 +3281,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.results.FunctionResults.transform_from_optimizer" class="md-nav__link">
+  <a href="#ropt.results.FunctionResults.unscale" class="md-nav__link">
     <span class="md-ellipsis">
       
-        transform_from_optimizer
+        unscale
       
     </span>
   </a>
@@ -3320,10 +3309,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.results.GradientResults.transform_from_optimizer" class="md-nav__link">
+  <a href="#ropt.results.GradientResults.unscale" class="md-nav__link">
     <span class="md-ellipsis">
       
-        transform_from_optimizer
+        unscale
       
     </span>
   </a>
@@ -3508,17 +3497,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#ropt.results.DomainType" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        DomainType
-      
-    </span>
-  </a>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -3584,7 +3562,7 @@ patterns.</p>
 
         <p>Data classes for storing intermediate optimization results.</p>
 <p>See <a href="../../optimizer_setup/results/">Working with Results</a> for a narrative overview of
-the result hierarchy, axis metadata, domain transforms, and pandas/polars export.</p>
+the result hierarchy, axis metadata, scaling, and pandas/polars export.</p>
 
 
 
@@ -4039,8 +4017,8 @@ for details.</p>
 <div class="doc doc-object doc-function">
 
 
-<h3 id="ropt.results.Results.transform_from_optimizer" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">transform_from_optimizer</span>
+<h3 id="ropt.results.Results.unscale" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">unscale</span>
 
 
   <span class="doc doc-labels">
@@ -4048,14 +4026,15 @@ for details.</p>
   </span>
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">transform_from_optimizer</span><span class="p">(</span><span class="n">context</span><span class="p">:</span> <span class="n">EnOptContext</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Results</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">unscale</span><span class="p">(</span><span class="n">context</span><span class="p">:</span> <span class="n">EnOptContext</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Results</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
 
-        <p>Transform results from the optimizer domain to the user domain.</p>
-<p>Reverses variable, objective, and constraint transforms applied during
-optimization, restoring values to the user-defined domain.</p>
+        <p>Unscale the results.</p>
+<p>Restores the quantities as configured: values are multiplied by their
+scales and offsets are added back, and objectives and gradients are
+negated again where <code>maximize</code> is set.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -4109,7 +4088,7 @@ optimization, restoring values to the user-defined domain.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A new <code>Results</code> object in the user domain.</p>
+                <p>A new, unscaled <code>Results</code> object.</p>
               </div>
             </td>
           </tr>
@@ -4409,22 +4388,20 @@ how axis metadata is used.</p>
 <div class="doc doc-object doc-function">
 
 
-<h3 id="ropt.results.FunctionResults.transform_from_optimizer" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">transform_from_optimizer</span>
+<h3 id="ropt.results.FunctionResults.unscale" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">unscale</span>
 
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">transform_from_optimizer</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">context</span><span class="p">:</span> <span class="n">EnOptContext</span><span class="p">,</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FunctionResults</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">unscale</span><span class="p">(</span><span class="n">context</span><span class="p">:</span> <span class="n">EnOptContext</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FunctionResults</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
 
-        <p>Transform results from optimizer space to user space.</p>
-<p>This applies inverse transformations to all transformable sub-fields
-(<code>evaluations</code>, <code>functions</code>, and <code>constraint_info</code> when present).
-Realization metadata is passed through unchanged.</p>
+        <p>Unscale the results.</p>
+<p>Unscales the sub-fields that carry values (<code>evaluations</code>, <code>functions</code>,
+and <code>constraint_info</code> when present). Realization metadata is passed
+through unchanged.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -4478,7 +4455,7 @@ Realization metadata is passed through unchanged.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The transformed results.</p>
+                <p>The unscaled results.</p>
               </div>
             </td>
           </tr>
@@ -4611,22 +4588,20 @@ Realization metadata is passed through unchanged.</p>
 <div class="doc doc-object doc-function">
 
 
-<h3 id="ropt.results.GradientResults.transform_from_optimizer" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">transform_from_optimizer</span>
+<h3 id="ropt.results.GradientResults.unscale" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">unscale</span>
 
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">transform_from_optimizer</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">context</span><span class="p">:</span> <span class="n">EnOptContext</span><span class="p">,</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GradientResults</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">unscale</span><span class="p">(</span><span class="n">context</span><span class="p">:</span> <span class="n">EnOptContext</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GradientResults</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
 
-        <p>Transform results from optimizer space to user space.</p>
-<p>This applies inverse transformations to transformable sub-fields
-(<code>evaluations</code> and <code>gradients</code> when present). Realization metadata is
-passed through unchanged.</p>
+        <p>Unscale the results.</p>
+<p>Unscales the sub-fields that carry values (<code>evaluations</code> and
+<code>gradients</code> when present). Realization metadata is passed through
+unchanged.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -4680,7 +4655,7 @@ passed through unchanged.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The transformed results.</p>
+                <p>The unscaled results.</p>
               </div>
             </td>
           </tr>
@@ -4734,7 +4709,7 @@ passed through unchanged.</p>
 <div class="tabbed-content">
 <div class="tabbed-block">
 <p><code>target_objective</code>: The overall objective calculated as a weighted sum
-over the, possibly transformed, objectives. This is a single floating
+over the, possibly scaled, objectives. This is a single floating
 point value. It is defined as a <code>numpy</code> array of dimensions 0, hence it
 has no axes:</p>
 <ul>
@@ -7023,33 +6998,6 @@ for details.</p>
       </tbody>
     </table>
 
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-attribute">
-
-
-
-<h2 id="ropt.results.DomainType" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">ropt.results.DomainType</span>
-
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
-  </span>
-
-</h2>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">DomainType</span> <span class="o">=</span> <span class="n">Literal</span><span class="p">[</span><span class="s1">'optimizer'</span><span class="p">,</span> <span class="s1">'user'</span><span class="p">]</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents first">
-
-        <p>Selects the domain that result values are expressed in.</p>
-<p>Values are <code>"optimizer"</code> for the domain the optimizer works in, and <code>"user"</code> for
-the domain the configuration is written in. The two coincide unless transforms
-are configured.</p>
 
     </div>
 

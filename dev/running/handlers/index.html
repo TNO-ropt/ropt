@@ -3202,25 +3202,25 @@ handler which of the two roles it plays; if you need both, use two handlers.</p>
       dataclass
   " href="../../reference/results/#ropt.results.Results"><code>Results</code></a> and returns <code>True</code> to keep it or <code>False</code> to
   drop it.</li>
-<li><code>domain="user"</code> (default) or <code>domain="optimizer"</code> chooses which of the two
-  the stored result is in; see
-  <a href="../../optimizer_setup/results/#domain-transforms-on-results">Domain transforms on results</a>.</li>
+<li><code>scaled=False</code> (default) unscales the stored result, restoring the quantities
+  as configured; <code>scaled=True</code> stores it as the optimizer works with it. See
+  <a href="../../optimizer_setup/results/#scaling-of-results">Scaling of results</a>.</li>
 </ul>
 <h4 id="historyhandler"><code>HistoryHandler</code></h4>
 <p><a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.HistoryHandler" href="../../reference/components_event_handlers/#ropt.components.event_handlers.HistoryHandler"><code>HistoryHandler</code></a> keeps <em>every</em> result it receives,
 in order, as a tuple. Read it with <code>handler.results</code>, which is an empty tuple
 until the first result arrives, or with <code>handler["results"]</code>, the raw stored
-value, which is <code>None</code> until then. It takes the same <code>domain=</code> keyword as
+value, which is <code>None</code> until then. It takes the same <code>scaled=</code> keyword as
 <code>ResultsHandler</code>.</p>
 <h4 id="dataframehandler"><code>DataFrameHandler</code></h4>
 <p><a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.DataFrameHandler" href="../../reference/components_event_handlers/#ropt.components.event_handlers.DataFrameHandler"><code>DataFrameHandler</code></a> collects results into named
 DataFrames, using either <code>pandas</code> (the default) or <code>polars</code> as its backend; the
 corresponding package must be installed. Define a table with
-<code>add_table(name, table_type, columns, domain="user")</code>, where <code>table_type</code> is
+<code>add_table(name, table_type, columns, scaled=False)</code>, where <code>table_type</code> is
 <code>"functions"</code> or <code>"gradients"</code>, <code>columns</code> maps result-field names (dotted
-attribute syntax) to column titles, and <code>domain</code> (<code>"user"</code> or <code>"optimizer"</code>,
-per table) chooses which domain that table is filled from; see
-<a href="../../optimizer_setup/results/#domain-transforms-on-results">Domain transforms on results</a>:</p>
+attribute syntax) to column titles, and <code>scaled</code> (per table) chooses whether
+that table is filled with scaled or unscaled values; see
+<a href="../../optimizer_setup/results/#scaling-of-results">Scaling of results</a>:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.simple</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataFrameHandler</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
 </span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">tables</span> <span class="o">=</span> <span class="n">DataFrameHandler</span><span class="p">()</span>
@@ -3256,9 +3256,9 @@ means the polars backend can build tables that mix per-batch and
 per-realization fields, which the pandas backend cannot.</p>
 <p>Convenience methods:</p>
 <ul>
-<li><code>set_default_tables(domain="user")</code> registers a standard set of tables
+<li><code>set_default_tables(scaled=False)</code> registers a standard set of tables
   (<code>functions</code>, <code>evaluations</code>, <code>constraints</code> for function results; <code>gradients</code>,
-  <code>perturbations</code> for gradient results), all filled from the given domain.</li>
+  <code>perturbations</code> for gradient results), all filled the same way.</li>
 <li><code>add_column(table, name, title)</code> adds one column to an existing table.</li>
 <li><code>set_callback(fn)</code> calls <code>fn(output_dir)</code> whenever the tables are updated,
   where <code>output_dir</code> is the run's configured

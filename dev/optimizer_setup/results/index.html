@@ -1066,10 +1066,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#domain-transforms-on-results" class="md-nav__link">
+  <a href="#scaling-of-results" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Domain transforms on results
+        Scaling of results
       
     </span>
   </a>
@@ -3127,10 +3127,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#domain-transforms-on-results" class="md-nav__link">
+  <a href="#scaling-of-results" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Domain transforms on results
+        Scaling of results
       
     </span>
   </a>
@@ -3581,37 +3581,37 @@ in the "Result descriptions" section of each class in the
 <p>Dimensionality is fixed: even with a single objective, result arrays still
 include an <code>OBJECTIVE</code> axis of length one.</p>
 </div>
-<h2 id="domain-transforms-on-results">Domain transforms on results</h2>
-<p>Optimization internally operates in the <em>optimizer domain</em>: variables are scaled
-and shifted by their
+<h2 id="scaling-of-results">Scaling of results</h2>
+<p>Optimization internally works with scaled values: variables are scaled and
+shifted by their
 <a href="../configuration/#variable-scales"><code>scales</code> and <code>offsets</code></a>, objectives and
 nonlinear constraints are divided by their
 <a href="../configuration/#objective-scales">scales</a>, and objectives marked
 <a href="../configuration/#objective-direction"><code>maximize</code></a> are negated once they have
-been combined across realizations. Results attached to events are in this
-optimizer domain.</p>
-<p>The <a class="autorefs autorefs-internal" title="            transform_from_optimizer
+been combined across realizations. Results attached to events are scaled this
+way.</p>
+<p>The <a class="autorefs autorefs-internal" title="            unscale
 
 
   
       abstractmethod
-  " href="../../reference/results/#ropt.results.Results.transform_from_optimizer"><code>transform_from_optimizer</code></a>
-method undoes all of that, mapping results back to the <em>user domain</em>.</p>
+  " href="../../reference/results/#ropt.results.Results.unscale"><code>unscale</code></a> method undoes all of that,
+restoring the quantities as configured.</p>
 <p>The <code>target_objective</code> field of <code>Functions</code> and <code>Gradients</code> is an exception: it
-is the quantity the optimizer minimizes and it stays in the
-optimizer domain in both directions. It is a weighted total over objectives that
-may differ in both scale and direction, so there is no single factor to undo; if
-you need it in user terms, combine the objectives yourself using
+is the quantity the optimizer minimizes and stays scaled in both directions. It
+is a weighted total over objectives that may differ in both scale and direction,
+so there is no single factor to undo; if you need it in configured terms,
+combine the objectives yourself using
 <a class="autorefs autorefs-internal" title="            get_objective_scales" href="../../reference/context/#ropt.context.EnOptContext.get_objective_scales"><code>get_objective_scales</code></a> and the
 directions on <code>objectives.maximize</code>.</p>
 <p>Because the direction is undone when reporting, a combined objective agrees in
 sign with the per-realization values it summarizes, whether it is an average or
 a spread.</p>
-<p>In the <a href="../../running/running/">simple API</a>, results are always transformed to the user
-domain automatically.</p>
+<p>In the <a href="../../running/running/">simple API</a>, results are always unscaled
+automatically.</p>
 <p>In <a href="../../workflows/workflows/">workflows</a>, event handlers determine how results are returned,
-for instance by offering a <code>domain</code> argument that controls whether results are
-handled in user or optimizer domain. See <a href="../../workflows/workflows/">Optimization Workflows</a>
+for instance by offering a <code>scaled</code> argument that controls whether results are
+unscaled before being stored. See <a href="../../workflows/workflows/">Optimization Workflows</a>
 for details on how individual event handlers handle this.</p>
 <h2 id="metadata">Metadata</h2>
 <p>Results carry two independent kinds of metadata, neither interpreted by <code>ropt</code>:</p>

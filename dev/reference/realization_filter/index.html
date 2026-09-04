@@ -3348,8 +3348,9 @@ gradients derived from that evaluation.</p>
 <p>Both arguments are two-dimensional arrays with one row per realization
 and one column per objective or per nonlinear constraint, in the order
 in which they are configured: <code>objectives[i, j]</code> is the value of
-objective <code>j</code> for realization <code>i</code>. The values are in the optimizer
-domain, i.e. after any objective or nonlinear constraint transforms.</p>
+objective <code>j</code> for realization <code>i</code>. The values are scaled, but not
+negated for maximization: direction applies to aggregates, and these
+are per-realization.</p>
 <p>A realization that failed to evaluate carries <code>nan</code> values. The filter
 should check for these and handle them, for instance by assigning such
 realizations a weight of zero.</p>

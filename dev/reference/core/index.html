@@ -4093,7 +4093,7 @@ non-linear constraint bounds returned by an
 <a class="autorefs autorefs-internal" title="            ropt.core.OptimizerCallback" href="#ropt.core.OptimizerCallback"><code>OptimizerCallback</code></a> evaluation. <code>functions</code>
 and <code>gradients</code> are <code>None</code> unless requested and successfully computed;
 <code>nonlinear_constraint_bounds</code> is <code>None</code> if the run has no non-linear
-constraints, and otherwise holds their bounds in the optimizer domain. The
+constraints, and otherwise holds their scaled bounds. The
 bounds are reported after every evaluation because auto-scaling can change
 them once, when the scales are estimated from the first batch.</p>
 <p><code>functions</code> and <code>gradients</code> follow a fixed shape:</p>
