@@ -46,7 +46,6 @@ def _function_results(
         batch_id=0,
         metadata={},
         names={},
-        evaluation_point=np.zeros(2),
         evaluations=FunctionEvaluations(
             variables=np.zeros(2),
             objectives=np.zeros((1, 2)) if objectives is None else objectives,

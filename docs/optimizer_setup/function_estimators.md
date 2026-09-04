@@ -85,5 +85,5 @@ field of [`EnOptContext`][ropt.context.EnOptContext].
 
 - Filter realizations before aggregation:
   [Realization Filters](realization_filters.md).
-- Transform aggregated values:
-  [Transforms](variable_transforms.md).
+- Scale aggregated values:
+  [Scaling objectives](configuration.md#objective-scales).

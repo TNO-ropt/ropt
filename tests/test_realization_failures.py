@@ -123,7 +123,6 @@ def _make_function_results(*, failed: bool) -> FunctionResults:
         batch_id=0,
         metadata={},
         names={},
-        evaluation_point=evaluations.variables,
         evaluations=evaluations,
         realizations=Realizations(
             evaluated_realizations=np.ones(3, dtype=np.bool_),
@@ -157,7 +156,6 @@ def _make_gradient_results(
         batch_id=0,
         metadata={},
         names={},
-        evaluation_point=evaluations.variables,
         evaluations=evaluations,
         realizations=Realizations(
             evaluated_realizations=np.ones(3, dtype=np.bool_),

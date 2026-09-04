@@ -399,7 +399,7 @@ with session() as s:
 ```
 
 This is for expensive, self-contained work in code you write — a helper, a custom
-step, or a transform. Like the objective, such functions are copied to the
+step, or a custom component. Like the objective, such functions are copied to the
 workers on a process, local, or HPC pool. Without a pool, `offload` simply runs
 the function inline instead, so your code never needs a separate fallback for
 the case where no pool is available. See

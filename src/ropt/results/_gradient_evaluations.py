@@ -193,11 +193,15 @@ class GradientEvaluations(ResultField):
         )
 
     def _transform_from_optimizer(
-        self, context: EnOptContext, evaluation_point: NDArray[np.float64]
+        self, context: EnOptContext
     ) -> GradientEvaluations | None:
+        variables = value_from_optimizer(
+            self.variables, context.variables.scales, context.variables.offsets
+        )
         perturbed_variables = self.perturbed_variables
-        for variable_transform in reversed(context.variable_transforms):
-            perturbed_variables = variable_transform.from_optimizer(perturbed_variables)
+        perturbed_variables = value_from_optimizer(
+            perturbed_variables, context.variables.scales, context.variables.offsets
+        )
         perturbed_objectives = value_from_optimizer(
             self.perturbed_objectives, context.get_objective_scales()
         )
@@ -210,7 +214,7 @@ class GradientEvaluations(ResultField):
             )
 
         return GradientEvaluations(
-            variables=evaluation_point,
+            variables=variables,
             perturbed_variables=perturbed_variables,
             perturbed_objectives=perturbed_objectives,
             perturbed_constraints=perturbed_constraints,

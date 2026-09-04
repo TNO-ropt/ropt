@@ -411,7 +411,7 @@ discarded.
 
 You can hand **your own** functions to a pool with
 [`offload`][ropt.simple.offload]. It is useful when code you control — a custom
-step, a domain transform, or a helper you call between optimizations — has an
+step, a custom component, or a helper you call between optimizations — has an
 expensive, self-contained piece of work you want to run on a pool instead of
 inline.
 

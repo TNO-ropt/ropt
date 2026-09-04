@@ -9,13 +9,12 @@ import pytest
 from pydantic import ValidationError
 
 from ropt.components.event_handlers import CallbackHandler
-from ropt.config import LinearConstraintsConfig, VariableTransformConfig
+from ropt.config import LinearConstraintsConfig
 from ropt.config.constants import DEFAULT_SEED
 from ropt.context import EnOptContext
 from ropt.enums import EnOptEventType, ExitCode
 from ropt.results import FunctionResults, GradientResults
 from ropt.simple import EvaluateResult, optimize
-from ropt.transforms.default import DefaultVariableTransform
 from ropt.utils import validate_backend_options
 
 if TYPE_CHECKING:
@@ -482,13 +481,11 @@ def test_nonlinear_constraint_with_auto_scale(
     assert np.allclose(result1.objectives, result2.objectives, atol=0.025)
 
 
-@pytest.mark.parametrize("use_plugin", [False, True])
 @pytest.mark.parametrize("offsets", [None, np.array([1.0, 1.1, 1.2])])
 @pytest.mark.parametrize("scales", [None, np.array([2.0, 2.1, 2.2])])
-def test_variables_scale_with_scaler(  # ruff: ignore[too-many-positional-arguments]
+def test_variables_are_scaled_and_offset(
     config: Any,
     eval_func: Any,
-    use_plugin: Any,
     offsets: NDArray[np.float64] | None,
     scales: NDArray[np.float64] | None,
     external: str,
@@ -501,15 +498,10 @@ def test_variables_scale_with_scaler(  # ruff: ignore[too-many-positional-argume
     config["backend"]["max_iterations"] = 20
     config["variables"]["lower_bounds"] = lower_bounds
     config["variables"]["upper_bounds"] = upper_bounds
-    config["variable_transforms"] = [
-        {"method": "scaler", "options": {"scales": scales, "offsets": offsets}}
-        if use_plugin
-        else DefaultVariableTransform(
-            VariableTransformConfig.model_validate(
-                {"method": "scaler", "options": {"scales": scales, "offsets": offsets}}
-            )
-        )
-    ]
+    if scales is not None:
+        config["variables"]["scales"] = scales
+    if offsets is not None:
+        config["variables"]["offsets"] = offsets
 
     opt_result = optimize(config, initial_values, eval_func())
     assert opt_result.variables is not None
@@ -523,12 +515,12 @@ def test_variables_scale_with_scaler(  # ruff: ignore[too-many-positional-argume
         upper_bounds /= scales
     assert np.allclose(context.variables.lower_bounds, lower_bounds)
     assert np.allclose(context.variables.upper_bounds, upper_bounds)
+    # The optimum is reported in the user domain, so it is where it always was.
     assert np.allclose(opt_result.variables, [0.0, 0.0, 0.5], atol=0.05)
 
 
-@pytest.mark.parametrize("use_plugin", [False, True])
-def test_variables_scale_linear_constraints_with_scaler(
-    config: Any, eval_func: Any, external: str, use_plugin: Any
+def test_scaled_variables_change_the_linear_constraints(
+    config: Any, eval_func: Any, external: str
 ) -> None:
     config["backend"]["method"] = f"{external}{_SLSQP}"
 
@@ -544,32 +536,29 @@ def test_variables_scale_linear_constraints_with_scaler(
 
     offsets = np.array([1.0, 1.1, 1.2])
     scales = np.array([2.0, 2.1, 2.2])
-    config["variable_transforms"] = [
-        {"method": "scaler", "options": {"scales": scales, "offsets": offsets}}
-        if use_plugin
-        else DefaultVariableTransform(
-            VariableTransformConfig.model_validate(
-                {"method": "scaler", "options": {"scales": scales, "offsets": offsets}}
-            )
-        )
-    ]
+    config["variables"]["scales"] = scales
+    config["variables"]["offsets"] = offsets
+    config["linear_constraints"]["auto_scale"] = True
 
     context = EnOptContext.model_validate(config)
     assert isinstance(context.linear_constraints, LinearConstraintsConfig)
     transformed_coefficients = coefficients * scales
-    transformed_scales = np.max(np.abs(transformed_coefficients), axis=-1)
+    shift = np.matmul(coefficients, offsets)
+    transformed_scales = np.maximum(
+        np.max(np.abs(transformed_coefficients), axis=-1),
+        np.maximum(np.abs(lower_bounds - shift), np.abs(upper_bounds - shift)),
+    )
     assert np.allclose(
         context.linear_constraints.coefficients,
         transformed_coefficients / transformed_scales[:, np.newaxis],
     )
-    offsets = np.matmul(coefficients, offsets)
     assert np.allclose(
         context.linear_constraints.lower_bounds,
-        (lower_bounds - offsets) / transformed_scales,
+        (lower_bounds - shift) / transformed_scales,
     )
     assert np.allclose(
         context.linear_constraints.upper_bounds,
-        (upper_bounds - offsets) / transformed_scales,
+        (upper_bounds - shift) / transformed_scales,
     )
 
     result = optimize(config, initial_values, eval_func())

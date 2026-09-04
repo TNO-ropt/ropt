@@ -21,8 +21,4 @@ registering it via a Python entry point under `ropt.plugins.<area>`. See
     options:
         members: []
 ::: ropt.plugins.sampler.SamplerPlugin
-::: ropt.plugins.transforms
-    options:
-        members: []
-::: ropt.plugins.transforms.VariableTransformPlugin
 

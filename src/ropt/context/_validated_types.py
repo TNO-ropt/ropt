@@ -11,13 +11,11 @@ from ropt.config import (
     FunctionEstimatorConfig,
     RealizationFilterConfig,
     SamplerConfig,
-    VariableTransformConfig,
 )
 from ropt.function_estimator import FunctionEstimator
 from ropt.plugins.manager import PluginType, get_plugin
 from ropt.realization_filter import RealizationFilter
 from ropt.sampler import Sampler
-from ropt.transforms import VariableTransform
 
 
 class _PluginConfig(Protocol):
@@ -125,13 +123,3 @@ FunctionEstimatorInstances = Annotated[
     dict[str, FunctionEstimatorInstance], BeforeValidator(_convert_to_mapping)
 ]
 """Validate a mapping of keys to FunctionEstimators; a sequence is keyed by position."""
-
-VariableTransformInstance = Annotated[
-    VariableTransform,
-    PlainValidator(
-        _make_validator(
-            "variable_transform", VariableTransformConfig, VariableTransform
-        )
-    ),
-]
-"""Validate that the value is an instance of a VariableTransform."""

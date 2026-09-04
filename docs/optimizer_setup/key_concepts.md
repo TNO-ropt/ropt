@@ -31,7 +31,7 @@ The optimizer does not request these points one at a time. It groups them into
 ## Optimization components
 
 Several parts of an optimization are pluggable: you select them in the
-configuration and `ropt` configures them for you. Five kinds of component can be
+configuration and `ropt` configures them for you. Four kinds of component can be
 chosen this way:
 
 - **Optimization backends** provide the optimization algorithms — the *methods*
@@ -42,9 +42,6 @@ chosen this way:
   robust objective, for example a mean, or a mean plus a standard-deviation term.
 - **Realization filters** select or reweight a subset of the realizations, for
   example to focus on the worst-performing ones.
-- **Transforms** convert values between the units you work in and the scaled
-  values the optimizer sees — for example rescaling variables, objectives, or
-  constraints to comparable magnitudes.
 
 A component is always an **object**. You can provide it in one of two ways:
 
@@ -59,14 +56,13 @@ A component is always an **object**. You can provide it in one of two ways:
 Plugins themselves are either built-in (shipped with `ropt`) or added by
 installing extra packages.
 
-Each of the five kinds has its own place in the configuration. The
+Each of the four kinds has its own place in the configuration. The
 exact syntax, the `method` naming convention (see
 [method strings](configuration.md#method-strings)), and the available options are
 described in [Configuration](configuration.md); the dedicated pages
 [Realization Filters](realization_filters.md),
 [Function Estimators](function_estimators.md),
-[samplers](gradients.md), and [Transforms](variable_transforms.md) cover each component in
-depth.
+and [samplers](gradients.md) cover each component in depth.
 
 The glossary below defines these terms precisely.
 
@@ -145,11 +141,13 @@ optimization as implemented by `ropt`.
     example to focus on the worst-performing ones. See
     [Realization Filters](realization_filters.md).
 
-**Transform**
-:   A component that converts variables between the units you work in and the
-    values the optimizer sees, such as rescaling or shifting them. Objectives
-    and nonlinear constraints are not transformed by a plugin; they are divided
-    by their `scales`. See [Transforms](variable_transforms.md).
+**Optimizer domain**
+:   The units the optimizer works in, as opposed to the ones you configure the
+    problem in. Variables reach it through the affine map given by their
+    [`scales` and `offsets`](configuration.md#variable-scales); objectives and
+    nonlinear constraints are divided by their
+    [`scales`](configuration.md#objective-scales). Results are reported in your
+    own units unless stated otherwise.
 
 ## Where to next
 
@@ -157,5 +155,4 @@ optimization as implemented by `ropt`.
 - How gradients are estimated: [Stochastic Gradients](gradients.md).
 - Selecting or reweighting realizations: [Realization Filters](realization_filters.md).
 - Combining realizations into a single value: [Function Estimators](function_estimators.md).
-- Rescaling values between domains: [Transforms](variable_transforms.md).
 - Reading the optimization output: [Working with Results](results.md).
