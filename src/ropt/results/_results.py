@@ -131,15 +131,16 @@ class Results(ABC):
         return _to_polars_frame(self, field_name, select, unstack, sep)[0]
 
     @abstractmethod
-    def transform_from_optimizer(self, context: EnOptContext) -> Results:
-        """Transform results from the optimizer domain to the user domain.
+    def unscale(self, context: EnOptContext) -> Results:
+        """Unscale the results.
 
-        Reverses variable, objective, and constraint transforms applied during
-        optimization, restoring values to the user-defined domain.
+        Restores the quantities as configured: values are multiplied by their
+        scales and offsets are added back, and objectives and gradients are
+        negated again where `maximize` is set.
 
         Args:
             context: The context used by the source of the results.
 
         Returns:
-            A new `Results` object in the user domain.
+            A new, unscaled `Results` object.
         """

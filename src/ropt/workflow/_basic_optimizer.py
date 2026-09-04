@@ -158,9 +158,7 @@ class BasicOptimizer:
         """
 
         def _results_callback(event: EnOptEvent) -> None:
-            results = tuple(
-                item.transform_from_optimizer(event.context) for item in event.results
-            )
+            results = tuple(item.unscale(event.context) for item in event.results)
             callback(results)
 
         self._observers.append((EnOptEventType.FINISHED_EVALUATION, _results_callback))

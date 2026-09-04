@@ -1,4 +1,4 @@
-"""Arithmetic for mapping values between the user and optimizer domains.
+"""Arithmetic for scaling and unscaling values.
 
 Values are divided by their scale on the way to the optimizer and multiplied by
 it on the way back. Scales are positive, so the map preserves order and sign;
@@ -6,7 +6,7 @@ whether an objective is minimized or maximized is a separate setting, applied to
 aggregated objectives only.
 
 Variables also carry an offset, so the map is affine rather than a pure
-change of units. That is why two kinds of quantity map back separately:
+change of units. That is why two kinds of quantity unscale separately:
 
 - A *value* is a quantity in its own right, such as a variable or an
   objective. The offset applies to it.
@@ -26,56 +26,56 @@ if TYPE_CHECKING:
     from numpy.typing import NDArray
 
 
-def to_optimizer(
+def scale(
     values: NDArray[np.float64],
     scales: NDArray[np.float64],
     offsets: NDArray[np.float64] | None = None,
 ) -> NDArray[np.float64]:
-    """Map values from the user domain to the optimizer domain.
+    """Scale values.
 
     Args:
-        values:  The values in the user domain.
+        values:  The unscaled values.
         scales:  The scales to apply.
         offsets: The offsets to subtract, if any.
 
     Returns:
-        The values in the optimizer domain.
+        The scaled values.
     """
     if offsets is None:
         return values / scales
     return (values - offsets) / scales
 
 
-def value_from_optimizer(
+def unscale_value(
     values: NDArray[np.float64],
     scales: NDArray[np.float64],
     offsets: NDArray[np.float64] | None = None,
 ) -> NDArray[np.float64]:
-    """Map values from the optimizer domain back to the user domain.
+    """Unscale values.
 
     Args:
-        values:  The values in the optimizer domain.
+        values:  The scaled values.
         scales:  The scales to apply.
         offsets: The offsets to add back, if any.
 
     Returns:
-        The values in the user domain.
+        The unscaled values.
     """
     if offsets is None:
         return values * scales
     return values * scales + offsets
 
 
-def diff_from_optimizer(
+def unscale_diff(
     diffs: NDArray[np.float64], scales: NDArray[np.float64]
 ) -> NDArray[np.float64]:
-    """Map differences from the optimizer domain back to the user domain.
+    """Unscale differences.
 
     Args:
-        diffs:  The differences in the optimizer domain.
+        diffs:  The scaled differences.
         scales: The scales to apply.
 
     Returns:
-        The differences in the user domain.
+        The unscaled differences.
     """
     return diffs * scales

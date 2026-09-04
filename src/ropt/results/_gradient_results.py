@@ -31,23 +31,23 @@ class GradientResults(Results):
     realizations: Realizations
     gradients: Gradients | None
 
-    def transform_from_optimizer(self, context: EnOptContext) -> GradientResults:
-        """Transform results from optimizer space to user space.
+    def unscale(self, context: EnOptContext) -> GradientResults:
+        """Unscale the results.
 
-        This applies inverse transformations to transformable sub-fields
-        (`evaluations` and `gradients` when present). Realization metadata is
-        passed through unchanged.
+        Unscales the sub-fields that carry values (`evaluations` and
+        `gradients` when present). Realization metadata is passed through
+        unchanged.
 
         Args:
             context: The context used by the source of the results.
 
         Returns:
-            The transformed results.
+            The unscaled results.
         """
-        evaluations = self.evaluations._transform_from_optimizer(context)  # ruff: ignore[private-member-access]
+        evaluations = self.evaluations._unscale(context)  # ruff: ignore[private-member-access]
         gradients: Gradients | None = self.gradients
         if self.gradients is not None:
-            gradients = self.gradients._transform_from_optimizer(context)  # ruff: ignore[private-member-access]
+            gradients = self.gradients._unscale(context)  # ruff: ignore[private-member-access]
 
         if evaluations is None and gradients is None:
             return self

@@ -186,7 +186,7 @@ The configuration objects an [`EnOptContext`][ropt.context.EnOptContext] holds
 are frozen, so an individual setting cannot be changed in place. The context
 itself is not: replacing one of its fields wholesale is not prevented, but
 nothing re-runs the work construction did — bounds, perturbation magnitudes and
-linear constraints are all converted to the optimizer domain at that point — so
+linear constraints are all scaled at that point — so
 the result is inconsistent. To change settings, build a new context from a
 modified dict.
 
@@ -194,8 +194,8 @@ modified dict.
 
     Treat an `EnOptContext` as read-only after construction. Do not try to
     serialize and round-trip them (for example, to/from JSON). Some parameters
-    are transformed during construction in a way that cannot be undone, so
-    building an `EnOptContext` from those serialized values would transform
+    are scaled during construction in a way that cannot be undone, so
+    building an `EnOptContext` from those serialized values would scale
     them again, incorrectly. NumPy arrays and plugin instances may also not
     come back unchanged from a round-trip. Persist the raw input dicts instead
     if you intend to
@@ -329,12 +329,12 @@ range and are already dimensionless, so they are left alone. Linear constraints
 follow the variables too, as described [below](#linear-constraint-scales).
 
 The scales and offsets apply to every variable, including the ones fixed by
-`mask`. This keeps the optimizer domain uniform, and a fixed variable maps back
+`mask`. This keeps the scaling uniform, and a fixed variable maps back
 to exactly the value you gave it.
 
 What you see in the results follows from that:
 
-- Variables and perturbed variables are reported in your own domain.
+- Variables and perturbed variables are reported unscaled.
 - Distances to the variable bounds, in
   [`ConstraintInfo`][ropt.results.ConstraintInfo], are multiplied by the scale.
   An offset is a shift shared by a value and its bound, so it cancels out of the
@@ -507,7 +507,7 @@ Unlike `auto_scale` for nonlinear constraints, this is a single boolean rather
 than one per equation: the rows form one matrix equation and are scaled together
 or not at all.
 
-Distances to the constraint bounds are reported in your own domain, with both
+Distances to the constraint bounds are reported unscaled, with both
 steps undone.
 
 ### `nonlinear_constraints` — [`NonlinearConstraintsConfig`][ropt.config.NonlinearConstraintsConfig] { #nonlinear_constraints }

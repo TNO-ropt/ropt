@@ -242,10 +242,10 @@ def test_objective_with_scales(
                 assert item.functions is not None
                 assert item.functions.objectives is not None
                 assert np.allclose(item.functions.objectives[-1], 1.0)
-                transformed = item.transform_from_optimizer(event.context)
-                assert transformed.functions is not None
-                assert transformed.functions.objectives is not None
-                assert np.allclose(transformed.functions.objectives[-1], init1)
+                unscaled = item.unscale(event.context)
+                assert unscaled.functions is not None
+                assert unscaled.functions.objectives is not None
+                assert np.allclose(unscaled.functions.objectives[-1], init1)
 
     result2 = optimize(
         config,
@@ -307,10 +307,10 @@ def test_objective_with_auto_scale(
                 assert item.functions.objectives is not None
                 assert np.allclose(item.functions.objectives, initial / scale)
                 assert np.allclose(item.functions.target_objective, 1.0)
-                transformed = item.transform_from_optimizer(event.context)
-                assert transformed.functions is not None
-                assert transformed.functions.objectives is not None
-                assert np.allclose(transformed.functions.objectives, initial)
+                unscaled = item.unscale(event.context)
+                assert unscaled.functions is not None
+                assert unscaled.functions.objectives is not None
+                assert np.allclose(unscaled.functions.objectives, initial)
 
     result2 = optimize(
         config,
@@ -378,10 +378,10 @@ def test_nonlinear_constraint_with_scales(
                 assert item.functions is not None
                 assert item.functions.constraints is not None
                 assert np.allclose(item.functions.constraints, 1.0)
-                transformed = item.transform_from_optimizer(event.context)
-                assert transformed.functions is not None
-                assert transformed.functions.constraints is not None
-                assert np.allclose(transformed.functions.constraints, scales)
+                unscaled = item.unscale(event.context)
+                assert unscaled.functions is not None
+                assert unscaled.functions.constraints is not None
+                assert np.allclose(unscaled.functions.constraints, scales)
 
     result2 = optimize(
         config,
@@ -457,10 +457,10 @@ def test_nonlinear_constraint_with_auto_scale(
                 assert item.functions is not None
                 assert item.functions.constraints is not None
                 assert np.allclose(item.functions.constraints, 1.0)
-                transformed = item.transform_from_optimizer(event.context)
-                assert transformed.functions is not None
-                assert transformed.functions.constraints is not None
-                assert np.allclose(transformed.functions.constraints, scales)
+                unscaled = item.unscale(event.context)
+                assert unscaled.functions is not None
+                assert unscaled.functions.constraints is not None
+                assert np.allclose(unscaled.functions.constraints, scales)
 
     result2 = optimize(
         config,
@@ -515,7 +515,7 @@ def test_variables_are_scaled_and_offset(
         upper_bounds /= scales
     assert np.allclose(context.variables.lower_bounds, lower_bounds)
     assert np.allclose(context.variables.upper_bounds, upper_bounds)
-    # The optimum is reported in the user domain, so it is where it always was.
+    # The optimum is reported unscaled, so it is where it always was.
     assert np.allclose(opt_result.variables, [0.0, 0.0, 0.5], atol=0.05)
 
 

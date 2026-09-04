@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 
 from ropt._logging import get_logger
-from ropt._scaling import to_optimizer
+from ropt._scaling import scale
 from ropt.core import EnsembleEvaluator
 from ropt.enums import EnOptEventType
 from ropt.events import EnOptEvent
@@ -100,7 +100,7 @@ class EvaluationStep(ComputeStep[None]):
             )
         )
 
-        variables = to_optimizer(
+        variables = scale(
             variables, context.variables.scales, context.variables.offsets
         )
 

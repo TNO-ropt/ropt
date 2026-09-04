@@ -27,7 +27,7 @@ ReportCallback = Callable[[EvaluateResult], bool | None]
 def make_report_handler(report: ReportCallback) -> EventHandler:
     """Build a handler that reports each new function evaluation.
 
-    The results are transformed to the user domain and adapted to an
+    The results are unscaled and adapted to an
     `EvaluateResult` before the callback is invoked; gradient results are
     skipped. If the callback returns `True`, the emitting run is asked to stop
     gracefully (exit code `USER_ABORT`); any other return value continues it.
@@ -42,10 +42,10 @@ def make_report_handler(report: ReportCallback) -> EventHandler:
 
     def _callback(event: EnOptEvent) -> None:
         for item in event.results or ():
-            transformed = item.transform_from_optimizer(event.context)
+            unscaled = item.unscale(event.context)
             if (
-                isinstance(transformed, FunctionResults)
-                and report(_build_evaluate_result(transformed))
+                isinstance(unscaled, FunctionResults)
+                and report(_build_evaluate_result(unscaled))
                 and event.source is not None
             ):
                 # A truthy return asks the emitting run to stop; the break is

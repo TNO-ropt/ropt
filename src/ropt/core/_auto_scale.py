@@ -27,7 +27,7 @@ def set_auto_scales(
     Args:
         context:           The context of the run.
         evaluator_context: The context the batch was evaluated with.
-        evaluator_result:  The results of the batch, in the user domain.
+        evaluator_result:  The results of the batch, unscaled.
     """
     if not context._needs_auto_scales():  # ruff: ignore[private-member-access]
         return

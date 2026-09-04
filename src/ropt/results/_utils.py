@@ -1,14 +1,6 @@
-from typing import Any, Literal, overload
+from typing import Any, overload
 
 from numpy.typing import NDArray
-
-DomainType = Literal["optimizer", "user"]
-"""Selects the domain that result values are expressed in.
-
-Values are `"optimizer"` for the domain the optimizer works in, and `"user"` for
-the domain the configuration is written in. The two coincide unless transforms
-are configured.
-"""
 
 
 @overload

@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 
-from ropt._scaling import diff_from_optimizer
+from ropt._scaling import unscale_diff
 from ropt._utils import apply_direction
 from ropt.enums import AxisName
 
@@ -116,14 +116,14 @@ class Gradients(ResultField):
             constraints=constraints,
         )
 
-    def _transform_from_optimizer(self, context: EnOptContext) -> Gradients | None:
+    def _unscale(self, context: EnOptContext) -> Gradients | None:
         # A gradient carries a function in its numerator and a variable in its
         # denominator, so both axes must be undone: the function axis comes
         # first here and takes a trailing axis to broadcast against the
         # variables, while the variable scales divide along the last axis.
         variable_scales = context.variables.scales
         objectives = (
-            diff_from_optimizer(
+            unscale_diff(
                 apply_direction(
                     self.objectives, context.objectives.maximize[:, np.newaxis]
                 ),
@@ -136,7 +136,7 @@ class Gradients(ResultField):
             constraint_scales = context.get_constraint_scales()
             assert constraint_scales is not None
             constraints = (
-                diff_from_optimizer(constraints, constraint_scales[:, np.newaxis])
+                unscale_diff(constraints, constraint_scales[:, np.newaxis])
                 / variable_scales
             )
 

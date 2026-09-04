@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any
 
-from ropt._scaling import value_from_optimizer
+from ropt._scaling import unscale_value
 from ropt.enums import AxisName
 
 from ._result_field import ResultField
@@ -192,24 +192,22 @@ class GradientEvaluations(ResultField):
             metadata={} if metadata is None else metadata,
         )
 
-    def _transform_from_optimizer(
-        self, context: EnOptContext
-    ) -> GradientEvaluations | None:
-        variables = value_from_optimizer(
+    def _unscale(self, context: EnOptContext) -> GradientEvaluations | None:
+        variables = unscale_value(
             self.variables, context.variables.scales, context.variables.offsets
         )
         perturbed_variables = self.perturbed_variables
-        perturbed_variables = value_from_optimizer(
+        perturbed_variables = unscale_value(
             perturbed_variables, context.variables.scales, context.variables.offsets
         )
-        perturbed_objectives = value_from_optimizer(
+        perturbed_objectives = unscale_value(
             self.perturbed_objectives, context.get_objective_scales()
         )
         perturbed_constraints = self.perturbed_constraints
         if perturbed_constraints is not None:
             constraint_scales = context.get_constraint_scales()
             assert constraint_scales is not None
-            perturbed_constraints = value_from_optimizer(
+            perturbed_constraints = unscale_value(
                 perturbed_constraints, constraint_scales
             )
 

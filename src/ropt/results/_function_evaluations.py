@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any
 
-from ropt._scaling import value_from_optimizer
+from ropt._scaling import unscale_value
 from ropt.enums import AxisName
 
 from ._result_field import ResultField
@@ -150,18 +150,16 @@ class FunctionEvaluations(ResultField):
             metadata={} if metadata is None else metadata,
         )
 
-    def _transform_from_optimizer(self, context: EnOptContext) -> FunctionEvaluations:
-        variables = value_from_optimizer(
+    def _unscale(self, context: EnOptContext) -> FunctionEvaluations:
+        variables = unscale_value(
             self.variables, context.variables.scales, context.variables.offsets
         )
-        objectives = value_from_optimizer(
-            self.objectives, context.get_objective_scales()
-        )
+        objectives = unscale_value(self.objectives, context.get_objective_scales())
         constraints = self.constraints
         if constraints is not None:
             constraint_scales = context.get_constraint_scales()
             assert constraint_scales is not None
-            constraints = value_from_optimizer(constraints, constraint_scales)
+            constraints = unscale_value(constraints, constraint_scales)
 
         return FunctionEvaluations(
             variables=variables,

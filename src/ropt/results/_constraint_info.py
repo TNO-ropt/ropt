@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 
-from ropt._scaling import diff_from_optimizer
+from ropt._scaling import unscale_diff
 from ropt.enums import AxisName
 
 from ._result_field import ResultField
@@ -204,22 +204,22 @@ class ConstraintInfo(ResultField):
 
         return None
 
-    def _transform_from_optimizer(self, context: EnOptContext) -> ConstraintInfo | None:
+    def _unscale(self, context: EnOptContext) -> ConstraintInfo | None:
         bound_lower: NDArray[np.float64] | None = self.bound_lower
         bound_upper: NDArray[np.float64] | None = self.bound_upper
         if bound_lower is not None:
             assert bound_upper is not None
             variable_scales = context.variables.scales
-            bound_lower = diff_from_optimizer(bound_lower, variable_scales)
-            bound_upper = diff_from_optimizer(bound_upper, variable_scales)
+            bound_lower = unscale_diff(bound_lower, variable_scales)
+            bound_upper = unscale_diff(bound_upper, variable_scales)
         linear_lower: NDArray[np.float64] | None = self.linear_lower
         linear_upper: NDArray[np.float64] | None = self.linear_upper
         if linear_lower is not None:
             assert linear_upper is not None
             assert context.linear_constraints is not None
             equation_scales = context.linear_constraints.scales
-            linear_lower = diff_from_optimizer(linear_lower, equation_scales)
-            linear_upper = diff_from_optimizer(linear_upper, equation_scales)
+            linear_lower = unscale_diff(linear_lower, equation_scales)
+            linear_upper = unscale_diff(linear_upper, equation_scales)
 
         nonlinear_lower: NDArray[np.float64] | None = self.nonlinear_lower
         nonlinear_upper: NDArray[np.float64] | None = self.nonlinear_upper
@@ -227,8 +227,8 @@ class ConstraintInfo(ResultField):
             assert nonlinear_upper is not None
             scales = context.get_constraint_scales()
             assert scales is not None
-            nonlinear_lower = diff_from_optimizer(nonlinear_lower, scales)
-            nonlinear_upper = diff_from_optimizer(nonlinear_upper, scales)
+            nonlinear_lower = unscale_diff(nonlinear_lower, scales)
+            nonlinear_upper = unscale_diff(nonlinear_upper, scales)
 
         return ConstraintInfo(
             bound_lower=bound_lower,

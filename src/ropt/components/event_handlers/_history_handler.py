@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from collections.abc import Generator
 
     from ropt.events import EnOptEvent
-    from ropt.results import DomainType, Results
+    from ropt.results import Results
 
 
 class HistoryHandler(EventHandler):
@@ -24,18 +24,21 @@ class HistoryHandler(EventHandler):
     property or `handler["results"]`.
 
     See [Result Handlers](../running/handlers.md#historyhandler) for full
-    details on domain handling and accumulation behavior.
+    details on scaling and accumulation behavior.
     """
 
-    def __init__(self, *, domain: DomainType = "user") -> None:
+    def __init__(self, *, scaled: bool = False) -> None:
         """Initialize the HistoryHandler.
 
         Args:
-            domain: Domain in which to store results ('user' or 'optimizer').
+            scaled: If `True`, store the values as the optimizer works with
+                them: scaled and offset, with objectives and gradients negated
+                where `maximize` is set. By default the values are unscaled
+                first, restoring the quantities as configured.
         """
         super().__init__()
         self["results"] = None
-        self._domain = domain
+        self._scaled = scaled
 
     @property
     def results(self) -> tuple[Results, ...]:
@@ -46,8 +49,8 @@ class HistoryHandler(EventHandler):
     def _handle_event(self, event: EnOptEvent) -> None:
         """Handle incoming events.
 
-        Processes `FINISHED_EVALUATION` events, optionally transforms results
-        to the user domain, and appends them to `self["results"]`.
+        Processes `FINISHED_EVALUATION` events, unscales the results unless
+        scaled values were requested, and appends them to `self["results"]`.
 
         Args:
             event: The event object.
@@ -55,10 +58,8 @@ class HistoryHandler(EventHandler):
         results: tuple[Results, ...] | Generator[Results, None, None]
         results = event.results
         if results:
-            if self._domain == "user":
-                results = (
-                    item.transform_from_optimizer(event.context) for item in results
-                )
+            if not self._scaled:
+                results = (item.unscale(event.context) for item in results)
             self["results"] = tuple(
                 results if self["results"] is None else (*self["results"], *results)
             )

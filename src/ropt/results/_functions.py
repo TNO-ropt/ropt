@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
 
-from ropt._scaling import value_from_optimizer
+from ropt._scaling import unscale_value
 from ropt._utils import apply_direction
 from ropt.enums import AxisName
 
@@ -28,7 +28,7 @@ class Functions(ResultField):
     === "Weighted Objective"
 
         `target_objective`: The overall objective calculated as a weighted sum
-        over the, possibly transformed, objectives. This is a single floating
+        over the, possibly scaled, objectives. This is a single floating
         point value. It is defined as a `numpy` array of dimensions 0, hence it
         has no axes:
 
@@ -104,11 +104,11 @@ class Functions(ResultField):
             constraints=constraints,
         )
 
-    def _transform_from_optimizer(self, context: EnOptContext) -> Functions | None:
+    def _unscale(self, context: EnOptContext) -> Functions | None:
         # Undo the flip that made a maximized objective something to minimize,
         # so that the reported aggregate agrees in sign with the values it
         # summarizes.
-        objectives = value_from_optimizer(
+        objectives = unscale_value(
             apply_direction(self.objectives, context.objectives.maximize),
             context.get_objective_scales(),
         )
@@ -116,7 +116,7 @@ class Functions(ResultField):
         if constraints is not None:
             constraint_scales = context.get_constraint_scales()
             assert constraint_scales is not None
-            constraints = value_from_optimizer(constraints, constraint_scales)
+            constraints = unscale_value(constraints, constraint_scales)
 
         return Functions(
             target_objective=self.target_objective,
