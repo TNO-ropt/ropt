@@ -68,8 +68,9 @@ class RealizationFilter(ABC):
         Both arguments are two-dimensional arrays with one row per realization
         and one column per objective or per nonlinear constraint, in the order
         in which they are configured: `objectives[i, j]` is the value of
-        objective `j` for realization `i`. The values are in the optimizer
-        domain, i.e. after any objective or nonlinear constraint transforms.
+        objective `j` for realization `i`. The values are scaled, but not
+        negated for maximization: direction applies to aggregates, and these
+        are per-realization.
 
         A realization that failed to evaluate carries `nan` values. The filter
         should check for these and handle them, for instance by assigning such

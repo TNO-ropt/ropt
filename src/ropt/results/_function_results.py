@@ -35,26 +35,26 @@ class FunctionResults(Results):
     functions: Functions | None
     constraint_info: ConstraintInfo | None = None
 
-    def transform_from_optimizer(self, context: EnOptContext) -> FunctionResults:
-        """Transform results from optimizer space to user space.
+    def unscale(self, context: EnOptContext) -> FunctionResults:
+        """Unscale the results.
 
-        This applies inverse transformations to all transformable sub-fields
-        (`evaluations`, `functions`, and `constraint_info` when present).
-        Realization metadata is passed through unchanged.
+        Unscales the sub-fields that carry values (`evaluations`, `functions`,
+        and `constraint_info` when present). Realization metadata is passed
+        through unchanged.
 
         Args:
             context: The context used by the source of the results.
 
         Returns:
-            The transformed results.
+            The unscaled results.
         """
-        evaluations = self.evaluations._transform_from_optimizer(context)  # ruff: ignore[private-member-access]
+        evaluations = self.evaluations._unscale(context)  # ruff: ignore[private-member-access]
         functions: Functions | None = None
         if self.functions is not None:
-            functions = self.functions._transform_from_optimizer(context)  # ruff: ignore[private-member-access]
+            functions = self.functions._unscale(context)  # ruff: ignore[private-member-access]
         constraint_info: ConstraintInfo | None = None
         if self.constraint_info is not None:
-            constraint_info = self.constraint_info._transform_from_optimizer(  # ruff: ignore[private-member-access]
+            constraint_info = self.constraint_info._unscale(  # ruff: ignore[private-member-access]
                 context
             )
 

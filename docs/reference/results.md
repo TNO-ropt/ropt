@@ -37,5 +37,4 @@ patterns.
         members: [create]
 ::: ropt.results.results_to_pandas
 ::: ropt.results.results_to_polars
-::: ropt.results.DomainType
 

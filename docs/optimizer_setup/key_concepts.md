@@ -141,13 +141,13 @@ optimization as implemented by `ropt`.
     example to focus on the worst-performing ones. See
     [Realization Filters](realization_filters.md).
 
-**Optimizer domain**
+**Scaling**
 :   The units the optimizer works in, as opposed to the ones you configure the
-    problem in. Variables reach it through the affine map given by their
+    problem in. Variables are scaled by the affine map given by their
     [`scales` and `offsets`](configuration.md#variable-scales); objectives and
     nonlinear constraints are divided by their
-    [`scales`](configuration.md#objective-scales). Results are reported in your
-    own units unless stated otherwise.
+    [`scales`](configuration.md#objective-scales). Results are unscaled before
+    being reported, unless stated otherwise.
 
 ## Where to next
 

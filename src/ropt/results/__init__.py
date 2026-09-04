@@ -1,7 +1,7 @@
 """Data classes for storing intermediate optimization results.
 
 See [Working with Results](../optimizer_setup/results.md) for a narrative overview of
-the result hierarchy, axis metadata, domain transforms, and pandas/polars export.
+the result hierarchy, axis metadata, scaling, and pandas/polars export.
 """
 
 from ._constraint_info import ConstraintInfo
@@ -16,11 +16,9 @@ from ._polars_frame import results_to_polars
 from ._realizations import Realizations
 from ._result_field import ResultField
 from ._results import Results
-from ._utils import DomainType
 
 __all__ = [
     "ConstraintInfo",
-    "DomainType",
     "FunctionEvaluations",
     "FunctionResults",
     "Functions",

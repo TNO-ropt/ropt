@@ -104,16 +104,16 @@ completion while its results go nowhere.
 - `filter` (optional) is a callable that receives each
   [`Results`][ropt.results.Results] and returns `True` to keep it or `False` to
   drop it.
-- `domain="user"` (default) or `domain="optimizer"` chooses which of the two
-  the stored result is in; see
-  [Domain transforms on results](../optimizer_setup/results.md#domain-transforms-on-results).
+- `scaled=False` (default) unscales the stored result, restoring the quantities
+  as configured; `scaled=True` stores it as the optimizer works with it. See
+  [Scaling of results](../optimizer_setup/results.md#scaling-of-results).
 
 #### `HistoryHandler`
 
 [`HistoryHandler`][ropt.simple.HistoryHandler] keeps *every* result it receives,
 in order, as a tuple. Read it with `handler.results`, which is an empty tuple
 until the first result arrives, or with `handler["results"]`, the raw stored
-value, which is `None` until then. It takes the same `domain=` keyword as
+value, which is `None` until then. It takes the same `scaled=` keyword as
 `ResultsHandler`.
 
 #### `DataFrameHandler`
@@ -121,11 +121,11 @@ value, which is `None` until then. It takes the same `domain=` keyword as
 [`DataFrameHandler`][ropt.simple.DataFrameHandler] collects results into named
 DataFrames, using either `pandas` (the default) or `polars` as its backend; the
 corresponding package must be installed. Define a table with
-`add_table(name, table_type, columns, domain="user")`, where `table_type` is
+`add_table(name, table_type, columns, scaled=False)`, where `table_type` is
 `"functions"` or `"gradients"`, `columns` maps result-field names (dotted
-attribute syntax) to column titles, and `domain` (`"user"` or `"optimizer"`,
-per table) chooses which domain that table is filled from; see
-[Domain transforms on results](../optimizer_setup/results.md#domain-transforms-on-results):
+attribute syntax) to column titles, and `scaled` (per table) chooses whether
+that table is filled with scaled or unscaled values; see
+[Scaling of results](../optimizer_setup/results.md#scaling-of-results):
 
 ```python
 from ropt.simple import DataFrameHandler
@@ -169,9 +169,9 @@ per-realization fields, which the pandas backend cannot.
 
 Convenience methods:
 
-- `set_default_tables(domain="user")` registers a standard set of tables
+- `set_default_tables(scaled=False)` registers a standard set of tables
   (`functions`, `evaluations`, `constraints` for function results; `gradients`,
-  `perturbations` for gradient results), all filled from the given domain.
+  `perturbations` for gradient results), all filled the same way.
 - `add_column(table, name, title)` adds one column to an existing table.
 - `set_callback(fn)` calls `fn(output_dir)` whenever the tables are updated,
   where `output_dir` is the run's configured

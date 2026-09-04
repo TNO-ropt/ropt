@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING, Any, Self
 import numpy as np
 from pydantic import BaseModel, ConfigDict, PrivateAttr, model_validator
 
-from ropt._scaling import to_optimizer
+from ropt._scaling import scale
 from ropt._utils import immutable_array
 from ropt.config import (
     FunctionEstimatorConfig,
@@ -127,7 +127,7 @@ class EnOptContext(BaseModel):
     def get_nonlinear_constraint_bounds(
         self,
     ) -> tuple[NDArray[np.float64], NDArray[np.float64]] | None:
-        """Return the nonlinear constraint bounds in the optimizer domain.
+        """Return the scaled nonlinear constraint bounds.
 
         The bounds are scaled together with the constraint values, so that the
         configured constraint is the constraint that is solved. Scales are
@@ -141,8 +141,8 @@ class EnOptContext(BaseModel):
         scales = self._constraint_scales
         assert scales is not None
         return (
-            to_optimizer(self.nonlinear_constraints.lower_bounds, scales),
-            to_optimizer(self.nonlinear_constraints.upper_bounds, scales),
+            scale(self.nonlinear_constraints.lower_bounds, scales),
+            scale(self.nonlinear_constraints.upper_bounds, scales),
         )
 
     def _needs_auto_scales(self) -> bool:
@@ -257,7 +257,7 @@ class EnOptContext(BaseModel):
         offsets = self.variables.offsets
 
         # The bounds and the absolute perturbation magnitudes describe the
-        # variables, so they move to the optimizer domain with them. A relative
+        # variables, so they are scaled with them. A relative
         # magnitude is a fraction of the bound range, which the affine map
         # leaves alone.
         absolute = self.variables.perturbation_types == PerturbationType.ABSOLUTE
@@ -269,10 +269,10 @@ class EnOptContext(BaseModel):
         updated_variables = self.variables.model_copy(
             update={
                 "lower_bounds": immutable_array(
-                    to_optimizer(self.variables.lower_bounds, scales, offsets)
+                    scale(self.variables.lower_bounds, scales, offsets)
                 ),
                 "upper_bounds": immutable_array(
-                    to_optimizer(self.variables.upper_bounds, scales, offsets)
+                    scale(self.variables.upper_bounds, scales, offsets)
                 ),
                 "perturbation_magnitudes": immutable_array(magnitudes),
             }

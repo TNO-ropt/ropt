@@ -6,7 +6,6 @@ from typing import TYPE_CHECKING, Any, Final, Literal, cast
 from ropt.enums import EnOptEventType
 from ropt.exceptions import UnsupportedError
 from ropt.results import (
-    DomainType,
     Results,
     results_to_pandas,
     results_to_polars,
@@ -146,7 +145,7 @@ class DataFrameHandler(EventHandler):
         """
         return self._engine
 
-    def set_default_tables(self, *, domain: DomainType = "user") -> None:
+    def set_default_tables(self, *, scaled: bool = False) -> None:
         """Register a standard set of result tables.
 
         Adds the default `functions`, `evaluations`, and `constraints` tables
@@ -154,14 +153,16 @@ class DataFrameHandler(EventHandler):
         tables for gradient results.
 
         Args:
-            domain: Domain (`"user"` or `"optimizer"`) the tables are filled
-                from. The `"user"` domain reports values as seen by the user;
-                `"optimizer"` reports them in the optimizer's transformed space.
+            scaled: If `True`, fill the tables with the values as the optimizer
+                works with them: scaled and offset, with objectives and
+                gradients negated where `maximize` is set. By default the
+                values are unscaled first, restoring the quantities as
+                configured.
         """
         for name, columns in _FUNCTION_TABLES.items():
-            self.add_table(name, "functions", columns, domain=domain)
+            self.add_table(name, "functions", columns, scaled=scaled)
         for name, columns in _GRADIENT_TABLES.items():
-            self.add_table(name, "gradients", columns, domain=domain)
+            self.add_table(name, "gradients", columns, scaled=scaled)
 
     def set_callback(self, callback: Callable[[Path | None], None]) -> None:
         """Set a function to call whenever the tables are updated.
@@ -187,7 +188,8 @@ class DataFrameHandler(EventHandler):
         name: str,
         table_type: Literal["functions", "gradients"],
         columns: dict[str, str],
-        domain: DomainType = "user",
+        *,
+        scaled: bool = False,
     ) -> None:
         """Register a new table to be populated from incoming results.
 
@@ -197,13 +199,15 @@ class DataFrameHandler(EventHandler):
                         (`"functions"`) or gradient results (`"gradients"`).
             columns:    Mapping from result-field attribute names (using dotted
                         attribute syntax) to display titles.
-            domain:     Domain (`"user"` or `"optimizer"`) the table is filled
-                        from.
+            scaled:     If `True`, fill this table with the values as the
+                        optimizer works with them: scaled and offset, with
+                        objectives and gradients negated where `maximize` is
+                        set. By default the values are unscaled first.
         """
         self._tables[name] = _ResultsTable(
             columns,
             table_type=table_type,
-            domain=domain,
+            scaled=scaled,
             engine=self._engine,
             sep=self._sep,
         )
@@ -229,15 +233,15 @@ class DataFrameHandler(EventHandler):
         """
         results = event.results
         if results:
-            transformed_results = (
-                tuple(item.transform_from_optimizer(event.context) for item in results)
-                if any(table.domain == "user" for table in self._tables.values())
+            unscaled_results = (
+                tuple(item.unscale(event.context) for item in results)
+                if any(not table.scaled for table in self._tables.values())
                 else ()
             )
             done = [
-                table.add_results(transformed_results)
-                if table.domain == "user"
-                else table.add_results(results)
+                table.add_results(results)
+                if table.scaled
+                else table.add_results(unscaled_results)
                 for table in self._tables.values()
             ]
             if any(done) and self._callback is not None:
@@ -295,21 +299,21 @@ class _ResultsTable:
         columns: dict[str, str],
         table_type: Literal["functions", "gradients"],
         *,
-        domain: DomainType = "user",
+        scaled: bool = False,
         engine: DataFrameEngine = "polars",
         sep: str = ",",
     ) -> None:
         self._columns = columns
         self._results_type = table_type
-        self._domain = domain
+        self._scaled = scaled
         self._engine = engine
         self._sep = sep
         self._frames: list[pd.DataFrame | pl.DataFrame] = []
         self._lock = threading.Lock()
 
     @property
-    def domain(self) -> DomainType:
-        return self._domain
+    def scaled(self) -> bool:
+        return self._scaled
 
     def add_column(self, name: str, title: str) -> None:
         with self._lock:

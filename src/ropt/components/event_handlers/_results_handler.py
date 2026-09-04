@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable
 
     from ropt.events import EnOptEvent
-    from ropt.results import DomainType, Results
+    from ropt.results import Results
 
 _logger = get_logger(__name__)
 
@@ -31,7 +31,7 @@ class ResultsHandler(EventHandler):
     `handler["results"]`.
 
     See [Result Handlers](../running/handlers.md#resultshandler) for full
-    details on selection criteria and domain handling.
+    details on selection criteria and scaling.
     """
 
     def __init__(
@@ -39,7 +39,7 @@ class ResultsHandler(EventHandler):
         *,
         what: Literal["best", "last"] = "best",
         constraint_tolerance: float | None = None,
-        domain: DomainType = "user",
+        scaled: bool = False,
         filter: Callable[[Results], bool] | None = None,  # ruff: ignore[builtin-argument-shadowing]
     ) -> None:
         """Initialize the ResultsHandler.
@@ -47,13 +47,17 @@ class ResultsHandler(EventHandler):
         Args:
             what:                 Criterion for selecting results ('best' or 'last').
             constraint_tolerance: Optional threshold for filtering constraint violations.
-            domain:               Domain in which to store the results ('user' or 'optimizer').
+            scaled:               If `True`, store the value as the optimizer works
+                                  with it: scaled and offset, with objectives and
+                                  gradients negated where `maximize` is set. By
+                                  default the value is unscaled first, restoring the
+                                  quantities as configured.
             filter:               Optional callable to filter results based on custom logic.
         """
         super().__init__()
         self._what = what
         self._constraint_tolerance = constraint_tolerance
-        self._domain = domain
+        self._scaled = scaled
         self._filter = filter
         self._best_results: FunctionResults | None = None
         self["results"] = None
@@ -85,17 +89,13 @@ class ResultsHandler(EventHandler):
             assert result.functions is not None
             return result.functions.target_objective.item()
 
-        def _transform(result: FunctionResults) -> FunctionResults:
-            return (
-                result.transform_from_optimizer(event.context)
-                if self._domain == "user"
-                else result
-            )
+        def _maybe_unscale(result: FunctionResults) -> FunctionResults:
+            return result if self._scaled else result.unscale(event.context)
 
         match self._what:
             case "best":
                 # The best so far competes with the new batch, so it is only
-                # replaced by something better, and kept untransformed to stay
+                # replaced by something better, and kept scaled to stay
                 # comparable with what arrives next.
                 if self._best_results is not None:
                     results = (self._best_results, *results)
@@ -103,9 +103,9 @@ class ResultsHandler(EventHandler):
                 if best is not self._best_results:
                     self._best_results = best
                     _logger.info("New best objective: %g", _get_target_objective(best))
-                    self["results"] = _transform(best)
+                    self["results"] = _maybe_unscale(best)
             case "last":
-                self["results"] = _transform(results[-1])
+                self["results"] = _maybe_unscale(results[-1])
             case _ as unreachable:
                 assert_never(unreachable)
 

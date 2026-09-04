@@ -175,25 +175,25 @@ in the "Result descriptions" section of each class in the
     Dimensionality is fixed: even with a single objective, result arrays still
     include an `OBJECTIVE` axis of length one.
 
-## Domain transforms on results
+## Scaling of results
 
-Optimization internally operates in the *optimizer domain*: variables are scaled
-and shifted by their
+Optimization internally works with scaled values: variables are scaled and
+shifted by their
 [`scales` and `offsets`](configuration.md#variable-scales), objectives and
 nonlinear constraints are divided by their
 [scales](configuration.md#objective-scales), and objectives marked
 [`maximize`](configuration.md#objective-direction) are negated once they have
-been combined across realizations. Results attached to events are in this
-optimizer domain.
+been combined across realizations. Results attached to events are scaled this
+way.
 
-The [`transform_from_optimizer`][ropt.results.Results.transform_from_optimizer]
-method undoes all of that, mapping results back to the *user domain*.
+The [`unscale`][ropt.results.Results.unscale] method undoes all of that,
+restoring the quantities as configured.
 
 The `target_objective` field of `Functions` and `Gradients` is an exception: it
-is the quantity the optimizer minimizes and it stays in the
-optimizer domain in both directions. It is a weighted total over objectives that
-may differ in both scale and direction, so there is no single factor to undo; if
-you need it in user terms, combine the objectives yourself using
+is the quantity the optimizer minimizes and stays scaled in both directions. It
+is a weighted total over objectives that may differ in both scale and direction,
+so there is no single factor to undo; if you need it in configured terms,
+combine the objectives yourself using
 [`get_objective_scales`][ropt.context.EnOptContext.get_objective_scales] and the
 directions on `objectives.maximize`.
 
@@ -201,12 +201,12 @@ Because the direction is undone when reporting, a combined objective agrees in
 sign with the per-realization values it summarizes, whether it is an average or
 a spread.
 
-In the [simple API](../running/running.md), results are always transformed to the user
-domain automatically.
+In the [simple API](../running/running.md), results are always unscaled
+automatically.
 
 In [workflows](../workflows/workflows.md), event handlers determine how results are returned,
-for instance by offering a `domain` argument that controls whether results are
-handled in user or optimizer domain. See [Optimization Workflows](../workflows/workflows.md)
+for instance by offering a `scaled` argument that controls whether results are
+unscaled before being stored. See [Optimization Workflows](../workflows/workflows.md)
 for details on how individual event handlers handle this.
 
 ## Metadata

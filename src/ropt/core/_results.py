@@ -6,7 +6,7 @@ from typing import Any
 import numpy as np
 from numpy.typing import NDArray
 
-from ropt._scaling import to_optimizer, value_from_optimizer
+from ropt._scaling import scale, unscale_value
 from ropt.context import EnOptContext
 from ropt.evaluation import EvaluationBatchCallback, EvaluationBatchContext
 
@@ -109,21 +109,19 @@ def _get_function_results(
         active=realizations_to_evaluate[realizations],
         metadata=metadata,
     )
-    variables = value_from_optimizer(
+    variables = unscale_value(
         variables, context.variables.scales, context.variables.offsets
     )
     evaluator_result = evaluator(
         np.repeat(variables, realization_num, axis=0), evaluator_context
     )
     set_auto_scales(context, evaluator_context, evaluator_result)
-    objectives = to_optimizer(
-        evaluator_result.objectives, context.get_objective_scales()
-    )
+    objectives = scale(evaluator_result.objectives, context.get_objective_scales())
     constraints = evaluator_result.constraints
     if constraints is not None:
         constraint_scales = context.get_constraint_scales()
         assert constraint_scales is not None
-        constraints = to_optimizer(constraints, constraint_scales)
+        constraints = scale(constraints, constraint_scales)
     split_objectives = np.vsplit(objectives, variables.shape[0])
     split_constraints = (
         [] if constraints is None else np.vsplit(constraints, variables.shape[0])
@@ -168,19 +166,17 @@ def _get_gradient_results(
     variables: NDArray[np.float64] = perturbed_variables.reshape(
         -1, perturbed_variables.shape[-1]
     )
-    variables = value_from_optimizer(
+    variables = unscale_value(
         variables, context.variables.scales, context.variables.offsets
     )
     evaluator_result = evaluator(variables, evaluator_context)
     set_auto_scales(context, evaluator_context, evaluator_result)
-    objectives = to_optimizer(
-        evaluator_result.objectives, context.get_objective_scales()
-    )
+    objectives = scale(evaluator_result.objectives, context.get_objective_scales())
     constraints = evaluator_result.constraints
     if constraints is not None:
         constraint_scales = context.get_constraint_scales()
         assert constraint_scales is not None
-        constraints = to_optimizer(constraints, constraint_scales)
+        constraints = scale(constraints, constraint_scales)
     return _GradientEvaluatorResults(
         batch_id=evaluator_result.batch_id,
         perturbed_objectives=objectives,
@@ -226,19 +222,17 @@ def _get_function_and_gradient_results(  # ruff:ignore[too-many-arguments, too-m
             perturbed_variables.reshape(-1, perturbed_variables.shape[-1]),
         ),
     )
-    all_variables = value_from_optimizer(
+    all_variables = unscale_value(
         all_variables, context.variables.scales, context.variables.offsets
     )
     evaluator_result = evaluator(all_variables, evaluator_context)
     set_auto_scales(context, evaluator_context, evaluator_result)
-    objectives = to_optimizer(
-        evaluator_result.objectives, context.get_objective_scales()
-    )
+    objectives = scale(evaluator_result.objectives, context.get_objective_scales())
     constraints = evaluator_result.constraints
     if constraints is not None:
         constraint_scales = context.get_constraint_scales()
         assert constraint_scales is not None
-        constraints = to_optimizer(constraints, constraint_scales)
+        constraints = scale(constraints, constraint_scales)
     return (
         _FunctionEvaluatorResults(
             batch_id=evaluator_result.batch_id,
