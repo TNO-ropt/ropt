@@ -434,3 +434,76 @@ def test_table_handler_polars_keeps_keys_for_mixed_granularity() -> None:
     assert list(tables["polars"].columns) == ["Batch", "Run", "Obj,0", "Total"]
     assert list(tables["polars"]["Run"]) == [0, 1]
     assert list(tables["polars"]["Total"]) == [1.5, 1.5]
+
+
+# The `scaled` flag selects, per table, whether values are unscaled before
+# being stored. Variable scales and offsets make the difference visible: the
+# optimizer works with (x - o)/s, so a scaled (1, 1) is (3, 6) unscaled.
+
+_SCALED_CONFIG: dict[str, Any] = {
+    "variables": {"variable_count": 2, "scales": [2.0, 4.0], "offsets": [1.0, 2.0]},
+    "objectives": {"weights": [1.0]},
+    "realizations": {"weights": [1.0]},
+}
+
+
+def _make_scaled_event() -> EnOptEvent:
+    context = EnOptContext.model_validate(_SCALED_CONFIG)
+    return EnOptEvent(
+        event_type=EnOptEventType.FINISHED_EVALUATION,
+        context=context,
+        results=(
+            FunctionResults(
+                batch_id=0,
+                metadata={},
+                names=context.names,
+                evaluations=FunctionEvaluations.create(
+                    variables=np.array([1.0, 1.0]),
+                    objectives=np.array([[1.0]]),
+                ),
+                realizations=Realizations(
+                    evaluated_realizations=np.ones(1, dtype=np.bool_),
+                    objective_weights=np.ones((1, 1)),
+                ),
+                functions=Functions.create(
+                    target_objective=np.array(1.0),
+                    objectives=np.array([1.0]),
+                ),
+            ),
+        ),
+    )
+
+
+@pytest.mark.parametrize("scaled", [False, True])
+def test_table_handler_fills_a_table_scaled_on_request(
+    engine: DataFrameEngine, *, scaled: bool
+) -> None:
+    handler = DataFrameHandler(engine=engine)
+    handler.add_table("t", "functions", {"evaluations.variables": "Var"}, scaled=scaled)
+    handler.handle_event(_make_scaled_event())
+    df = handler["t"]
+    expected = [1.0, 1.0] if scaled else [3.0, 6.0]
+    assert np.allclose([df["Var,0"][0], df["Var,1"][0]], expected)
+
+
+def test_table_handler_unscales_by_default(engine: DataFrameEngine) -> None:
+    handler = DataFrameHandler(engine=engine)
+    handler.add_table("default", "functions", {"evaluations.variables": "Var"})
+    handler.add_table(
+        "explicit", "functions", {"evaluations.variables": "Var"}, scaled=False
+    )
+    handler.handle_event(_make_scaled_event())
+    assert np.isclose(handler["default"]["Var,0"][0], handler["explicit"]["Var,0"][0])
+
+
+def test_table_handler_tables_may_differ_in_scaling(engine: DataFrameEngine) -> None:
+    handler = DataFrameHandler(engine=engine)
+    for name, scaled in (("plain", False), ("scaled", True)):
+        handler.add_table(
+            name, "functions", {"evaluations.variables": "Var"}, scaled=scaled
+        )
+    handler.handle_event(_make_scaled_event())
+    # Both tables are filled from the same results, and unscaling happens once
+    # for the whole batch, so it must not leak from one table into the other.
+    assert np.isclose(handler["plain"]["Var,0"][0], 3.0)
+    assert np.isclose(handler["scaled"]["Var,0"][0], 1.0)

@@ -25,7 +25,6 @@ from ropt.results import (
     Realizations,
 )
 from ropt.simple import (
-    DataFrameHandler,
     EvaluationFunctionContext,
     HistoryHandler,
     ResultsHandler,
@@ -616,31 +615,3 @@ def test_the_results_handler_stores_scaled_values_on_request(*, scaled: bool) ->
         variables if not scaled else unscaled,
         reference.result.evaluations.variables,
     )
-
-
-@pytest.mark.parametrize("scaled", [False, True])
-def test_a_dataframe_table_is_filled_scaled_on_request(*, scaled: bool) -> None:
-    tables = DataFrameHandler(engine="pandas")
-    tables.add_table(
-        "vars",
-        "functions",
-        {"evaluations.variables": "Variable"},
-        scaled=scaled,
-    )
-    optimize(_SCALED_CONFIG, _initial(), _objective, handlers=[tables])
-    first = tables["vars"].to_numpy()[0]
-    expected = [1.0, 1.0] if scaled else [3.0, 6.0]
-    assert np.allclose(first, expected)
-
-
-def test_tables_in_one_handler_may_differ_in_scaling() -> None:
-    tables = DataFrameHandler(engine="pandas")
-    for name, scaled in (("plain", False), ("scaled", True)):
-        tables.add_table(
-            name, "functions", {"evaluations.variables": "Variable"}, scaled=scaled
-        )
-    optimize(_SCALED_CONFIG, _initial(), _objective, handlers=[tables])
-    # Both tables are filled from the same results, so a shared unscaling pass
-    # must not leak from one table into the other.
-    assert np.allclose(tables["plain"].to_numpy()[0], [3.0, 6.0])
-    assert np.allclose(tables["scaled"].to_numpy()[0], [1.0, 1.0])
