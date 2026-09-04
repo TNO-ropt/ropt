@@ -23,7 +23,7 @@
     
     
       
-        <title>Transforms - ropt Documentation</title>
+        <title>Variable Transforms - ropt Documentation</title>
       
     
     
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#transforms" class="md-skip">
+        <a href="#variable-transforms" class="md-skip">
           Skip to content
         </a>
       
@@ -118,7 +118,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Transforms
+              Variable Transforms
             
           </span>
         </div>
@@ -933,7 +933,7 @@
   <span class="md-ellipsis">
     
   
-    Transforms
+    Variable Transforms
   
 
     
@@ -951,7 +951,7 @@
   <span class="md-ellipsis">
     
   
-    Transforms
+    Variable Transforms
   
 
     
@@ -1016,60 +1016,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#default-transforms" class="md-nav__link">
+  <a href="#the-default-transform" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Default transforms
+        The default transform
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="Default transforms">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#defaultvariabletransform" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        DefaultVariableTransform
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#defaultobjectivetransform" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        DefaultObjectiveTransform
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#defaultnonlinearconstrainttransform" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        DefaultNonlinearConstraintTransform
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#effects-on-bounds-and-constraints" class="md-nav__link">
+  <a href="#effects-on-bounds-and-linear-constraints" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Effects on bounds and constraints
+        Effects on bounds and linear constraints
       
     </span>
   </a>
@@ -3072,60 +3033,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#default-transforms" class="md-nav__link">
+  <a href="#the-default-transform" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Default transforms
+        The default transform
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="Default transforms">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#defaultvariabletransform" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        DefaultVariableTransform
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#defaultobjectivetransform" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        DefaultObjectiveTransform
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#defaultnonlinearconstrainttransform" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        DefaultNonlinearConstraintTransform
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#effects-on-bounds-and-constraints" class="md-nav__link">
+  <a href="#effects-on-bounds-and-linear-constraints" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Effects on bounds and constraints
+        Effects on bounds and linear constraints
       
     </span>
   </a>
@@ -3185,53 +3107,23 @@
   
 
 
-<h1 id="transforms">Transforms</h1>
-<p>A transform converts a quantity between the <strong>user domain</strong> (the values you
-specify in the configuration and read back from results) and the <strong>optimizer
-domain</strong> (the values actually presented to the optimization algorithm).</p>
-<p>Three independent transform types exist:</p>
-<table>
-<thead>
-<tr>
-<th>Transform</th>
-<th>Applied to</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><a class="autorefs autorefs-internal" title="            VariableTransform" href="../../reference/transforms/#ropt.transforms.VariableTransform"><code>VariableTransform</code></a></td>
-<td>Optimization variables (and their bounds).</td>
-</tr>
-<tr>
-<td><a class="autorefs autorefs-internal" title="            ObjectiveTransform" href="../../reference/transforms/#ropt.transforms.ObjectiveTransform"><code>ObjectiveTransform</code></a></td>
-<td>Objective function values.</td>
-</tr>
-<tr>
-<td><a class="autorefs autorefs-internal" title="            NonlinearConstraintTransform" href="../../reference/transforms/#ropt.transforms.NonlinearConstraintTransform"><code>NonlinearConstraintTransform</code></a></td>
-<td>Nonlinear constraint values.</td>
-</tr>
-</tbody>
-</table>
+<h1 id="variable-transforms">Variable Transforms</h1>
+<p>A <a class="autorefs autorefs-internal" title="            VariableTransform" href="../../reference/transforms/#ropt.transforms.VariableTransform"><code>VariableTransform</code></a> converts variables
+between the <strong>user domain</strong> (the values you specify in the configuration and
+read back from results) and the <strong>optimizer domain</strong> (the values actually
+presented to the optimization algorithm).</p>
 <h2 id="why-use-them">Why use them</h2>
 <ul>
 <li><strong>Scaling</strong> — bring variables of different physical magnitudes onto a common
   numerical scale so the optimizer treats them evenly.</li>
 <li><strong>Reparametrization</strong> — optimize in a more convenient space (log-space,
   normalized <span class="arithmatex">\([0,1]\)</span> space).</li>
-<li><strong>Stability</strong> — apply monotone transforms to objectives that span many
-  orders of magnitude.</li>
 </ul>
 <h2 id="how-they-plug-in">How they plug in</h2>
-<p>Transform instances are stored in top-level tuples on the
-<a class="autorefs autorefs-internal" title="            EnOptContext" href="../../reference/context/#ropt.context.EnOptContext"><code>EnOptContext</code></a>:</p>
-<ul>
-<li><code>variable_transforms</code></li>
-<li><code>objective_transforms</code></li>
-<li><code>nonlinear_constraint_transforms</code></li>
-</ul>
-<p>Each tuple is an ordered <strong>chain</strong> applied to <em>all</em> variables, objectives, or
-constraints. Going to the optimizer domain the chain runs in order; coming back
-it runs in reverse:</p>
+<p>Transform instances are stored in the <code>variable_transforms</code> tuple on the
+<a class="autorefs autorefs-internal" title="            EnOptContext" href="../../reference/context/#ropt.context.EnOptContext"><code>EnOptContext</code></a>. The tuple is an ordered <strong>chain</strong>
+applied to <em>all</em> variables. Going to the optimizer domain the chain runs in
+order; coming back it runs in reverse:</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>user domain  --[ A ]--&gt;--[ B ]--&gt;--[ C ]--&gt;  optimizer domain
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>user domain  &lt;--[ A ]--&lt;--[ B ]--&lt;--[ C ]--  optimizer domain
 </span></code></pre></div>
@@ -3249,30 +3141,28 @@ different answers depending on which comes first.</p>
 <p>Variables held fixed through the <code>mask</code> field of <code>variables</code> are never passed
 to the optimizer, and the chain leaves them unchanged.</p>
 <h3 id="restricting-a-transform-to-a-subset">Restricting a transform to a subset</h3>
-<p>Each transform config takes an optional boolean <code>mask</code> selecting the elements
-it applies to. It defaults to <code>None</code>, meaning the whole set:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="s2">"objective_transforms"</span><span class="p">:</span> <span class="p">[</span>
+<p>A transform config takes an optional boolean <code>mask</code> selecting the variables it
+applies to. It defaults to <code>None</code>, meaning all of them:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="s2">"variable_transforms"</span><span class="p">:</span> <span class="p">[</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    <span class="p">{</span>
 </span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>        <span class="s2">"method"</span><span class="p">:</span> <span class="s2">"default/scaler"</span><span class="p">,</span>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>        <span class="s2">"options"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"scales"</span><span class="p">:</span> <span class="p">[</span><span class="mf">1e6</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]},</span>
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>        <span class="s2">"mask"</span><span class="p">:</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">],</span>   <span class="c1"># only the first objective is scaled</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>        <span class="s2">"options"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"scales"</span><span class="p">:</span> <span class="p">[</span><span class="mf">1e6</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]},</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>        <span class="s2">"mask"</span><span class="p">:</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">],</span>   <span class="c1"># only the first variable is scaled</span>
 </span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>    <span class="p">},</span>
 </span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="p">],</span>
 </span></code></pre></div>
 <p>Unlike the chain itself, masks of different transforms need not be disjoint: an
 element is acted on by every chain member whose mask selects it, in order. A
 mask is therefore a filter, not a partition.</p>
-<p>Masks are available on all three transform configs, and the transform decides
-what to do with them — the core does not apply them for you. The built-in
-scalers implement a mask by neutralizing their scale and offset on the excluded
-positions, which leaves those values untouched in both directions.</p>
-<p>For variable transforms the mask is combined with the free-variable mask by a
-logical <em>and</em>, so a variable is transformed only when it is both free and
-selected.</p>
-<h2 id="default-transforms">Default transforms</h2>
-<p>The <code>ropt.transforms.default</code> package provides built-in linear scaling
-transforms, exposed as the <code>default/scaler</code> method.</p>
-<h3 id="defaultvariabletransform">DefaultVariableTransform</h3>
+<p>The transform decides what to do with a mask — the core does not apply it for
+you. The built-in scaler implements a mask by neutralizing its scale and offset
+on the excluded positions, which leaves those values untouched in both
+directions.</p>
+<p>The mask is combined with the free-variable mask by a logical <em>and</em>, so a
+variable is transformed only when it is both free and selected.</p>
+<h2 id="the-default-transform">The default transform</h2>
+<p>The <code>ropt.transforms.default</code> package provides a built-in linear scaling
+transform, exposed as the <code>default/scaler</code> method.</p>
 <p><a class="autorefs autorefs-internal" title="            ropt.transforms.default.DefaultVariableTransform" href="../../reference/transforms/#ropt.transforms.default.DefaultVariableTransform"><code>DefaultVariableTransform</code></a>
 applies a per-variable linear scale and offset:</p>
 <div class="arithmatex">\[x_{\text{opt}} = \frac{x_{\text{user}} - \text{offset}}{\text{scale}}, \qquad
@@ -3295,31 +3185,7 @@ applies a per-variable linear scale and offset:</p>
   for the full derivation). The resulting equations are further normalized by
   dividing each row by its maximum absolute coefficient.</li>
 </ul>
-<h3 id="defaultobjectivetransform">DefaultObjectiveTransform</h3>
-<p><a class="autorefs autorefs-internal" title="            ropt.transforms.default.DefaultObjectiveTransform" href="../../reference/transforms/#ropt.transforms.default.DefaultObjectiveTransform"><code>DefaultObjectiveTransform</code></a>
-divides objective values by <code>scales</code> when going to the optimizer domain and
-multiplies when returning:</p>
-<div class="arithmatex">\[f_{\text{opt}} = f_{\text{user}} / \text{scale}, \qquad
-  f_{\text{user}} = f_{\text{opt}} \cdot \text{scale}\]</div>
-<p>Configuration options:</p>
-<ul>
-<li><strong><code>scales</code></strong> — array of per-objective scaling factors.</li>
-</ul>
-<p>The <code>update(scales)</code> method allows changing scales mid-run (for example, for
-adaptive normalization when initial magnitudes are unknown).</p>
-<h3 id="defaultnonlinearconstrainttransform">DefaultNonlinearConstraintTransform</h3>
-<p><a class="autorefs autorefs-internal" title="            ropt.transforms.default.DefaultNonlinearConstraintTransform" href="../../reference/transforms/#ropt.transforms.default.DefaultNonlinearConstraintTransform"><code>DefaultNonlinearConstraintTransform</code></a>
-divides constraint values <em>and</em> their RHS bounds by <code>scales</code>:</p>
-<div class="arithmatex">\[c_{\text{opt}} = c_{\text{user}} / \text{scale}, \qquad
-  b_{\text{opt}} = b_{\text{user}} / \text{scale}\]</div>
-<p>Configuration options:</p>
-<ul>
-<li><strong><code>scales</code></strong> — array of per-constraint scaling factors.</li>
-</ul>
-<p>Like the objective transform, it supports <code>update(scales)</code> for mid-run
-changes. Constraint-violation differences are multiplied by <code>scales</code> when
-converting back to user domain.</p>
-<h2 id="effects-on-bounds-and-constraints">Effects on bounds and constraints</h2>
+<h2 id="effects-on-bounds-and-linear-constraints">Effects on bounds and linear constraints</h2>
 <p>During context initialization, <code>ropt</code> automatically applies the variable
 transform chain to:</p>
 <ul>
@@ -3333,10 +3199,8 @@ linear constraints in user-domain terms. See
 <a class="autorefs autorefs-internal" title="            LinearConstraintsConfig" href="../../reference/config/#ropt.config.LinearConstraintsConfig"><code>LinearConstraintsConfig</code></a> for the
 underlying math.</p>
 <h2 id="round-tripping-results">Round-tripping results</h2>
-<p>During optimization, objective/constraint values are computed in the user
-domain by the evaluator, then transformed to the optimizer domain for the
-algorithm. Results objects therefore live in the <strong>optimizer domain</strong> by
-default.</p>
+<p>Results objects live in the <strong>optimizer domain</strong> by default, so the variables
+they carry are the transformed ones.</p>
 <p>To obtain user-domain results, call
 <a class="autorefs autorefs-internal" title="            transform_from_optimizer
 
@@ -3344,9 +3208,10 @@ default.</p>
   
       abstractmethod
   " href="../../reference/results/#ropt.results.Results.transform_from_optimizer"><code>transform_from_optimizer</code></a> on
-a <code>FunctionResults</code> or <code>GradientResults</code> object. This returns a new results
-object with variables, objectives, and constraints mapped back to user-domain
-values (including bound/constraint violation differences).</p>
+a <code>FunctionResults</code> or <code>GradientResults</code> object. It returns a new results
+object with the chain run in reverse, including the bound and linear-constraint
+differences. See <a href="../results/">Results</a> for what each field holds in each
+domain.</p>
 <p>Higher-level helpers handle this automatically:</p>
 <ul>
 <li>The <a href="../../running/running/">simple API</a> returns user-domain results.</li>
@@ -3356,23 +3221,19 @@ values (including bound/constraint violation differences).</p>
   stored result lives in.</li>
 </ul>
 <h2 id="writing-a-custom-transform">Writing a custom transform</h2>
-<p>Custom transforms are plugins implementing one of the three base classes —
-<a class="autorefs autorefs-internal" title="            VariableTransform" href="../../reference/transforms/#ropt.transforms.VariableTransform"><code>VariableTransform</code></a>,
-<a class="autorefs autorefs-internal" title="            ObjectiveTransform" href="../../reference/transforms/#ropt.transforms.ObjectiveTransform"><code>ObjectiveTransform</code></a>, or
-<a class="autorefs autorefs-internal" title="            NonlinearConstraintTransform" href="../../reference/transforms/#ropt.transforms.NonlinearConstraintTransform"><code>NonlinearConstraintTransform</code></a>
-— whose docstrings document the lifecycle and the methods to implement.
-<code>VariableTransform</code> is the most involved: variables also interact with bounds
-and linear constraints, and it is the only one that receives the free-variable
-mask, through <code>set_free_mask</code>.</p>
+<p>A custom transform is a plugin implementing
+<a class="autorefs autorefs-internal" title="            VariableTransform" href="../../reference/transforms/#ropt.transforms.VariableTransform"><code>VariableTransform</code></a>, whose docstring
+documents the lifecycle and the methods to implement. Variables interact with
+bounds and linear constraints, and the transform receives the free-variable
+mask through <code>set_free_mask</code>.</p>
 <p>A transform only needs to describe its own step; <code>ropt</code> takes care of running
 the chain in the right order in each direction. <code>to_optimizer</code> and
 <code>from_optimizer</code> must be inverses, otherwise results cannot be mapped back.</p>
 <h2 id="where-to-next">Where to next</h2>
 <ul>
-<li><a href="../realization_filters/">Realization Filters</a> — selecting realizations per
-  objective or constraint.</li>
-<li><a href="../configuration/">Configuration</a> — broadcasting and index-sharing rules in
-  context.</li>
+<li><a href="../results/">Results</a> — which domain each result field lives in.</li>
+<li><a href="../configuration/">Configuration</a> — broadcasting rules and the remaining
+  context fields, including scaling.</li>
 </ul>
 
 

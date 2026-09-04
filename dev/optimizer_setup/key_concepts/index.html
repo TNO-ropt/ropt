@@ -997,14 +997,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../transforms/" class="md-nav__link">
+      <a href="../variable_transforms/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Transforms
+    Variable Transforms
   
 
     
@@ -3045,7 +3045,7 @@ exact syntax, the <code>method</code> naming convention (see
 described in <a href="../configuration/">Configuration</a>; the dedicated pages
 <a href="../realization_filters/">Realization Filters</a>,
 <a href="../function_estimators/">Function Estimators</a>,
-<a href="../gradients/">samplers</a>, and <a href="../transforms/">Transforms</a> cover each component in
+<a href="../gradients/">samplers</a>, and <a href="../variable_transforms/">Transforms</a> cover each component in
 depth.</p>
 <p>The glossary below defines these terms precisely.</p>
 <h2 id="glossary">Glossary</h2>
@@ -3110,9 +3110,10 @@ term. See <a href="../function_estimators/">Function Estimators</a>.</dd>
 example to focus on the worst-performing ones. See
 <a href="../realization_filters/">Realization Filters</a>.</dd>
 <dt><strong>Transform</strong></dt>
-<dd>A component that converts values between the units you work in and the scaled
-values the optimizer sees, such as rescaling variables, objectives, or
-constraints. See <a href="../transforms/">Transforms</a>.</dd>
+<dd>A component that converts variables between the units you work in and the
+values the optimizer sees, such as rescaling or shifting them. Objectives
+and nonlinear constraints are not transformed by a plugin; they are divided
+by their <code>scales</code>. See <a href="../variable_transforms/">Transforms</a>.</dd>
 </dl>
 <h2 id="where-to-next">Where to next</h2>
 <ul>
@@ -3120,7 +3121,7 @@ constraints. See <a href="../transforms/">Transforms</a>.</dd>
 <li>How gradients are estimated: <a href="../gradients/">Stochastic Gradients</a>.</li>
 <li>Selecting or reweighting realizations: <a href="../realization_filters/">Realization Filters</a>.</li>
 <li>Combining realizations into a single value: <a href="../function_estimators/">Function Estimators</a>.</li>
-<li>Rescaling values between domains: <a href="../transforms/">Transforms</a>.</li>
+<li>Rescaling values between domains: <a href="../variable_transforms/">Transforms</a>.</li>
 <li>Reading the optimization output: <a href="../results/">Working with Results</a>.</li>
 </ul>
 

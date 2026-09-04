@@ -914,14 +914,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../optimizer_setup/transforms/" class="md-nav__link">
+      <a href="../../optimizer_setup/variable_transforms/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Transforms
+    Variable Transforms
   
 
     
@@ -1949,6 +1949,39 @@
   
     <nav class="md-nav" aria-label="EnOptContext">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.context.EnOptContext.get_objective_scales" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        get_objective_scales
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.context.EnOptContext.get_constraint_scales" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        get_constraint_scales
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.context.EnOptContext.get_nonlinear_constraint_bounds" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        get_nonlinear_constraint_bounds
+      
+    </span>
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#ropt.context.EnOptContext.lock" class="md-nav__link">
@@ -2987,6 +3020,39 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#ropt.context.EnOptContext.get_objective_scales" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        get_objective_scales
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.context.EnOptContext.get_constraint_scales" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        get_constraint_scales
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.context.EnOptContext.get_nonlinear_constraint_bounds" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        get_nonlinear_constraint_bounds
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ropt.context.EnOptContext.lock" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3031,9 +3097,13 @@
 <p><a class="autorefs autorefs-internal" title="            EnOptContext" href="#ropt.context.EnOptContext"><code>EnOptContext</code></a> is the validated, frozen container
 that holds every setting needed to execute a single optimization run. It is
 typically built from a plain dict (<code>EnOptContext.model_validate(CONFIG)</code>).</p>
-<p>For a narrative overview of all fields — including broadcasting rules,
-index-based sharing of plugin instances, defaults, and worked examples — see
-the <a href="../../optimizer_setup/configuration/">Configuration</a> user-manual page.</p>
+<p>For a narrative overview of all fields — including broadcasting rules, sharing
+plugin instances by key, defaults, and worked examples — see the
+<a href="../../optimizer_setup/configuration/">Configuration</a> user-manual page.</p>
+<p>The scales applied to the objectives and the nonlinear constraints of a run are
+read with
+<a class="autorefs autorefs-internal" title="            get_objective_scales" href="#ropt.context.EnOptContext.get_objective_scales"><code>get_objective_scales</code></a> and
+<a class="autorefs autorefs-internal" title="            get_constraint_scales" href="#ropt.context.EnOptContext.get_constraint_scales"><code>get_constraint_scales</code></a>.</p>
 
 
 <div class="doc doc-object doc-module">
@@ -3249,28 +3319,6 @@ raw input dicts instead.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.context.EnOptContext.objective_transforms">objective_transforms</span></code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a>[<span title="ropt.context._validated_types.ObjectiveTransformInstance">ObjectiveTransformInstance</span>, ...]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Tuple of objective transform plugin instances.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.context.EnOptContext.nonlinear_constraint_transforms">nonlinear_constraint_transforms</span></code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a>[<span title="ropt.context._validated_types.NonlinearConstraintTransformInstance">NonlinearConstraintTransformInstance</span>, ...]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Tuple of nonlinear constraint transform plugin instances.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
             <td><code><span title="ropt.context.EnOptContext.names">names</span></code></td>
             <td>
                   <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a> | <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a>, ...]]</code>
@@ -3296,6 +3344,159 @@ raw input dicts instead.</p>
 
 <div class="doc doc-children">
 
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="ropt.context.EnOptContext.get_objective_scales" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">get_objective_scales</span>
+
+
+</h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">get_objective_scales</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Return the scale applied to each objective.</p>
+<p>Objectives are divided by their scale before they reach the optimizer,
+and multiplied by it again before they are reported. The scales are the
+configured <code>scales</code>, multiplied by an estimated factor if auto-scaling
+is enabled and has run.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The objective scales.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="ropt.context.EnOptContext.get_constraint_scales" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">get_constraint_scales</span>
+
+
+</h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">get_constraint_scales</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Return the scale applied to each nonlinear constraint.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The constraint scales, or <code>None</code> if there are no constraints.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="ropt.context.EnOptContext.get_nonlinear_constraint_bounds" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">get_nonlinear_constraint_bounds</span>
+
+
+</h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">get_nonlinear_constraint_bounds</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="nb">tuple</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Return the nonlinear constraint bounds in the optimizer domain.</p>
+<p>The bounds are scaled together with the constraint values, so that the
+configured constraint is the constraint that is solved. Scales are
+positive, so the bounds keep their order.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>], <span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The lower and upper bounds, or <code>None</code> if there are no constraints.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
 
 
 

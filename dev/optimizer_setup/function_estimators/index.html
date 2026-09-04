@@ -12,7 +12,7 @@
         <link rel="prev" href="../realization_filters/">
       
       
-        <link rel="next" href="../transforms/">
+        <link rel="next" href="../variable_transforms/">
       
       
         
@@ -1019,14 +1019,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../transforms/" class="md-nav__link">
+      <a href="../variable_transforms/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Transforms
+    Variable Transforms
   
 
     
@@ -3084,6 +3084,10 @@ entirely when weighted-average aggregation is all you need.</p>
 <li>At least two realizations with non-zero weight are required.</li>
 <li>The <code>stddev</code> method is incompatible with <code>gradient.merge_realizations = True</code>;
   per-realization gradients must be available.</li>
+<li>A standard deviation is always positive. To <em>maximize</em> variability, set
+  <a href="../configuration/#objective-direction"><code>maximize</code></a> on the objective; the sign
+  is flipped after the spread has been computed, which is the only point at
+  which flipping it has any effect.</li>
 </ul>
 <h2 id="writing-a-custom-estimator">Writing a custom estimator</h2>
 <p>Custom estimators are plugins implementing the
@@ -3099,7 +3103,7 @@ field of <a class="autorefs autorefs-internal" title="            EnOptContext" 
 <li>Filter realizations before aggregation:
   <a href="../realization_filters/">Realization Filters</a>.</li>
 <li>Transform aggregated values:
-  <a href="../transforms/">Transforms</a>.</li>
+  <a href="../variable_transforms/">Transforms</a>.</li>
 </ul>
 
 
@@ -3153,13 +3157,13 @@ field of <a class="autorefs autorefs-internal" title="            EnOptContext" 
         
         
           
-          <a href="../transforms/" class="md-footer__link md-footer__link--next" aria-label="Next: Transforms">
+          <a href="../variable_transforms/" class="md-footer__link md-footer__link--next" aria-label="Next: Variable Transforms">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Transforms
+                Variable Transforms
               </div>
             </div>
             <div class="md-footer__button md-icon">

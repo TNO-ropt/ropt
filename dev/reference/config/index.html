@@ -914,14 +914,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../optimizer_setup/transforms/" class="md-nav__link">
+      <a href="../../optimizer_setup/variable_transforms/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Transforms
+    Variable Transforms
   
 
     
@@ -2092,28 +2092,6 @@
     <span class="md-ellipsis">
       
         VariableTransformConfig
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.config.ObjectiveTransformConfig" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        ObjectiveTransformConfig
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.config.NonlinearConstraintTransformConfig" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        NonlinearConstraintTransformConfig
       
     </span>
   </a>
@@ -3371,28 +3349,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#ropt.config.ObjectiveTransformConfig" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        ObjectiveTransformConfig
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.config.NonlinearConstraintTransformConfig" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        NonlinearConstraintTransformConfig
-      
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -3841,6 +3797,39 @@ detailed descriptions and usage examples.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
+            <td><code><span title="ropt.config.ObjectiveFunctionsConfig.scales">scales</span></code></td>
+            <td>
+                  <code><span title="ropt.config._validated_types.Array1D">Array1D</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Scale factors for the objective functions (default: 1.0).</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.ObjectiveFunctionsConfig.auto_scale">auto_scale</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Estimate additional scales from the first batch.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.ObjectiveFunctionsConfig.maximize">maximize</span></code></td>
+            <td>
+                  <code><span title="ropt.config._validated_types.Array1DBool">Array1DBool</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Which objectives to maximize (default: <code>False</code>).</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
             <td><code><span title="ropt.config.ObjectiveFunctionsConfig.realization_filters">realization_filters</span></code></td>
             <td>
                   <code><span title="ropt.config._validated_types.Keys">Keys</span></code>
@@ -4044,6 +4033,29 @@ descriptions and usage examples.</p>
             <td>
               <div class="doc-md-description">
                 <p>Upper bounds for the right-hand-side values.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.NonlinearConstraintsConfig.scales">scales</span></code></td>
+            <td>
+                  <code><span title="ropt.config._validated_types.Array1D">Array1D</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Scale factors for the constraint functions (default: 1.0).</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.NonlinearConstraintsConfig.auto_scale">auto_scale</span></code></td>
+            <td>
+                  <code><span title="ropt.config._validated_types.Array1DBool">Array1DBool</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Which constraints to estimate an additional scale for,
+                 from the first batch (default: <code>False</code>).</p>
               </div>
             </td>
           </tr>
@@ -4866,200 +4878,6 @@ detailed descriptions and usage examples.</p>
             <td>
               <div class="doc-md-description">
                 <p>Optional boolean array selecting the variables this transform
-     applies to (default: all).</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-
-
-
-
-
-
-
-
-
-<div class="doc doc-children">
-
-
-
-
-
-  </div>
-
-    </div>
-
-</div>
-
-
-
-
-
-
-<div class="doc doc-object doc-class">
-
-
-
-<h3 id="ropt.config.ObjectiveTransformConfig" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ObjectiveTransformConfig</span>
-
-
-</h3>
-
-
-    <div class="doc doc-contents ">
-
-
-
-        <p>Configuration class for objective transforms.</p>
-<p><code>ObjectiveTransformConfig</code> configures an
-<a class="autorefs autorefs-internal" title="            ObjectiveTransform" href="../transforms/#ropt.transforms.ObjectiveTransform"><code>ObjectiveTransform</code></a> plugin that
-transforms objective values.</p>
-<p>See the <a href="../../optimizer_setup/configuration/#transforms">Configuration guide</a> for
-detailed descriptions and usage examples.</p>
-
-
-<p><span class="doc-section-title">Attributes:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.config.ObjectiveTransformConfig.method">method</span></code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Name of the objective transform method.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.config.ObjectiveTransformConfig.options">options</span></code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Dictionary of options for the objective transform method.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.config.ObjectiveTransformConfig.mask">mask</span></code></td>
-            <td>
-                  <code><span title="ropt.config._validated_types.Array1DBool">Array1DBool</span> | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional boolean array selecting the objectives this transform
-     applies to (default: all).</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-
-
-
-
-
-
-
-
-
-<div class="doc doc-children">
-
-
-
-
-
-  </div>
-
-    </div>
-
-</div>
-
-
-
-
-
-
-<div class="doc doc-object doc-class">
-
-
-
-<h3 id="ropt.config.NonlinearConstraintTransformConfig" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">NonlinearConstraintTransformConfig</span>
-
-
-</h3>
-
-
-    <div class="doc doc-contents ">
-
-
-
-        <p>Configuration class for nonlinear constraint transforms.</p>
-<p><code>NonlinearConstraintTransformConfig</code> configures a
-<a class="autorefs autorefs-internal" title="            NonlinearConstraintTransform" href="../transforms/#ropt.transforms.NonlinearConstraintTransform"><code>NonlinearConstraintTransform</code></a>
-plugin that transforms constraint values.</p>
-<p>See the <a href="../../optimizer_setup/configuration/#transforms">Configuration guide</a> for
-detailed descriptions and usage examples.</p>
-
-
-<p><span class="doc-section-title">Attributes:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.config.NonlinearConstraintTransformConfig.method">method</span></code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Name of the nonlinear constraint transform method.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.config.NonlinearConstraintTransformConfig.options">options</span></code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Dictionary of options for the nonlinear constraint transform method.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.config.NonlinearConstraintTransformConfig.mask">mask</span></code></td>
-            <td>
-                  <code><span title="ropt.config._validated_types.Array1DBool">Array1DBool</span> | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional boolean array selecting the constraints this transform
      applies to (default: all).</p>
               </div>
             </td>

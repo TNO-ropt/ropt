@@ -1064,14 +1064,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../transforms/" class="md-nav__link">
+      <a href="../variable_transforms/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Transforms
+    Variable Transforms
   
 
     
@@ -3154,7 +3154,7 @@ realizations) and common variance-reduction techniques.</p>
 </span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="s2">"realization_filters"</span><span class="p">:</span> <span class="p">[</span>
 </span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>        <span class="p">{</span>
 </span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>            <span class="s2">"method"</span><span class="p">:</span> <span class="s2">"default/sort-objective"</span><span class="p">,</span>
-</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>            <span class="s2">"options"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"sort"</span><span class="p">:</span> <span class="s2">"descending"</span><span class="p">,</span> <span class="s2">"first"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">"last"</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>            <span class="s2">"options"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"sort"</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">"first"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">"last"</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span>
 </span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>        <span class="p">},</span>
 </span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>    <span class="p">],</span>
 </span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>    <span class="s2">"gradient"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"number_of_perturbations"</span><span class="p">:</span> <span class="mi">5</span><span class="p">},</span>
@@ -3168,8 +3168,11 @@ realizations) and common variance-reduction techniques.</p>
 <li>Computes a weighted sum of the objective values specified by the <code>sort</code>
    indices for each realization (using the objective weights from the
    configuration). If a single objective index is given, no weighting is
-   applied.</li>
-<li>Sorts realizations by that value.</li>
+   applied. Objectives marked in
+   <a href="../configuration/#objective-direction"><code>maximize</code></a> have their sign flipped
+   first, per objective, so that the sum ranks realizations the way the
+   optimizer would.</li>
+<li>Sorts realizations by that value, lowest first.</li>
 <li>Selects realizations whose rank falls in the inclusive range
    [<code>first</code>, <code>last</code>].</li>
 <li>Retains the original realization weights for selected realizations; all
@@ -3179,12 +3182,20 @@ realizations) and common variance-reduction techniques.</p>
 <p>The <code>sort-constraint</code> variant
 (<a class="autorefs autorefs-internal" title="            ropt.realization_filter.default.SortConstraintOptions" href="../../reference/realization_filter/#ropt.realization_filter.default.SortConstraintOptions"><code>SortConstraintOptions</code></a>)
 works identically but sorts on a single constraint function value.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Realizations reach a filter with their objectives already scaled but not
+yet flipped for direction: the flip belongs to the aggregate, and these are
+per-realization values. The filters apply it themselves when ranking.
+Constraint filters need no such step, since a constraint is a bound and has
+no direction.</p>
+</div>
 <h2 id="cvar-example">CVaR example</h2>
 <p>Optimize the conditional expectation of the worst 30% of realizations:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="s2">"realization_filters"</span><span class="p">:</span> <span class="p">[</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    <span class="p">{</span>
 </span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>        <span class="s2">"method"</span><span class="p">:</span> <span class="s2">"default/cvar-objective"</span><span class="p">,</span>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>        <span class="s2">"options"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"percentile"</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">},</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>        <span class="s2">"options"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"sort"</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">"percentile"</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">},</span>
 </span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    <span class="p">},</span>
 </span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="p">],</span>
 </span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="s2">"objectives"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"weights"</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">],</span> <span class="s2">"realization_filters"</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">]},</span>
@@ -3195,9 +3206,9 @@ for the parameters. The corresponding constraint variant is
 <h3 id="how-cvar-filters-work">How CVaR filters work</h3>
 <p>The <code>cvar-objective</code> method:</p>
 <ol>
-<li>Computes a weighted sum of objectives (same as the sorting filter).</li>
-<li>Conceptually sorts realizations by that value (ascending, assuming
-   minimization).</li>
+<li>Computes a weighted sum of objectives (same as the sorting filter, and
+   including the sign flip for maximized objectives).</li>
+<li>Conceptually sorts realizations by that value, ascending.</li>
 <li>Identifies the subset corresponding to the <code>percentile</code> worst outcomes
    (highest weighted values).</li>
 <li>Assigns CVaR-derived weights to those realizations. When the percentile
@@ -3233,7 +3244,7 @@ instance can be passed directly in the <code>realization_filters</code> field of
 <h2 id="where-to-next">Where to next</h2>
 <ul>
 <li>Combine filters with transforms:
-  <a href="../transforms/">Transforms</a>.</li>
+  <a href="../variable_transforms/">Transforms</a>.</li>
 <li>Inspect per-realization output:
   <a href="../results/">Working with Results</a>.</li>
 </ul>

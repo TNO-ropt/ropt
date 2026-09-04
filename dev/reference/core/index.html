@@ -914,14 +914,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../optimizer_setup/transforms/" class="md-nav__link">
+      <a href="../../optimizer_setup/variable_transforms/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Transforms
+    Variable Transforms
   
 
     
@@ -4148,7 +4148,10 @@ vector per row) for optimizers that evaluate a batch at once.
 non-linear constraint bounds returned by an
 <a class="autorefs autorefs-internal" title="            ropt.core.OptimizerCallback" href="#ropt.core.OptimizerCallback"><code>OptimizerCallback</code></a> evaluation. <code>functions</code>
 and <code>gradients</code> are <code>None</code> unless requested and successfully computed;
-<code>nonlinear_constraint_bounds</code> is <code>None</code> unless the callback updated them.</p>
+<code>nonlinear_constraint_bounds</code> is <code>None</code> if the run has no non-linear
+constraints, and otherwise holds their bounds in the optimizer domain. The
+bounds are reported after every evaluation because auto-scaling can change
+them once, when the scales are estimated from the first batch.</p>
 <p><code>functions</code> and <code>gradients</code> follow a fixed shape:</p>
 <ul>
 <li><strong>Functions array:</strong> the objective and non-linear constraint values. A

@@ -914,14 +914,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../optimizer_setup/transforms/" class="md-nav__link">
+      <a href="../../optimizer_setup/variable_transforms/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Transforms
+    Variable Transforms
   
 
     
@@ -2959,8 +2959,7 @@ returns the plugin name, or <code>None</code> if no plugin supports the method:<
 </span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="n">get_plugin_name</span><span class="p">(</span><span class="s2">"sampler"</span><span class="p">,</span> <span class="s2">"scipy/default"</span><span class="p">)</span>   <span class="c1"># "scipy"</span>
 </span></code></pre></div>
 <p>The area is one of <code>"backend"</code>, <code>"sampler"</code>, <code>"realization_filter"</code>,
-<code>"function_estimator"</code>, <code>"variable_transform"</code>, <code>"objective_transform"</code> or
-<code>"nonlinear_constraint_transform"</code>.</p>
+<code>"function_estimator"</code> or <code>"variable_transform"</code>.</p>
 <p><a class="autorefs autorefs-internal" title="            validate_backend_options" href="../../reference/utils/#ropt.utils.validate_backend_options"><code>validate_backend_options</code></a> checks
 whether a set of backend-specific options is valid for a given method, raising
 an error if not. Call it before starting a long optimization run to catch
