@@ -2379,28 +2379,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.realization_filter.default.SortObjectiveOptions" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        SortObjectiveOptions
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#ropt.realization_filter.default.SortConstraintOptions" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        SortConstraintOptions
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#ropt.realization_filter.default.CVaRObjectiveOptions" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3084,28 +3062,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.realization_filter.default.SortObjectiveOptions" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        SortObjectiveOptions
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#ropt.realization_filter.default.SortConstraintOptions" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        SortConstraintOptions
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#ropt.realization_filter.default.CVaRObjectiveOptions" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3149,8 +3105,8 @@
 
 <h1 id="realization-filters">Realization Filters</h1>
 <p>A realization filter selects which realizations contribute to a function or
-gradient value at each evaluation. The defaults provide worst-/best-N sorting
-and CVaR-style tail selection, enabling risk-aware objectives.</p>
+gradient value at each evaluation. The default provides CVaR-style tail
+selection, enabling risk-aware objectives.</p>
 <p>See <a href="../../optimizer_setup/realization_filters/">Realization Filters</a> for usage.</p>
 
 
@@ -3506,7 +3462,7 @@ the evaluation as failed.</p>
 
 
 
-        <p>Default filter implementation providing sort and CVaR methods.</p>
+        <p>Default filter implementation providing CVaR methods.</p>
 <p>The method is selected via the <code>method</code> field of
 <a class="autorefs autorefs-internal" title="            RealizationFilterConfig" href="../config/#ropt.config.RealizationFilterConfig"><code>RealizationFilterConfig</code></a>.
 See <a href="../../optimizer_setup/realization_filters/">Realization Filters</a> for usage.</p>
@@ -3579,188 +3535,6 @@ See <a href="../../optimizer_setup/realization_filters/">Realization Filters</a>
     </div>
 
 </div>
-
-
-
-
-  </div>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-class">
-
-
-
-<h2 id="ropt.realization_filter.default.SortObjectiveOptions" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.realization_filter.default.SortObjectiveOptions</span>
-
-
-</h2>
-
-
-    <div class="doc doc-contents first">
-            <p class="doc doc-class-bases">
-              Bases: <code><span title="ropt.realization_filter.default._ConfigBaseModel">_ConfigBaseModel</span></code></p>
-
-
-
-        <p>Options for the <code>sort-objective</code> filter method.</p>
-<p>Selects realizations by ranking a weighted sum of objectives.
-See <a href="../../optimizer_setup/realization_filters/#how-sorting-filters-work">Realization Filters</a>
-for the algorithm.</p>
-
-
-<p><span class="doc-section-title">Attributes:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.realization_filter.default.SortObjectiveOptions.sort">sort</span></code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a>[<a class="autorefs autorefs-external" title="pydantic.NonNegativeInt" href="https://docs.pydantic.dev/latest/api/pydantic/types/#pydantic.types.NonNegativeInt">NonNegativeInt</a>, ...]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Objective indices used for the weighted sum.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.realization_filter.default.SortObjectiveOptions.first">first</span></code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" title="pydantic.NonNegativeInt" href="https://docs.pydantic.dev/latest/api/pydantic/types/#pydantic.types.NonNegativeInt">NonNegativeInt</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Starting rank (0-based, inclusive) of selected realizations.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.realization_filter.default.SortObjectiveOptions.last">last</span></code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" title="pydantic.NonNegativeInt" href="https://docs.pydantic.dev/latest/api/pydantic/types/#pydantic.types.NonNegativeInt">NonNegativeInt</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Ending rank (0-based, inclusive) of selected realizations.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-
-
-
-
-
-
-
-
-
-<div class="doc doc-children">
-
-
-
-
-
-  </div>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-class">
-
-
-
-<h2 id="ropt.realization_filter.default.SortConstraintOptions" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.realization_filter.default.SortConstraintOptions</span>
-
-
-</h2>
-
-
-    <div class="doc doc-contents first">
-            <p class="doc doc-class-bases">
-              Bases: <code><span title="ropt.realization_filter.default._ConfigBaseModel">_ConfigBaseModel</span></code></p>
-
-
-
-        <p>Options for the <code>sort-constraint</code> filter method.</p>
-<p>Selects realizations by ranking a single constraint function value.
-See <a href="../../optimizer_setup/realization_filters/#how-sorting-filters-work">Realization Filters</a>
-for the algorithm.</p>
-
-
-<p><span class="doc-section-title">Attributes:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.realization_filter.default.SortConstraintOptions.sort">sort</span></code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" title="pydantic.NonNegativeInt" href="https://docs.pydantic.dev/latest/api/pydantic/types/#pydantic.types.NonNegativeInt">NonNegativeInt</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Index of the constraint function to sort by.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.realization_filter.default.SortConstraintOptions.first">first</span></code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" title="pydantic.NonNegativeInt" href="https://docs.pydantic.dev/latest/api/pydantic/types/#pydantic.types.NonNegativeInt">NonNegativeInt</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Starting rank (0-based, inclusive) of selected realizations.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.realization_filter.default.SortConstraintOptions.last">last</span></code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" title="pydantic.NonNegativeInt" href="https://docs.pydantic.dev/latest/api/pydantic/types/#pydantic.types.NonNegativeInt">NonNegativeInt</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Ending rank (0-based, inclusive) of selected realizations.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-
-
-
-
-
-
-
-
-
-<div class="doc doc-children">
-
 
 
 
