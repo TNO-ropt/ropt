@@ -11,7 +11,7 @@ the actual work, which the
 
 `ropt` ships
 [`DefaultRealizationFilter`][ropt.realization_filter.default.DefaultRealizationFilter],
-which provides sorting and CVaR based methods.
+which provides CVaR based methods.
 
 See [Realization Filters](../optimizer_setup/realization_filters.md) for usage,
 and [Writing a Plugin](../utilities/writing_plugins.md) for a walkthrough.

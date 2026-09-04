@@ -17,7 +17,6 @@ from ropt.realization_filter import RealizationFilter
 from ropt.realization_filter.default import (
     DefaultRealizationFilter,
     _get_cvar_weights_from_percentile,
-    _sort_and_select,
 )
 from ropt.results import FunctionResults, GradientResults, Results
 from ropt.simple import optimize
@@ -49,24 +48,6 @@ def config_fixture() -> dict[str, Any]:
 
 
 @pytest.mark.parametrize(
-    ("failed", "first", "last", "expected"),
-    [
-        ([False, False, False, False, False], 0, 1, [0, 0, 0, 0.4, 0.5]),
-        ([False, False, False, False, False], 1, 2, [0, 0, 0.3, 0.4, 0]),
-        ([False, False, False, True, False], 0, 1, [0, 0, 0.3, 0, 0.5]),
-        ([False, False, True, False, False], 1, 2, [0.1, 0, 0.0, 0.4, 0]),
-    ],
-)
-def test__sort_and_select(
-    failed: list[bool], first: int, last: int, expected: list[float]
-) -> None:
-    values = np.array([3, 4, 2, 1, 0])
-    weights = np.array([0.1, 0.2, 0.3, 0.4, 0.5])
-    result = _sort_and_select(values, weights, np.array(failed), first, last)
-    assert np.allclose(result, expected)
-
-
-@pytest.mark.parametrize(
     ("failed", "percentile", "weights"),
     [
         ([False, False, False, False, False], 0.1, [0.0, 0.0, 0.0, 0.0, 0.1]),
@@ -91,7 +72,7 @@ def test__get_cvar_weights_from_percentile(
     assert np.allclose(estimated_weights, weights)
 
 
-def test_sort_filter_ranks_an_infinite_objective_last() -> None:
+def test_cvar_filter_ranks_an_infinite_objective_worst() -> None:
     context = EnOptContext.model_validate(
         {
             "variables": {"variable_count": 2},
@@ -100,14 +81,14 @@ def test_sort_filter_ranks_an_infinite_objective_last() -> None:
     )
     realization_filter = DefaultRealizationFilter(
         RealizationFilterConfig(
-            method="sort-objective", options={"sort": [0], "first": 0, "last": 1}
+            method="cvar-objective", options={"sort": [0], "percentile": 1 / 3}
         )
     )
     realization_filter.init(context)
     weights = realization_filter.get_realization_weights(
         np.array([[1.0], [np.inf], [3.0]]), None
     )
-    assert np.allclose(weights, [1 / 3, 0.0, 1 / 3])
+    assert np.allclose(weights, [0.0, 1 / 3, 0.0])
 
 
 def _filter_context(**objectives: Any) -> EnOptContext:
@@ -118,25 +99,6 @@ def _filter_context(**objectives: Any) -> EnOptContext:
             "objectives": objectives or {"weights": [1.0]},
         }
     )
-
-
-def test_sort_filter_ranks_a_maximized_objective_the_other_way() -> None:
-    values = np.array([[1.0], [2.0], [3.0]])
-    realization_filter = DefaultRealizationFilter(
-        RealizationFilterConfig(
-            method="sort-objective", options={"sort": [0], "first": 0, "last": 1}
-        )
-    )
-
-    realization_filter.init(_filter_context(weights=[1.0]))
-    minimized = realization_filter.get_realization_weights(values, None)
-    # Sorting keeps the smallest two of a minimized objective.
-    assert np.allclose(minimized, [1 / 3, 1 / 3, 0.0])
-
-    realization_filter.init(_filter_context(weights=[1.0], maximize=True))
-    maximized = realization_filter.get_realization_weights(values, None)
-    # Maximizing reverses what "best" means, so the largest two are kept.
-    assert np.allclose(maximized, [0.0, 1 / 3, 1 / 3])
 
 
 def test_cvar_filter_ranks_a_maximized_objective_the_other_way() -> None:
@@ -157,11 +119,11 @@ def test_cvar_filter_ranks_a_maximized_objective_the_other_way() -> None:
     assert np.allclose(maximized, [1 / 3, 0.0, 0.0])
 
 
-def test_sort_filter_takes_the_direction_of_the_objective_it_sorts_by() -> None:
+def test_cvar_filter_takes_the_direction_of_the_objective_it_sorts_by() -> None:
     # Two objectives with different directions, ranking by the maximized one.
     realization_filter = DefaultRealizationFilter(
         RealizationFilterConfig(
-            method="sort-objective", options={"sort": [1], "first": 0, "last": 0}
+            method="cvar-objective", options={"sort": [1], "percentile": 1 / 3}
         )
     )
     realization_filter.init(
@@ -170,26 +132,27 @@ def test_sort_filter_takes_the_direction_of_the_objective_it_sorts_by() -> None:
     weights = realization_filter.get_realization_weights(
         np.array([[9.0, 1.0], [9.0, 2.0], [9.0, 3.0]]), None
     )
-    # The direction of objective 1, not of objective 0, decides the ranking.
-    assert np.allclose(weights, [0.0, 0.0, 1 / 3])
+    # The direction of objective 1, not of objective 0, decides the ranking, so
+    # the worst realization is the one with the smallest value.
+    assert np.allclose(weights, [1 / 3, 0.0, 0.0])
 
 
-def test_sort_filter_applies_direction_before_the_weighted_sum() -> None:
+def test_cvar_filter_applies_direction_before_the_weighted_sum() -> None:
     # Two objectives pulling in opposite directions, both in the sum. Applying
     # one sign to the combined value could not express this.
     realization_filter = DefaultRealizationFilter(
         RealizationFilterConfig(
-            method="sort-objective", options={"sort": [0, 1], "first": 0, "last": 0}
+            method="cvar-objective", options={"sort": [0, 1], "percentile": 1 / 3}
         )
     )
     realization_filter.init(_filter_context(weights=[0.5, 0.5], maximize=[False, True]))
     weights = realization_filter.get_realization_weights(
         np.array([[1.0, 1.0], [2.0, 5.0], [3.0, 2.0]]), None
     )
-    # Ranks are 0.5 * f0 - 0.5 * f1: 0.0, -1.5 and 0.5, so realization 1 wins.
-    # Flipping the combined sum instead would rank 1.0, 3.5 and 2.5, and pick
-    # realization 0.
-    assert np.allclose(weights, [0.0, 1 / 3, 0.0])
+    # Ranks are 0.5 * f0 - 0.5 * f1: 0.0, -1.5 and 0.5, so realization 2 is the
+    # worst. Flipping the combined sum instead would rank 1.0, 3.5 and 2.5, and
+    # pick realization 1.
+    assert np.allclose(weights, [0.0, 0.0, 1 / 3])
 
 
 def _objective_function(
@@ -221,311 +184,6 @@ def _constraint_function(
 
 def _track_results(event: EnOptEvent, result_list: list[Results]) -> None:
     result_list.extend(event.results or ())
-
-
-@pytest.mark.parametrize("evaluation_policy", ["separate", "speculative"])
-def test_sort_filter_on_objectives(
-    config: Any,
-    eval_func: Any,
-    evaluation_policy: Literal["speculative", "separate", "auto"],
-) -> None:
-    functions = [
-        partial(_objective_function, target=np.array([0.5, 0.5, 0.5])),
-        partial(_objective_function, target=np.array([-1.5, -1.5, 0.5])),
-    ]
-
-    config["gradient"]["evaluation_policy"] = evaluation_policy
-
-    opt_result = optimize(config, initial_values, eval_func(functions))
-    assert opt_result.variables is not None
-    assert not np.allclose(opt_result.variables, [0.0, 0.0, 0.5], atol=0.02)
-
-    config["realization_filters"] = [
-        {
-            "method": "sort-objective",
-            "options": {
-                "sort": [0],
-                "first": 3,
-                "last": 4,
-            },
-        },
-    ]
-    config["objectives"]["realization_filters"] = [0, 0]
-
-    result_list: list[Results] = []
-    opt_result = optimize(
-        config,
-        initial_values,
-        eval_func(functions),
-        handlers=[
-            CallbackHandler(
-                event_types={EnOptEventType.FINISHED_EVALUATION},
-                callback=partial(_track_results, result_list=result_list),
-            )
-        ],
-    )
-    assert opt_result.variables is not None
-    assert np.allclose(opt_result.variables, [0.0, 0.0, 0.5], atol=0.02)
-    for result in result_list:
-        assert result is not None
-        if isinstance(result, FunctionResults):
-            assert result.realizations is not None
-            assert result.realizations.objective_weights is not None
-            filtered = result.realizations.objective_weights[0, :] == 0.0
-        if isinstance(result, GradientResults):
-            if evaluation_policy == "separate":
-                assert np.all(
-                    result.evaluations.perturbed_objectives[filtered, ...] == 0.0
-                )
-            else:
-                assert np.all(
-                    result.evaluations.perturbed_objectives[filtered, ...] != 0.0
-                )
-
-
-@pytest.mark.parametrize("evaluation_policy", ["separate", "speculative"])
-def test_sort_filter_on_objectives_with_constraints(
-    config: Any,
-    eval_func: Any,
-    evaluation_policy: Literal["speculative", "separate", "auto"],
-) -> None:
-    objective_functions = [
-        partial(_objective_function, target=np.array([0.5, 0.5, 0.5])),
-        partial(_objective_function, target=np.array([-1.5, -1.5, 0.5])),
-    ]
-    constraint_functions = [
-        partial(_constraint_function),
-    ]
-
-    config["gradient"]["evaluation_policy"] = evaluation_policy
-
-    config["nonlinear_constraints"] = {
-        "lower_bounds": -np.inf,
-        "upper_bounds": 0.4,
-    }
-    config["realization_filters"] = [
-        {
-            "method": "sort-objective",
-            "options": {
-                "sort": [0],
-                "first": 3,
-                "last": 4,
-            },
-        },
-    ]
-    config["objectives"]["realization_filters"] = [0, 0]
-    config["nonlinear_constraints"]["realization_filters"] = [0]
-    result_list: list[Results] = []
-    opt_result = optimize(
-        config,
-        initial_values,
-        eval_func(objective_functions, constraint_functions),
-        handlers=[
-            CallbackHandler(
-                event_types={EnOptEventType.FINISHED_EVALUATION},
-                callback=partial(_track_results, result_list=result_list),
-            )
-        ],
-    )
-    assert opt_result.variables is not None
-    assert np.allclose(opt_result.variables, [-0.05, 0.0, 0.45], atol=0.02)
-    for result in result_list:
-        assert result is not None
-        if isinstance(result, FunctionResults):
-            assert result.realizations is not None
-            assert result.realizations.objective_weights is not None
-            filtered = result.realizations.objective_weights[0, :] == 0.0
-        if isinstance(result, GradientResults):
-            assert result.evaluations.perturbed_constraints is not None
-            if evaluation_policy == "separate":
-                assert np.all(
-                    result.evaluations.perturbed_objectives[filtered, ...] == 0.0
-                )
-                assert np.all(
-                    result.evaluations.perturbed_constraints[filtered, ...] == 0.0
-                )
-            else:
-                assert np.all(
-                    result.evaluations.perturbed_objectives[filtered, ...] != 0.0
-                )
-                assert np.all(
-                    result.evaluations.perturbed_constraints[filtered, ...] != 0.0
-                )
-
-
-@pytest.mark.parametrize("evaluation_policy", ["separate", "speculative"])
-def test_sort_filter_on_constraints(
-    config: Any,
-    eval_func: Any,
-    evaluation_policy: Literal["speculative", "separate", "auto"],
-) -> None:
-    objective_functions = [
-        partial(_objective_function, target=np.array([0.5, 0.5, 0.5])),
-        partial(_objective_function, target=np.array([-1.5, -1.5, 0.5])),
-    ]
-    constraint_functions = [
-        partial(_constraint_function),
-    ]
-
-    config["gradient"]["evaluation_policy"] = evaluation_policy
-    config["nonlinear_constraints"] = {
-        "lower_bounds": -np.inf,
-        "upper_bounds": 0.4,
-    }
-    config["realization_filters"] = [
-        {
-            "method": "sort-constraint",
-            "options": {
-                "sort": 0,
-                "first": 3,
-                "last": 4,
-            },
-        },
-    ]
-    config["objectives"]["realization_filters"] = [0, 0]
-    config["nonlinear_constraints"]["realization_filters"] = [0]
-    result_list: list[Results] = []
-    opt_result = optimize(
-        config,
-        initial_values,
-        eval_func(objective_functions, constraint_functions),
-        handlers=[
-            CallbackHandler(
-                event_types={EnOptEventType.FINISHED_EVALUATION},
-                callback=partial(_track_results, result_list=result_list),
-            )
-        ],
-    )
-    assert opt_result.variables is not None
-    assert np.allclose(opt_result.variables, [-0.05, 0.0, 0.45], atol=0.02)
-    for result in result_list:
-        assert result is not None
-        if isinstance(result, FunctionResults):
-            assert result.realizations is not None
-            assert result.realizations.objective_weights is not None
-            filtered = result.realizations.objective_weights[0, :] == 0.0
-        if isinstance(result, GradientResults):
-            assert result.evaluations.perturbed_constraints is not None
-            if evaluation_policy == "separate":
-                assert np.all(
-                    result.evaluations.perturbed_objectives[filtered, ...] == 0.0
-                )
-                assert np.all(
-                    result.evaluations.perturbed_constraints[filtered, ...] == 0.0
-                )
-            else:
-                assert np.all(
-                    result.evaluations.perturbed_objectives[filtered, ...] != 0.0
-                )
-                assert np.all(
-                    result.evaluations.perturbed_constraints[filtered, ...] != 0.0
-                )
-
-
-@pytest.mark.parametrize("evaluation_policy", ["separate", "speculative"])
-def test_sort_filter_mixed(
-    config: Any,
-    eval_func: Any,
-    evaluation_policy: Literal["speculative", "separate", "auto"],
-) -> None:
-    objective_functions = [
-        partial(_objective_function, target=np.array([0.5, 0.5, 0.5])),
-        partial(_objective_function, target=np.array([-1.5, -1.5, 0.5])),
-        partial(_objective_function, target=np.array([0.5, 0.5, 0.5])),
-        partial(_objective_function, target=np.array([-1.5, -1.5, 0.5])),
-    ]
-
-    config["objectives"]["weights"] = [0.75, 0.25, 0.75, 0.25]
-    config["gradient"]["evaluation_policy"] = evaluation_policy
-
-    objective_values: list[NDArray[np.float64]] = []
-
-    def _add_objective(event: EnOptEvent) -> None:
-        for item in event.results or ():
-            if isinstance(item, FunctionResults):
-                assert item.functions is not None
-                objective_values.append(item.functions.target_objective)
-        _track_results(event, result_list=result_list)
-
-    # Apply the filtering to all objectives, giving the expected result.
-    config["realization_filters"] = [
-        {
-            "method": "sort-objective",
-            "options": {
-                "sort": [0],
-                "first": 3,
-                "last": 4,
-            },
-        },
-    ]
-    config["objectives"]["realization_filters"] = [0, 0, 0, 0]
-
-    result_list: list[Results] = []
-    opt_result = optimize(
-        config,
-        initial_values,
-        eval_func(objective_functions),
-        handlers=[
-            CallbackHandler(
-                event_types={EnOptEventType.FINISHED_EVALUATION},
-                callback=_add_objective,
-            )
-        ],
-    )
-    assert opt_result.variables is not None
-    assert np.allclose(opt_result.variables, [0.0, 0.0, 0.5], atol=0.02)
-    for result in result_list:
-        assert result is not None
-        if isinstance(result, FunctionResults):
-            assert result.realizations is not None
-            assert result.realizations.objective_weights is not None
-            filtered = result.realizations.objective_weights[0, :] == 0.0
-        if isinstance(result, GradientResults):
-            if evaluation_policy == "separate":
-                assert np.all(
-                    result.evaluations.perturbed_objectives[filtered, ...] == 0.0
-                )
-            else:
-                assert np.all(
-                    result.evaluations.perturbed_objectives[filtered, ...] != 0.0
-                )
-
-    # Apply filtering only to the first two, giving a wrong result.
-    config["realization_filters"] = [
-        {
-            "method": "sort-objective",
-            "options": {
-                "sort": [0],
-                "first": 3,
-                "last": 4,
-            },
-        },
-    ]
-    config["objectives"]["realization_filters"] = [0, 0, None, None]
-
-    result_list = []
-    opt_result = optimize(
-        config,
-        initial_values,
-        eval_func(objective_functions),
-        handlers=[
-            CallbackHandler(
-                event_types={EnOptEventType.FINISHED_EVALUATION},
-                callback=_add_objective,
-            )
-        ],
-    )
-    assert opt_result.variables is not None
-    assert not np.allclose(opt_result.variables, [0.0, 0.0, 0.5], atol=0.02)
-    for result in result_list:
-        assert result is not None
-        if isinstance(result, FunctionResults):
-            assert result.realizations is not None
-            assert result.realizations.objective_weights is not None
-            filtered = result.realizations.objective_weights[0, :] == 0.0
-
-    # The first objective values should differ.
-    assert objective_values[0] != objective_values[1]
 
 
 @pytest.mark.parametrize("evaluation_policy", ["separate", "speculative"])

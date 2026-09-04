@@ -1,4 +1,4 @@
-"""Default realization filter plugin with sort and CVaR methods."""
+"""Default realization filter plugin with CVaR methods."""
 
 from typing import Annotated
 
@@ -14,8 +14,6 @@ from ropt.plugins.realization_filter import RealizationFilterPlugin
 from ropt.realization_filter import RealizationFilter
 
 DEFAULT_REALIZATION_FILTER_METHODS = {
-    "sort-objective",
-    "sort-constraint",
     "cvar-objective",
     "cvar-constraint",
 }
@@ -29,42 +27,6 @@ class _ConfigBaseModel(BaseModel):
         str_strip_whitespace=True,
         frozen=True,
     )
-
-
-class SortObjectiveOptions(_ConfigBaseModel):
-    """Options for the `sort-objective` filter method.
-
-    Selects realizations by ranking a weighted sum of objectives.
-    See [Realization Filters](../optimizer_setup/realization_filters.md#how-sorting-filters-work)
-    for the algorithm.
-
-    Attributes:
-        sort:  Objective indices used for the weighted sum.
-        first: Starting rank (0-based, inclusive) of selected realizations.
-        last:  Ending rank (0-based, inclusive) of selected realizations.
-    """
-
-    sort: tuple[NonNegativeInt, ...]
-    first: NonNegativeInt
-    last: NonNegativeInt
-
-
-class SortConstraintOptions(_ConfigBaseModel):
-    """Options for the `sort-constraint` filter method.
-
-    Selects realizations by ranking a single constraint function value.
-    See [Realization Filters](../optimizer_setup/realization_filters.md#how-sorting-filters-work)
-    for the algorithm.
-
-    Attributes:
-        sort:  Index of the constraint function to sort by.
-        first: Starting rank (0-based, inclusive) of selected realizations.
-        last:  Ending rank (0-based, inclusive) of selected realizations.
-    """
-
-    sort: NonNegativeInt
-    first: NonNegativeInt
-    last: NonNegativeInt
 
 
 class CVaRObjectiveOptions(_ConfigBaseModel):
@@ -102,7 +64,7 @@ class CVaRConstraintOptions(_ConfigBaseModel):
 
 
 class DefaultRealizationFilter(RealizationFilter):
-    """Default filter implementation providing sort and CVaR methods.
+    """Default filter implementation providing CVaR methods.
 
     The method is selected via the `method` field of
     [`RealizationFilterConfig`][ropt.config.RealizationFilterConfig].
@@ -116,12 +78,7 @@ class DefaultRealizationFilter(RealizationFilter):
             filter_config: The realization filter configuration.
         """
         self._filter_config = filter_config
-        self._filter_options: (
-            SortObjectiveOptions
-            | SortConstraintOptions
-            | CVaRObjectiveOptions
-            | CVaRConstraintOptions
-        )
+        self._filter_options: CVaRObjectiveOptions | CVaRConstraintOptions
 
         assert isinstance(self._filter_config, RealizationFilterConfig)
         _, _, self._method = self._filter_config.method.lower().rpartition("/")
@@ -135,36 +92,15 @@ class DefaultRealizationFilter(RealizationFilter):
         constraints: NDArray[np.float64] | None,
     ) -> NDArray[np.float64]:
         match self._method:
-            case "sort-objective":
-                self._filter_options = SortObjectiveOptions.model_validate(
-                    self._filter_config.options
-                )
-                self._check_range(self._filter_options)
-            case "sort-constraint":
-                self._filter_options = SortConstraintOptions.model_validate(
-                    self._filter_config.options
-                )
-                self._check_range(self._filter_options)
             case "cvar-objective":
                 self._filter_options = CVaRObjectiveOptions.model_validate(
                     self._filter_config.options
                 )
-            case "cvar-constraint":
+                weights = self._cvar_objectives(objectives)
+            case "cvar-constraint" if constraints is not None:
                 self._filter_options = CVaRConstraintOptions.model_validate(
                     self._filter_config.options
                 )
-            case _:
-                msg = f"Realization filter not supported: {self._method}"
-                raise ValueError(msg)
-        weights = self._context.realizations.weights
-        match self._method:
-            case "sort-objective":
-                weights = self._sort_objectives(objectives)
-            case "sort-constraint" if constraints is not None:
-                weights = self._sort_constraint(constraints)
-            case "cvar-objective":
-                weights = self._cvar_objectives(objectives)
-            case "cvar-constraint" if constraints is not None:
                 weights = self._cvar_constraint(constraints)
             case _:
                 msg = f"Realization filter not supported: {self._method}"
@@ -174,30 +110,6 @@ class DefaultRealizationFilter(RealizationFilter):
             raise TooFewRealizations
 
         return weights
-
-    def _check_range(
-        self,
-        options: SortObjectiveOptions | SortConstraintOptions,
-    ) -> None:
-        realizations = self._context.realizations.weights.size
-        msg = f"Invalid range of realizations: [{options.first}, {options.last}]"
-        if options.first < 0 or options.first >= realizations:
-            raise ValueError(msg)
-        if options.last < 0 or options.last >= realizations:
-            raise ValueError(msg)
-        if options.last < options.first:
-            raise ValueError(msg)
-
-    def _sort_objectives(self, objectives: NDArray[np.float64]) -> NDArray[np.float64]:
-        assert isinstance(self._filter_options, SortObjectiveOptions)
-        failed_realizations = np.isnan(objectives[..., 0])
-        return _sort_and_select(
-            self._rank_by(objectives, self._filter_options.sort),
-            self._context.realizations.weights,
-            failed_realizations,
-            self._filter_options.first,
-            self._filter_options.last,
-        )
 
     def _rank_by(
         self, objectives: NDArray[np.float64], sort: tuple[int, ...]
@@ -213,21 +125,6 @@ class DefaultRealizationFilter(RealizationFilter):
         if objective_config.weights.size > 1:
             values = np.dot(values, objective_config.weights[sort,])
         return values.flatten()
-
-    def _sort_constraint(
-        self,
-        constraints: NDArray[np.float64],
-    ) -> NDArray[np.float64]:
-        assert isinstance(self._filter_options, SortConstraintOptions)
-        failed_realizations = np.isnan(constraints[..., 0])
-        constraints = zero_failures(constraints[..., self._filter_options.sort])
-        return _sort_and_select(
-            constraints,
-            self._context.realizations.weights,
-            failed_realizations,
-            self._filter_options.first,
-            self._filter_options.last,
-        )
 
     def _cvar_objectives(self, objectives: NDArray[np.float64]) -> NDArray[np.float64]:
         assert isinstance(self._filter_options, CVaRObjectiveOptions)
@@ -246,23 +143,6 @@ class DefaultRealizationFilter(RealizationFilter):
         return _get_cvar_weights_from_percentile(
             -constraints, failed_realizations, self._filter_options.percentile
         )
-
-
-def _sort_and_select(
-    values: NDArray[np.float64],
-    configured_weights: NDArray[np.float64],
-    failed_realizations: NDArray[np.bool_],
-    first: int,
-    last: int,
-) -> NDArray[np.float64]:
-    values = np.where(failed_realizations, np.nan, values)
-    indices = np.argsort(values)
-    # nan values are sorted to the end, drop them:
-    indices = indices[: np.count_nonzero(~failed_realizations)]
-    indices = indices[first : last + 1]
-    weights = np.zeros(configured_weights.size)
-    weights[indices] = configured_weights[indices]
-    return weights
 
 
 def _get_cvar_weights_from_percentile(
