@@ -135,6 +135,12 @@ class SciPyBackend(Backend):
     is the only method that handles integer variables; the others silently
     treat them as continuous.
 
+    SciPy prints its own progress report, which this backend switches on when an
+    [`output_dir`][ropt.config.OptimizerConfig] is configured. SciPy offers no
+    way to send it anywhere in particular, so it goes to the process's standard
+    output; concurrent runs cannot keep theirs apart. See [Parallel Execution
+    and Many Runs](../running/parallel.md#many-optimizations-at-once).
+
     Algorithm-specific options are passed through the `options` dictionary.
     Click on the common options or the method name for the corresponding
     [`scipy.optimize`](https://docs.scipy.org/doc/scipy/reference/optimize.html)

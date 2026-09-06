@@ -66,6 +66,18 @@ class Backend(ABC):
 
     - `is_parallel`: Indicates whether the backend may evaluate multiple
                      candidate variable vectors concurrently.
+
+    **Process-global state**
+
+    A backend shares its process with everything else in the program, including
+    other optimizations running at the same time. While a run is in progress it
+    must therefore not change the working directory, the environment,
+    `sys.stdout` or `sys.stderr`, or file descriptors 1 and 2. A backend wrapping
+    a library that requires this, or that prints where it cannot be redirected
+    per run, must document that it cannot run concurrently in-process and direct
+    users to the [`external`][ropt.backend.external.ExternalBackend] backend. See
+    [What a backend may not change](../utilities/writing_plugins.md#what-a-backend-may-not-change)
+    for the full contract.
     """
 
     methods: ClassVar[MethodSpec]

@@ -395,6 +395,19 @@ runs](handlers.md#sharing-a-handler-across-concurrent-runs).
     [`serial_pool`][ropt.simple.serial_pool] if you want one shared batch-ID
     sequence, when it must not be.
 
+!!! warning "Not every backend can take part"
+    An optimizer that needs a working directory of its own, writes to a file
+    whose name is fixed, or keeps state inside its library between calls cannot
+    run while anything else is running in the same process — another run of its
+    own kind included. Each backend documents whether this applies to it.
+    Select it as
+    [`external/...`](../optimizer_setup/configuration.md#external-backend) and
+    it gets a process of its own, where none of that is shared.
+
+    Optimizer output cannot be separated here whichever backend you use:
+    [`stdout` and `stderr`](../optimizer_setup/configuration.md#optimizer)
+    redirect the process as a whole, so leave them unset while runs overlap.
+
 ### Failure in one run
 
 The first run to raise propagates its exception immediately (fail-fast). Runs

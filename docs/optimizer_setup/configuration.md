@@ -609,6 +609,16 @@ redirection):
 - **`stderr`** (default: `None`): Redirect optimizer standard error to the given
   file. When `None`, standard error is not redirected.
 
+!!! warning "`stdout` and `stderr` redirect the whole process"
+    An optimizer prints through the process's standard output and error
+    streams, so capturing it means redirecting those streams for as long as the
+    run lasts — everything else the program writes meanwhile goes to the file
+    as well. That is harmless for a single run, but it cannot keep concurrent
+    runs apart: the runs of
+    [`optimize_many`](../running/parallel.md#many-optimizations-at-once) overlap
+    in time, and one run's redirection is in force for all of them. Leave both
+    unset when runs overlap.
+
 ### `backend` — [`BackendConfig`][ropt.config.BackendConfig] { #backend }
 
 Selects the optimizer algorithm and provides a standardized set of common
@@ -664,6 +674,18 @@ This is useful when a backend cannot safely share a process with the rest of
 your program — for example one that crashes the interpreter, leaks memory,
 keeps state between runs, or links against native libraries that clash with
 your other dependencies.
+
+It is also the answer for a backend that **cannot run concurrently in-process**.
+Some optimizers need a working directory of their own, write to a file whose
+name is fixed, or keep state inside the library that a second simultaneous run
+corrupts. What such a backend rules out is not merely a second run of its own
+kind: changing the working directory applies to the whole process, so it breaks
+another run's relative output path, and any file your evaluation function opens
+by relative name, just as surely. Each backend states in its own documentation
+whether this applies to it; where it does, `external/` is what lets it run
+alongside anything else, because the state it needs is then its own. This
+matters as soon as runs overlap — see [Parallel Execution and Many
+Runs](../running/parallel.md#many-optimizations-at-once).
 
 Two details differ from the other backends:
 

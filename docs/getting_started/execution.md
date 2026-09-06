@@ -355,6 +355,10 @@ evaluates one point at a time, while a larger pool (or a process, local, or HPC
 pool) evaluates several at once. Without a pool the runs evaluate on their own
 driver threads, so your objective is then called by several threads at once.
 
+Some optimizer backends cannot run while anything else runs in the same process,
+and none of them can keep their output apart from the others' — see [Not every
+backend can take part](../running/parallel.md#many-optimizations-at-once).
+
 ### Collecting results from concurrent runs
 
 [Collecting Results with Handlers](handlers.md) showed a handler reused across

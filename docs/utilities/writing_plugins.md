@@ -175,6 +175,42 @@ options of each method in one place, and both validates them and generates the
 documentation table for them. The built-in SciPy backend uses it; see
 `SCIPY_OPTIONS_SCHEMA` in `ropt.backend.scipy` for a complete example.
 
+## What a backend may not change
+
+A backend runs in the caller's process, alongside whatever else is in it —
+including other optimizations, since
+[`optimize_many`][ropt.simple.optimize_many] runs several at once, each on its
+own thread with its own configuration. Anything a backend changes *per process*
+is therefore shared with runs it knows nothing about, and cannot carry per-run
+settings.
+
+So while a run is in progress a backend must not change the working directory,
+the environment, `sys.stdout` or `sys.stderr`, or file descriptors 1 and 2.
+Where the optimizer produces a log, ask the library to write it to a named
+file — that is the per-run answer — or to be quiet.
+
+Not every library allows this, and `ropt` does not paper over the ones that do
+not. What such a backend must do instead is **say so in its own
+documentation**, in one of two ways:
+
+- **It needs exclusive process state** — a working directory, a fixed file name,
+  or state kept in the library between calls. What that rules out is not "one
+  at a time" but "anything at all at the same time": a changed working directory
+  breaks another run in the process whatever backend it uses, and the user's
+  evaluation function with it. Say that the backend cannot run concurrently
+  in-process, and point users at the
+  [`external`][ropt.backend.external.ExternalBackend] backend, which gives it a
+  process of its own.
+- **Its output cannot be directed per run** — it prints, and offers no more
+  than an on/off switch. Say that its output goes to the process's standard
+  output. [`stdout`](../optimizer_setup/configuration.md#optimizer) captures
+  that for a single run, but cannot keep concurrent runs apart, because it
+  redirects the process as a whole.
+
+Both are properties of the wrapped library rather than defects in the backend
+wrapping it. State them; capturing the process's output on one run's behalf is
+precisely what cannot be made correct once runs overlap.
+
 ## Where to next
 
 - The registry in full: [Plugin Manager](../reference/plugin_manager.md).
