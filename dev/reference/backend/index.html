@@ -3509,6 +3509,16 @@ gradient evaluations as needed by the underlying algorithm.</p>
 <li><code>is_parallel</code>: Indicates whether the backend may evaluate multiple
                  candidate variable vectors concurrently.</li>
 </ul>
+<p><strong>Process-global state</strong></p>
+<p>A backend shares its process with everything else in the program, including
+other optimizations running at the same time. While a run is in progress it
+must therefore not change the working directory, the environment,
+<code>sys.stdout</code> or <code>sys.stderr</code>, or file descriptors 1 and 2. A backend wrapping
+a library that requires this, or that prints where it cannot be redirected
+per run, must document that it cannot run concurrently in-process and direct
+users to the <a class="autorefs autorefs-internal" title="            ropt.backend.external.ExternalBackend" href="#ropt.backend.external.ExternalBackend"><code>external</code></a> backend. See
+<a href="../../utilities/writing_plugins/#what-a-backend-may-not-change">What a backend may not change</a>
+for the full contract.</p>
 
 
 
@@ -4111,6 +4121,11 @@ it does not support raises
 <code>differential_evolution</code> requires bound constraints on all variables, and
 is the only method that handles integer variables; the others silently
 treat them as continuous.</p>
+<p>SciPy prints its own progress report, which this backend switches on when an
+<a class="autorefs autorefs-internal" title="            OptimizerConfig" href="../config/#ropt.config.OptimizerConfig"><code>output_dir</code></a> is configured. SciPy offers no
+way to send it anywhere in particular, so it goes to the process's standard
+output; concurrent runs cannot keep theirs apart. See <a href="../../running/parallel/#many-optimizations-at-once">Parallel Execution
+and Many Runs</a>.</p>
 <p>Algorithm-specific options are passed through the <code>options</code> dictionary.
 Click on the common options or the method name for the corresponding
 <a href="https://docs.scipy.org/doc/scipy/reference/optimize.html"><code>scipy.optimize</code></a>

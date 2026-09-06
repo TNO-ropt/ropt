@@ -3474,6 +3474,19 @@ and must tolerate that. Give the call a pool, or a
 <a class="autorefs autorefs-internal" title="            ropt.simple.serial_pool" href="../../reference/simple/#ropt.simple.serial_pool"><code>serial_pool</code></a> if you want one shared batch-ID
 sequence, when it must not be.</p>
 </div>
+<div class="admonition warning">
+<p class="admonition-title">Not every backend can take part</p>
+<p>An optimizer that needs a working directory of its own, writes to a file
+whose name is fixed, or keeps state inside its library between calls cannot
+run while anything else is running in the same process — another run of its
+own kind included. Each backend documents whether this applies to it.
+Select it as
+<a href="../../optimizer_setup/configuration/#external-backend"><code>external/...</code></a> and
+it gets a process of its own, where none of that is shared.</p>
+<p>Optimizer output cannot be separated here whichever backend you use:
+<a href="../../optimizer_setup/configuration/#optimizer"><code>stdout</code> and <code>stderr</code></a>
+redirect the process as a whole, so leave them unset while runs overlap.</p>
+</div>
 <h3 id="failure-in-one-run">Failure in one run</h3>
 <p>The first run to raise propagates its exception immediately (fail-fast). Runs
 that have not started yet are skipped, but a run already in progress cannot be

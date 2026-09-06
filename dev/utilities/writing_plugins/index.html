@@ -1506,6 +1506,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#what-a-backend-may-not-change" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What a backend may not change
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#where-to-next" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2869,6 +2880,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#what-a-backend-may-not-change" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What a backend may not change
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#where-to-next" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3063,6 +3085,38 @@ that users can catch mistakes before starting a long run.</p>
 options of each method in one place, and both validates them and generates the
 documentation table for them. The built-in SciPy backend uses it; see
 <code>SCIPY_OPTIONS_SCHEMA</code> in <code>ropt.backend.scipy</code> for a complete example.</p>
+<h2 id="what-a-backend-may-not-change">What a backend may not change</h2>
+<p>A backend runs in the caller's process, alongside whatever else is in it —
+including other optimizations, since
+<a class="autorefs autorefs-internal" title="            ropt.simple.optimize_many" href="../../reference/simple/#ropt.simple.optimize_many"><code>optimize_many</code></a> runs several at once, each on its
+own thread with its own configuration. Anything a backend changes <em>per process</em>
+is therefore shared with runs it knows nothing about, and cannot carry per-run
+settings.</p>
+<p>So while a run is in progress a backend must not change the working directory,
+the environment, <code>sys.stdout</code> or <code>sys.stderr</code>, or file descriptors 1 and 2.
+Where the optimizer produces a log, ask the library to write it to a named
+file — that is the per-run answer — or to be quiet.</p>
+<p>Not every library allows this, and <code>ropt</code> does not paper over the ones that do
+not. What such a backend must do instead is <strong>say so in its own
+documentation</strong>, in one of two ways:</p>
+<ul>
+<li><strong>It needs exclusive process state</strong> — a working directory, a fixed file name,
+  or state kept in the library between calls. What that rules out is not "one
+  at a time" but "anything at all at the same time": a changed working directory
+  breaks another run in the process whatever backend it uses, and the user's
+  evaluation function with it. Say that the backend cannot run concurrently
+  in-process, and point users at the
+  <a class="autorefs autorefs-internal" title="            ropt.backend.external.ExternalBackend" href="../../reference/backend/#ropt.backend.external.ExternalBackend"><code>external</code></a> backend, which gives it a
+  process of its own.</li>
+<li><strong>Its output cannot be directed per run</strong> — it prints, and offers no more
+  than an on/off switch. Say that its output goes to the process's standard
+  output. <a href="../../optimizer_setup/configuration/#optimizer"><code>stdout</code></a> captures
+  that for a single run, but cannot keep concurrent runs apart, because it
+  redirects the process as a whole.</li>
+</ul>
+<p>Both are properties of the wrapped library rather than defects in the backend
+wrapping it. State them; capturing the process's output on one run's behalf is
+precisely what cannot be made correct once runs overlap.</p>
 <h2 id="where-to-next">Where to next</h2>
 <ul>
 <li>The registry in full: <a href="../../reference/plugin_manager/">Plugin Manager</a>.</li>
