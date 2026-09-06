@@ -2342,6 +2342,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#ropt.backend.Backend.methods" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        methods
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ropt.backend.Backend.__init__" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2901,91 +2912,6 @@
   
   
   
-    
-    
-    
-    
-      
-      
-        
-          
-          
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8_8" >
-        
-          
-          <label class="md-nav__link" for="__nav_8_8" id="__nav_8_8_label" tabindex="">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Plugin System
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_8_8_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_8_8">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Plugin System
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../plugin_bases/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Plugin Bases
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
     <li class="md-nav__item">
       <a href="../plugin_manager/" class="md-nav__link">
         
@@ -2994,7 +2920,7 @@
   <span class="md-ellipsis">
     
   
-    Plugin Manager
+    Plugin System
   
 
     
@@ -3003,42 +2929,6 @@
   
 
       </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../default_plugins/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Default Plugins
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
     </li>
   
 
@@ -3184,6 +3074,17 @@
   
     <nav class="md-nav" aria-label="Backend">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.backend.Backend.methods" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        methods
+      
+    </span>
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#ropt.backend.Backend.__init__" class="md-nav__link">
@@ -3621,6 +3522,43 @@ gradient evaluations as needed by the underlying algorithm.</p>
 
 <div class="doc doc-children">
 
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="ropt.backend.Backend.methods" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">methods</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+  </span>
+
+</h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">methods</span><span class="p">:</span> <span class="n">MethodSpec</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>The optimization algorithms this class provides.</p>
+<p>Either a set of names, which the registry matches case-insensitively, or a
+predicate for classes that cannot enumerate them. Include <code>"default"</code> in the
+set if this class has one. See <a class="autorefs autorefs-internal" title="            ropt.plugins.MethodSpec
+
+
+  
+      module-attribute
+  " href="../plugin_manager/#ropt.plugins.MethodSpec"><code>MethodSpec</code></a>.</p>
+
+    </div>
+
+</div>
 
 
 
@@ -4394,12 +4332,13 @@ the prefix is not supported by this backend.</p>
 <details class="note" open>
   <summary>Note</summary>
   <p>The problem is sent to the child process by serializing it, so
-everything the delegate needs must be serializable. The standard
-library can send anything that can be looked up by name, which covers
-the built-in plugins and any plugin class defined in an importable
-module. Installing the optional <code>cloudpickle</code> extra lifts that
-restriction, so plugin instances of classes defined inside a function
-or a notebook can be sent as well.</p>
+everything the delegate needs must be serializable, including the
+delegate class itself. The standard library can send anything that can
+be looked up by name, which covers the built-in plugins and any plugin
+class defined in an importable module. Installing the optional
+<code>cloudpickle</code> extra lifts that restriction, so plugins and plugin
+instances of classes defined inside a function or a notebook can be
+sent as well.</p>
 </details>
 
 

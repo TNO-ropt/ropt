@@ -9,10 +9,10 @@
       
       
       
-        <link rel="prev" href="../plugin_bases/">
+        <link rel="prev" href="../components_utils/">
       
       
-        <link rel="next" href="../default_plugins/">
+        <link rel="next" href="../enums/">
       
       
         
@@ -23,7 +23,7 @@
     
     
       
-        <title>Plugin Manager - ropt Documentation</title>
+        <title>Plugin System - ropt Documentation</title>
       
     
     
@@ -118,7 +118,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Plugin Manager
+              Plugin System
             
           </span>
         </div>
@@ -2556,91 +2556,6 @@
   
   
   
-    
-    
-    
-    
-      
-      
-        
-          
-          
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8_8" checked>
-        
-          
-          <label class="md-nav__link" for="__nav_8_8" id="__nav_8_8_label" tabindex="">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Plugin System
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_8_8_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_8_8">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Plugin System
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../plugin_bases/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Plugin Bases
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-    
-  
-  
-  
     <li class="md-nav__item md-nav__item--active">
       
       <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
@@ -2656,7 +2571,7 @@
   <span class="md-ellipsis">
     
   
-    Plugin Manager
+    Plugin System
   
 
     
@@ -2674,7 +2589,7 @@
   <span class="md-ellipsis">
     
   
-    Plugin Manager
+    Plugin System
   
 
     
@@ -2700,41 +2615,13 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#ropt.plugins.Plugin" class="md-nav__link">
+  <a href="#ropt.plugins.MethodSpec" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Plugin
+        MethodSpec
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="Plugin">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plugins.Plugin.is_supported" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        is_supported
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plugins.Plugin.allows_discovery" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        allows_discovery
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -2755,6 +2642,17 @@
     <span class="md-ellipsis">
       
         __init__
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.manager.PluginManager.register_plugin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        register_plugin
       
     </span>
   </a>
@@ -2821,45 +2719,20 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.manager.register_plugin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        register_plugin
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../default_plugins/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Default Plugins
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
       
     </li>
   
@@ -2984,41 +2857,13 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#ropt.plugins.Plugin" class="md-nav__link">
+  <a href="#ropt.plugins.MethodSpec" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Plugin
+        MethodSpec
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="Plugin">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plugins.Plugin.is_supported" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        is_supported
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plugins.Plugin.allows_discovery" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        allows_discovery
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -3039,6 +2884,17 @@
     <span class="md-ellipsis">
       
         __init__
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.manager.PluginManager.register_plugin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        register_plugin
       
     </span>
   </a>
@@ -3105,6 +2961,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.manager.register_plugin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        register_plugin
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -3127,217 +2994,49 @@
 
 <h1 id="plugin-manager">Plugin Manager</h1>
 <p>The <a class="autorefs autorefs-internal" title="            ropt.plugins.manager.PluginManager" href="#ropt.plugins.manager.PluginManager"><code>PluginManager</code></a> discovers plugins
-registered through Python entry points and looks them up by method name.</p>
+registered through Python entry points and looks them up by method name. A
+lookup returns the plugin class itself, which is called with the configuration
+object for its area to build the component.</p>
 <p>The module-level <a class="autorefs autorefs-internal" title="            ropt.plugins.manager.get_plugin" href="#ropt.plugins.manager.get_plugin"><code>get_plugin</code></a> and
 <a class="autorefs autorefs-internal" title="            ropt.plugins.manager.get_plugin_name" href="#ropt.plugins.manager.get_plugin_name"><code>get_plugin_name</code></a> functions do the same
-lookups against a shared manager that is created on first use. They are what
-<code>ropt</code> itself calls, and are the convenient choice unless you need a manager of
-your own.</p>
+lookups against one shared manager, created on first use. Every optimization
+resolves against that manager and no other, so it is the one a plugin has to be
+registered with to have any effect.</p>
+<p>Plugins are normally installed, and found through their entry points. One that
+cannot be, such as a class defined in a script or a notebook, is added to the
+shared manager with
+<a class="autorefs autorefs-internal" title="            ropt.plugins.manager.register_plugin" href="#ropt.plugins.manager.register_plugin"><code>register_plugin</code></a>.</p>
 <p>See <a href="../../utilities/writing_plugins/">Writing a Plugin</a> for how to implement and
 register one.</p>
 
 
-<div class="doc doc-object doc-class">
+<div class="doc doc-object doc-attribute">
 
 
 
-<h2 id="ropt.plugins.Plugin" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.plugins.Plugin</span>
+<h2 id="ropt.plugins.MethodSpec" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">ropt.plugins.MethodSpec</span>
 
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
+  </span>
 
 </h2>
-
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">MethodSpec</span><span class="p">:</span> <span class="n">TypeAlias</span> <span class="o">=</span> <span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">AbstractSet</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">bool</span><span class="p">]</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span>
+</span></code></pre></div>
 
     <div class="doc doc-contents first">
-            <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-external" title="abc.ABC" href="https://docs.python.org/3/library/abc.html#abc.ABC">ABC</a></code></p>
 
-
-
-        <p>Abstract base class for all <code>ropt</code> plugins.</p>
-<p>This class serves as the fundamental building block for all plugins within
-the <code>ropt</code> framework. Any class intended to function as a plugin (for example an
-optimizer, sampler, or event handler) must inherit from this base class.</p>
-<p>It defines the core interface that all plugins must adhere to, ensuring
-consistency and enabling the
-<a class="autorefs autorefs-internal" title="            ropt.plugins.manager.PluginManager" href="#ropt.plugins.manager.PluginManager"><code>PluginManager</code></a> to discover and manage
-them effectively.</p>
-<p>Subclasses must implement the <code>is_supported</code> class method to indicate which
-named methods (functionalities) they provide. They can optionally override
-the <code>allows_discovery</code> class method if they should not be automatically
-selected by the plugin manager when a method name is provided without an
-explicit plugin name.</p>
-
-
-
-
-
-
-
-
-
-
-
-<div class="doc doc-children">
-
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="ropt.plugins.Plugin.is_supported" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">is_supported</span>
-
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
-      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
-  </span>
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">is_supported</span><span class="p">(</span><span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Verify if this plugin supports a specific named method.</p>
-<p>This class method is used by the
-<a class="autorefs autorefs-internal" title="            ropt.plugins.manager.PluginManager" href="#ropt.plugins.manager.PluginManager"><code>PluginManager</code></a> (specifically its
-<a class="autorefs autorefs-internal" title="            get_plugin_name" href="#ropt.plugins.manager.PluginManager.get_plugin_name"><code>get_plugin_name</code></a>
-method) to determine if this plugin class provides the functionality
-associated with the given <code>method</code> name.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>method</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The string identifier of the method to check for support.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p><code>True</code> if the plugin supports the specified method, <code>False</code> otherwise.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="ropt.plugins.Plugin.allows_discovery" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">allows_discovery</span>
-
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
-  </span>
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">allows_discovery</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">bool</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Determine if the plugin allows implicit discovery by method name.</p>
-<p>By default (<code>True</code>), plugins can be found by the
-<a class="autorefs autorefs-internal" title="            ropt.plugins.manager.PluginManager" href="#ropt.plugins.manager.PluginManager"><code>PluginManager</code></a> when a user
-provides only a method name (without specifying the plugin, for example
-<code>"method-name"</code>).</p>
-<p>If a plugin should <em>only</em> be used when explicitly named (for example
-<code>"plugin-name/method-name"</code>), it must override this class method to
-return <code>False</code>.</p>
-<p>For instance, the
-<a class="autorefs autorefs-internal" title="            ropt.backend.external.ExternalBackend" href="../backend/#ropt.backend.external.ExternalBackend"><code>external</code></a> optimizer
-plugin acts as a wrapper for other optimizers run in separate processes.
-It doesn't provide methods directly and must always be explicitly
-requested, so it overrides this method to return <code>False</code>.</p>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p><code>True</code> if the plugin can be discovered implicitly by method name.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
-
-
-
-
-  </div>
+        <p>How a plugin declares the methods it provides.</p>
+<p>Either a set of method names, which the registry matches case-insensitively, or
+a predicate for the plugins that cannot enumerate what they support and must
+decide per name. A predicate receives the name verbatim, so it owns its own
+casing, and it cannot be listed. A plugin that has a default method lists
+<code>"default"</code> in its set; nothing is added on its behalf, since not every plugin
+has one.</p>
 
     </div>
 
@@ -3368,8 +3067,11 @@ name with
 <p>A third-party plugin registers itself under the relevant group in its own
 <code>pyproject.toml</code>, for example:</p>
 <div class="language-toml highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">[project.entry-points.</span><span class="s2">"ropt.plugins.backend"</span><span class="k">]</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">my_backend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"my_package.my_module:MyBackendPlugin"</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">my_backend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"my_package.my_module:MyBackend"</span>
 </span></code></pre></div>
+<p>A plugin that is not installed, for instance one defined in a script or a
+notebook, is added with
+<a class="autorefs autorefs-internal" title="            register_plugin" href="#ropt.plugins.manager.PluginManager.register_plugin"><code>register_plugin</code></a>.</p>
 
 
 
@@ -3417,17 +3119,146 @@ name with
 <div class="doc doc-object doc-function">
 
 
+<h3 id="ropt.plugins.manager.PluginManager.register_plugin" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">register_plugin</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">register_plugin</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">plugin_type</span><span class="p">:</span> <span class="n">PluginType</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">plugin</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Register a plugin that is not installed.</p>
+<p>For a plugin defined where an entry point cannot reach it, such as a
+script or a notebook. Registering is otherwise equivalent to installing:
+the plugin is found by the same lookups, under the same rules, and
+<code>plugin</code> must subclass the base class of its area just the same. It must
+declare the methods it provides, as an installed plugin does.</p>
+<p>Registering the name of an installed plugin is an error; installed
+plugins cannot be shadowed. Registering a name that was registered
+before replaces it, and takes effect for every lookup that follows,
+including one made while an optimization is running.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>plugin_type</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.plugins.manager.PluginType
+
+
+  
+      module-attribute
+  " href="#ropt.plugins.manager.PluginType">PluginType</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The category of the plugin (for example "backend").</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>name</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The name to register the plugin under.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>plugin</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#type">type</a>[<a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The class to register.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#ValueError">ValueError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If <code>name</code> is the name of an installed plugin.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
 <h3 id="ropt.plugins.manager.PluginManager.get_plugin" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">get_plugin</span>
 
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">get_plugin</span><span class="p">(</span><span class="n">plugin_type</span><span class="p">:</span> <span class="n">PluginType</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">get_plugin</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">plugin_type</span><span class="p">:</span> <span class="n">PluginType</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">str</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
 
-        <p>Retrieve a plugin class by its type and a supported method name.</p>
+        <p>Retrieve the class of a plugin by its type and a supported method name.</p>
 <p><code>method</code> is either <code>"plugin-name/method-name"</code> to request a specific
 plugin, or just <code>"method-name"</code> to search discoverable plugins of
 <code>plugin_type</code> for one that supports it (preferring the default plugin).</p>
@@ -3497,11 +3328,11 @@ plugin, or just <code>"method-name"</code> to search discoverable plugins of
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a></code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#type">type</a>[<a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a>]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The plugin class that matches the criteria.</p>
+                <p>The class of the plugin that matches the criteria.</p>
               </div>
             </td>
           </tr>
@@ -3693,12 +3524,14 @@ plugins within the <code>ropt</code> framework.</p>
 
 
 </h2>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">get_plugin</span><span class="p">(</span><span class="n">plugin_type</span><span class="p">:</span> <span class="n">PluginType</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">get_plugin</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">plugin_type</span><span class="p">:</span> <span class="n">PluginType</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">str</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents first">
 
-        <p>Retrieve a plugin class by its type and a supported method name.</p>
+        <p>Retrieve the class of a plugin by its type and a supported method name.</p>
 <p>Uses a lazily created, module-level <a class="autorefs autorefs-internal" title="            ropt.plugins.manager.PluginManager" href="#ropt.plugins.manager.PluginManager"><code>PluginManager</code></a>;
 see <a class="autorefs autorefs-internal" title="            get_plugin" href="#ropt.plugins.manager.PluginManager.get_plugin"><code>PluginManager.get_plugin</code></a>
 for the argument format.</p>
@@ -3768,11 +3601,11 @@ for the argument format.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a></code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#type">type</a>[<a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a>]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The plugin class that matches the criteria.</p>
+                <p>The class of the plugin that matches the criteria.</p>
               </div>
             </td>
           </tr>
@@ -3885,6 +3718,102 @@ for the argument format.</p>
 
 </div>
 
+<div class="doc doc-object doc-function">
+
+
+<h2 id="ropt.plugins.manager.register_plugin" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">ropt.plugins.manager.register_plugin</span>
+
+
+</h2>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">register_plugin</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">plugin_type</span><span class="p">:</span> <span class="n">PluginType</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">plugin</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents first">
+
+        <p>Register a plugin that is not installed.</p>
+<p>Adds the plugin to the lazily created, module-level
+<a class="autorefs autorefs-internal" title="            ropt.plugins.manager.PluginManager" href="#ropt.plugins.manager.PluginManager"><code>PluginManager</code></a> that <code>optimize()</code> and
+<code>evaluate()</code> resolve against, so a plugin registered here is available to
+every workflow started afterwards. See
+<a class="autorefs autorefs-internal" title="            register_plugin" href="#ropt.plugins.manager.PluginManager.register_plugin"><code>PluginManager.register_plugin</code></a>
+for the rules.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>plugin_type</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.plugins.manager.PluginType
+
+
+  
+      module-attribute
+  " href="#ropt.plugins.manager.PluginType">PluginType</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The category of the plugin (for example "backend").</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>name</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The name to register the plugin under.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>plugin</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#type">type</a>[<a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The class to register.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
 
 
 
@@ -3919,7 +3848,7 @@ for the argument format.</p>
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../plugin_bases/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Plugin Bases">
+          <a href="../components_utils/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Utilities">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -3929,20 +3858,20 @@ for the argument format.</p>
                 Previous
               </span>
               <div class="md-ellipsis">
-                Plugin Bases
+                Utilities
               </div>
             </div>
           </a>
         
         
           
-          <a href="../default_plugins/" class="md-footer__link md-footer__link--next" aria-label="Next: Default Plugins">
+          <a href="../enums/" class="md-footer__link md-footer__link--next" aria-label="Next: Enumerations">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Default Plugins
+                Enumerations
               </div>
             </div>
             <div class="md-footer__button md-icon">

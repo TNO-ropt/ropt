@@ -1451,10 +1451,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#what-a-plugin-must-implement" class="md-nav__link">
+  <a href="#what-a-plugin-must-declare" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What a plugin must implement
+        What a plugin must declare
       
     </span>
   </a>
@@ -1477,6 +1477,17 @@
     <span class="md-ellipsis">
       
         Registering it
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#registering-one-without-an-entry-point" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Registering one without an entry point
       
     </span>
   </a>
@@ -2652,88 +2663,6 @@
   
   
   
-    
-    
-    
-    
-      
-      
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8_8" >
-        
-          
-          <label class="md-nav__link" for="__nav_8_8" id="__nav_8_8_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Plugin System
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_8_8_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_8_8">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Plugin System
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../reference/plugin_bases/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Plugin Bases
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
     <li class="md-nav__item">
       <a href="../../reference/plugin_manager/" class="md-nav__link">
         
@@ -2742,7 +2671,7 @@
   <span class="md-ellipsis">
     
   
-    Plugin Manager
+    Plugin System
   
 
     
@@ -2751,42 +2680,6 @@
   
 
       </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../reference/default_plugins/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Default Plugins
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
     </li>
   
 
@@ -2921,10 +2814,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#what-a-plugin-must-implement" class="md-nav__link">
+  <a href="#what-a-plugin-must-declare" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What a plugin must implement
+        What a plugin must declare
       
     </span>
   </a>
@@ -2947,6 +2840,17 @@
     <span class="md-ellipsis">
       
         Registering it
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#registering-one-without-an-entry-point" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Registering one without an entry point
       
     </span>
   </a>
@@ -3000,9 +2904,9 @@
 from a configuration by name, in the same way the built-in ones are:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="s2">"backend"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"method"</span><span class="p">:</span> <span class="s2">"my_package/my_method"</span><span class="p">}</span>
 </span></code></pre></div>
-<p>A plugin is a small factory class. It answers which method names it provides,
-and builds the object that does the actual work. <code>ropt</code> finds it through a
-Python entry point, so nothing has to be imported or registered by hand.</p>
+<p>A plugin is the implementation class itself. It declares which method names it
+provides, and <code>ropt</code> finds it through a Python entry point, so nothing has to be
+imported or registered by hand.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>You do not need a plugin to use your own component. Every component field
@@ -3013,63 +2917,66 @@ Write a plugin when the component should be selectable by name — typically
 when you ship it in a package for others to configure.</p>
 </div>
 <h2 id="the-plugin-areas">The plugin areas</h2>
-<p>There is one plugin area per component type. Each has its own entry-point group,
-its own factory base class, and the base class of the object it creates:</p>
+<p>There is one plugin area per component type, each with its own entry-point group
+and its own base class:</p>
 <table>
 <thead>
 <tr>
 <th>Entry-point group</th>
-<th>Factory base class</th>
-<th>Creates</th>
+<th>Base class</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><code>ropt.plugins.backend</code></td>
-<td><a class="autorefs autorefs-internal" title="            ropt.plugins.backend.BackendPlugin" href="../../reference/plugin_bases/#ropt.plugins.backend.BackendPlugin"><code>BackendPlugin</code></a></td>
 <td><a class="autorefs autorefs-internal" title="            Backend" href="../../reference/backend/#ropt.backend.Backend"><code>Backend</code></a></td>
 </tr>
 <tr>
 <td><code>ropt.plugins.sampler</code></td>
-<td><a class="autorefs autorefs-internal" title="            ropt.plugins.sampler.SamplerPlugin" href="../../reference/plugin_bases/#ropt.plugins.sampler.SamplerPlugin"><code>SamplerPlugin</code></a></td>
 <td><a class="autorefs autorefs-internal" title="            Sampler" href="../../reference/sampler/#ropt.sampler.Sampler"><code>Sampler</code></a></td>
 </tr>
 <tr>
 <td><code>ropt.plugins.realization_filter</code></td>
-<td><a class="autorefs autorefs-internal" title="            ropt.plugins.realization_filter.RealizationFilterPlugin" href="../../reference/plugin_bases/#ropt.plugins.realization_filter.RealizationFilterPlugin"><code>RealizationFilterPlugin</code></a></td>
 <td><a class="autorefs autorefs-internal" title="            ropt.realization_filter.RealizationFilter" href="../../reference/realization_filter/#ropt.realization_filter.RealizationFilter"><code>RealizationFilter</code></a></td>
 </tr>
 <tr>
 <td><code>ropt.plugins.function_estimator</code></td>
-<td><a class="autorefs autorefs-internal" title="            ropt.plugins.function_estimator.FunctionEstimatorPlugin" href="../../reference/plugin_bases/#ropt.plugins.function_estimator.FunctionEstimatorPlugin"><code>FunctionEstimatorPlugin</code></a></td>
 <td><a class="autorefs autorefs-internal" title="            ropt.function_estimator.FunctionEstimator" href="../../reference/function_estimator/#ropt.function_estimator.FunctionEstimator"><code>FunctionEstimator</code></a></td>
 </tr>
 </tbody>
 </table>
-<h2 id="what-a-plugin-must-implement">What a plugin must implement</h2>
-<p>All factory classes derive from <a class="autorefs autorefs-internal" title="            ropt.plugins.Plugin" href="../../reference/plugin_manager/#ropt.plugins.Plugin"><code>Plugin</code></a> and share the
-same two-method interface:</p>
+<h2 id="what-a-plugin-must-declare">What a plugin must declare</h2>
+<p>Subclass the base class of the area and add one class attribute:</p>
 <ul>
-<li><strong><code>is_supported(method)</code></strong> — return <code>True</code> for every method name the plugin
-  provides. It receives the method name only, without the plugin prefix. Method
-  names are matched case-insensitively, so compare in lower case.</li>
-<li><strong><code>create(config)</code></strong> — build and return the object. The argument is the
-  validated configuration object for the area, for example a
-  <a class="autorefs autorefs-internal" title="            SamplerConfig" href="../../reference/config/#ropt.config.SamplerConfig"><code>SamplerConfig</code></a> for a sampler, carrying the
-  <code>method</code> string and the <code>options</code> given in the configuration.</li>
+<li><strong><code>methods</code></strong> — the method names the class provides, as a set. The names are
+  matched case-insensitively, so they may be written in any case. Include
+  <code>"default"</code> if the class has a sensible standard choice, so that
+  <code>"my_package/default"</code> selects it; leave it out if it does not, and the name
+  will correctly fail to resolve.</li>
 </ul>
-<p>One method is optional:</p>
+<p>Two things are optional:</p>
 <ul>
-<li><strong><code>allows_discovery()</code></strong> — return <code>False</code> to keep the plugin from being
-  matched when a configuration gives a bare method name without a plugin
-  prefix. The built-in
-  <a class="autorefs autorefs-internal" title="            ropt.backend.external.ExternalBackend" href="../../reference/backend/#ropt.backend.external.ExternalBackend"><code>external</code></a> backend does this,
-  because its method names belong to the backend it delegates to. The default
-  is <code>True</code>.</li>
+<li><strong><code>discoverable</code></strong> — set it to <code>False</code> to keep the plugin from being matched
+  when a configuration gives a bare method name without a plugin prefix. The
+  built-in <a class="autorefs autorefs-internal" title="            ropt.backend.external.ExternalBackend" href="../../reference/backend/#ropt.backend.external.ExternalBackend"><code>external</code></a> backend does
+  this, because its method names belong to the backend it delegates to. The
+  default is <code>True</code>.</li>
+<li><strong><code>methods</code> as a predicate</strong> — a class that cannot enumerate what it supports
+  may instead set <code>methods</code> to a function taking a method name and returning a
+  <code>bool</code>. Use this only when the names are not knowable in advance, for example
+  when they are resolved against another installed package. A predicate receives
+  the method name exactly as written, so it owns its own casing, and it cannot
+  be listed. See <a class="autorefs autorefs-internal" title="            ropt.plugins.MethodSpec
+
+
+  
+      module-attribute
+  " href="../../reference/plugin_manager/#ropt.plugins.MethodSpec"><code>MethodSpec</code></a>.</li>
 </ul>
-<p>By convention every plugin also supports the method name <code>"default"</code>, so that
-<code>"my_package/default"</code> selects whatever the plugin considers its standard
-choice.</p>
+<p>The object is constructed by calling the class with the validated configuration
+object for its area, for example a
+<a class="autorefs autorefs-internal" title="            SamplerConfig" href="../../reference/config/#ropt.config.SamplerConfig"><code>SamplerConfig</code></a> for a sampler, carrying the
+<code>method</code> string and the <code>options</code> given in the configuration.</p>
 <h2 id="an-example">An example</h2>
 <p>A sampler that draws uniform perturbations. First the sampler itself, a
 <a class="autorefs autorefs-internal" title="            Sampler" href="../../reference/sampler/#ropt.sampler.Sampler"><code>Sampler</code></a> subclass:</p>
@@ -3094,24 +3001,26 @@ choice.</p>
 </span><span id="__span-1-19"><a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">generate_samples</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
 </span><span id="__span-1-20"><a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a>        <span class="o">...</span>
 </span></code></pre></div>
-<p>Then the factory that makes it selectable:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.plugins.sampler</span><span class="w"> </span><span class="kn">import</span> <span class="n">SamplerPlugin</span>
+<p>The only thing needed to make it selectable is the <code>methods</code> attribute, so it
+goes on the class itself:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">ClassVar</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="k">class</span><span class="w"> </span><span class="nc">UniformSamplerPlugin</span><span class="p">(</span><span class="n">SamplerPlugin</span><span class="p">):</span>
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    <span class="nd">@classmethod</span>
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">is_supported</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>        <span class="k">return</span> <span class="n">method</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">"default"</span><span class="p">,</span> <span class="s2">"uniform"</span><span class="p">}</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.plugins</span><span class="w"> </span><span class="kn">import</span> <span class="n">MethodSpec</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="k">class</span><span class="w"> </span><span class="nc">UniformSampler</span><span class="p">(</span><span class="n">Sampler</span><span class="p">):</span>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>    <span class="n">methods</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="n">MethodSpec</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"default"</span><span class="p">,</span> <span class="s2">"uniform"</span><span class="p">}</span>
 </span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>
-</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>    <span class="nd">@classmethod</span>
-</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">create</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">sampler_config</span><span class="p">:</span> <span class="n">SamplerConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sampler</span><span class="p">:</span>
-</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>        <span class="k">return</span> <span class="n">UniformSampler</span><span class="p">(</span><span class="n">sampler_config</span><span class="p">)</span>
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>    <span class="o">...</span>
 </span></code></pre></div>
+<p>Annotating it as a <code>ClassVar</code> is what keeps type checkers and linters happy
+about a set assigned at class level; a bare <code>methods = {...}</code> works just as
+well at runtime.</p>
 <h2 id="registering-it">Registering it</h2>
-<p>Declare the factory class under the entry-point group of its area, in the
+<p>Declare the class under the entry-point group of its area, in the
 <code>pyproject.toml</code> of the package that contains it:</p>
 <div class="language-toml highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">[project.entry-points.</span><span class="s2">"ropt.plugins.sampler"</span><span class="k">]</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">my_package</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"my_package.sampler:UniformSamplerPlugin"</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">my_package</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"my_package.sampler:UniformSampler"</span>
 </span></code></pre></div>
 <p>The entry-point name is the plugin name used in method strings. After
 installing the package, the sampler is available as <code>"my_package/uniform"</code>, or
@@ -3124,9 +3033,25 @@ as <code>"uniform"</code> if no other installed plugin claims that name:</p>
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>
 </span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="n">get_plugin_name</span><span class="p">(</span><span class="s2">"sampler"</span><span class="p">,</span> <span class="s2">"my_package/uniform"</span><span class="p">)</span>   <span class="c1"># "my_package"</span>
 </span></code></pre></div>
-<p>Plugins are discovered once: the shared plugin manager scans the entry points
-the first time a method is looked up. A package installed while the program is
-running is not picked up.</p>
+<h2 id="registering-one-without-an-entry-point">Registering one without an entry point</h2>
+<p>An entry point needs an installed package, which a class written in a script or
+a notebook does not have. Such a class is added by hand with
+<a class="autorefs autorefs-internal" title="            ropt.plugins.manager.register_plugin" href="../../reference/plugin_manager/#ropt.plugins.manager.register_plugin"><code>register_plugin</code></a>:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.plugins.manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">register_plugin</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="n">register_plugin</span><span class="p">(</span><span class="s2">"sampler"</span><span class="p">,</span> <span class="s2">"my_package"</span><span class="p">,</span> <span class="n">UniformSampler</span><span class="p">)</span>
+</span></code></pre></div>
+<p>It is then found by exactly the same lookups as an installed one, so
+<code>"my_package/uniform"</code> works from that point on, for every optimization started
+afterwards. The class must declare its <code>methods</code> just as an installed plugin
+does.</p>
+<p>Registering under the name of an installed plugin is an error, since installed
+plugins cannot be shadowed. Registering a name that was registered before
+replaces it, which is what re-running a cell that defines and registers a class
+needs to do.</p>
+<p>Plugins are otherwise discovered once: the shared plugin manager scans the entry
+points the first time a method is looked up, so a package installed while the
+program is running is not picked up.</p>
 <h2 id="validating-options">Validating options</h2>
 <p>Backends receive their method-specific settings through the <code>options</code> field of
 <a class="autorefs autorefs-internal" title="            BackendConfig" href="../../reference/config/#ropt.config.BackendConfig"><code>BackendConfig</code></a>, which <code>ropt</code> passes through
@@ -3140,10 +3065,7 @@ documentation table for them. The built-in SciPy backend uses it; see
 <code>SCIPY_OPTIONS_SCHEMA</code> in <code>ropt.backend.scipy</code> for a complete example.</p>
 <h2 id="where-to-next">Where to next</h2>
 <ul>
-<li>The interfaces in full: <a href="../../reference/plugin_bases/">Plugin Base Classes</a>
-  and <a href="../../reference/plugin_manager/">Plugin Manager</a>.</li>
-<li>What the built-in plugins register:
-  <a href="../../reference/default_plugins/">Default Plugins</a>.</li>
+<li>The registry in full: <a href="../../reference/plugin_manager/">Plugin Manager</a>.</li>
 <li>Looking up and validating installed plugins:
   <a href="../plugin_discovery/">Plugin Discovery</a>.</li>
 <li>How method strings are resolved:
