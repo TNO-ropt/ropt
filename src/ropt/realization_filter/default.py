@@ -1,6 +1,6 @@
 """Default realization filter plugin with CVaR methods."""
 
-from typing import Annotated
+from typing import Annotated, ClassVar
 
 import numpy as np
 from numpy.typing import NDArray
@@ -10,7 +10,7 @@ from ropt._utils import apply_direction, zero_failures
 from ropt.config import RealizationFilterConfig
 from ropt.context import EnOptContext
 from ropt.exceptions import TooFewRealizations
-from ropt.plugins.realization_filter import RealizationFilterPlugin
+from ropt.plugins import MethodSpec
 from ropt.realization_filter import RealizationFilter
 
 DEFAULT_REALIZATION_FILTER_METHODS = {
@@ -70,6 +70,8 @@ class DefaultRealizationFilter(RealizationFilter):
     [`RealizationFilterConfig`][ropt.config.RealizationFilterConfig].
     See [Realization Filters](../optimizer_setup/realization_filters.md) for usage.
     """
+
+    methods: ClassVar[MethodSpec] = DEFAULT_REALIZATION_FILTER_METHODS
 
     def __init__(self, filter_config: RealizationFilterConfig) -> None:
         """Initialize the realization filter.
@@ -165,23 +167,3 @@ def _get_cvar_weights_from_percentile(
     if n_var < indices.size:
         weights[indices[n_var]] = p_var
     return weights
-
-
-class DefaultRealizationFilterPlugin(RealizationFilterPlugin):
-    """Default realization filter plugin class."""
-
-    @classmethod
-    def create(cls, filter_config: RealizationFilterConfig) -> DefaultRealizationFilter:
-        """Create a DefaultRealizationFilter instance.
-
-        Args:
-            filter_config: The realization filter configuration.
-
-        Returns:
-            A new `DefaultRealizationFilter`.
-        """
-        return DefaultRealizationFilter(filter_config)
-
-    @classmethod
-    def is_supported(cls, method: str) -> bool:  # ruff: ignore[undocumented-public-method]
-        return method.lower() in DEFAULT_REALIZATION_FILTER_METHODS

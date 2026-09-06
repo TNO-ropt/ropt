@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 if TYPE_CHECKING:
     import numpy as np
@@ -11,6 +11,7 @@ if TYPE_CHECKING:
 
     from ropt.config import FunctionEstimatorConfig
     from ropt.context import EnOptContext
+    from ropt.plugins import MethodSpec
 
 
 class FunctionEstimator(ABC):
@@ -26,6 +27,14 @@ class FunctionEstimator(ABC):
 
     See [Function Estimators](../optimizer_setup/function_estimators.md) for examples
     and further guidance.
+    """
+
+    methods: ClassVar[MethodSpec]
+    """The estimator methods this class provides.
+
+    Either a set of names, which the registry matches case-insensitively, or a
+    predicate for classes that cannot enumerate them. Include `"default"` in the
+    set if this class has one. See [`MethodSpec`][ropt.plugins.MethodSpec].
     """
 
     @abstractmethod

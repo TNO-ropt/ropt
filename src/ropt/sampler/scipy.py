@@ -2,7 +2,7 @@
 
 import copy
 import warnings
-from typing import Any, Final
+from typing import Any, ClassVar, Final
 
 import numpy as np
 from numpy.random import Generator
@@ -13,7 +13,7 @@ from scipy.stats.qmc import Halton, LatinHypercube, QMCEngine, Sobol, scale
 from ropt.config import SamplerConfig
 from ropt.context import EnOptContext
 from ropt.exceptions import UnsupportedError
-from ropt.plugins.sampler import SamplerPlugin
+from ropt.plugins import MethodSpec
 from ropt.sampler import Sampler
 
 _STATS_SAMPLERS: Final[dict[str, Any]] = {
@@ -69,6 +69,8 @@ class SciPySampler(Sampler):
     [`scipy.stats`](https://docs.scipy.org/doc/scipy/reference/stats.html) and
     documentation for available options.
     """
+
+    methods: ClassVar[MethodSpec] = SCIPY_SAMPLER_SUPPORTED_METHODS | {"default"}
 
     def __init__(self, sampler_config: SamplerConfig) -> None:  # ruff: ignore[undocumented-public-init]
         self._sampler_config = sampler_config
@@ -184,26 +186,3 @@ class SciPySampler(Sampler):
                 return _run_qmc_engine()
         else:
             return _run_qmc_engine()
-
-
-class SciPySamplerPlugin(SamplerPlugin):
-    """Default sampler plugin class."""
-
-    @classmethod
-    def create(
-        cls,
-        sampler_config: SamplerConfig,
-    ) -> SciPySampler:
-        """Create a SciPySampler instance.
-
-        Args:
-            sampler_config: The sampler configuration.
-
-        Returns:
-            A new `SciPySampler`.
-        """
-        return SciPySampler(sampler_config)
-
-    @classmethod
-    def is_supported(cls, method: str) -> bool:  # ruff: ignore[undocumented-public-method]
-        return method.lower() in (SCIPY_SAMPLER_SUPPORTED_METHODS | {"default"})

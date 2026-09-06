@@ -16,7 +16,7 @@ before they arrive. A backend therefore neither scales nor unscales anything:
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 if TYPE_CHECKING:
     import numpy as np
@@ -25,6 +25,7 @@ if TYPE_CHECKING:
     from ropt.config import BackendConfig
     from ropt.context import EnOptContext
     from ropt.core import OptimizerCallback
+    from ropt.plugins import MethodSpec
 
 
 class Backend(ABC):
@@ -65,6 +66,14 @@ class Backend(ABC):
 
     - `is_parallel`: Indicates whether the backend may evaluate multiple
                      candidate variable vectors concurrently.
+    """
+
+    methods: ClassVar[MethodSpec]
+    """The optimization algorithms this class provides.
+
+    Either a set of names, which the registry matches case-insensitively, or a
+    predicate for classes that cannot enumerate them. Include `"default"` in the
+    set if this class has one. See [`MethodSpec`][ropt.plugins.MethodSpec].
     """
 
     @abstractmethod

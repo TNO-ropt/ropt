@@ -1,7 +1,7 @@
 """Extending `ropt` with plugins."""
 
-from .base import Plugin
+from .manager import MethodSpec
 
 __all__ = [
-    "Plugin",
+    "MethodSpec",
 ]
