@@ -195,14 +195,12 @@ class EnOptContext(BaseModel):
             updates["function_estimators"] = {
                 "0": get_plugin(
                     "function_estimator", method=function_estimator_config.method
-                ).create(function_estimator_config)
+                )(function_estimator_config)
             }
         if not self.samplers:
             sampler_config = SamplerConfig.model_validate({})
             updates["samplers"] = {
-                "0": get_plugin("sampler", method=sampler_config.method).create(
-                    sampler_config
-                )
+                "0": get_plugin("sampler", method=sampler_config.method)(sampler_config)
             }
         if updates:
             return self.model_copy(update=updates)

@@ -167,10 +167,9 @@ All `method` fields use the same naming convention:
   the same name.
 
 The plugin part corresponds to the name under which the plugin is registered
-(via an entry point); the method part is any string that the plugin's
-`is_supported()` classmethod accepts. For example, the built-in SciPy backend
-plugin is named `scipy` and supports methods like `"default"`, `"SLSQP"`, and
-`"L-BFGS-B"`.
+(via an entry point); the method part is any name the plugin declares in its
+`methods` attribute. For example, the built-in SciPy backend is named `scipy`
+and supports methods like `"default"`, `"SLSQP"`, and `"L-BFGS-B"`.
 
 Both the plugin name and the method name are case-insensitive, so
 `"SciPy/SLSQP"`, `"scipy/slsqp"`, and `"SCIPY/Slsqp"` all resolve to the

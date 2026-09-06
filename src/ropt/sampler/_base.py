@@ -8,7 +8,7 @@ sampler implementations must follow.
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 if TYPE_CHECKING:
     import numpy as np
@@ -17,6 +17,7 @@ if TYPE_CHECKING:
 
     from ropt.config._sampler_config import SamplerConfig
     from ropt.context import EnOptContext
+    from ropt.plugins import MethodSpec
 
 
 class Sampler(ABC):
@@ -43,6 +44,14 @@ class Sampler(ABC):
     - `init`: Receives context-dependent inputs for workflow-specific setup.
     - `generate_samples`: Returns perturbation samples with the expected shape
       and masking semantics.
+    """
+
+    methods: ClassVar[MethodSpec]
+    """The sampling methods this class provides.
+
+    Either a set of names, which the registry matches case-insensitively, or a
+    predicate for classes that cannot enumerate them. Include `"default"` in the
+    set if this class has one. See [`MethodSpec`][ropt.plugins.MethodSpec].
     """
 
     @abstractmethod

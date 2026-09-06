@@ -43,7 +43,7 @@ def validate_backend_options(method: str, options: dict[str, Any] | list[str]) -
     backend_config = BackendConfig.model_validate(
         {"method": method, "options": options}
     )
-    plugin.create(backend_config).validate_options()
+    plugin(backend_config).validate_options()
 
 
 def restore_keyboard_interrupt() -> None:

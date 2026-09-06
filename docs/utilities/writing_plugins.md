@@ -7,9 +7,9 @@ from a configuration by name, in the same way the built-in ones are:
 "backend": {"method": "my_package/my_method"}
 ```
 
-A plugin is a small factory class. It answers which method names it provides,
-and builds the object that does the actual work. `ropt` finds it through a
-Python entry point, so nothing has to be imported or registered by hand.
+A plugin is the implementation class itself. It declares which method names it
+provides, and `ropt` finds it through a Python entry point, so nothing has to be
+imported or registered by hand.
 
 !!! note
 
@@ -22,41 +22,44 @@ Python entry point, so nothing has to be imported or registered by hand.
 
 ## The plugin areas
 
-There is one plugin area per component type. Each has its own entry-point group,
-its own factory base class, and the base class of the object it creates:
+There is one plugin area per component type, each with its own entry-point group
+and its own base class:
 
-| Entry-point group | Factory base class | Creates |
-| ----------------- | ------------------ | ------- |
-| `ropt.plugins.backend` | [`BackendPlugin`][ropt.plugins.backend.BackendPlugin] | [`Backend`][ropt.backend.Backend] |
-| `ropt.plugins.sampler` | [`SamplerPlugin`][ropt.plugins.sampler.SamplerPlugin] | [`Sampler`][ropt.sampler.Sampler] |
-| `ropt.plugins.realization_filter` | [`RealizationFilterPlugin`][ropt.plugins.realization_filter.RealizationFilterPlugin] | [`RealizationFilter`][ropt.realization_filter.RealizationFilter] |
-| `ropt.plugins.function_estimator` | [`FunctionEstimatorPlugin`][ropt.plugins.function_estimator.FunctionEstimatorPlugin] | [`FunctionEstimator`][ropt.function_estimator.FunctionEstimator] |
+| Entry-point group | Base class |
+| ----------------- | ---------- |
+| `ropt.plugins.backend` | [`Backend`][ropt.backend.Backend] |
+| `ropt.plugins.sampler` | [`Sampler`][ropt.sampler.Sampler] |
+| `ropt.plugins.realization_filter` | [`RealizationFilter`][ropt.realization_filter.RealizationFilter] |
+| `ropt.plugins.function_estimator` | [`FunctionEstimator`][ropt.function_estimator.FunctionEstimator] |
 
-## What a plugin must implement
+## What a plugin must declare
 
-All factory classes derive from [`Plugin`][ropt.plugins.Plugin] and share the
-same two-method interface:
+Subclass the base class of the area and add one class attribute:
 
-- **`is_supported(method)`** — return `True` for every method name the plugin
-  provides. It receives the method name only, without the plugin prefix. Method
-  names are matched case-insensitively, so compare in lower case.
-- **`create(config)`** — build and return the object. The argument is the
-  validated configuration object for the area, for example a
-  [`SamplerConfig`][ropt.config.SamplerConfig] for a sampler, carrying the
-  `method` string and the `options` given in the configuration.
+- **`methods`** — the method names the class provides, as a set. The names are
+  matched case-insensitively, so they may be written in any case. Include
+  `"default"` if the class has a sensible standard choice, so that
+  `"my_package/default"` selects it; leave it out if it does not, and the name
+  will correctly fail to resolve.
 
-One method is optional:
+Two things are optional:
 
-- **`allows_discovery()`** — return `False` to keep the plugin from being
-  matched when a configuration gives a bare method name without a plugin
-  prefix. The built-in
-  [`external`][ropt.backend.external.ExternalBackend] backend does this,
-  because its method names belong to the backend it delegates to. The default
-  is `True`.
+- **`discoverable`** — set it to `False` to keep the plugin from being matched
+  when a configuration gives a bare method name without a plugin prefix. The
+  built-in [`external`][ropt.backend.external.ExternalBackend] backend does
+  this, because its method names belong to the backend it delegates to. The
+  default is `True`.
+- **`methods` as a predicate** — a class that cannot enumerate what it supports
+  may instead set `methods` to a function taking a method name and returning a
+  `bool`. Use this only when the names are not knowable in advance, for example
+  when they are resolved against another installed package. A predicate receives
+  the method name exactly as written, so it owns its own casing, and it cannot
+  be listed. See [`MethodSpec`][ropt.plugins.MethodSpec].
 
-By convention every plugin also supports the method name `"default"`, so that
-`"my_package/default"` selects whatever the plugin considers its standard
-choice.
+The object is constructed by calling the class with the validated configuration
+object for its area, for example a
+[`SamplerConfig`][ropt.config.SamplerConfig] for a sampler, carrying the
+`method` string and the `options` given in the configuration.
 
 ## An example
 
@@ -86,30 +89,33 @@ class UniformSampler(Sampler):
         ...
 ```
 
-Then the factory that makes it selectable:
+The only thing needed to make it selectable is the `methods` attribute, so it
+goes on the class itself:
 
 ```python
-from ropt.plugins.sampler import SamplerPlugin
+from typing import ClassVar
+
+from ropt.plugins import MethodSpec
 
 
-class UniformSamplerPlugin(SamplerPlugin):
-    @classmethod
-    def is_supported(cls, method: str) -> bool:
-        return method.lower() in {"default", "uniform"}
+class UniformSampler(Sampler):
+    methods: ClassVar[MethodSpec] = {"default", "uniform"}
 
-    @classmethod
-    def create(cls, sampler_config: SamplerConfig) -> Sampler:
-        return UniformSampler(sampler_config)
+    ...
 ```
+
+Annotating it as a `ClassVar` is what keeps type checkers and linters happy
+about a set assigned at class level; a bare `methods = {...}` works just as
+well at runtime.
 
 ## Registering it
 
-Declare the factory class under the entry-point group of its area, in the
+Declare the class under the entry-point group of its area, in the
 `pyproject.toml` of the package that contains it:
 
 ```toml
 [project.entry-points."ropt.plugins.sampler"]
-my_package = "my_package.sampler:UniformSamplerPlugin"
+my_package = "my_package.sampler:UniformSampler"
 ```
 
 The entry-point name is the plugin name used in method strings. After
@@ -129,9 +135,31 @@ from ropt.utils import get_plugin_name
 get_plugin_name("sampler", "my_package/uniform")   # "my_package"
 ```
 
-Plugins are discovered once: the shared plugin manager scans the entry points
-the first time a method is looked up. A package installed while the program is
-running is not picked up.
+## Registering one without an entry point
+
+An entry point needs an installed package, which a class written in a script or
+a notebook does not have. Such a class is added by hand with
+[`register_plugin`][ropt.plugins.manager.register_plugin]:
+
+```python
+from ropt.plugins.manager import register_plugin
+
+register_plugin("sampler", "my_package", UniformSampler)
+```
+
+It is then found by exactly the same lookups as an installed one, so
+`"my_package/uniform"` works from that point on, for every optimization started
+afterwards. The class must declare its `methods` just as an installed plugin
+does.
+
+Registering under the name of an installed plugin is an error, since installed
+plugins cannot be shadowed. Registering a name that was registered before
+replaces it, which is what re-running a cell that defines and registers a class
+needs to do.
+
+Plugins are otherwise discovered once: the shared plugin manager scans the entry
+points the first time a method is looked up, so a package installed while the
+program is running is not picked up.
 
 ## Validating options
 
@@ -149,10 +177,7 @@ documentation table for them. The built-in SciPy backend uses it; see
 
 ## Where to next
 
-- The interfaces in full: [Plugin Base Classes](../reference/plugin_bases.md)
-  and [Plugin Manager](../reference/plugin_manager.md).
-- What the built-in plugins register:
-  [Default Plugins](../reference/default_plugins.md).
+- The registry in full: [Plugin Manager](../reference/plugin_manager.md).
 - Looking up and validating installed plugins:
   [Plugin Discovery](plugin_discovery.md).
 - How method strings are resolved:

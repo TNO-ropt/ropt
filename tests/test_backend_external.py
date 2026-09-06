@@ -5,7 +5,7 @@ from __future__ import annotations
 import multiprocessing
 import pickle  # ruff: ignore[suspicious-pickle-import]
 import sys
-from typing import Any, cast
+from typing import TYPE_CHECKING, Any, ClassVar, cast
 
 import numpy as np
 import pytest
@@ -20,6 +20,7 @@ from ropt.backend.external import (
     ExternalBackend,
     _decode_child_exception,
     _encode_child_exception,
+    _register_delegate,
     _run,
     _wrap_with_traceback,
 )
@@ -29,7 +30,17 @@ from ropt.config import BackendConfig
 from ropt.context import EnOptContext
 from ropt.enums import ExitCode
 from ropt.exceptions import ExecutionError, OptimizerStop
+from ropt.plugins.manager import get_plugin, get_plugin_name, register_plugin
 from ropt.simple import optimize
+
+if TYPE_CHECKING:
+    from ropt.plugins import MethodSpec
+
+
+class _RegisteredDelegate(SciPyBackend):
+    """A delegate no entry point declares, so only a registration can find it."""
+
+    methods: ClassVar[MethodSpec] = {"slsqp"}
 
 
 def _make_context() -> EnOptContext:
@@ -43,6 +54,8 @@ def _make_child_args() -> bytes:
     return dumps(
         {
             "config": config,
+            "delegate_name": get_plugin_name("backend", config.method),
+            "delegate_cls": get_plugin("backend", config.method),
             "context": _make_context(),
             "initial_values": np.zeros(2),
         }
@@ -241,7 +254,33 @@ def test_the_problem_travels_without_cloudpickle(
 
     assert dumped
     assert restored["config"].method == "scipy/slsqp"
+    assert restored["delegate_cls"] is SciPyBackend
     assert np.array_equal(restored["initial_values"], np.zeros(2))
+
+
+def test_an_installed_delegate_is_left_to_the_child_to_find(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Registering over an installed name is refused, so it must not be tried.
+
+    Every run with a built-in delegate goes through here, so getting this wrong
+    breaks all of them.
+    """
+    monkeypatch.setattr("ropt.plugins.manager._plugin_manager", None)
+
+    _register_delegate("scipy", SciPyBackend, "scipy/slsqp")
+
+    assert get_plugin("backend", "scipy/slsqp") is SciPyBackend
+
+
+def test_a_registered_delegate_is_registered_again_in_the_child(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr("ropt.plugins.manager._plugin_manager", None)
+
+    _register_delegate("registered", _RegisteredDelegate, "registered/slsqp")
+
+    assert get_plugin("backend", "registered/slsqp") is _RegisteredDelegate
 
 
 class _VanishingMarker:
@@ -340,5 +379,37 @@ def test_a_closure_objective_runs_in_an_external_process(
     result = optimize(config, np.zeros(3), _objective)
 
     assert dumped
+    assert result.variables is not None
+    assert np.allclose(result.variables, target, atol=0.02)
+
+
+@pytest.mark.external
+def test_a_registered_delegate_runs_in_an_external_process(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A delegate the child cannot discover has to travel with the problem.
+
+    The child builds its registry from entry points, so without the record it
+    would fail to resolve a delegate that was only ever registered here.
+    """
+    monkeypatch.setattr("ropt.plugins.manager._plugin_manager", None)
+    register_plugin("backend", "registered", _RegisteredDelegate)
+
+    target = 0.5
+
+    def _objective(variables: np.ndarray, _: Any) -> float:
+        return float(((variables - target) ** 2).sum())
+
+    config = {
+        "optimizer": {"max_functions": 20},
+        "backend": {
+            "method": "external/registered/slsqp",
+            "max_iterations": 15,
+            "convergence_tolerance": 1e-5,
+        },
+        "variables": {"variable_count": 3, "perturbation_magnitudes": 0.01},
+    }
+    result = optimize(config, np.zeros(3), _objective)
+
     assert result.variables is not None
     assert np.allclose(result.variables, target, atol=0.02)

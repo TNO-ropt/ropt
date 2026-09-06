@@ -47,7 +47,7 @@ def _make_validator(
                 if isinstance(value, config_type)
                 else config_type.model_validate(value)
             )
-            result = get_plugin(plugin_type, method=config.method).create(config)
+            result = get_plugin(plugin_type, method=config.method)(config)
             assert isinstance(result, instance_type)
         else:
             msg = (

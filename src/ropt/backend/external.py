@@ -7,7 +7,7 @@ import multiprocessing
 import queue
 import traceback
 from functools import partial
-from typing import TYPE_CHECKING, Any, Final
+from typing import TYPE_CHECKING, Any, ClassVar, Final
 
 import numpy as np
 
@@ -15,8 +15,7 @@ from ropt._logging import get_logger
 from ropt._serialize import CANNOT_DESERIALIZE, CANNOT_SERIALIZE, dumps, loads
 from ropt.backend import Backend
 from ropt.exceptions import ExecutionError, OptimizerStop
-from ropt.plugins.backend import BackendPlugin
-from ropt.plugins.manager import get_plugin, get_plugin_name
+from ropt.plugins.manager import get_plugin, get_plugin_name, register_plugin
 
 if TYPE_CHECKING:
     from multiprocessing.process import BaseProcess
@@ -26,6 +25,7 @@ if TYPE_CHECKING:
     from ropt.config import BackendConfig
     from ropt.context import EnOptContext
     from ropt.core import OptimizerCallback, OptimizerCallbackResult
+    from ropt.plugins import MethodSpec
 
 _logger = get_logger(__name__)
 
@@ -39,6 +39,20 @@ class _DriverStopped(Exception):  # ruff: ignore[error-suffix-on-exception-name]
     Swallowed in the child and never reported back; the driver re-raises the
     real exception.
     """
+
+
+def _delegate_exists(method: str) -> bool:
+    """Report whether some other backend provides `method`.
+
+    The method is passed on verbatim, since the delegate owns its own casing.
+
+    Args:
+        method: The method name to look for, without the `external/` prefix.
+
+    Returns:
+        Whether a backend other than this one provides it.
+    """
+    return get_plugin_name("backend", method) is not None
 
 
 class ExternalBackend(Backend):
@@ -64,13 +78,21 @@ class ExternalBackend(Backend):
 
     Note:
         The problem is sent to the child process by serializing it, so
-        everything the delegate needs must be serializable. The standard
-        library can send anything that can be looked up by name, which covers
-        the built-in plugins and any plugin class defined in an importable
-        module. Installing the optional `cloudpickle` extra lifts that
-        restriction, so plugin instances of classes defined inside a function
-        or a notebook can be sent as well.
+        everything the delegate needs must be serializable, including the
+        delegate class itself. The standard library can send anything that can
+        be looked up by name, which covers the built-in plugins and any plugin
+        class defined in an importable module. Installing the optional
+        `cloudpickle` extra lifts that restriction, so plugins and plugin
+        instances of classes defined inside a function or a notebook can be
+        sent as well.
     """
+
+    # A predicate, not a set: what this backend can proxy is whatever else is
+    # registered, which is not knowable in advance. It consults the registry by
+    # name, so it must never be discoverable itself, or every lookup would
+    # match it as well as the real plugin.
+    methods: ClassVar[MethodSpec] = staticmethod(_delegate_exists)
+    discoverable: ClassVar[bool] = False
 
     def __init__(self, backend_config: BackendConfig) -> None:
         """Initialize the external backend.
@@ -82,14 +104,16 @@ class ExternalBackend(Backend):
         self._backend_config = backend_config.model_copy(
             update={"method": backend_config.method.split("/", maxsplit=1)[1]}
         )
-        self._backend_plugin = get_plugin("backend", method=self._backend_config.method)
+        method = self._backend_config.method
+        self._delegate_cls = get_plugin("backend", method=method)
+        self._delegate_name = get_plugin_name("backend", method)
 
     def init(  # ruff: ignore[undocumented-public-method]
         self, context: EnOptContext, optimizer_callback: OptimizerCallback
     ) -> None:
         self._context = context
         self._optimizer_callback = optimizer_callback
-        backend = self._backend_plugin.create(self._backend_config)
+        backend = self._delegate_cls(self._backend_config)
         backend.init(
             context.model_copy(update={"backend": backend}), optimizer_callback
         )
@@ -155,7 +179,7 @@ class ExternalBackend(Backend):
     def validate_options(  # ruff: ignore[undocumented-public-method]
         self,
     ) -> None:
-        self._backend_plugin.create(self._backend_config).validate_options()
+        self._delegate_cls(self._backend_config).validate_options()
 
     @property
     def is_parallel(self) -> bool:  # ruff: ignore[undocumented-public-method]
@@ -176,6 +200,8 @@ class ExternalBackend(Backend):
             return dumps(
                 {
                     "config": self._backend_config,
+                    "delegate_name": self._delegate_name,
+                    "delegate_cls": self._delegate_cls,
                     "context": self._context,
                     "initial_values": initial_values,
                 }
@@ -233,6 +259,23 @@ def _run(
         request_queue.put(None)
 
 
+def _register_delegate(name: str, plugin: type[Any], method: str) -> None:
+    """Make a delegate that is not installed available in this process.
+
+    A new process rebuilds its registry from entry points, which cannot see a
+    delegate the parent registered by hand. An installed one is already there,
+    and an installed name may not be registered over, so the class is added
+    only when this process cannot resolve the method by itself.
+
+    Args:
+        name:   The name the parent resolved the delegate to.
+        plugin: The delegate class.
+        method: The method the delegate was selected for.
+    """
+    if get_plugin_name("backend", method) is None:
+        register_plugin("backend", name, plugin)
+
+
 def _prepare(
     data: bytes,
     request_queue: multiprocessing.Queue[dict[str, Any] | None],
@@ -246,7 +289,10 @@ def _prepare(
         raise
 
     config = data_dict["config"]
-    backend = get_plugin("backend", method=config.method).create(config)
+    _register_delegate(
+        data_dict["delegate_name"], data_dict["delegate_cls"], config.method
+    )
+    backend = get_plugin("backend", method=config.method)(config)
     context = data_dict["context"].model_copy(update={"backend": backend})
     backend.init(
         context,
@@ -331,27 +377,3 @@ def _wrap_with_traceback(message: str, tb_str: str) -> RuntimeError:
     if tb_str:
         err.add_note(f"Child traceback:\n{tb_str}")
     return err
-
-
-class ExternalBackendPlugin(BackendPlugin):
-    """The external optimizer plugin class."""
-
-    @classmethod
-    def create(cls, backend_config: BackendConfig) -> ExternalBackend:
-        """Create an ExternalBackend instance.
-
-        Args:
-            backend_config: The backend configuration.
-
-        Returns:
-            A new `ExternalBackend`.
-        """
-        return ExternalBackend(backend_config)
-
-    @classmethod
-    def is_supported(cls, method: str) -> bool:  # ruff: ignore[undocumented-public-method]
-        return get_plugin_name("backend", method) is not None
-
-    @classmethod
-    def allows_discovery(cls) -> bool:  # ruff: ignore[undocumented-public-method]
-        return False

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 if TYPE_CHECKING:
     import numpy as np
@@ -11,6 +11,7 @@ if TYPE_CHECKING:
 
     from ropt.config._realization_filter_config import RealizationFilterConfig
     from ropt.context import EnOptContext
+    from ropt.plugins import MethodSpec
 
 
 class RealizationFilter(ABC):
@@ -26,6 +27,14 @@ class RealizationFilter(ABC):
 
     See [Realization Filters](../optimizer_setup/realization_filters.md) for examples
     and further guidance.
+    """
+
+    methods: ClassVar[MethodSpec]
+    """The filter methods this class provides.
+
+    Either a set of names, which the registry matches case-insensitively, or a
+    predicate for classes that cannot enumerate them. Include `"default"` in the
+    set if this class has one. See [`MethodSpec`][ropt.plugins.MethodSpec].
     """
 
     @abstractmethod

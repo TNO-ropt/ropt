@@ -163,10 +163,7 @@ nav:
         - "Evaluators": reference/components_evaluators.md
         - "Executors": reference/components_executors.md
         - "Utilities": reference/components_utils.md
-      - "Plugin System":
-        - "Plugin Bases": reference/plugin_bases.md
-        - "Plugin Manager": reference/plugin_manager.md
-        - "Default Plugins": reference/default_plugins.md
+      - "Plugin System": reference/plugin_manager.md
       - "Enumerations": reference/enums.md
       - "Exceptions": reference/exceptions.md
       - "Basic Optimizer": reference/basic_optimizer.md
