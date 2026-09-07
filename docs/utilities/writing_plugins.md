@@ -191,7 +191,7 @@ file — that is the per-run answer — or to be quiet.
 
 Not every library allows this, and `ropt` does not paper over the ones that do
 not. What such a backend must do instead is **say so in its own
-documentation**, in one of two ways:
+documentation**:
 
 - **It needs exclusive process state** — a working directory, a fixed file name,
   or state kept in the library between calls. What that rules out is not "one
@@ -201,15 +201,76 @@ documentation**, in one of two ways:
   in-process, and point users at the
   [`external`][ropt.backend.external.ExternalBackend] backend, which gives it a
   process of its own.
-- **Its output cannot be directed per run** — it prints, and offers no more
-  than an on/off switch. Say that its output goes to the process's standard
-  output. [`stdout`](../optimizer_setup/configuration.md#optimizer) captures
-  that for a single run, but cannot keep concurrent runs apart, because it
-  redirects the process as a whole.
 
-Both are properties of the wrapped library rather than defects in the backend
-wrapping it. State them; capturing the process's output on one run's behalf is
-precisely what cannot be made correct once runs overlap.
+Output is the exception to the rule: `ropt` captures it for you, on both levels,
+when the user configures
+[`stdout` or `stderr`](../optimizer_setup/configuration.md#optimizer). A backend
+should not capture its own output, but it does have two things to do.
+
+## Reporting progress { #reporting-progress }
+
+Whether the optimizer reports at all is the user's choice, made through
+[`verbose`](../optimizer_setup/configuration.md#backend). Map it onto whatever
+your library provides using
+[`resolve_verbosity`][ropt.backend.utils.resolve_verbosity], which normalises
+the setting so you need not tell `True` from `1` yourself:
+
+```python
+level = resolve_verbosity(verbose=self._config.verbose)
+```
+
+`None` means "your library's own default level", `0` means silent, and a
+positive integer is an explicit level to be clamped to what you support. Note
+that `None` calls for opposite actions in different libraries: SciPy prints
+nothing unless asked, so it must be switched on, while NOMAD reports by default,
+so it is left alone.
+
+Set the corresponding option only if the user has not set it themselves —
+`setdefault` for a dictionary, or a check before appending for a list — so that
+a specific option such as `DISPLAY_DEGREE 3` refines the generic flag rather
+than fighting it.
+
+## Declaring native output { #declaring-native-output }
+
+`ropt` captures the optimizer's output by swapping `sys.stdout` and
+`sys.stderr` for the duration of the run. That catches anything printed from
+Python — which is most optimizers, including everything in SciPy except `tnc`.
+A compiled optimizer, though, commonly writes to file descriptors 1 and 2
+directly, and never touches `sys.stdout` at all.
+
+Set
+[`bypasses_python_output`][ropt.backend.Backend.bypasses_python_output] to
+`True` when the wrapped library does that, and `ropt` redirects the descriptors
+as well:
+
+```python
+class MyBackend(Backend):
+    @property
+    def bypasses_python_output(self) -> bool:
+        return True
+```
+
+The answer may differ per method, in which case return it based on the
+configured method — the built-in SciPy backend returns `self._method == "tnc"`.
+**When unsure, declare it for the whole backend.** Being wrong that way costs
+only a brief rewiring of process-global state; being wrong the other way means
+the user's output escapes to the terminal, and nothing announces it.
+
+You do not have to guess.
+[`collect_native_output`][ropt.backend.utils.collect_native_output] runs an
+optimization with the Python streams diverted and the descriptors captured, so
+whatever it returns was written below Python:
+
+```python
+from ropt.backend.utils import collect_native_output
+
+def test_backend_declares_native_output_correctly():
+    native = collect_native_output(lambda: optimize(config, x0, objective))
+    assert native == ""      # ... or `!= ""` if the declaration is True
+```
+
+Worth having as a test rather than a one-off check: these properties drift.
+SciPy's `disp` silently became a no-op for `l-bfgs-b` and `nelder-mead` in 1.18.
 
 ## Where to next
 

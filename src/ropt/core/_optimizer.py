@@ -4,20 +4,29 @@ from __future__ import annotations
 
 import os
 import sys
+import threading
 from contextlib import contextmanager
 from typing import TYPE_CHECKING, Protocol
 
 import numpy as np
 
 from ropt._logging import get_logger
+from ropt._native_streams import flush_native_streams
 from ropt.enums import ExitCode
-from ropt.exceptions import ExecutorStopped, OptimizerStop, TooFewRealizations
+from ropt.exceptions import (
+    ExecutorStopped,
+    OptimizerStop,
+    TooFewRealizations,
+    WorkflowError,
+)
 from ropt.results import FunctionResults, GradientResults
 
 from ._callback import OptimizerCallbackResult
 
 if TYPE_CHECKING:
     from collections.abc import Generator
+    from pathlib import Path
+    from typing import TextIO
 
     from numpy.typing import NDArray
 
@@ -28,6 +37,37 @@ if TYPE_CHECKING:
 
 
 _logger = get_logger(__name__)
+
+
+# Output capture rewires process-global state, so at most one run may hold it.
+_capture_lock = threading.Lock()
+_capture_active = False
+
+
+def _claim_capture() -> None:
+    global _capture_active  # ruff: ignore[global-statement]
+    with _capture_lock:
+        if _capture_active:
+            msg = (
+                "Optimizer output is already being captured in this process. "
+                "Only one optimization at a time can capture output; remove "
+                "`stdout` and `stderr` from the optimizer settings of the "
+                "concurrent runs, or run them in separate processes."
+            )
+            raise WorkflowError(msg)
+        _capture_active = True
+
+
+def _release_capture() -> None:
+    global _capture_active  # ruff: ignore[global-statement]
+    with _capture_lock:
+        _capture_active = False
+
+
+def _resolve_output_path(path: Path | None, output_dir: Path | None) -> Path | None:
+    if path is None or path.is_absolute() or output_dir is None:
+        return path
+    return output_dir / path
 
 
 class SignalEvaluationCallback(Protocol):
@@ -104,8 +144,11 @@ class EnsembleOptimizer:
         self._backend = self._context.backend
         self._backend.init(self._context, self._optimizer_callback)
 
-        # Optional redirection of standard output:
-        self._redirector = _Redirector(self._context)
+        # Optional capture of the optimizer's output:
+        self._capture = _OutputCapture(
+            self._context,
+            bypasses_python_output=self._backend.bypasses_python_output,
+        )
 
     @property
     def is_parallel(self) -> bool:
@@ -138,7 +181,7 @@ class EnsembleOptimizer:
         self._initial_variables = variables.copy()
         exit_code = ExitCode.OPTIMIZER_FINISHED
         try:
-            with self._redirector.start():
+            with self._capture.capture():
                 self._backend.start(variables)
         except TooFewRealizations:
             exit_code = ExitCode.TOO_FEW_REALIZATIONS
@@ -245,7 +288,7 @@ class EnsembleOptimizer:
         compute_functions: bool = False,
         compute_gradients: bool = False,
     ) -> tuple[Results, ...]:
-        with self._redirector.suspend():
+        with self._capture.release():
             assert compute_functions or compute_gradients
             if self._signal_evaluation:
                 self._signal_evaluation()
@@ -307,59 +350,117 @@ class EnsembleOptimizer:
         )
 
 
-class _Redirector:
-    def __init__(self, context: EnOptContext) -> None:
+class _OutputCapture:
+    def __init__(self, context: EnOptContext, *, bypasses_python_output: bool) -> None:
         output_dir = context.optimizer.output_dir
-        stdout = context.optimizer.stdout
-        stderr = context.optimizer.stderr
+        stdout = _resolve_output_path(context.optimizer.stdout, output_dir)
+        stderr = _resolve_output_path(context.optimizer.stderr, output_dir)
+        # Configuring only `stdout` sends both streams to the same file.
+        if stdout is not None and stderr is None:
+            stderr = stdout
 
-        if stdout is not None:
-            self._redirect = True
-            if stderr is None:
-                stderr = stdout
-            if not stdout.is_absolute() and output_dir is not None:
-                stdout = output_dir / stdout
-            if not stderr.is_absolute() and output_dir is not None:
-                stderr = output_dir / stderr
-            sys.stdout.flush()
-            sys.stderr.flush()
-            self._old_stdout = os.dup(1)
-            self._old_stderr = os.dup(2)
-            self._new_stdout = os.open(stdout, os.O_WRONLY | os.O_CREAT)
-            self._new_stderr = os.open(stderr, os.O_WRONLY | os.O_CREAT)
-        else:
-            self._redirect = False
+        self._stdout_path = stdout
+        self._stderr_path = stderr
+        self._redirect_descriptors = bypasses_python_output
+        self._enabled = stdout is not None or stderr is not None
 
-    @contextmanager
-    def start(self) -> Generator[None]:
-        if self._redirect:
-            try:
-                sys.stdout.flush()
-                sys.stderr.flush()
-                os.dup2(self._new_stdout, 1)
-                os.dup2(self._new_stderr, 2)
-                yield
-            finally:
-                os.dup2(self._old_stdout, 1)
-                os.dup2(self._old_stderr, 2)
-                os.close(self._new_stdout)
-                os.close(self._new_stderr)
-        else:
-            yield
+        self._stdout_file: TextIO | None = None
+        self._stderr_file: TextIO | None = None
+        self._saved_stdout: TextIO | None = None
+        self._saved_stderr: TextIO | None = None
+        self._saved_stdout_fd: int | None = None
+        self._saved_stderr_fd: int | None = None
+        self._installed = False
 
     @contextmanager
-    def suspend(self) -> Generator[None]:
-        if self._redirect:
-            try:
-                os.fsync(self._new_stdout)
-                os.fsync(self._new_stderr)
-                os.dup2(self._old_stdout, 1)
-                os.dup2(self._old_stderr, 2)
-                yield
-            finally:
-                sys.stdout.flush()
-                sys.stderr.flush()
-                os.dup2(self._new_stdout, 1)
-                os.dup2(self._new_stderr, 2)
-        else:
+    def capture(self) -> Generator[None]:
+        if not self._enabled:
             yield
+            return
+        _claim_capture()
+        try:
+            with self._open_files():
+                self._install()
+                try:
+                    yield
+                finally:
+                    self._uninstall()
+        finally:
+            _release_capture()
+
+    @contextmanager
+    def release(self) -> Generator[None]:
+        if not self._installed:
+            yield
+            return
+        self._uninstall()
+        try:
+            yield
+        finally:
+            self._install()
+
+    @contextmanager
+    def _open_files(self) -> Generator[None]:
+        opened: dict[Path, TextIO] = {}
+        try:
+            for path in (self._stdout_path, self._stderr_path):
+                if path is not None and path not in opened:
+                    opened[path] = path.open("w", buffering=1)
+            self._stdout_file = (
+                None if self._stdout_path is None else opened[self._stdout_path]
+            )
+            self._stderr_file = (
+                None if self._stderr_path is None else opened[self._stderr_path]
+            )
+            yield
+        finally:
+            self._stdout_file = None
+            self._stderr_file = None
+            for handle in opened.values():
+                handle.close()
+
+    def _install(self) -> None:
+        sys.stdout.flush()
+        sys.stderr.flush()
+        if self._redirect_descriptors:
+            flush_native_streams()
+
+        self._saved_stdout = sys.stdout
+        self._saved_stderr = sys.stderr
+        if self._stdout_file is not None:
+            sys.stdout = self._stdout_file
+        if self._stderr_file is not None:
+            sys.stderr = self._stderr_file
+
+        if self._redirect_descriptors:
+            if self._stdout_file is not None:
+                self._saved_stdout_fd = os.dup(1)
+                os.dup2(self._stdout_file.fileno(), 1)
+            if self._stderr_file is not None:
+                self._saved_stderr_fd = os.dup(2)
+                os.dup2(self._stderr_file.fileno(), 2)
+
+        self._installed = True
+
+    def _uninstall(self) -> None:
+        for handle in (self._stdout_file, self._stderr_file):
+            if handle is not None:
+                handle.flush()
+        if self._redirect_descriptors:
+            flush_native_streams()
+
+        if self._saved_stdout_fd is not None:
+            os.dup2(self._saved_stdout_fd, 1)
+            os.close(self._saved_stdout_fd)
+            self._saved_stdout_fd = None
+        if self._saved_stderr_fd is not None:
+            os.dup2(self._saved_stderr_fd, 2)
+            os.close(self._saved_stderr_fd)
+            self._saved_stderr_fd = None
+
+        if self._saved_stdout is not None:
+            sys.stdout = self._saved_stdout
+        if self._saved_stderr is not None:
+            sys.stderr = self._saved_stderr
+
+        self._installed = False

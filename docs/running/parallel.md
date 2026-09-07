@@ -404,9 +404,12 @@ runs](handlers.md#sharing-a-handler-across-concurrent-runs).
     [`external/...`](../optimizer_setup/configuration.md#external-backend) and
     it gets a process of its own, where none of that is shared.
 
-    Optimizer output cannot be separated here whichever backend you use:
-    [`stdout` and `stderr`](../optimizer_setup/configuration.md#optimizer)
-    redirect the process as a whole, so leave them unset while runs overlap.
+    Optimizer output capture is likewise for one run at a time. If more than
+    one of these runs sets
+    [`stdout` or `stderr`](../optimizer_setup/configuration.md#optimizer), the
+    second to start raises [`WorkflowError`][ropt.exceptions.WorkflowError].
+    Leave both unset here, and set [`verbose=False`](../optimizer_setup/configuration.md#backend)
+    unless you want the runs' reports interleaved on the terminal.
 
 ### Failure in one run
 

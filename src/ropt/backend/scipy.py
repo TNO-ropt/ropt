@@ -28,6 +28,7 @@ from ropt.backend._base import Backend
 from ropt.backend.utils import (
     NormalizedConstraints,
     get_masked_linear_constraints,
+    resolve_verbosity,
     validate_supported_constraints,
 )
 from ropt.config.options import OptionsSchemaModel
@@ -106,9 +107,10 @@ _NO_GRADIENT: Final = {
 
 # These methods can handle integer variables:
 _SUPPORT_INTEGER: Final = {"differential_evolution"}
-
 # These methods use constraint objects instead of dicts:
 _USE_CONSTRAINT_OBJECTS: Final = {"differential_evolution", "cobyqa", "trust-constr"}
+# The highest reporting level `trust-constr` accepts:
+_MAX_TRUST_CONSTR_VERBOSITY: Final = 3
 
 _ConstraintType = str | Callable[..., float] | Callable[..., NDArray[np.float64]]
 
@@ -135,11 +137,11 @@ class SciPyBackend(Backend):
     is the only method that handles integer variables; the others silently
     treat them as continuous.
 
-    SciPy prints its own progress report, which this backend switches on when an
-    [`output_dir`][ropt.config.OptimizerConfig] is configured. SciPy offers no
-    way to send it anywhere in particular, so it goes to the process's standard
-    output; concurrent runs cannot keep theirs apart. See [Parallel Execution
-    and Many Runs](../running/parallel.md#many-optimizations-at-once).
+    SciPy prints its own progress report when
+    [`verbose`][ropt.config.BackendConfig] asks for it. `trust-constr` is the
+    only method with reporting levels of its own; for the rest the setting is
+    on or off. Note that `disp` is a no-op for `l-bfgs-b` and `nelder-mead` in
+    recent SciPy releases, which therefore report nothing.
 
     Algorithm-specific options are passed through the `options` dictionary.
     Click on the common options or the method name for the corresponding
@@ -240,6 +242,12 @@ class SciPyBackend(Backend):
     @property
     def is_parallel(self) -> bool:  # ruff: ignore[undocumented-public-method]
         return self._parallel
+
+    @property
+    def bypasses_python_output(self) -> bool:  # ruff: ignore[undocumented-public-method]
+        # Every SciPy method prints through `sys.stdout`, except `tnc`, which
+        # prints from its C implementation.
+        return self._method == "tnc"
 
     def validate_options(  # ruff: ignore[undocumented-public-method]
         self,
@@ -621,9 +629,13 @@ class SciPyBackend(Backend):
                 options["maxfun"] = iterations
             else:
                 options["maxiter"] = iterations
-        # We switch on display if there is an output folder.
-        if self._context.optimizer.output_dir is not None:
-            options["disp"] = True
+        # SciPy is silent by default, so the option is only set to switch
+        # reporting on. `trust-constr` is the only method with levels of its own.
+        level = resolve_verbosity(verbose=self._config.verbose)
+        if level is None or level > 0:
+            options.setdefault("disp", True)
+            if level is not None and self._method == "trust-constr":
+                options.setdefault("verbose", min(level, _MAX_TRUST_CONSTR_VERBOSITY))
 
         if self._method in _SUPPORT_INTEGER and "integrality" not in options:
             options["integrality"] = (

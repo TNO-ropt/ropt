@@ -8,6 +8,7 @@ from pydantic import (
     BaseModel,
     ConfigDict,
     NonNegativeFloat,
+    NonNegativeInt,
     PositiveInt,
     model_validator,
 )
@@ -27,6 +28,7 @@ class BackendConfig(BaseModel):
         max_iterations:        Maximum number of iterations (optional).
         convergence_tolerance: Convergence tolerance (optional).
         parallel:              Allow parallelized function evaluations (default: `False`).
+        verbose:               How much the optimizer reports (optional).
         options:               Generic options for the optimizer (optional).
     """
 
@@ -34,6 +36,7 @@ class BackendConfig(BaseModel):
     max_iterations: PositiveInt | None = None
     convergence_tolerance: NonNegativeFloat | None = None
     parallel: bool = False
+    verbose: bool | NonNegativeInt | None = None
     options: dict[str, Any] | list[str] | None = None
 
     model_config = ConfigDict(

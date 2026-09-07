@@ -205,6 +205,32 @@ ropt_logger.addHandler(file_handler)
 ropt_logger.propagate = False
 ```
 
+## Logging during an optimization { #logging-during-an-optimization }
+
+Configuring [`stdout` or
+`stderr`](../optimizer_setup/configuration.md#optimizer) captures the
+optimizer's output for the duration of a run. That capture is scoped to a period
+of time rather than to a source, so **log records written to a console handler
+while the optimizer is working end up in the capture file** along with the
+optimizer's own output.
+
+Handlers that write anywhere else are unaffected — a `FileHandler`, a
+`RotatingFileHandler`, a socket or a queue all have their own destination and
+never touch the captured streams. Only handlers on `sys.stdout` or `sys.stderr`
+are involved, which includes the one `logging.basicConfig()` installs; note that
+this catches `ropt`'s records by propagation even if you never configure the
+`ropt` logger yourself.
+
+Most of what `ropt` logs is emitted outside the captured region — every batch
+statistic, every executor message and both workflow milestones — so in practice
+this affects a handful of records. If you want them kept apart regardless, give
+the `ropt` logger a file handler of its own and set `propagate = False`, as in
+the example above.
+
+Python warnings are a separate matter: `warnings.warn` writes to `sys.stderr` at
+the moment it fires, so warnings raised while the optimizer runs are captured.
+That is usually what you want, since they generally come from the optimizer.
+
 ## Where to next
 
 - React to results programmatically instead of just tracing them:

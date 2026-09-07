@@ -603,21 +603,41 @@ redirection):
   cause the optimization to terminate mid-batch.
 
 - **`output_dir`** (default: `None`): An optional output directory where the
-  optimizer can store files. When `None`, no output directory is used.
-- **`stdout`** (default: `None`): Redirect optimizer standard output to the
-  given file. When `None`, standard output is not redirected.
-- **`stderr`** (default: `None`): Redirect optimizer standard error to the given
-  file. When `None`, standard error is not redirected.
+  optimizer can store files. When `None`, no output directory is used. A
+  relative `stdout` or `stderr` path is resolved against it.
+- **`stdout`** (default: `None`): Capture the optimizer's standard output into
+  the given file. When `None`, the optimizer's output is not captured. Unless
+  `stderr` is also set, the optimizer's error output goes to this file too.
+- **`stderr`** (default: `None`): Capture the optimizer's standard error into
+  the given file. May be set on its own, in which case standard output is left
+  alone.
 
-!!! warning "`stdout` and `stderr` redirect the whole process"
-    An optimizer prints through the process's standard output and error
-    streams, so capturing it means redirecting those streams for as long as the
-    run lasts — everything else the program writes meanwhile goes to the file
-    as well. That is harmless for a single run, but it cannot keep concurrent
-    runs apart: the runs of
-    [`optimize_many`](../running/parallel.md#many-optimizations-at-once) overlap
-    in time, and one run's redirection is in force for all of them. Leave both
-    unset when runs overlap.
+These settings decide **where** the optimizer's output goes, not whether there
+is any: that is [`verbose`](#backend). The evaluation callback is excluded
+either way — anything your objective function or your result handlers print goes
+to the terminal as usual.
+
+!!! warning "Capture is for one run at a time"
+    Capturing rewires process-global state, so only one optimization at a time
+    can do it. A second run that tries while another holds it — a concurrent run
+    of [`optimize_many`](../running/parallel.md#many-optimizations-at-once), or
+    an optimization started from inside an evaluation callback — raises
+    [`WorkflowError`][ropt.exceptions.WorkflowError]. Leave `stdout` and
+    `stderr` unset on runs that overlap.
+
+    Whether an optimizer reports at all is decided by [`verbose`](#backend),
+    independently of capture. To silence one, set `verbose=False`; to discard
+    output you cannot switch off, capture to `os.devnull` — but note that this
+    discards anything *else* the process writes during the run, which a
+    throwaway file would not.
+
+!!! note "What else lands in the file"
+    Capture is scoped to a period of time, not to a source, so anything the
+    process writes while the optimizer is working is captured with it. In
+    practice that means Python warnings raised by the optimizer, which belong
+    there, and output from your own threads, which does not. Log records are
+    unaffected unless they go to a console handler; see
+    [Logging](../utilities/logging.md#logging-during-an-optimization).
 
 ### `backend` — [`BackendConfig`][ropt.config.BackendConfig] { #backend }
 
@@ -635,6 +655,17 @@ settings that are forwarded to the backend:
 - **`parallel`** (default: `False`): If `True`, allows the optimizer to use
   parallelized function evaluations. Typically applies to gradient-free methods;
   not all backends support this setting.
+- **`verbose`** (default: `None`): How much the optimizer reports about its own
+  progress. `False` or `0` is silent, `True` selects the optimizer's own default
+  level, and a positive integer selects a level explicitly, clamped to what the
+  optimizer offers. `None` is silent. Backends map this onto whatever their
+  library provides, so the levels are not directly comparable between them: as a
+  guide, `1` is normal progress, `2` is detailed and `3` is everything.
+
+    Where that output ends up is a separate question, decided by
+    [`stdout` and `stderr`](#optimizer). With neither set it goes to the
+    terminal. A backend option that names the same setting, such as SciPy's
+    `disp`, takes precedence over `verbose`.
 - **`options`** (default: `None`): A dictionary or list of strings for generic
   optimizer options. The format and interpretation depend on the specific
   optimization method. These are passed straight to the backend.

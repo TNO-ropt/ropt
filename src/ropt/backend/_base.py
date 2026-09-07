@@ -159,6 +159,29 @@ class Backend(ABC):
         """
         return False
 
+    @property
+    def bypasses_python_output(self) -> bool:
+        """Indicate whether the optimizer prints without going through Python.
+
+        Compiled optimizers commonly write to file descriptors 1 and 2 directly
+        instead of through `sys.stdout`, which puts their output beyond reach of
+        the capture `ropt` applies for the `stdout` and `stderr` settings of
+        [`OptimizerConfig`][ropt.config.OptimizerConfig]. A backend wrapping
+        such a library should override this to return `True`, and `ropt` then
+        redirects the descriptors as well.
+
+        The answer may differ per method, in which case return it based on the
+        configured method. Return `True` for the whole backend when unsure: the
+        cost is that capture briefly rewires process-global state, whereas the
+        cost of being wrong the other way is output escaping to the terminal.
+
+        See [Writing a Plugin](../utilities/writing_plugins.md#declaring-native-output).
+
+        Returns:
+            `True` if the optimizer writes output below the Python level.
+        """
+        return False
+
     @abstractmethod
     def validate_options(self) -> None:
         """Validate backend-specific options for the configured method.

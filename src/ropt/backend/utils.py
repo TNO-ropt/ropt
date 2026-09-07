@@ -8,11 +8,18 @@ Every array these helpers accept or return is scaled, as is everything else a
 backend sees; see [`Backend`][ropt.backend.Backend].
 """
 
+import io
+import os
+import sys
+from collections.abc import Callable
+from contextlib import redirect_stderr, redirect_stdout
 from pathlib import Path
+from tempfile import TemporaryDirectory
 
 import numpy as np
 from numpy.typing import NDArray
 
+from ropt._native_streams import flush_native_streams
 from ropt.context import EnOptContext
 from ropt.exceptions import UnsupportedError
 
@@ -23,6 +30,75 @@ _MESSAGES = {
     "nonlinear:eq": "non-linear equality constraints",
     "nonlinear:ineq": "non-linear inequality constraints",
 }
+
+
+def resolve_verbosity(*, verbose: bool | int | None) -> int | None:
+    """Resolve how much the optimizer should report.
+
+    Normalizes the `verbose` field of
+    [`BackendConfig`][ropt.config.BackendConfig] into a single value, so that
+    backends need not distinguish `True` from `1` themselves:
+
+    | Result | Meaning                                                    |
+    | ------ | ---------------------------------------------------------- |
+    | `None` | Report at the optimizer's own default level.               |
+    | `0`    | Do not report.                                             |
+    | `n`    | Report at level `n`, clamped to what the optimizer offers. |
+
+    This says nothing about where the output goes: that is decided by the
+    `stdout` and `stderr` settings of
+    [`OptimizerConfig`][ropt.config.OptimizerConfig].
+
+    Args:
+        verbose: The `verbose` field of the backend configuration.
+
+    Returns:
+        The reporting level, or `None` for the optimizer's own default.
+    """
+    if verbose is None or verbose is False:
+        return 0
+    return None if verbose is True else verbose
+
+
+def collect_native_output(run: Callable[[], None]) -> str:
+    """Collect the output a callable writes below the Python level.
+
+    Runs `run` with `sys.stdout` and `sys.stderr` replaced, so that everything
+    written through Python is diverted, and with file descriptors 1 and 2
+    pointing at a temporary file. Whatever reaches that file was therefore
+    written without going through Python.
+
+    Use this to check a backend's
+    [`bypasses_python_output`][ropt.backend.Backend.bypasses_python_output]
+    declaration from its test suite: a non-empty result means the declaration
+    must be `True` for the method that was run.
+
+    Args:
+        run: A callable that runs an optimization with the backend under test.
+
+    Returns:
+        Everything the callable wrote below the Python level.
+    """
+    with TemporaryDirectory() as directory:
+        path = Path(directory) / "native-output.txt"
+        sys.stdout.flush()
+        sys.stderr.flush()
+        flush_native_streams()
+        saved_stdout_fd = os.dup(1)
+        saved_stderr_fd = os.dup(2)
+        try:
+            with path.open("w") as handle:
+                os.dup2(handle.fileno(), 1)
+                os.dup2(handle.fileno(), 2)
+                with redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()):
+                    run()
+                flush_native_streams()
+        finally:
+            os.dup2(saved_stdout_fd, 1)
+            os.dup2(saved_stderr_fd, 2)
+            os.close(saved_stdout_fd)
+            os.close(saved_stderr_fd)
+        return path.read_text()
 
 
 def validate_supported_constraints(
