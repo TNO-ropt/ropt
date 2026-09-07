@@ -12,6 +12,7 @@ import numpy as np
 
 from ropt._logging import get_logger
 from ropt._native_streams import flush_native_streams
+from ropt._utils import split_constraints
 from ropt.enums import ExitCode
 from ropt.exceptions import (
     ExecutorStopped,
@@ -134,6 +135,19 @@ class EnsembleOptimizer:
         self._function_evaluator = ensemble_evaluator
         self._signal_evaluation = signal_evaluation
 
+        # How the nonlinear constraints split into the values handed to the
+        # optimizer. Fixed for the run: it follows the configured bounds.
+        self._constraint_index: NDArray[np.intp] | None = None
+        self._use_lower_bound: NDArray[np.bool_] | None = None
+        if context.nonlinear_constraints is not None:
+            equality = context._nonlinear_equality  # ruff: ignore[private-member-access]
+            assert equality is not None
+            self._constraint_index, self._use_lower_bound = split_constraints(
+                context.nonlinear_constraints.lower_bounds,
+                context.nonlinear_constraints.upper_bounds,
+                equality,
+            )
+
         # This stores the values of the fixed variable
         self._initial_variables: NDArray[np.float64]
 
@@ -245,11 +259,7 @@ class EnsembleOptimizer:
 
         self._completed_batches += 1
 
-        return OptimizerCallbackResult(
-            functions=functions,
-            gradients=gradients,
-            nonlinear_constraint_bounds=self._context.get_nonlinear_constraint_bounds(),
-        )
+        return OptimizerCallbackResult(functions=functions, gradients=gradients)
 
     def _get_completed_variables(
         self, variables: NDArray[np.float64]
@@ -315,18 +325,30 @@ class EnsembleOptimizer:
 
         return results
 
-    @staticmethod
-    def _functions_from_results(functions: Functions | None) -> NDArray[np.float64]:
+    def _functions_from_results(
+        self, functions: Functions | None
+    ) -> NDArray[np.float64]:
         assert functions is not None
-        return (
-            np.array(functions.target_objective, ndmin=1)
-            if functions.constraints is None
-            else np.append(functions.target_objective, functions.constraints)
+        constraint_index = self._constraint_index
+        if constraint_index is None:
+            return np.array(functions.target_objective, ndmin=1)
+        assert self._use_lower_bound is not None
+        assert functions.constraints is not None
+        bounds = self._context.get_nonlinear_constraint_bounds()
+        assert bounds is not None
+        lower_bounds, upper_bounds = bounds
+        values = functions.constraints[constraint_index]
+        return np.append(
+            functions.target_objective,
+            np.where(
+                self._use_lower_bound,
+                values - lower_bounds[constraint_index],
+                upper_bounds[constraint_index] - values,
+            ),
         )
 
-    @staticmethod
     def _gradients_from_results(
-        gradients: Gradients | None, mask: NDArray[np.bool_] | None
+        self, gradients: Gradients | None, mask: NDArray[np.bool_] | None
     ) -> NDArray[np.float64]:
         assert gradients is not None
         target_objective_gradient = (
@@ -334,19 +356,24 @@ class EnsembleOptimizer:
             if mask is None
             else gradients.target_objective[mask]
         )
+        constraint_index = self._constraint_index
+        if constraint_index is None:
+            return np.expand_dims(target_objective_gradient, axis=0)
+        use_lower_bound = self._use_lower_bound
+        assert use_lower_bound is not None
+        assert gradients.constraints is not None
         constraint_gradients = (
-            None
-            if gradients.constraints is None
-            else (
-                gradients.constraints.copy()
-                if mask is None
-                else gradients.constraints[:, mask]
+            gradients.constraints if mask is None else gradients.constraints[:, mask]
+        )[constraint_index, :]
+        return np.vstack(
+            (
+                target_objective_gradient,
+                np.where(
+                    use_lower_bound[:, np.newaxis],
+                    constraint_gradients,
+                    -constraint_gradients,
+                ),
             )
-        )
-        return (
-            np.expand_dims(target_objective_gradient, axis=0)
-            if constraint_gradients is None
-            else np.vstack((target_objective_gradient, constraint_gradients))
         )
 
 

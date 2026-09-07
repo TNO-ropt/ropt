@@ -12,6 +12,7 @@ import numpy as np
 import pytest
 from numpy.typing import NDArray
 
+from ropt.backend.utils import validate_supported_constraints
 from ropt.config import VariablesConfig
 from ropt.context import EnOptContext
 from ropt.enums import PerturbationType
@@ -404,30 +405,20 @@ def test_auto_scale_normalizes_the_largest_coefficient() -> None:
     assert np.allclose(constraints.coefficients, [[0.5, -1.0, 0.0], [0.0, 0.25, 1.0]])
 
 
-def test_auto_scale_takes_the_bounds_into_account() -> None:
+def test_auto_scale_ignores_the_bounds() -> None:
     constraints = _linear_constraints(
         linear_constraints={
             "coefficients": [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0]],
-            "lower_bounds": [-100.0, 0.0],
+            "lower_bounds": [-100.0, -np.inf],
             "upper_bounds": [0.0, 50.0],
             "auto_scale": True,
         }
     )
-    assert np.allclose(constraints.scales, [100.0, 50.0])
-    assert np.allclose(constraints.lower_bounds, [-1.0, 0.0])
-    assert np.allclose(constraints.upper_bounds, [0.0, 1.0])
-
-
-def test_auto_scale_ignores_infinite_bounds() -> None:
-    constraints = _linear_constraints(
-        linear_constraints={
-            "coefficients": [[2.0, 0.0, 0.0]],
-            "lower_bounds": [-np.inf],
-            "upper_bounds": [np.inf],
-            "auto_scale": True,
-        }
-    )
-    assert np.allclose(constraints.scales, [2.0])
+    # Dividing by a bound would shrink the coefficients, which loosens the
+    # equation rather than conditioning it.
+    assert np.allclose(constraints.scales, [1.0, 1.0])
+    assert np.allclose(constraints.lower_bounds, [-100.0, -np.inf])
+    assert np.allclose(constraints.upper_bounds, [0.0, 50.0])
 
 
 def test_auto_scale_ignores_fixed_columns() -> None:
@@ -457,6 +448,20 @@ def test_auto_scale_clamps_an_empty_equation() -> None:
     # Dividing by an estimate of zero would turn the row into NaN.
     assert np.allclose(constraints.scales, [1.0])
     assert np.allclose(constraints.coefficients, [[0.0, 0.0, 0.0]])
+
+
+def test_auto_scale_does_not_reclassify_an_inequality() -> None:
+    context = _context(
+        linear_constraints={
+            "coefficients": [[1e16, 1e16, 0.0]],
+            "lower_bounds": [0.0],
+            "upper_bounds": [1.0],
+            "auto_scale": True,
+        }
+    )
+    # Scaling leaves the bounds a whole `1e-16` apart, which an absolute
+    # tolerance applied after the fact would read as an equality.
+    validate_supported_constraints(context, "method", {"linear:ineq": {"method"}}, {})
 
 
 def test_auto_scale_composes_with_the_configured_scales() -> None:

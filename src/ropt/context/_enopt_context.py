@@ -40,6 +40,14 @@ if TYPE_CHECKING:
 _global_lock = threading.Lock()
 
 
+def _equality_flags(
+    lower_bounds: NDArray[np.float64], upper_bounds: NDArray[np.float64]
+) -> NDArray[np.bool_]:
+    eps = 1e-15
+    # Read from the configured bounds, **before** anything is scaled:
+    return immutable_array(np.abs(upper_bounds - lower_bounds) < eps, dtype=np.bool_)
+
+
 class EnOptContext(BaseModel):
     """The primary context object for a single optimization run.
 
@@ -98,6 +106,8 @@ class EnOptContext(BaseModel):
     _constraint_scales: NDArray[np.float64] | None = PrivateAttr()
     _auto_scales_set: bool = PrivateAttr(default=False)
 
+    _nonlinear_equality: NDArray[np.bool_] | None = PrivateAttr()
+    _linear_equality: NDArray[np.bool_] | None = PrivateAttr()
     model_config = ConfigDict(
         extra="forbid",
         validate_default=True,
@@ -250,6 +260,26 @@ class EnOptContext(BaseModel):
         return self
 
     @model_validator(mode="after")
+    def _classify_constraints(self) -> Self:
+        self._nonlinear_equality = (
+            None
+            if self.nonlinear_constraints is None
+            else _equality_flags(
+                self.nonlinear_constraints.lower_bounds,
+                self.nonlinear_constraints.upper_bounds,
+            )
+        )
+        self._linear_equality = (
+            None
+            if self.linear_constraints is None
+            else _equality_flags(
+                self.linear_constraints.lower_bounds,
+                self.linear_constraints.upper_bounds,
+            )
+        )
+        return self
+
+    @model_validator(mode="after")
     def _scale_variables_and_constraints(self) -> Self:
         scales = self.variables.scales
         offsets = self.variables.offsets
@@ -324,8 +354,7 @@ def _scale_linear_constraints(
     # estimate below is only meaningful once the change of variables has been
     # made.
     row_scales = (
-        config.scales
-        * _estimate_equation_scales(coefficients, lower_bounds, upper_bounds, mask)
+        config.scales * _estimate_equation_scales(coefficients, mask)
         if config.auto_scale
         else config.scales
     )
@@ -342,17 +371,7 @@ def _scale_linear_constraints(
 
 def _estimate_equation_scales(
     coefficients: NDArray[np.float64],
-    lower_bounds: NDArray[np.float64],
-    upper_bounds: NDArray[np.float64],
     mask: NDArray[np.bool_],
 ) -> NDArray[np.float64]:
-    # Fixed variables are eliminated before the optimizer sees the problem, so
-    # their coefficients must not inflate the estimate.
     largest = np.max(np.abs(coefficients[:, mask]), axis=-1, initial=0.0)
-    for bounds in (lower_bounds, upper_bounds):
-        largest = np.maximum(
-            largest, np.where(np.isfinite(bounds), np.abs(bounds), 0.0)
-        )
-    # An all-zero equation is one that `get_masked_linear_constraints` drops.
-    # Dividing it by its own estimate would turn its coefficients into NaN.
     return np.where(largest > 0.0, largest, 1.0)

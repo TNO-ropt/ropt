@@ -100,7 +100,9 @@ def optimize(  # ruff: ignore[too-many-arguments]
                               so results after it in the same batch are not
                               passed on.
         constraint_tolerance: The tolerance within which a constraint is
-                              considered satisfied.
+                              considered satisfied. Violations are compared in
+                              the domain the optimizer works in, so a scale
+                              applies to them as well.
         metadata:             An optional dictionary attached to every
                               [`Results`][ropt.results.Results] this run emits,
                               for example to tag or identify the run. It also
@@ -232,7 +234,9 @@ def optimize_many(  # ruff: ignore[too-many-arguments]
                               `USER_ABORT`.
         limit:                The maximum number of runs to execute at once.
         constraint_tolerance: The tolerance within which a constraint is
-                              considered satisfied.
+                              considered satisfied. Violations are compared in
+                              the domain the optimizer works in, so a scale
+                              applies to them as well.
         metadata:             An optional dictionary attached to every
                               [`Results`][ropt.results.Results] a run emits,
                               shared by all runs or given one per run — for

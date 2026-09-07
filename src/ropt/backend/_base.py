@@ -11,6 +11,19 @@ bounds, perturbation magnitudes, linear constraints — were scaled when the
 context was built, and the values delivered through the callback are scaled
 before they arrive. A backend therefore neither scales nor unscales anything:
 `ropt` unscales results for reporting.
+
+A backend also works in **free-variable space**: the variable vectors it passes
+and receives cover only the variables that `variables.mask` leaves free. The
+mask is applied for it on the values and the gradients, but a backend that uses
+the variable bounds or the linear constraints reduces those itself, the latter
+with [`get_linear_constraints`][ropt.backend.utils.get_linear_constraints].
+
+Non-linear constraints arrive **normalized**, as values that are non-negative
+when the constraint is satisfied, so a backend compares them against zero and
+never handles a bound. See
+[`OptimizerCallbackResult`][ropt.core.OptimizerCallbackResult]. A backend whose
+algorithm expects the opposite convention negates the values and their
+gradients.
 """
 
 from __future__ import annotations

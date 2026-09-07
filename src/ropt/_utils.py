@@ -34,6 +34,37 @@ def apply_direction(
     return np.where(maximize, -values, values)
 
 
+def split_constraints(
+    lower_bounds: NDArray[np.float64],
+    upper_bounds: NDArray[np.float64],
+    equality: NDArray[np.bool_],
+) -> tuple[NDArray[np.intp], NDArray[np.bool_]]:
+    # A constraint reaches the optimizer as one entry per finite bound, or as a
+    # single entry if it is an equality. The returned index gathers the entries
+    # from the constraints, and the flags say which bound each entry is measured
+    # against. Only `equality` and the finiteness of the bounds are read, and a
+    # positive scale changes neither, so scaled bounds may be passed in.
+    constraint_index: list[int] = []
+    use_lower_bound: list[bool] = []
+    for constraint, (lower, upper, is_equality) in enumerate(
+        zip(lower_bounds, upper_bounds, equality, strict=True)
+    ):
+        if is_equality:
+            constraint_index.append(constraint)
+            use_lower_bound.append(True)
+            continue
+        if np.isfinite(lower):
+            constraint_index.append(constraint)
+            use_lower_bound.append(True)
+        if np.isfinite(upper):
+            constraint_index.append(constraint)
+            use_lower_bound.append(False)
+    return (
+        np.asarray(constraint_index, dtype=np.intp),
+        np.asarray(use_lower_bound, dtype=np.bool_),
+    )
+
+
 def immutable_array(
     array_like: ArrayLike,
     **kwargs: Any,  # ruff: ignore[any-type]

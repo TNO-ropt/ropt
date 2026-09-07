@@ -495,12 +495,12 @@ instead of stating them:
 ```
 
 The estimate for an equation is the largest absolute value among its
-coefficients and its finite bounds, which brings the largest entry of each row
-to a magnitude of one. Only the columns of variables that are free count towards
-it, since the fixed ones are eliminated before the optimizer sees the problem.
-An equation with nothing to measure is left alone rather than divided by zero.
-The estimate *multiplies* `scales`, so a configured scale still applies on top
-of an estimated one.
+coefficients, so that the largest coefficient the optimizer sees is one. Only
+the columns of variables that are free count towards it, since the fixed ones
+are eliminated before the optimizer sees the problem. An equation with nothing
+left to measure is divided by one rather than by zero. The estimate
+*multiplies* `scales`, so a configured scale still applies on top of an
+estimated one.
 
 Unlike `auto_scale` for nonlinear constraints, this is a single boolean rather
 than one per equation: the rows form one matrix equation and are scaled together
@@ -651,7 +651,11 @@ settings that are forwarded to the backend:
   support this setting.
 - **`convergence_tolerance`** (default: `None`): Convergence tolerance used as a
   stopping criterion. The exact definition depends on the optimizer, and not all
-  backends support this setting.
+  backends support this setting. It is compared against the quantities the
+  optimizer works with, which are scaled; see [Scaling
+  objectives](#objective-scales). Setting `auto_scale` there brings the weighted
+  objective sum to a magnitude of one at the start of the run, which is what
+  makes a fixed tolerance mean the same thing across problems.
 - **`parallel`** (default: `False`): If `True`, allows the optimizer to use
   parallelized function evaluations. Typically applies to gradient-free methods;
   not all backends support this setting.

@@ -14,38 +14,39 @@ if TYPE_CHECKING:
 class OptimizerCallbackResult:
     """Holds the results from an optimizer callback evaluation.
 
-    Bundles the objective function values, gradient values, and any updated
-    non-linear constraint bounds returned by an
-    [`OptimizerCallback`][ropt.core.OptimizerCallback] evaluation. `functions`
-    and `gradients` are `None` unless requested and successfully computed;
-    `nonlinear_constraint_bounds` is `None` if the run has no non-linear
-    constraints, and otherwise holds their scaled bounds. The
-    bounds are reported after every evaluation because auto-scaling can change
-    them once, when the scales are estimated from the first batch.
+    Bundles the objective and constraint values, and their gradients, returned
+    by an [`OptimizerCallback`][ropt.core.OptimizerCallback] evaluation. Both
+    are `None` unless requested and successfully computed.
+
+    Non-linear constraints arrive **normalized**: each is split into values that
+    are non-negative when the constraint is satisfied, so a backend compares
+    them against zero and never needs a bound. A constraint with a finite lower
+    and a finite upper bound contributes two values, an equality one, and a
+    constraint with no finite bound none. Which of them are equalities is fixed
+    for the run and available from
+    [`get_nonlinear_equalities`][ropt.backend.utils.get_nonlinear_equalities].
 
     `functions` and `gradients` follow a fixed shape:
 
-    - **Functions array:** the objective and non-linear constraint values. A
+    - **Functions array:** the objective followed by the constraint values. A
         vector `variables` gives a 1D array `[objective, constraint1, ...]`; a
         matrix `variables` gives a 2D array with one such row per input row.
-    - **Gradients array:** always 2D, with one row per objective/constraint and
-        one column per variable:
+    - **Gradients array:** always 2D, with one row per objective and constraint
+        value, and one column per variable:
 
             [
-                [grad_obj_var1,  grad_obj_var2,  ...],
-                [grad_con1_var1, grad_con1_var2, ...],
+                [grad_obj_var1,         grad_obj_var2,         ...],
+                [grad_constraint1_var1, grad_constraint1_var2, ...],
                 ...
             ]
 
     Attributes:
-        functions: Objective function value(s).
+        functions: Objective and constraint value(s).
         gradients: Gradient values.
-        nonlinear_constraint_bounds: Updated non-linear constraint lower and upper bounds.
     """
 
     functions: NDArray[np.float64] | None
     gradients: NDArray[np.float64] | None
-    nonlinear_constraint_bounds: tuple[NDArray[np.float64], NDArray[np.float64]] | None
 
 
 class OptimizerCallback(Protocol):

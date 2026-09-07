@@ -46,7 +46,10 @@ class ResultsHandler(EventHandler):
 
         Args:
             what:                 Criterion for selecting results ('best' or 'last').
-            constraint_tolerance: Optional threshold for filtering constraint violations.
+            constraint_tolerance: Optional threshold for filtering constraint
+                                  violations. Violations are compared in the
+                                  domain the optimizer works in, so a scale
+                                  applies to them as well.
             scaled:               If `True`, store the value as the optimizer works
                                   with it: scaled and offset, with objectives and
                                   gradients negated where `maximize` is set. By

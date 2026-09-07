@@ -95,6 +95,8 @@ class BasicOptimizer:
                 advanced features such as caching, parallel, or HPC evaluation.
             constraint_tolerance: The constraint violation tolerance; a
                 constraint within this tolerance is considered satisfied.
+                Violations are compared in the domain the optimizer works in,
+                so a scale applies to them as well.
         """
         self._context = EnOptContext.model_validate(config)
         self._constraint_tolerance = constraint_tolerance

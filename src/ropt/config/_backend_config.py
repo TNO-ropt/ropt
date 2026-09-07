@@ -26,7 +26,8 @@ class BackendConfig(BaseModel):
     Attributes:
         method:                Name of the optimization method.
         max_iterations:        Maximum number of iterations (optional).
-        convergence_tolerance: Convergence tolerance (optional).
+        convergence_tolerance: Convergence tolerance, compared against scaled
+                               quantities (optional).
         parallel:              Allow parallelized function evaluations (default: `False`).
         verbose:               How much the optimizer reports (optional).
         options:               Generic options for the optimizer (optional).

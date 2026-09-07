@@ -544,10 +544,7 @@ def test_scaled_variables_change_the_linear_constraints(
     assert isinstance(context.linear_constraints, LinearConstraintsConfig)
     transformed_coefficients = coefficients * scales
     shift = np.matmul(coefficients, offsets)
-    transformed_scales = np.maximum(
-        np.max(np.abs(transformed_coefficients), axis=-1),
-        np.maximum(np.abs(lower_bounds - shift), np.abs(upper_bounds - shift)),
-    )
+    transformed_scales = np.max(np.abs(transformed_coefficients), axis=-1)
     assert np.allclose(
         context.linear_constraints.coefficients,
         transformed_coefficients / transformed_scales[:, np.newaxis],
@@ -609,10 +606,18 @@ def test_check_nonlinear_constraints(
     )
     assert result1.variables is not None
 
-    # Flipping the bounds should still work:
-    config["nonlinear_constraints"]["lower_bounds"] = [0.0, -np.inf, 0.0]
-    config["nonlinear_constraints"]["upper_bounds"] = [0.0, 0.0, np.inf]
-    result2 = optimize(config, initial_values, eval_func(test_functions))
+    # Swapping which side of each inequality is bounded, and the sign of the
+    # constraint with it, describes the same feasible set:
+    config["nonlinear_constraints"]["lower_bounds"] = [0.0, 0.0, -np.inf]
+    config["nonlinear_constraints"]["upper_bounds"] = [0.0, np.inf, 0.0]
+    flipped_constraint_functions = (
+        lambda variables, _: variables[0],
+        lambda variables, _: -variables[0],
+        lambda variables, _: -variables[0],
+    )
+    result2 = optimize(
+        config, initial_values, eval_func(test_functions, flipped_constraint_functions)
+    )
     assert result2.variables is not None
     assert np.allclose(result1.variables, result2.variables)
 
