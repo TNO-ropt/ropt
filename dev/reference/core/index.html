@@ -3967,23 +3967,25 @@ vector per row) for optimizers that evaluate a batch at once.
 
 
         <p>Holds the results from an optimizer callback evaluation.</p>
-<p>Bundles the objective function values, gradient values, and any updated
-non-linear constraint bounds returned by an
-<a class="autorefs autorefs-internal" title="            ropt.core.OptimizerCallback" href="#ropt.core.OptimizerCallback"><code>OptimizerCallback</code></a> evaluation. <code>functions</code>
-and <code>gradients</code> are <code>None</code> unless requested and successfully computed;
-<code>nonlinear_constraint_bounds</code> is <code>None</code> if the run has no non-linear
-constraints, and otherwise holds their scaled bounds. The
-bounds are reported after every evaluation because auto-scaling can change
-them once, when the scales are estimated from the first batch.</p>
+<p>Bundles the objective and constraint values, and their gradients, returned
+by an <a class="autorefs autorefs-internal" title="            ropt.core.OptimizerCallback" href="#ropt.core.OptimizerCallback"><code>OptimizerCallback</code></a> evaluation. Both
+are <code>None</code> unless requested and successfully computed.</p>
+<p>Non-linear constraints arrive <strong>normalized</strong>: each is split into values that
+are non-negative when the constraint is satisfied, so a backend compares
+them against zero and never needs a bound. A constraint with a finite lower
+and a finite upper bound contributes two values, an equality one, and a
+constraint with no finite bound none. Which of them are equalities is fixed
+for the run and available from
+<a class="autorefs autorefs-internal" title="            get_nonlinear_equalities" href="../backend/#ropt.backend.utils.get_nonlinear_equalities"><code>get_nonlinear_equalities</code></a>.</p>
 <p><code>functions</code> and <code>gradients</code> follow a fixed shape:</p>
 <ul>
-<li><strong>Functions array:</strong> the objective and non-linear constraint values. A
+<li><strong>Functions array:</strong> the objective followed by the constraint values. A
     vector <code>variables</code> gives a 1D array <code>[objective, constraint1, ...]</code>; a
     matrix <code>variables</code> gives a 2D array with one such row per input row.</li>
-<li><strong>Gradients array:</strong> always 2D, with one row per objective/constraint and
-    one column per variable:<div class="language-text highlight"><pre><span></span><code>[
-    [grad_obj_var1,  grad_obj_var2,  ...],
-    [grad_con1_var1, grad_con1_var2, ...],
+<li><strong>Gradients array:</strong> always 2D, with one row per objective and constraint
+    value, and one column per variable:<div class="language-text highlight"><pre><span></span><code>[
+    [grad_obj_var1,         grad_obj_var2,         ...],
+    [grad_constraint1_var1, grad_constraint1_var2, ...],
     ...
 ]
 </code></pre></div>
@@ -4008,7 +4010,7 @@ them once, when the scales are estimated from the first batch.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Objective function value(s).</p>
+                <p>Objective and constraint value(s).</p>
               </div>
             </td>
           </tr>
@@ -4020,17 +4022,6 @@ them once, when the scales are estimated from the first batch.</p>
             <td>
               <div class="doc-md-description">
                 <p>Gradient values.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.core.OptimizerCallbackResult.nonlinear_constraint_bounds">nonlinear_constraint_bounds</span></code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>], <span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]] | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Updated non-linear constraint lower and upper bounds.</p>
               </div>
             </td>
           </tr>
