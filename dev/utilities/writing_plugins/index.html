@@ -1517,6 +1517,28 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#reporting-progress" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reporting progress
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#declaring-native-output" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Declaring native output
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#where-to-next" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2891,6 +2913,28 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#reporting-progress" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reporting progress
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#declaring-native-output" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Declaring native output
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#where-to-next" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3098,7 +3142,7 @@ Where the optimizer produces a log, ask the library to write it to a named
 file — that is the per-run answer — or to be quiet.</p>
 <p>Not every library allows this, and <code>ropt</code> does not paper over the ones that do
 not. What such a backend must do instead is <strong>say so in its own
-documentation</strong>, in one of two ways:</p>
+documentation</strong>:</p>
 <ul>
 <li><strong>It needs exclusive process state</strong> — a working directory, a fixed file name,
   or state kept in the library between calls. What that rules out is not "one
@@ -3108,15 +3152,65 @@ documentation</strong>, in one of two ways:</p>
   in-process, and point users at the
   <a class="autorefs autorefs-internal" title="            ropt.backend.external.ExternalBackend" href="../../reference/backend/#ropt.backend.external.ExternalBackend"><code>external</code></a> backend, which gives it a
   process of its own.</li>
-<li><strong>Its output cannot be directed per run</strong> — it prints, and offers no more
-  than an on/off switch. Say that its output goes to the process's standard
-  output. <a href="../../optimizer_setup/configuration/#optimizer"><code>stdout</code></a> captures
-  that for a single run, but cannot keep concurrent runs apart, because it
-  redirects the process as a whole.</li>
 </ul>
-<p>Both are properties of the wrapped library rather than defects in the backend
-wrapping it. State them; capturing the process's output on one run's behalf is
-precisely what cannot be made correct once runs overlap.</p>
+<p>Output is the exception to the rule: <code>ropt</code> captures it for you, on both levels,
+when the user configures
+<a href="../../optimizer_setup/configuration/#optimizer"><code>stdout</code> or <code>stderr</code></a>. A backend
+should not capture its own output, but it does have two things to do.</p>
+<h2 id="reporting-progress">Reporting progress</h2>
+<p>Whether the optimizer reports at all is the user's choice, made through
+<a href="../../optimizer_setup/configuration/#backend"><code>verbose</code></a>. Map it onto whatever
+your library provides using
+<a class="autorefs autorefs-internal" title="            resolve_verbosity" href="../../reference/backend/#ropt.backend.utils.resolve_verbosity"><code>resolve_verbosity</code></a>, which normalises
+the setting so you need not tell <code>True</code> from <code>1</code> yourself:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">level</span> <span class="o">=</span> <span class="n">resolve_verbosity</span><span class="p">(</span><span class="n">verbose</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="o">.</span><span class="n">verbose</span><span class="p">)</span>
+</span></code></pre></div>
+<p><code>None</code> means "your library's own default level", <code>0</code> means silent, and a
+positive integer is an explicit level to be clamped to what you support. Note
+that <code>None</code> calls for opposite actions in different libraries: SciPy prints
+nothing unless asked, so it must be switched on, while NOMAD reports by default,
+so it is left alone.</p>
+<p>Set the corresponding option only if the user has not set it themselves —
+<code>setdefault</code> for a dictionary, or a check before appending for a list — so that
+a specific option such as <code>DISPLAY_DEGREE 3</code> refines the generic flag rather
+than fighting it.</p>
+<h2 id="declaring-native-output">Declaring native output</h2>
+<p><code>ropt</code> captures the optimizer's output by swapping <code>sys.stdout</code> and
+<code>sys.stderr</code> for the duration of the run. That catches anything printed from
+Python — which is most optimizers, including everything in SciPy except <code>tnc</code>.
+A compiled optimizer, though, commonly writes to file descriptors 1 and 2
+directly, and never touches <code>sys.stdout</code> at all.</p>
+<p>Set
+<a class="autorefs autorefs-internal" title="            bypasses_python_output
+
+
+  
+      property
+  " href="../../reference/backend/#ropt.backend.Backend.bypasses_python_output"><code>bypasses_python_output</code></a> to
+<code>True</code> when the wrapped library does that, and <code>ropt</code> redirects the descriptors
+as well:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">MyBackend</span><span class="p">(</span><span class="n">Backend</span><span class="p">):</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>    <span class="nd">@property</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">bypasses_python_output</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>        <span class="k">return</span> <span class="kc">True</span>
+</span></code></pre></div>
+<p>The answer may differ per method, in which case return it based on the
+configured method — the built-in SciPy backend returns <code>self._method == "tnc"</code>.
+<strong>When unsure, declare it for the whole backend.</strong> Being wrong that way costs
+only a brief rewiring of process-global state; being wrong the other way means
+the user's output escapes to the terminal, and nothing announces it.</p>
+<p>You do not have to guess.
+<a class="autorefs autorefs-internal" title="            collect_native_output" href="../../reference/backend/#ropt.backend.utils.collect_native_output"><code>collect_native_output</code></a> runs an
+optimization with the Python streams diverted and the descriptors captured, so
+whatever it returns was written below Python:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.backend.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">collect_native_output</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="k">def</span><span class="w"> </span><span class="nf">test_backend_declares_native_output_correctly</span><span class="p">():</span>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>    <span class="n">native</span> <span class="o">=</span> <span class="n">collect_native_output</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">))</span>
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>    <span class="k">assert</span> <span class="n">native</span> <span class="o">==</span> <span class="s2">""</span>      <span class="c1"># ... or `!= ""` if the declaration is True</span>
+</span></code></pre></div>
+<p>Worth having as a test rather than a one-off check: these properties drift.
+SciPy's <code>disp</code> silently became a no-op for <code>l-bfgs-b</code> and <code>nelder-mead</code> in 1.18.</p>
 <h2 id="where-to-next">Where to next</h2>
 <ul>
 <li>The registry in full: <a href="../../reference/plugin_manager/">Plugin Manager</a>.</li>

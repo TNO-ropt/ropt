@@ -3483,9 +3483,12 @@ own kind included. Each backend documents whether this applies to it.
 Select it as
 <a href="../../optimizer_setup/configuration/#external-backend"><code>external/...</code></a> and
 it gets a process of its own, where none of that is shared.</p>
-<p>Optimizer output cannot be separated here whichever backend you use:
-<a href="../../optimizer_setup/configuration/#optimizer"><code>stdout</code> and <code>stderr</code></a>
-redirect the process as a whole, so leave them unset while runs overlap.</p>
+<p>Optimizer output capture is likewise for one run at a time. If more than
+one of these runs sets
+<a href="../../optimizer_setup/configuration/#optimizer"><code>stdout</code> or <code>stderr</code></a>, the
+second to start raises <a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a>.
+Leave both unset here, and set <a href="../../optimizer_setup/configuration/#backend"><code>verbose=False</code></a>
+unless you want the runs' reports interleaved on the terminal.</p>
 </div>
 <h3 id="failure-in-one-run">Failure in one run</h3>
 <p>The first run to raise propagates its exception immediately (fail-fast). Runs

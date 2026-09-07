@@ -2397,6 +2397,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#ropt.backend.Backend.bypasses_python_output" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        bypasses_python_output
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ropt.backend.Backend.validate_options" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2484,6 +2495,28 @@
   
     <nav class="md-nav" aria-label="utils">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.backend.utils.resolve_verbosity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        resolve_verbosity
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.backend.utils.collect_native_output" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        collect_native_output
+      
+    </span>
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#ropt.backend.utils.validate_supported_constraints" class="md-nav__link">
@@ -3131,6 +3164,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#ropt.backend.Backend.bypasses_python_output" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        bypasses_python_output
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ropt.backend.Backend.validate_options" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3218,6 +3262,28 @@
   
     <nav class="md-nav" aria-label="utils">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.backend.utils.resolve_verbosity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        resolve_verbosity
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.backend.utils.collect_native_output" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        collect_native_output
+      
+    </span>
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#ropt.backend.utils.validate_supported_constraints" class="md-nav__link">
@@ -3860,6 +3926,69 @@ resources or coordinate parallel execution appropriately.</p>
 
 
 
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="ropt.backend.Backend.bypasses_python_output" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">bypasses_python_output</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">bypasses_python_output</span><span class="p">:</span> <span class="nb">bool</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Indicate whether the optimizer prints without going through Python.</p>
+<p>Compiled optimizers commonly write to file descriptors 1 and 2 directly
+instead of through <code>sys.stdout</code>, which puts their output beyond reach of
+the capture <code>ropt</code> applies for the <code>stdout</code> and <code>stderr</code> settings of
+<a class="autorefs autorefs-internal" title="            OptimizerConfig" href="../config/#ropt.config.OptimizerConfig"><code>OptimizerConfig</code></a>. A backend wrapping
+such a library should override this to return <code>True</code>, and <code>ropt</code> then
+redirects the descriptors as well.</p>
+<p>The answer may differ per method, in which case return it based on the
+configured method. Return <code>True</code> for the whole backend when unsure: the
+cost is that capture briefly rewires process-global state, whereas the
+cost of being wrong the other way is output escaping to the terminal.</p>
+<p>See <a href="../../utilities/writing_plugins/#declaring-native-output">Writing a Plugin</a>.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p><code>True</code> if the optimizer writes output below the Python level.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+
+
+
+
+
 <div class="doc doc-object doc-function">
 
 
@@ -4121,11 +4250,11 @@ it does not support raises
 <code>differential_evolution</code> requires bound constraints on all variables, and
 is the only method that handles integer variables; the others silently
 treat them as continuous.</p>
-<p>SciPy prints its own progress report, which this backend switches on when an
-<a class="autorefs autorefs-internal" title="            OptimizerConfig" href="../config/#ropt.config.OptimizerConfig"><code>output_dir</code></a> is configured. SciPy offers no
-way to send it anywhere in particular, so it goes to the process's standard
-output; concurrent runs cannot keep theirs apart. See <a href="../../running/parallel/#many-optimizations-at-once">Parallel Execution
-and Many Runs</a>.</p>
+<p>SciPy prints its own progress report when
+<a class="autorefs autorefs-internal" title="            BackendConfig" href="../config/#ropt.config.BackendConfig"><code>verbose</code></a> asks for it. <code>trust-constr</code> is the
+only method with reporting levels of its own; for the rest the setting is
+on or off. Note that <code>disp</code> is a no-op for <code>l-bfgs-b</code> and <code>nelder-mead</code> in
+recent SciPy releases, which therefore report nothing.</p>
 <p>Algorithm-specific options are passed through the <code>options</code> dictionary.
 Click on the common options or the method name for the corresponding
 <a href="https://docs.scipy.org/doc/scipy/reference/optimize.html"><code>scipy.optimize</code></a>
@@ -4472,6 +4601,207 @@ backend sees; see <a class="autorefs autorefs-internal" title="            Backe
 
 
 
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.backend.utils.resolve_verbosity" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">resolve_verbosity</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">resolve_verbosity</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="o">*</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Resolve how much the optimizer should report.</p>
+<p>Normalizes the <code>verbose</code> field of
+<a class="autorefs autorefs-internal" title="            BackendConfig" href="../config/#ropt.config.BackendConfig"><code>BackendConfig</code></a> into a single value, so that
+backends need not distinguish <code>True</code> from <code>1</code> themselves:</p>
+<table>
+<thead>
+<tr>
+<th>Result</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>None</code></td>
+<td>Report at the optimizer's own default level.</td>
+</tr>
+<tr>
+<td><code>0</code></td>
+<td>Do not report.</td>
+</tr>
+<tr>
+<td><code>n</code></td>
+<td>Report at level <code>n</code>, clamped to what the optimizer offers.</td>
+</tr>
+</tbody>
+</table>
+<p>This says nothing about where the output goes: that is decided by the
+<code>stdout</code> and <code>stderr</code> settings of
+<a class="autorefs autorefs-internal" title="            OptimizerConfig" href="../config/#ropt.config.OptimizerConfig"><code>OptimizerConfig</code></a>.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>verbose</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a> | <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The <code>verbose</code> field of the backend configuration.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The reporting level, or <code>None</code> for the optimizer's own default.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.backend.utils.collect_native_output" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">collect_native_output</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">collect_native_output</span><span class="p">(</span><span class="n">run</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="kc">None</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Collect the output a callable writes below the Python level.</p>
+<p>Runs <code>run</code> with <code>sys.stdout</code> and <code>sys.stderr</code> replaced, so that everything
+written through Python is diverted, and with file descriptors 1 and 2
+pointing at a temporary file. Whatever reaches that file was therefore
+written without going through Python.</p>
+<p>Use this to check a backend's
+<a class="autorefs autorefs-internal" title="            bypasses_python_output
+
+
+  
+      property
+  " href="#ropt.backend.Backend.bypasses_python_output"><code>bypasses_python_output</code></a>
+declaration from its test suite: a non-empty result means the declaration
+must be <code>True</code> for the method that was run.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>run</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="collections.abc.Callable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable">Callable</a>[[], None]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A callable that runs an optimization with the backend under test.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Everything the callable wrote below the Python level.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
 
 
 
