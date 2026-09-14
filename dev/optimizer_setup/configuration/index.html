@@ -4106,11 +4106,10 @@ conditions rather than terms of one weighted sum. For the same reason
 independently:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="s2">"nonlinear_constraints"</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">,</span> <span class="s2">"auto_scale"</span><span class="p">:</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">]}</span>
 </span></code></pre></div>
-<p>Constraints also accept <code>offsets</code>, but note what they do not do. The optimizer
-only ever sees the difference between a constraint and its bound, and an offset
-shifts both alike, so it cancels out: the problem that is solved, the reported
-violations, and feasibility are all unaffected. A constraint offset changes only
-the reported constraint value and, where <code>auto_scale</code> is set, the estimate.</p>
+<p>There is no <code>offsets</code> entry for constraints. An objective needs an offset
+because it has no natural reference point, but a constraint already has one: the
+optimizer only ever sees the difference between a constraint and its bound, so
+the value is centred on the bound already and an offset would cancel out.</p>
 <h3 id="realizations"><code>realizations</code> — <a class="autorefs autorefs-internal" title="            RealizationsConfig" href="../../reference/config/#ropt.config.RealizationsConfig"><code>RealizationsConfig</code></a></h3>
 <p>To optimize an ensemble of functions, a set of realizations is defined. When the
 optimizer requests a function value or a gradient, these are calculated for each
@@ -4526,19 +4525,18 @@ follows:</p>
 </span><span id="__span-22-12"><a id="__codelineno-22-12" name="__codelineno-22-12" href="#__codelineno-22-12"></a>    <span class="s2">"lower_bounds"</span><span class="p">:</span> <span class="o">...</span><span class="p">,</span>                      <span class="c1"># required: 1D array (one per constraint)</span>
 </span><span id="__span-22-13"><a id="__codelineno-22-13" name="__codelineno-22-13" href="#__codelineno-22-13"></a>    <span class="s2">"upper_bounds"</span><span class="p">:</span> <span class="o">...</span><span class="p">,</span>                      <span class="c1"># required: 1D array (one per constraint)</span>
 </span><span id="__span-22-14"><a id="__codelineno-22-14" name="__codelineno-22-14" href="#__codelineno-22-14"></a>    <span class="s2">"scales"</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>                            <span class="c1"># default: no scaling</span>
-</span><span id="__span-22-15"><a id="__codelineno-22-15" name="__codelineno-22-15" href="#__codelineno-22-15"></a>    <span class="s2">"offsets"</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>                           <span class="c1"># default: no offset</span>
-</span><span id="__span-22-16"><a id="__codelineno-22-16" name="__codelineno-22-16" href="#__codelineno-22-16"></a>    <span class="s2">"auto_scale"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>                      <span class="c1"># default: do not estimate scales</span>
-</span><span id="__span-22-17"><a id="__codelineno-22-17" name="__codelineno-22-17" href="#__codelineno-22-17"></a>    <span class="s2">"realization_filters"</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>               <span class="c1"># default: no filter</span>
-</span><span id="__span-22-18"><a id="__codelineno-22-18" name="__codelineno-22-18" href="#__codelineno-22-18"></a>    <span class="s2">"function_estimators"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>                 <span class="c1"># default: use first estimator</span>
-</span><span id="__span-22-19"><a id="__codelineno-22-19" name="__codelineno-22-19" href="#__codelineno-22-19"></a><span class="p">}</span>
-</span><span id="__span-22-20"><a id="__codelineno-22-20" name="__codelineno-22-20" href="#__codelineno-22-20"></a>
-</span><span id="__span-22-21"><a id="__codelineno-22-21" name="__codelineno-22-21" href="#__codelineno-22-21"></a><span class="c1"># realization_filters entries (method is required):</span>
-</span><span id="__span-22-22"><a id="__codelineno-22-22" name="__codelineno-22-22" href="#__codelineno-22-22"></a><span class="s2">"realization_filters"</span><span class="p">:</span> <span class="p">[</span>
-</span><span id="__span-22-23"><a id="__codelineno-22-23" name="__codelineno-22-23" href="#__codelineno-22-23"></a>    <span class="p">{</span>
-</span><span id="__span-22-24"><a id="__codelineno-22-24" name="__codelineno-22-24" href="#__codelineno-22-24"></a>        <span class="s2">"method"</span><span class="p">:</span> <span class="o">...</span><span class="p">,</span>                        <span class="c1"># required: str ("plugin/method")</span>
-</span><span id="__span-22-25"><a id="__codelineno-22-25" name="__codelineno-22-25" href="#__codelineno-22-25"></a>        <span class="s2">"options"</span><span class="p">:</span> <span class="p">{},</span>
-</span><span id="__span-22-26"><a id="__codelineno-22-26" name="__codelineno-22-26" href="#__codelineno-22-26"></a>    <span class="p">},</span>
-</span><span id="__span-22-27"><a id="__codelineno-22-27" name="__codelineno-22-27" href="#__codelineno-22-27"></a><span class="p">]</span>
+</span><span id="__span-22-15"><a id="__codelineno-22-15" name="__codelineno-22-15" href="#__codelineno-22-15"></a>    <span class="s2">"auto_scale"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>                      <span class="c1"># default: do not estimate scales</span>
+</span><span id="__span-22-16"><a id="__codelineno-22-16" name="__codelineno-22-16" href="#__codelineno-22-16"></a>    <span class="s2">"realization_filters"</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>               <span class="c1"># default: no filter</span>
+</span><span id="__span-22-17"><a id="__codelineno-22-17" name="__codelineno-22-17" href="#__codelineno-22-17"></a>    <span class="s2">"function_estimators"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>                 <span class="c1"># default: use first estimator</span>
+</span><span id="__span-22-18"><a id="__codelineno-22-18" name="__codelineno-22-18" href="#__codelineno-22-18"></a><span class="p">}</span>
+</span><span id="__span-22-19"><a id="__codelineno-22-19" name="__codelineno-22-19" href="#__codelineno-22-19"></a>
+</span><span id="__span-22-20"><a id="__codelineno-22-20" name="__codelineno-22-20" href="#__codelineno-22-20"></a><span class="c1"># realization_filters entries (method is required):</span>
+</span><span id="__span-22-21"><a id="__codelineno-22-21" name="__codelineno-22-21" href="#__codelineno-22-21"></a><span class="s2">"realization_filters"</span><span class="p">:</span> <span class="p">[</span>
+</span><span id="__span-22-22"><a id="__codelineno-22-22" name="__codelineno-22-22" href="#__codelineno-22-22"></a>    <span class="p">{</span>
+</span><span id="__span-22-23"><a id="__codelineno-22-23" name="__codelineno-22-23" href="#__codelineno-22-23"></a>        <span class="s2">"method"</span><span class="p">:</span> <span class="o">...</span><span class="p">,</span>                        <span class="c1"># required: str ("plugin/method")</span>
+</span><span id="__span-22-24"><a id="__codelineno-22-24" name="__codelineno-22-24" href="#__codelineno-22-24"></a>        <span class="s2">"options"</span><span class="p">:</span> <span class="p">{},</span>
+</span><span id="__span-22-25"><a id="__codelineno-22-25" name="__codelineno-22-25" href="#__codelineno-22-25"></a>    <span class="p">},</span>
+</span><span id="__span-22-26"><a id="__codelineno-22-26" name="__codelineno-22-26" href="#__codelineno-22-26"></a><span class="p">]</span>
 </span></code></pre></div>
 </details>
 <h2 id="where-to-next">Where to next</h2>

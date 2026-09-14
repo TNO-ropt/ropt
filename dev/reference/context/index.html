@@ -1956,17 +1956,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.context.EnOptContext.get_constraint_offsets" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get_constraint_offsets
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ropt.context.EnOptContext.get_nonlinear_constraint_bounds" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2898,17 +2887,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.context.EnOptContext.get_constraint_offsets" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get_constraint_offsets
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ropt.context.EnOptContext.get_nonlinear_constraint_bounds" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3359,54 +3337,6 @@ scale, and it is added back before they are reported.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.context.EnOptContext.get_constraint_offsets" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">get_constraint_offsets</span>
-
-
-</h4>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">get_constraint_offsets</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Return the offset applied to each nonlinear constraint.</p>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>] | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The constraint offsets, or <code>None</code> if there are no constraints.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
 <h4 id="ropt.context.EnOptContext.get_nonlinear_constraint_bounds" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">get_nonlinear_constraint_bounds</span>
 
@@ -3422,8 +3352,7 @@ scale, and it is added back before they are reported.</p>
         <p>Return the scaled nonlinear constraint bounds.</p>
 <p>The bounds are transformed together with the constraint values, so that
 the configured constraint is the constraint that is solved. Scales are
-positive and an offset shifts both sides alike, so the bounds keep their
-order.</p>
+positive, so the bounds keep their order.</p>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
