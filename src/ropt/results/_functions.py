@@ -98,7 +98,5 @@ class Functions(ResultField):
         if constraints is not None:
             constraint_scales = context.get_constraint_scales()
             assert constraint_scales is not None
-            constraints = unscale_value(
-                constraints, constraint_scales, context.get_constraint_offsets()
-            )
+            constraints = unscale_value(constraints, constraint_scales)
         return Functions(objectives=objectives, constraints=constraints)

@@ -584,11 +584,10 @@ independently:
 "nonlinear_constraints": {..., "auto_scale": [True, False]}
 ```
 
-Constraints also accept `offsets`, but note what they do not do. The optimizer
-only ever sees the difference between a constraint and its bound, and an offset
-shifts both alike, so it cancels out: the problem that is solved, the reported
-violations, and feasibility are all unaffected. A constraint offset changes only
-the reported constraint value and, where `auto_scale` is set, the estimate.
+There is no `offsets` entry for constraints. An objective needs an offset
+because it has no natural reference point, but a constraint already has one: the
+optimizer only ever sees the difference between a constraint and its bound, so
+the value is centred on the bound already and an offset would cancel out.
 
 ### `realizations` — [`RealizationsConfig`][ropt.config.RealizationsConfig] { #realizations }
 
@@ -1018,7 +1017,6 @@ Expand the block below to see every field and its default value.
         "lower_bounds": ...,                      # required: 1D array (one per constraint)
         "upper_bounds": ...,                      # required: 1D array (one per constraint)
         "scales": 1.0,                            # default: no scaling
-        "offsets": 0.0,                           # default: no offset
         "auto_scale": False,                      # default: do not estimate scales
         "realization_filters": None,               # default: no filter
         "function_estimators": 0,                 # default: use first estimator

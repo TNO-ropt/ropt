@@ -64,27 +64,6 @@ def test_objective_offsets_are_undone_when_reporting() -> None:
     assert np.allclose(functions.objectives, [3.0, 11.0])
 
 
-def test_constraint_offsets_cancel_in_the_residuals() -> None:
-    # The optimizer only ever sees the difference between a constraint and its
-    # bound, and an offset shifts both alike.
-    def residuals(offset: float) -> tuple[np.float64, np.float64]:
-        context = _context(
-            nonlinear_constraints={
-                "lower_bounds": [1.0],
-                "upper_bounds": [4.0],
-                "scales": [2.0],
-                "offsets": [offset],
-            }
-        )
-        bounds = context.get_nonlinear_constraint_bounds()
-        assert bounds is not None
-        lower, upper = bounds
-        value = (3.0 - offset) / 2.0
-        return value - lower[0], upper[0] - value
-
-    assert np.allclose(residuals(0.0), residuals(10.0))
-
-
 def test_constraint_bounds_keep_their_order_when_scaled() -> None:
     context = _context(
         nonlinear_constraints={

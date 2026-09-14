@@ -145,16 +145,6 @@ class EnOptContext(BaseModel):
         """
         return self.objectives.offsets
 
-    def get_constraint_offsets(self) -> NDArray[np.float64] | None:
-        """Return the offset applied to each nonlinear constraint.
-
-        Returns:
-            The constraint offsets, or `None` if there are no constraints.
-        """
-        if self.nonlinear_constraints is None:
-            return None
-        return self.nonlinear_constraints.offsets
-
     def get_nonlinear_constraint_bounds(
         self,
     ) -> tuple[NDArray[np.float64], NDArray[np.float64]] | None:
@@ -162,8 +152,7 @@ class EnOptContext(BaseModel):
 
         The bounds are transformed together with the constraint values, so that
         the configured constraint is the constraint that is solved. Scales are
-        positive and an offset shifts both sides alike, so the bounds keep their
-        order.
+        positive, so the bounds keep their order.
 
         Returns:
             The lower and upper bounds, or `None` if there are no constraints.
@@ -172,10 +161,9 @@ class EnOptContext(BaseModel):
             return None
         scales = self._constraint_scales
         assert scales is not None
-        offsets = self.nonlinear_constraints.offsets
         return (
-            scale(self.nonlinear_constraints.lower_bounds, scales, offsets),
-            scale(self.nonlinear_constraints.upper_bounds, scales, offsets),
+            scale(self.nonlinear_constraints.lower_bounds, scales),
+            scale(self.nonlinear_constraints.upper_bounds, scales),
         )
 
     def _needs_auto_scales(self) -> bool:

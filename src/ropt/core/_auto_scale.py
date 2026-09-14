@@ -69,7 +69,6 @@ def set_auto_scales(
         averages = _weighted_average(
             evaluator_result.constraints[rows, :], realizations, weights, "constraints"
         )
-        averages -= context.nonlinear_constraints.offsets
         # A constraint that is not auto-scaled keeps a factor of one, and its
         # estimate is never inspected: it may legitimately be zero.
         constraints = np.where(

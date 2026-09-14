@@ -555,11 +555,7 @@ class EnsembleEvaluator:
             if constraints is not None:
                 constraint_scales = self._context.get_constraint_scales()
                 assert constraint_scales is not None
-                constraints = scale(
-                    constraints,
-                    constraint_scales,
-                    self._context.get_constraint_offsets(),
-                )
+                constraints = scale(constraints, constraint_scales)
 
             # Maximizing an objective is minimizing its negation. The flip
             # belongs here, on the aggregate, and not on the values that went
