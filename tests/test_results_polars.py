@@ -152,8 +152,8 @@ def test_polars_results_metadata(config: Any, eval_func: Any) -> None:
     assert frame.height == 3
     assert frame.columns == [
         "batch_id",
-        *(f"variables,{idx}" for idx in range(3)),
         "metadata.foo.bar",
+        *(f"variables,{idx}" for idx in range(3)),
     ]
     assert frame["metadata.foo.bar"].to_list() == [1, 1, 1]
 
@@ -178,8 +178,8 @@ def test_polars_results_mixed_granularity(config: Any, eval_func: Any) -> None:
         "batch_id",
         "realization",
         "perturbation",
-        *(f"target_gradient,a:{idx}" for idx in range(1, 4)),
         *(f"perturbed_variables,a:{idx}" for idx in range(1, 4)),
+        *(f"target_gradient,a:{idx}" for idx in range(1, 4)),
     ]
     assert frame.null_count().sum_horizontal().item() == 0
     for batch_frame in frame.partition_by("batch_id"):

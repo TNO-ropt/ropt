@@ -6,13 +6,7 @@ from typing import TYPE_CHECKING, Literal
 
 from ropt.exceptions import UnsupportedError
 
-from ._frame_core import (
-    FRAME_SPECS,
-    _get_select,
-    _get_value,
-    _has_results,
-    _resolve_field,
-)
+from ._frame_core import UNSTACK_AXES, _has_results, _value_fields
 from ._frame_support import HAVE_POLARS, missing_engine_message
 from ._function_results import FunctionResults
 from ._gradient_results import GradientResults
@@ -36,74 +30,9 @@ def _get_results(
 ) -> pl.DataFrame:
     if not sub_fields or not _has_results(results, result_type):
         return pl.DataFrame()
-
-    frames: list[pl.DataFrame] = []
-    keys: list[str] = []
-    for spec in FRAME_SPECS[result_type]:
-        if _resolve_field(results, spec.field) is None:
-            continue
-        if spec.has_sub_fields:
-            select = _get_select(spec.field, sub_fields)
-            prefix = spec.field
-        else:
-            if spec.field not in sub_fields:
-                continue
-            select = []
-            prefix = spec.field.rpartition(".")[0]
-        frame, key_columns = _to_polars_frame(
-            results,
-            spec.field,
-            select,
-            spec.unstack,
-            sep,
-            has_sub_fields=spec.has_sub_fields,
-        )
-        frames.append(frame if not prefix else _add_prefix(frame, key_columns, prefix))
-        keys += [column for column in key_columns if column not in keys]
-    return _join_frames(frames, keys)
-
-
-def _join_frames(args: Sequence[pl.DataFrame], keys: Sequence[str]) -> pl.DataFrame:
-    frames = [frame for frame in args if frame.height > 0]
-    if not frames:
-        return pl.DataFrame()
-    joined_frame = frames[0]
-    for frame in frames[1:]:
-        joined_frame = joined_frame.join(
-            frame,
-            on=[
-                column
-                for column in frame.columns
-                if column in keys and column in joined_frame.columns
-            ],
-            how="full",
-            coalesce=True,
-            maintain_order="left_right",
-        )
-    return joined_frame.select(
-        *(column for column in joined_frame.columns if column in keys),
-        *(column for column in joined_frame.columns if column not in keys),
-    )
-
-
-def _add_prefix(frame: pl.DataFrame, keys: Sequence[str], prefix: str) -> pl.DataFrame:
-    return frame.rename(
-        {column: f"{prefix}.{column}" for column in frame.columns if column not in keys}
-    )
-
-
-def _add_metadata(
-    frame: pl.DataFrame, results: Results, sub_fields: set[str]
-) -> pl.DataFrame:
-    if frame.height == 0:
-        return frame
-    for field in sub_fields:
-        split_fields = field.split(".")
-        if split_fields[0] == "metadata":
-            value = _get_value(results.metadata, split_fields[1:])
-            if value is not None:
-                frame = frame.with_columns(pl.lit(value).alias(field))
-    return frame
+    return _to_polars_frame(
+        results, _value_fields(sub_fields), UNSTACK_AXES[result_type], sep
+    )[0]
 
 
 def results_to_polars(
@@ -153,11 +82,7 @@ def results_to_polars(
             raise TypeError(msg)
 
         if _has_results(item, result_type):
-            frames.append(
-                _add_metadata(
-                    _get_results(item, fields, result_type, sep), item, fields
-                )
-            )
+            frames.append(_get_results(item, fields, result_type, sep))
 
     frames = [frame for frame in frames if frame.width > 0]
     return pl.concat(frames, how="diagonal") if frames else pl.DataFrame()

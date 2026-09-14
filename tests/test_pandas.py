@@ -132,10 +132,10 @@ def test__get_field_data(gradient_result: GradientResults) -> None:
 
 def test__get_field_data_metadata(gradient_result: GradientResults) -> None:
     field_data = _get_field_data(
-        gradient_result.evaluations, "metadata.foo", gradient_result.names
+        gradient_result, "evaluations.metadata.foo", gradient_result.names
     )
     assert field_data is not None
-    assert field_data.name == "metadata.foo"
+    assert field_data.name == "evaluations.metadata.foo"
     info = np.array(gradient_result.evaluations.metadata["foo"])
     assert len(field_data.data) == info.size
     assert [axis.value for axis in field_data.axes] == [
@@ -149,7 +149,7 @@ def test__get_field_data_metadata(gradient_result: GradientResults) -> None:
 
 
 def test_to_pandas_function(function_result: FunctionResults) -> None:
-    frame = function_result.to_pandas("functions", ["objectives"])
+    frame = function_result.to_pandas(["functions.objectives"])
     assert len(frame) == 2
     assert frame.index.names == ["batch_id", "objective"]
     assert frame.index[0] == (1, "fa")
@@ -157,7 +157,7 @@ def test_to_pandas_function(function_result: FunctionResults) -> None:
 
 
 def test_to_pandas_value_field(function_result: FunctionResults) -> None:
-    frame = function_result.to_pandas("target_objective", [])
+    frame = function_result.to_pandas(["target_objective"])
     assert list(frame.columns.values) == ["target_objective"]
     assert frame.index.names == ["batch_id"]
     assert frame["target_objective"].to_list() == [1.0]
@@ -165,10 +165,9 @@ def test_to_pandas_value_field(function_result: FunctionResults) -> None:
 
 def test_to_pandas_gradient(gradient_result: GradientResults) -> None:
     frame = gradient_result.to_pandas(
-        "evaluations",
         [
-            "perturbed_objectives",
-            "metadata.foo",
+            "evaluations.perturbed_objectives",
+            "evaluations.metadata.foo",
         ],
     )
     assert len(frame) == gradient_result.evaluations.perturbed_objectives.size
@@ -188,8 +187,7 @@ def test_to_pandas_gradient(gradient_result: GradientResults) -> None:
 
 def test_to_pandas_unstack1(gradient_result: GradientResults) -> None:
     frame = gradient_result.to_pandas(
-        "perturbed_variables",
-        select=[],
+        ["perturbed_variables"],
         unstack=[AxisName.REALIZATION, AxisName.VARIABLE],
     )
     assert frame.index.names == ["batch_id", "perturbation"]
@@ -206,22 +204,20 @@ def test_to_pandas_unstack1(gradient_result: GradientResults) -> None:
 def test_to_pandas_unstack2(gradient_result: GradientResults) -> None:
     assert gradient_result.scaled.gradients is not None
     frame = gradient_result.to_pandas(
-        "scaled.gradients",
-        select=["objectives"],
+        ["scaled.gradients.objectives"],
         unstack=[AxisName.OBJECTIVE, AxisName.VARIABLE],
     )
     assert list(frame.columns.values) == [
-        ("objectives", "fa", "va"),
-        ("objectives", "fa", "vb"),
-        ("objectives", "fb", "va"),
-        ("objectives", "fb", "vb"),
+        ("scaled.gradients.objectives", "fa", "va"),
+        ("scaled.gradients.objectives", "fa", "vb"),
+        ("scaled.gradients.objectives", "fb", "va"),
+        ("scaled.gradients.objectives", "fb", "vb"),
     ]
 
 
 def test_to_pandas_unstack_only_variable(gradient_result: GradientResults) -> None:
     frame = gradient_result.to_pandas(
-        "perturbed_variables",
-        select=[],
+        ["perturbed_variables"],
         unstack=[AxisName.VARIABLE],
     )
     assert frame.index.names == [
@@ -236,8 +232,8 @@ def test_to_pandas_unstack_only_variable(gradient_result: GradientResults) -> No
 
 
 def test_to_pandas_join(function_result: FunctionResults) -> None:
-    frame1 = function_result.to_pandas("evaluations", ["objectives"])
-    frame2 = function_result.to_pandas("functions", ["objectives"])
+    frame1 = function_result.to_pandas(["evaluations.objectives"])
+    frame2 = function_result.to_pandas(["functions.objectives"])
     frame1.columns = pandas.Index(
         "_".join(column) if isinstance(column, tuple) else column
         for column in frame1.columns.to_numpy()

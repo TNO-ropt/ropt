@@ -2,18 +2,11 @@
 
 from __future__ import annotations
 
-from functools import partial
 from typing import TYPE_CHECKING, Literal
 
 from ropt.exceptions import UnsupportedError
 
-from ._frame_core import (
-    FRAME_SPECS,
-    _get_select,
-    _get_value,
-    _has_results,
-    _resolve_field,
-)
+from ._frame_core import UNSTACK_AXES, _has_results, _value_fields
 from ._frame_support import HAVE_PANDAS, missing_engine_message
 from ._function_results import FunctionResults
 from ._gradient_results import GradientResults
@@ -22,8 +15,6 @@ if TYPE_CHECKING:
     from collections.abc import Sequence
 
     from ropt.results import Results
-
-    from ._frame_core import FrameSpec
 
 if HAVE_PANDAS:
     import pandas as pd
@@ -38,68 +29,9 @@ def _get_results(
 ) -> pd.DataFrame:
     if not sub_fields or not _has_results(results, result_type):
         return pd.DataFrame()
-
-    return _join_frames(
-        *(
-            _spec_frame(results, spec, sub_fields)
-            for spec in FRAME_SPECS[result_type]
-            if _resolve_field(results, spec.field) is not None
-            and (spec.has_sub_fields or spec.field in sub_fields)
-        )
+    return _to_pandas_frame(
+        results, _value_fields(sub_fields), UNSTACK_AXES[result_type]
     )
-
-
-def _spec_frame(
-    results: Results, spec: FrameSpec, sub_fields: set[str]
-) -> pd.DataFrame:
-    if spec.has_sub_fields:
-        select = _get_select(spec.field, sub_fields)
-        prefix = spec.field
-    else:
-        select = []
-        prefix = spec.field.rpartition(".")[0]
-    frame = _to_pandas_frame(
-        results,
-        spec.field,
-        select,
-        spec.unstack,
-        has_sub_fields=spec.has_sub_fields,
-    )
-    if prefix:
-        frame = frame.rename(columns=partial(_add_prefix, prefix=prefix))
-    return frame
-
-
-def _join_frames(*args: pd.DataFrame) -> pd.DataFrame:
-    frames = [frame for frame in args if not frame.empty]
-    if not frames:
-        return pd.DataFrame()
-    # Folding pairwise lets pandas align a coarse index against a finer one and
-    # broadcast; joining the whole list at once cannot, and raises instead.
-    joined_frame = frames[0]
-    for frame in frames[1:]:
-        joined_frame = joined_frame.join(frame, how="outer")
-    return joined_frame
-
-
-def _add_prefix(name: tuple[str, ...] | str, prefix: str) -> tuple[str, ...] | str:
-    return (
-        (f"{prefix}.{name[0]}", *name[1:])
-        if isinstance(name, tuple)
-        else f"{prefix}.{name}"
-    )
-
-
-def _add_metadata(
-    data_frame: pd.DataFrame, results: Results, sub_fields: set[str]
-) -> pd.DataFrame:
-    for field in sub_fields:
-        split_fields = field.split(".")
-        if split_fields[0] == "metadata":
-            value = _get_value(results.metadata, split_fields[1:])
-            if value is not None:
-                data_frame[field] = value
-    return data_frame
 
 
 def results_to_pandas(
@@ -145,8 +77,6 @@ def results_to_pandas(
             raise TypeError(msg)
 
         if _has_results(item, result_type):
-            frames.append(
-                _add_metadata(_get_results(item, fields, result_type), item, fields)
-            )
+            frames.append(_get_results(item, fields, result_type))
 
     return pd.concat(frames) if frames else pd.DataFrame()

@@ -276,48 +276,54 @@ exporting the objectives of a single result **without** any `names` gives plain
 numbers for both the realization and the objective axes:
 
 ```python
-df = result.to_pandas("evaluations", select=["objectives"])
+df = result.to_pandas(["evaluations.objectives"])
 ```
 
 ```
-                               objectives
+                               evaluations.objectives
 batch_id realization objective
-1        0           0               2.10
-                     1               0.94
-         1           0               2.35
-                     1               1.02
+1        0           0                           2.10
+                     1                           0.94
+         1           0                           2.35
+                     1                           1.02
 ```
 
 Adding a `names` entry replaces those numbers with meaningful labels. The
 examples below assume the realizations are named `"r0"`/`"r1"` and the objectives
 `"val"`/`"cost"`.
 
-### Exporting a single result field
+### Exporting selected fields
 
 The [`to_pandas`][ropt.results.Results.to_pandas] method on an individual
-result exports one field (or a subset of its sub-fields):
+result exports any set of fields, each named by a dotted path from the result:
 
 ```python
-df = result.to_pandas("evaluations", select=["variables", "objectives"])
+df = result.to_pandas(["variables", "evaluations.objectives"])
 ```
 
-By default, every axis of the exported sub-fields becomes a level in a
+A path may name a field of the result itself (`"variables"`,
+`"target_objective"`), a field of one of its sub-objects
+(`"functions.objectives"`, `"scaled.variables"`), or an entry of a dict-valued
+field (`"metadata.run.id"`). Each path becomes a column of that name. Paths
+whose value is `None`, and missing dict keys, are skipped.
+
+By default, every axis of the exported fields becomes a level in a
 multi-index. For example, `objectives` in
 [`FunctionEvaluations`][ropt.results.FunctionEvaluations] has the axes
 `REALIZATION` and `OBJECTIVE`, so exporting it keeps both in the index — now
 with the configured names:
 
 ```python
-df = result.to_pandas("evaluations", select=["objectives"])
+df = result.to_pandas(["evaluations.objectives"])
 ```
 
 ```
-                               objectives
+                               evaluations.objectives
 batch_id realization objective
-1        r0          val             2.10
-                     cost            0.94
-         r1          val             2.35
-                     cost            1.02
+1        r0          val                         2.10
+                     cost                        0.94
+         r1          val                         2.35
+                     cost                        1.02
 ```
 
 Passing `unstack` pivots selected axes out of the index and into columns. Here
@@ -327,17 +333,16 @@ the `OBJECTIVE` axis is unstacked:
 from ropt.enums import AxisName
 
 df = result.to_pandas(
-    "evaluations",
-    select=["objectives"],
+    ["evaluations.objectives"],
     unstack=[AxisName.OBJECTIVE],
 )
 ```
 
 ```
-                     (objectives, val)  (objectives, cost)
+                     (evaluations.objectives, val)  (evaluations.objectives, cost)
 batch_id realization
-1        r0                       2.10                0.94
-         r1                       2.35                1.02
+1        r0                                   2.10                            0.94
+         r1                                   2.35                            1.02
 ```
 
 The unstacked axis is flattened into the column labels, so each new column is a
@@ -379,29 +384,27 @@ which results to process: `"functions"` for
 
 ### Metadata columns
 
-The two kinds of [metadata](#metadata) are exported differently, and the two
-functions are **not** symmetric.
+Both kinds of [metadata](#metadata) are reached by the same dotted paths, since
+a path may end in one or more dict keys.
 
-`to_pandas` works on a single result field, so it reaches that field's
-**per-realization metadata** (named `metadata.<key>`), which keeps the
-`realization` axis. For example, if the objective attached a per-realization
-`shift`:
+The **per-realization metadata** attached by the evaluator lives on the
+evaluations, so it keeps the `realization` axis. For example, if the objective
+attached a per-realization `shift`:
 
 ```python
-df = result.to_pandas("evaluations", select=["metadata.shift"])
+df = result.to_pandas(["evaluations.metadata.shift"])
 ```
 
 ```
-                     metadata.shift
+                     evaluations.metadata.shift
 batch_id realization
-1        r0                     0.9
-         r1                     1.1
+1        r0                                 0.9
+         r1                                 1.1
 ```
 
-`to_pandas` **cannot** reach the run-level **result metadata**, because it is
-not part of any single field. Use `results_to_pandas` for that: name it with a
-top-level `metadata.` prefix to get one value per result — handy for pulling in a
-run tag:
+The run-level **result metadata** sits directly on the result, so it has no
+axes and gives one value per result — handy for pulling in a run tag. It may be
+nested to any depth:
 
 ```python
 df = results_to_pandas(
@@ -456,41 +459,41 @@ differences you need to know about.
 puts in leading columns of the frame:
 
 ```python
-df = result.to_polars("evaluations", select=["objectives"])
+df = result.to_polars(["evaluations.objectives"])
 ```
 
 ```
-┌──────────┬─────────────┬───────────┬────────────┐
-│ batch_id ┆ realization ┆ objective ┆ objectives │
-╞══════════╪═════════════╪═══════════╪════════════╡
-│ 1        ┆ r0          ┆ val       ┆ 2.10       │
-│ 1        ┆ r0          ┆ cost      ┆ 0.94       │
-│ 1        ┆ r1          ┆ val       ┆ 2.35       │
-│ 1        ┆ r1          ┆ cost      ┆ 1.02       │
-└──────────┴─────────────┴───────────┴────────────┘
+┌──────────┬─────────────┬───────────┬────────────────────────┐
+│ batch_id ┆ realization ┆ objective ┆ evaluations.objectives │
+╞══════════╪═════════════╪═══════════╪════════════════════════╡
+│ 1        ┆ r0          ┆ val       ┆ 2.10                   │
+│ 1        ┆ r0          ┆ cost      ┆ 0.94                   │
+│ 1        ┆ r1          ┆ val       ┆ 2.35                   │
+│ 1        ┆ r1          ┆ cost      ┆ 1.02                   │
+└──────────┴─────────────┴───────────┴────────────────────────┘
 ```
 
 **Tuple column labels become joined strings.** Where pandas produces the column
-`("objectives", "val")`, polars produces `"objectives,val"`. The separator is
-configurable with the `sep` argument, which defaults to `","`:
+`("evaluations.objectives", "val")`, polars produces
+`"evaluations.objectives,val"`. The separator is configurable with the `sep`
+argument, which defaults to `","`:
 
 ```python
 from ropt.enums import AxisName
 
 df = result.to_polars(
-    "evaluations",
-    select=["objectives"],
+    ["evaluations.objectives"],
     unstack=[AxisName.OBJECTIVE],
 )
 ```
 
 ```
-┌──────────┬─────────────┬────────────────┬─────────────────┐
-│ batch_id ┆ realization ┆ objectives,val ┆ objectives,cost │
-╞══════════╪═════════════╪════════════════╪═════════════════╡
-│ 1        ┆ r0          ┆ 2.10           ┆ 0.94            │
-│ 1        ┆ r1          ┆ 2.35           ┆ 1.02            │
-└──────────┴─────────────┴────────────────┴─────────────────┘
+┌──────────┬─────────────┬────────────────────────────┬─────────────────────────────┐
+│ batch_id ┆ realization ┆ evaluations.objectives,val ┆ evaluations.objectives,cost │
+╞══════════╪═════════════╪════════════════════════════╪═════════════════════════════╡
+│ 1        ┆ r0          ┆ 2.10                       ┆ 0.94                        │
+│ 1        ┆ r1          ┆ 2.35                       ┆ 1.02                        │
+└──────────┴─────────────┴────────────────────────────┴─────────────────────────────┘
 ```
 
 Aggregating a sequence of results works the same way:

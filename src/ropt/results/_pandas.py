@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, Any
 
 import pandas as pd
 
-from ._frame_core import _iter_spec_data
+from ._frame_core import _iter_field_data
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
@@ -16,18 +16,13 @@ if TYPE_CHECKING:
 
 def _to_pandas_frame(
     results: Results,
-    field_name: str,
     select: Iterable[str],
     unstack: Iterable[AxisName] | None,
-    *,
-    has_sub_fields: bool = True,
 ) -> pd.DataFrame:
     if unstack is None:
         unstack = []
     joined_frame = pd.DataFrame()
-    for field_data in _iter_spec_data(
-        results, field_name, select, results.names, has_sub_fields=has_sub_fields
-    ):
+    for field_data in _iter_field_data(results, select, results.names):
         index: pd.Index[Any]
         if field_data.axes:
             index = pd.MultiIndex.from_product(

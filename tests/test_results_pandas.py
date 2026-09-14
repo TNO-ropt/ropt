@@ -191,9 +191,9 @@ def test_dataframe_results_metadata(config: Any, eval_func: Any) -> None:
     )
     frame = pd.concat(frames)
     assert len(frame) == 3
-    assert list(frame.columns.get_level_values(level=0)) == [
+    assert list(frame.columns.get_level_values(level=0)) == ["metadata.foo.bar"] + [
         ("variables", idx) for idx in range(3)
-    ] + ["metadata.foo.bar"]
+    ]
 
 
 def test_pandas_results_empty_input() -> None:
