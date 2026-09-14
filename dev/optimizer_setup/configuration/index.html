@@ -1033,6 +1033,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#objective-offsets" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Offsetting objectives
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#objective-direction" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3294,6 +3305,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#objective-offsets" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Offsetting objectives
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#objective-direction" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3943,11 +3965,32 @@ the meaning of <code>weights</code> and, unlike a per-objective scale, the locat
 optimum. Realizations that fail do not contribute.</p>
 <p>The estimate is computed once, from the first batch, and then fixed for the rest
 of the run. It <em>multiplies</em> <code>scales</code> rather than replacing it, so a configured
-scale still applies on top of an estimated one.</p>
+scale still applies on top of an estimated one. An <code>offsets</code> entry is subtracted
+before the estimate is taken, so the estimate measures what is left after it.</p>
+<h4 id="objective-offsets">Offsetting objectives</h4>
+<p>An objective reaches the optimizer as <span class="arithmatex">\((f_j - o_j)/s_j\)</span>, using the <code>offsets</code>
+field, and is reported back to you as <span class="arithmatex">\(f_j = s_j\,y_j + o_j\)</span>. The default is
+zero, which is the identity.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="s2">"objectives"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"weights"</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">],</span> <span class="s2">"scales"</span><span class="p">:</span> <span class="p">[</span><span class="mf">1e5</span><span class="p">],</span> <span class="s2">"offsets"</span><span class="p">:</span> <span class="p">[</span><span class="mf">1e9</span><span class="p">]}</span>
+</span></code></pre></div>
+<p>An offset does not move the optimum and does not change the gradient: it shifts
+the weighted total by a constant. What it changes is the <em>magnitude</em> the
+optimizer works with, and that matters when an objective is large but varies
+little. An NPV around <span class="arithmatex">\(10^9\)</span> that varies by <span class="arithmatex">\(10^5\)</span> becomes, after dividing by
+<span class="arithmatex">\(10^9\)</span>, a quantity near one that varies by <span class="arithmatex">\(10^{-4}\)</span> — below the convergence
+tolerance of many methods. Subtracting a baseline of <span class="arithmatex">\(10^9\)</span> first and then
+dividing by <span class="arithmatex">\(10^5\)</span> leaves the variation at order one.</p>
+<p>Because it changes the value the optimizer tests against its tolerances, an
+offset can change where a run stops, even though it cannot change where the
+optimum is.</p>
+<p>An aggregate that is a spread rather than an average has its offset subtracted
+too. A standard deviation is unchanged by shifting the values it summarizes, so
+the offset applies to the aggregate itself; the map is undone on the way out, so
+what you are reported is unaffected.</p>
 <h4 id="objective-direction">Choosing the direction of an objective</h4>
 <p><code>ropt</code> minimizes. To maximize an objective, mark it in the <code>maximize</code> field,
 which is a boolean per objective and defaults to all-false:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="s2">"objectives"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"weights"</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.6</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">],</span> <span class="s2">"maximize"</span><span class="p">:</span> <span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">]}</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="s2">"objectives"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"weights"</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.6</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">],</span> <span class="s2">"maximize"</span><span class="p">:</span> <span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">]}</span>
 </span></code></pre></div>
 <p>The sign is flipped <em>after</em> the values of the individual realizations have been
 combined, and never on the values themselves. This matters when a
@@ -3960,7 +4003,7 @@ combined value is correct whatever produced it.</p>
 <li>Per-realization values (<code>evaluations.objectives</code>) are scaled, never flipped.</li>
 <li>Combined values (<code>functions.objectives</code>) and their gradients are reported with
   the flip undone, so that they agree in sign with the values they summarize.</li>
-<li><code>target_objective</code> is reported as the optimizer sees it, because it mixes
+<li><code>target_objective</code> exists only as the optimizer sees it, because it mixes
   objectives of different scales and directions and there is no single factor
   to undo. It is always a value being minimized, which is what lets results be
   compared by "lowest is best".</li>
@@ -4008,13 +4051,13 @@ between them, and therefore the feasible set, is unchanged. It happens whenever
 the variables are scaled, and needs no configuration.</p>
 <p>Second, each equation is divided by its entry in the <code>scales</code> field, together
 with its bounds:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="s2">"linear_constraints"</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">,</span> <span class="s2">"scales"</span><span class="p">:</span> <span class="p">[</span><span class="mf">1e3</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]}</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="s2">"linear_constraints"</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">,</span> <span class="s2">"scales"</span><span class="p">:</span> <span class="p">[</span><span class="mf">1e3</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]}</span>
 </span></code></pre></div>
 <p>Dividing an equation by a positive number leaves its solutions alone; what it
 changes is the size of the numbers the optimizer works with, in the same way
 that scaling the variables does. Set <code>auto_scale</code> to estimate those divisors
 instead of stating them:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="s2">"linear_constraints"</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">,</span> <span class="s2">"auto_scale"</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="s2">"linear_constraints"</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">,</span> <span class="s2">"auto_scale"</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
 </span></code></pre></div>
 <p>The estimate for an equation is the largest absolute value among its
 coefficients, so that the largest coefficient the optimizer sees is one. Only
@@ -4061,8 +4104,13 @@ single shared factor used for objectives, because constraints are independent
 conditions rather than terms of one weighted sum. For the same reason
 <code>auto_scale</code> is a boolean <em>per constraint</em>, so that constraints can be scaled
 independently:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="s2">"nonlinear_constraints"</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">,</span> <span class="s2">"auto_scale"</span><span class="p">:</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">]}</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="s2">"nonlinear_constraints"</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">,</span> <span class="s2">"auto_scale"</span><span class="p">:</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">]}</span>
 </span></code></pre></div>
+<p>Constraints also accept <code>offsets</code>, but note what they do not do. The optimizer
+only ever sees the difference between a constraint and its bound, and an offset
+shifts both alike, so it cancels out: the problem that is solved, the reported
+violations, and feasibility are all unaffected. A constraint offset changes only
+the reported constraint value and, where <code>auto_scale</code> is set, the estimate.</p>
 <h3 id="realizations"><code>realizations</code> — <a class="autorefs autorefs-internal" title="            RealizationsConfig" href="../../reference/config/#ropt.config.RealizationsConfig"><code>RealizationsConfig</code></a></h3>
 <p>To optimize an ensemble of functions, a set of realizations is defined. When the
 optimizer requests a function value or a gradient, these are calculated for each
@@ -4181,11 +4229,11 @@ terminal. A backend option that names the same setting, such as SciPy's
   optimization method. These are passed straight to the backend.</p>
 </li>
 </ul>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="s2">"backend"</span><span class="p">:</span> <span class="p">{</span>
-</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>    <span class="s2">"method"</span><span class="p">:</span> <span class="s2">"scipy/default"</span><span class="p">,</span>
-</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>    <span class="s2">"max_iterations"</span><span class="p">:</span> <span class="mi">200</span><span class="p">,</span>
-</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a>    <span class="s2">"options"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"maxiter"</span><span class="p">:</span> <span class="mi">200</span><span class="p">},</span>
-</span><span id="__span-16-5"><a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="p">}</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="s2">"backend"</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>    <span class="s2">"method"</span><span class="p">:</span> <span class="s2">"scipy/default"</span><span class="p">,</span>
+</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>    <span class="s2">"max_iterations"</span><span class="p">:</span> <span class="mi">200</span><span class="p">,</span>
+</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a>    <span class="s2">"options"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"maxiter"</span><span class="p">:</span> <span class="mi">200</span><span class="p">},</span>
+</span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="p">}</span>
 </span></code></pre></div>
 <p>Which methods a backend supports, which kinds of constraint and variable each
 of them accepts, and which <code>options</code> they take, is documented by the backend
@@ -4197,7 +4245,7 @@ the table before writing the rest of the configuration.</p>
 <h4 id="external-backend">Running the optimizer in a separate process</h4>
 <p>Prefix the method with <code>external/</code> to run the optimization algorithm in a
 process of its own:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="s2">"backend"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"method"</span><span class="p">:</span> <span class="s2">"external/scipy/slsqp"</span><span class="p">}</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="s2">"backend"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"method"</span><span class="p">:</span> <span class="s2">"external/scipy/slsqp"</span><span class="p">}</span>
 </span></code></pre></div>
 <p><code>ropt</code> spawns a child process, creates the named backend there, and lets it
 drive the optimization. The function and gradient evaluations still happen in
@@ -4354,31 +4402,31 @@ dimension of the optimization problem:</p>
 </table>
 <p>The corresponding value is a tuple of strings (or integers) whose length must
 match the count of that axis. For example, with 3 variables and 2 objectives:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="s2">"names"</span><span class="p">:</span> <span class="p">{</span>
-</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>    <span class="s2">"variable"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"x"</span><span class="p">,</span> <span class="s2">"y"</span><span class="p">,</span> <span class="s2">"z"</span><span class="p">),</span>
-</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a>    <span class="s2">"objective"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"f0"</span><span class="p">,</span> <span class="s2">"f1"</span><span class="p">),</span>
-</span><span id="__span-18-4"><a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="p">}</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="s2">"names"</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>    <span class="s2">"variable"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"x"</span><span class="p">,</span> <span class="s2">"y"</span><span class="p">,</span> <span class="s2">"z"</span><span class="p">),</span>
+</span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a>    <span class="s2">"objective"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"f0"</span><span class="p">,</span> <span class="s2">"f1"</span><span class="p">),</span>
+</span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="p">}</span>
 </span></code></pre></div>
 <p>You only need to provide labels for axes you want named — unlabelled axes
 default to integer indices. See <a href="../results/">Working with Results</a> for how
 these labels appear in exported DataFrames.</p>
 <h2 id="a-worked-example">A worked example</h2>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="n">CONFIG</span> <span class="o">=</span> <span class="p">{</span>
-</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>    <span class="s2">"variables"</span><span class="p">:</span> <span class="p">{</span>
-</span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a>        <span class="s2">"variable_count"</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
-</span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a>        <span class="s2">"lower_bounds"</span><span class="p">:</span> <span class="o">-</span><span class="mf">5.0</span><span class="p">,</span>
-</span><span id="__span-19-5"><a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a>        <span class="s2">"upper_bounds"</span><span class="p">:</span>  <span class="mf">5.0</span><span class="p">,</span>
-</span><span id="__span-19-6"><a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a>        <span class="s2">"perturbation_magnitudes"</span><span class="p">:</span> <span class="mf">1e-5</span><span class="p">,</span>
-</span><span id="__span-19-7"><a id="__codelineno-19-7" name="__codelineno-19-7" href="#__codelineno-19-7"></a>    <span class="p">},</span>
-</span><span id="__span-19-8"><a id="__codelineno-19-8" name="__codelineno-19-8" href="#__codelineno-19-8"></a>    <span class="s2">"objectives"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"weights"</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">]},</span>
-</span><span id="__span-19-9"><a id="__codelineno-19-9" name="__codelineno-19-9" href="#__codelineno-19-9"></a>    <span class="s2">"realizations"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"weights"</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">]</span> <span class="o">*</span> <span class="mi">10</span><span class="p">},</span>
-</span><span id="__span-19-10"><a id="__codelineno-19-10" name="__codelineno-19-10" href="#__codelineno-19-10"></a>    <span class="s2">"gradient"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"number_of_perturbations"</span><span class="p">:</span> <span class="mi">5</span><span class="p">},</span>
-</span><span id="__span-19-11"><a id="__codelineno-19-11" name="__codelineno-19-11" href="#__codelineno-19-11"></a>    <span class="s2">"optimizer"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"max_batches"</span><span class="p">:</span> <span class="mi">50</span><span class="p">},</span>
-</span><span id="__span-19-12"><a id="__codelineno-19-12" name="__codelineno-19-12" href="#__codelineno-19-12"></a>    <span class="s2">"backend"</span><span class="p">:</span> <span class="p">{</span>
-</span><span id="__span-19-13"><a id="__codelineno-19-13" name="__codelineno-19-13" href="#__codelineno-19-13"></a>        <span class="s2">"method"</span><span class="p">:</span> <span class="s2">"scipy/default"</span><span class="p">,</span>
-</span><span id="__span-19-14"><a id="__codelineno-19-14" name="__codelineno-19-14" href="#__codelineno-19-14"></a>        <span class="s2">"options"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"maxiter"</span><span class="p">:</span> <span class="mi">200</span><span class="p">},</span>
-</span><span id="__span-19-15"><a id="__codelineno-19-15" name="__codelineno-19-15" href="#__codelineno-19-15"></a>    <span class="p">},</span>
-</span><span id="__span-19-16"><a id="__codelineno-19-16" name="__codelineno-19-16" href="#__codelineno-19-16"></a><span class="p">}</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="n">CONFIG</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>    <span class="s2">"variables"</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a>        <span class="s2">"variable_count"</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+</span><span id="__span-20-4"><a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a>        <span class="s2">"lower_bounds"</span><span class="p">:</span> <span class="o">-</span><span class="mf">5.0</span><span class="p">,</span>
+</span><span id="__span-20-5"><a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a>        <span class="s2">"upper_bounds"</span><span class="p">:</span>  <span class="mf">5.0</span><span class="p">,</span>
+</span><span id="__span-20-6"><a id="__codelineno-20-6" name="__codelineno-20-6" href="#__codelineno-20-6"></a>        <span class="s2">"perturbation_magnitudes"</span><span class="p">:</span> <span class="mf">1e-5</span><span class="p">,</span>
+</span><span id="__span-20-7"><a id="__codelineno-20-7" name="__codelineno-20-7" href="#__codelineno-20-7"></a>    <span class="p">},</span>
+</span><span id="__span-20-8"><a id="__codelineno-20-8" name="__codelineno-20-8" href="#__codelineno-20-8"></a>    <span class="s2">"objectives"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"weights"</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">]},</span>
+</span><span id="__span-20-9"><a id="__codelineno-20-9" name="__codelineno-20-9" href="#__codelineno-20-9"></a>    <span class="s2">"realizations"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"weights"</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">]</span> <span class="o">*</span> <span class="mi">10</span><span class="p">},</span>
+</span><span id="__span-20-10"><a id="__codelineno-20-10" name="__codelineno-20-10" href="#__codelineno-20-10"></a>    <span class="s2">"gradient"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"number_of_perturbations"</span><span class="p">:</span> <span class="mi">5</span><span class="p">},</span>
+</span><span id="__span-20-11"><a id="__codelineno-20-11" name="__codelineno-20-11" href="#__codelineno-20-11"></a>    <span class="s2">"optimizer"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"max_batches"</span><span class="p">:</span> <span class="mi">50</span><span class="p">},</span>
+</span><span id="__span-20-12"><a id="__codelineno-20-12" name="__codelineno-20-12" href="#__codelineno-20-12"></a>    <span class="s2">"backend"</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="__span-20-13"><a id="__codelineno-20-13" name="__codelineno-20-13" href="#__codelineno-20-13"></a>        <span class="s2">"method"</span><span class="p">:</span> <span class="s2">"scipy/default"</span><span class="p">,</span>
+</span><span id="__span-20-14"><a id="__codelineno-20-14" name="__codelineno-20-14" href="#__codelineno-20-14"></a>        <span class="s2">"options"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"maxiter"</span><span class="p">:</span> <span class="mi">200</span><span class="p">},</span>
+</span><span id="__span-20-15"><a id="__codelineno-20-15" name="__codelineno-20-15" href="#__codelineno-20-15"></a>    <span class="p">},</span>
+</span><span id="__span-20-16"><a id="__codelineno-20-16" name="__codelineno-20-16" href="#__codelineno-20-16"></a><span class="p">}</span>
 </span></code></pre></div>
 <p>This configures a 5-variable problem with bounded variables, an ensemble of
 10 equally-weighted realizations, 5 perturbations per gradient estimate,
@@ -4391,104 +4439,106 @@ SciPy's default optimizer, and a 50-batch cap.</p>
 <a class="autorefs autorefs-internal" title="            EnOptContext" href="../../reference/context/#ropt.context.EnOptContext"><code>EnOptContext</code></a> configuration with all fields
 set to their default values. In practice you only need to specify the
 fields you want to override — everything else is filled in automatically.</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.enums</span><span class="w"> </span><span class="kn">import</span> <span class="n">BoundaryType</span><span class="p">,</span> <span class="n">PerturbationType</span><span class="p">,</span> <span class="n">VariableType</span>
-</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>
-</span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a><span class="n">CONFIG</span> <span class="o">=</span> <span class="p">{</span>
-</span><span id="__span-20-4"><a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a>    <span class="s2">"variables"</span><span class="p">:</span> <span class="p">{</span>
-</span><span id="__span-20-5"><a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a>        <span class="s2">"variable_count"</span><span class="p">:</span> <span class="o">...</span><span class="p">,</span>                            <span class="c1"># required, no default</span>
-</span><span id="__span-20-6"><a id="__codelineno-20-6" name="__codelineno-20-6" href="#__codelineno-20-6"></a>        <span class="s2">"lower_bounds"</span><span class="p">:</span> <span class="o">-</span><span class="nb">float</span><span class="p">(</span><span class="s2">"inf"</span><span class="p">),</span>                    <span class="c1"># default: -inf</span>
-</span><span id="__span-20-7"><a id="__codelineno-20-7" name="__codelineno-20-7" href="#__codelineno-20-7"></a>        <span class="s2">"upper_bounds"</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="s2">"inf"</span><span class="p">),</span>                     <span class="c1"># default: +inf</span>
-</span><span id="__span-20-8"><a id="__codelineno-20-8" name="__codelineno-20-8" href="#__codelineno-20-8"></a>        <span class="s2">"types"</span><span class="p">:</span> <span class="n">VariableType</span><span class="o">.</span><span class="n">REAL</span><span class="p">,</span>                       <span class="c1"># default: "real" (continuous)</span>
-</span><span id="__span-20-9"><a id="__codelineno-20-9" name="__codelineno-20-9" href="#__codelineno-20-9"></a>        <span class="s2">"mask"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>                                     <span class="c1"># default: all free</span>
-</span><span id="__span-20-10"><a id="__codelineno-20-10" name="__codelineno-20-10" href="#__codelineno-20-10"></a>        <span class="s2">"scales"</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>                                    <span class="c1"># default: no scaling</span>
-</span><span id="__span-20-11"><a id="__codelineno-20-11" name="__codelineno-20-11" href="#__codelineno-20-11"></a>        <span class="s2">"offsets"</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>                                   <span class="c1"># default: no offset</span>
-</span><span id="__span-20-12"><a id="__codelineno-20-12" name="__codelineno-20-12" href="#__codelineno-20-12"></a>        <span class="s2">"perturbation_magnitudes"</span><span class="p">:</span> <span class="mf">0.005</span><span class="p">,</span>
-</span><span id="__span-20-13"><a id="__codelineno-20-13" name="__codelineno-20-13" href="#__codelineno-20-13"></a>        <span class="s2">"perturbation_types"</span><span class="p">:</span> <span class="n">PerturbationType</span><span class="o">.</span><span class="n">ABSOLUTE</span><span class="p">,</span>
-</span><span id="__span-20-14"><a id="__codelineno-20-14" name="__codelineno-20-14" href="#__codelineno-20-14"></a>        <span class="s2">"boundary_types"</span><span class="p">:</span> <span class="n">BoundaryType</span><span class="o">.</span><span class="n">MIRROR_BOTH</span><span class="p">,</span>
-</span><span id="__span-20-15"><a id="__codelineno-20-15" name="__codelineno-20-15" href="#__codelineno-20-15"></a>        <span class="s2">"samplers"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>                                    <span class="c1"># default: use first sampler for all</span>
-</span><span id="__span-20-16"><a id="__codelineno-20-16" name="__codelineno-20-16" href="#__codelineno-20-16"></a>        <span class="s2">"seed"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-</span><span id="__span-20-17"><a id="__codelineno-20-17" name="__codelineno-20-17" href="#__codelineno-20-17"></a>    <span class="p">},</span>
-</span><span id="__span-20-18"><a id="__codelineno-20-18" name="__codelineno-20-18" href="#__codelineno-20-18"></a>    <span class="s2">"objectives"</span><span class="p">:</span> <span class="p">{</span>
-</span><span id="__span-20-19"><a id="__codelineno-20-19" name="__codelineno-20-19" href="#__codelineno-20-19"></a>        <span class="s2">"weights"</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">],</span>                                 <span class="c1"># default: single objective, weight 1.0</span>
-</span><span id="__span-20-20"><a id="__codelineno-20-20" name="__codelineno-20-20" href="#__codelineno-20-20"></a>        <span class="s2">"scales"</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>                                    <span class="c1"># default: no scaling</span>
-</span><span id="__span-20-21"><a id="__codelineno-20-21" name="__codelineno-20-21" href="#__codelineno-20-21"></a>        <span class="s2">"auto_scale"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>                              <span class="c1"># default: do not estimate scales</span>
-</span><span id="__span-20-22"><a id="__codelineno-20-22" name="__codelineno-20-22" href="#__codelineno-20-22"></a>        <span class="s2">"maximize"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>                                <span class="c1"># default: minimize</span>
-</span><span id="__span-20-23"><a id="__codelineno-20-23" name="__codelineno-20-23" href="#__codelineno-20-23"></a>        <span class="s2">"realization_filters"</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>                       <span class="c1"># default: no filter</span>
-</span><span id="__span-20-24"><a id="__codelineno-20-24" name="__codelineno-20-24" href="#__codelineno-20-24"></a>        <span class="s2">"function_estimators"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>                         <span class="c1"># default: use first estimator for all</span>
-</span><span id="__span-20-25"><a id="__codelineno-20-25" name="__codelineno-20-25" href="#__codelineno-20-25"></a>    <span class="p">},</span>
-</span><span id="__span-20-26"><a id="__codelineno-20-26" name="__codelineno-20-26" href="#__codelineno-20-26"></a>    <span class="s2">"linear_constraints"</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>                           <span class="c1"># No linear constraints</span>
-</span><span id="__span-20-27"><a id="__codelineno-20-27" name="__codelineno-20-27" href="#__codelineno-20-27"></a>    <span class="s2">"nonlinear_constraints"</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>                        <span class="c1"># No non-linear constraints</span>
-</span><span id="__span-20-28"><a id="__codelineno-20-28" name="__codelineno-20-28" href="#__codelineno-20-28"></a>    <span class="s2">"realizations"</span><span class="p">:</span> <span class="p">{</span>
-</span><span id="__span-20-29"><a id="__codelineno-20-29" name="__codelineno-20-29" href="#__codelineno-20-29"></a>        <span class="s2">"weights"</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">],</span>                                 <span class="c1"># default: single realization, weight 1.0</span>
-</span><span id="__span-20-30"><a id="__codelineno-20-30" name="__codelineno-20-30" href="#__codelineno-20-30"></a>        <span class="s2">"realization_min_success"</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>                  <span class="c1"># default: equal to number of realizations</span>
-</span><span id="__span-20-31"><a id="__codelineno-20-31" name="__codelineno-20-31" href="#__codelineno-20-31"></a>    <span class="p">},</span>
-</span><span id="__span-20-32"><a id="__codelineno-20-32" name="__codelineno-20-32" href="#__codelineno-20-32"></a>    <span class="s2">"optimizer"</span><span class="p">:</span> <span class="p">{</span>
-</span><span id="__span-20-33"><a id="__codelineno-20-33" name="__codelineno-20-33" href="#__codelineno-20-33"></a>        <span class="s2">"max_batches"</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>                              <span class="c1"># default: no limit</span>
-</span><span id="__span-20-34"><a id="__codelineno-20-34" name="__codelineno-20-34" href="#__codelineno-20-34"></a>        <span class="s2">"max_functions"</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>                            <span class="c1"># default: no limit</span>
-</span><span id="__span-20-35"><a id="__codelineno-20-35" name="__codelineno-20-35" href="#__codelineno-20-35"></a>        <span class="s2">"output_dir"</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>                               <span class="c1"># default: no output directory</span>
-</span><span id="__span-20-36"><a id="__codelineno-20-36" name="__codelineno-20-36" href="#__codelineno-20-36"></a>        <span class="s2">"stdout"</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>                                   <span class="c1"># default: discard</span>
-</span><span id="__span-20-37"><a id="__codelineno-20-37" name="__codelineno-20-37" href="#__codelineno-20-37"></a>        <span class="s2">"stderr"</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>                                   <span class="c1"># default: discard</span>
-</span><span id="__span-20-38"><a id="__codelineno-20-38" name="__codelineno-20-38" href="#__codelineno-20-38"></a>    <span class="p">},</span>
-</span><span id="__span-20-39"><a id="__codelineno-20-39" name="__codelineno-20-39" href="#__codelineno-20-39"></a>    <span class="s2">"backend"</span><span class="p">:</span> <span class="p">{</span>
-</span><span id="__span-20-40"><a id="__codelineno-20-40" name="__codelineno-20-40" href="#__codelineno-20-40"></a>        <span class="s2">"method"</span><span class="p">:</span> <span class="s2">"scipy/default"</span><span class="p">,</span>                        <span class="c1"># default: SciPy SLSQP</span>
-</span><span id="__span-20-41"><a id="__codelineno-20-41" name="__codelineno-20-41" href="#__codelineno-20-41"></a>        <span class="s2">"max_iterations"</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>                           <span class="c1"># default: backend-specific</span>
-</span><span id="__span-20-42"><a id="__codelineno-20-42" name="__codelineno-20-42" href="#__codelineno-20-42"></a>        <span class="s2">"convergence_tolerance"</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>                    <span class="c1"># default: backend-specific</span>
-</span><span id="__span-20-43"><a id="__codelineno-20-43" name="__codelineno-20-43" href="#__codelineno-20-43"></a>        <span class="s2">"parallel"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>                                <span class="c1"># default: Do not evaluate in parallel</span>
-</span><span id="__span-20-44"><a id="__codelineno-20-44" name="__codelineno-20-44" href="#__codelineno-20-44"></a>        <span class="s2">"options"</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>                                  <span class="c1"># default: no extra options</span>
-</span><span id="__span-20-45"><a id="__codelineno-20-45" name="__codelineno-20-45" href="#__codelineno-20-45"></a>    <span class="p">},</span>
-</span><span id="__span-20-46"><a id="__codelineno-20-46" name="__codelineno-20-46" href="#__codelineno-20-46"></a>    <span class="s2">"gradient"</span><span class="p">:</span> <span class="p">{</span>
-</span><span id="__span-20-47"><a id="__codelineno-20-47" name="__codelineno-20-47" href="#__codelineno-20-47"></a>        <span class="s2">"number_of_perturbations"</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
-</span><span id="__span-20-48"><a id="__codelineno-20-48" name="__codelineno-20-48" href="#__codelineno-20-48"></a>        <span class="s2">"perturbation_min_success"</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>                 <span class="c1"># default: equal to number_of_perturbations</span>
-</span><span id="__span-20-49"><a id="__codelineno-20-49" name="__codelineno-20-49" href="#__codelineno-20-49"></a>        <span class="s2">"merge_realizations"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>                      <span class="c1"># default: estimate and average gradients</span>
-</span><span id="__span-20-50"><a id="__codelineno-20-50" name="__codelineno-20-50" href="#__codelineno-20-50"></a>        <span class="s2">"evaluation_policy"</span><span class="p">:</span> <span class="s2">"auto"</span><span class="p">,</span>                      <span class="c1"># default: evaluate functions and perturbations</span>
-</span><span id="__span-20-51"><a id="__codelineno-20-51" name="__codelineno-20-51" href="#__codelineno-20-51"></a>    <span class="p">},</span>                                                    <span class="c1">#          as needed</span>
-</span><span id="__span-20-52"><a id="__codelineno-20-52" name="__codelineno-20-52" href="#__codelineno-20-52"></a>    <span class="s2">"samplers"</span><span class="p">:</span> <span class="p">[</span>
-</span><span id="__span-20-53"><a id="__codelineno-20-53" name="__codelineno-20-53" href="#__codelineno-20-53"></a>        <span class="p">{</span>
-</span><span id="__span-20-54"><a id="__codelineno-20-54" name="__codelineno-20-54" href="#__codelineno-20-54"></a>            <span class="s2">"method"</span><span class="p">:</span> <span class="s2">"scipy/default"</span><span class="p">,</span>                    <span class="c1"># default: standard normal N(0,1)</span>
-</span><span id="__span-20-55"><a id="__codelineno-20-55" name="__codelineno-20-55" href="#__codelineno-20-55"></a>            <span class="s2">"options"</span><span class="p">:</span> <span class="p">{},</span>
-</span><span id="__span-20-56"><a id="__codelineno-20-56" name="__codelineno-20-56" href="#__codelineno-20-56"></a>            <span class="s2">"shared"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>                              <span class="c1"># default: Each realizations has its own</span>
-</span><span id="__span-20-57"><a id="__codelineno-20-57" name="__codelineno-20-57" href="#__codelineno-20-57"></a>                                                          <span class="c1">#          set of perturbations</span>
-</span><span id="__span-20-58"><a id="__codelineno-20-58" name="__codelineno-20-58" href="#__codelineno-20-58"></a>        <span class="p">},</span>
-</span><span id="__span-20-59"><a id="__codelineno-20-59" name="__codelineno-20-59" href="#__codelineno-20-59"></a>    <span class="p">],</span>
-</span><span id="__span-20-60"><a id="__codelineno-20-60" name="__codelineno-20-60" href="#__codelineno-20-60"></a>    <span class="s2">"function_estimators"</span><span class="p">:</span> <span class="p">[</span>
-</span><span id="__span-20-61"><a id="__codelineno-20-61" name="__codelineno-20-61" href="#__codelineno-20-61"></a>        <span class="p">{</span>
-</span><span id="__span-20-62"><a id="__codelineno-20-62" name="__codelineno-20-62" href="#__codelineno-20-62"></a>            <span class="s2">"method"</span><span class="p">:</span> <span class="s2">"default/default"</span><span class="p">,</span>                  <span class="c1"># default: weighted average</span>
-</span><span id="__span-20-63"><a id="__codelineno-20-63" name="__codelineno-20-63" href="#__codelineno-20-63"></a>            <span class="s2">"options"</span><span class="p">:</span> <span class="p">{},</span>
-</span><span id="__span-20-64"><a id="__codelineno-20-64" name="__codelineno-20-64" href="#__codelineno-20-64"></a>        <span class="p">},</span>
-</span><span id="__span-20-65"><a id="__codelineno-20-65" name="__codelineno-20-65" href="#__codelineno-20-65"></a>    <span class="p">],</span>
-</span><span id="__span-20-66"><a id="__codelineno-20-66" name="__codelineno-20-66" href="#__codelineno-20-66"></a>    <span class="s2">"realization_filters"</span><span class="p">:</span> <span class="p">[],</span>                            <span class="c1"># default: none configured</span>
-</span><span id="__span-20-67"><a id="__codelineno-20-67" name="__codelineno-20-67" href="#__codelineno-20-67"></a>    <span class="s2">"names"</span><span class="p">:</span> <span class="p">{},</span>                                          <span class="c1"># default: none configured</span>
-</span><span id="__span-20-68"><a id="__codelineno-20-68" name="__codelineno-20-68" href="#__codelineno-20-68"></a><span class="p">}</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.enums</span><span class="w"> </span><span class="kn">import</span> <span class="n">BoundaryType</span><span class="p">,</span> <span class="n">PerturbationType</span><span class="p">,</span> <span class="n">VariableType</span>
+</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>
+</span><span id="__span-21-3"><a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a><span class="n">CONFIG</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="__span-21-4"><a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a>    <span class="s2">"variables"</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="__span-21-5"><a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a>        <span class="s2">"variable_count"</span><span class="p">:</span> <span class="o">...</span><span class="p">,</span>                            <span class="c1"># required, no default</span>
+</span><span id="__span-21-6"><a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a>        <span class="s2">"lower_bounds"</span><span class="p">:</span> <span class="o">-</span><span class="nb">float</span><span class="p">(</span><span class="s2">"inf"</span><span class="p">),</span>                    <span class="c1"># default: -inf</span>
+</span><span id="__span-21-7"><a id="__codelineno-21-7" name="__codelineno-21-7" href="#__codelineno-21-7"></a>        <span class="s2">"upper_bounds"</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="s2">"inf"</span><span class="p">),</span>                     <span class="c1"># default: +inf</span>
+</span><span id="__span-21-8"><a id="__codelineno-21-8" name="__codelineno-21-8" href="#__codelineno-21-8"></a>        <span class="s2">"types"</span><span class="p">:</span> <span class="n">VariableType</span><span class="o">.</span><span class="n">REAL</span><span class="p">,</span>                       <span class="c1"># default: "real" (continuous)</span>
+</span><span id="__span-21-9"><a id="__codelineno-21-9" name="__codelineno-21-9" href="#__codelineno-21-9"></a>        <span class="s2">"mask"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>                                     <span class="c1"># default: all free</span>
+</span><span id="__span-21-10"><a id="__codelineno-21-10" name="__codelineno-21-10" href="#__codelineno-21-10"></a>        <span class="s2">"scales"</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>                                    <span class="c1"># default: no scaling</span>
+</span><span id="__span-21-11"><a id="__codelineno-21-11" name="__codelineno-21-11" href="#__codelineno-21-11"></a>        <span class="s2">"offsets"</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>                                   <span class="c1"># default: no offset</span>
+</span><span id="__span-21-12"><a id="__codelineno-21-12" name="__codelineno-21-12" href="#__codelineno-21-12"></a>        <span class="s2">"perturbation_magnitudes"</span><span class="p">:</span> <span class="mf">0.005</span><span class="p">,</span>
+</span><span id="__span-21-13"><a id="__codelineno-21-13" name="__codelineno-21-13" href="#__codelineno-21-13"></a>        <span class="s2">"perturbation_types"</span><span class="p">:</span> <span class="n">PerturbationType</span><span class="o">.</span><span class="n">ABSOLUTE</span><span class="p">,</span>
+</span><span id="__span-21-14"><a id="__codelineno-21-14" name="__codelineno-21-14" href="#__codelineno-21-14"></a>        <span class="s2">"boundary_types"</span><span class="p">:</span> <span class="n">BoundaryType</span><span class="o">.</span><span class="n">MIRROR_BOTH</span><span class="p">,</span>
+</span><span id="__span-21-15"><a id="__codelineno-21-15" name="__codelineno-21-15" href="#__codelineno-21-15"></a>        <span class="s2">"samplers"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>                                    <span class="c1"># default: use first sampler for all</span>
+</span><span id="__span-21-16"><a id="__codelineno-21-16" name="__codelineno-21-16" href="#__codelineno-21-16"></a>        <span class="s2">"seed"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+</span><span id="__span-21-17"><a id="__codelineno-21-17" name="__codelineno-21-17" href="#__codelineno-21-17"></a>    <span class="p">},</span>
+</span><span id="__span-21-18"><a id="__codelineno-21-18" name="__codelineno-21-18" href="#__codelineno-21-18"></a>    <span class="s2">"objectives"</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="__span-21-19"><a id="__codelineno-21-19" name="__codelineno-21-19" href="#__codelineno-21-19"></a>        <span class="s2">"weights"</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">],</span>                                 <span class="c1"># default: single objective, weight 1.0</span>
+</span><span id="__span-21-20"><a id="__codelineno-21-20" name="__codelineno-21-20" href="#__codelineno-21-20"></a>        <span class="s2">"scales"</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>                                    <span class="c1"># default: no scaling</span>
+</span><span id="__span-21-21"><a id="__codelineno-21-21" name="__codelineno-21-21" href="#__codelineno-21-21"></a>        <span class="s2">"offsets"</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>                                   <span class="c1"># default: no offset</span>
+</span><span id="__span-21-22"><a id="__codelineno-21-22" name="__codelineno-21-22" href="#__codelineno-21-22"></a>        <span class="s2">"auto_scale"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>                              <span class="c1"># default: do not estimate scales</span>
+</span><span id="__span-21-23"><a id="__codelineno-21-23" name="__codelineno-21-23" href="#__codelineno-21-23"></a>        <span class="s2">"maximize"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>                                <span class="c1"># default: minimize</span>
+</span><span id="__span-21-24"><a id="__codelineno-21-24" name="__codelineno-21-24" href="#__codelineno-21-24"></a>        <span class="s2">"realization_filters"</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>                       <span class="c1"># default: no filter</span>
+</span><span id="__span-21-25"><a id="__codelineno-21-25" name="__codelineno-21-25" href="#__codelineno-21-25"></a>        <span class="s2">"function_estimators"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>                         <span class="c1"># default: use first estimator for all</span>
+</span><span id="__span-21-26"><a id="__codelineno-21-26" name="__codelineno-21-26" href="#__codelineno-21-26"></a>    <span class="p">},</span>
+</span><span id="__span-21-27"><a id="__codelineno-21-27" name="__codelineno-21-27" href="#__codelineno-21-27"></a>    <span class="s2">"linear_constraints"</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>                           <span class="c1"># No linear constraints</span>
+</span><span id="__span-21-28"><a id="__codelineno-21-28" name="__codelineno-21-28" href="#__codelineno-21-28"></a>    <span class="s2">"nonlinear_constraints"</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>                        <span class="c1"># No non-linear constraints</span>
+</span><span id="__span-21-29"><a id="__codelineno-21-29" name="__codelineno-21-29" href="#__codelineno-21-29"></a>    <span class="s2">"realizations"</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="__span-21-30"><a id="__codelineno-21-30" name="__codelineno-21-30" href="#__codelineno-21-30"></a>        <span class="s2">"weights"</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">],</span>                                 <span class="c1"># default: single realization, weight 1.0</span>
+</span><span id="__span-21-31"><a id="__codelineno-21-31" name="__codelineno-21-31" href="#__codelineno-21-31"></a>        <span class="s2">"realization_min_success"</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>                  <span class="c1"># default: equal to number of realizations</span>
+</span><span id="__span-21-32"><a id="__codelineno-21-32" name="__codelineno-21-32" href="#__codelineno-21-32"></a>    <span class="p">},</span>
+</span><span id="__span-21-33"><a id="__codelineno-21-33" name="__codelineno-21-33" href="#__codelineno-21-33"></a>    <span class="s2">"optimizer"</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="__span-21-34"><a id="__codelineno-21-34" name="__codelineno-21-34" href="#__codelineno-21-34"></a>        <span class="s2">"max_batches"</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>                              <span class="c1"># default: no limit</span>
+</span><span id="__span-21-35"><a id="__codelineno-21-35" name="__codelineno-21-35" href="#__codelineno-21-35"></a>        <span class="s2">"max_functions"</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>                            <span class="c1"># default: no limit</span>
+</span><span id="__span-21-36"><a id="__codelineno-21-36" name="__codelineno-21-36" href="#__codelineno-21-36"></a>        <span class="s2">"output_dir"</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>                               <span class="c1"># default: no output directory</span>
+</span><span id="__span-21-37"><a id="__codelineno-21-37" name="__codelineno-21-37" href="#__codelineno-21-37"></a>        <span class="s2">"stdout"</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>                                   <span class="c1"># default: discard</span>
+</span><span id="__span-21-38"><a id="__codelineno-21-38" name="__codelineno-21-38" href="#__codelineno-21-38"></a>        <span class="s2">"stderr"</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>                                   <span class="c1"># default: discard</span>
+</span><span id="__span-21-39"><a id="__codelineno-21-39" name="__codelineno-21-39" href="#__codelineno-21-39"></a>    <span class="p">},</span>
+</span><span id="__span-21-40"><a id="__codelineno-21-40" name="__codelineno-21-40" href="#__codelineno-21-40"></a>    <span class="s2">"backend"</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="__span-21-41"><a id="__codelineno-21-41" name="__codelineno-21-41" href="#__codelineno-21-41"></a>        <span class="s2">"method"</span><span class="p">:</span> <span class="s2">"scipy/default"</span><span class="p">,</span>                        <span class="c1"># default: SciPy SLSQP</span>
+</span><span id="__span-21-42"><a id="__codelineno-21-42" name="__codelineno-21-42" href="#__codelineno-21-42"></a>        <span class="s2">"max_iterations"</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>                           <span class="c1"># default: backend-specific</span>
+</span><span id="__span-21-43"><a id="__codelineno-21-43" name="__codelineno-21-43" href="#__codelineno-21-43"></a>        <span class="s2">"convergence_tolerance"</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>                    <span class="c1"># default: backend-specific</span>
+</span><span id="__span-21-44"><a id="__codelineno-21-44" name="__codelineno-21-44" href="#__codelineno-21-44"></a>        <span class="s2">"parallel"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>                                <span class="c1"># default: Do not evaluate in parallel</span>
+</span><span id="__span-21-45"><a id="__codelineno-21-45" name="__codelineno-21-45" href="#__codelineno-21-45"></a>        <span class="s2">"options"</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>                                  <span class="c1"># default: no extra options</span>
+</span><span id="__span-21-46"><a id="__codelineno-21-46" name="__codelineno-21-46" href="#__codelineno-21-46"></a>    <span class="p">},</span>
+</span><span id="__span-21-47"><a id="__codelineno-21-47" name="__codelineno-21-47" href="#__codelineno-21-47"></a>    <span class="s2">"gradient"</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="__span-21-48"><a id="__codelineno-21-48" name="__codelineno-21-48" href="#__codelineno-21-48"></a>        <span class="s2">"number_of_perturbations"</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+</span><span id="__span-21-49"><a id="__codelineno-21-49" name="__codelineno-21-49" href="#__codelineno-21-49"></a>        <span class="s2">"perturbation_min_success"</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>                 <span class="c1"># default: equal to number_of_perturbations</span>
+</span><span id="__span-21-50"><a id="__codelineno-21-50" name="__codelineno-21-50" href="#__codelineno-21-50"></a>        <span class="s2">"merge_realizations"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>                      <span class="c1"># default: estimate and average gradients</span>
+</span><span id="__span-21-51"><a id="__codelineno-21-51" name="__codelineno-21-51" href="#__codelineno-21-51"></a>        <span class="s2">"evaluation_policy"</span><span class="p">:</span> <span class="s2">"auto"</span><span class="p">,</span>                      <span class="c1"># default: evaluate functions and perturbations</span>
+</span><span id="__span-21-52"><a id="__codelineno-21-52" name="__codelineno-21-52" href="#__codelineno-21-52"></a>    <span class="p">},</span>                                                    <span class="c1">#          as needed</span>
+</span><span id="__span-21-53"><a id="__codelineno-21-53" name="__codelineno-21-53" href="#__codelineno-21-53"></a>    <span class="s2">"samplers"</span><span class="p">:</span> <span class="p">[</span>
+</span><span id="__span-21-54"><a id="__codelineno-21-54" name="__codelineno-21-54" href="#__codelineno-21-54"></a>        <span class="p">{</span>
+</span><span id="__span-21-55"><a id="__codelineno-21-55" name="__codelineno-21-55" href="#__codelineno-21-55"></a>            <span class="s2">"method"</span><span class="p">:</span> <span class="s2">"scipy/default"</span><span class="p">,</span>                    <span class="c1"># default: standard normal N(0,1)</span>
+</span><span id="__span-21-56"><a id="__codelineno-21-56" name="__codelineno-21-56" href="#__codelineno-21-56"></a>            <span class="s2">"options"</span><span class="p">:</span> <span class="p">{},</span>
+</span><span id="__span-21-57"><a id="__codelineno-21-57" name="__codelineno-21-57" href="#__codelineno-21-57"></a>            <span class="s2">"shared"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>                              <span class="c1"># default: Each realizations has its own</span>
+</span><span id="__span-21-58"><a id="__codelineno-21-58" name="__codelineno-21-58" href="#__codelineno-21-58"></a>                                                          <span class="c1">#          set of perturbations</span>
+</span><span id="__span-21-59"><a id="__codelineno-21-59" name="__codelineno-21-59" href="#__codelineno-21-59"></a>        <span class="p">},</span>
+</span><span id="__span-21-60"><a id="__codelineno-21-60" name="__codelineno-21-60" href="#__codelineno-21-60"></a>    <span class="p">],</span>
+</span><span id="__span-21-61"><a id="__codelineno-21-61" name="__codelineno-21-61" href="#__codelineno-21-61"></a>    <span class="s2">"function_estimators"</span><span class="p">:</span> <span class="p">[</span>
+</span><span id="__span-21-62"><a id="__codelineno-21-62" name="__codelineno-21-62" href="#__codelineno-21-62"></a>        <span class="p">{</span>
+</span><span id="__span-21-63"><a id="__codelineno-21-63" name="__codelineno-21-63" href="#__codelineno-21-63"></a>            <span class="s2">"method"</span><span class="p">:</span> <span class="s2">"default/default"</span><span class="p">,</span>                  <span class="c1"># default: weighted average</span>
+</span><span id="__span-21-64"><a id="__codelineno-21-64" name="__codelineno-21-64" href="#__codelineno-21-64"></a>            <span class="s2">"options"</span><span class="p">:</span> <span class="p">{},</span>
+</span><span id="__span-21-65"><a id="__codelineno-21-65" name="__codelineno-21-65" href="#__codelineno-21-65"></a>        <span class="p">},</span>
+</span><span id="__span-21-66"><a id="__codelineno-21-66" name="__codelineno-21-66" href="#__codelineno-21-66"></a>    <span class="p">],</span>
+</span><span id="__span-21-67"><a id="__codelineno-21-67" name="__codelineno-21-67" href="#__codelineno-21-67"></a>    <span class="s2">"realization_filters"</span><span class="p">:</span> <span class="p">[],</span>                            <span class="c1"># default: none configured</span>
+</span><span id="__span-21-68"><a id="__codelineno-21-68" name="__codelineno-21-68" href="#__codelineno-21-68"></a>    <span class="s2">"names"</span><span class="p">:</span> <span class="p">{},</span>                                          <span class="c1"># default: none configured</span>
+</span><span id="__span-21-69"><a id="__codelineno-21-69" name="__codelineno-21-69" href="#__codelineno-21-69"></a><span class="p">}</span>
 </span></code></pre></div>
 <p>Some sections above are set to <code>None</code> or <code>[]</code> because they are optional
 and problem-specific. When configured, their internal structure is as
 follows:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="c1"># linear_constraints (all fields required, no defaults):</span>
-</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="s2">"linear_constraints"</span><span class="p">:</span> <span class="p">{</span>
-</span><span id="__span-21-3"><a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a>    <span class="s2">"coefficients"</span><span class="p">:</span> <span class="o">...</span><span class="p">,</span>                      <span class="c1"># required: 2D array (constraints × variables)</span>
-</span><span id="__span-21-4"><a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a>    <span class="s2">"lower_bounds"</span><span class="p">:</span> <span class="o">...</span><span class="p">,</span>                      <span class="c1"># required: 1D array (one per constraint)</span>
-</span><span id="__span-21-5"><a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a>    <span class="s2">"upper_bounds"</span><span class="p">:</span> <span class="o">...</span><span class="p">,</span>                      <span class="c1"># required: 1D array (one per constraint)</span>
-</span><span id="__span-21-6"><a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a>    <span class="s2">"scales"</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>                            <span class="c1"># default: no scaling</span>
-</span><span id="__span-21-7"><a id="__codelineno-21-7" name="__codelineno-21-7" href="#__codelineno-21-7"></a>    <span class="s2">"auto_scale"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>                      <span class="c1"># default: do not estimate scales</span>
-</span><span id="__span-21-8"><a id="__codelineno-21-8" name="__codelineno-21-8" href="#__codelineno-21-8"></a><span class="p">}</span>
-</span><span id="__span-21-9"><a id="__codelineno-21-9" name="__codelineno-21-9" href="#__codelineno-21-9"></a>
-</span><span id="__span-21-10"><a id="__codelineno-21-10" name="__codelineno-21-10" href="#__codelineno-21-10"></a><span class="c1"># nonlinear_constraints (bounds are required, the rest has defaults):</span>
-</span><span id="__span-21-11"><a id="__codelineno-21-11" name="__codelineno-21-11" href="#__codelineno-21-11"></a><span class="s2">"nonlinear_constraints"</span><span class="p">:</span> <span class="p">{</span>
-</span><span id="__span-21-12"><a id="__codelineno-21-12" name="__codelineno-21-12" href="#__codelineno-21-12"></a>    <span class="s2">"lower_bounds"</span><span class="p">:</span> <span class="o">...</span><span class="p">,</span>                      <span class="c1"># required: 1D array (one per constraint)</span>
-</span><span id="__span-21-13"><a id="__codelineno-21-13" name="__codelineno-21-13" href="#__codelineno-21-13"></a>    <span class="s2">"upper_bounds"</span><span class="p">:</span> <span class="o">...</span><span class="p">,</span>                      <span class="c1"># required: 1D array (one per constraint)</span>
-</span><span id="__span-21-14"><a id="__codelineno-21-14" name="__codelineno-21-14" href="#__codelineno-21-14"></a>    <span class="s2">"scales"</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>                            <span class="c1"># default: no scaling</span>
-</span><span id="__span-21-15"><a id="__codelineno-21-15" name="__codelineno-21-15" href="#__codelineno-21-15"></a>    <span class="s2">"auto_scale"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>                      <span class="c1"># default: do not estimate scales</span>
-</span><span id="__span-21-16"><a id="__codelineno-21-16" name="__codelineno-21-16" href="#__codelineno-21-16"></a>    <span class="s2">"realization_filters"</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>               <span class="c1"># default: no filter</span>
-</span><span id="__span-21-17"><a id="__codelineno-21-17" name="__codelineno-21-17" href="#__codelineno-21-17"></a>    <span class="s2">"function_estimators"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>                 <span class="c1"># default: use first estimator</span>
-</span><span id="__span-21-18"><a id="__codelineno-21-18" name="__codelineno-21-18" href="#__codelineno-21-18"></a><span class="p">}</span>
-</span><span id="__span-21-19"><a id="__codelineno-21-19" name="__codelineno-21-19" href="#__codelineno-21-19"></a>
-</span><span id="__span-21-20"><a id="__codelineno-21-20" name="__codelineno-21-20" href="#__codelineno-21-20"></a><span class="c1"># realization_filters entries (method is required):</span>
-</span><span id="__span-21-21"><a id="__codelineno-21-21" name="__codelineno-21-21" href="#__codelineno-21-21"></a><span class="s2">"realization_filters"</span><span class="p">:</span> <span class="p">[</span>
-</span><span id="__span-21-22"><a id="__codelineno-21-22" name="__codelineno-21-22" href="#__codelineno-21-22"></a>    <span class="p">{</span>
-</span><span id="__span-21-23"><a id="__codelineno-21-23" name="__codelineno-21-23" href="#__codelineno-21-23"></a>        <span class="s2">"method"</span><span class="p">:</span> <span class="o">...</span><span class="p">,</span>                        <span class="c1"># required: str ("plugin/method")</span>
-</span><span id="__span-21-24"><a id="__codelineno-21-24" name="__codelineno-21-24" href="#__codelineno-21-24"></a>        <span class="s2">"options"</span><span class="p">:</span> <span class="p">{},</span>
-</span><span id="__span-21-25"><a id="__codelineno-21-25" name="__codelineno-21-25" href="#__codelineno-21-25"></a>    <span class="p">},</span>
-</span><span id="__span-21-26"><a id="__codelineno-21-26" name="__codelineno-21-26" href="#__codelineno-21-26"></a><span class="p">]</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="c1"># linear_constraints (all fields required, no defaults):</span>
+</span><span id="__span-22-2"><a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="s2">"linear_constraints"</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="__span-22-3"><a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a>    <span class="s2">"coefficients"</span><span class="p">:</span> <span class="o">...</span><span class="p">,</span>                      <span class="c1"># required: 2D array (constraints × variables)</span>
+</span><span id="__span-22-4"><a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a>    <span class="s2">"lower_bounds"</span><span class="p">:</span> <span class="o">...</span><span class="p">,</span>                      <span class="c1"># required: 1D array (one per constraint)</span>
+</span><span id="__span-22-5"><a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a>    <span class="s2">"upper_bounds"</span><span class="p">:</span> <span class="o">...</span><span class="p">,</span>                      <span class="c1"># required: 1D array (one per constraint)</span>
+</span><span id="__span-22-6"><a id="__codelineno-22-6" name="__codelineno-22-6" href="#__codelineno-22-6"></a>    <span class="s2">"scales"</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>                            <span class="c1"># default: no scaling</span>
+</span><span id="__span-22-7"><a id="__codelineno-22-7" name="__codelineno-22-7" href="#__codelineno-22-7"></a>    <span class="s2">"auto_scale"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>                      <span class="c1"># default: do not estimate scales</span>
+</span><span id="__span-22-8"><a id="__codelineno-22-8" name="__codelineno-22-8" href="#__codelineno-22-8"></a><span class="p">}</span>
+</span><span id="__span-22-9"><a id="__codelineno-22-9" name="__codelineno-22-9" href="#__codelineno-22-9"></a>
+</span><span id="__span-22-10"><a id="__codelineno-22-10" name="__codelineno-22-10" href="#__codelineno-22-10"></a><span class="c1"># nonlinear_constraints (bounds are required, the rest has defaults):</span>
+</span><span id="__span-22-11"><a id="__codelineno-22-11" name="__codelineno-22-11" href="#__codelineno-22-11"></a><span class="s2">"nonlinear_constraints"</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="__span-22-12"><a id="__codelineno-22-12" name="__codelineno-22-12" href="#__codelineno-22-12"></a>    <span class="s2">"lower_bounds"</span><span class="p">:</span> <span class="o">...</span><span class="p">,</span>                      <span class="c1"># required: 1D array (one per constraint)</span>
+</span><span id="__span-22-13"><a id="__codelineno-22-13" name="__codelineno-22-13" href="#__codelineno-22-13"></a>    <span class="s2">"upper_bounds"</span><span class="p">:</span> <span class="o">...</span><span class="p">,</span>                      <span class="c1"># required: 1D array (one per constraint)</span>
+</span><span id="__span-22-14"><a id="__codelineno-22-14" name="__codelineno-22-14" href="#__codelineno-22-14"></a>    <span class="s2">"scales"</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>                            <span class="c1"># default: no scaling</span>
+</span><span id="__span-22-15"><a id="__codelineno-22-15" name="__codelineno-22-15" href="#__codelineno-22-15"></a>    <span class="s2">"offsets"</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>                           <span class="c1"># default: no offset</span>
+</span><span id="__span-22-16"><a id="__codelineno-22-16" name="__codelineno-22-16" href="#__codelineno-22-16"></a>    <span class="s2">"auto_scale"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>                      <span class="c1"># default: do not estimate scales</span>
+</span><span id="__span-22-17"><a id="__codelineno-22-17" name="__codelineno-22-17" href="#__codelineno-22-17"></a>    <span class="s2">"realization_filters"</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>               <span class="c1"># default: no filter</span>
+</span><span id="__span-22-18"><a id="__codelineno-22-18" name="__codelineno-22-18" href="#__codelineno-22-18"></a>    <span class="s2">"function_estimators"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>                 <span class="c1"># default: use first estimator</span>
+</span><span id="__span-22-19"><a id="__codelineno-22-19" name="__codelineno-22-19" href="#__codelineno-22-19"></a><span class="p">}</span>
+</span><span id="__span-22-20"><a id="__codelineno-22-20" name="__codelineno-22-20" href="#__codelineno-22-20"></a>
+</span><span id="__span-22-21"><a id="__codelineno-22-21" name="__codelineno-22-21" href="#__codelineno-22-21"></a><span class="c1"># realization_filters entries (method is required):</span>
+</span><span id="__span-22-22"><a id="__codelineno-22-22" name="__codelineno-22-22" href="#__codelineno-22-22"></a><span class="s2">"realization_filters"</span><span class="p">:</span> <span class="p">[</span>
+</span><span id="__span-22-23"><a id="__codelineno-22-23" name="__codelineno-22-23" href="#__codelineno-22-23"></a>    <span class="p">{</span>
+</span><span id="__span-22-24"><a id="__codelineno-22-24" name="__codelineno-22-24" href="#__codelineno-22-24"></a>        <span class="s2">"method"</span><span class="p">:</span> <span class="o">...</span><span class="p">,</span>                        <span class="c1"># required: str ("plugin/method")</span>
+</span><span id="__span-22-25"><a id="__codelineno-22-25" name="__codelineno-22-25" href="#__codelineno-22-25"></a>        <span class="s2">"options"</span><span class="p">:</span> <span class="p">{},</span>
+</span><span id="__span-22-26"><a id="__codelineno-22-26" name="__codelineno-22-26" href="#__codelineno-22-26"></a>    <span class="p">},</span>
+</span><span id="__span-22-27"><a id="__codelineno-22-27" name="__codelineno-22-27" href="#__codelineno-22-27"></a><span class="p">]</span>
 </span></code></pre></div>
 </details>
 <h2 id="where-to-next">Where to next</h2>

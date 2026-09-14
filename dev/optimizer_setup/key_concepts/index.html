@@ -2934,10 +2934,11 @@ example to focus on the worst-performing ones. See
 <dt><strong>Scaling</strong></dt>
 <dd>The units the optimizer works in, as opposed to the ones you configure the
 problem in. Variables are scaled by the affine map given by their
-<a href="../configuration/#variable-scales"><code>scales</code> and <code>offsets</code></a>; objectives and
-nonlinear constraints are divided by their
-<a href="../configuration/#objective-scales"><code>scales</code></a>. Results are unscaled before
-being reported, unless stated otherwise.</dd>
+<a href="../configuration/#variable-scales"><code>scales</code> and <code>offsets</code></a>; aggregated
+objectives and nonlinear constraints by the affine map given by their
+<a href="../configuration/#objective-scales"><code>scales</code></a> and
+<a href="../configuration/#objective-offsets"><code>offsets</code></a>. Results carry both domains:
+a field and its <code>scaled</code> counterpart sit at the same path.</dd>
 </dl>
 <h2 id="where-to-next">Where to next</h2>
 <ul>

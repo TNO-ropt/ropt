@@ -3274,7 +3274,7 @@ types are useful for logging, progress bars, or custom lifecycle hooks.</p>
 </span><span id="__span-0-42"><a id="__codelineno-0-42" name="__codelineno-0-42" href="#__codelineno-0-42"></a><span class="p">)</span>
 </span><span id="__span-0-43"><a id="__codelineno-0-43" name="__codelineno-0-43" href="#__codelineno-0-43"></a>
 </span><span id="__span-0-44"><a id="__codelineno-0-44" name="__codelineno-0-44" href="#__codelineno-0-44"></a><span class="c1"># 7. Read best results from the handlers.</span>
-</span><span id="__span-0-45"><a id="__codelineno-0-45" name="__codelineno-0-45" href="#__codelineno-0-45"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Optimal variables: </span><span class="si">{</span><span class="n">result_handler</span><span class="p">[</span><span class="s1">'results'</span><span class="p">]</span><span class="o">.</span><span class="n">evaluations</span><span class="o">.</span><span class="n">variables</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</span><span id="__span-0-45"><a id="__codelineno-0-45" name="__codelineno-0-45" href="#__codelineno-0-45"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Optimal variables: </span><span class="si">{</span><span class="n">result_handler</span><span class="p">[</span><span class="s1">'results'</span><span class="p">]</span><span class="o">.</span><span class="n">variables</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </span></code></pre></div>
 <p>This is a minimal example of optimizing a simple deterministic function. A full
 runnable example that assembles the workflow components by hand can be found
@@ -3554,9 +3554,9 @@ pushed each event) rather than polling another handler's state.</p>
 described in full in <a href="../../running/handlers/#built-in-handlers">Result Handlers</a>.
 They expose their state through dictionary access (<code>handler[key]</code>);
 <code>ResultsHandler</code> and <code>HistoryHandler</code> use the key <code>"results"</code>, while
-<code>DataFrameHandler</code> uses the table name. At this level each also accepts a
-<code>scaled</code> argument (<code>False</code> by default) that selects whether results are unscaled
-before being stored; the Simple API always unscales.</p>
+<code>DataFrameHandler</code> uses the table name. Stored results carry both the configured
+and the optimizer's domain; see
+<a href="../../optimizer_setup/results/#scaling-of-results">Scaling of results</a>.</p>
 <p>Two more handlers exist only at this level, for wiring events:</p>
 <table>
 <thead>

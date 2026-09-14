@@ -3084,25 +3084,23 @@ handler which of the two roles it plays; if you need both, use two handlers.</p>
       dataclass
   " href="../../reference/results/#ropt.results.Results"><code>Results</code></a> and returns <code>True</code> to keep it or <code>False</code> to
   drop it.</li>
-<li><code>scaled=False</code> (default) unscales the stored result, restoring the quantities
-  as configured; <code>scaled=True</code> stores it as the optimizer works with it. See
-  <a href="../../optimizer_setup/results/#scaling-of-results">Scaling of results</a>.</li>
 </ul>
+<p>The stored result carries both domains; see
+<a href="../../optimizer_setup/results/#scaling-of-results">Scaling of results</a>.</p>
 <h4 id="historyhandler"><code>HistoryHandler</code></h4>
 <p><a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.HistoryHandler" href="../../reference/components_event_handlers/#ropt.components.event_handlers.HistoryHandler"><code>HistoryHandler</code></a> keeps <em>every</em> result it receives,
 in order, as a tuple. Read it with <code>handler.results</code>, which is an empty tuple
 until the first result arrives, or with <code>handler["results"]</code>, the raw stored
-value, which is <code>None</code> until then. It takes the same <code>scaled=</code> keyword as
-<code>ResultsHandler</code>.</p>
+value, which is <code>None</code> until then.</p>
 <h4 id="dataframehandler"><code>DataFrameHandler</code></h4>
 <p><a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.DataFrameHandler" href="../../reference/components_event_handlers/#ropt.components.event_handlers.DataFrameHandler"><code>DataFrameHandler</code></a> collects results into named
 DataFrames, using either <code>pandas</code> (the default) or <code>polars</code> as its backend; the
 corresponding package must be installed. Define a table with
-<code>add_table(name, table_type, columns, scaled=False)</code>, where <code>table_type</code> is
-<code>"functions"</code> or <code>"gradients"</code>, <code>columns</code> maps result-field names (dotted
-attribute syntax) to column titles, and <code>scaled</code> (per table) chooses whether
-that table is filled with scaled or unscaled values; see
-<a href="../../optimizer_setup/results/#scaling-of-results">Scaling of results</a>:</p>
+<code>add_table(name, table_type, columns)</code>, where <code>table_type</code> is
+<code>"functions"</code> or <code>"gradients"</code> and <code>columns</code> maps result-field names (dotted
+attribute syntax) to column titles. Because every result carries both domains,
+the column name selects which one: <code>variables</code> is the vector as configured and
+<code>scaled.variables</code> is the vector the optimizer proposed.</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.simple</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataFrameHandler</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
 </span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">tables</span> <span class="o">=</span> <span class="n">DataFrameHandler</span><span class="p">()</span>
@@ -3112,7 +3110,7 @@ that table is filled with scaled or unscaled values; see
 </span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>    <span class="p">{</span>
 </span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>        <span class="s2">"batch_id"</span><span class="p">:</span> <span class="s2">"Batch"</span><span class="p">,</span>
 </span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>        <span class="s2">"functions.objectives"</span><span class="p">:</span> <span class="s2">"Objective"</span><span class="p">,</span>
-</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>        <span class="s2">"evaluations.variables"</span><span class="p">:</span> <span class="s2">"Variable"</span><span class="p">,</span>
+</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>        <span class="s2">"variables"</span><span class="p">:</span> <span class="s2">"Variable"</span><span class="p">,</span>
 </span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>    <span class="p">},</span>
 </span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="p">)</span>
 </span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">handlers</span><span class="o">=</span><span class="p">[</span><span class="n">tables</span><span class="p">])</span>
@@ -3122,10 +3120,10 @@ that table is filled with scaled or unscaled values; see
 field whose value is a vector or matrix expands to several columns; the extra
 column levels come from the field's axis labels (or indices), joined to the
 title with a separator (<code>,</code> by default, set with <code>sep=</code>). For example, a
-length-2 <code>evaluations.variables</code> gives <code>Variable,v0</code> and <code>Variable,v1</code>. Because
-the column names follow
-<a href="../../optimizer_setup/results/#metadata-columns"><code>results_to_pandas</code></a>,
-both result-level and per-realization metadata can be included and renamed.</p>
+length-2 <code>variables</code> gives <code>Variable,v0</code> and <code>Variable,v1</code>. Because the column
+names follow
+<a href="../../optimizer_setup/results/#metadata-columns"><code>results_to_pandas</code></a>, both
+result-level and per-realization metadata can be included and renamed.</p>
 <p>Tables are built with polars by default. Pass <code>engine="pandas"</code> to get pandas
 DataFrames instead:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">tables</span> <span class="o">=</span> <span class="n">DataFrameHandler</span><span class="p">(</span><span class="n">engine</span><span class="o">=</span><span class="s2">"pandas"</span><span class="p">)</span>
@@ -3133,14 +3131,14 @@ DataFrames instead:</p>
 <p>The tables carry the same columns under the same titles. As explained in
 <a href="../../optimizer_setup/results/#exporting-to-polars">Exporting to polars</a>, polars
 has no index, so the key columns (<code>batch_id</code>, <code>realization</code>, and the other axis
-names) appear as ordinary leading columns rather than in the index. This also
-means the polars backend can build tables that mix per-batch and
-per-realization fields, which the pandas backend cannot.</p>
+names) appear as ordinary leading columns rather than in the index; with pandas
+they form the index instead. Both backends align fields of differing
+granularity, broadcasting a per-batch field across the per-realization rows.</p>
 <p>Convenience methods:</p>
 <ul>
-<li><code>set_default_tables(scaled=False)</code> registers a standard set of tables
+<li><code>set_default_tables()</code> registers a standard set of tables
   (<code>functions</code>, <code>evaluations</code>, <code>constraints</code> for function results; <code>gradients</code>,
-  <code>perturbations</code> for gradient results), all filled the same way.</li>
+  <code>perturbations</code> for gradient results).</li>
 <li><code>add_column(table, name, title)</code> adds one column to an existing table.</li>
 <li><code>set_callback(fn)</code> calls <code>fn(output_dir)</code> whenever the tables are updated,
   where <code>output_dir</code> is the run's configured

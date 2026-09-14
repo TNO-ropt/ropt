@@ -3286,9 +3286,12 @@ gradients derived from that evaluation.</p>
 <p>Both arguments are two-dimensional arrays with one row per realization
 and one column per objective or per nonlinear constraint, in the order
 in which they are configured: <code>objectives[i, j]</code> is the value of
-objective <code>j</code> for realization <code>i</code>. The values are scaled, but not
-negated for maximization: direction applies to aggregates, and these
-are per-realization.</p>
+objective <code>j</code> for realization <code>i</code>. The values are as the evaluator
+returned them: neither scaled nor negated for maximization, since both
+apply to aggregates and these are per-realization. A filter that ranks
+by what the optimizer minimizes should apply them itself, using
+<a class="autorefs autorefs-internal" title="            get_objective_scales" href="../context/#ropt.context.EnOptContext.get_objective_scales"><code>get_objective_scales</code></a>
+and the directions on <code>objectives.maximize</code>.</p>
 <p>A realization that failed to evaluate carries <code>nan</code> values. The filter
 should check for these and handle them, for instance by assigning such
 realizations a weight of zero.</p>
