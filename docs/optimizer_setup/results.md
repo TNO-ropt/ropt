@@ -30,16 +30,19 @@ Each carries nested [`ResultField`][ropt.results.ResultField] objects:
 
 | Result             | Fields                                                                                          |
 | ------------------ | ----------------------------------------------------------------------------------------------- |
-| `FunctionResults`  | `evaluations` ([`FunctionEvaluations`][ropt.results.FunctionEvaluations]), `functions` ([`Functions`][ropt.results.Functions]), `realizations` ([`Realizations`][ropt.results.Realizations]), `constraint_info` ([`ConstraintInfo`][ropt.results.ConstraintInfo]). |
-| `GradientResults`  | `evaluations` ([`GradientEvaluations`][ropt.results.GradientEvaluations]), `gradients` ([`Gradients`][ropt.results.Gradients]). |
+| `FunctionResults`  | `variables`, `target_objective`, `evaluations` ([`FunctionEvaluations`][ropt.results.FunctionEvaluations]), `functions` ([`Functions`][ropt.results.Functions]), `realizations` ([`Realizations`][ropt.results.Realizations]), `constraint_info` ([`ConstraintInfo`][ropt.results.ConstraintInfo]), `scaled` ([`ScaledFunctionResults`][ropt.results.ScaledFunctionResults]). |
+| `GradientResults`  | `variables`, `perturbed_variables`, `target_gradient`, `evaluations` ([`GradientEvaluations`][ropt.results.GradientEvaluations]), `gradients` ([`Gradients`][ropt.results.Gradients]), `scaled` ([`ScaledGradientResults`][ropt.results.ScaledGradientResults]). |
 
 ### What each field holds
 
 #### `FunctionResults` fields
 
+- **`variables`** — the variable vector that was evaluated, shape $(n_v,)$.
+- **`target_objective`** — the single weighted scalar the optimizer minimizes
+  (0-D array), or `None` if no aggregate could be formed. Always in the domain
+  the optimizer works in; see [Scaling of results](#scaling-of-results).
 - **`evaluations`** ([`FunctionEvaluations`][ropt.results.FunctionEvaluations])
-  — the raw per-realization evaluation data:
-    - `variables`: the unperturbed variable vector, shape $(n_v,)$.
+  — the raw per-realization values returned by the evaluator:
     - `objectives`: objective values per realization, shape $(n_r, n_o)$.
     - `constraints`: constraint values per realization, shape $(n_r, n_c)$
       (only present when nonlinear constraints are configured).
@@ -48,8 +51,6 @@ Each carries nested [`ResultField`][ropt.results.ResultField] objects:
 - **`functions`** ([`Functions`][ropt.results.Functions]) — aggregated values
   derived from the per-realization evaluations (or `None` if all realizations
   failed):
-    - `target_objective`: the single weighted scalar the optimizer minimizes
-      (0-D array).
     - `objectives`: individual objective values, shape $(n_o,)$.
     - `constraints`: individual constraint values, shape $(n_c,)$ (if
       configured).
@@ -81,11 +82,13 @@ Each carries nested [`ResultField`][ropt.results.ResultField] objects:
 
 #### `GradientResults` fields
 
+- **`variables`** — the unperturbed variable vector, shape $(n_v,)$.
+- **`perturbed_variables`** — perturbed variable values, shape
+  $(n_r, n_p, n_v)$.
+- **`target_gradient`** — the gradient the optimizer descends, shape $(n_v,)$,
+  or `None` if estimation failed. Always in the domain the optimizer works in.
 - **`evaluations`** ([`GradientEvaluations`][ropt.results.GradientEvaluations])
-  — evaluation data for perturbed variables:
-    - `variables`: the unperturbed variable vector, shape $(n_v,)$.
-    - `perturbed_variables`: perturbed variable values, shape
-      $(n_r, n_p, n_v)$.
+  — the raw per-perturbation values returned by the evaluator:
     - `perturbed_objectives`: objective values for each perturbation, shape
       $(n_r, n_p, n_o)$.
     - `perturbed_constraints`: constraint values for each perturbation, shape
@@ -94,8 +97,6 @@ Each carries nested [`ResultField`][ropt.results.ResultField] objects:
       arrays, each of shape $(n_r, n_p)$.
 - **`gradients`** ([`Gradients`][ropt.results.Gradients]) — aggregated gradient
   values (or `None` if estimation failed):
-    - `target_objective`: gradient of the weighted objective w.r.t. each
-      variable, shape $(n_v,)$.
     - `objectives`: per-objective gradients, shape $(n_o, n_v)$.
     - `constraints`: per-constraint gradients, shape $(n_c, n_v)$ (if
       configured).
@@ -123,18 +124,19 @@ Every [`Results`][ropt.results.Results] object carries:
 Common access patterns:
 
 ```python
-result.evaluations.variables       # variable vector(s) evaluated
-result.functions.target_objective  # weighted scalar objective
+result.variables                   # variable vector evaluated
+result.target_objective            # weighted scalar objective
 result.functions.objectives        # per-objective values (after weighting)
 result.functions.constraints       # per-constraint values
 ```
 
 If `functions` is `None`, the result represents a request that produced no
-valid values (for example, all realizations failed). Always guard accesses:
+valid values (for example, all realizations failed). `target_objective` is
+`None` exactly then, so a single guard covers both:
 
 ```python
 if result.functions is not None:
-    print(result.functions.target_objective)
+    print(result.target_objective)
 ```
 
 ## Axes and dimensionality
@@ -146,7 +148,7 @@ each row is a realization and each column is an objective.
 
 To simplify exporting and reporting, the identity of each dimension is stored as
 axis metadata on each field. The [`ResultField`][ropt.results.ResultField] base
-class provides a [`get_axes`][ropt.results.ResultField.get_axes] class method
+class provides a [`get_axes`][ropt.results.AxisMetadata.get_axes] class method
 for retrieving this metadata:
 
 ```python
@@ -184,36 +186,36 @@ nonlinear constraint *aggregates* have their
 [offsets](configuration.md#objective-offsets) subtracted and are divided by
 their [scales](configuration.md#objective-scales), and objectives marked
 [`maximize`](configuration.md#objective-direction) are negated once they have
-been combined across realizations. Results attached to events are scaled this
-way.
+been combined across realizations.
 
-The per-realization values in `evaluations` are an exception: they are reported
-exactly as the evaluator returned them. Scales apply to the quantities the
-optimizer consumes, and the optimizer never sees a single realization, so there
-is nothing to undo for those fields.
+Every result carries both domains at once, and one rule connects them:
 
-The [`unscale`][ropt.results.Results.unscale] method undoes the rest,
-restoring the quantities as configured.
+!!! note
+    `scaled.X` is the optimizer's version of `X`, at the same path. Fields
+    without a scaled counterpart have only one domain.
 
-The `target_objective` field of `Functions` and `Gradients` is an exception: it
-is the quantity the optimizer minimizes and stays scaled in both directions. It
-is a weighted total over objectives that may differ in both scale and direction,
-so there is no single factor to undo; if you need it in configured terms,
-combine the objectives yourself using
-[`get_objective_scales`][ropt.context.EnOptContext.get_objective_scales] and the
-directions on `objectives.maximize`.
+So `result.variables` is the variable vector as configured and
+`result.scaled.variables` is the same vector as the optimizer proposed it;
+`result.functions.objectives` and `result.scaled.functions.objectives` are the
+same pair for the aggregates.
+
+Two groups of fields have a single domain:
+
+- The per-realization values in `evaluations` are reported exactly as the
+  evaluator returned them. Scales apply to the quantities the optimizer
+  consumes, and the optimizer never sees a single realization, so there is
+  nothing to undo for those fields.
+- `target_objective` and `target_gradient` exist only in the domain the
+  optimizer works in. Each is a weighted total over objectives that may differ
+  in both scale and direction, so there is no single factor to undo. The
+  gradient is differentiated with respect to the *scaled* variables. If you need
+  either in configured terms, combine the objectives yourself using
+  [`get_objective_scales`][ropt.context.EnOptContext.get_objective_scales] and
+  the directions on `objectives.maximize`.
 
 Because the direction is undone when reporting, a combined objective agrees in
 sign with the per-realization values it summarizes, whether it is an average or
 a spread.
-
-In the [simple API](../running/running.md), results are always unscaled
-automatically.
-
-In [workflows](../workflows/workflows.md), event handlers determine how results are returned,
-for instance by offering a `scaled` argument that controls whether results are
-unscaled before being stored. See [Optimization Workflows](../workflows/workflows.md)
-for details on how individual event handlers handle this.
 
 ## Metadata
 
@@ -355,13 +357,13 @@ from ropt.results import results_to_pandas
 
 df = results_to_pandas(
     all_results,
-    fields={"evaluations.variables"},
+    fields={"variables"},
     result_type="functions",
 )
 ```
 
 ```
-          (evaluations.variables, x0)  (evaluations.variables, x1)  (evaluations.variables, x2)
+          (variables, x0)  (variables, x1)  (variables, x2)
 batch_id
 1                                0.30                         0.42                        -0.11
 2                                0.55                         0.48                         0.02
@@ -370,8 +372,8 @@ batch_id
 
 Each column is a `(field, label)` pair, and each row is one result identified by
 its `batch_id`. Field names use dot notation for nested sub-fields (for example,
-`evaluations.variables`, `functions.target_objective`). The `result_type`
-argument selects which results to process: `"functions"` for
+`variables`, `target_objective`). The `result_type` argument selects
+which results to process: `"functions"` for
 [`FunctionResults`][ropt.results.FunctionResults] only, `"gradients"` for
 [`GradientResults`][ropt.results.GradientResults] only.
 
@@ -404,13 +406,13 @@ run tag:
 ```python
 df = results_to_pandas(
     all_results,
-    fields={"metadata.run_id", "functions.target_objective"},
+    fields={"metadata.run_id", "target_objective"},
     result_type="functions",
 )
 ```
 
 ```
-          functions.target_objective  metadata.run_id
+          target_objective  metadata.run_id
 batch_id
 1                               1.83                0
 2                               0.42                1
@@ -498,14 +500,14 @@ from ropt.results import results_to_polars
 
 df = results_to_polars(
     all_results,
-    fields={"evaluations.variables"},
+    fields={"variables"},
     result_type="functions",
 )
 ```
 
 ```
 ┌──────────┬──────────────────────────┬──────────────────────────┬──────────────────────────┐
-│ batch_id ┆ evaluations.variables,x0 ┆ evaluations.variables,x1 ┆ evaluations.variables,x2 │
+│ batch_id ┆ variables,x0             ┆ variables,x1             ┆ variables,x2             │
 ╞══════════╪══════════════════════════╪══════════════════════════╪══════════════════════════╡
 │ 1        ┆ 0.30                     ┆ 0.42                     ┆ -0.11                    │
 │ 2        ┆ 0.55                     ┆ 0.48                     ┆ 0.02                     │
@@ -520,14 +522,14 @@ metadata is reachable from `to_polars`, run-level result metadata only from
 ```python
 df = results_to_polars(
     all_results,
-    fields={"metadata.run_id", "functions.target_objective"},
+    fields={"metadata.run_id", "target_objective"},
     result_type="functions",
 )
 ```
 
 ```
 ┌──────────┬────────────────────────────┬─────────────────┐
-│ batch_id ┆ functions.target_objective ┆ metadata.run_id │
+│ batch_id ┆ target_objective ┆ metadata.run_id │
 ╞══════════╪════════════════════════════╪═════════════════╡
 │ 1        ┆ 1.83                       ┆ 0               │
 │ 2        ┆ 0.42                       ┆ 1               │

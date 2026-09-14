@@ -6,7 +6,7 @@ import numpy as np
 from numpy.random import default_rng
 
 from ropt._logging import get_logger
-from ropt._scaling import scale
+from ropt._scaling import scale, unscale_value
 from ropt._utils import apply_direction
 from ropt.exceptions import TooFewRealizations
 from ropt.results import (
@@ -19,6 +19,8 @@ from ropt.results import (
     Gradients,
     Realizations,
     Results,
+    ScaledFunctionResults,
+    ScaledGradientResults,
 )
 
 from ._function import _calculate_estimated_functions
@@ -109,7 +111,7 @@ class EnsembleEvaluator:
 
         # Invalidate the cached results if not usable:
         if self._cached_results is not None and not np.allclose(
-            self._cached_results.evaluations.variables,
+            self._cached_results.scaled.variables,
             variables,
             rtol=0.0,
             atol=1e-15,
@@ -190,7 +192,8 @@ class EnsembleEvaluator:
         assert self._context.realizations.realization_min_success is not None
         objective_weights: NDArray[np.float64] | None = None
         constraint_weights: NDArray[np.float64] | None = None
-        functions: Functions | None = None
+        scaled_functions: Functions | None = None
+        target_objective: NDArray[np.float64] | None = None
         try:
             objective_weights, constraint_weights = (
                 self._calculate_filtered_realization_weights(f_eval_results)
@@ -199,7 +202,7 @@ class EnsembleEvaluator:
                 np.count_nonzero(~failed_realizations)
                 >= self._context.realizations.realization_min_success
             ):
-                functions = self._compute_functions(
+                scaled_functions, target_objective = self._compute_functions(
                     f_eval_results.objectives,
                     f_eval_results.constraints,
                     objective_weights,
@@ -209,31 +212,38 @@ class EnsembleEvaluator:
         except TooFewRealizations:
             # A filter or estimator could not produce a value; record this
             # evaluation as failed so the batch continues with the others.
-            functions = None
+            scaled_functions = None
+            target_objective = None
 
-        evaluations = FunctionEvaluations.create(
-            variables=variables,
-            objectives=f_eval_results.objectives,
-            constraints=f_eval_results.constraints,
-            metadata=f_eval_results.metadata,
+        scaled_constraint_info = ConstraintInfo.create(
+            self._context,
+            variables,
+            scaled_functions.constraints if scaled_functions is not None else None,
         )
 
         return FunctionResults(
             batch_id=f_eval_results.batch_id,
             metadata={},
             names=self._context.names,
-            evaluations=evaluations,
+            variables=self._unscale_variables(variables),
+            evaluations=FunctionEvaluations.create(
+                objectives=f_eval_results.objectives,
+                constraints=f_eval_results.constraints,
+                metadata=f_eval_results.metadata,
+            ),
             realizations=Realizations(
                 evaluated_realizations=realizations_to_evaluate,
                 objective_weights=objective_weights,
                 constraint_weights=constraint_weights,
             ),
-            functions=functions,
-            constraint_info=ConstraintInfo.create(
-                self._context,
-                evaluations.variables,
-                functions.constraints if functions is not None else None,
+            functions=self._unscale_functions(scaled_functions),
+            target_objective=target_objective,
+            scaled=ScaledFunctionResults(
+                variables=variables,
+                functions=scaled_functions,
+                constraint_info=scaled_constraint_info,
             ),
+            constraint_info=self._unscale_constraint_info(scaled_constraint_info),
         )
 
     def _calculate_gradients(
@@ -284,7 +294,7 @@ class EnsembleEvaluator:
             np.count_nonzero(~failed_realizations)
             >= self._context.realizations.realization_min_success
         ):
-            gradients = self._compute_gradients(
+            scaled_gradients, target_gradient = self._compute_gradients(
                 variables,
                 mask,
                 perturbed_variables,
@@ -297,7 +307,8 @@ class EnsembleEvaluator:
                 failed_realizations,
             )
         else:
-            gradients = None
+            scaled_gradients = None
+            target_gradient = None
 
         assert g_eval_results.perturbed_objectives is not None
         return (
@@ -305,9 +316,9 @@ class EnsembleEvaluator:
                 batch_id=g_eval_results.batch_id,
                 metadata={},
                 names=self._context.names,
+                variables=self._unscale_variables(variables),
+                perturbed_variables=self._unscale_variables(perturbed_variables),
                 evaluations=GradientEvaluations.create(
-                    variables=variables,
-                    perturbed_variables=perturbed_variables,
                     perturbed_objectives=g_eval_results.perturbed_objectives,
                     perturbed_constraints=g_eval_results.perturbed_constraints,
                     metadata=g_eval_results.metadata,
@@ -317,7 +328,13 @@ class EnsembleEvaluator:
                     objective_weights=objective_weights,
                     constraint_weights=constraint_weights,
                 ),
-                gradients=gradients,
+                gradients=self._unscale_gradients(scaled_gradients),
+                target_gradient=target_gradient,
+                scaled=ScaledGradientResults(
+                    variables=variables,
+                    perturbed_variables=perturbed_variables,
+                    gradients=scaled_gradients,
+                ),
             ),
         )
 
@@ -340,7 +357,6 @@ class EnsembleEvaluator:
         )
 
         evaluations = FunctionEvaluations.create(
-            variables=variables,
             objectives=f_eval_results.objectives,
             constraints=f_eval_results.constraints,
             metadata=f_eval_results.metadata,
@@ -363,7 +379,7 @@ class EnsembleEvaluator:
             np.count_nonzero(~failed_realizations)
             >= self._context.realizations.realization_min_success
         ):
-            functions = self._compute_functions(
+            scaled_functions, target_objective = self._compute_functions(
                 f_eval_results.objectives,
                 f_eval_results.constraints,
                 objective_weights,
@@ -371,24 +387,34 @@ class EnsembleEvaluator:
                 failed_realizations,
             )
         else:
-            functions = None
+            scaled_functions = None
+            target_objective = None
+
+        scaled_constraint_info = ConstraintInfo.create(
+            self._context,
+            variables,
+            scaled_functions.constraints if scaled_functions is not None else None,
+        )
 
         function_results = FunctionResults(
             batch_id=f_eval_results.batch_id,
             metadata={},
             names=self._context.names,
+            variables=self._unscale_variables(variables),
             evaluations=evaluations,
             realizations=Realizations(
                 evaluated_realizations=realizations_to_evaluate,
                 objective_weights=objective_weights,
                 constraint_weights=constraint_weights,
             ),
-            functions=functions,
-            constraint_info=ConstraintInfo.create(
-                self._context,
-                evaluations.variables,
-                functions.constraints if functions is not None else None,
+            functions=self._unscale_functions(scaled_functions),
+            target_objective=target_objective,
+            scaled=ScaledFunctionResults(
+                variables=variables,
+                functions=scaled_functions,
+                constraint_info=scaled_constraint_info,
             ),
+            constraint_info=self._unscale_constraint_info(scaled_constraint_info),
         )
 
         assert self._context.gradient.perturbation_min_success is not None
@@ -407,7 +433,7 @@ class EnsembleEvaluator:
             np.count_nonzero(~failed_realizations)
             >= self._context.realizations.realization_min_success
         ):
-            gradients = self._compute_gradients(
+            scaled_gradients, target_gradient = self._compute_gradients(
                 variables,
                 mask,
                 perturbed_variables,
@@ -420,15 +446,16 @@ class EnsembleEvaluator:
                 failed_realizations,
             )
         else:
-            gradients = None
+            scaled_gradients = None
+            target_gradient = None
 
         gradient_results = GradientResults(
             batch_id=g_eval_results.batch_id,
             metadata={},
             names=self._context.names,
+            variables=self._unscale_variables(variables),
+            perturbed_variables=self._unscale_variables(perturbed_variables),
             evaluations=GradientEvaluations.create(
-                variables=variables,
-                perturbed_variables=perturbed_variables,
                 perturbed_objectives=g_eval_results.perturbed_objectives,
                 perturbed_constraints=g_eval_results.perturbed_constraints,
                 metadata=g_eval_results.metadata,
@@ -438,10 +465,38 @@ class EnsembleEvaluator:
                 objective_weights=objective_weights,
                 constraint_weights=constraint_weights,
             ),
-            gradients=gradients,
+            gradients=self._unscale_gradients(scaled_gradients),
+            target_gradient=target_gradient,
+            scaled=ScaledGradientResults(
+                variables=variables,
+                perturbed_variables=perturbed_variables,
+                gradients=scaled_gradients,
+            ),
         )
 
         return function_results, gradient_results
+
+    def _unscale_variables(self, variables: NDArray[np.float64]) -> NDArray[np.float64]:
+        return unscale_value(
+            variables,
+            self._context.variables.scales,
+            self._context.variables.offsets,
+        )
+
+    def _unscale_functions(self, scaled: Functions | None) -> Functions | None:
+        return None if scaled is None else Functions.from_scaled(self._context, scaled)
+
+    def _unscale_gradients(self, scaled: Gradients | None) -> Gradients | None:
+        return None if scaled is None else Gradients.from_scaled(self._context, scaled)
+
+    def _unscale_constraint_info(
+        self, scaled: ConstraintInfo | None
+    ) -> ConstraintInfo | None:
+        return (
+            None
+            if scaled is None
+            else ConstraintInfo.from_scaled(self._context, scaled)
+        )
 
     def _compute_functions(
         self,
@@ -450,7 +505,7 @@ class EnsembleEvaluator:
         objective_weights: NDArray[np.float64] | None,
         constraint_weights: NDArray[np.float64] | None,
         failed_realizations: NDArray[np.bool_],
-    ) -> Functions:
+    ) -> tuple[Functions, NDArray[np.float64]]:
         # Individual objective and constraint functions are calculated from the
         # realizations using one or more function estimators:
         if np.all(failed_realizations):
@@ -516,10 +571,9 @@ class EnsembleEvaluator:
                 (self._context.objectives.weights * objectives).sum()
             )
 
-        return Functions.create(
-            target_objective=target_objective,
-            objectives=objectives,
-            constraints=constraints,
+        return (
+            Functions(objectives=objectives, constraints=constraints),
+            target_objective,
         )
 
     def _compute_gradients(  # ruff: ignore[too-many-arguments, too-many-positional-arguments]
@@ -534,7 +588,7 @@ class EnsembleEvaluator:
         objective_weights: NDArray[np.float64] | None,
         constraint_weights: NDArray[np.float64] | None,
         failed_realizations: NDArray[np.bool_],
-    ) -> Gradients:
+    ) -> tuple[Gradients, NDArray[np.float64]]:
         if mask is not None:
             variables = variables[mask]
         variables = np.repeat(
@@ -601,14 +655,16 @@ class EnsembleEvaluator:
             )
         )
 
-        return Gradients.create(
-            target_objective=self._expand_gradients(target_objective_gradient, mask),
-            objectives=self._expand_gradients(objective_gradients, mask),
-            constraints=(
-                None
-                if constraint_gradients is None
-                else self._expand_gradients(constraint_gradients, mask)
+        return (
+            Gradients(
+                objectives=self._expand_gradients(objective_gradients, mask),
+                constraints=(
+                    None
+                    if constraint_gradients is None
+                    else self._expand_gradients(constraint_gradients, mask)
+                ),
             ),
+            self._expand_gradients(target_objective_gradient, mask),
         )
 
     @staticmethod

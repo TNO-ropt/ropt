@@ -15,6 +15,8 @@ from ropt.results import (
     Gradients,
     Realizations,
     Results,
+    ScaledFunctionResults,
+    ScaledGradientResults,
 )
 
 pytest.importorskip("polars")
@@ -48,37 +50,39 @@ def config_fixture() -> dict[str, Any]:
 @pytest.fixture(name="function_result")
 def function_result_fixture(config: dict[str, Any]) -> FunctionResults:
     evaluations = FunctionEvaluations.create(
-        variables=np.array([1.0, 2.0]),
         objectives=np.arange(6, dtype=np.float64).reshape((3, 2)),
     )
     realizations = Realizations(
         objective_weights=np.arange(6, dtype=np.float64).reshape((2, 3)),
         evaluated_realizations=np.ones(3, dtype=np.bool_),
     )
-    functions = Functions.create(
-        target_objective=np.array(1.0), objectives=np.array([1.0, 2.0])
+    functions = Functions(
+        objectives=np.array([1.0, 2.0]),
     )
     context = EnOptContext.model_validate(config)
     return FunctionResults(
         batch_id=1,
         metadata={},
         names=context.names,
+        variables=np.array([1.0, 2.0]),
         evaluations=evaluations,
         realizations=realizations,
         functions=functions,
+        target_objective=np.array(1.0),
+        scaled=ScaledFunctionResults(
+            variables=np.array([1.0, 2.0]),
+            functions=Functions(objectives=np.array([1.0, 2.0])),
+        ),
     )
 
 
 @pytest.fixture(name="gradient_result")
 def gradient_result_fixture(config: dict[str, Any]) -> GradientResults:
     evaluations = GradientEvaluations(
-        variables=np.array([1.0, 2.0]),
-        perturbed_variables=np.arange(30, dtype=np.float64).reshape((3, 5, 2)),
         perturbed_objectives=np.arange(30, dtype=np.float64).reshape((3, 5, 2)),
         metadata={"foo": np.arange(15, dtype=np.float64).reshape((3, 5))},
     )
     gradients = Gradients(
-        target_objective=np.array([1.0, 2.0]),
         objectives=np.arange(4, dtype=np.float64).reshape((2, 2)),
     )
     context = EnOptContext.model_validate(config)
@@ -86,16 +90,26 @@ def gradient_result_fixture(config: dict[str, Any]) -> GradientResults:
         batch_id=1,
         metadata={},
         names=context.names,
+        variables=np.array([1.0, 2.0]),
+        perturbed_variables=np.arange(30, dtype=np.float64).reshape((3, 5, 2)),
         evaluations=evaluations,
         realizations=Realizations(
             evaluated_realizations=np.ones(36, dtype=np.bool_),
         ),
         gradients=gradients,
+        target_gradient=np.array([1.0, 2.0]),
+        scaled=ScaledGradientResults(
+            variables=np.array([1.0, 2.0]),
+            perturbed_variables=np.arange(30, dtype=np.float64).reshape((3, 5, 2)),
+            gradients=Gradients(
+                objectives=np.arange(4, dtype=np.float64).reshape((2, 2)),
+            ),
+        ),
     )
 
 
 def test_to_polars_scalar(function_result: FunctionResults) -> None:
-    frame = function_result.to_polars("functions", ["target_objective"])
+    frame = function_result.to_polars("target_objective", [])
     assert frame.columns == ["batch_id", "target_objective"]
     assert frame.height == 1
     assert frame["batch_id"].to_list() == [1]
@@ -103,18 +117,11 @@ def test_to_polars_scalar(function_result: FunctionResults) -> None:
 
 
 def test_to_polars_function(function_result: FunctionResults) -> None:
-    frame = function_result.to_polars(
-        "functions",
-        [
-            "target_objective",
-            "objectives",
-        ],
-    )
+    frame = function_result.to_polars("functions", ["objectives"])
     assert frame.height == 2
     assert frame.columns == [
         "batch_id",
         "objective",
-        "target_objective",
         "objectives",
     ]
     assert frame["batch_id"].to_list() == [1, 1]
@@ -125,34 +132,30 @@ def test_to_polars_gradient(gradient_result: GradientResults) -> None:
     frame = gradient_result.to_polars(
         "evaluations",
         [
-            "variables",
-            "perturbed_variables",
             "perturbed_objectives",
             "metadata.foo",
         ],
     )
-    assert frame.height == gradient_result.evaluations.perturbed_variables.size * 2
-    assert frame.columns[:5] == [
+    assert frame.height == gradient_result.evaluations.perturbed_objectives.size
+    assert frame.columns[:4] == [
         "batch_id",
-        "variable",
         "realization",
         "perturbation",
         "objective",
     ]
-    rows = frame.select("batch_id", "variable", "realization", "perturbation").rows()
+    rows = frame.select("batch_id", "realization", "perturbation").rows()
     idx = 0
-    for var in gradient_result.names[AxisName.VARIABLE]:
-        for real in gradient_result.names[AxisName.REALIZATION]:
-            for pert in range(gradient_result.evaluations.perturbed_variables.shape[1]):
-                for _ in gradient_result.names[AxisName.OBJECTIVE]:
-                    assert rows[idx] == (1, var, real, pert)
-                    idx += 1
+    for real in gradient_result.names[AxisName.REALIZATION]:
+        for pert in range(gradient_result.perturbed_variables.shape[1]):
+            for _ in gradient_result.names[AxisName.OBJECTIVE]:
+                assert rows[idx] == (1, real, pert)
+                idx += 1
 
 
 def test_to_polars_unstack1(gradient_result: GradientResults) -> None:
     frame = gradient_result.to_polars(
-        "evaluations",
-        select=["perturbed_variables"],
+        "perturbed_variables",
+        select=[],
         unstack=[AxisName.REALIZATION, AxisName.VARIABLE],
     )
     assert frame.columns == [
@@ -168,10 +171,10 @@ def test_to_polars_unstack1(gradient_result: GradientResults) -> None:
 
 
 def test_to_polars_unstack2(gradient_result: GradientResults) -> None:
-    assert gradient_result.gradients is not None
+    assert gradient_result.scaled.gradients is not None
     frame = gradient_result.to_polars(
-        "gradients",
-        select=["objectives", "target_objective"],
+        "scaled.gradients",
+        select=["objectives"],
         unstack=[AxisName.OBJECTIVE, AxisName.VARIABLE],
     )
     assert frame.columns == [
@@ -180,23 +183,19 @@ def test_to_polars_unstack2(gradient_result: GradientResults) -> None:
         "objectives,fa,vb",
         "objectives,fb,va",
         "objectives,fb,vb",
-        "target_objective,va",
-        "target_objective,vb",
     ]
 
 
 def test_to_polars_unstack_only_variable(gradient_result: GradientResults) -> None:
     frame = gradient_result.to_polars(
-        "evaluations",
-        select=["perturbed_objectives", "perturbed_variables"],
+        "perturbed_variables",
+        select=[],
         unstack=[AxisName.VARIABLE],
     )
     assert frame.columns == [
         "batch_id",
         "realization",
         "perturbation",
-        "objective",
-        "perturbed_objectives",
         "perturbed_variables,va",
         "perturbed_variables,vb",
     ]
@@ -204,8 +203,8 @@ def test_to_polars_unstack_only_variable(gradient_result: GradientResults) -> No
 
 def test_to_polars_sep(gradient_result: GradientResults) -> None:
     frame = gradient_result.to_polars(
-        "evaluations",
-        select=["perturbed_variables"],
+        "perturbed_variables",
+        select=[],
         unstack=[AxisName.REALIZATION, AxisName.VARIABLE],
         sep="::",
     )
@@ -251,22 +250,16 @@ def test_to_polars_invalid_field(function_result: FunctionResults) -> None:
 
 
 _PARITY_CASES = [
-    ("function_result", "functions", ["target_objective"], None),
-    ("function_result", "functions", ["target_objective", "objectives"], None),
-    ("function_result", "functions", ["objectives", "target_objective"], None),
+    ("function_result", "target_objective", [], None),
+    ("function_result", "functions", ["objectives"], None),
     (
         "function_result",
         "functions",
-        ["target_objective", "objectives"],
+        ["objectives"],
         [AxisName.OBJECTIVE],
     ),
-    ("function_result", "evaluations", ["variables", "objectives"], None),
-    (
-        "function_result",
-        "evaluations",
-        ["variables", "objectives"],
-        [AxisName.VARIABLE],
-    ),
+    ("function_result", "evaluations", ["objectives"], None),
+    ("function_result", "variables", [], [AxisName.VARIABLE]),
     (
         "function_result",
         "realizations",
@@ -276,34 +269,35 @@ _PARITY_CASES = [
     (
         "gradient_result",
         "evaluations",
-        ["variables", "perturbed_variables", "perturbed_objectives", "metadata.foo"],
+        ["perturbed_objectives", "metadata.foo"],
         None,
     ),
     (
         "gradient_result",
-        "evaluations",
-        ["perturbed_variables"],
+        "perturbed_variables",
+        [],
         [AxisName.REALIZATION, AxisName.VARIABLE],
     ),
     (
         "gradient_result",
-        "evaluations",
-        ["perturbed_variables"],
+        "perturbed_variables",
+        [],
         [AxisName.VARIABLE, AxisName.REALIZATION],
     ),
     (
         "gradient_result",
-        "evaluations",
-        ["perturbed_objectives", "perturbed_variables"],
+        "perturbed_variables",
+        [],
         [AxisName.VARIABLE],
     ),
     (
         "gradient_result",
-        "gradients",
-        ["objectives", "target_objective"],
+        "scaled.gradients",
+        ["objectives"],
         [AxisName.OBJECTIVE, AxisName.VARIABLE],
     ),
-    ("gradient_result", "gradients", ["target_objective", "objectives"], None),
+    ("gradient_result", "scaled.gradients", ["objectives"], None),
+    ("gradient_result", "target_gradient", [], [AxisName.VARIABLE]),
     (
         "gradient_result",
         "evaluations",
@@ -313,8 +307,8 @@ _PARITY_CASES = [
     (
         "gradient_result",
         "evaluations",
-        ["perturbed_variables", "metadata.foo"],
-        [AxisName.VARIABLE],
+        ["perturbed_objectives", "metadata.foo"],
+        [AxisName.OBJECTIVE],
     ),
 ]
 

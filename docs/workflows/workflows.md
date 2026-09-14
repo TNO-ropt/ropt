@@ -137,7 +137,7 @@ step.run(
 )
 
 # 7. Read best results from the handlers.
-print(f"Optimal variables: {result_handler['results'].evaluations.variables}")
+print(f"Optimal variables: {result_handler['results'].variables}")
 ```
 
 This is a minimal example of optimizing a simple deterministic function. A full
@@ -334,9 +334,9 @@ The result-collecting built-ins —
 described in full in [Result Handlers](../running/handlers.md#built-in-handlers).
 They expose their state through dictionary access (`handler[key]`);
 `ResultsHandler` and `HistoryHandler` use the key `"results"`, while
-`DataFrameHandler` uses the table name. At this level each also accepts a
-`scaled` argument (`False` by default) that selects whether results are unscaled
-before being stored; the Simple API always unscales.
+`DataFrameHandler` uses the table name. Stored results carry both the configured
+and the optimizer's domain; see
+[Scaling of results](../optimizer_setup/results.md#scaling-of-results).
 
 Two more handlers exist only at this level, for wiring events:
 

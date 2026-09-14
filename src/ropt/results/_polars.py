@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 import polars as pl
 
-from ._frame_core import _iter_field_data
+from ._frame_core import _iter_spec_data
 
 if TYPE_CHECKING:
     from collections.abc import Iterable, Sequence
@@ -16,20 +16,23 @@ if TYPE_CHECKING:
     from ._results import Results
 
 
-def _to_polars_frame(
+def _to_polars_frame(  # ruff: ignore[too-many-arguments]
     results: Results,
     field_name: str,
     select: Iterable[str],
     unstack: Iterable[AxisName] | None,
     sep: str,
+    *,
+    has_sub_fields: bool = True,
 ) -> tuple[pl.DataFrame, list[str]]:
     if unstack is None:
         unstack = []
-    result_field = getattr(results, field_name)
     joined_frame: pl.DataFrame | None = None
     keys: list[str] = []
     values: list[str] = []
-    for field_data in _iter_field_data(result_field, select, results.names):
+    for field_data in _iter_spec_data(
+        results, field_name, select, results.names, has_sub_fields=has_sub_fields
+    ):
         frame = _build_frame(field_data, results.batch_id)
         index = [column for column in frame.columns if column != field_data.name]
         label_order = [axis.value for axis in unstack if axis.value in index]

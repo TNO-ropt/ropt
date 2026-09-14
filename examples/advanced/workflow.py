@@ -82,8 +82,8 @@ def report(event: EnOptEvent) -> None:
     """
     for item in event.results:
         if isinstance(item, FunctionResults) and item.functions is not None:
-            print(f"  variables: {item.evaluations.variables}")
-            print(f"  objective: {item.functions.target_objective}\n")
+            print(f"  variables: {item.variables}")
+            print(f"  objective: {item.target_objective}\n")
 
 
 def main(*, merge: bool = False) -> None:
@@ -135,10 +135,10 @@ def main(*, merge: bool = False) -> None:
     # Check the results
     assert optimal_result is not None
     assert optimal_result.functions is not None
-    print(f"Optimal variables: {optimal_result.evaluations.variables}")
-    print(f"Optimal objective: {optimal_result.functions.target_objective}\n")
-    assert np.allclose(optimal_result.functions.target_objective, 0, atol=1e-1)
-    assert np.allclose(optimal_result.evaluations.variables, 1, atol=1e-1)
+    print(f"Optimal variables: {optimal_result.variables}")
+    print(f"Optimal objective: {optimal_result.target_objective}\n")
+    assert np.allclose(optimal_result.target_objective, 0, atol=1e-1)
+    assert np.allclose(optimal_result.variables, 1, atol=1e-1)
 
 
 if __name__ == "__main__":

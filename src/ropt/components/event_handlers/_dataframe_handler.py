@@ -36,16 +36,16 @@ if HAVE_POLARS:
 _FUNCTION_TABLES: Final[dict[str, dict[str, str]]] = {
     "functions": {
         "batch_id": "Batch",
-        "functions.target_objective": "Total-Objective",
+        "target_objective": "Target-Objective",
         "functions.objectives": "Objective",
         "functions.constraints": "Constraint",
-        "evaluations.variables": "Variable",
+        "variables": "Variable",
     },
     "evaluations": {
         "batch_id": "Batch",
         "realization": "Realization",
         "variable": "Variable-name",
-        "evaluations.variables": "Variable",
+        "variables": "Variable",
         "evaluations.objectives": "Objective",
         "evaluations.constraints": "Constraint",
     },
@@ -65,7 +65,7 @@ _FUNCTION_TABLES: Final[dict[str, dict[str, str]]] = {
 _GRADIENT_TABLES: Final[dict[str, dict[str, str]]] = {
     "gradients": {
         "batch_id": "Batch",
-        "gradients.target_objective": "Total-Gradient",
+        "target_gradient": "Target-Gradient",
         "gradients.objectives": "Grad-objective",
         "gradients.constraints": "Grad-constraint",
     },
@@ -73,7 +73,7 @@ _GRADIENT_TABLES: Final[dict[str, dict[str, str]]] = {
         "batch_id": "Batch",
         "realization": "Realization",
         "perturbation": "Perturbation",
-        "evaluations.perturbed_variables": "Variable",
+        "perturbed_variables": "Variable",
         "evaluations.perturbed_objectives": "Objective",
         "evaluations.perturbed_constraints": "Constraint",
     },
@@ -145,24 +145,17 @@ class DataFrameHandler(EventHandler):
         """
         return self._engine
 
-    def set_default_tables(self, *, scaled: bool = False) -> None:
+    def set_default_tables(self) -> None:
         """Register a standard set of result tables.
 
         Adds the default `functions`, `evaluations`, and `constraints` tables
         for function results, and the default `gradients` and `perturbations`
         tables for gradient results.
-
-        Args:
-            scaled: If `True`, fill the tables with the values as the optimizer
-                works with them: scaled and offset, with objectives and
-                gradients negated where `maximize` is set. By default the
-                values are unscaled first, restoring the quantities as
-                configured.
         """
         for name, columns in _FUNCTION_TABLES.items():
-            self.add_table(name, "functions", columns, scaled=scaled)
+            self.add_table(name, "functions", columns)
         for name, columns in _GRADIENT_TABLES.items():
-            self.add_table(name, "gradients", columns, scaled=scaled)
+            self.add_table(name, "gradients", columns)
 
     def set_callback(self, callback: Callable[[Path | None], None]) -> None:
         """Set a function to call whenever the tables are updated.
@@ -188,8 +181,6 @@ class DataFrameHandler(EventHandler):
         name: str,
         table_type: Literal["functions", "gradients"],
         columns: dict[str, str],
-        *,
-        scaled: bool = False,
     ) -> None:
         """Register a new table to be populated from incoming results.
 
@@ -199,15 +190,10 @@ class DataFrameHandler(EventHandler):
                         (`"functions"`) or gradient results (`"gradients"`).
             columns:    Mapping from result-field attribute names (using dotted
                         attribute syntax) to display titles.
-            scaled:     If `True`, fill this table with the values as the
-                        optimizer works with them: scaled and offset, with
-                        objectives and gradients negated where `maximize` is
-                        set. By default the values are unscaled first.
         """
         self._tables[name] = _ResultsTable(
             columns,
             table_type=table_type,
-            scaled=scaled,
             engine=self._engine,
             sep=self._sep,
         )
@@ -233,17 +219,7 @@ class DataFrameHandler(EventHandler):
         """
         results = event.results
         if results:
-            unscaled_results = (
-                tuple(item.unscale(event.context) for item in results)
-                if any(not table.scaled for table in self._tables.values())
-                else ()
-            )
-            done = [
-                table.add_results(results)
-                if table.scaled
-                else table.add_results(unscaled_results)
-                for table in self._tables.values()
-            ]
+            done = [table.add_results(results) for table in self._tables.values()]
             if any(done) and self._callback is not None:
                 self._callback(event.context.optimizer.output_dir)
 
@@ -299,21 +275,15 @@ class _ResultsTable:
         columns: dict[str, str],
         table_type: Literal["functions", "gradients"],
         *,
-        scaled: bool = False,
         engine: DataFrameEngine = "polars",
         sep: str = ",",
     ) -> None:
         self._columns = columns
         self._results_type = table_type
-        self._scaled = scaled
         self._engine = engine
         self._sep = sep
         self._frames: list[pd.DataFrame | pl.DataFrame] = []
         self._lock = threading.Lock()
-
-    @property
-    def scaled(self) -> bool:
-        return self._scaled
 
     def add_column(self, name: str, title: str) -> None:
         with self._lock:

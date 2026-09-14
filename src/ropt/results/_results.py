@@ -1,21 +1,22 @@
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
+from abc import ABC
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, TypeVar
 
 from ropt.exceptions import UnsupportedError
 
+from ._frame_core import _resolve_field
 from ._frame_support import (
     HAVE_PANDAS,
     HAVE_POLARS,
     missing_engine_message,
 )
+from ._result_field import AxisMetadata, ResultField
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
 
-    from ropt.context import EnOptContext
     from ropt.enums import AxisName
 
 
@@ -32,7 +33,7 @@ TypeResults = TypeVar("TypeResults", bound="Results")
 
 
 @dataclass(slots=True)
-class Results(ABC):
+class Results(AxisMetadata, ABC):
     """Abstract base class for optimization results.
 
     Subclassed by [`FunctionResults`][ropt.results.FunctionResults] and
@@ -72,7 +73,7 @@ class Results(ABC):
 
         Args:
             field_name: The field to export.
-            select:     Sub-fields to include.
+            select:     Sub-fields to include, ignored if the field is a value.
             unstack:    Axes to pivot into columns (default: none).
 
         Returns:
@@ -86,11 +87,18 @@ class Results(ABC):
             msg = missing_engine_message("pandas", "to_pandas", "use to_polars")
             raise UnsupportedError(msg)
 
-        if getattr(self, field_name, None) is None:
+        field = _resolve_field(self, field_name)
+        if field is None:
             msg = f"Invalid result field: {field_name}"
             raise AttributeError(msg)
 
-        return _to_pandas_frame(self, field_name, select, unstack)
+        return _to_pandas_frame(
+            self,
+            field_name,
+            select,
+            unstack,
+            has_sub_fields=isinstance(field, ResultField),
+        )
 
     def to_polars(
         self,
@@ -109,7 +117,7 @@ class Results(ABC):
 
         Args:
             field_name: The field to export.
-            select:     Sub-fields to include.
+            select:     Sub-fields to include, ignored if the field is a value.
             unstack:    Axes to pivot into columns (default: none).
             sep:        Separator used to join unstacked column names.
 
@@ -124,23 +132,16 @@ class Results(ABC):
             msg = missing_engine_message("polars", "to_polars", "use to_pandas")
             raise UnsupportedError(msg)
 
-        if getattr(self, field_name, None) is None:
+        field = _resolve_field(self, field_name)
+        if field is None:
             msg = f"Invalid result field: {field_name}"
             raise AttributeError(msg)
 
-        return _to_polars_frame(self, field_name, select, unstack, sep)[0]
-
-    @abstractmethod
-    def unscale(self, context: EnOptContext) -> Results:
-        """Unscale the results.
-
-        Restores the quantities as configured: values are multiplied by their
-        scales and offsets are added back, and objectives and gradients are
-        negated again where `maximize` is set.
-
-        Args:
-            context: The context used by the source of the results.
-
-        Returns:
-            A new, unscaled `Results` object.
-        """
+        return _to_polars_frame(
+            self,
+            field_name,
+            select,
+            unstack,
+            sep,
+            has_sub_fields=isinstance(field, ResultField),
+        )[0]

@@ -163,9 +163,7 @@ def _get_from_cache(
                 continue
         if results.realizations.evaluated_realizations[
             realization_index
-        ] and np.allclose(
-            results.evaluations.variables, variables, rtol=0.0, atol=_EPS
-        ):
+        ] and np.allclose(results.variables, variables, rtol=0.0, atol=_EPS):
             return results, realization_index
     return None, -1
 

@@ -6,18 +6,19 @@ the result hierarchy, axis metadata, scaling, and pandas/polars export.
 
 from ._constraint_info import ConstraintInfo
 from ._function_evaluations import FunctionEvaluations
-from ._function_results import FunctionResults
+from ._function_results import FunctionResults, ScaledFunctionResults
 from ._functions import Functions
 from ._gradient_evaluations import GradientEvaluations
-from ._gradient_results import GradientResults
+from ._gradient_results import GradientResults, ScaledGradientResults
 from ._gradients import Gradients
 from ._pandas_frame import results_to_pandas
 from ._polars_frame import results_to_polars
 from ._realizations import Realizations
-from ._result_field import ResultField
+from ._result_field import AxisMetadata, ResultField
 from ._results import Results
 
 __all__ = [
+    "AxisMetadata",
     "ConstraintInfo",
     "FunctionEvaluations",
     "FunctionResults",
@@ -28,6 +29,8 @@ __all__ = [
     "Realizations",
     "ResultField",
     "Results",
+    "ScaledFunctionResults",
+    "ScaledGradientResults",
     "results_to_pandas",
     "results_to_polars",
 ]

@@ -422,8 +422,8 @@ def test_cvar_filter_mixed(
     def _add_objective(event: EnOptEvent) -> None:
         for item in event.results or ():
             if isinstance(item, FunctionResults):
-                assert item.functions is not None
-                objective_values.append(item.functions.target_objective)
+                assert item.scaled.functions is not None
+                objective_values.append(item.target_objective)
         _track_results(event, result_list=result_list)
 
     # Apply the filtering to all objectives, giving the expected result.

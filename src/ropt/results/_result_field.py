@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, fields
-from typing import TYPE_CHECKING, TypeVar
+from dataclasses import Field, dataclass, fields
+from typing import TYPE_CHECKING, Any, ClassVar, TypeVar
 
 if TYPE_CHECKING:
     from ropt.enums import AxisName
@@ -9,13 +9,10 @@ if TYPE_CHECKING:
 TypeResultField = TypeVar("TypeResultField", bound="ResultField")
 
 
-@dataclass(slots=True)
-class ResultField:
-    """Base class for result field containers that carry axis metadata.
+class AxisMetadata:
+    """Mixin for dataclasses whose fields carry axis metadata."""
 
-    See [Working with Results](../optimizer_setup/results.md#axes-and-dimensionality) for
-    how axis metadata is used.
-    """
+    __dataclass_fields__: ClassVar[dict[str, Field[Any]]]
 
     @classmethod
     def get_axes(cls, name: str) -> tuple[AxisName, ...]:
@@ -38,3 +35,12 @@ class ResultField:
             raise ValueError(msg)
         axes: tuple[AxisName, ...] = metadata.get("__axes__", ())
         return axes
+
+
+@dataclass(slots=True)
+class ResultField(AxisMetadata):
+    """Base class for result field containers that carry axis metadata.
+
+    See [Working with Results](../optimizer_setup/results.md#axes-and-dimensionality) for
+    how axis metadata is used.
+    """

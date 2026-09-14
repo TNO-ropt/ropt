@@ -16,6 +16,7 @@ from ropt.results import (
     FunctionResults,
     Functions,
     Realizations,
+    ScaledFunctionResults,
 )
 
 if TYPE_CHECKING:
@@ -49,24 +50,26 @@ def _is_empty(frame: Any) -> bool:
 
 def _make_result(batch_id: int, objective: float = 1.0) -> FunctionResults:
     evaluations = FunctionEvaluations.create(
-        variables=np.array([0.5, 1.5]),
         objectives=np.array([[objective]]),
     )
-    functions = Functions.create(
-        target_objective=np.array(objective),
-        objectives=np.array([objective]),
-    )
+    functions = Functions(objectives=np.array([objective]))
     context = EnOptContext.model_validate(_CONFIG)
     return FunctionResults(
         batch_id=batch_id,
         metadata={},
         names=context.names,
+        variables=np.array([0.5, 1.5]),
         evaluations=evaluations,
         realizations=Realizations(
             evaluated_realizations=np.ones(1, dtype=np.bool_),
             objective_weights=np.ones((1, 1)),
         ),
         functions=functions,
+        target_objective=np.array(objective),
+        scaled=ScaledFunctionResults(
+            variables=np.array([0.5, 1.5]),
+            functions=Functions(objectives=np.array([objective])),
+        ),
     )
 
 
@@ -87,24 +90,26 @@ def _make_event(
 
 def _make_result_two_realizations(batch_id: int) -> FunctionResults:
     evaluations = FunctionEvaluations.create(
-        variables=np.array([0.5, 1.5]),
         objectives=np.array([[1.0], [2.0]]),
     )
-    functions = Functions.create(
-        target_objective=np.array(1.5),
-        objectives=np.array([1.0, 2.0]),
-    )
+    functions = Functions(objectives=np.array([1.0, 2.0]))
     context = EnOptContext.model_validate(_CONFIG_TWO_REALIZATIONS)
     return FunctionResults(
         batch_id=batch_id,
         metadata={},
         names=context.names,
+        variables=np.array([0.5, 1.5]),
         evaluations=evaluations,
         realizations=Realizations(
             evaluated_realizations=np.ones(2, dtype=np.bool_),
             objective_weights=np.ones((1, 2)),
         ),
         functions=functions,
+        target_objective=np.array(1.5),
+        scaled=ScaledFunctionResults(
+            variables=np.array([0.5, 1.5]),
+            functions=Functions(objectives=np.array([1.0, 2.0])),
+        ),
     )
 
 
@@ -119,7 +124,7 @@ def _make_event_two_realizations(batch_id: int) -> EnOptEvent:
 
 def test_table_handler_populates_table_from_events(engine: DataFrameEngine) -> None:
     handler = DataFrameHandler(engine=engine)
-    handler.add_table("t", "functions", {"functions.target_objective": "Obj"})
+    handler.add_table("t", "functions", {"target_objective": "Obj"})
     handler.handle_event(_make_event(1))
     df = handler["t"]
     assert not _is_empty(df)
@@ -130,13 +135,13 @@ def test_table_handler_returns_empty_dataframe_before_any_event(
     engine: DataFrameEngine,
 ) -> None:
     handler = DataFrameHandler(engine=engine)
-    handler.add_table("t", "functions", {"functions.target_objective": "Obj"})
+    handler.add_table("t", "functions", {"target_objective": "Obj"})
     assert _is_empty(handler["t"])
 
 
 def test_table_handler_accumulates_multiple_events(engine: DataFrameEngine) -> None:
     handler = DataFrameHandler(engine=engine)
-    handler.add_table("t", "functions", {"functions.target_objective": "Obj"})
+    handler.add_table("t", "functions", {"target_objective": "Obj"})
     handler.handle_event(_make_event(1, objective=1.0))
     handler.handle_event(_make_event(2, objective=2.0))
     df = handler["t"]
@@ -151,12 +156,12 @@ def test_table_handler_uses_display_title_not_field_name(
     handler.add_table(
         "t",
         "functions",
-        {"functions.target_objective": "Total Objective"},
+        {"target_objective": "Total Objective"},
     )
     handler.handle_event(_make_event(1))
     df = handler["t"]
     assert "Total Objective" in df.columns
-    assert "functions.target_objective" not in df.columns
+    assert "target_objective" not in df.columns
 
 
 def test_table_handler_renames_batch_id_column(engine: DataFrameEngine) -> None:
@@ -166,7 +171,7 @@ def test_table_handler_renames_batch_id_column(engine: DataFrameEngine) -> None:
         "functions",
         {
             "batch_id": "Batch",
-            "functions.target_objective": "Obj",
+            "target_objective": "Obj",
         },
     )
     handler.handle_event(_make_event(5))
@@ -182,7 +187,7 @@ def test_table_handler_batch_id_value(engine: DataFrameEngine) -> None:
         "functions",
         {
             "batch_id": "Batch",
-            "functions.target_objective": "Obj",
+            "target_objective": "Obj",
         },
     )
     handler.handle_event(_make_event(batch_id=7))
@@ -198,7 +203,7 @@ def test_table_handler_column_order_objective_before_batch(
         "t",
         "functions",
         {
-            "functions.target_objective": "Obj",
+            "target_objective": "Obj",
             "batch_id": "Batch",
         },
     )
@@ -216,7 +221,7 @@ def test_table_handler_column_order_batch_before_objective(
         "functions",
         {
             "batch_id": "Batch",
-            "functions.target_objective": "Obj",
+            "target_objective": "Obj",
         },
     )
     handler.handle_event(_make_event(1))
@@ -231,7 +236,7 @@ def test_table_handler_omits_batch_id_when_not_in_columns(
     handler.add_table(
         "t",
         "functions",
-        {"functions.target_objective": "Obj"},
+        {"target_objective": "Obj"},
     )
     handler.handle_event(_make_event(1))
     df = handler["t"]
@@ -324,7 +329,7 @@ def test_table_handler_invalid_engine() -> None:
 
 def test_table_handler_callback_runs_on_every_update(engine: DataFrameEngine) -> None:
     handler = DataFrameHandler(engine=engine)
-    handler.add_table("t", "functions", {"functions.target_objective": "Obj"})
+    handler.add_table("t", "functions", {"target_objective": "Obj"})
     calls = 0
 
     def _record(_: Path | None) -> None:
@@ -343,7 +348,7 @@ def test_table_handler_callback_receives_configured_output_dir(
     # The callback typically persists the tables, so it is passed the output
     # directory of the run rather than having to dig it out of the context.
     handler = DataFrameHandler(engine=engine)
-    handler.add_table("t", "functions", {"functions.target_objective": "Obj"})
+    handler.add_table("t", "functions", {"target_objective": "Obj"})
     received: list[Path | None] = []
 
     handler.set_callback(received.append)
@@ -358,7 +363,7 @@ def test_table_handler_callback_skipped_when_no_table_grew(
     # Function results leave a gradients table untouched, so a callback that
     # persists the tables has nothing to persist.
     handler = DataFrameHandler(engine=engine)
-    handler.add_table("t", "gradients", {"gradients.target_objective": "Grad"})
+    handler.add_table("t", "gradients", {"target_gradient": "Grad"})
     called = False
 
     def _record(_: Path | None) -> None:
@@ -397,7 +402,7 @@ def test_table_handler_engine_parity() -> None:
                 "batch_id": "Batch",
                 "realization": "Run",
                 "evaluations.objectives": "Obj",
-                "evaluations.variables": "Var",
+                "variables": "Var",
             },
         )
         handler.handle_event(_make_event_two_realizations(1))
@@ -411,7 +416,7 @@ def test_table_handler_engine_parity() -> None:
         assert list(polars_table[column]) == list(pandas_table[column])
 
 
-def test_table_handler_polars_keeps_keys_for_mixed_granularity() -> None:
+def test_table_handler_broadcasts_a_batch_field_over_realizations() -> None:
     pytest.importorskip("pandas")
     pytest.importorskip("polars")
 
@@ -419,7 +424,7 @@ def test_table_handler_polars_keeps_keys_for_mixed_granularity() -> None:
         "batch_id": "Batch",
         "realization": "Run",
         "evaluations.objectives": "Obj",
-        "functions.target_objective": "Total",
+        "target_objective": "Total",
     }
     tables = {}
     for engine in ("pandas", "polars"):
@@ -428,16 +433,15 @@ def test_table_handler_polars_keeps_keys_for_mixed_granularity() -> None:
         handler.handle_event(_make_event_two_realizations(1))
         tables[engine] = handler["t"]
 
-    # Pandas cannot align the per-batch and per-realization fields, so it loses
-    # the key columns entirely; polars joins them and keeps every column.
-    assert list(tables["pandas"].columns) == ["Obj,0", "Total"]
-    assert list(tables["polars"].columns) == ["Batch", "Run", "Obj,0", "Total"]
-    assert list(tables["polars"]["Run"]) == [0, 1]
-    assert list(tables["polars"]["Total"]) == [1.5, 1.5]
+    # The target is one value per batch and the objectives are one per
+    # realization, so the target is repeated across the realization rows.
+    for engine in ("pandas", "polars"):
+        assert set(tables[engine].columns) == {"Batch", "Run", "Total", "Obj,0"}
+        assert list(tables[engine]["Run"]) == [0, 1]
+        assert list(tables[engine]["Total"]) == [1.5, 1.5]
 
 
-# The `scaled` flag selects, per table, whether values are unscaled before
-# being stored. Variable scales and offsets make the difference visible: the
+# Variable scales and offsets make the two domains distinguishable: the
 # optimizer works with (x - o)/s, so a scaled (1, 1) is (3, 6) unscaled.
 
 _SCALED_CONFIG: dict[str, Any] = {
@@ -457,53 +461,55 @@ def _make_scaled_event() -> EnOptEvent:
                 batch_id=0,
                 metadata={},
                 names=context.names,
+                variables=np.array([3.0, 6.0]),
                 evaluations=FunctionEvaluations.create(
-                    variables=np.array([1.0, 1.0]),
                     objectives=np.array([[1.0]]),
                 ),
                 realizations=Realizations(
                     evaluated_realizations=np.ones(1, dtype=np.bool_),
                     objective_weights=np.ones((1, 1)),
                 ),
-                functions=Functions.create(
-                    target_objective=np.array(1.0),
-                    objectives=np.array([1.0]),
+                functions=Functions(objectives=np.array([2.0])),
+                target_objective=np.array(1.0),
+                scaled=ScaledFunctionResults(
+                    variables=np.array([1.0, 1.0]),
+                    functions=Functions(objectives=np.array([1.0])),
                 ),
             ),
         ),
     )
 
 
-@pytest.mark.parametrize("scaled", [False, True])
-def test_table_handler_fills_a_table_scaled_on_request(
-    engine: DataFrameEngine, *, scaled: bool
+def test_table_handler_column_names_select_the_domain(
+    engine: DataFrameEngine,
 ) -> None:
     handler = DataFrameHandler(engine=engine)
-    handler.add_table("t", "functions", {"evaluations.variables": "Var"}, scaled=scaled)
-    handler.handle_event(_make_scaled_event())
-    df = handler["t"]
-    expected = [1.0, 1.0] if scaled else [3.0, 6.0]
-    assert np.allclose([df["Var,0"][0], df["Var,1"][0]], expected)
-
-
-def test_table_handler_unscales_by_default(engine: DataFrameEngine) -> None:
-    handler = DataFrameHandler(engine=engine)
-    handler.add_table("default", "functions", {"evaluations.variables": "Var"})
     handler.add_table(
-        "explicit", "functions", {"evaluations.variables": "Var"}, scaled=False
+        "t",
+        "functions",
+        {"variables": "Var", "scaled.variables": "Scaled"},
     )
     handler.handle_event(_make_scaled_event())
-    assert np.isclose(handler["default"]["Var,0"][0], handler["explicit"]["Var,0"][0])
+    df = handler["t"]
+    assert np.allclose([df["Var,0"][0], df["Var,1"][0]], [3.0, 6.0])
+    assert np.allclose([df["Scaled,0"][0], df["Scaled,1"][0]], [1.0, 1.0])
 
 
-def test_table_handler_tables_may_differ_in_scaling(engine: DataFrameEngine) -> None:
+def test_table_handler_fills_a_column_from_a_nested_scaled_field(
+    engine: DataFrameEngine,
+) -> None:
     handler = DataFrameHandler(engine=engine)
-    for name, scaled in (("plain", False), ("scaled", True)):
-        handler.add_table(
-            name, "functions", {"evaluations.variables": "Var"}, scaled=scaled
-        )
+    handler.add_table(
+        "t",
+        "functions",
+        {
+            "functions.objectives": "Obj",
+            "scaled.functions.objectives": "Scaled",
+            "target_objective": "Total",
+        },
+    )
     handler.handle_event(_make_scaled_event())
-    # Both tables are filled from the same results, and unscaling happens once
-    # for the whole batch, so it must not leak from one table into the other.
-    assert np.isclose(handler["plain"]["Var,0"][0], 3.0)
-    assert np.isclose(handler["scaled"]["Var,0"][0], 1.0)
+    df = handler["t"]
+    assert np.isclose(df["Obj,0"][0], 2.0)
+    assert np.isclose(df["Scaled,0"][0], 1.0)
+    assert np.isclose(df["Total"][0], 1.0)

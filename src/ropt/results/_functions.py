@@ -21,19 +21,18 @@ if TYPE_CHECKING:
 class Functions(ResultField):
     """Aggregated objective and constraint function values.
 
+    The same class carries both domains: the values the optimizer works with
+    are found under `scaled`, the values as configured directly on the result.
+
     See [Working with Results](../optimizer_setup/results.md) for usage details.
 
+    There is no target objective here: the quantity the optimizer minimizes is
+    a weighted total over objectives that may differ in both scale and
+    direction, so it has no counterpart in the configured domain. It is
+    reported as `target_objective` on
+    [`FunctionResults`][ropt.results.FunctionResults].
+
     **Result descriptions**
-
-    === "Weighted Objective"
-
-        `target_objective`: The overall objective calculated as a weighted sum
-        over the, possibly scaled, objectives. This is a single floating
-        point value. It is defined as a `numpy` array of dimensions 0, hence it
-        has no axes:
-
-        - Shape: $()$
-        - Axis type: `None`
 
     === "Objectives"
 
@@ -56,14 +55,10 @@ class Functions(ResultField):
             - [`AxisName.NONLINEAR_CONSTRAINT`][ropt.enums.AxisName.NONLINEAR_CONSTRAINT]
 
     Attributes:
-        target_objective: The target objective value used by the optimizer.
-        objectives:       The value of each individual objective.
-        constraints:      The value of each individual constraint, if present.
+        objectives:  The value of each individual objective.
+        constraints: The value of each individual constraint, if present.
     """
 
-    target_objective: NDArray[np.float64] = field(
-        metadata={"__axes__": ()},
-    )
     objectives: NDArray[np.float64] = field(
         metadata={
             "__axes__": (AxisName.OBJECTIVE,),
@@ -77,52 +72,33 @@ class Functions(ResultField):
     )
 
     def __post_init__(self) -> None:
-        self.target_objective = _immutable_copy(self.target_objective)
         self.objectives = _immutable_copy(self.objectives)
         self.constraints = _immutable_copy(self.constraints)
 
     @classmethod
-    def create(
-        cls,
-        target_objective: NDArray[np.float64],
-        objectives: NDArray[np.float64],
-        constraints: NDArray[np.float64] | None = None,
-    ) -> Functions:
-        """Create a `Functions` object from pre-aggregated function values.
+    def from_scaled(cls, context: EnOptContext, scaled: Functions) -> Functions:
+        """Derive the configured function values from the scaled ones.
 
         Args:
-            target_objective: The target objective used by the optimizer.
-            objectives:       Objective function values.
-            constraints:      Constraint function values.
+            context: The context of the run.
+            scaled:  The values as the optimizer sees them.
 
         Returns:
-            A new Functions object.
+            A new `Functions` object.
         """
-        return Functions(
-            target_objective=target_objective,
-            objectives=objectives,
-            constraints=constraints,
-        )
-
-    def _unscale(self, context: EnOptContext) -> Functions | None:
         # Undo the flip that made a maximized objective something to minimize,
         # so that the reported aggregate agrees in sign with the values it
         # summarizes.
         objectives = unscale_value(
-            apply_direction(self.objectives, context.objectives.maximize),
+            apply_direction(scaled.objectives, context.objectives.maximize),
             context.get_objective_scales(),
             context.get_objective_offsets(),
         )
-        constraints = self.constraints
+        constraints = scaled.constraints
         if constraints is not None:
             constraint_scales = context.get_constraint_scales()
             assert constraint_scales is not None
             constraints = unscale_value(
                 constraints, constraint_scales, context.get_constraint_offsets()
             )
-
-        return Functions(
-            target_objective=self.target_objective,
-            objectives=objectives,
-            constraints=constraints,
-        )
+        return Functions(objectives=objectives, constraints=constraints)

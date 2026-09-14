@@ -1556,7 +1556,7 @@ async def test_executor_evaluator_ok(
     assert not executor._running.is_set()  # ruff: ignore[private-member-access]
 
     assert results is not None
-    assert np.allclose(results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02)
+    assert np.allclose(results.variables, [0.0, 0.0, 0.5], atol=0.02)
 
 
 @pytest.mark.parametrize(
@@ -1645,7 +1645,7 @@ async def test_executor_survives_user_code_error_and_is_reusable(
         assert executor._running.is_set()  # ruff: ignore[private-member-access]
         results = await asyncio.to_thread(_opt_workflow, executor, config, eval_func())
         assert results is not None
-        assert np.allclose(results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02)
+        assert np.allclose(results.variables, [0.0, 0.0, 0.5], atol=0.02)
         executor.cancel()
     assert not executor._running.is_set()  # ruff: ignore[private-member-access]
 
@@ -1724,7 +1724,7 @@ async def test_executor_evaluator_two_optimizations(
     assert len(results_list) == 2
     for results in results_list:
         assert results is not None
-        assert np.allclose(results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02)
+        assert np.allclose(results.variables, [0.0, 0.0, 0.5], atol=0.02)
 
 
 @pytest.mark.parametrize("bundle_size", [1, 2, 4, 0])
@@ -1777,7 +1777,7 @@ async def test_groups_work_items(
 
     results = result_handler["results"]
     assert results is not None
-    assert np.allclose(results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02)
+    assert np.allclose(results.variables, [0.0, 0.0, 0.5], atol=0.02)
     assert bundle_sizes, "No work items were submitted"
     expected_max = max(bundle_sizes) if bundle_size == 0 else bundle_size
     for size in bundle_sizes:

@@ -66,9 +66,7 @@ def test_run_basic(config: dict[str, Any], evaluator: Any) -> None:
     step.add_event_handler(result_handler)
     step.run(variables=initial_values, context=EnOptContext.model_validate(config))
     assert result_handler["results"] is not None
-    assert np.allclose(
-        result_handler["results"].evaluations.variables, [0.0, 0.0, 0.5], atol=0.02
-    )
+    assert np.allclose(result_handler["results"].variables, [0.0, 0.0, 0.5], atol=0.02)
 
 
 def test_function_evaluator_with_info(
@@ -99,9 +97,7 @@ def test_function_evaluator_with_info(
     step.add_event_handler(result_handler)
     step.run(variables=initial_values, context=EnOptContext.model_validate(config))
     assert result_handler["results"] is not None
-    assert np.allclose(
-        result_handler["results"].evaluations.variables, [0.0, 0.0, 0.5], atol=0.02
-    )
+    assert np.allclose(result_handler["results"].variables, [0.0, 0.0, 0.5], atol=0.02)
     assert result_handler["results"].evaluations.metadata["foo"] == "bar"
 
 
@@ -116,15 +112,15 @@ def test_rng(config: dict[str, Any], evaluator: Any) -> None:
 
     step.run(variables=initial_values, context=EnOptContext.model_validate(config))
     assert result_handler["results"] is not None
-    variables1 = result_handler["results"].evaluations.variables
+    variables1 = result_handler["results"].variables
     result_handler["results"] = None
     step.run(variables=initial_values, context=EnOptContext.model_validate(config))
     assert result_handler["results"] is not None
-    variables2 = result_handler["results"].evaluations.variables
+    variables2 = result_handler["results"].variables
     result_handler["results"] = None
     step.run(variables=initial_values, context=EnOptContext.model_validate(config2))
     assert result_handler["results"] is not None
-    variables3 = result_handler["results"].evaluations.variables
+    variables3 = result_handler["results"].variables
 
     assert np.all(variables1 == variables2)
     assert not np.all(variables2 == variables3)
@@ -136,14 +132,14 @@ def test_set_initial_values(config: dict[str, Any], evaluator: Any) -> None:
     step.add_event_handler(result_handler)
     step.run(variables=initial_values, context=EnOptContext.model_validate(config))
     assert result_handler["results"] is not None
-    variables1 = result_handler["results"].evaluations.variables
+    variables1 = result_handler["results"].variables
     result_handler["variables"] = None
     step.run(
         context=EnOptContext.model_validate(config),
         variables=[0, 0, 0],
     )
     assert result_handler["results"] is not None
-    variables2 = result_handler["results"].evaluations.variables
+    variables2 = result_handler["results"].variables
 
     assert variables1 is not None
     assert variables2 is not None
@@ -162,7 +158,7 @@ def test_reset_results(config: dict[str, Any], evaluator: Any) -> None:
     saved_results = deepcopy(result_handler["results"])
     result_handler["results"] = None
     assert saved_results is not None
-    assert np.allclose(saved_results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02)
+    assert np.allclose(saved_results.variables, [0.0, 0.0, 0.5], atol=0.02)
 
 
 def test_two_optimizers_alternating(config: dict[str, Any], evaluator: Any) -> None:
@@ -201,23 +197,21 @@ def test_two_optimizers_alternating(config: dict[str, Any], evaluator: Any) -> N
     assert result_handler2["results"] is not None
     step.run(
         context=EnOptContext.model_validate(config2),
-        variables=result_handler2["results"].evaluations.variables,
+        variables=result_handler2["results"].variables,
     )
     assert result_handler2["results"] is not None
     step.run(
         context=EnOptContext.model_validate(config1),
-        variables=result_handler2["results"].evaluations.variables,
+        variables=result_handler2["results"].variables,
     )
     assert result_handler2["results"] is not None
     step.run(
         context=EnOptContext.model_validate(config2),
-        variables=result_handler2["results"].evaluations.variables,
+        variables=result_handler2["results"].variables,
     )
     assert completed_functions == 14
     assert result_handler1["results"] is not None
-    assert np.allclose(
-        result_handler1["results"].evaluations.variables, [0.0, 0.0, 0.5], atol=0.02
-    )
+    assert np.allclose(result_handler1["results"].variables, [0.0, 0.0, 0.5], atol=0.02)
 
 
 def test_optimization_sequential(config: dict[str, Any], evaluator: Any) -> None:
@@ -247,16 +241,12 @@ def test_optimization_sequential(config: dict[str, Any], evaluator: Any) -> None
     assert result_handler["results"] is not None
     step.run(
         context=EnOptContext.model_validate(config2),
-        variables=result_handler["results"].evaluations.variables,
+        variables=result_handler["results"].variables,
     )
 
-    assert not np.allclose(
-        completed[1].evaluations.variables, [0.0, 0.0, 0.5], atol=0.02
-    )
-    assert np.all(
-        completed[2].evaluations.variables == completed[1].evaluations.variables
-    )
-    assert np.allclose(completed[-1].evaluations.variables, [0.0, 0.0, 0.5], atol=0.02)
+    assert not np.allclose(completed[1].variables, [0.0, 0.0, 0.5], atol=0.02)
+    assert np.all(completed[2].variables == completed[1].variables)
+    assert np.allclose(completed[-1].variables, [0.0, 0.0, 0.5], atol=0.02)
 
 
 def test_restart_initial(config: dict[str, Any], evaluator: Any) -> None:
@@ -281,8 +271,8 @@ def test_restart_initial(config: dict[str, Any], evaluator: Any) -> None:
         step.run(variables=initial_values, context=EnOptContext.model_validate(config))
 
     assert len(completed) == 6
-    assert np.all(completed[0].evaluations.variables == initial_values)
-    assert np.all(completed[3].evaluations.variables == initial_values)
+    assert np.all(completed[0].variables == initial_values)
+    assert np.all(completed[3].variables == initial_values)
 
 
 def test_restart_last(config: dict[str, Any], evaluator: Any) -> None:
@@ -309,16 +299,14 @@ def test_restart_last(config: dict[str, Any], evaluator: Any) -> None:
         variables = (
             initial_values
             if result_handler["results"] is None
-            else result_handler["results"].evaluations.variables
+            else result_handler["results"].variables
         )
         step.run(
             context=EnOptContext.model_validate(config),
             variables=variables,
         )
 
-    assert np.all(
-        completed[3].evaluations.variables == completed[2].evaluations.variables
-    )
+    assert np.all(completed[3].variables == completed[2].variables)
 
 
 def test_restart_optimum(config: dict[str, Any], evaluator: Any) -> None:
@@ -347,16 +335,14 @@ def test_restart_optimum(config: dict[str, Any], evaluator: Any) -> None:
         variables = (
             initial_values
             if result_handler["results"] is None
-            else result_handler["results"].evaluations.variables
+            else result_handler["results"].variables
         )
         step.run(
             context=EnOptContext.model_validate(config),
             variables=variables,
         )
 
-    assert np.all(
-        completed[2].evaluations.variables == completed[4].evaluations.variables
-    )
+    assert np.all(completed[2].variables == completed[4].variables)
 
 
 def test_restart_optimum_with_reset(
@@ -404,7 +390,7 @@ def test_restart_optimum_with_reset(
         variables = (
             initial_values
             if result_handler["results"] is None
-            else result_handler["results"].evaluations.variables
+            else result_handler["results"].variables
         )
         result_handler["results"] = None
         step.run(
@@ -413,15 +399,9 @@ def test_restart_optimum_with_reset(
         )
 
     # The third evaluation is the optimum, and used to restart the second run:
-    assert np.all(
-        completed[max_functions].evaluations.variables
-        == completed[2].evaluations.variables
-    )
+    assert np.all(completed[max_functions].variables == completed[2].variables)
     # The 5th evaluation is the optimum of the second run, and used for the third:
-    assert np.all(
-        completed[2 * max_functions].evaluations.variables
-        == completed[5].evaluations.variables
-    )
+    assert np.all(completed[2 * max_functions].variables == completed[5].variables)
 
 
 def test_repeat_metadata(config: dict[str, Any], evaluator: Any) -> None:
@@ -462,7 +442,7 @@ def test_evaluator(config: dict[str, Any], evaluator: Any) -> None:
     step.add_event_handler(result_handler)
     step.run(context=EnOptContext.model_validate(config), variables=[0.0, 0.0, 0.1])
     assert result_handler["results"].functions is not None
-    assert np.allclose(result_handler["results"].functions.target_objective, 1.66)
+    assert np.allclose(result_handler["results"].target_objective, 1.66)
 
     result_handler["results"] = None
     step.run(
@@ -470,7 +450,7 @@ def test_evaluator(config: dict[str, Any], evaluator: Any) -> None:
         variables=[0, 0, 0],
     )
     assert result_handler["results"].functions is not None
-    assert np.allclose(result_handler["results"].functions.target_objective, 1.75)
+    assert np.allclose(result_handler["results"].target_objective, 1.75)
 
 
 def test_evaluator_multi(config: dict[str, Any], evaluator: Any) -> None:
@@ -484,10 +464,7 @@ def test_evaluator_multi(config: dict[str, Any], evaluator: Any) -> None:
         context=EnOptContext.model_validate(config),
         variables=np.array([[0, 0, 0.1], [0, 0, 0]]),
     )
-    values = [
-        results.functions.target_objective.item()
-        for results in history_handler["results"]
-    ]
+    values = [results.target_objective.item() for results in history_handler["results"]]
     assert np.allclose(values, [1.66, 1.75])
 
 
@@ -565,7 +542,7 @@ def test_nested_optimization(
             new_variables[1] = (
                 initial[1]
                 if outer_result_handler["results"] is None
-                else outer_result_handler["results"].evaluations.variables[1]
+                else outer_result_handler["results"].variables[1]
             )
             result_handler = ResultsHandler()
             step = OptimizationStep(evaluator=evaluator())
@@ -579,7 +556,7 @@ def test_nested_optimization(
                 objectives=result_handler["results"].functions.objectives
             )
 
-        new_variables[1] = outer_result_handler["results"].evaluations.variables[1]
+        new_variables[1] = outer_result_handler["results"].variables[1]
         return EvaluationFunctionResult(
             objectives=np.fromiter(
                 (func(new_variables, context) for func in test_functions),
@@ -591,7 +568,7 @@ def test_nested_optimization(
     step = OptimizationStep(evaluator=outer_evaluator)
     step.run(variables=initial, context=EnOptContext.model_validate(config))
     assert np.allclose(
-        outer_result_handler["results"].evaluations.variables,
+        outer_result_handler["results"].variables,
         [0.0, 0.0, 0.5],
         atol=0.02,
     )
@@ -890,7 +867,7 @@ def test_evaluator_cache(
     completed_test_functions = 0
     step.run(
         context=EnOptContext.model_validate(config),
-        variables=result_handler["results"].evaluations.variables,
+        variables=result_handler["results"].variables,
     )
     assert completed_test_functions == 6  # Two evaluations were cached
 

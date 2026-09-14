@@ -12,18 +12,15 @@ import numpy as np
 import pytest
 from numpy.typing import NDArray
 
+from ropt._scaling import unscale_value
 from ropt.backend.utils import validate_supported_constraints
 from ropt.config import VariablesConfig
 from ropt.context import EnOptContext
 from ropt.enums import PerturbationType
 from ropt.results import (
     ConstraintInfo,
-    FunctionEvaluations,
     FunctionResults,
-    GradientEvaluations,
-    GradientResults,
     Gradients,
-    Realizations,
 )
 from ropt.simple import (
     EvaluationFunctionContext,
@@ -37,25 +34,6 @@ from ropt.utils import scales_and_offsets_from_bounds
 
 def _context(**fields: Any) -> EnOptContext:
     return EnOptContext.model_validate({"variables": {"variable_count": 3}} | fields)
-
-
-def _function_results(
-    variables: NDArray[np.float64],
-    constraint_info: ConstraintInfo | None = None,
-) -> FunctionResults:
-    return FunctionResults(
-        batch_id=0,
-        metadata={},
-        names={},
-        evaluations=FunctionEvaluations(
-            variables=variables,
-            objectives=np.zeros((1, 2)),
-            constraints=None,
-        ),
-        realizations=Realizations(evaluated_realizations=np.array([True])),
-        functions=None,
-        constraint_info=constraint_info,
-    )
 
 
 def _linear_constraints(**fields: Any) -> Any:
@@ -129,8 +107,10 @@ def test_reported_variables_are_mapped_back() -> None:
     user_variables = np.array([0.5, 1.5, 2.5])
     optimizer_variables = (user_variables - offsets) / scales
 
-    unscaled = _function_results(optimizer_variables).unscale(context)
-    assert np.allclose(unscaled.evaluations.variables, user_variables)
+    reported = unscale_value(
+        optimizer_variables, context.variables.scales, context.variables.offsets
+    )
+    assert np.allclose(reported, user_variables)
 
 
 def test_perturbed_variables_are_mapped_back() -> None:
@@ -138,22 +118,12 @@ def test_perturbed_variables_are_mapped_back() -> None:
         variables={"variable_count": 3, "scales": [2.0, 4.0, 8.0], "offsets": 1.0}
     )
     user_variables = np.array([2.0, 7.0, 21.0])
-    results = GradientResults(
-        batch_id=0,
-        metadata={},
-        names={},
-        evaluations=GradientEvaluations(
-            variables=np.array([0.5, 1.5, 2.5]),
-            perturbed_variables=np.array([[[0.5, 1.5, 2.5]]]),
-            perturbed_objectives=np.zeros((1, 1, 2)),
-            metadata={},
-        ),
-        realizations=Realizations(evaluated_realizations=np.array([True])),
-        gradients=None,
+    reported = unscale_value(
+        np.array([[[0.5, 1.5, 2.5]]]),
+        context.variables.scales,
+        context.variables.offsets,
     )
-    unscaled = results.unscale(context)
-    assert np.allclose(unscaled.evaluations.variables, user_variables)
-    assert np.allclose(unscaled.evaluations.perturbed_variables, [[user_variables]])
+    assert np.allclose(reported, [[user_variables]])
 
 
 def test_gradients_are_divided_by_the_variable_scales() -> None:
@@ -169,48 +139,35 @@ def test_gradients_are_divided_by_the_variable_scales() -> None:
     # A variable sits in the denominator of a derivative, so the optimizer holds
     # d(f / s_f) / d((x - o) / s_x): the true gradient times s_x / s_f.
     true_gradient = np.array([[3.0, 7.0]])
-    results = GradientResults(
-        batch_id=0,
-        metadata={},
-        names={},
-        evaluations=GradientEvaluations(
-            variables=np.zeros(2),
-            perturbed_variables=np.zeros((1, 1, 2)),
-            perturbed_objectives=np.zeros((1, 1, 1)),
-            metadata={},
-        ),
-        realizations=Realizations(evaluated_realizations=np.array([True])),
-        gradients=Gradients(
-            target_objective=np.zeros(2),
+    gradients = Gradients.from_scaled(
+        context,
+        Gradients(
             objectives=true_gradient * [2.0, 4.0] / 5.0,
             constraints=true_gradient * [2.0, 4.0] / 10.0,
         ),
     )
-    unscaled = results.unscale(context)
-    assert unscaled.gradients is not None
-    assert np.allclose(unscaled.gradients.objectives, true_gradient)
-    assert unscaled.gradients.constraints is not None
-    assert np.allclose(unscaled.gradients.constraints, true_gradient)
+    assert np.allclose(gradients.objectives, true_gradient)
+    assert gradients.constraints is not None
+    assert np.allclose(gradients.constraints, true_gradient)
 
 
 def test_bound_constraint_diffs_are_scaled_back() -> None:
     context = _context(
         variables={"variable_count": 3, "scales": [2.0, 4.0, 8.0], "offsets": 100.0}
     )
-    unscaled = _function_results(
-        np.zeros(3),
-        constraint_info=ConstraintInfo(
+    constraint_info = ConstraintInfo.from_scaled(
+        context,
+        ConstraintInfo(
             bound_lower=np.array([0.25, 0.5, 0.75]),
             bound_upper=np.array([-0.25, -0.5, -0.75]),
         ),
-    ).unscale(context)
+    )
 
     # A difference is a distance between two values, so the offset cancels.
-    assert unscaled.constraint_info is not None
-    assert unscaled.constraint_info.bound_lower is not None
-    assert np.allclose(unscaled.constraint_info.bound_lower, [0.5, 2.0, 6.0])
-    assert unscaled.constraint_info.bound_upper is not None
-    assert np.allclose(unscaled.constraint_info.bound_upper, [-0.5, -2.0, -6.0])
+    assert constraint_info.bound_lower is not None
+    assert np.allclose(constraint_info.bound_lower, [0.5, 2.0, 6.0])
+    assert constraint_info.bound_upper is not None
+    assert np.allclose(constraint_info.bound_upper, [-0.5, -2.0, -6.0])
 
 
 def test_linear_constraint_diffs_are_scaled_back() -> None:
@@ -222,19 +179,18 @@ def test_linear_constraint_diffs_are_scaled_back() -> None:
             "scales": [2.0, 5.0],
         }
     )
-    unscaled = _function_results(
-        np.zeros(3),
-        constraint_info=ConstraintInfo(
+    constraint_info = ConstraintInfo.from_scaled(
+        context,
+        ConstraintInfo(
             linear_lower=np.array([0.25, 0.5]),
             linear_upper=np.array([-0.25, -0.5]),
         ),
-    ).unscale(context)
+    )
 
-    assert unscaled.constraint_info is not None
-    assert unscaled.constraint_info.linear_lower is not None
-    assert np.allclose(unscaled.constraint_info.linear_lower, [0.5, 2.5])
-    assert unscaled.constraint_info.linear_upper is not None
-    assert np.allclose(unscaled.constraint_info.linear_upper, [-0.5, -2.5])
+    assert constraint_info.linear_lower is not None
+    assert np.allclose(constraint_info.linear_lower, [0.5, 2.5])
+    assert constraint_info.linear_upper is not None
+    assert np.allclose(constraint_info.linear_upper, [-0.5, -2.5])
 
 
 def test_the_estimated_equation_scales_are_undone_in_the_diffs() -> None:
@@ -249,21 +205,20 @@ def test_the_estimated_equation_scales_are_undone_in_the_diffs() -> None:
     assert context.linear_constraints is not None
     assert np.allclose(context.linear_constraints.scales, [10.0, 4.0])
 
-    unscaled = _function_results(
-        np.zeros(3),
-        constraint_info=ConstraintInfo(
+    constraint_info = ConstraintInfo.from_scaled(
+        context,
+        ConstraintInfo(
             linear_lower=np.array([1.0, 1.0]),
             linear_upper=np.array([-1.0, -1.0]),
         ),
-    ).unscale(context)
+    )
 
     # An estimated scale is undone just like a configured one; leaving it in
     # would report distances in the optimizer's units.
-    assert unscaled.constraint_info is not None
-    assert unscaled.constraint_info.linear_lower is not None
-    assert np.allclose(unscaled.constraint_info.linear_lower, [10.0, 4.0])
-    assert unscaled.constraint_info.linear_upper is not None
-    assert np.allclose(unscaled.constraint_info.linear_upper, [-10.0, -4.0])
+    assert constraint_info.linear_lower is not None
+    assert np.allclose(constraint_info.linear_lower, [10.0, 4.0])
+    assert constraint_info.linear_upper is not None
+    assert np.allclose(constraint_info.linear_upper, [-10.0, -4.0])
 
 
 def test_the_evaluator_is_called_with_unscaled_variables() -> None:
@@ -561,9 +516,8 @@ def test_scales_and_offsets_reject_a_degenerate_range(
         scales_and_offsets_from_bounds(*bounds, target_range)
 
 
-# The `scaled` flag on the result-collecting handlers selects whether the
-# values are unscaled before being stored. Variable scales and offsets make the
-# difference visible: the optimizer works with (x - o)/s.
+# Every result carries both domains. Variable scales and offsets make them
+# distinguishable: the optimizer works with (x - o)/s.
 
 _SCALED_CONFIG: dict[str, Any] = {
     "variables": {"variable_count": 2, "scales": [2.0, 4.0], "offsets": [1.0, 2.0]},
@@ -583,40 +537,19 @@ def _initial() -> NDArray[np.float64]:
     return np.array([3.0, 6.0])
 
 
-@pytest.mark.parametrize("scaled", [False, True])
-def test_the_history_handler_stores_scaled_values_on_request(*, scaled: bool) -> None:
-    history = HistoryHandler(scaled=scaled)
+def test_the_history_handler_stores_both_domains() -> None:
+    history = HistoryHandler()
     optimize(_SCALED_CONFIG, _initial(), _objective, handlers=[history])
     first = history.results[0]
     assert isinstance(first, FunctionResults)
-    variables = first.evaluations.variables
     # (3, 6) is (1, 1) once scaled, since scales are (2, 4) and offsets (1, 2).
-    expected = [1.0, 1.0] if scaled else [3.0, 6.0]
-    assert np.allclose(variables, expected)
+    assert np.allclose(first.variables, [3.0, 6.0])
+    assert np.allclose(first.scaled.variables, [1.0, 1.0])
 
 
-def test_the_history_handler_unscales_by_default() -> None:
-    default = HistoryHandler()
-    explicit = HistoryHandler(scaled=False)
-    optimize(_SCALED_CONFIG, _initial(), _objective, handlers=[default, explicit])
-    first, second = default.results[0], explicit.results[0]
-    assert isinstance(first, FunctionResults)
-    assert isinstance(second, FunctionResults)
-    assert np.allclose(first.evaluations.variables, second.evaluations.variables)
-
-
-@pytest.mark.parametrize("scaled", [False, True])
-def test_the_results_handler_stores_scaled_values_on_request(*, scaled: bool) -> None:
-    handler = ResultsHandler(scaled=scaled)
+def test_the_results_handler_stores_both_domains() -> None:
+    handler = ResultsHandler()
     optimize(_SCALED_CONFIG, _initial(), _objective, handlers=[handler])
     assert handler.result is not None
-    variables = handler.result.evaluations.variables
-    unscaled = variables * [2.0, 4.0] + [1.0, 2.0]
-    # Whichever way it is stored, unscaling recovers the reported values.
-    reference = ResultsHandler()
-    optimize(_SCALED_CONFIG, _initial(), _objective, handlers=[reference])
-    assert reference.result is not None
-    assert np.allclose(
-        variables if not scaled else unscaled,
-        reference.result.evaluations.variables,
-    )
+    assert np.allclose(handler.result.variables, [3.0, 6.0])
+    assert np.allclose(handler.result.scaled.variables, [1.0, 1.0])

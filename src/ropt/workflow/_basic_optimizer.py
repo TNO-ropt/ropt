@@ -160,8 +160,7 @@ class BasicOptimizer:
         """
 
         def _results_callback(event: EnOptEvent) -> None:
-            results = tuple(item.unscale(event.context) for item in event.results)
-            callback(results)
+            callback(event.results)
 
         self._observers.append((EnOptEventType.FINISHED_EVALUATION, _results_callback))
 

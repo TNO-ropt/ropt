@@ -198,10 +198,10 @@ async def main(
     for optimal_result in results:
         assert optimal_result is not None
         assert optimal_result.functions is not None
-        print(f"Optimal variables: {optimal_result.evaluations.variables}")
-        print(f"Optimal objective: {optimal_result.functions.target_objective}\n")
-        assert np.allclose(optimal_result.functions.target_objective, 0, atol=2e-1)
-        assert np.allclose(optimal_result.evaluations.variables, 1, atol=2e-1)
+        print(f"Optimal variables: {optimal_result.variables}")
+        print(f"Optimal objective: {optimal_result.target_objective}\n")
+        assert np.allclose(optimal_result.target_objective, 0, atol=2e-1)
+        assert np.allclose(optimal_result.variables, 1, atol=2e-1)
 
     print(f"Elapsed time: {end_time - start_time} seconds")
 

@@ -554,9 +554,7 @@ async def test_event_dispatcher_with_optimization_step(
         event_dispatcher.cancel()
 
     assert result_handler["results"] is not None
-    assert np.allclose(
-        result_handler["results"].evaluations.variables, [0.0, 0.0, 0.5], atol=0.02
-    )
+    assert np.allclose(result_handler["results"].variables, [0.0, 0.0, 0.5], atol=0.02)
 
 
 class _HandlerError(Exception):

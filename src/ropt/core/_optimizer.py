@@ -32,7 +32,7 @@ if TYPE_CHECKING:
     from numpy.typing import NDArray
 
     from ropt.context import EnOptContext
-    from ropt.results import Functions, Gradients, Results
+    from ropt.results import Results
 
     from ._evaluator import EnsembleEvaluator
 
@@ -236,7 +236,7 @@ class EnsembleOptimizer:
             # Functions might be parallelized hence we need potentially to
             # process a list of function results:
             functions_list = [
-                self._functions_from_results(item.functions)
+                self._functions_from_results(item)
                 for item in results
                 if isinstance(item, FunctionResults)
             ]
@@ -249,11 +249,7 @@ class EnsembleOptimizer:
         if return_gradients:
             # Gradients cannot be parallelized, there is at most one gradient:
             gradients = self._gradients_from_results(
-                next(
-                    item.gradients
-                    for item in results
-                    if isinstance(item, GradientResults)
-                ),
+                next(item for item in results if isinstance(item, GradientResults)),
                 self._context.variables.mask,
             )
 
@@ -325,21 +321,22 @@ class EnsembleOptimizer:
 
         return results
 
-    def _functions_from_results(
-        self, functions: Functions | None
-    ) -> NDArray[np.float64]:
-        assert functions is not None
+    def _functions_from_results(self, results: FunctionResults) -> NDArray[np.float64]:
+        target_objective = results.target_objective
+        assert target_objective is not None
         constraint_index = self._constraint_index
         if constraint_index is None:
-            return np.array(functions.target_objective, ndmin=1)
+            return np.array(target_objective, ndmin=1)
         assert self._use_lower_bound is not None
+        functions = results.scaled.functions
+        assert functions is not None
         assert functions.constraints is not None
         bounds = self._context.get_nonlinear_constraint_bounds()
         assert bounds is not None
         lower_bounds, upper_bounds = bounds
         values = functions.constraints[constraint_index]
         return np.append(
-            functions.target_objective,
+            target_objective,
             np.where(
                 self._use_lower_bound,
                 values - lower_bounds[constraint_index],
@@ -348,26 +345,27 @@ class EnsembleOptimizer:
         )
 
     def _gradients_from_results(
-        self, gradients: Gradients | None, mask: NDArray[np.bool_] | None
+        self, results: GradientResults, mask: NDArray[np.bool_] | None
     ) -> NDArray[np.float64]:
-        assert gradients is not None
-        target_objective_gradient = (
-            gradients.target_objective.copy()
-            if mask is None
-            else gradients.target_objective[mask]
+        target_gradient = results.target_gradient
+        assert target_gradient is not None
+        target_gradient = (
+            target_gradient.copy() if mask is None else target_gradient[mask]
         )
         constraint_index = self._constraint_index
         if constraint_index is None:
-            return np.expand_dims(target_objective_gradient, axis=0)
+            return np.expand_dims(target_gradient, axis=0)
         use_lower_bound = self._use_lower_bound
         assert use_lower_bound is not None
+        gradients = results.scaled.gradients
+        assert gradients is not None
         assert gradients.constraints is not None
         constraint_gradients = (
             gradients.constraints if mask is None else gradients.constraints[:, mask]
         )[constraint_index, :]
         return np.vstack(
             (
-                target_objective_gradient,
+                target_gradient,
                 np.where(
                     use_lower_bound[:, np.newaxis],
                     constraint_gradients,

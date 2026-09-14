@@ -16,6 +16,8 @@ from ropt.results import (
     GradientEvaluations,
     GradientResults,
     Realizations,
+    ScaledFunctionResults,
+    ScaledGradientResults,
 )
 
 
@@ -112,7 +114,6 @@ def config_fixture() -> dict[str, Any]:
 
 def _make_function_results(*, failed: bool) -> FunctionResults:
     evaluations = FunctionEvaluations.create(
-        variables=np.array([0.0, 0.0]),
         objectives=(
             np.array([[np.nan], [np.nan], [np.nan]], dtype=np.float64)
             if failed
@@ -123,17 +124,16 @@ def _make_function_results(*, failed: bool) -> FunctionResults:
         batch_id=0,
         metadata={},
         names={},
+        variables=np.array([0.0, 0.0]),
         evaluations=evaluations,
         realizations=Realizations(
             evaluated_realizations=np.ones(3, dtype=np.bool_),
         ),
-        functions=(
-            None
-            if failed
-            else Functions.create(
-                target_objective=np.array(1.0),
-                objectives=np.array([1.0]),
-            )
+        functions=None if failed else Functions(objectives=np.array([1.0])),
+        target_objective=None if failed else np.array(1.0),
+        scaled=ScaledFunctionResults(
+            variables=np.array([0.0, 0.0]),
+            functions=None if failed else Functions(objectives=np.array([1.0])),
         ),
     )
 
@@ -147,8 +147,6 @@ def _make_gradient_results(
     else:
         perturbed_objectives = np.ones((3, 4, 1), dtype=np.float64)
     evaluations = GradientEvaluations(
-        variables=np.array([0.0, 0.0]),
-        perturbed_variables=np.zeros((3, 4, 2), dtype=np.float64),
         perturbed_objectives=perturbed_objectives,
         metadata={},
     )
@@ -156,9 +154,17 @@ def _make_gradient_results(
         batch_id=0,
         metadata={},
         names={},
+        variables=np.array([0.0, 0.0]),
+        perturbed_variables=np.zeros((3, 4, 2), dtype=np.float64),
         evaluations=evaluations,
         realizations=Realizations(
             evaluated_realizations=np.ones(3, dtype=np.bool_),
         ),
         gradients=None if failed else object(),  # type: ignore[arg-type]
+        target_gradient=None if failed else np.zeros(2),
+        scaled=ScaledGradientResults(
+            variables=np.array([0.0, 0.0]),
+            perturbed_variables=np.zeros((3, 4, 2), dtype=np.float64),
+            gradients=None if failed else object(),  # type: ignore[arg-type]
+        ),
     )

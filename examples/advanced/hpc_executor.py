@@ -99,7 +99,7 @@ def report(event: EnOptEvent) -> None:
     """
     for item in event.results:
         if isinstance(item, FunctionResults) and item.functions is not None:
-            print(f"  objective: {item.functions.target_objective}", flush=True)
+            print(f"  objective: {item.target_objective}", flush=True)
 
 
 def main(*, workdir: Path, local: bool = False, queue: str | None = None) -> None:
@@ -145,9 +145,9 @@ def main(*, workdir: Path, local: bool = False, queue: str | None = None) -> Non
     optimal_result = results.result
     assert optimal_result is not None
     assert optimal_result.functions is not None
-    print(f"optimal variables: {optimal_result.evaluations.variables}", flush=True)
-    print(f"optimal objective: {optimal_result.functions.target_objective}", flush=True)
-    assert np.allclose(optimal_result.evaluations.variables, 1.0, atol=1e-1)
+    print(f"optimal variables: {optimal_result.variables}", flush=True)
+    print(f"optimal objective: {optimal_result.target_objective}", flush=True)
+    assert np.allclose(optimal_result.variables, 1.0, atol=1e-1)
 
 
 if __name__ == "__main__":

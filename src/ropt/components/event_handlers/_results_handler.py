@@ -39,7 +39,6 @@ class ResultsHandler(EventHandler):
         *,
         what: Literal["best", "last"] = "best",
         constraint_tolerance: float | None = None,
-        scaled: bool = False,
         filter: Callable[[Results], bool] | None = None,  # ruff: ignore[builtin-argument-shadowing]
     ) -> None:
         """Initialize the ResultsHandler.
@@ -50,17 +49,11 @@ class ResultsHandler(EventHandler):
                                   violations. Violations are compared in the
                                   domain the optimizer works in, so a scale
                                   applies to them as well.
-            scaled:               If `True`, store the value as the optimizer works
-                                  with it: scaled and offset, with objectives and
-                                  gradients negated where `maximize` is set. By
-                                  default the value is unscaled first, restoring the
-                                  quantities as configured.
             filter:               Optional callable to filter results based on custom logic.
         """
         super().__init__()
         self._what = what
         self._constraint_tolerance = constraint_tolerance
-        self._scaled = scaled
         self._filter = filter
         self._best_results: FunctionResults | None = None
         self["results"] = None
@@ -89,26 +82,20 @@ class ResultsHandler(EventHandler):
             self._best_results = None
 
         def _get_target_objective(result: FunctionResults) -> float:
-            assert result.functions is not None
-            return result.functions.target_objective.item()
-
-        def _maybe_unscale(result: FunctionResults) -> FunctionResults:
-            return result if self._scaled else result.unscale(event.context)
+            assert result.target_objective is not None
+            return result.target_objective.item()
 
         match self._what:
             case "best":
-                # The best so far competes with the new batch, so it is only
-                # replaced by something better, and kept scaled to stay
-                # comparable with what arrives next.
                 if self._best_results is not None:
                     results = (self._best_results, *results)
                 best = min(results, key=_get_target_objective)
                 if best is not self._best_results:
                     self._best_results = best
                     _logger.info("New best objective: %g", _get_target_objective(best))
-                    self["results"] = _maybe_unscale(best)
+                    self["results"] = best
             case "last":
-                self["results"] = _maybe_unscale(results[-1])
+                self["results"] = results[-1]
             case _ as unreachable:
                 assert_never(unreachable)
 
@@ -127,13 +114,13 @@ def _violates_constraint(results: Results, tolerance: float | None) -> bool:
         return False
 
     assert isinstance(results, FunctionResults)
-    if results.constraint_info is None:
+    if results.scaled.constraint_info is None:
         return False
 
     for violations in (
-        results.constraint_info.bound_violation,
-        results.constraint_info.linear_violation,
-        results.constraint_info.nonlinear_violation,
+        results.scaled.constraint_info.bound_violation,
+        results.scaled.constraint_info.linear_violation,
+        results.scaled.constraint_info.nonlinear_violation,
     ):
         if violations is not None and np.any(violations > tolerance):
             return True

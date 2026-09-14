@@ -112,8 +112,8 @@ def report(event: EnOptEvent) -> None:
             thread = item.metadata.get("thread")
             msg = (
                 f"batch: {item.batch_id}  thread: {thread}  tasks: {tasks}\n"
-                f"  variables: {item.evaluations.variables}\n"
-                f"  objective: {item.functions.target_objective}\n\n"
+                f"  variables: {item.variables}\n"
+                f"  objective: {item.target_objective}\n\n"
             )
             # Single msg with flush to prevent interleaving from threads:
             print(msg, end="", flush=True)
@@ -178,7 +178,7 @@ def main() -> None:
         assert inner_result is not None
         assert inner_result.functions is not None
         return EvaluationFunctionResult(
-            objectives=np.array(inner_result.functions.target_objective)
+            objectives=np.array(inner_result.target_objective)
         )
 
     # Outer evaluator: thread pool so multiple inner optimizations are in
@@ -212,12 +212,13 @@ def main() -> None:
     assert optimal_result is not None
     assert optimal_result.functions is not None
     print(f"Optimal batch: {optimal_result.batch_id}", flush=True)
-    print(f"Optimal variables: {optimal_result.evaluations.variables}", flush=True)
+    print(f"Optimal variables: {optimal_result.variables}", flush=True)
     print(
-        f"Optimal objective: {optimal_result.functions.target_objective}\n", flush=True
+        f"Optimal objective: {optimal_result.target_objective}\n",
+        flush=True,
     )
-    assert np.allclose(optimal_result.functions.target_objective, 0, atol=1e-1)
-    assert np.allclose(optimal_result.evaluations.variables, [1, 2, 3, 4], atol=1e-1)
+    assert np.allclose(optimal_result.target_objective, 0, atol=1e-1)
+    assert np.allclose(optimal_result.variables, [1, 2, 3, 4], atol=1e-1)
 
 
 if __name__ == "__main__":

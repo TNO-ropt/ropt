@@ -69,7 +69,7 @@ def test_scipy_samplers_shared(config: Any, method: str, eval_func: Any) -> None
     def _observer(event: EnOptEvent, tag: str) -> None:
         for item in event.results:
             if isinstance(item, GradientResults) and tag not in perturbations:
-                perturbations[tag] = item.evaluations.perturbed_variables
+                perturbations[tag] = item.perturbed_variables
 
     config["samplers"][0]["shared"] = False
     result1 = optimize(

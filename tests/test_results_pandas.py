@@ -95,7 +95,7 @@ def test_dataframe_results_function_results(config: Any, eval_func: Any) -> None
                     _handle_results,
                     frames=frames,
                     fields={
-                        "evaluations.variables",
+                        "variables",
                     },
                     result_type="functions",
                 ),
@@ -105,7 +105,7 @@ def test_dataframe_results_function_results(config: Any, eval_func: Any) -> None
     frame = pd.concat(frames)
     assert len(frame) == 3
     assert list(frame.columns.get_level_values(level=0)) == [
-        ("evaluations.variables", idx) for idx in range(3)
+        ("variables", idx) for idx in range(3)
     ]
 
 
@@ -124,7 +124,7 @@ def test_dataframe_results_function_results_formatted_names(
                     _handle_results,
                     frames=frames,
                     fields={
-                        "evaluations.variables",
+                        "variables",
                     },
                     result_type="functions",
                 ),
@@ -134,7 +134,7 @@ def test_dataframe_results_function_results_formatted_names(
     frame = pd.concat(frames)
     assert len(frame) == 3
     assert list(frame.columns.get_level_values(level=0)) == [
-        ("evaluations.variables", f"a:{idx}") for idx in range(1, 4)
+        ("variables", f"a:{idx}") for idx in range(1, 4)
     ]
 
 
@@ -151,7 +151,7 @@ def test_dataframe_results_gradient_results(config: Any, eval_func: Any) -> None
                     _handle_results,
                     frames=frames,
                     fields={
-                        "gradients.target_objective",
+                        "target_gradient",
                     },
                     result_type="gradients",
                 ),
@@ -161,7 +161,7 @@ def test_dataframe_results_gradient_results(config: Any, eval_func: Any) -> None
     frame = pd.concat(frames)
     assert len(frame) == 3
     assert list(frame.columns.get_level_values(level=0)) == [
-        ("gradients.target_objective", f"a:{idx}") for idx in range(1, 4)
+        ("target_gradient", f"a:{idx}") for idx in range(1, 4)
     ]
 
 
@@ -179,7 +179,7 @@ def test_dataframe_results_metadata(config: Any, eval_func: Any) -> None:
                     _handle_results,
                     frames=frames,
                     fields={
-                        "evaluations.variables",
+                        "variables",
                         "metadata.foo.bar",
                         "metadata.not.existing",
                     },
@@ -192,7 +192,7 @@ def test_dataframe_results_metadata(config: Any, eval_func: Any) -> None:
     frame = pd.concat(frames)
     assert len(frame) == 3
     assert list(frame.columns.get_level_values(level=0)) == [
-        ("evaluations.variables", idx) for idx in range(3)
+        ("variables", idx) for idx in range(3)
     ] + ["metadata.foo.bar"]
 
 

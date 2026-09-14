@@ -99,43 +99,43 @@ def test_polars_results_no_results(config: Any, eval_func: Any) -> None:
 
 def test_polars_results_function_results(config: Any, eval_func: Any) -> None:
     del config["names"]
-    frames = _run(config, eval_func, {"evaluations.variables"}, "functions")
+    frames = _run(config, eval_func, {"variables"}, "functions")
     frame = pl.concat(frames, how="diagonal")
     assert frame.height == 3
     assert frame.columns == [
         "batch_id",
-        *(f"evaluations.variables,{idx}" for idx in range(3)),
+        *(f"variables,{idx}" for idx in range(3)),
     ]
 
 
 def test_polars_results_function_results_formatted_names(
     config: Any, eval_func: Any
 ) -> None:
-    frames = _run(config, eval_func, {"evaluations.variables"}, "functions")
+    frames = _run(config, eval_func, {"variables"}, "functions")
     frame = pl.concat(frames, how="diagonal")
     assert frame.height == 3
     assert frame.columns == [
         "batch_id",
-        *(f"evaluations.variables,a:{idx}" for idx in range(1, 4)),
+        *(f"variables,a:{idx}" for idx in range(1, 4)),
     ]
 
 
 def test_polars_results_sep(config: Any, eval_func: Any) -> None:
-    frames = _run(config, eval_func, {"evaluations.variables"}, "functions", sep="::")
+    frames = _run(config, eval_func, {"variables"}, "functions", sep="::")
     frame = pl.concat(frames, how="diagonal")
     assert frame.columns == [
         "batch_id",
-        *(f"evaluations.variables::a:{idx}" for idx in range(1, 4)),
+        *(f"variables::a:{idx}" for idx in range(1, 4)),
     ]
 
 
 def test_polars_results_gradient_results(config: Any, eval_func: Any) -> None:
-    frames = _run(config, eval_func, {"gradients.target_objective"}, "gradients")
+    frames = _run(config, eval_func, {"target_gradient"}, "gradients")
     frame = pl.concat(frames, how="diagonal")
     assert frame.height == 3
     assert frame.columns == [
         "batch_id",
-        *(f"gradients.target_objective,a:{idx}" for idx in range(1, 4)),
+        *(f"target_gradient,a:{idx}" for idx in range(1, 4)),
     ]
 
 
@@ -144,7 +144,7 @@ def test_polars_results_metadata(config: Any, eval_func: Any) -> None:
     frames = _run(
         config,
         eval_func,
-        {"evaluations.variables", "metadata.foo.bar", "metadata.not.existing"},
+        {"variables", "metadata.foo.bar", "metadata.not.existing"},
         "functions",
         metadata={"foo": {"bar": 1}},
     )
@@ -152,7 +152,7 @@ def test_polars_results_metadata(config: Any, eval_func: Any) -> None:
     assert frame.height == 3
     assert frame.columns == [
         "batch_id",
-        *(f"evaluations.variables,{idx}" for idx in range(3)),
+        *(f"variables,{idx}" for idx in range(3)),
         "metadata.foo.bar",
     ]
     assert frame["metadata.foo.bar"].to_list() == [1, 1, 1]
@@ -170,7 +170,7 @@ def test_polars_results_mixed_granularity(config: Any, eval_func: Any) -> None:
     frames = _run(
         config,
         eval_func,
-        {"gradients.target_objective", "evaluations.perturbed_variables"},
+        {"target_gradient", "perturbed_variables"},
         "gradients",
     )
     frame = pl.concat(frames, how="diagonal")
@@ -178,42 +178,43 @@ def test_polars_results_mixed_granularity(config: Any, eval_func: Any) -> None:
         "batch_id",
         "realization",
         "perturbation",
-        *(f"gradients.target_objective,a:{idx}" for idx in range(1, 4)),
-        *(f"evaluations.perturbed_variables,a:{idx}" for idx in range(1, 4)),
+        *(f"target_gradient,a:{idx}" for idx in range(1, 4)),
+        *(f"perturbed_variables,a:{idx}" for idx in range(1, 4)),
     ]
     assert frame.null_count().sum_horizontal().item() == 0
     for batch_frame in frame.partition_by("batch_id"):
         assert batch_frame.height == 2
-        gradients = batch_frame.select(pl.col("^gradients\\..*$"))
-        assert gradients.row(0) == gradients.row(1)
+        target = batch_frame.select(pl.col("^target_gradient,.*$"))
+        assert target.width > 0
+        assert target.row(0) == target.row(1)
 
 
 _PARITY_FIELDS: list[tuple[set[str], Literal["functions", "gradients"]]] = [
-    ({"evaluations.variables"}, "functions"),
+    ({"variables"}, "functions"),
     (
         {
             "batch_id",
-            "functions.target_objective",
+            "target_objective",
             "functions.objectives",
-            "evaluations.variables",
+            "variables",
             "constraint_info.bound_lower",
             "constraint_info.bound_upper",
             "constraint_info.bound_violation",
         },
         "functions",
     ),
-    ({"evaluations.variables", "metadata.foo.bar"}, "functions"),
-    ({"gradients.target_objective", "gradients.objectives"}, "gradients"),
+    ({"variables", "metadata.foo.bar"}, "functions"),
+    ({"target_gradient", "gradients.objectives"}, "gradients"),
     (
         {
-            "gradients.target_objective",
+            "target_gradient",
             "gradients.objectives",
         },
         "gradients",
     ),
     (
         {
-            "evaluations.perturbed_variables",
+            "perturbed_variables",
             "evaluations.perturbed_objectives",
         },
         "gradients",

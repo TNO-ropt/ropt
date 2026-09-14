@@ -204,16 +204,29 @@ class ConstraintInfo(ResultField):
 
         return None
 
-    def _unscale(self, context: EnOptContext) -> ConstraintInfo | None:
-        bound_lower: NDArray[np.float64] | None = self.bound_lower
-        bound_upper: NDArray[np.float64] | None = self.bound_upper
+    @classmethod
+    def from_scaled(
+        cls, context: EnOptContext, scaled: ConstraintInfo
+    ) -> ConstraintInfo:
+        """Convert constraint differences to the domain the user configured.
+
+        Args:
+            context: The context used by the source of the results.
+            scaled:  The differences as the optimizer sees them.
+
+        Returns:
+            The same differences expressed in unscaled units.
+        """
+        bound_lower: NDArray[np.float64] | None = scaled.bound_lower
+        bound_upper: NDArray[np.float64] | None = scaled.bound_upper
         if bound_lower is not None:
             assert bound_upper is not None
             variable_scales = context.variables.scales
             bound_lower = unscale_diff(bound_lower, variable_scales)
             bound_upper = unscale_diff(bound_upper, variable_scales)
-        linear_lower: NDArray[np.float64] | None = self.linear_lower
-        linear_upper: NDArray[np.float64] | None = self.linear_upper
+
+        linear_lower: NDArray[np.float64] | None = scaled.linear_lower
+        linear_upper: NDArray[np.float64] | None = scaled.linear_upper
         if linear_lower is not None:
             assert linear_upper is not None
             assert context.linear_constraints is not None
@@ -221,8 +234,8 @@ class ConstraintInfo(ResultField):
             linear_lower = unscale_diff(linear_lower, equation_scales)
             linear_upper = unscale_diff(linear_upper, equation_scales)
 
-        nonlinear_lower: NDArray[np.float64] | None = self.nonlinear_lower
-        nonlinear_upper: NDArray[np.float64] | None = self.nonlinear_upper
+        nonlinear_lower: NDArray[np.float64] | None = scaled.nonlinear_lower
+        nonlinear_upper: NDArray[np.float64] | None = scaled.nonlinear_upper
         if nonlinear_lower is not None:
             assert nonlinear_upper is not None
             scales = context.get_constraint_scales()

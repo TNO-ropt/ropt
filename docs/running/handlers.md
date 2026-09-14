@@ -104,28 +104,27 @@ completion while its results go nowhere.
 - `filter` (optional) is a callable that receives each
   [`Results`][ropt.results.Results] and returns `True` to keep it or `False` to
   drop it.
-- `scaled=False` (default) unscales the stored result, restoring the quantities
-  as configured; `scaled=True` stores it as the optimizer works with it. See
-  [Scaling of results](../optimizer_setup/results.md#scaling-of-results).
+
+The stored result carries both domains; see
+[Scaling of results](../optimizer_setup/results.md#scaling-of-results).
 
 #### `HistoryHandler`
 
 [`HistoryHandler`][ropt.simple.HistoryHandler] keeps *every* result it receives,
 in order, as a tuple. Read it with `handler.results`, which is an empty tuple
 until the first result arrives, or with `handler["results"]`, the raw stored
-value, which is `None` until then. It takes the same `scaled=` keyword as
-`ResultsHandler`.
+value, which is `None` until then.
 
 #### `DataFrameHandler`
 
 [`DataFrameHandler`][ropt.simple.DataFrameHandler] collects results into named
 DataFrames, using either `pandas` (the default) or `polars` as its backend; the
 corresponding package must be installed. Define a table with
-`add_table(name, table_type, columns, scaled=False)`, where `table_type` is
-`"functions"` or `"gradients"`, `columns` maps result-field names (dotted
-attribute syntax) to column titles, and `scaled` (per table) chooses whether
-that table is filled with scaled or unscaled values; see
-[Scaling of results](../optimizer_setup/results.md#scaling-of-results):
+`add_table(name, table_type, columns)`, where `table_type` is
+`"functions"` or `"gradients"` and `columns` maps result-field names (dotted
+attribute syntax) to column titles. Because every result carries both domains,
+the column name selects which one: `variables` is the vector as configured and
+`scaled.variables` is the vector the optimizer proposed.
 
 ```python
 from ropt.simple import DataFrameHandler
@@ -137,7 +136,7 @@ tables.add_table(
     {
         "batch_id": "Batch",
         "functions.objectives": "Objective",
-        "evaluations.variables": "Variable",
+        "variables": "Variable",
     },
 )
 optimize(config, x0, objective, handlers=[tables])
@@ -148,10 +147,10 @@ Read one table with `tables["summary"]`, or all of them with `get_tables()`. A
 field whose value is a vector or matrix expands to several columns; the extra
 column levels come from the field's axis labels (or indices), joined to the
 title with a separator (`,` by default, set with `sep=`). For example, a
-length-2 `evaluations.variables` gives `Variable,v0` and `Variable,v1`. Because
-the column names follow
-[`results_to_pandas`](../optimizer_setup/results.md#metadata-columns),
-both result-level and per-realization metadata can be included and renamed.
+length-2 `variables` gives `Variable,v0` and `Variable,v1`. Because the column
+names follow
+[`results_to_pandas`](../optimizer_setup/results.md#metadata-columns), both
+result-level and per-realization metadata can be included and renamed.
 
 Tables are built with polars by default. Pass `engine="pandas"` to get pandas
 DataFrames instead:
@@ -163,15 +162,15 @@ tables = DataFrameHandler(engine="pandas")
 The tables carry the same columns under the same titles. As explained in
 [Exporting to polars](../optimizer_setup/results.md#exporting-to-polars), polars
 has no index, so the key columns (`batch_id`, `realization`, and the other axis
-names) appear as ordinary leading columns rather than in the index. This also
-means the polars backend can build tables that mix per-batch and
-per-realization fields, which the pandas backend cannot.
+names) appear as ordinary leading columns rather than in the index; with pandas
+they form the index instead. Both backends align fields of differing
+granularity, broadcasting a per-batch field across the per-realization rows.
 
 Convenience methods:
 
-- `set_default_tables(scaled=False)` registers a standard set of tables
+- `set_default_tables()` registers a standard set of tables
   (`functions`, `evaluations`, `constraints` for function results; `gradients`,
-  `perturbations` for gradient results), all filled the same way.
+  `perturbations` for gradient results).
 - `add_column(table, name, title)` adds one column to an existing table.
 - `set_callback(fn)` calls `fn(output_dir)` whenever the tables are updated,
   where `output_dir` is the run's configured

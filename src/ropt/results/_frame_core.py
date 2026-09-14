@@ -18,7 +18,7 @@ if TYPE_CHECKING:
 
     from numpy.typing import NDArray
 
-    from ._result_field import ResultField
+    from ._result_field import AxisMetadata
     from ._results import Results
 
 
@@ -49,32 +49,43 @@ class FrameSpec:
     unstack: tuple[AxisName, ...]
     """The axes of the field that are unstacked into columns."""
 
+    has_sub_fields: bool = True
+    """Whether the field holds sub-fields, rather than being a value itself."""
+
+
+_VARIABLE_AXES: Final = (AxisName.VARIABLE,)
+_VALUE_AXES: Final = (AxisName.OBJECTIVE, AxisName.NONLINEAR_CONSTRAINT)
+_GRADIENT_AXES: Final = (
+    AxisName.OBJECTIVE,
+    AxisName.NONLINEAR_CONSTRAINT,
+    AxisName.VARIABLE,
+)
+_CONSTRAINT_AXES: Final = (
+    AxisName.VARIABLE,
+    AxisName.LINEAR_CONSTRAINT,
+    AxisName.NONLINEAR_CONSTRAINT,
+)
 
 FRAME_SPECS: Final[dict[str, tuple[FrameSpec, ...]]] = {
     "functions": (
-        FrameSpec("functions", (AxisName.OBJECTIVE, AxisName.NONLINEAR_CONSTRAINT)),
-        FrameSpec(
-            "evaluations",
-            (AxisName.VARIABLE, AxisName.OBJECTIVE, AxisName.NONLINEAR_CONSTRAINT),
-        ),
-        FrameSpec(
-            "constraint_info",
-            (
-                AxisName.VARIABLE,
-                AxisName.LINEAR_CONSTRAINT,
-                AxisName.NONLINEAR_CONSTRAINT,
-            ),
-        ),
+        FrameSpec("functions", _VALUE_AXES),
+        FrameSpec("scaled.functions", _VALUE_AXES),
+        FrameSpec("target_objective", (), has_sub_fields=False),
+        FrameSpec("variables", _VARIABLE_AXES, has_sub_fields=False),
+        FrameSpec("scaled.variables", _VARIABLE_AXES, has_sub_fields=False),
+        FrameSpec("evaluations", _VALUE_AXES),
+        FrameSpec("constraint_info", _CONSTRAINT_AXES),
+        FrameSpec("scaled.constraint_info", _CONSTRAINT_AXES),
     ),
     "gradients": (
-        FrameSpec(
-            "gradients",
-            (AxisName.OBJECTIVE, AxisName.NONLINEAR_CONSTRAINT, AxisName.VARIABLE),
-        ),
-        FrameSpec(
-            "evaluations",
-            (AxisName.VARIABLE, AxisName.OBJECTIVE, AxisName.NONLINEAR_CONSTRAINT),
-        ),
+        FrameSpec("gradients", _GRADIENT_AXES),
+        FrameSpec("scaled.gradients", _GRADIENT_AXES),
+        FrameSpec("target_gradient", _VARIABLE_AXES, has_sub_fields=False),
+        FrameSpec("variables", _VARIABLE_AXES, has_sub_fields=False),
+        FrameSpec("scaled.variables", _VARIABLE_AXES, has_sub_fields=False),
+        FrameSpec("perturbed_variables", _VARIABLE_AXES, has_sub_fields=False),
+        FrameSpec("scaled.perturbed_variables", _VARIABLE_AXES, has_sub_fields=False),
+        FrameSpec("evaluations", _VALUE_AXES),
     ),
 }
 """The fields that make up an aggregated frame, and the axes they unstack.
@@ -83,8 +94,17 @@ Fields that are `None` on a given result are skipped.
 """
 
 
+def _resolve_field(results: Results, field_name: str) -> Any | None:  # ruff: ignore[any-type]
+    target: Any = results
+    for part in field_name.split("."):
+        target = getattr(target, part, None)
+        if target is None:
+            return None
+    return target
+
+
 def _get_field_data(
-    result_field: ResultField,
+    result_field: AxisMetadata,
     name: str,
     names: dict[str, tuple[str | int, ...]],
 ) -> FieldData | None:
@@ -116,8 +136,31 @@ def _get_field_data(
     )
 
 
+def _iter_spec_data(
+    results: Results,
+    field_name: str,
+    select: Iterable[str],
+    names: dict[str, tuple[str | int, ...]],
+    *,
+    has_sub_fields: bool,
+) -> Iterator[FieldData]:
+    if has_sub_fields:
+        owner = _resolve_field(results, field_name)
+        assert owner is not None
+        yield from _iter_field_data(owner, select, names)
+        return
+    # The owner of a value field is the result itself, unless the field is
+    # nested, as the scaled fields are.
+    owner_name, _, name = field_name.rpartition(".")
+    owner = results if not owner_name else _resolve_field(results, owner_name)
+    if owner is not None:
+        field_data = _get_field_data(owner, name, names)
+        if field_data is not None:
+            yield field_data
+
+
 def _iter_field_data(
-    result_field: ResultField,
+    result_field: AxisMetadata,
     select: Iterable[str],
     names: dict[str, tuple[str | int, ...]],
 ) -> Iterator[FieldData]:

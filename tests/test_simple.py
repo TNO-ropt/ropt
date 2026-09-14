@@ -487,7 +487,7 @@ def test_evaluate_single_vector(config: Any, test_functions: Any) -> None:
     assert result.objectives.shape == (1,)
     assert result.constraints is None
     assert result.results is not None
-    assert result.results.evaluations.variables.shape == (initial_values.size,)
+    assert result.results.variables.shape == (initial_values.size,)
 
 
 def test_evaluate_reports_the_evaluated_point(config: Any, test_functions: Any) -> None:

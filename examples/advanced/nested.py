@@ -103,8 +103,8 @@ def report(event: EnOptEvent) -> None:
     for item in event.results:
         if isinstance(item, FunctionResults) and item.functions is not None:
             print(f"batch: {item.batch_id}")
-            print(f"  variables: {item.evaluations.variables}")
-            print(f"  objective: {item.functions.target_objective}\n")
+            print(f"  variables: {item.variables}")
+            print(f"  objective: {item.target_objective}\n")
 
 
 def main() -> None:
@@ -145,7 +145,7 @@ def main() -> None:
         assert inner_result is not None
         assert inner_result.functions is not None
         return EvaluationFunctionResult(
-            objectives=np.array(inner_result.functions.target_objective)
+            objectives=np.array(inner_result.target_objective)
         )
 
     # Outer evaluator: caches the (discrete) variable combinations seen so the
@@ -165,10 +165,10 @@ def main() -> None:
     assert optimal_result is not None
     assert optimal_result.functions is not None
     print(f"Optimal batch: {optimal_result.batch_id}")
-    print(f"Optimal variables: {optimal_result.evaluations.variables}")
-    print(f"Optimal objective: {optimal_result.functions.target_objective}\n")
-    assert np.allclose(optimal_result.functions.target_objective, 0, atol=1e-1)
-    assert np.allclose(optimal_result.evaluations.variables, [1, 2, 3, 4], atol=1e-1)
+    print(f"Optimal variables: {optimal_result.variables}")
+    print(f"Optimal objective: {optimal_result.target_objective}\n")
+    assert np.allclose(optimal_result.target_objective, 0, atol=1e-1)
+    assert np.allclose(optimal_result.variables, [1, 2, 3, 4], atol=1e-1)
 
 
 if __name__ == "__main__":

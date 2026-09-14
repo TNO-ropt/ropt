@@ -164,10 +164,11 @@ def _build_run_result(
             constraints=None,
             results=None,
         )
+    assert results.target_objective is not None
     return OptimizeResult(
         exit_code=exit_code,
-        variables=results.evaluations.variables,
-        target_objective=float(results.functions.target_objective),
+        variables=results.variables,
+        target_objective=float(results.target_objective),
         objectives=results.functions.objectives,
         constraints=results.functions.constraints,
         results=results,

@@ -7,7 +7,13 @@ from typing import TYPE_CHECKING, Literal
 
 from ropt.exceptions import UnsupportedError
 
-from ._frame_core import FRAME_SPECS, _get_select, _get_value, _has_results
+from ._frame_core import (
+    FRAME_SPECS,
+    _get_select,
+    _get_value,
+    _has_results,
+    _resolve_field,
+)
 from ._frame_support import HAVE_PANDAS, missing_engine_message
 from ._function_results import FunctionResults
 from ._gradient_results import GradientResults
@@ -17,8 +23,12 @@ if TYPE_CHECKING:
 
     from ropt.results import Results
 
+    from ._frame_core import FrameSpec
+
 if HAVE_PANDAS:
     import pandas as pd
+
+    from ._pandas import _to_pandas_frame
 
 
 def _get_results(
@@ -31,24 +41,45 @@ def _get_results(
 
     return _join_frames(
         *(
-            results.to_pandas(
-                spec.field,
-                select=_get_select(spec.field, sub_fields),
-                unstack=spec.unstack,
-            ).rename(columns=partial(_add_prefix, prefix=spec.field))
+            _spec_frame(results, spec, sub_fields)
             for spec in FRAME_SPECS[result_type]
-            if getattr(results, spec.field, None) is not None
+            if _resolve_field(results, spec.field) is not None
+            and (spec.has_sub_fields or spec.field in sub_fields)
         )
     )
+
+
+def _spec_frame(
+    results: Results, spec: FrameSpec, sub_fields: set[str]
+) -> pd.DataFrame:
+    if spec.has_sub_fields:
+        select = _get_select(spec.field, sub_fields)
+        prefix = spec.field
+    else:
+        select = []
+        prefix = spec.field.rpartition(".")[0]
+    frame = _to_pandas_frame(
+        results,
+        spec.field,
+        select,
+        spec.unstack,
+        has_sub_fields=spec.has_sub_fields,
+    )
+    if prefix:
+        frame = frame.rename(columns=partial(_add_prefix, prefix=prefix))
+    return frame
 
 
 def _join_frames(*args: pd.DataFrame) -> pd.DataFrame:
     frames = [frame for frame in args if not frame.empty]
     if not frames:
         return pd.DataFrame()
-    return (
-        frames[0].join(list(frames[1:]), how="outer") if len(frames) > 1 else frames[0]
-    )
+    # Folding pairwise lets pandas align a coarse index against a finer one and
+    # broadcast; joining the whole list at once cannot, and raises instead.
+    joined_frame = frames[0]
+    for frame in frames[1:]:
+        joined_frame = joined_frame.join(frame, how="outer")
+    return joined_frame
 
 
 def _add_prefix(name: tuple[str, ...] | str, prefix: str) -> tuple[str, ...] | str:

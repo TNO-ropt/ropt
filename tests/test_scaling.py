@@ -7,6 +7,7 @@ is separate, set per objective by `maximize`, and applied to aggregated
 objectives alone.
 """
 
+from dataclasses import fields
 from typing import Any
 
 import numpy as np
@@ -22,13 +23,13 @@ from ropt.evaluation import EvaluationBatchContext, EvaluationBatchResult
 from ropt.events import EnOptEvent
 from ropt.results import (
     ConstraintInfo,
-    FunctionEvaluations,
     FunctionResults,
     Functions,
     GradientResults,
     Gradients,
-    Realizations,
     Results,
+    ScaledFunctionResults,
+    ScaledGradientResults,
 )
 from ropt.simple import optimize
 
@@ -37,41 +38,15 @@ def _context(**fields: Any) -> EnOptContext:
     return EnOptContext.model_validate({"variables": {"variable_count": 2}} | fields)
 
 
-def _function_results(
-    objectives: NDArray[np.float64] | None = None,
-    constraints: NDArray[np.float64] | None = None,
-    functions: Functions | None = None,
-    constraint_info: ConstraintInfo | None = None,
-) -> FunctionResults:
-    return FunctionResults(
-        batch_id=0,
-        metadata={},
-        names={},
-        evaluations=FunctionEvaluations(
-            variables=np.zeros(2),
-            objectives=np.zeros((1, 2)) if objectives is None else objectives,
-            constraints=constraints,
-        ),
-        realizations=Realizations(evaluated_realizations=np.array([True])),
-        functions=functions,
-        constraint_info=constraint_info,
-    )
-
-
-def test_per_realization_objectives_are_not_scaled() -> None:
-    context = _context(objectives={"weights": [0.5, 0.5], "scales": [2.0, 4.0]})
-    results = _function_results(objectives=np.array([[3.0, 5.0]]))
-    unscaled = results.unscale(context)
-    # Scales apply to the aggregate, so these are what the evaluator returned.
-    assert np.allclose(unscaled.evaluations.objectives, [[3.0, 5.0]])
-
-
-def test_per_realization_objectives_are_never_flipped() -> None:
-    context = _context(objectives={"weights": [0.5, 0.5], "maximize": True})
-    results = _function_results(objectives=np.array([[3.0, 5.0]]))
-    unscaled = results.unscale(context)
-    # Direction applies to aggregates only.
-    assert np.allclose(unscaled.evaluations.objectives, [[3.0, 5.0]])
+def test_the_scaled_bundle_mirrors_the_fields_with_two_domains() -> None:
+    # Every member of a scaled bundle names a field of the result itself; the
+    # per-realization values and the target have a single domain and no mirror.
+    assert {field.name for field in fields(ScaledFunctionResults)} <= {
+        field.name for field in fields(FunctionResults)
+    }
+    assert {field.name for field in fields(ScaledGradientResults)} <= {
+        field.name for field in fields(GradientResults)
+    }
 
 
 def test_objective_offsets_are_undone_when_reporting() -> None:
@@ -82,14 +57,11 @@ def test_objective_offsets_are_undone_when_reporting() -> None:
             "offsets": [1.0, 3.0],
         }
     )
-    results = _function_results(
-        functions=Functions.create(
-            target_objective=np.array(0.0), objectives=np.array([1.0, 2.0])
-        )
+    functions = Functions.from_scaled(
+        context,
+        Functions(objectives=np.array([1.0, 2.0])),
     )
-    unscaled = results.unscale(context)
-    assert unscaled.functions is not None
-    assert np.allclose(unscaled.functions.objectives, [3.0, 11.0])
+    assert np.allclose(functions.objectives, [3.0, 11.0])
 
 
 def test_constraint_offsets_cancel_in_the_residuals() -> None:
@@ -111,20 +83,6 @@ def test_constraint_offsets_cancel_in_the_residuals() -> None:
         return value - lower[0], upper[0] - value
 
     assert np.allclose(residuals(0.0), residuals(10.0))
-
-
-def test_per_realization_constraints_are_not_scaled() -> None:
-    context = _context(
-        nonlinear_constraints={
-            "lower_bounds": [0.0, 0.0],
-            "upper_bounds": [1.0, 1.0],
-            "scales": [2.0, 4.0],
-        }
-    )
-    results = _function_results(constraints=np.array([[3.0, 5.0]]))
-    unscaled = results.unscale(context)
-    assert unscaled.evaluations.constraints is not None
-    assert np.allclose(unscaled.evaluations.constraints, [[3.0, 5.0]])
 
 
 def test_constraint_bounds_keep_their_order_when_scaled() -> None:
@@ -151,18 +109,17 @@ def test_constraint_diffs_are_scaled_back() -> None:
             "scales": [2.0, 4.0],
         }
     )
-    results = _function_results(
-        constraint_info=ConstraintInfo(
+    constraint_info = ConstraintInfo.from_scaled(
+        context,
+        ConstraintInfo(
             nonlinear_lower=np.array([0.25, 0.5]),
             nonlinear_upper=np.array([-0.25, -0.5]),
-        )
+        ),
     )
-    unscaled = results.unscale(context)
-    assert unscaled.constraint_info is not None
-    assert unscaled.constraint_info.nonlinear_lower is not None
-    assert unscaled.constraint_info.nonlinear_upper is not None
-    assert np.allclose(unscaled.constraint_info.nonlinear_lower, [0.5, 2.0])
-    assert np.allclose(unscaled.constraint_info.nonlinear_upper, [-0.5, -2.0])
+    assert constraint_info.nonlinear_lower is not None
+    assert constraint_info.nonlinear_upper is not None
+    assert np.allclose(constraint_info.nonlinear_lower, [0.5, 2.0])
+    assert np.allclose(constraint_info.nonlinear_upper, [-0.5, -2.0])
 
 
 def test_the_direction_of_an_aggregate_is_undone_when_reporting() -> None:
@@ -173,46 +130,32 @@ def test_the_direction_of_an_aggregate_is_undone_when_reporting() -> None:
             "maximize": [False, True],
         }
     )
-    results = _function_results(
-        functions=Functions(
-            target_objective=np.array(1.0),
-            objectives=np.array([3.0, -5.0]),
-        )
+    functions = Functions.from_scaled(
+        context,
+        Functions(objectives=np.array([3.0, -5.0])),
     )
-    unscaled = results.unscale(context)
-    assert unscaled.functions is not None
     # The maximized objective was negated for the optimizer; reporting it
     # undoes that, so it comes back positive.
-    assert np.allclose(unscaled.functions.objectives, [6.0, 10.0])
+    assert np.allclose(functions.objectives, [6.0, 10.0])
 
 
-def test_the_target_objective_stays_scaled() -> None:
-    context = _context(
-        objectives={"weights": [0.5, 0.5], "scales": [2.0, 2.0], "maximize": True}
-    )
-    results = _function_results(
-        functions=Functions(
-            target_objective=np.array(7.0),
-            objectives=np.array([3.0, 5.0]),
-        )
-    )
-    unscaled = results.unscale(context)
-    assert unscaled.functions is not None
+def test_the_target_is_only_reported_in_the_optimizers_domain() -> None:
     # It mixes objectives of different scales and directions, so there is no
-    # single factor to undo: it is always a value to minimize.
-    assert np.allclose(unscaled.functions.target_objective, 7.0)
+    # single factor to undo: it is always a value to minimize, and it has no
+    # counterpart in the domain the user configured.
+    assert not hasattr(Functions(objectives=np.zeros(2)), "target_objective")
+    assert not hasattr(Gradients(objectives=np.zeros((2, 2))), "target_gradient")
+    assert not hasattr(ScaledFunctionResults(variables=np.zeros(2)), "target_objective")
 
 
 def test_gradients_are_scaled_as_differences() -> None:
     context = _context(objectives={"weights": [0.5, 0.5], "scales": [2.0, 4.0]})
-    gradients = Gradients(
-        target_objective=np.zeros(2),
-        objectives=np.array([[1.0, 2.0], [3.0, 4.0]]),
+    gradients = Gradients.from_scaled(
+        context,
+        Gradients(objectives=np.array([[1.0, 2.0], [3.0, 4.0]])),
     )
-    unscaled = gradients._unscale(context)  # ruff: ignore[private-member-access]
-    assert unscaled is not None
     # Every column of a row is scaled by the scale of that objective.
-    assert np.allclose(unscaled.objectives, [[2.0, 4.0], [12.0, 16.0]])
+    assert np.allclose(gradients.objectives, [[2.0, 4.0], [12.0, 16.0]])
 
 
 def test_gradient_directions_are_undone_when_reporting() -> None:
@@ -223,13 +166,11 @@ def test_gradient_directions_are_undone_when_reporting() -> None:
             "maximize": [False, True],
         }
     )
-    gradients = Gradients(
-        target_objective=np.zeros(2),
-        objectives=np.array([[1.0, 2.0], [3.0, 4.0]]),
+    gradients = Gradients.from_scaled(
+        context,
+        Gradients(objectives=np.array([[1.0, 2.0], [3.0, 4.0]])),
     )
-    unscaled = gradients._unscale(context)  # ruff: ignore[private-member-access]
-    assert unscaled is not None
-    assert np.allclose(unscaled.objectives, [[2.0, 4.0], [-12.0, -16.0]])
+    assert np.allclose(gradients.objectives, [[2.0, 4.0], [-12.0, -16.0]])
 
 
 def test_scales_default_to_one() -> None:
@@ -463,18 +404,17 @@ def test_the_estimated_scales_cannot_be_set_twice() -> None:
         context._set_auto_scales(np.array(2.0), None)  # ruff: ignore[private-member-access]
 
 
-# The invariant that separating scale from direction buys: once unscaled,
-# the reported aggregate equals the aggregate of the reported per-realization
-# values. A negative scale used to break this for a spread, which came back
-# positive while the values it summarized came back negative.
+# The invariant that separating scale from direction buys: the reported
+# aggregate equals the aggregate of the reported per-realization values. A
+# negative scale used to break this for a spread, which came back positive
+# while the values it summarized came back negative.
 
 
 def _run(objectives: dict[str, Any], estimator: str) -> list[Results]:
     collected: list[Results] = []
 
     def collect(event: EnOptEvent) -> None:
-        # Results reach a handler scaled; reporting them is what unscales them.
-        collected.extend(item.unscale(event.context) for item in (event.results or ()))
+        collected.extend(event.results or ())
 
     optimize(
         {
@@ -506,10 +446,12 @@ def _run_and_collect(
     ]
 
 
-def _first_gradient(objectives: dict[str, Any], estimator: str) -> Gradients:
+def _first_target_gradient(
+    objectives: dict[str, Any], estimator: str
+) -> NDArray[np.float64]:
     for item in _run(objectives, estimator):
-        if isinstance(item, GradientResults) and item.gradients is not None:
-            return item.gradients
+        if isinstance(item, GradientResults) and item.target_gradient is not None:
+            return item.target_gradient
     msg = "the run produced no gradients"
     raise AssertionError(msg)
 
@@ -556,33 +498,37 @@ def test_maximizing_negates_what_the_optimizer_minimizes(estimator: str) -> None
     assert minimized
     assert maximized
     for low, high in zip(minimized, maximized, strict=True):
-        assert low.functions is not None
-        assert high.functions is not None
-        # `target_objective` stays scaled, so the flip shows there. A spread flips too, which sign-blind aggregation of
-        # negated inputs would not have achieved.
+        assert low.target_objective is not None
+        assert high.target_objective is not None
+        # `target_objective` lives in the optimizer's domain, so the flip shows
+        # there. A spread flips too, which sign-blind aggregation of negated
+        # inputs would not have achieved.
         assert np.allclose(
-            high.functions.target_objective, -low.functions.target_objective
+            high.target_objective,
+            -low.target_objective,
         )
-        assert low.functions.target_objective > 0.0
+        assert low.target_objective > 0.0
 
 
 @pytest.mark.parametrize("estimator", ["mean", "stddev"])
 def test_maximizing_negates_the_gradient_the_optimizer_follows(estimator: str) -> None:
-    minimized = _first_gradient({"weights": [1.0]}, estimator)
-    maximized = _first_gradient({"weights": [1.0], "maximize": True}, estimator)
-    # `target_objective` is the gradient the optimizer descends, and it stays
-    # scaled, so the flip shows there.
-    assert np.any(np.abs(minimized.target_objective) > 0.0)
-    assert np.allclose(maximized.target_objective, -minimized.target_objective)
+    minimized = _first_target_gradient({"weights": [1.0]}, estimator)
+    maximized = _first_target_gradient({"weights": [1.0], "maximize": True}, estimator)
+    # `target_gradient` is the gradient the optimizer descends, so the flip
+    # shows there.
+    assert np.any(np.abs(minimized) > 0.0)
+    assert np.allclose(maximized, -minimized)
 
 
 @pytest.mark.parametrize("estimator", ["mean", "stddev"])
 def test_an_objective_offset_leaves_the_gradient_alone(estimator: str) -> None:
-    without = _first_gradient({"weights": [1.0]}, estimator)
-    with_offset = _first_gradient({"weights": [1.0], "offsets": [100.0]}, estimator)
+    without = _first_target_gradient({"weights": [1.0]}, estimator)
+    with_offset = _first_target_gradient(
+        {"weights": [1.0], "offsets": [100.0]}, estimator
+    )
     # An offset is a constant, and a constant has no derivative.
-    assert np.any(np.abs(without.target_objective) > 0.0)
-    assert np.allclose(with_offset.target_objective, without.target_objective)
+    assert np.any(np.abs(without) > 0.0)
+    assert np.allclose(with_offset, without)
 
 
 @pytest.mark.parametrize("estimator", ["mean", "stddev"])

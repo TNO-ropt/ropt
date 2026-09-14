@@ -22,19 +22,18 @@ if TYPE_CHECKING:
 class Gradients(ResultField):
     """Aggregated objective and constraint gradients.
 
+    The same class carries both domains: the gradients the optimizer works with
+    are found under `scaled`, differentiated with respect to the scaled
+    variables, the gradients as configured directly on the result.
+
     See [Working with Results](../optimizer_setup/results.md) for usage details.
 
+    There is no target gradient here: the quantity the optimizer descends is a
+    weighted total over objectives that may differ in both scale and direction,
+    so it has no counterpart in the configured domain. It is reported as
+    `target_gradient` on [`GradientResults`][ropt.results.GradientResults].
+
     **Result descriptions**
-
-    === "Weighted Objective Gradient"
-
-        `target_objective`: The gradient of the target objective with
-        respect to each variable:
-
-        - Shape: $(n_v,)$, where:
-            - $n_v$ is the number of variables.
-        - Axis type:
-            - [`AxisName.VARIABLE`][ropt.enums.AxisName.VARIABLE]
 
     === "Objective Gradients"
 
@@ -62,14 +61,10 @@ class Gradients(ResultField):
             - [`AxisName.VARIABLE`][ropt.enums.AxisName.VARIABLE]
 
     Attributes:
-        target_objective: The gradient of the target objective.
-        objectives:       The gradient of each individual objective.
-        constraints:      The gradient of each individual constraint, if present.
+        objectives:  The gradient of each individual objective.
+        constraints: The gradient of each individual constraint, if present.
     """
 
-    target_objective: NDArray[np.float64] = field(
-        metadata={"__axes__": (AxisName.VARIABLE,)},
-    )
     objectives: NDArray[np.float64] = field(
         metadata={
             "__axes__": (
@@ -89,34 +84,20 @@ class Gradients(ResultField):
     )
 
     def __post_init__(self) -> None:
-        self.target_objective = _immutable_copy(self.target_objective)
         self.objectives = _immutable_copy(self.objectives)
         self.constraints = _immutable_copy(self.constraints)
 
     @classmethod
-    def create(
-        cls,
-        target_objective: NDArray[np.float64],
-        objectives: NDArray[np.float64],
-        constraints: NDArray[np.float64] | None = None,
-    ) -> Gradients:
-        """Create a `Gradients` object from pre-aggregated gradient values.
+    def from_scaled(cls, context: EnOptContext, scaled: Gradients) -> Gradients:
+        """Derive the configured gradients from the scaled ones.
 
         Args:
-            target_objective: The gradient of the target objective.
-            objectives:       Objective gradients.
-            constraints:      Constraint gradients.
+            context: The context of the run.
+            scaled:  The gradients as the optimizer sees them.
 
         Returns:
             A new `Gradients` object.
         """
-        return Gradients(
-            target_objective=target_objective,
-            objectives=objectives,
-            constraints=constraints,
-        )
-
-    def _unscale(self, context: EnOptContext) -> Gradients | None:
         # A gradient carries a function in its numerator and a variable in its
         # denominator, so both axes must be undone: the function axis comes
         # first here and takes a trailing axis to broadcast against the
@@ -125,13 +106,13 @@ class Gradients(ResultField):
         objectives = (
             unscale_diff(
                 apply_direction(
-                    self.objectives, context.objectives.maximize[:, np.newaxis]
+                    scaled.objectives, context.objectives.maximize[:, np.newaxis]
                 ),
                 context.get_objective_scales()[:, np.newaxis],
             )
             / variable_scales
         )
-        constraints = self.constraints
+        constraints = scaled.constraints
         if constraints is not None:
             constraint_scales = context.get_constraint_scales()
             assert constraint_scales is not None
@@ -139,9 +120,4 @@ class Gradients(ResultField):
                 unscale_diff(constraints, constraint_scales[:, np.newaxis])
                 / variable_scales
             )
-
-        return Gradients(
-            target_objective=self.target_objective,
-            objectives=objectives,
-            constraints=constraints,
-        )
+        return Gradients(objectives=objectives, constraints=constraints)

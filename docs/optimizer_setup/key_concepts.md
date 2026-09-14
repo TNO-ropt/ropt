@@ -147,8 +147,8 @@ optimization as implemented by `ropt`.
     [`scales` and `offsets`](configuration.md#variable-scales); aggregated
     objectives and nonlinear constraints by the affine map given by their
     [`scales`](configuration.md#objective-scales) and
-    [`offsets`](configuration.md#objective-offsets). Results are unscaled before
-    being reported, unless stated otherwise.
+    [`offsets`](configuration.md#objective-offsets). Results carry both domains:
+    a field and its `scaled` counterpart sit at the same path.
 
 ## Where to next
 

@@ -3,7 +3,6 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any
 
-from ropt._scaling import unscale_value
 from ropt.enums import AxisName
 
 from ._result_field import ResultField
@@ -12,8 +11,6 @@ from ._utils import _immutable_copy
 if TYPE_CHECKING:
     import numpy as np
     from numpy.typing import NDArray
-
-    from ropt.context import EnOptContext
 
 
 @dataclass(slots=True)
@@ -84,17 +81,11 @@ class FunctionEvaluations(ResultField):
         objects.
 
     Attributes:
-        variables:   The variable vector.
         objectives:  The objective function values for each realization.
         constraints: The constraint function values for each realization.
         metadata:    Optional metadata for each evaluated realization.
     """
 
-    variables: NDArray[np.float64] = field(
-        metadata={
-            "__axes__": (AxisName.VARIABLE,),
-        },
-    )
     objectives: NDArray[np.float64] = field(
         metadata={
             "__axes__": (
@@ -120,14 +111,12 @@ class FunctionEvaluations(ResultField):
     )
 
     def __post_init__(self) -> None:
-        self.variables = _immutable_copy(self.variables)
         self.objectives = _immutable_copy(self.objectives)
         self.constraints = _immutable_copy(self.constraints)
 
     @classmethod
     def create(
         cls,
-        variables: NDArray[np.float64],
         objectives: NDArray[np.float64],
         constraints: NDArray[np.float64] | None = None,
         metadata: dict[str, NDArray[Any]] | None = None,
@@ -135,7 +124,6 @@ class FunctionEvaluations(ResultField):
         """Create a `FunctionEvaluations` object with the given data.
 
         Args:
-            variables:       The unperturbed variable vector.
             objectives:      The objective functions for each realization.
             constraints:     The constraint functions for each realization.
             metadata: Optional info for each evaluation.
@@ -144,19 +132,7 @@ class FunctionEvaluations(ResultField):
             A new FunctionEvaluations object.
         """
         return FunctionEvaluations(
-            variables=variables,
             objectives=objectives,
             constraints=constraints,
             metadata={} if metadata is None else metadata,
-        )
-
-    def _unscale(self, context: EnOptContext) -> FunctionEvaluations:
-        variables = unscale_value(
-            self.variables, context.variables.scales, context.variables.offsets
-        )
-        return FunctionEvaluations(
-            variables=variables,
-            objectives=self.objectives,
-            constraints=self.constraints,
-            metadata=self.metadata,
         )

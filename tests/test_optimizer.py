@@ -239,13 +239,12 @@ def test_objective_with_scales(
         for item in results:
             if isinstance(item, FunctionResults) and not checked:
                 checked = True
+                assert item.scaled.functions is not None
+                assert item.scaled.functions.objectives is not None
+                assert np.allclose(item.scaled.functions.objectives[-1], 1.0)
                 assert item.functions is not None
                 assert item.functions.objectives is not None
-                assert np.allclose(item.functions.objectives[-1], 1.0)
-                unscaled = item.unscale(event.context)
-                assert unscaled.functions is not None
-                assert unscaled.functions.objectives is not None
-                assert np.allclose(unscaled.functions.objectives[-1], init1)
+                assert np.allclose(item.functions.objectives[-1], init1)
 
     result2 = optimize(
         config,
@@ -303,14 +302,13 @@ def test_objective_with_auto_scale(
             if isinstance(item, FunctionResults) and not checked:
                 checked = True
                 assert np.allclose(event.context.get_objective_scales(), scale)
+                assert item.scaled.functions is not None
+                assert item.scaled.functions.objectives is not None
+                assert np.allclose(item.scaled.functions.objectives, initial / scale)
+                assert np.allclose(item.target_objective, 1.0)
                 assert item.functions is not None
                 assert item.functions.objectives is not None
-                assert np.allclose(item.functions.objectives, initial / scale)
-                assert np.allclose(item.functions.target_objective, 1.0)
-                unscaled = item.unscale(event.context)
-                assert unscaled.functions is not None
-                assert unscaled.functions.objectives is not None
-                assert np.allclose(unscaled.functions.objectives, initial)
+                assert np.allclose(item.functions.objectives, initial)
 
     result2 = optimize(
         config,
@@ -375,13 +373,12 @@ def test_nonlinear_constraint_with_scales(
         for item in results:
             if isinstance(item, FunctionResults) and check:
                 check = False
+                assert item.scaled.functions is not None
+                assert item.scaled.functions.constraints is not None
+                assert np.allclose(item.scaled.functions.constraints, 1.0)
                 assert item.functions is not None
                 assert item.functions.constraints is not None
-                assert np.allclose(item.functions.constraints, 1.0)
-                unscaled = item.unscale(event.context)
-                assert unscaled.functions is not None
-                assert unscaled.functions.constraints is not None
-                assert np.allclose(unscaled.functions.constraints, scales)
+                assert np.allclose(item.functions.constraints, scales)
 
     result2 = optimize(
         config,
@@ -454,13 +451,12 @@ def test_nonlinear_constraint_with_auto_scale(
                 bounds = context.get_nonlinear_constraint_bounds()
                 assert bounds is not None
                 assert np.allclose(bounds[1], 0.4 / scales)
+                assert item.scaled.functions is not None
+                assert item.scaled.functions.constraints is not None
+                assert np.allclose(item.scaled.functions.constraints, 1.0)
                 assert item.functions is not None
                 assert item.functions.constraints is not None
-                assert np.allclose(item.functions.constraints, 1.0)
-                unscaled = item.unscale(event.context)
-                assert unscaled.functions is not None
-                assert unscaled.functions.constraints is not None
-                assert np.allclose(unscaled.functions.constraints, scales)
+                assert np.allclose(item.functions.constraints, scales)
 
     result2 = optimize(
         config,
@@ -639,9 +635,9 @@ def test_optimizer_variables_subset(config: Any, eval_func: Any, external: str) 
     def assert_gradient(event: EnOptEvent) -> None:
         for item in event.results:
             if isinstance(item, GradientResults):
-                assert item.gradients is not None
-                assert item.gradients.target_objective[1] == 0.0
-                assert np.all(item.gradients.objectives[:, 1] == 0.0)
+                assert item.scaled.gradients is not None
+                assert item.target_gradient[1] == 0.0
+                assert np.all(item.scaled.gradients.objectives[:, 1] == 0.0)
 
     result = optimize(
         config,

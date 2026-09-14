@@ -148,8 +148,8 @@ def main() -> None:
             "metadata.outer_batch": "Outer-batch",
             "metadata.outer_eval": "Outer-eval",
             "batch_id": "Inner-batch",
-            "functions.target_objective": "Objective",
-            "evaluations.variables": "Variable",
+            "target_objective": "Objective",
+            "variables": "Variable",
         },
     )
 

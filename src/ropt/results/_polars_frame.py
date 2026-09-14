@@ -6,7 +6,13 @@ from typing import TYPE_CHECKING, Literal
 
 from ropt.exceptions import UnsupportedError
 
-from ._frame_core import FRAME_SPECS, _get_select, _get_value, _has_results
+from ._frame_core import (
+    FRAME_SPECS,
+    _get_select,
+    _get_value,
+    _has_results,
+    _resolve_field,
+)
 from ._frame_support import HAVE_POLARS, missing_engine_message
 from ._function_results import FunctionResults
 from ._gradient_results import GradientResults
@@ -34,16 +40,25 @@ def _get_results(
     frames: list[pl.DataFrame] = []
     keys: list[str] = []
     for spec in FRAME_SPECS[result_type]:
-        if getattr(results, spec.field, None) is None:
+        if _resolve_field(results, spec.field) is None:
             continue
+        if spec.has_sub_fields:
+            select = _get_select(spec.field, sub_fields)
+            prefix = spec.field
+        else:
+            if spec.field not in sub_fields:
+                continue
+            select = []
+            prefix = spec.field.rpartition(".")[0]
         frame, key_columns = _to_polars_frame(
             results,
             spec.field,
-            _get_select(spec.field, sub_fields),
+            select,
             spec.unstack,
             sep,
+            has_sub_fields=spec.has_sub_fields,
         )
-        frames.append(_add_prefix(frame, key_columns, spec.field))
+        frames.append(frame if not prefix else _add_prefix(frame, key_columns, prefix))
         keys += [column for column in key_columns if column not in keys]
     return _join_frames(frames, keys)
 

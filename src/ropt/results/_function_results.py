@@ -1,12 +1,17 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, TypeVar
 
+from ropt.enums import AxisName
+
+from ._result_field import ResultField
 from ._results import Results
+from ._utils import _immutable_copy
 
 if TYPE_CHECKING:
-    from ropt.context import EnOptContext
+    import numpy as np
+    from numpy.typing import NDArray
 
     from ._constraint_info import ConstraintInfo
     from ._function_evaluations import FunctionEvaluations
@@ -18,57 +23,62 @@ TypeResults = TypeVar("TypeResults", bound="Results")
 
 
 @dataclass(slots=True)
+class ScaledFunctionResults(ResultField):
+    """The scaled counterpart of the fields that have two domains.
+
+    Each field mirrors the field of the same name on
+    [`FunctionResults`][ropt.results.FunctionResults], expressed in the domain
+    the optimizer works in.
+
+    Attributes:
+        variables:       The variable vector the optimizer proposed.
+        functions:       Scaled aggregates, or `None` if all realizations failed.
+        constraint_info: Constraint differences in the optimizer's domain.
+    """
+
+    variables: NDArray[np.float64] = field(
+        metadata={"__axes__": (AxisName.VARIABLE,)},
+    )
+    functions: Functions | None = None
+    constraint_info: ConstraintInfo | None = None
+
+    def __post_init__(self) -> None:
+        self.variables = _immutable_copy(self.variables)
+
+
+@dataclass(slots=True)
 class FunctionResults(Results):
     """Results of a function evaluation batch.
+
+    Fields that have two domains appear twice: once here, in the domain that was
+    configured, and once under `scaled`, in the domain the optimizer works in.
+    The `target_objective` is the exception. It is a weighted total over
+    objectives that may differ in both scale and direction, so it exists only in
+    the optimizer's domain and has no scaled counterpart.
 
     See [Working with Results](../optimizer_setup/results.md) for usage details.
 
     Attributes:
-        evaluations:     Per-realization evaluation data.
-        realizations:    Realization activity and weights.
-        functions:       Aggregated function values, or `None` if all failed.
-        constraint_info: Constraint differences and violations, if applicable.
+        variables:        The variable vector that was evaluated.
+        evaluations:      Per-realization values returned by the evaluator.
+        realizations:     Realization activity and weights.
+        functions:        Aggregated function values, or `None` if all failed.
+        target_objective: The value the optimizer minimizes, in its own domain.
+        scaled:           The same quantities as the optimizer works with them.
+        constraint_info:  Constraint differences and violations, if applicable.
     """
 
+    variables: NDArray[np.float64] = field(
+        metadata={"__axes__": (AxisName.VARIABLE,)},
+    )
     evaluations: FunctionEvaluations
     realizations: Realizations
     functions: Functions | None
+    target_objective: NDArray[np.float64] | None
+    scaled: ScaledFunctionResults
     constraint_info: ConstraintInfo | None = None
 
-    def unscale(self, context: EnOptContext) -> FunctionResults:
-        """Unscale the results.
-
-        Unscales the sub-fields that carry values (`evaluations`, `functions`,
-        and `constraint_info` when present). Realization metadata is passed
-        through unchanged.
-
-        Args:
-            context: The context used by the source of the results.
-
-        Returns:
-            The unscaled results.
-        """
-        evaluations = self.evaluations._unscale(context)  # ruff: ignore[private-member-access]
-        functions: Functions | None = None
-        if self.functions is not None:
-            functions = self.functions._unscale(context)  # ruff: ignore[private-member-access]
-        constraint_info: ConstraintInfo | None = None
-        if self.constraint_info is not None:
-            constraint_info = self.constraint_info._unscale(  # ruff: ignore[private-member-access]
-                context
-            )
-
-        if evaluations is None and functions is None and constraint_info is None:
-            return self
-
-        return FunctionResults(
-            batch_id=self.batch_id,
-            metadata=self.metadata,
-            names=self.names,
-            evaluations=self.evaluations if evaluations is None else evaluations,
-            realizations=self.realizations,
-            functions=self.functions if functions is None else functions,
-            constraint_info=(
-                self.constraint_info if constraint_info is None else constraint_info
-            ),
-        )
+    def __post_init__(self) -> None:
+        self.variables = _immutable_copy(self.variables)
+        self.target_objective = _immutable_copy(self.target_objective)
+        assert (self.target_objective is None) == (self.functions is None)

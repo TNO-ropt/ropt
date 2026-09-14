@@ -73,15 +73,16 @@ class OptimizeResult(EvaluateResult):
 def _build_evaluate_result(result: FunctionResults) -> EvaluateResult:
     if result.functions is None:
         return EvaluateResult(
-            variables=result.evaluations.variables,
+            variables=result.variables,
             target_objective=None,
             objectives=None,
             constraints=None,
             results=result,
         )
+    assert result.target_objective is not None
     return EvaluateResult(
-        variables=result.evaluations.variables,
-        target_objective=float(result.functions.target_objective),
+        variables=result.variables,
+        target_objective=float(result.target_objective),
         objectives=result.functions.objectives,
         constraints=result.functions.constraints,
         results=result,

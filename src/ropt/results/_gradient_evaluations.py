@@ -3,7 +3,6 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any
 
-from ropt._scaling import unscale_value
 from ropt.enums import AxisName
 
 from ._result_field import ResultField
@@ -12,8 +11,6 @@ from ._utils import _immutable_copy
 if TYPE_CHECKING:
     import numpy as np
     from numpy.typing import NDArray
-
-    from ropt.context import EnOptContext
 
 
 @dataclass(slots=True)
@@ -100,9 +97,6 @@ class GradientEvaluations(ResultField):
         objects.
 
     Attributes:
-        variables:             The unperturbed variable vector.
-        perturbed_variables:   The perturbed variable values for each
-                               realization and perturbation.
         perturbed_objectives:  The objective function values for each
                                realization and perturbation.
         perturbed_constraints: The constraint function values for each
@@ -111,20 +105,6 @@ class GradientEvaluations(ResultField):
                                realization and perturbation.
     """
 
-    variables: NDArray[np.float64] = field(
-        metadata={
-            "__axes__": (AxisName.VARIABLE,),
-        },
-    )
-    perturbed_variables: NDArray[np.float64] = field(
-        metadata={
-            "__axes__": (
-                AxisName.REALIZATION,
-                AxisName.PERTURBATION,
-                AxisName.VARIABLE,
-            ),
-        },
-    )
     perturbed_objectives: NDArray[np.float64] = field(
         metadata={
             "__axes__": (
@@ -155,16 +135,12 @@ class GradientEvaluations(ResultField):
     )
 
     def __post_init__(self) -> None:
-        self.variables = _immutable_copy(self.variables)
-        self.perturbed_variables = _immutable_copy(self.perturbed_variables)
         self.perturbed_objectives = _immutable_copy(self.perturbed_objectives)
         self.perturbed_constraints = _immutable_copy(self.perturbed_constraints)
 
     @classmethod
     def create(
         cls,
-        variables: NDArray[np.float64],
-        perturbed_variables: NDArray[np.float64],
         perturbed_objectives: NDArray[np.float64],
         perturbed_constraints: NDArray[np.float64] | None = None,
         metadata: dict[str, NDArray[Any]] | None = None,
@@ -172,9 +148,6 @@ class GradientEvaluations(ResultField):
         """Create a `GradientEvaluations` object with the given data.
 
         Args:
-            variables:             The unperturbed variable vector.
-            perturbed_variables:   Perturbed variable values for each
-                                   realization and perturbation.
             perturbed_objectives:  Objective function values for each
                                    realization and perturbation.
             perturbed_constraints: Constraint function values for each
@@ -185,26 +158,7 @@ class GradientEvaluations(ResultField):
             A new `GradientEvaluations` object.
         """
         return GradientEvaluations(
-            variables=variables,
-            perturbed_variables=perturbed_variables,
             perturbed_objectives=perturbed_objectives,
             perturbed_constraints=perturbed_constraints,
             metadata={} if metadata is None else metadata,
-        )
-
-    def _unscale(self, context: EnOptContext) -> GradientEvaluations | None:
-        variables = unscale_value(
-            self.variables, context.variables.scales, context.variables.offsets
-        )
-        perturbed_variables = unscale_value(
-            self.perturbed_variables,
-            context.variables.scales,
-            context.variables.offsets,
-        )
-        return GradientEvaluations(
-            variables=variables,
-            perturbed_variables=perturbed_variables,
-            perturbed_objectives=self.perturbed_objectives,
-            perturbed_constraints=self.perturbed_constraints,
-            metadata=self.metadata,
         )

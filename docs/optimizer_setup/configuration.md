@@ -459,7 +459,7 @@ What you see in the results follows from that:
 - Per-realization values (`evaluations.objectives`) are scaled, never flipped.
 - Combined values (`functions.objectives`) and their gradients are reported with
   the flip undone, so that they agree in sign with the values they summarize.
-- `target_objective` is reported as the optimizer sees it, because it mixes
+- `target_objective` exists only as the optimizer sees it, because it mixes
   objectives of different scales and directions and there is no single factor
   to undo. It is always a value being minimized, which is what lets results be
   compared by "lowest is best".
