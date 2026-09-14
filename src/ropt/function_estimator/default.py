@@ -13,6 +13,7 @@ from ropt.function_estimator import FunctionEstimator
 from ropt.plugins import MethodSpec
 
 _MIN_STDDEV_REALIZATIONS: Final = 2
+_STDDEV_TOLERANCE: Final = 1e-8
 
 DEFAULT_FUNCTION_ESTIMATOR_METHODS = {"default", "mean", "stddev"}
 
@@ -130,9 +131,12 @@ def _calculate_gradient_stddev(
         return np.full(gradient.shape[:-1], np.inf, dtype=np.float64)
     norm, mean, stddev = _mean_stddev(functions, weights)
     mean_gradient = np.dot(gradient, weights)
+    negligible = bool(
+        np.all(stddev <= _STDDEV_TOLERANCE * np.max(np.abs(functions), axis=-1))
+    )
     return (
         np.zeros(mean_gradient.shape, dtype=np.float64)
-        if np.allclose(np.abs(stddev), 0.0)
+        if negligible
         else (
             (norm / stddev)
             * (np.dot(gradient, functions * weights) - mean * mean_gradient)

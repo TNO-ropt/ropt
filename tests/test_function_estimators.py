@@ -165,6 +165,33 @@ def test_stddev_gradient_propagates_an_infinite_realization(
     assert np.all(np.isinf(result))
 
 
+def test_stddev_gradient_guard_is_scale_invariant(
+    estimator_context: EnOptContext,
+) -> None:
+    estimator = _estimator("stddev", estimator_context)
+    # Small enough that an absolute threshold would suppress it.
+    functions = np.array([1.0, 1.0 + 1e-7, 1.0 + 2e-7])
+    gradient = np.array([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
+    scale = 1e6
+
+    unscaled = estimator.calculate_gradient(functions, gradient, _EQUAL_WEIGHTS)
+    scaled = estimator.calculate_gradient(
+        functions / scale, gradient / scale, _EQUAL_WEIGHTS
+    )
+
+    assert not np.allclose(unscaled, 0.0)
+    assert np.allclose(scaled, unscaled / scale, rtol=1e-5)
+
+
+def test_stddev_gradient_is_zero_for_identical_realizations(
+    estimator_context: EnOptContext,
+) -> None:
+    estimator = _estimator("stddev", estimator_context)
+    gradient = np.array([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
+    result = estimator.calculate_gradient(np.zeros(3), gradient, _EQUAL_WEIGHTS)
+    assert not np.any(result)
+
+
 def test_estimators_ignore_an_infinite_value_carrying_no_weight(
     estimator_context: EnOptContext,
 ) -> None:
