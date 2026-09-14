@@ -408,7 +408,35 @@ optimum. Realizations that fail do not contribute.
 
 The estimate is computed once, from the first batch, and then fixed for the rest
 of the run. It *multiplies* `scales` rather than replacing it, so a configured
-scale still applies on top of an estimated one.
+scale still applies on top of an estimated one. An `offsets` entry is subtracted
+before the estimate is taken, so the estimate measures what is left after it.
+
+#### Offsetting objectives { #objective-offsets }
+
+An objective reaches the optimizer as $(f_j - o_j)/s_j$, using the `offsets`
+field, and is reported back to you as $f_j = s_j\,y_j + o_j$. The default is
+zero, which is the identity.
+
+```python
+"objectives": {"weights": [1.0], "scales": [1e5], "offsets": [1e9]}
+```
+
+An offset does not move the optimum and does not change the gradient: it shifts
+the weighted total by a constant. What it changes is the *magnitude* the
+optimizer works with, and that matters when an objective is large but varies
+little. An NPV around $10^9$ that varies by $10^5$ becomes, after dividing by
+$10^9$, a quantity near one that varies by $10^{-4}$ — below the convergence
+tolerance of many methods. Subtracting a baseline of $10^9$ first and then
+dividing by $10^5$ leaves the variation at order one.
+
+Because it changes the value the optimizer tests against its tolerances, an
+offset can change where a run stops, even though it cannot change where the
+optimum is.
+
+An aggregate that is a spread rather than an average has its offset subtracted
+too. A standard deviation is unchanged by shifting the values it summarizes, so
+the offset applies to the aggregate itself; the map is undone on the way out, so
+what you are reported is unaffected.
 
 #### Choosing the direction of an objective { #objective-direction }
 
@@ -555,6 +583,12 @@ independently:
 ```python
 "nonlinear_constraints": {..., "auto_scale": [True, False]}
 ```
+
+Constraints also accept `offsets`, but note what they do not do. The optimizer
+only ever sees the difference between a constraint and its bound, and an offset
+shifts both alike, so it cancels out: the problem that is solved, the reported
+violations, and feasibility are all unaffected. A constraint offset changes only
+the reported constraint value and, where `auto_scale` is set, the estimate.
 
 ### `realizations` — [`RealizationsConfig`][ropt.config.RealizationsConfig] { #realizations }
 
@@ -914,6 +948,7 @@ Expand the block below to see every field and its default value.
         "objectives": {
             "weights": [1.0],                                 # default: single objective, weight 1.0
             "scales": 1.0,                                    # default: no scaling
+            "offsets": 0.0,                                   # default: no offset
             "auto_scale": False,                              # default: do not estimate scales
             "maximize": False,                                # default: minimize
             "realization_filters": None,                       # default: no filter
@@ -983,6 +1018,7 @@ Expand the block below to see every field and its default value.
         "lower_bounds": ...,                      # required: 1D array (one per constraint)
         "upper_bounds": ...,                      # required: 1D array (one per constraint)
         "scales": 1.0,                            # default: no scaling
+        "offsets": 0.0,                           # default: no offset
         "auto_scale": False,                      # default: do not estimate scales
         "realization_filters": None,               # default: no filter
         "function_estimators": 0,                 # default: use first estimator

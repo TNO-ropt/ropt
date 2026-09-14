@@ -196,25 +196,15 @@ class GradientEvaluations(ResultField):
         variables = unscale_value(
             self.variables, context.variables.scales, context.variables.offsets
         )
-        perturbed_variables = self.perturbed_variables
         perturbed_variables = unscale_value(
-            perturbed_variables, context.variables.scales, context.variables.offsets
+            self.perturbed_variables,
+            context.variables.scales,
+            context.variables.offsets,
         )
-        perturbed_objectives = unscale_value(
-            self.perturbed_objectives, context.get_objective_scales()
-        )
-        perturbed_constraints = self.perturbed_constraints
-        if perturbed_constraints is not None:
-            constraint_scales = context.get_constraint_scales()
-            assert constraint_scales is not None
-            perturbed_constraints = unscale_value(
-                perturbed_constraints, constraint_scales
-            )
-
         return GradientEvaluations(
             variables=variables,
             perturbed_variables=perturbed_variables,
-            perturbed_objectives=perturbed_objectives,
-            perturbed_constraints=perturbed_constraints,
+            perturbed_objectives=self.perturbed_objectives,
+            perturbed_constraints=self.perturbed_constraints,
             metadata=self.metadata,
         )

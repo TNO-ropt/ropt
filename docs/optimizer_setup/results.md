@@ -179,14 +179,20 @@ in the "Result descriptions" section of each class in the
 
 Optimization internally works with scaled values: variables are scaled and
 shifted by their
-[`scales` and `offsets`](configuration.md#variable-scales), objectives and
-nonlinear constraints are divided by their
-[scales](configuration.md#objective-scales), and objectives marked
+[`scales` and `offsets`](configuration.md#variable-scales), objective and
+nonlinear constraint *aggregates* have their
+[offsets](configuration.md#objective-offsets) subtracted and are divided by
+their [scales](configuration.md#objective-scales), and objectives marked
 [`maximize`](configuration.md#objective-direction) are negated once they have
 been combined across realizations. Results attached to events are scaled this
 way.
 
-The [`unscale`][ropt.results.Results.unscale] method undoes all of that,
+The per-realization values in `evaluations` are an exception: they are reported
+exactly as the evaluator returned them. Scales apply to the quantities the
+optimizer consumes, and the optimizer never sees a single realization, so there
+is nothing to undo for those fields.
+
+The [`unscale`][ropt.results.Results.unscale] method undoes the rest,
 restoring the quantities as configured.
 
 The `target_objective` field of `Functions` and `Gradients` is an exception: it

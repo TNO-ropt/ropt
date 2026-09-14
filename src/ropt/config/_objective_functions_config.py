@@ -33,6 +33,7 @@ class ObjectiveFunctionsConfig(BaseModel):
     Attributes:
         weights:             Weights for the objective functions (default: 1.0).
         scales:              Scale factors for the objective functions (default: 1.0).
+        offsets:             Offsets for the objective functions (default: 0.0).
         auto_scale:          Estimate additional scales from the first batch.
         maximize:            Which objectives to maximize (default: `False`).
         realization_filters: Realization filter to apply to each objective, by key,
@@ -43,6 +44,7 @@ class ObjectiveFunctionsConfig(BaseModel):
 
     weights: Array1D = np.array(1.0)
     scales: Array1D = np.array(1.0)
+    offsets: Array1D = np.array(0.0)
     auto_scale: bool = False
     maximize: Array1DBool = np.array(0)
     realization_filters: Keys = (None,)
@@ -62,6 +64,7 @@ class ObjectiveFunctionsConfig(BaseModel):
             update={
                 "weights": normalize(self.weights),
                 "scales": check_scales(self.scales, "scales", weights.size),
+                "offsets": broadcast_1d_array(self.offsets, "offsets", weights.size),
                 "maximize": broadcast_1d_array(self.maximize, "maximize", weights.size),
                 "realization_filters": broadcast_keys(
                     self.realization_filters, "realization_filters", weights.size

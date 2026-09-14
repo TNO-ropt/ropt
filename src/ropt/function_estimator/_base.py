@@ -65,6 +65,10 @@ class FunctionEstimator(ABC):
     ) -> NDArray[np.float64]:
         """Aggregate function values across realizations.
 
+        The values arrive as the evaluator returned them. Scales are applied to
+        the aggregate this method produces, so an implementation does not need
+        to account for them.
+
         Args:
             functions: Shape `(n_realizations,)` — per-realization values.
             weights:   Shape `(n_realizations,)` — realization weights.

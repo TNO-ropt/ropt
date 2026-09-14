@@ -1,9 +1,10 @@
 """Tests for the scaling and direction of objectives and constraints.
 
-Objectives and constraints are divided by their scale before they reach the
-optimizer and multiplied by it again before they are reported. Scales are
-positive: a scale is a change of units only. Direction is separate, set per
-objective by `maximize`, and applied to aggregated objectives alone.
+Objectives and constraints have their offset subtracted and are then divided by
+their scale before they reach the optimizer, and the map is undone before they
+are reported. Scales are positive: a scale is a change of units only. Direction
+is separate, set per objective by `maximize`, and applied to aggregated
+objectives alone.
 """
 
 from typing import Any
@@ -57,24 +58,62 @@ def _function_results(
     )
 
 
-def test_objective_scales_are_undone_when_reporting() -> None:
+def test_per_realization_objectives_are_not_scaled() -> None:
     context = _context(objectives={"weights": [0.5, 0.5], "scales": [2.0, 4.0]})
     results = _function_results(objectives=np.array([[3.0, 5.0]]))
     unscaled = results.unscale(context)
-    assert np.allclose(unscaled.evaluations.objectives, [[6.0, 20.0]])
+    # Scales apply to the aggregate, so these are what the evaluator returned.
+    assert np.allclose(unscaled.evaluations.objectives, [[3.0, 5.0]])
 
 
 def test_per_realization_objectives_are_never_flipped() -> None:
-    context = _context(
-        objectives={"weights": [0.5, 0.5], "scales": [2.0, 4.0], "maximize": True}
-    )
+    context = _context(objectives={"weights": [0.5, 0.5], "maximize": True})
     results = _function_results(objectives=np.array([[3.0, 5.0]]))
     unscaled = results.unscale(context)
-    # Direction applies to aggregates only, so these are scaled and nothing else.
-    assert np.allclose(unscaled.evaluations.objectives, [[6.0, 20.0]])
+    # Direction applies to aggregates only.
+    assert np.allclose(unscaled.evaluations.objectives, [[3.0, 5.0]])
 
 
-def test_constraint_scales_are_undone_when_reporting() -> None:
+def test_objective_offsets_are_undone_when_reporting() -> None:
+    context = _context(
+        objectives={
+            "weights": [0.5, 0.5],
+            "scales": [2.0, 4.0],
+            "offsets": [1.0, 3.0],
+        }
+    )
+    results = _function_results(
+        functions=Functions.create(
+            target_objective=np.array(0.0), objectives=np.array([1.0, 2.0])
+        )
+    )
+    unscaled = results.unscale(context)
+    assert unscaled.functions is not None
+    assert np.allclose(unscaled.functions.objectives, [3.0, 11.0])
+
+
+def test_constraint_offsets_cancel_in_the_residuals() -> None:
+    # The optimizer only ever sees the difference between a constraint and its
+    # bound, and an offset shifts both alike.
+    def residuals(offset: float) -> tuple[np.float64, np.float64]:
+        context = _context(
+            nonlinear_constraints={
+                "lower_bounds": [1.0],
+                "upper_bounds": [4.0],
+                "scales": [2.0],
+                "offsets": [offset],
+            }
+        )
+        bounds = context.get_nonlinear_constraint_bounds()
+        assert bounds is not None
+        lower, upper = bounds
+        value = (3.0 - offset) / 2.0
+        return value - lower[0], upper[0] - value
+
+    assert np.allclose(residuals(0.0), residuals(10.0))
+
+
+def test_per_realization_constraints_are_not_scaled() -> None:
     context = _context(
         nonlinear_constraints={
             "lower_bounds": [0.0, 0.0],
@@ -85,7 +124,7 @@ def test_constraint_scales_are_undone_when_reporting() -> None:
     results = _function_results(constraints=np.array([[3.0, 5.0]]))
     unscaled = results.unscale(context)
     assert unscaled.evaluations.constraints is not None
-    assert np.allclose(unscaled.evaluations.constraints, [[6.0, 20.0]])
+    assert np.allclose(unscaled.evaluations.constraints, [[3.0, 5.0]])
 
 
 def test_constraint_bounds_keep_their_order_when_scaled() -> None:
@@ -241,6 +280,15 @@ def test_auto_scale_uses_a_single_factor_for_all_objectives() -> None:
     _estimate(context, np.array([[2.0, 6.0], [2.0, 6.0]]))
     # A single factor, the weighted total: 0.25 * 2 + 0.75 * 6.
     assert np.allclose(context.get_objective_scales(), 5.0)
+
+
+def test_auto_scale_subtracts_the_offset_from_the_estimate() -> None:
+    context = _auto_scale_context(
+        objectives={"weights": [1.0], "offsets": [3.0], "auto_scale": True}
+    )
+    _estimate(context, np.array([[5.0], [5.0]]))
+    # The offset is subtracted before the scale divides, so |5 - 3|, not |5|.
+    assert np.allclose(context.get_objective_scales(), 2.0)
 
 
 def test_auto_scale_preserves_the_relative_size_of_the_objectives() -> None:
@@ -526,3 +574,25 @@ def test_maximizing_negates_the_gradient_the_optimizer_follows(estimator: str) -
     # scaled, so the flip shows there.
     assert np.any(np.abs(minimized.target_objective) > 0.0)
     assert np.allclose(maximized.target_objective, -minimized.target_objective)
+
+
+@pytest.mark.parametrize("estimator", ["mean", "stddev"])
+def test_an_objective_offset_leaves_the_gradient_alone(estimator: str) -> None:
+    without = _first_gradient({"weights": [1.0]}, estimator)
+    with_offset = _first_gradient({"weights": [1.0], "offsets": [100.0]}, estimator)
+    # An offset is a constant, and a constant has no derivative.
+    assert np.any(np.abs(without.target_objective) > 0.0)
+    assert np.allclose(with_offset.target_objective, without.target_objective)
+
+
+@pytest.mark.parametrize("estimator", ["mean", "stddev"])
+def test_an_objective_offset_is_undone_before_it_is_reported(estimator: str) -> None:
+    without = _run_and_collect({"weights": [1.0]}, estimator)
+    with_offset = _run_and_collect({"weights": [1.0], "offsets": [100.0]}, estimator)
+    assert without
+    for plain, offset in zip(without, with_offset, strict=True):
+        assert plain.functions is not None
+        assert offset.functions is not None
+        # True for a spread as well, which is invariant under a shift of its
+        # inputs: the offset applies to the aggregate, so it comes back off it.
+        assert np.allclose(plain.functions.objectives, offset.functions.objectives)

@@ -5,8 +5,13 @@ it on the way back. Scales are positive, so the map preserves order and sign;
 whether an objective is minimized or maximized is a separate setting, applied to
 aggregated objectives only.
 
-Variables also carry an offset, so the map is affine rather than a pure
-change of units. That is why two kinds of quantity unscale separately:
+Objectives and nonlinear constraints are transformed where the optimizer
+consumes them, which is after the realizations have been aggregated.
+Per-realization values are never transformed.
+
+Variables, objectives and nonlinear constraints all carry an offset as well, so
+the map is affine rather than a pure change of units. That is why two kinds of
+quantity unscale separately:
 
 - A *value* is a quantity in its own right, such as a variable or an
   objective. The offset applies to it.

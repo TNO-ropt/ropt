@@ -154,16 +154,9 @@ class FunctionEvaluations(ResultField):
         variables = unscale_value(
             self.variables, context.variables.scales, context.variables.offsets
         )
-        objectives = unscale_value(self.objectives, context.get_objective_scales())
-        constraints = self.constraints
-        if constraints is not None:
-            constraint_scales = context.get_constraint_scales()
-            assert constraint_scales is not None
-            constraints = unscale_value(constraints, constraint_scales)
-
         return FunctionEvaluations(
             variables=variables,
-            objectives=objectives,
-            constraints=constraints,
+            objectives=self.objectives,
+            constraints=self.constraints,
             metadata=self.metadata,
         )

@@ -144,9 +144,10 @@ optimization as implemented by `ropt`.
 **Scaling**
 :   The units the optimizer works in, as opposed to the ones you configure the
     problem in. Variables are scaled by the affine map given by their
-    [`scales` and `offsets`](configuration.md#variable-scales); objectives and
-    nonlinear constraints are divided by their
-    [`scales`](configuration.md#objective-scales). Results are unscaled before
+    [`scales` and `offsets`](configuration.md#variable-scales); aggregated
+    objectives and nonlinear constraints by the affine map given by their
+    [`scales`](configuration.md#objective-scales) and
+    [`offsets`](configuration.md#objective-offsets). Results are unscaled before
     being reported, unless stated otherwise.
 
 ## Where to next

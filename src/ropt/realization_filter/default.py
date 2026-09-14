@@ -6,6 +6,7 @@ import numpy as np
 from numpy.typing import NDArray
 from pydantic import BaseModel, ConfigDict, Field, NonNegativeInt
 
+from ropt._scaling import scale
 from ropt._utils import apply_direction, zero_failures
 from ropt.config import RealizationFilterConfig
 from ropt.context import EnOptContext
@@ -116,13 +117,10 @@ class DefaultRealizationFilter(RealizationFilter):
     def _rank_by(
         self, objectives: NDArray[np.float64], sort: tuple[int, ...]
     ) -> NDArray[np.float64]:
-        # The values arrive scaled but not flipped, since direction applies to
-        # aggregates and these are per-realization. Ranking is a comparison of
-        # what the optimizer is trying to make small, so apply the direction
-        # here, per objective and before the weighted sum: one sign cannot
-        # stand in for several.
+        # Ranking occurs after scaling and applying the direction for maximization.
         objective_config = self._context.objectives
         values = zero_failures(objectives[..., sort])
+        values = scale(values, self._context.get_objective_scales()[sort,])
         values = apply_direction(values, objective_config.maximize[sort,])
         if objective_config.weights.size > 1:
             values = np.dot(values, objective_config.weights[sort,])

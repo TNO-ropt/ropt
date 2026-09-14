@@ -77,9 +77,12 @@ class RealizationFilter(ABC):
         Both arguments are two-dimensional arrays with one row per realization
         and one column per objective or per nonlinear constraint, in the order
         in which they are configured: `objectives[i, j]` is the value of
-        objective `j` for realization `i`. The values are scaled, but not
-        negated for maximization: direction applies to aggregates, and these
-        are per-realization.
+        objective `j` for realization `i`. The values are as the evaluator
+        returned them: neither scaled nor negated for maximization, since both
+        apply to aggregates and these are per-realization. A filter that ranks
+        by what the optimizer minimizes should apply them itself, using
+        [`get_objective_scales`][ropt.context.EnOptContext.get_objective_scales]
+        and the directions on `objectives.maximize`.
 
         A realization that failed to evaluate carries `nan` values. The filter
         should check for these and handle them, for instance by assigning such

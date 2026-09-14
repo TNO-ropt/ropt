@@ -111,12 +111,15 @@ class Functions(ResultField):
         objectives = unscale_value(
             apply_direction(self.objectives, context.objectives.maximize),
             context.get_objective_scales(),
+            context.get_objective_offsets(),
         )
         constraints = self.constraints
         if constraints is not None:
             constraint_scales = context.get_constraint_scales()
             assert constraint_scales is not None
-            constraints = unscale_value(constraints, constraint_scales)
+            constraints = unscale_value(
+                constraints, constraint_scales, context.get_constraint_offsets()
+            )
 
         return Functions(
             target_objective=self.target_objective,

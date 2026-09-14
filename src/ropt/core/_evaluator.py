@@ -6,6 +6,7 @@ import numpy as np
 from numpy.random import default_rng
 
 from ropt._logging import get_logger
+from ropt._scaling import scale
 from ropt._utils import apply_direction
 from ropt.exceptions import TooFewRealizations
 from ropt.results import (
@@ -491,6 +492,20 @@ class EnsembleEvaluator:
                     failed_realizations,
                 )
 
+            objectives = scale(
+                objectives,
+                self._context.get_objective_scales(),
+                self._context.get_objective_offsets(),
+            )
+            if constraints is not None:
+                constraint_scales = self._context.get_constraint_scales()
+                assert constraint_scales is not None
+                constraints = scale(
+                    constraints,
+                    constraint_scales,
+                    self._context.get_constraint_offsets(),
+                )
+
             # Maximizing an objective is minimizing its negation. The flip
             # belongs here, on the aggregate, and not on the values that went
             # into it: aggregation does not commute with negation, since a
@@ -565,6 +580,16 @@ class EnsembleEvaluator:
             )
         else:
             constraint_gradients = None
+
+        objective_gradients = scale(
+            objective_gradients, self._context.get_objective_scales()[:, np.newaxis]
+        )
+        if constraint_gradients is not None:
+            constraint_scales = self._context.get_constraint_scales()
+            assert constraint_scales is not None
+            constraint_gradients = scale(
+                constraint_gradients, constraint_scales[:, np.newaxis]
+            )
 
         objective_gradients = apply_direction(
             objective_gradients, self._context.objectives.maximize[:, np.newaxis]

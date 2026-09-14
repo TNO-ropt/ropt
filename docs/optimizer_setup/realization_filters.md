@@ -54,10 +54,11 @@ The `cvar-objective` method:
 1. Computes a weighted sum of the objective values specified by the `sort`
    indices for each realization (using the objective weights from the
    configuration). If a single objective index is given, no weighting is
-   applied. Objectives marked in
-   [`maximize`](configuration.md#objective-direction) have their sign flipped
-   first, per objective, so that the sum ranks realizations the way the
-   optimizer would.
+   applied. The objective [scales](configuration.md#objective-scales) are
+   applied first, and objectives marked in
+   [`maximize`](configuration.md#objective-direction) have their sign flipped,
+   per objective, so that the sum ranks realizations the way the optimizer
+   would.
 2. Conceptually sorts realizations by that value, ascending.
 3. Identifies the subset corresponding to the `percentile` worst outcomes
    (highest weighted values).
@@ -74,11 +75,13 @@ with "worst" defined by constraint type:
 - **EQ (`==`):** largest absolute values (furthest from zero).
 
 !!! note
-    Realizations reach a filter with their objectives already scaled but not
-    yet flipped for direction: the flip belongs to the aggregate, and these are
-    per-realization values. The filter applies it itself when ranking.
-    Constraint filters need no such step, since a constraint is a bound and has
-    no direction.
+    Realizations reach a filter with their objectives exactly as the evaluator
+    returned them: neither scaled nor flipped for direction, since both belong
+    to the aggregate and these are per-realization values. A filter that ranks
+    by what the optimizer minimizes applies them itself, as the CVaR filter
+    does. Constraint filters need no such step, since a constraint is a bound
+    and has no direction, and ranking by a single constraint is unaffected by
+    its scale.
 
 !!! note "Weight normalization"
     The optimizer normalizes all filter-produced weights to sum to one before

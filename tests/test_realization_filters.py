@@ -155,6 +155,24 @@ def test_cvar_filter_applies_direction_before_the_weighted_sum() -> None:
     assert np.allclose(weights, [0.0, 0.0, 1 / 3])
 
 
+def test_cvar_filter_applies_the_objective_scales_before_the_weighted_sum() -> None:
+    # Two objectives of very different magnitude, both in the sum. The scales
+    # decide which realization ranks worst.
+    realization_filter = DefaultRealizationFilter(
+        RealizationFilterConfig(
+            method="cvar-objective", options={"sort": [0, 1], "percentile": 1 / 3}
+        )
+    )
+    realization_filter.init(_filter_context(weights=[0.5, 0.5], scales=[1.0, 10.0]))
+    weights = realization_filter.get_realization_weights(
+        np.array([[0.0, 0.0], [1.0, 0.0], [0.0, 8.0]]), None
+    )
+    # Ranks are 0.5 * f0 + 0.05 * f1: 0.0, 0.5 and 0.4, so realization 1 is the
+    # worst. Ranking the unscaled values would give 0.0, 0.5 and 4.0, and pick
+    # realization 2.
+    assert np.allclose(weights, [0.0, 1 / 3, 0.0])
+
+
 def _objective_function(
     variables: NDArray[np.float64],
     context: EvaluationFunctionContext,

@@ -36,6 +36,7 @@ class NonlinearConstraintsConfig(BaseModel):
         lower_bounds:        Lower bounds for the right-hand-side values.
         upper_bounds:        Upper bounds for the right-hand-side values.
         scales:              Scale factors for the constraint functions (default: 1.0).
+        offsets:             Offsets for the constraint functions (default: 0.0).
         auto_scale:          Which constraints to estimate an additional scale for,
                              from the first batch (default: `False`).
         realization_filters: Realization filter to apply to each constraint, by key,
@@ -47,6 +48,7 @@ class NonlinearConstraintsConfig(BaseModel):
     lower_bounds: Array1D
     upper_bounds: Array1D
     scales: Array1D = np.array(1.0)
+    offsets: Array1D = np.array(0.0)
     auto_scale: Array1DBool = np.array(0)
     realization_filters: Keys = (None,)
     function_estimators: Keys = ("0",)
@@ -68,6 +70,9 @@ class NonlinearConstraintsConfig(BaseModel):
                 "lower_bounds": lower_bounds,
                 "upper_bounds": upper_bounds,
                 "scales": check_scales(self.scales, "scales", lower_bounds.size),
+                "offsets": broadcast_1d_array(
+                    self.offsets, "offsets", lower_bounds.size
+                ),
                 "auto_scale": broadcast_1d_array(
                     self.auto_scale, "auto_scale", lower_bounds.size
                 ),
