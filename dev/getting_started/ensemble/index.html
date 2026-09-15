@@ -9,7 +9,7 @@
       
       
       
-        <link rel="prev" href="../deterministic/">
+        <link rel="prev" href="../quickstart/">
       
       
         <link rel="next" href="../handlers/">
@@ -584,34 +584,6 @@
     
   
     Quickstart
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../deterministic/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Deterministic Optimization
   
 
     
@@ -1618,62 +1590,6 @@
     
   
     Overview
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../tutorials/optimize/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Your First Optimization
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../tutorials/ensemble/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Ensemble Optimization
   
 
     
@@ -2906,12 +2822,11 @@
 
 
 <h1 id="ensemble-based-optimization">Ensemble-Based Optimization</h1>
-<p>The <a href="../deterministic/">Deterministic Optimization</a> page minimized a single,
-fixed objective. Here we work through an <em>uncertain</em> problem: the objective
-depends on parameters we do not know exactly. We now have a set of functions,
-each with different parameters drawn from some (possibly unknown) probability
-distribution. Each member of the set is a <strong>realization</strong>. The full runnable
-script is
+<p>The <a href="../quickstart/">Quickstart</a> minimized a single, fixed objective. Here we
+work through an <em>uncertain</em> problem: the objective depends on parameters we do
+not know exactly. We now have a set of functions, each with different parameters
+drawn from some (possibly unknown) probability distribution. Each member of the
+set is a <strong>realization</strong>. The full runnable script is
 <a href="https://github.com/TNO-ropt/ropt/blob/main/examples/simple/ensemble.py">examples/simple/ensemble.py</a>.</p>
 <p><code>ropt</code> optimizes the realizations together by combining them into a single
 <strong>robust objective</strong> — by default a weighted average over the realizations.
@@ -2922,9 +2837,9 @@ but now its two coefficients vary between realizations.</p>
 objective is:</p>
 <div class="arithmatex">\[ f_i(\mathbf{x}) = \sum_{k=1}^{n-1} \left[ (a_i - x_k)^2 + b_i \left(
 x_{k+1} - x_k^2 \right)^2 \right] \]</div>
-<p>which reduces to the deterministic Rosenbrock function when <span class="arithmatex">\(a_i = 1\)</span> and
-<span class="arithmatex">\(b_i = 100\)</span> for every realization. <code>ropt</code> combines the realizations into the
-robust objective:</p>
+<p>which is the Rosenbrock function of the <a href="../quickstart/">Quickstart</a>, generalized
+to <span class="arithmatex">\(n\)</span> variables: it reduces to that function when <span class="arithmatex">\(a_i = 1\)</span> and <span class="arithmatex">\(b_i = 100\)</span> for
+every realization. <code>ropt</code> combines the realizations into the robust objective:</p>
 <div class="arithmatex">\[ f(\mathbf{x}) = \sum_i w_i f_i(\mathbf{x}), \]</div>
 <p>with weights <span class="arithmatex">\(w_i\)</span> that we set in the configuration below.</p>
 <h2 id="1-describe-the-problem">1. Describe the problem</h2>
@@ -2971,10 +2886,10 @@ which we use to index the parameter arrays:</p>
 </span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>        <span class="n">objective</span> <span class="o">+=</span> <span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="n">r</span><span class="p">]</span> <span class="o">-</span> <span class="n">x</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">b</span><span class="p">[</span><span class="n">r</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">x</span> <span class="o">*</span> <span class="n">x</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
 </span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">objective</span><span class="p">)</span>
 </span></code></pre></div>
-<p>The deterministic example ignored this second argument; an ensemble objective
-uses <code>context.realization</code> to select the parameters for the realization it is
-computing. <code>ropt</code> combines the per-realization values into the robust objective
-for you.</p>
+<p>The <a href="../quickstart/">Quickstart</a> ignored this second argument; an ensemble
+objective uses <code>context.realization</code> to select the parameters for the
+realization it is computing. <code>ropt</code> combines the per-realization values into the
+robust objective for you.</p>
 <h2 id="4-run-it">4. Run it</h2>
 <p>The call is the same as for a deterministic problem:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.simple</span><span class="w"> </span><span class="kn">import</span> <span class="n">optimize</span>
@@ -2983,22 +2898,32 @@ for you.</p>
 </span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">initial_values</span><span class="p">,</span> <span class="n">rosenbrock</span><span class="p">)</span>
 </span></code></pre></div>
 <p><code>ropt</code> evaluates all ten realizations at each point, averages them into the
-robust objective, and optimizes that. As in the deterministic example, you can
-pass a <code>report</code> callback to watch the run.</p>
+robust objective, and optimizes that. To follow the run while it proceeds, pass
+a <code>report</code> callback; see
+<a href="../../running/running/#reporting-progress">Reporting progress</a>.</p>
 <h2 id="5-read-the-result">5. Read the result</h2>
 <p><code>optimize</code> returns an <a class="autorefs autorefs-internal" title="            ropt.simple.OptimizeResult
 
 
   
       dataclass
-  " href="../../reference/simple/#ropt.simple.OptimizeResult"><code>OptimizeResult</code></a>, exactly as
-in the deterministic case:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"optimal variables: </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">variables</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"optimal objective: </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">target_objective</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+  " href="../../reference/simple/#ropt.simple.OptimizeResult"><code>OptimizeResult</code></a>:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"exit code:         </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">exit_code</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"optimal variables: </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">variables</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"optimal objective: </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">target_objective</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </span></code></pre></div>
-<p>Because the coefficients are centered on the deterministic values, the robust
-optimum still lies close to where all variables equal 1 — but it minimizes the
-<em>average</em> over the uncertain coefficients rather than any single realization.</p>
+<ul>
+<li><code>result.variables</code> is the best set of variables found, and
+  <code>result.target_objective</code> the robust objective value there. Both are <code>None</code> if
+  the run produced no valid result.</li>
+<li><code>result.exit_code</code> says why the run stopped.</li>
+<li><code>result.results</code> holds the full low-level result, if you need every detail.</li>
+</ul>
+<p>See <a href="../../running/running/#the-result">The result</a> for the remaining fields.</p>
+<p>Because the coefficients are centered on the values used in the
+<a href="../quickstart/">Quickstart</a>, the robust optimum still lies close to where all
+variables equal 1 — but it minimizes the <em>average</em> over the uncertain
+coefficients rather than any single realization.</p>
 <h2 id="where-to-next">Where to next</h2>
 <ul>
 <li>Collect every result, not just the best one:
@@ -3043,7 +2968,7 @@ optimum still lies close to where all variables equal 1 — but it minimizes the
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../deterministic/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Deterministic Optimization">
+          <a href="../quickstart/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Quickstart">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -3053,7 +2978,7 @@ optimum still lies close to where all variables equal 1 — but it minimizes the
                 Previous
               </span>
               <div class="md-ellipsis">
-                Deterministic Optimization
+                Quickstart
               </div>
             </div>
           </a>
