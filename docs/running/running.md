@@ -77,7 +77,10 @@ There are three ways to return them:
 
 If a realization fails to compute, return `float("nan")` for it. `ropt` treats
 `NaN` as a failed realization and keeps going, as long as enough realizations
-succeed (see [Configuration](../optimizer_setup/configuration.md)).
+succeed. How many is enough is set by
+[`realization_min_success`](../optimizer_setup/configuration.md#realizations),
+which defaults to *all* of them — so a single `NaN` ends the run with
+`TOO_FEW_REALIZATIONS` unless you lower it.
 
 ## The result
 
@@ -94,10 +97,12 @@ result.constraints       # the nonlinear constraint values, or None
 result.results           # the full low-level result object (see below)
 ```
 
-The fields are `None` when the run produced no valid result (for example when
-too few realizations succeeded). `result.results` is the full
-[`FunctionResults`][ropt.results.FunctionResults] object; you rarely need it at
-first, but it holds every detail if you do. See
+The fields are `None` when the run produced no valid result: too few
+realizations succeeded, the pool was closed under the run, or no result ever
+satisfied the constraints — see
+[When something goes wrong](#when-something-goes-wrong). `result.results` is the
+full [`FunctionResults`][ropt.results.FunctionResults] object; you rarely need
+it at first, but it holds every detail if you do. See
 [Working with Results](../optimizer_setup/results.md).
 
 ## Reporting progress
@@ -227,6 +232,14 @@ both cases the result fields are `None`, so check `exit_code` before using
 them. A plain [`evaluate`][ropt.simple.evaluate] has no `exit_code`; there the
 `None` fields are the only sign that nothing usable came back.
 
+A run can also end with `OPTIMIZER_FINISHED` and still leave those fields
+`None`. Only a result that satisfies every constraint to within
+`constraint_tolerance` can be returned as the best one, and that tolerance —
+`1e-10` unless you pass another — applies to the bounds and the linear
+constraints as well as the nonlinear ones. A run that never reaches a feasible
+point therefore has no best result to return, although the evaluations it did
+make still reach the [handlers](handlers.md) attached to it.
+
 What *is* raised falls into three groups:
 
 - **Mistakes in the configuration** surface as a `pydantic.ValidationError`
@@ -291,6 +304,8 @@ from ropt.enums import ExitCode, VariableType
 
 ## Where to next
 
+- The behaviours that most often cause confusion:
+  [Common Pitfalls](pitfalls.md).
 - Run evaluations in parallel, or several optimizations at once:
   [Parallel Execution and Many Runs](parallel.md).
 - Collect or react to every result, not just the best one:

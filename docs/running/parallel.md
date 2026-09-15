@@ -387,6 +387,15 @@ is **shared**: one list of groups that all runs feed together, which is why a
 plain handler is refused there — see [Sharing a handler across concurrent
 runs](handlers.md#sharing-a-handler-across-concurrent-runs).
 
+!!! warning "One `report=` callback is called by every run at once"
+    A single callback is wired into each run separately, and each run calls it
+    on its own thread. Nothing serializes those calls, so a callback that
+    appends to a list, updates a counter, or writes a file needs a lock of its
+    own. Give each run its own callback when they must stay apart, or collect
+    the results in a [shared
+    group](handlers.md#sharing-a-handler-across-concurrent-runs), where the
+    dispatcher serializes them for you.
+
 !!! warning "Without a pool the driver threads do the evaluating"
     `optimize_many` needs no session and no pool. Without one, the runs still
     execute concurrently, but each evaluates in-process on its own driver

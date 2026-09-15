@@ -120,6 +120,7 @@ nav:
       - "Working with Results": optimizer_setup/results.md
   - "Running":
       - "Running Optimizations": running/running.md
+      - "Common Pitfalls": running/pitfalls.md
       - "Parallel Execution and Many Runs": running/parallel.md
       - "Result Handlers": running/handlers.md
   - "Workflows":
