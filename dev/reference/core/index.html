@@ -2203,17 +2203,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.core.EnsembleOptimizer.is_parallel" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        is_parallel
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ropt.core.EnsembleOptimizer.start" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2959,17 +2948,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.core.EnsembleOptimizer.is_parallel" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        is_parallel
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ropt.core.EnsembleOptimizer.start" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3509,72 +3487,6 @@ invoked before and after each function evaluation.</p>
 
 
 
-<div class="doc doc-object doc-attribute">
-
-
-
-<h3 id="ropt.core.EnsembleOptimizer.is_parallel" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">is_parallel</span>
-
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-property"><code>property</code></small>
-  </span>
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">is_parallel</span><span class="p">:</span> <span class="nb">bool</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Determine if the optimization supports parallel evaluations.</p>
-<p>The underlying optimization algorithm may request function evaluations
-via a callback. Parallel optimization, in this context, means that the
-algorithm may request multiple function evaluations in a single
-callback.</p>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/functions.html#bool">bool</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p><code>True</code> if the optimization supports parallel evaluations, <code>False</code></p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/functions.html#bool">bool</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>otherwise.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-    </div>
-
-</div>
-
-
-
-
-
-
 <div class="doc doc-object doc-function">
 
 
@@ -3976,7 +3888,12 @@ them against zero and never needs a bound. A constraint with a finite lower
 and a finite upper bound contributes two values, an equality one, and a
 constraint with no finite bound none. Which of them are equalities is fixed
 for the run and available from
-<a class="autorefs autorefs-internal" title="            get_nonlinear_equalities" href="../backend/#ropt.backend.utils.get_nonlinear_equalities"><code>get_nonlinear_equalities</code></a>.</p>
+<a class="autorefs autorefs-internal" title="            nonlinear_equalities
+
+
+  
+      property
+  " href="../backend/#ropt.backend.OptimizationProblem.nonlinear_equalities"><code>nonlinear_equalities</code></a>.</p>
 <p><code>functions</code> and <code>gradients</code> follow a fixed shape:</p>
 <ul>
 <li><strong>Functions array:</strong> the objective followed by the constraint values. A
