@@ -117,6 +117,7 @@ nav:
       - "Common Pitfalls": running/pitfalls.md
       - "Parallel Execution and Many Runs": running/parallel.md
       - "Result Handlers": running/handlers.md
+      - "Nested Optimization": running/nested.md
   - "Optimizer Setup":
       - "Key Concepts": optimizer_setup/key_concepts.md
       - "Configuration": optimizer_setup/configuration.md

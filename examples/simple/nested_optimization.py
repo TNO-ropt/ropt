@@ -31,6 +31,7 @@ from ropt.simple import (
     session,
 )
 
+# --8<-- [start:configs]
 DIM = 4
 REALIZATIONS = 5
 MASK = [True, True, False, False]
@@ -62,6 +63,7 @@ OUTER_CONFIG: dict[str, Any] = {
         "max_iterations": 4,
     },
 }
+# --8<-- [end:configs]
 INITIAL_VALUES = [1.0, 1.0, 1.0, 1.0]
 UNCERTAINTY = 0.01
 
@@ -118,6 +120,7 @@ def inner_optimization(
     Returns:
         The best inner objective found at this outer point.
     """
+    # --8<-- [start:inner]
     result = optimize(
         INNER_CONFIG,
         np.where(MASK, INITIAL_VALUES, variables),
@@ -130,6 +133,7 @@ def inner_optimization(
     )
     assert result.target_objective is not None
     return result.target_objective
+    # --8<-- [end:inner]
 
 
 def main() -> None:
@@ -153,6 +157,7 @@ def main() -> None:
         },
     )
 
+    # --8<-- [start:run]
     with session() as active:
         inner_pool = active.process_pool(workers=2, bundle_size=0)
         outer_pool = active.thread_pool(workers=2)
@@ -168,6 +173,7 @@ def main() -> None:
             ),
             pool=outer_pool,
         )
+    # --8<-- [end:run]
 
     frame = tables["inner"]
     assert frame is not None
@@ -176,8 +182,10 @@ def main() -> None:
     # The optimum has to be read from the shared frame rather than from the
     # outer result: the outer layer only ever sees its own variables, and holds
     # the inner ones at their initial values.
+    # --8<-- [start:best]
     best = frame.sort("Objective").row(0, named=True)
     variables = [best[f"Variable,{idx}"] for idx in range(DIM)]
+    # --8<-- [end:best]
     print(f"\nbest inner objective: {best['Objective']}")
     print(f"at variables:         {variables}")
 
