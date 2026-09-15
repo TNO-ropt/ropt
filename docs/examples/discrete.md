@@ -53,9 +53,9 @@ def function(variables, context):
     return [float(objective), float(x + y)]
 ```
 
-As in [Constrained Optimization](constrained.md), the config declares the bounds
-while the objective returns the value; `ropt` pairs them by position (objectives
-first, then constraints).
+As in [Constraints](../optimizer_setup/constraints.md), the config declares the
+bounds while the objective returns the value; `ropt` pairs them by position
+(objectives first, then constraints).
 
 ## Run it
 

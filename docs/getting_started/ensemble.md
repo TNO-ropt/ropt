@@ -68,6 +68,10 @@ objective uses `context.realization` to select the parameters for the
 realization it is computing. `ropt` combines the per-realization values into the
 robust objective for you.
 
+Returning a single number, as here, is the simplest case. A function that also
+has constraints returns a sequence instead — the objectives first, then the
+constraints; see [Constraints](../optimizer_setup/constraints.md).
+
 ## 4. Run it
 
 The call is the same as for a deterministic problem, with `INITIAL_VALUES` the

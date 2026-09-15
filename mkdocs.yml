@@ -120,6 +120,7 @@ nav:
   - "Optimizer Setup":
       - "Key Concepts": optimizer_setup/key_concepts.md
       - "Configuration": optimizer_setup/configuration.md
+      - "Constraints": optimizer_setup/constraints.md
       - "Stochastic Gradients": optimizer_setup/gradients.md
       - "Realization Filters": optimizer_setup/realization_filters.md
       - "Function Estimators": optimizer_setup/function_estimators.md
@@ -135,7 +136,6 @@ nav:
       - "Writing a Plugin": utilities/writing_plugins.md
   - "Examples":
       - "Overview": examples/index.md
-      - "Constrained Optimization": examples/constrained.md
       - "Mixed-Integer Optimization": examples/discrete.md
       - "Restarting from the Best Point": examples/restart.md
       - "Building a Workflow": examples/workflow.md

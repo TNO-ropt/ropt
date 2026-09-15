@@ -3,8 +3,9 @@
 !!! note
 
     This section describes how an optimization is **set up** — its variables,
-    objectives, constraints, and the components that drive it. It is independent
-    of how you run the optimization; running a configured optimization is done in
+    objectives, constraints, and the components that drive it. The examples here
+    run their setup so you can see it work, but the setup itself is independent
+    of how you run an optimization: that is covered in
     [Running Optimizations](../running/running.md) or
     [Optimization Workflows](../workflows/workflows.md).
 

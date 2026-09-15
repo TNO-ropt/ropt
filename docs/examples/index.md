@@ -19,7 +19,7 @@ optimization tasks.
 | --- | --- | --- |
 | [`evaluate.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/evaluate.py) | Evaluating variable vectors without optimizing | — |
 | [`ensemble.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/ensemble.py) | Optimizing the mean objective over uncertain realizations | [Ensemble-Based Optimization](../getting_started/ensemble.md) |
-| [`constrained.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/constrained.py) | Linear and nonlinear constraints | [Constrained Optimization](constrained.md) |
+| [`constrained.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/constrained.py) | Linear and nonlinear constraints | [Constraints](../optimizer_setup/constraints.md) |
 | [`discrete.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/discrete.py) | Integer variables, solved with differential evolution | [Mixed-Integer Optimization](discrete.md) |
 | [`mixed.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/mixed.py) | Continuous and integer variables in one problem | — |
 | [`realization_filter.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/realization_filter.py) | A custom filter that reweights realizations | — |

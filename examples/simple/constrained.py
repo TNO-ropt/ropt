@@ -22,6 +22,7 @@ from ropt.simple import EvaluateResult, EvaluationFunctionContext, optimize
 DIM = 5
 REALIZATIONS = 10
 UNCERTAINTY = 0.1
+# --8<-- [start:config]
 CONFIG: dict[str, Any] = {
     "variables": {
         "variable_count": DIM,
@@ -37,6 +38,7 @@ CONFIG: dict[str, Any] = {
         "upper_bounds": -1.0,
     },
 }
+# --8<-- [end:config]
 INITIAL_VALUES = 2 * np.arange(DIM) / DIM + 0.5
 
 _RNG = default_rng(seed=123)
@@ -44,6 +46,7 @@ A = _RNG.normal(loc=1.0, scale=UNCERTAINTY, size=REALIZATIONS)
 B = _RNG.normal(loc=100.0, scale=100 * UNCERTAINTY, size=REALIZATIONS)
 
 
+# --8<-- [start:objective]
 def rosenbrock(
     variables: NDArray[np.float64], context: EvaluationFunctionContext
 ) -> list[float]:
@@ -66,6 +69,10 @@ def rosenbrock(
     return [float(objective), float(constraint)]
 
 
+# --8<-- [end:objective]
+
+
+# --8<-- [start:report]
 def report(result: EvaluateResult) -> None:
     """Print any constraint violation, and the point that caused it.
 
@@ -83,6 +90,9 @@ def report(result: EvaluateResult) -> None:
         print(f"  at variables: {result.variables}")
 
 
+# --8<-- [end:report]
+
+
 def main(*, linear: bool = False) -> None:
     """Run the constrained optimization and check the result.
 
@@ -91,14 +101,18 @@ def main(*, linear: bool = False) -> None:
     """
     config = {**CONFIG}
     if linear:
+        # --8<-- [start:linear]
         config["linear_constraints"] = {
             "coefficients": [[0.0, 0.0, 0.0, 1.0, -1.0]],
             "lower_bounds": 0.0,
             "upper_bounds": 0.0,
         }
+        # --8<-- [end:linear]
+    # --8<-- [start:run]
     result = optimize(
         config, INITIAL_VALUES, rosenbrock, report=report, constraint_tolerance=1e-6
     )
+    # --8<-- [end:run]
     print(f"optimal variables:  {result.variables}")
     print(f"optimal objective:  {result.target_objective}")
     print(f"optimal constraint: {result.constraints}")
