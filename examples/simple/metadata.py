@@ -5,6 +5,10 @@ Metadata comes from two independent sources. Passing a ``metadata`` dict to
 ``result.metadata``. Returning an ``EvaluationFunctionResult`` with a
 ``metadata`` field instead records per-realization metadata, stored as one array
 entry per realization on ``result.evaluations.metadata``.
+
+A per-realization value may also be an array rather than a scalar. It then spans
+an extra axis named after the metadata key, which the ``names`` section of the
+configuration can label, and which the table handler unstacks into columns.
 """
 
 from typing import Any
@@ -23,6 +27,7 @@ DIM = 3
 REALIZATIONS = 3
 RUN_ID = 7
 SHIFTS = np.array([0.9, 1.0, 1.1])  # one uncertain shift per realization
+VARIABLES = ("x", "y", "z")
 CONFIG: dict[str, Any] = {
     "variables": {
         "variable_count": DIM,
@@ -31,13 +36,15 @@ CONFIG: dict[str, Any] = {
     "realizations": {
         "weights": [1.0] * REALIZATIONS,
     },
+    # The `residual` entry labels the axis spanned by the metadata of that name.
+    "names": {"variable": VARIABLES, "residual": VARIABLES},
 }
 
 
 def objective(
     variables: NDArray[np.float64], context: EvaluationFunctionContext
 ) -> EvaluationFunctionResult:
-    """Objective for one realization, recording its shift as metadata.
+    """Objective for one realization, recording its shift and residual.
 
     Args:
         variables: The variable vector to evaluate.
@@ -47,8 +54,11 @@ def objective(
         The objective value and the per-realization metadata for this realization.
     """
     shift = SHIFTS[context.realization]
-    value = float(np.sum((variables - shift) ** 2))
-    return EvaluationFunctionResult(objectives=value, metadata={"shift": shift})
+    residual = variables - shift
+    return EvaluationFunctionResult(
+        objectives=float(np.sum(residual**2)),
+        metadata={"shift": shift, "residual": residual},
+    )
 
 
 def main() -> None:
@@ -60,8 +70,8 @@ def main() -> None:
         {
             "batch_id": "Batch",
             "realization": "Realization",
-            "variables": "Variables",
             "evaluations.metadata.shift": "Shift",
+            "evaluations.metadata.residual": "Residual",
             "metadata.run_id": "Run ID",
         },
     )
@@ -77,6 +87,7 @@ def main() -> None:
 
     assert best.metadata["run_id"] == RUN_ID
     assert np.allclose(best.evaluations.metadata["shift"], SHIFTS)
+    assert best.evaluations.metadata["residual"].shape == (REALIZATIONS, DIM)
 
 
 if __name__ == "__main__":

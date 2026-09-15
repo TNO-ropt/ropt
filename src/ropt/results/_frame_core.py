@@ -19,7 +19,7 @@ from ropt.enums import AxisName
 from ._result_field import AxisMetadata
 
 if TYPE_CHECKING:
-    from collections.abc import Iterable, Iterator
+    from collections.abc import Iterable, Iterator, Sequence
 
     from numpy.typing import NDArray
 
@@ -36,14 +36,18 @@ class FieldData:
     data: NDArray[Any]
     """The values of the sub-field, flattened in C order."""
 
-    axes: tuple[AxisName, ...]
-    """The axes of the sub-field, in array order."""
+    axes: tuple[str, ...]
+    """The axes of the sub-field, in array order.
+
+    A builtin axis is an [`AxisName`][ropt.enums.AxisName] value; a user axis
+    carries the name of the metadata key that defines it.
+    """
 
     labels: tuple[tuple[str | int, ...], ...]
     """The labels of each axis, in the same order as `axes`."""
 
 
-UNSTACK_AXES: Final[dict[str, tuple[AxisName, ...]]] = {
+UNSTACK_AXES: Final[dict[str, tuple[str, ...]]] = {
     "functions": (
         AxisName.OBJECTIVE,
         AxisName.NONLINEAR_CONSTRAINT,
@@ -115,6 +119,10 @@ def _get_field_data(
         return None
     values = np.asarray(data)
     axes = owner.get_axes(field)
+    if keys and values.ndim == len(axes) + 1:
+        # An array-valued mapping entry spans one extra axis, named after the
+        # key that holds it, so its labels can be looked up like any other.
+        axes = (*axes, keys[-1])
     labels = tuple(
         tuple(range(values.shape[idx])) if labels is None else tuple(labels)
         for idx, labels in enumerate(names.get(axis) for axis in axes)
@@ -136,6 +144,30 @@ def _iter_field_data(
 _KEY_COLUMNS: Final = frozenset(
     {"batch_id", *(axis.value for axis in AxisName)},
 )
+
+_BUILTIN_AXES: Final = frozenset(AxisName)
+
+
+def _unstack_order(
+    field_data: FieldData, unstack: Sequence[str], *, aggregated: bool
+) -> list[str]:
+    wanted = list(unstack)
+    if aggregated:
+        wanted += [
+            axis
+            for axis in field_data.axes
+            if axis not in _BUILTIN_AXES and axis not in wanted
+        ]
+    return [axis for axis in wanted if axis in field_data.axes]
+
+
+def _check_unstack_axes(unstack: Sequence[str], seen: set[str]) -> None:
+    # Without this an unrecognised axis is silently dropped, and the caller gets
+    # a stacked frame with no indication that the name was never matched.
+    unknown = [axis for axis in unstack if axis not in seen]
+    if unknown:
+        msg = f"Unknown axes to unstack: {', '.join(unknown)}"
+        raise ValueError(msg)
 
 
 def _value_fields(sub_fields: set[str]) -> list[str]:

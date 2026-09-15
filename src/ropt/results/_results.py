@@ -16,8 +16,6 @@ from ._result_field import AxisMetadata
 if TYPE_CHECKING:
     from collections.abc import Iterable
 
-    from ropt.enums import AxisName
-
 
 if TYPE_CHECKING and HAVE_PANDAS:
     import pandas as pd  # ruff: ignore[typing-only-third-party-import]
@@ -43,8 +41,9 @@ class Results(AxisMetadata, ABC):
     Attributes:
         batch_id: Identifier for the evaluation batch.
         metadata: Dictionary of additional information (not used internally).
-        names:    Mapping from [`AxisName`][ropt.enums.AxisName] to label tuples
-                  for DataFrame export.
+        names:    Mapping from axis name to label tuples for DataFrame export.
+                  Keys are [`AxisName`][ropt.enums.AxisName] values, or the name
+                  of a metadata key that defines a user axis.
     """
 
     batch_id: int
@@ -54,7 +53,7 @@ class Results(AxisMetadata, ABC):
     def to_pandas(
         self,
         select: Iterable[str],
-        unstack: Iterable[AxisName] | None = None,
+        unstack: Iterable[str] | None = None,
     ) -> pd.DataFrame:
         """Export selected fields to a pandas DataFrame.
 
@@ -94,7 +93,7 @@ class Results(AxisMetadata, ABC):
     def to_polars(
         self,
         select: Iterable[str],
-        unstack: Iterable[AxisName] | None = None,
+        unstack: Iterable[str] | None = None,
         sep: str = ",",
     ) -> pl.DataFrame:
         """Export selected fields to a polars DataFrame.

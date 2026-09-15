@@ -184,6 +184,12 @@ You can attach arbitrary **metadata** to a run, from two sources:
   Callbacks](../workflows/evaluation_callbacks.md#using-functionevaluator) for
   the effect on the column dtype.
 
+  Returning an array instead of a scalar gives the key its own
+  [user-defined axis](../optimizer_setup/results.md#user-defined-axes), which
+  the `names` section of the configuration can label and which the
+  [`DataFrameHandler`](handlers.md#dataframehandler) spreads over one column
+  per entry.
+
 Neither kind is interpreted by `ropt`. Constant metadata ends up on
 `result.results.metadata`; per-evaluation metadata on
 `result.results.evaluations.metadata` (one entry per realization). Both kinds can

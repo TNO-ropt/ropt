@@ -31,7 +31,11 @@ def _get_results(
     if not sub_fields or not _has_results(results, result_type):
         return pl.DataFrame()
     return _to_polars_frame(
-        results, _value_fields(sub_fields), UNSTACK_AXES[result_type], sep
+        results,
+        _value_fields(sub_fields),
+        UNSTACK_AXES[result_type],
+        sep,
+        aggregated=True,
     )[0]
 
 

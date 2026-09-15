@@ -236,6 +236,12 @@ def my_function(
     row keeps its natural dtype. Mixing strings and non-strings under one key
     raises a `ValueError`.
 
+    A value may be a 1-D array rather than a scalar, which gives the key an
+    extra [user-defined axis](../optimizer_setup/results.md#user-defined-axes)
+    named after the key. Every row must then return the same number of entries,
+    and the key may not be named after an
+    [`AxisName`][ropt.enums.AxisName] value or `batch_id`.
+
 Wrap the function in a
 [`FunctionEvaluator`][ropt.components.evaluators.FunctionEvaluator] and give the
 evaluator to a compute step (see [Optimization Workflows](workflows.md)):

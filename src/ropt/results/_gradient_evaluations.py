@@ -88,6 +88,11 @@ class GradientEvaluations(ResultField):
             - [`AxisName.REALIZATION`][ropt.enums.AxisName.REALIZATION]
             - [`AxisName.PERTURBATION`][ropt.enums.AxisName.PERTURBATION]
 
+        An entry whose values are arrays rather than scalars has shape
+        $(n_r, n_p, n_k)$ and carries a third, user-defined axis named after
+        its key. See
+        [User-defined axes](../optimizer_setup/results.md#user-defined-axes).
+
     Note: Metadata data type.
         The data type of the metadata fields is not fixed. Each field in the
         `metadata` dictionary can have its own data type, which must be a

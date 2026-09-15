@@ -170,6 +170,59 @@ def test_metadata_mixing_strings_and_numbers_is_rejected(
         )
 
 
+def test_array_metadata_spans_a_user_axis(
+    config: dict[str, Any], test_functions: Any
+) -> None:
+    metadata = _run_with_metadata(
+        config,
+        test_functions,
+        lambda context: {"pair": np.array([context.realization, 1.0])},
+    )
+    assert metadata["pair"].shape == (3, 2)
+    assert metadata["pair"].tolist() == [[0.0, 1.0], [1.0, 1.0], [2.0, 1.0]]
+
+
+def test_array_metadata_of_differing_lengths_is_rejected(
+    config: dict[str, Any], test_functions: Any
+) -> None:
+    with pytest.raises(ValueError, match="Metadata has inconsistent shapes: pair"):
+        _run_with_metadata(
+            config,
+            test_functions,
+            lambda context: {"pair": np.ones(1 + context.realization)},
+        )
+
+
+def test_metadata_mixing_scalars_and_arrays_is_rejected(
+    config: dict[str, Any], test_functions: Any
+) -> None:
+    with pytest.raises(ValueError, match="Metadata has inconsistent shapes: pair"):
+        _run_with_metadata(
+            config,
+            test_functions,
+            lambda context: {"pair": 1.0 if context.realization == 0 else np.ones(2)},
+        )
+
+
+def test_multidimensional_metadata_is_rejected(
+    config: dict[str, Any], test_functions: Any
+) -> None:
+    with pytest.raises(
+        ValueError, match="Metadata values must be scalars or one-dimensional"
+    ):
+        _run_with_metadata(config, test_functions, lambda _: {"grid": np.ones((2, 2))})
+
+
+@pytest.mark.parametrize("key", ["realization", "variable", "batch_id"])
+def test_metadata_key_shadowing_an_axis_name_is_rejected(
+    config: dict[str, Any], test_functions: Any, key: str
+) -> None:
+    with pytest.raises(
+        ValueError, match=f"Metadata key is reserved as an axis name: {key}"
+    ):
+        _run_with_metadata(config, test_functions, lambda _: {key: 1.0})
+
+
 def test_rng(config: dict[str, Any], evaluator: Any) -> None:
     config["variables"]["seed"] = 1
     config2 = deepcopy(config)

@@ -860,9 +860,9 @@ Fields:
 
 ### `names`
 
-Optional mapping from [`AxisName`][ropt.enums.AxisName] strings to tuples of
-labels. These labels are used to produce human-readable multi-index DataFrames
-when results are exported (see [Working with Results](results.md)).
+Optional mapping from axis names to tuples of labels. These labels are used to
+produce human-readable multi-index DataFrames when results are exported (see
+[Working with Results](results.md)).
 
 Each key is an [`AxisName`][ropt.enums.AxisName] value that identifies a
 dimension of the optimization problem:
@@ -875,6 +875,9 @@ dimension of the optimization problem:
 | `"linear_constraint"`      | The linear constraints                               |
 | `"realization"`            | The realizations in the ensemble                     |
 | `"perturbation"`           | The perturbations used for gradient estimation       |
+
+A key may also be the name of a metadata key that carries array values, which
+labels the [user axis](results.md#user-defined-axes) that metadata spans.
 
 The corresponding value is a tuple of strings (or integers) whose length must
 match the count of that axis. For example, with 3 variables and 2 objectives:

@@ -30,7 +30,7 @@ def _get_results(
     if not sub_fields or not _has_results(results, result_type):
         return pd.DataFrame()
     return _to_pandas_frame(
-        results, _value_fields(sub_fields), UNSTACK_AXES[result_type]
+        results, _value_fields(sub_fields), UNSTACK_AXES[result_type], aggregated=True
     )
 
 

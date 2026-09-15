@@ -25,7 +25,7 @@ class _FunctionEvaluatorResults:
             self.objectives, self.constraints
         )
         for key, value in self.metadata.items():
-            if value.ndim != 1 and value.size != self.objectives.shape[1]:
+            if value.shape[0] != self.objectives.shape[0]:
                 msg = f"Metadata has incorrect size: {key}"
                 raise ValueError(msg)
 
@@ -52,11 +52,13 @@ class _GradientEvaluatorResults:
             else self.perturbed_constraints.reshape(shape)
         )
         for key, value in self.metadata.items():
-            if value.ndim != 1 and value.size != realization_count * perturbation_count:
+            if value.shape[0] != realization_count * perturbation_count:
                 msg = f"Metadata has incorrect size: {key}"
                 raise ValueError(msg)
+        # Any axis beyond the rows is user-defined and is carried through as-is.
         self.metadata = {
-            key: value.reshape(shape[:2]) for key, value in self.metadata.items()
+            key: value.reshape(realization_count, perturbation_count, *value.shape[1:])
+            for key, value in self.metadata.items()
         }
 
 

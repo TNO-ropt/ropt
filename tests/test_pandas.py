@@ -114,7 +114,7 @@ def test__get_field_data(gradient_result: GradientResults) -> None:
     )
     assert field_data is not None
     assert field_data.name == "perturbed_variables"
-    assert [axis.value for axis in field_data.axes] == [
+    assert list(field_data.axes) == [
         "realization",
         "perturbation",
         "variable",
@@ -138,7 +138,7 @@ def test__get_field_data_metadata(gradient_result: GradientResults) -> None:
     assert field_data.name == "evaluations.metadata.foo"
     info = np.array(gradient_result.evaluations.metadata["foo"])
     assert len(field_data.data) == info.size
-    assert [axis.value for axis in field_data.axes] == [
+    assert list(field_data.axes) == [
         "realization",
         "perturbation",
     ]

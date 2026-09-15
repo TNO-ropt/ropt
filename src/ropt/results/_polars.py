@@ -5,12 +5,10 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 import polars as pl
 
-from ._frame_core import _iter_field_data
+from ._frame_core import _check_unstack_axes, _iter_field_data, _unstack_order
 
 if TYPE_CHECKING:
     from collections.abc import Iterable, Sequence
-
-    from ropt.enums import AxisName
 
     from ._frame_core import FieldData
     from ._results import Results
@@ -19,18 +17,23 @@ if TYPE_CHECKING:
 def _to_polars_frame(
     results: Results,
     select: Iterable[str],
-    unstack: Iterable[AxisName] | None,
+    unstack: Iterable[str] | None,
     sep: str,
+    *,
+    aggregated: bool = False,
 ) -> tuple[pl.DataFrame, list[str]]:
-    if unstack is None:
-        unstack = []
+    # An aggregated frame applies one default axis set to every field, so an
+    # axis that no field has is filtered rather than reported.
+    requested = [] if unstack is None else [str(axis) for axis in unstack]
     joined_frame: pl.DataFrame | None = None
     keys: list[str] = []
     values: list[str] = []
+    seen: set[str] = set()
     for field_data in _iter_field_data(results, select, results.names):
+        seen.update(field_data.axes)
         frame = _build_frame(field_data, results.batch_id)
         index = [column for column in frame.columns if column != field_data.name]
-        label_order = [axis.value for axis in unstack if axis.value in index]
+        label_order = _unstack_order(field_data, requested, aggregated=aggregated)
         if label_order:
             frame = _unstack(frame, field_data, index, label_order, sep)
             index = [column for column in index if column not in label_order]
@@ -47,6 +50,8 @@ def _to_polars_frame(
         values += [column for column in frame.columns if column not in index]
     if joined_frame is None:
         return pl.DataFrame(), keys
+    if not aggregated:
+        _check_unstack_axes(requested, seen)
     return joined_frame.select(*keys, *values), keys
 
 
@@ -59,7 +64,7 @@ def _build_frame(field_data: FieldData, batch_id: int) -> pl.DataFrame:
             *(np.asarray(labels) for labels in field_data.labels), indexing="ij"
         )
         for axis, grid in zip(field_data.axes, grids, strict=True):
-            columns[axis.value] = grid.ravel()
+            columns[str(axis)] = grid.ravel()
     columns[field_data.name] = field_data.data
     return pl.DataFrame(columns)
 

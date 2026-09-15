@@ -149,6 +149,20 @@ def test_string_metadata_with_unset_realizations_exports_as_nulls(
     assert list(nulls) == [False, True]
 
 
+def test_array_metadata_is_unstacked_by_default(engine: DataFrameEngine) -> None:
+    handler = DataFrameHandler(engine=engine)
+    handler.add_table("t", "functions", {"evaluations.metadata.pair": "Pair"})
+    handler.handle_event(
+        _make_event_with_metadata(
+            {"pair": np.arange(4, dtype=np.float64).reshape((2, 2))}
+        )
+    )
+    frame = handler["t"]
+    assert list(frame.columns) == ["Pair,0", "Pair,1"]
+    assert list(frame["Pair,0"]) == [0.0, 2.0]
+    assert list(frame["Pair,1"]) == [1.0, 3.0]
+
+
 def test_table_handler_populates_table_from_events(engine: DataFrameEngine) -> None:
     handler = DataFrameHandler(engine=engine)
     handler.add_table("t", "functions", {"target_objective": "Obj"})
