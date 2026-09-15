@@ -311,4 +311,4 @@ executors.
 - Read the results: [Working with Results](../optimizer_setup/results.md).
 - Run evaluations in parallel, in processes, or on a cluster:
   [Parallel Evaluation](parallel.md).
-- See it in action: [Building a Workflow](../tutorials/workflow.md).
+- See it in action: [Building a Workflow](../examples/workflow.md).

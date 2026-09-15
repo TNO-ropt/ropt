@@ -1,6 +1,6 @@
 # Restarting from the Best Point Found
 
-The full script for this tutorial is
+The full script for this example is
 [examples/simple/restart.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/restart.py).
 It restarts the same optimization several times, each time starting from the
 best point the previous run found.

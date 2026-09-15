@@ -131,12 +131,12 @@ nav:
       - "Keyboard Interrupts": utilities/keyboard_interrupt.md
       - "Plugin Discovery": utilities/plugin_discovery.md
       - "Writing a Plugin": utilities/writing_plugins.md
-  - "Tutorials":
-      - "Overview": tutorials/index.md
-      - "Constrained Optimization": tutorials/constrained.md
-      - "Mixed-Integer Optimization": tutorials/discrete.md
-      - "Restarting from the Best Point": tutorials/restart.md
-      - "Building a Workflow": tutorials/workflow.md
+  - "Examples":
+      - "Overview": examples/index.md
+      - "Constrained Optimization": examples/constrained.md
+      - "Mixed-Integer Optimization": examples/discrete.md
+      - "Restarting from the Best Point": examples/restart.md
+      - "Building a Workflow": examples/workflow.md
   - "Reference":
       - "Simple API": reference/simple.md
       - "Utility Functions": reference/utils.md

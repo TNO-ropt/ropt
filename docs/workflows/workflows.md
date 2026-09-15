@@ -377,7 +377,7 @@ process-based, or HPC evaluation, see
 
 - [Parallel Evaluation](parallel.md) — run evaluations off-process
   or on a cluster.
-- [Building a Workflow](../tutorials/workflow.md) — step-by-step
+- [Building a Workflow](../examples/workflow.md) — step-by-step
   example building a workflow from scratch.
 - Full example:
   [examples/advanced/workflow.py](https://github.com/TNO-ropt/ropt/blob/main/examples/advanced/workflow.py).

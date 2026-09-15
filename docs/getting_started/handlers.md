@@ -39,7 +39,7 @@ print(f"collected {len(history.results)} results across all restarts")
 Restarting needs nothing special from `ropt`: each call to `optimize` is
 independent, so `result.variables` — the best point a run found — is simply
 the start point for the next one. See
-[Restarting from the Best Point](../tutorials/restart.md) for the full,
+[Restarting from the Best Point](../examples/restart.md) for the full,
 runnable version of this example.
 
 ## Other built-in handlers
@@ -59,4 +59,4 @@ list, and how to write your own.
 - Collecting results from runs that overlap in time, instead of one after
   another: [Running in Parallel](execution.md#collecting-results-from-concurrent-runs).
 - The complete simple API: [Result Handlers](../running/handlers.md#result-handlers).
-- A full worked example: [Restarting from the Best Point](../tutorials/restart.md).
+- A full worked example: [Restarting from the Best Point](../examples/restart.md).

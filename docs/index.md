@@ -81,7 +81,7 @@ covering *how* to run a configured optimization:
   for running an optimization and covers most cases.
 - The [Key Concepts](optimizer_setup/key_concepts.md) page introduces the terms used
   throughout the documentation.
-- The [Tutorials](tutorials/index.md) show `ropt` in action through worked
+- The [Examples](examples/index.md) show `ropt` in action through worked
   examples.
 - The [Configuration](optimizer_setup/configuration.md) page describes the
   configuration format in detail.

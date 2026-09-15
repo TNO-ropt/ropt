@@ -4,7 +4,7 @@
 
 The [simple API](../running/running.md) covers most cases. When you need more —
 custom event handling, several optimizers, or nested runs — you assemble the
-low-level workflow components yourself. This tutorial follows
+low-level workflow components yourself. This page follows
 [examples/advanced/workflow.py](https://github.com/TNO-ropt/ropt/blob/main/examples/advanced/workflow.py).
 
 See [Optimization Workflows](../workflows/workflows.md) for the full reference on the
