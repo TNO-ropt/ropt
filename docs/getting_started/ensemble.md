@@ -34,21 +34,13 @@ list has one entry per realization and sets how much each contributes to the
 combined objective:
 
 ```python
-DIM = 5
-config = {
-    "variables": {
-        "variable_count": DIM,
-        "perturbation_magnitudes": 1e-6,
-    },
-    "realizations": {
-        "weights": [1.0] * 10,   # ten equally weighted realizations
-    },
-}
+--8<-- "examples/simple/ensemble.py:config"
 ```
 
 The weights need not sum to one; `ropt` normalizes them. Equal weights, as here,
 give a plain average. See [Configuration](../optimizer_setup/configuration.md) for the
-other realization settings.
+other realization settings. `INITIAL_VALUES` is the point the optimization
+starts from.
 
 ## 2. Draw the uncertain parameters
 
@@ -57,11 +49,7 @@ coefficients are sampled once per realization, so that `a[r]` and `b[r]` are the
 coefficients for realization `r`:
 
 ```python
-import numpy as np
-
-rng = np.random.default_rng(seed=123)
-a = rng.normal(loc=1.0, scale=0.1, size=10)
-b = rng.normal(loc=100.0, scale=10.0, size=10)
+--8<-- "examples/simple/ensemble.py:draws"
 ```
 
 ## 3. Write the evaluation function
@@ -72,16 +60,7 @@ argument tells it which one: `context.realization` is the realization number,
 which we use to index the parameter arrays:
 
 ```python
-from ropt.simple import EvaluationFunctionContext
-
-
-def rosenbrock(variables: np.ndarray, context: EvaluationFunctionContext) -> float:
-    r = context.realization
-    objective = 0.0
-    for i in range(DIM - 1):
-        x, y = variables[i : i + 2]
-        objective += (a[r] - x) ** 2 + b[r] * (y - x * x) ** 2
-    return float(objective)
+--8<-- "examples/simple/ensemble.py:objective"
 ```
 
 The [Quickstart](quickstart.md) ignored this second argument; an ensemble
@@ -91,13 +70,11 @@ robust objective for you.
 
 ## 4. Run it
 
-The call is the same as for a deterministic problem:
+The call is the same as for a deterministic problem, with `INITIAL_VALUES` the
+start point defined above:
 
 ```python
-from ropt.simple import optimize
-
-initial_values = 2 * np.arange(DIM) / DIM + 0.5
-result = optimize(config, initial_values, rosenbrock)
+--8<-- "examples/simple/ensemble.py:run"
 ```
 
 `ropt` evaluates all ten realizations at each point, averages them into the
@@ -110,9 +87,7 @@ a `report` callback; see
 `optimize` returns an [`OptimizeResult`][ropt.simple.OptimizeResult]:
 
 ```python
-print(f"exit code:         {result.exit_code}")
-print(f"optimal variables: {result.variables}")
-print(f"optimal objective: {result.target_objective}")
+--8<-- "examples/simple/ensemble.py:report"
 ```
 
 - `result.variables` is the best set of variables found, and

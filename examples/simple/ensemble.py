@@ -14,6 +14,7 @@ from numpy.typing import NDArray
 
 from ropt.simple import EvaluationFunctionContext, optimize
 
+# --8<-- [start:config]
 DIM = 5
 REALIZATIONS = 10
 UNCERTAINTY = 0.1
@@ -27,12 +28,16 @@ CONFIG: dict[str, Any] = {
     },
 }
 INITIAL_VALUES = 2 * np.arange(DIM) / DIM + 0.5
+# --8<-- [end:config]
 
+# --8<-- [start:draws]
 rng = default_rng(seed=123)
 a = rng.normal(loc=1.0, scale=UNCERTAINTY, size=REALIZATIONS)
 b = rng.normal(loc=100.0, scale=100 * UNCERTAINTY, size=REALIZATIONS)
+# --8<-- [end:draws]
 
 
+# --8<-- [start:objective]
 def rosenbrock(
     variables: NDArray[np.float64], context: EvaluationFunctionContext
 ) -> float:
@@ -53,12 +58,19 @@ def rosenbrock(
     return float(objective)
 
 
+# --8<-- [end:objective]
+
+
 def main() -> None:
     """Run the ensemble optimization and check the result."""
+    # --8<-- [start:run]
     result = optimize(CONFIG, INITIAL_VALUES, rosenbrock)
+    # --8<-- [end:run]
+    # --8<-- [start:report]
     print(f"exit code:         {result.exit_code}")
     print(f"optimal variables: {result.variables}")
     print(f"optimal objective: {result.target_objective}")
+    # --8<-- [end:report]
     assert result.variables is not None
     assert np.allclose(result.variables, 1.0, atol=1e-1)
 
