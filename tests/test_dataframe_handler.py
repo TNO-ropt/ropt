@@ -122,6 +122,33 @@ def _make_event_two_realizations(batch_id: int) -> EnOptEvent:
     )
 
 
+def _make_event_with_metadata(metadata: dict[str, Any]) -> EnOptEvent:
+    context = EnOptContext.model_validate(_CONFIG_TWO_REALIZATIONS)
+    results = _make_result_two_realizations(1)
+    results.evaluations = FunctionEvaluations.create(
+        objectives=np.array([[1.0], [2.0]]), metadata=metadata
+    )
+    return EnOptEvent(
+        event_type=EnOptEventType.FINISHED_EVALUATION,
+        context=context,
+        results=(results,),
+    )
+
+
+def test_string_metadata_with_unset_realizations_exports_as_nulls(
+    engine: DataFrameEngine,
+) -> None:
+    handler = DataFrameHandler(engine=engine)
+    handler.add_table("t", "functions", {"evaluations.metadata.tag": "Tag"})
+    handler.handle_event(
+        _make_event_with_metadata({"tag": np.array(["hello", None], dtype=object)})
+    )
+    column = handler["t"]["Tag"]
+    nulls = column.is_null() if hasattr(column, "is_null") else column.isna()
+    assert column[0] == "hello"
+    assert list(nulls) == [False, True]
+
+
 def test_table_handler_populates_table_from_events(engine: DataFrameEngine) -> None:
     handler = DataFrameHandler(engine=engine)
     handler.add_table("t", "functions", {"target_objective": "Obj"})

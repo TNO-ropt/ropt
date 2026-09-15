@@ -2451,7 +2451,7 @@ async def test_handle_result_records_executor_failure_as_nan() -> None:  # ruff:
         args=(None, bundle),
         result=ExecutorFailure("Background process was killed"),
     )
-    _handle_result(work_item, results, {}, objective_count=1, eval_count=2)
+    _handle_result(work_item, results, {}, objective_count=1)
     assert np.all(np.isnan(results))
 
 
@@ -2475,7 +2475,7 @@ async def test_handle_result_logs_executor_failure_reason(  # ruff: ignore[unuse
         result=ExecutorFailure("the job wrote to item.txt"),
     )
     with caplog.at_level(logging.WARNING, logger="ropt"):
-        _handle_result(work_item, results, {}, objective_count=1, eval_count=1)
+        _handle_result(work_item, results, {}, objective_count=1)
     assert "the job wrote to item.txt" in caplog.text
 
 
@@ -2504,7 +2504,6 @@ async def test_evaluation_function_wrong_shape_rejected(  # ruff: ignore[unused-
             np.zeros((1, 1), dtype=np.float64),
             {},
             objective_count=1,
-            eval_count=1,
         )
 
 
@@ -2524,7 +2523,6 @@ async def test_wrong_evaluation_result_type_rejected() -> None:  # ruff: ignore[
             np.zeros((1, 1), dtype=np.float64),
             {},
             objective_count=1,
-            eval_count=1,
         )
 
 

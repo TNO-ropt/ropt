@@ -8,7 +8,7 @@ import numpy as np
 
 from ropt.evaluation import EvaluationBatchContext, EvaluationBatchResult
 
-from ._common import _active_evaluations, _scatter_result
+from ._common import _active_evaluations, _build_metadata, _scatter_result
 from ._counter import BatchIdCounter
 from .base import (
     EvaluationFunctionCallback,
@@ -71,7 +71,7 @@ class FunctionEvaluator(Evaluator):
             else evaluator_context.context.nonlinear_constraints.lower_bounds.size
         )
         results = np.zeros((variables.shape[0], no + nc), dtype=np.float64)
-        metadata: dict[str, NDArray[Any]] = {}
+        metadata: dict[str, dict[int, Any]] = {}
 
         for eval_idx, function_context in _active_evaluations(
             evaluator_context, batch_id
@@ -82,11 +82,10 @@ class FunctionEvaluator(Evaluator):
                 results,
                 metadata,
                 no,
-                variables.shape[0],
             )
         return EvaluationBatchResult(
             batch_id=batch_id,
             objectives=results[:, :no],
             constraints=results[:, no:] if nc > 0 else None,
-            metadata=metadata,
+            metadata=_build_metadata(metadata, variables.shape[0]),
         )

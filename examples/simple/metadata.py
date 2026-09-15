@@ -13,6 +13,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from ropt.simple import (
+    DataFrameHandler,
     EvaluationFunctionContext,
     EvaluationFunctionResult,
     optimize,
@@ -52,9 +53,23 @@ def objective(
 
 def main() -> None:
     """Run one optimization, tagging the run and recording per-realization data."""
+    table = DataFrameHandler()
+    table.add_table(
+        "results",
+        "functions",
+        {
+            "batch_id": "Batch",
+            "realization": "Realization",
+            "variables": "Variables",
+            "evaluations.metadata.shift": "Shift",
+            "metadata.run_id": "Run ID",
+        },
+    )
     # `metadata` here is constant, per-run metadata copied onto every result.
-    result = optimize(CONFIG, np.zeros(DIM), objective, metadata={"run_id": RUN_ID})
-
+    result = optimize(
+        CONFIG, np.zeros(DIM), objective, metadata={"run_id": RUN_ID}, handlers=[table]
+    )
+    print(table["results"])
     best = result.results
     assert best is not None
     print(f"result metadata:          {best.metadata}")

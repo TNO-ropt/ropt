@@ -101,6 +101,75 @@ def test_function_evaluator_with_info(
     assert result_handler["results"].evaluations.metadata["foo"] == "bar"
 
 
+def _run_with_metadata(
+    config: dict[str, Any],
+    test_functions: Any,
+    metadata: Callable[[EvaluationFunctionContext], dict[str, Any] | None],
+) -> dict[str, NDArray[Any]]:
+    config["realizations"] = {"weights": [1.0, 1.0, 1.0]}
+
+    def _function(
+        variables: NDArray[np.float64], context: EvaluationFunctionContext
+    ) -> EvaluationFunctionResult:
+        return EvaluationFunctionResult(
+            objectives=np.fromiter(
+                (func(variables, context) for func in test_functions),
+                dtype=np.float64,
+            ),
+            metadata=metadata(context),
+        )
+
+    result_handler = ResultsHandler()
+    step = EvaluationStep(evaluator=FunctionEvaluator(function=_function))
+    step.add_event_handler(result_handler)
+    step.run(context=EnOptContext.model_validate(config), variables=initial_values)
+    results: FunctionResults = result_handler["results"]
+    return results.evaluations.metadata
+
+
+def test_unset_numeric_metadata_is_nan(
+    config: dict[str, Any], test_functions: Any
+) -> None:
+    metadata = _run_with_metadata(
+        config,
+        test_functions,
+        lambda context: {"shift": 3} if context.realization == 1 else None,
+    )
+    assert np.array_equal(metadata["shift"], [np.nan, 3.0, np.nan], equal_nan=True)
+
+
+def test_unset_string_metadata_is_none(
+    config: dict[str, Any], test_functions: Any
+) -> None:
+    metadata = _run_with_metadata(
+        config,
+        test_functions,
+        lambda context: {"tag": "hello"} if context.realization == 0 else None,
+    )
+    assert metadata["tag"].tolist() == ["hello", None, None]
+
+
+def test_metadata_set_by_every_realization_keeps_integer_dtype(
+    config: dict[str, Any], test_functions: Any
+) -> None:
+    metadata = _run_with_metadata(
+        config, test_functions, lambda context: {"index": context.realization}
+    )
+    assert metadata["index"].dtype == np.int64
+    assert metadata["index"].tolist() == [0, 1, 2]
+
+
+def test_metadata_mixing_strings_and_numbers_is_rejected(
+    config: dict[str, Any], test_functions: Any
+) -> None:
+    with pytest.raises(ValueError, match="Metadata has inconsistent types: tag"):
+        _run_with_metadata(
+            config,
+            test_functions,
+            lambda context: {"tag": "hello" if context.realization == 0 else 1},
+        )
+
+
 def test_rng(config: dict[str, Any], evaluator: Any) -> None:
     config["variables"]["seed"] = 1
     config2 = deepcopy(config)

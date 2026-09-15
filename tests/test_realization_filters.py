@@ -423,6 +423,7 @@ def test_cvar_filter_mixed(
         for item in event.results or ():
             if isinstance(item, FunctionResults):
                 assert item.scaled.functions is not None
+                assert item.target_objective is not None
                 objective_values.append(item.target_objective)
         _track_results(event, result_list=result_list)
 

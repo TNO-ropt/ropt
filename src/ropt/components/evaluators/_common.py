@@ -49,28 +49,52 @@ def _active_evaluations(
         )
 
 
-def _scatter_result(  # ruff:ignore[too-many-arguments, too-many-positional-arguments]
+def _scatter_result(
     eval_idx: int,
     result: EvaluationFunctionResult,
     results: NDArray[np.float64],
-    metadata: dict[str, NDArray[Any]],
+    metadata: dict[str, dict[int, Any]],
     objective_count: int,
-    eval_count: int,
 ) -> None:
     results[eval_idx, :objective_count] = result.objectives
     if result.constraints is not None:
         results[eval_idx, objective_count:] = result.constraints
     if result.metadata is not None:
         for key, value in result.metadata.items():
-            if key not in metadata:
-                # A key may first appear on any row, so the column is created
-                # for the whole batch and left at zero for the rows before it.
-                metadata[key] = np.zeros(
-                    eval_count,
-                    dtype=(
-                        np.array(value).dtype
-                        if isinstance(value, (int, float, complex, np.number))
-                        else object
-                    ),
-                )
-            metadata[key][eval_idx] = value
+            metadata.setdefault(key, {})[eval_idx] = value
+
+
+def _build_metadata(
+    metadata: dict[str, dict[int, Any]], eval_count: int
+) -> dict[str, NDArray[Any]]:
+    return {
+        key: _build_metadata_column(key, values, eval_count)
+        for key, values in metadata.items()
+    }
+
+
+def _build_metadata_column(
+    key: str, values: dict[int, Any], eval_count: int
+) -> NDArray[Any]:
+    # Rows that never set the key get a missing marker rather than a zero, which
+    # would be indistinguishable from a value the evaluator actually returned.
+    # Numpy has no integer NaN, so a numeric column that has holes can only keep
+    # its values by widening to float.
+    strings = sum(isinstance(value, str) for value in values.values())
+    if strings and strings != len(values):
+        msg = f"Metadata has inconsistent types: {key}"
+        raise ValueError(msg)
+    numeric = all(
+        isinstance(value, (bool, int, float, complex, np.number))
+        for value in values.values()
+    )
+    if numeric and len(values) == eval_count:
+        return np.array([values[idx] for idx in range(eval_count)])
+    column: NDArray[Any] = (
+        np.full(eval_count, np.nan)
+        if numeric
+        else np.full(eval_count, None, dtype=object)
+    )
+    for idx, value in values.items():
+        column[idx] = value
+    return column

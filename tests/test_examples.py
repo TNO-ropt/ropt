@@ -78,6 +78,7 @@ def test_example_simple_optimize_many(tmp_path: Path, monkeypatch: Any) -> None:
 
 
 def test_example_simple_metadata(tmp_path: Path, monkeypatch: Any) -> None:
+    pytest.importorskip("polars")
     monkeypatch.chdir(tmp_path)
     _load_from_file("metadata", "simple").main()
 

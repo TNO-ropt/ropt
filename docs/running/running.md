@@ -179,6 +179,11 @@ You can attach arbitrary **metadata** to a run, from two sources:
       return EvaluationFunctionResult(objectives=value, metadata={"seconds": 1.3})
   ```
 
+  A key does not have to be set by every realization; those that do not set it
+  get `np.nan` for numeric values and `None` otherwise. See [Writing Evaluation
+  Callbacks](../workflows/evaluation_callbacks.md#using-functionevaluator) for
+  the effect on the column dtype.
+
 Neither kind is interpreted by `ropt`. Constant metadata ends up on
 `result.results.metadata`; per-evaluation metadata on
 `result.results.evaluations.metadata` (one entry per realization). Both kinds can

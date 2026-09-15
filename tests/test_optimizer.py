@@ -305,6 +305,7 @@ def test_objective_with_auto_scale(
                 assert item.scaled.functions is not None
                 assert item.scaled.functions.objectives is not None
                 assert np.allclose(item.scaled.functions.objectives, initial / scale)
+                assert item.target_objective is not None
                 assert np.allclose(item.target_objective, 1.0)
                 assert item.functions is not None
                 assert item.functions.objectives is not None
@@ -636,6 +637,7 @@ def test_optimizer_variables_subset(config: Any, eval_func: Any, external: str) 
         for item in event.results:
             if isinstance(item, GradientResults):
                 assert item.scaled.gradients is not None
+                assert item.target_gradient is not None
                 assert item.target_gradient[1] == 0.0
                 assert np.all(item.scaled.gradients.objectives[:, 1] == 0.0)
 

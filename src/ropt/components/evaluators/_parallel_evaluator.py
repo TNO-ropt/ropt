@@ -13,7 +13,7 @@ from ropt.components.executors import Executor, Submission, WorkItem
 from ropt.evaluation import EvaluationBatchContext, EvaluationBatchResult
 from ropt.exceptions import ExecutorFailure, WorkflowError
 
-from ._common import _active_evaluations, _scatter_result
+from ._common import _active_evaluations, _build_metadata, _scatter_result
 from ._counter import BatchIdCounter
 from .base import (
     EvaluationFunctionCallback,
@@ -119,7 +119,7 @@ class ParallelEvaluator(Evaluator):
         )
 
         results = np.zeros((variables.shape[0], no + nc), dtype=np.float64)
-        metadata: dict[str, NDArray[Any]] = {}
+        metadata: dict[str, dict[int, Any]] = {}
 
         bundles = self._make_bundles(variables, evaluator_context, batch_id)
         _logger.debug("Dispatching %d work item(s) to executor", len(bundles))
@@ -140,7 +140,6 @@ class ParallelEvaluator(Evaluator):
                 results=results,
                 metadata=metadata,
                 objective_count=no,
-                eval_count=variables.shape[0],
             ),
         )
 
@@ -148,7 +147,7 @@ class ParallelEvaluator(Evaluator):
             batch_id=batch_id,
             objectives=results[:, :no],
             constraints=results[:, no:] if nc > 0 else None,
-            metadata=metadata,
+            metadata=_build_metadata(metadata, variables.shape[0]),
         )
 
     def _make_bundles(
@@ -179,9 +178,8 @@ def _run_bundle(
 def _handle_result(
     work_item: WorkItem,
     results: NDArray[np.float64],
-    metadata: dict[str, NDArray[Any]],
+    metadata: dict[str, dict[int, Any]],
     objective_count: int,
-    eval_count: int,
 ) -> None:
     bundle: list[tuple[NDArray[np.float64], EvaluationFunctionContext]] = (
         work_item.args[1]
@@ -215,5 +213,4 @@ def _handle_result(
             results,
             metadata,
             objective_count,
-            eval_count,
         )

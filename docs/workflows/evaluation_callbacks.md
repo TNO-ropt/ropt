@@ -230,6 +230,12 @@ def my_function(
     [`EvaluationBatchResult.metadata`][ropt.evaluation.EvaluationBatchResult]
     for the corresponding row.
 
+    A key need not be set by every row. Rows that do not set it get `np.nan` for
+    numeric values and `None` otherwise, so a numeric column with missing rows
+    is widened to `float64` — numpy has no integer NaN. A column set by every
+    row keeps its natural dtype. Mixing strings and non-strings under one key
+    raises a `ValueError`.
+
 Wrap the function in a
 [`FunctionEvaluator`][ropt.components.evaluators.FunctionEvaluator] and give the
 evaluator to a compute step (see [Optimization Workflows](workflows.md)):
