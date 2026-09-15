@@ -9,10 +9,10 @@
       
       
       
-        <link rel="prev" href="../keyboard_interrupt/">
+        <link rel="prev" href="../configuration/">
       
       
-        <link rel="next" href="../writing_plugins/">
+        <link rel="next" href="../discrete/">
       
       
         
@@ -23,7 +23,7 @@
     
     
       
-        <title>Plugin Discovery - ropt Documentation</title>
+        <title>Constraints - ropt Documentation</title>
       
     
     
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#plugin-discovery-and-validation" class="md-skip">
+        <a href="#constraints" class="md-skip">
           Skip to content
         </a>
       
@@ -118,7 +118,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Plugin Discovery
+              Constraints
             
           </span>
         </div>
@@ -280,11 +280,13 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="../../optimizer_setup/key_concepts/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../key_concepts/" class="md-tabs__link">
           
   
   
@@ -320,13 +322,11 @@
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="../logging/" class="md-tabs__link">
+      <li class="md-tabs__item">
+        <a href="../../utilities/logging/" class="md-tabs__link">
           
   
   
@@ -890,28 +890,31 @@
       
   
   
+    
   
   
+  
     
     
     
     
+      
+        
+        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
         
           
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
-        
-          
-          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
             
   
   
@@ -929,7 +932,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_4">
             <span class="md-nav__icon md-icon"></span>
             
@@ -947,7 +950,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../optimizer_setup/key_concepts/" class="md-nav__link">
+      <a href="../key_concepts/" class="md-nav__link">
         
   
   
@@ -975,7 +978,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../optimizer_setup/configuration/" class="md-nav__link">
+      <a href="../configuration/" class="md-nav__link">
         
   
   
@@ -1000,10 +1003,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../../optimizer_setup/constraints/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Constraints
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -1019,6 +1049,81 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#declaring-bounds-and-nonlinear-constraints" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Declaring bounds and nonlinear constraints
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#returning-a-constraint-from-the-evaluation-function" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Returning a constraint from the evaluation function
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#deciding-when-a-constraint-is-satisfied" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Deciding when a constraint is satisfied
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#adding-a-linear-constraint" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adding a linear constraint
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#where-to-next" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Where to next
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1031,7 +1136,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../optimizer_setup/discrete/" class="md-nav__link">
+      <a href="../discrete/" class="md-nav__link">
         
   
   
@@ -1059,7 +1164,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../optimizer_setup/gradients/" class="md-nav__link">
+      <a href="../gradients/" class="md-nav__link">
         
   
   
@@ -1087,7 +1192,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../optimizer_setup/realization_filters/" class="md-nav__link">
+      <a href="../realization_filters/" class="md-nav__link">
         
   
   
@@ -1115,7 +1220,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../optimizer_setup/function_estimators/" class="md-nav__link">
+      <a href="../function_estimators/" class="md-nav__link">
         
   
   
@@ -1143,7 +1248,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../optimizer_setup/results/" class="md-nav__link">
+      <a href="../results/" class="md-nav__link">
         
   
   
@@ -1320,31 +1425,28 @@
       
   
   
-    
   
   
-  
     
     
     
     
-      
-        
-        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" checked>
         
           
-          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
             
   
   
@@ -1362,7 +1464,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_6">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1380,7 +1482,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../logging/" class="md-nav__link">
+      <a href="../../utilities/logging/" class="md-nav__link">
         
   
   
@@ -1408,7 +1510,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../keyboard_interrupt/" class="md-nav__link">
+      <a href="../../utilities/keyboard_interrupt/" class="md-nav__link">
         
   
   
@@ -1433,37 +1535,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Plugin Discovery
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../utilities/plugin_discovery/" class="md-nav__link">
         
   
   
@@ -1479,37 +1554,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#where-to-next" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Where to next
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1522,7 +1566,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../writing_plugins/" class="md-nav__link">
+      <a href="../../utilities/writing_plugins/" class="md-nav__link">
         
   
   
@@ -2709,6 +2753,50 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#declaring-bounds-and-nonlinear-constraints" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Declaring bounds and nonlinear constraints
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#returning-a-constraint-from-the-evaluation-function" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Returning a constraint from the evaluation function
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#deciding-when-a-constraint-is-satisfied" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Deciding when a constraint is satisfied
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#adding-a-linear-constraint" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adding a linear constraint
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#where-to-next" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2739,41 +2827,164 @@
   
 
 
-<h1 id="plugin-discovery-and-validation">Plugin Discovery and Validation</h1>
-<p><code>ropt</code> provides helper functions for querying installed plugins at runtime.
-These are useful for verifying your environment or building dynamic
-configurations.</p>
-<p><a class="autorefs autorefs-internal" title="            ropt.plugins.manager.get_plugin_name" href="../../reference/plugin_manager/#ropt.plugins.manager.get_plugin_name"><code>get_plugin_name</code></a> looks up which plugin
-provides a given method. It takes the plugin area and a method string — the same
-<code>"plugin/method"</code> or <code>"method"</code> strings used in the configuration (see
-<a href="../../optimizer_setup/configuration/#method-strings">Method strings</a>) — and
-returns the plugin name, or <code>None</code> if no plugin supports the method:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_plugin_name</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">get_plugin_name</span><span class="p">(</span><span class="s2">"backend"</span><span class="p">,</span> <span class="s2">"slsqp"</span><span class="p">)</span>           <span class="c1"># "scipy"</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">get_plugin_name</span><span class="p">(</span><span class="s2">"backend"</span><span class="p">,</span> <span class="s2">"scipy/L-BFGS-B"</span><span class="p">)</span>  <span class="c1"># "scipy"</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="n">get_plugin_name</span><span class="p">(</span><span class="s2">"backend"</span><span class="p">,</span> <span class="s2">"unknown"</span><span class="p">)</span>         <span class="c1"># None</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="n">get_plugin_name</span><span class="p">(</span><span class="s2">"sampler"</span><span class="p">,</span> <span class="s2">"scipy/default"</span><span class="p">)</span>   <span class="c1"># "scipy"</span>
+<h1 id="constraints">Constraints</h1>
+<p>A constraint restricts which variable vectors count as a valid solution. <code>ropt</code>
+distinguishes three kinds, and the difference that matters in practice is <em>who
+computes them</em>:</p>
+<table>
+<thead>
+<tr>
+<th>Kind</th>
+<th>Declared</th>
+<th>Computed by</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Bounds</strong></td>
+<td><code>variables.lower_bounds</code> / <code>upper_bounds</code></td>
+<td>nobody — the optimizer never leaves the box</td>
+</tr>
+<tr>
+<td><strong>Linear</strong></td>
+<td><code>linear_constraints</code></td>
+<td><code>ropt</code>, from the coefficients you give</td>
+</tr>
+<tr>
+<td><strong>Nonlinear</strong></td>
+<td><code>nonlinear_constraints</code></td>
+<td>your evaluation function, once per realization</td>
+</tr>
+</tbody>
+</table>
+<p>Bounds and linear constraints are deterministic: they are fully described by the
+configuration, so <code>ropt</code> can evaluate them itself. A nonlinear constraint is not
+— it is computed alongside the objective, which means it can be as expensive as
+the objective and, in an ensemble, can differ between realizations.</p>
+<p>The runnable script for this page is
+<a href="https://github.com/TNO-ropt/ropt/blob/main/examples/simple/constrained.py">examples/simple/constrained.py</a>.
+It adds a nonlinear constraint to the ensemble Rosenbrock problem of
+<a href="../../getting_started/ensemble/">Ensemble-Based Optimization</a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Not every optimization method supports every kind of constraint. <code>ropt</code>
+reports an error when the configured method cannot handle what you declared;
+see <a href="../../reference/backend/">Optimizer Backends</a> for what each method
+supports.</p>
+</div>
+<h2 id="declaring-bounds-and-nonlinear-constraints">Declaring bounds and nonlinear constraints</h2>
+<p>Both live in the configuration, next to the variables:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">CONFIG</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="s2">"variables"</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>        <span class="s2">"variable_count"</span><span class="p">:</span> <span class="n">DIM</span><span class="p">,</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>        <span class="s2">"perturbation_magnitudes"</span><span class="p">:</span> <span class="mf">1e-6</span><span class="p">,</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>        <span class="s2">"lower_bounds"</span><span class="p">:</span> <span class="o">-</span><span class="mf">5.0</span><span class="p">,</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>        <span class="s2">"upper_bounds"</span><span class="p">:</span> <span class="mf">5.0</span><span class="p">,</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="p">},</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="s2">"realizations"</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>        <span class="s2">"weights"</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">]</span> <span class="o">*</span> <span class="n">REALIZATIONS</span><span class="p">,</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    <span class="p">},</span>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    <span class="s2">"nonlinear_constraints"</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>        <span class="s2">"lower_bounds"</span><span class="p">:</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span>
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>        <span class="s2">"upper_bounds"</span><span class="p">:</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span>
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>    <span class="p">},</span>
+</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>The area is one of <code>"backend"</code>, <code>"sampler"</code>, <code>"realization_filter"</code> or
-<code>"function_estimator"</code>.</p>
-<p><a class="autorefs autorefs-internal" title="            validate_backend_options" href="../../reference/utils/#ropt.utils.validate_backend_options"><code>validate_backend_options</code></a> checks
-whether a set of backend-specific options is valid for a given method, raising
-an error if not. Call it before starting a long optimization run to catch
-configuration mistakes early:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">validate_backend_options</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">validate_backend_options</span><span class="p">(</span><span class="s2">"scipy/slsqp"</span><span class="p">,</span> <span class="p">{</span><span class="s2">"maxiter"</span><span class="p">:</span> <span class="mi">200</span><span class="p">})</span>   <span class="c1"># ok</span>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="n">validate_backend_options</span><span class="p">(</span><span class="s2">"scipy/slsqp"</span><span class="p">,</span> <span class="p">{</span><span class="s2">"bogus"</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>       <span class="c1"># raises: unknown option</span>
+<p>Bounds keep every variable in <span class="arithmatex">\([-5, 5]\)</span>. The <code>nonlinear_constraints</code> section
+declares <em>how many</em> nonlinear constraints there are and what range each value
+must fall in — here a single constraint that must stay at or below <span class="arithmatex">\(-1\)</span>. Use
+<code>-np.inf</code> or <code>np.inf</code> for a one-sided constraint, and equal lower and upper
+bounds for an equality.</p>
+<p>The section declares only the bounds; the values themselves come from the
+evaluation function. See
+<a href="../configuration/#nonlinear_constraints"><code>nonlinear_constraints</code></a> and
+<a href="../configuration/#variables"><code>variables</code></a> for the full field reference.</p>
+<h2 id="returning-a-constraint-from-the-evaluation-function">Returning a constraint from the evaluation function</h2>
+<p>An evaluation function that has constraints returns a sequence instead of a
+single number: <strong>the objectives first, then the constraints</strong>. With one
+objective and one constraint, that is a two-element list:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">rosenbrock</span><span class="p">(</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    <span class="n">variables</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">context</span><span class="p">:</span> <span class="n">EvaluationFunctionContext</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">    </span><span class="sd">"""The Rosenbrock objective and nonlinear constraint for one realization.</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="sd">    Args:</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="sd">        variables: The variable vector to evaluate.</span>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="sd">        context:   Identifies the realization being evaluated.</span>
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="sd">    Returns:</span>
+</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="sd">        The objective followed by the constraint value for the realization.</span>
+</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="sd">    """</span>
+</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>    <span class="n">r</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">realization</span>
+</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>    <span class="n">objective</span> <span class="o">=</span> <span class="mf">0.0</span>
+</span><span id="__span-1-15"><a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>    <span class="k">for</span> <span class="n">d_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">DIM</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+</span><span id="__span-1-16"><a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a>        <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">variables</span><span class="p">[</span><span class="n">d_idx</span> <span class="p">:</span> <span class="n">d_idx</span> <span class="o">+</span> <span class="mi">2</span><span class="p">]</span>
+</span><span id="__span-1-17"><a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a>        <span class="n">objective</span> <span class="o">+=</span> <span class="p">(</span><span class="n">A</span><span class="p">[</span><span class="n">r</span><span class="p">]</span> <span class="o">-</span> <span class="n">x</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">B</span><span class="p">[</span><span class="n">r</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">x</span> <span class="o">*</span> <span class="n">x</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
+</span><span id="__span-1-18"><a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a>    <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">variables</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span>
+</span><span id="__span-1-19"><a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a>    <span class="n">constraint</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">A</span><span class="p">[</span><span class="n">r</span><span class="p">])</span> <span class="o">**</span> <span class="mi">3</span> <span class="o">-</span> <span class="n">y</span>
+</span><span id="__span-1-20"><a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a>    <span class="k">return</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">objective</span><span class="p">),</span> <span class="nb">float</span><span class="p">(</span><span class="n">constraint</span><span class="p">)]</span>
 </span></code></pre></div>
+<p>The order is positional — there are no names — so it must match the order in
+which the objectives and constraints are configured. See
+<a href="../../running/running/#the-evaluation-function">The evaluation function</a> for the
+other shapes the return value can take.</p>
+<p>Because the constraint is computed per realization and uses <code>A[r]</code>, it is
+<em>stochastic</em>: each realization constrains the problem slightly differently, and
+<code>ropt</code> combines them the same way it combines the objectives.</p>
+<h2 id="deciding-when-a-constraint-is-satisfied">Deciding when a constraint is satisfied</h2>
+<p>A constraint is rarely met exactly, so <code>optimize</code> takes a
+<code>constraint_tolerance</code>: a result counts as feasible when no constraint is
+violated by more than that amount.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    <span class="n">config</span><span class="p">,</span> <span class="n">INITIAL_VALUES</span><span class="p">,</span> <span class="n">rosenbrock</span><span class="p">,</span> <span class="n">report</span><span class="o">=</span><span class="n">report</span><span class="p">,</span> <span class="n">constraint_tolerance</span><span class="o">=</span><span class="mf">1e-6</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="p">)</span>
+</span></code></pre></div>
+<p>This matters more than it looks. <code>result.variables</code> is only ever the best
+<strong>feasible</strong> point; if no evaluation satisfied the constraints to within the
+tolerance, the run returns <code>None</code> instead of a best point. A tolerance that is
+too tight is a common reason for an empty result — see
+<a href="../../running/pitfalls/">Common Pitfalls</a>.</p>
+<p>To watch feasibility as the run proceeds, read <code>constraint_info</code> from the full
+result. Its <code>nonlinear_violation</code> is zero where a constraint is met and positive
+by the amount it is exceeded:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">report</span><span class="p">(</span><span class="n">result</span><span class="p">:</span> <span class="n">EvaluateResult</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">    </span><span class="sd">"""Print any constraint violation, and the point that caused it.</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="sd">    Args:</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="sd">        result: The result of a single function evaluation.</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="sd">    """</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>    <span class="k">assert</span> <span class="n">result</span><span class="o">.</span><span class="n">results</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>    <span class="n">info</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">constraint_info</span>
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>    <span class="k">if</span> <span class="p">(</span>
+</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>        <span class="n">info</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>        <span class="ow">and</span> <span class="n">info</span><span class="o">.</span><span class="n">nonlinear_violation</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>        <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">info</span><span class="o">.</span><span class="n">nonlinear_violation</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>    <span class="p">):</span>
+</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  constraint violation: </span><span class="si">{</span><span class="n">info</span><span class="o">.</span><span class="n">nonlinear_violation</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  at variables: </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">variables</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</span></code></pre></div>
+<h2 id="adding-a-linear-constraint">Adding a linear constraint</h2>
+<p>A linear constraint is a row of coefficients applied to the variable vector,
+with bounds on the result. It never reaches your evaluation function. Equal
+lower and upper bounds make it an equality — this one forces the fourth and
+fifth variables to be equal:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">config</span><span class="p">[</span><span class="s2">"linear_constraints"</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>    <span class="s2">"coefficients"</span><span class="p">:</span> <span class="p">[[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">]],</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    <span class="s2">"lower_bounds"</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>    <span class="s2">"upper_bounds"</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="p">}</span>
+</span></code></pre></div>
+<p>The script adds it when run with <code>--linear</code>. One row per constraint, one
+coefficient per variable; see
+<a href="../configuration/#linear_constraints"><code>linear_constraints</code></a> for the field
+reference.</p>
 <h2 id="where-to-next">Where to next</h2>
 <ul>
-<li>Implementing a plugin of your own: <a href="../writing_plugins/">Writing a Plugin</a>.</li>
-<li>Installing plugin packages: <a href="../../getting_started/installation/#plugin-packages">Installation</a>.</li>
-<li>The <code>"plugin/method"</code> naming convention in full:
-  <a href="../../optimizer_setup/configuration/#method-strings">Method strings</a>.</li>
-<li>Tracing what <code>ropt</code> is doing at runtime: <a href="../logging/">Logging</a>.</li>
+<li>The fields used here, in full: <a href="../configuration/">Configuration</a>.</li>
+<li>What the evaluation function may return:
+  <a href="../../running/running/#the-evaluation-function">Running Optimizations</a>.</li>
+<li>Why a run can end without a best point:
+  <a href="../../running/pitfalls/">Common Pitfalls</a>.</li>
 </ul>
 
 
@@ -2810,7 +3021,7 @@ configuration mistakes early:</p>
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../keyboard_interrupt/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Keyboard Interrupts">
+          <a href="../configuration/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Configuration">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -2820,20 +3031,20 @@ configuration mistakes early:</p>
                 Previous
               </span>
               <div class="md-ellipsis">
-                Keyboard Interrupts
+                Configuration
               </div>
             </div>
           </a>
         
         
           
-          <a href="../writing_plugins/" class="md-footer__link md-footer__link--next" aria-label="Next: Writing a Plugin">
+          <a href="../discrete/" class="md-footer__link md-footer__link--next" aria-label="Next: Discrete and Mixed-Integer Variables">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Writing a Plugin
+                Discrete and Mixed-Integer Variables
               </div>
             </div>
             <div class="md-footer__button md-icon">
