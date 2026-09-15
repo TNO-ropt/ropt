@@ -72,7 +72,6 @@ from numpy.random import Generator
 from numpy.typing import NDArray
 
 from ropt.config import SamplerConfig
-from ropt.context import EnOptContext
 from ropt.sampler import Sampler
 
 
@@ -81,7 +80,13 @@ class UniformSampler(Sampler):
         self._config = sampler_config
 
     def init(
-        self, context: EnOptContext, mask: NDArray[np.bool_] | None, rng: Generator
+        self,
+        *,
+        realization_count: int,
+        perturbation_count: int,
+        variable_count: int,
+        mask: NDArray[np.bool_] | None,
+        rng: Generator,
     ) -> None:
         self._rng = rng
 

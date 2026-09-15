@@ -11,7 +11,6 @@ from scipy.stats import norm, rv_continuous, truncnorm, uniform
 from scipy.stats.qmc import Halton, LatinHypercube, QMCEngine, Sobol, scale
 
 from ropt.config import SamplerConfig
-from ropt.context import EnOptContext
 from ropt.exceptions import UnsupportedError
 from ropt.plugins import MethodSpec
 from ropt.sampler import Sampler
@@ -85,11 +84,16 @@ class SciPySampler(Sampler):
 
     def init(  # ruff: ignore[undocumented-public-method]
         self,
-        context: EnOptContext,
+        *,
+        realization_count: int,
+        perturbation_count: int,
+        variable_count: int,
         mask: NDArray[np.bool_] | None,
         rng: Generator,
     ) -> None:
-        self._context = context
+        self._realization_count = realization_count
+        self._perturbation_count = perturbation_count
+        self._variable_count = variable_count
         self._mask = mask
         self._rng = rng
         if self._sampler is None:
@@ -98,9 +102,9 @@ class SciPySampler(Sampler):
             )
 
     def generate_samples(self) -> NDArray[np.float64]:  # ruff: ignore[undocumented-public-method]
-        variable_count = self._context.variables.variable_count
-        realization_count = self._context.realizations.weights.size
-        perturbation_count = self._context.gradient.number_of_perturbations
+        variable_count = self._variable_count
+        realization_count = self._realization_count
+        perturbation_count = self._perturbation_count
 
         sample_dim = variable_count if self._mask is None else self._mask.sum()
 
@@ -136,9 +140,7 @@ class SciPySampler(Sampler):
             sampler = _STATS_SAMPLERS[self._method]
         elif self._method in _QMC_ENGINES:
             sample_dim = (
-                self._context.variables.variable_count
-                if self._mask is None
-                else self._mask.sum()
+                self._variable_count if self._mask is None else self._mask.sum()
             )
             sampler = _QMC_ENGINES[self._method](sample_dim, seed=self._rng, **options)
         else:

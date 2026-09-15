@@ -16,7 +16,6 @@ if TYPE_CHECKING:
     from numpy.typing import NDArray
 
     from ropt.config._sampler_config import SamplerConfig
-    from ropt.context import EnOptContext
     from ropt.plugins import MethodSpec
 
 
@@ -32,16 +31,15 @@ class Sampler(ABC):
 
     1. Instantiation via `__init__`: Called by the plugin system with a
        configuration object.
-    2. Setup via `init`: Called once per optimization workflow with the
-       [`EnOptContext`][ropt.context.EnOptContext], a variable mask, and a
-       random number generator.
+    2. Setup via `init`: Called once per optimization workflow with the shape of
+       the samples to generate, a variable mask, and a random number generator.
     3. Sampling via `generate_samples`: Called repeatedly during optimization
        whenever perturbed variable vectors are needed.
 
     Subclasses must implement:
 
     - `__init__`: Stores sampler configuration and performs lightweight setup.
-    - `init`: Receives context-dependent inputs for workflow-specific setup.
+    - `init`: Receives the sample shape and the random number generator.
     - `generate_samples`: Returns perturbation samples with the expected shape
       and masking semantics.
     """
@@ -60,7 +58,7 @@ class Sampler(ABC):
 
         Called during instantiation. Subclasses should store the configuration
         and perform any lightweight initialization. Validation and
-        context-dependent setup should usually be deferred to `init`.
+        run-dependent setup should usually be deferred to `init`.
 
         Args:
             sampler_config: Configuration object specifying the sampler method
@@ -69,22 +67,29 @@ class Sampler(ABC):
 
     @abstractmethod
     def init(
-        self, context: EnOptContext, mask: NDArray[np.bool_] | None, rng: Generator
+        self,
+        *,
+        realization_count: int,
+        perturbation_count: int,
+        variable_count: int,
+        mask: NDArray[np.bool_] | None,
+        rng: Generator,
     ) -> None:
-        """Finalize initialization after the optimization context is known.
+        """Finalize initialization before the optimization starts.
 
         Called once at the start of each optimization workflow, after all
-        configuration is finalized. Use this method to store the active
-        context, receive the variable subset handled by this sampler, and
-        initialize random-state dependent internals.
+        configuration is finalized. The three counts are the shape of the array
+        `generate_samples` must return.
 
         Args:
-            context: The main EnOpt context object.
-            mask: Optional boolean mask selecting the variables handled by this
-                sampler. If `None`, the sampler is responsible for all
-                variables.
-            rng: NumPy random number generator instance for stochastic
-                sampling methods.
+            realization_count:  The number of realizations in the ensemble.
+            perturbation_count: The number of perturbations to generate.
+            variable_count:     The total number of optimization variables.
+            mask:               Optional boolean mask selecting the variables
+                                handled by this sampler. If `None`, the sampler
+                                is responsible for all variables.
+            rng:                NumPy random number generator instance for
+                                stochastic sampling methods.
         """
 
     @abstractmethod

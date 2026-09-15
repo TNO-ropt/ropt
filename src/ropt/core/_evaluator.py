@@ -752,7 +752,13 @@ class EnsembleEvaluator:
                     [sampler == key for sampler in self._context.variables.samplers]
                 )
             )
-            item.init(self._context, mask, rng)
+            item.init(
+                realization_count=self._context.realizations.weights.size,
+                perturbation_count=self._context.gradient.number_of_perturbations,
+                variable_count=self._context.variables.variable_count,
+                mask=mask,
+                rng=rng,
+            )
         return self._context.samplers
 
 

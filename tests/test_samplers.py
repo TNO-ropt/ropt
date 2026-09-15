@@ -59,23 +59,26 @@ class MockedSampler(Sampler):
 
     def init(
         self,
-        context: EnOptContext,
+        *,
+        realization_count: int,
+        perturbation_count: int,
+        variable_count: int,
         mask: NDArray[np.bool_] | None,
-        _: Generator,
+        rng: Generator,
     ) -> None:
-        self._context = context
+        self._realization_count = realization_count
+        self._perturbation_count = perturbation_count
+        self._variable_count = variable_count
         self._mask = mask
+        self._rng = rng
 
     def generate_samples(
         self,
     ) -> NDArray[np.float64]:
-        assert (
-            self._context.gradient.number_of_perturbations
-            == self._context.variables.variable_count
-        )
-        variable_count = self._context.variables.variable_count
-        realization_count = self._context.realizations.weights.size
-        perturbation_count = self._context.gradient.number_of_perturbations
+        assert self._perturbation_count == self._variable_count
+        variable_count = self._variable_count
+        realization_count = self._realization_count
+        perturbation_count = self._perturbation_count
 
         samples: NDArray[np.float64]
         if self._mask is None:
@@ -97,6 +100,21 @@ class MockedSampler(Sampler):
         return samples
 
 
+def _init(
+    sampler: Sampler,
+    context: EnOptContext,
+    mask: NDArray[np.bool_] | None,
+    rng: Generator,
+) -> None:
+    sampler.init(
+        realization_count=context.realizations.weights.size,
+        perturbation_count=context.gradient.number_of_perturbations,
+        variable_count=context.variables.variable_count,
+        mask=mask,
+        rng=rng,
+    )
+
+
 def test_sampler_simple(config: Any) -> None:
     sampler_config = SamplerConfig.model_validate({"method": "test"})
     sampler = MockedSampler(sampler_config)
@@ -104,7 +122,7 @@ def test_sampler_simple(config: Any) -> None:
     config["samplers"] = [sampler]
     context = EnOptContext.model_validate(config)
     rng = default_rng(123)
-    sampler.init(context, None, rng)
+    _init(sampler, context, None, rng)
     perturbed_variables = _perturb_variables(
         context,
         np.array([0.0, 0.0, 0.0]),
@@ -121,7 +139,7 @@ def test_sampler_use_options(config: Any) -> None:
     config["samplers"] = [sampler]
     context = EnOptContext.model_validate(config)
     rng = default_rng(123)
-    sampler.init(context, None, rng)
+    _init(sampler, context, None, rng)
     perturbed_variables = _perturb_variables(
         context,
         np.array([0.0, 0.0, 0.0]),
@@ -143,8 +161,8 @@ def test_sampler_indexed(config: Any) -> None:
     context = EnOptContext.model_validate(config)
 
     rng = default_rng(123)
-    sampler0.init(context, np.array([0]), rng)
-    sampler1.init(context, np.array([1, 2]), rng)
+    _init(sampler0, context, np.array([0]), rng)
+    _init(sampler1, context, np.array([1, 2]), rng)
 
     perturbed_variables = _perturb_variables(
         context,
