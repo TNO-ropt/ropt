@@ -20,8 +20,8 @@ optimization tasks.
 | [`evaluate.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/evaluate.py) | Evaluating variable vectors without optimizing | — |
 | [`ensemble.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/ensemble.py) | Optimizing the mean objective over uncertain realizations | [Ensemble-Based Optimization](../getting_started/ensemble.md) |
 | [`constrained.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/constrained.py) | Linear and nonlinear constraints | [Constraints](../optimizer_setup/constraints.md) |
-| [`discrete.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/discrete.py) | Integer variables, solved with differential evolution | [Mixed-Integer Optimization](discrete.md) |
-| [`mixed.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/mixed.py) | Continuous and integer variables in one problem | — |
+| [`discrete.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/discrete.py) | Integer variables, solved with differential evolution | [Discrete and Mixed-Integer Variables](../optimizer_setup/discrete.md) |
+| [`mixed.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/mixed.py) | Continuous and integer variables in one problem | [Discrete and Mixed-Integer Variables](../optimizer_setup/discrete.md) |
 | [`realization_filter.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/realization_filter.py) | A custom filter that reweights realizations | — |
 | [`metadata.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/metadata.py) | Tagging a run, and recording per-realization data | [Attaching metadata](../running/running.md#attaching-metadata) |
 | [`restart.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/restart.py) | Restarting from the best point, collecting every result | [Restarting from the Best Point](restart.md) |

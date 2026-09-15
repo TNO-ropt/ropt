@@ -38,6 +38,7 @@ def main(*, linear: bool = False) -> None:
         linear: Impose ``x + y <= 10`` as a linear rather than nonlinear
                 constraint.
     """
+    # --8<-- [start:config]
     config: dict[str, Any] = {
         "variables": {
             "variable_count": 2,
@@ -54,6 +55,7 @@ def main(*, linear: bool = False) -> None:
             "parallel": False,
         },
     }
+    # --8<-- [end:config]
     if linear:
         config["linear_constraints"] = {
             "coefficients": [1.0, 1.0],
@@ -66,6 +68,7 @@ def main(*, linear: bool = False) -> None:
             "upper_bounds": [10.0],
         }
 
+    # --8<-- [start:objective]
     def function(
         variables: NDArray[np.float64],
         _context: EvaluationFunctionContext,
@@ -75,6 +78,8 @@ def main(*, linear: bool = False) -> None:
         if linear:
             return float(objective)
         return [float(objective), float(x + y)]
+
+    # --8<-- [end:objective]
 
     result = optimize(config, INITIAL_VALUES, function, report=report)
     print(f"optimal variables: {result.variables}")

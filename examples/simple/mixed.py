@@ -19,6 +19,7 @@ from ropt.simple import EvaluateResult, EvaluationFunctionContext, optimize
 DIM = 4
 REALIZATIONS = 10
 UNCERTAINTY = 0.1
+# --8<-- [start:config]
 CONFIG: dict[str, Any] = {
     "variables": {
         "variable_count": DIM,
@@ -41,6 +42,7 @@ CONFIG: dict[str, Any] = {
         "weights": [1.0] * REALIZATIONS,
     },
 }
+# --8<-- [end:config]
 INITIAL_VALUES = [1.0, 1.0, 1.0, 1.0]
 
 _RNG = default_rng(seed=123)
