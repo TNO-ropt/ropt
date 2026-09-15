@@ -3047,8 +3047,8 @@ algorithm descriptions.</p>
 <p>Subclasses must implement four methods:</p>
 <ol>
 <li><code>__init__</code> — store configuration; defer heavy work to <code>init</code>.</li>
-<li><code>init</code> — called once with the full optimization context; validate
-   settings and pre-compute state here.</li>
+<li><code>init</code> — called once before the run; validate settings and pre-compute
+   state here.</li>
 <li><code>calculate_function</code> — aggregate per-realization function values.</li>
 <li><code>calculate_gradient</code> — aggregate per-realization gradients.</li>
 </ol>
@@ -3129,7 +3129,7 @@ set if this class has one. See <a class="autorefs autorefs-internal" title="    
 
         <p>Create a new function estimator instance.</p>
 <p>Store the configuration; keep initialization lightweight.
-Context-dependent setup belongs in <code>init</code>.</p>
+Run-dependent setup belongs in <code>init</code>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3184,12 +3184,12 @@ Context-dependent setup belongs in <code>init</code>.</p>
   </span>
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">init</span><span class="p">(</span><span class="n">context</span><span class="p">:</span> <span class="n">EnOptContext</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">init</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">merge_realizations</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
 
-        <p>Finalize initialization with the optimization context.</p>
+        <p>Finalize initialization before the optimization starts.</p>
 <p>Called once after configuration is finalized. Use for validation
 (for example compatibility with <code>merge_realizations</code>) and precomputation.</p>
 
@@ -3207,14 +3207,16 @@ Context-dependent setup belongs in <code>init</code>.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                <code>context</code>
+                <code>merge_realizations</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            EnOptContext (ropt.context.EnOptContext)" href="../context/#ropt.context.EnOptContext">EnOptContext</a></code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/functions.html#bool">bool</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The optimization context.</p>
+                <p>Whether gradients arrive merged across
+                realizations, as described in
+                <code>calculate_gradient</code>.</p>
               </div>
             </td>
             <td>

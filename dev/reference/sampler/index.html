@@ -3149,16 +3149,15 @@ optimization variables when estimating gradients.</p>
 <ol>
 <li>Instantiation via <code>__init__</code>: Called by the plugin system with a
    configuration object.</li>
-<li>Setup via <code>init</code>: Called once per optimization workflow with the
-   <a class="autorefs autorefs-internal" title="            EnOptContext" href="../context/#ropt.context.EnOptContext"><code>EnOptContext</code></a>, a variable mask, and a
-   random number generator.</li>
+<li>Setup via <code>init</code>: Called once per optimization workflow with the shape of
+   the samples to generate, a variable mask, and a random number generator.</li>
 <li>Sampling via <code>generate_samples</code>: Called repeatedly during optimization
    whenever perturbed variable vectors are needed.</li>
 </ol>
 <p>Subclasses must implement:</p>
 <ul>
 <li><code>__init__</code>: Stores sampler configuration and performs lightweight setup.</li>
-<li><code>init</code>: Receives context-dependent inputs for workflow-specific setup.</li>
+<li><code>init</code>: Receives the sample shape and the random number generator.</li>
 <li><code>generate_samples</code>: Returns perturbation samples with the expected shape
   and masking semantics.</li>
 </ul>
@@ -3238,7 +3237,7 @@ set if this class has one. See <a class="autorefs autorefs-internal" title="    
         <p>Create a new sampler instance.</p>
 <p>Called during instantiation. Subclasses should store the configuration
 and perform any lightweight initialization. Validation and
-context-dependent setup should usually be deferred to <code>init</code>.</p>
+run-dependent setup should usually be deferred to <code>init</code>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3295,19 +3294,21 @@ and any method-specific options.</p>
 
 </h4>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">init</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">context</span><span class="p">:</span> <span class="n">EnOptContext</span><span class="p">,</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">mask</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">bool_</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">rng</span><span class="p">:</span> <span class="n">Generator</span><span class="p">,</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="o">*</span><span class="p">,</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">realization_count</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">perturbation_count</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">variable_count</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">mask</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">bool_</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">rng</span><span class="p">:</span> <span class="n">Generator</span><span class="p">,</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
 
-        <p>Finalize initialization after the optimization context is known.</p>
+        <p>Finalize initialization before the optimization starts.</p>
 <p>Called once at the start of each optimization workflow, after all
-configuration is finalized. Use this method to store the active
-context, receive the variable subset handled by this sampler, and
-initialize random-state dependent internals.</p>
+configuration is finalized. The three counts are the shape of the array
+<code>generate_samples</code> must return.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3323,14 +3324,46 @@ initialize random-state dependent internals.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                <code>context</code>
+                <code>realization_count</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            EnOptContext (ropt.context.EnOptContext)" href="../context/#ropt.context.EnOptContext">EnOptContext</a></code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/functions.html#int">int</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The main EnOpt context object.</p>
+                <p>The number of realizations in the ensemble.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>perturbation_count</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/functions.html#int">int</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The number of perturbations to generate.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>variable_count</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/functions.html#int">int</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The total number of optimization variables.</p>
               </div>
             </td>
             <td>
@@ -3346,9 +3379,9 @@ initialize random-state dependent internals.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional boolean mask selecting the variables handled by this
-sampler. If <code>None</code>, the sampler is responsible for all
-variables.</p>
+                <p>Optional boolean mask selecting the variables
+                handled by this sampler. If <code>None</code>, the sampler
+                is responsible for all variables.</p>
               </div>
             </td>
             <td>
@@ -3364,8 +3397,8 @@ variables.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>NumPy random number generator instance for stochastic
-sampling methods.</p>
+                <p>NumPy random number generator instance for
+                stochastic sampling methods.</p>
               </div>
             </td>
             <td>
@@ -3511,16 +3544,15 @@ optimization variables when estimating gradients.</p>
 <ol>
 <li>Instantiation via <code>__init__</code>: Called by the plugin system with a
    configuration object.</li>
-<li>Setup via <code>init</code>: Called once per optimization workflow with the
-   <a class="autorefs autorefs-internal" title="            EnOptContext" href="../context/#ropt.context.EnOptContext"><code>EnOptContext</code></a>, a variable mask, and a
-   random number generator.</li>
+<li>Setup via <code>init</code>: Called once per optimization workflow with the shape of
+   the samples to generate, a variable mask, and a random number generator.</li>
 <li>Sampling via <code>generate_samples</code>: Called repeatedly during optimization
    whenever perturbed variable vectors are needed.</li>
 </ol>
 <p>Subclasses must implement:</p>
 <ul>
 <li><code>__init__</code>: Stores sampler configuration and performs lightweight setup.</li>
-<li><code>init</code>: Receives context-dependent inputs for workflow-specific setup.</li>
+<li><code>init</code>: Receives the sample shape and the random number generator.</li>
 <li><code>generate_samples</code>: Returns perturbation samples with the expected shape
   and masking semantics.</li>
 </ul>
@@ -3600,7 +3632,7 @@ set if this class has one. See <a class="autorefs autorefs-internal" title="    
         <p>Create a new sampler instance.</p>
 <p>Called during instantiation. Subclasses should store the configuration
 and perform any lightweight initialization. Validation and
-context-dependent setup should usually be deferred to <code>init</code>.</p>
+run-dependent setup should usually be deferred to <code>init</code>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3657,19 +3689,21 @@ and any method-specific options.</p>
 
 </h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">init</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">context</span><span class="p">:</span> <span class="n">EnOptContext</span><span class="p">,</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">mask</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">bool_</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">rng</span><span class="p">:</span> <span class="n">Generator</span><span class="p">,</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="o">*</span><span class="p">,</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">realization_count</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">perturbation_count</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">variable_count</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">mask</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">bool_</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">rng</span><span class="p">:</span> <span class="n">Generator</span><span class="p">,</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
 
-        <p>Finalize initialization after the optimization context is known.</p>
+        <p>Finalize initialization before the optimization starts.</p>
 <p>Called once at the start of each optimization workflow, after all
-configuration is finalized. Use this method to store the active
-context, receive the variable subset handled by this sampler, and
-initialize random-state dependent internals.</p>
+configuration is finalized. The three counts are the shape of the array
+<code>generate_samples</code> must return.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3685,14 +3719,46 @@ initialize random-state dependent internals.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                <code>context</code>
+                <code>realization_count</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            EnOptContext (ropt.context.EnOptContext)" href="../context/#ropt.context.EnOptContext">EnOptContext</a></code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/functions.html#int">int</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The main EnOpt context object.</p>
+                <p>The number of realizations in the ensemble.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>perturbation_count</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/functions.html#int">int</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The number of perturbations to generate.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>variable_count</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/functions.html#int">int</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The total number of optimization variables.</p>
               </div>
             </td>
             <td>
@@ -3708,9 +3774,9 @@ initialize random-state dependent internals.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional boolean mask selecting the variables handled by this
-sampler. If <code>None</code>, the sampler is responsible for all
-variables.</p>
+                <p>Optional boolean mask selecting the variables
+                handled by this sampler. If <code>None</code>, the sampler
+                is responsible for all variables.</p>
               </div>
             </td>
             <td>
@@ -3726,8 +3792,8 @@ variables.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>NumPy random number generator instance for stochastic
-sampling methods.</p>
+                <p>NumPy random number generator instance for
+                stochastic sampling methods.</p>
               </div>
             </td>
             <td>
