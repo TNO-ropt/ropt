@@ -3303,6 +3303,11 @@ contents must be picklable.</p>
       dataclass
   " href="../../reference/evaluation/#ropt.evaluation.EvaluationBatchResult"><code>EvaluationBatchResult.metadata</code></a>
 for the corresponding row.</p>
+<p>A key need not be set by every row. Rows that do not set it get <code>np.nan</code> for
+numeric values and <code>None</code> otherwise, so a numeric column with missing rows
+is widened to <code>float64</code> — numpy has no integer NaN. A column set by every
+row keeps its natural dtype. Mixing strings and non-strings under one key
+raises a <code>ValueError</code>.</p>
 </li>
 </ul>
 <p>Wrap the function in a

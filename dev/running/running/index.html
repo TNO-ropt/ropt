@@ -3160,6 +3160,10 @@ This is the permanent contract, not a gap to be filled later.</p>
 </span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>    <span class="n">value</span> <span class="o">=</span> <span class="o">...</span>
 </span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>    <span class="k">return</span> <span class="n">EvaluationFunctionResult</span><span class="p">(</span><span class="n">objectives</span><span class="o">=</span><span class="n">value</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">"seconds"</span><span class="p">:</span> <span class="mf">1.3</span><span class="p">})</span>
 </span></code></pre></div>
+<p>A key does not have to be set by every realization; those that do not set it
+  get <code>np.nan</code> for numeric values and <code>None</code> otherwise. See <a href="../../workflows/evaluation_callbacks/#using-functionevaluator">Writing Evaluation
+  Callbacks</a> for
+  the effect on the column dtype.</p>
 <p>Neither kind is interpreted by <code>ropt</code>. Constant metadata ends up on
 <code>result.results.metadata</code>; per-evaluation metadata on
 <code>result.results.evaluations.metadata</code> (one entry per realization). Both kinds can
