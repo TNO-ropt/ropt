@@ -16,7 +16,6 @@ from numpy.random import default_rng
 from numpy.typing import NDArray
 
 from ropt.config import RealizationFilterConfig
-from ropt.context import EnOptContext
 from ropt.realization_filter import RealizationFilter
 from ropt.simple import EvaluateResult, EvaluationFunctionContext, optimize
 
@@ -30,33 +29,31 @@ class MedianFilter(RealizationFilter):
 
     def __init__(
         self,
-        filter_config: RealizationFilterConfig,  # ruff: ignore[unused-method-argument]
+        filter_config: RealizationFilterConfig,
     ) -> None:
         """Create the filter.
 
         Args:
             filter_config: The filter configuration, unused by this filter.
         """
-        self._realization_count: int
 
-    def init(self, context: EnOptContext) -> None:
-        """Store the number of realizations.
-
-        Args:
-            context: The optimization context.
-        """
-        self._realization_count = len(context.realizations.weights)
-
-    def get_realization_weights(
+    def get_realization_weights(  # ruff: ignore[no-self-use]
         self,
         objectives: NDArray[np.float64],
         constraints: NDArray[np.float64] | None,  # ruff: ignore[unused-method-argument]
+        *,
+        objective_scales: NDArray[np.float64],  # ruff: ignore[unused-method-argument]
+        maximize: NDArray[np.bool_],  # ruff: ignore[unused-method-argument]
+        objective_weights: NDArray[np.float64],  # ruff: ignore[unused-method-argument]
     ) -> NDArray[np.float64]:
         """Give the realization with the median objective a weight of one.
 
         Args:
-            objectives:  The objective values for each realization.
-            constraints: The constraint values, unused by this filter.
+            objectives:        The objective values for each realization.
+            constraints:       The constraint values, unused by this filter.
+            objective_scales:  The objective scales, unused by this filter.
+            maximize:          The objective directions, unused by this filter.
+            objective_weights: The objective weights, unused by this filter.
 
         Returns:
             The weights for each realization, zero for all but the median.
@@ -65,9 +62,10 @@ class MedianFilter(RealizationFilter):
         # objective, hence the indexing to get the only objective there is. A
         # real filter would also handle failed realizations, which carry nan
         # values, for instance by giving them a weight of zero.
+        realization_count = objectives.shape[0]
         order = np.argsort(objectives[:, 0])
-        weights = np.zeros(self._realization_count, dtype=np.float64)
-        weights[order[self._realization_count // 2]] = 1.0
+        weights = np.zeros(realization_count, dtype=np.float64)
+        weights[order[realization_count // 2]] = 1.0
         return weights
 
 

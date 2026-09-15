@@ -84,10 +84,7 @@ def test_cvar_filter_ranks_an_infinite_objective_worst() -> None:
             method="cvar-objective", options={"sort": [0], "percentile": 1 / 3}
         )
     )
-    realization_filter.init(context)
-    weights = realization_filter.get_realization_weights(
-        np.array([[1.0], [np.inf], [3.0]]), None
-    )
+    weights = _weights(realization_filter, context, np.array([[1.0], [np.inf], [3.0]]))
     assert np.allclose(weights, [0.0, 1 / 3, 0.0])
 
 
@@ -101,6 +98,20 @@ def _filter_context(**objectives: Any) -> EnOptContext:
     )
 
 
+def _weights(
+    realization_filter: RealizationFilter,
+    context: EnOptContext,
+    objectives: NDArray[np.float64],
+) -> NDArray[np.float64]:
+    return realization_filter.get_realization_weights(
+        objectives,
+        None,
+        objective_scales=context.get_objective_scales(),
+        maximize=context.objectives.maximize,
+        objective_weights=context.objectives.weights,
+    )
+
+
 def test_cvar_filter_ranks_a_maximized_objective_the_other_way() -> None:
     values = np.array([[1.0], [2.0], [3.0]])
     realization_filter = DefaultRealizationFilter(
@@ -109,13 +120,13 @@ def test_cvar_filter_ranks_a_maximized_objective_the_other_way() -> None:
         )
     )
 
-    realization_filter.init(_filter_context(weights=[1.0]))
-    minimized = realization_filter.get_realization_weights(values, None)
+    minimized = _weights(realization_filter, _filter_context(weights=[1.0]), values)
     # CVaR keeps the worst, which for a minimized objective is the largest.
     assert np.allclose(minimized, [0.0, 0.0, 1 / 3])
 
-    realization_filter.init(_filter_context(weights=[1.0], maximize=True))
-    maximized = realization_filter.get_realization_weights(values, None)
+    maximized = _weights(
+        realization_filter, _filter_context(weights=[1.0], maximize=True), values
+    )
     assert np.allclose(maximized, [1 / 3, 0.0, 0.0])
 
 
@@ -126,11 +137,10 @@ def test_cvar_filter_takes_the_direction_of_the_objective_it_sorts_by() -> None:
             method="cvar-objective", options={"sort": [1], "percentile": 1 / 3}
         )
     )
-    realization_filter.init(
-        _filter_context(weights=[0.25, 0.75], maximize=[False, True])
-    )
-    weights = realization_filter.get_realization_weights(
-        np.array([[9.0, 1.0], [9.0, 2.0], [9.0, 3.0]]), None
+    weights = _weights(
+        realization_filter,
+        _filter_context(weights=[0.25, 0.75], maximize=[False, True]),
+        np.array([[9.0, 1.0], [9.0, 2.0], [9.0, 3.0]]),
     )
     # The direction of objective 1, not of objective 0, decides the ranking, so
     # the worst realization is the one with the smallest value.
@@ -145,9 +155,10 @@ def test_cvar_filter_applies_direction_before_the_weighted_sum() -> None:
             method="cvar-objective", options={"sort": [0, 1], "percentile": 1 / 3}
         )
     )
-    realization_filter.init(_filter_context(weights=[0.5, 0.5], maximize=[False, True]))
-    weights = realization_filter.get_realization_weights(
-        np.array([[1.0, 1.0], [2.0, 5.0], [3.0, 2.0]]), None
+    weights = _weights(
+        realization_filter,
+        _filter_context(weights=[0.5, 0.5], maximize=[False, True]),
+        np.array([[1.0, 1.0], [2.0, 5.0], [3.0, 2.0]]),
     )
     # Ranks are 0.5 * f0 - 0.5 * f1: 0.0, -1.5 and 0.5, so realization 2 is the
     # worst. Flipping the combined sum instead would rank 1.0, 3.5 and 2.5, and
@@ -163,9 +174,10 @@ def test_cvar_filter_applies_the_objective_scales_before_the_weighted_sum() -> N
             method="cvar-objective", options={"sort": [0, 1], "percentile": 1 / 3}
         )
     )
-    realization_filter.init(_filter_context(weights=[0.5, 0.5], scales=[1.0, 10.0]))
-    weights = realization_filter.get_realization_weights(
-        np.array([[0.0, 0.0], [1.0, 0.0], [0.0, 8.0]]), None
+    weights = _weights(
+        realization_filter,
+        _filter_context(weights=[0.5, 0.5], scales=[1.0, 10.0]),
+        np.array([[0.0, 0.0], [1.0, 0.0], [0.0, 8.0]]),
     )
     # Ranks are 0.5 * f0 + 0.05 * f1: 0.0, 0.5 and 0.4, so realization 1 is the
     # worst. Ranking the unscaled values would give 0.0, 0.5 and 4.0, and pick
@@ -514,11 +526,12 @@ class CustomRealizationFilter(RealizationFilter):
         self,
         objectives: NDArray[np.float64],
         _: NDArray[np.float64] | None,
+        *,
+        objective_scales: NDArray[np.float64],  # ruff: ignore[unused-method-argument]
+        maximize: NDArray[np.bool_],  # ruff: ignore[unused-method-argument]
+        objective_weights: NDArray[np.float64],  # ruff: ignore[unused-method-argument]
     ) -> NDArray[np.float64]:
         return np.ones(objectives.shape[0])
-
-    def init(self, _0: EnOptContext) -> None:
-        pass
 
 
 def test_custom_realization_filter(
@@ -531,3 +544,34 @@ def test_custom_realization_filter(
     opt_result = optimize(config, initial_values, eval_func(test_functions))
     assert opt_result.variables is not None
     assert np.allclose(opt_result.variables, [0.0, 0.0, 0.5], atol=0.02)
+
+
+class _ScaleRecordingFilter(RealizationFilter):
+    def __init__(self, _: RealizationFilterConfig) -> None:  # D107
+        self.received: list[NDArray[np.float64]] = []
+
+    def get_realization_weights(
+        self,
+        objectives: NDArray[np.float64],
+        _: NDArray[np.float64] | None,
+        *,
+        objective_scales: NDArray[np.float64],
+        maximize: NDArray[np.bool_],  # ruff: ignore[unused-method-argument]
+        objective_weights: NDArray[np.float64],  # ruff: ignore[unused-method-argument]
+    ) -> NDArray[np.float64]:
+        self.received.append(objective_scales)
+        return np.ones(objectives.shape[0])
+
+
+def test_filter_receives_the_configured_objective_scales(
+    config: Any, eval_func: Any, test_functions: Any
+) -> None:
+    realization_filter = _ScaleRecordingFilter(RealizationFilterConfig(method="custom"))
+    config["objectives"]["scales"] = [2.0, 4.0]
+    config["objectives"]["realization_filters"] = 0
+    config["realization_filters"] = [realization_filter]
+    optimize(config, initial_values, eval_func(test_functions))
+    assert realization_filter.received
+    assert all(
+        np.allclose(scales, [2.0, 4.0]) for scales in realization_filter.received
+    )

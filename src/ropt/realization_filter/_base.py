@@ -10,19 +10,16 @@ if TYPE_CHECKING:
     from numpy.typing import NDArray
 
     from ropt.config._realization_filter_config import RealizationFilterConfig
-    from ropt.context import EnOptContext
     from ropt.plugins import MethodSpec
 
 
 class RealizationFilter(ABC):
     """Abstract base class for realization filter implementations.
 
-    Subclasses must implement three methods:
+    Subclasses must implement two methods:
 
-    1. `__init__` — store configuration; defer heavy work to `init`.
-    2. `init` — called once with the full optimization context; validate
-       settings and pre-compute any method-specific state here.
-    3. `get_realization_weights` — called at each evaluation; return a
+    1. `__init__` — store configuration and pre-compute method-specific state.
+    2. `get_realization_weights` — called at each evaluation; return a
        non-negative weight per realization.
 
     See [Realization Filters](../optimizer_setup/realization_filters.md) for examples
@@ -41,24 +38,10 @@ class RealizationFilter(ABC):
     def __init__(self, filter_config: RealizationFilterConfig) -> None:  # D107
         """Create a new realization filter instance.
 
-        Store the configuration; keep initialization lightweight.
-        Context-dependent setup belongs in `init`.
+        Store the configuration and pre-compute any method-specific state.
 
         Args:
             filter_config: The realization filter configuration.
-        """
-
-    @abstractmethod
-    def init(self, context: EnOptContext) -> None:
-        """Finalize initialization with the optimization context.
-
-        Called once at the start of a run, for every configured filter, also
-        for those that no objective or constraint refers to. Use for
-        validation, internal state setup, or precomputation. The number of
-        realizations is available as `context.realizations.weights.size`.
-
-        Args:
-            context: The optimization context.
         """
 
     @abstractmethod
@@ -66,6 +49,10 @@ class RealizationFilter(ABC):
         self,
         objectives: NDArray[np.float64],
         constraints: NDArray[np.float64] | None,
+        *,
+        objective_scales: NDArray[np.float64],
+        maximize: NDArray[np.bool_],
+        objective_weights: NDArray[np.float64],
     ) -> NDArray[np.float64]:
         """Compute one weight per realization from current evaluation results.
 
@@ -74,15 +61,15 @@ class RealizationFilter(ABC):
         a single call are applied to all of them, and are reused for the
         gradients derived from that evaluation.
 
-        Both arguments are two-dimensional arrays with one row per realization
-        and one column per objective or per nonlinear constraint, in the order
-        in which they are configured: `objectives[i, j]` is the value of
-        objective `j` for realization `i`. The values are as the evaluator
-        returned them: neither scaled nor negated for maximization, since both
-        apply to aggregates and these are per-realization. A filter that ranks
-        by what the optimizer minimizes should apply them itself, using
-        [`get_objective_scales`][ropt.context.EnOptContext.get_objective_scales]
-        and the directions on `objectives.maximize`.
+        `objectives` and `constraints` are two-dimensional arrays with one row
+        per realization and one column per objective or per nonlinear
+        constraint, in the order in which they are configured:
+        `objectives[i, j]` is the value of objective `j` for realization `i`.
+        The number of realizations is therefore `objectives.shape[0]`. The
+        values are as the evaluator returned them: neither scaled nor negated
+        for maximization, since both apply to aggregates and these are
+        per-realization. A filter that ranks by what the optimizer minimizes
+        should apply `objective_scales` and `maximize` itself.
 
         A realization that failed to evaluate carries `nan` values. The filter
         should check for these and handle them, for instance by assigning such
@@ -95,10 +82,15 @@ class RealizationFilter(ABC):
         the evaluation as failed.
 
         Args:
-            objectives:  Objectives, shape `(n_realizations, n_objectives)`.
-            constraints: Nonlinear constraints, shape
-                         `(n_realizations, n_constraints)`, or `None` if no
-                         nonlinear constraints are configured.
+            objectives:        Objectives, shape `(n_realizations, n_objectives)`.
+            constraints:       Nonlinear constraints, shape
+                               `(n_realizations, n_constraints)`, or `None` if no
+                               nonlinear constraints are configured.
+            objective_scales:  The scale applied to each objective. Passed on
+                               every call because auto-scaling only fixes these
+                               after the first batch.
+            maximize:          Which objectives are maximized.
+            objective_weights: The configured weight of each objective.
 
         Returns:
             The non-negative weights, shape `(n_realizations,)`.

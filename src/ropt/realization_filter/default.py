@@ -9,7 +9,6 @@ from pydantic import BaseModel, ConfigDict, Field, NonNegativeInt
 from ropt._scaling import scale
 from ropt._utils import apply_direction, zero_failures
 from ropt.config import RealizationFilterConfig
-from ropt.context import EnOptContext
 from ropt.exceptions import TooFewRealizations
 from ropt.plugins import MethodSpec
 from ropt.realization_filter import RealizationFilter
@@ -86,20 +85,23 @@ class DefaultRealizationFilter(RealizationFilter):
         assert isinstance(self._filter_config, RealizationFilterConfig)
         _, _, self._method = self._filter_config.method.lower().rpartition("/")
 
-    def init(self, context: EnOptContext) -> None:  # ruff: ignore[undocumented-public-method]
-        self._context = context
-
     def get_realization_weights(  # D107  # ruff: ignore[undocumented-public-method]
         self,
         objectives: NDArray[np.float64],
         constraints: NDArray[np.float64] | None,
+        *,
+        objective_scales: NDArray[np.float64],
+        maximize: NDArray[np.bool_],
+        objective_weights: NDArray[np.float64],
     ) -> NDArray[np.float64]:
         match self._method:
             case "cvar-objective":
                 self._filter_options = CVaRObjectiveOptions.model_validate(
                     self._filter_config.options
                 )
-                weights = self._cvar_objectives(objectives)
+                weights = self._cvar_objectives(
+                    objectives, objective_scales, maximize, objective_weights
+                )
             case "cvar-constraint" if constraints is not None:
                 self._filter_options = CVaRConstraintOptions.model_validate(
                     self._filter_config.options
@@ -114,23 +116,24 @@ class DefaultRealizationFilter(RealizationFilter):
 
         return weights
 
-    def _rank_by(
-        self, objectives: NDArray[np.float64], sort: tuple[int, ...]
+    def _cvar_objectives(
+        self,
+        objectives: NDArray[np.float64],
+        objective_scales: NDArray[np.float64],
+        maximize: NDArray[np.bool_],
+        objective_weights: NDArray[np.float64],
     ) -> NDArray[np.float64]:
-        # Ranking occurs after scaling and applying the direction for maximization.
-        objective_config = self._context.objectives
-        values = zero_failures(objectives[..., sort])
-        values = scale(values, self._context.get_objective_scales()[sort,])
-        values = apply_direction(values, objective_config.maximize[sort,])
-        if objective_config.weights.size > 1:
-            values = np.dot(values, objective_config.weights[sort,])
-        return values.flatten()
-
-    def _cvar_objectives(self, objectives: NDArray[np.float64]) -> NDArray[np.float64]:
         assert isinstance(self._filter_options, CVaRObjectiveOptions)
         failed_realizations = np.isnan(objectives[..., 0])
+        sort = self._filter_options.sort
+        ranked = _rank_by(
+            objectives[..., sort],
+            objective_scales[sort,],
+            maximize[sort,],
+            objective_weights[sort,],
+        )
         return _get_cvar_weights_from_percentile(
-            -self._rank_by(objectives, self._filter_options.sort),
+            -ranked,
             failed_realizations,
             self._filter_options.percentile,
         )
@@ -139,10 +142,24 @@ class DefaultRealizationFilter(RealizationFilter):
         assert isinstance(self._filter_options, CVaRConstraintOptions)
         failed_realizations = np.isnan(constraints[..., 0])
         constraints = zero_failures(constraints[..., self._filter_options.sort])
-        assert self._context.nonlinear_constraints is not None
         return _get_cvar_weights_from_percentile(
             -constraints, failed_realizations, self._filter_options.percentile
         )
+
+
+def _rank_by(
+    objectives: NDArray[np.float64],
+    scales: NDArray[np.float64],
+    maximize: NDArray[np.bool_],
+    weights: NDArray[np.float64],
+) -> NDArray[np.float64]:
+    # Ranking occurs after scaling and applying the direction for maximization.
+    values = zero_failures(objectives)
+    values = scale(values, scales)
+    values = apply_direction(values, maximize)
+    if weights.size > 1:
+        values = np.dot(values, weights)
+    return values.flatten()
 
 
 def _get_cvar_weights_from_percentile(

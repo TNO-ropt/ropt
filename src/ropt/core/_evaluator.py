@@ -72,7 +72,9 @@ class EnsembleEvaluator:
         self._context = context
         self._evaluator = evaluator
         self._metadata = metadata
-        self._realization_filters = self._init_realization_filters()
+        self._realization_filters: dict[str, RealizationFilter] = (
+            context.realization_filters
+        )
         self._function_estimators = self._init_function_estimators()
         rng = default_rng(context.variables.seed)
         self._samplers = self._init_samplers(rng)
@@ -709,7 +711,11 @@ class EnsembleEvaluator:
                 continue
 
             weights = realization_filter.get_realization_weights(
-                objectives, constraints
+                objectives,
+                constraints,
+                objective_scales=self._context.get_objective_scales(),
+                maximize=self._context.objectives.maximize,
+                objective_weights=self._context.objectives.weights,
             )
             if apply_to_objectives is not None:
                 if objective_weights is None:
@@ -731,11 +737,6 @@ class EnsembleEvaluator:
                     )
                 constraint_weights[apply_to_constraints, :] = weights
         return objective_weights, constraint_weights
-
-    def _init_realization_filters(self) -> dict[str, RealizationFilter]:
-        for realization_filter in self._context.realization_filters.values():
-            realization_filter.init(self._context)
-        return self._context.realization_filters
 
     def _init_function_estimators(self) -> dict[str, FunctionEstimator]:
         for function_estimator in self._context.function_estimators.values():
