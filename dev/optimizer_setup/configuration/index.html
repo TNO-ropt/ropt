@@ -4360,9 +4360,9 @@ calculations. These perturbations can be deterministic or stochastic.</p>
   used for all realizations.</li>
 </ul>
 <h3 id="names"><code>names</code></h3>
-<p>Optional mapping from <a class="autorefs autorefs-internal" title="            AxisName" href="../../reference/enums/#ropt.enums.AxisName"><code>AxisName</code></a> strings to tuples of
-labels. These labels are used to produce human-readable multi-index DataFrames
-when results are exported (see <a href="../results/">Working with Results</a>).</p>
+<p>Optional mapping from axis names to tuples of labels. These labels are used to
+produce human-readable multi-index DataFrames when results are exported (see
+<a href="../results/">Working with Results</a>).</p>
 <p>Each key is an <a class="autorefs autorefs-internal" title="            AxisName" href="../../reference/enums/#ropt.enums.AxisName"><code>AxisName</code></a> value that identifies a
 dimension of the optimization problem:</p>
 <table>
@@ -4399,6 +4399,8 @@ dimension of the optimization problem:</p>
 </tr>
 </tbody>
 </table>
+<p>A key may also be the name of a metadata key that carries array values, which
+labels the <a href="../results/#user-defined-axes">user axis</a> that metadata spans.</p>
 <p>The corresponding value is a tuple of strings (or integers) whose length must
 match the count of that axis. For example, with 3 variables and 2 objectives:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="s2">"names"</span><span class="p">:</span> <span class="p">{</span>

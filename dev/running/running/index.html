@@ -3164,6 +3164,11 @@ This is the permanent contract, not a gap to be filled later.</p>
   get <code>np.nan</code> for numeric values and <code>None</code> otherwise. See <a href="../../workflows/evaluation_callbacks/#using-functionevaluator">Writing Evaluation
   Callbacks</a> for
   the effect on the column dtype.</p>
+<p>Returning an array instead of a scalar gives the key its own
+  <a href="../../optimizer_setup/results/#user-defined-axes">user-defined axis</a>, which
+  the <code>names</code> section of the configuration can label and which the
+  <a href="../handlers/#dataframehandler"><code>DataFrameHandler</code></a> spreads over one column
+  per entry.</p>
 <p>Neither kind is interpreted by <code>ropt</code>. Constant metadata ends up on
 <code>result.results.metadata</code>; per-evaluation metadata on
 <code>result.results.evaluations.metadata</code> (one entry per realization). Both kinds can

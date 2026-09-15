@@ -3308,6 +3308,11 @@ numeric values and <code>None</code> otherwise, so a numeric column with missing
 is widened to <code>float64</code> — numpy has no integer NaN. A column set by every
 row keeps its natural dtype. Mixing strings and non-strings under one key
 raises a <code>ValueError</code>.</p>
+<p>A value may be a 1-D array rather than a scalar, which gives the key an
+extra <a href="../../optimizer_setup/results/#user-defined-axes">user-defined axis</a>
+named after the key. Every row must then return the same number of entries,
+and the key may not be named after an
+<a class="autorefs autorefs-internal" title="            AxisName" href="../../reference/enums/#ropt.enums.AxisName"><code>AxisName</code></a> value or <code>batch_id</code>.</p>
 </li>
 </ul>
 <p>Wrap the function in a
