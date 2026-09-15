@@ -7,7 +7,6 @@ from numpy.typing import NDArray
 
 from ropt.components.evaluators import EvaluationFunctionContext
 from ropt.config._function_estimator_config import FunctionEstimatorConfig
-from ropt.context import EnOptContext
 from ropt.function_estimator import FunctionEstimator
 from ropt.function_estimator.default import DefaultFunctionEstimator
 from ropt.simple import optimize
@@ -113,26 +112,14 @@ def test_stddev_function_estimator(
     assert np.allclose(result.variables, [0.0, 0.0, 0.5], atol=0.02)
 
 
-@pytest.fixture(name="estimator_context")
-def estimator_context_fixture() -> EnOptContext:
-    return EnOptContext.model_validate(
-        {
-            "variables": {"variable_count": 2},
-            "realizations": {"weights": 3 * [1.0]},
-        }
-    )
-
-
-def _estimator(method: str, context: EnOptContext) -> DefaultFunctionEstimator:
+def _estimator(method: str) -> DefaultFunctionEstimator:
     estimator = DefaultFunctionEstimator(FunctionEstimatorConfig(method=method))
-    estimator.init(context)
+    estimator.init(merge_realizations=False)
     return estimator
 
 
-def test_mean_estimator_propagates_an_infinite_realization(
-    estimator_context: EnOptContext,
-) -> None:
-    estimator = _estimator("mean", estimator_context)
+def test_mean_estimator_propagates_an_infinite_realization() -> None:
+    estimator = _estimator("mean")
     finite = estimator.calculate_function(np.array([1.0, 2.0, 3.0]), _EQUAL_WEIGHTS)
     assert finite == pytest.approx(2.0)
     infinite = estimator.calculate_function(
@@ -141,10 +128,10 @@ def test_mean_estimator_propagates_an_infinite_realization(
     assert infinite == np.inf
 
 
-def test_stddev_estimator_reports_an_infinite_realization_as_an_infinite_spread(
-    estimator_context: EnOptContext,
-) -> None:
-    estimator = _estimator("stddev", estimator_context)
+def test_stddev_estimator_reports_an_infinite_realization_as_an_infinite_spread() -> (
+    None
+):
+    estimator = _estimator("stddev")
     finite = estimator.calculate_function(np.array([1.0, 2.0, 3.0]), _EQUAL_WEIGHTS)
     assert finite == pytest.approx(1.0)
     infinite = estimator.calculate_function(
@@ -153,10 +140,8 @@ def test_stddev_estimator_reports_an_infinite_realization_as_an_infinite_spread(
     assert infinite == np.inf
 
 
-def test_stddev_gradient_propagates_an_infinite_realization(
-    estimator_context: EnOptContext,
-) -> None:
-    estimator = _estimator("stddev", estimator_context)
+def test_stddev_gradient_propagates_an_infinite_realization() -> None:
+    estimator = _estimator("stddev")
     gradient = np.array([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
     result = estimator.calculate_gradient(
         np.array([1.0, np.inf, 3.0]), gradient, _EQUAL_WEIGHTS
@@ -165,10 +150,8 @@ def test_stddev_gradient_propagates_an_infinite_realization(
     assert np.all(np.isinf(result))
 
 
-def test_stddev_gradient_guard_is_scale_invariant(
-    estimator_context: EnOptContext,
-) -> None:
-    estimator = _estimator("stddev", estimator_context)
+def test_stddev_gradient_guard_is_scale_invariant() -> None:
+    estimator = _estimator("stddev")
     # Small enough that an absolute threshold would suppress it.
     functions = np.array([1.0, 1.0 + 1e-7, 1.0 + 2e-7])
     gradient = np.array([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
@@ -183,24 +166,20 @@ def test_stddev_gradient_guard_is_scale_invariant(
     assert np.allclose(scaled, unscaled / scale, rtol=1e-5)
 
 
-def test_stddev_gradient_is_zero_for_identical_realizations(
-    estimator_context: EnOptContext,
-) -> None:
-    estimator = _estimator("stddev", estimator_context)
+def test_stddev_gradient_is_zero_for_identical_realizations() -> None:
+    estimator = _estimator("stddev")
     gradient = np.array([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
     result = estimator.calculate_gradient(np.zeros(3), gradient, _EQUAL_WEIGHTS)
     assert not np.any(result)
 
 
-def test_estimators_ignore_an_infinite_value_carrying_no_weight(
-    estimator_context: EnOptContext,
-) -> None:
+def test_estimators_ignore_an_infinite_value_carrying_no_weight() -> None:
     # inf * 0 is NaN, so a value excluded by a filter must be dropped, not scaled.
     functions = np.array([1.0, np.inf, 3.0])
     weights = np.array([0.5, 0.0, 0.5])
-    mean = _estimator("mean", estimator_context)
+    mean = _estimator("mean")
     assert mean.calculate_function(functions, weights) == pytest.approx(2.0)
-    stddev = _estimator("stddev", estimator_context)
+    stddev = _estimator("stddev")
     assert stddev.calculate_function(functions, weights) == pytest.approx(np.sqrt(2.0))
 
 
@@ -208,7 +187,7 @@ class CustomFunctionEstimator(FunctionEstimator):
     def __init__(self, _: FunctionEstimatorConfig) -> None:
         pass
 
-    def init(self, _: EnOptContext) -> None:
+    def init(self, *, merge_realizations: bool) -> None:
         pass
 
     def calculate_function(  # ruff: ignore[no-self-use]

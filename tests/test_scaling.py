@@ -459,7 +459,7 @@ def test_the_reported_aggregate_matches_the_reported_values(
         function_estimators={"0": {"method": estimator}},
     )
     aggregate = context.function_estimators["0"]
-    aggregate.init(context)
+    aggregate.init(merge_realizations=context.gradient.merge_realizations)
 
     for item in results:
         assert item.functions is not None

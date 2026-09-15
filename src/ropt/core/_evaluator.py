@@ -739,7 +739,9 @@ class EnsembleEvaluator:
 
     def _init_function_estimators(self) -> dict[str, FunctionEstimator]:
         for function_estimator in self._context.function_estimators.values():
-            function_estimator.init(self._context)
+            function_estimator.init(
+                merge_realizations=self._context.gradient.merge_realizations
+            )
         return self._context.function_estimators
 
     def _init_samplers(self, rng: Generator) -> dict[str, Sampler]:

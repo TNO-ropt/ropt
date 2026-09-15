@@ -7,7 +7,6 @@ from numpy.typing import NDArray
 
 from ropt._utils import zero_failures
 from ropt.config import FunctionEstimatorConfig
-from ropt.context import EnOptContext
 from ropt.exceptions import TooFewRealizations
 from ropt.function_estimator import FunctionEstimator
 from ropt.plugins import MethodSpec
@@ -39,15 +38,15 @@ class DefaultFunctionEstimator(FunctionEstimator):
         if self._method == "default":
             self._method = "mean"
 
-    def init(self, context: EnOptContext) -> None:  # ruff: ignore[undocumented-public-method]
-        self._context = context
+    def init(self, *, merge_realizations: bool) -> None:  # ruff: ignore[undocumented-public-method]
+        self._merge_realizations = merge_realizations
 
     def calculate_function(  # ruff: ignore[undocumented-public-method]
         self,
         functions: NDArray[np.float64],
         weights: NDArray[np.float64],
     ) -> NDArray[np.float64]:
-        if self._method == "stddev" and self._context.gradient.merge_realizations:
+        if self._method == "stddev" and self._merge_realizations:
             msg = (
                 "The stddev estimator does not support merging "
                 "realizations in the gradient."
@@ -67,7 +66,7 @@ class DefaultFunctionEstimator(FunctionEstimator):
         gradient: NDArray[np.float64],
         weights: NDArray[np.float64],
     ) -> NDArray[np.float64]:
-        if self._method == "stddev" and self._context.gradient.merge_realizations:
+        if self._method == "stddev" and self._merge_realizations:
             msg = (
                 "The stddev estimator does not support merging "
                 "realizations in the gradient."
@@ -79,7 +78,7 @@ class DefaultFunctionEstimator(FunctionEstimator):
                 functions,
                 gradient,
                 weights,
-                merge_realizations=self._context.gradient.merge_realizations,
+                merge_realizations=self._merge_realizations,
             )
         if estimator_method == "stddev":
             return _calculate_gradient_stddev(functions, gradient, weights)

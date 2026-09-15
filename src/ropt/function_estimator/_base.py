@@ -10,7 +10,6 @@ if TYPE_CHECKING:
     from numpy.typing import NDArray
 
     from ropt.config import FunctionEstimatorConfig
-    from ropt.context import EnOptContext
     from ropt.plugins import MethodSpec
 
 
@@ -20,8 +19,8 @@ class FunctionEstimator(ABC):
     Subclasses must implement four methods:
 
     1. `__init__` — store configuration; defer heavy work to `init`.
-    2. `init` — called once with the full optimization context; validate
-       settings and pre-compute state here.
+    2. `init` — called once before the run; validate settings and pre-compute
+       state here.
     3. `calculate_function` — aggregate per-realization function values.
     4. `calculate_gradient` — aggregate per-realization gradients.
 
@@ -42,21 +41,23 @@ class FunctionEstimator(ABC):
         """Create a new function estimator instance.
 
         Store the configuration; keep initialization lightweight.
-        Context-dependent setup belongs in `init`.
+        Run-dependent setup belongs in `init`.
 
         Args:
             estimator_config: The estimator configuration.
         """
 
     @abstractmethod
-    def init(self, context: EnOptContext) -> None:
-        """Finalize initialization with the optimization context.
+    def init(self, *, merge_realizations: bool) -> None:
+        """Finalize initialization before the optimization starts.
 
         Called once after configuration is finalized. Use for validation
         (for example compatibility with `merge_realizations`) and precomputation.
 
         Args:
-            context: The optimization context.
+            merge_realizations: Whether gradients arrive merged across
+                                realizations, as described in
+                                `calculate_gradient`.
         """
 
     @abstractmethod
