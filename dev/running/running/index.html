@@ -12,7 +12,7 @@
         <link rel="prev" href="../../optimizer_setup/results/">
       
       
-        <link rel="next" href="../parallel/">
+        <link rel="next" href="../pitfalls/">
       
       
         
@@ -1185,6 +1185,34 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pitfalls/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Common Pitfalls
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -3058,7 +3086,10 @@ There are three ways to return them:</p>
 </ul>
 <p>If a realization fails to compute, return <code>float("nan")</code> for it. <code>ropt</code> treats
 <code>NaN</code> as a failed realization and keeps going, as long as enough realizations
-succeed (see <a href="../../optimizer_setup/configuration/">Configuration</a>).</p>
+succeed. How many is enough is set by
+<a href="../../optimizer_setup/configuration/#realizations"><code>realization_min_success</code></a>,
+which defaults to <em>all</em> of them — so a single <code>NaN</code> ends the run with
+<code>TOO_FEW_REALIZATIONS</code> unless you lower it.</p>
 <h2 id="the-result">The result</h2>
 <p><code>optimize</code> returns an <a class="autorefs autorefs-internal" title="            ropt.simple.OptimizeResult
 
@@ -3075,15 +3106,17 @@ succeed (see <a href="../../optimizer_setup/configuration/">Configuration</a>).<
 </span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="n">result</span><span class="o">.</span><span class="n">constraints</span>       <span class="c1"># the nonlinear constraint values, or None</span>
 </span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="n">result</span><span class="o">.</span><span class="n">results</span>           <span class="c1"># the full low-level result object (see below)</span>
 </span></code></pre></div>
-<p>The fields are <code>None</code> when the run produced no valid result (for example when
-too few realizations succeeded). <code>result.results</code> is the full
-<a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+<p>The fields are <code>None</code> when the run produced no valid result: too few
+realizations succeeded, the pool was closed under the run, or no result ever
+satisfied the constraints — see
+<a href="#when-something-goes-wrong">When something goes wrong</a>. <code>result.results</code> is the
+full <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
 
 
   
       dataclass
-  " href="../../reference/results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> object; you rarely need it at
-first, but it holds every detail if you do. See
+  " href="../../reference/results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> object; you rarely need
+it at first, but it holds every detail if you do. See
 <a href="../../optimizer_setup/results/">Working with Results</a>.</p>
 <h2 id="reporting-progress">Reporting progress</h2>
 <p>Pass a <code>report</code> callback to watch the optimization as it runs. It is called once
@@ -3203,6 +3236,13 @@ still returns normally, and says why in <code>result.exit_code</code>:
 both cases the result fields are <code>None</code>, so check <code>exit_code</code> before using
 them. A plain <a class="autorefs autorefs-internal" title="            ropt.simple.evaluate" href="../../reference/simple/#ropt.simple.evaluate"><code>evaluate</code></a> has no <code>exit_code</code>; there the
 <code>None</code> fields are the only sign that nothing usable came back.</p>
+<p>A run can also end with <code>OPTIMIZER_FINISHED</code> and still leave those fields
+<code>None</code>. Only a result that satisfies every constraint to within
+<code>constraint_tolerance</code> can be returned as the best one, and that tolerance —
+<code>1e-10</code> unless you pass another — applies to the bounds and the linear
+constraints as well as the nonlinear ones. A run that never reaches a feasible
+point therefore has no best result to return, although the evaluations it did
+make still reach the <a href="../handlers/">handlers</a> attached to it.</p>
 <p>What <em>is</em> raised falls into three groups:</p>
 <ul>
 <li>
@@ -3261,6 +3301,8 @@ of <code>ropt.simple</code>; import them from <a class="autorefs autorefs-intern
 </span></code></pre></div>
 <h2 id="where-to-next">Where to next</h2>
 <ul>
+<li>The behaviours that most often cause confusion:
+  <a href="../pitfalls/">Common Pitfalls</a>.</li>
 <li>Run evaluations in parallel, or several optimizations at once:
   <a href="../parallel/">Parallel Execution and Many Runs</a>.</li>
 <li>Collect or react to every result, not just the best one:
@@ -3318,13 +3360,13 @@ of <code>ropt.simple</code>; import them from <a class="autorefs autorefs-intern
         
         
           
-          <a href="../parallel/" class="md-footer__link md-footer__link--next" aria-label="Next: Parallel Execution and Many Runs">
+          <a href="../pitfalls/" class="md-footer__link md-footer__link--next" aria-label="Next: Common Pitfalls">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Parallel Execution and Many Runs
+                Common Pitfalls
               </div>
             </div>
             <div class="md-footer__button md-icon">
