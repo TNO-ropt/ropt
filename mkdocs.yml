@@ -107,7 +107,6 @@ nav:
       - "Background": getting_started/background.md
       - "Installation": getting_started/installation.md
       - "Quickstart": getting_started/quickstart.md
-      - "Deterministic Optimization": getting_started/deterministic.md
       - "Ensemble-Based Optimization": getting_started/ensemble.md
       - "Collecting Results with Handlers": getting_started/handlers.md
       - "Running in Parallel": getting_started/execution.md
@@ -134,8 +133,6 @@ nav:
       - "Writing a Plugin": utilities/writing_plugins.md
   - "Tutorials":
       - "Overview": tutorials/index.md
-      - "Your First Optimization": tutorials/optimize.md
-      - "Ensemble Optimization": tutorials/ensemble.md
       - "Constrained Optimization": tutorials/constrained.md
       - "Mixed-Integer Optimization": tutorials/discrete.md
       - "Restarting from the Best Point": tutorials/restart.md

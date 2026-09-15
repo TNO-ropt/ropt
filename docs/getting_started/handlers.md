@@ -16,7 +16,7 @@ print(len(history.results))   # every evaluation from this run
 ```
 
 Compare this with the `report` callback from
-[Deterministic Optimization](deterministic.md#3-follow-the-progress-optional):
+[Reporting progress](../running/running.md#reporting-progress):
 `report` is called once per evaluation, for one run. A handler is more
 general — it keeps or reacts to results, and, unlike `report`, the same
 handler can be reused across several **sequential** calls to `optimize`,

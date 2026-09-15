@@ -19,7 +19,8 @@ each call to `optimize` is independent, this is just a loop in your own code;
 also want to see every evaluation across the whole sequence of restarts — not
 just the final result — attach a **handler**. A handler is an object you pass
 with `handlers=` that observes every result an optimization produces; unlike
-the `report` callback (see [Your First Optimization](optimize.md)), the same
+the `report` callback (see
+[Reporting progress](../running/running.md#reporting-progress)), the same
 handler can be reused across several calls to `optimize`, accumulating results
 as it goes. See [Result handlers](../running/handlers.md#result-handlers) for
 the full explanation.

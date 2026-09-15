@@ -578,6 +578,6 @@ df = results_to_polars(
 ## Where to next
 
 - Run an optimization and receive results via callbacks:
-  [Deterministic Optimization](../getting_started/deterministic.md).
+  [Reporting progress](../running/running.md#reporting-progress).
 - Use event handlers to collect or react to results in a workflow:
   [Optimization Workflows](../workflows/workflows.md).

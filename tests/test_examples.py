@@ -57,11 +57,6 @@ def test_example_nested_parallel(tmp_path: Path, monkeypatch: Any) -> None:
     module.main()
 
 
-def test_example_simple_optimize(tmp_path: Path, monkeypatch: Any) -> None:
-    monkeypatch.chdir(tmp_path)
-    _load_from_file("optimize", "simple").main()
-
-
 def test_example_simple_evaluate(tmp_path: Path, monkeypatch: Any) -> None:
     monkeypatch.chdir(tmp_path)
     _load_from_file("evaluate", "simple").main()
@@ -100,10 +95,9 @@ def test_example_simple_nested_optimization(tmp_path: Path, monkeypatch: Any) ->
     _load_from_file("nested_optimization", "simple").main()
 
 
-@pytest.mark.parametrize("merge", [True, False])
-def test_example_simple_ensemble(tmp_path: Path, monkeypatch: Any, merge: Any) -> None:
+def test_example_simple_ensemble(tmp_path: Path, monkeypatch: Any) -> None:
     monkeypatch.chdir(tmp_path)
-    _load_from_file("ensemble", "simple").main(merge=merge)
+    _load_from_file("ensemble", "simple").main()
 
 
 def test_example_simple_realization_filter(tmp_path: Path, monkeypatch: Any) -> None:

@@ -11,8 +11,6 @@ More tutorials will be added over time.
 
 These use the [simple API](../running/running.md) and are the best place to start.
 
-- [Your First Optimization](optimize.md) — run one optimization.
-- [Ensemble Optimization](ensemble.md) — optimize over uncertain realizations.
 - [Constrained Optimization](constrained.md) — add constraints.
 - [Mixed-Integer Optimization](discrete.md) — integer variables with
   differential evolution.

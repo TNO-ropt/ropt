@@ -1,7 +1,13 @@
 # Quickstart
 
-This page shows the smallest complete `ropt` program: it minimizes a simple
-function.
+This page shows the smallest complete `ropt` program. It minimizes the
+**Rosenbrock function**, a standard test problem for optimizers:
+
+$$ f(x, y) = (1 - x)^2 + 100 \left( y - x^2 \right)^2 $$
+
+Its minimum is at $x = y = 1$, at the bottom of a long curved valley that is
+easy to fall into and slow to follow — which is exactly what makes it a useful
+thing to watch an optimizer solve.
 
 ## Install `ropt`
 
@@ -18,29 +24,30 @@ import numpy as np
 
 from ropt.simple import optimize
 
-# 1. Describe the problem: three variables.
+# 1. Describe the problem: two variables.
 config = {
     "variables": {
-        "variable_count": 3,
+        "variable_count": 2,
         "perturbation_magnitudes": 1e-6,
     },
 }
 
 
 # 2. The objective: the value to minimize.
-def objective(variables, context):
+def rosenbrock(variables, context):
     # `context` identifies which evaluation this is; not needed here.
-    return float(np.sum((variables - 1.0) ** 2))
+    x, y = variables
+    return float((1.0 - x) ** 2 + 100 * (y - x * x) ** 2)
 
 
 # 3. Run the optimization from a starting point equal to zero.
-result = optimize(config, np.zeros(3), objective)
+result = optimize(config, np.zeros(2), rosenbrock)
 
 print(f"best variables: {result.variables}")
 print(f"best objective: {result.target_objective}")
 ```
 
-Running this finds variables close to `[1, 1, 1]`.
+Running this finds variables close to `[1, 1]`.
 
 ## How it works
 
@@ -61,6 +68,7 @@ values it found.
 
 ## Where to next
 
-- A fuller walkthrough: [Deterministic Optimization](deterministic.md).
+- Optimizing under uncertainty:
+  [Ensemble-Based Optimization](ensemble.md).
 - The complete simple API: [Running Optimizations](../running/running.md).
 - All configuration settings: [Configuration](../optimizer_setup/configuration.md).
