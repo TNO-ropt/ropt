@@ -3,8 +3,10 @@
 from typing import Any
 
 import numpy as np
+from numpy.typing import NDArray
 
-from ropt.backend.utils import get_linear_constraints, split_linear_constraints
+from ropt.backend import OptimizationProblem
+from ropt.backend.utils import split_linear_constraints
 from ropt.context import EnOptContext
 
 
@@ -17,6 +19,16 @@ def _context(linear_constraints: Any, **variables: Any) -> EnOptContext:
     )
 
 
+def _reduced(
+    context: EnOptContext, initial_values: NDArray[np.float64]
+) -> tuple[
+    NDArray[np.float64], NDArray[np.float64], NDArray[np.float64], NDArray[np.bool_]
+]:
+    constraints = OptimizationProblem(context, initial_values).linear_constraints
+    assert constraints is not None
+    return constraints
+
+
 def test_linear_constraints_without_a_finite_bound_are_dropped() -> None:
     context = _context(
         {
@@ -25,9 +37,7 @@ def test_linear_constraints_without_a_finite_bound_are_dropped() -> None:
             "upper_bounds": [2.0, np.inf],
         }
     )
-    coefficients, lower_bounds, upper_bounds, equality = get_linear_constraints(
-        context, np.zeros(3)
-    )
+    coefficients, lower_bounds, upper_bounds, equality = _reduced(context, np.zeros(3))
     assert np.allclose(coefficients, [[1.0, 0.0, 1.0]])
     assert np.allclose(lower_bounds, [1.0])
     assert np.allclose(upper_bounds, [2.0])
@@ -43,7 +53,7 @@ def test_linear_constraints_without_a_free_coefficient_are_dropped() -> None:
         },
         mask=[True, False, True],
     )
-    coefficients, lower_bounds, upper_bounds, equality = get_linear_constraints(
+    coefficients, lower_bounds, upper_bounds, equality = _reduced(
         context, np.array([0.0, 3.0, 0.0])
     )
     # The fixed variable contributes 3 to the surviving equation.
@@ -61,7 +71,7 @@ def test_the_equality_flags_follow_the_surviving_constraints() -> None:
             "upper_bounds": [np.inf, 1.0, 2.0],
         }
     )
-    *_, equality = get_linear_constraints(context, np.zeros(3))
+    *_, equality = _reduced(context, np.zeros(3))
     assert equality.tolist() == [True, False]
 
 

@@ -11,7 +11,7 @@ import subprocess
 import sys
 import textwrap
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, ClassVar
+from typing import TYPE_CHECKING, Any, ClassVar, Literal
 
 import numpy as np
 import pytest
@@ -29,8 +29,8 @@ from ropt.simple import optimize
 if TYPE_CHECKING:
     from numpy.typing import NDArray
 
+    from ropt.backend import OptimizationProblem
     from ropt.config import BackendConfig
-    from ropt.context import EnOptContext
     from ropt.core import OptimizerCallback
     from ropt.plugins import MethodSpec
 
@@ -49,17 +49,20 @@ class _PrintingBackend(Backend):
     def __init__(self, backend_config: BackendConfig) -> None:
         self._config = backend_config
 
-    def init(
-        self, context: EnOptContext, optimizer_callback: OptimizerCallback
+    def start(  # ruff: ignore[no-self-use]
+        self,
+        problem: OptimizationProblem,
+        optimizer_callback: OptimizerCallback,
+        *,
+        evaluation_policy: Literal["speculative", "separate", "auto"],  # ruff: ignore[unused-method-argument]
+        output_dir: Path | None,  # ruff: ignore[unused-method-argument]
     ) -> None:
-        self._context = context
-        self._callback = optimizer_callback
-
-    def start(self, initial_values: NDArray[np.float64]) -> None:
         print("OPTIMIZER-PYTHON-STDOUT")
         print("OPTIMIZER-PYTHON-STDERR", file=sys.stderr)
         _native_print("OPTIMIZER-NATIVE\n")
-        self._callback(initial_values, return_functions=True, return_gradients=False)
+        optimizer_callback(
+            problem.initial_values, return_functions=True, return_gradients=False
+        )
         print("OPTIMIZER-AFTER-EVALUATION")
 
     def validate_options(self) -> None:

@@ -1,17 +1,16 @@
 """Public API for optimizer backend implementations.
 
-Backends define how `ropt` runs an optimization algorithm against the problem
-described by an [`EnOptContext`][ropt.context.EnOptContext] object. A backend
-manages the optimizer lifecycle, requests function and gradient evaluations
-through the core callback interface, and advances the optimization from an
-initial variable vector toward a solution.
+Backends define how `ropt` runs an optimization algorithm against an
+[`OptimizationProblem`][ropt.backend.OptimizationProblem]. A backend requests
+function and gradient evaluations through the core callback interface, and
+advances the optimization from an initial variable vector toward a solution.
 
 **Core Interface**
 
 All backend implementations inherit from the
-[`Backend`][ropt.backend.Backend] base class, which defines the backend
-lifecycle (`__init__`, `init`, `start`), validation hook (`validate_options`),
-and capability flags (`is_parallel`).
+[`Backend`][ropt.backend.Backend] base class, which defines construction from a
+[`BackendConfig`][ropt.config.BackendConfig], a validation hook
+(`validate_options`), and the single entry point `start`.
 
 **Integration with Optimization**
 
@@ -20,7 +19,8 @@ Backends are accessed via an
 field. A backend is instantiated either directly as an object or via a
 [`BackendConfig`][ropt.config.BackendConfig] object, which is used by the
 plugin system to create an instance based on the configured backend method
-string.
+string. The context itself never reaches the backend: `ropt` reduces it to an
+[`OptimizationProblem`][ropt.backend.OptimizationProblem] when the run starts.
 
 During execution, a backend uses the
 [`OptimizerCallback`][ropt.core.OptimizerCallback] interface to request
@@ -44,5 +44,6 @@ only required when the backend should be selected and configured via
 """
 
 from ._base import Backend
+from ._problem import OptimizationProblem
 
-__all__ = ["Backend"]
+__all__ = ["Backend", "OptimizationProblem"]

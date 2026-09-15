@@ -1,42 +1,19 @@
 """Abstract base class for optimizer backend implementations.
 
-Backends are responsible for driving the optimization algorithm used by `ropt`.
-They coordinate the optimizer lifecycle, request objective/constraint and
-gradient evaluations through the core callback interface, and advance the
-optimization from an initial variable vector toward a solution. This module
-defines the interface that all concrete backend implementations must follow.
-
-Everything a backend sees is **scaled**. The arrays on the context it is given —
-bounds, perturbation magnitudes, linear constraints — were scaled when the
-context was built, and the values delivered through the callback are scaled
-before they arrive. A backend therefore neither scales nor unscales anything:
-`ropt` unscales results for reporting.
-
-A backend also works in **free-variable space**: the variable vectors it passes
-and receives cover only the variables that `variables.mask` leaves free. The
-mask is applied for it on the values and the gradients, but a backend that uses
-the variable bounds or the linear constraints reduces those itself, the latter
-with [`get_linear_constraints`][ropt.backend.utils.get_linear_constraints].
-
-Non-linear constraints arrive **normalized**, as values that are non-negative
-when the constraint is satisfied, so a backend compares them against zero and
-never handles a bound. See
-[`OptimizerCallbackResult`][ropt.core.OptimizerCallbackResult]. A backend whose
-algorithm expects the opposite convention negates the values and their
-gradients.
+This module defines the interface that all concrete backend implementations
+must follow.
 """
 
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, ClassVar
+from typing import TYPE_CHECKING, ClassVar, Literal
 
 if TYPE_CHECKING:
-    import numpy as np
-    from numpy.typing import NDArray
+    from pathlib import Path
 
+    from ropt.backend import OptimizationProblem
     from ropt.config import BackendConfig
-    from ropt.context import EnOptContext
     from ropt.core import OptimizerCallback
     from ropt.plugins import MethodSpec
 
@@ -51,34 +28,40 @@ class Backend(ABC):
     [`OptimizerCallback`][ropt.core.OptimizerCallback], and executing the main
     optimization loop.
 
-    During optimization, the backend receives an
-    [`EnOptContext`][ropt.context.EnOptContext] object describing the problem
-    setup and uses the callback interface to request objective, constraint, and
-    gradient evaluations as needed by the underlying algorithm.
+    **What a backend receives**
+
+    What a backend is asked to solve arrives as an
+    [`OptimizationProblem`][ropt.backend.OptimizationProblem]: already scaled,
+    and already reduced to the free variables. A backend therefore neither
+    scales nor masks anything; `ropt` unscales and expands results for
+    reporting.
+
+    Non-linear constraints arrive **normalized**, as values that are
+    non-negative when the constraint is satisfied, so a backend compares them
+    against zero and never handles a bound. See
+    [`OptimizerCallbackResult`][ropt.core.OptimizerCallbackResult]. A backend
+    whose algorithm expects the opposite convention negates the values and
+    their gradients.
 
     **Lifecycle**
 
     1. Instantiation via `__init__`: Called with a backend configuration
         object.
-    2. Setup via `init`: Called once per optimization workflow with the
-        [`EnOptContext`][ropt.context.EnOptContext] and an
-        [`OptimizerCallback`][ropt.core.OptimizerCallback].
-    3. Validation via `validate_options`: Called to verify that the configured
+    2. Validation via `validate_options`: Called to verify that the configured
         backend options are supported.
-    4. Execution via `start`: Called with the initial variable vector to run
-        the optimization algorithm.
+    3. Execution via `start`: Called with the problem to solve and the callback
+        that evaluates it.
 
     Subclasses must implement:
 
     - `__init__`: Stores backend configuration and performs lightweight setup.
-    - `init`: Receives the optimization context and callback interface.
     - `start`: Runs the optimization algorithm.
     - `validate_options`: Verifies that backend-specific options are valid.
 
     Subclasses may optionally override:
 
-    - `is_parallel`: Indicates whether the backend may evaluate multiple
-                     candidate variable vectors concurrently.
+    - `bypasses_python_output`: Declares that the optimizer prints below the
+                                Python level.
 
     **Process-global state**
 
@@ -107,8 +90,8 @@ class Backend(ABC):
 
         Called during instantiation. Subclasses should store the configuration
         and perform any lightweight initialization. Validation and
-        context-dependent setup should usually be deferred to `validate_options`
-        and `init`.
+        problem-dependent setup should usually be deferred to `validate_options`
+        and `start`.
 
         Warning: Method name with prefix
             `backend_config.method` may be prefixed in the form
@@ -125,52 +108,33 @@ class Backend(ABC):
         """
 
     @abstractmethod
-    def init(
-        self, context: EnOptContext, optimizer_callback: OptimizerCallback
+    def start(
+        self,
+        problem: OptimizationProblem,
+        optimizer_callback: OptimizerCallback,
+        *,
+        evaluation_policy: Literal["speculative", "separate", "auto"],
+        output_dir: Path | None,
     ) -> None:
-        """Finalize initialization after the optimization context is known.
+        """Run the optimization algorithm on the given problem.
 
-        Called once at the start of each optimization workflow, after all
-        configuration is finalized. Use this method to store the optimization
-        context, retain the callback interface, and perform any setup that
-        depends on the full problem definition.
+        Starts the backend's main optimization loop. During execution, the
+        implementation uses `optimizer_callback` to request any objective,
+        constraint, or gradient evaluations its algorithm needs.
 
-        Args:
-            context: The full optimization context, containing all
-                configuration and state for the current workflow.
-            optimizer_callback: Callback interface used to request objective,
-                constraint, and gradient evaluations from the `ropt` core.
-        """
-
-    @abstractmethod
-    def start(self, initial_values: NDArray[np.float64]) -> None:
-        """Run the optimization algorithm from the provided initial values.
-
-        Starts the backend's main optimization loop using the supplied initial
-        variable vector. During execution, the implementation is expected to
-        use the [`OptimizerCallback`][ropt.core.OptimizerCallback] provided in
-        `init` to request any required objective, constraint, or gradient
-        evaluations from the `ropt` core.
+        Called at most once per backend instance.
 
         Args:
-            initial_values: A 1D array of shape `(n_variables,)` containing
-                the starting point for the optimization.
+            problem:            The problem to solve, in free-variable space.
+            optimizer_callback: Callback used to request objective, constraint,
+                                and gradient evaluations from the `ropt` core.
+            evaluation_policy:  Whether functions and gradients should be asked
+                                for together (`"speculative"`), in separate
+                                calls (`"separate"`), or as the algorithm
+                                happens to need them (`"auto"`).
+            output_dir:         Directory for any files the optimizer writes,
+                                or `None` if none was configured.
         """
-
-    @property
-    def is_parallel(self) -> bool:
-        """Indicate whether the backend may issue parallel evaluations.
-
-        Backends that evaluate multiple candidate variable vectors concurrently
-        should override this property to return `True`.
-
-        This information can be used by `ropt` and related components to manage
-        resources or coordinate parallel execution appropriately.
-
-        Returns:
-            `True` if the backend may perform parallel evaluations.
-        """
-        return False
 
     @property
     def bypasses_python_output(self) -> bool:

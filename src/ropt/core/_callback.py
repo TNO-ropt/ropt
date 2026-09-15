@@ -24,7 +24,7 @@ class OptimizerCallbackResult:
     and a finite upper bound contributes two values, an equality one, and a
     constraint with no finite bound none. Which of them are equalities is fixed
     for the run and available from
-    [`get_nonlinear_equalities`][ropt.backend.utils.get_nonlinear_equalities].
+    [`nonlinear_equalities`][ropt.backend.OptimizationProblem.nonlinear_equalities].
 
     `functions` and `gradients` follow a fixed shape:
 

@@ -13,6 +13,7 @@ import numpy as np
 from ropt._logging import get_logger
 from ropt._native_streams import flush_native_streams
 from ropt._utils import split_constraints
+from ropt.backend import OptimizationProblem
 from ropt.enums import ExitCode
 from ropt.exceptions import (
     ExecutorStopped,
@@ -156,28 +157,9 @@ class EnsembleOptimizer:
         self._completed_batches = 0
 
         self._backend = self._context.backend
-        self._backend.init(self._context, self._optimizer_callback)
 
-        # Optional capture of the optimizer's output:
-        self._capture = _OutputCapture(
-            self._context,
-            bypasses_python_output=self._backend.bypasses_python_output,
-        )
-
-    @property
-    def is_parallel(self) -> bool:
-        """Determine if the optimization supports parallel evaluations.
-
-        The underlying optimization algorithm may request function evaluations
-        via a callback. Parallel optimization, in this context, means that the
-        algorithm may request multiple function evaluations in a single
-        callback.
-
-        Returns:
-            `True` if the optimization supports parallel evaluations, `False`
-            otherwise.
-        """
-        return self._backend.is_parallel
+        # Built in `start`: it asks the backend how it reports.
+        self._capture: _OutputCapture
 
     def start(self, variables: NDArray[np.float64]) -> ExitCode:
         """Start the optimization process.
@@ -193,10 +175,20 @@ class EnsembleOptimizer:
             An [`ExitCode`][ropt.enums.ExitCode] describing the reason for termination.
         """
         self._initial_variables = variables.copy()
+        problem = OptimizationProblem(self._context, variables)
+        self._capture = _OutputCapture(
+            self._context,
+            bypasses_python_output=self._backend.bypasses_python_output,
+        )
         exit_code = ExitCode.OPTIMIZER_FINISHED
         try:
             with self._capture.capture():
-                self._backend.start(variables)
+                self._backend.start(
+                    problem,
+                    self._optimizer_callback,
+                    evaluation_policy=self._context.gradient.evaluation_policy,
+                    output_dir=self._context.optimizer.output_dir,
+                )
         except TooFewRealizations:
             exit_code = ExitCode.TOO_FEW_REALIZATIONS
         except ExecutorStopped:

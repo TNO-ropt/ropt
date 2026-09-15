@@ -25,20 +25,14 @@ from scipy.optimize import (
 
 from ropt._logging import get_logger
 from ropt.backend._base import Backend
-from ropt.backend.utils import (
-    get_linear_constraints,
-    get_nonlinear_equalities,
-    resolve_verbosity,
-    split_linear_constraints,
-    validate_supported_constraints,
-)
+from ropt.backend.utils import resolve_verbosity, split_linear_constraints
 from ropt.config.options import OptionsSchemaModel
 from ropt.enums import VariableType
 from ropt.exceptions import UnsupportedError
 
 if TYPE_CHECKING:
+    from ropt.backend import OptimizationProblem
     from ropt.config import BackendConfig
-    from ropt.context import EnOptContext
     from ropt.core import OptimizerCallback
     from ropt.plugins import MethodSpec
 
@@ -182,13 +176,18 @@ class SciPyBackend(Backend):
             msg = f"SciPy optimizer algorithm {self._method} is not supported."
             raise UnsupportedError(msg)
 
-    def init(  # ruff: ignore[undocumented-public-method]
-        self, context: EnOptContext, optimizer_callback: OptimizerCallback
+    def start(  # ruff: ignore[undocumented-public-method]
+        self,
+        problem: OptimizationProblem,
+        optimizer_callback: OptimizerCallback,
+        *,
+        evaluation_policy: Literal["speculative", "separate", "auto"],
+        output_dir: Path | None,  # ruff: ignore[unused-method-argument]
     ) -> None:
+        self._problem = problem
         self._optimizer_callback = optimizer_callback
-        self._context = context
-        validate_supported_constraints(
-            self._context,
+        self._evaluation_policy = evaluation_policy
+        problem.validate_supported_constraints(
             self._method,
             self._supported_constraints,
             self._required_constraints,
@@ -197,19 +196,14 @@ class SciPyBackend(Backend):
         self._parallel = (
             self._config.parallel and self._method == "differential_evolution"
         )
+        _logger.debug("Using SciPy optimizer: %s", self._method)
 
         self._cached_variables: NDArray[np.float64] | None = None
         self._cached_function: NDArray[np.float64] | None = None
         self._cached_gradient: NDArray[np.float64] | None = None
-        _logger.debug("Using SciPy optimizer: %s", self._method)
-
-    def start(self, initial_values: NDArray[np.float64]) -> None:  # ruff: ignore[undocumented-public-method]
-        self._cached_variables = None
-        self._cached_function = None
-        self._cached_gradient = None
 
         self._bounds = self._initialize_bounds()
-        self._constraints = self._initialize_constraints(initial_values)
+        self._constraints = self._initialize_constraints()
 
         if self._method == "differential_evolution":
             if self._parallel:
@@ -218,7 +212,7 @@ class SciPyBackend(Backend):
             assert self._bounds is not None
             differential_evolution(  # type: ignore[call-overload]
                 func=self._function,
-                x0=initial_values[self._context.variables.mask],
+                x0=problem.initial_values,
                 bounds=self._bounds,
                 constraints=self._constraints,
                 polish=False,
@@ -230,7 +224,7 @@ class SciPyBackend(Backend):
                 warnings.filterwarnings("ignore", message="delta_grad == 0.0")
                 minimize(  # type: ignore[call-overload,misc]
                     fun=self._function,
-                    x0=initial_values[self._context.variables.mask],
+                    x0=problem.initial_values,
                     tol=self._config.convergence_tolerance,
                     method=self._method,
                     bounds=self._bounds,
@@ -239,10 +233,6 @@ class SciPyBackend(Backend):
                     constraints=self._constraints,
                     options=self._options or None,
                 )
-
-    @property
-    def is_parallel(self) -> bool:  # ruff: ignore[undocumented-public-method]
-        return self._parallel
 
     @property
     def bypasses_python_output(self) -> bool:  # ruff: ignore[undocumented-public-method]
@@ -262,34 +252,23 @@ class SciPyBackend(Backend):
             ).model_validate(self._config.options)
 
     def _initialize_bounds(self) -> Bounds | None:
-        if (
-            np.isfinite(self._context.variables.lower_bounds).any()
-            or np.isfinite(self._context.variables.upper_bounds).any()
-        ):
-            lower_bounds = self._context.variables.lower_bounds[
-                self._context.variables.mask
-            ]
-            upper_bounds = self._context.variables.upper_bounds[
-                self._context.variables.mask
-            ]
+        lower_bounds = self._problem.lower_bounds
+        upper_bounds = self._problem.upper_bounds
+        if np.isfinite(lower_bounds).any() or np.isfinite(upper_bounds).any():
             return Bounds(lower_bounds, upper_bounds, keep_feasible=True)
         return None
 
     def _initialize_constraints(
-        self, initial_values: NDArray[np.float64]
+        self,
     ) -> (
         list[dict[str, _ConstraintType]] | list[NonlinearConstraint | LinearConstraint]
     ):
-        is_eq = get_nonlinear_equalities(self._context)
+        is_eq = self._problem.nonlinear_equalities
         self._nonlinear_constraint_count = 0 if is_eq is None else int(is_eq.size)
         self._linear_coefficients: NDArray[np.float64] | None = None
         self._linear_offsets: NDArray[np.float64] | None = None
 
-        linear = (
-            None
-            if self._context.linear_constraints is None
-            else get_linear_constraints(self._context, initial_values)
-        )
+        linear = self._problem.linear_constraints
         if linear is not None and self._method not in _USE_CONSTRAINT_OBJECTS:
             coefficients, offsets, linear_is_eq = split_linear_constraints(*linear)
             self._linear_coefficients = coefficients
@@ -477,7 +456,7 @@ class SciPyBackend(Backend):
 
         if compute_functions or compute_gradients:
             self._cached_variables = variables.copy()
-            speculative = self._context.gradient.evaluation_policy == "speculative"
+            speculative = self._evaluation_policy == "speculative"
             compute_functions = compute_functions or speculative
             compute_gradients = compute_gradients or speculative
             new_function, new_gradient = self._compute_functions_and_gradients(
@@ -510,7 +489,7 @@ class SciPyBackend(Backend):
         if (
             compute_functions
             and compute_gradients
-            and self._context.gradient.evaluation_policy == "separate"
+            and self._evaluation_policy == "separate"
         ):
             callback_result = self._optimizer_callback(
                 variables,
@@ -587,8 +566,7 @@ class SciPyBackend(Backend):
 
         if self._method in _SUPPORT_INTEGER and "integrality" not in options:
             options["integrality"] = (
-                self._context.variables.types[self._context.variables.mask]
-                == VariableType.INTEGER
+                self._problem.variable_types == VariableType.INTEGER
             )
 
         return options

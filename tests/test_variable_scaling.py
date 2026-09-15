@@ -13,7 +13,7 @@ import pytest
 from numpy.typing import NDArray
 
 from ropt._scaling import unscale_value
-from ropt.backend.utils import validate_supported_constraints
+from ropt.backend import OptimizationProblem
 from ropt.config import VariablesConfig
 from ropt.context import EnOptContext
 from ropt.enums import PerturbationType
@@ -416,7 +416,9 @@ def test_auto_scale_does_not_reclassify_an_inequality() -> None:
     )
     # Scaling leaves the bounds a whole `1e-16` apart, which an absolute
     # tolerance applied after the fact would read as an equality.
-    validate_supported_constraints(context, "method", {"linear:ineq": {"method"}}, {})
+    OptimizationProblem(context, np.zeros(3)).validate_supported_constraints(
+        "method", {"linear:ineq": {"method"}}, {}
+    )
 
 
 def test_auto_scale_composes_with_the_configured_scales() -> None:

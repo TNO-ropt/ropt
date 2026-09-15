@@ -7,9 +7,7 @@ import multiprocessing
 import queue
 import traceback
 from functools import partial
-from typing import TYPE_CHECKING, Any, ClassVar, Final
-
-import numpy as np
+from typing import TYPE_CHECKING, Any, ClassVar, Final, Literal
 
 from ropt._logging import get_logger
 from ropt._serialize import CANNOT_DESERIALIZE, CANNOT_SERIALIZE, dumps, loads
@@ -19,11 +17,13 @@ from ropt.plugins.manager import get_plugin, get_plugin_name, register_plugin
 
 if TYPE_CHECKING:
     from multiprocessing.process import BaseProcess
+    from pathlib import Path
 
+    import numpy as np
     from numpy.typing import NDArray
 
+    from ropt.backend import OptimizationProblem
     from ropt.config import BackendConfig
-    from ropt.context import EnOptContext
     from ropt.core import OptimizerCallback, OptimizerCallbackResult
     from ropt.plugins import MethodSpec
 
@@ -108,21 +108,16 @@ class ExternalBackend(Backend):
         self._delegate_cls = get_plugin("backend", method=method)
         self._delegate_name = get_plugin_name("backend", method)
 
-    def init(  # ruff: ignore[undocumented-public-method]
-        self, context: EnOptContext, optimizer_callback: OptimizerCallback
-    ) -> None:
-        self._context = context
-        self._optimizer_callback = optimizer_callback
-        backend = self._delegate_cls(self._backend_config)
-        backend.init(
-            context.model_copy(update={"backend": backend}), optimizer_callback
-        )
-        self._is_parallel: bool = backend.is_parallel
-
     def start(  # ruff: ignore[undocumented-public-method]
-        self, initial_values: NDArray[np.float64]
+        self,
+        problem: OptimizationProblem,
+        optimizer_callback: OptimizerCallback,
+        *,
+        evaluation_policy: Literal["speculative", "separate", "auto"],
+        output_dir: Path | None,
     ) -> None:
-        payload = self._serialize(initial_values)
+        self._optimizer_callback = optimizer_callback
+        payload = self._serialize(problem, evaluation_policy, output_dir)
 
         context = multiprocessing.get_context("spawn")
         request_queue = context.Queue()
@@ -181,29 +176,21 @@ class ExternalBackend(Backend):
     ) -> None:
         self._delegate_cls(self._backend_config).validate_options()
 
-    @property
-    def is_parallel(self) -> bool:  # ruff: ignore[undocumented-public-method]
-        return self._is_parallel
-
-    def _serialize(self, initial_values: NDArray[np.float64]) -> bytes:
-        # The context points back at this backend, which holds the optimizer
-        # callback, so the entire ensemble graph would travel with it. The child
-        # replaces the backend and the callback both, so that edge is cut here
-        # rather than sent.
-        #
-        # Cut on the context itself, not on a copy: plugin instances store the
-        # context in their `init`, so a copy leaves the original reachable
-        # through them and both end up in the payload.
-        backend = self._context.backend
-        object.__setattr__(self._context, "backend", None)  # ruff: ignore[unnecessary-dunder-call]
+    def _serialize(
+        self,
+        problem: OptimizationProblem,
+        evaluation_policy: Literal["speculative", "separate", "auto"],
+        output_dir: Path | None,
+    ) -> bytes:
         try:
             return dumps(
                 {
                     "config": self._backend_config,
                     "delegate_name": self._delegate_name,
                     "delegate_cls": self._delegate_cls,
-                    "context": self._context,
-                    "initial_values": initial_values,
+                    "problem": problem,
+                    "evaluation_policy": evaluation_policy,
+                    "output_dir": output_dir,
                 }
             )
         except Exception as exc:
@@ -212,8 +199,6 @@ class ExternalBackend(Backend):
                 f"{CANNOT_SERIALIZE}."
             )
             raise ExecutionError(msg) from exc
-        finally:
-            object.__setattr__(self._context, "backend", backend)  # ruff: ignore[unnecessary-dunder-call]
 
 
 def _shutdown(
@@ -243,14 +228,21 @@ def _run(
     result_queue: multiprocessing.Queue[OptimizerCallbackResult | None],
 ) -> None:
     try:
-        backend, initial_values = _prepare(data, request_queue, result_queue)
+        backend, problem, evaluation_policy, output_dir = _prepare(data)
         # Suppressed rather than handled, and deliberately not spanning
         # `_prepare`: this arm reports nothing while the `finally` queues the
         # sentinel either way, so letting it cover setup would turn a setup
         # failure into a run that ends with no error and no result.
         # `backend.start` is also the only place it is raised from.
         with contextlib.suppress(_DriverStopped):
-            backend.start(initial_values)
+            backend.start(
+                problem,
+                partial(
+                    _callback, request_queue=request_queue, result_queue=result_queue
+                ),
+                evaluation_policy=evaluation_policy,
+                output_dir=output_dir,
+            )
     except OptimizerStop as exc:
         request_queue.put({"stop": True, "exit_code": exc.exit_code})
     except Exception as exc:  # ruff: ignore[blind-except]
@@ -278,10 +270,12 @@ def _register_delegate(name: str, plugin: type[Any], method: str) -> None:
 
 def _prepare(
     data: bytes,
-    request_queue: multiprocessing.Queue[dict[str, Any] | None],
-    result_queue: multiprocessing.Queue[OptimizerCallbackResult | None],
-) -> tuple[Backend, NDArray[np.float64]]:
-    # Workflow objects arrive as inert placeholders and are never used here.
+) -> tuple[
+    Backend,
+    OptimizationProblem,
+    Literal["speculative", "separate", "auto"],
+    Path | None,
+]:
     try:
         data_dict = loads(data)
     except Exception as exc:
@@ -293,12 +287,12 @@ def _prepare(
         data_dict["delegate_name"], data_dict["delegate_cls"], config.method
     )
     backend = get_plugin("backend", method=config.method)(config)
-    context = data_dict["context"].model_copy(update={"backend": backend})
-    backend.init(
-        context,
-        partial(_callback, request_queue=request_queue, result_queue=result_queue),
+    return (
+        backend,
+        data_dict["problem"],
+        data_dict["evaluation_policy"],
+        data_dict["output_dir"],
     )
-    return backend, np.asarray(data_dict["initial_values"], dtype=np.float64)
 
 
 def _callback(

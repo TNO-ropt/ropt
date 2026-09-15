@@ -17,11 +17,10 @@ from ropt.plugins.manager import (
 )
 
 if TYPE_CHECKING:
-    import numpy as np
-    from numpy.typing import NDArray
+    from pathlib import Path
 
+    from ropt.backend import OptimizationProblem
     from ropt.config import BackendConfig
-    from ropt.context import EnOptContext
     from ropt.core import OptimizerCallback
     from ropt.plugins import MethodSpec
 
@@ -32,10 +31,14 @@ class MockedPlugin1(Backend):
     def __init__(self, _0: BackendConfig) -> None:
         pass
 
-    def init(self, _0: EnOptContext, _1: OptimizerCallback) -> None:
-        pass
-
-    def start(self, _0: NDArray[np.float64]) -> None:
+    def start(
+        self,
+        _0: OptimizationProblem,
+        _1: OptimizerCallback,
+        *,
+        evaluation_policy: Literal["speculative", "separate", "auto"],
+        output_dir: Path | None,
+    ) -> None:
         pass
 
     def validate_options(self) -> None:
@@ -50,10 +53,14 @@ class MockedPluginWithoutMethods(Backend):
     def __init__(self, _0: BackendConfig) -> None:
         pass
 
-    def init(self, _0: EnOptContext, _1: OptimizerCallback) -> None:
-        pass
-
-    def start(self, _0: NDArray[np.float64]) -> None:
+    def start(
+        self,
+        _0: OptimizationProblem,
+        _1: OptimizerCallback,
+        *,
+        evaluation_policy: Literal["speculative", "separate", "auto"],
+        output_dir: Path | None,
+    ) -> None:
         pass
 
     def validate_options(self) -> None:

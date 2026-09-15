@@ -16,6 +16,7 @@ from ropt._serialize import (
     HAVE_CLOUDPICKLE,
     dumps,
 )
+from ropt.backend import OptimizationProblem
 from ropt.backend.external import (
     ExternalBackend,
     _decode_child_exception,
@@ -25,7 +26,6 @@ from ropt.backend.external import (
     _wrap_with_traceback,
 )
 from ropt.backend.scipy import SciPyBackend
-from ropt.components.evaluators import EvaluationFunctionResult, FunctionEvaluator
 from ropt.config import BackendConfig
 from ropt.context import EnOptContext
 from ropt.enums import ExitCode
@@ -56,8 +56,9 @@ def _make_child_args() -> bytes:
             "config": config,
             "delegate_name": get_plugin_name("backend", config.method),
             "delegate_cls": get_plugin("backend", config.method),
-            "context": _make_context(),
-            "initial_values": np.zeros(2),
+            "problem": OptimizationProblem(_make_context(), np.zeros(2)),
+            "evaluation_policy": "auto",
+            "output_dir": None,
         }
     )
 
@@ -65,7 +66,7 @@ def _make_child_args() -> bytes:
 def test_child_abort_forwards_exit_code(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    def _raise_abort(_self: SciPyBackend, _initial_values: np.ndarray) -> None:
+    def _raise_abort(_self: SciPyBackend, *_args: Any, **_kwargs: Any) -> None:
         raise OptimizerStop(ExitCode.MAX_FUNCTIONS_REACHED)
 
     monkeypatch.setattr(SciPyBackend, "start", _raise_abort)
@@ -87,7 +88,7 @@ def test_child_abort_forwards_exit_code(
 def test_child_exception_is_serialized(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    def _raise_value_error(_self: SciPyBackend, _initial_values: np.ndarray) -> None:
+    def _raise_value_error(_self: SciPyBackend, *_args: Any, **_kwargs: Any) -> None:
         msg = "delegate failed in child"
         raise ValueError(msg)
 
@@ -119,7 +120,7 @@ def test_unserializable_child_exception_falls_back(
     class _UnserializableError(ValueError):
         pass
 
-    def _raise_unserializable(_self: SciPyBackend, _initial_values: np.ndarray) -> None:
+    def _raise_unserializable(_self: SciPyBackend, *_args: Any, **_kwargs: Any) -> None:
         msg = "error cannot be pickled"
         raise _UnserializableError(msg)
 
@@ -225,9 +226,8 @@ def test_the_problem_travels_without_cloudpickle(
 ) -> None:
     """`cloudpickle` is optional: the standard library must be able to send this.
 
-    The evaluations stay in the parent process, so the objective is held by an
-    evaluator, which serializes as an inert placeholder. It is therefore never
-    sent, and what is sent can be looked up by name.
+    The payload is the reduced problem plus names that resolve in the child, so
+    nothing that only `cloudpickle` could send is in it.
     """
     context = EnOptContext.model_validate(
         {
@@ -238,24 +238,16 @@ def test_the_problem_travels_without_cloudpickle(
     backend = context.backend
     assert isinstance(backend, ExternalBackend)
 
-    # A closure, which only `cloudpickle` could send, reached the way a real
-    # run reaches it: through an evaluator.
-    target = 0.5
-    evaluator = FunctionEvaluator(
-        function=lambda variables, _: EvaluationFunctionResult(
-            objectives=np.array([float(((variables - target) ** 2).sum())])
-        )
-    )
-    backend.init(context, cast("Any", evaluator.eval))
+    problem = OptimizationProblem(context, np.zeros(2))
 
     # The standard library, whether or not `cloudpickle` is installed.
     dumped = _record_stdlib_dumps(monkeypatch, "ropt.backend.external.dumps")
-    restored = pickle.loads(backend._serialize(np.zeros(2)))  # ruff: ignore[private-member-access, suspicious-pickle-usage]
+    restored = pickle.loads(backend._serialize(problem, "auto", None))  # ruff: ignore[private-member-access, suspicious-pickle-usage]
 
     assert dumped
     assert restored["config"].method == "scipy/slsqp"
     assert restored["delegate_cls"] is SciPyBackend
-    assert np.array_equal(restored["initial_values"], np.zeros(2))
+    assert np.array_equal(restored["problem"].initial_values, np.zeros(2))
 
 
 def test_an_installed_delegate_is_left_to_the_child_to_find(
@@ -296,8 +288,9 @@ def test_a_payload_the_child_cannot_rebuild_reports_why(
     data = pickle.dumps(
         {
             "config": BackendConfig.model_validate({"method": "scipy/slsqp"}),
-            "context": _make_context(),
-            "initial_values": np.zeros(2),
+            "problem": OptimizationProblem(_make_context(), np.zeros(2)),
+            "evaluation_policy": "auto",
+            "output_dir": None,
             "marker": _VanishingMarker(),
         }
     )
@@ -329,10 +322,6 @@ def test_the_advice_names_the_extra_only_when_it_is_missing() -> None:
 
 def test_unserializable_problem_reports_how_to_send_it() -> None:
     class _Unserializable:
-        # `_serialize` cuts the backend edge before dumping, so the stand-in
-        # needs the field even though nothing reads it.
-        backend = None
-
         def __reduce__(self) -> tuple[Any, ...]:
             msg = "cannot be sent"
             raise TypeError(msg)
@@ -340,10 +329,9 @@ def test_unserializable_problem_reports_how_to_send_it() -> None:
     backend = ExternalBackend(
         BackendConfig.model_validate({"method": "external/scipy/slsqp"})
     )
-    backend._context = cast("Any", _Unserializable())  # ruff: ignore[private-member-access]
 
     with pytest.raises(ExecutionError, match="could not be sent") as exc_info:
-        backend._serialize(np.zeros(2))  # ruff: ignore[private-member-access]
+        backend._serialize(cast("Any", _Unserializable()), "auto", None)  # ruff: ignore[private-member-access]
 
     assert CANNOT_SERIALIZE in str(exc_info.value)
 
