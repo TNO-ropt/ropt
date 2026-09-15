@@ -110,6 +110,11 @@ nav:
       - "Ensemble-Based Optimization": getting_started/ensemble.md
       - "Collecting Results with Handlers": getting_started/handlers.md
       - "Running in Parallel": getting_started/execution.md
+  - "Running":
+      - "Running Optimizations": running/running.md
+      - "Common Pitfalls": running/pitfalls.md
+      - "Parallel Execution and Many Runs": running/parallel.md
+      - "Result Handlers": running/handlers.md
   - "Optimizer Setup":
       - "Key Concepts": optimizer_setup/key_concepts.md
       - "Configuration": optimizer_setup/configuration.md
@@ -117,11 +122,6 @@ nav:
       - "Realization Filters": optimizer_setup/realization_filters.md
       - "Function Estimators": optimizer_setup/function_estimators.md
       - "Working with Results": optimizer_setup/results.md
-  - "Running":
-      - "Running Optimizations": running/running.md
-      - "Common Pitfalls": running/pitfalls.md
-      - "Parallel Execution and Many Runs": running/parallel.md
-      - "Result Handlers": running/handlers.md
   - "Workflows":
       - "Optimization Workflows": workflows/workflows.md
       - "Writing Evaluation Callbacks": workflows/evaluation_callbacks.md
