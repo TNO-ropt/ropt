@@ -2955,7 +2955,7 @@ side when the optimizer requests gradients separately from functions. Set
 <a class="autorefs autorefs-internal" title="            ropt.realization_filter.RealizationFilter" href="../../reference/realization_filter/#ropt.realization_filter.RealizationFilter"><code>RealizationFilter</code></a> base class,
 whose docstring documents the methods to implement. A filter defined where an
 entry point cannot reach it — in a script or a notebook — is added with
-<a class="autorefs autorefs-internal" title="            ropt.plugins.manager.register_plugin" href="../../reference/plugin_manager/#ropt.plugins.manager.register_plugin"><code>register_plugin</code></a>, after which it is
+<a class="autorefs autorefs-internal" title="            ropt.plugins.register_plugin" href="../../reference/plugin_manager/#ropt.plugins.register_plugin"><code>register_plugin</code></a>, after which it is
 selected by its <code>"plugin/method"</code> string exactly like an installed one. An
 instance can also be passed directly in the <code>realization_filters</code> field of
 <a class="autorefs autorefs-internal" title="            EnOptContext" href="../../reference/context/#ropt.context.EnOptContext"><code>EnOptContext</code></a>, which needs no registration.</p>

@@ -2709,12 +2709,12 @@
 <p><code>ropt</code> provides helper functions for querying installed plugins at runtime.
 These are useful for verifying your environment or building dynamic
 configurations.</p>
-<p><a class="autorefs autorefs-internal" title="            ropt.plugins.manager.get_plugin_name" href="../../reference/plugin_manager/#ropt.plugins.manager.get_plugin_name"><code>get_plugin_name</code></a> looks up which plugin
+<p><a class="autorefs autorefs-internal" title="            ropt.plugins.get_plugin_name" href="../../reference/plugin_manager/#ropt.plugins.get_plugin_name"><code>get_plugin_name</code></a> looks up which plugin
 provides a given method. It takes the plugin area and a method string — the same
 <code>"plugin/method"</code> or <code>"method"</code> strings used in the configuration (see
 <a href="../../optimizer_setup/configuration/#method-strings">Configuration</a>) — and
 returns the plugin name, or <code>None</code> if no plugin supports the method:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_plugin_name</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.plugins</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_plugin_name</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">get_plugin_name</span><span class="p">(</span><span class="s2">"backend"</span><span class="p">,</span> <span class="s2">"slsqp"</span><span class="p">)</span>           <span class="c1"># "scipy"</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">get_plugin_name</span><span class="p">(</span><span class="s2">"backend"</span><span class="p">,</span> <span class="s2">"scipy/L-BFGS-B"</span><span class="p">)</span>  <span class="c1"># "scipy"</span>

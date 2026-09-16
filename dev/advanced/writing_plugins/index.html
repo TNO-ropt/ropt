@@ -3082,16 +3082,16 @@ as <code>"uniform"</code> if no other installed plugin claims that name:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="s2">"samplers"</span><span class="p">:</span> <span class="p">[{</span><span class="s2">"method"</span><span class="p">:</span> <span class="s2">"my_package/uniform"</span><span class="p">}],</span>
 </span></code></pre></div>
 <p>Check that the plugin is found with
-<a class="autorefs autorefs-internal" title="            ropt.plugins.manager.get_plugin_name" href="../../reference/plugin_manager/#ropt.plugins.manager.get_plugin_name"><code>get_plugin_name</code></a>:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_plugin_name</span>
+<a class="autorefs autorefs-internal" title="            ropt.plugins.get_plugin_name" href="../../reference/plugin_manager/#ropt.plugins.get_plugin_name"><code>get_plugin_name</code></a>:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.plugins</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_plugin_name</span>
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>
 </span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="n">get_plugin_name</span><span class="p">(</span><span class="s2">"sampler"</span><span class="p">,</span> <span class="s2">"my_package/uniform"</span><span class="p">)</span>   <span class="c1"># "my_package"</span>
 </span></code></pre></div>
 <h2 id="registering-one-without-an-entry-point">Registering one without an entry point</h2>
 <p>An entry point needs an installed package, which a class written in a script or
 a notebook does not have. Such a class is added by hand with
-<a class="autorefs autorefs-internal" title="            ropt.plugins.manager.register_plugin" href="../../reference/plugin_manager/#ropt.plugins.manager.register_plugin"><code>register_plugin</code></a>:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.plugins.manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">register_plugin</span>
+<a class="autorefs autorefs-internal" title="            ropt.plugins.register_plugin" href="../../reference/plugin_manager/#ropt.plugins.register_plugin"><code>register_plugin</code></a>:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.plugins</span><span class="w"> </span><span class="kn">import</span> <span class="n">register_plugin</span>
 </span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
 </span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="n">register_plugin</span><span class="p">(</span><span class="s2">"sampler"</span><span class="p">,</span> <span class="s2">"my_package"</span><span class="p">,</span> <span class="n">UniformSampler</span><span class="p">)</span>
 </span></code></pre></div>

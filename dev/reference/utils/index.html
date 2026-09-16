@@ -2864,9 +2864,6 @@ plugin queries, <a href="../../optimizer_setup/configuration/#variable-scales">V
 for the bounds converter, and <a href="../../troubleshooting/keyboard_interrupt/">Keyboard
 Interrupts</a> for when the escape hatch is
 worth reaching for.</p>
-<p><code>ropt.utils</code> also re-exports
-<a class="autorefs autorefs-internal" title="            ropt.plugins.manager.get_plugin_name" href="../plugin_manager/#ropt.plugins.manager.get_plugin_name"><code>get_plugin_name</code></a>, documented with the
-<a href="../plugin_manager/">Plugin Manager</a>.</p>
 
 
 <div class="doc doc-object doc-module">
@@ -2882,12 +2879,12 @@ worth reaching for.</p>
     <div class="doc doc-contents first">
 
         <p>Optional helpers for scripts and applications that use <code>ropt</code>.</p>
-<p>Nothing in <code>ropt</code> calls anything here. Three kinds of helper live here: queries
-about the installed plugins, for code that builds configurations dynamically or
-checks them before starting a long run; a converter from variable bounds to the
-scales and offsets that a configuration expects; and escape hatches for problems
-that come from outside the library, offered because the fix is easy to get wrong
-and hard to find.</p>
+<p>Nothing in <code>ropt</code> calls anything here. Three kinds of helper live here: a check
+on the options a backend accepts, for code that builds configurations
+dynamically or checks them before starting a long run; a converter from variable
+bounds to the scales and offsets that a configuration expects; and escape
+hatches for problems that come from outside the library, offered because the fix
+is easy to get wrong and hard to find.</p>
 
 
 
