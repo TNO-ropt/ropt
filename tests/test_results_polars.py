@@ -2,8 +2,15 @@ import math
 from functools import partial
 from typing import Any, Literal
 
+import numpy as np
 import pytest
+from numpy.typing import NDArray
 
+from ropt.components.evaluators import (
+    EvaluationFunctionCallback,
+    EvaluationFunctionContext,
+    EvaluationFunctionResult,
+)
 from ropt.components.event_handlers import CallbackHandler
 from ropt.enums import AxisName, EnOptEventType
 from ropt.events import EnOptEvent
@@ -60,6 +67,22 @@ def _handle_results(
     frame = results_to_polars(results, fields, result_type=result_type, sep=sep)
     if frame.height > 0:
         frames.append(frame)
+
+
+def _with_pair_metadata(
+    function: EvaluationFunctionCallback,
+) -> EvaluationFunctionCallback:
+    def _wrapped(
+        variables: NDArray[np.float64], context: EvaluationFunctionContext
+    ) -> EvaluationFunctionResult:
+        result = function(variables, context)
+        return EvaluationFunctionResult(
+            objectives=result.objectives,
+            constraints=result.constraints,
+            metadata={"pair": np.array([context.realization, 1.0])},
+        )
+
+    return _wrapped
 
 
 def _run(
@@ -156,6 +179,26 @@ def test_polars_results_metadata(config: Any, eval_func: Any) -> None:
         *(f"variables,{idx}" for idx in range(3)),
     ]
     assert frame["metadata.foo.bar"].to_list() == [1, 1, 1]
+
+
+def test_polars_results_unstack_user_axis_but_keep_realization_stacked(
+    config: Any, eval_func: Any
+) -> None:
+    config["realizations"] = {"weights": [1.0, 1.0, 1.0]}
+    config["names"]["pair"] = ("lo", "hi")
+    frames = _run(
+        config,
+        lambda: _with_pair_metadata(eval_func()),
+        {"evaluations.metadata.pair"},
+        "functions",
+    )
+    frame = pl.concat(frames, how="diagonal")
+    assert frame.columns == [
+        "batch_id",
+        "realization",
+        "evaluations.metadata.pair,lo",
+        "evaluations.metadata.pair,hi",
+    ]
 
 
 def test_polars_results_invalid_type() -> None:

@@ -1,8 +1,15 @@
 from functools import partial
 from typing import Any, Literal
 
+import numpy as np
 import pytest
+from numpy.typing import NDArray
 
+from ropt.components.evaluators import (
+    EvaluationFunctionCallback,
+    EvaluationFunctionContext,
+    EvaluationFunctionResult,
+)
 from ropt.components.event_handlers import CallbackHandler
 from ropt.enums import AxisName, EnOptEventType
 from ropt.events import EnOptEvent
@@ -58,6 +65,22 @@ def _handle_results(
     frame = results_to_pandas(results, fields, result_type=result_type)
     if not frame.empty:
         frames.append(frame)
+
+
+def _with_pair_metadata(
+    function: EvaluationFunctionCallback,
+) -> EvaluationFunctionCallback:
+    def _wrapped(
+        variables: NDArray[np.float64], context: EvaluationFunctionContext
+    ) -> EvaluationFunctionResult:
+        result = function(variables, context)
+        return EvaluationFunctionResult(
+            objectives=result.objectives,
+            constraints=result.constraints,
+            metadata={"pair": np.array([context.realization, 1.0])},
+        )
+
+    return _wrapped
 
 
 def test_dataframe_results_no_results(config: Any, eval_func: Any) -> None:
@@ -194,6 +217,36 @@ def test_dataframe_results_metadata(config: Any, eval_func: Any) -> None:
     assert list(frame.columns.get_level_values(level=0)) == ["metadata.foo.bar"] + [
         ("variables", idx) for idx in range(3)
     ]
+
+
+def test_dataframe_results_unstack_user_axis_but_keep_realization_stacked(
+    config: Any, eval_func: Any
+) -> None:
+    config["realizations"] = {"weights": [1.0, 1.0, 1.0]}
+    config["names"]["pair"] = ("lo", "hi")
+    frames: list[pd.DataFrame] = []
+    optimize(
+        config,
+        initial_values,
+        _with_pair_metadata(eval_func()),
+        handlers=[
+            CallbackHandler(
+                event_types={EnOptEventType.FINISHED_EVALUATION},
+                callback=partial(
+                    _handle_results,
+                    frames=frames,
+                    fields={"evaluations.metadata.pair"},
+                    result_type="functions",
+                ),
+            )
+        ],
+    )
+    frame = pd.concat(frames)
+    assert list(frame.columns.get_level_values(level=0)) == [
+        ("evaluations.metadata.pair", "lo"),
+        ("evaluations.metadata.pair", "hi"),
+    ]
+    assert frame.index.names == ["batch_id", "realization"]
 
 
 def test_pandas_results_empty_input() -> None:
