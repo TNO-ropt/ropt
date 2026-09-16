@@ -90,6 +90,16 @@ def test_example_simple_export_pandas(tmp_path: Path, monkeypatch: Any) -> None:
     _load_from_file("export", "simple").main(pandas=True)
 
 
+def test_example_simple_failures(tmp_path: Path, monkeypatch: Any) -> None:
+    monkeypatch.chdir(tmp_path)
+    _load_from_file("failures", "simple").main()
+
+
+def test_example_simple_stopping(tmp_path: Path, monkeypatch: Any) -> None:
+    monkeypatch.chdir(tmp_path)
+    _load_from_file("stopping", "simple").main()
+
+
 def test_example_simple_handlers(tmp_path: Path, monkeypatch: Any) -> None:
     monkeypatch.chdir(tmp_path)
     _load_from_file("handlers", "simple").main()
