@@ -53,11 +53,13 @@ def main() -> None:
     """Collect every result from concurrent runs, in two groups at once."""
     history = HistoryHandler()
     per_run = HistoryHandler()
+    # --8<-- [start:groups]
     with session() as active:
         pool = active.thread_pool(workers=len(STARTS))
         shared = active.shared_handlers(history)
         tagged = active.shared_handlers(per_run)
         optimize_many(CONFIG, STARTS, rosenbrock, pool=pool, handlers=[shared, tagged])
+    # --8<-- [end:groups]
     print(
         f"collected results across {len(STARTS)} concurrent runs: "
         f"{len(history['results'])}"

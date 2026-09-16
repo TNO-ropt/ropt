@@ -47,6 +47,7 @@ def rosenbrock(
 def main() -> None:
     """Run one optimization per start vector, concurrently, tagging each run."""
     run_metadata = [{"run_id": idx} for idx in range(len(STARTS))]
+    # --8<-- [start:run]
     with session() as active:
         results = optimize_many(
             CONFIG,
@@ -56,6 +57,7 @@ def main() -> None:
             metadata=run_metadata,
             limit=2,
         )
+    # --8<-- [end:run]
     for result in results:
         assert result.results is not None
         run_id = result.results.metadata["run_id"]
