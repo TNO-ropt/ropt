@@ -697,10 +697,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#4-run-it" class="md-nav__link">
+  <a href="#4-follow-the-progress-optional" class="md-nav__link">
     <span class="md-ellipsis">
       
-        4. Run it
+        4. Follow the progress (optional)
       
     </span>
   </a>
@@ -708,10 +708,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#5-read-the-result" class="md-nav__link">
+  <a href="#5-run-it" class="md-nav__link">
     <span class="md-ellipsis">
       
-        5. Read the result
+        5. Run it
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-read-the-result" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Read the result
       
     </span>
   </a>
@@ -2797,10 +2808,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#4-run-it" class="md-nav__link">
+  <a href="#4-follow-the-progress-optional" class="md-nav__link">
     <span class="md-ellipsis">
       
-        4. Run it
+        4. Follow the progress (optional)
       
     </span>
   </a>
@@ -2808,10 +2819,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#5-read-the-result" class="md-nav__link">
+  <a href="#5-run-it" class="md-nav__link">
     <span class="md-ellipsis">
       
-        5. Read the result
+        5. Run it
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-read-the-result" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Read the result
       
     </span>
   </a>
@@ -2859,21 +2881,20 @@ set is a <strong>realization</strong>. The full runnable script is
 <p><code>ropt</code> optimizes the realizations together by combining them into a single
 <strong>robust objective</strong> — by default a weighted average over the realizations.
 Minimizing the average yields a solution that performs well across the whole set
-rather than for one particular case. We minimize the Rosenbrock function again,
-but now its two coefficients vary between realizations.</p>
+rather than for one particular case. We minimize the Rosenbrock function,
+generalized to <span class="arithmatex">\(n\)</span> variables, with coefficients that vary between realizations.</p>
 <p>For realization <span class="arithmatex">\(i\)</span>, with coefficients <span class="arithmatex">\(a_i\)</span> and <span class="arithmatex">\(b_i\)</span>, the per-realization
 objective is:</p>
 <div class="arithmatex">\[ f_i(\mathbf{x}) = \sum_{k=1}^{n-1} \left[ (a_i - x_k)^2 + b_i \left(
 x_{k+1} - x_k^2 \right)^2 \right] \]</div>
-<p>which is the Rosenbrock function of the <a href="../quickstart/">Quickstart</a>, generalized
-to <span class="arithmatex">\(n\)</span> variables: it reduces to that function when <span class="arithmatex">\(a_i = 1\)</span> and <span class="arithmatex">\(b_i = 100\)</span> for
-every realization. <code>ropt</code> combines the realizations into the robust objective:</p>
+<p>which it reduces to the standard Rosenbrock function when <span class="arithmatex">\(n = 1\)</span>, and <span class="arithmatex">\(a_i = 1,
+b_i = 100\)</span> for every realization.</p>
+<p><code>ropt</code> combines the realizations into the robust objective:</p>
 <div class="arithmatex">\[ f(\mathbf{x}) = \sum_i w_i f_i(\mathbf{x}), \]</div>
 <p>with weights <span class="arithmatex">\(w_i\)</span> that we set in the configuration below.</p>
 <h2 id="1-describe-the-problem">1. Describe the problem</h2>
-<p>The config adds a <code>realizations</code> section next to the variables. The <code>weights</code>
-list has one entry per realization and sets how much each contributes to the
-combined objective:</p>
+<p>The config adds a <code>realizations</code> section: the <code>weights</code> list has one entry per
+realization that sets how much each contributes to the combined objective:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">DIM</span> <span class="o">=</span> <span class="mi">5</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">REALIZATIONS</span> <span class="o">=</span> <span class="mi">10</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">UNCERTAINTY</span> <span class="o">=</span> <span class="mf">0.1</span>
@@ -2915,7 +2936,7 @@ which we use to index the parameter arrays:</p>
 </span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="sd">        context:   Identifies the realization being evaluated.</span>
 </span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>
 </span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="sd">    Returns:</span>
-</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="sd">        The objective of this realization at ``variables``.</span>
+</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="sd">        The objective of this realization at `variables`.</span>
 </span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="sd">    """</span>
 </span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>    <span class="n">r</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">realization</span>
 </span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>    <span class="n">objective</span> <span class="o">=</span> <span class="mf">0.0</span>
@@ -2928,35 +2949,64 @@ which we use to index the parameter arrays:</p>
 objective uses <code>context.realization</code> to select the parameters for the
 realization it is computing. <code>ropt</code> combines the per-realization values into the
 robust objective for you.</p>
-<p>Returning a single number, as here, is the simplest case. A function that also
-has constraints returns a sequence instead — the objectives first, then the
-constraints; see <a href="../../optimizer_setup/constraints/">Constraints</a>.</p>
-<h2 id="4-run-it">4. Run it</h2>
+<p>Returning a single number, as here, is the simplest case. A function that has
+multiple objectives and has constraints returns a sequence instead — the
+objectives first, then the constraints; see
+<a href="../../optimizer_setup/constraints/">Constraints</a>.</p>
+<h2 id="4-follow-the-progress-optional">4. Follow the progress (optional)</h2>
+<p>To track a running optimization, pass a <code>report</code> callback: <code>ropt</code> calls it after
+every evaluation, with an <a class="autorefs autorefs-internal" title="            ropt.simple.EvaluateResult
+
+
+  
+      dataclass
+  " href="../../reference/simple/#ropt.simple.EvaluateResult"><code>EvaluateResult</code></a>
+describing what was just computed.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">report</span><span class="p">(</span><span class="n">result</span><span class="p">:</span> <span class="n">EvaluateResult</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">    </span><span class="sd">"""Print the objective of each evaluation as the run proceeds.</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="sd">    Args:</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="sd">        result: The result of a single function evaluation.</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="sd">    """</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>    <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">target_objective</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  objective: </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">target_objective</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</span></code></pre></div>
+<p>The callback belongs to one run and sees one evaluation at a time. To keep the
+results rather than just look at them — or to collect them across several runs
+— use a handler instead; see
+<a href="../handlers/">Collecting Results with Handlers</a>.</p>
+<h2 id="5-run-it">5. Run it</h2>
 <p>The call is the same as for a deterministic problem, with <code>INITIAL_VALUES</code> the
 start point defined above:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">CONFIG</span><span class="p">,</span> <span class="n">INITIAL_VALUES</span><span class="p">,</span> <span class="n">rosenbrock</span><span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">CONFIG</span><span class="p">,</span> <span class="n">INITIAL_VALUES</span><span class="p">,</span> <span class="n">rosenbrock</span><span class="p">,</span> <span class="n">report</span><span class="o">=</span><span class="n">report</span><span class="p">)</span>
 </span></code></pre></div>
-<p><code>ropt</code> evaluates all ten realizations at each point, averages them into the
-robust objective, and optimizes that. To follow the run while it proceeds, pass
-a <code>report</code> callback; see
-<a href="../../running/running/#reporting-progress">Reporting progress</a>.</p>
-<h2 id="5-read-the-result">5. Read the result</h2>
+<p><code>ropt</code> evaluates all ten realizations at each point and averages them into the
+robust objective, which is what it optimizes.</p>
+<h2 id="6-read-the-result">6. Read the result</h2>
 <p><code>optimize</code> returns an <a class="autorefs autorefs-internal" title="            ropt.simple.OptimizeResult
 
 
   
       dataclass
   " href="../../reference/simple/#ropt.simple.OptimizeResult"><code>OptimizeResult</code></a>:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"exit code:         </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">exit_code</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"optimal variables: </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">variables</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"optimal objective: </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">target_objective</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"exit code:         </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">exit_code</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"optimal variables: </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">variables</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"optimal objective: </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">target_objective</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </span></code></pre></div>
 <ul>
 <li><code>result.variables</code> is the best set of variables found, and
   <code>result.target_objective</code> the robust objective value there. Both are <code>None</code> if
   the run produced no valid result.</li>
-<li><code>result.exit_code</code> says why the run stopped.</li>
-<li><code>result.results</code> holds the full low-level result, if you need every detail.</li>
+<li><code>result.exit_code</code> says why the run stopped (a member of the
+  <a class="autorefs autorefs-internal" title="            ExitCode" href="../../reference/enums/#ropt.enums.ExitCode"><code>ExitCode</code></a> enumeration).</li>
+<li><code>result.results</code> holds the full low-level result (a
+  <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="../../reference/results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> object), if you need every
+  detail.</li>
 </ul>
 <p>See <a href="../../running/running/#the-result">The result</a> for the remaining fields.</p>
 <p>Because the coefficients are centered on the values used in the

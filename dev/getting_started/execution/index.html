@@ -743,10 +743,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#thread_pool-a-pool-of-threads-in-the-same-process" class="md-nav__link">
+  <a href="#thread_pool-a-pool-of-threads-in-your-program" class="md-nav__link">
     <span class="md-ellipsis">
       
-        thread_pool — a pool of threads in the same process
+        thread_pool — a pool of threads in your program
       
     </span>
   </a>
@@ -769,6 +769,17 @@
     <span class="md-ellipsis">
       
         local_pool — one process per evaluation, on this machine
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#process-or-local" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        process_pool or local_pool?
       
     </span>
   </a>
@@ -830,6 +841,17 @@
     <span class="md-ellipsis">
       
         Collecting results from concurrent runs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#what-the-runs-can-share" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What the runs can share
       
     </span>
   </a>
@@ -2854,10 +2876,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#thread_pool-a-pool-of-threads-in-the-same-process" class="md-nav__link">
+  <a href="#thread_pool-a-pool-of-threads-in-your-program" class="md-nav__link">
     <span class="md-ellipsis">
       
-        thread_pool — a pool of threads in the same process
+        thread_pool — a pool of threads in your program
       
     </span>
   </a>
@@ -2880,6 +2902,17 @@
     <span class="md-ellipsis">
       
         local_pool — one process per evaluation, on this machine
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#process-or-local" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        process_pool or local_pool?
       
     </span>
   </a>
@@ -2947,6 +2980,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#what-the-runs-can-share" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What the runs can share
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2988,8 +3032,8 @@
 happen one after another, on the same thread that called
 <a class="autorefs autorefs-internal" title="            ropt.simple.optimize" href="../../reference/simple/#ropt.simple.optimize"><code>optimize</code></a>. If each call is slow, you can run several at
 the same time by evaluating on a <strong>worker pool</strong>.</p>
-<p>Pools come from a <a class="autorefs autorefs-internal" title="            ropt.simple.session" href="../../reference/simple/#ropt.simple.session"><code>session</code></a>. Open one, ask it for the kind
-of pool you want, and pass that pool to the run:</p>
+<p>Pools come from a <a class="autorefs autorefs-internal" title="            ropt.simple.session" href="../../reference/simple/#ropt.simple.session"><code>session</code></a>. Open one using a <code>with</code>
+statement, ask it for the kind of pool you want, and pass that pool to the run:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.simple</span><span class="w"> </span><span class="kn">import</span> <span class="n">optimize</span><span class="p">,</span> <span class="n">session</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
@@ -3002,8 +3046,8 @@ any kind, and each run uses the one you give it — and only that one. Closing t
 session releases them all.</p>
 <p>Where your objective runs depends on which pool you pass (or none):</p>
 <pre class="mermaid"><code>flowchart TB
-    subgraph proc["your Python process"]
-        main(["your program&lt;br/&gt;(main thread)"])
+    subgraph proc["your program (one process)"]
+        main(["your code&lt;br/&gt;(main thread)"])
         seq["no pool / serial_pool —&lt;br/&gt;one eval at a time"]
         th["thread_pool —&lt;br/&gt;worker threads&lt;br/&gt;(share memory)"]
     end
@@ -3015,9 +3059,13 @@ session releases them all.</p>
     main --&gt; wp
     main --&gt; loc
     main --&gt; clu</code></pre>
-<p>Threads stay <strong>inside</strong> your Python process and share its memory, so any Python
+<p>Threads stay <strong>inside</strong> your program and share its memory, so any Python
 function works and nothing is copied. The other three run the work <strong>outside</strong>
-your process, so the objective and its data are copied there.</p>
+it, so the objective and its data are copied there.</p>
+<p>Only the evaluations ever leave. The optimizer itself, the session, the pool
+object and your handlers all stay put, whichever pool you choose. Below, <strong>your
+program</strong> always means that one process — the one that opened the session and
+called <code>optimize</code>.</p>
 <details class="info">
 <summary>New to threads and processes?</summary>
 <p>A <strong>process</strong> is a running program with its own private memory. A <strong>thread</strong>
@@ -3029,7 +3077,10 @@ and so does work a library performs outside Python, as <code>numpy</code> and fr
 do while they crunch an array. What is stuck one-at-a-time is arithmetic
 written in Python itself. Separate <strong>processes</strong> each have their own
 interpreter and always run truly in parallel, but they do not share memory,
-so data has to be copied between them.</p>
+so data has to be copied between them, and starting one takes noticeably
+longer than starting a thread. A process also need not be on this machine:
+an <code>hpc_pool</code> runs each evaluation as a job on a cluster, which is the same
+arrangement spread over more machines.</p>
 </details>
 <h2 id="the-choices">The choices</h2>
 <h3 id="no-pool-or-serial_pool-evaluate-in-place">No pool, or <code>serial_pool</code> — evaluate in place</h3>
@@ -3044,9 +3095,9 @@ pool costs something to set up and to hand work to, and below a certain
 evaluation cost that is all it does.</p>
 <p><a class="autorefs autorefs-internal" title="            ropt.simple.serial_pool" href="../../reference/simple/#ropt.simple.serial_pool"><code>serial_pool</code></a> is that same behaviour named
 explicitly. It needs no session and holds no workers, and it is worth passing
-when running in-process is a decision rather than an oversight — or when several
+when evaluating in place is a decision rather than an oversight — or when several
 runs should share one batch-ID sequence.</p>
-<h3 id="thread_pool-a-pool-of-threads-in-the-same-process"><code>thread_pool</code> — a pool of threads in the same process</h3>
+<h3 id="thread_pool-a-pool-of-threads-in-your-program"><code>thread_pool</code> — a pool of threads in your program</h3>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">pool</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">thread_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
 </span></code></pre></div>
 <p>The evaluations run on background <strong>threads</strong>, all inside your program. Nothing
@@ -3095,9 +3146,7 @@ below, which was built for exactly this.</p>
 afterwards, with its output captured to a file. It sits between a process pool
 and a cluster: no queueing system, nothing to install, no extras.</p>
 <p>It is the right choice when an evaluation is a self-contained <em>job</em> rather than
-a Python function call — it runs a simulator, writes files, and takes long
-enough that starting a process for it is noise. Two things it gives that
-<code>process_pool</code> does not:</p>
+a function call. Two things it gives that <code>process_pool</code> does not:</p>
 <ul>
 <li><strong>Stopping actually stops.</strong> The evaluation and everything it launched are
   signalled together, so an interrupted run does not leave simulators behind.</li>
@@ -3118,6 +3167,55 @@ script you ran cannot be looked up by name. Either keep it in a module the
 worker can import, or install <code>ropt[cloudpickle]</code> — which is the simpler answer,
 and the recommended one (see
 <a href="../installation/#optional-extras">Installation</a>).</p>
+<h3 id="process-or-local"><code>process_pool</code> or <code>local_pool</code>?</h3>
+<p>Both run your objective in a separate process, so "is it copied?" does not tell
+them apart. What differs is whether a process is a <em>worker</em> or a <em>job</em>:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><code>process_pool</code></th>
+<th><code>local_pool</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Processes</td>
+<td>a few, <strong>reused</strong> for many evaluations</td>
+<td>one <strong>fresh</strong> process per evaluation</td>
+</tr>
+<tr>
+<td>Start-up cost</td>
+<td>paid once, when the pool opens</td>
+<td>paid again on every evaluation</td>
+</tr>
+<tr>
+<td>Programs your objective starts</td>
+<td>keep running when the run stops</td>
+<td>killed along with the evaluation</td>
+</tr>
+<tr>
+<td>Output of a failed evaluation</td>
+<td>lost</td>
+<td>captured, and attached to the error</td>
+</tr>
+<tr>
+<td>Sending the objective</td>
+<td>your script is re-imported, so a function defined in it can be found by name</td>
+<td>a fresh command; needs an importable module or <code>ropt[cloudpickle]</code></td>
+</tr>
+<tr>
+<td>Platform</td>
+<td>anywhere</td>
+<td>POSIX only</td>
+</tr>
+</tbody>
+</table>
+<p>One question decides it: <strong>is an evaluation a function call, or a job?</strong> A call
+is too short to pay for a process each time, so reuse a few workers and take
+<code>process_pool</code>. A job runs a simulator, writes files, and lasts long enough that
+one process start is noise — take <code>local_pool</code>, or <code>hpc_pool</code> below, the same
+shape once more, if it belongs on a cluster.</p>
 <h3 id="hpc_pool-a-pool-of-jobs-on-a-cluster"><code>hpc_pool</code> — a pool of jobs on a cluster</h3>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">pool</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">hpc_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
 </span></code></pre></div>
@@ -3129,8 +3227,9 @@ the <code>ropt[hpc]</code> extra and a reachable cluster:</p>
 </span></code></pre></div>
 <p>This is <code>local_pool</code> with a scheduler in front of it: the same shape of one
 process per evaluation, the same captured output, the same cancellation, and the
-same rule about which functions can be sent — only the process now starts on a
-compute node instead of this machine. So an objective that already works on a
+same rule about which functions can be sent — only that per-evaluation process
+now starts on a compute node instead of this machine. So an objective that
+already works on a
 <code>local_pool</code> will work here, and the step up to a cluster is a change of pool
 rather than a change of objective. That makes <code>local_pool</code> the way to develop
 and debug an objective before a cluster is involved.</p>
@@ -3156,8 +3255,9 @@ call.</p>
 <ul>
 <li><strong>No.</strong> Every pool works. Choose on speed alone, and you can swap between
   them freely later.</li>
-<li><strong>Yes.</strong> Stay with threads or in-process. Those live in your program and
-  see the same memory. <code>process_pool</code>, <code>local_pool</code> and <code>hpc_pool</code> run the
+<li><strong>Yes.</strong> Stay with threads, or with no pool at all: either way the
+  objective runs in your program, where it sees the same memory.
+  <code>process_pool</code>, <code>local_pool</code> and <code>hpc_pool</code> run the
   objective somewhere else, on a <em>copy</em> of everything it touched — so the
   writes land in that copy and vanish, and the reads see whatever the copy
   was made from. Nothing raises; the numbers just come out wrong.</li>
@@ -3330,15 +3430,23 @@ runs several optimizations at once:</p>
 </span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>    <span class="n">pool</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">thread_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
 </span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>    <span class="n">results</span> <span class="o">=</span> <span class="n">optimize_many</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">start_points</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">pool</span><span class="o">=</span><span class="n">pool</span><span class="p">)</span>
 </span></code></pre></div>
-<p><code>optimize_many</code> always runs the optimizations themselves concurrently, each on
-its own thread — that part does not depend on the pool. The pool instead decides
-how the <em>function evaluations</em> inside those runs are parallelized: they all
-happen on it. So <code>thread_pool(workers=1)</code> runs the optimizations together but
-evaluates one point at a time, while a larger pool (or a process, local, or HPC
-pool) evaluates several at once. Without a pool the runs evaluate on their own
-driver threads, so your objective is then called by several threads at once.</p>
-<p>Some optimizer backends cannot run while anything else runs in the same process,
-and only one run at a time can capture its optimizer's output — see <a href="../../running/parallel/#many-optimizations-at-once">Not every
+<p>Two different things run at the same time here, and <strong>the pool controls only one
+of them</strong>:</p>
+<ul>
+<li><strong>The optimizations</strong> always run concurrently, each on a thread inside your
+  program. There is no pool for them, and passing one changes nothing about
+  this. Their number is set by <code>limit</code>: all of them at once by default, or at
+  most <code>limit</code> at a time.</li>
+<li><strong>The evaluations</strong> inside those runs all go to the pool you passed, and they
+  <strong>share</strong> it.</li>
+</ul>
+<p>So the two arguments cap different things: <code>limit=2, pool=thread_pool(workers=4)</code>
+means at most two optimizations running, sharing four evaluation workers between
+them. Without a pool each run evaluates on its own thread, so your objective is
+then called by several threads at once.</p>
+<p>Because every run is a thread in your program, an optimizer backend that cannot
+run alongside anything else in one program cannot take part here; and only one
+run at a time can capture its optimizer's output — see <a href="../../running/parallel/#many-optimizations-at-once">Not every
 backend can take part</a>.</p>
 <h3 id="collecting-results-from-concurrent-runs">Collecting results from concurrent runs</h3>
 <p><a href="../handlers/">Collecting Results with Handlers</a> showed a handler reused across
@@ -3362,6 +3470,26 @@ group where you would pass the handler:</p>
 <p><code>optimize_many</code> only accepts groups in <code>handlers=</code> — a bare handler is rejected
 there, because its runs overlap.</p>
 <p>See <a href="../../running/parallel/#many-optimizations-at-once">Parallel Execution and Many Runs</a> for more.</p>
+<h3 id="what-the-runs-can-share">What the runs can share</h3>
+<p>Sharing works at one of those two levels and not the other.</p>
+<p><strong>The runs share everything, whatever the pool.</strong> They are threads in your
+program, so they all reach the same objects:</p>
+<ul>
+<li><strong>Handlers.</strong> A shared group collects from every run at once, as above.</li>
+<li><strong>The pool.</strong> <code>workers=10</code> means ten evaluations at a time across the whole
+  batch, not ten per run — one number sets the load on the machine.</li>
+</ul>
+<p><strong>The evaluations share only on a thread pool.</strong> If your evaluation function has
+to reach a live object — a second pool, say, which is how
+<a href="../../running/nested/">Nested Optimization</a> gives its inner runs somewhere to go
+— then it has to run in your program too, so the evaluations must be on a thread
+pool or on no pool at all. On a process, local, or HPC pool the objective gets
+a copy instead, and can send results back only by returning them.</p>
+<p>That second pool has to be a <em>different</em> one — handing the inner run the pool it
+is already running on is refused, because it would wait for the workers it is
+itself occupying. Open it <strong>once</strong>, in the calling code, and pass it to every
+evaluation: ten evaluations each opening a ten-worker pool of their own put a
+hundred workers on the machine, where one shared pool puts ten.</p>
 <h2 id="offloading-your-own-functions">Offloading your own functions</h2>
 <p>A pool can also run <strong>your own</strong> functions in parallel, not just the optimizer's
 evaluations. Pass a function — or several — to <a class="autorefs autorefs-internal" title="            ropt.simple.offload" href="../../reference/simple/#ropt.simple.offload"><code>offload</code></a>,
@@ -3380,6 +3508,32 @@ the function inline instead, so your code never needs a separate fallback for
 the case where no pool is available. See
 <a href="../../running/parallel/#offloading-your-own-work">Parallel Execution and Many Runs</a> for
 details.</p>
+<div class="admonition warning">
+<p class="admonition-title">Offloaded work coordinates with nothing</p>
+<p>An offloaded callable runs wherever its pool puts it, and on a process,
+local, or HPC pool that is somewhere else. It may create handlers and pools
+of its own, but they are <em>its</em> handlers and <em>its</em> pools.</p>
+<ul>
+<li><strong>Results cannot be tracked across offloaded calls.</strong> A handler created
+  inside one sees only that call's results and cannot be brought back:
+  handlers refuse to cross a process boundary, so the return value is all
+  that comes home. Following several concurrent pieces of work in one place
+  is something <code>optimize_many</code> can do and <code>offload</code> cannot.</li>
+<li><strong>Worker budgets multiply, with no way around it.</strong> A pool cannot be
+  carried into a worker process, so a callable that needs one opens its own.
+  Four callables that each open a ten-worker pool put <strong>forty</strong> workers on
+  the machine in four independent groups \u2014 and they do not pool their
+  effort: one with twenty pieces of work still runs ten at a time while
+  another group sits idle. Forty are carried, and never forty work on the
+  same thing. Where evaluations run in your program this is avoidable by
+  sharing one pool \u2014 see <a href="#what-the-runs-can-share">What the runs can share</a>
+  \u2014 but offloaded onto a process, local, or HPC pool it is not.</li>
+</ul>
+<p>So reach for <code>offload</code> when a piece of work is genuinely self-contained and
+hands its answer back as a return value. When several pieces must be
+coordinated \u2014 counted, collected, or held to one budget \u2014 drive them from
+your program instead.</p>
+</div>
 
 
 

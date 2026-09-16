@@ -2806,10 +2806,10 @@
 
 
 <h1 id="collecting-results-with-handlers">Collecting Results with Handlers</h1>
-<p>So far, <code>optimize</code> returned only the single best result. Sometimes you want to
-see every result instead — to watch progress across several runs, or to log
-every evaluation. A <strong>handler</strong> does this: an object you attach with
-<code>handlers=</code> that observes every result an optimization produces.</p>
+<p>So far, <code>optimize</code> returned only the single best result. In many cases you want
+to see every result to watch progress over the optimization. A <strong>handler</strong> does
+this: an object you attach with a <code>handlers=</code> argument that observes every
+result an optimization produces.</p>
 <h2 id="a-handler-that-collects-everything">A handler that collects everything</h2>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.simple</span><span class="w"> </span><span class="kn">import</span> <span class="n">HistoryHandler</span><span class="p">,</span> <span class="n">optimize</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
@@ -2818,7 +2818,7 @@ every evaluation. A <strong>handler</strong> does this: an object you attach wit
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">history</span><span class="o">.</span><span class="n">results</span><span class="p">))</span>   <span class="c1"># every evaluation from this run</span>
 </span></code></pre></div>
 <p>Compare this with the <code>report</code> callback from
-<a href="../../running/running/#reporting-progress">Reporting progress</a>:
+<a href="../ensemble/#4-follow-the-progress-optional">Follow the progress</a>:
 <code>report</code> is called once per evaluation, for one run. A handler is more
 general — it keeps or reacts to results, and, unlike <code>report</code>, the same
 handler can be reused across several <strong>sequential</strong> calls to <code>optimize</code>,
