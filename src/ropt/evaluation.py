@@ -15,7 +15,7 @@ T = TypeVar("T", bound=np.generic)
 class EvaluationBatchContext:
     """Per-batch metadata passed to evaluator functions.
 
-    See [Writing Evaluation Callbacks](../workflows/evaluation_callbacks.md) for
+    See [Writing Evaluation Callbacks](../advanced/evaluation_callbacks.md) for
     usage details and examples.
 
     Attributes:
@@ -77,7 +77,7 @@ class EvaluationBatchResult:
     variable vectors. Inactive rows should be set to zero; failed active rows
     should be set to `numpy.nan`.
 
-    See [Writing Evaluation Callbacks](../workflows/evaluation_callbacks.md) for
+    See [Writing Evaluation Callbacks](../advanced/evaluation_callbacks.md) for
     `batch_id` management and other conventions.
 
     Args:

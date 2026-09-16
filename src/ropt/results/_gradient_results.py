@@ -64,7 +64,7 @@ class GradientResults(Results):
     the scaled variables, so it exists only in the optimizer's domain and has no
     scaled counterpart.
 
-    See [Working with Results](../optimizer_setup/results.md) for usage details.
+    See [Working with Results](../running/results.md) for usage details.
 
     Attributes:
         variables:           The variable vector that was perturbed.

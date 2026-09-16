@@ -2,9 +2,23 @@
 
 `ropt` exposes the full intermediate and final state of an optimization through
 [`Results`][ropt.results.Results] objects. This page describes the result
-classes and how to inspect them; see [Running Optimizations](../running/running.md) and
-[Optimization Workflows](../workflows/workflows.md) for how results are produced and
+classes and how to inspect them; see [Running Optimizations](running.md) and
+[Optimization Workflows](../advanced/workflows.md) for how results are produced and
 delivered to your code.
+
+!!! note "Two layers of result object"
+
+    [`Results`][ropt.results.Results] is the **fundamental** record: one object
+    per variable vector evaluated, carrying every field described below. Result
+    handlers receive these.
+
+    [`EvaluateResult`][ropt.simple.EvaluateResult] and
+    [`OptimizeResult`][ropt.simple.OptimizeResult], which
+    [`optimize`](running.md) returns and a `report` callback is given, are a
+    **convenience** layer over one of them: a few named attributes such as
+    `variables`, `target_objective` and `exit_code`, for the common case where
+    that is all you need. The fundamental object is still there, on
+    `result.results`, whenever it is not.
 
 ## The result hierarchy
 
@@ -207,11 +221,11 @@ indices, as builtin axes do.
 
 Optimization internally works with scaled values: variables are scaled and
 shifted by their
-[`scales` and `offsets`](configuration.md#variable-scales), objective and
+[`scales` and `offsets`](../optimizer_setup/configuration.md#variable-scales), objective and
 nonlinear constraint *aggregates* have their
-[offsets](configuration.md#objective-offsets) subtracted and are divided by
-their [scales](configuration.md#objective-scales), and objectives marked
-[`maximize`](configuration.md#objective-direction) are negated once they have
+[offsets](../optimizer_setup/configuration.md#objective-offsets) subtracted and are divided by
+their [scales](../optimizer_setup/configuration.md#objective-scales), and objectives marked
+[`maximize`](../optimizer_setup/configuration.md#objective-direction) are negated once they have
 been combined across realizations.
 
 Every result carries both domains at once, and one rule connects them:
@@ -289,14 +303,13 @@ This requires the `pandas` optional extra (see [Installation](../getting_started
 
 !!! note
 
-    The `to_pandas` and `results_to_pandas` functions shown here are the
-    low-level export primitives. Most users do not call them directly: the
-    [`DataFrameHandler`](../running/handlers.md#dataframehandler) builds and updates
-    these tables automatically as an optimization runs. This section explains
-    what that handler produces under the hood.
+    These functions turn results into DataFrames. The
+    [`DataFrameHandler`](handlers.md#dataframehandler) uses them to build and
+    update such tables for you as an optimization runs; see
+    [Result Handlers](handlers.md).
 
 The row index and the unstacked column labels come from the
-[`names`](configuration.md#names) mapping in the configuration. If an axis is
+[`names`](../optimizer_setup/configuration.md#names) mapping in the configuration. If an axis is
 not named, its labels fall back to 0-based integer indices. For example,
 exporting the objectives of a single result **without** any `names` gives plain
 numbers for both the realization and the objective axes:
@@ -321,17 +334,30 @@ examples below assume the realizations are named `"r0"`/`"r1"` and the objective
 ### Exporting selected fields
 
 The [`to_pandas`][ropt.results.Results.to_pandas] method on an individual
-result exports any set of fields, each named by a dotted path from the result:
+result exports a list of fields, each named by a dotted path from the result:
 
 ```python
 df = result.to_pandas(["variables", "evaluations.objectives"])
 ```
+
+The runnable script for this section is
+[examples/simple/export.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/export.py),
+which exports one result stacked, the same result unstacked, and then every
+result of the run in one frame. It uses polars by default and pandas with
+`--pandas`, so only one of the two needs to be installed.
 
 A path may name a field of the result itself (`"variables"`,
 `"target_objective"`), a field of one of its sub-objects
 (`"functions.objectives"`, `"scaled.variables"`), or an entry of a dict-valued
 field (`"metadata.run.id"`). Each path becomes a column of that name. Paths
 whose value is `None`, and missing dict keys, are skipped.
+
+!!! note "Fields are an ordered list"
+
+    Every export function takes its fields as a **sequence**, and the columns
+    follow the order you give. Passing a set raises a `TypeError`, because a
+    set has no order to follow, and naming the same path twice raises a
+    `ValueError`, because one column cannot appear twice.
 
 By default, every axis of the exported fields becomes a level in a
 multi-index. For example, `objectives` in
@@ -372,23 +398,30 @@ batch_id realization
 ```
 
 The unstacked axis is flattened into the column labels, so each new column is a
-tuple of the sub-field name and the axis label — here `("objectives", "val")`
-and `("objectives", "cost")`. Unstacking more axes adds more elements to these
-tuples; unstacking every axis leaves a flat table with one row per result.
+tuple of the full field path and the axis label — here
+`("evaluations.objectives", "val")` and `("evaluations.objectives", "cost")`.
+Unstacking more axes adds more elements to these tuples. Unstacking every axis
+of every selected field leaves one row per result, which is what makes results
+from different batches comparable row by row.
 
 ### Aggregating multiple results
 
-[`results_to_pandas`][ropt.results.results_to_pandas] builds on
-`to_pandas` to convert a *sequence* of results into a single DataFrame, one
-row per result. It automatically unstacks the most common axes (`VARIABLE`,
-`OBJECTIVE`, `NONLINEAR_CONSTRAINT`) into columns:
+[`results_to_pandas`][ropt.results.results_to_pandas] builds on `to_pandas` to
+convert a *sequence* of results into a single DataFrame. It takes no `unstack`
+argument, because an aggregated frame always pivots the same way:
+
+!!! note
+    Every axis becomes columns **except `realization` and `perturbation`**,
+    which stay as row labels next to `batch_id`.
+
+A field with neither of those axes therefore gives exactly one row per result:
 
 ```python
 from ropt.results import results_to_pandas
 
 df = results_to_pandas(
     all_results,
-    fields={"variables"},
+    fields=["variables"],
     result_type="functions",
 )
 ```
@@ -396,15 +429,17 @@ df = results_to_pandas(
 ```
           (variables, x0)  (variables, x1)  (variables, x2)
 batch_id
-1                                0.30                         0.42                        -0.11
-2                                0.55                         0.48                         0.02
-3                                0.61                         0.50                         0.10
+1                    0.30             0.42            -0.11
+2                    0.55             0.48             0.02
+3                    0.61             0.50             0.10
 ```
 
-Each column is a `(field, label)` pair, and each row is one result identified by
-its `batch_id`. Field names use dot notation for nested sub-fields (for example,
-`variables`, `target_objective`). The `result_type` argument selects
-which results to process: `"functions"` for
+Each column is a `(field, label)` pair, and here each row is one result
+identified by its `batch_id`; selecting a field that keeps the `realization`
+axis adds a level to the index and one row per realization. Field names use dot
+notation for nested sub-fields (for example, `variables`, `target_objective`),
+and the fields appear in the order you list them. The `result_type`
+argument selects which results to process: `"functions"` for
 [`FunctionResults`][ropt.results.FunctionResults] only, `"gradients"` for
 [`GradientResults`][ropt.results.GradientResults] only.
 
@@ -428,23 +463,64 @@ batch_id realization
          r1                                 1.1
 ```
 
-The run-level **result metadata** sits directly on the result, so it has no
-axes and gives one value per result — handy for pulling in a run tag. It may be
-nested to any depth:
+If the value a realization returns is an array rather than a scalar, the key
+also spans a [user axis](#user-defined-axes) named after the key, which is
+treated like a builtin one. Exporting a single result keeps it in the index,
+here for a two-element `residual` labelled `"x"`/`"y"`:
+
+```python
+df = result.to_pandas(["evaluations.metadata.residual"])
+```
+
+```
+                               evaluations.metadata.residual
+batch_id realization residual
+1        r0          x                                  0.12
+                     y                                 -0.04
+         r1          x                                  0.31
+                     y                                  0.08
+```
+
+Passing `unstack=["residual"]` pivots it into columns, exactly as for a builtin
+axis. In an aggregated frame the rule above applies, so the axis is always
+unstacked while `realization` stays a row label:
 
 ```python
 df = results_to_pandas(
     all_results,
-    fields={"metadata.run_id", "target_objective"},
+    fields=["evaluations.metadata.residual"],
     result_type="functions",
 )
 ```
 
 ```
-          target_objective  metadata.run_id
+                      (evaluations.metadata.residual, x)  (evaluations.metadata.residual, y)
+batch_id realization
+1        r0                                         0.12                               -0.04
+         r1                                         0.31                                0.08
+2        r0                                         0.09                               -0.02
+         r1                                         0.22                                0.05
+```
+
+The run-level **result metadata** sits directly on the result, so it has no
+axes and gives one value per result — handy for pulling in a run tag. It may be
+nested to any depth, and is reachable from `to_pandas` and `results_to_pandas`
+alike:
+
+```python
+df = results_to_pandas(
+    all_results,
+    fields=["metadata.run_id", "target_objective"],
+    result_type="functions",
+)
+```
+
+```
+          metadata.run_id  target_objective
 batch_id
-1                               1.83                0
-2                               0.42                1
+1                       0              1.83
+2                       1              0.42
+3                       2              0.11
 ```
 
 ### Labels and the index
@@ -453,7 +529,7 @@ Every axis of an exported field becomes an index level, named after its
 [`AxisName`][ropt.enums.AxisName] value (for example `"variable"`, `"realization"`,
 `"objective"`), and `batch_id` is always prepended so results from different
 batches stay distinct. The label on each level — and on each unstacked column —
-comes from the [`names`](configuration.md#names) mapping in the configuration, a
+comes from the [`names`](../optimizer_setup/configuration.md#names) mapping in the configuration, a
 dict from axis name to a tuple of labels:
 
 ```python
@@ -479,7 +555,8 @@ previous section carries over. This requires the `polars` optional extra (see
 [Installation](../getting_started/installation.md)).
 
 Polars has no index and its column names must be strings, which leads to the two
-differences you need to know about.
+differences you need to know about. The frames below are shown without the
+borders polars draws around them in a terminal.
 
 **Index levels become ordinary columns.** What pandas puts in the index, polars
 puts in leading columns of the frame:
@@ -489,14 +566,11 @@ df = result.to_polars(["evaluations.objectives"])
 ```
 
 ```
-┌──────────┬─────────────┬───────────┬────────────────────────┐
-│ batch_id ┆ realization ┆ objective ┆ evaluations.objectives │
-╞══════════╪═════════════╪═══════════╪════════════════════════╡
-│ 1        ┆ r0          ┆ val       ┆ 2.10                   │
-│ 1        ┆ r0          ┆ cost      ┆ 0.94                   │
-│ 1        ┆ r1          ┆ val       ┆ 2.35                   │
-│ 1        ┆ r1          ┆ cost      ┆ 1.02                   │
-└──────────┴─────────────┴───────────┴────────────────────────┘
+batch_id  realization  objective  evaluations.objectives
+1         r0           val        2.10
+1         r0           cost       0.94
+1         r1           val        2.35
+1         r1           cost       1.02
 ```
 
 **Tuple column labels become joined strings.** Where pandas produces the column
@@ -514,12 +588,9 @@ df = result.to_polars(
 ```
 
 ```
-┌──────────┬─────────────┬────────────────────────────┬─────────────────────────────┐
-│ batch_id ┆ realization ┆ evaluations.objectives,val ┆ evaluations.objectives,cost │
-╞══════════╪═════════════╪════════════════════════════╪═════════════════════════════╡
-│ 1        ┆ r0          ┆ 2.10                       ┆ 0.94                        │
-│ 1        ┆ r1          ┆ 2.35                       ┆ 1.02                        │
-└──────────┴─────────────┴────────────────────────────┴─────────────────────────────┘
+batch_id  realization  evaluations.objectives,val  evaluations.objectives,cost
+1         r0           2.10                        0.94
+1         r1           2.35                        1.02
 ```
 
 Aggregating a sequence of results works the same way:
@@ -529,41 +600,34 @@ from ropt.results import results_to_polars
 
 df = results_to_polars(
     all_results,
-    fields={"variables"},
+    fields=["variables"],
     result_type="functions",
 )
 ```
 
 ```
-┌──────────┬──────────────────────────┬──────────────────────────┬──────────────────────────┐
-│ batch_id ┆ variables,x0             ┆ variables,x1             ┆ variables,x2             │
-╞══════════╪══════════════════════════╪══════════════════════════╪══════════════════════════╡
-│ 1        ┆ 0.30                     ┆ 0.42                     ┆ -0.11                    │
-│ 2        ┆ 0.55                     ┆ 0.48                     ┆ 0.02                     │
-│ 3        ┆ 0.61                     ┆ 0.50                     ┆ 0.10                     │
-└──────────┴──────────────────────────┴──────────────────────────┴──────────────────────────┘
+batch_id  variables,x0  variables,x1  variables,x2
+1         0.30          0.42          -0.11
+2         0.55          0.48          0.02
+3         0.61          0.50          0.10
 ```
 
-Metadata behaves exactly as described [above](#metadata-columns): per-realization
-metadata is reachable from `to_polars`, run-level result metadata only from
-`results_to_polars`:
+Metadata behaves exactly as described [above](#metadata-columns), and both kinds
+are reachable from either function:
 
 ```python
 df = results_to_polars(
     all_results,
-    fields={"metadata.run_id", "target_objective"},
+    fields=["metadata.run_id", "target_objective"],
     result_type="functions",
 )
 ```
 
 ```
-┌──────────┬────────────────────────────┬─────────────────┐
-│ batch_id ┆ target_objective ┆ metadata.run_id │
-╞══════════╪════════════════════════════╪═════════════════╡
-│ 1        ┆ 1.83                       ┆ 0               │
-│ 2        ┆ 0.42                       ┆ 1               │
-│ 3        ┆ 0.11                       ┆ 2               │
-└──────────┴────────────────────────────┴─────────────────┘
+batch_id  metadata.run_id  target_objective
+1         0                1.83
+2         1                0.42
+3         2                0.11
 ```
 
 !!! note
@@ -574,10 +638,3 @@ df = results_to_polars(
     finer rows. Pandas cannot align such fields and returns them as disjoint
     blocks of rows padded with missing values instead, so prefer polars when a
     single table has to mix granularities.
-
-## Where to next
-
-- Run an optimization and receive results via callbacks:
-  [Reporting progress](../running/running.md#reporting-progress).
-- Use event handlers to collect or react to results in a workflow:
-  [Optimization Workflows](../workflows/workflows.md).

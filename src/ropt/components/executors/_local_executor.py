@@ -69,7 +69,7 @@ class LocalJobExecutor(JobExecutorBase):
     """An executor that runs each work item as a separate local process.
 
     Needs no extras and no configuration. See
-    [Parallel Evaluation](../workflows/parallel.md#localjobexecutor) for details.
+    [Parallel Evaluation](../advanced/parallel.md#localjobexecutor) for details.
 
     POSIX only: cancelling kills a job's whole process group, so that whatever
     the job started itself goes with it, and Windows has no equivalent.

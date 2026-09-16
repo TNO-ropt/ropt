@@ -133,12 +133,3 @@ The default
 uses the mean of the functions and gradients. Alternative estimators are configured via the
 `function_estimators` tuple and selected per-objective in
 [`ObjectiveFunctionsConfig.function_estimators`][ropt.config.ObjectiveFunctionsConfig].
-
-## Where to next
-
-- Filter out unhelpful realizations before estimation:
-  [Realization Filters](realization_filters.md).
-- Inspect the gradient values produced:
-  [Working with Results](results.md) (`GradientResults`).
-- Algorithm-specific gradient details: see the relevant backend page under
-  [Reference / Optimizer Backends](../reference/backend.md).

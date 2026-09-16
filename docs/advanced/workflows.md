@@ -336,7 +336,7 @@ They expose their state through dictionary access (`handler[key]`);
 `ResultsHandler` and `HistoryHandler` use the key `"results"`, while
 `DataFrameHandler` uses the table name. Stored results carry both the configured
 and the optimizer's domain; see
-[Scaling of results](../optimizer_setup/results.md#scaling-of-results).
+[Working with Results](../running/results.md#scaling-of-results).
 
 Two more handlers exist only at this level, for wiring events:
 
@@ -373,11 +373,7 @@ process-based, or HPC evaluation, see
 [`ParallelEvaluator`][ropt.components.evaluators.ParallelEvaluator] in
 [Parallel Evaluation](parallel.md).
 
-## Where to next
+## See also
 
-- [Parallel Evaluation](parallel.md) — run evaluations off-process
-  or on a cluster.
-- [Building a Workflow](../examples/workflow.md) — step-by-step
+- [Building a Workflow](../advanced/workflow.md) — step-by-step
   example building a workflow from scratch.
-- Full example:
-  [examples/advanced/workflow.py](https://github.com/TNO-ropt/ropt/blob/main/examples/advanced/workflow.py).

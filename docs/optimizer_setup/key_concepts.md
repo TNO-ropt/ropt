@@ -7,7 +7,7 @@
     run their setup so you can see it work, but the setup itself is independent
     of how you run an optimization: that is covered in
     [Running Optimizations](../running/running.md) or
-    [Optimization Workflows](../workflows/workflows.md).
+    [Optimization Workflows](../advanced/workflows.md).
 
 This page introduces the ideas and terms that appear throughout the `ropt`
 documentation and shows how they fit together. For the mathematical background
@@ -114,7 +114,7 @@ optimization as implemented by `ropt`.
 
 **Batch**
 :   A group of one or more variable vectors evaluated together in a single call
-    to the [evaluator](../workflows/evaluation_callbacks.md). These may include
+    to the [evaluator](../advanced/evaluation_callbacks.md). These may include
     points in optimization space that the optimizer is exploring, or perturbed
     points for gradient calculations.
 
@@ -150,11 +150,3 @@ optimization as implemented by `ropt`.
     [`scales`](configuration.md#objective-scales) and
     [`offsets`](configuration.md#objective-offsets). Results carry both domains:
     a field and its `scaled` counterpart sit at the same path.
-
-## Where to next
-
-- The full configuration schema: [Configuration](configuration.md).
-- How gradients are estimated: [Stochastic Gradients](gradients.md).
-- Selecting or reweighting realizations: [Realization Filters](realization_filters.md).
-- Combining realizations into a single value: [Function Estimators](function_estimators.md).
-- Reading the optimization output: [Working with Results](results.md).

@@ -5,6 +5,10 @@ to see every result to watch progress over the optimization. A **handler** does
 this: an object you attach with a `handlers=` argument that observes every
 result an optimization produces.
 
+What it collects are the full result objects — `FunctionResults` and
+`GradientResults` — rather than the summary `optimize` returns; see
+[Working with Results](../running/results.md).
+
 ## A handler that collects everything
 
 ```python
@@ -39,7 +43,7 @@ print(f"collected {len(history.results)} results across all restarts")
 Restarting needs nothing special from `ropt`: each call to `optimize` is
 independent, so `result.variables` — the best point a run found — is simply
 the start point for the next one. See
-[Restarting from the Best Point](../examples/restart.md) for the full,
+[Restarting from the Best Point](../running/restart.md) for the full,
 runnable version of this example.
 
 ## Other built-in handlers
@@ -51,12 +55,5 @@ runnable version of this example.
   (default), or the most recent.
 - **`DataFrameHandler`** — collects results into a `pandas` or `polars` table.
 
-See [Result handlers](../running/handlers.md#result-handlers) for the full
+See [Result handlers](../running/handlers.md) for the full
 list, and how to write your own.
-
-## Where to next
-
-- Collecting results from runs that overlap in time, instead of one after
-  another: [Running in Parallel](execution.md#collecting-results-from-concurrent-runs).
-- The complete simple API: [Result Handlers](../running/handlers.md#result-handlers).
-- A full worked example: [Restarting from the Best Point](../examples/restart.md).

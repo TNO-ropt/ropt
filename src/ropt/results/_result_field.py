@@ -38,6 +38,6 @@ class AxisMetadata:
 class ResultField(AxisMetadata):
     """Base class for result field containers that carry axis metadata.
 
-    See [Working with Results](../optimizer_setup/results.md#axes-and-dimensionality) for
+    See [Working with Results](../running/results.md#axes-and-dimensionality) for
     how axis metadata is used.
     """

@@ -1,10 +1,10 @@
 # Utility Functions
 
 Optional helpers for scripts and applications that use `ropt`. Nothing in `ropt`
-calls these. See [Plugin Discovery](../utilities/plugin_discovery.md) for the
+calls these. See [Plugin Discovery](../advanced/plugin_discovery.md) for the
 plugin queries, [Variable scaling](../optimizer_setup/configuration.md#variable-scales)
 for the bounds converter, and [Keyboard
-Interrupts](../utilities/keyboard_interrupt.md) for when the escape hatch is
+Interrupts](../troubleshooting/keyboard_interrupt.md) for when the escape hatch is
 worth reaching for.
 
 `ropt.utils` also re-exports

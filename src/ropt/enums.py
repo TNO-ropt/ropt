@@ -78,7 +78,7 @@ class PerturbationType(IntEnum):
 class EnOptEventType(IntEnum):
     """Enumerates the types of events emitted during optimization workflows.
 
-    See [Optimization Workflows](../workflows/workflows.md#event-types) for a
+    See [Optimization Workflows](../advanced/workflows.md#event-types) for a
     description of when each event type fires and what data it carries.
     """
 
@@ -132,7 +132,7 @@ class AxisName(StrEnum):
     Labels what each dimension of a [`Results`][ropt.results.Results] field's
     multidimensional array represents, and is used to look up axis labels via
     [`get_axes`][ropt.results.AxisMetadata.get_axes]. See
-    [Working with Results](../optimizer_setup/results.md#axes-and-dimensionality)
+    [Working with Results](../running/results.md#axes-and-dimensionality)
     for a full table of fields and their axes.
     """
 

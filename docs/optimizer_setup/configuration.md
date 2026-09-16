@@ -670,7 +670,7 @@ to the terminal as usual.
     practice that means Python warnings raised by the optimizer, which belong
     there, and output from your own threads, which does not. Log records are
     unaffected unless they go to a console handler; see
-    [Logging](../utilities/logging.md#logging-during-an-optimization).
+    [Logging](../troubleshooting/logging.md#logging-during-an-optimization).
 
 ### `backend` — [`BackendConfig`][ropt.config.BackendConfig] { #backend }
 
@@ -862,7 +862,7 @@ Fields:
 
 Optional mapping from axis names to tuples of labels. These labels are used to
 produce human-readable multi-index DataFrames when results are exported (see
-[Working with Results](results.md)).
+[Working with Results](../running/results.md)).
 
 Each key is an [`AxisName`][ropt.enums.AxisName] value that identifies a
 dimension of the optimization problem:
@@ -877,7 +877,7 @@ dimension of the optimization problem:
 | `"perturbation"`           | The perturbations used for gradient estimation       |
 
 A key may also be the name of a metadata key that carries array values, which
-labels the [user axis](results.md#user-defined-axes) that metadata spans.
+labels the [user axis](../running/results.md#user-defined-axes) that metadata spans.
 
 The corresponding value is a tuple of strings (or integers) whose length must
 match the count of that axis. For example, with 3 variables and 2 objectives:
@@ -890,7 +890,7 @@ match the count of that axis. For example, with 3 variables and 2 objectives:
 ```
 
 You only need to provide labels for axes you want named — unlabelled axes
-default to integer indices. See [Working with Results](results.md) for how
+default to integer indices. See [Working with Results](../running/results.md) for how
 these labels appear in exported DataFrames.
 
 ## A worked example
@@ -1034,10 +1034,3 @@ Expand the block below to see every field and its default value.
     ]
 
     ```
-
-## Where to next
-
-- [Writing Evaluation Callbacks](../workflows/evaluation_callbacks.md) — produce the values that `ropt`
-  consumes.
-- [Working with Results](results.md) — read the optimization output.
-- [Optimization Workflows](../workflows/workflows.md) — go beyond a single optimization run.

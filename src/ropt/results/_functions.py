@@ -24,7 +24,7 @@ class Functions(ResultField):
     The same class carries both domains: the values the optimizer works with
     are found under `scaled`, the values as configured directly on the result.
 
-    See [Working with Results](../optimizer_setup/results.md) for usage details.
+    See [Working with Results](../running/results.md) for usage details.
 
     There is no target objective here: the quantity the optimizer minimizes is
     a weighted total over objectives that may differ in both scale and

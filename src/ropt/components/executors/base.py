@@ -84,7 +84,7 @@ class Submission:
     blocked in [`collect`][ropt.components.executors.Submission.collect] is
     always released.
 
-    See [Error handling](../workflows/parallel.md#error-handling) for how
+    See [Error handling](../advanced/parallel.md#error-handling) for how
     infrastructure failures (delivered via
     [`deliver`][ropt.components.executors.Submission.deliver]) and user-code
     exceptions (ended via [`fail`][ropt.components.executors.Submission.fail])
@@ -213,7 +213,7 @@ class Executor(ABC):
     - [`is_running`][ropt.components.executors.Executor.is_running]: Reports
       whether the executor accepts work.
 
-    See [Error handling](../workflows/parallel.md#error-handling) for the
+    See [Error handling](../advanced/parallel.md#error-handling) for the
     distinction an implementation must make between an infrastructure failure,
     delivered as an [`ExecutorFailure`][ropt.exceptions.ExecutorFailure] result,
     and an exception from the work item's own function, which ends the

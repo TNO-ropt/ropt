@@ -2,9 +2,16 @@
 
 !!! note
 
-    This is one of two ways to **run** an optimization; the other is
-    [Optimization Workflows](../workflows/workflows.md). What the optimization
-    does — its variables, objectives, constraints, and components — is set up in
+    This is one of two ways to **run** an optimization: the `ropt.simple` API,
+    used by the [Quickstart](../getting_started/quickstart.md) and the rest of
+    Getting Started, which covers most optimization tasks. The other is
+    [Optimization Workflows](../advanced/workflows.md), a low-level API that
+    exposes the building blocks — compute steps, event handlers, executors —
+    directly: full flexibility, at the cost of assembling the run yourself, and
+    written for readers at home in Python, threads and asyncio included.
+
+    What the optimization *does* — its variables, objectives, constraints, and
+    components — is set up in
     [Optimizer Setup](../optimizer_setup/key_concepts.md), the same whichever way you run
     it.
 
@@ -57,9 +64,11 @@ def objective(variables: np.ndarray, context: EvaluationFunctionContext) -> floa
 - `context` is an
   [`EvaluationFunctionContext`][ropt.components.evaluators.EvaluationFunctionContext]
   that tells you *which* evaluation this is:
-    - `context.realization` — the realization number (see
-      [Ensembles](#optimizing-over-an-ensemble) below); the field you need most
-      often.
+    - `context.realization` — the realization number, for a problem with an
+      ensemble of realizations; `optimize` then minimizes the weighted average
+      objective over all of them. See
+      [Ensemble-Based Optimization](../getting_started/ensemble.md). The field
+      you need most often.
     - `context.metadata` — the `metadata` dict the run was started with, if
       any (see [Attaching metadata](#attaching-metadata)).
     - `context.batch_id`, `context.eval_idx`, `context.perturbation` — identify
@@ -103,7 +112,7 @@ satisfied the constraints — see
 [When something goes wrong](#when-something-goes-wrong). `result.results` is the
 full [`FunctionResults`][ropt.results.FunctionResults] object; you rarely need
 it at first, but it holds every detail if you do. See
-[Working with Results](../optimizer_setup/results.md).
+[Working with Results](results.md).
 
 ## Reporting progress
 
@@ -150,7 +159,6 @@ whose callback returned `True`; the other runs continue.
     [`evaluate_many`][ropt.simple.evaluate_many] take `report=` as well, but
     there the return value is **ignored**. An evaluation is a single batch with
     no optimizer loop to interrupt, so the callback reports and nothing more.
-    This is the permanent contract, not a gap to be filled later.
 
 ## Attaching metadata
 
@@ -186,11 +194,11 @@ You can attach arbitrary **metadata** to a run, from two sources:
 
   A key does not have to be set by every realization; those that do not set it
   get `np.nan` for numeric values and `None` otherwise. See [Writing Evaluation
-  Callbacks](../workflows/evaluation_callbacks.md#using-functionevaluator) for
+  Callbacks](../advanced/evaluation_callbacks.md#using-functionevaluator) for
   the effect on the column dtype.
 
   Returning an array instead of a scalar gives the key its own
-  [user-defined axis](../optimizer_setup/results.md#user-defined-axes), which
+  [user-defined axis](results.md#user-defined-axes), which
   the `names` section of the configuration can label and which the
   [`DataFrameHandler`](handlers.md#dataframehandler) spreads over one column
   per entry.
@@ -199,7 +207,7 @@ Neither kind is interpreted by `ropt`. Constant metadata ends up on
 `result.results.metadata`; per-evaluation metadata on
 `result.results.evaluations.metadata` (one entry per realization). Both kinds can
 be tabulated as columns by the [`DataFrameHandler`](handlers.md#dataframehandler). See
-[Working with Results](../optimizer_setup/results.md#metadata) for how
+[Working with Results](results.md#metadata) for how
 each appears in the pandas export. The full runnable script is
 [examples/simple/metadata.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/metadata.py).
 
@@ -219,8 +227,12 @@ batch = evaluate_many(config, matrix, objective)    # one per row of the matrix
 An [`EvaluateResult`][ropt.simple.EvaluateResult] is what one point produced.
 `OptimizeResult` **is** one of these, with `exit_code` added: a run ends at its
 best evaluation, so the two read the same way. Here `result.variables` is just
-the point you supplied; it earns its place in a `report` callback, where the
-optimizer picked the point instead.
+the point you supplied; it is only informative in a `report` callback, where the
+optimizer chose the point.
+
+The runnable script is
+[examples/simple/evaluate.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/evaluate.py),
+which evaluates a single vector and then a matrix of them.
 
 ## When something goes wrong
 
@@ -271,26 +283,6 @@ errors at once. It deliberately does not cover the first and third groups:
 configuration errors belong to pydantic, and errors from your evaluation
 function stay whatever you raised.
 
-## Optimizing over an ensemble
-
-Many problems are uncertain: the objective depends on parameters that vary
-across a set of *realizations*. You add a `realizations` section to the config
-and use `context.realization` to pick the right parameters:
-
-```python
-config = {
-    "variables": {"variable_count": 3, "perturbation_magnitudes": 1e-6},
-    "realizations": {"weights": [1.0] * 10},   # ten realizations
-}
-
-
-def objective(variables, context):
-    a = uncertain_parameters[context.realization]
-    return float(np.sum((variables - a) ** 2))
-```
-
-`optimize` then minimizes the weighted average objective over all realizations.
-
 ## A note on enums
 
 A few config values and result fields use enumerations, such as
@@ -301,12 +293,3 @@ of `ropt.simple`; import them from [`ropt.enums`][ropt.enums]:
 ```python
 from ropt.enums import ExitCode, VariableType
 ```
-
-## Where to next
-
-- The behaviours that most often cause confusion:
-  [Common Pitfalls](pitfalls.md).
-- Run evaluations in parallel, or several optimizations at once:
-  [Parallel Execution and Many Runs](parallel.md).
-- Collect or react to every result, not just the best one:
-  [Result Handlers](handlers.md).

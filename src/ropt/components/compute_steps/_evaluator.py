@@ -36,7 +36,7 @@ class EvaluationStep(ComputeStep[None]):
     `START_ENSEMBLE_EVALUATOR`, `START_EVALUATION`, `FINISHED_EVALUATION`,
     and `FINISHED_ENSEMBLE_EVALUATOR` events.
 
-    See [Optimization Workflows](../workflows/workflows.md#events-emitted-by-evaluationstep)
+    See [Optimization Workflows](../advanced/workflows.md#events-emitted-by-evaluationstep)
     for the full event lifecycle description.
     """
 

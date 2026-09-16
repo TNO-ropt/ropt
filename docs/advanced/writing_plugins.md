@@ -276,11 +276,3 @@ def test_backend_declares_native_output_correctly():
 
 Worth having as a test rather than a one-off check: these properties drift.
 SciPy's `disp` silently became a no-op for `l-bfgs-b` and `nelder-mead` in 1.18.
-
-## Where to next
-
-- The registry in full: [Plugin Manager](../reference/plugin_manager.md).
-- Looking up and validating installed plugins:
-  [Plugin Discovery](plugin_discovery.md).
-- How method strings are resolved:
-  [Method strings](../optimizer_setup/configuration.md#method-strings).

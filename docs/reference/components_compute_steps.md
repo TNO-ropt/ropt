@@ -7,7 +7,7 @@ optimization algorithm, and
 [`EvaluationStep`][ropt.components.compute_steps.EvaluationStep] runs a
 single ensemble evaluation.
 
-See [Optimization Workflows](../workflows/workflows.md) for usage.
+See [Optimization Workflows](../advanced/workflows.md) for usage.
 
 ::: ropt.components.compute_steps.ComputeStep
 ::: ropt.components.compute_steps.EvaluationStep

@@ -237,7 +237,7 @@ def my_function(
     raises a `ValueError`.
 
     A value may be a 1-D array rather than a scalar, which gives the key an
-    extra [user-defined axis](../optimizer_setup/results.md#user-defined-axes)
+    extra [user-defined axis](../running/results.md#user-defined-axes)
     named after the key. Every row must then return the same number of entries,
     and the key may not be named after an
     [`AxisName`][ropt.enums.AxisName] value or `batch_id`.
@@ -306,9 +306,6 @@ executors.
     evaluating all realizations twice, compute them once and return the
     values for both objectives from a single evaluator call.
 
-## Where to next
+## See also
 
-- Read the results: [Working with Results](../optimizer_setup/results.md).
-- Run evaluations in parallel, in processes, or on a cluster:
-  [Parallel Evaluation](parallel.md).
-- See it in action: [Building a Workflow](../examples/workflow.md).
+- See it in action: [Building a Workflow](../advanced/workflow.md).

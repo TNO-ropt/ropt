@@ -330,7 +330,7 @@ in the configuration**, not necessarily the scheduler's partition: it selects
 that entry's script and resource limits, and the partition is written in the
 script. Both are laid out [below](#configuring-the-scheduler).
 
-See [Running on an HPC cluster](../running/parallel.md#running-on-an-hpc-cluster)
+See [Parallel Execution and Many Runs](../running/parallel.md#running-on-an-hpc-cluster)
 for the same ground from the high-level API, and the
 [`pysqa` documentation](https://pysqa.readthedocs.io/en/latest/queue.html) for
 the file formats in full.
@@ -519,7 +519,7 @@ from ropt.utils import restore_keyboard_interrupt
 restore_keyboard_interrupt()
 ```
 
-See [Keyboard Interrupts](../utilities/keyboard_interrupt.md) for the whole
+See [Keyboard Interrupts](../troubleshooting/keyboard_interrupt.md) for the whole
 story.
 
 ### Platforms
@@ -557,7 +557,7 @@ Only the `numpy.nan` survives that step — the `ExecutorFailure` and its messag
 do not reach the optimizer, so an aborted run reports `TOO_FEW_REALIZATIONS`
 without saying why. The reason is logged instead, once per failed work item, at
 `WARNING` from the `ropt.components.evaluators` logger; see
-[Logging](../utilities/logging.md). Because `realization_min_success` defaults to
+[Logging](../troubleshooting/logging.md). Because `realization_min_success` defaults to
 *all* realizations, a single failed work item is enough to end the run this way.
 
 ### User-code exception (raised)
@@ -892,10 +892,3 @@ nested workflow. The nested examples follow exactly this shape:
   inner leaf evaluations run on a `ProcessExecutor`. Submitting those leaf
   evaluations to a cluster instead is the same shape, with `HPCExecutor` in
   place of `ProcessExecutor`.
-
-## Where to next
-
-- Wire a parallel evaluator into a workflow:
-  [Optimization Workflows](workflows.md).
-- Reference: [Executors](../reference/components_executors.md),
-  [Evaluators](../reference/components_evaluators.md).

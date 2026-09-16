@@ -114,10 +114,11 @@ nav:
       - "Running in Parallel": getting_started/execution.md
   - "Running":
       - "Running Optimizations": running/running.md
-      - "Common Pitfalls": running/pitfalls.md
-      - "Parallel Execution and Many Runs": running/parallel.md
+      - "Working with Results": running/results.md
       - "Result Handlers": running/handlers.md
+      - "Parallel Execution and Many Runs": running/parallel.md
       - "Nested Optimization": running/nested.md
+      - "Restarting from the Best Point": running/restart.md
   - "Optimizer Setup":
       - "Key Concepts": optimizer_setup/key_concepts.md
       - "Configuration": optimizer_setup/configuration.md
@@ -126,20 +127,19 @@ nav:
       - "Stochastic Gradients": optimizer_setup/gradients.md
       - "Realization Filters": optimizer_setup/realization_filters.md
       - "Function Estimators": optimizer_setup/function_estimators.md
-      - "Working with Results": optimizer_setup/results.md
-  - "Workflows":
-      - "Optimization Workflows": workflows/workflows.md
-      - "Writing Evaluation Callbacks": workflows/evaluation_callbacks.md
-      - "Parallel Evaluation": workflows/parallel.md
-  - "Utilities":
-      - "Logging": utilities/logging.md
-      - "Keyboard Interrupts": utilities/keyboard_interrupt.md
-      - "Plugin Discovery": utilities/plugin_discovery.md
-      - "Writing a Plugin": utilities/writing_plugins.md
-  - "Examples":
-      - "Overview": examples/index.md
-      - "Restarting from the Best Point": examples/restart.md
-      - "Building a Workflow": examples/workflow.md
+  - "Advanced":
+      - "Workflows":
+          - "Optimization Workflows": advanced/workflows.md
+          - "Writing Evaluation Callbacks": advanced/evaluation_callbacks.md
+          - "Parallel Evaluation": advanced/parallel.md
+          - "Building a Workflow": advanced/workflow.md
+      - "Plugins":
+          - "Plugin Discovery": advanced/plugin_discovery.md
+          - "Writing a Plugin": advanced/writing_plugins.md
+  - "Troubleshooting":
+      - "Troubleshooting": troubleshooting/index.md
+      - "Logging": troubleshooting/logging.md
+      - "Keyboard Interrupts": troubleshooting/keyboard_interrupt.md
   - "Reference":
       - "Simple API": reference/simple.md
       - "Utility Functions": reference/utils.md

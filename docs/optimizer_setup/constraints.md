@@ -58,7 +58,7 @@ objective and one constraint, that is a two-element list:
 
 The order is positional — there are no names — so it must match the order in
 which the objectives and constraints are configured. See
-[The evaluation function](../running/running.md#the-evaluation-function) for the
+[Running Optimizations](../running/running.md#the-evaluation-function) for the
 other shapes the return value can take.
 
 Because the constraint is computed per realization and uses `A[r]`, it is
@@ -79,7 +79,7 @@ This matters more than it looks. `result.variables` is only ever the best
 **feasible** point; if no evaluation satisfied the constraints to within the
 tolerance, the run returns `None` instead of a best point. A tolerance that is
 too tight is a common reason for an empty result — see
-[Common Pitfalls](../running/pitfalls.md).
+[Common Pitfalls](../troubleshooting/index.md).
 
 To watch feasibility as the run proceeds, read `constraint_info` from the full
 result. Its `nonlinear_violation` is zero where a constraint is met and positive
@@ -104,11 +104,3 @@ The script adds it when run with `--linear`. One row per constraint, one
 coefficient per variable; see
 [`linear_constraints`](configuration.md#linear_constraints) for the field
 reference.
-
-## Where to next
-
-- The fields used here, in full: [Configuration](configuration.md).
-- What the evaluation function may return:
-  [Running Optimizations](../running/running.md#the-evaluation-function).
-- Why a run can end without a best point:
-  [Common Pitfalls](../running/pitfalls.md).

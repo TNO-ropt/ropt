@@ -68,7 +68,7 @@ covering *how* to run a configured optimization:
    parallel evaluation across threads, processes, or an HPC cluster, custom
    result handling, and running multiple optimization steps sequentially or
    in parallel, possibly nested within each other.
-2. [Optimization Workflows](workflows/workflows.md) expose the individual
+2. [Optimization Workflows](advanced/workflows.md) expose the individual
    building blocks — compute steps, event handlers, executors — directly, for
    full flexibility.
 
@@ -81,8 +81,6 @@ covering *how* to run a configured optimization:
   for running an optimization and covers most cases.
 - The [Key Concepts](optimizer_setup/key_concepts.md) page introduces the terms used
   throughout the documentation.
-- The [Examples](examples/index.md) show `ropt` in action through worked
-  examples.
 - The [Configuration](optimizer_setup/configuration.md) page describes the
   configuration format in detail.
 

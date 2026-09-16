@@ -10,7 +10,6 @@ from ropt.config.options import gen_options_table
 
 _ROOT = Path(__file__).parent.parent
 _SNIPPET_DIR = _ROOT / "docs" / "snippets"
-_EXAMPLES_INDEX = _ROOT / "docs" / "examples" / "index.md"
 _QUICKSTART = _ROOT / "docs" / "getting_started" / "quickstart.md"
 
 # Misplaced backticks render as a code span, so no reference reaches
@@ -46,21 +45,6 @@ def test_no_malformed_cross_references() -> None:
     if found:
         pytest.fail(
             "Malformed cross-references, expected [`X`][path]:\n" + "\n".join(found)
-        )
-
-
-def test_every_example_script_is_listed_in_the_examples_index() -> None:
-    index = _EXAMPLES_INDEX.read_text()
-    missing = [
-        str(path.relative_to(_ROOT))
-        for sub_dir in ("simple", "advanced")
-        for path in sorted((_ROOT / "examples" / sub_dir).glob("*.py"))
-        if str(path.relative_to(_ROOT)) not in index
-    ]
-    if missing:
-        pytest.fail(
-            f"Not listed in {_EXAMPLES_INDEX.relative_to(_ROOT)}, so unreachable "
-            "from the documentation:\n" + "\n".join(missing)
         )
 
 

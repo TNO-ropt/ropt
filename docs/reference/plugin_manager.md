@@ -16,7 +16,7 @@ cannot be, such as a class defined in a script or a notebook, is added to the
 shared manager with
 [`register_plugin`][ropt.plugins.manager.register_plugin].
 
-See [Writing a Plugin](../utilities/writing_plugins.md) for how to implement and
+See [Writing a Plugin](../advanced/writing_plugins.md) for how to implement and
 register one.
 
 ::: ropt.plugins.MethodSpec

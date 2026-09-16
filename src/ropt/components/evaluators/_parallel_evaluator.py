@@ -39,7 +39,7 @@ class ParallelEvaluator(Evaluator):
     used to group several active evaluations into a single task that the worker
     executes sequentially.
 
-    See [Parallel Evaluation](../workflows/parallel.md#parallelevaluator) for
+    See [Parallel Evaluation](../advanced/parallel.md#parallelevaluator) for
     details on how this integrates with the asyncio event loop.
     """
 
@@ -88,7 +88,7 @@ class ParallelEvaluator(Evaluator):
         user-code exception is re-raised, leaving the executor running. Raises
         [`ExecutorStopped`][ropt.exceptions.ExecutorStopped] if the executor
         cannot run the evaluation. See
-        [error handling](../workflows/parallel.md#error-handling) for the full
+        [error handling](../advanced/parallel.md#error-handling) for the full
         contract.
 
         Args:

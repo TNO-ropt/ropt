@@ -103,10 +103,3 @@ the plugin system is only required when it should be selectable via
 [`RealizationFilterConfig`][ropt.config.RealizationFilterConfig]; otherwise, an
 instance can be passed directly in the `realization_filters` field of
 [`EnOptContext`][ropt.context.EnOptContext].
-
-## Where to next
-
-- Combine filters with function estimators:
-  [Function Estimators](function_estimators.md).
-- Inspect per-realization output:
-  [Working with Results](results.md).

@@ -80,10 +80,3 @@ an estimator with the plugin system is only required when it should be
 selectable via [`FunctionEstimatorConfig`][ropt.config.FunctionEstimatorConfig];
 otherwise, an instance can be passed directly in the `function_estimators`
 field of [`EnOptContext`][ropt.context.EnOptContext].
-
-## Where to next
-
-- Filter realizations before aggregation:
-  [Realization Filters](realization_filters.md).
-- Scale aggregated values:
-  [Scaling objectives](configuration.md#objective-scales).

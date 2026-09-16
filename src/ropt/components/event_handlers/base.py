@@ -50,8 +50,8 @@ class EventHandler(ABC):
         shared across concurrently running steps with an
         [`EventDispatcher`][ropt.components.event_handlers.EventDispatcher]
         instead, which serializes the calls. See
-        [Optimization Workflows](../workflows/workflows.md#event-handlers) and
-        [Parallel Evaluation](../workflows/parallel.md#event-dispatcher) for usage
+        [Optimization Workflows](../advanced/workflows.md#event-handlers) and
+        [Parallel Evaluation](../advanced/parallel.md#event-dispatcher) for usage
         and pitfalls.
     """
 

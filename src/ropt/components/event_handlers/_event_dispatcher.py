@@ -45,7 +45,7 @@ class EventDispatcher:
     dispatcher owns and shuts down when it stops, so handler work is isolated
     from the asyncio loop's shared default pool.
 
-    See [Parallel Evaluation](../workflows/parallel.md#event-dispatcher) for usage.
+    See [Parallel Evaluation](../advanced/parallel.md#event-dispatcher) for usage.
     """
 
     def __init__(self) -> None:
@@ -67,7 +67,7 @@ class EventDispatcher:
 
         By default the handler is called directly on the event loop's thread.
         Pass `run_in_thread=True` for handlers that perform blocking I/O; see
-        [Thread-based dispatch](../workflows/parallel.md#thread-based-dispatch).
+        [Thread-based dispatch](../advanced/parallel.md#thread-based-dispatch).
 
         Args:
             handler:       The handler to add.
@@ -108,7 +108,7 @@ class EventDispatcher:
 
         Events are handled in submission order. A handler exception is
         re-raised here, on the caller's own stack. See
-        [Handler failures](../workflows/parallel.md#handler-failures).
+        [Handler failures](../advanced/parallel.md#handler-failures).
 
         Args:
             event: The event to submit.

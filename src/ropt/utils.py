@@ -33,7 +33,7 @@ def validate_backend_options(method: str, options: dict[str, Any] | list[str]) -
     """Validate the optimizer-specific options for a given method.
 
     `method` is either `"plugin-name/method-name"` or just `"method-name"`; see
-    [Plugin Discovery](../utilities/plugin_discovery.md) for both forms.
+    [Plugin Discovery](../advanced/plugin_discovery.md) for both forms.
 
     Args:
         method:  The specific optimization method name.
@@ -56,7 +56,7 @@ def restore_keyboard_interrupt() -> None:
 
     Entirely optional: call it at the top of a script, after the imports, only
     if Ctrl-C stops working. See
-    [Keyboard Interrupts](../utilities/keyboard_interrupt.md).
+    [Keyboard Interrupts](../troubleshooting/keyboard_interrupt.md).
     """
     if not hasattr(signal, "siginterrupt"):
         return

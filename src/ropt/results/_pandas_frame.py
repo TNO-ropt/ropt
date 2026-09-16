@@ -51,7 +51,7 @@ def results_to_pandas(
     Concatenates the specified fields from a sequence of
     [`FunctionResults`][ropt.results.FunctionResults] or
     [`GradientResults`][ropt.results.GradientResults] objects. See
-    [Aggregating multiple results](../optimizer_setup/results.md#aggregating-multiple-results)
+    [Aggregating multiple results](../running/results.md#aggregating-multiple-results)
     for field selection and unstacking.
 
     Args:

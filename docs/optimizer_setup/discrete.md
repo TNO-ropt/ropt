@@ -77,11 +77,3 @@ by following a slope, so plan for a different cost profile:
   `max_iterations` rather than a convergence tolerance.
 - The result is reproducible only if the method's own generator is seeded —
   hence `"options": {"rng": 4}` in both scripts.
-
-## Where to next
-
-- The fields used here, in full: [`variables`](configuration.md#variables) and
-  [`backend`](configuration.md#backend).
-- Which methods support what:
-  [`SciPyBackend`][ropt.backend.scipy.SciPyBackend].
-- Constraining a discrete problem: [Constraints](constraints.md).

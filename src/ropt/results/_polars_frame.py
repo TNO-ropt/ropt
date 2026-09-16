@@ -59,7 +59,7 @@ def results_to_polars(
     long format with tuple column names joined into a single string using
     `sep`. Unlike the pandas export, fields with different granularities are
     aligned into one table rather than kept as separate blocks. See
-    [Exporting to polars](../optimizer_setup/results.md#exporting-to-polars)
+    [Exporting to polars](../running/results.md#exporting-to-polars)
     for details.
 
     Args:

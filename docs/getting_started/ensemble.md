@@ -113,22 +113,18 @@ robust objective, which is what it optimizes.
   the run produced no valid result.
 - `result.exit_code` says why the run stopped (a member of the
   [`ExitCode`][ropt.enums.ExitCode] enumeration).
-- `result.results` holds the full low-level result (a
-  [`FunctionResults`][ropt.results.FunctionResults] object), if you need every
-  detail.
+- `result.results` is the underlying result object, a
+  [`FunctionResults`][ropt.results.FunctionResults] carrying every value the
+  evaluation produced; `OptimizeResult` is a convenience view of it.
 
-See [The result](../running/running.md#the-result) for the remaining fields.
+See [Running Optimizations](../running/running.md#the-result) for the remaining fields.
 
 Because the coefficients are centered on the values used in the
 [Quickstart](quickstart.md), the robust optimum still lies close to where all
 variables equal 1 — but it minimizes the *average* over the uncertain
 coefficients rather than any single realization.
 
-## Where to next
+## See also
 
-- Collect every result, not just the best one:
-  [Collecting Results with Handlers](handlers.md).
-- The complete simple API: [Running Optimizations](../running/running.md).
-- All realization settings: [Configuration](../optimizer_setup/configuration.md).
 - The ideas and terms behind ensembles:
   [Key Concepts](../optimizer_setup/key_concepts.md).

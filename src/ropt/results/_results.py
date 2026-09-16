@@ -41,7 +41,7 @@ class Results(AxisMetadata, ABC):
     Subclassed by [`FunctionResults`][ropt.results.FunctionResults] and
     [`GradientResults`][ropt.results.GradientResults].
 
-    See [Working with Results](../optimizer_setup/results.md) for a narrative overview.
+    See [Working with Results](../running/results.md) for a narrative overview.
 
     Attributes:
         batch_id: Identifier for the evaluation batch.
@@ -76,7 +76,7 @@ class Results(AxisMetadata, ABC):
         Paths whose value is `None`, and missing mapping keys, are skipped. A
         path that does not name a value raises a `ValueError`.
 
-        See [Working with Results](../optimizer_setup/results.md#exporting-to-pandas) for
+        See [Working with Results](../running/results.md#exporting-to-pandas) for
         further details and examples.
 
         Args:
@@ -116,7 +116,7 @@ class Results(AxisMetadata, ABC):
         This is the polars counterpart of
         [`to_pandas`][ropt.results.Results.to_pandas], returned in long
         format with tuple column names joined into a single string using
-        `sep`. See [Exporting to polars](../optimizer_setup/results.md#exporting-to-polars)
+        `sep`. See [Exporting to polars](../running/results.md#exporting-to-polars)
         for details.
 
         Args:

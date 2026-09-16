@@ -8,7 +8,7 @@ explicitly enables them.
 
 Logging gives a human-readable *trace* of a run. To *react* to results
 programmatically — collect them, tabulate them, or stop early — use
-[result handlers](../running/handlers.md#result-handlers) instead.
+[result handlers](../running/handlers.md) instead.
 
 ## Logger hierarchy
 
@@ -230,11 +230,3 @@ the example above.
 Python warnings are a separate matter: `warnings.warn` writes to `sys.stderr` at
 the moment it fires, so warnings raised while the optimizer runs are captured.
 That is usually what you want, since they generally come from the optimizer.
-
-## Where to next
-
-- React to results programmatically instead of just tracing them:
-  [Result Handlers](../running/handlers.md).
-- HPC job submission, polling, and retries in depth:
-  [Parallel Evaluation](../workflows/parallel.md).
-- Query installed plugins at runtime: [Plugin Discovery](plugin_discovery.md).

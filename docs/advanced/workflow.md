@@ -7,7 +7,7 @@ custom event handling, several optimizers, or nested runs — you assemble the
 low-level workflow components yourself. This page follows
 [examples/advanced/workflow.py](https://github.com/TNO-ropt/ropt/blob/main/examples/advanced/workflow.py).
 
-See [Optimization Workflows](../workflows/workflows.md) for the full reference on the
+See [Optimization Workflows](workflows.md) for the full reference on the
 components used here.
 
 ## The evaluator
@@ -32,7 +32,7 @@ from ropt.components.evaluators import BatchEvaluator
 evaluator = BatchEvaluator(callback=partial(rosenbrock, a=a, b=b))
 ```
 
-See [Writing Evaluation Callbacks](../workflows/evaluation_callbacks.md) for the
+See [Writing Evaluation Callbacks](evaluation_callbacks.md) for the
 batch callback signature and the other evaluators.
 
 ## The compute step and its handlers
@@ -71,7 +71,7 @@ best = result_handler.result
 
 ## Next
 
-- The full component reference: [Optimization Workflows](../workflows/workflows.md).
+- The full component reference: [Optimization Workflows](workflows.md).
 - Writing the evaluation callback:
-  [Writing Evaluation Callbacks](../workflows/evaluation_callbacks.md).
-- Running evaluations in parallel: [Parallel Evaluation](../workflows/parallel.md).
+  [Writing Evaluation Callbacks](evaluation_callbacks.md).
+- Running evaluations in parallel: [Parallel Evaluation](parallel.md).

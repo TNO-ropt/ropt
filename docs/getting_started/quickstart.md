@@ -65,10 +65,3 @@ Every `ropt` optimization needs three things:
 [`optimize`][ropt.simple.optimize] combines these three, runs the optimization,
 and returns an [`OptimizeResult`][ropt.simple.OptimizeResult] with the best
 values it found.
-
-## Where to next
-
-- Optimizing under uncertainty:
-  [Ensemble-Based Optimization](ensemble.md).
-- The complete simple API: [Running Optimizations](../running/running.md).
-- All configuration settings: [Configuration](../optimizer_setup/configuration.md).

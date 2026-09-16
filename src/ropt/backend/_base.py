@@ -72,7 +72,7 @@ class Backend(ABC):
     a library that requires this, or that prints where it cannot be redirected
     per run, must document that it cannot run concurrently in-process and direct
     users to the [`external`][ropt.backend.external.ExternalBackend] backend. See
-    [What a backend may not change](../utilities/writing_plugins.md#what-a-backend-may-not-change)
+    [What a backend may not change](../advanced/writing_plugins.md#what-a-backend-may-not-change)
     for the full contract.
     """
 
@@ -152,7 +152,7 @@ class Backend(ABC):
         cost is that capture briefly rewires process-global state, whereas the
         cost of being wrong the other way is output escaping to the terminal.
 
-        See [Writing a Plugin](../utilities/writing_plugins.md#declaring-native-output).
+        See [Writing a Plugin](../advanced/writing_plugins.md#declaring-native-output).
 
         Returns:
             `True` if the optimizer writes output below the Python level.

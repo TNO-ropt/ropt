@@ -18,8 +18,8 @@ The [`EventDispatcher`][ropt.components.event_handlers.EventDispatcher] fans
 events out to its registered handlers from the asyncio event loop's thread, so
 handlers shared across concurrent compute steps need no locking.
 
-See [Optimization Workflows](../workflows/workflows.md) and
-[Working with Results](../optimizer_setup/results.md) for usage.
+See [Optimization Workflows](../advanced/workflows.md) and
+[Working with Results](../running/results.md) for usage.
 
 ::: ropt.components.event_handlers.EventHandler
 ::: ropt.components.event_handlers.ResultsHandler

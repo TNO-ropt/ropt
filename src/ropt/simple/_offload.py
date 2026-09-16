@@ -69,7 +69,7 @@ def offload(
 
     See [Running Optimizations](../running/running.md) for a walkthrough.
 
-    A handler in a shared group runs on the pool's own event loop and cannot
+    A handler in a shared group runs on the session's own event loop and cannot
     wait on it; offloading from there raises a
     [`WorkflowError`][ropt.exceptions.WorkflowError]. So does a pool that is
     closed, or one carried into a worker process.

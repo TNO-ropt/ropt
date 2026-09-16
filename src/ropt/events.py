@@ -23,7 +23,7 @@ class EnOptEvent:
         source:      The compute step that emitted the event; a handler may call
                      its `stop()` to stop that run.
 
-    See [Optimization Workflows](../workflows/workflows.md#the-enoptevent-object)
+    See [Optimization Workflows](../advanced/workflows.md#the-enoptevent-object)
     for a detailed description of events and their lifecycle.
     """
 

@@ -26,7 +26,7 @@ class Gradients(ResultField):
     are found under `scaled`, differentiated with respect to the scaled
     variables, the gradients as configured directly on the result.
 
-    See [Working with Results](../optimizer_setup/results.md) for usage details.
+    See [Working with Results](../running/results.md) for usage details.
 
     There is no target gradient here: the quantity the optimizer descends is a
     weighted total over objectives that may differ in both scale and direction,

@@ -29,7 +29,7 @@ class CachedEvaluator(Evaluator):
     Wraps another evaluator, retrieving previously computed results from
     `EventHandler` sources before delegating uncached evaluations.
 
-    See [Using CachedEvaluator](../workflows/evaluation_callbacks.md#using-cachedevaluator)
+    See [Using CachedEvaluator](../advanced/evaluation_callbacks.md#using-cachedevaluator)
     for full details on cache matching, realization name handling, and source
     management.
     """

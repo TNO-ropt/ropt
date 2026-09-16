@@ -56,13 +56,7 @@ optimization runs can be combined sequentially, in parallel, or nested within
 each other.
 
 
-## Where to next
+## See also
 
-- Install and run your first optimization: [Installation](installation.md) and
-  [Quickstart](quickstart.md).
-- Learn the terms used across the documentation: [Key Concepts](../optimizer_setup/key_concepts.md).
-- Learn the configuration format: [Configuration](../optimizer_setup/configuration.md).
 - Understand the stochastic gradient (StoSAG) machinery in depth:
   [Stochastic Gradients](../optimizer_setup/gradients.md).
-- Build custom optimization workflows beyond a single optimization run:
-  [Optimization Workflows](../workflows/workflows.md).
