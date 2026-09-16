@@ -291,7 +291,7 @@ class _ResultsTable:
 
     def add_results(self, results: Sequence[Results]) -> bool:
         with self._lock:
-            columns = set(self._columns)
+            columns = list(self._columns)
         if self._engine == "polars":
             polars_frame = results_to_polars(
                 results, columns, result_type=self._results_type, sep=self._sep

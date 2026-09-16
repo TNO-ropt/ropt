@@ -6,6 +6,11 @@ from typing import TYPE_CHECKING, Any, TypeVar
 
 from ropt.exceptions import UnsupportedError
 
+from ._frame_core import (
+    _UNORDERED_FIELDS_ERROR,
+    _duplicate_fields,
+    _is_unordered,
+)
 from ._frame_support import (
     HAVE_PANDAS,
     HAVE_POLARS,
@@ -14,7 +19,7 @@ from ._frame_support import (
 from ._result_field import AxisMetadata
 
 if TYPE_CHECKING:
-    from collections.abc import Iterable
+    from collections.abc import Iterable, Sequence
 
 
 if TYPE_CHECKING and HAVE_PANDAS:
@@ -52,7 +57,7 @@ class Results(AxisMetadata, ABC):
 
     def to_pandas(
         self,
-        select: Iterable[str],
+        select: Sequence[str],
         unstack: Iterable[str] | None = None,
     ) -> pd.DataFrame:
         """Export selected fields to a pandas DataFrame.
@@ -60,7 +65,7 @@ class Results(AxisMetadata, ABC):
         Fields are named by a dotted path from this result, such as
         `"functions.objectives"`, `"scaled.variables"` or `"target_objective"`.
         A path may end in one or more mapping keys, as `"metadata.run.id"` does.
-        Each selected path becomes a column of that name.
+        Each selected path becomes a column of that name, in the order given.
 
         Multi-dimensional fields are stacked into rows indexed by a multi-index
         derived from the field's axis metadata; index levels are labeled using
@@ -75,24 +80,34 @@ class Results(AxisMetadata, ABC):
         further details and examples.
 
         Args:
-            select:  The dotted paths of the fields to export.
+            select:  The dotted paths of the fields to export, in column order.
             unstack: Axes to pivot into columns (default: none).
 
         Returns:
             A DataFrame with the selected fields as columns.
 
         Raises:
+            TypeError:        If `select` is a set rather than an ordered
+                              sequence.
+            ValueError:       If `select` names the same path more than once.
             UnsupportedError: If the `pandas` module is not installed.
         """
         if not HAVE_PANDAS:
             msg = missing_engine_message("pandas", "to_pandas", "use to_polars")
             raise UnsupportedError(msg)
 
+        if _is_unordered(select):
+            raise TypeError(_UNORDERED_FIELDS_ERROR)
+        duplicates = _duplicate_fields(select)
+        if duplicates:
+            msg = f"Duplicate fields: {duplicates}"
+            raise ValueError(msg)
+
         return _to_pandas_frame(self, select, unstack)
 
     def to_polars(
         self,
-        select: Iterable[str],
+        select: Sequence[str],
         unstack: Iterable[str] | None = None,
         sep: str = ",",
     ) -> pl.DataFrame:
@@ -105,7 +120,7 @@ class Results(AxisMetadata, ABC):
         for details.
 
         Args:
-            select:  The dotted paths of the fields to export.
+            select:  The dotted paths of the fields to export, in column order.
             unstack: Axes to pivot into columns (default: none).
             sep:     Separator used to join unstacked column names.
 
@@ -113,10 +128,20 @@ class Results(AxisMetadata, ABC):
             A DataFrame with axis labels and the selected fields as columns.
 
         Raises:
+            TypeError:        If `select` is a set rather than an ordered
+                              sequence.
+            ValueError:       If `select` names the same path more than once.
             UnsupportedError: If the `polars` module is not installed.
         """
         if not HAVE_POLARS:
             msg = missing_engine_message("polars", "to_polars", "use to_pandas")
             raise UnsupportedError(msg)
+
+        if _is_unordered(select):
+            raise TypeError(_UNORDERED_FIELDS_ERROR)
+        duplicates = _duplicate_fields(select)
+        if duplicates:
+            msg = f"Duplicate fields: {duplicates}"
+            raise ValueError(msg)
 
         return _to_polars_frame(self, select, unstack, sep)[0]

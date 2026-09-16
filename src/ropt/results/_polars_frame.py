@@ -6,7 +6,14 @@ from typing import TYPE_CHECKING, Literal
 
 from ropt.exceptions import UnsupportedError
 
-from ._frame_core import UNSTACK_AXES, _has_results, _value_fields
+from ._frame_core import (
+    _UNORDERED_FIELDS_ERROR,
+    UNSTACK_AXES,
+    _duplicate_fields,
+    _has_results,
+    _is_unordered,
+    _value_fields,
+)
 from ._frame_support import HAVE_POLARS, missing_engine_message
 from ._function_results import FunctionResults
 from ._gradient_results import GradientResults
@@ -24,7 +31,7 @@ if HAVE_POLARS:
 
 def _get_results(
     results: Results,
-    sub_fields: set[str],
+    sub_fields: Sequence[str],
     result_type: Literal["functions", "gradients"],
     sep: str,
 ) -> pl.DataFrame:
@@ -41,7 +48,7 @@ def _get_results(
 
 def results_to_polars(
     results: Sequence[Results],
-    fields: set[str],
+    fields: Sequence[str],
     result_type: Literal["functions", "gradients"],
     sep: str = ",",
 ) -> pl.DataFrame:
@@ -57,16 +64,20 @@ def results_to_polars(
 
     Args:
         results:     A sequence of [`Results`][ropt.results.Results] objects.
-        fields:      Field names to include (dot notation for nested fields).
+        fields:      Field names to include, in column order (dot notation for
+                     nested fields).
         result_type: `"functions"` or `"gradients"`.
         sep:         Separator used to join unstacked column names.
 
     Returns:
-        A DataFrame with one row per result and requested fields as columns.
+        A DataFrame with the requested fields as columns, keyed by `batch_id`
+        and by any axes that stay stacked.
 
     Raises:
-        TypeError:        If `result_type` is invalid or results contain
-                          unexpected types.
+        TypeError:        If `result_type` is invalid, if `fields` is a set
+                          rather than an ordered sequence, or if results
+                          contain unexpected types.
+        ValueError:       If `fields` names the same path more than once.
         UnsupportedError: If the `polars` module is not installed.
     """
     if not HAVE_POLARS:
@@ -79,6 +90,12 @@ def results_to_polars(
         msg = f"Invalid frame output type: {result_type}"
         raise TypeError(msg)
 
+    if _is_unordered(fields):
+        raise TypeError(_UNORDERED_FIELDS_ERROR)
+    duplicates = _duplicate_fields(fields)
+    if duplicates:
+        msg = f"Duplicate fields: {duplicates}"
+        raise ValueError(msg)
     frames: list[pl.DataFrame] = []
     for item in results:
         if not isinstance(item, (FunctionResults, GradientResults)):

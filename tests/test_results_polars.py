@@ -1,4 +1,5 @@
 import math
+from collections.abc import Sequence
 from functools import partial
 from typing import Any, Literal
 
@@ -55,7 +56,7 @@ def _handle_results(
     event: EnOptEvent,
     *,
     frames: list[pl.DataFrame],
-    fields: set[str],
+    fields: Sequence[str],
     result_type: Literal["functions", "gradients"],
     metadata: dict[str, Any] | None = None,
     sep: str = ",",
@@ -88,7 +89,7 @@ def _with_pair_metadata(
 def _run(
     config: Any,
     eval_func: Any,
-    fields: set[str],
+    fields: Sequence[str],
     result_type: Literal["functions", "gradients"],
     *,
     metadata: dict[str, Any] | None = None,
@@ -117,12 +118,12 @@ def _run(
 
 
 def test_polars_results_no_results(config: Any, eval_func: Any) -> None:
-    assert not _run(config, eval_func, set(), "functions")
+    assert not _run(config, eval_func, [], "functions")
 
 
 def test_polars_results_function_results(config: Any, eval_func: Any) -> None:
     del config["names"]
-    frames = _run(config, eval_func, {"variables"}, "functions")
+    frames = _run(config, eval_func, ["variables"], "functions")
     frame = pl.concat(frames, how="diagonal")
     assert frame.height == 3
     assert frame.columns == [
@@ -134,7 +135,7 @@ def test_polars_results_function_results(config: Any, eval_func: Any) -> None:
 def test_polars_results_function_results_formatted_names(
     config: Any, eval_func: Any
 ) -> None:
-    frames = _run(config, eval_func, {"variables"}, "functions")
+    frames = _run(config, eval_func, ["variables"], "functions")
     frame = pl.concat(frames, how="diagonal")
     assert frame.height == 3
     assert frame.columns == [
@@ -144,7 +145,7 @@ def test_polars_results_function_results_formatted_names(
 
 
 def test_polars_results_sep(config: Any, eval_func: Any) -> None:
-    frames = _run(config, eval_func, {"variables"}, "functions", sep="::")
+    frames = _run(config, eval_func, ["variables"], "functions", sep="::")
     frame = pl.concat(frames, how="diagonal")
     assert frame.columns == [
         "batch_id",
@@ -153,7 +154,7 @@ def test_polars_results_sep(config: Any, eval_func: Any) -> None:
 
 
 def test_polars_results_gradient_results(config: Any, eval_func: Any) -> None:
-    frames = _run(config, eval_func, {"target_gradient"}, "gradients")
+    frames = _run(config, eval_func, ["target_gradient"], "gradients")
     frame = pl.concat(frames, how="diagonal")
     assert frame.height == 3
     assert frame.columns == [
@@ -167,7 +168,7 @@ def test_polars_results_metadata(config: Any, eval_func: Any) -> None:
     frames = _run(
         config,
         eval_func,
-        {"variables", "metadata.foo.bar", "metadata.not.existing"},
+        ["metadata.foo.bar", "metadata.not.existing", "variables"],
         "functions",
         metadata={"foo": {"bar": 1}},
     )
@@ -189,7 +190,7 @@ def test_polars_results_unstack_user_axis_but_keep_realization_stacked(
     frames = _run(
         config,
         lambda: _with_pair_metadata(eval_func()),
-        {"evaluations.metadata.pair"},
+        ["evaluations.metadata.pair"],
         "functions",
     )
     frame = pl.concat(frames, how="diagonal")
@@ -203,9 +204,9 @@ def test_polars_results_unstack_user_axis_but_keep_realization_stacked(
 
 def test_polars_results_invalid_type() -> None:
     with pytest.raises(TypeError, match="Invalid frame output type: invalid"):
-        results_to_polars((), set(), result_type="invalid")  # type: ignore[arg-type]
+        results_to_polars((), [], result_type="invalid")  # type: ignore[arg-type]
     with pytest.raises(TypeError, match="Invalid result type:"):
-        results_to_polars(("nonsense",), {"a"}, result_type="functions")  # type: ignore[arg-type]
+        results_to_polars(("nonsense",), ["a"], result_type="functions")  # type: ignore[arg-type]
 
 
 def test_polars_results_mixed_granularity(config: Any, eval_func: Any) -> None:
@@ -213,7 +214,7 @@ def test_polars_results_mixed_granularity(config: Any, eval_func: Any) -> None:
     frames = _run(
         config,
         eval_func,
-        {"target_gradient", "perturbed_variables"},
+        ["perturbed_variables", "target_gradient"],
         "gradients",
     )
     frame = pl.concat(frames, how="diagonal")
@@ -232,10 +233,10 @@ def test_polars_results_mixed_granularity(config: Any, eval_func: Any) -> None:
         assert target.row(0) == target.row(1)
 
 
-_PARITY_FIELDS: list[tuple[set[str], Literal["functions", "gradients"]]] = [
-    ({"variables"}, "functions"),
+_PARITY_FIELDS: list[tuple[list[str], Literal["functions", "gradients"]]] = [
+    (["variables"], "functions"),
     (
-        {
+        [
             "batch_id",
             "target_objective",
             "functions.objectives",
@@ -243,23 +244,23 @@ _PARITY_FIELDS: list[tuple[set[str], Literal["functions", "gradients"]]] = [
             "constraint_info.bound_lower",
             "constraint_info.bound_upper",
             "constraint_info.bound_violation",
-        },
+        ],
         "functions",
     ),
-    ({"variables", "metadata.foo.bar"}, "functions"),
-    ({"target_gradient", "gradients.objectives"}, "gradients"),
+    (["variables", "metadata.foo.bar"], "functions"),
+    (["target_gradient", "gradients.objectives"], "gradients"),
     (
-        {
-            "target_gradient",
+        [
             "gradients.objectives",
-        },
+            "target_gradient",
+        ],
         "gradients",
     ),
     (
-        {
+        [
             "perturbed_variables",
             "evaluations.perturbed_objectives",
-        },
+        ],
         "gradients",
     ),
 ]
@@ -270,7 +271,7 @@ _PARITY_FIELDS: list[tuple[set[str], Literal["functions", "gradients"]]] = [
 def test_polars_results_pandas_parity(
     config: Any,
     eval_func: Any,
-    fields: set[str],
+    fields: list[str],
     result_type: Literal["functions", "gradients"],
     *,
     sep: str,
@@ -321,7 +322,30 @@ def test_polars_results_pandas_parity(
                 assert lhs == rhs
 
 
+def test_polars_results_keep_the_requested_field_order(
+    config: Any, eval_func: Any
+) -> None:
+    frames = _run(config, eval_func, ["variables", "target_objective"], "functions")
+    frame = pl.concat(frames, how="diagonal")
+    # Sorting the names would put target_objective first.
+    assert frame.columns == [
+        "batch_id",
+        *(f"variables,a:{idx}" for idx in range(1, 4)),
+        "target_objective",
+    ]
+
+
+def test_polars_results_reject_a_set_of_fields() -> None:
+    with pytest.raises(TypeError, match="Fields must be an ordered sequence"):
+        results_to_polars((), {"variables"}, result_type="functions")  # type: ignore[arg-type]
+
+
+def test_polars_results_reject_duplicate_fields() -> None:
+    with pytest.raises(ValueError, match="Duplicate fields: variables"):
+        results_to_polars((), ["variables", "variables"], result_type="functions")
+
+
 def test_polars_results_empty_input() -> None:
-    frame = results_to_polars((), set(), result_type="functions")
+    frame = results_to_polars((), [], result_type="functions")
     assert frame.height == 0
     assert frame.width == 0

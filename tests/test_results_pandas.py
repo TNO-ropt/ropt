@@ -1,3 +1,4 @@
+from collections.abc import Sequence
 from functools import partial
 from typing import Any, Literal
 
@@ -54,7 +55,7 @@ def config_fixture() -> dict[str, Any]:
 def _handle_results(
     event: EnOptEvent,
     frames: list[pd.DataFrame],
-    fields: set[str],
+    fields: Sequence[str],
     result_type: Literal["functions", "gradients"],
     metadata: dict[str, Any] | None = None,
 ) -> None:
@@ -95,7 +96,7 @@ def test_dataframe_results_no_results(config: Any, eval_func: Any) -> None:
                 callback=partial(
                     _handle_results,
                     frames=frames,
-                    fields=set(),
+                    fields=[],
                     result_type="functions",
                 ),
             )
@@ -117,9 +118,7 @@ def test_dataframe_results_function_results(config: Any, eval_func: Any) -> None
                 callback=partial(
                     _handle_results,
                     frames=frames,
-                    fields={
-                        "variables",
-                    },
+                    fields=["variables"],
                     result_type="functions",
                 ),
             )
@@ -146,9 +145,7 @@ def test_dataframe_results_function_results_formatted_names(
                 callback=partial(
                     _handle_results,
                     frames=frames,
-                    fields={
-                        "variables",
-                    },
+                    fields=["variables"],
                     result_type="functions",
                 ),
             )
@@ -173,9 +170,7 @@ def test_dataframe_results_gradient_results(config: Any, eval_func: Any) -> None
                 callback=partial(
                     _handle_results,
                     frames=frames,
-                    fields={
-                        "target_gradient",
-                    },
+                    fields=["target_gradient"],
                     result_type="gradients",
                 ),
             )
@@ -201,11 +196,11 @@ def test_dataframe_results_metadata(config: Any, eval_func: Any) -> None:
                 callback=partial(
                     _handle_results,
                     frames=frames,
-                    fields={
-                        "variables",
+                    fields=[
                         "metadata.foo.bar",
                         "metadata.not.existing",
-                    },
+                        "variables",
+                    ],
                     result_type="functions",
                     metadata={"foo": {"bar": 1}},
                 ),
@@ -235,7 +230,7 @@ def test_dataframe_results_unstack_user_axis_but_keep_realization_stacked(
                 callback=partial(
                     _handle_results,
                     frames=frames,
-                    fields={"evaluations.metadata.pair"},
+                    fields=["evaluations.metadata.pair"],
                     result_type="functions",
                 ),
             )
@@ -249,5 +244,43 @@ def test_dataframe_results_unstack_user_axis_but_keep_realization_stacked(
     assert frame.index.names == ["batch_id", "realization"]
 
 
+def test_dataframe_results_keep_the_requested_field_order(
+    config: Any, eval_func: Any
+) -> None:
+    frames: list[pd.DataFrame] = []
+    optimize(
+        config,
+        initial_values,
+        eval_func(),
+        handlers=[
+            CallbackHandler(
+                event_types={EnOptEventType.FINISHED_EVALUATION},
+                callback=partial(
+                    _handle_results,
+                    frames=frames,
+                    fields=["variables", "target_objective"],
+                    result_type="functions",
+                ),
+            )
+        ],
+    )
+    frame = pd.concat(frames)
+    # Sorting the names would put target_objective first.
+    assert list(frame.columns.get_level_values(level=0)) == [
+        *(("variables", f"a:{idx}") for idx in range(1, 4)),
+        "target_objective",
+    ]
+
+
+def test_dataframe_results_reject_a_set_of_fields() -> None:
+    with pytest.raises(TypeError, match="Fields must be an ordered sequence"):
+        results_to_pandas((), {"variables"}, result_type="functions")  # type: ignore[arg-type]
+
+
+def test_dataframe_results_reject_duplicate_fields() -> None:
+    with pytest.raises(ValueError, match="Duplicate fields: variables"):
+        results_to_pandas((), ["variables", "variables"], result_type="functions")
+
+
 def test_pandas_results_empty_input() -> None:
-    assert results_to_pandas((), set(), result_type="functions").empty
+    assert results_to_pandas((), [], result_type="functions").empty

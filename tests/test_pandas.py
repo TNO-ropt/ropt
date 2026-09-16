@@ -245,3 +245,13 @@ def test_to_pandas_join(function_result: FunctionResults) -> None:
     frame = frame1.join(frame2, how="inner", lsuffix="_eval", rsuffix="_func")
     assert not frame.empty
     assert len(frame.columns) == len(frame1.columns) + len(frame2.columns)
+
+
+def test_to_pandas_rejects_a_set_of_fields(function_result: FunctionResults) -> None:
+    with pytest.raises(TypeError, match="Fields must be an ordered sequence"):
+        function_result.to_pandas({"variables"})  # type: ignore[arg-type]
+
+
+def test_to_pandas_rejects_duplicate_fields(function_result: FunctionResults) -> None:
+    with pytest.raises(ValueError, match="Duplicate fields: variables"):
+        function_result.to_pandas(["variables", "variables"])

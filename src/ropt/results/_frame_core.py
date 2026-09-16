@@ -8,7 +8,9 @@ produce identical column names, values and row ordering.
 
 from __future__ import annotations
 
+from collections import Counter
 from collections.abc import Mapping
+from collections.abc import Set as AbstractSet
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Final, Literal, NoReturn
 
@@ -170,11 +172,25 @@ def _check_unstack_axes(unstack: Sequence[str], seen: set[str]) -> None:
         raise ValueError(msg)
 
 
-def _value_fields(sub_fields: set[str]) -> list[str]:
+_UNORDERED_FIELDS_ERROR: Final = "Fields must be an ordered sequence, not a set"
+
+
+def _is_unordered(paths: Sequence[str]) -> bool:
+    return isinstance(paths, AbstractSet)
+
+
+def _duplicate_fields(paths: Sequence[str]) -> str:
+    # Checked before key columns are filtered out: a name asked for twice is
+    # unsatisfiable either way, since a frame cannot carry one column twice.
+    return ", ".join(
+        sorted({path for path, count in Counter(paths).items() if count > 1})
+    )
+
+
+def _value_fields(sub_fields: Sequence[str]) -> list[str]:
     # Key columns are emitted by the exporter itself, so a request for one of
-    # them names a column to keep, not a field to read. Sorting keeps the
-    # column order of an aggregated frame independent of set iteration order.
-    return sorted(sub_fields - _KEY_COLUMNS)
+    # them names a column to keep, not a field to read.
+    return [path for path in sub_fields if path not in _KEY_COLUMNS]
 
 
 def _has_results(
