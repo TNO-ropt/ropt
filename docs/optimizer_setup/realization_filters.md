@@ -98,8 +98,14 @@ side when the optimizer requests gradients separately from functions. Set
 
 Custom filters are plugins implementing the
 [`RealizationFilter`][ropt.realization_filter.RealizationFilter] base class,
-whose docstring documents the methods to implement. Registering a filter with
-the plugin system is only required when it should be selectable via
-[`RealizationFilterConfig`][ropt.config.RealizationFilterConfig]; otherwise, an
-instance can be passed directly in the `realization_filters` field of
-[`EnOptContext`][ropt.context.EnOptContext].
+whose docstring documents the methods to implement. A filter defined where an
+entry point cannot reach it — in a script or a notebook — is added with
+[`register_plugin`][ropt.plugins.manager.register_plugin], after which it is
+selected by its `"plugin/method"` string exactly like an installed one. An
+instance can also be passed directly in the `realization_filters` field of
+[`EnOptContext`][ropt.context.EnOptContext], which needs no registration.
+
+The runnable script is
+[examples/simple/realization_filter.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/realization_filter.py),
+which implements a filter that puts all weight on the median realization,
+registers it, and selects it from the configuration as `"custom/median"`.

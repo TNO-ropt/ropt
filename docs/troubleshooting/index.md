@@ -37,6 +37,10 @@ config = {
 }
 ```
 
+[examples/simple/failures.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/failures.py)
+runs the same problem twice, once with the default and once allowing the
+failure, and prints the exit code and result of each.
+
 **Not everything that goes wrong raises.** Check `exit_code` before using a
 result, and remember that `TOO_FEW_REALIZATIONS` and `EXECUTOR_STOPPED` leave
 every field `None`. See

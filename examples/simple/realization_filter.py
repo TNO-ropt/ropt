@@ -3,19 +3,23 @@
 A realization filter reweights the realizations of an ensemble at each
 evaluation, letting the optimizer target a robust statistic instead of the mean.
 This example implements ``MedianFilter``, which puts all weight on the
-realization with the median objective. Since the filter is passed as an
-instance, it needs no plugin registration: it is added to the top-level
-``realization_filters`` and referenced by key from the ``objectives``
-section.
+realization with the median objective.
+
+The filter is **registered** with ``register_plugin``, which makes it available
+exactly like an installed one: it is selected from the configuration by its
+``"plugin/method"`` string. A filter defined in a script or a notebook cannot be
+found through an entry point, and registering is what closes that gap.
 """
 
-from typing import Any
+from typing import Any, ClassVar
 
 import numpy as np
 from numpy.random import default_rng
 from numpy.typing import NDArray
 
 from ropt.config import RealizationFilterConfig
+from ropt.plugins import MethodSpec
+from ropt.plugins.manager import register_plugin
 from ropt.realization_filter import RealizationFilter
 from ropt.simple import EvaluateResult, EvaluationFunctionContext, optimize
 
@@ -26,6 +30,9 @@ INITIAL_VALUES = 2 * np.arange(DIM) / DIM + 0.5
 
 class MedianFilter(RealizationFilter):
     """Assign all weight to the realization with the median objective."""
+
+    # The methods this plugin provides, as an installed plugin declares them.
+    methods: ClassVar[MethodSpec] = {"median"}
 
     def __init__(
         self,
@@ -81,6 +88,8 @@ def report(result: EvaluateResult) -> None:
 
 def main() -> None:
     """Run the median-filtered ensemble optimization and check the result."""
+    register_plugin("realization_filter", "custom", MedianFilter)
+
     realizations = 10
     config: dict[str, Any] = {
         "variables": {
@@ -91,9 +100,11 @@ def main() -> None:
             "weights": [1.0] * realizations,
         },
         # Filters are listed here and referred to by index by the objectives or
-        # the nonlinear constraints that use them.
+        # the nonlinear constraints that use them. Passing the instance itself,
+        # `MedianFilter(RealizationFilterConfig(method="median"))`, works too
+        # and needs no registration.
         "realization_filters": [
-            MedianFilter(RealizationFilterConfig(method="median")),
+            {"method": "custom/median"},
         ],
         "objectives": {
             "realization_filters": [0],

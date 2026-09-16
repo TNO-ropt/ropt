@@ -154,6 +154,11 @@ assert result.exit_code is ExitCode.USER_ABORT
 With [`optimize_many`](parallel.md#many-optimizations-at-once) this stops only the run
 whose callback returned `True`; the other runs continue.
 
+The runnable script is
+[examples/simple/stopping.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/stopping.py),
+which stops a run after a fixed number of results and then reads the best point
+it had reached.
+
 !!! note "Nothing to stop on an evaluation"
     [`evaluate`][ropt.simple.evaluate] and
     [`evaluate_many`][ropt.simple.evaluate_many] take `report=` as well, but
