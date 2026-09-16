@@ -1,9 +1,9 @@
 # Collecting Results with Handlers
 
-So far, `optimize` returned only the single best result. Sometimes you want to
-see every result instead — to watch progress across several runs, or to log
-every evaluation. A **handler** does this: an object you attach with
-`handlers=` that observes every result an optimization produces.
+So far, `optimize` returned only the single best result. In many cases you want
+to see every result to watch progress over the optimization. A **handler** does
+this: an object you attach with a `handlers=` argument that observes every
+result an optimization produces.
 
 ## A handler that collects everything
 
@@ -16,7 +16,7 @@ print(len(history.results))   # every evaluation from this run
 ```
 
 Compare this with the `report` callback from
-[Reporting progress](../running/running.md#reporting-progress):
+[Follow the progress](ensemble.md#4-follow-the-progress-optional):
 `report` is called once per evaluation, for one run. A handler is more
 general — it keeps or reacts to results, and, unlike `report`, the same
 handler can be reused across several **sequential** calls to `optimize`,

@@ -10,8 +10,8 @@ set is a **realization**. The full runnable script is
 `ropt` optimizes the realizations together by combining them into a single
 **robust objective** — by default a weighted average over the realizations.
 Minimizing the average yields a solution that performs well across the whole set
-rather than for one particular case. We minimize the Rosenbrock function again,
-but now its two coefficients vary between realizations.
+rather than for one particular case. We minimize the Rosenbrock function,
+generalized to $n$ variables, with coefficients that vary between realizations.
 
 For realization $i$, with coefficients $a_i$ and $b_i$, the per-realization
 objective is:
@@ -19,9 +19,10 @@ objective is:
 $$ f_i(\mathbf{x}) = \sum_{k=1}^{n-1} \left[ (a_i - x_k)^2 + b_i \left(
 x_{k+1} - x_k^2 \right)^2 \right] $$
 
-which is the Rosenbrock function of the [Quickstart](quickstart.md), generalized
-to $n$ variables: it reduces to that function when $a_i = 1$ and $b_i = 100$ for
-every realization. `ropt` combines the realizations into the robust objective:
+which it reduces to the standard Rosenbrock function when $n = 1$, and $a_i = 1,
+b_i = 100$ for every realization.
+
+`ropt` combines the realizations into the robust objective:
 
 $$ f(\mathbf{x}) = \sum_i w_i f_i(\mathbf{x}), $$
 
@@ -29,9 +30,8 @@ with weights $w_i$ that we set in the configuration below.
 
 ## 1. Describe the problem
 
-The config adds a `realizations` section next to the variables. The `weights`
-list has one entry per realization and sets how much each contributes to the
-combined objective:
+The config adds a `realizations` section: the `weights` list has one entry per
+realization that sets how much each contributes to the combined objective:
 
 ```python
 --8<-- "examples/simple/ensemble.py:config"
@@ -68,11 +68,27 @@ objective uses `context.realization` to select the parameters for the
 realization it is computing. `ropt` combines the per-realization values into the
 robust objective for you.
 
-Returning a single number, as here, is the simplest case. A function that also
-has constraints returns a sequence instead — the objectives first, then the
-constraints; see [Constraints](../optimizer_setup/constraints.md).
+Returning a single number, as here, is the simplest case. A function that has
+multiple objectives and has constraints returns a sequence instead — the
+objectives first, then the constraints; see
+[Constraints](../optimizer_setup/constraints.md).
 
-## 4. Run it
+## 4. Follow the progress (optional)
+
+To track a running optimization, pass a `report` callback: `ropt` calls it after
+every evaluation, with an [`EvaluateResult`][ropt.simple.EvaluateResult]
+describing what was just computed.
+
+```python
+--8<-- "examples/simple/ensemble.py:report"
+```
+
+The callback belongs to one run and sees one evaluation at a time. To keep the
+results rather than just look at them — or to collect them across several runs
+— use a handler instead; see
+[Collecting Results with Handlers](handlers.md).
+
+## 5. Run it
 
 The call is the same as for a deterministic problem, with `INITIAL_VALUES` the
 start point defined above:
@@ -81,24 +97,25 @@ start point defined above:
 --8<-- "examples/simple/ensemble.py:run"
 ```
 
-`ropt` evaluates all ten realizations at each point, averages them into the
-robust objective, and optimizes that. To follow the run while it proceeds, pass
-a `report` callback; see
-[Reporting progress](../running/running.md#reporting-progress).
+`ropt` evaluates all ten realizations at each point and averages them into the
+robust objective, which is what it optimizes.
 
-## 5. Read the result
+## 6. Read the result
 
 `optimize` returns an [`OptimizeResult`][ropt.simple.OptimizeResult]:
 
 ```python
---8<-- "examples/simple/ensemble.py:report"
+--8<-- "examples/simple/ensemble.py:result"
 ```
 
 - `result.variables` is the best set of variables found, and
   `result.target_objective` the robust objective value there. Both are `None` if
   the run produced no valid result.
-- `result.exit_code` says why the run stopped.
-- `result.results` holds the full low-level result, if you need every detail.
+- `result.exit_code` says why the run stopped (a member of the
+  [`ExitCode`][ropt.enums.ExitCode] enumeration).
+- `result.results` holds the full low-level result (a
+  [`FunctionResults`][ropt.results.FunctionResults] object), if you need every
+  detail.
 
 See [The result](../running/running.md#the-result) for the remaining fields.
 

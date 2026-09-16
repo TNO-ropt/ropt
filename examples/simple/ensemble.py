@@ -3,7 +3,8 @@
 An *ensemble* optimization minimizes the mean objective over a set of
 realizations with uncertain parameters. Compared to a deterministic run, the
 config gains a ``realizations`` section, and the per-realization objective uses
-``context.realization`` to return the value for its own realization.
+``context.realization`` to return the value for its own realization. A
+``report`` callback prints each evaluation as it lands.
 """
 
 from typing import Any
@@ -12,7 +13,7 @@ import numpy as np
 from numpy.random import default_rng
 from numpy.typing import NDArray
 
-from ropt.simple import EvaluationFunctionContext, optimize
+from ropt.simple import EvaluateResult, EvaluationFunctionContext, optimize
 
 # --8<-- [start:config]
 DIM = 5
@@ -48,7 +49,7 @@ def rosenbrock(
         context:   Identifies the realization being evaluated.
 
     Returns:
-        The objective of this realization at ``variables``.
+        The objective of this realization at `variables`.
     """
     r = context.realization
     objective = 0.0
@@ -61,16 +62,30 @@ def rosenbrock(
 # --8<-- [end:objective]
 
 
+# --8<-- [start:report]
+def report(result: EvaluateResult) -> None:
+    """Print the objective of each evaluation as the run proceeds.
+
+    Args:
+        result: The result of a single function evaluation.
+    """
+    if result.target_objective is not None:
+        print(f"  objective: {result.target_objective}")
+
+
+# --8<-- [end:report]
+
+
 def main() -> None:
     """Run the ensemble optimization and check the result."""
     # --8<-- [start:run]
-    result = optimize(CONFIG, INITIAL_VALUES, rosenbrock)
+    result = optimize(CONFIG, INITIAL_VALUES, rosenbrock, report=report)
     # --8<-- [end:run]
-    # --8<-- [start:report]
+    # --8<-- [start:result]
     print(f"exit code:         {result.exit_code}")
     print(f"optimal variables: {result.variables}")
     print(f"optimal objective: {result.target_objective}")
-    # --8<-- [end:report]
+    # --8<-- [end:result]
     assert result.variables is not None
     assert np.allclose(result.variables, 1.0, atol=1e-1)
 
