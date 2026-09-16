@@ -78,6 +78,18 @@ def test_example_simple_metadata(tmp_path: Path, monkeypatch: Any) -> None:
     _load_from_file("metadata", "simple").main()
 
 
+def test_example_simple_export_polars(tmp_path: Path, monkeypatch: Any) -> None:
+    pytest.importorskip("polars")
+    monkeypatch.chdir(tmp_path)
+    _load_from_file("export", "simple").main()
+
+
+def test_example_simple_export_pandas(tmp_path: Path, monkeypatch: Any) -> None:
+    pytest.importorskip("pandas")
+    monkeypatch.chdir(tmp_path)
+    _load_from_file("export", "simple").main(pandas=True)
+
+
 def test_example_simple_handlers(tmp_path: Path, monkeypatch: Any) -> None:
     monkeypatch.chdir(tmp_path)
     _load_from_file("handlers", "simple").main()
