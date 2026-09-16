@@ -9,10 +9,10 @@
       
       
       
-        <link rel="prev" href="../running/">
+        <link rel="prev" href="../plugin_discovery/">
       
       
-        <link rel="next" href="../parallel/">
+        <link rel="next" href="../../troubleshooting/">
       
       
         
@@ -23,7 +23,7 @@
     
     
       
-        <title>Common Pitfalls - ropt Documentation</title>
+        <title>Writing a Plugin - ropt Documentation</title>
       
     
     
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#common-pitfalls" class="md-skip">
+        <a href="#writing-a-plugin" class="md-skip">
           Skip to content
         </a>
       
@@ -118,7 +118,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Common Pitfalls
+              Writing a Plugin
             
           </span>
         </div>
@@ -260,13 +260,11 @@
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="../running/" class="md-tabs__link">
+      <li class="md-tabs__item">
+        <a href="../../running/running/" class="md-tabs__link">
           
   
   
@@ -302,18 +300,32 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="../../workflows/workflows/" class="md-tabs__link">
+      
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../workflows/" class="md-tabs__link">
           
   
   
-  Workflows
+  Advanced
 
         </a>
       </li>
+    
+  
+
     
   
 
@@ -326,31 +338,11 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../utilities/logging/" class="md-tabs__link">
+        <a href="../../troubleshooting/" class="md-tabs__link">
           
   
   
-  Utilities
-
-        </a>
-      </li>
-    
-  
-
-      
-        
-  
-  
-  
-  
-    
-    
-      <li class="md-tabs__item">
-        <a href="../../examples/" class="md-tabs__link">
-          
-  
-  
-  Examples
+  Troubleshooting
 
         </a>
       </li>
@@ -689,31 +681,28 @@
       
   
   
-    
   
   
-  
     
     
     
     
-      
-        
-        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
         
           
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
             
   
   
@@ -731,7 +720,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_3">
             <span class="md-nav__icon md-icon"></span>
             
@@ -749,7 +738,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../running/" class="md-nav__link">
+      <a href="../../running/running/" class="md-nav__link">
         
   
   
@@ -774,125 +763,17 @@
                 
   
   
-    
-  
-  
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Common Pitfalls
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Common Pitfalls
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#what-to-keep-in-mind" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        What to keep in mind
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#when-something-looks-wrong" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        When something looks wrong
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#where-to-next" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Where to next
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
   
   
     <li class="md-nav__item">
-      <a href="../parallel/" class="md-nav__link">
+      <a href="../../running/results/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Parallel Execution and Many Runs
+    Working with Results
   
 
     
@@ -913,7 +794,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../handlers/" class="md-nav__link">
+      <a href="../../running/handlers/" class="md-nav__link">
         
   
   
@@ -941,7 +822,35 @@
   
   
     <li class="md-nav__item">
-      <a href="../nested/" class="md-nav__link">
+      <a href="../../running/parallel/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Parallel Execution and Many Runs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../running/nested/" class="md-nav__link">
         
   
   
@@ -949,6 +858,34 @@
     
   
     Nested Optimization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../running/restart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Restarting from the Best Point
   
 
     
@@ -1219,34 +1156,6 @@
 
               
             
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../optimizer_setup/results/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Working with Results
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -1258,6 +1167,63 @@
       
   
   
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Advanced
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Advanced
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
   
   
     
@@ -1267,19 +1233,22 @@
       
       
         
+          
+          
+        
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
       
         
         
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5_1" >
         
           
-          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_5_1" id="__nav_5_1_label" tabindex="">
             
   
   
@@ -1297,8 +1266,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_5">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_1">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -1315,7 +1284,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../workflows/workflows/" class="md-nav__link">
+      <a href="../workflows/" class="md-nav__link">
         
   
   
@@ -1343,7 +1312,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../workflows/evaluation_callbacks/" class="md-nav__link">
+      <a href="../evaluation_callbacks/" class="md-nav__link">
         
   
   
@@ -1371,7 +1340,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../workflows/parallel/" class="md-nav__link">
+      <a href="../parallel/" class="md-nav__link">
         
   
   
@@ -1387,6 +1356,309 @@
   
 
       </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../workflow/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Building a Workflow
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_5_2" id="__nav_5_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plugins
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Plugins
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plugin_discovery/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plugin Discovery
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Writing a Plugin
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Writing a Plugin
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#the-plugin-areas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The plugin areas
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-a-plugin-must-declare" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What a plugin must declare
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#an-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        An example
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#registering-it" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Registering it
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#registering-one-without-an-entry-point" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Registering one without an entry point
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#validating-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Validating options
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-a-backend-may-not-change" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What a backend may not change
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#reporting-progress" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reporting progress
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#declaring-native-output" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Declaring native output
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
     </li>
   
 
@@ -1431,7 +1703,7 @@
   <span class="md-ellipsis">
     
   
-    Utilities
+    Troubleshooting
   
 
     
@@ -1447,7 +1719,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Utilities
+    Troubleshooting
   
 
           </label>
@@ -1460,7 +1732,35 @@
   
   
     <li class="md-nav__item">
-      <a href="../../utilities/logging/" class="md-nav__link">
+      <a href="../../troubleshooting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Troubleshooting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../troubleshooting/logging/" class="md-nav__link">
         
   
   
@@ -1488,7 +1788,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../utilities/keyboard_interrupt/" class="md-nav__link">
+      <a href="../../troubleshooting/keyboard_interrupt/" class="md-nav__link">
         
   
   
@@ -1496,62 +1796,6 @@
     
   
     Keyboard Interrupts
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../utilities/plugin_discovery/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Plugin Discovery
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../utilities/writing_plugins/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Writing a Plugin
   
 
     
@@ -1604,7 +1848,7 @@
   <span class="md-ellipsis">
     
   
-    Examples
+    Reference
   
 
     
@@ -1617,151 +1861,6 @@
         
         <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_7">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Examples
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../examples/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Overview
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../examples/restart/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Restarting from the Best Point
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../examples/workflow/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Building a Workflow
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    
-    
-    
-    
-      
-      
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8" >
-        
-          
-          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Reference
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_8">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -1849,10 +1948,10 @@
         
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8_3" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7_3" >
         
           
-          <label class="md-nav__link" for="__nav_8_3" id="__nav_8_3_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_7_3" id="__nav_7_3_label" tabindex="0">
             
   
   
@@ -1870,8 +1969,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_8_3_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_8_3">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_7_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_3">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -1967,10 +2066,10 @@
         
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8_4" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7_4" >
         
           
-          <label class="md-nav__link" for="__nav_8_4" id="__nav_8_4_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_7_4" id="__nav_7_4_label" tabindex="0">
             
   
   
@@ -1988,8 +2087,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_8_4_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_8_4">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_7_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_4">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -2085,10 +2184,10 @@
         
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8_5" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7_5" >
         
           
-          <label class="md-nav__link" for="__nav_8_5" id="__nav_8_5_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_7_5" id="__nav_7_5_label" tabindex="0">
             
   
   
@@ -2106,8 +2205,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_8_5_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_8_5">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_7_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_5">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -2203,10 +2302,10 @@
         
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8_6" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7_6" >
         
           
-          <label class="md-nav__link" for="__nav_8_6" id="__nav_8_6_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_7_6" id="__nav_7_6_label" tabindex="0">
             
   
   
@@ -2224,8 +2323,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_8_6_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_8_6">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_7_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_6">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -2377,10 +2476,10 @@
         
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8_7" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7_7" >
         
           
-          <label class="md-nav__link" for="__nav_8_7" id="__nav_8_7_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_7_7" id="__nav_7_7_label" tabindex="0">
             
   
   
@@ -2398,8 +2497,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_8_7_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_8_7">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_7_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_7">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -2731,10 +2830,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#what-to-keep-in-mind" class="md-nav__link">
+  <a href="#the-plugin-areas" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What to keep in mind
+        The plugin areas
       
     </span>
   </a>
@@ -2742,10 +2841,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#when-something-looks-wrong" class="md-nav__link">
+  <a href="#what-a-plugin-must-declare" class="md-nav__link">
     <span class="md-ellipsis">
       
-        When something looks wrong
+        What a plugin must declare
       
     </span>
   </a>
@@ -2753,10 +2852,76 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#where-to-next" class="md-nav__link">
+  <a href="#an-example" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Where to next
+        An example
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#registering-it" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Registering it
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#registering-one-without-an-entry-point" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Registering one without an entry point
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#validating-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Validating options
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-a-backend-may-not-change" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What a backend may not change
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#reporting-progress" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reporting progress
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#declaring-native-output" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Declaring native output
       
     </span>
   </a>
@@ -2783,155 +2948,257 @@
   
 
 
-<h1 id="common-pitfalls">Common Pitfalls</h1>
-<p><code>ropt</code> tries to keep a run going rather than stop it at the first sign of
-trouble. That is usually what you want, but it means a run can end without a
-result to return, and without raising an error to say so. This page collects the
-behaviours that most often cause confusion.</p>
-<p>Read it once from top to bottom, then come back to the
-<a href="#when-something-looks-wrong">table below</a> when a run does something you did not
-expect.</p>
-<h2 id="what-to-keep-in-mind">What to keep in mind</h2>
-<p><strong>A run uses the pool you hand it, and no other.</strong> Nothing is picked up from the
-surrounding code. A run given no <code>pool=</code> evaluates in-process, on the thread that
-called it — even if a session is open next to it.</p>
-<p><strong>Outside your process, your objective works on a copy.</strong> On a
-<a href="../../getting_started/execution/#process-pool"><code>process_pool</code></a>, a
-<a href="../../getting_started/execution/#local-pool"><code>local_pool</code></a> or an <code>hpc_pool</code>, your
-evaluation function is sent to a worker together with the data it uses. Anything
-it writes there — a global, a cache, a list it appends to — is thrown away when
-the worker finishes. Return what you need instead; see
-<a href="../handlers/#handlers-and-the-process-boundary">Handlers and the process boundary</a>.</p>
-<p><strong><code>NaN</code> means "this realization failed", and one failure is already too many.</strong>
-<a href="../../optimizer_setup/configuration/#realizations"><code>realization_min_success</code></a>
-defaults to <em>all</em> realizations, so a single <code>NaN</code> ends the run with
-<code>TOO_FEW_REALIZATIONS</code>. If some realizations are allowed to fail, say so:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">config</span> <span class="o">=</span> <span class="p">{</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="s2">"variables"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"variable_count"</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">"perturbation_magnitudes"</span><span class="p">:</span> <span class="mf">1e-6</span><span class="p">},</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="s2">"realizations"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"weights"</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">]</span> <span class="o">*</span> <span class="mi">10</span><span class="p">,</span> <span class="s2">"realization_min_success"</span><span class="p">:</span> <span class="mi">8</span><span class="p">},</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="p">}</span>
+<h1 id="writing-a-plugin">Writing a Plugin</h1>
+<p>A plugin makes your own optimizer, sampler, filter, or estimator selectable
+from a configuration by name, in the same way the built-in ones are:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="s2">"backend"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"method"</span><span class="p">:</span> <span class="s2">"my_package/my_method"</span><span class="p">}</span>
 </span></code></pre></div>
-<p><strong>The returned result is the best <em>feasible</em> one.</strong>
-<a class="autorefs autorefs-internal" title="            ropt.simple.optimize" href="../../reference/simple/#ropt.simple.optimize"><code>optimize</code></a> returns the best result that satisfies every
-constraint to within <code>constraint_tolerance</code>, which defaults to <code>1e-10</code> and
-applies to bounds and linear constraints as well as nonlinear ones. If no
-evaluation ever clears that bar, the run ends normally with <code>result.variables</code>
-set to <code>None</code>. The evaluations themselves are not lost: every result, feasible
-or not, still reaches the <a href="../handlers/">handlers</a> attached to the run.</p>
-<p><strong>The return value is a summary, not the record of the run.</strong> It holds a single
-result, the best feasible evaluation. Most analysis works from the whole history
-instead: attach a <a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.HistoryHandler" href="../../reference/components_event_handlers/#ropt.components.event_handlers.HistoryHandler"><code>HistoryHandler</code></a> or a
-<a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.DataFrameHandler" href="../../reference/components_event_handlers/#ropt.components.event_handlers.DataFrameHandler"><code>DataFrameHandler</code></a> to collect every result as it
-arrives. That history is also what remains when there is no best result to
-return.</p>
-<p><strong>Not everything that goes wrong raises.</strong> Check <code>exit_code</code> before using a
-result, and remember that <code>TOO_FEW_REALIZATIONS</code> and <code>EXECUTOR_STOPPED</code> leave
-every field <code>None</code>. See
-<a href="../running/#when-something-goes-wrong">When something goes wrong</a>.</p>
-<p><strong>Some reasons are only ever logged.</strong> When the machinery itself fails — a
-worker process is killed, a cluster job never writes its result — the affected
-evaluations are recorded as <code>NaN</code>. The optimizer sees only the <code>NaN</code>, so the
-reason appears once, as a <code>WARNING</code> from the <code>ropt.components.evaluators</code>
-logger, and nowhere else. Turn logging on before investigating a run that ended
-in <code>TOO_FEW_REALIZATIONS</code>; see <a href="../../utilities/logging/">Logging</a>.</p>
-<p><strong><code>optimize_many</code> really does run everything at once.</strong> A handler must be in a
-<a href="../handlers/#sharing-a-handler-across-concurrent-runs">shared group</a>, and a
-single <code>report=</code> callback given to all the runs is called by several threads at
-the same time. Keep such a callback free of shared state, or give each run its
-own.</p>
-<p><strong>Metadata is copied with <code>copy.deepcopy</code>.</strong> Every result gets its own copy of
-the <code>metadata</code> you passed, so keep it to plain data — numbers, strings, lists,
-arrays. A lock, an open file, or a database connection cannot be copied and
-raises a <code>TypeError</code> in the middle of the run.</p>
-<p><strong>Runs are reproducible by default.</strong> The
-<a href="../../optimizer_setup/configuration/#variable-perturbations">seed</a> is fixed at
-<code>1</code> unless you set it, so repeating a run reproduces its perturbations exactly.
-Change the seed when you deliberately want an independent repetition of the same
-problem.</p>
-<p><strong>Threads cannot be hurried.</strong> Evaluations on a <code>thread_pool</code> run to completion
-even after Ctrl-C, because Python cannot interrupt a thread from outside. If an
-evaluation may run long and has to be interruptible, put it on a <code>local_pool</code> or
-an <code>hpc_pool</code>; see <a href="../../getting_started/execution/#stopping-a-run">Stopping a run</a>.</p>
-<h2 id="when-something-looks-wrong">When something looks wrong</h2>
+<p>A plugin is the implementation class itself. It declares which method names it
+provides, and <code>ropt</code> finds it through a Python entry point, so nothing has to be
+imported or registered by hand.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>You do not need a plugin to use your own component. Every component field
+also accepts an already-constructed object, so a <code>Sampler</code> subclass can be
+passed straight into the configuration (see <a href="../../optimizer_setup/configuration/#providing-optimizer-components">Providing optimizer
+components</a>).
+Write a plugin when the component should be selectable by name — typically
+when you ship it in a package for others to configure.</p>
+</div>
+<h2 id="the-plugin-areas">The plugin areas</h2>
+<p>There is one plugin area per component type, each with its own entry-point group
+and its own base class:</p>
 <table>
 <thead>
 <tr>
-<th>What you see</th>
-<th>Most likely cause</th>
+<th>Entry-point group</th>
+<th>Base class</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>result.variables</code> is <code>None</code>, but <code>exit_code</code> is <code>OPTIMIZER_FINISHED</code></td>
-<td>No evaluation satisfied the constraints to within <code>constraint_tolerance</code> (default <code>1e-10</code>; bounds and linear constraints count too), so there is no best feasible result to return. The evaluations are still in the handlers. Raise the tolerance, or check that the constraints can be satisfied at all.</td>
+<td><code>ropt.plugins.backend</code></td>
+<td><a class="autorefs autorefs-internal" title="            Backend" href="../../reference/backend/#ropt.backend.Backend"><code>Backend</code></a></td>
 </tr>
 <tr>
-<td><code>TOO_FEW_REALIZATIONS</code> although only one realization failed</td>
-<td><a href="../../optimizer_setup/configuration/#realizations"><code>realization_min_success</code></a> defaults to all of them. Lower it.</td>
+<td><code>ropt.plugins.sampler</code></td>
+<td><a class="autorefs autorefs-internal" title="            Sampler" href="../../reference/sampler/#ropt.sampler.Sampler"><code>Sampler</code></a></td>
 </tr>
 <tr>
-<td><code>TOO_FEW_REALIZATIONS</code> and nothing says why</td>
-<td>The failures came from the machinery, not from your objective. The reason is logged at <code>WARNING</code> by <code>ropt.components.evaluators</code>; enable <a href="../../utilities/logging/">logging</a>.</td>
+<td><code>ropt.plugins.realization_filter</code></td>
+<td><a class="autorefs autorefs-internal" title="            ropt.realization_filter.RealizationFilter" href="../../reference/realization_filter/#ropt.realization_filter.RealizationFilter"><code>RealizationFilter</code></a></td>
 </tr>
 <tr>
-<td>A global or a cache your objective writes to is never updated</td>
-<td>The objective ran in a worker process, on a copy. Return the value as <a href="../running/#attaching-metadata">metadata</a> instead.</td>
-</tr>
-<tr>
-<td>A handler collects nothing from <code>optimize_many</code></td>
-<td>A plain handler belongs to one run. Put it in a <a href="../handlers/#sharing-a-handler-across-concurrent-runs">shared group</a>.</td>
-</tr>
-<tr>
-<td>Results from a shared <code>report=</code> callback are jumbled or lost</td>
-<td>The callback is called from every run's thread at once. Use a shared group, or one callback per run.</td>
-</tr>
-<tr>
-<td><code>TypeError: cannot pickle ...</code> part-way through a run</td>
-<td>Something in <code>metadata</code> cannot be deep-copied.</td>
-</tr>
-<tr>
-<td><code>RuntimeError: Auto-scaling of the objectives failed to estimate a scale factor</code></td>
-<td>The first batch averaged to zero, or to a value that is not finite, so no scale could be derived. Set the scales yourself, or start somewhere else.</td>
-</tr>
-<tr>
-<td>Ctrl-C appears to do nothing</td>
-<td>A process-wide signal setting, changed by an imported package. Call <a class="autorefs autorefs-internal" title="            restore_keyboard_interrupt" href="../../reference/utils/#ropt.utils.restore_keyboard_interrupt"><code>restore_keyboard_interrupt</code></a>; see <a href="../../utilities/keyboard_interrupt/">Keyboard Interrupts</a>.</td>
-</tr>
-<tr>
-<td>The program will not exit after Ctrl-C</td>
-<td>Evaluations on a <code>thread_pool</code> are still running and cannot be interrupted.</td>
-</tr>
-<tr>
-<td>More workers made everything slower</td>
-<td><code>numpy</code> and friends already use every core. Set <code>OMP_NUM_THREADS=1</code> and let the pool provide the parallelism; see <a href="../../getting_started/execution/#which-one-should-i-use">Running in Parallel</a>.</td>
-</tr>
-<tr>
-<td>Simulators keep running after the run stopped</td>
-<td>A <code>process_pool</code> kills only its own workers. Use a <a href="../../getting_started/execution/#local-pool"><code>local_pool</code></a>, which signals the whole process group.</td>
-</tr>
-<tr>
-<td>A cluster directive has no effect</td>
-<td>The submission script never mentions that variable, or the value was clamped to the queue's limit; see <a href="../parallel/#running-on-an-hpc-cluster">Running on an HPC cluster</a>.</td>
-</tr>
-<tr>
-<td>Two runs that should agree give different gradients</td>
-<td>Quasi-random samplers (<code>sobol</code>, <code>halton</code>, <code>lhs</code>) are seeded in the order the <a href="../../optimizer_setup/configuration/#samplers">samplers</a> are defined, so reordering that section changes the perturbations.</td>
-</tr>
-<tr>
-<td>Numbers do not match what you configured</td>
-<td>Results carry the configured values and the optimizer's scaled ones side by side; see <a href="../../optimizer_setup/results/#scaling-of-results">Scaling of results</a>.</td>
+<td><code>ropt.plugins.function_estimator</code></td>
+<td><a class="autorefs autorefs-internal" title="            ropt.function_estimator.FunctionEstimator" href="../../reference/function_estimator/#ropt.function_estimator.FunctionEstimator"><code>FunctionEstimator</code></a></td>
 </tr>
 </tbody>
 </table>
-<h2 id="where-to-next">Where to next</h2>
+<h2 id="what-a-plugin-must-declare">What a plugin must declare</h2>
+<p>Subclass the base class of the area and add one class attribute:</p>
 <ul>
-<li>The basics of a single run: <a href="../running/">Running Optimizations</a>.</li>
-<li>Pools, many runs, and what stopping does:
-  <a href="../parallel/">Parallel Execution and Many Runs</a> and
-  <a href="../../getting_started/execution/">Running in Parallel</a>.</li>
-<li>The same failure model at the low level, in more detail:
-  <a href="../../workflows/parallel/#error-handling">Error handling</a>.</li>
+<li><strong><code>methods</code></strong> — the method names the class provides, as a set. The names are
+  matched case-insensitively, so they may be written in any case. Include
+  <code>"default"</code> if the class has a sensible standard choice, so that
+  <code>"my_package/default"</code> selects it; leave it out if it does not, and the name
+  will correctly fail to resolve.</li>
 </ul>
+<p>Two things are optional:</p>
+<ul>
+<li><strong><code>discoverable</code></strong> — set it to <code>False</code> to keep the plugin from being matched
+  when a configuration gives a bare method name without a plugin prefix. The
+  built-in <a class="autorefs autorefs-internal" title="            ropt.backend.external.ExternalBackend" href="../../reference/backend/#ropt.backend.external.ExternalBackend"><code>external</code></a> backend does
+  this, because its method names belong to the backend it delegates to. The
+  default is <code>True</code>.</li>
+<li><strong><code>methods</code> as a predicate</strong> — a class that cannot enumerate what it supports
+  may instead set <code>methods</code> to a function taking a method name and returning a
+  <code>bool</code>. Use this only when the names are not knowable in advance, for example
+  when they are resolved against another installed package. A predicate receives
+  the method name exactly as written, so it owns its own casing, and it cannot
+  be listed. See <a class="autorefs autorefs-internal" title="            ropt.plugins.MethodSpec
+
+
+  
+      module-attribute
+  " href="../../reference/plugin_manager/#ropt.plugins.MethodSpec"><code>MethodSpec</code></a>.</li>
+</ul>
+<p>The object is constructed by calling the class with the validated configuration
+object for its area, for example a
+<a class="autorefs autorefs-internal" title="            SamplerConfig" href="../../reference/config/#ropt.config.SamplerConfig"><code>SamplerConfig</code></a> for a sampler, carrying the
+<code>method</code> string and the <code>options</code> given in the configuration.</p>
+<h2 id="an-example">An example</h2>
+<p>A sampler that draws uniform perturbations. First the sampler itself, a
+<a class="autorefs autorefs-internal" title="            Sampler" href="../../reference/sampler/#ropt.sampler.Sampler"><code>Sampler</code></a> subclass:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">numpy.random</span><span class="w"> </span><span class="kn">import</span> <span class="n">Generator</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">numpy.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">NDArray</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">SamplerConfig</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.sampler</span><span class="w"> </span><span class="kn">import</span> <span class="n">Sampler</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="k">class</span><span class="w"> </span><span class="nc">UniformSampler</span><span class="p">(</span><span class="n">Sampler</span><span class="p">):</span>
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sampler_config</span><span class="p">:</span> <span class="n">SamplerConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_config</span> <span class="o">=</span> <span class="n">sampler_config</span>
+</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>
+</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">init</span><span class="p">(</span>
+</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>        <span class="bp">self</span><span class="p">,</span>
+</span><span id="__span-1-15"><a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>        <span class="o">*</span><span class="p">,</span>
+</span><span id="__span-1-16"><a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a>        <span class="n">realization_count</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+</span><span id="__span-1-17"><a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a>        <span class="n">perturbation_count</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+</span><span id="__span-1-18"><a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a>        <span class="n">variable_count</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+</span><span id="__span-1-19"><a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a>        <span class="n">mask</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-1-20"><a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a>        <span class="n">rng</span><span class="p">:</span> <span class="n">Generator</span><span class="p">,</span>
+</span><span id="__span-1-21"><a id="__codelineno-1-21" name="__codelineno-1-21" href="#__codelineno-1-21"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-1-22"><a id="__codelineno-1-22" name="__codelineno-1-22" href="#__codelineno-1-22"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_rng</span> <span class="o">=</span> <span class="n">rng</span>
+</span><span id="__span-1-23"><a id="__codelineno-1-23" name="__codelineno-1-23" href="#__codelineno-1-23"></a>
+</span><span id="__span-1-24"><a id="__codelineno-1-24" name="__codelineno-1-24" href="#__codelineno-1-24"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">generate_samples</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]:</span>
+</span><span id="__span-1-25"><a id="__codelineno-1-25" name="__codelineno-1-25" href="#__codelineno-1-25"></a>        <span class="o">...</span>
+</span></code></pre></div>
+<p>The only thing needed to make it selectable is the <code>methods</code> attribute, so it
+goes on the class itself:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">ClassVar</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.plugins</span><span class="w"> </span><span class="kn">import</span> <span class="n">MethodSpec</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="k">class</span><span class="w"> </span><span class="nc">UniformSampler</span><span class="p">(</span><span class="n">Sampler</span><span class="p">):</span>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>    <span class="n">methods</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="n">MethodSpec</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"default"</span><span class="p">,</span> <span class="s2">"uniform"</span><span class="p">}</span>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>    <span class="o">...</span>
+</span></code></pre></div>
+<p>Annotating it as a <code>ClassVar</code> is what keeps type checkers and linters happy
+about a set assigned at class level; a bare <code>methods = {...}</code> works just as
+well at runtime.</p>
+<h2 id="registering-it">Registering it</h2>
+<p>Declare the class under the entry-point group of its area, in the
+<code>pyproject.toml</code> of the package that contains it:</p>
+<div class="language-toml highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">[project.entry-points.</span><span class="s2">"ropt.plugins.sampler"</span><span class="k">]</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">my_package</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"my_package.sampler:UniformSampler"</span>
+</span></code></pre></div>
+<p>The entry-point name is the plugin name used in method strings. After
+installing the package, the sampler is available as <code>"my_package/uniform"</code>, or
+as <code>"uniform"</code> if no other installed plugin claims that name:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="s2">"samplers"</span><span class="p">:</span> <span class="p">[{</span><span class="s2">"method"</span><span class="p">:</span> <span class="s2">"my_package/uniform"</span><span class="p">}],</span>
+</span></code></pre></div>
+<p>Check that the plugin is found with
+<a class="autorefs autorefs-internal" title="            ropt.plugins.manager.get_plugin_name" href="../../reference/plugin_manager/#ropt.plugins.manager.get_plugin_name"><code>get_plugin_name</code></a>:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_plugin_name</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="n">get_plugin_name</span><span class="p">(</span><span class="s2">"sampler"</span><span class="p">,</span> <span class="s2">"my_package/uniform"</span><span class="p">)</span>   <span class="c1"># "my_package"</span>
+</span></code></pre></div>
+<h2 id="registering-one-without-an-entry-point">Registering one without an entry point</h2>
+<p>An entry point needs an installed package, which a class written in a script or
+a notebook does not have. Such a class is added by hand with
+<a class="autorefs autorefs-internal" title="            ropt.plugins.manager.register_plugin" href="../../reference/plugin_manager/#ropt.plugins.manager.register_plugin"><code>register_plugin</code></a>:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.plugins.manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">register_plugin</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="n">register_plugin</span><span class="p">(</span><span class="s2">"sampler"</span><span class="p">,</span> <span class="s2">"my_package"</span><span class="p">,</span> <span class="n">UniformSampler</span><span class="p">)</span>
+</span></code></pre></div>
+<p>It is then found by exactly the same lookups as an installed one, so
+<code>"my_package/uniform"</code> works from that point on, for every optimization started
+afterwards. The class must declare its <code>methods</code> just as an installed plugin
+does.</p>
+<p>Registering under the name of an installed plugin is an error, since installed
+plugins cannot be shadowed. Registering a name that was registered before
+replaces it, which is what re-running a cell that defines and registers a class
+needs to do.</p>
+<p>Plugins are otherwise discovered once: the shared plugin manager scans the entry
+points the first time a method is looked up, so a package installed while the
+program is running is not picked up.</p>
+<h2 id="validating-options">Validating options</h2>
+<p>Backends receive their method-specific settings through the <code>options</code> field of
+<a class="autorefs autorefs-internal" title="            BackendConfig" href="../../reference/config/#ropt.config.BackendConfig"><code>BackendConfig</code></a>, which <code>ropt</code> passes through
+unchecked. A backend reports what it accepts by implementing
+<code>validate_options</code>, which is what
+<a class="autorefs autorefs-internal" title="            validate_backend_options" href="../../reference/utils/#ropt.utils.validate_backend_options"><code>validate_backend_options</code></a> calls so
+that users can catch mistakes before starting a long run.</p>
+<p><a class="autorefs autorefs-internal" title="            OptionsSchemaModel" href="../../reference/config/#ropt.config.options.OptionsSchemaModel"><code>OptionsSchemaModel</code></a> describes the
+options of each method in one place, and both validates them and generates the
+documentation table for them. The built-in SciPy backend uses it; see
+<code>SCIPY_OPTIONS_SCHEMA</code> in <code>ropt.backend.scipy</code> for a complete example.</p>
+<h2 id="what-a-backend-may-not-change">What a backend may not change</h2>
+<p>A backend runs in the caller's process, alongside whatever else is in it —
+including other optimizations, since
+<a class="autorefs autorefs-internal" title="            ropt.simple.optimize_many" href="../../reference/simple/#ropt.simple.optimize_many"><code>optimize_many</code></a> runs several at once, each on its
+own thread with its own configuration. Anything a backend changes <em>per process</em>
+is therefore shared with runs it knows nothing about, and cannot carry per-run
+settings.</p>
+<p>So while a run is in progress a backend must not change the working directory,
+the environment, <code>sys.stdout</code> or <code>sys.stderr</code>, or file descriptors 1 and 2.
+Where the optimizer produces a log, ask the library to write it to a named
+file — that is the per-run answer — or to be quiet.</p>
+<p>Not every library allows this, and <code>ropt</code> does not paper over the ones that do
+not. What such a backend must do instead is <strong>say so in its own
+documentation</strong>:</p>
+<ul>
+<li><strong>It needs exclusive process state</strong> — a working directory, a fixed file name,
+  or state kept in the library between calls. What that rules out is not "one
+  at a time" but "anything at all at the same time": a changed working directory
+  breaks another run in the process whatever backend it uses, and the user's
+  evaluation function with it. Say that the backend cannot run concurrently
+  in-process, and point users at the
+  <a class="autorefs autorefs-internal" title="            ropt.backend.external.ExternalBackend" href="../../reference/backend/#ropt.backend.external.ExternalBackend"><code>external</code></a> backend, which gives it a
+  process of its own.</li>
+</ul>
+<p>Output is the exception to the rule: <code>ropt</code> captures it for you, on both levels,
+when the user configures
+<a href="../../optimizer_setup/configuration/#optimizer"><code>stdout</code> or <code>stderr</code></a>. A backend
+should not capture its own output, but it does have two things to do.</p>
+<h2 id="reporting-progress">Reporting progress</h2>
+<p>Whether the optimizer reports at all is the user's choice, made through
+<a href="../../optimizer_setup/configuration/#backend"><code>verbose</code></a>. Map it onto whatever
+your library provides using
+<a class="autorefs autorefs-internal" title="            resolve_verbosity" href="../../reference/backend/#ropt.backend.utils.resolve_verbosity"><code>resolve_verbosity</code></a>, which normalises
+the setting so you need not tell <code>True</code> from <code>1</code> yourself:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">level</span> <span class="o">=</span> <span class="n">resolve_verbosity</span><span class="p">(</span><span class="n">verbose</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="o">.</span><span class="n">verbose</span><span class="p">)</span>
+</span></code></pre></div>
+<p><code>None</code> means "your library's own default level", <code>0</code> means silent, and a
+positive integer is an explicit level to be clamped to what you support. Note
+that <code>None</code> calls for opposite actions in different libraries: SciPy prints
+nothing unless asked, so it must be switched on, while NOMAD reports by default,
+so it is left alone.</p>
+<p>Set the corresponding option only if the user has not set it themselves —
+<code>setdefault</code> for a dictionary, or a check before appending for a list — so that
+a specific option such as <code>DISPLAY_DEGREE 3</code> refines the generic flag rather
+than fighting it.</p>
+<h2 id="declaring-native-output">Declaring native output</h2>
+<p><code>ropt</code> captures the optimizer's output by swapping <code>sys.stdout</code> and
+<code>sys.stderr</code> for the duration of the run. That catches anything printed from
+Python — which is most optimizers, including everything in SciPy except <code>tnc</code>.
+A compiled optimizer, though, commonly writes to file descriptors 1 and 2
+directly, and never touches <code>sys.stdout</code> at all.</p>
+<p>Set
+<a class="autorefs autorefs-internal" title="            bypasses_python_output
+
+
+  
+      property
+  " href="../../reference/backend/#ropt.backend.Backend.bypasses_python_output"><code>bypasses_python_output</code></a> to
+<code>True</code> when the wrapped library does that, and <code>ropt</code> redirects the descriptors
+as well:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">MyBackend</span><span class="p">(</span><span class="n">Backend</span><span class="p">):</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>    <span class="nd">@property</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">bypasses_python_output</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>        <span class="k">return</span> <span class="kc">True</span>
+</span></code></pre></div>
+<p>The answer may differ per method, in which case return it based on the
+configured method — the built-in SciPy backend returns <code>self._method == "tnc"</code>.
+<strong>When unsure, declare it for the whole backend.</strong> Being wrong that way costs
+only a brief rewiring of process-global state; being wrong the other way means
+the user's output escapes to the terminal, and nothing announces it.</p>
+<p>You do not have to guess.
+<a class="autorefs autorefs-internal" title="            collect_native_output" href="../../reference/backend/#ropt.backend.utils.collect_native_output"><code>collect_native_output</code></a> runs an
+optimization with the Python streams diverted and the descriptors captured, so
+whatever it returns was written below Python:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.backend.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">collect_native_output</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="k">def</span><span class="w"> </span><span class="nf">test_backend_declares_native_output_correctly</span><span class="p">():</span>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>    <span class="n">native</span> <span class="o">=</span> <span class="n">collect_native_output</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">))</span>
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>    <span class="k">assert</span> <span class="n">native</span> <span class="o">==</span> <span class="s2">""</span>      <span class="c1"># ... or `!= ""` if the declaration is True</span>
+</span></code></pre></div>
+<p>Worth having as a test rather than a one-off check: these properties drift.
+SciPy's <code>disp</code> silently became a no-op for <code>l-bfgs-b</code> and <code>nelder-mead</code> in 1.18.</p>
 
 
 
@@ -2967,7 +3234,7 @@ an <code>hpc_pool</code>; see <a href="../../getting_started/execution/#stopping
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../running/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Running Optimizations">
+          <a href="../plugin_discovery/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Plugin Discovery">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -2977,20 +3244,20 @@ an <code>hpc_pool</code>; see <a href="../../getting_started/execution/#stopping
                 Previous
               </span>
               <div class="md-ellipsis">
-                Running Optimizations
+                Plugin Discovery
               </div>
             </div>
           </a>
         
         
           
-          <a href="../parallel/" class="md-footer__link md-footer__link--next" aria-label="Next: Parallel Execution and Many Runs">
+          <a href="../../troubleshooting/" class="md-footer__link md-footer__link--next" aria-label="Next: Troubleshooting">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Parallel Execution and Many Runs
+                Troubleshooting
               </div>
             </div>
             <div class="md-footer__button md-icon">
