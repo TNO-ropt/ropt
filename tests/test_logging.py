@@ -13,7 +13,7 @@ from ropt.components.evaluators import (
     EvaluationFunctionContext,
     EvaluationFunctionResult,
 )
-from ropt.plugins.manager import PluginManager
+from ropt.plugins import PluginManager
 from ropt.simple import optimize
 
 if TYPE_CHECKING:

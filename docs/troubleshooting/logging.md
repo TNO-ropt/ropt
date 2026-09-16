@@ -24,8 +24,7 @@ ropt
 │   ├── ropt.components.event_handlers   ← ResultsHandler
 │   └── ropt.components.executors        ← Threading/Multiprocessing/HPCExecutor
 ├── ropt.core                            ← EnsembleOptimizer, EnsembleEvaluator
-└── ropt.plugins
-    └── ropt.plugins.manager             ← PluginManager
+└── ropt.plugins                         ← PluginManager
 ```
 
 This means you can enable logging for the entire library by configuring the

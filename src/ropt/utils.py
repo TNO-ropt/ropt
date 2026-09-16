@@ -1,11 +1,11 @@
 """Optional helpers for scripts and applications that use `ropt`.
 
-Nothing in `ropt` calls anything here. Three kinds of helper live here: queries
-about the installed plugins, for code that builds configurations dynamically or
-checks them before starting a long run; a converter from variable bounds to the
-scales and offsets that a configuration expects; and escape hatches for problems
-that come from outside the library, offered because the fix is easy to get wrong
-and hard to find.
+Nothing in `ropt` calls anything here. Three kinds of helper live here: a check
+on the options a backend accepts, for code that builds configurations
+dynamically or checks them before starting a long run; a converter from variable
+bounds to the scales and offsets that a configuration expects; and escape
+hatches for problems that come from outside the library, offered because the fix
+is easy to get wrong and hard to find.
 """
 
 from __future__ import annotations
@@ -16,13 +16,12 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 
 from ropt.config import BackendConfig
-from ropt.plugins.manager import get_plugin, get_plugin_name
+from ropt.plugins import get_plugin
 
 if TYPE_CHECKING:
     from numpy.typing import ArrayLike, NDArray
 
 __all__ = [
-    "get_plugin_name",
     "restore_keyboard_interrupt",
     "scales_and_offsets_from_bounds",
     "validate_backend_options",

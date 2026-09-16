@@ -132,10 +132,10 @@ as `"uniform"` if no other installed plugin claims that name:
 ```
 
 Check that the plugin is found with
-[`get_plugin_name`][ropt.plugins.manager.get_plugin_name]:
+[`get_plugin_name`][ropt.plugins.get_plugin_name]:
 
 ```python
-from ropt.utils import get_plugin_name
+from ropt.plugins import get_plugin_name
 
 get_plugin_name("sampler", "my_package/uniform")   # "my_package"
 ```
@@ -144,10 +144,10 @@ get_plugin_name("sampler", "my_package/uniform")   # "my_package"
 
 An entry point needs an installed package, which a class written in a script or
 a notebook does not have. Such a class is added by hand with
-[`register_plugin`][ropt.plugins.manager.register_plugin]:
+[`register_plugin`][ropt.plugins.register_plugin]:
 
 ```python
-from ropt.plugins.manager import register_plugin
+from ropt.plugins import register_plugin
 
 register_plugin("sampler", "my_package", UniformSampler)
 ```

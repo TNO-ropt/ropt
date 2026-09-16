@@ -13,7 +13,7 @@ from ropt._logging import get_logger
 from ropt._serialize import CANNOT_DESERIALIZE, CANNOT_SERIALIZE, dumps, loads
 from ropt.backend import Backend
 from ropt.exceptions import ExecutionError, OptimizerStop
-from ropt.plugins.manager import get_plugin, get_plugin_name, register_plugin
+from ropt.plugins import get_plugin, get_plugin_name, register_plugin
 
 if TYPE_CHECKING:
     from multiprocessing.process import BaseProcess

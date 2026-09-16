@@ -30,7 +30,7 @@ from ropt.config import BackendConfig
 from ropt.context import EnOptContext
 from ropt.enums import ExitCode
 from ropt.exceptions import ExecutionError, OptimizerStop
-from ropt.plugins.manager import get_plugin, get_plugin_name, register_plugin
+from ropt.plugins import get_plugin, get_plugin_name, register_plugin
 from ropt.simple import optimize
 
 if TYPE_CHECKING:
@@ -258,7 +258,7 @@ def test_an_installed_delegate_is_left_to_the_child_to_find(
     Every run with a built-in delegate goes through here, so getting this wrong
     breaks all of them.
     """
-    monkeypatch.setattr("ropt.plugins.manager._plugin_manager", None)
+    monkeypatch.setattr("ropt.plugins._manager._plugin_manager", None)
 
     _register_delegate("scipy", SciPyBackend, "scipy/slsqp")
 
@@ -268,7 +268,7 @@ def test_an_installed_delegate_is_left_to_the_child_to_find(
 def test_a_registered_delegate_is_registered_again_in_the_child(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    monkeypatch.setattr("ropt.plugins.manager._plugin_manager", None)
+    monkeypatch.setattr("ropt.plugins._manager._plugin_manager", None)
 
     _register_delegate("registered", _RegisteredDelegate, "registered/slsqp")
 
@@ -380,7 +380,7 @@ def test_a_registered_delegate_runs_in_an_external_process(
     The child builds its registry from entry points, so without the record it
     would fail to resolve a delegate that was only ever registered here.
     """
-    monkeypatch.setattr("ropt.plugins.manager._plugin_manager", None)
+    monkeypatch.setattr("ropt.plugins._manager._plugin_manager", None)
     register_plugin("backend", "registered", _RegisteredDelegate)
 
     target = 0.5

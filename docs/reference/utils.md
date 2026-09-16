@@ -7,10 +7,6 @@ for the bounds converter, and [Keyboard
 Interrupts](../troubleshooting/keyboard_interrupt.md) for when the escape hatch is
 worth reaching for.
 
-`ropt.utils` also re-exports
-[`get_plugin_name`][ropt.plugins.manager.get_plugin_name], documented with the
-[Plugin Manager](plugin_manager.md).
-
 ::: ropt.utils
     options:
         show_root_members_full_path: false

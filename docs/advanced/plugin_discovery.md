@@ -4,14 +4,14 @@
 These are useful for verifying your environment or building dynamic
 configurations.
 
-[`get_plugin_name`][ropt.plugins.manager.get_plugin_name] looks up which plugin
+[`get_plugin_name`][ropt.plugins.get_plugin_name] looks up which plugin
 provides a given method. It takes the plugin area and a method string — the same
 `"plugin/method"` or `"method"` strings used in the configuration (see
 [Configuration](../optimizer_setup/configuration.md#method-strings)) — and
 returns the plugin name, or `None` if no plugin supports the method:
 
 ```python
-from ropt.utils import get_plugin_name
+from ropt.plugins import get_plugin_name
 
 get_plugin_name("backend", "slsqp")           # "scipy"
 get_plugin_name("backend", "scipy/L-BFGS-B")  # "scipy"

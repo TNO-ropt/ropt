@@ -18,8 +18,7 @@ from numpy.random import default_rng
 from numpy.typing import NDArray
 
 from ropt.config import RealizationFilterConfig
-from ropt.plugins import MethodSpec
-from ropt.plugins.manager import register_plugin
+from ropt.plugins import MethodSpec, register_plugin
 from ropt.realization_filter import RealizationFilter
 from ropt.simple import EvaluateResult, EvaluationFunctionContext, optimize
 

@@ -23,7 +23,7 @@ from ropt.config import (
 )
 from ropt.enums import PerturbationType
 from ropt.exceptions import WorkflowError
-from ropt.plugins.manager import get_plugin
+from ropt.plugins import get_plugin
 
 from ._validated_types import (  # ruff: ignore[typing-only-first-party-import]
     BackendInstance,

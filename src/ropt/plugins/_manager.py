@@ -59,9 +59,9 @@ class PluginManager:
     On initialization, scans the `ropt.plugins.*` entry-point groups (for
     example `ropt.plugins.backend`) and registers what it finds, alongside the
     plugins built into `ropt`. Retrieve a plugin class with
-    [`get_plugin`][ropt.plugins.manager.PluginManager.get_plugin], or just its
+    [`get_plugin`][ropt.plugins.PluginManager.get_plugin], or just its
     name with
-    [`get_plugin_name`][ropt.plugins.manager.PluginManager.get_plugin_name].
+    [`get_plugin_name`][ropt.plugins.PluginManager.get_plugin_name].
 
     A third-party plugin registers itself under the relevant group in its own
     `pyproject.toml`, for example:
@@ -73,7 +73,7 @@ class PluginManager:
 
     A plugin that is not installed, for instance one defined in a script or a
     notebook, is added with
-    [`register_plugin`][ropt.plugins.manager.PluginManager.register_plugin].
+    [`register_plugin`][ropt.plugins.PluginManager.register_plugin].
     """
 
     def __init__(self) -> None:
@@ -252,7 +252,7 @@ class PluginManager:
         """Return the name of the plugin that supports a given method.
 
         Useful for checking availability before calling
-        [`get_plugin`][ropt.plugins.manager.PluginManager.get_plugin], which
+        [`get_plugin`][ropt.plugins.PluginManager.get_plugin], which
         takes `method` in the same two forms (`"plugin-name/method-name"` or
         just `"method-name"`).
 
@@ -283,8 +283,8 @@ _plugin_manager = None
 def get_plugin(plugin_type: PluginType, method: str) -> type[Any]:
     """Retrieve the class of a plugin by its type and a supported method name.
 
-    Uses a lazily created, module-level [`PluginManager`][ropt.plugins.manager.PluginManager];
-    see [`PluginManager.get_plugin`][ropt.plugins.manager.PluginManager.get_plugin]
+    Uses a lazily created, module-level [`PluginManager`][ropt.plugins.PluginManager];
+    see [`PluginManager.get_plugin`][ropt.plugins.PluginManager.get_plugin]
     for the argument format.
 
     Args:
@@ -304,8 +304,8 @@ def get_plugin(plugin_type: PluginType, method: str) -> type[Any]:
 def get_plugin_name(plugin_type: PluginType, method: str) -> str | None:
     """Return the name of the plugin that supports a given method.
 
-    Uses a lazily created, module-level [`PluginManager`][ropt.plugins.manager.PluginManager];
-    see [`PluginManager.get_plugin_name`][ropt.plugins.manager.PluginManager.get_plugin_name]
+    Uses a lazily created, module-level [`PluginManager`][ropt.plugins.PluginManager];
+    see [`PluginManager.get_plugin_name`][ropt.plugins.PluginManager.get_plugin_name]
     for the argument format.
 
     Args:
@@ -331,10 +331,10 @@ def register_plugin(
     """Register a plugin that is not installed.
 
     Adds the plugin to the lazily created, module-level
-    [`PluginManager`][ropt.plugins.manager.PluginManager] that `optimize()` and
+    [`PluginManager`][ropt.plugins.PluginManager] that `optimize()` and
     `evaluate()` resolve against, so a plugin registered here is available to
     every workflow started afterwards. See
-    [`PluginManager.register_plugin`][ropt.plugins.manager.PluginManager.register_plugin]
+    [`PluginManager.register_plugin`][ropt.plugins.PluginManager.register_plugin]
     for the rules.
 
     Args:

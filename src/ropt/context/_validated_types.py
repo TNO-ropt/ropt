@@ -13,7 +13,7 @@ from ropt.config import (
     SamplerConfig,
 )
 from ropt.function_estimator import FunctionEstimator
-from ropt.plugins.manager import PluginType, get_plugin
+from ropt.plugins import PluginType, get_plugin
 from ropt.realization_filter import RealizationFilter
 from ropt.sampler import Sampler
 

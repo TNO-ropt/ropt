@@ -9,7 +9,7 @@ from pydantic import ValidationError
 from ropt.backend import Backend
 from ropt.backend.scipy import SciPyBackend
 from ropt.config.options import OptionsSchemaModel
-from ropt.plugins.manager import (
+from ropt.plugins import (
     PluginManager,
     get_plugin,
     get_plugin_name,
@@ -170,7 +170,7 @@ def test_a_registered_plugin_is_found_like_an_installed_one(
 ) -> None:
     # Registering targets the module-level manager, so keep it out of the
     # manager the rest of the session shares.
-    monkeypatch.setattr("ropt.plugins.manager._plugin_manager", None)
+    monkeypatch.setattr("ropt.plugins._manager._plugin_manager", None)
 
     register_plugin("backend", "Mocked", MockedPlugin1)
 

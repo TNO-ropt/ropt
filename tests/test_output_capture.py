@@ -23,7 +23,7 @@ from ropt.components.evaluators import (
     EvaluationFunctionResult,
 )
 from ropt.exceptions import WorkflowError
-from ropt.plugins.manager import register_plugin
+from ropt.plugins import register_plugin
 from ropt.simple import optimize
 
 if TYPE_CHECKING:
@@ -239,7 +239,7 @@ _SUBPROCESS_SCRIPT = """
 import sys
 import numpy as np
 from ropt.components.evaluators import EvaluationFunctionResult
-from ropt.plugins.manager import register_plugin
+from ropt.plugins import register_plugin
 from ropt.simple import optimize
 sys.path.insert(0, {tests!r})
 from test_output_capture import _NativePrintingBackend, _objective
