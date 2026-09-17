@@ -3099,12 +3099,12 @@ works without it:</p>
 </tr>
 <tr>
 <td><a href="../../running/parallel/#external-backend">The external backend</a></td>
-<td>The built-in plugins, and any plugin class in an importable module</td>
+<td>The built-in plugins, and any plugin class at the top level of a module <em>or of the script you ran</em></td>
 <td>Plugin instances of classes defined in a function or a notebook</td>
 </tr>
 </tbody>
 </table>
-<p>The two pool rows differ, and the difference bites in practice. A process pool
+<p>The two pool rows differ, and the difference matters in practice. A process pool
 starts its workers with <code>spawn</code>, which re-imports the script you launched, so a
 function defined there can be looked up again. A local or cluster job is a fresh
 command whose <code>__main__</code> is <code>ropt</code>'s own worker module, so a function defined in
