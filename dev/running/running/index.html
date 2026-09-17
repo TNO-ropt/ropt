@@ -3299,13 +3299,13 @@ no optimizer loop to interrupt, so the callback reports and nothing more.</p>
 <ul>
 <li><strong>Constant, per run</strong> — pass a <code>metadata</code> dict to <code>optimize</code>, <code>optimize_many</code>,
   <code>evaluate</code>, or <code>evaluate_many</code>. <code>ropt</code> copies it onto every result the run
-  produces, which is handy for tagging a run:</li>
+  produces, which is a convenient way to tag a run:</li>
 </ul>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">"run_id"</span><span class="p">:</span> <span class="mi">7</span><span class="p">})</span>
 </span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">"run_id"</span><span class="p">])</span>   <span class="c1"># 7</span>
 </span></code></pre></div>
 <p>The same dict also reaches the evaluation function itself, as
-  <code>context.metadata</code> — handy when the evaluation needs to know which run it is
+  <code>context.metadata</code> — useful when the evaluation needs to know which run it is
   part of. With <code>optimize_many</code>, this is the natural way to tell runs apart:
   give one dict (shared by all runs) or a list with one dict per run; see
   <a href="../parallel/#many-optimizations-at-once">Give each run an ID</a>.</p>

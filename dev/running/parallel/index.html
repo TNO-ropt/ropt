@@ -3456,8 +3456,8 @@ where a gradient is estimated. The second factor is <code>1</code> unless you us
 <a class="autorefs autorefs-internal" title="            ropt.simple.optimize_many" href="../../reference/simple/#ropt.simple.optimize_many"><code>optimize_many</code></a>, where it is the <code>limit</code> argument
 (or the number of runs, if you set no limit).</p>
 <p>A worker is not free, so this is an upper bound rather than a target. Ask for
-what the work needs; the interesting number is usually a good deal smaller than
-the machine's core count.</p>
+what the work needs; the useful number is usually much smaller than the
+machine's core count.</p>
 <div class="admonition tip">
 <p class="admonition-title">How a batch is split across workers</p>
 <p>Each evaluation in a batch is transferred to a worker as its own task by
@@ -3471,7 +3471,7 @@ parallelism comes from the runs above it, as in
 <a href="../nested/#two-pools-not-one">Nested Optimization</a>.</p>
 <p><code>workers</code> and <code>bundle_size</code> are the two halves of matching work to capacity.
 <code>workers</code> says how many tasks may be in flight; <code>bundle_size</code> says how much
-work one task is worth carrying. With a batch of 100 cheap evaluations and
+work one task should carry. With a batch of 100 cheap evaluations and
 8 workers, the default sends 100 separate tasks and pays 100 transfer costs
 to keep 8 workers busy; <code>bundle_size=13</code> sends 8 and pays 8. Raise it when
 the evaluations are cheap relative to a transfer — above all on a
@@ -3547,7 +3547,7 @@ mostly runs an external program gains nothing here that a thread pool would not
 have given more cheaply.</p>
 <p>The objective and its data are <strong>copied</strong> to the workers, so they must be
 serializable. An objective defined at module level — or in the script you ran,
-which each worker re-imports — works out of the box; a lambda, a closure, or a
+which each worker re-imports — works as is; a lambda, a closure, or a
 function defined in a notebook cell needs the <code>cloudpickle</code> extra (see
 <a href="../../getting_started/installation/#optional-extras">Installation</a>). Results can
 only come <strong>back</strong> through the return value; see
@@ -4238,9 +4238,10 @@ of its own, but they are <em>its</em> handlers and <em>its</em> pools.</p>
   Four callables that each open a ten-worker pool put <strong>forty</strong> workers on
   the machine in four independent groups — and they do not pool their
   effort: one with twenty pieces of work still runs ten at a time while
-  another group sits idle. Forty are carried, and never forty work on the
-  same thing. Where evaluations stay in your process this is avoidable by
-  sharing one pool; offloaded onto a process, local, or HPC pool it is not.</li>
+  another group sits idle. The machine carries forty workers, and never
+  forty working on the same thing. Where evaluations stay in your process
+  this is avoidable by sharing one pool; offloaded onto a process, local, or
+  HPC pool it is not.</li>
 </ul>
 <p>So reach for <code>offload</code> when a piece of work is genuinely self-contained and
 hands its answer back as a return value. When several pieces must be

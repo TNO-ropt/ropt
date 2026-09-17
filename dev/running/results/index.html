@@ -3986,9 +3986,9 @@ unstacked while <code>realization</code> stays a row label:</p>
 </span><span id="__span-21-6"><a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a>         r1                                         0.22                                0.05
 </span></code></pre></div>
 <p>The run-level <strong>result metadata</strong> sits directly on the result, so it has no
-axes and gives one value per result — handy for pulling in a run tag. It may be
-nested to any depth, and is reachable from <code>to_pandas</code> and <code>results_to_pandas</code>
-alike:</p>
+axes and gives one value per result, which is convenient for pulling in a run
+tag. It may be nested to any depth, and is reachable from <code>to_pandas</code> and
+<code>results_to_pandas</code> alike:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="n">df</span> <span class="o">=</span> <span class="n">results_to_pandas</span><span class="p">(</span>
 </span><span id="__span-22-2"><a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a>    <span class="n">all_results</span><span class="p">,</span>
 </span><span id="__span-22-3"><a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a>    <span class="n">fields</span><span class="o">=</span><span class="p">[</span><span class="s2">"metadata.run_id"</span><span class="p">,</span> <span class="s2">"target_objective"</span><span class="p">],</span>
