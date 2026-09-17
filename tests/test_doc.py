@@ -11,11 +11,16 @@ from ropt.config.options import gen_options_table
 _ROOT = Path(__file__).parent.parent
 _SNIPPET_DIR = _ROOT / "docs" / "snippets"
 _QUICKSTART = _ROOT / "docs" / "getting_started" / "quickstart.md"
+_EXAMPLE_PAGES = {
+    "simple": _ROOT / "docs" / "getting_started" / "examples.md",
+    "advanced": _ROOT / "docs" / "advanced" / "examples.md",
+}
 
 # Misplaced backticks render as a code span, so no reference reaches
 # mkdocs-autorefs and `mkdocs build --strict` stays silent.
 _MALFORMED_REF = re.compile(r"\[`[^`\n]*\]\[[^`\n]*`\]")
 _PYTHON_BLOCK = re.compile(r"```python\n(.*?)```", re.DOTALL)
+_EXAMPLE_LINK = re.compile(r"examples/(?:simple|advanced)/\w+\.py")
 
 
 def _check_snippet(name: str, generated: str) -> None:
@@ -56,3 +61,31 @@ def test_quickstart_program_reaches_the_optimum_it_claims(tmp_path: Path) -> Non
     result = runpy.run_path(str(script), run_name="__main__")["result"]
     assert result.variables is not None
     assert np.allclose(result.variables, 1.0, atol=1e-2)
+
+
+def test_examples_pages_list_every_script() -> None:
+    missing = [
+        str(path.relative_to(_ROOT))
+        for sub_dir, page in _EXAMPLE_PAGES.items()
+        for path in sorted((_ROOT / "examples" / sub_dir).glob("*.py"))
+        if str(path.relative_to(_ROOT)) not in page.read_text()
+    ]
+    if missing:
+        pytest.fail(
+            "Not listed on the examples pages, so unreachable from the "
+            "documentation:\n" + "\n".join(missing)
+        )
+
+
+def test_examples_pages_have_no_dead_entries() -> None:
+    # The scripts are linked by their GitHub URL, which mkdocs never resolves.
+    missing = sorted(
+        {
+            name
+            for page in _EXAMPLE_PAGES.values()
+            for name in _EXAMPLE_LINK.findall(page.read_text())
+            if not (_ROOT / name).exists()
+        }
+    )
+    if missing:
+        pytest.fail("Listed but absent from the repository:\n" + "\n".join(missing))

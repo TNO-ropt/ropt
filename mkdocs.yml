@@ -112,6 +112,7 @@ nav:
       - "Ensemble-Based Optimization": getting_started/ensemble.md
       - "Collecting Results with Handlers": getting_started/handlers.md
       - "Running in Parallel": getting_started/execution.md
+      - "Examples": getting_started/examples.md
   - "Running":
       - "Running Optimizations": running/running.md
       - "Working with Results": running/results.md
@@ -133,6 +134,7 @@ nav:
           - "Writing Evaluation Callbacks": advanced/evaluation_callbacks.md
           - "Parallel Evaluation": advanced/parallel.md
           - "Building a Workflow": advanced/workflow.md
+          - "Workflow Examples": advanced/examples.md
       - "Plugins":
           - "Plugin Discovery": advanced/plugin_discovery.md
           - "Writing a Plugin": advanced/writing_plugins.md
