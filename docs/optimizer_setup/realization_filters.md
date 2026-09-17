@@ -81,12 +81,15 @@ The `cvar-objective` method:
    [`maximize`](configuration_sections.md#objective-direction) have their sign flipped,
    per objective, so that the sum ranks realizations the way the optimizer
    would.
-2. Conceptually sorts realizations by that value, ascending.
-3. Identifies the subset corresponding to the `percentile` worst outcomes
-   (highest weighted values).
-4. Assigns CVaR-derived weights to those realizations. When the percentile
-   boundary falls between two realizations, interpolation produces partial
-   weights. All other realizations receive zero.
+2. Conceptually sorts realizations by that value, worst first. Since step 1
+   flipped the sign of any maximized objective, the worst outcomes are the
+   highest values.
+3. Takes the `percentile` fraction of realizations from the start of that
+   order.
+4. Gives each selected realization the same weight, one divided by the number
+   of valid realizations. If `percentile` does not cover a whole number of
+   realizations, the realization at the boundary receives the leftover
+   fraction instead. All other realizations receive zero.
 5. Failed realizations (NaN values) are excluded.
 
 The `cvar-constraint` variant applies CVaR to a single constraint function,
