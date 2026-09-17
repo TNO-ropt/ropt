@@ -111,10 +111,10 @@ with session() as s:
                 optimize(config, case, objective, pool=pool)
     ```
 
-    A closed pool cannot be reopened, and a run still using it stops with
-    [`ExecutorStopped`][ropt.exceptions.ExecutorStopped] — though on a thread
-    pool the evaluations already running still finish first, since a thread
-    cannot be interrupted; see
+    A closed pool cannot be reopened, and a run still using it returns with
+    [`ExitCode.EXECUTOR_STOPPED`][ropt.enums.ExitCode] rather than raising —
+    though on a thread pool the evaluations already running still finish first,
+    since a thread cannot be interrupted; see
     [Stopping a run](#stopping-a-run). Starting a *new* run
     on it is refused before anything runs, with a
     [`WorkflowError`][ropt.exceptions.WorkflowError] saying the pool is closed —

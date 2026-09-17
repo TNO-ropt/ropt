@@ -245,10 +245,12 @@ which evaluates a single vector and then a matrix of them.
 Not every problem is an exception. An optimization that cannot make progress
 still returns normally, and says why in `result.exit_code`:
 `TOO_FEW_REALIZATIONS` when not enough realizations produced a value,
-`EXECUTOR_STOPPED` when the pool it was evaluating on was closed under it. In
-both cases the result fields are `None`, so check `exit_code` before using
-them. A plain [`evaluate`][ropt.simple.evaluate] has no `exit_code`; there the
-`None` fields are the only sign that nothing usable came back.
+`EXECUTOR_STOPPED` when the pool it was evaluating on was closed under it. The
+fields are `None` when nothing usable was found — always so for
+`TOO_FEW_REALIZATIONS`, whereas a run stopped with its pool keeps the best
+result it had reached. A plain [`evaluate`][ropt.simple.evaluate] has no
+`exit_code`; there the `None` fields are the only sign that nothing usable came
+back.
 
 A run can also end with `OPTIMIZER_FINISHED` and still leave those fields
 `None`. Only a result that satisfies every constraint to within
