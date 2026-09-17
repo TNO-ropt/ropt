@@ -2899,6 +2899,10 @@ an estimator with the plugin system is only required when it should be
 selectable via <a class="autorefs autorefs-internal" title="            FunctionEstimatorConfig" href="../../reference/config/#ropt.config.FunctionEstimatorConfig"><code>FunctionEstimatorConfig</code></a>;
 otherwise, an instance can be passed directly in the <code>function_estimators</code>
 field of <a class="autorefs autorefs-internal" title="            EnOptContext" href="../../reference/context/#ropt.context.EnOptContext"><code>EnOptContext</code></a>.</p>
+<p>The runnable script is
+<a href="https://github.com/TNO-ropt/ropt/blob/main/examples/simple/function_estimator.py">examples/simple/function_estimator.py</a>,
+which implements a weighted geometric mean, registers it, and selects it from
+the configuration as <code>"custom/geometric"</code>.</p>
 
 
 

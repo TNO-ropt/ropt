@@ -3360,7 +3360,7 @@ to account for them.</p>
 
         <p>Aggregate gradients across realizations.</p>
 <p>When <code>merge_realizations</code> is <code>False</code> (default), <code>gradient</code> has shape
-<code>(n_realizations, n_variables)</code> and must be combined using <code>weights</code>.
+<code>(n_variables, n_realizations)</code> and must be combined using <code>weights</code>.
 When <code>True</code>, a single pre-merged gradient of shape <code>(n_variables,)</code> is
 passed instead — suitable only for estimators that aggregate by a
 simple weighted combination (for example the mean). Estimators that need each
@@ -3406,7 +3406,7 @@ estimators (for example standard deviation).</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Shape <code>(n_realizations, n_variables)</code> or
+                <p>Shape <code>(n_variables, n_realizations)</code> or
 <code>(n_variables,)</code> if merged.</p>
               </div>
             </td>
