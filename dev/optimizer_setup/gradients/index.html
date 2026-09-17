@@ -3117,6 +3117,11 @@ crashes), the gradient can still be computed when at least
 <code>perturbation_min_success</code> rows succeeded. Combine with the <code>realization_min_success</code> field of
 <a class="autorefs autorefs-internal" title="            RealizationsConfig" href="../../reference/config/#ropt.config.RealizationsConfig"><code>RealizationsConfig</code></a>
 to also tolerate failed realizations.</p>
+<p><a href="https://github.com/TNO-ropt/ropt/blob/main/examples/simple/failures.py">examples/simple/failures.py</a>
+runs one problem twice: once with the default, where a single failing
+realization ends the run with <code>TOO_FEW_REALIZATIONS</code> and no result, and once
+with <code>realization_min_success</code> lowered, where the run finishes on the
+realizations that did work.</p>
 <h2 id="evaluation-policy">Evaluation policy</h2>
 <p><a class="autorefs autorefs-internal" title="            GradientConfig" href="../../reference/config/#ropt.config.GradientConfig"><code>GradientConfig.evaluation_policy</code></a> picks one of:</p>
 <ul>
