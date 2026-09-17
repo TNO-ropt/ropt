@@ -3094,12 +3094,15 @@ registers it, and selects it from the configuration as <code>"custom/median"</co
    <a href="../configuration_sections/#objective-direction"><code>maximize</code></a> have their sign flipped,
    per objective, so that the sum ranks realizations the way the optimizer
    would.</li>
-<li>Conceptually sorts realizations by that value, ascending.</li>
-<li>Identifies the subset corresponding to the <code>percentile</code> worst outcomes
-   (highest weighted values).</li>
-<li>Assigns CVaR-derived weights to those realizations. When the percentile
-   boundary falls between two realizations, interpolation produces partial
-   weights. All other realizations receive zero.</li>
+<li>Conceptually sorts realizations by that value, worst first. Since step 1
+   flipped the sign of any maximized objective, the worst outcomes are the
+   highest values.</li>
+<li>Takes the <code>percentile</code> fraction of realizations from the start of that
+   order.</li>
+<li>Gives each selected realization the same weight, one divided by the number
+   of valid realizations. If <code>percentile</code> does not cover a whole number of
+   realizations, the realization at the boundary receives the leftover
+   fraction instead. All other realizations receive zero.</li>
 <li>Failed realizations (NaN values) are excluded.</li>
 </ol>
 <p>The <code>cvar-constraint</code> variant applies CVaR to a single constraint function,

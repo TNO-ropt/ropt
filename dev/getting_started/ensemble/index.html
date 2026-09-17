@@ -3103,13 +3103,15 @@ set is a <strong>realization</strong>. The full runnable script is
 <strong>robust objective</strong> — by default a weighted average over the realizations.
 Minimizing the average yields a solution that performs well across the whole set
 rather than for one particular case. We minimize the Rosenbrock function,
-generalized to <span class="arithmatex">\(n\)</span> variables, with coefficients that vary between realizations.</p>
+generalized to a sum of <span class="arithmatex">\(n\)</span> terms over <span class="arithmatex">\(n + 1\)</span> variables, with coefficients that
+vary between realizations.</p>
 <p>For realization <span class="arithmatex">\(i\)</span>, with coefficients <span class="arithmatex">\(a_i\)</span> and <span class="arithmatex">\(b_i\)</span>, the per-realization
 objective is:</p>
-<div class="arithmatex">\[ f_i(\mathbf{x}) = \sum_{k=1}^{n-1} \left[ (a_i - x_k)^2 + b_i \left(
+<div class="arithmatex">\[ f_i(\mathbf{x}) = \sum_{k=1}^{n} \left[ (a_i - x_k)^2 + b_i \left(
 x_{k+1} - x_k^2 \right)^2 \right] \]</div>
-<p>which it reduces to the standard Rosenbrock function when <span class="arithmatex">\(n = 1\)</span>, and <span class="arithmatex">\(a_i = 1,
-b_i = 100\)</span> for every realization.</p>
+<p>which reduces to the standard Rosenbrock function of the
+<a href="../quickstart/">Quickstart</a> when <span class="arithmatex">\(n = 1\)</span>, with <span class="arithmatex">\(a_i = 1\)</span> and <span class="arithmatex">\(b_i = 100\)</span> for
+every realization.</p>
 <p><code>ropt</code> combines the realizations into the robust objective:</p>
 <div class="arithmatex">\[ f(\mathbf{x}) = \sum_i w_i f_i(\mathbf{x}), \]</div>
 <p>with weights <span class="arithmatex">\(w_i\)</span> that we set in the configuration below.</p>
@@ -3131,9 +3133,9 @@ realization that sets how much each contributes to the combined objective:</p>
 </span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="n">INITIAL_VALUES</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">DIM</span><span class="p">)</span> <span class="o">/</span> <span class="n">DIM</span> <span class="o">+</span> <span class="mf">0.5</span>
 </span></code></pre></div>
 <p>The weights need not sum to one; <code>ropt</code> normalizes them. Equal weights, as here,
-give a plain average. See <a href="../../optimizer_setup/configuration_sections/#realizations">Configuration</a> for the
-other realization settings. <code>INITIAL_VALUES</code> is the point the optimization
-starts from.</p>
+give a plain average. See <a href="../../optimizer_setup/configuration_sections/#realizations">Configuration Sections</a>
+for the other realization settings. <code>INITIAL_VALUES</code> is the point the
+optimization starts from.</p>
 <h2 id="2-draw-the-uncertain-parameters">2. Draw the uncertain parameters</h2>
 <p>Each realization is one draw of the uncertain parameters. Here the two Rosenbrock
 coefficients are sampled once per realization, so that <code>a[r]</code> and <code>b[r]</code> are the
