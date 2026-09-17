@@ -81,10 +81,10 @@ class ExternalBackend(Backend):
         everything the delegate needs must be serializable, including the
         delegate class itself. The standard library can send anything that can
         be looked up by name, which covers the built-in plugins and any plugin
-        class defined in an importable module. Installing the optional
-        `cloudpickle` extra lifts that restriction, so plugins and plugin
-        instances of classes defined inside a function or a notebook can be
-        sent as well.
+        class at the top level of a module or of the script you ran. Installing
+        the optional `cloudpickle` extra lifts that restriction, so plugins and
+        plugin instances of classes defined inside a function or a notebook can
+        be sent as well.
     """
 
     # A predicate, not a set: what this backend can proxy is whatever else is
