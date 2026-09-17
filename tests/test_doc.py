@@ -1,3 +1,4 @@
+import importlib
 import re
 import runpy
 from pathlib import Path
@@ -21,6 +22,8 @@ _EXAMPLE_PAGES = {
 _MALFORMED_REF = re.compile(r"\[`[^`\n]*\]\[[^`\n]*`\]")
 _PYTHON_BLOCK = re.compile(r"```python\n(.*?)```", re.DOTALL)
 _EXAMPLE_LINK = re.compile(r"examples/(?:simple|advanced)/\w+\.py")
+_FROM_IMPORT = re.compile(r"^\s*from\s+(ropt[\w.]*)\s+import\s+([^\n#]+)", re.MULTILINE)
+_PLAIN_IMPORT = re.compile(r"^\s*import\s+(ropt[\w.]*)", re.MULTILINE)
 
 
 def _check_snippet(name: str, generated: str) -> None:
@@ -89,3 +92,30 @@ def test_examples_pages_have_no_dead_entries() -> None:
     )
     if missing:
         pytest.fail("Listed but absent from the repository:\n" + "\n".join(missing))
+
+
+def test_documented_imports_resolve() -> None:
+    # mkdocs checks `[x][ropt.y]` references, but never the code blocks.
+    broken = []
+    for path in sorted((_ROOT / "docs").rglob("*.md")):
+        text = path.read_text()
+        for block in _PYTHON_BLOCK.finditer(text):
+            line_nr = text[: block.start()].count("\n") + 1
+            where = f"{path.relative_to(_ROOT)}:{line_nr}"
+            for module, names in _FROM_IMPORT.findall(block.group(1)):
+                try:
+                    imported = importlib.import_module(module)
+                except ImportError:
+                    broken.append(f"{where}: cannot import {module}")
+                    continue
+                for raw in names.split(","):
+                    name = raw.strip().split(" as ")[0].strip().strip("()")
+                    if name and not hasattr(imported, name):
+                        broken.append(f"{where}: {module} has no {name!r}")
+            for module in _PLAIN_IMPORT.findall(block.group(1)):
+                try:
+                    importlib.import_module(module)
+                except ImportError:
+                    broken.append(f"{where}: cannot import {module}")
+    if broken:
+        pytest.fail("Imports shown in the docs that fail:\n" + "\n".join(broken))

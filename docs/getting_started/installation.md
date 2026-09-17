@@ -95,7 +95,7 @@ from ropt.version import __version__
 print(__version__)
 
 # Verify the SciPy backend is available:
-from ropt.utils import get_plugin_name
+from ropt.plugins import get_plugin_name
 print(get_plugin_name("backend", "slsqp"))  # should print "scipy"
 ```
 
