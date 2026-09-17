@@ -185,7 +185,8 @@ All `method` fields use the same naming convention:
 - **`"method"`** — *implicit*: omit the plugin name and let `ropt` search all
   registered plugins for one that supports `method`. This is convenient when
   only one plugin provides the method, but ambiguous if multiple plugins expose
-  the same name.
+  the same name. The name `"default"` cannot be used this way, since more than
+  one plugin may define one; write it as `"plugin/default"`.
 
 The plugin part corresponds to the name under which the plugin is registered
 (via an entry point); the method part is any name the plugin declares in its
@@ -327,14 +328,15 @@ Expand the block below to see every field and its default value.
             "max_batches": None,                              # default: no limit
             "max_functions": None,                            # default: no limit
             "output_dir": None,                               # default: no output directory
-            "stdout": None,                                   # default: discard
-            "stderr": None,                                   # default: discard
+            "stdout": None,                                   # default: not captured
+            "stderr": None,                                   # default: not captured
         },
         "backend": {
             "method": "scipy/default",                        # default: SciPy SLSQP
             "max_iterations": None,                           # default: backend-specific
             "convergence_tolerance": None,                    # default: backend-specific
             "parallel": False,                                # default: Do not evaluate in parallel
+            "verbose": None,                                  # default: silent
             "options": None,                                  # default: no extra options
         },
         "gradient": {

@@ -17,9 +17,8 @@ variables, including both free and fixed variables.
 
 The `lower_bounds` and `upper_bounds` fields define the bounds for each
 variable. They are broadcasted to match the number of variables and default to
-$-\infty$ and $+\infty$, respectively. `numpy.nan` values in these arrays
-indicate unbounded variables and are converted to `numpy.inf` with the
-appropriate sign.
+$-\infty$ and $+\infty$, respectively. Use an infinity to leave a variable
+unbounded on that side.
 
 The optional `types` field allows assigning a
 [`VariableType`][ropt.enums.VariableType] to each variable (continuous or
