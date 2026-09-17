@@ -3335,7 +3335,8 @@ granularity, broadcasting a per-batch field across the per-realization rows.</p>
 <ul>
 <li><code>set_default_tables()</code> registers a standard set of tables
   (<code>functions</code>, <code>evaluations</code>, <code>constraints</code> for function results; <code>gradients</code>,
-  <code>perturbations</code> for gradient results).</li>
+  <code>perturbations</code> for gradient results). Its <code>constraints</code> table requires a
+  problem that defines bounds or constraints.</li>
 <li><code>add_column(table, name, title)</code> adds one column to an existing table.</li>
 <li><code>set_callback(fn)</code> calls <code>fn(output_dir)</code> whenever the tables are updated,
   where <code>output_dir</code> is the run's configured

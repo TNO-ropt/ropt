@@ -3853,7 +3853,8 @@ result of the run in one frame. It uses polars by default and pandas with
 <code>"target_objective"</code>), a field of one of its sub-objects
 (<code>"functions.objectives"</code>, <code>"scaled.variables"</code>), or an entry of a dict-valued
 field (<code>"metadata.run.id"</code>). Each path becomes a column of that name. Paths
-whose value is <code>None</code>, and missing dict keys, are skipped.</p>
+whose value is <code>None</code>, and missing dict keys, are skipped; descending into a
+field that is <code>None</code> is an error.</p>
 <div class="admonition note">
 <p class="admonition-title">Fields are an ordered list</p>
 <p>Every export function takes its fields as a <strong>sequence</strong>, and the columns
