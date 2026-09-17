@@ -1024,6 +1024,90 @@
   
   
     <li class="md-nav__item">
+      <a href="../configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration_sections/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration Sections
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../variables/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Variables
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../objectives/" class="md-nav__link">
         
   
@@ -1308,34 +1392,6 @@
     
   
     Function Estimators
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../configuration/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Configuration Reference
   
 
     
@@ -2994,6 +3050,8 @@ searches within a box rather than stepping from a start point.</p>
 <p><code>VariableType</code> comes from <code>ropt.enums</code>, not from <code>ropt.simple</code>:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.enums</span><span class="w"> </span><span class="kn">import</span> <span class="n">VariableType</span>
 </span></code></pre></div>
+<p>The <code>types</code> field, and every other field of the variables section, is described
+under <a href="../configuration_sections/#variables"><code>variables</code></a>.</p>
 <p>The objective is an ordinary evaluation function. It receives the variables as
 floats that happen to hold integral values:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">function</span><span class="p">(</span>
@@ -3046,7 +3104,7 @@ by following a gradient, and the cost profile differs accordingly:</p>
 <ul>
 <li><code>perturbation_magnitudes</code> is unused. No perturbations are evaluated, because
   no gradient is estimated.</li>
-<li>Limit the run with <a href="../configuration/#optimizer"><code>max_functions</code></a> or
+<li>Limit the run with <a href="../configuration_sections/#optimizer"><code>max_functions</code></a> or
   <code>max_iterations</code> rather than a convergence tolerance.</li>
 <li>The result is reproducible only if the method's own generator is seeded —
   hence <code>"options": {"rng": 4}</code> in both scripts.</li>

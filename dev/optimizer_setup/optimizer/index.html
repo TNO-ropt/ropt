@@ -1024,6 +1024,90 @@
   
   
     <li class="md-nav__item">
+      <a href="../configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration_sections/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration Sections
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../variables/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Variables
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../objectives/" class="md-nav__link">
         
   
@@ -1330,34 +1414,6 @@
     
   
     Function Estimators
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../configuration/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Configuration Reference
   
 
     
@@ -3000,8 +3056,8 @@ is not appropriate.</p>
 <p>The two settings live in different places: <strong><code>backend</code> selects and configures
 the algorithm</strong>, while <strong><code>optimizer</code> sets the limits <code>ropt</code> enforces around
 it</strong>. The full field reference is under
-<a href="../configuration/#backend"><code>backend</code></a> and
-<a href="../configuration/#optimizer"><code>optimizer</code></a>.</p>
+<a href="../configuration_sections/#backend"><code>backend</code></a> and
+<a href="../configuration_sections/#optimizer"><code>optimizer</code></a>.</p>
 <h2 id="selecting-a-method">Selecting a method</h2>
 <p>A method is named by a <code>"plugin/method"</code> string:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="s2">"backend"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"method"</span><span class="p">:</span> <span class="s2">"scipy/slsqp"</span><span class="p">}</span>
@@ -3019,10 +3075,10 @@ backend supports.</p>
 </span></code></pre></div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Not every method supports every kind of constraint. <code>ropt</code> raises an error
-at the start of a run when the configured method cannot handle what the
-configuration declares, rather than silently ignoring it. The one case where
-something <em>is</em> ignored silently is integer variables; see
+<p>Not every method supports every kind of constraint, and a mismatch is
+rejected when the run starts rather than ignored; see
+<a href="../configuration_sections/#backend"><code>backend</code></a> for what that error is. The
+one case that <em>is</em> ignored silently is integer variables; see
 <a href="../discrete/">Discrete and Mixed-Integer Variables</a>.</p>
 </div>
 <h2 id="gradient-based-or-gradient-free">Gradient-based or gradient-free</h2>
@@ -3100,7 +3156,7 @@ as the runnable version.</p>
 <code>optimizer.stdout</code> and <code>optimizer.stderr</code> capture it to files, resolved against
 <code>optimizer.output_dir</code>. Capture rewires process-global state, so only one run at
 a time can use it — leave those unset on runs that overlap. See
-<a href="../configuration/#optimizer"><code>optimizer</code></a> for the details.</p>
+<a href="../configuration_sections/#optimizer"><code>optimizer</code></a> for the details.</p>
 <h2 id="see-also">See also</h2>
 <ul>
 <li>Watching results as they arrive, instead of reading optimizer output:

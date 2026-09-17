@@ -1,0 +1,4165 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../configuration/">
+      
+      
+        <link rel="next" href="../variables/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Configuration Sections - ropt Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="blue">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#configuration-sections" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="ropt Documentation" class="md-header__button md-logo" aria-label="ropt Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            ropt Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Configuration Sections
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="blue"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="teal" data-md-color-accent="lime"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/TNO-ropt/ropt" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    TNO-ropt/ropt
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  About
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../getting_started/background/" class="md-tabs__link">
+          
+  
+  
+  Getting Started
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../running/running/" class="md-tabs__link">
+          
+  
+  
+  Running
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../key_concepts/" class="md-tabs__link">
+          
+  
+  
+  Optimizer Setup
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../advanced/workflows/" class="md-tabs__link">
+          
+  
+  
+  Advanced
+
+        </a>
+      </li>
+    
+  
+
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../troubleshooting/" class="md-tabs__link">
+          
+  
+  
+  Troubleshooting
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../reference/simple/" class="md-tabs__link">
+          
+  
+  
+  Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="ropt Documentation" class="md-nav__button md-logo" aria-label="ropt Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    ropt Documentation
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/TNO-ropt/ropt" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    TNO-ropt/ropt
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    About
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Getting Started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting_started/background/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Background
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting_started/installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting_started/quickstart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quickstart
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting_started/ensemble/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ensemble-Based Optimization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting_started/handlers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Collecting Results with Handlers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting_started/execution/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Running in Parallel
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting_started/examples/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Examples
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Running
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Running
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../running/running/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Running Optimizations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../running/results/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Working with Results
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../running/handlers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Result Handlers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../running/parallel/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Parallel Execution and Many Runs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../running/nested/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Nested Optimization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../running/restart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Restarting from the Best Point
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Optimizer Setup
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Optimizer Setup
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../key_concepts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Key Concepts
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration Sections
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration Sections
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        variables
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="variables">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#variable-perturbations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Variable perturbations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#variable-scales" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scaling the variables
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#objectives" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        objectives
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="objectives">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#objective-scales" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scaling objectives
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#objective-offsets" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Offsetting objectives
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#objective-direction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Choosing the direction of an objective
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#linear_constraints" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        linear_constraints
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="linear_constraints">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#linear-constraint-scales" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scaling the equations
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#nonlinear_constraints" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        nonlinear_constraints
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="nonlinear_constraints">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#constraint-scales" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scaling constraints
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#realizations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        realizations
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#optimizer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        optimizer
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#backend" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        backend
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gradient" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        gradient
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#function-estimators" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        function_estimators
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#realization-filters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        realization_filters
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#samplers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        samplers
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#names" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        names
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../variables/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Variables
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../objectives/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Objectives
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../constraints/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Constraints
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../discrete/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Discrete and Mixed-Integer Variables
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../optimizer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Choosing an Optimizer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../gradients/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Stochastic Gradients
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../samplers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Samplers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../realization_filters/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Realization Filters
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../function_estimators/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Function Estimators
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Advanced
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Advanced
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_1" id="__nav_5_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Workflows
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Workflows
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../advanced/workflows/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Optimization Workflows
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../advanced/evaluation_callbacks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Writing Evaluation Callbacks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../advanced/parallel/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Parallel Evaluation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../advanced/workflow/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Building a Workflow
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../advanced/examples/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Workflow Examples
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_2" id="__nav_5_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plugins
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Plugins
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../advanced/plugin_discovery/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plugin Discovery
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../advanced/writing_plugins/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Writing a Plugin
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Troubleshooting
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Troubleshooting
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../troubleshooting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Troubleshooting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../troubleshooting/logging/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Logging
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../troubleshooting/keyboard_interrupt/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Keyboard Interrupts
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/simple/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Simple API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/utils/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Utility Functions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_7_3" id="__nav_7_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_7_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Configuration
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/context/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Context Class
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/config/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration Classes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_7_4" id="__nav_7_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Results & Events
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_7_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Results & Events
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/results/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evaluation Results
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/events/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Optimization Events
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_7_5" id="__nav_7_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Optimization Engine
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_7_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Optimization Engine
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/core/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Core Classes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/evaluation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evaluation Classes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_7_6" id="__nav_7_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Optimizer Components
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_7_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Optimizer Components
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/function_estimator/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Function Estimators
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/realization_filter/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Realization Filters
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/backend/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Optimizer Backends
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/sampler/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Samplers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7_7" id="__nav_7_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Workflow Components
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_7_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Workflow Components
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/components/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/components_compute_steps/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Compute Steps
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/components_event_handlers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Event Handlers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/components_evaluators/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evaluators
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/components_executors/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Executors
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/components_utils/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Utilities
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/plugin_manager/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plugin System
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/enums/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Enumerations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/exceptions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Exceptions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/basic_optimizer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Basic Optimizer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        variables
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="variables">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#variable-perturbations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Variable perturbations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#variable-scales" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scaling the variables
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#objectives" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        objectives
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="objectives">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#objective-scales" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scaling objectives
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#objective-offsets" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Offsetting objectives
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#objective-direction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Choosing the direction of an objective
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#linear_constraints" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        linear_constraints
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="linear_constraints">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#linear-constraint-scales" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scaling the equations
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#nonlinear_constraints" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        nonlinear_constraints
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="nonlinear_constraints">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#constraint-scales" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scaling constraints
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#realizations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        realizations
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#optimizer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        optimizer
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#backend" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        backend
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gradient" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        gradient
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#function-estimators" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        function_estimators
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#realization-filters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        realization_filters
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#samplers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        samplers
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#names" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        names
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="configuration-sections">Configuration Sections</h1>
+<p>Every section of a configuration dictionary, field by field, with its default
+value. For what that dictionary becomes, the rules that apply across all of it,
+and a fully expanded configuration showing every default at once, see
+<a href="../configuration/">Configuration</a>; for the generated class
+documentation, see <a href="../../reference/config/">Configuration Classes</a>.</p>
+<h2 id="variables"><code>variables</code></h2>
+<p>Validated into <a class="autorefs autorefs-internal" title="            VariablesConfig" href="../../reference/config/#ropt.config.VariablesConfig"><code>VariablesConfig</code></a>.</p>
+<p>Defines the decision variables for the optimization problem.</p>
+<p>The <code>variable_count</code> field is required and determines the total number of
+variables, including both free and fixed variables.</p>
+<p>The <code>lower_bounds</code> and <code>upper_bounds</code> fields define the bounds for each
+variable. They are broadcasted to match the number of variables and default to
+<span class="arithmatex">\(-\infty\)</span> and <span class="arithmatex">\(+\infty\)</span>, respectively. <code>numpy.nan</code> values in these arrays
+indicate unbounded variables and are converted to <code>numpy.inf</code> with the
+appropriate sign.</p>
+<p>The optional <code>types</code> field allows assigning a
+<a class="autorefs autorefs-internal" title="            VariableType" href="../../reference/enums/#ropt.enums.VariableType"><code>VariableType</code></a> to each variable (continuous or
+integer). If not provided, all variables default to continuous
+(<a class="autorefs autorefs-internal" title="            REAL
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../../reference/enums/#ropt.enums.VariableType.REAL"><code>VariableType.REAL</code></a>). Integer variables are
+only honored by methods that support them; in the SciPy backend that is
+<code>differential_evolution</code> (see
+<a class="autorefs autorefs-internal" title="            ropt.backend.scipy.SciPyBackend" href="../../reference/backend/#ropt.backend.scipy.SciPyBackend"><code>SciPyBackend</code></a>).</p>
+<p>The optional <code>mask</code> field is a boolean array that indicates which variables are
+free to change during optimization (default: all <code>True</code>, meaning all variables
+are free). <code>True</code> means the variable is free; <code>False</code> means it is fixed.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="s2">"variables"</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="s2">"variable_count"</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="s2">"lower_bounds"</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="s2">"upper_bounds"</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="s2">"types"</span><span class="p">:</span> <span class="s2">"real"</span><span class="p">,</span>              <span class="c1"># default; or "integer" for discrete variables</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="s2">"mask"</span><span class="p">:</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">],</span>  <span class="c1"># third variable is fixed</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="s2">"perturbation_magnitudes"</span><span class="p">:</span> <span class="mf">1e-5</span><span class="p">,</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="p">}</span>
+</span></code></pre></div>
+<h3 id="variable-perturbations">Variable perturbations</h3>
+<p>The <code>variables</code> section also stores information needed to generate perturbed
+variables for stochastic gradient estimation (see <a href="../gradients/">Stochastic
+Gradients</a>).</p>
+<p>Perturbations are generated by <a class="autorefs autorefs-internal" title="            Sampler" href="../../reference/sampler/#ropt.sampler.Sampler"><code>Sampler</code></a> instances
+configured in the
+<a href="#samplers"><code>samplers</code></a>
+section. The <code>samplers</code> field of <code>variables</code> assigns each variable to a sampler
+by key (default: <code>"0"</code>, which is the first sampler when they are given as a
+list). Unless explicitly configured otherwise, the default sampler method is
+<code>"scipy/default"</code>, which draws perturbations from a standard normal distribution
+<span class="arithmatex">\(N(0, 1)\)</span>.</p>
+<p>The generated perturbation values are scaled by <code>perturbation_magnitudes</code>
+(default: <code>0.005</code>) and can be modified based on <code>perturbation_types</code> (see
+<a class="autorefs autorefs-internal" title="            PerturbationType" href="../../reference/enums/#ropt.enums.PerturbationType"><code>PerturbationType</code></a>):</p>
+<ul>
+<li><a class="autorefs autorefs-internal" title="            ABSOLUTE
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../../reference/enums/#ropt.enums.PerturbationType.ABSOLUTE"><code>ABSOLUTE</code></a> (default): the
+  perturbation magnitude is added directly to the variable value.</li>
+<li><a class="autorefs autorefs-internal" title="            RELATIVE
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../../reference/enums/#ropt.enums.PerturbationType.RELATIVE"><code>RELATIVE</code></a>: the magnitude is scaled
+  based on the variable's bounds.</li>
+</ul>
+<p>Perturbed variables may violate the defined bounds. The <code>boundary_types</code> field
+specifies how to handle such violations (see
+<a class="autorefs autorefs-internal" title="            BoundaryType" href="../../reference/enums/#ropt.enums.BoundaryType"><code>BoundaryType</code></a>). The default,
+<a class="autorefs autorefs-internal" title="            MIRROR_BOTH
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../../reference/enums/#ropt.enums.BoundaryType.MIRROR_BOTH"><code>MIRROR_BOTH</code></a>, mirrors perturbations
+back into the valid range.</p>
+<p>The <code>seed</code> value (default: <code>1</code>) ensures consistent results across repeated runs.
+To obtain unique results for each optimization run, modify the seed. A common
+approach is to use a tuple with a unique ID as the first
+element, ensuring reproducibility across nested and parallel evaluations.</p>
+<div class="admonition tip">
+<p class="admonition-title">Named constants</p>
+<p>The defaults above are defined as named constants in
+<a class="autorefs autorefs-internal" title="            ropt.config.constants" href="../../reference/config/#ropt.config.constants"><code>ropt.config.constants</code></a>:
+<a class="autorefs autorefs-internal" title="            DEFAULT_SEED
+
+
+  
+      module-attribute
+  " href="../../reference/config/#ropt.config.constants.DEFAULT_SEED"><code>DEFAULT_SEED</code></a>,
+<a class="autorefs autorefs-internal" title="            DEFAULT_PERTURBATION_MAGNITUDE
+
+
+  
+      module-attribute
+  " href="../../reference/config/#ropt.config.constants.DEFAULT_PERTURBATION_MAGNITUDE"><code>DEFAULT_PERTURBATION_MAGNITUDE</code></a>,
+<a class="autorefs autorefs-internal" title="            DEFAULT_PERTURBATION_TYPE
+
+
+  
+      module-attribute
+  " href="../../reference/config/#ropt.config.constants.DEFAULT_PERTURBATION_TYPE"><code>DEFAULT_PERTURBATION_TYPE</code></a>, and
+<a class="autorefs autorefs-internal" title="            DEFAULT_PERTURBATION_BOUNDARY_TYPE
+
+
+  
+      module-attribute
+  " href="../../reference/config/#ropt.config.constants.DEFAULT_PERTURBATION_BOUNDARY_TYPE"><code>DEFAULT_PERTURBATION_BOUNDARY_TYPE</code></a>.</p>
+</div>
+<h3 id="variable-scales">Scaling the variables</h3>
+<p>Variables reach the optimizer as <span class="arithmatex">\(y = (x - o)/s\)</span>, using the <code>scales</code> and
+<code>offsets</code> fields, and are reported back to you as <span class="arithmatex">\(x = s\,y + o\)</span>. Both
+directions come from the same two arrays, so they cannot disagree.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="s2">"variables"</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    <span class="s2">"variable_count"</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    <span class="s2">"lower_bounds"</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">100.0</span><span class="p">],</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    <span class="s2">"upper_bounds"</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">600.0</span><span class="p">],</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    <span class="s2">"scales"</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">500.0</span><span class="p">],</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    <span class="s2">"offsets"</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">100.0</span><span class="p">],</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="p">}</span>
+</span></code></pre></div>
+<p>Scaling matters when variables differ by orders of magnitude. An optimizer takes
+a step of the same size in every direction, and judges convergence with one
+tolerance for all of them; both of those are only meaningful if the variables
+are comparable in size. The example above puts both variables in the range
+<span class="arithmatex">\([0, 1]\)</span>.</p>
+<p>Deriving the scales and offsets from the bounds like that is the common case,
+and <a class="autorefs autorefs-internal" title="            scales_and_offsets_from_bounds" href="../../reference/utils/#ropt.utils.scales_and_offsets_from_bounds"><code>scales_and_offsets_from_bounds</code></a>
+does it for you:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">scales_and_offsets_from_bounds</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">scales</span><span class="p">,</span> <span class="n">offsets</span> <span class="o">=</span> <span class="n">scales_and_offsets_from_bounds</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">100.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">600.0</span><span class="p">])</span>
+</span></code></pre></div>
+<p>Scales must be positive: a scale is a change of units, and nothing else. The
+default is a scale of 1 and an offset of 0, which is the identity. There is no
+<code>auto_scale</code> for variables, because there is nothing to estimate one from: the
+bounds are the only information available before the run starts, and using them
+is a choice, not a default.</p>
+<p>Everything that describes the variables moves with them. The bounds are mapped,
+and so are the <a href="#variable-perturbations">perturbation magnitudes</a> of type
+<code>ABSOLUTE</code>; a magnitude is a distance rather than a position, so only the scale
+applies to it, not the offset. <code>RELATIVE</code> magnitudes are a fraction of the bound
+range and are already dimensionless, so they are left alone. Linear constraints
+follow the variables too, as described <a href="#linear-constraint-scales">below</a>.</p>
+<p>The scales and offsets apply to every variable, including the ones fixed by
+<code>mask</code>. This keeps the scaling uniform, and a fixed variable maps back
+to exactly the value you gave it.</p>
+<p>What you see in the results follows from that:</p>
+<ul>
+<li>Variables and perturbed variables are reported unscaled.</li>
+<li>Distances to the variable bounds, in
+  <a class="autorefs autorefs-internal" title="            ropt.results.ConstraintInfo
+
+
+  
+      dataclass
+  " href="../../reference/results/#ropt.results.ConstraintInfo"><code>ConstraintInfo</code></a>, are multiplied by the scale.
+  An offset is a shift shared by a value and its bound, so it cancels out of the
+  distance between them.</li>
+</ul>
+<h2 id="objectives"><code>objectives</code></h2>
+<p>Validated into
+<a class="autorefs autorefs-internal" title="            ObjectiveFunctionsConfig" href="../../reference/config/#ropt.config.ObjectiveFunctionsConfig"><code>ObjectiveFunctionsConfig</code></a>.</p>
+<p><code>ropt</code> supports multi-objective optimization. Multiple objectives are combined
+into a single value by summing them after weighting. The <code>weights</code> field
+determines the weight of each objective function, and its length defines the
+number of objectives (default: <code>[1.0]</code>, meaning a single objective). The weights
+are automatically normalized to sum to 1 (for example, <code>[1, 1]</code> becomes <code>[0.5, 0.5]</code>).</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="s2">"objectives"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"weights"</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.6</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">]}</span>
+</span></code></pre></div>
+<p>Weights must not be negative, and must not all be zero. A zero weight is
+allowed, and disables its objective.</p>
+<p>Objective functions can optionally be processed using
+<a href="../realization_filters/">realization filters</a> and
+<a href="../function_estimators/">function estimators</a>. Both fields select an object by
+its key in the corresponding mapping defined in
+<a class="autorefs autorefs-internal" title="            EnOptContext" href="../../reference/context/#ropt.context.EnOptContext"><code>EnOptContext</code></a>.</p>
+<ul>
+<li><code>realization_filters</code>: default <code>None</code> (no filter applied).</li>
+<li><code>function_estimators</code>: default <code>"0"</code> (the first function estimator). Unless
+  explicitly configured otherwise, the default function estimator method is
+  <code>"default/default"</code>, which computes a weighted average of the per-realization
+  values.</li>
+</ul>
+<p>Setting <code>function_estimators</code> to <code>None</code> leaves that objective unestimated, and
+its value is reported as <code>NaN</code>. Any other key must exist; see <a href="../configuration/#sharing-optimizer-components-by-key">Sharing optimizer
+components by
+key</a>.</p>
+<h3 id="objective-scales">Scaling objectives</h3>
+<p>Objectives are passed to the optimizer divided by the <code>scales</code> field, and
+reported back to you multiplied by it again. This changes the numbers the
+optimizer sees, which matters when objectives differ by orders of magnitude or
+when a method has absolute tolerances.</p>
+<p>With a single objective that is all it changes: dividing by a positive constant
+leaves the optimum where it was. With several objectives it does more. The
+optimizer minimizes <span class="arithmatex">\(\sum_j w_j f_j / s_j\)</span>, so the effective weight of an
+objective is <span class="arithmatex">\(w_j / s_j\)</span>, and changing one scale changes the trade-off between
+the objectives and moves the optimum with it. Scales and weights multiply, so
+setting both means deciding what their product should be.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="s2">"objectives"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"weights"</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.6</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">],</span> <span class="s2">"scales"</span><span class="p">:</span> <span class="p">[</span><span class="mf">1e6</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]}</span>
+</span></code></pre></div>
+<p>Scales must be positive: a scale is a change of units, and nothing else. Which
+direction an objective is optimized in is a separate setting, described
+<a href="#objective-direction">below</a>.</p>
+<p>Set <code>auto_scale</code> to estimate a scale from the first batch of evaluations
+instead of stating one:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="s2">"objectives"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"auto_scale"</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+</span></code></pre></div>
+<p>The estimate is the weighted average of the objectives over the realizations,
+combined into a single factor using the objective weights, so that the weighted
+sum of the objectives starts out at a magnitude of one. It is a <em>single</em> factor
+for all objectives, which preserves their relative magnitudes and therefore both
+the meaning of <code>weights</code> and, unlike a per-objective scale, the location of the
+optimum. Realizations that fail do not contribute.</p>
+<p>The estimate is computed once, from the first batch, and then fixed for the rest
+of the run. It <em>multiplies</em> <code>scales</code> rather than replacing it, so a configured
+scale still applies on top of an estimated one. An <code>offsets</code> entry is subtracted
+before the estimate is taken, so the estimate measures what is left after it.</p>
+<p>Because the estimate divides the objective the optimizer reports, switching
+<code>auto_scale</code> on lowers <code>target_objective</code> without changing the solution. Two
+runs that differ in this setting can only be compared through
+<code>functions.objectives</code> or their variables; see
+<a href="../../running/results/#scaling-of-results">Scaling of results</a>.</p>
+<h3 id="objective-offsets">Offsetting objectives</h3>
+<p>An objective reaches the optimizer as <span class="arithmatex">\((f_j - o_j)/s_j\)</span>, using the <code>offsets</code>
+field, and is reported back to you as <span class="arithmatex">\(f_j = s_j\,y_j + o_j\)</span>. The default is
+zero, which is the identity.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="s2">"objectives"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"weights"</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">],</span> <span class="s2">"scales"</span><span class="p">:</span> <span class="p">[</span><span class="mf">1e5</span><span class="p">],</span> <span class="s2">"offsets"</span><span class="p">:</span> <span class="p">[</span><span class="mf">1e9</span><span class="p">]}</span>
+</span></code></pre></div>
+<p>An offset does not move the optimum and does not change the gradient: it shifts
+the weighted total by a constant. What it changes is the <em>magnitude</em> the
+optimizer works with, and that matters when an objective is large but varies
+little. An NPV around <span class="arithmatex">\(10^9\)</span> that varies by <span class="arithmatex">\(10^5\)</span> becomes, after dividing by
+<span class="arithmatex">\(10^9\)</span>, a quantity near one that varies by <span class="arithmatex">\(10^{-4}\)</span> — below the convergence
+tolerance of many methods. Subtracting a baseline of <span class="arithmatex">\(10^9\)</span> first and then
+dividing by <span class="arithmatex">\(10^5\)</span> leaves the variation at order one.</p>
+<p>Because it changes the value the optimizer tests against its tolerances, an
+offset can change where a run stops, even though it cannot change where the
+optimum is.</p>
+<p>An aggregate that measures dispersion rather than central tendency has its
+offset subtracted too. A standard deviation is unchanged by shifting the values
+it summarizes, so the offset applies to the aggregate itself; the map is undone
+on the way out, so what you are reported is unaffected.</p>
+<h3 id="objective-direction">Choosing the direction of an objective</h3>
+<p><code>ropt</code> minimizes. To maximize an objective, mark it in the <code>maximize</code> field,
+which is a boolean per objective and defaults to all-false:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="s2">"objectives"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"weights"</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.6</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">],</span> <span class="s2">"maximize"</span><span class="p">:</span> <span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">]}</span>
+</span></code></pre></div>
+<p>The sign is flipped <em>after</em> the values of the individual realizations have been
+combined, and never on the values themselves. This matters when a
+<a href="../function_estimators/">function estimator</a> produces a measure of dispersion
+rather than an average: negating the inputs of a standard deviation leaves it
+unchanged, so asking to maximize it would silently have minimized it instead.
+Negating the combined value is correct whatever produced it.</p>
+<p>What you see in the results follows from that:</p>
+<ul>
+<li>Per-realization values (<code>evaluations.objectives</code>) are scaled, never flipped.</li>
+<li>Combined values (<code>functions.objectives</code>) and their gradients are reported with
+  the flip undone, so that they agree in sign with the values they summarize.</li>
+<li><code>target_objective</code> exists only as the optimizer sees it, because it mixes
+  objectives of different scales and directions and there is no single factor
+  to undo. It is always a value being minimized, which is what lets results be
+  compared by "lowest is best".</li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Objective and realization weights must not be negative. A negative weight
+used to act as a way to maximize; mark the objective in <code>maximize</code> instead.</p>
+</div>
+<h2 id="linear_constraints"><code>linear_constraints</code></h2>
+<p>Validated into <a class="autorefs autorefs-internal" title="            LinearConstraintsConfig" href="../../reference/config/#ropt.config.LinearConstraintsConfig"><code>LinearConstraintsConfig</code></a>.</p>
+<p>Linear constraints are defined by a set of linear equations involving the
+optimization variables. The <code>coefficients</code> field is a 2D array where each row
+represents a constraint and each column corresponds to a variable. The number of
+rows determines the number of constraints.</p>
+<p>The <code>lower_bounds</code> and <code>upper_bounds</code> fields specify the bounds on the
+right-hand side of each constraint equation. They are broadcasted to match the
+number of constraints.</p>
+<ul>
+<li>Less-than inequalities: set <code>lower_bounds</code> to <span class="arithmatex">\(-\infty\)</span>.</li>
+<li>Greater-than inequalities: set <code>upper_bounds</code> to <span class="arithmatex">\(+\infty\)</span>.</li>
+<li>Equality constraints: set <code>lower_bounds</code> equal to <code>upper_bounds</code>.</li>
+</ul>
+<p>All three fields (<code>coefficients</code>, <code>lower_bounds</code>, <code>upper_bounds</code>) are required;
+there are no defaults.</p>
+<p>Coefficients refer to all variables, including those fixed by the <code>mask</code> field
+of <a href="#variables"><code>variables</code></a>. Before the constraints are passed to the
+optimizer, the contribution of the fixed variables, evaluated at their initial
+values, is subtracted from the bounds. Constraints that only involve fixed
+variables reduce to a constant and are dropped. Dropping applies only to the
+optimizer: results are checked against the full set of constraints, so a
+constant that violates its bounds is reported in every result through
+<a class="autorefs autorefs-internal" title="            ropt.results.ConstraintInfo
+
+
+  
+      dataclass
+  " href="../../reference/results/#ropt.results.ConstraintInfo"><code>ConstraintInfo</code></a>.</p>
+<h3 id="linear-constraint-scales">Scaling the equations</h3>
+<p>Two separate things happen to the linear constraints, in this order.</p>
+<p>First, the variable <code>scales</code> and <code>offsets</code> are substituted into the equations.
+Writing <span class="arithmatex">\(x = s\,y + o\)</span> turns <span class="arithmatex">\(A\)</span> into <span class="arithmatex">\(A\,\mathrm{diag}(s)\)</span> and the bounds <span class="arithmatex">\(b\)</span>
+into <span class="arithmatex">\(b - A\,o\)</span>. This is a change of variables rather than a rescaling: it
+shifts every equation and every bound by the same amount, so the distance
+between them, and therefore the feasible set, is unchanged. It happens whenever
+the variables are scaled, and needs no configuration.</p>
+<p>Second, each equation is divided by its entry in the <code>scales</code> field, together
+with its bounds:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="s2">"linear_constraints"</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">,</span> <span class="s2">"scales"</span><span class="p">:</span> <span class="p">[</span><span class="mf">1e3</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]}</span>
+</span></code></pre></div>
+<p>Dividing an equation by a positive number leaves its solutions alone; what it
+changes is the size of the numbers the optimizer works with, in the same way
+that scaling the variables does. Set <code>auto_scale</code> to estimate those divisors
+instead of stating them:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="s2">"linear_constraints"</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">,</span> <span class="s2">"auto_scale"</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+</span></code></pre></div>
+<p>The estimate for an equation is the largest absolute value among its
+coefficients, so that the largest coefficient the optimizer sees is one. Only
+the columns of variables that are free count towards it, since the fixed ones
+are eliminated before the optimizer sees the problem. An equation with nothing
+left to measure is divided by one rather than by zero. The estimate
+<em>multiplies</em> <code>scales</code>, so a configured scale still applies on top of an
+estimated one.</p>
+<p>Unlike <code>auto_scale</code> for nonlinear constraints, this is a single boolean rather
+than one per equation: the rows form one matrix equation and are scaled together
+or not at all.</p>
+<p>Distances to the constraint bounds are reported unscaled, with both
+steps undone.</p>
+<h2 id="nonlinear_constraints"><code>nonlinear_constraints</code></h2>
+<p>Validated into
+<a class="autorefs autorefs-internal" title="            NonlinearConstraintsConfig" href="../../reference/config/#ropt.config.NonlinearConstraintsConfig"><code>NonlinearConstraintsConfig</code></a>.</p>
+<p>Nonlinear constraints are defined by comparing a constraint function to
+right-hand-side bounds. The <code>lower_bounds</code> and <code>upper_bounds</code> fields specify
+these bounds, and their length determines the number of constraint functions.
+Both fields are required; there are no defaults.</p>
+<p>The same bound conventions apply as for linear constraints: use <span class="arithmatex">\(-\infty\)</span> or
+<span class="arithmatex">\(+\infty\)</span> for one-sided inequalities, and equal bounds for equality
+constraints.</p>
+<p>The constraint function values are returned by the evaluator in the same array
+as the objectives (appended after them).</p>
+<p>Only some optimization methods accept non-linear constraints; for the SciPy
+backend, see the table in <a class="autorefs autorefs-internal" title="            ropt.backend.scipy.SciPyBackend" href="../../reference/backend/#ropt.backend.scipy.SciPyBackend"><code>SciPyBackend</code></a>.</p>
+<p>Like objectives, nonlinear constraints can optionally be processed using
+<a href="../realization_filters/">realization filters</a> and
+<a href="../function_estimators/">function estimators</a>, selected by key:</p>
+<ul>
+<li><code>realization_filters</code>: default <code>None</code> (no filter applied).</li>
+<li><code>function_estimators</code>: default <code>"0"</code> (the first function estimator, which by
+  default computes a weighted average of per-realization values).</li>
+</ul>
+<h3 id="constraint-scales">Scaling constraints</h3>
+<p>Constraints support <code>scales</code> and <code>auto_scale</code> just as
+<a href="#objective-scales">objectives</a> do, with two differences.</p>
+<p>The bounds are scaled together with the constraint values, so the constraint
+you configured is the constraint that is solved. Scales are positive, so the
+bounds keep their order.</p>
+<p>Constraints have no <code>maximize</code> field: a constraint is a bound to satisfy, not a
+quantity to optimize.</p>
+<p>Auto-scaling estimates a <em>separate</em> factor for each constraint, rather than the
+single shared factor used for objectives, because constraints are independent
+conditions rather than terms of one weighted sum. For the same reason
+<code>auto_scale</code> is a boolean <em>per constraint</em>, so that constraints can be scaled
+independently:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="s2">"nonlinear_constraints"</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">,</span> <span class="s2">"auto_scale"</span><span class="p">:</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">]}</span>
+</span></code></pre></div>
+<p>There is no <code>offsets</code> entry for constraints. An objective needs an offset
+because it has no natural reference point, but a constraint already has one: the
+optimizer only ever sees the difference between a constraint and its bound, so
+the value is centred on the bound already and an offset would cancel out.</p>
+<h2 id="realizations"><code>realizations</code></h2>
+<p>Validated into <a class="autorefs autorefs-internal" title="            RealizationsConfig" href="../../reference/config/#ropt.config.RealizationsConfig"><code>RealizationsConfig</code></a>.</p>
+<p>To optimize an ensemble of functions, a set of realizations is defined. When the
+optimizer requests a function value or a gradient, these are calculated for each
+realization and then combined into a single value. Typically, this combination is
+a weighted sum, but other methods are possible (see
+<a href="../function_estimators/">function estimators</a>).</p>
+<p>The <code>weights</code> field determines the weight of each realization, and its length
+defines the ensemble size (default: <code>[1.0]</code>, meaning a single realization). The
+weights are automatically normalized to sum to 1 (for example, <code>[1, 1]</code> becomes
+<code>[0.5, 0.5]</code>). As with the objective weights, they must not be negative and must
+not all be zero.</p>
+<p>If function evaluations for some realizations fail (for example, due to a simulation
+error), the total function and gradient values can still be calculated by
+excluding the missing values. The <code>realization_min_success</code> field specifies the
+minimum number of successful realizations required (default: equal to the number
+of realizations, meaning no failures are allowed).</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Setting <code>realization_min_success</code> to zero allows the optimization to proceed
+even if all realizations fail. While some optimizers can handle this, most
+will treat it as if the value were one, requiring at least one successful
+realization.</p>
+</div>
+<h2 id="optimizer"><code>optimizer</code></h2>
+<p>Validated into <a class="autorefs autorefs-internal" title="            OptimizerConfig" href="../../reference/config/#ropt.config.OptimizerConfig"><code>OptimizerConfig</code></a>.</p>
+<p>Workflow-level settings that control how the optimization run is managed. All
+fields are optional and default to <code>None</code> (no limit) or <code>None</code> (no
+redirection):</p>
+<ul>
+<li>
+<p><strong><code>max_batches</code></strong>: Limits the total number of <em>calls</em> made to the evaluation
+  function. An optimizer might request a batch containing multiple function
+  and/or gradient evaluations within a single call. This is particularly useful
+  for managing resource usage when batches are evaluated in parallel (for example, on
+  an HPC cluster), as it controls the number of sequential submission steps. The
+  number of batches does not necessarily correspond directly to the number of
+  optimizer iterations.</p>
+</li>
+<li>
+<p><strong><code>max_functions</code></strong>: Sets a hard limit on the total <em>number</em> of individual
+  objective function evaluations performed across all batches. Since a single
+  batch can involve multiple function evaluations, this gives finer control
+  over total computational effort. Note that exceeding this limit might
+  cause the optimization to terminate mid-batch.</p>
+</li>
+<li>
+<p><strong><code>output_dir</code></strong> (default: <code>None</code>): An optional output directory where the
+  optimizer can store files. When <code>None</code>, no output directory is used. A
+  relative <code>stdout</code> or <code>stderr</code> path is resolved against it.</p>
+</li>
+<li><strong><code>stdout</code></strong> (default: <code>None</code>): Capture the optimizer's standard output into
+  the given file. When <code>None</code>, the optimizer's output is not captured. Unless
+  <code>stderr</code> is also set, the optimizer's error output goes to this file too.</li>
+<li><strong><code>stderr</code></strong> (default: <code>None</code>): Capture the optimizer's standard error into
+  the given file. May be set on its own, in which case standard output is left
+  alone.</li>
+</ul>
+<p>These settings decide <strong>where</strong> the optimizer's output goes, not whether there
+is any: that is <a href="#backend"><code>verbose</code></a>. The evaluation callback is excluded
+either way — anything your objective function or your result handlers print goes
+to the terminal as usual.</p>
+<div class="admonition warning">
+<p class="admonition-title">Capture is for one run at a time</p>
+<p>Capturing rewires process-global state, so only one optimization at a time
+can do it. A second run that tries while another holds it — a concurrent run
+of <a href="../../running/parallel/#many-optimizations-at-once"><code>optimize_many</code></a>, or
+an optimization started from inside an evaluation callback — raises
+<a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a>. Leave <code>stdout</code> and
+<code>stderr</code> unset on runs that overlap.</p>
+<p>Whether an optimizer reports at all is decided by <a href="#backend"><code>verbose</code></a>,
+independently of capture. To silence one, set <code>verbose=False</code>; to discard
+output you cannot switch off, capture to <code>os.devnull</code> — but note that this
+discards anything <em>else</em> the process writes during the run, which a
+throwaway file would not.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">What else lands in the file</p>
+<p>Capture is scoped to a period of time, not to a source, so anything the
+process writes while the optimizer is working is captured with it. In
+practice that means Python warnings raised by the optimizer, which belong
+there, and output from your own threads, which does not. Log records are
+unaffected unless they go to a console handler; see
+<a href="../../troubleshooting/logging/#logging-during-an-optimization">Logging</a>.</p>
+</div>
+<h2 id="backend"><code>backend</code></h2>
+<p>Validated into <a class="autorefs autorefs-internal" title="            BackendConfig" href="../../reference/config/#ropt.config.BackendConfig"><code>BackendConfig</code></a>.</p>
+<p>Selects the optimizer algorithm and provides a standardized set of common
+settings that are forwarded to the backend:</p>
+<ul>
+<li><strong><code>method</code></strong> (default: <code>"scipy/default"</code>): Selects the algorithm using a
+  <code>"plugin/method"</code> string. The default uses SciPy's SLSQP optimizer.</li>
+<li><strong><code>max_iterations</code></strong> (default: <code>None</code>): Maximum number of iterations. The
+  exact definition depends on the optimizer backend, and not all backends
+  support this setting.</li>
+<li><strong><code>convergence_tolerance</code></strong> (default: <code>None</code>): Convergence tolerance used as a
+  stopping criterion. The exact definition depends on the optimizer, and not all
+  backends support this setting. It is compared against the quantities the
+  optimizer works with, which are scaled; see <a href="#objective-scales">Scaling
+  objectives</a>. Setting <code>auto_scale</code> there brings the weighted
+  objective sum to a magnitude of one at the start of the run, which is what
+  makes a fixed tolerance mean the same thing across problems.</li>
+<li><strong><code>parallel</code></strong> (default: <code>False</code>): If <code>True</code>, allows the optimizer to use
+  parallelized function evaluations. Typically applies to gradient-free methods;
+  not all backends support this setting.</li>
+<li>
+<p><strong><code>verbose</code></strong> (default: <code>None</code>): How much the optimizer reports about its own
+  progress. <code>False</code> or <code>0</code> is silent, <code>True</code> selects the optimizer's own default
+  level, and a positive integer selects a level explicitly, clamped to what the
+  optimizer offers. <code>None</code> is silent. Backends map this onto whatever their
+  library provides, so the levels are not directly comparable between them: as a
+  guide, <code>1</code> is normal progress, <code>2</code> is detailed and <code>3</code> is everything.</p>
+<p>Where that output ends up is a separate question, decided by
+<a href="#optimizer"><code>stdout</code> and <code>stderr</code></a>. With neither set it goes to the
+terminal. A backend option that names the same setting, such as SciPy's
+<code>disp</code>, takes precedence over <code>verbose</code>.
+- <strong><code>options</code></strong> (default: <code>None</code>): A dictionary or list of strings for generic
+  optimizer options. The format and interpretation depend on the specific
+  optimization method. These are passed straight to the backend.</p>
+</li>
+</ul>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="s2">"backend"</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>    <span class="s2">"method"</span><span class="p">:</span> <span class="s2">"scipy/default"</span><span class="p">,</span>
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>    <span class="s2">"max_iterations"</span><span class="p">:</span> <span class="mi">200</span><span class="p">,</span>
+</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>    <span class="s2">"options"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"maxiter"</span><span class="p">:</span> <span class="mi">200</span><span class="p">},</span>
+</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="p">}</span>
+</span></code></pre></div>
+<p>Which methods a backend supports, which kinds of constraint and variable each
+of them accepts, and which <code>options</code> they take, is documented by the backend
+itself. For the built-in SciPy backend, see
+<a class="autorefs autorefs-internal" title="            ropt.backend.scipy.SciPyBackend" href="../../reference/backend/#ropt.backend.scipy.SciPyBackend"><code>SciPyBackend</code></a>. A method configured with a
+constraint it cannot handle is only rejected when the run starts, with
+<a class="autorefs autorefs-internal" title="            UnsupportedError" href="../../reference/exceptions/#ropt.exceptions.UnsupportedError"><code>UnsupportedError</code></a>, so it is worth checking
+the table before writing the rest of the configuration.</p>
+<p>A backend can also be run in a process of its own, by prefixing the method with
+<code>external/</code>; see <a href="../../running/parallel/#external-backend">Running the optimizer in a separate
+process</a>.</p>
+<h2 id="gradient"><code>gradient</code></h2>
+<p>Validated into <a class="autorefs autorefs-internal" title="            GradientConfig" href="../../reference/config/#ropt.config.GradientConfig"><code>GradientConfig</code></a>.</p>
+<p>Controls how stochastic gradients are estimated (see also <a href="../gradients/">Stochastic
+Gradients</a> for a deeper discussion).</p>
+<p>Gradients are estimated using function values calculated from perturbed and
+unperturbed variables. The <code>number_of_perturbations</code> field determines how many
+perturbed variable sets are used (default:
+<a class="autorefs autorefs-internal" title="            DEFAULT_NUMBER_OF_PERTURBATIONS
+
+
+  
+      module-attribute
+  " href="../../reference/config/#ropt.config.constants.DEFAULT_NUMBER_OF_PERTURBATIONS"><code>DEFAULT_NUMBER_OF_PERTURBATIONS</code></a>
+= <code>5</code>, must be at least 1).</p>
+<p>If function evaluations for some perturbations fail, the gradient can still be
+estimated as long as a minimum number succeed. The <code>perturbation_min_success</code>
+field specifies this minimum (default: equal to <code>number_of_perturbations</code>).</p>
+<p>Gradients are calculated for each realization individually and then combined. If
+<code>number_of_perturbations</code> is low (or just 1), individual gradient calculations
+may be unreliable. Setting <code>merge_realizations</code> to <code>True</code> (default: <code>False</code>)
+directs the optimizer to combine the results of all realizations directly into a
+single gradient estimate.</p>
+<p>The <code>evaluation_policy</code> option (default: <code>"auto"</code>) controls how and when
+objective functions and gradients are calculated:</p>
+<ul>
+<li><strong><code>"auto"</code></strong>: Evaluate functions and/or gradients strictly according to the
+  optimizer's requests.</li>
+<li><strong><code>"speculative"</code></strong>: Evaluate the gradient whenever the objective function is
+  requested, even if the optimizer hasn't explicitly asked for it. This can
+  improve load balancing on HPC clusters by initiating gradient work earlier.</li>
+<li><strong><code>"separate"</code></strong>: Always launch function and gradient evaluations as distinct
+  operations, even if the optimizer requests both simultaneously. Useful when
+  using <a href="../realization_filters/">realization filters</a> that might disable
+  certain realizations, as it can reduce the number of gradient evaluations
+  needed based on information obtained from the function evaluations.</li>
+</ul>
+<h2 id="function-estimators"><code>function_estimators</code></h2>
+<p>Validated into
+<a class="autorefs autorefs-internal" title="            FunctionEstimatorConfig" href="../../reference/config/#ropt.config.FunctionEstimatorConfig"><code>FunctionEstimatorConfig</code></a>.</p>
+<p>A list of component configurations, each selecting a plugin with a <code>method</code>
+field and an optional <code>options</code> dict, referenced by key from the sections that
+use it (see <a href="../configuration/#sharing-optimizer-components-by-key">Sharing optimizer components by
+key</a>).</p>
+<p><a href="../function_estimators/">Function estimators</a> control how objective and
+constraint function values (and their gradients) are combined across
+realizations. By default, a weighted average over realizations is used; function
+estimators allow replacing that with a different combination method (for example,
+standard deviation).</p>
+<p>Fields:</p>
+<ul>
+<li><code>method</code> (default: <code>"default/default"</code>): Selects the estimator plugin.</li>
+<li><code>options</code> (default: <code>{}</code>): Plugin-specific options.</li>
+</ul>
+<h2 id="realization-filters"><code>realization_filters</code></h2>
+<p>Validated into
+<a class="autorefs autorefs-internal" title="            RealizationFilterConfig" href="../../reference/config/#ropt.config.RealizationFilterConfig"><code>RealizationFilterConfig</code></a>.</p>
+<p>A list of component configurations, each selecting a plugin with a <code>method</code>
+field and an optional <code>options</code> dict, referenced by key from the sections that
+use it (see <a href="../configuration/#sharing-optimizer-components-by-key">Sharing optimizer components by
+key</a>).</p>
+<p><a href="../realization_filters/">Realization filters</a> modify the weights of individual
+realizations. For example, they can select a subset of realizations by setting
+the weights of the others to zero — useful for constructing risk-aware
+objectives.</p>
+<p>Fields:</p>
+<ul>
+<li><code>method</code> (required, no default): Selects the filter plugin.</li>
+<li><code>options</code> (default: <code>{}</code>): Plugin-specific options.</li>
+</ul>
+<h2 id="samplers"><code>samplers</code></h2>
+<p>Validated into <a class="autorefs autorefs-internal" title="            SamplerConfig" href="../../reference/config/#ropt.config.SamplerConfig"><code>SamplerConfig</code></a>.</p>
+<p>A list of component configurations, each selecting a plugin with a <code>method</code>
+field and an optional <code>options</code> dict, referenced by key from
+<a href="#variables"><code>variables.samplers</code></a> (see <a href="../configuration/#sharing-optimizer-components-by-key">Sharing optimizer components by
+key</a>).</p>
+<p><a href="../samplers/">Samplers</a> generate perturbations added to variables for gradient
+calculations. These perturbations can be deterministic or stochastic.</p>
+<p>Fields:</p>
+<ul>
+<li><code>method</code> (default: <code>"scipy/default"</code>): Selects the sampler plugin. The default
+  draws perturbations from a standard normal distribution <span class="arithmatex">\(N(0, 1)\)</span>.</li>
+<li><code>options</code> (default: <code>{}</code>): Plugin-specific options.</li>
+<li><code>shared</code> (default: <code>False</code>): If <code>True</code>, the same set of perturbed values is
+  used for all realizations.</li>
+</ul>
+<h2 id="names"><code>names</code></h2>
+<p>Optional mapping from axis names to tuples of labels. These labels are used to
+produce human-readable multi-index DataFrames when results are exported (see
+<a href="../../running/results/">Working with Results</a>).</p>
+<p>Each key is an <a class="autorefs autorefs-internal" title="            AxisName" href="../../reference/enums/#ropt.enums.AxisName"><code>AxisName</code></a> value that identifies a
+dimension of the optimization problem:</p>
+<table>
+<thead>
+<tr>
+<th><code>AxisName</code> value</th>
+<th>Labels apply to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>"variable"</code></td>
+<td>The optimization variables</td>
+</tr>
+<tr>
+<td><code>"objective"</code></td>
+<td>The objective functions</td>
+</tr>
+<tr>
+<td><code>"nonlinear_constraint"</code></td>
+<td>The nonlinear constraint functions</td>
+</tr>
+<tr>
+<td><code>"linear_constraint"</code></td>
+<td>The linear constraints</td>
+</tr>
+<tr>
+<td><code>"realization"</code></td>
+<td>The realizations in the ensemble</td>
+</tr>
+<tr>
+<td><code>"perturbation"</code></td>
+<td>The perturbations used for gradient estimation</td>
+</tr>
+</tbody>
+</table>
+<p>A key may also be the name of a metadata key that carries array values, which
+labels the <a href="../../running/results/#user-defined-axes">user axis</a> that metadata spans.</p>
+<p>The corresponding value is a tuple of strings (or integers) whose length must
+match the count of that axis. For example, with 3 variables and 2 objectives:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="s2">"names"</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>    <span class="s2">"variable"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"x"</span><span class="p">,</span> <span class="s2">"y"</span><span class="p">,</span> <span class="s2">"z"</span><span class="p">),</span>
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>    <span class="s2">"objective"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"f0"</span><span class="p">,</span> <span class="s2">"f1"</span><span class="p">),</span>
+</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="p">}</span>
+</span></code></pre></div>
+<p>You only need to provide labels for axes you want named — unlabelled axes
+default to integer indices. See <a href="../../running/results/">Working with Results</a> for how
+these labels appear in exported DataFrames.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../configuration/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Configuration">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Configuration
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../variables/" class="md-footer__link md-footer__link--next" aria-label="Next: Variables">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Variables
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.expand", "navigation.footer", "navigation.sections", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="../../javascripts/mathjax.js"></script>
+      
+        <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>

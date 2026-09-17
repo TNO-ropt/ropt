@@ -1024,6 +1024,90 @@
   
   
     <li class="md-nav__item">
+      <a href="../configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration_sections/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration Sections
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../variables/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Variables
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../objectives/" class="md-nav__link">
         
   
@@ -1229,6 +1313,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#reproducibility" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reproducibility
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#choosing-number_of_perturbations" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1374,34 +1469,6 @@
     
   
     Function Estimators
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../configuration/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Configuration Reference
   
 
     
@@ -2995,6 +3062,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#reproducibility" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reproducibility
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#choosing-number_of_perturbations" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3116,6 +3194,10 @@ gradient configuration work together.</p>
 </tr>
 </tbody>
 </table>
+<p>The fields themselves are described under
+<a href="../configuration_sections/#gradient"><code>gradient</code></a> and
+<a href="../configuration_sections/#variable-perturbations">Variable perturbations</a> in
+the Configuration Reference.</p>
 <h2 id="configuration-in-one-place">Configuration in one place</h2>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.enums</span><span class="w"> </span><span class="kn">import</span> <span class="n">BoundaryType</span><span class="p">,</span> <span class="n">PerturbationType</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
@@ -3188,6 +3270,16 @@ variable. The <code>perturbation_types</code> field decides how that scale is in
   through the violated bound.</li>
 </ul>
 <p>See <a class="autorefs autorefs-internal" title="            BoundaryType" href="../../reference/enums/#ropt.enums.BoundaryType"><code>BoundaryType</code></a>.</p>
+<h2 id="reproducibility">Reproducibility</h2>
+<p>The perturbations are drawn from a generator seeded by <code>variables.seed</code>, which
+defaults to <code>1</code>. Repeating a run therefore reproduces it exactly, and changing
+the seed draws a different set of perturbations.</p>
+<p>A plain integer is enough for a single run. The field also accepts a tuple, and
+giving a unique identifier as its first element is what keeps runs distinct when
+they are nested or evaluated in parallel: each run draws its own perturbations
+while remaining reproducible on its own.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="s2">"variables"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"variable_count"</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="s2">"seed"</span><span class="p">:</span> <span class="p">(</span><span class="n">run_id</span><span class="p">,</span> <span class="mi">1</span><span class="p">)}</span>
+</span></code></pre></div>
 <h2 id="choosing-number_of_perturbations">Choosing <code>number_of_perturbations</code></h2>
 <p>More perturbations → more accurate gradient estimates but more evaluator calls
 per iteration. With <code>merge_realizations=False</code> (the default) the per-realization

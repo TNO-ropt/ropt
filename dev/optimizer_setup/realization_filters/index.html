@@ -1024,6 +1024,90 @@
   
   
     <li class="md-nav__item">
+      <a href="../configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration_sections/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration Sections
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../variables/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Variables
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../objectives/" class="md-nav__link">
         
   
@@ -1330,34 +1414,6 @@
     
   
     Function Estimators
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../configuration/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Configuration Reference
   
 
     
@@ -3012,7 +3068,8 @@ constraints, or both.</p>
 </ol>
 <p>See <a href="../configuration/#sharing-optimizer-components-by-key">Sharing optimizer components by
 key</a> for the indexing
-pattern.</p>
+pattern, and <a href="../configuration_sections/#realization-filters"><code>realization_filters</code></a>
+for the fields of a filter configuration.</p>
 <h2 id="cvar-example">CVaR example</h2>
 <p>Optimize the conditional expectation of the worst 30% of 10 realizations:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">CONFIG</span> <span class="o">=</span> <span class="p">{</span>
@@ -3058,9 +3115,9 @@ registers it, and selects it from the configuration as <code>"custom/median"</co
 <li>Computes a weighted sum of the objective values specified by the <code>sort</code>
    indices for each realization (using the objective weights from the
    configuration). If a single objective index is given, no weighting is
-   applied. The objective <a href="../configuration/#objective-scales">scales</a> are
+   applied. The objective <a href="../configuration_sections/#objective-scales">scales</a> are
    applied first, and objectives marked in
-   <a href="../configuration/#objective-direction"><code>maximize</code></a> have their sign flipped,
+   <a href="../configuration_sections/#objective-direction"><code>maximize</code></a> have their sign flipped,
    per objective, so that the sum ranks realizations the way the optimizer
    would.</li>
 <li>Conceptually sorts realizations by that value, ascending.</li>

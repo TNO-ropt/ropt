@@ -1023,6 +1023,90 @@
   
   
     <li class="md-nav__item">
+      <a href="../../optimizer_setup/configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../optimizer_setup/configuration_sections/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration Sections
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../optimizer_setup/variables/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Variables
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../optimizer_setup/objectives/" class="md-nav__link">
         
   
@@ -1227,34 +1311,6 @@
     
   
     Function Estimators
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../optimizer_setup/configuration/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Configuration Reference
   
 
     
@@ -3283,11 +3339,11 @@ documentation</strong>:</p>
 </ul>
 <p>Output is the exception to the rule: <code>ropt</code> captures it for you, on both levels,
 when the user configures
-<a href="../../optimizer_setup/configuration/#optimizer"><code>stdout</code> or <code>stderr</code></a>. A backend
+<a href="../../optimizer_setup/configuration_sections/#optimizer"><code>stdout</code> or <code>stderr</code></a>. A backend
 should not capture its own output, but it does have two things to do.</p>
 <h2 id="reporting-progress">Reporting progress</h2>
 <p>Whether the optimizer reports at all is the user's choice, made through
-<a href="../../optimizer_setup/configuration/#backend"><code>verbose</code></a>. Map it onto whatever
+<a href="../../optimizer_setup/configuration_sections/#backend"><code>verbose</code></a>. Map it onto whatever
 your library provides using
 <a class="autorefs autorefs-internal" title="            resolve_verbosity" href="../../reference/backend/#ropt.backend.utils.resolve_verbosity"><code>resolve_verbosity</code></a>, which normalises
 the setting so you need not tell <code>True</code> from <code>1</code> yourself:</p>

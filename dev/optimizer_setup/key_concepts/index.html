@@ -12,7 +12,7 @@
         <link rel="prev" href="../../running/restart/">
       
       
-        <link rel="next" href="../objectives/">
+        <link rel="next" href="../configuration/">
       
       
         
@@ -1093,6 +1093,90 @@
   
   
     <li class="md-nav__item">
+      <a href="../configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration_sections/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration Sections
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../variables/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Variables
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../objectives/" class="md-nav__link">
         
   
@@ -1297,34 +1381,6 @@
     
   
     Function Estimators
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../configuration/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Configuration Reference
   
 
     
@@ -2981,7 +3037,7 @@ installing extra packages.</p>
 <p>Each of the four kinds has its own place in the configuration. The
 exact syntax, the <code>method</code> naming convention (see
 <a href="../configuration/#method-strings">method strings</a>), and the available options are
-described in <a href="../configuration/">Configuration</a>; the dedicated pages
+described in <a href="../configuration_sections/">Configuration</a>; the dedicated pages
 <a href="../realization_filters/">Realization Filters</a>,
 <a href="../function_estimators/">Function Estimators</a>,
 and <a href="../samplers/">samplers</a> cover each component in depth.</p>
@@ -3014,12 +3070,12 @@ across all realizations. The per-realization values are then combined
 <dt><strong>Linear constraint</strong></dt>
 <dd>A constraint that is a linear function of the variables. Linear constraints
 are defined entirely in the
-<a href="../configuration/#linear_constraints">configuration</a> and are handled by
+<a href="../configuration_sections/#linear_constraints">configuration</a> and are handled by
 <code>ropt</code>; they require no action from the function evaluation.</dd>
 <dt><strong>Nonlinear constraint</strong></dt>
 <dd>A constraint that is a general (nonlinear) function of the variables. Like a
 linear constraint it is declared in the
-<a href="../configuration/#nonlinear_constraints">configuration</a>, but its value must
+<a href="../configuration_sections/#nonlinear_constraints">configuration</a>, but its value must
 be computed by the function evaluation, together with the objective, for
 each variable vector.</dd>
 <dt><strong>Gradient evaluation</strong></dt>
@@ -3038,7 +3094,7 @@ iteration may involve one or more batches.</dd>
 <dd>A component that provides the optimization algorithms (the <em>methods</em>) <code>ropt</code>
 runs. The built-in backend wraps <a href="https://www.scipy.org">SciPy</a>; other
 backends add algorithms from external packages. See the
-<a href="../configuration/#backend">backend configuration</a>.</dd>
+<a href="../configuration_sections/#backend">backend configuration</a>.</dd>
 <dt><strong>Sampler</strong></dt>
 <dd>A component that generates the perturbations used for stochastic gradient
 estimation. See <a href="../samplers/">Samplers</a>.</dd>
@@ -3053,10 +3109,10 @@ example to focus on the worst-performing ones. See
 <dt><strong>Scaling</strong></dt>
 <dd>The units the optimizer works in, as opposed to the ones you configure the
 problem in. Variables are scaled by the affine map given by their
-<a href="../configuration/#variable-scales"><code>scales</code> and <code>offsets</code></a>; aggregated
+<a href="../configuration_sections/#variable-scales"><code>scales</code> and <code>offsets</code></a>; aggregated
 objectives and nonlinear constraints by the affine map given by their
-<a href="../configuration/#objective-scales"><code>scales</code></a> and
-<a href="../configuration/#objective-offsets"><code>offsets</code></a>. Results carry both domains:
+<a href="../configuration_sections/#objective-scales"><code>scales</code></a> and
+<a href="../configuration_sections/#objective-offsets"><code>offsets</code></a>. Results carry both domains:
 a field and its <code>scaled</code> counterpart sit at the same path.</dd>
 </dl>
 
@@ -3111,13 +3167,13 @@ a field and its <code>scaled</code> counterpart sit at the same path.</dd>
         
         
           
-          <a href="../objectives/" class="md-footer__link md-footer__link--next" aria-label="Next: Objectives">
+          <a href="../configuration/" class="md-footer__link md-footer__link--next" aria-label="Next: Configuration">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Objectives
+                Configuration
               </div>
             </div>
             <div class="md-footer__button md-icon">

@@ -1024,6 +1024,90 @@
   
   
     <li class="md-nav__item">
+      <a href="../configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration_sections/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration Sections
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../variables/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Variables
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../objectives/" class="md-nav__link">
         
   
@@ -1319,34 +1403,6 @@
     
   
     Function Estimators
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../configuration/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Configuration Reference
   
 
     
@@ -2998,7 +3054,9 @@ perturbed by different samplers:</p>
 <p>Omit both fields entirely to perturb every variable with the default sampler.
 See <a href="../configuration/#sharing-optimizer-components-by-key">Sharing optimizer components by
 key</a> for the indexing
-pattern, which objectives and constraints use in the same way.</p>
+pattern, which objectives and constraints use in the same way, and
+<a href="../configuration_sections/#samplers"><code>samplers</code></a> for the fields of a sampler
+configuration.</p>
 <h2 id="sample-scaling">Sample scaling</h2>
 <p>Samplers produce <strong>unscaled</strong> perturbations — values with a characteristic
 magnitude of approximately one. During gradient estimation these samples are

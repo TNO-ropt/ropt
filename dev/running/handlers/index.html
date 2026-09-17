@@ -1176,6 +1176,90 @@
   
   
     <li class="md-nav__item">
+      <a href="../../optimizer_setup/configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../optimizer_setup/configuration_sections/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration Sections
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../optimizer_setup/variables/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Variables
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../optimizer_setup/objectives/" class="md-nav__link">
         
   
@@ -1380,34 +1464,6 @@
     
   
     Function Estimators
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../optimizer_setup/configuration/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Configuration Reference
   
 
     
@@ -3259,7 +3315,7 @@ Columns appear in the order the specification lists them. A
 field whose value is a vector or matrix expands to several columns; the extra
 column levels come from the field's axis labels (or indices), joined to the
 title with a separator (<code>,</code> by default, set with <code>sep=</code>). The labels come from
-the <a href="../../optimizer_setup/configuration/#names"><code>names</code></a> mapping: a length-2
+the <a href="../../optimizer_setup/configuration_sections/#names"><code>names</code></a> mapping: a length-2
 <code>variables</code> gives <code>Variable,v0</code> and <code>Variable,v1</code> when the variables are named
 <code>v0</code> and <code>v1</code>, and <code>Variable,0</code> and <code>Variable,1</code> when they are not. Because the
 column names follow
@@ -3283,7 +3339,7 @@ granularity, broadcasting a per-batch field across the per-realization rows.</p>
 <li><code>add_column(table, name, title)</code> adds one column to an existing table.</li>
 <li><code>set_callback(fn)</code> calls <code>fn(output_dir)</code> whenever the tables are updated,
   where <code>output_dir</code> is the run's configured
-  <a href="../../optimizer_setup/configuration/#optimizer"><code>output_dir</code></a> (<code>None</code> if it is
+  <a href="../../optimizer_setup/configuration_sections/#optimizer"><code>output_dir</code></a> (<code>None</code> if it is
   not set).</li>
 </ul>
 <div class="admonition tip">

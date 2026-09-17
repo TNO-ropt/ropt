@@ -1021,6 +1021,90 @@
   
   
     <li class="md-nav__item">
+      <a href="../optimizer_setup/configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../optimizer_setup/configuration_sections/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration Sections
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../optimizer_setup/variables/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Variables
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../optimizer_setup/objectives/" class="md-nav__link">
         
   
@@ -1225,34 +1309,6 @@
     
   
     Function Estimators
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../optimizer_setup/configuration/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Configuration Reference
   
 
     
@@ -3036,7 +3092,7 @@ instead: attach a <a class="autorefs autorefs-internal" title="            ropt.
 arrives. That history is also what remains when there is no best result to
 return.</p>
 <p><strong><code>NaN</code> means "this realization failed", and one failure is already too many.</strong>
-<a href="../optimizer_setup/configuration/#realizations"><code>realization_min_success</code></a>
+<a href="../optimizer_setup/configuration_sections/#realizations"><code>realization_min_success</code></a>
 defaults to <em>all</em> realizations, so a single <code>NaN</code> ends the run with
 <code>TOO_FEW_REALIZATIONS</code>. If some realizations are allowed to fail, say so:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">config</span> <span class="o">=</span> <span class="p">{</span>
@@ -3071,7 +3127,7 @@ in <code>TOO_FEW_REALIZATIONS</code>; see <a href="logging/">Logging</a>.</p>
 </tr>
 <tr>
 <td><code>TOO_FEW_REALIZATIONS</code> although only one realization failed</td>
-<td><a href="../optimizer_setup/configuration/#realizations"><code>realization_min_success</code></a> defaults to all of them. Lower it.</td>
+<td><a href="../optimizer_setup/configuration_sections/#realizations"><code>realization_min_success</code></a> defaults to all of them. Lower it.</td>
 </tr>
 <tr>
 <td><code>TOO_FEW_REALIZATIONS</code> and nothing says why</td>
@@ -3185,7 +3241,7 @@ it. Keep shared handlers cheap, or register a slow one with
 <p><strong>Not every optimizer can run beside another.</strong> A backend that needs its own
 working directory, writes to a fixed file name, or keeps state inside its
 library cannot run concurrently in one process; select it as
-<a href="../optimizer_setup/configuration/#external-backend"><code>external/...</code></a> to give it a
+<a href="../running/parallel/#external-backend"><code>external/...</code></a> to give it a
 process of its own. Optimizer output capture is likewise for one run at a time.</p>
 <table>
 <thead>
@@ -3219,7 +3275,7 @@ process of its own. Optimizer output capture is likewise for one run at a time.<
 </table>
 <h2 id="configuration">Configuration</h2>
 <p><strong>Runs are reproducible by default.</strong> The
-<a href="../optimizer_setup/configuration/#variable-perturbations">seed</a> is fixed at
+<a href="../optimizer_setup/configuration_sections/#variable-perturbations">seed</a> is fixed at
 <code>1</code> unless you set it, so repeating a run reproduces its perturbations exactly.
 Change the seed when you deliberately want an independent repetition of the same
 problem.</p>
@@ -3237,7 +3293,7 @@ problem.</p>
 </tr>
 <tr>
 <td>Two runs that should agree give different gradients</td>
-<td>Quasi-random samplers (<code>sobol</code>, <code>halton</code>, <code>lhs</code>) are seeded in the order the <a href="../optimizer_setup/configuration/#samplers">samplers</a> are defined, so reordering that section changes the perturbations.</td>
+<td>Quasi-random samplers (<code>sobol</code>, <code>halton</code>, <code>lhs</code>) are seeded in the order the <a href="../optimizer_setup/configuration_sections/#samplers">samplers</a> are defined, so reordering that section changes the perturbations.</td>
 </tr>
 </tbody>
 </table>

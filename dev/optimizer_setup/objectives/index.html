@@ -9,7 +9,7 @@
       
       
       
-        <link rel="prev" href="../key_concepts/">
+        <link rel="prev" href="../variables/">
       
       
         <link rel="next" href="../constraints/">
@@ -1021,6 +1021,90 @@
                 
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration_sections/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration Sections
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../variables/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Variables
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
     
   
   
@@ -1319,34 +1403,6 @@
     
   
     Function Estimators
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../configuration/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Configuration Reference
   
 
     
@@ -2977,7 +3033,7 @@ forms that number for you, as a weighted sum of the objectives you declare.</p>
 <p>This page covers how many objectives there are, how they are weighted, which
 direction each is optimized in, and how scaling interacts with the weights. For
 the field-by-field reference, see
-<a href="../configuration/#objectives"><code>objectives</code></a>.</p>
+<a href="../configuration_sections/#objectives"><code>objectives</code></a>.</p>
 <h2 id="declaring-more-than-one-objective">Declaring more than one objective</h2>
 <p>The <code>weights</code> field declares how many objectives there are: one entry each.
 Nothing else in the configuration changes.</p>
@@ -3011,7 +3067,9 @@ one boolean per objective:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="s2">"objectives"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"weights"</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.6</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">],</span> <span class="s2">"maximize"</span><span class="p">:</span> <span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">]}</span>
 </span></code></pre></div>
 <p>Do not try to maximize by making a weight negative; weights must be
-non-negative, and <code>maximize</code> is the supported way to express a direction.</p>
+non-negative, and <code>maximize</code> is the supported way to express a direction. See
+<a href="../configuration_sections/#objective-direction">Choosing the direction of an
+objective</a>.</p>
 <p>The sign is flipped <strong>after</strong> the realizations have been combined, never on the
 per-realization values. That ordering matters as soon as a
 <a href="../function_estimators/">function estimator</a> produces something other than an
@@ -3046,8 +3104,10 @@ or their variables. The runnable demonstration is
 <p>An <code>offsets</code> entry is subtracted before the division. It cannot move the optimum
 or change the gradient, but it changes the magnitude the optimizer tests against
 its tolerances, which is what makes it useful for an objective that is large and
-varies little. See
-<a href="../configuration/#objective-offsets">Offsetting objectives</a>.</p>
+varies little. See <a href="../configuration_sections/#objective-scales">Scaling
+objectives</a> and
+<a href="../configuration_sections/#objective-offsets">Offsetting objectives</a> for the
+full field descriptions.</p>
 <h2 id="see-also">See also</h2>
 <ul>
 <li>What a run reports in each domain, and which fields are comparable between
@@ -3088,7 +3148,7 @@ varies little. See
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../key_concepts/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Key Concepts">
+          <a href="../variables/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Variables">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -3098,7 +3158,7 @@ varies little. See
                 Previous
               </span>
               <div class="md-ellipsis">
-                Key Concepts
+                Variables
               </div>
             </div>
           </a>

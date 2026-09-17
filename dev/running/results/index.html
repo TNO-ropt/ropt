@@ -1271,6 +1271,90 @@
   
   
     <li class="md-nav__item">
+      <a href="../../optimizer_setup/configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../optimizer_setup/configuration_sections/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration Sections
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../optimizer_setup/variables/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Variables
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../optimizer_setup/objectives/" class="md-nav__link">
         
   
@@ -1475,34 +1559,6 @@
     
   
     Function Estimators
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../optimizer_setup/configuration/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Configuration Reference
   
 
     
@@ -3673,11 +3729,11 @@ include an <code>OBJECTIVE</code> axis of length one.</p>
 <h2 id="scaling-of-results">Scaling of results</h2>
 <p>Optimization internally works with scaled values: variables are scaled and
 shifted by their
-<a href="../../optimizer_setup/configuration/#variable-scales"><code>scales</code> and <code>offsets</code></a>, objective and
+<a href="../../optimizer_setup/configuration_sections/#variable-scales"><code>scales</code> and <code>offsets</code></a>, objective and
 nonlinear constraint <em>aggregates</em> have their
-<a href="../../optimizer_setup/configuration/#objective-offsets">offsets</a> subtracted and are divided by
-their <a href="../../optimizer_setup/configuration/#objective-scales">scales</a>, and objectives marked
-<a href="../../optimizer_setup/configuration/#objective-direction"><code>maximize</code></a> are negated once they have
+<a href="../../optimizer_setup/configuration_sections/#objective-offsets">offsets</a> subtracted and are divided by
+their <a href="../../optimizer_setup/configuration_sections/#objective-scales">scales</a>, and objectives marked
+<a href="../../optimizer_setup/configuration_sections/#objective-direction"><code>maximize</code></a> are negated once they have
 been combined across realizations.</p>
 <p>Every result carries both domains at once, and one rule connects them:</p>
 <div class="admonition note">
@@ -3765,7 +3821,7 @@ update such tables for you as an optimization runs; see
 <a href="../handlers/">Result Handlers</a>.</p>
 </div>
 <p>The row index and the unstacked column labels come from the
-<a href="../../optimizer_setup/configuration/#names"><code>names</code></a> mapping in the configuration. If an axis is
+<a href="../../optimizer_setup/configuration_sections/#names"><code>names</code></a> mapping in the configuration. If an axis is
 not named, its labels fall back to 0-based integer indices. For example,
 exporting the objectives of a single result <strong>without</strong> any <code>names</code> gives plain
 numbers for both the realization and the objective axes:</p>
@@ -3947,7 +4003,7 @@ alike:</p>
 <a class="autorefs autorefs-internal" title="            AxisName" href="../../reference/enums/#ropt.enums.AxisName"><code>AxisName</code></a> value (for example <code>"variable"</code>, <code>"realization"</code>,
 <code>"objective"</code>), and <code>batch_id</code> is always prepended so results from different
 batches stay distinct. The label on each level — and on each unstacked column —
-comes from the <a href="../../optimizer_setup/configuration/#names"><code>names</code></a> mapping in the configuration, a
+comes from the <a href="../../optimizer_setup/configuration_sections/#names"><code>names</code></a> mapping in the configuration, a
 dict from axis name to a tuple of labels:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="n">CONFIG</span> <span class="o">=</span> <span class="p">{</span>
 </span><span id="__span-24-2"><a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a>    <span class="o">...</span>

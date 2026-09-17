@@ -1024,6 +1024,90 @@
   
   
     <li class="md-nav__item">
+      <a href="../configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration_sections/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration Sections
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../variables/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Variables
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../objectives/" class="md-nav__link">
         
   
@@ -1319,34 +1403,6 @@
     
   
     Function Estimators
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../configuration/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Configuration Reference
   
 
     
@@ -3040,8 +3096,10 @@ must fall in — here a single constraint that must stay at or below <span class
 bounds for an equality.</p>
 <p>The section declares only the bounds; the values themselves come from the
 evaluation function. See
-<a href="../configuration/#nonlinear_constraints"><code>nonlinear_constraints</code></a> and
-<a href="../configuration/#variables"><code>variables</code></a> for the full field reference.</p>
+<a href="../configuration_sections/#nonlinear_constraints"><code>nonlinear_constraints</code></a> and
+<a href="../configuration_sections/#variables"><code>variables</code></a> for the full field reference.
+Constraint values can also be rescaled before the optimizer sees them; see
+<a href="../configuration_sections/#constraint-scales">Scaling constraints</a>.</p>
 <h2 id="returning-a-constraint-from-the-evaluation-function">Returning a constraint from the evaluation function</h2>
 <p>An evaluation function that has constraints returns a sequence instead of a
 single number: <strong>the objectives first, then the constraints</strong>. With one
@@ -3119,8 +3177,10 @@ fifth variables to be equal:</p>
 </span></code></pre></div>
 <p>The script adds it when run with <code>--linear</code>. One row per constraint, one
 coefficient per variable; see
-<a href="../configuration/#linear_constraints"><code>linear_constraints</code></a> for the field
-reference.</p>
+<a href="../configuration_sections/#linear_constraints"><code>linear_constraints</code></a> for the field
+reference, and <a href="../configuration_sections/#linear-constraint-scales">Scaling the
+equations</a> for rescaling a
+row before it reaches the optimizer.</p>
 
 
 
