@@ -2437,21 +2437,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.simple.EvaluateResult" class="md-nav__link">
+  <a href="#ropt.simple.OptimizationResult" class="md-nav__link">
     <span class="md-ellipsis">
       
-        EvaluateResult
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#ropt.simple.OptimizeResult" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        OptimizeResult
+        OptimizationResult
       
     </span>
   </a>
@@ -3933,21 +3922,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.simple.EvaluateResult" class="md-nav__link">
+  <a href="#ropt.simple.OptimizationResult" class="md-nav__link">
     <span class="md-ellipsis">
       
-        EvaluateResult
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#ropt.simple.OptimizeResult" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        OptimizeResult
+        OptimizationResult
       
     </span>
   </a>
@@ -4104,7 +4082,7 @@ the run is started from, including a thread you spawn yourself.</p>
 </span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="n">report</span><span class="p">:</span> <span class="n">ReportCallback</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    <span class="n">constraint_tolerance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-10</span><span class="p">,</span>
 </span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OptimizeResult</span>
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OptimizationResult</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents first">
@@ -4237,7 +4215,7 @@ a worker process, where it cannot work at all.</p>
             <td>
               <div class="doc-md-description">
                 <p>An optional callback invoked with an
-                  <code>EvaluateResult</code> for each function evaluation;
+                  <code>FunctionResults</code> for each function evaluation;
                   return <code>True</code> from it to stop the optimization
                   early with <code>USER_ABORT</code>. Reporting stops there,
                   so results after it in the same batch are not
@@ -4306,21 +4284,21 @@ a worker process, where it cannot work at all.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.simple.OptimizeResult
+                  <code><a class="autorefs autorefs-internal" title="            ropt.simple.OptimizationResult
 
 
   
       dataclass
-   (ropt.simple._result.OptimizeResult)" href="#ropt.simple.OptimizeResult">OptimizeResult</a></code>
+   (ropt.simple._result.OptimizationResult)" href="#ropt.simple.OptimizationResult">OptimizationResult</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A <a class="autorefs autorefs-internal" title="            ropt.simple.OptimizeResult
+                <p>A <a class="autorefs autorefs-internal" title="            ropt.simple.OptimizationResult
 
 
   
       dataclass
-  " href="#ropt.simple.OptimizeResult"><code>OptimizeResult</code></a> describing the outcome.</p>
+  " href="#ropt.simple.OptimizationResult"><code>OptimizationResult</code></a> describing the outcome.</p>
               </div>
             </td>
           </tr>
@@ -4356,7 +4334,7 @@ a worker process, where it cannot work at all.</p>
 </span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
 </span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>    <span class="o">|</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span>
 </span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>    <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">OptimizeResult</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
+</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">OptimizationResult</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents first">
@@ -4504,7 +4482,7 @@ a worker process, where it cannot work at all.</p>
             <td>
               <div class="doc-md-description">
                 <p>An optional callback invoked with an
-                  <code>EvaluateResult</code> for each function evaluation,
+                  <code>FunctionResults</code> for each function evaluation,
                   either shared by every run or one per run; return
                   <code>True</code> from it to stop that run early with
                   <code>USER_ABORT</code>.</p>
@@ -4590,21 +4568,21 @@ a worker process, where it cannot work at all.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple">tuple</a>[<a class="autorefs autorefs-internal" title="            ropt.simple.OptimizeResult
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple">tuple</a>[<a class="autorefs autorefs-internal" title="            ropt.simple.OptimizationResult
 
 
   
       dataclass
-   (ropt.simple._result.OptimizeResult)" href="#ropt.simple.OptimizeResult">OptimizeResult</a>, ...]</code>
+   (ropt.simple._result.OptimizationResult)" href="#ropt.simple.OptimizationResult">OptimizationResult</a>, ...]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>One <a class="autorefs autorefs-internal" title="            ropt.simple.OptimizeResult
+                <p>One <a class="autorefs autorefs-internal" title="            ropt.simple.OptimizationResult
 
 
   
       dataclass
-  " href="#ropt.simple.OptimizeResult"><code>OptimizeResult</code></a> per run, in order.</p>
+  " href="#ropt.simple.OptimizationResult"><code>OptimizationResult</code></a> per run, in order.</p>
               </div>
             </td>
           </tr>
@@ -4658,7 +4636,7 @@ a worker process, where it cannot work at all.</p>
 </span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="n">report</span><span class="p">:</span> <span class="n">ReportCallback</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EvaluateResult</span>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FunctionResults</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents first">
@@ -4786,7 +4764,13 @@ a worker process, where it cannot work at all.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>An optional callback invoked with an <code>EvaluateResult</code> for
+                <p>An optional callback invoked with a
+       <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="../results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> for
        each evaluation. An evaluation is a single batch that has
        already run by the time the callback sees it, and there is no
        optimizer loop to interrupt, so unlike on
@@ -4837,21 +4821,21 @@ a worker process, where it cannot work at all.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.simple.EvaluateResult
+                  <code><a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
 
 
   
       dataclass
-   (ropt.simple._result.EvaluateResult)" href="#ropt.simple.EvaluateResult">EvaluateResult</a></code>
+  " href="../results/#ropt.results.FunctionResults">FunctionResults</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>An <a class="autorefs autorefs-internal" title="            ropt.simple.EvaluateResult
+                <p>The <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
 
 
   
       dataclass
-  " href="#ropt.simple.EvaluateResult"><code>EvaluateResult</code></a> for the vector.</p>
+  " href="../results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> for the vector.</p>
               </div>
             </td>
           </tr>
@@ -4904,7 +4888,7 @@ a worker process, where it cannot work at all.</p>
 </span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="n">report</span><span class="p">:</span> <span class="n">ReportCallback</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">EvaluateResult</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">FunctionResults</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents first">
@@ -5032,7 +5016,13 @@ a worker process, where it cannot work at all.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>An optional callback invoked with an <code>EvaluateResult</code> for
+                <p>An optional callback invoked with a
+       <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="../results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> for
        each evaluation. An evaluation is a single batch that has
        already run by the time the callback sees it, and there is no
        optimizer loop to interrupt, so unlike on
@@ -5083,21 +5073,21 @@ a worker process, where it cannot work at all.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple">tuple</a>[<a class="autorefs autorefs-internal" title="            ropt.simple.EvaluateResult
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple">tuple</a>[<a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
 
 
   
       dataclass
-   (ropt.simple._result.EvaluateResult)" href="#ropt.simple.EvaluateResult">EvaluateResult</a>, ...]</code>
+  " href="../results/#ropt.results.FunctionResults">FunctionResults</a>, ...]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>One <a class="autorefs autorefs-internal" title="            ropt.simple.EvaluateResult
+                <p>One <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
 
 
   
       dataclass
-  " href="#ropt.simple.EvaluateResult"><code>EvaluateResult</code></a> per input vector.</p>
+  " href="../results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> per input vector.</p>
               </div>
             </td>
           </tr>
@@ -6172,7 +6162,7 @@ handler whether it is local or shared. See
             </td>
             <td>
               <div class="doc-md-description">
-                <p>An optional callback invoked with an <code>EvaluateResult</code> for
+                <p>An optional callback invoked with a <code>FunctionResults</code> for
       each function evaluation across the group's runs.
       Returning <code>True</code> stops the emitting run early with
       <code>USER_ABORT</code> if it is an optimization; an evaluation has
@@ -7207,8 +7197,8 @@ for when this matters and the resulting lifecycle.</p>
 
 
 
-<h2 id="ropt.simple.EvaluateResult" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.simple.EvaluateResult</span>
+<h2 id="ropt.simple.OptimizationResult" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.simple.OptimizationResult</span>
 
 
   <span class="doc doc-labels">
@@ -7219,159 +7209,12 @@ for when this matters and the resulting lifecycle.</p>
 
 
     <div class="doc doc-contents first">
-
-
-
-        <p>The values one variable vector produced.</p>
-<p>Returned by <a class="autorefs autorefs-internal" title="            ropt.simple.evaluate" href="#ropt.simple.evaluate"><code>evaluate</code></a>, once per input vector by
-<a class="autorefs autorefs-internal" title="            ropt.simple.evaluate_many" href="#ropt.simple.evaluate_many"><code>evaluate_many</code></a>, and handed to a <code>report</code>
-callback once per function evaluation of a run. See
-<a href="../../running/running/">Running Optimizations</a> for a walkthrough.</p>
-
-
-<p><span class="doc-section-title">Attributes:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.simple.EvaluateResult.variables">variables</span></code></td>
-            <td>
-                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>] | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The variable vector these values belong to, or <code>None</code>.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.simple.EvaluateResult.target_objective">target_objective</span></code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/functions.html#float">float</a> | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The weighted objective, or <code>None</code> where the evaluation
-              produced no valid result.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.simple.EvaluateResult.objectives">objectives</span></code></td>
-            <td>
-                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>] | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The individual objective values, shape <code>(n_obj,)</code>, or
-              <code>None</code>.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.simple.EvaluateResult.constraints">constraints</span></code></td>
-            <td>
-                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>] | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The constraint values, shape <code>(n_con,)</code>, or <code>None</code> when
-              there are no nonlinear constraints or the evaluation
-              produced no valid result.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.simple.EvaluateResult.results">results</span></code></td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
-
-
-  
-      dataclass
-  " href="../results/#ropt.results.FunctionResults">FunctionResults</a> | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The full low-level
-              <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
-
-
-  
-      dataclass
-  " href="../results/#ropt.results.FunctionResults"><code>FunctionResults</code></a>
-              object, or <code>None</code>. Only an optimization that reached
-              no valid result leaves this empty; an evaluation and a
-              <code>report</code> callback always have one.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-
-
-
-
-
-
-
-
-
-<div class="doc doc-children">
-
-
-
-
-
-  </div>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-class">
-
-
-
-<h2 id="ropt.simple.OptimizeResult" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.simple.OptimizeResult</span>
-
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
-  </span>
-
-</h2>
-
-
-    <div class="doc doc-contents first">
-            <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="            ropt.simple.EvaluateResult
-
-
-  
-      dataclass
-   (ropt.simple._result.EvaluateResult)" href="#ropt.simple.EvaluateResult">EvaluateResult</a></code></p>
 
 
 
         <p>The outcome of a single optimization run.</p>
-<p>An optimization ends at one evaluation, the best one it found, so this is
-that evaluation's <a class="autorefs autorefs-internal" title="            ropt.simple.EvaluateResult
-
-
-  
-      dataclass
-  " href="#ropt.simple.EvaluateResult"><code>EvaluateResult</code></a> together
-with the exit code of the run that reached it. See
+<p>A run ends at one evaluation, the best one it found, and that evaluation is
+carried unchanged on <code>results</code>. See
 <a href="../../running/running/">Running Optimizations</a> for a walkthrough.</p>
 
 
@@ -7386,82 +7229,36 @@ with the exit code of the run that reached it. See
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.simple.OptimizeResult.variables">variables</span></code></td>
-            <td>
-                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>] | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The optimal variable vector, or <code>None</code> if no valid
-              result was found.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.simple.OptimizeResult.target_objective">target_objective</span></code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/functions.html#float">float</a> | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The weighted objective at the optimum, or <code>None</code>.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.simple.OptimizeResult.objectives">objectives</span></code></td>
-            <td>
-                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>] | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The individual objective values at the optimum, shape
-              <code>(n_obj,)</code>, or <code>None</code>.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.simple.OptimizeResult.constraints">constraints</span></code></td>
-            <td>
-                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>] | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The nonlinear constraint values at the optimum, or <code>None</code>.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.simple.OptimizeResult.results">results</span></code></td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
-
-
-  
-      dataclass
-  " href="../results/#ropt.results.FunctionResults">FunctionResults</a> | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The full low-level
-              <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
-
-
-  
-      dataclass
-  " href="../results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> object
-              for the optimum, or <code>None</code>.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.simple.OptimizeResult.exit_code">exit_code</span></code></td>
+            <td><code><span title="ropt.simple.OptimizationResult.exit_code">exit_code</span></code></td>
             <td>
                   <code><a class="autorefs autorefs-internal" title="            ExitCode (ropt.enums.ExitCode)" href="../enums/#ropt.enums.ExitCode">ExitCode</a></code>
             </td>
             <td>
               <div class="doc-md-description">
                 <p>The exit code describing how the optimization terminated.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.simple.OptimizationResult.results">results</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="../results/#ropt.results.FunctionResults">FunctionResults</a> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="../results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> of the
+       best evaluation, or <code>None</code> if the run produced no valid
+       result.</p>
               </div>
             </td>
           </tr>
@@ -7663,7 +7460,7 @@ with the exit code of the run that reached it. See
   </span>
 
 </h2>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">ReportCallback</span> <span class="o">=</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">EvaluateResult</span><span class="p">],</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">ReportCallback</span> <span class="o">=</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">FunctionResults</span><span class="p">],</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents first">

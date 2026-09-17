@@ -3082,7 +3082,7 @@ table of the section it belongs to.</p>
 <a class="autorefs autorefs-internal" title="            ropt.simple.optimize" href="../reference/simple/#ropt.simple.optimize"><code>optimize</code></a> returns the best result that satisfies every
 constraint to within <code>constraint_tolerance</code>, which defaults to <code>1e-10</code> and
 applies to bounds and linear constraints as well as nonlinear ones. If no
-evaluation ever clears that bar, the run ends normally with <code>result.variables</code>
+evaluation ever clears that bar, the run ends normally with <code>result.results</code>
 set to <code>None</code>. The evaluations themselves are not lost: every result, feasible
 or not, still reaches the <a href="../running/handlers/">handlers</a> attached to the run.</p>
 <p><strong>The return value is a summary, not the record of the run.</strong> It holds a single
@@ -3122,7 +3122,7 @@ in <code>TOO_FEW_REALIZATIONS</code>; see <a href="logging/">Logging</a>.</p>
 </thead>
 <tbody>
 <tr>
-<td><code>result.variables</code> is <code>None</code>, but <code>exit_code</code> is <code>OPTIMIZER_FINISHED</code></td>
+<td><code>result.results</code> is <code>None</code>, but <code>exit_code</code> is <code>OPTIMIZER_FINISHED</code></td>
 <td>No evaluation satisfied the constraints to within <code>constraint_tolerance</code> (default <code>1e-10</code>; bounds and linear constraints count too), so there is no best feasible result to return. The evaluations are still in the handlers. Raise the tolerance, or check that the constraints can be satisfied at all.</td>
 </tr>
 <tr>

@@ -3178,14 +3178,15 @@ objectives first, then the constraints; see
 <a href="../../optimizer_setup/constraints/">Constraints</a>.</p>
 <h2 id="4-follow-the-progress-optional">4. Follow the progress (optional)</h2>
 <p>To track a running optimization, pass a <code>report</code> callback: <code>ropt</code> calls it after
-every evaluation, with an <a class="autorefs autorefs-internal" title="            ropt.simple.EvaluateResult
+every evaluation, with the
+<a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
 
 
   
       dataclass
-  " href="../../reference/simple/#ropt.simple.EvaluateResult"><code>EvaluateResult</code></a>
-describing what was just computed.</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">report</span><span class="p">(</span><span class="n">result</span><span class="p">:</span> <span class="n">EvaluateResult</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+  " href="../../reference/results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> describing what was just
+computed.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">report</span><span class="p">(</span><span class="n">result</span><span class="p">:</span> <span class="n">FunctionResults</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">    </span><span class="sd">"""Print the objective of each evaluation as the run proceeds.</span>
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
 </span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="sd">    Args:</span>
@@ -3206,30 +3207,31 @@ start point defined above:</p>
 <p><code>ropt</code> evaluates all ten realizations at each point and averages them into the
 robust objective, which is what it optimizes.</p>
 <h2 id="6-read-the-result">6. Read the result</h2>
-<p><code>optimize</code> returns an <a class="autorefs autorefs-internal" title="            ropt.simple.OptimizeResult
+<p><code>optimize</code> returns an <a class="autorefs autorefs-internal" title="            ropt.simple.OptimizationResult
 
 
   
       dataclass
-  " href="../../reference/simple/#ropt.simple.OptimizeResult"><code>OptimizeResult</code></a>:</p>
+  " href="../../reference/simple/#ropt.simple.OptimizationResult"><code>OptimizationResult</code></a>:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"exit code:         </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">exit_code</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"optimal variables: </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">variables</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"optimal objective: </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">target_objective</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">results</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"optimal variables: </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">variables</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"optimal objective: </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">target_objective</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </span></code></pre></div>
 <ul>
-<li><code>result.variables</code> is the best set of variables found, and
-  <code>result.target_objective</code> the robust objective value there. Both are <code>None</code> if
-  the run produced no valid result.</li>
 <li><code>result.exit_code</code> says why the run stopped (a member of the
   <a class="autorefs autorefs-internal" title="            ExitCode" href="../../reference/enums/#ropt.enums.ExitCode"><code>ExitCode</code></a> enumeration).</li>
-<li><code>result.results</code> is the underlying result object, a
+<li><code>result.results</code> is the best evaluation the run reached, a
   <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
 
 
   
       dataclass
-  " href="../../reference/results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> carrying every value the
-  evaluation produced; <code>OptimizeResult</code> is a convenience view of it.</li>
+  " href="../../reference/results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> carrying every value that
+  evaluation produced — the same object a handler receives. It is <code>None</code> if the
+  run produced no valid result, so one check covers every value read from it.</li>
+<li><code>result.results.variables</code> is the best set of variables found, and
+  <code>result.results.target_objective</code> the robust objective value there.</li>
 </ul>
 <p>See <a href="../../running/running/#the-result">Running Optimizations</a> for the remaining fields.</p>
 <p>Because the coefficients are centered on the values used in the

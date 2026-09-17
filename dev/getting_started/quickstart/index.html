@@ -3038,8 +3038,9 @@ easy to reach but slow to follow.</p>
 </span><span id="__span-1-21"><a id="__codelineno-1-21" name="__codelineno-1-21" href="#__codelineno-1-21"></a><span class="c1"># 3. Run the optimization from a starting point equal to zero.</span>
 </span><span id="__span-1-22"><a id="__codelineno-1-22" name="__codelineno-1-22" href="#__codelineno-1-22"></a><span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">rosenbrock</span><span class="p">)</span>
 </span><span id="__span-1-23"><a id="__codelineno-1-23" name="__codelineno-1-23" href="#__codelineno-1-23"></a>
-</span><span id="__span-1-24"><a id="__codelineno-1-24" name="__codelineno-1-24" href="#__codelineno-1-24"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"best variables: </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">variables</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</span><span id="__span-1-25"><a id="__codelineno-1-25" name="__codelineno-1-25" href="#__codelineno-1-25"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"best objective: </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">target_objective</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</span><span id="__span-1-24"><a id="__codelineno-1-24" name="__codelineno-1-24" href="#__codelineno-1-24"></a><span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">results</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-1-25"><a id="__codelineno-1-25" name="__codelineno-1-25" href="#__codelineno-1-25"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"best variables: </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">variables</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</span><span id="__span-1-26"><a id="__codelineno-1-26" name="__codelineno-1-26" href="#__codelineno-1-26"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"best objective: </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">target_objective</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </span></code></pre></div>
 <p>Running this finds variables close to <code>[1, 1]</code>.</p>
 <h2 id="how-it-works">How it works</h2>
@@ -3056,13 +3057,20 @@ easy to reach but slow to follow.</p>
 <li><strong>A start point</strong> — the variable values to start from.</li>
 </ol>
 <p><a class="autorefs autorefs-internal" title="            ropt.simple.optimize" href="../../reference/simple/#ropt.simple.optimize"><code>optimize</code></a> combines these three, runs the optimization,
-and returns an <a class="autorefs autorefs-internal" title="            ropt.simple.OptimizeResult
+and returns an <a class="autorefs autorefs-internal" title="            ropt.simple.OptimizationResult
 
 
   
       dataclass
-  " href="../../reference/simple/#ropt.simple.OptimizeResult"><code>OptimizeResult</code></a> with the best
-values it found.</p>
+  " href="../../reference/simple/#ropt.simple.OptimizationResult"><code>OptimizationResult</code></a>. Its
+<code>results</code> field holds the best evaluation the run reached, as a
+<a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="../../reference/results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> — the same object a handler
+receives — and is <code>None</code> if the run found nothing valid.</p>
 
 
 

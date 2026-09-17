@@ -3038,7 +3038,7 @@ runs <code>optimize</code> again, using the previous result as the new start poi
 each call to <code>optimize</code> is independent, this is just a loop in your own code;
 <code>ropt</code> needs nothing special to support it.</p>
 <h2 id="collecting-every-result-with-a-handler">Collecting every result with a handler</h2>
-<p><code>result.variables</code> from one run is all you need to start the next, but if you
+<p>The best point of one run is all you need to start the next, but if you
 also want to see every evaluation across the whole sequence of restarts — not
 just the final result — attach a <strong>handler</strong>. A handler is an object you pass
 with <code>handlers=</code> that observes every result an optimization produces; unlike
@@ -3059,13 +3059,14 @@ and feeds its results into <code>history</code>:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">x0</span> <span class="o">=</span> <span class="n">INITIAL_VALUES</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">RESTARTS</span><span class="p">):</span>
 </span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">CONFIG</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">rosenbrock</span><span class="p">,</span> <span class="n">handlers</span><span class="o">=</span><span class="p">[</span><span class="n">history</span><span class="p">])</span>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    <span class="n">x0</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">variables</span>  <span class="c1"># restart from the best point found so far</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    <span class="k">assert</span> <span class="n">result</span><span class="o">.</span><span class="n">results</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    <span class="n">x0</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">variables</span>  <span class="c1"># restart from the best point found so far</span>
 </span></code></pre></div>
-<p><code>result.variables</code> is the best point the run found — feeding it back in as
-<code>x0</code> is the entire restart mechanism. After the loop, <code>history.results</code> holds
+<p><code>result.results.variables</code> is the best point the run found — feeding it back in
+as <code>x0</code> is the entire restart mechanism. After the loop, <code>history.results</code> holds
 every evaluation from every restart, not just the last run's:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"evaluations collected across all restarts: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">history</span><span class="o">.</span><span class="n">results</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"best objective after </span><span class="si">{</span><span class="n">RESTARTS</span><span class="si">}</span><span class="s2"> restarts: </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">target_objective</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"best objective after </span><span class="si">{</span><span class="n">RESTARTS</span><span class="si">}</span><span class="s2"> restarts: </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">target_objective</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </span></code></pre></div>
 <h2 id="next">Next</h2>
 <ul>

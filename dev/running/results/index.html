@@ -3350,32 +3350,24 @@ classes and how to inspect them; see <a href="../running/">Running Optimizations
 <a href="../../advanced/workflows/">Optimization Workflows</a> for how results are produced and
 delivered to your code.</p>
 <div class="admonition note">
-<p class="admonition-title">Two layers of result object</p>
+<p class="admonition-title">One kind of result object</p>
 <p><a class="autorefs autorefs-internal" title="            ropt.results.Results
 
 
   
       dataclass
-  " href="../../reference/results/#ropt.results.Results"><code>Results</code></a> is the <strong>fundamental</strong> record: one object
-per variable vector evaluated, carrying every field described below. Result
-handlers receive these.</p>
-<p><a class="autorefs autorefs-internal" title="            ropt.simple.EvaluateResult
+  " href="../../reference/results/#ropt.results.Results"><code>Results</code></a> is the record every part of <code>ropt</code> hands
+out: one object per variable vector evaluated, carrying every field
+described below. Result handlers receive these, a <code>report</code> callback is given
+one per evaluation, <a class="autorefs autorefs-internal" title="            ropt.simple.evaluate" href="../../reference/simple/#ropt.simple.evaluate"><code>evaluate</code></a> returns one, and
+<a href="../running/"><code>optimize</code></a> puts the best one on the <code>results</code> field of the
+<a class="autorefs autorefs-internal" title="            ropt.simple.OptimizationResult
 
 
   
       dataclass
-  " href="../../reference/simple/#ropt.simple.EvaluateResult"><code>EvaluateResult</code></a> and
-<a class="autorefs autorefs-internal" title="            ropt.simple.OptimizeResult
-
-
-  
-      dataclass
-  " href="../../reference/simple/#ropt.simple.OptimizeResult"><code>OptimizeResult</code></a>, which
-<a href="../running/"><code>optimize</code></a> returns and a <code>report</code> callback is given, are a
-<strong>convenience</strong> layer over one of them: a few named attributes such as
-<code>variables</code>, <code>target_objective</code> and <code>exit_code</code>, for the common case where
-that is all you need. The fundamental object is still there, on
-<code>result.results</code>, whenever it is not.</p>
+  " href="../../reference/simple/#ropt.simple.OptimizationResult"><code>OptimizationResult</code></a> it returns. Whichever
+way you reach a result, it reads the same.</p>
 </div>
 <h2 id="the-result-hierarchy">The result hierarchy</h2>
 <p>During optimization, function and gradient evaluations generate data that is

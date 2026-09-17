@@ -3153,16 +3153,18 @@
 <strong>handler</strong> lets you collect or react to <em>every</em> result instead: it is an object
 that observes an optimization and processes its results as they arrive — keeping
 them, tabulating them, or invoking a callback.</p>
-<p>A handler is given the fundamental <a class="autorefs autorefs-internal" title="            ropt.results.Results
+<p>A handler is given <a class="autorefs autorefs-internal" title="            ropt.results.Results
 
 
   
       dataclass
   " href="../../reference/results/#ropt.results.Results"><code>Results</code></a> objects —
-<code>FunctionResults</code> and <code>GradientResults</code> — not the <code>OptimizeResult</code> that
-<code>optimize</code> returns. Everything a run produces is in them, at the field paths
-described in <a href="../results/">Working with Results</a>, which is the vocabulary the
-handlers below are configured in.</p>
+<code>FunctionResults</code> and <code>GradientResults</code> — which is what every other part of the
+simple API hands out too: a <code>report</code> callback receives one per evaluation, and
+<code>optimize</code> puts the best one on the <code>results</code> field of what it returns.
+Everything a run produces is in them, at the field paths described in
+<a href="../results/">Working with Results</a>, which is the vocabulary the handlers below
+are configured in.</p>
 <p>The <a href="../running/#reporting-progress"><code>report</code></a> callback you may already be using
 is only shorthand for this: <code>report=</code> builds a handler for you behind the
 scenes. Where you pass it decides which kind. Given to a run, as
