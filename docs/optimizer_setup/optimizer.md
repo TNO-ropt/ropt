@@ -90,7 +90,7 @@ with, which are **scaled**. An objective that has been divided by a large number
 reaches any absolute tolerance sooner; see [Objectives](objectives.md) for how
 scaling changes what the optimizer sees.
 
-To stop on a condition of your own rather than a count, return `False` from the
+To stop on a condition of your own rather than a count, return `True` from the
 `report` callback; that is covered in
 [Running Optimizations](../running/running.md), with
 [examples/simple/stopping.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/stopping.py)
