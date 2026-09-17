@@ -360,7 +360,8 @@ A path may name a field of the result itself (`"variables"`,
 `"target_objective"`), a field of one of its sub-objects
 (`"functions.objectives"`, `"scaled.variables"`), or an entry of a dict-valued
 field (`"metadata.run.id"`). Each path becomes a column of that name. Paths
-whose value is `None`, and missing dict keys, are skipped.
+whose value is `None`, and missing dict keys, are skipped; descending into a
+field that is `None` is an error.
 
 !!! note "Fields are an ordered list"
 

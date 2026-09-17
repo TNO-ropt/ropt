@@ -205,7 +205,8 @@ Convenience methods:
 
 - `set_default_tables()` registers a standard set of tables
   (`functions`, `evaluations`, `constraints` for function results; `gradients`,
-  `perturbations` for gradient results).
+  `perturbations` for gradient results). Its `constraints` table requires a
+  problem that defines bounds or constraints.
 - `add_column(table, name, title)` adds one column to an existing table.
 - `set_callback(fn)` calls `fn(output_dir)` whenever the tables are updated,
   where `output_dir` is the run's configured
