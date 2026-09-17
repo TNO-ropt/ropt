@@ -12,7 +12,7 @@
         <link rel="prev" href="../realization_filters/">
       
       
-        <link rel="next" href="../../advanced/workflows/">
+        <link rel="next" href="../configuration/">
       
       
         
@@ -1024,14 +1024,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../configuration/" class="md-nav__link">
+      <a href="../objectives/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Configuration
+    Objectives
   
 
     
@@ -1108,6 +1108,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../optimizer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Choosing an Optimizer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../gradients/" class="md-nav__link">
         
   
@@ -1116,6 +1144,34 @@
     
   
     Stochastic Gradients
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../samplers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Samplers
   
 
     
@@ -1271,6 +1327,34 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -2912,7 +2996,9 @@ strategy.</p>
    and gradient arrays plus the current weights, and returns a single
    aggregated value.</li>
 </ol>
-<p>See <a href="../configuration/">Configuration</a> for the index-sharing pattern.</p>
+<p>See <a href="../configuration/#sharing-optimizer-components-by-key">Sharing optimizer components by
+key</a> for the indexing
+pattern.</p>
 <h2 id="mean-estimator-default">Mean estimator (default)</h2>
 <p>The default method computes a simple weighted average:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">CONFIG</span> <span class="o">=</span> <span class="p">{</span>
@@ -2942,9 +3028,9 @@ entirely when weighted-average aggregation is all you need.</p>
 <li>The <code>stddev</code> method is incompatible with <code>gradient.merge_realizations = True</code>;
   per-realization gradients must be available.</li>
 <li>A standard deviation is always positive. To <em>maximize</em> variability, set
-  <a href="../configuration/#objective-direction"><code>maximize</code></a> on the objective; the sign
-  is flipped after the spread has been computed, which is the only point at
-  which flipping it has any effect.</li>
+  <a href="../objectives/#maximizing-instead-of-minimizing"><code>maximize</code></a> on the objective;
+  the sign is flipped after the standard deviation has been computed, which is
+  the only point at which flipping it has any effect.</li>
 </ul>
 <h2 id="writing-a-custom-estimator">Writing a custom estimator</h2>
 <p>Custom estimators are plugins implementing the
@@ -3011,13 +3097,13 @@ the configuration as <code>"custom/geometric"</code>.</p>
         
         
           
-          <a href="../../advanced/workflows/" class="md-footer__link md-footer__link--next" aria-label="Next: Optimization Workflows">
+          <a href="../configuration/" class="md-footer__link md-footer__link--next" aria-label="Next: Configuration Reference">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Optimization Workflows
+                Configuration Reference
               </div>
             </div>
             <div class="md-footer__button md-icon">

@@ -12,7 +12,7 @@
         <link rel="prev" href="../constraints/">
       
       
-        <link rel="next" href="../gradients/">
+        <link rel="next" href="../optimizer/">
       
       
         
@@ -1024,14 +1024,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../configuration/" class="md-nav__link">
+      <a href="../objectives/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Configuration
+    Objectives
   
 
     
@@ -1188,6 +1188,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../optimizer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Choosing an Optimizer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../gradients/" class="md-nav__link">
         
   
@@ -1196,6 +1224,34 @@
     
   
     Stochastic Gradients
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../samplers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Samplers
   
 
     
@@ -1252,6 +1308,34 @@
     
   
     Function Estimators
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration Reference
   
 
     
@@ -2958,11 +3042,11 @@ are the same as in <a href="../../getting_started/ensemble/">Ensemble-Based Opti
 around them.</p>
 <h2 id="what-to-expect-from-the-search">What to expect from the search</h2>
 <p>A gradient-free method reaches an answer by evaluating many points rather than
-by following a slope, so plan for a different cost profile:</p>
+by following a gradient, and the cost profile differs accordingly:</p>
 <ul>
 <li><code>perturbation_magnitudes</code> is unused. No perturbations are evaluated, because
   no gradient is estimated.</li>
-<li>Budget the run with <a href="../configuration/#optimizer"><code>max_functions</code></a> or
+<li>Limit the run with <a href="../configuration/#optimizer"><code>max_functions</code></a> or
   <code>max_iterations</code> rather than a convergence tolerance.</li>
 <li>The result is reproducible only if the method's own generator is seeded —
   hence <code>"options": {"rng": 4}</code> in both scripts.</li>
@@ -3019,13 +3103,13 @@ by following a slope, so plan for a different cost profile:</p>
         
         
           
-          <a href="../gradients/" class="md-footer__link md-footer__link--next" aria-label="Next: Stochastic Gradients">
+          <a href="../optimizer/" class="md-footer__link md-footer__link--next" aria-label="Next: Choosing an Optimizer">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Stochastic Gradients
+                Choosing an Optimizer
               </div>
             </div>
             <div class="md-footer__button md-icon">

@@ -9,10 +9,10 @@
       
       
       
-        <link rel="prev" href="../discrete/">
+        <link rel="prev" href="../optimizer/">
       
       
-        <link rel="next" href="../realization_filters/">
+        <link rel="next" href="../samplers/">
       
       
         
@@ -1024,14 +1024,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../configuration/" class="md-nav__link">
+      <a href="../objectives/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Configuration
+    Objectives
   
 
     
@@ -1088,6 +1088,34 @@
     
   
     Discrete and Mixed-Integer Variables
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../optimizer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Choosing an Optimizer
   
 
     
@@ -1242,45 +1270,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Samplers">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#sample-scaling" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Sample scaling
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#shared-perturbations" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Shared perturbations
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#writing-a-custom-sampler" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Writing a custom sampler
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
       
         <li class="md-nav__item">
@@ -1309,6 +1298,34 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../samplers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Samplers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -1357,6 +1374,34 @@
     
   
     Function Estimators
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration Reference
   
 
     
@@ -2991,45 +3036,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Samplers">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#sample-scaling" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Sample scaling
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#shared-perturbations" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Shared perturbations
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#writing-a-custom-sampler" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Writing a custom sampler
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
       
         <li class="md-nav__item">
@@ -3213,45 +3219,17 @@ realizations that did work.</p>
   realizations and reduce gradient work.</li>
 </ul>
 <h2 id="samplers">Samplers</h2>
-<p>A sampler draws the perturbation samples used for gradient estimation. The
-default <a class="autorefs autorefs-internal" title="            ropt.sampler.scipy.SciPySampler" href="../../reference/sampler/#ropt.sampler.scipy.SciPySampler"><code>SciPySampler</code></a> draws from a standard
-normal distribution <span class="arithmatex">\(N(0, 1)\)</span>; other samplers can be added through the plugin
-system. Configure the <code>samplers</code> tuple at the top level of the config and
-reference them by index from <code>variables.samplers</code> (see
-<a href="../configuration/">Configuration</a> on index sharing).</p>
-<h3 id="sample-scaling">Sample scaling</h3>
-<p>Samplers produce <strong>unscaled</strong> perturbations — values with a characteristic
-magnitude of approximately one. During gradient estimation, these samples are
-multiplied element-wise by the <code>perturbation_magnitudes</code> defined in
-<a class="autorefs autorefs-internal" title="            VariablesConfig" href="../../reference/config/#ropt.config.VariablesConfig"><code>VariablesConfig</code></a>. This separation means that
-<code>perturbation_magnitudes</code> directly controls the effective size of the
-perturbations, regardless of which sampler is used.</p>
-<h3 id="shared-perturbations">Shared perturbations</h3>
-<p>By default, each realization receives its own independently drawn set of
-perturbations. Setting the <code>shared</code> flag to <code>True</code> in
-<a class="autorefs autorefs-internal" title="            SamplerConfig" href="../../reference/config/#ropt.config.SamplerConfig"><code>SamplerConfig</code></a> causes the same perturbation
-values to be reused across all realizations. This can reduce noise in the
-gradient estimate when the objective function varies smoothly across
-realizations.</p>
-<h3 id="writing-a-custom-sampler">Writing a custom sampler</h3>
-<p>A custom sampler is a plugin implementing the
-<a class="autorefs autorefs-internal" title="            Sampler" href="../../reference/sampler/#ropt.sampler.Sampler"><code>Sampler</code></a> base class, whose docstring documents the
-shape the samples must have and how the <code>mask</code> and <code>shared</code> settings affect
-them. The runnable script is
-<a href="https://github.com/TNO-ropt/ropt/blob/main/examples/simple/sampler.py">examples/simple/sampler.py</a>,
-which perturbs one variable at a time. With one perturbation per variable and a
-unit step, the gradient estimate is a forward finite difference, which shows
-that perturbations need not be random. Its second method scales each step by a
-random factor instead, and the two runs differ in <code>shared</code> to show where that
-flag changes the samples.</p>
+<p>A sampler decides <em>where</em> the perturbed points are placed, while
+<code>perturbation_magnitudes</code> decides how far away they are. The default draws from
+a standard normal distribution, and quasi-random alternatives are available.
+Selecting one, perturbing different variables differently, sharing samples
+across realizations and writing your own are all covered in
+<a href="../samplers/">Samplers</a>.</p>
 <h2 id="function-estimators">Function estimators</h2>
-<p>A function estimator decides how the gradient samples (and the function
-samples for non-default estimators) are combined into the final estimate.
-The default
-<a class="autorefs autorefs-internal" title="            ropt.function_estimator.default.DefaultFunctionEstimator" href="../../reference/function_estimator/#ropt.function_estimator.default.DefaultFunctionEstimator"><code>DefaultFunctionEstimator</code></a>
-uses the mean of the functions and gradients. Alternative estimators are configured via the
-<code>function_estimators</code> tuple and selected per-objective in
-<a class="autorefs autorefs-internal" title="            ObjectiveFunctionsConfig" href="../../reference/config/#ropt.config.ObjectiveFunctionsConfig"><code>ObjectiveFunctionsConfig.function_estimators</code></a>.</p>
+<p>A function estimator decides <em>how</em> the per-realization values and gradients are
+combined into the single estimate the optimizer receives. The default is a
+weighted mean; alternatives, including a measure of dispersion rather than an
+average, are covered in <a href="../function_estimators/">Function Estimators</a>.</p>
 <h2 id="a-runnable-example">A runnable example</h2>
 <p><a href="https://github.com/TNO-ropt/ropt/blob/main/examples/simple/ensemble.py">examples/simple/ensemble.py</a>
 exercises the machinery described here: it minimizes the mean objective over ten
@@ -3293,7 +3271,7 @@ settings at the defaults described above.</p>
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../discrete/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Discrete and Mixed-Integer Variables">
+          <a href="../optimizer/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Choosing an Optimizer">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -3303,20 +3281,20 @@ settings at the defaults described above.</p>
                 Previous
               </span>
               <div class="md-ellipsis">
-                Discrete and Mixed-Integer Variables
+                Choosing an Optimizer
               </div>
             </div>
           </a>
         
         
           
-          <a href="../realization_filters/" class="md-footer__link md-footer__link--next" aria-label="Next: Realization Filters">
+          <a href="../samplers/" class="md-footer__link md-footer__link--next" aria-label="Next: Samplers">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Realization Filters
+                Samplers
               </div>
             </div>
             <div class="md-footer__button md-icon">

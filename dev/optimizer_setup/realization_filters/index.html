@@ -9,7 +9,7 @@
       
       
       
-        <link rel="prev" href="../gradients/">
+        <link rel="prev" href="../samplers/">
       
       
         <link rel="next" href="../function_estimators/">
@@ -1024,14 +1024,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../configuration/" class="md-nav__link">
+      <a href="../objectives/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Configuration
+    Objectives
   
 
     
@@ -1108,6 +1108,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../optimizer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Choosing an Optimizer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../gradients/" class="md-nav__link">
         
   
@@ -1116,6 +1144,34 @@
     
   
     Stochastic Gradients
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../samplers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Samplers
   
 
     
@@ -1215,23 +1271,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="CVaR example">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#how-cvar-filters-work" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        How CVaR filters work
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
       
         <li class="md-nav__item">
@@ -1250,6 +1289,17 @@
     <span class="md-ellipsis">
       
         Writing a custom filter
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-cvar-filters-work" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How CVaR filters work
       
     </span>
   </a>
@@ -1280,6 +1330,34 @@
     
   
     Function Estimators
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration Reference
   
 
     
@@ -2859,23 +2937,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="CVaR example">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#how-cvar-filters-work" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        How CVaR filters work
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
       
         <li class="md-nav__item">
@@ -2894,6 +2955,17 @@
     <span class="md-ellipsis">
       
         Writing a custom filter
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-cvar-filters-work" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How CVaR filters work
       
     </span>
   </a>
@@ -2938,7 +3010,9 @@ constraints, or both.</p>
 <li>At each evaluation, the filter is consulted to compute per-realization
    weights that override the static <code>realizations.weights</code>.</li>
 </ol>
-<p>See <a href="../configuration/">Configuration</a> for the index-sharing pattern.</p>
+<p>See <a href="../configuration/#sharing-optimizer-components-by-key">Sharing optimizer components by
+key</a> for the indexing
+pattern.</p>
 <h2 id="cvar-example">CVaR example</h2>
 <p>Optimize the conditional expectation of the worst 30% of 10 realizations:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">CONFIG</span> <span class="o">=</span> <span class="p">{</span>
@@ -2960,7 +3034,25 @@ constraints, or both.</p>
 <p>See <a class="autorefs autorefs-internal" title="            ropt.realization_filter.default.CVaRObjectiveOptions" href="../../reference/realization_filter/#ropt.realization_filter.default.CVaRObjectiveOptions"><code>CVaRObjectiveOptions</code></a>
 for the parameters. The corresponding constraint variant is
 <a class="autorefs autorefs-internal" title="            ropt.realization_filter.default.CVaRConstraintOptions" href="../../reference/realization_filter/#ropt.realization_filter.default.CVaRConstraintOptions"><code>CVaRConstraintOptions</code></a>.</p>
-<h3 id="how-cvar-filters-work">How CVaR filters work</h3>
+<h2 id="interaction-with-evaluation_policy">Interaction with <code>evaluation_policy</code></h2>
+<p>Filters that disable some realizations only deliver savings on the gradient
+side when the optimizer requests gradients separately from functions. Set
+<code>gradient.evaluation_policy = "separate"</code> (see
+<a href="../gradients/">Stochastic Gradients</a>) to maximize that benefit.</p>
+<h2 id="writing-a-custom-filter">Writing a custom filter</h2>
+<p>Custom filters are plugins implementing the
+<a class="autorefs autorefs-internal" title="            ropt.realization_filter.RealizationFilter" href="../../reference/realization_filter/#ropt.realization_filter.RealizationFilter"><code>RealizationFilter</code></a> base class,
+whose docstring documents the methods to implement. A filter defined where an
+entry point cannot reach it — in a script or a notebook — is added with
+<a class="autorefs autorefs-internal" title="            ropt.plugins.register_plugin" href="../../reference/plugin_manager/#ropt.plugins.register_plugin"><code>register_plugin</code></a>, after which it is
+selected by its <code>"plugin/method"</code> string exactly like an installed one. An
+instance can also be passed directly in the <code>realization_filters</code> field of
+<a class="autorefs autorefs-internal" title="            EnOptContext" href="../../reference/context/#ropt.context.EnOptContext"><code>EnOptContext</code></a>, which needs no registration.</p>
+<p>The runnable script is
+<a href="https://github.com/TNO-ropt/ropt/blob/main/examples/simple/realization_filter.py">examples/simple/realization_filter.py</a>,
+which implements a filter that puts all weight on the median realization,
+registers it, and selects it from the configuration as <code>"custom/median"</code>.</p>
+<h2 id="how-cvar-filters-work">How CVaR filters work</h2>
 <p>The <code>cvar-objective</code> method:</p>
 <ol>
 <li>Computes a weighted sum of the objective values specified by the <code>sort</code>
@@ -3001,24 +3093,6 @@ its scale.</p>
 <p>The optimizer normalizes all filter-produced weights to sum to one before
 use, so any non-negative values are permissible.</p>
 </div>
-<h2 id="interaction-with-evaluation_policy">Interaction with <code>evaluation_policy</code></h2>
-<p>Filters that disable some realizations only deliver savings on the gradient
-side when the optimizer requests gradients separately from functions. Set
-<code>gradient.evaluation_policy = "separate"</code> (see
-<a href="../gradients/">Stochastic Gradients</a>) to maximize that benefit.</p>
-<h2 id="writing-a-custom-filter">Writing a custom filter</h2>
-<p>Custom filters are plugins implementing the
-<a class="autorefs autorefs-internal" title="            ropt.realization_filter.RealizationFilter" href="../../reference/realization_filter/#ropt.realization_filter.RealizationFilter"><code>RealizationFilter</code></a> base class,
-whose docstring documents the methods to implement. A filter defined where an
-entry point cannot reach it — in a script or a notebook — is added with
-<a class="autorefs autorefs-internal" title="            ropt.plugins.register_plugin" href="../../reference/plugin_manager/#ropt.plugins.register_plugin"><code>register_plugin</code></a>, after which it is
-selected by its <code>"plugin/method"</code> string exactly like an installed one. An
-instance can also be passed directly in the <code>realization_filters</code> field of
-<a class="autorefs autorefs-internal" title="            EnOptContext" href="../../reference/context/#ropt.context.EnOptContext"><code>EnOptContext</code></a>, which needs no registration.</p>
-<p>The runnable script is
-<a href="https://github.com/TNO-ropt/ropt/blob/main/examples/simple/realization_filter.py">examples/simple/realization_filter.py</a>,
-which implements a filter that puts all weight on the median realization,
-registers it, and selects it from the configuration as <code>"custom/median"</code>.</p>
 
 
 
@@ -3054,7 +3128,7 @@ registers it, and selects it from the configuration as <code>"custom/median"</co
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../gradients/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Stochastic Gradients">
+          <a href="../samplers/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Samplers">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -3064,7 +3138,7 @@ registers it, and selects it from the configuration as <code>"custom/median"</co
                 Previous
               </span>
               <div class="md-ellipsis">
-                Stochastic Gradients
+                Samplers
               </div>
             </div>
           </a>
