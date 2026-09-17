@@ -668,6 +668,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting_started/examples/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Examples
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1239,6 +1267,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#writing-a-custom-sampler" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Writing a custom sampler
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1545,6 +1584,34 @@
     
   
     Building a Workflow
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../advanced/examples/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Workflow Examples
   
 
     
@@ -2949,6 +3016,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#writing-a-custom-sampler" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Writing a custom sampler
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -3155,6 +3233,17 @@ perturbations. Setting the <code>shared</code> flag to <code>True</code> in
 values to be reused across all realizations. This can reduce noise in the
 gradient estimate when the objective function varies smoothly across
 realizations.</p>
+<h3 id="writing-a-custom-sampler">Writing a custom sampler</h3>
+<p>A custom sampler is a plugin implementing the
+<a class="autorefs autorefs-internal" title="            Sampler" href="../../reference/sampler/#ropt.sampler.Sampler"><code>Sampler</code></a> base class, whose docstring documents the
+shape the samples must have and how the <code>mask</code> and <code>shared</code> settings affect
+them. The runnable script is
+<a href="https://github.com/TNO-ropt/ropt/blob/main/examples/simple/sampler.py">examples/simple/sampler.py</a>,
+which perturbs one variable at a time. With one perturbation per variable and a
+unit step, the gradient estimate is a forward finite difference, which shows
+that perturbations need not be random. Its second method scales each step by a
+random factor instead, and the two runs differ in <code>shared</code> to show where that
+flag changes the samples.</p>
 <h2 id="function-estimators">Function estimators</h2>
 <p>A function estimator decides how the gradient samples (and the function
 samples for non-default estimators) are combined into the final estimate.

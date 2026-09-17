@@ -668,6 +668,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting_started/examples/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Examples
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1618,6 +1646,34 @@
     
   
     Building a Workflow
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../advanced/examples/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Workflow Examples
   
 
     
@@ -3566,6 +3622,13 @@ same pair for the aggregates.</p>
 <p>Because the direction is undone when reporting, a combined objective agrees in
 sign with the per-realization values it summarizes, whether it is an average or
 a spread.</p>
+<p>The runnable script is
+<a href="https://github.com/TNO-ropt/ropt/blob/main/examples/simple/scaling.py">examples/simple/scaling.py</a>,
+which runs the same problem unscaled, with <code>auto_scale</code> on the objective, and
+with a variable scale, printing both domains each time. It shows that
+<code>auto_scale</code> divides the reported objective by a large factor while leaving the
+solution where it was, so only <code>functions.objectives</code> and <code>variables</code> can be
+compared between runs.</p>
 <h2 id="metadata">Metadata</h2>
 <p>Results carry two independent kinds of metadata, neither interpreted by <code>ropt</code>:</p>
 <ul>

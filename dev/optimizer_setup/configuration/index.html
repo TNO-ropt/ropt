@@ -668,6 +668,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting_started/examples/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Examples
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1818,6 +1846,34 @@
     
   
     Building a Workflow
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../advanced/examples/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Workflow Examples
   
 
     
@@ -3947,6 +4003,11 @@ optimum. Realizations that fail do not contribute.</p>
 of the run. It <em>multiplies</em> <code>scales</code> rather than replacing it, so a configured
 scale still applies on top of an estimated one. An <code>offsets</code> entry is subtracted
 before the estimate is taken, so the estimate measures what is left after it.</p>
+<p>Because the estimate divides the objective the optimizer reports, switching
+<code>auto_scale</code> on lowers <code>target_objective</code> without changing the solution. Two
+runs that differ in this setting can only be compared through
+<code>functions.objectives</code> or their variables; see
+<a href="../../running/results/#scaling-of-results">Scaling of results</a>.</p>
 <h4 id="objective-offsets">Offsetting objectives</h4>
 <p>An objective reaches the optimizer as <span class="arithmatex">\((f_j - o_j)/s_j\)</span>, using the <code>offsets</code>
 field, and is reported back to you as <span class="arithmatex">\(f_j = s_j\,y_j + o_j\)</span>. The default is
