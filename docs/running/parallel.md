@@ -339,7 +339,8 @@ For `account` to have any effect the script must reference it. A variable a
 script never mentions is simply ignored, and one the script mentions but nobody
 supplies renders as empty — so a misspelling on either side drops the directive
 silently rather than failing. Entries that are `None` are dropped, so omitting a
-key and passing `None` mean the same thing.
+key and passing `None` mean the same thing. A name the executor sets itself,
+such as `cores` or `queue`, is rejected rather than allowed to override it.
 
 With a configuration, `cores` and `run_time_max` are also **clamped** to the
 selected queue's limits rather than rejected: asking for more cores than the
