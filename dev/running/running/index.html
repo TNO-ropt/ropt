@@ -3373,12 +3373,12 @@ which evaluates a single vector and then a matrix of them.</p>
 <p>Not every problem is an exception. An optimization that cannot make progress
 still returns normally, and says why in <code>result.exit_code</code>:
 <code>TOO_FEW_REALIZATIONS</code> when not enough realizations produced a value,
-<code>EXECUTOR_STOPPED</code> when the pool it was evaluating on was closed under it. The
-fields are <code>None</code> when nothing usable was found — always so for
+<code>EXECUTOR_STOPPED</code> when the pool it was evaluating on was closed under it.
+<code>result.results</code> is <code>None</code> when nothing usable was found — always so for
 <code>TOO_FEW_REALIZATIONS</code>, whereas a run stopped with its pool keeps the best
 result it had reached. A plain <a class="autorefs autorefs-internal" title="            ropt.simple.evaluate" href="../../reference/simple/#ropt.simple.evaluate"><code>evaluate</code></a> has no
-<code>exit_code</code>; there the <code>None</code> fields are the only sign that nothing usable came
-back.</p>
+<code>exit_code</code>, and always hands back a result object; there it is <code>functions</code>
+being <code>None</code> that says nothing usable came back.</p>
 <p>A run can also end with <code>OPTIMIZER_FINISHED</code> and still leave those fields
 <code>None</code>. Only a result that satisfies every constraint to within
 <code>constraint_tolerance</code> can be returned as the best one, and that tolerance —
