@@ -643,7 +643,7 @@ runs](handlers.md#sharing-a-handler-across-concurrent-runs).
     run while anything else is running in the same process — another run of its
     own kind included. Each backend documents whether this applies to it.
     Select it as
-    [`external/...`](../optimizer_setup/configuration_sections.md#external-backend) and
+    [`external/...`](#external-backend) and
     it gets a process of its own, where none of that is shared.
 
     Optimizer output capture is likewise for one run at a time. If more than
@@ -664,6 +664,60 @@ its next evaluation and returns rather than raising, usually with
 [`ExitCode.EXECUTOR_STOPPED`][ropt.enums.ExitCode], though a run that ends its
 own optimizer loop first reports that reason instead. Either way its result is
 discarded.
+
+## Running the optimizer in a separate process { #external-backend }
+
+Prefix the method with `external/` to run the optimization algorithm in a
+process of its own:
+
+```python
+"backend": {"method": "external/scipy/slsqp"}
+```
+
+`ropt` spawns a child process, creates the named backend there, and lets it
+drive the optimization. The function and gradient evaluations still happen in
+the original process: the child sends each set of variables back, the parent
+evaluates it as usual, and the values are passed to the child. An error raised
+in the child is re-raised in the parent.
+
+This is useful when a backend cannot safely share a process with the rest of
+your program — for example one that crashes the interpreter, leaks memory,
+keeps state between runs, or links against native libraries that clash with
+your other dependencies.
+
+It is also the answer for a backend that **cannot run concurrently in-process**.
+Some optimizers need a working directory of their own, write to a file whose
+name is fixed, or keep state inside the library that a second simultaneous run
+corrupts. What such a backend rules out is not merely a second run of its own
+kind: changing the working directory applies to the whole process, so it breaks
+another run's relative output path, and any file your evaluation function opens
+by relative name, just as surely. Each backend states in its own documentation
+whether this applies to it; where it does, `external/` is what lets it run
+alongside anything else, because the state it needs is then its own. This
+matters as soon as runs overlap — see [Many optimizations at
+once](#many-optimizations-at-once).
+
+Two details differ from the other backends:
+
+- The method must name the delegate in full, as `external/plugin/method` or
+  `external/method`. The `external/` prefix is removed and the rest is resolved
+  like any other method string. `external` is never selected implicitly, so it
+  is used only when you ask for it by name.
+- The problem is sent to the child process, so everything describing it must be
+  serializable. The built-in plugins are, and so is any plugin class defined in
+  a module that can be imported. Only if you pass a plugin instance of a class
+  defined inside a function or a notebook do you need the optional
+  `cloudpickle` extra (see
+  [Installation](../getting_started/installation.md#optional-extras)). Without
+  it the two differ in *where* they fail: a class defined inside a function
+  cannot be sent at all, and is refused here with an
+  [`ExecutionError`][ropt.exceptions.ExecutionError]; a class defined in a
+  notebook is sent by name, and the failure arrives from the child, which
+  reports the name it could not find. Your objective function is never
+  affected: it stays in this process.
+
+This has nothing to do with evaluating in parallel; for that see [Running in
+Parallel](../getting_started/execution.md).
 
 ## Offloading your own work
 

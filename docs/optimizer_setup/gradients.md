@@ -72,6 +72,21 @@ After a perturbed value is computed, it may fall outside the variable bounds.
 
 See [`BoundaryType`][ropt.enums.BoundaryType].
 
+## Reproducibility
+
+The perturbations are drawn from a generator seeded by `variables.seed`, which
+defaults to `1`. Repeating a run therefore reproduces it exactly, and changing
+the seed draws a different set of perturbations.
+
+A plain integer is enough for a single run. The field also accepts a tuple, and
+giving a unique identifier as its first element is what keeps runs distinct when
+they are nested or evaluated in parallel: each run draws its own perturbations
+while remaining reproducible on its own.
+
+```python
+"variables": {"variable_count": 5, "seed": (run_id, 1)}
+```
+
 ## Choosing `number_of_perturbations`
 
 More perturbations → more accurate gradient estimates but more evaluator calls

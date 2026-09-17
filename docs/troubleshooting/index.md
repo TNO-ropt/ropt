@@ -133,7 +133,7 @@ it. Keep shared handlers cheap, or register a slow one with
 **Not every optimizer can run beside another.** A backend that needs its own
 working directory, writes to a fixed file name, or keeps state inside its
 library cannot run concurrently in one process; select it as
-[`external/...`](../optimizer_setup/configuration_sections.md#external-backend) to give it a
+[`external/...`](../running/parallel.md#external-backend) to give it a
 process of its own. Optimizer output capture is likewise for one run at a time.
 
 | What you see | Most likely cause |

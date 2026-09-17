@@ -124,6 +124,7 @@ nav:
       - "Key Concepts": optimizer_setup/key_concepts.md
       - "Configuration": optimizer_setup/configuration.md
       - "Configuration Sections": optimizer_setup/configuration_sections.md
+      - "Variables": optimizer_setup/variables.md
       - "Objectives": optimizer_setup/objectives.md
       - "Constraints": optimizer_setup/constraints.md
       - "Discrete and Mixed-Integer Variables": optimizer_setup/discrete.md

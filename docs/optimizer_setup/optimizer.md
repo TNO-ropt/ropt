@@ -36,10 +36,10 @@ Options that belong to the algorithm itself, rather than to `ropt`, go in
 
 !!! note
 
-    Not every method supports every kind of constraint. `ropt` raises an error
-    at the start of a run when the configured method cannot handle what the
-    configuration declares, rather than silently ignoring it. The one case where
-    something *is* ignored silently is integer variables; see
+    Not every method supports every kind of constraint, and a mismatch is
+    rejected when the run starts rather than ignored; see
+    [`backend`](configuration_sections.md#backend) for what that error is. The
+    one case that *is* ignored silently is integer variables; see
     [Discrete and Mixed-Integer Variables](discrete.md).
 
 ## Gradient-based or gradient-free
