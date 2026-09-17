@@ -53,8 +53,8 @@ where a gradient is estimated. The second factor is `1` unless you use
 (or the number of runs, if you set no limit).
 
 A worker is not free, so this is an upper bound rather than a target. Ask for
-what the work needs; the interesting number is usually a good deal smaller than
-the machine's core count.
+what the work needs; the useful number is usually much smaller than the
+machine's core count.
 
 !!! tip "How a batch is split across workers"
     Each evaluation in a batch is transferred to a worker as its own task by
@@ -69,7 +69,7 @@ the machine's core count.
 
     `workers` and `bundle_size` are the two halves of matching work to capacity.
     `workers` says how many tasks may be in flight; `bundle_size` says how much
-    work one task is worth carrying. With a batch of 100 cheap evaluations and
+    work one task should carry. With a batch of 100 cheap evaluations and
     8 workers, the default sends 100 separate tasks and pays 100 transfer costs
     to keep 8 workers busy; `bundle_size=13` sends 8 and pays 8. Raise it when
     the evaluations are cheap relative to a transfer — above all on a
@@ -160,7 +160,7 @@ have given more cheaply.
 
 The objective and its data are **copied** to the workers, so they must be
 serializable. An objective defined at module level — or in the script you ran,
-which each worker re-imports — works out of the box; a lambda, a closure, or a
+which each worker re-imports — works as is; a lambda, a closure, or a
 function defined in a notebook cell needs the `cloudpickle` extra (see
 [Installation](../getting_started/installation.md#optional-extras)). Results can
 only come **back** through the return value; see
@@ -769,9 +769,10 @@ processes.
       Four callables that each open a ten-worker pool put **forty** workers on
       the machine in four independent groups — and they do not pool their
       effort: one with twenty pieces of work still runs ten at a time while
-      another group sits idle. Forty are carried, and never forty work on the
-      same thing. Where evaluations stay in your process this is avoidable by
-      sharing one pool; offloaded onto a process, local, or HPC pool it is not.
+      another group sits idle. The machine carries forty workers, and never
+      forty working on the same thing. Where evaluations stay in your process
+      this is avoidable by sharing one pool; offloaded onto a process, local, or
+      HPC pool it is not.
 
     So reach for `offload` when a piece of work is genuinely self-contained and
     hands its answer back as a return value. When several pieces must be

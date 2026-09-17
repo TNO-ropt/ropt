@@ -172,7 +172,7 @@ You can attach arbitrary **metadata** to a run, from two sources:
 
 - **Constant, per run** — pass a `metadata` dict to `optimize`, `optimize_many`,
   `evaluate`, or `evaluate_many`. `ropt` copies it onto every result the run
-  produces, which is handy for tagging a run:
+  produces, which is a convenient way to tag a run:
 
   ```python
   result = optimize(config, x0, objective, metadata={"run_id": 7})
@@ -180,7 +180,7 @@ You can attach arbitrary **metadata** to a run, from two sources:
   ```
 
   The same dict also reaches the evaluation function itself, as
-  `context.metadata` — handy when the evaluation needs to know which run it is
+  `context.metadata` — useful when the evaluation needs to know which run it is
   part of. With `optimize_many`, this is the natural way to tell runs apart:
   give one dict (shared by all runs) or a list with one dict per run; see
   [Give each run an ID](parallel.md#many-optimizations-at-once).

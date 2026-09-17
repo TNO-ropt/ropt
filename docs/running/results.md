@@ -514,9 +514,9 @@ batch_id realization
 ```
 
 The run-level **result metadata** sits directly on the result, so it has no
-axes and gives one value per result — handy for pulling in a run tag. It may be
-nested to any depth, and is reachable from `to_pandas` and `results_to_pandas`
-alike:
+axes and gives one value per result, which is convenient for pulling in a run
+tag. It may be nested to any depth, and is reachable from `to_pandas` and
+`results_to_pandas` alike:
 
 ```python
 df = results_to_pandas(
