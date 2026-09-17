@@ -3522,10 +3522,12 @@ objects, one per variable vector evaluated in that batch.</p>
 <li><code>evaluated_realizations</code>: boolean array indicating which realizations were
   evaluated, shape <span class="arithmatex">\((n_r,)\)</span>.</li>
 <li><code>objective_weights</code>: per-realization objective weights, shape
-  <span class="arithmatex">\((n_o, n_r)\)</span>. May change during optimization (for example, when realization
-  filters are active).</li>
+  <span class="arithmatex">\((n_o, n_r)\)</span>, or <code>None</code> when no
+  <a href="../../optimizer_setup/realization_filters/">realization filter</a> is
+  configured. A filter may change them from one batch to the next.</li>
 <li><code>constraint_weights</code>: per-realization constraint weights, shape
-  <span class="arithmatex">\((n_c, n_r)\)</span> (if constraints are configured).</li>
+  <span class="arithmatex">\((n_c, n_r)\)</span>, or <code>None</code> unless nonlinear constraints and a realization
+  filter are both configured.</li>
 </ul>
 </li>
 <li>

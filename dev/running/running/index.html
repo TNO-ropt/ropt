@@ -3211,7 +3211,8 @@ There are three ways to return them:</p>
   
       dataclass
   " href="../../reference/components_evaluators/#ropt.components.evaluators.EvaluationFunctionResult"><code>EvaluationFunctionResult</code></a>
-  when you also want to attach <code>metadata</code>.</li>
+  when you also want to attach <code>metadata</code>; it holds <code>objectives</code>, <code>constraints</code>
+  and <code>metadata</code> in separate fields, so nothing has to be ordered.</li>
 </ul>
 <p>If a realization fails to compute, return <code>float("nan")</code> for it. <code>ropt</code> treats
 <code>NaN</code> as a failed realization and keeps going, as long as enough realizations
