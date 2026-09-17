@@ -116,8 +116,8 @@ across realizations and writing your own are all covered in
 
 A function estimator decides *how* the per-realization values and gradients are
 combined into the single estimate the optimizer receives. The default is a
-weighted mean; alternatives, including a spread rather than an average, are
-covered in [Function Estimators](function_estimators.md).
+weighted mean; alternatives, including a measure of dispersion rather than an
+average, are covered in [Function Estimators](function_estimators.md).
 
 ## A runnable example
 

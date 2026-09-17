@@ -61,8 +61,8 @@ The sign is flipped **after** the realizations have been combined, never on the
 per-realization values. That ordering matters as soon as a
 [function estimator](function_estimators.md) produces something other than an
 average. Negating the inputs of a standard deviation leaves it unchanged, so
-flipping first would silently minimize a spread declared for maximization;
-flipping the combined value is correct whatever produced it.
+flipping first would silently minimize the dispersion that was declared for
+maximization; flipping the combined value is correct whatever produced it.
 
 ## Weights and scales decide the trade-off together
 

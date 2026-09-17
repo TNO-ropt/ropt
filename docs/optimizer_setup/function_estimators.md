@@ -69,8 +69,8 @@ Note:
   per-realization gradients must be available.
 - A standard deviation is always positive. To *maximize* variability, set
   [`maximize`](objectives.md#maximizing-instead-of-minimizing) on the objective;
-  the sign is flipped after the spread has been computed, which is the only
-  point at which flipping it has any effect.
+  the sign is flipped after the standard deviation has been computed, which is
+  the only point at which flipping it has any effect.
 
 ## Writing a custom estimator
 

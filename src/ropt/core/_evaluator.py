@@ -562,7 +562,7 @@ class EnsembleEvaluator:
             # Maximizing an objective is minimizing its negation. The flip
             # belongs here, on the aggregate, and not on the values that went
             # into it: aggregation does not commute with negation, since a
-            # spread is positive whatever the sign of its inputs.
+            # measure of dispersion is positive whatever the sign of its inputs.
             objectives = apply_direction(objectives, self._context.objectives.maximize)
 
             target_objective = np.array(

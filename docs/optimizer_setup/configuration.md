@@ -445,10 +445,10 @@ Because it changes the value the optimizer tests against its tolerances, an
 offset can change where a run stops, even though it cannot change where the
 optimum is.
 
-An aggregate that is a spread rather than an average has its offset subtracted
-too. A standard deviation is unchanged by shifting the values it summarizes, so
-the offset applies to the aggregate itself; the map is undone on the way out, so
-what you are reported is unaffected.
+An aggregate that measures dispersion rather than central tendency has its
+offset subtracted too. A standard deviation is unchanged by shifting the values
+it summarizes, so the offset applies to the aggregate itself; the map is undone
+on the way out, so what you are reported is unaffected.
 
 #### Choosing the direction of an objective { #objective-direction }
 
@@ -461,10 +461,10 @@ which is a boolean per objective and defaults to all-false:
 
 The sign is flipped *after* the values of the individual realizations have been
 combined, and never on the values themselves. This matters when a
-[function estimator](function_estimators.md) produces a spread rather than an
-average: negating the inputs of a standard deviation leaves it unchanged, so
-asking to maximize it would quietly have minimized it instead. Negating the
-combined value is correct whatever produced it.
+[function estimator](function_estimators.md) produces a measure of dispersion
+rather than an average: negating the inputs of a standard deviation leaves it
+unchanged, so asking to maximize it would silently have minimized it instead.
+Negating the combined value is correct whatever produced it.
 
 What you see in the results follows from that:
 

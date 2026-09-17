@@ -255,7 +255,7 @@ Two groups of fields have a single domain:
 
 Because the direction is undone when reporting, a combined objective agrees in
 sign with the per-realization values it summarizes, whether it is an average or
-a spread.
+a measure of dispersion.
 
 The runnable script is
 [examples/simple/scaling.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/scaling.py),
