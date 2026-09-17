@@ -6,8 +6,7 @@ This page shows the smallest complete `ropt` program. It minimizes the
 $$ f(x, y) = (1 - x)^2 + 100 \left( y - x^2 \right)^2 $$
 
 Its minimum is at $x = y = 1$, at the bottom of a long curved valley that is
-easy to fall into and slow to follow — which is exactly what makes it a useful
-thing to watch an optimizer solve.
+easy to reach but slow to follow.
 
 ## Install `ropt`
 

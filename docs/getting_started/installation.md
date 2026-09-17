@@ -43,7 +43,7 @@ works without it:
 | [Local and cluster jobs](../running/parallel.md#local-pool) | Evaluation functions at the top level of a module the worker can **import** | The same, plus functions defined in the script you ran, and results built from locally defined classes |
 | [The external backend](../running/parallel.md#external-backend) | The built-in plugins, and any plugin class at the top level of a module *or of the script you ran* | Plugin instances of classes defined in a function or a notebook |
 
-The two pool rows differ, and the difference bites in practice. A process pool
+The two pool rows differ, and the difference matters in practice. A process pool
 starts its workers with `spawn`, which re-imports the script you launched, so a
 function defined there can be looked up again. A local or cluster job is a fresh
 command whose `__main__` is `ropt`'s own worker module, so a function defined in

@@ -55,9 +55,9 @@ called `optimize`.
     is a worker inside a process, and all threads in a process share that memory.
     Threads are cheap and share data for free, but Python runs only one thread's
     *Python* code at a time. Work that **waits** — for a file, a network reply,
-    an external tool — overlaps freely, because a waiting thread holds nothing;
-    and so does work a library performs outside Python, as `numpy` and friends
-    do while they crunch an array. What is stuck one-at-a-time is arithmetic
+    an external tool — overlaps freely, because a waiting thread is not running
+    Python code; and so does work a library performs outside Python, as `numpy`
+    does while it crunches an array. What is stuck one-at-a-time is arithmetic
     written in Python itself. Separate **processes** each have their own
     interpreter and always run truly in parallel, but they do not share memory,
     so data has to be copied between them, and starting one takes noticeably
