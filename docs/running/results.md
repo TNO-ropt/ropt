@@ -73,10 +73,12 @@ Each carries nested [`ResultField`][ropt.results.ResultField] objects:
     - `evaluated_realizations`: boolean array indicating which realizations were
       evaluated, shape $(n_r,)$.
     - `objective_weights`: per-realization objective weights, shape
-      $(n_o, n_r)$. May change during optimization (for example, when realization
-      filters are active).
+      $(n_o, n_r)$, or `None` when no
+      [realization filter](../optimizer_setup/realization_filters.md) is
+      configured. A filter may change them from one batch to the next.
     - `constraint_weights`: per-realization constraint weights, shape
-      $(n_c, n_r)$ (if constraints are configured).
+      $(n_c, n_r)$, or `None` unless nonlinear constraints and a realization
+      filter are both configured.
 - **`constraint_info`** ([`ConstraintInfo`][ropt.results.ConstraintInfo]) —
   constraint bound information. Present when bounds or constraints are defined.
   Contains two kinds of data for each constraint type (bound, linear, and

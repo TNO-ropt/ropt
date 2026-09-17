@@ -82,7 +82,8 @@ There are three ways to return them:
 - a **list** of numbers when there are several objectives or nonlinear
   constraints — put the objectives first, then the constraints;
 - an [`EvaluationFunctionResult`][ropt.components.evaluators.EvaluationFunctionResult]
-  when you also want to attach `metadata`.
+  when you also want to attach `metadata`; it holds `objectives`, `constraints`
+  and `metadata` in separate fields, so nothing has to be ordered.
 
 If a realization fails to compute, return `float("nan")` for it. `ropt` treats
 `NaN` as a failed realization and keeps going, as long as enough realizations
