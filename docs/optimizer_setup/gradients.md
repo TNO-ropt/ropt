@@ -130,6 +130,19 @@ values to be reused across all realizations. This can reduce noise in the
 gradient estimate when the objective function varies smoothly across
 realizations.
 
+### Writing a custom sampler
+
+A custom sampler is a plugin implementing the
+[`Sampler`][ropt.sampler.Sampler] base class, whose docstring documents the
+shape the samples must have and how the `mask` and `shared` settings affect
+them. The runnable script is
+[examples/simple/sampler.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/sampler.py),
+which perturbs one variable at a time. With one perturbation per variable and a
+unit step, the gradient estimate is a forward finite difference, which shows
+that perturbations need not be random. Its second method scales each step by a
+random factor instead, and the two runs differ in `shared` to show where that
+flag changes the samples.
+
 ## Function estimators
 
 A function estimator decides how the gradient samples (and the function
