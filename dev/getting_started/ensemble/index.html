@@ -3233,7 +3233,9 @@ robust objective, which is what it optimizes.</p>
 <li><code>result.results.variables</code> is the best set of variables found, and
   <code>result.results.target_objective</code> the robust objective value there.</li>
 </ul>
-<p>See <a href="../../running/running/#the-result">Running Optimizations</a> for the remaining fields.</p>
+<p>That evaluation carries much more than those two values — the per-realization
+objectives, the aggregates, the ensemble weights; see
+<a href="../../running/results/">Working with Results</a>.</p>
 <p>Because the coefficients are centered on the values used in the
 <a href="../quickstart/">Quickstart</a>, the robust optimum still lies close to where all
 variables equal 1 — but it minimizes the <em>average</em> over the uncertain
