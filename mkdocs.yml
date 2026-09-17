@@ -122,12 +122,15 @@ nav:
       - "Restarting from the Best Point": running/restart.md
   - "Optimizer Setup":
       - "Key Concepts": optimizer_setup/key_concepts.md
-      - "Configuration": optimizer_setup/configuration.md
+      - "Objectives": optimizer_setup/objectives.md
       - "Constraints": optimizer_setup/constraints.md
       - "Discrete and Mixed-Integer Variables": optimizer_setup/discrete.md
+      - "Choosing an Optimizer": optimizer_setup/optimizer.md
       - "Stochastic Gradients": optimizer_setup/gradients.md
+      - "Samplers": optimizer_setup/samplers.md
       - "Realization Filters": optimizer_setup/realization_filters.md
       - "Function Estimators": optimizer_setup/function_estimators.md
+      - "Configuration Reference": optimizer_setup/configuration.md
   - "Advanced":
       - "Workflows":
           - "Optimization Workflows": advanced/workflows.md

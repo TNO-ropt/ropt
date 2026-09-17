@@ -859,7 +859,7 @@ Fields:
 
 #### Samplers — [`SamplerConfig`][ropt.config.SamplerConfig] { #samplers }
 
-[Samplers](gradients.md) generate perturbations added to variables for gradient
+[Samplers](samplers.md) generate perturbations added to variables for gradient
 calculations. These perturbations can be deterministic or stochastic.
 
 Fields:

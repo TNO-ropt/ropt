@@ -105,53 +105,19 @@ realizations that did work.
 
 ## Samplers
 
-A sampler draws the perturbation samples used for gradient estimation. The
-default [`SciPySampler`][ropt.sampler.scipy.SciPySampler] draws from a standard
-normal distribution $N(0, 1)$; other samplers can be added through the plugin
-system. Configure the `samplers` tuple at the top level of the config and
-reference them by index from `variables.samplers` (see
-[Configuration](configuration.md) on index sharing).
-
-### Sample scaling
-
-Samplers produce **unscaled** perturbations — values with a characteristic
-magnitude of approximately one. During gradient estimation, these samples are
-multiplied element-wise by the `perturbation_magnitudes` defined in
-[`VariablesConfig`][ropt.config.VariablesConfig]. This separation means that
-`perturbation_magnitudes` directly controls the effective size of the
-perturbations, regardless of which sampler is used.
-
-### Shared perturbations
-
-By default, each realization receives its own independently drawn set of
-perturbations. Setting the `shared` flag to `True` in
-[`SamplerConfig`][ropt.config.SamplerConfig] causes the same perturbation
-values to be reused across all realizations. This can reduce noise in the
-gradient estimate when the objective function varies smoothly across
-realizations.
-
-### Writing a custom sampler
-
-A custom sampler is a plugin implementing the
-[`Sampler`][ropt.sampler.Sampler] base class, whose docstring documents the
-shape the samples must have and how the `mask` and `shared` settings affect
-them. The runnable script is
-[examples/simple/sampler.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/sampler.py),
-which perturbs one variable at a time. With one perturbation per variable and a
-unit step, the gradient estimate is a forward finite difference, which shows
-that perturbations need not be random. Its second method scales each step by a
-random factor instead, and the two runs differ in `shared` to show where that
-flag changes the samples.
+A sampler decides *where* the perturbed points are placed, while
+`perturbation_magnitudes` decides how far away they are. The default draws from
+a standard normal distribution, and quasi-random alternatives are available.
+Selecting one, perturbing different variables differently, sharing samples
+across realizations and writing your own are all covered in
+[Samplers](samplers.md).
 
 ## Function estimators
 
-A function estimator decides how the gradient samples (and the function
-samples for non-default estimators) are combined into the final estimate.
-The default
-[`DefaultFunctionEstimator`][ropt.function_estimator.default.DefaultFunctionEstimator]
-uses the mean of the functions and gradients. Alternative estimators are configured via the
-`function_estimators` tuple and selected per-objective in
-[`ObjectiveFunctionsConfig.function_estimators`][ropt.config.ObjectiveFunctionsConfig].
+A function estimator decides *how* the per-realization values and gradients are
+combined into the single estimate the optimizer receives. The default is a
+weighted mean; alternatives, including a spread rather than an average, are
+covered in [Function Estimators](function_estimators.md).
 
 ## A runnable example
 

@@ -19,7 +19,9 @@ constraints, or both.
 3. At each evaluation, the filter is consulted to compute per-realization
    weights that override the static `realizations.weights`.
 
-See [Configuration](configuration.md) for the index-sharing pattern.
+See [Sharing optimizer components by
+key](configuration.md#sharing-optimizer-components-by-key) for the indexing
+pattern.
 
 ## CVaR example
 
@@ -47,7 +49,30 @@ See [`CVaRObjectiveOptions`][ropt.realization_filter.default.CVaRObjectiveOption
 for the parameters. The corresponding constraint variant is
 [`CVaRConstraintOptions`][ropt.realization_filter.default.CVaRConstraintOptions].
 
-### How CVaR filters work
+## Interaction with `evaluation_policy`
+
+Filters that disable some realizations only deliver savings on the gradient
+side when the optimizer requests gradients separately from functions. Set
+`gradient.evaluation_policy = "separate"` (see
+[Stochastic Gradients](gradients.md)) to maximize that benefit.
+
+## Writing a custom filter
+
+Custom filters are plugins implementing the
+[`RealizationFilter`][ropt.realization_filter.RealizationFilter] base class,
+whose docstring documents the methods to implement. A filter defined where an
+entry point cannot reach it — in a script or a notebook — is added with
+[`register_plugin`][ropt.plugins.register_plugin], after which it is
+selected by its `"plugin/method"` string exactly like an installed one. An
+instance can also be passed directly in the `realization_filters` field of
+[`EnOptContext`][ropt.context.EnOptContext], which needs no registration.
+
+The runnable script is
+[examples/simple/realization_filter.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/realization_filter.py),
+which implements a filter that puts all weight on the median realization,
+registers it, and selects it from the configuration as `"custom/median"`.
+
+## How CVaR filters work
 
 The `cvar-objective` method:
 
@@ -86,26 +111,3 @@ with "worst" defined by constraint type:
 !!! note "Weight normalization"
     The optimizer normalizes all filter-produced weights to sum to one before
     use, so any non-negative values are permissible.
-
-## Interaction with `evaluation_policy`
-
-Filters that disable some realizations only deliver savings on the gradient
-side when the optimizer requests gradients separately from functions. Set
-`gradient.evaluation_policy = "separate"` (see
-[Stochastic Gradients](gradients.md)) to maximize that benefit.
-
-## Writing a custom filter
-
-Custom filters are plugins implementing the
-[`RealizationFilter`][ropt.realization_filter.RealizationFilter] base class,
-whose docstring documents the methods to implement. A filter defined where an
-entry point cannot reach it — in a script or a notebook — is added with
-[`register_plugin`][ropt.plugins.register_plugin], after which it is
-selected by its `"plugin/method"` string exactly like an installed one. An
-instance can also be passed directly in the `realization_filters` field of
-[`EnOptContext`][ropt.context.EnOptContext], which needs no registration.
-
-The runnable script is
-[examples/simple/realization_filter.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/realization_filter.py),
-which implements a filter that puts all weight on the median realization,
-registers it, and selects it from the configuration as `"custom/median"`.

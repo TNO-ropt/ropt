@@ -21,7 +21,7 @@ Scripts that assemble a workflow by hand are listed under
 | [`mixed.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/mixed.py) | Continuous and integer variables in one problem | [Discrete and Mixed-Integer Variables](../optimizer_setup/discrete.md) |
 | [`realization_filter.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/realization_filter.py) | A custom filter that reweights realizations | [Realization Filters](../optimizer_setup/realization_filters.md) |
 | [`function_estimator.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/function_estimator.py) | A custom estimator that aggregates realizations | [Function Estimators](../optimizer_setup/function_estimators.md) |
-| [`sampler.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/sampler.py) | A custom sampler that perturbs one variable at a time | [Stochastic Gradients](../optimizer_setup/gradients.md) |
+| [`sampler.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/sampler.py) | A custom sampler that perturbs one variable at a time | [Samplers](../optimizer_setup/samplers.md) |
 | [`metadata.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/metadata.py) | Tagging a run, and recording per-realization data | [Working with Results](../running/results.md) |
 | [`export.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/export.py) | Exporting results to a pandas or polars frame | [Working with Results](../running/results.md) |
 | [`scaling.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/scaling.py) | Reading results in the configured and the optimizer's units | [Working with Results](../running/results.md) |

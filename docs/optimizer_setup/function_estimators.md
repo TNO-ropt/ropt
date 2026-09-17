@@ -26,7 +26,9 @@ strategy.
    and gradient arrays plus the current weights, and returns a single
    aggregated value.
 
-See [Configuration](configuration.md) for the index-sharing pattern.
+See [Sharing optimizer components by
+key](configuration.md#sharing-optimizer-components-by-key) for the indexing
+pattern.
 
 ## Mean estimator (default)
 
@@ -66,9 +68,9 @@ Note:
 - The `stddev` method is incompatible with `gradient.merge_realizations = True`;
   per-realization gradients must be available.
 - A standard deviation is always positive. To *maximize* variability, set
-  [`maximize`](configuration.md#objective-direction) on the objective; the sign
-  is flipped after the spread has been computed, which is the only point at
-  which flipping it has any effect.
+  [`maximize`](objectives.md#maximizing-instead-of-minimizing) on the objective;
+  the sign is flipped after the spread has been computed, which is the only
+  point at which flipping it has any effect.
 
 ## Writing a custom estimator
 
