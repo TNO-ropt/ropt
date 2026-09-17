@@ -20,7 +20,8 @@ from numpy.typing import NDArray
 from ropt.config import RealizationFilterConfig
 from ropt.plugins import MethodSpec, register_plugin
 from ropt.realization_filter import RealizationFilter
-from ropt.simple import EvaluateResult, EvaluationFunctionContext, optimize
+from ropt.results import FunctionResults
+from ropt.simple import EvaluationFunctionContext, optimize
 
 DIM = 5
 UNCERTAINTY = 0.1
@@ -75,7 +76,7 @@ class MedianFilter(RealizationFilter):
         return weights
 
 
-def report(result: EvaluateResult) -> None:
+def report(result: FunctionResults) -> None:
     """Print the objective of each function evaluation.
 
     Args:
@@ -125,10 +126,10 @@ def main() -> None:
         return float(objective)
 
     result = optimize(config, INITIAL_VALUES, rosenbrock, report=report)
-    print(f"optimal variables: {result.variables}")
-    print(f"optimal objective: {result.target_objective}")
-    assert result.variables is not None
-    assert np.allclose(result.variables, 1.0, atol=1e-1)
+    assert result.results is not None
+    print(f"optimal variables: {result.results.variables}")
+    print(f"optimal objective: {result.results.target_objective}")
+    assert np.allclose(result.results.variables, 1.0, atol=1e-1)
 
 
 if __name__ == "__main__":

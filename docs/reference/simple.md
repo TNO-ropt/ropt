@@ -34,8 +34,7 @@ group; the group itself is a `SharedHandlers` object.
 
 ## Result objects
 
-::: ropt.simple.EvaluateResult
-::: ropt.simple.OptimizeResult
+::: ropt.simple.OptimizationResult
 
 ## Callback types
 

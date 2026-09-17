@@ -14,7 +14,7 @@ from ropt.config.constants import DEFAULT_SEED
 from ropt.context import EnOptContext
 from ropt.enums import EnOptEventType, ExitCode
 from ropt.results import FunctionResults, GradientResults
-from ropt.simple import EvaluateResult, optimize
+from ropt.simple import optimize
 from ropt.utils import validate_backend_options
 
 if TYPE_CHECKING:
@@ -58,8 +58,8 @@ def config_fixture() -> dict[str, Any]:
 def test_basic_run(config: Any, eval_func: Any, external: str) -> None:
     config["backend"]["method"] = f"{external}{_SLSQP}"
     result = optimize(config, initial_values, eval_func())
-    assert result.variables is not None
-    assert np.allclose(result.variables, [0, 0, 0.5], atol=0.02)
+    assert result.results is not None
+    assert np.allclose(result.results.variables, [0, 0, 0.5], atol=0.02)
 
 
 def test_invalid_options(config: Any, external: str) -> None:
@@ -153,7 +153,7 @@ def test_max_functions_not_exceeded(config: Any, eval_func: Any, external: str) 
 
 
 def test_failed_realizations(config: Any, eval_func: Any, external: str) -> None:
-    def _observer(item: EvaluateResult) -> None:
+    def _observer(item: FunctionResults) -> None:
         assert item.target_objective is None
 
     config["backend"]["method"] = f"{external}{_SLSQP}"
@@ -166,7 +166,7 @@ def test_failed_realizations(config: Any, eval_func: Any, external: str) -> None
 def test_failed_realizations_constraints(
     config: Any, eval_func: Any, test_functions: Any, external: str
 ) -> None:
-    def _observer(item: EvaluateResult) -> None:
+    def _observer(item: FunctionResults) -> None:
         assert item.target_objective is None
 
     config["backend"]["method"] = f"{external}{_SLSQP}"
@@ -194,8 +194,8 @@ def test_single_perturbation(config: Any, eval_func: Any, external: str) -> None
     config["backend"]["method"] = f"{external}{_SLSQP}"
 
     result = optimize(config, initial_values, eval_func())
-    assert result.variables is not None
-    assert np.allclose(result.variables, [0.0, 0.0, 0.5], atol=0.02)
+    assert result.results is not None
+    assert np.allclose(result.results.variables, [0.0, 0.0, 0.5], atol=0.02)
 
 
 def test_external_error(config: Any, eval_func: Any, external: str) -> None:
@@ -213,10 +213,10 @@ def test_objective_with_scales(
     external: str,
 ) -> None:
     result1 = optimize(config, initial_values, eval_func())
-    assert result1.variables is not None
-    assert result1.objectives is not None
-    variables1 = result1.variables
-    objectives1 = result1.objectives
+    assert result1.results is not None
+    assert result1.results.functions is not None
+    variables1 = result1.results.variables
+    objectives1 = result1.results.functions.objectives
     assert np.allclose(variables1, [0.0, 0.0, 0.5], atol=0.02)
     assert np.allclose(objectives1, [0.5, 4.5], atol=0.02)
 
@@ -243,7 +243,6 @@ def test_objective_with_scales(
                 assert item.scaled.functions.objectives is not None
                 assert np.allclose(item.scaled.functions.objectives[-1], 1.0)
                 assert item.functions is not None
-                assert item.functions.objectives is not None
                 assert np.allclose(item.functions.objectives[-1], init1)
 
     result2 = optimize(
@@ -257,10 +256,10 @@ def test_objective_with_scales(
         ],
     )
     assert checked
-    assert result2.variables is not None
-    assert np.allclose(result2.variables, variables1, atol=0.02)
-    assert result2.objectives is not None
-    assert np.allclose(objectives1, result2.objectives, atol=0.025)
+    assert result2.results is not None
+    assert np.allclose(result2.results.variables, variables1, atol=0.02)
+    assert result2.results.functions is not None
+    assert np.allclose(objectives1, result2.results.functions.objectives, atol=0.025)
 
 
 def test_objective_with_auto_scale(
@@ -272,10 +271,10 @@ def test_objective_with_auto_scale(
     config["backend"]["method"] = f"{external}{_SLSQP}"
 
     result1 = optimize(config, initial_values, eval_func())
-    assert result1.variables is not None
-    assert result1.objectives is not None
-    variables1 = result1.variables
-    objectives1 = result1.objectives
+    assert result1.results is not None
+    assert result1.results.functions is not None
+    variables1 = result1.results.variables
+    objectives1 = result1.results.functions.objectives
     assert np.allclose(variables1, [0.0, 0.0, 0.5], atol=0.02)
     assert np.allclose(objectives1, [0.5, 4.5], atol=0.02)
 
@@ -308,7 +307,6 @@ def test_objective_with_auto_scale(
                 assert item.target_objective is not None
                 assert np.allclose(item.target_objective, 1.0)
                 assert item.functions is not None
-                assert item.functions.objectives is not None
                 assert np.allclose(item.functions.objectives, initial)
 
     result2 = optimize(
@@ -322,12 +320,12 @@ def test_objective_with_auto_scale(
         ],
     )
     assert checked
-    assert result2.variables is not None
-    assert np.allclose(result2.variables, variables1, atol=0.02)
-    assert result2.objectives is not None
+    assert result2.results is not None
+    assert np.allclose(result2.results.variables, variables1, atol=0.02)
     # Rescaling the objective changes the steps the optimizer takes, so within
     # the same budget it stops at a slightly different point.
-    assert np.allclose(objectives1, result2.objectives, atol=0.05)
+    assert result2.results.functions is not None
+    assert np.allclose(objectives1, result2.results.functions.objectives, atol=0.05)
 
 
 def test_nonlinear_constraint_with_scales(
@@ -353,9 +351,9 @@ def test_nonlinear_constraint_with_scales(
         initial_values,
         eval_func(test_functions, [constraint_function]),
     )
-    assert result1.variables is not None
-    assert result1.variables[[0, 2]].sum() > 0.0 - 1e-5
-    assert result1.variables[[0, 2]].sum() < 0.4 + 1e-5
+    assert result1.results is not None
+    assert result1.results.variables[[0, 2]].sum() > 0.0 - 1e-5
+    assert result1.results.variables[[0, 2]].sum() < 0.4 + 1e-5
 
     config["nonlinear_constraints"]["scales"] = scales
 
@@ -393,11 +391,15 @@ def test_nonlinear_constraint_with_scales(
         ],
     )
     assert not check
-    assert result2.variables is not None
-    assert np.allclose(result2.variables, result1.variables, atol=0.02)
-    assert result1.objectives is not None
-    assert result2.objectives is not None
-    assert np.allclose(result1.objectives, result2.objectives, atol=0.025)
+    assert result2.results is not None
+    assert result1.results.functions is not None
+    assert result2.results.functions is not None
+    assert np.allclose(result2.results.variables, result1.results.variables, atol=0.02)
+    assert np.allclose(
+        result1.results.functions.objectives,
+        result2.results.functions.objectives,
+        atol=0.025,
+    )
 
 
 def test_nonlinear_constraint_with_auto_scale(
@@ -423,9 +425,9 @@ def test_nonlinear_constraint_with_auto_scale(
         initial_values,
         eval_func(test_functions, [constraint_function]),
     )
-    assert result1.variables is not None
-    assert result1.variables[[0, 2]].sum() > 0.0 - 1e-5
-    assert result1.variables[[0, 2]].sum() < 0.4 + 1e-5
+    assert result1.results is not None
+    assert result1.results.variables[[0, 2]].sum() > 0.0 - 1e-5
+    assert result1.results.variables[[0, 2]].sum() < 0.4 + 1e-5
 
     config["nonlinear_constraints"]["auto_scale"] = True
 
@@ -471,11 +473,15 @@ def test_nonlinear_constraint_with_auto_scale(
         ],
     )
     assert not check
-    assert result2.variables is not None
-    assert np.allclose(result2.variables, result1.variables, atol=0.02)
-    assert result1.objectives is not None
-    assert result2.objectives is not None
-    assert np.allclose(result1.objectives, result2.objectives, atol=0.025)
+    assert result2.results is not None
+    assert result1.results.functions is not None
+    assert result2.results.functions is not None
+    assert np.allclose(result2.results.variables, result1.results.variables, atol=0.02)
+    assert np.allclose(
+        result1.results.functions.objectives,
+        result2.results.functions.objectives,
+        atol=0.025,
+    )
 
 
 @pytest.mark.parametrize("offsets", [None, np.array([1.0, 1.1, 1.2])])
@@ -501,7 +507,7 @@ def test_variables_are_scaled_and_offset(
         config["variables"]["offsets"] = offsets
 
     opt_result = optimize(config, initial_values, eval_func())
-    assert opt_result.variables is not None
+    assert opt_result.results is not None
 
     context = EnOptContext.model_validate(config)
     if offsets is not None:
@@ -513,7 +519,7 @@ def test_variables_are_scaled_and_offset(
     assert np.allclose(context.variables.lower_bounds, lower_bounds)
     assert np.allclose(context.variables.upper_bounds, upper_bounds)
     # The optimum is reported unscaled, so it is where it always was.
-    assert np.allclose(opt_result.variables, [0.0, 0.0, 0.5], atol=0.05)
+    assert np.allclose(opt_result.results.variables, [0.0, 0.0, 0.5], atol=0.05)
 
 
 def test_scaled_variables_change_the_linear_constraints(
@@ -556,8 +562,8 @@ def test_scaled_variables_change_the_linear_constraints(
     )
 
     result = optimize(config, initial_values, eval_func())
-    assert result.variables is not None
-    assert np.allclose(result.variables, [0.25, 0.0, 0.75], atol=0.02)
+    assert result.results is not None
+    assert np.allclose(result.results.variables, [0.25, 0.0, 0.75], atol=0.02)
 
 
 def test_check_linear_constraints(config: Any, eval_func: Any, external: str) -> None:
@@ -568,19 +574,19 @@ def test_check_linear_constraints(config: Any, eval_func: Any, external: str) ->
         "upper_bounds": [0.0, 1.0, np.inf],
     }
     result1 = optimize(config, initial_values, eval_func())
-    assert result1.variables is not None
+    assert result1.results is not None
 
     config["linear_constraints"]["lower_bounds"] = [0.0, -np.inf, -1.0]
     config["linear_constraints"]["upper_bounds"] = [0.0, 1.0, np.inf]
     result2 = optimize(config, initial_values, eval_func())
-    assert result2.variables is not None
-    assert np.allclose(result1.variables, result2.variables)
+    assert result2.results is not None
+    assert np.allclose(result1.results.variables, result2.results.variables)
 
     config["linear_constraints"]["lower_bounds"] = [1.0, -np.inf, 1.0]
     config["linear_constraints"]["upper_bounds"] = [1.0, -1.0, np.inf]
 
     result3 = optimize(config, initial_values, eval_func())
-    assert result3.variables is None
+    assert result3.results is None
 
 
 def test_check_nonlinear_constraints(
@@ -601,7 +607,7 @@ def test_check_nonlinear_constraints(
     result1 = optimize(
         config, initial_values, eval_func(test_functions, constraint_functions)
     )
-    assert result1.variables is not None
+    assert result1.results is not None
 
     # Swapping which side of each inequality is bounded, and the sign of the
     # constraint with it, describes the same feasible set:
@@ -615,8 +621,8 @@ def test_check_nonlinear_constraints(
     result2 = optimize(
         config, initial_values, eval_func(test_functions, flipped_constraint_functions)
     )
-    assert result2.variables is not None
-    assert np.allclose(result1.variables, result2.variables)
+    assert result2.results is not None
+    assert np.allclose(result1.results.variables, result2.results.variables)
 
     config["nonlinear_constraints"]["lower_bounds"] = [1.0, -np.inf, 1.0]
     config["nonlinear_constraints"]["upper_bounds"] = [1.0, -1.0, np.inf]
@@ -624,7 +630,7 @@ def test_check_nonlinear_constraints(
     result3 = optimize(
         config, initial_values, eval_func(test_functions, constraint_functions)
     )
-    assert result3.variables is None
+    assert result3.results is None
 
 
 def test_optimizer_variables_subset(config: Any, eval_func: Any, external: str) -> None:
@@ -652,8 +658,8 @@ def test_optimizer_variables_subset(config: Any, eval_func: Any, external: str) 
             )
         ],
     )
-    assert result.variables is not None
-    assert np.allclose(result.variables, [0.0, 1.0, 0.5], atol=0.02)
+    assert result.results is not None
+    assert np.allclose(result.results.variables, [0.0, 1.0, 0.5], atol=0.02)
 
 
 def test_optimizer_variables_subset_linear_constraints(
@@ -669,8 +675,8 @@ def test_optimizer_variables_subset_linear_constraints(
     config["variables"]["mask"] = [True, False, True]
 
     result = optimize(config, [0.0, 1.0, 0.1], eval_func())
-    assert result.variables is not None
-    assert np.allclose(result.variables, [0.25, 1.0, 0.75], atol=0.02)
+    assert result.results is not None
+    assert np.allclose(result.results.variables, [0.25, 1.0, 0.75], atol=0.02)
 
 
 def test_optimizer_variables_subset_linear_constraints_offset(
@@ -685,8 +691,8 @@ def test_optimizer_variables_subset_linear_constraints_offset(
     config["variables"]["mask"] = [True, False, True]
 
     result = optimize(config, [0.0, 1.0, 0.1], eval_func())
-    assert result.variables is not None
-    assert np.allclose(result.variables, [0.15, 1.0, 0.85], atol=0.02)
+    assert result.results is not None
+    assert np.allclose(result.results.variables, [0.15, 1.0, 0.85], atol=0.02)
 
 
 def test_parallelize(config: Any, eval_func: Any, external: str) -> None:
@@ -701,31 +707,31 @@ def test_parallelize(config: Any, eval_func: Any, external: str) -> None:
 
     config["backend"]["parallel"] = False
     result = optimize(config, [0.2, *initial_values[1:]], eval_func())
-    assert result.variables is not None
-    assert np.allclose(result.variables, [0.15, 0.0, 0.2], atol=3e-2)
+    assert result.results is not None
+    assert np.allclose(result.results.variables, [0.15, 0.0, 0.2], atol=3e-2)
 
     config["backend"]["parallel"] = True
     result = optimize(config, [0.2, *initial_values[1:]], eval_func())
-    assert result.variables is not None
-    assert np.allclose(result.variables, [0.15, 0.0, 0.2], atol=3e-2)
+    assert result.results is not None
+    assert np.allclose(result.results.variables, [0.15, 0.0, 0.2], atol=3e-2)
 
 
 def test_rng(config: Any, eval_func: Any, external: str) -> None:
     config["backend"]["method"] = f"{external}{_SLSQP}"
     result1 = optimize(config, initial_values, eval_func())
-    assert result1.variables is not None
-    assert np.allclose(result1.variables, [0.0, 0.0, 0.5], atol=0.02)
+    assert result1.results is not None
+    assert np.allclose(result1.results.variables, [0.0, 0.0, 0.5], atol=0.02)
 
     result2 = optimize(config, initial_values, eval_func())
-    assert result2.variables is not None
-    assert np.allclose(result2.variables, [0.0, 0.0, 0.5], atol=0.02)
-    assert np.all(result2.variables == result2.variables)
+    assert result2.results is not None
+    assert np.allclose(result2.results.variables, [0.0, 0.0, 0.5], atol=0.02)
+    assert np.all(result2.results.variables == result2.results.variables)
 
     config["variables"]["seed"] = (1, DEFAULT_SEED)
     result3 = optimize(config, initial_values, eval_func())
-    assert result3.variables is not None
-    assert np.allclose(result3.variables, [0.0, 0.0, 0.5], atol=0.02)
-    assert not np.all(result3.variables == result1.variables)
+    assert result3.results is not None
+    assert np.allclose(result3.results.variables, [0.0, 0.0, 0.5], atol=0.02)
+    assert not np.all(result3.results.variables == result1.results.variables)
 
 
 def test_zero_objective_weight_disables_an_objective(
@@ -739,5 +745,5 @@ def test_zero_objective_weight_disables_an_objective(
 
     config["objectives"]["weights"] = [0.75, 0.25, 0.0]
     result = optimize(config, initial_values, eval_func(new_functions))
-    assert result.variables is not None
-    assert np.allclose(result.variables, [0, 0, 0.5], atol=0.02)
+    assert result.results is not None
+    assert np.allclose(result.results.variables, [0, 0, 0.5], atol=0.02)

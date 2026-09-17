@@ -131,8 +131,9 @@ def inner_optimization(
         # a realization, so realization alone would not identify the caller.
         metadata={"outer_batch": context.batch_id, "outer_eval": context.eval_idx},
     )
-    assert result.target_objective is not None
-    return result.target_objective
+    assert result.results is not None
+    assert result.results.target_objective is not None
+    return float(result.results.target_objective)
     # --8<-- [end:inner]
 
 

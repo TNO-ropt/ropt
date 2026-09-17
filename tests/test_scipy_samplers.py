@@ -40,8 +40,8 @@ def config_fixture() -> dict[str, Any]:
 def test_scipy_samplers_unconstrained(config: Any, method: str, eval_func: Any) -> None:
     config["samplers"] = [{"method": method}]
     result = optimize(config, initial_values, eval_func())
-    assert result.variables is not None
-    assert np.allclose(result.variables, [0.0, 0.0, 0.5], atol=0.02)
+    assert result.results is not None
+    assert np.allclose(result.results.variables, [0.0, 0.0, 0.5], atol=0.02)
 
 
 def test_scipy_indexed_sampler(config: Any, eval_func: Any) -> None:
@@ -53,10 +53,10 @@ def test_scipy_indexed_sampler(config: Any, eval_func: Any) -> None:
     initial[1] = 0.1
 
     result = optimize(config, initial, eval_func())
-    assert result.variables is not None
-    assert pytest.approx(result.variables[0]) != 0.0
-    assert pytest.approx(result.variables[1]) == 0.1
-    assert pytest.approx(result.variables[2]) != 0.5
+    assert result.results is not None
+    assert pytest.approx(result.results.variables[0]) != 0.0
+    assert pytest.approx(result.results.variables[1]) == 0.1
+    assert pytest.approx(result.results.variables[2]) != 0.5
 
 
 @pytest.mark.parametrize("method", sorted(SCIPY_SAMPLER_SUPPORTED_METHODS))
@@ -83,7 +83,7 @@ def test_scipy_samplers_shared(config: Any, method: str, eval_func: Any) -> None
             )
         ],
     )
-    assert result1.variables is not None
+    assert result1.results is not None
 
     config["samplers"][0]["shared"] = True
     result2 = optimize(
@@ -97,7 +97,7 @@ def test_scipy_samplers_shared(config: Any, method: str, eval_func: Any) -> None
             )
         ],
     )
-    assert result2.variables is not None
+    assert result2.results is not None
 
     # The perturbations of the two realizations must differ, if not shared:
     assert not np.allclose(
@@ -110,6 +110,8 @@ def test_scipy_samplers_shared(config: Any, method: str, eval_func: Any) -> None
     )
 
     # The results should be correct, but slightly different:
-    assert np.allclose(result1.variables, [0.0, 0.0, 0.5], atol=0.02)
-    assert np.allclose(result2.variables, [0.0, 0.0, 0.5], atol=0.02)
-    assert not np.allclose(result1.variables, result2.variables, atol=1e-3)
+    assert np.allclose(result1.results.variables, [0.0, 0.0, 0.5], atol=0.02)
+    assert np.allclose(result2.results.variables, [0.0, 0.0, 0.5], atol=0.02)
+    assert not np.allclose(
+        result1.results.variables, result2.results.variables, atol=1e-3
+    )

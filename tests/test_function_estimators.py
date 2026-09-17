@@ -68,8 +68,8 @@ def test_mean_stddev_function_estimator(
     config["objectives"]["function_estimators"] = [0, 0, 1, 1]
     config["function_estimators"] = [{"method": "mean"}, {"method": "stddev"}]
     result = optimize(config, initial_values, eval_func(test_functions))
-    assert result.variables is not None
-    assert np.allclose(result.variables, [0.0, 0.0, 0.5], atol=0.02)
+    assert result.results is not None
+    assert np.allclose(result.results.variables, [0.0, 0.0, 0.5], atol=0.02)
 
 
 def _compute_distance_squared_stddev(
@@ -108,8 +108,8 @@ def test_stddev_function_estimator(
     config["gradient"]["evaluation_policy"] = evaluation_policy
     config["function_estimators"] = [{"method": "stddev"}]
     result = optimize(config, initial_values, eval_func(functions))
-    assert result.variables is not None
-    assert np.allclose(result.variables, [0.0, 0.0, 0.5], atol=0.02)
+    assert result.results is not None
+    assert np.allclose(result.results.variables, [0.0, 0.0, 0.5], atol=0.02)
 
 
 def _estimator(method: str) -> DefaultFunctionEstimator:
@@ -212,5 +212,5 @@ def test_custom_function_estimator(
         CustomFunctionEstimator(FunctionEstimatorConfig(method="custom"))
     ]
     result = optimize(config, initial_values, eval_func(test_functions))
-    assert result.variables is not None
-    assert np.allclose(result.variables, [0.0, 0.0, 0.5], atol=0.02)
+    assert result.results is not None
+    assert np.allclose(result.results.variables, [0.0, 0.0, 0.5], atol=0.02)

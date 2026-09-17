@@ -15,7 +15,7 @@ each call to `optimize` is independent, this is just a loop in your own code;
 
 ## Collecting every result with a handler
 
-`result.variables` from one run is all you need to start the next, but if you
+The best point of one run is all you need to start the next, but if you
 also want to see every evaluation across the whole sequence of restarts — not
 just the final result — attach a **handler**. A handler is an object you pass
 with `handlers=` that observes every result an optimization produces; unlike
@@ -43,16 +43,17 @@ and feeds its results into `history`:
 x0 = INITIAL_VALUES
 for _ in range(RESTARTS):
     result = optimize(CONFIG, x0, rosenbrock, handlers=[history])
-    x0 = result.variables  # restart from the best point found so far
+    assert result.results is not None
+    x0 = result.results.variables  # restart from the best point found so far
 ```
 
-`result.variables` is the best point the run found — feeding it back in as
-`x0` is the entire restart mechanism. After the loop, `history.results` holds
+`result.results.variables` is the best point the run found — feeding it back in
+as `x0` is the entire restart mechanism. After the loop, `history.results` holds
 every evaluation from every restart, not just the last run's:
 
 ```python
 print(f"evaluations collected across all restarts: {len(history.results)}")
-print(f"best objective after {RESTARTS} restarts: {result.target_objective}")
+print(f"best objective after {RESTARTS} restarts: {result.results.target_objective}")
 ```
 
 ## Next

@@ -22,7 +22,8 @@ from ropt.simple import optimize
 if TYPE_CHECKING:
     from numpy.typing import NDArray
 
-    from ropt.simple import EvaluateResult, EvaluationFunctionContext
+    from ropt.results import FunctionResults
+    from ropt.simple import EvaluationFunctionContext
 
 DIM = 5
 MAX_RESULTS = 4  # stop once this many results have arrived
@@ -57,7 +58,7 @@ def objective(
     return float(total)
 
 
-def stop_after_max_results(result: EvaluateResult) -> bool:
+def stop_after_max_results(result: FunctionResults) -> bool:
     """Count one result and decide whether the run should go on.
 
     Args:
@@ -81,9 +82,9 @@ def main() -> None:
     assert _seen == MAX_RESULTS
 
     # Stopping keeps what the run had already found.
-    assert result.variables is not None
-    assert result.target_objective is not None
-    print(f"best objective so far: {result.target_objective}")
+    assert result.results is not None
+    assert result.results.target_objective is not None
+    print(f"best objective so far: {result.results.target_objective}")
 
 
 if __name__ == "__main__":

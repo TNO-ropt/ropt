@@ -479,7 +479,7 @@ class Session:
                       databases, network); for in-memory work it gives no
                       benefit under CPython's GIL. See
                       [Result Handlers](../running/handlers.md#running-a-handler-in-a-thread).
-            report:   An optional callback invoked with an `EvaluateResult` for
+            report:   An optional callback invoked with a `FunctionResults` for
                       each function evaluation across the group's runs.
                       Returning `True` stops the emitting run early with
                       `USER_ABORT` if it is an optimization; an evaluation has

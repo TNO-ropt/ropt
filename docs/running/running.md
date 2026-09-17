@@ -94,31 +94,39 @@ which defaults to *all* of them — so a single `NaN` ends the run with
 
 ## The result
 
-`optimize` returns an [`OptimizeResult`][ropt.simple.OptimizeResult]:
+`optimize` returns an [`OptimizationResult`][ropt.simple.OptimizationResult],
+which carries two things:
 
 ```python
 result = optimize(config, x0, objective)
 
-result.exit_code         # why the run stopped (an ropt.enums.ExitCode)
-result.variables         # the best variables, or None if none was valid
-result.target_objective  # the objective value at the best point, or None
-result.objectives        # the separate objective values, or None
-result.constraints       # the nonlinear constraint values, or None
-result.results           # the full low-level result object (see below)
+result.exit_code  # why the run stopped (an ropt.enums.ExitCode)
+result.results    # the best evaluation, or None if none was valid
 ```
 
-The fields are `None` when the run produced no valid result: too few
-realizations succeeded, the pool was closed under the run, or no result ever
-satisfied the constraints — see
-[When something goes wrong](#when-something-goes-wrong). `result.results` is the
-full [`FunctionResults`][ropt.results.FunctionResults] object; you rarely need
-it at first, but it holds every detail if you do. See
-[Working with Results](results.md).
+`results` is a [`FunctionResults`][ropt.results.FunctionResults] — the same
+object a [handler](handlers.md) receives — so the best point and its values are
+read from it at the paths described in [Working with Results](results.md):
+
+```python
+if result.results is not None:
+    result.results.variables             # the best variables
+    result.results.target_objective      # the objective value there
+    result.results.functions.objectives  # the separate objective values
+    result.results.functions.constraints # the nonlinear constraint values
+```
+
+`results` is `None` when the run produced no valid result: too few realizations
+succeeded, or no result ever satisfied the constraints — see
+[When something goes wrong](#when-something-goes-wrong). One check therefore
+covers every field.
 
 ## Reporting progress
 
 Pass a `report` callback to watch the optimization as it runs. It is called once
-for every function evaluation, with an [`EvaluateResult`][ropt.simple.EvaluateResult]:
+for every function evaluation, with the
+[`FunctionResults`][ropt.results.FunctionResults] of that evaluation — the same
+object a handler is given:
 
 ```python
 def report(result):
@@ -226,14 +234,14 @@ optimizer. Use [`evaluate`][ropt.simple.evaluate] for one point and
 ```python
 from ropt.simple import evaluate, evaluate_many
 
-single = evaluate(config, x, objective)             # one EvaluateResult
+single = evaluate(config, x, objective)             # one FunctionResults
 batch = evaluate_many(config, matrix, objective)    # one per row of the matrix
 ```
 
-An [`EvaluateResult`][ropt.simple.EvaluateResult] is what one point produced.
-`OptimizeResult` **is** one of these, with `exit_code` added: a run ends at its
-best evaluation, so the two read the same way. Here `result.variables` is just
-the point you supplied; it is only informative in a `report` callback, where the
+Both hand back [`FunctionResults`][ropt.results.FunctionResults] objects, the
+same kind `optimize` puts on `results` and a handler receives, so everything is
+read the same way wherever it came from. Here `result.variables` is just the
+point you supplied; it is only informative in a `report` callback, where the
 optimizer chose the point.
 
 The runnable script is
@@ -245,12 +253,12 @@ which evaluates a single vector and then a matrix of them.
 Not every problem is an exception. An optimization that cannot make progress
 still returns normally, and says why in `result.exit_code`:
 `TOO_FEW_REALIZATIONS` when not enough realizations produced a value,
-`EXECUTOR_STOPPED` when the pool it was evaluating on was closed under it. The
-fields are `None` when nothing usable was found — always so for
+`EXECUTOR_STOPPED` when the pool it was evaluating on was closed under it.
+`result.results` is `None` when nothing usable was found — always so for
 `TOO_FEW_REALIZATIONS`, whereas a run stopped with its pool keeps the best
 result it had reached. A plain [`evaluate`][ropt.simple.evaluate] has no
-`exit_code`; there the `None` fields are the only sign that nothing usable came
-back.
+`exit_code`, and always hands back a result object; there it is `functions`
+being `None` that says nothing usable came back.
 
 A run can also end with `OPTIMIZER_FINISHED` and still leave those fields
 `None`. Only a result that satisfies every constraint to within

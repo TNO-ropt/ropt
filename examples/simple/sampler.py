@@ -154,10 +154,10 @@ def main() -> None:
 
         result = optimize(config, INITIAL_VALUES, rosenbrock)
         print(f"{method} (shared={shared}):")
-        print(f"  optimal variables: {result.variables}")
-        print(f"  optimal objective: {result.target_objective}")
-        assert result.variables is not None
-        assert np.allclose(result.variables, 1.0, atol=1e-1)
+        assert result.results is not None
+        print(f"  optimal variables: {result.results.variables}")
+        print(f"  optimal objective: {result.results.target_objective}")
+        assert np.allclose(result.results.variables, 1.0, atol=1e-1)
 
 
 if __name__ == "__main__":

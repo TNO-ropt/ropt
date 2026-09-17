@@ -14,7 +14,7 @@ table of the section it belongs to.
 [`optimize`][ropt.simple.optimize] returns the best result that satisfies every
 constraint to within `constraint_tolerance`, which defaults to `1e-10` and
 applies to bounds and linear constraints as well as nonlinear ones. If no
-evaluation ever clears that bar, the run ends normally with `result.variables`
+evaluation ever clears that bar, the run ends normally with `result.results`
 set to `None`. The evaluations themselves are not lost: every result, feasible
 or not, still reaches the [handlers](../running/handlers.md) attached to the run.
 
@@ -55,7 +55,7 @@ in `TOO_FEW_REALIZATIONS`; see [Logging](logging.md).
 
 | What you see | Most likely cause |
 | --- | --- |
-| `result.variables` is `None`, but `exit_code` is `OPTIMIZER_FINISHED` | No evaluation satisfied the constraints to within `constraint_tolerance` (default `1e-10`; bounds and linear constraints count too), so there is no best feasible result to return. The evaluations are still in the handlers. Raise the tolerance, or check that the constraints can be satisfied at all. |
+| `result.results` is `None`, but `exit_code` is `OPTIMIZER_FINISHED` | No evaluation satisfied the constraints to within `constraint_tolerance` (default `1e-10`; bounds and linear constraints count too), so there is no best feasible result to return. The evaluations are still in the handlers. Raise the tolerance, or check that the constraints can be satisfied at all. |
 | `TOO_FEW_REALIZATIONS` although only one realization failed | [`realization_min_success`](../optimizer_setup/configuration_sections.md#realizations) defaults to all of them. Lower it. |
 | `TOO_FEW_REALIZATIONS` and nothing says why | The failures came from the machinery, not from your objective. The reason is logged at `WARNING` by `ropt.components.evaluators`; enable [logging](logging.md). |
 | Numbers do not match what you configured | Results carry the configured values and the optimizer's scaled ones side by side; see [Scaling of results](../running/results.md#scaling-of-results). |

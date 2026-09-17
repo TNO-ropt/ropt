@@ -14,7 +14,8 @@ from numpy.random import default_rng
 from numpy.typing import NDArray
 
 from ropt.enums import VariableType
-from ropt.simple import EvaluateResult, EvaluationFunctionContext, optimize
+from ropt.results import FunctionResults
+from ropt.simple import EvaluationFunctionContext, optimize
 
 DIM = 4
 REALIZATIONS = 10
@@ -71,7 +72,7 @@ def rosenbrock(
     return float(objective)
 
 
-def report(result: EvaluateResult) -> None:
+def report(result: FunctionResults) -> None:
     """Print the variables and objective of each function evaluation.
 
     Args:
@@ -85,10 +86,10 @@ def report(result: EvaluateResult) -> None:
 def main() -> None:
     """Run the mixed-integer optimization and check the result."""
     result = optimize(CONFIG, INITIAL_VALUES, rosenbrock, report=report)
-    print(f"optimal variables: {result.variables}")
-    print(f"optimal objective: {result.target_objective}")
-    assert result.variables is not None
-    assert np.allclose(result.variables, [1, 2, 3, 4], atol=1e-1)
+    assert result.results is not None
+    print(f"optimal variables: {result.results.variables}")
+    print(f"optimal objective: {result.results.target_objective}")
+    assert np.allclose(result.results.variables, [1, 2, 3, 4], atol=1e-1)
 
 
 if __name__ == "__main__":

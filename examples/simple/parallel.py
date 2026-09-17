@@ -60,9 +60,9 @@ def main(*, multiprocessing: bool = False) -> None:
             else active.thread_pool(workers=4)
         )
         result = optimize(CONFIG, INITIAL_VALUES, rosenbrock, pool=pool)
-    print(f"optimal variables: {result.variables}")
-    assert result.variables is not None
-    assert np.allclose(result.variables, 1.0, atol=1e-2)
+    assert result.results is not None
+    print(f"optimal variables: {result.results.variables}")
+    assert np.allclose(result.results.variables, 1.0, atol=1e-2)
 
 
 if __name__ == "__main__":

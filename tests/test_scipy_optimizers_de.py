@@ -44,8 +44,8 @@ def test_scipy_bound_constraints_de(config: Any, eval_func: Any) -> None:
     validate_backend_options("differential_evolution", config["backend"]["options"])
 
     result = optimize(config, [0.2, *initial_values[1:]], eval_func())
-    assert result.variables is not None
-    assert np.allclose(result.variables, [0.15, 0.0, 0.2], atol=0.03)
+    assert result.results is not None
+    assert np.allclose(result.results.variables, [0.15, 0.0, 0.2], atol=0.03)
 
 
 def test_scipy_bound_constraints_differential_evolution_de(
@@ -56,8 +56,8 @@ def test_scipy_bound_constraints_differential_evolution_de(
 
     config["realizations"] = {"realization_min_success": 0}
     result1 = optimize(config, [0.2, *initial_values[1:]], eval_func())
-    assert result1.variables is not None
-    assert np.allclose(result1.variables, [0.15, 0.0, 0.2], atol=0.03)
+    assert result1.results is not None
+    assert np.allclose(result1.results.variables, [0.15, 0.0, 0.2], atol=0.03)
 
     counter = 0
 
@@ -72,9 +72,9 @@ def test_scipy_bound_constraints_differential_evolution_de(
     result2 = optimize(
         config, [0.2, *initial_values[1:]], eval_func((_add_nan, test_functions[1]))
     )
-    assert result2.variables is not None
-    assert np.allclose(result2.variables, [0.15, 0.0, 0.2], atol=0.03)
-    assert not np.all(result1.variables == result2.variables)
+    assert result2.results is not None
+    assert np.allclose(result2.results.variables, [0.15, 0.0, 0.2], atol=0.03)
+    assert not np.all(result1.results.variables == result2.results.variables)
 
 
 def test_scipy_eq_linear_constraints_de(config: Any, eval_func: Any) -> None:
@@ -88,12 +88,16 @@ def test_scipy_eq_linear_constraints_de(config: Any, eval_func: Any) -> None:
     }
 
     result = optimize(config, initial_values, eval_func())
-    assert result.variables is not None
+    assert result.results is not None
     # The result should be [0.25, 0.0, 0.75], but DE appears to have
     # difficulties with linear equality equations. Therefore, we just test if it
     # does not violate them.
-    assert result.variables[0] + result.variables[2] == pytest.approx(1.0, abs=0.02)
-    assert result.variables[1] + result.variables[2] == pytest.approx(0.75, abs=0.02)
+    assert result.results.variables[0] + result.results.variables[2] == pytest.approx(
+        1.0, abs=0.02
+    )
+    assert result.results.variables[1] + result.results.variables[2] == pytest.approx(
+        0.75, abs=0.02
+    )
 
 
 def test_scipy_ge_linear_constraints_de(config: Any, eval_func: Any) -> None:
@@ -107,8 +111,8 @@ def test_scipy_ge_linear_constraints_de(config: Any, eval_func: Any) -> None:
     }
 
     result = optimize(config, initial_values, eval_func())
-    assert result.variables is not None
-    assert np.allclose(result.variables, [-0.05, 0.0, 0.45], atol=0.03)
+    assert result.results is not None
+    assert np.allclose(result.results.variables, [-0.05, 0.0, 0.45], atol=0.03)
 
 
 def test_scipy_le_linear_constraints_de(config: Any, eval_func: Any) -> None:
@@ -122,8 +126,8 @@ def test_scipy_le_linear_constraints_de(config: Any, eval_func: Any) -> None:
     }
 
     result = optimize(config, initial_values, eval_func())
-    assert result.variables is not None
-    assert np.allclose(result.variables, [-0.05, 0.0, 0.45], atol=0.03)
+    assert result.results is not None
+    assert np.allclose(result.results.variables, [-0.05, 0.0, 0.45], atol=0.03)
 
 
 def test_scipy_le_ge_linear_constraints_de(config: Any, eval_func: Any) -> None:
@@ -137,8 +141,8 @@ def test_scipy_le_ge_linear_constraints_de(config: Any, eval_func: Any) -> None:
     }
 
     result = optimize(config, initial_values, eval_func())
-    assert result.variables is not None
-    assert np.allclose(result.variables, [-0.05, 0.0, 0.45], atol=0.03)
+    assert result.results is not None
+    assert np.allclose(result.results.variables, [-0.05, 0.0, 0.45], atol=0.03)
 
 
 def test_scipy_le_ge_linear_constraints_two_sided_de(
@@ -154,8 +158,8 @@ def test_scipy_le_ge_linear_constraints_two_sided_de(
     }
 
     result = optimize(config, initial_values, eval_func())
-    assert result.variables is not None
-    assert np.allclose(result.variables, [-0.1, 0.0, 0.4], atol=0.03)
+    assert result.results is not None
+    assert np.allclose(result.results.variables, [-0.1, 0.0, 0.4], atol=0.03)
 
     config["linear_constraints"] = {
         "coefficients": [[1, 0, 1]],
@@ -164,8 +168,8 @@ def test_scipy_le_ge_linear_constraints_two_sided_de(
     }
 
     result = optimize(config, initial_values, eval_func())
-    assert result.variables is not None
-    assert np.allclose(result.variables, [-0.1, 0.0, 0.4], atol=0.03)
+    assert result.results is not None
+    assert np.allclose(result.results.variables, [-0.1, 0.0, 0.4], atol=0.03)
 
 
 def test_scipy_eq_nonlinear_constraints_de(
@@ -185,8 +189,8 @@ def test_scipy_eq_nonlinear_constraints_de(
     result = optimize(
         config, initial_values, eval_func(test_functions, [constraint_function])
     )
-    assert result.variables is not None
-    assert np.allclose(result.variables, [0.25, 0.0, 0.75], atol=0.03)
+    assert result.results is not None
+    assert np.allclose(result.results.variables, [0.25, 0.0, 0.75], atol=0.03)
 
 
 @pytest.mark.parametrize(
@@ -215,8 +219,8 @@ def test_scipy_ineq_nonlinear_constraints_de(
     result = optimize(
         config, initial_values, eval_func(test_functions, [constraint_function])
     )
-    assert result.variables is not None
-    assert np.allclose(result.variables, [-0.05, 0.0, 0.45], atol=0.03)
+    assert result.results is not None
+    assert np.allclose(result.results.variables, [-0.05, 0.0, 0.45], atol=0.03)
 
 
 def test_scipy_ineq_nonlinear_constraints_two_sided_de(
@@ -237,5 +241,5 @@ def test_scipy_ineq_nonlinear_constraints_two_sided_de(
     result = optimize(
         config, initial_values, eval_func(test_functions, [constraint_function])
     )
-    assert result.variables is not None
-    assert np.allclose(result.variables, [-0.1, 0.0, 0.4], atol=0.03)
+    assert result.results is not None
+    assert np.allclose(result.results.variables, [-0.1, 0.0, 0.4], atol=0.03)

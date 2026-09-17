@@ -60,20 +60,21 @@ def objective(
 def main() -> None:
     """Run with the default minimum, then with the failure allowed."""
     # Every realization must succeed, so the single NaN ends the run and
-    # leaves every field of the result unset.
+    # leaves the run without a result at all.
     strict = optimize(CONFIG, INITIAL_VALUES, objective)
-    print(f"all required: {strict.exit_code.name}, variables={strict.variables}")
+    print(f"all required: {strict.exit_code.name}, results={strict.results}")
     assert strict.exit_code == ExitCode.TOO_FEW_REALIZATIONS
-    assert strict.variables is None
-    assert strict.target_objective is None
+    assert strict.results is None
 
     # Allowing one failure lets the aggregate form from the rest.
     CONFIG["realizations"]["realization_min_success"] = REALIZATIONS - 1
     lenient = optimize(CONFIG, INITIAL_VALUES, objective)
-    print(f"one allowed: {lenient.exit_code.name}, variables={lenient.variables}")
+    assert lenient.results is not None
+    print(
+        f"one allowed: {lenient.exit_code.name}, variables={lenient.results.variables}"
+    )
     assert lenient.exit_code != ExitCode.TOO_FEW_REALIZATIONS
-    assert lenient.variables is not None
-    assert np.allclose(lenient.variables, 1.0, atol=1e-1)
+    assert np.allclose(lenient.results.variables, 1.0, atol=1e-1)
 
 
 if __name__ == "__main__":

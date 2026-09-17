@@ -77,15 +77,15 @@ violated by more than that amount.
 --8<-- "examples/simple/constrained.py:run"
 ```
 
-This matters more than it looks. `result.variables` is only ever the best
-**feasible** point; if no evaluation satisfied the constraints to within the
-tolerance, the run returns `None` instead of a best point. A tolerance that is
+This matters more than it looks. `result.results` is only ever the best
+**feasible** evaluation; if none satisfied the constraints to within the
+tolerance, the run returns `None` instead of a best result. A tolerance that is
 too tight is a common reason for an empty result — see
 [Common Pitfalls](../troubleshooting/index.md).
 
-To watch feasibility as the run proceeds, read `constraint_info` from the full
-result. Its `nonlinear_violation` is zero where a constraint is met and positive
-by the amount it is exceeded:
+To watch feasibility as the run proceeds, read `constraint_info` from the result
+the `report` callback receives. Its `nonlinear_violation` is zero where a
+constraint is met and positive by the amount it is exceeded:
 
 ```python
 --8<-- "examples/simple/constrained.py:report"

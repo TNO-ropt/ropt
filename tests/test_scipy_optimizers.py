@@ -77,10 +77,10 @@ def test_scipy_unconstrained(config: Any, method: str, eval_func: Any) -> None:
     config["backend"]["method"] = method
 
     result = optimize(config, initial_values, eval_func())
-    assert result.variables is not None
+    assert result.results is not None
     # Some methods are supported, but not reliable in this test.
     if method != "newton-cg":
-        assert np.allclose(result.variables, [0, 0, 0.5], atol=0.02)
+        assert np.allclose(result.results.variables, [0, 0, 0.5], atol=0.02)
 
 
 @pytest.mark.parametrize("method", sorted(_SUPPORTED - _SUPPORTS_BOUNDS))
@@ -193,8 +193,8 @@ def test_scipy_bound_constraints(config: Any, method: str, eval_func: Any) -> No
     config["variables"]["lower_bounds"] = [0.15, 0.0, 0.0]
     config["variables"]["upper_bounds"] = [0.5, 0.5, 0.2]
     result = optimize(config, [0.2, 0.1, 0.1], eval_func())
-    assert result.variables is not None
-    assert np.allclose(result.variables, [0.15, 0.0, 0.2], atol=0.02)
+    assert result.results is not None
+    assert np.allclose(result.results.variables, [0.15, 0.0, 0.2], atol=0.02)
 
 
 @pytest.mark.parametrize("method", sorted(_SUPPORTS_LINEAR_EQ))
@@ -210,8 +210,8 @@ def test_scipy_eq_linear_constraints(config: Any, method: str, eval_func: Any) -
     }
 
     result = optimize(config, initial_values, eval_func())
-    assert result.variables is not None
-    assert np.allclose(result.variables, [0.25, 0.0, 0.75], atol=0.02)
+    assert result.results is not None
+    assert np.allclose(result.results.variables, [0.25, 0.0, 0.75], atol=0.02)
 
 
 @pytest.mark.parametrize("method", sorted(_SUPPORTS_LINEAR_INEQ))
@@ -226,8 +226,8 @@ def test_scipy_ge_linear_constraints(config: Any, method: str, eval_func: Any) -
         "upper_bounds": np.inf,
     }
     result = optimize(config, initial_values, eval_func())
-    assert result.variables is not None
-    assert np.allclose(result.variables, [-0.05, 0.0, 0.45], atol=0.02)
+    assert result.results is not None
+    assert np.allclose(result.results.variables, [-0.05, 0.0, 0.45], atol=0.02)
 
 
 @pytest.mark.parametrize("method", sorted(_SUPPORTS_LINEAR_INEQ))
@@ -242,8 +242,8 @@ def test_scipy_le_linear_constraints(config: Any, method: str, eval_func: Any) -
         "upper_bounds": 0.4,
     }
     result = optimize(config, initial_values, eval_func())
-    assert result.variables is not None
-    assert np.allclose(result.variables, [-0.05, 0.0, 0.45], atol=0.02)
+    assert result.results is not None
+    assert np.allclose(result.results.variables, [-0.05, 0.0, 0.45], atol=0.02)
 
 
 @pytest.mark.parametrize("method", sorted(_SUPPORTS_LINEAR_INEQ))
@@ -260,8 +260,8 @@ def test_scipy_le_ge_linear_constraints(
         "upper_bounds": [0.4, np.inf],
     }
     result = optimize(config, initial_values, eval_func())
-    assert result.variables is not None
-    assert np.allclose(result.variables, [-0.05, 0.0, 0.45], atol=0.02)
+    assert result.results is not None
+    assert np.allclose(result.results.variables, [-0.05, 0.0, 0.45], atol=0.02)
 
 
 @pytest.mark.parametrize("method", sorted(_SUPPORTS_LINEAR_INEQ))
@@ -278,8 +278,8 @@ def test_scipy_le_ge_linear_constraints_two_sided(
         "upper_bounds": [0.3, np.inf],
     }
     result = optimize(config, initial_values, eval_func())
-    assert result.variables is not None
-    assert np.allclose(result.variables, [-0.1, 0.0, 0.4], atol=0.02)
+    assert result.results is not None
+    assert np.allclose(result.results.variables, [-0.1, 0.0, 0.4], atol=0.02)
 
     config["linear_constraints"] = {
         "coefficients": [[1, 0, 1]],
@@ -288,8 +288,8 @@ def test_scipy_le_ge_linear_constraints_two_sided(
     }
 
     result = optimize(config, initial_values, eval_func())
-    assert result.variables is not None
-    assert np.allclose(result.variables, [-0.1, 0.0, 0.4], atol=0.02)
+    assert result.results is not None
+    assert np.allclose(result.results.variables, [-0.1, 0.0, 0.4], atol=0.02)
 
 
 @pytest.mark.parametrize("method", sorted(_SUPPORTS_NONLINEAR_EQ))
@@ -315,8 +315,8 @@ def test_scipy_eq_nonlinear_constraints(
     result = optimize(
         config, initial_values, eval_func(test_functions, [constraint_function])
     )
-    assert result.variables is not None
-    assert np.allclose(result.variables, [0.25, 0.0, 0.75], atol=0.02)
+    assert result.results is not None
+    assert np.allclose(result.results.variables, [0.25, 0.0, 0.75], atol=0.02)
 
 
 @pytest.mark.parametrize("method", sorted(_SUPPORTS_NONLINEAR_INEQ))
@@ -349,8 +349,8 @@ def test_scipy_ineq_nonlinear_constraints(  # ruff: ignore[too-many-positional-a
     result = optimize(
         config, initial_values, eval_func(test_functions, [constraint_function])
     )
-    assert result.variables is not None
-    assert np.allclose(result.variables, [-0.05, 0.0, 0.45], atol=0.02)
+    assert result.results is not None
+    assert np.allclose(result.results.variables, [-0.05, 0.0, 0.45], atol=0.02)
 
 
 @pytest.mark.parametrize("method", sorted(_SUPPORTS_NONLINEAR_INEQ))
@@ -377,8 +377,8 @@ def test_scipy_ineq_nonlinear_constraints_two_sided(
     result = optimize(
         config, initial_values, eval_func(test_functions, [constraint_function])
     )
-    assert result.variables is not None
-    assert np.allclose(result.variables, [-0.1, 0.0, 0.4], atol=0.02)
+    assert result.results is not None
+    assert np.allclose(result.results.variables, [-0.1, 0.0, 0.4], atol=0.02)
 
 
 def test_scipy_options(config: Any, eval_func: Any) -> None:
@@ -386,8 +386,8 @@ def test_scipy_options(config: Any, eval_func: Any) -> None:
     config["backend"]["options"] = {"maxfev": 10}
 
     result = optimize(config, initial_values, eval_func())
-    assert result.variables is not None
-    assert pytest.approx(result.variables[2], abs=0.025) != 0.5
+    assert result.results is not None
+    assert pytest.approx(result.results.variables[2], abs=0.025) != 0.5
 
 
 @pytest.mark.parametrize("method", sorted(_SUPPORTED - _REQUIRES_BOUNDS))
@@ -398,10 +398,10 @@ def test_scipy_evaluation_policy_separate(
     config["gradient"] = {"evaluation_policy": "separate"}
 
     result = optimize(config, initial_values, eval_func())
-    assert result.variables is not None
+    assert result.results is not None
     # Some methods are supported, but not reliable in this test.
     if method != "newton-cg":
-        assert np.allclose(result.variables, [0.0, 0.0, 0.5], atol=0.02)
+        assert np.allclose(result.results.variables, [0.0, 0.0, 0.5], atol=0.02)
 
 
 @pytest.mark.parametrize("evaluation_policy", ["speculative", "auto"])
@@ -427,5 +427,5 @@ def test_scipy_speculative(
             )
         ],
     )
-    assert result.variables is not None
-    assert np.allclose(result.variables, [0.0, 0.0, 0.5], atol=0.02)
+    assert result.results is not None
+    assert np.allclose(result.results.variables, [0.0, 0.0, 0.5], atol=0.02)

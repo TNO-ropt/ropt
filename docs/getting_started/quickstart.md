@@ -42,8 +42,9 @@ def rosenbrock(variables, context):
 # 3. Run the optimization from a starting point equal to zero.
 result = optimize(config, np.zeros(2), rosenbrock)
 
-print(f"best variables: {result.variables}")
-print(f"best objective: {result.target_objective}")
+if result.results is not None:
+    print(f"best variables: {result.results.variables}")
+    print(f"best objective: {result.results.target_objective}")
 ```
 
 Running this finds variables close to `[1, 1]`.
@@ -63,5 +64,7 @@ Every `ropt` optimization needs three things:
 3. **A start point** — the variable values to start from.
 
 [`optimize`][ropt.simple.optimize] combines these three, runs the optimization,
-and returns an [`OptimizeResult`][ropt.simple.OptimizeResult] with the best
-values it found.
+and returns an [`OptimizationResult`][ropt.simple.OptimizationResult]. Its
+`results` field holds the best evaluation the run reached, as a
+[`FunctionResults`][ropt.results.FunctionResults] — the same object a handler
+receives — and is `None` if the run found nothing valid.

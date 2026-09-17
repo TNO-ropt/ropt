@@ -5,11 +5,13 @@ An [`optimize`][ropt.simple.optimize] call returns only the best result. A
 that observes an optimization and processes its results as they arrive — keeping
 them, tabulating them, or invoking a callback.
 
-A handler is given the fundamental [`Results`][ropt.results.Results] objects —
-`FunctionResults` and `GradientResults` — not the `OptimizeResult` that
-`optimize` returns. Everything a run produces is in them, at the field paths
-described in [Working with Results](results.md), which is the vocabulary the
-handlers below are configured in.
+A handler is given [`Results`][ropt.results.Results] objects —
+`FunctionResults` and `GradientResults` — which is what every other part of the
+simple API hands out too: a `report` callback receives one per evaluation, and
+`optimize` puts the best one on the `results` field of what it returns.
+Everything a run produces is in them, at the field paths described in
+[Working with Results](results.md), which is the vocabulary the handlers below
+are configured in.
 
 The [`report`](running.md#reporting-progress) callback you may already be using
 is only shorthand for this: `report=` builds a handler for you behind the

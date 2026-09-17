@@ -35,18 +35,17 @@ from ._offload import offload
 from ._optimize import optimize, optimize_many
 from ._pool import WorkerPool, serial_pool
 from ._report import ReportCallback
-from ._result import EvaluateResult, OptimizeResult
+from ._result import OptimizationResult
 from ._session import Session, session
 
 __all__ = [
     "DataFrameHandler",
-    "EvaluateResult",
     "EvaluationFunction",
     "EvaluationFunctionContext",
     "EvaluationFunctionResult",
     "EventHandler",
     "HistoryHandler",
-    "OptimizeResult",
+    "OptimizationResult",
     "ReportCallback",
     "ResultsHandler",
     "Session",

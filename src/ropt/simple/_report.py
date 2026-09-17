@@ -14,27 +14,26 @@ from ropt.components.event_handlers import CallbackHandler
 from ropt.enums import EnOptEventType
 from ropt.results import FunctionResults
 
-from ._result import EvaluateResult, _build_evaluate_result
-
 if TYPE_CHECKING:
     from ropt.components.event_handlers import EventHandler
     from ropt.events import EnOptEvent
 
 
-ReportCallback = Callable[[EvaluateResult], bool | None]
+ReportCallback = Callable[[FunctionResults], bool | None]
 
 
 def make_report_handler(report: ReportCallback) -> EventHandler:
     """Build a handler that reports each new function evaluation.
 
-    The results are adapted to an `EvaluateResult` before the callback is
-    invoked; gradient results are skipped. If the callback returns `True`, the
-    emitting run is asked to stop gracefully (exit code `USER_ABORT`); any other
-    return value continues it. Reporting stops there: results after it in the
-    same batch are not passed on.
+    The callback is given the
+    [`FunctionResults`][ropt.results.FunctionResults] of the evaluation;
+    gradient results are skipped. If the callback returns `True`, the emitting
+    run is asked to stop gracefully (exit code `USER_ABORT`); any other return
+    value continues it. Reporting stops there: results after it in the same
+    batch are not passed on.
 
     Args:
-        report: The callback invoked with an `EvaluateResult` per evaluation.
+        report: The callback invoked with a `FunctionResults` per evaluation.
 
     Returns:
         A handler forwarding each function evaluation to the callback.
@@ -44,7 +43,7 @@ def make_report_handler(report: ReportCallback) -> EventHandler:
         for item in event.results or ():
             if (
                 isinstance(item, FunctionResults)
-                and report(_build_evaluate_result(item))
+                and report(item)
                 and event.source is not None
             ):
                 # A truthy return asks the emitting run to stop; the break is

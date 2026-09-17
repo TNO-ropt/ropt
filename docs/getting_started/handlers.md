@@ -35,14 +35,15 @@ run found, while collecting every result from every restart in one handler:
 x0 = initial_values
 for _ in range(3):
     result = optimize(config, x0, objective, handlers=[history])
-    x0 = result.variables   # restart from the best point found so far
+    assert result.results is not None
+    x0 = result.results.variables   # restart from the best point found so far
 
 print(f"collected {len(history.results)} results across all restarts")
 ```
 
 Restarting needs nothing special from `ropt`: each call to `optimize` is
-independent, so `result.variables` — the best point a run found — is simply
-the start point for the next one. The runnable script is
+independent, so `result.results.variables` — the best point a run found — is
+simply the start point for the next one. The runnable script is
 [examples/simple/restart.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/restart.py),
 which [Restarting from the Best Point](../running/restart.md) walks through.
 

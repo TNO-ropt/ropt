@@ -13,7 +13,8 @@ import numpy as np
 from numpy.random import default_rng
 from numpy.typing import NDArray
 
-from ropt.simple import EvaluateResult, EvaluationFunctionContext, optimize
+from ropt.results import FunctionResults
+from ropt.simple import EvaluationFunctionContext, optimize
 
 # --8<-- [start:config]
 DIM = 5
@@ -63,7 +64,7 @@ def rosenbrock(
 
 
 # --8<-- [start:report]
-def report(result: EvaluateResult) -> None:
+def report(result: FunctionResults) -> None:
     """Print the objective of each evaluation as the run proceeds.
 
     Args:
@@ -83,11 +84,12 @@ def main() -> None:
     # --8<-- [end:run]
     # --8<-- [start:result]
     print(f"exit code:         {result.exit_code}")
-    print(f"optimal variables: {result.variables}")
-    print(f"optimal objective: {result.target_objective}")
+    if result.results is not None:
+        print(f"optimal variables: {result.results.variables}")
+        print(f"optimal objective: {result.results.target_objective}")
     # --8<-- [end:result]
-    assert result.variables is not None
-    assert np.allclose(result.variables, 1.0, atol=1e-1)
+    assert result.results is not None
+    assert np.allclose(result.results.variables, 1.0, atol=1e-1)
 
 
 if __name__ == "__main__":

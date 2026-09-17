@@ -17,7 +17,8 @@ import numpy as np
 from numpy.random import default_rng
 from numpy.typing import NDArray
 
-from ropt.simple import EvaluateResult, EvaluationFunctionContext, optimize
+from ropt.results import FunctionResults
+from ropt.simple import EvaluationFunctionContext, optimize
 
 DIM = 5
 REALIZATIONS = 10
@@ -73,14 +74,13 @@ def rosenbrock(
 
 
 # --8<-- [start:report]
-def report(result: EvaluateResult) -> None:
+def report(result: FunctionResults) -> None:
     """Print any constraint violation, and the point that caused it.
 
     Args:
         result: The result of a single function evaluation.
     """
-    assert result.results is not None
-    info = result.results.constraint_info
+    info = result.constraint_info
     if (
         info is not None
         and info.nonlinear_violation is not None
@@ -113,11 +113,12 @@ def main(*, linear: bool = False) -> None:
         config, INITIAL_VALUES, rosenbrock, report=report, constraint_tolerance=1e-6
     )
     # --8<-- [end:run]
-    print(f"optimal variables:  {result.variables}")
-    print(f"optimal objective:  {result.target_objective}")
-    print(f"optimal constraint: {result.constraints}")
-    assert result.variables is not None
-    assert np.allclose(result.variables, 1.0, atol=1e-1)
+    assert result.results is not None
+    assert result.results.functions is not None
+    print(f"optimal variables:  {result.results.variables}")
+    print(f"optimal objective:  {result.results.target_objective}")
+    print(f"optimal constraint: {result.results.functions.constraints}")
+    assert np.allclose(result.results.variables, 1.0, atol=1e-1)
 
 
 if __name__ == "__main__":

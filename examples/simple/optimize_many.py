@@ -61,9 +61,10 @@ def main() -> None:
     for result in results:
         assert result.results is not None
         run_id = result.results.metadata["run_id"]
-        print(f"run {run_id} -> objective {result.target_objective}")
-        assert result.target_objective is not None
-        assert result.target_objective < 1.0
+        objective = result.results.target_objective
+        print(f"run {run_id} -> objective {objective}")
+        assert objective is not None
+        assert objective < 1.0
 
 
 if __name__ == "__main__":

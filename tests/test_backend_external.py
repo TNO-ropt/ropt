@@ -367,8 +367,8 @@ def test_a_closure_objective_runs_in_an_external_process(
     result = optimize(config, np.zeros(3), _objective)
 
     assert dumped
-    assert result.variables is not None
-    assert np.allclose(result.variables, target, atol=0.02)
+    assert result.results is not None
+    assert np.allclose(result.results.variables, target, atol=0.02)
 
 
 @pytest.mark.external
@@ -399,5 +399,5 @@ def test_a_registered_delegate_runs_in_an_external_process(
     }
     result = optimize(config, np.zeros(3), _objective)
 
-    assert result.variables is not None
-    assert np.allclose(result.variables, target, atol=0.02)
+    assert result.results is not None
+    assert np.allclose(result.results.variables, target, atol=0.02)

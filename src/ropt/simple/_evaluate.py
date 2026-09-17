@@ -20,7 +20,6 @@ from ._evaluator import make_evaluator
 from ._guards import check_handlers, check_pool
 from ._handlers import SharedHandlers, attach_handlers
 from ._pool import serial_pool
-from ._result import EvaluateResult, _build_evaluate_result
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -45,7 +44,7 @@ def evaluate(  # ruff: ignore[too-many-arguments]
     handlers: Sequence[EventHandler | SharedHandlers] | None = None,
     report: ReportCallback | None = None,
     metadata: dict[str, Any] | None = None,
-) -> EvaluateResult:
+) -> FunctionResults:
     """Evaluate a single variable vector without optimizing.
 
     Use [`evaluate_many`][ropt.simple.evaluate_many] to evaluate several
@@ -71,7 +70,8 @@ def evaluate(  # ruff: ignore[too-many-arguments]
                    objects with shared
                    [`SharedHandlers`][ropt.simple.SharedHandlers] groups, as
                    [`optimize`][ropt.simple.optimize] takes them.
-        report:    An optional callback invoked with an `EvaluateResult` for
+        report:    An optional callback invoked with a
+                   [`FunctionResults`][ropt.results.FunctionResults] for
                    each evaluation. An evaluation is a single batch that has
                    already run by the time the callback sees it, and there is no
                    optimizer loop to interrupt, so unlike on
@@ -83,7 +83,7 @@ def evaluate(  # ruff: ignore[too-many-arguments]
                    `function` as `context.metadata`.
 
     Returns:
-        An [`EvaluateResult`][ropt.simple.EvaluateResult] for the vector.
+        The [`FunctionResults`][ropt.results.FunctionResults] for the vector.
 
     Raises:
         ValueError: If `variables` is not a single vector.
@@ -103,7 +103,7 @@ def evaluate(  # ruff: ignore[too-many-arguments]
         report=report,
         metadata=metadata,
     )
-    return _build_evaluate_result(results[0])
+    return results[0]
 
 
 def evaluate_many(  # ruff: ignore[too-many-arguments]
@@ -115,7 +115,7 @@ def evaluate_many(  # ruff: ignore[too-many-arguments]
     handlers: Sequence[EventHandler | SharedHandlers] | None = None,
     report: ReportCallback | None = None,
     metadata: dict[str, Any] | None = None,
-) -> tuple[EvaluateResult, ...]:
+) -> tuple[FunctionResults, ...]:
     """Evaluate a batch of variable vectors without optimizing.
 
     Each row of `variables` is one variable vector; the results are returned in
@@ -141,7 +141,8 @@ def evaluate_many(  # ruff: ignore[too-many-arguments]
                    objects with shared
                    [`SharedHandlers`][ropt.simple.SharedHandlers] groups, as
                    [`optimize`][ropt.simple.optimize] takes them.
-        report:    An optional callback invoked with an `EvaluateResult` for
+        report:    An optional callback invoked with a
+                   [`FunctionResults`][ropt.results.FunctionResults] for
                    each evaluation. An evaluation is a single batch that has
                    already run by the time the callback sees it, and there is no
                    optimizer loop to interrupt, so unlike on
@@ -153,7 +154,7 @@ def evaluate_many(  # ruff: ignore[too-many-arguments]
                    `function` as `context.metadata`.
 
     Returns:
-        One [`EvaluateResult`][ropt.simple.EvaluateResult] per input vector.
+        One [`FunctionResults`][ropt.results.FunctionResults] per input vector.
 
     Raises:
         ValueError: If `variables` is not a 2-D matrix.
@@ -176,7 +177,7 @@ def evaluate_many(  # ruff: ignore[too-many-arguments]
         report=report,
         metadata=metadata,
     )
-    return tuple(_build_evaluate_result(result) for result in results)
+    return tuple(results)
 
 
 def _run_evaluation(  # ruff: ignore[too-many-arguments]

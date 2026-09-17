@@ -179,8 +179,8 @@ def test_sampler_order(config: Any, eval_func: Any) -> None:
         {"method": "uniform"},
     ]
     result1 = optimize(config, initial_values, eval_func())
-    assert result1.variables is not None
-    assert np.allclose(result1.variables, [0, 0, 0.5], atol=0.025)
+    assert result1.results is not None
+    assert np.allclose(result1.results.variables, [0, 0, 0.5], atol=0.025)
 
     # Switch the samplers:
     config["samplers"] = [
@@ -189,7 +189,7 @@ def test_sampler_order(config: Any, eval_func: Any) -> None:
     ]
     config["variables"]["samplers"] = [1, 1, 0]
     result2 = optimize(config, initial_values, eval_func())
-    assert result2.variables is not None
-    assert np.allclose(result2.variables, [0, 0, 0.5], atol=0.025)
+    assert result2.results is not None
+    assert np.allclose(result2.results.variables, [0, 0, 0.5], atol=0.025)
 
-    assert np.allclose(result1.variables, result2.variables)
+    assert np.allclose(result1.results.variables, result2.results.variables)

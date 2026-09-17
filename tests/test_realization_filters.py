@@ -230,8 +230,8 @@ def test_cvar_filter_on_objectives(
     config["gradient"]["evaluation_policy"] = evaluation_policy
 
     opt_result = optimize(config, initial_values, eval_func(objective_functions))
-    assert opt_result.variables is not None
-    assert not np.allclose(opt_result.variables, [0.0, 0.0, 0.5], atol=0.02)
+    assert opt_result.results is not None
+    assert not np.allclose(opt_result.results.variables, [0.0, 0.0, 0.5], atol=0.02)
 
     config["realization_filters"] = [
         {
@@ -256,8 +256,8 @@ def test_cvar_filter_on_objectives(
             )
         ],
     )
-    assert opt_result.variables is not None
-    assert np.allclose(opt_result.variables, [0.0, 0.0, 0.5], atol=0.02)
+    assert opt_result.results is not None
+    assert np.allclose(opt_result.results.variables, [0.0, 0.0, 0.5], atol=0.02)
     for result in result_list:
         assert result is not None
         if isinstance(result, FunctionResults):
@@ -318,8 +318,8 @@ def test_cvar_filter_on_objectives_with_constraints(
             )
         ],
     )
-    assert opt_result.variables is not None
-    assert np.allclose(opt_result.variables, [-0.05, 0.0, 0.45], atol=0.02)
+    assert opt_result.results is not None
+    assert np.allclose(opt_result.results.variables, [-0.05, 0.0, 0.45], atol=0.02)
     for result in result_list:
         assert result is not None
         if isinstance(result, FunctionResults):
@@ -387,8 +387,8 @@ def test_cvar_filter_on_constraints(
             )
         ],
     )
-    assert opt_result.variables is not None
-    assert np.allclose(opt_result.variables, [-0.05, 0.0, 0.45], atol=0.02)
+    assert opt_result.results is not None
+    assert np.allclose(opt_result.results.variables, [-0.05, 0.0, 0.45], atol=0.02)
     for result in result_list:
         assert result is not None
         if isinstance(result, FunctionResults):
@@ -463,8 +463,8 @@ def test_cvar_filter_mixed(
             )
         ],
     )
-    assert opt_result.variables is not None
-    assert np.allclose(opt_result.variables, [0.0, 0.0, 0.5], atol=0.02)
+    assert opt_result.results is not None
+    assert np.allclose(opt_result.results.variables, [0.0, 0.0, 0.5], atol=0.02)
     for result in result_list:
         assert result is not None
         if isinstance(result, FunctionResults):
@@ -505,8 +505,8 @@ def test_cvar_filter_mixed(
             )
         ],
     )
-    assert opt_result.variables is not None
-    assert not np.allclose(opt_result.variables, [0.0, 0.0, 0.5], atol=0.02)
+    assert opt_result.results is not None
+    assert not np.allclose(opt_result.results.variables, [0.0, 0.0, 0.5], atol=0.02)
     for result in result_list:
         assert result is not None
         if isinstance(result, FunctionResults):
@@ -542,8 +542,8 @@ def test_custom_realization_filter(
         CustomRealizationFilter(RealizationFilterConfig(method="custom"))
     ]
     opt_result = optimize(config, initial_values, eval_func(test_functions))
-    assert opt_result.variables is not None
-    assert np.allclose(opt_result.variables, [0.0, 0.0, 0.5], atol=0.02)
+    assert opt_result.results is not None
+    assert np.allclose(opt_result.results.variables, [0.0, 0.0, 0.5], atol=0.02)
 
 
 class _ScaleRecordingFilter(RealizationFilter):

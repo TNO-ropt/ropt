@@ -28,7 +28,7 @@ from ._evaluator import make_evaluator
 from ._guards import check_handlers, check_pool
 from ._handlers import SharedHandlers, attach_handlers, split_handlers
 from ._pool import serial_pool
-from ._result import OptimizeResult
+from ._result import OptimizationResult
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
@@ -37,8 +37,6 @@ if TYPE_CHECKING:
     from numpy.typing import ArrayLike
 
     from ropt.components.event_handlers import EventHandler
-    from ropt.enums import ExitCode
-    from ropt.results import FunctionResults
 
     from ._function import EvaluationFunction
     from ._pool import WorkerPool
@@ -63,7 +61,7 @@ def optimize(  # ruff: ignore[too-many-arguments]
     report: ReportCallback | None = None,
     constraint_tolerance: float = 1e-10,
     metadata: dict[str, Any] | None = None,
-) -> OptimizeResult:
+) -> OptimizationResult:
     """Run a single optimization.
 
     See [Running Optimizations](../running/running.md) for a walkthrough.
@@ -94,7 +92,7 @@ def optimize(  # ruff: ignore[too-many-arguments]
                               group. A group is shared: this run feeds it
                               alongside every other run that lists it.
         report:               An optional callback invoked with an
-                              `EvaluateResult` for each function evaluation;
+                              `FunctionResults` for each function evaluation;
                               return `True` from it to stop the optimization
                               early with `USER_ABORT`. Reporting stops there,
                               so results after it in the same batch are not
@@ -109,7 +107,7 @@ def optimize(  # ruff: ignore[too-many-arguments]
                               reaches `function` as `context.metadata`.
 
     Returns:
-        A [`OptimizeResult`][ropt.simple.OptimizeResult] describing the outcome.
+        A [`OptimizationResult`][ropt.simple.OptimizationResult] describing the outcome.
     """
     check_pool(pool)
     check_handlers(handlers)
@@ -135,7 +133,7 @@ def _optimize(  # ruff: ignore[too-many-arguments]
     report: ReportCallback | None,
     constraint_tolerance: float,
     metadata: dict[str, Any] | None = None,
-) -> OptimizeResult:
+) -> OptimizationResult:
     context = EnOptContext.model_validate(config)
     evaluator = make_evaluator(context, function, pool)
     # This run's own handler, tracking the result the call returns; it is added
@@ -149,29 +147,10 @@ def _optimize(  # ruff: ignore[too-many-arguments]
             variables=np.asarray(x0, dtype=np.float64),
             metadata=metadata,
         )
-    return _build_run_result(exit_code, result_handler["results"])
-
-
-def _build_run_result(
-    exit_code: ExitCode, results: FunctionResults | None
-) -> OptimizeResult:
-    if results is None or results.functions is None:
-        return OptimizeResult(
-            exit_code=exit_code,
-            variables=None,
-            target_objective=None,
-            objectives=None,
-            constraints=None,
-            results=None,
-        )
-    assert results.target_objective is not None
-    return OptimizeResult(
+    results = result_handler["results"]
+    return OptimizationResult(
         exit_code=exit_code,
-        variables=results.variables,
-        target_objective=float(results.target_objective),
-        objectives=results.functions.objectives,
-        constraints=results.functions.constraints,
-        results=results,
+        results=None if results is None or results.functions is None else results,
     )
 
 
@@ -186,7 +165,7 @@ def optimize_many(  # ruff: ignore[too-many-arguments]
     limit: int | None = None,
     constraint_tolerance: float = 1e-10,
     metadata: dict[str, Any] | Sequence[dict[str, Any]] | None = None,
-) -> tuple[OptimizeResult, ...]:
+) -> tuple[OptimizationResult, ...]:
     """Run several optimizations concurrently, sharing one pool.
 
     Each of `config`, `x0`, and `function` may be a single value (used for
@@ -229,7 +208,7 @@ def optimize_many(  # ruff: ignore[too-many-arguments]
         handlers:             Optional [`SharedHandlers`][ropt.simple.SharedHandlers]
                               groups, fed by every run.
         report:               An optional callback invoked with an
-                              `EvaluateResult` for each function evaluation,
+                              `FunctionResults` for each function evaluation,
                               either shared by every run or one per run; return
                               `True` from it to stop that run early with
                               `USER_ABORT`.
@@ -246,7 +225,7 @@ def optimize_many(  # ruff: ignore[too-many-arguments]
                               `context.metadata`.
 
     Returns:
-        One [`OptimizeResult`][ropt.simple.OptimizeResult] per run, in order.
+        One [`OptimizationResult`][ropt.simple.OptimizationResult] per run, in order.
 
     Raises:
         WorkflowError: If `handlers` holds a handler that is not in a group.
@@ -264,7 +243,7 @@ def optimize_many(  # ruff: ignore[too-many-arguments]
     runs = broadcast_runs(config, x0, function)
     reports = broadcast_reports(report, len(runs))
     metadatas = broadcast_metadata(metadata, len(runs))
-    jobs: list[Callable[[], OptimizeResult]] = [
+    jobs: list[Callable[[], OptimizationResult]] = [
         partial(
             _optimize,
             shared_pool,

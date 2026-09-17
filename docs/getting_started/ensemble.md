@@ -78,8 +78,9 @@ objectives first, then the constraints; see
 ## 4. Follow the progress (optional)
 
 To track a running optimization, pass a `report` callback: `ropt` calls it after
-every evaluation, with an [`EvaluateResult`][ropt.simple.EvaluateResult]
-describing what was just computed.
+every evaluation, with the
+[`FunctionResults`][ropt.results.FunctionResults] describing what was just
+computed.
 
 ```python
 --8<-- "examples/simple/ensemble.py:report"
@@ -104,22 +105,24 @@ robust objective, which is what it optimizes.
 
 ## 6. Read the result
 
-`optimize` returns an [`OptimizeResult`][ropt.simple.OptimizeResult]:
+`optimize` returns an [`OptimizationResult`][ropt.simple.OptimizationResult]:
 
 ```python
 --8<-- "examples/simple/ensemble.py:result"
 ```
 
-- `result.variables` is the best set of variables found, and
-  `result.target_objective` the robust objective value there. Both are `None` if
-  the run produced no valid result.
 - `result.exit_code` says why the run stopped (a member of the
   [`ExitCode`][ropt.enums.ExitCode] enumeration).
-- `result.results` is the underlying result object, a
-  [`FunctionResults`][ropt.results.FunctionResults] carrying every value the
-  evaluation produced; `OptimizeResult` is a convenience view of it.
+- `result.results` is the best evaluation the run reached, a
+  [`FunctionResults`][ropt.results.FunctionResults] carrying every value that
+  evaluation produced — the same object a handler receives. It is `None` if the
+  run produced no valid result, so one check covers every value read from it.
+- `result.results.variables` is the best set of variables found, and
+  `result.results.target_objective` the robust objective value there.
 
-See [Running Optimizations](../running/running.md#the-result) for the remaining fields.
+That evaluation carries much more than those two values — the per-realization
+objectives, the aggregates, the ensemble weights; see
+[Working with Results](../running/results.md).
 
 Because the coefficients are centered on the values used in the
 [Quickstart](quickstart.md), the robust optimum still lies close to where all

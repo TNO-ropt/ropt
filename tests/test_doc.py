@@ -59,8 +59,8 @@ def test_quickstart_program_reaches_the_optimum_it_claims(tmp_path: Path) -> Non
     script = tmp_path / "quickstart.py"
     script.write_text(block.group(1))
     result = runpy.run_path(str(script), run_name="__main__")["result"]
-    assert result.variables is not None
-    assert np.allclose(result.variables, 1.0, atol=1e-2)
+    assert result.results is not None
+    assert np.allclose(result.results.variables, 1.0, atol=1e-2)
 
 
 def test_examples_pages_list_every_script() -> None:

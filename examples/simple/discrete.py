@@ -15,12 +15,13 @@ import numpy as np
 from numpy.typing import NDArray
 
 from ropt.enums import VariableType
-from ropt.simple import EvaluateResult, EvaluationFunctionContext, optimize
+from ropt.results import FunctionResults
+from ropt.simple import EvaluationFunctionContext, optimize
 
 INITIAL_VALUES = [0.0, 0.0]
 
 
-def report(result: EvaluateResult) -> None:
+def report(result: FunctionResults) -> None:
     """Print the variables and objective of each function evaluation.
 
     Args:
@@ -82,10 +83,10 @@ def main(*, linear: bool = False) -> None:
     # --8<-- [end:objective]
 
     result = optimize(config, INITIAL_VALUES, function, report=report)
-    print(f"optimal variables: {result.variables}")
-    print(f"optimal objective: {result.target_objective}")
-    assert result.variables is not None
-    assert np.all(result.variables == [3, 7])
+    assert result.results is not None
+    print(f"optimal variables: {result.results.variables}")
+    print(f"optimal objective: {result.results.target_objective}")
+    assert np.all(result.results.variables == [3, 7])
 
 
 if __name__ == "__main__":

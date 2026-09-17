@@ -1,8 +1,8 @@
 """Restart an optimization from its own best point, collecting every result.
 
 Each call to ``optimize`` starts a fresh run, so restarting from the previous
-best point is just a loop: feed the returned ``result.variables`` back in as
-the next start point. A ``HistoryHandler`` reused across the loop collects
+best point is just a loop: feed the returned ``result.results.variables`` back
+in as the next start point. A ``HistoryHandler`` reused across the loop collects
 every result from every restart, not just the final one.
 """
 
@@ -48,12 +48,14 @@ def main() -> None:
     x0 = INITIAL_VALUES
     for _ in range(RESTARTS):
         result = optimize(CONFIG, x0, rosenbrock, handlers=[history])
-        assert result.variables is not None
-        x0 = result.variables
+        assert result.results is not None
+        x0 = result.results.variables
     print(f"evaluations collected across all restarts: {len(history.results)}")
-    print(f"best objective after {RESTARTS} restarts: {result.target_objective}")
-    assert result.target_objective is not None
-    assert result.target_objective < 1e-4  # ruff: ignore[magic-value-comparison]
+    assert result.results is not None
+    best = result.results.target_objective
+    print(f"best objective after {RESTARTS} restarts: {best}")
+    assert best is not None
+    assert best < 1e-4  # ruff: ignore[magic-value-comparison]
 
 
 if __name__ == "__main__":

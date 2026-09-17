@@ -24,12 +24,12 @@ from ropt.components.executors import HPCExecutor, LocalJobExecutor, ThreadExecu
 from ropt.context import EnOptContext
 from ropt.enums import ExitCode
 from ropt.exceptions import ExecutorStopped, WorkflowError
+from ropt.results import FunctionResults
 from ropt.simple import (
-    EvaluateResult,
     EvaluationFunctionContext,
     EvaluationFunctionResult,
     HistoryHandler,
-    OptimizeResult,
+    OptimizationResult,
     SharedHandlers,
     WorkerPool,
     evaluate,
@@ -79,24 +79,22 @@ def config_fixture() -> dict[str, Any]:
 
 def test_optimize_returns_run_result(config: Any, test_functions: Any) -> None:
     result = optimize(config, initial_values, test_functions[0])
-    assert isinstance(result, OptimizeResult)
+    assert isinstance(result, OptimizationResult)
     assert result.exit_code == ExitCode.OPTIMIZER_FINISHED
-    assert result.variables is not None
-    assert np.allclose(result.variables, 0.5, atol=0.02)
-    assert result.target_objective is not None
-    assert result.target_objective == pytest.approx(0.0, abs=1e-3)
-    assert result.objectives is not None
-    assert result.objectives.shape == (1,)
-    assert result.constraints is None
     assert result.results is not None
+    assert np.allclose(result.results.variables, 0.5, atol=0.02)
+    assert result.results.target_objective == pytest.approx(0.0, abs=1e-3)
+    assert result.results.functions is not None
+    assert result.results.functions.objectives.shape == (1,)
+    assert result.results.functions.constraints is None
 
 
 def test_optimize_accepts_evaluation_function_result(
     config: Any, eval_func: Any, test_functions: Any
 ) -> None:
     result = optimize(config, initial_values, eval_func([test_functions[0]]))
-    assert result.variables is not None
-    assert np.allclose(result.variables, 0.5, atol=0.02)
+    assert result.results is not None
+    assert np.allclose(result.results.variables, 0.5, atol=0.02)
 
 
 def test_optimize_accepts_sequence_for_multiple_objectives(
@@ -109,17 +107,13 @@ def test_optimize_accepts_sequence_for_multiple_objectives(
 
     config["objectives"] = {"weights": [0.75, 0.25]}
     result = optimize(config, initial_values, objective)
-    assert result.variables is not None
-    assert np.allclose(result.variables, [0.0, 0.0, 0.5], atol=0.02)
+    assert result.results is not None
+    assert np.allclose(result.results.variables, [0.0, 0.0, 0.5], atol=0.02)
 
 
-def test_optimize_no_valid_result_has_none_fields(config: Any) -> None:
+def test_optimize_no_valid_result_has_no_results(config: Any) -> None:
     result = optimize(config, initial_values, lambda _v, _c: np.nan)
     assert result.exit_code == ExitCode.TOO_FEW_REALIZATIONS
-    assert result.variables is None
-    assert result.target_objective is None
-    assert result.objectives is None
-    assert result.constraints is None
     assert result.results is None
 
 
@@ -145,10 +139,10 @@ def test_optimize_local_handler_collects_results(
 def test_optimize_report_callback_receives_evaluate_results(
     config: Any, test_functions: Any
 ) -> None:
-    reported: list[EvaluateResult] = []
+    reported: list[FunctionResults] = []
     optimize(config, initial_values, test_functions[0], report=reported.append)
     assert reported
-    assert all(isinstance(item, EvaluateResult) for item in reported)
+    assert all(isinstance(item, FunctionResults) for item in reported)
     assert any(item.target_objective is not None for item in reported)
 
 
@@ -157,7 +151,7 @@ def test_report_callback_receives_evaluated_variables(
 ) -> None:
     # The optimizer chooses these points, so the caller has no other way to
     # learn which one an evaluation belongs to.
-    reported: list[EvaluateResult] = []
+    reported: list[FunctionResults] = []
     optimize(config, initial_values, test_functions[0], report=reported.append)
     variables = [item.variables for item in reported if item.variables is not None]
     assert variables
@@ -166,20 +160,20 @@ def test_report_callback_receives_evaluated_variables(
     assert any(not np.array_equal(item, initial_values) for item in variables)
 
 
-def test_optimize_result_is_an_evaluate_result(
+def test_optimize_result_carries_the_best_evaluation(
     config: Any, test_functions: Any
 ) -> None:
-    # A run ends at one evaluation, so its result carries that evaluation's
-    # fields and adds only the exit code.
+    # A run ends at one evaluation, which it hands back unchanged.
     result = optimize(config, initial_values, test_functions[0])
-    assert isinstance(result, EvaluateResult)
-    assert result.variables is not None
+    assert isinstance(result, OptimizationResult)
+    assert isinstance(result.results, FunctionResults)
+    assert result.results.variables is not None
 
 
 def test_group_report_callback_reports_across_runs(
     config: Any, test_functions: Any
 ) -> None:
-    reported: list[EvaluateResult] = []
+    reported: list[FunctionResults] = []
     with session() as active:
         group = active.shared_handlers(report=reported.append)
         optimize(config, initial_values, test_functions[0], handlers=[group])
@@ -187,7 +181,7 @@ def test_group_report_callback_reports_across_runs(
         optimize(config, initial_values, test_functions[0], handlers=[group])
     assert after_first > 0
     assert len(reported) > after_first
-    assert all(isinstance(item, EvaluateResult) for item in reported)
+    assert all(isinstance(item, FunctionResults) for item in reported)
 
 
 def test_group_threaded_handlers_run_in_thread() -> None:
@@ -388,7 +382,7 @@ def test_optimize_local_handler_claimed_during_run(
     history = HistoryHandler()
     observed: list[bool] = []
 
-    def _report(_: EvaluateResult) -> None:
+    def _report(_: FunctionResults) -> None:
         observed.append(history._claimed)  # ruff: ignore[private-member-access]
         with pytest.raises(WorkflowError, match="already been claimed"):
             history.claim()
@@ -419,7 +413,7 @@ def test_optimize_local_handler_claim_rolls_back_on_failure(
 def test_report_callback_stops_optimization(config: Any, test_functions: Any) -> None:
     reported = 0
 
-    def _report(_: EvaluateResult) -> bool:
+    def _report(_: FunctionResults) -> bool:
         nonlocal reported
         reported += 1
         return True
@@ -430,10 +424,10 @@ def test_report_callback_stops_optimization(config: Any, test_functions: Any) ->
 
 
 def test_report_callback_stops_only_own_run(config: Any, test_functions: Any) -> None:
-    def _stop(_: EvaluateResult) -> bool:
+    def _stop(_: FunctionResults) -> bool:
         return True
 
-    def _continue(_: EvaluateResult) -> None:
+    def _continue(_: FunctionResults) -> None:
         return None
 
     x0 = np.array([initial_values, initial_values])
@@ -480,14 +474,13 @@ def test_adapt_function_splits_objectives_and_constraints() -> None:
 
 def test_evaluate_single_vector(config: Any, test_functions: Any) -> None:
     result = evaluate(config, initial_values, test_functions[0])
-    assert isinstance(result, EvaluateResult)
+    assert isinstance(result, FunctionResults)
     assert result.target_objective is not None
     assert result.target_objective == pytest.approx(0.66)
-    assert result.objectives is not None
-    assert result.objectives.shape == (1,)
-    assert result.constraints is None
-    assert result.results is not None
-    assert result.results.variables.shape == (initial_values.size,)
+    assert result.functions is not None
+    assert result.functions.objectives.shape == (1,)
+    assert result.functions.constraints is None
+    assert result.variables.shape == (initial_values.size,)
 
 
 def test_evaluate_reports_the_evaluated_point(config: Any, test_functions: Any) -> None:
@@ -548,9 +541,9 @@ def test_evaluate_many_accepts_a_local_handler(
 
 
 def test_evaluate_report_return_value_ignored(config: Any, test_functions: Any) -> None:
-    reported: list[EvaluateResult] = []
+    reported: list[FunctionResults] = []
 
-    def _stop(result: EvaluateResult) -> bool:
+    def _stop(result: FunctionResults) -> bool:
         reported.append(result)
         return True
 
@@ -565,9 +558,9 @@ def test_evaluate_many_report_return_value_ignored(
     # The callback returns True on the very first result, which stops the
     # forwarding of further results to it -- but the batch itself already ran
     # to completion before the event fired, so every row still comes back.
-    reported: list[EvaluateResult] = []
+    reported: list[FunctionResults] = []
 
-    def _stop(result: EvaluateResult) -> bool:
+    def _stop(result: FunctionResults) -> bool:
         reported.append(result)
         return True
 
@@ -587,7 +580,7 @@ def test_evaluate_many_returns_result_per_row(config: Any, test_functions: Any) 
     matrix = np.array([initial_values, np.zeros(initial_values.size)])
     results = evaluate_many(config, matrix, test_functions[0])
     assert len(results) == 2
-    assert all(isinstance(result, EvaluateResult) for result in results)
+    assert all(isinstance(result, FunctionResults) for result in results)
     # Squared distance to [0.5, 0.5, 0.5]: row 0 = 0.5^2+0.5^2+0.4^2, row 1 = 3*0.5^2.
     for result, expected in zip(results, [0.66, 0.75], strict=True):
         assert result.target_objective == pytest.approx(expected)
@@ -607,9 +600,9 @@ def test_evaluate_many_rejects_vector(config: Any, test_functions: Any) -> None:
 def test_evaluate_multiple_objectives(config: Any, eval_func: Any) -> None:
     config["objectives"] = {"weights": [0.75, 0.25]}
     result = evaluate(config, initial_values, eval_func())
-    assert result.objectives is not None
-    assert result.objectives.shape == (2,)
-    assert result.constraints is None
+    assert result.functions is not None
+    assert result.functions.objectives.shape == (2,)
+    assert result.functions.constraints is None
 
 
 def test_evaluate_attaches_metadata_to_results(
@@ -618,8 +611,7 @@ def test_evaluate_attaches_metadata_to_results(
     result = evaluate(
         config, initial_values, test_functions[0], metadata={"tag": "eval"}
     )
-    assert result.results is not None
-    assert result.results.metadata["tag"] == "eval"
+    assert result.metadata["tag"] == "eval"
 
 
 def test_evaluate_many_attaches_metadata_to_every_result(
@@ -629,8 +621,7 @@ def test_evaluate_many_attaches_metadata_to_every_result(
     results = evaluate_many(config, matrix, test_functions[0], metadata={"tag": "eval"})
     assert len(results) == 2
     for result in results:
-        assert result.results is not None
-        assert result.results.metadata["tag"] == "eval"
+        assert result.metadata["tag"] == "eval"
 
 
 def test_optimize_with_thread_pool(config: Any, test_functions: Any) -> None:
@@ -641,8 +632,8 @@ def test_optimize_with_thread_pool(config: Any, test_functions: Any) -> None:
             test_functions[0],
             pool=active.thread_pool(workers=2),
         )
-    assert result.variables is not None
-    assert np.allclose(result.variables, 0.5, atol=0.02)
+    assert result.results is not None
+    assert np.allclose(result.results.variables, 0.5, atol=0.02)
 
 
 def _collect_batch_ids(sink: list[int], lock: threading.Lock) -> Any:
@@ -907,8 +898,9 @@ def _run_inner_optimization(variables: NDArray[np.float64], _context: Any) -> fl
         result = optimize(
             _INNER_CONFIG, variables, _sphere, pool=active.thread_pool(workers=1)
         )
-    assert result.target_objective is not None
-    return result.target_objective
+    assert result.results is not None
+    assert result.results.target_objective is not None
+    return float(result.results.target_objective)
 
 
 def _offload_from_evaluation(_variables: NDArray[np.float64], _context: Any) -> float:
@@ -927,8 +919,7 @@ def test_evaluation_function_can_open_its_own_thread_pool(config: Any) -> None:
             _run_inner_optimization,
             pool=active.thread_pool(workers=2),
         )
-    assert result.variables is not None
-    assert result.target_objective is not None
+    assert result.results is not None
 
 
 @pytest.mark.slow
@@ -940,8 +931,7 @@ def test_evaluation_function_can_open_its_own_process_pool(config: Any) -> None:
             _run_inner_optimization,
             pool=active.process_pool(workers=2),
         )
-    assert result.variables is not None
-    assert result.target_objective is not None
+    assert result.results is not None
 
 
 _BUNDLE_CONFIG: dict[str, Any] = {
@@ -1013,8 +1003,9 @@ def _nested_run(
         handlers=[group],
         metadata={"outer": context.eval_idx},
     )
-    assert result.target_objective is not None
-    return result.target_objective
+    assert result.results is not None
+    assert result.results.target_objective is not None
+    return float(result.results.target_objective)
 
 
 @pytest.mark.parametrize(
@@ -1089,8 +1080,9 @@ def _bilevel_outer(variables: NDArray[np.float64], _context: Any) -> float:
             partial(_inner_objective, outer_value=a),
             pool=active.thread_pool(workers=1),
         )
-    assert inner.target_objective is not None
-    return inner.target_objective
+    assert inner.results is not None
+    assert inner.results.target_objective is not None
+    return float(inner.results.target_objective)
 
 
 def test_nested_optimization_on_a_thread_pool() -> None:
@@ -1098,9 +1090,9 @@ def test_nested_optimization_on_a_thread_pool() -> None:
         result = optimize(
             _BILEVEL_CONFIG, [0.0], _bilevel_outer, pool=active.thread_pool(workers=1)
         )
-    assert result.variables is not None
-    assert result.variables[0] == pytest.approx(2.0, abs=0.05)
-    assert result.target_objective == pytest.approx(0.0, abs=1e-2)
+    assert result.results is not None
+    assert result.results.variables[0] == pytest.approx(2.0, abs=0.05)
+    assert result.results.target_objective == pytest.approx(0.0, abs=1e-2)
 
 
 def test_offload_in_evaluation_without_a_pool_runs_inline(config: Any) -> None:
@@ -1114,7 +1106,7 @@ def test_offload_in_evaluation_without_a_pool_runs_inline(config: Any) -> None:
             _offload_from_evaluation,
             pool=active.thread_pool(workers=2),
         )
-    assert result.target_objective is not None
+    assert result.results is not None
 
 
 class _FatalWork(BaseException):
@@ -1170,7 +1162,7 @@ def test_offload_in_evaluation_uses_its_own_pool(config: Any) -> None:
             _offload_in_own_pool,
             pool=active.thread_pool(workers=2),
         )
-    assert result.target_objective is not None
+    assert result.results is not None
 
 
 def test_group_in_an_evaluation(config: Any) -> None:
@@ -1181,7 +1173,7 @@ def test_group_in_an_evaluation(config: Any) -> None:
             _own_handlers_in_evaluation,
             pool=active.thread_pool(workers=2),
         )
-    assert result.target_objective is not None
+    assert result.results is not None
 
 
 @pytest.mark.slow
@@ -1201,7 +1193,9 @@ def test_sequential_pools_are_allowed(config: Any, test_functions: Any) -> None:
             pool=active.process_pool(workers=2),
         )
     assert first.exit_code == second.exit_code
-    assert first.variables == pytest.approx(second.variables)
+    assert first.results is not None
+    assert second.results is not None
+    assert first.results.variables == pytest.approx(second.results.variables)
 
 
 def test_session_without_task_group_reports_stopped() -> None:
@@ -1234,8 +1228,8 @@ def test_thread_pool_survives_objective_exception(
             optimize(config, initial_values, boom, pool=pool)
         # The pool survives a failed run and can still be used by the next one.
         result = optimize(config, initial_values, test_functions[0], pool=pool)
-        assert result.variables is not None
-        assert np.allclose(result.variables, 0.5, atol=0.02)
+        assert result.results is not None
+        assert np.allclose(result.results.variables, 0.5, atol=0.02)
 
 
 @pytest.mark.slow
@@ -1247,8 +1241,8 @@ def test_optimize_with_process_pool(config: Any, test_functions: Any) -> None:
             test_functions[0],
             pool=active.process_pool(workers=2),
         )
-    assert result.variables is not None
-    assert np.allclose(result.variables, 0.5, atol=0.02)
+    assert result.results is not None
+    assert np.allclose(result.results.variables, 0.5, atol=0.02)
 
 
 @pytest.mark.slow
@@ -1261,8 +1255,8 @@ def test_process_pool_without_cloudpickle(config: Any, monkeypatch: Any) -> None
         result = optimize(
             config, initial_values, _sphere, pool=active.process_pool(workers=2)
         )
-    assert result.variables is not None
-    assert np.allclose(result.variables, 0.0, atol=0.02)
+    assert result.results is not None
+    assert np.allclose(result.results.variables, 0.0, atol=0.02)
 
 
 @pytest.mark.slow
@@ -1287,10 +1281,10 @@ def test_optimize_many_broadcasts_config_and_objective(
             config, starts, test_functions[0], pool=active.thread_pool(workers=2)
         )
     assert len(results) == 2
-    assert all(isinstance(result, OptimizeResult) for result in results)
+    assert all(isinstance(result, OptimizationResult) for result in results)
     for result in results:
-        assert result.variables is not None
-        assert np.allclose(result.variables, 0.5, atol=0.02)
+        assert result.results is not None
+        assert np.allclose(result.results.variables, 0.5, atol=0.02)
 
 
 def test_optimize_many_per_run_objectives(config: Any, test_functions: Any) -> None:
@@ -1302,16 +1296,16 @@ def test_optimize_many_per_run_objectives(config: Any, test_functions: Any) -> N
             pool=active.thread_pool(workers=2),
         )
     assert len(results) == 2
-    assert results[0].variables is not None
-    assert results[1].variables is not None
-    assert np.allclose(results[0].variables, [0.5, 0.5, 0.5], atol=0.02)
-    assert np.allclose(results[1].variables, [-1.5, -1.5, 0.5], atol=0.02)
+    assert results[0].results is not None
+    assert results[1].results is not None
+    assert np.allclose(results[0].results.variables, [0.5, 0.5, 0.5], atol=0.02)
+    assert np.allclose(results[1].results.variables, [-1.5, -1.5, 0.5], atol=0.02)
 
 
 def test_optimize_many_report_callback_shared_across_runs(
     config: Any, test_functions: Any
 ) -> None:
-    reported: list[EvaluateResult] = []
+    reported: list[FunctionResults] = []
     starts = np.array([initial_values, np.zeros(initial_values.size)])
     with session() as active:
         optimize_many(
@@ -1322,14 +1316,14 @@ def test_optimize_many_report_callback_shared_across_runs(
             pool=active.thread_pool(workers=2),
         )
     assert reported
-    assert all(isinstance(item, EvaluateResult) for item in reported)
+    assert all(isinstance(item, FunctionResults) for item in reported)
 
 
 def test_optimize_many_accepts_a_report_per_run(
     config: Any, test_functions: Any
 ) -> None:
-    first: list[EvaluateResult] = []
-    second: list[EvaluateResult] = []
+    first: list[FunctionResults] = []
+    second: list[FunctionResults] = []
     starts = np.array([initial_values, np.zeros(initial_values.size)])
     with session() as active:
         optimize_many(
@@ -1341,7 +1335,7 @@ def test_optimize_many_accepts_a_report_per_run(
         )
     assert first
     assert second
-    assert all(isinstance(item, EvaluateResult) for item in (*first, *second))
+    assert all(isinstance(item, FunctionResults) for item in (*first, *second))
 
 
 def test_optimize_many_rejects_mismatched_report_sequence(
@@ -1439,8 +1433,8 @@ def test_optimize_many_without_a_pool_or_session(
     results = optimize_many(config, starts, test_functions[0])
     assert len(results) == 2
     for result in results:
-        assert result.variables is not None
-        assert np.allclose(result.variables, 0.5, atol=0.02)
+        assert result.results is not None
+        assert np.allclose(result.results.variables, 0.5, atol=0.02)
 
 
 def test_optimize_many_fail_fast(config: Any, test_functions: Any) -> None:
