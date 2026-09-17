@@ -127,6 +127,11 @@ def test_example_simple_realization_filter(tmp_path: Path, monkeypatch: Any) -> 
     _load_from_file("realization_filter", "simple").main()
 
 
+def test_example_simple_function_estimator(tmp_path: Path, monkeypatch: Any) -> None:
+    monkeypatch.chdir(tmp_path)
+    _load_from_file("function_estimator", "simple").main()
+
+
 @pytest.mark.parametrize("linear", [True, False])
 def test_example_simple_constrained(
     tmp_path: Path, monkeypatch: Any, linear: Any
