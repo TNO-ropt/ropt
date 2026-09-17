@@ -11,16 +11,18 @@ set is a **realization**. The full runnable script is
 **robust objective** — by default a weighted average over the realizations.
 Minimizing the average yields a solution that performs well across the whole set
 rather than for one particular case. We minimize the Rosenbrock function,
-generalized to $n$ variables, with coefficients that vary between realizations.
+generalized to a sum of $n$ terms over $n + 1$ variables, with coefficients that
+vary between realizations.
 
 For realization $i$, with coefficients $a_i$ and $b_i$, the per-realization
 objective is:
 
-$$ f_i(\mathbf{x}) = \sum_{k=1}^{n-1} \left[ (a_i - x_k)^2 + b_i \left(
+$$ f_i(\mathbf{x}) = \sum_{k=1}^{n} \left[ (a_i - x_k)^2 + b_i \left(
 x_{k+1} - x_k^2 \right)^2 \right] $$
 
-which it reduces to the standard Rosenbrock function when $n = 1$, and $a_i = 1,
-b_i = 100$ for every realization.
+which reduces to the standard Rosenbrock function of the
+[Quickstart](quickstart.md) when $n = 1$, with $a_i = 1$ and $b_i = 100$ for
+every realization.
 
 `ropt` combines the realizations into the robust objective:
 
@@ -38,9 +40,9 @@ realization that sets how much each contributes to the combined objective:
 ```
 
 The weights need not sum to one; `ropt` normalizes them. Equal weights, as here,
-give a plain average. See [Configuration](../optimizer_setup/configuration_sections.md#realizations) for the
-other realization settings. `INITIAL_VALUES` is the point the optimization
-starts from.
+give a plain average. See [Configuration Sections](../optimizer_setup/configuration_sections.md#realizations)
+for the other realization settings. `INITIAL_VALUES` is the point the
+optimization starts from.
 
 ## 2. Draw the uncertain parameters
 
