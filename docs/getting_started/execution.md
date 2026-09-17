@@ -17,7 +17,10 @@ with session() as s:
 
 That is the whole pattern. A session can hand out as many pools as you like, of
 any kind, and each run uses the one you give it — and only that one. Closing the
-session releases them all.
+session releases them all. The runnable script is
+[examples/simple/parallel.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/parallel.py),
+which evaluates one optimization on a thread pool, or on a process pool when it
+is passed `--multiprocessing`.
 
 Where your objective runs depends on which pool you pass (or none):
 

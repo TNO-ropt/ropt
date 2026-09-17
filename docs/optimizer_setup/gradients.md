@@ -84,6 +84,12 @@ crashes), the gradient can still be computed when at least
 [`RealizationsConfig`][ropt.config.RealizationsConfig]
 to also tolerate failed realizations.
 
+[examples/simple/failures.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/failures.py)
+runs one problem twice: once with the default, where a single failing
+realization ends the run with `TOO_FEW_REALIZATIONS` and no result, and once
+with `realization_min_success` lowered, where the run finishes on the
+realizations that did work.
+
 ## Evaluation policy
 
 [`GradientConfig.evaluation_policy`][ropt.config.GradientConfig] picks one of:
@@ -133,3 +139,11 @@ The default
 uses the mean of the functions and gradients. Alternative estimators are configured via the
 `function_estimators` tuple and selected per-objective in
 [`ObjectiveFunctionsConfig.function_estimators`][ropt.config.ObjectiveFunctionsConfig].
+
+## A runnable example
+
+[examples/simple/ensemble.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/ensemble.py)
+exercises the machinery described here: it minimizes the mean objective over ten
+realizations, setting only `perturbation_magnitudes` and the realization
+weights, which leaves the sampler, the estimator and the remaining gradient
+settings at the defaults described above.

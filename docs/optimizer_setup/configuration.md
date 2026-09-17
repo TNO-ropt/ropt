@@ -113,6 +113,12 @@ For optional fields like `realization_filters`, `None` (the default) leaves the
 corresponding element unfiltered. Any other key must exist, or building the
 context fails with an error naming the unknown key.
 
+Two runnable scripts select a component by position this way:
+[examples/simple/realization_filter.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/realization_filter.py)
+and
+[examples/simple/function_estimator.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/function_estimator.py),
+each of which registers a custom component and points the objectives at it.
+
 ### Providing optimizer components
 
 Each entry ends up as an object that implements the component's base class (from

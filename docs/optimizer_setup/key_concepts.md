@@ -65,6 +65,10 @@ described in [Configuration](configuration.md); the dedicated pages
 [Function Estimators](function_estimators.md),
 and [samplers](gradients.md) cover each component in depth.
 
+[examples/simple/ensemble.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/ensemble.py)
+puts the central terms in one short script: a variable vector optimized across
+an ensemble of realizations, with perturbations driving the gradient estimate.
+
 The glossary below defines these terms precisely.
 
 ## Glossary

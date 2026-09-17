@@ -42,9 +42,9 @@ print(f"collected {len(history.results)} results across all restarts")
 
 Restarting needs nothing special from `ropt`: each call to `optimize` is
 independent, so `result.variables` — the best point a run found — is simply
-the start point for the next one. See
-[Restarting from the Best Point](../running/restart.md) for the full,
-runnable version of this example.
+the start point for the next one. The runnable script is
+[examples/simple/restart.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/restart.py),
+which [Restarting from the Best Point](../running/restart.md) walks through.
 
 ## Other built-in handlers
 
