@@ -7,7 +7,7 @@ forms that number for you, as a weighted sum of the objectives you declare.
 This page covers how many objectives there are, how they are weighted, which
 direction each is optimized in, and how scaling interacts with the weights. For
 the field-by-field reference, see
-[`objectives`](configuration.md#objectives).
+[`objectives`](configuration_sections.md#objectives).
 
 ## Declaring more than one objective
 
@@ -55,7 +55,9 @@ one boolean per objective:
 ```
 
 Do not try to maximize by making a weight negative; weights must be
-non-negative, and `maximize` is the supported way to express a direction.
+non-negative, and `maximize` is the supported way to express a direction. See
+[Choosing the direction of an
+objective](configuration_sections.md#objective-direction).
 
 The sign is flipped **after** the realizations have been combined, never on the
 per-realization values. That ordering matters as soon as a
@@ -100,8 +102,10 @@ optimum.
 An `offsets` entry is subtracted before the division. It cannot move the optimum
 or change the gradient, but it changes the magnitude the optimizer tests against
 its tolerances, which is what makes it useful for an objective that is large and
-varies little. See
-[Offsetting objectives](configuration.md#objective-offsets).
+varies little. See [Scaling
+objectives](configuration_sections.md#objective-scales) and
+[Offsetting objectives](configuration_sections.md#objective-offsets) for the
+full field descriptions.
 
 ## See also
 

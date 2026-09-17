@@ -209,13 +209,13 @@ documentation**:
 
 Output is the exception to the rule: `ropt` captures it for you, on both levels,
 when the user configures
-[`stdout` or `stderr`](../optimizer_setup/configuration.md#optimizer). A backend
+[`stdout` or `stderr`](../optimizer_setup/configuration_sections.md#optimizer). A backend
 should not capture its own output, but it does have two things to do.
 
 ## Reporting progress { #reporting-progress }
 
 Whether the optimizer reports at all is the user's choice, made through
-[`verbose`](../optimizer_setup/configuration.md#backend). Map it onto whatever
+[`verbose`](../optimizer_setup/configuration_sections.md#backend). Map it onto whatever
 your library provides using
 [`resolve_verbosity`][ropt.backend.utils.resolve_verbosity], which normalises
 the setting so you need not tell `True` from `1` yourself:

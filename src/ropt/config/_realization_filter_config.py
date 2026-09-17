@@ -14,8 +14,8 @@ class RealizationFilterConfig(BaseModel):
     [`RealizationFilter`][ropt.realization_filter.RealizationFilter] plugin that
     adjusts per-realization weights.
 
-    See the [Configuration
-    guide](../optimizer_setup/configuration.md#realization-filters) for detailed
+    See [Configuration
+    Sections](../optimizer_setup/configuration_sections.md#realization-filters) for detailed
     descriptions and usage examples.
 
     Attributes:

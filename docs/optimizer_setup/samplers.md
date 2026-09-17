@@ -33,7 +33,9 @@ CONFIG = {
 Omit both fields entirely to perturb every variable with the default sampler.
 See [Sharing optimizer components by
 key](configuration.md#sharing-optimizer-components-by-key) for the indexing
-pattern, which objectives and constraints use in the same way.
+pattern, which objectives and constraints use in the same way, and
+[`samplers`](configuration_sections.md#samplers) for the fields of a sampler
+configuration.
 
 ## Sample scaling
 

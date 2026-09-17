@@ -43,8 +43,10 @@ bounds for an equality.
 
 The section declares only the bounds; the values themselves come from the
 evaluation function. See
-[`nonlinear_constraints`](configuration.md#nonlinear_constraints) and
-[`variables`](configuration.md#variables) for the full field reference.
+[`nonlinear_constraints`](configuration_sections.md#nonlinear_constraints) and
+[`variables`](configuration_sections.md#variables) for the full field reference.
+Constraint values can also be rescaled before the optimizer sees them; see
+[Scaling constraints](configuration_sections.md#constraint-scales).
 
 ## Returning a constraint from the evaluation function
 
@@ -102,5 +104,7 @@ fifth variables to be equal:
 
 The script adds it when run with `--linear`. One row per constraint, one
 coefficient per variable; see
-[`linear_constraints`](configuration.md#linear_constraints) for the field
-reference.
+[`linear_constraints`](configuration_sections.md#linear_constraints) for the field
+reference, and [Scaling the
+equations](configuration_sections.md#linear-constraint-scales) for rescaling a
+row before it reaches the optimizer.

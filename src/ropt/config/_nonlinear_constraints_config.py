@@ -28,8 +28,8 @@ class NonlinearConstraintsConfig(BaseModel):
     `nonlinear_constraints` field of an
     [`EnOptContext`][ropt.context.EnOptContext] object.
 
-    See the [Configuration
-    guide](../optimizer_setup/configuration.md#nonlinear_constraints) for detailed
+    See [Configuration
+    Sections](../optimizer_setup/configuration_sections.md#nonlinear_constraints) for detailed
     descriptions and usage examples.
 
     Attributes:

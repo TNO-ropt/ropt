@@ -87,7 +87,7 @@ There are three ways to return them:
 If a realization fails to compute, return `float("nan")` for it. `ropt` treats
 `NaN` as a failed realization and keeps going, as long as enough realizations
 succeed. How many is enough is set by
-[`realization_min_success`](../optimizer_setup/configuration.md#realizations),
+[`realization_min_success`](../optimizer_setup/configuration_sections.md#realizations),
 which defaults to *all* of them — so a single `NaN` ends the run with
 `TOO_FEW_REALIZATIONS` unless you lower it.
 

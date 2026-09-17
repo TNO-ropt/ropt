@@ -19,6 +19,11 @@ gradient configuration work together.
 | [`SamplerConfig`][ropt.config.SamplerConfig] + samplers tuple         | How perturbation samples are drawn (uniform, normal, Sobol, ...).             |
 | [`FunctionEstimatorConfig`][ropt.config.FunctionEstimatorConfig]      | How per-realization gradients combine into the final estimate.                |
 
+The fields themselves are described under
+[`gradient`](configuration_sections.md#gradient) and
+[Variable perturbations](configuration_sections.md#variable-perturbations) in
+the Configuration Reference.
+
 ## Configuration in one place
 
 ```python

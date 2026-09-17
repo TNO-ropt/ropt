@@ -21,7 +21,8 @@ constraints, or both.
 
 See [Sharing optimizer components by
 key](configuration.md#sharing-optimizer-components-by-key) for the indexing
-pattern.
+pattern, and [`realization_filters`](configuration_sections.md#realization-filters)
+for the fields of a filter configuration.
 
 ## CVaR example
 
@@ -79,9 +80,9 @@ The `cvar-objective` method:
 1. Computes a weighted sum of the objective values specified by the `sort`
    indices for each realization (using the objective weights from the
    configuration). If a single objective index is given, no weighting is
-   applied. The objective [scales](configuration.md#objective-scales) are
+   applied. The objective [scales](configuration_sections.md#objective-scales) are
    applied first, and objectives marked in
-   [`maximize`](configuration.md#objective-direction) have their sign flipped,
+   [`maximize`](configuration_sections.md#objective-direction) have their sign flipped,
    per objective, so that the sum ranks realizations the way the optimizer
    would.
 2. Conceptually sorts realizations by that value, ascending.

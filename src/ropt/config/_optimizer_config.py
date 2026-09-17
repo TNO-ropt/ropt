@@ -14,7 +14,7 @@ class OptimizerConfig(BaseModel):
     configured as the `optimizer` field of
     [`EnOptContext`][ropt.context.EnOptContext].
 
-    See the [Configuration guide](../optimizer_setup/configuration.md#optimizer) for
+    See [Configuration Sections](../optimizer_setup/configuration_sections.md#optimizer) for
     detailed descriptions and usage examples.
 
     Attributes:

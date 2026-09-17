@@ -26,7 +26,7 @@ arrives. That history is also what remains when there is no best result to
 return.
 
 **`NaN` means "this realization failed", and one failure is already too many.**
-[`realization_min_success`](../optimizer_setup/configuration.md#realizations)
+[`realization_min_success`](../optimizer_setup/configuration_sections.md#realizations)
 defaults to *all* realizations, so a single `NaN` ends the run with
 `TOO_FEW_REALIZATIONS`. If some realizations are allowed to fail, say so:
 
@@ -56,7 +56,7 @@ in `TOO_FEW_REALIZATIONS`; see [Logging](logging.md).
 | What you see | Most likely cause |
 | --- | --- |
 | `result.variables` is `None`, but `exit_code` is `OPTIMIZER_FINISHED` | No evaluation satisfied the constraints to within `constraint_tolerance` (default `1e-10`; bounds and linear constraints count too), so there is no best feasible result to return. The evaluations are still in the handlers. Raise the tolerance, or check that the constraints can be satisfied at all. |
-| `TOO_FEW_REALIZATIONS` although only one realization failed | [`realization_min_success`](../optimizer_setup/configuration.md#realizations) defaults to all of them. Lower it. |
+| `TOO_FEW_REALIZATIONS` although only one realization failed | [`realization_min_success`](../optimizer_setup/configuration_sections.md#realizations) defaults to all of them. Lower it. |
 | `TOO_FEW_REALIZATIONS` and nothing says why | The failures came from the machinery, not from your objective. The reason is logged at `WARNING` by `ropt.components.evaluators`; enable [logging](logging.md). |
 | Numbers do not match what you configured | Results carry the configured values and the optimizer's scaled ones side by side; see [Scaling of results](../running/results.md#scaling-of-results). |
 
@@ -133,7 +133,7 @@ it. Keep shared handlers cheap, or register a slow one with
 **Not every optimizer can run beside another.** A backend that needs its own
 working directory, writes to a fixed file name, or keeps state inside its
 library cannot run concurrently in one process; select it as
-[`external/...`](../optimizer_setup/configuration.md#external-backend) to give it a
+[`external/...`](../optimizer_setup/configuration_sections.md#external-backend) to give it a
 process of its own. Optimizer output capture is likewise for one run at a time.
 
 | What you see | Most likely cause |
@@ -147,7 +147,7 @@ process of its own. Optimizer output capture is likewise for one run at a time.
 ## Configuration
 
 **Runs are reproducible by default.** The
-[seed](../optimizer_setup/configuration.md#variable-perturbations) is fixed at
+[seed](../optimizer_setup/configuration_sections.md#variable-perturbations) is fixed at
 `1` unless you set it, so repeating a run reproduces its perturbations exactly.
 Change the seed when you deliberately want an independent repetition of the same
 problem.
@@ -156,7 +156,7 @@ problem.
 | What you see | Most likely cause |
 | --- | --- |
 | `RuntimeError: Auto-scaling of the objectives failed to estimate a scale factor` | The first batch averaged to zero, or to a value that is not finite, so no scale could be derived. Set the scales yourself, or start somewhere else. |
-| Two runs that should agree give different gradients | Quasi-random samplers (`sobol`, `halton`, `lhs`) are seeded in the order the [samplers](../optimizer_setup/configuration.md#samplers) are defined, so reordering that section changes the perturbations. |
+| Two runs that should agree give different gradients | Quasi-random samplers (`sobol`, `halton`, `lhs`) are seeded in the order the [samplers](../optimizer_setup/configuration_sections.md#samplers) are defined, so reordering that section changes the perturbations. |
 
 ## See also
 

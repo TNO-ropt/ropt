@@ -40,6 +40,9 @@ searches within a box rather than stepping from a start point.
 from ropt.enums import VariableType
 ```
 
+The `types` field, and every other field of the variables section, is described
+under [`variables`](configuration_sections.md#variables).
+
 The objective is an ordinary evaluation function. It receives the variables as
 floats that happen to hold integral values:
 
@@ -73,7 +76,7 @@ by following a gradient, and the cost profile differs accordingly:
 
 - `perturbation_magnitudes` is unused. No perturbations are evaluated, because
   no gradient is estimated.
-- Limit the run with [`max_functions`](configuration.md#optimizer) or
+- Limit the run with [`max_functions`](configuration_sections.md#optimizer) or
   `max_iterations` rather than a convergence tolerance.
 - The result is reproducible only if the method's own generator is seeded —
   hence `"options": {"rng": 4}` in both scripts.

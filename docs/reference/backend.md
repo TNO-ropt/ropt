@@ -6,7 +6,7 @@ in a separate Python process; additional backends are provided by plugin
 packages (see [Installation](../getting_started/installation.md)).
 
 See [Running the optimizer in a separate
-process](../optimizer_setup/configuration.md#external-backend) for when and how
+process](../optimizer_setup/configuration_sections.md#external-backend) for when and how
 to use the `external` backend.
 
 ::: ropt.backend

@@ -221,11 +221,11 @@ indices, as builtin axes do.
 
 Optimization internally works with scaled values: variables are scaled and
 shifted by their
-[`scales` and `offsets`](../optimizer_setup/configuration.md#variable-scales), objective and
+[`scales` and `offsets`](../optimizer_setup/configuration_sections.md#variable-scales), objective and
 nonlinear constraint *aggregates* have their
-[offsets](../optimizer_setup/configuration.md#objective-offsets) subtracted and are divided by
-their [scales](../optimizer_setup/configuration.md#objective-scales), and objectives marked
-[`maximize`](../optimizer_setup/configuration.md#objective-direction) are negated once they have
+[offsets](../optimizer_setup/configuration_sections.md#objective-offsets) subtracted and are divided by
+their [scales](../optimizer_setup/configuration_sections.md#objective-scales), and objectives marked
+[`maximize`](../optimizer_setup/configuration_sections.md#objective-direction) are negated once they have
 been combined across realizations.
 
 Every result carries both domains at once, and one rule connects them:
@@ -317,7 +317,7 @@ This requires the `pandas` optional extra (see [Installation](../getting_started
     [Result Handlers](handlers.md).
 
 The row index and the unstacked column labels come from the
-[`names`](../optimizer_setup/configuration.md#names) mapping in the configuration. If an axis is
+[`names`](../optimizer_setup/configuration_sections.md#names) mapping in the configuration. If an axis is
 not named, its labels fall back to 0-based integer indices. For example,
 exporting the objectives of a single result **without** any `names` gives plain
 numbers for both the realization and the objective axes:
@@ -537,7 +537,7 @@ Every axis of an exported field becomes an index level, named after its
 [`AxisName`][ropt.enums.AxisName] value (for example `"variable"`, `"realization"`,
 `"objective"`), and `batch_id` is always prepended so results from different
 batches stay distinct. The label on each level — and on each unstacked column —
-comes from the [`names`](../optimizer_setup/configuration.md#names) mapping in the configuration, a
+comes from the [`names`](../optimizer_setup/configuration_sections.md#names) mapping in the configuration, a
 dict from axis name to a tuple of labels:
 
 ```python

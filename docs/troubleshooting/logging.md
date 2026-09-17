@@ -207,7 +207,7 @@ ropt_logger.propagate = False
 ## Logging during an optimization { #logging-during-an-optimization }
 
 Configuring [`stdout` or
-`stderr`](../optimizer_setup/configuration.md#optimizer) captures the
+`stderr`](../optimizer_setup/configuration_sections.md#optimizer) captures the
 optimizer's output for the duration of a run. That capture is scoped to a period
 of time rather than to a source, so **log records written to a console handler
 while the optimizer is working end up in the capture file** along with the

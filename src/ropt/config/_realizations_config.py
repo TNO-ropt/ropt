@@ -18,7 +18,7 @@ class RealizationsConfig(BaseModel):
     `RealizationsConfig` defines realization ensemble settings for an
     [`EnOptContext`][ropt.context.EnOptContext] object.
 
-    See the [Configuration guide](../optimizer_setup/configuration.md#realizations) for
+    See [Configuration Sections](../optimizer_setup/configuration_sections.md#realizations) for
     detailed descriptions and usage examples.
 
     Attributes:

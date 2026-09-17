@@ -28,7 +28,8 @@ strategy.
 
 See [Sharing optimizer components by
 key](configuration.md#sharing-optimizer-components-by-key) for the indexing
-pattern.
+pattern, and [`function_estimators`](configuration_sections.md#function-estimators)
+for the fields of an estimator configuration.
 
 ## Mean estimator (default)
 

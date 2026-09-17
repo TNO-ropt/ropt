@@ -14,8 +14,8 @@ class FunctionEstimatorConfig(BaseModel):
     controls how objective and constraint function values (and their gradients)
     are combined across realizations.
 
-    See the [Configuration
-    guide](../optimizer_setup/configuration.md#function-estimators) for detailed
+    See [Configuration
+    Sections](../optimizer_setup/configuration_sections.md#function-estimators) for detailed
     descriptions and usage examples.
 
     Attributes:

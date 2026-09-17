@@ -38,7 +38,7 @@ realization that sets how much each contributes to the combined objective:
 ```
 
 The weights need not sum to one; `ropt` normalizes them. Equal weights, as here,
-give a plain average. See [Configuration](../optimizer_setup/configuration.md) for the
+give a plain average. See [Configuration](../optimizer_setup/configuration_sections.md#realizations) for the
 other realization settings. `INITIAL_VALUES` is the point the optimization
 starts from.
 

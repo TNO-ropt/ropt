@@ -2,7 +2,7 @@
 
 Optional helpers for scripts and applications that use `ropt`. Nothing in `ropt`
 calls these. See [Plugin Discovery](../advanced/plugin_discovery.md) for the
-plugin queries, [Variable scaling](../optimizer_setup/configuration.md#variable-scales)
+plugin queries, [Variable scaling](../optimizer_setup/configuration_sections.md#variable-scales)
 for the bounds converter, and [Keyboard
 Interrupts](../troubleshooting/keyboard_interrupt.md) for when the escape hatch is
 worth reaching for.

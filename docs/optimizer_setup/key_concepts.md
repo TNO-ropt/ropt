@@ -60,7 +60,7 @@ installing extra packages.
 Each of the four kinds has its own place in the configuration. The
 exact syntax, the `method` naming convention (see
 [method strings](configuration.md#method-strings)), and the available options are
-described in [Configuration](configuration.md); the dedicated pages
+described in [Configuration](configuration_sections.md); the dedicated pages
 [Realization Filters](realization_filters.md),
 [Function Estimators](function_estimators.md),
 and [samplers](samplers.md) cover each component in depth.
@@ -101,13 +101,13 @@ optimization as implemented by `ropt`.
 **Linear constraint**
 :   A constraint that is a linear function of the variables. Linear constraints
     are defined entirely in the
-    [configuration](configuration.md#linear_constraints) and are handled by
+    [configuration](configuration_sections.md#linear_constraints) and are handled by
     `ropt`; they require no action from the function evaluation.
 
 **Nonlinear constraint**
 :   A constraint that is a general (nonlinear) function of the variables. Like a
     linear constraint it is declared in the
-    [configuration](configuration.md#nonlinear_constraints), but its value must
+    [configuration](configuration_sections.md#nonlinear_constraints), but its value must
     be computed by the function evaluation, together with the objective, for
     each variable vector.
 
@@ -130,7 +130,7 @@ optimization as implemented by `ropt`.
 :   A component that provides the optimization algorithms (the *methods*) `ropt`
     runs. The built-in backend wraps [SciPy](https://www.scipy.org); other
     backends add algorithms from external packages. See the
-    [backend configuration](configuration.md#backend).
+    [backend configuration](configuration_sections.md#backend).
 
 **Sampler**
 :   A component that generates the perturbations used for stochastic gradient
@@ -149,8 +149,8 @@ optimization as implemented by `ropt`.
 **Scaling**
 :   The units the optimizer works in, as opposed to the ones you configure the
     problem in. Variables are scaled by the affine map given by their
-    [`scales` and `offsets`](configuration.md#variable-scales); aggregated
+    [`scales` and `offsets`](configuration_sections.md#variable-scales); aggregated
     objectives and nonlinear constraints by the affine map given by their
-    [`scales`](configuration.md#objective-scales) and
-    [`offsets`](configuration.md#objective-offsets). Results carry both domains:
+    [`scales`](configuration_sections.md#objective-scales) and
+    [`offsets`](configuration_sections.md#objective-offsets). Results carry both domains:
     a field and its `scaled` counterpart sit at the same path.

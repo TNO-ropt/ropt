@@ -8,8 +8,8 @@ is not appropriate.
 The two settings live in different places: **`backend` selects and configures
 the algorithm**, while **`optimizer` sets the limits `ropt` enforces around
 it**. The full field reference is under
-[`backend`](configuration.md#backend) and
-[`optimizer`](configuration.md#optimizer).
+[`backend`](configuration_sections.md#backend) and
+[`optimizer`](configuration_sections.md#optimizer).
 
 ## Selecting a method
 
@@ -108,7 +108,7 @@ Backends can report their own progress, which is disabled by default:
 `optimizer.stdout` and `optimizer.stderr` capture it to files, resolved against
 `optimizer.output_dir`. Capture rewires process-global state, so only one run at
 a time can use it — leave those unset on runs that overlap. See
-[`optimizer`](configuration.md#optimizer) for the details.
+[`optimizer`](configuration_sections.md#optimizer) for the details.
 
 ## See also
 

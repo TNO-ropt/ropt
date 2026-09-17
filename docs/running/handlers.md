@@ -180,7 +180,7 @@ Columns appear in the order the specification lists them. A
 field whose value is a vector or matrix expands to several columns; the extra
 column levels come from the field's axis labels (or indices), joined to the
 title with a separator (`,` by default, set with `sep=`). The labels come from
-the [`names`](../optimizer_setup/configuration.md#names) mapping: a length-2
+the [`names`](../optimizer_setup/configuration_sections.md#names) mapping: a length-2
 `variables` gives `Variable,v0` and `Variable,v1` when the variables are named
 `v0` and `v1`, and `Variable,0` and `Variable,1` when they are not. Because the
 column names follow
@@ -209,7 +209,7 @@ Convenience methods:
 - `add_column(table, name, title)` adds one column to an existing table.
 - `set_callback(fn)` calls `fn(output_dir)` whenever the tables are updated,
   where `output_dir` is the run's configured
-  [`output_dir`](../optimizer_setup/configuration.md#optimizer) (`None` if it is
+  [`output_dir`](../optimizer_setup/configuration_sections.md#optimizer) (`None` if it is
   not set).
 
 !!! tip "Write the tables to a file as they update"

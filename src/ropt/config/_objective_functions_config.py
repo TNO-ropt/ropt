@@ -27,7 +27,7 @@ class ObjectiveFunctionsConfig(BaseModel):
     `ObjectiveFunctionsConfig` defines objective function settings for an
     [`EnOptContext`][ropt.context.EnOptContext] object.
 
-    See the [Configuration guide](../optimizer_setup/configuration.md#objectives) for
+    See [Configuration Sections](../optimizer_setup/configuration_sections.md#objectives) for
     detailed descriptions and usage examples.
 
     Attributes:

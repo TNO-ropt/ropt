@@ -66,7 +66,7 @@ optimizer, so the inner run treats the outer variables as constants and the
 outer run never touches the inner ones. The two layers can otherwise be
 configured completely differently — here the outer is integer-valued and
 gradient-free, while the inner is continuous and uses an ensemble of five
-realizations. See [`variables`](../optimizer_setup/configuration.md#variables)
+realizations. See [`variables`](../optimizer_setup/configuration_sections.md#variables)
 for the field, and
 [Discrete and Mixed-Integer Variables](../optimizer_setup/discrete.md) for the
 outer method.
