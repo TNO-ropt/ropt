@@ -1364,21 +1364,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#how-estimators-fit-in" class="md-nav__link">
+  <a href="#selecting-an-estimator" class="md-nav__link">
     <span class="md-ellipsis">
       
-        How estimators fit in
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#mean-estimator-default" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Mean estimator (default)
+        Selecting an estimator
       
     </span>
   </a>
@@ -2963,21 +2952,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#how-estimators-fit-in" class="md-nav__link">
+  <a href="#selecting-an-estimator" class="md-nav__link">
     <span class="md-ellipsis">
       
-        How estimators fit in
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#mean-estimator-default" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Mean estimator (default)
+        Selecting an estimator
       
     </span>
   </a>
@@ -3041,23 +3019,10 @@ strategy.</p>
   chain-rule gradients — useful when the optimization target is variability
   rather than the mean.</li>
 </ul>
-<h2 id="how-estimators-fit-in">How estimators fit in</h2>
-<ol>
-<li>You add estimator configurations to the top-level <code>function_estimators</code>
-   list in the context.</li>
-<li>You point objectives (or constraints) at an estimator by its index in
-   <code>ObjectiveFunctionsConfig.function_estimators</code> /
-   <code>NonlinearConstraintsConfig.function_estimators</code>.</li>
-<li>During optimization, the estimator is called with per-realization function
-   and gradient arrays plus the current weights, and returns a single
-   aggregated value.</li>
-</ol>
-<p>See <a href="../configuration/#sharing-optimizer-components-by-key">Sharing optimizer components by
-key</a> for the indexing
-pattern, and <a href="../configuration_sections/#function-estimators"><code>function_estimators</code></a>
-for the fields of an estimator configuration.</p>
-<h2 id="mean-estimator-default">Mean estimator (default)</h2>
-<p>The default method computes a simple weighted average:</p>
+<h2 id="selecting-an-estimator">Selecting an estimator</h2>
+<p>Estimators are listed at the top level of the configuration and referenced from
+the objectives or nonlinear constraints that use them, so different objectives
+can be aggregated differently. The default method is a weighted average:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">CONFIG</span> <span class="o">=</span> <span class="p">{</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="s2">"variables"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"variable_count"</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">"perturbation_magnitudes"</span><span class="p">:</span> <span class="mf">1e-5</span><span class="p">},</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="s2">"realizations"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"weights"</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">]</span> <span class="o">*</span> <span class="mi">10</span><span class="p">},</span>
@@ -3070,8 +3035,14 @@ for the fields of an estimator configuration.</p>
 </span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    <span class="p">],</span>
 </span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>Because <code>mean</code> is the default, you can omit the <code>function_estimators</code> list
-entirely when weighted-average aggregation is all you need.</p>
+<p>Because <code>mean</code> is the default, both fields can be omitted entirely when
+weighted-average aggregation is all you need. During optimization the estimator
+receives the per-realization function and gradient arrays together with the
+current weights, and returns a single aggregated value. See <a href="../configuration/#sharing-optimizer-components-by-key">Sharing optimizer
+components by key</a> for the
+indexing pattern, and
+<a href="../configuration_sections/#function-estimators"><code>function_estimators</code></a>
+for the fields of an estimator configuration.</p>
 <h2 id="standard-deviation-estimator">Standard-deviation estimator</h2>
 <p>To optimize for low variability instead of low mean, use <code>stddev</code>:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="s2">"function_estimators"</span><span class="p">:</span> <span class="p">[</span>

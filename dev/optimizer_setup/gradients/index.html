@@ -1379,10 +1379,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#a-runnable-example" class="md-nav__link">
+  <a href="#see-also" class="md-nav__link">
     <span class="md-ellipsis">
       
-        A runnable example
+        See also
       
     </span>
   </a>
@@ -3128,10 +3128,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#a-runnable-example" class="md-nav__link">
+  <a href="#see-also" class="md-nav__link">
     <span class="md-ellipsis">
       
-        A runnable example
+        See also
       
     </span>
   </a>
@@ -3166,7 +3166,11 @@ gradients stochastically using the <em>Stochastic Simplex Approximate Gradient</
 function values evaluated at the current point and at a number of randomly
 perturbed points.</p>
 <p>This page explains how perturbations, samplers, function estimators, and the
-gradient configuration work together.</p>
+gradient configuration work together. The runnable script is
+<a href="https://github.com/TNO-ropt/ropt/blob/main/examples/simple/ensemble.py">examples/simple/ensemble.py</a>,
+which exercises this machinery with only <code>perturbation_magnitudes</code> and the
+realization weights set, leaving the sampler, the estimator and the remaining
+gradient settings at their defaults.</p>
 <h2 id="the-pieces">The pieces</h2>
 <table>
 <thead>
@@ -3322,12 +3326,13 @@ across realizations and writing your own are all covered in
 combined into the single estimate the optimizer receives. The default is a
 weighted mean; alternatives, including a measure of dispersion rather than an
 average, are covered in <a href="../function_estimators/">Function Estimators</a>.</p>
-<h2 id="a-runnable-example">A runnable example</h2>
-<p><a href="https://github.com/TNO-ropt/ropt/blob/main/examples/simple/ensemble.py">examples/simple/ensemble.py</a>
-exercises the machinery described here: it minimizes the mean objective over ten
-realizations, setting only <code>perturbation_magnitudes</code> and the realization
-weights, which leaves the sampler, the estimator and the remaining gradient
-settings at the defaults described above.</p>
+<h2 id="see-also">See also</h2>
+<ul>
+<li>What <code>evaluation_policy</code> means when evaluations are submitted concurrently:
+  <a href="../../running/parallel/">Parallel Execution and Many Runs</a>.</li>
+<li>When a run ends with <code>TOO_FEW_REALIZATIONS</code>, or two runs disagree:
+  <a href="../../troubleshooting/">Common Pitfalls</a>.</li>
+</ul>
 
 
 

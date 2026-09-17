@@ -1336,21 +1336,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#how-filters-fit-in" class="md-nav__link">
+  <a href="#selecting-a-filter" class="md-nav__link">
     <span class="md-ellipsis">
       
-        How filters fit in
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#cvar-example" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        CVaR example
+        Selecting a filter
       
     </span>
   </a>
@@ -2974,21 +2963,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#how-filters-fit-in" class="md-nav__link">
+  <a href="#selecting-a-filter" class="md-nav__link">
     <span class="md-ellipsis">
       
-        How filters fit in
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#cvar-example" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        CVaR example
+        Selecting a filter
       
     </span>
   </a>
@@ -3057,21 +3035,11 @@ realizations) and common variance-reduction techniques.</p>
 module, which selects the realizations contributing to the
 Conditional-Value-at-Risk tail. It can be configured for objectives, for
 constraints, or both.</p>
-<h2 id="how-filters-fit-in">How filters fit in</h2>
-<ol>
-<li>You add filter configurations to the top-level <code>realization_filters</code> list.</li>
-<li>You point objectives (or constraints) at a filter by its index in
-   <code>ObjectiveFunctionsConfig.realization_filters</code> /
-   <code>NonlinearConstraintsConfig.realization_filters</code>.</li>
-<li>At each evaluation, the filter is consulted to compute per-realization
-   weights that override the static <code>realizations.weights</code>.</li>
-</ol>
-<p>See <a href="../configuration/#sharing-optimizer-components-by-key">Sharing optimizer components by
-key</a> for the indexing
-pattern, and <a href="../configuration_sections/#realization-filters"><code>realization_filters</code></a>
-for the fields of a filter configuration.</p>
-<h2 id="cvar-example">CVaR example</h2>
-<p>Optimize the conditional expectation of the worst 30% of 10 realizations:</p>
+<h2 id="selecting-a-filter">Selecting a filter</h2>
+<p>Filters are listed at the top level of the configuration and referenced from the
+objectives or nonlinear constraints that use them, so different objectives can be
+filtered differently. This one optimizes the conditional expectation of the worst
+30% of 10 realizations:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">CONFIG</span> <span class="o">=</span> <span class="p">{</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="s2">"variables"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"variable_count"</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="s2">"perturbation_magnitudes"</span><span class="p">:</span> <span class="mf">1e-6</span><span class="p">},</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="s2">"realizations"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"weights"</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">]</span> <span class="o">*</span> <span class="mi">10</span><span class="p">},</span>
@@ -3088,6 +3056,12 @@ for the fields of a filter configuration.</p>
 </span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>    <span class="s2">"gradient"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"number_of_perturbations"</span><span class="p">:</span> <span class="mi">5</span><span class="p">},</span>
 </span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="p">}</span>
 </span></code></pre></div>
+<p>Omit both fields to leave every realization at its configured weight. At each
+evaluation a filter returns per-realization weights that replace
+<code>realizations.weights</code> for that evaluation. See <a href="../configuration/#sharing-optimizer-components-by-key">Sharing optimizer components by
+key</a> for the indexing
+pattern, and <a href="../configuration_sections/#realization-filters"><code>realization_filters</code></a>
+for the fields of a filter configuration.</p>
 <p>See <a class="autorefs autorefs-internal" title="            ropt.realization_filter.default.CVaRObjectiveOptions" href="../../reference/realization_filter/#ropt.realization_filter.default.CVaRObjectiveOptions"><code>CVaRObjectiveOptions</code></a>
 for the parameters. The corresponding constraint variant is
 <a class="autorefs autorefs-internal" title="            ropt.realization_filter.default.CVaRConstraintOptions" href="../../reference/realization_filter/#ropt.realization_filter.default.CVaRConstraintOptions"><code>CVaRConstraintOptions</code></a>.</p>
