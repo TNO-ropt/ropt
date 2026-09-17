@@ -69,11 +69,11 @@ around them.
 ## What to expect from the search
 
 A gradient-free method reaches an answer by evaluating many points rather than
-by following a slope, so plan for a different cost profile:
+by following a gradient, and the cost profile differs accordingly:
 
 - `perturbation_magnitudes` is unused. No perturbations are evaluated, because
   no gradient is estimated.
-- Budget the run with [`max_functions`](configuration.md#optimizer) or
+- Limit the run with [`max_functions`](configuration.md#optimizer) or
   `max_iterations` rather than a convergence tolerance.
 - The result is reproducible only if the method's own generator is seeded —
   hence `"options": {"rng": 4}` in both scripts.

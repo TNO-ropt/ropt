@@ -1,13 +1,13 @@
 # Choosing an Optimizer
 
-Every run needs an algorithm and a budget. `ropt` picks a reasonable default for
-both — SciPy's SLSQP, running until it converges — so neither has to be
-configured to get started. This page covers what to change when the default is
-not what you want.
+Every run needs an algorithm and a criterion for stopping. `ropt` supplies a
+default for both — SciPy's SLSQP, running until it converges — so neither has to
+be configured for a first run. This page covers what to change when the default
+is not appropriate.
 
-The two settings live in different places, which is worth knowing up front:
-**`backend` selects and configures the algorithm**, while **`optimizer` governs
-the run around it**. The full field reference is under
+The two settings live in different places: **`backend` selects and configures
+the algorithm**, while **`optimizer` sets the limits `ropt` enforces around
+it**. The full field reference is under
 [`backend`](configuration.md#backend) and
 [`optimizer`](configuration.md#optimizer).
 
@@ -49,12 +49,12 @@ analytic derivative, they rely on the estimated gradients described in
 [Stochastic Gradients](gradients.md). That estimate costs extra evaluations at
 perturbed points on every iteration.
 
-A gradient-free method such as `differential_evolution` skips that entirely: it
-evaluates many candidate points instead of following a slope. It needs bounds on
-every variable, ignores `perturbation_magnitudes`, and is the only choice when
-any variable is an integer.
+A gradient-free method such as `differential_evolution` avoids that entirely: it
+evaluates many candidate points instead of following a gradient. It needs bounds
+on every variable, ignores `perturbation_magnitudes`, and is the only choice
+when any variable is an integer.
 
-## Budgeting the run
+## Limiting the length of a run
 
 Four settings can stop a run, and they are **split across the two sections**:
 
@@ -63,12 +63,12 @@ Four settings can stop a run, and they are **split across the two sections**:
 | `max_batches` | `optimizer` | calls made to your evaluation function |
 | `max_functions` | `optimizer` | individual objective evaluations, across all batches |
 | `max_iterations` | `backend` | iterations of the algorithm itself |
-| `convergence_tolerance` | `backend` | how small an improvement still counts |
+| `convergence_tolerance` | `backend` | the improvement below which the algorithm stops |
 
 The division follows who enforces the limit. `ropt` counts batches and function
 evaluations itself, so those belong to `optimizer`. Iterations and convergence
-are the algorithm's own notions — their exact meaning depends on the method, and
-not every backend supports them — so they belong to `backend`.
+are the algorithm's own criteria — their exact meaning depends on the method,
+and not every backend supports them — so they belong to `backend`.
 
 ```python
 CONFIG = {
@@ -78,11 +78,12 @@ CONFIG = {
 }
 ```
 
-Which to reach for depends on what is scarce. When each evaluation is expensive,
-`max_functions` caps the total cost directly. When evaluations are submitted in
-parallel, `max_batches` caps the number of sequential submission rounds, which
-is usually the thing that determines wall-clock time. A batch may contain many
-evaluations, so the two are not interchangeable.
+Which limit applies depends on which resource constrains the run. When each
+evaluation is expensive, `max_functions` bounds the total number of evaluations
+directly. When the evaluations within a batch are submitted concurrently,
+`max_batches` bounds the number of sequential submissions, which determines the
+elapsed time. A batch may contain many evaluations, so the two are not
+interchangeable.
 
 `convergence_tolerance` is compared against the quantities the optimizer works
 with, which are **scaled**. An objective that has been divided by a large number
@@ -95,15 +96,15 @@ To stop on a condition of your own rather than a count, return `False` from the
 [examples/simple/stopping.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/stopping.py)
 as the runnable version.
 
-## Seeing what the optimizer is doing
+## Output from the optimizer
 
-Backends can report their own progress, which is off by default:
+Backends can report their own progress, which is disabled by default:
 
 ```python
 "backend": {"verbose": True}
 ```
 
-That decides whether there is any output. Where it goes is separate:
+`verbose` decides whether output is produced at all. Where it goes is separate:
 `optimizer.stdout` and `optimizer.stderr` capture it to files, resolved against
 `optimizer.output_dir`. Capture rewires process-global state, so only one run at
 a time can use it — leave those unset on runs that overlap. See

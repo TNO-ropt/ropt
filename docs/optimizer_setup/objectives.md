@@ -34,7 +34,7 @@ nonlinear constraints, their values follow the objectives in the same sequence.
 See [Constraints](constraints.md) and
 [Running Optimizations](../running/running.md#the-evaluation-function).
 
-Two details are worth knowing early:
+Two properties of `weights` matter here:
 
 - **Weights are normalized to sum to one.** `[1, 1]` and `[0.5, 0.5]` describe
   the same problem, so only the ratio matters.
@@ -61,8 +61,8 @@ The sign is flipped **after** the realizations have been combined, never on the
 per-realization values. That ordering matters as soon as a
 [function estimator](function_estimators.md) produces something other than an
 average. Negating the inputs of a standard deviation leaves it unchanged, so
-flipping first would quietly minimize a spread you asked to maximize; flipping
-the combined value is correct whatever produced it.
+flipping first would silently minimize a spread declared for maximization;
+flipping the combined value is correct whatever produced it.
 
 ## Weights and scales decide the trade-off together
 
@@ -72,13 +72,13 @@ minimized is
 $$ \sum_j \frac{w_j}{s_j} f_j $$
 
 The effective weight of an objective is therefore $w_j / s_j$, not $w_j$. With a
-single objective this is harmless: dividing by a positive constant leaves the
-optimum where it is. With several it is not, because changing one scale changes
-the balance between them and moves the optimum with it.
+single objective this does not affect the solution: dividing by a positive
+constant leaves the optimum where it is. With several it does, because changing
+one scale changes the balance between them and moves the optimum with it.
 
-This is the trap to watch for. Two objectives that differ by orders of magnitude
-are not balanced by their weights alone — the larger one dominates whatever the
-weights say, because it contributes far more to the sum:
+The consequence is that two objectives differing by orders of magnitude are not
+balanced by their weights alone — the larger one dominates whatever the weights
+say, because it contributes far more to the sum:
 
 ```python
 "objectives": {"weights": [0.5, 0.5], "scales": [1.0, 1e6]}

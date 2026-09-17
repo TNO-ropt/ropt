@@ -42,9 +42,9 @@ magnitude of approximately one. During gradient estimation these samples are
 multiplied element-wise by the `perturbation_magnitudes` defined in
 [`VariablesConfig`][ropt.config.VariablesConfig].
 
-Keeping the two separate is what makes them independent: the sampler decides the
-shape of the cloud of perturbed points, and `perturbation_magnitudes` decides its
-size, whichever sampler is in use.
+The separation keeps the two independent: the sampler determines the
+distribution of the perturbed points, and `perturbation_magnitudes` determines
+their distance from the current point, whichever sampler is in use.
 
 ## Shared perturbations
 

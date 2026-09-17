@@ -928,7 +928,7 @@ CONFIG = {
 
 This configures a 5-variable problem with bounded variables, an ensemble of
 10 equally-weighted realizations, 5 perturbations per gradient estimate,
-SciPy's default optimizer, and a 50-batch cap.
+SciPy's default optimizer, and a limit of 50 batches.
 
 ## Full configuration schema
 
