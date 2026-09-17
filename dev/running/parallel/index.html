@@ -3746,7 +3746,8 @@ and <code>submit_options</code> carries anything else that script declares:</p>
 script never mentions is simply ignored, and one the script mentions but nobody
 supplies renders as empty — so a misspelling on either side drops the directive
 silently rather than failing. Entries that are <code>None</code> are dropped, so omitting a
-key and passing <code>None</code> mean the same thing.</p>
+key and passing <code>None</code> mean the same thing. A name the executor sets itself,
+such as <code>cores</code> or <code>queue</code>, is rejected rather than allowed to override it.</p>
 <p>With a configuration, <code>cores</code> and <code>run_time_max</code> are also <strong>clamped</strong> to the
 selected queue's limits rather than rejected: asking for more cores than the
 queue allows quietly gets you the queue's maximum.</p>

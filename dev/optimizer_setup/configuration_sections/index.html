@@ -3417,9 +3417,8 @@ documentation, see <a href="../../reference/config/">Configuration Classes</a>.<
 variables, including both free and fixed variables.</p>
 <p>The <code>lower_bounds</code> and <code>upper_bounds</code> fields define the bounds for each
 variable. They are broadcasted to match the number of variables and default to
-<span class="arithmatex">\(-\infty\)</span> and <span class="arithmatex">\(+\infty\)</span>, respectively. <code>numpy.nan</code> values in these arrays
-indicate unbounded variables and are converted to <code>numpy.inf</code> with the
-appropriate sign.</p>
+<span class="arithmatex">\(-\infty\)</span> and <span class="arithmatex">\(+\infty\)</span>, respectively. Use an infinity to leave a variable
+unbounded on that side.</p>
 <p>The optional <code>types</code> field allows assigning a
 <a class="autorefs autorefs-internal" title="            VariableType" href="../../reference/enums/#ropt.enums.VariableType"><code>VariableType</code></a> to each variable (continuous or
 integer). If not provided, all variables default to continuous
