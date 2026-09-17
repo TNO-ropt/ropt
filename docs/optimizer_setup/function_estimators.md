@@ -15,25 +15,11 @@ strategy.
   chain-rule gradients — useful when the optimization target is variability
   rather than the mean.
 
-## How estimators fit in
+## Selecting an estimator
 
-1. You add estimator configurations to the top-level `function_estimators`
-   list in the context.
-2. You point objectives (or constraints) at an estimator by its index in
-   `ObjectiveFunctionsConfig.function_estimators` /
-   `NonlinearConstraintsConfig.function_estimators`.
-3. During optimization, the estimator is called with per-realization function
-   and gradient arrays plus the current weights, and returns a single
-   aggregated value.
-
-See [Sharing optimizer components by
-key](configuration.md#sharing-optimizer-components-by-key) for the indexing
-pattern, and [`function_estimators`](configuration_sections.md#function-estimators)
-for the fields of an estimator configuration.
-
-## Mean estimator (default)
-
-The default method computes a simple weighted average:
+Estimators are listed at the top level of the configuration and referenced from
+the objectives or nonlinear constraints that use them, so different objectives
+can be aggregated differently. The default method is a weighted average:
 
 ```python
 CONFIG = {
@@ -49,8 +35,14 @@ CONFIG = {
 }
 ```
 
-Because `mean` is the default, you can omit the `function_estimators` list
-entirely when weighted-average aggregation is all you need.
+Because `mean` is the default, both fields can be omitted entirely when
+weighted-average aggregation is all you need. During optimization the estimator
+receives the per-realization function and gradient arrays together with the
+current weights, and returns a single aggregated value. See [Sharing optimizer
+components by key](configuration.md#sharing-optimizer-components-by-key) for the
+indexing pattern, and
+[`function_estimators`](configuration_sections.md#function-estimators)
+for the fields of an estimator configuration.
 
 ## Standard-deviation estimator
 

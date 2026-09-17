@@ -8,7 +8,11 @@ function values evaluated at the current point and at a number of randomly
 perturbed points.
 
 This page explains how perturbations, samplers, function estimators, and the
-gradient configuration work together.
+gradient configuration work together. The runnable script is
+[examples/simple/ensemble.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/ensemble.py),
+which exercises this machinery with only `perturbation_magnitudes` and the
+realization weights set, leaving the sampler, the estimator and the remaining
+gradient settings at their defaults.
 
 ## The pieces
 
@@ -139,10 +143,9 @@ combined into the single estimate the optimizer receives. The default is a
 weighted mean; alternatives, including a measure of dispersion rather than an
 average, are covered in [Function Estimators](function_estimators.md).
 
-## A runnable example
+## See also
 
-[examples/simple/ensemble.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/ensemble.py)
-exercises the machinery described here: it minimizes the mean objective over ten
-realizations, setting only `perturbation_magnitudes` and the realization
-weights, which leaves the sampler, the estimator and the remaining gradient
-settings at the defaults described above.
+- What `evaluation_policy` means when evaluations are submitted concurrently:
+  [Parallel Execution and Many Runs](../running/parallel.md).
+- When a run ends with `TOO_FEW_REALIZATIONS`, or two runs disagree:
+  [Common Pitfalls](../troubleshooting/index.md).

@@ -10,23 +10,12 @@ module, which selects the realizations contributing to the
 Conditional-Value-at-Risk tail. It can be configured for objectives, for
 constraints, or both.
 
-## How filters fit in
+## Selecting a filter
 
-1. You add filter configurations to the top-level `realization_filters` list.
-2. You point objectives (or constraints) at a filter by its index in
-   `ObjectiveFunctionsConfig.realization_filters` /
-   `NonlinearConstraintsConfig.realization_filters`.
-3. At each evaluation, the filter is consulted to compute per-realization
-   weights that override the static `realizations.weights`.
-
-See [Sharing optimizer components by
-key](configuration.md#sharing-optimizer-components-by-key) for the indexing
-pattern, and [`realization_filters`](configuration_sections.md#realization-filters)
-for the fields of a filter configuration.
-
-## CVaR example
-
-Optimize the conditional expectation of the worst 30% of 10 realizations:
+Filters are listed at the top level of the configuration and referenced from the
+objectives or nonlinear constraints that use them, so different objectives can be
+filtered differently. This one optimizes the conditional expectation of the worst
+30% of 10 realizations:
 
 ```python
 CONFIG = {
@@ -45,6 +34,13 @@ CONFIG = {
     "gradient": {"number_of_perturbations": 5},
 }
 ```
+
+Omit both fields to leave every realization at its configured weight. At each
+evaluation a filter returns per-realization weights that replace
+`realizations.weights` for that evaluation. See [Sharing optimizer components by
+key](configuration.md#sharing-optimizer-components-by-key) for the indexing
+pattern, and [`realization_filters`](configuration_sections.md#realization-filters)
+for the fields of a filter configuration.
 
 See [`CVaRObjectiveOptions`][ropt.realization_filter.default.CVaRObjectiveOptions]
 for the parameters. The corresponding constraint variant is
