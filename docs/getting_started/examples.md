@@ -24,6 +24,7 @@ Scripts that assemble a workflow by hand are listed under
 | [`sampler.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/sampler.py) | A custom sampler that perturbs one variable at a time | [Stochastic Gradients](../optimizer_setup/gradients.md) |
 | [`metadata.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/metadata.py) | Tagging a run, and recording per-realization data | [Working with Results](../running/results.md) |
 | [`export.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/export.py) | Exporting results to a pandas or polars frame | [Working with Results](../running/results.md) |
+| [`scaling.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/scaling.py) | Reading results in the configured and the optimizer's units | [Working with Results](../running/results.md) |
 | [`handlers.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/handlers.py) | Collecting results from runs that overlap in time | [Result Handlers](../running/handlers.md) |
 | [`stopping.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/stopping.py) | Stopping a run from the `report` callback | [Running Optimizations](../running/running.md) |
 | [`failures.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/failures.py) | What a failing realization does, and how to allow some | [Common Pitfalls](../troubleshooting/index.md) |

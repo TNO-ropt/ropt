@@ -417,6 +417,12 @@ of the run. It *multiplies* `scales` rather than replacing it, so a configured
 scale still applies on top of an estimated one. An `offsets` entry is subtracted
 before the estimate is taken, so the estimate measures what is left after it.
 
+Because the estimate divides the objective the optimizer reports, switching
+`auto_scale` on lowers `target_objective` without changing the solution. Two
+runs that differ in this setting can only be compared through
+`functions.objectives` or their variables; see
+[Scaling of results](../running/results.md#scaling-of-results).
+
 #### Offsetting objectives { #objective-offsets }
 
 An objective reaches the optimizer as $(f_j - o_j)/s_j$, using the `offsets`

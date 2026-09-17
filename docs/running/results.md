@@ -257,6 +257,14 @@ Because the direction is undone when reporting, a combined objective agrees in
 sign with the per-realization values it summarizes, whether it is an average or
 a spread.
 
+The runnable script is
+[examples/simple/scaling.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/scaling.py),
+which runs the same problem unscaled, with `auto_scale` on the objective, and
+with a variable scale, printing both domains each time. It shows that
+`auto_scale` divides the reported objective by a large factor while leaving the
+solution where it was, so only `functions.objectives` and `variables` can be
+compared between runs.
+
 ## Metadata
 
 Results carry two independent kinds of metadata, neither interpreted by `ropt`:

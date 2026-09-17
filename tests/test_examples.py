@@ -137,6 +137,11 @@ def test_example_simple_sampler(tmp_path: Path, monkeypatch: Any) -> None:
     _load_from_file("sampler", "simple").main()
 
 
+def test_example_simple_scaling(tmp_path: Path, monkeypatch: Any) -> None:
+    monkeypatch.chdir(tmp_path)
+    _load_from_file("scaling", "simple").main()
+
+
 @pytest.mark.parametrize("linear", [True, False])
 def test_example_simple_constrained(
     tmp_path: Path, monkeypatch: Any, linear: Any
