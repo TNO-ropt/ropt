@@ -2844,7 +2844,10 @@ statement, ask it for the kind of pool you want, and pass that pool to the run:<
 </span></code></pre></div>
 <p>That is the whole pattern. A session can hand out as many pools as you like, of
 any kind, and each run uses the one you give it — and only that one. Closing the
-session releases them all.</p>
+session releases them all. The runnable script is
+<a href="https://github.com/TNO-ropt/ropt/blob/main/examples/simple/parallel.py">examples/simple/parallel.py</a>,
+which evaluates one optimization on a thread pool, or on a process pool when it
+is passed <code>--multiprocessing</code>.</p>
 <p>Where your objective runs depends on which pool you pass (or none):</p>
 <pre class="mermaid"><code>flowchart TB
     subgraph proc["your program (one process)"]

@@ -3644,6 +3644,11 @@ broadcasting, a single value (the default <code>"0"</code>) is sufficient.</p>
 <p>For optional fields like <code>realization_filters</code>, <code>None</code> (the default) leaves the
 corresponding element unfiltered. Any other key must exist, or building the
 context fails with an error naming the unknown key.</p>
+<p>Two runnable scripts select a component by position this way:
+<a href="https://github.com/TNO-ropt/ropt/blob/main/examples/simple/realization_filter.py">examples/simple/realization_filter.py</a>
+and
+<a href="https://github.com/TNO-ropt/ropt/blob/main/examples/simple/function_estimator.py">examples/simple/function_estimator.py</a>,
+each of which registers a custom component and points the objectives at it.</p>
 <h3 id="providing-optimizer-components">Providing optimizer components</h3>
 <p>Each entry ends up as an object that implements the component's base class (from
 the table above). You can build that object yourself, but usually you just

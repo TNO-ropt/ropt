@@ -2841,9 +2841,9 @@ run found, while collecting every result from every restart in one handler:</p>
 </span></code></pre></div>
 <p>Restarting needs nothing special from <code>ropt</code>: each call to <code>optimize</code> is
 independent, so <code>result.variables</code> — the best point a run found — is simply
-the start point for the next one. See
-<a href="../../running/restart/">Restarting from the Best Point</a> for the full,
-runnable version of this example.</p>
+the start point for the next one. The runnable script is
+<a href="https://github.com/TNO-ropt/ropt/blob/main/examples/simple/restart.py">examples/simple/restart.py</a>,
+which <a href="../../running/restart/">Restarting from the Best Point</a> walks through.</p>
 <h2 id="other-built-in-handlers">Other built-in handlers</h2>
 <p><code>ropt</code> ships a few ready-to-use handlers, all imported from <code>ropt.simple</code>:</p>
 <ul>
