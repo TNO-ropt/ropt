@@ -3292,9 +3292,9 @@ a notebook does not have. Such a class is added by hand with
 </span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="n">register_plugin</span><span class="p">(</span><span class="s2">"sampler"</span><span class="p">,</span> <span class="s2">"my_package"</span><span class="p">,</span> <span class="n">UniformSampler</span><span class="p">)</span>
 </span></code></pre></div>
 <p>It is then found by exactly the same lookups as an installed one, so
-<code>"my_package/uniform"</code> works from that point on, for every optimization started
-afterwards. The class must declare its <code>methods</code> just as an installed plugin
-does.</p>
+<code>"my_package/uniform"</code> works for every lookup that follows, including one made
+while an optimization is already running. The class must declare its <code>methods</code>
+just as an installed plugin does.</p>
 <p>Registering under the name of an installed plugin is an error, since installed
 plugins cannot be shadowed. Registering a name that was registered before
 replaces it, which is what re-running a cell that defines and registers a class
@@ -3326,17 +3326,14 @@ Where the optimizer produces a log, ask the library to write it to a named
 file — that is the per-run answer — or to be quiet.</p>
 <p>Not every library allows this, and <code>ropt</code> does not paper over the ones that do
 not. What such a backend must do instead is <strong>say so in its own
-documentation</strong>:</p>
-<ul>
-<li><strong>It needs exclusive process state</strong> — a working directory, a fixed file name,
-  or state kept in the library between calls. What that rules out is not "one
-  at a time" but "anything at all at the same time": a changed working directory
-  breaks another run in the process whatever backend it uses, and the user's
-  evaluation function with it. Say that the backend cannot run concurrently
-  in-process, and point users at the
-  <a class="autorefs autorefs-internal" title="            ropt.backend.external.ExternalBackend" href="../../reference/backend/#ropt.backend.external.ExternalBackend"><code>external</code></a> backend, which gives it a
-  process of its own.</li>
-</ul>
+documentation</strong>: that it needs exclusive process state — a working directory, a
+fixed file name, or state kept in the library between calls. What that rules out
+is not "one at a time" but "anything at all at the same time": a changed working
+directory breaks another run in the process whatever backend it uses, and the
+user's evaluation function with it. Say that the backend cannot run
+concurrently in-process, and point users at the
+<a class="autorefs autorefs-internal" title="            ropt.backend.external.ExternalBackend" href="../../reference/backend/#ropt.backend.external.ExternalBackend"><code>external</code></a> backend, which gives it a
+process of its own.</p>
 <p>Output is the exception to the rule: <code>ropt</code> captures it for you, on both levels,
 when the user configures
 <a href="../../optimizer_setup/configuration_sections/#optimizer"><code>stdout</code> or <code>stderr</code></a>. A backend

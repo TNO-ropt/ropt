@@ -3236,8 +3236,9 @@ For instance an evaluator function should look like this:</p>
   
       dataclass
   " href="../../reference/evaluation/#ropt.evaluation.EvaluationBatchResult"><code>EvaluationBatchResult</code></a> object that
-  packages objective values (and optional constraint values, metadata,
-  and per-row error indicators).</li>
+  packages objective values, and optionally constraint values and per-row
+  metadata. A failed row is marked by writing <code>numpy.nan</code> into <code>objectives</code>;
+  there is no separate error field.</li>
 </ul>
 <p>One advantage of this approach is that the callback receives all variable
 vectors at once as a 2-D NumPy array. This makes it possible to exploit NumPy's
@@ -3272,7 +3273,15 @@ Python loops and achieving better performance.</p>
 </tr>
 <tr>
 <td><code>perturbations</code></td>
-<td>Integer perturbation index per row, or <code>-1</code> for unperturbed rows. <code>None</code> if no perturbations are used.</td>
+<td>Integer perturbation index per row, negative for unperturbed rows. <code>None</code> if no perturbations are used.</td>
+</tr>
+<tr>
+<td><code>batch_id</code></td>
+<td>Integer identifying the current evaluation batch.</td>
+</tr>
+<tr>
+<td><code>metadata</code></td>
+<td>The metadata the run was started with, or <code>None</code>.</td>
 </tr>
 </tbody>
 </table>

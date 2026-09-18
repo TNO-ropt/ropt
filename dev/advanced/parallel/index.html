@@ -3983,30 +3983,14 @@ signalling the whole group. Use it when an evaluation launches external
 programs and stopping has to mean stopping.</p>
 </div>
 <h3 id="ctrl-c">Ctrl-C</h3>
-<p>Ctrl-C raises <code>SIGINT</code>, which CPython turns into <code>KeyboardInterrupt</code> — but only
-once the interrupted thread returns to the interpreter. A thread parked in
-<code>Queue.get</code>, <code>Event.wait</code>, <code>Thread.join</code>, <code>Future.result</code> or <code>Lock.acquire</code> is
-not there while it waits, and whether the signal breaks the wait depends on a
-process-global flag, <code>SA_RESTART</code>.</p>
-<p>CPython leaves that flag clear, so waits are interruptible. Some third-party
-extension modules install their own <code>SIGINT</code> handler with the flag <strong>set</strong>, and
-because it is process-global the effect is not confined to whoever set it: from
-then on Ctrl-C appears to do nothing at all, for the entire program. The
-symptom is identical on every backend, since the thread that fails to wake is
-the one waiting for results rather than the one producing them.</p>
-<p><code>ropt</code> does not touch the flag. It is process-global state that belongs to the
-program, and a library that quietly changes it decides for every other part of
-that program as well — including the parts that wanted the handler they
-installed. Nor would clearing it once be enough: any import that happens later
-can set it again.</p>
-<p>So this is left to you, and only if it happens to you. When it does,
-<a class="autorefs autorefs-internal" title="            restore_keyboard_interrupt" href="../../reference/utils/#ropt.utils.restore_keyboard_interrupt"><code>restore_keyboard_interrupt</code></a> clears the
-flag, at the top of your script and after the imports:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">restore_keyboard_interrupt</span>
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="n">restore_keyboard_interrupt</span><span class="p">()</span>
-</span></code></pre></div>
-<p>See <a href="../../troubleshooting/keyboard_interrupt/">Keyboard Interrupts</a> for the whole
+<p>An imported extension module can set the process-global <code>SA_RESTART</code> flag, after
+which Ctrl-C no longer breaks into a thread that is waiting. The thread waiting
+for results is exactly the one that then fails to wake, so the symptom is
+identical on every executor: Ctrl-C appears to do nothing at all. <code>ropt</code> does
+not touch the flag, since it belongs to the program rather than to a library;
+<a class="autorefs autorefs-internal" title="            restore_keyboard_interrupt" href="../../reference/utils/#ropt.utils.restore_keyboard_interrupt"><code>restore_keyboard_interrupt</code></a> clears it
+if you want it cleared. See
+<a href="../../troubleshooting/keyboard_interrupt/">Keyboard Interrupts</a> for the whole
 story.</p>
 <h3 id="platforms">Platforms</h3>
 <p><a class="autorefs autorefs-internal" title="            ropt.components.executors.LocalJobExecutor" href="../../reference/components_executors/#ropt.components.executors.LocalJobExecutor"><code>LocalJobExecutor</code></a> needs process
@@ -4136,11 +4120,11 @@ for what belongs where.</p>
 synchronous method that runs its evaluator and its handlers <strong>on whatever
 thread called it</strong>. On the event loop thread it blocks the loop, and the
 executors and dispatchers it is waiting for are tasks on that same loop:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1"># Wrong: run() executes here, on the loop thread.</span>
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="n">step</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="n">x0</span><span class="p">)</span>
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>
-</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="c1"># Right: the loop stays free to service the workers.</span>
-</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">to_thread</span><span class="p">(</span><span class="n">step</span><span class="o">.</span><span class="n">run</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="n">x0</span><span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1"># Wrong: run() executes here, on the loop thread.</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="n">step</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="n">x0</span><span class="p">)</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="c1"># Right: the loop stays free to service the workers.</span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">to_thread</span><span class="p">(</span><span class="n">step</span><span class="o">.</span><span class="n">run</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="n">x0</span><span class="p">)</span>
 </span></code></pre></div>
 <p><code>ropt.simple</code> already does this for you; it applies when driving compute steps
 yourself. A step that dispatches to an executor detects the mistake and raises
@@ -4176,7 +4160,7 @@ or <a class="autorefs autorefs-internal" title="            ropt.components.exec
 subprocess or HPC job has no access to the live loop, executors, or
 dispatcher. An inner
 <a class="autorefs autorefs-internal" title="            ropt.components.evaluators.ParallelEvaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.ParallelEvaluator"><code>ParallelEvaluator</code></a> running
-there would find <code>executor.loop is None</code> and raise
+there would find its executor not running and raise
 <a class="autorefs autorefs-internal" title="            ExecutorStopped" href="../../reference/exceptions/#ropt.exceptions.ExecutorStopped"><code>ExecutorStopped</code></a>, and any events
 it emits would never reach the main-process dispatcher.</p>
 </div>
