@@ -1,4 +1,11 @@
-"""Data classes for storing intermediate optimization results.
+"""The objects a batch evaluation produces.
+
+Every evaluation yields a tuple of [`Results`][ropt.results.Results]: a
+[`FunctionResults`][ropt.results.FunctionResults] for objective and constraint
+values, a [`GradientResults`][ropt.results.GradientResults] for gradient
+estimates, or both. Each is a frozen container of
+[`ResultField`][ropt.results.ResultField] sub-objects holding NumPy arrays with
+axis-name metadata.
 
 See [Working with Results](../running/results.md) for a narrative overview of
 the result hierarchy, axis metadata, scaling, and pandas/polars export.

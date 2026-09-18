@@ -1,9 +1,11 @@
 """Configuration classes for ensemble-based optimization.
 
-The `ropt.config` module provides Pydantic-based configuration classes that
-collectively define a complete optimization setup. These classes are used to
-construct an [`EnOptContext`][ropt.context.EnOptContext] object, which serves
-as the in-memory configuration for a single optimization run.
+Pydantic models that together define a complete optimization setup. Each
+corresponds to a top-level section of the configuration dictionary used to build
+an [`EnOptContext`][ropt.context.EnOptContext], the in-memory configuration of a
+single run. See
+[Configuration Sections](../optimizer_setup/configuration_sections.md) for the
+fields, their defaults and worked examples.
 """
 
 from ._backend_config import BackendConfig

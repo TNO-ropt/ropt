@@ -1,4 +1,4 @@
-"""Enumerations used within the `ropt` library."""
+"""Enumerations used in the configuration, event and result APIs."""
 
 from enum import IntEnum, StrEnum
 

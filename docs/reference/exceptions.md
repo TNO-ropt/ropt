@@ -1,7 +1,5 @@
 # Exceptions
 
-Exception types raised by `ropt`.
-
 ::: ropt.exceptions
     options:
         show_bases: true

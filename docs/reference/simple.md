@@ -49,18 +49,3 @@
 
 ::: ropt.simple.EvaluationFunction
 ::: ropt.simple.ReportCallback
-
-## Re-exported for convenience
-
-These names are re-exported from `ropt.simple` (so simple-API code imports them
-from one place), but they are the low-level classes and are documented with the
-components:
-
-- the evaluation context and result:
-  [`EvaluationFunctionContext`][ropt.components.evaluators.EvaluationFunctionContext],
-  [`EvaluationFunctionResult`][ropt.components.evaluators.EvaluationFunctionResult];
-- the result handlers:
-  [`EventHandler`][ropt.components.event_handlers.EventHandler],
-  [`HistoryHandler`][ropt.components.event_handlers.HistoryHandler],
-  [`ResultsHandler`][ropt.components.event_handlers.ResultsHandler],
-  [`DataFrameHandler`][ropt.components.event_handlers.DataFrameHandler].
