@@ -2,9 +2,9 @@
 
 `ropt` reports its progress through Python's standard
 [`logging`](https://docs.python.org/3/library/logging.html) module. Switching it
-on takes one line and needs no code of your own, which makes it the cheapest way
-to watch a run. To *collect* what a run produces — to keep results, tabulate
-them, or stop a run early — use [result handlers](handlers.md) instead.
+on takes one line and needs no code of your own. To *collect* what a run
+produces — to keep results, tabulate them, or stop a run early — use
+[result handlers](handlers.md) instead.
 
 ## Turning it on
 
