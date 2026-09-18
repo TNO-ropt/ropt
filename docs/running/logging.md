@@ -38,8 +38,8 @@ application adds a destination for it.
 
 **The per-batch counts** appear one per batch of evaluations, and `4/4` means an
 ensemble of 4 evaluations came back with a value. While these keep arriving, the
-run is alive and calling your objective. A `3/4` after a run of `4/4` tells you a
-realization failed; how many failures a run tolerates is set by
+run is alive and calling your objective. A `3/4` after a run of `4/4` indicates a
+failed realization; how many failures a run tolerates is set by
 [`realization_min_success`](../optimizer_setup/configuration_sections.md#realizations).
 
 **A new best objective** is reported each time the run improves on what it had.
@@ -50,9 +50,9 @@ names the [`ExitCode`][ropt.enums.ExitCode] it finished with — the same one
 [When something goes wrong](running.md#when-something-goes-wrong) for what each
 code means.
 
-The name at the start of each line says which part of `ropt` produced it. That
-is worth having in a bug report and rarely otherwise, so leave `%(name)s` out of
-the format string if it is in the way.
+The name at the start of each line identifies the part of `ropt` that produced
+it. That is worth having in a bug report and rarely otherwise, so leave
+`%(name)s` out of the format string if it is in the way.
 
 ## Warnings only
 

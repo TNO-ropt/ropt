@@ -1,9 +1,9 @@
 # Troubleshooting
 
 A `ropt` run keeps going through a failed realization or an infeasible result,
-so it can end without a result to return and without raising an error to say so.
-Check `exit_code` before using what comes back. This page collects the
-behaviours that most often cause confusion.
+so it can end without a result to return and without raising an error. Check
+`exit_code` before using what comes back. This page collects the behaviours that
+most often cause confusion.
 
 Skim it once to know what is here, then come back with a symptom and read the
 table of the section it belongs to.
@@ -14,7 +14,7 @@ table of the section it belongs to.
 [`optimize`][ropt.simple.optimize] returns the best result that satisfies every
 constraint to within `constraint_tolerance`, which defaults to `1e-10` and
 applies to bounds and linear constraints as well as nonlinear ones. If no
-evaluation ever clears that bar, the run ends normally with `result.results`
+evaluation satisfies them, the run ends normally with `result.results`
 set to `None`. The evaluations themselves are not lost: every result, feasible
 or not, still reaches the [handlers](../running/handlers.md) attached to the run.
 
@@ -42,23 +42,23 @@ runs the same problem twice, once with the default and once allowing the
 failure, and prints the exit code and result of each.
 
 **Not everything that goes wrong raises.** Check `exit_code` before using a
-result. The exit code says why the run ended; the result is the best feasible
-evaluation recorded before it did, and is `None` only when there was none. A
-run that fails part-way therefore still hands back what it had reached. See
-[When something goes wrong](../running/running.md#when-something-goes-wrong).
+result. The exit code gives the reason the run ended; the result is the best
+feasible evaluation recorded before it did, and is `None` only when there was
+none. A run that fails part-way therefore still returns what it had reached.
+See [When something goes wrong](../running/running.md#when-something-goes-wrong).
 
 **`OPTIMIZER_FINISHED` does not mean a limit was reached.** It is the exit code
 for every run the backend ended by itself — because it converged, or because it
 reached `max_iterations` or `convergence_tolerance`. Those two live in the
-`backend` section and are enforced by the algorithm, not counted by `ropt`, so a
-run can stop far short of `max_functions` with nothing to say which of them
-applied. Only `MAX_FUNCTIONS_REACHED` and `MAX_BATCHES_REACHED` name a limit
-`ropt` enforced itself.
+`backend` section and are enforced by the algorithm rather than counted by
+`ropt`, so a run can stop far short of `max_functions`, and the exit code does
+not distinguish which of the three applied. Only `MAX_FUNCTIONS_REACHED` and
+`MAX_BATCHES_REACHED` correspond to a limit `ropt` enforced itself.
 
 **A broken machine is an error, not a failed realization.** When the machinery
 itself fails — a worker process is killed, a cluster job never writes its result
-— the run stops with an [`ExecutionError`][ropt.exceptions.ExecutionError] that
-says how many evaluations were lost and why. It is not absorbed as a `NaN`,
+— the run stops with an [`ExecutionError`][ropt.exceptions.ExecutionError] giving
+the number of evaluations lost and the reason. It is not absorbed as a `NaN`,
 because a result computed over the workers that survived is indistinguishable
 from one computed over the whole ensemble.
 
@@ -104,10 +104,11 @@ raises a `TypeError` in the middle of the run.
 surrounding code. A run given no `pool=` evaluates in-process, on the thread that
 called it — even if a session is open next to it.
 
-**Threads cannot be hurried.** Evaluations on a `thread_pool` run to completion
-even after Ctrl-C, because Python cannot interrupt a thread from outside. If an
-evaluation may run long and has to be interruptible, put it on a `local_pool` or
-an `hpc_pool`; see [Stopping a run](../running/parallel.md#stopping-a-run).
+**Threads cannot be interrupted.** Evaluations on a `thread_pool` run to
+completion even after Ctrl-C, because Python cannot interrupt a thread from
+outside. If an evaluation may run long and has to be interruptible, put it on a
+`local_pool` or an `hpc_pool`; see
+[Stopping a run](../running/parallel.md#stopping-a-run).
 
 **A `process_pool` re-imports your script.** Its workers are started with
 `spawn`, so each of them imports the file the run was started from, and
@@ -125,7 +126,7 @@ anything runs. Open the pool inside the block that uses it; see
 | Ctrl-C appears to do nothing | A process-wide signal setting, changed by an imported package. Call [`restore_keyboard_interrupt`][ropt.utils.restore_keyboard_interrupt]; see [Keyboard Interrupts](keyboard_interrupt.md). |
 | The program will not exit after Ctrl-C | Evaluations on a `thread_pool` are still running and cannot be interrupted. |
 | Pages of `multiprocessing` tracebacks, ending in `ExecutionError: Could not start worker processes` | The script has no `if __name__ == "__main__":` guard, so every worker re-ran it from the top. |
-| A `WorkflowError` says the pool is closed | The pool outlived the `with session()` block that created it, or was closed explicitly. |
+| A `WorkflowError` about a closed pool | The pool outlived the `with session()` block that created it, or was closed explicitly. |
 | More workers made everything slower | `numpy` and similar libraries already use every core. Set `OMP_NUM_THREADS=1` and let the pool provide the parallelism; see [Which pool should I use?](../running/parallel.md#which-pool). |
 | Simulators keep running after the run stopped | A `process_pool` kills only its own workers. Use a [`local_pool`](../running/parallel.md#local-pool), which signals the whole process group. |
 | A cluster directive has no effect | The submission script never mentions that variable, or the value was clamped to the queue's limit; see [Running on an HPC cluster](../running/parallel.md#running-on-an-hpc-cluster). |

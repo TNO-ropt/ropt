@@ -57,7 +57,7 @@ cannot put the flag back afterwards without restoring the very problem it was
 called to fix.
 
 There is also no point at which a library could do it reliably. Any import that
-happens later can set the flag again, and `ropt` has no say over when your
+happens later can set the flag again, and `ropt` does not control when your
 program imports things.
 
 So the decision is left where it can actually be made: in the application, by
