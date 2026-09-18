@@ -495,7 +495,7 @@ to the terminal as usual.
     by the optimizer, which belong there, and output from your own threads,
     which does not. Log records are normally left alone, because a handler
     writes to the stream it was given when it was created; see
-    [Logging](../troubleshooting/logging.md#logging-during-an-optimization).
+    [Logging](../running/logging.md#logging-during-an-optimization).
 
 ## `backend` { #backend }
 

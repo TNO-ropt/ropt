@@ -117,6 +117,7 @@ nav:
       - "Running Optimizations": running/running.md
       - "Working with Results": running/results.md
       - "Result Handlers": running/handlers.md
+      - "Logging": running/logging.md
       - "Parallel Execution and Many Runs": running/parallel.md
       - "Nested Optimization": running/nested.md
       - "Restarting from the Best Point": running/restart.md
@@ -135,7 +136,6 @@ nav:
       - "Function Estimators": optimizer_setup/function_estimators.md
   - "Troubleshooting":
       - "Troubleshooting": troubleshooting/index.md
-      - "Logging": troubleshooting/logging.md
       - "Keyboard Interrupts": troubleshooting/keyboard_interrupt.md
   - "Advanced":
       - "Workflows":
