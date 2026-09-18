@@ -183,7 +183,9 @@ The [`AxisName`][ropt.enums.AxisName] enumeration defines:
 | `REALIZATION`          | Index corresponds to the realization number in the ensemble. Present whenever results involve multiple realizations.
 | `PERTURBATION`         | Index corresponds to a perturbation used for gradient estimation. Present in [`GradientEvaluations`][ropt.results.GradientEvaluations] where objectives and constraints are reported for each perturbed variable set.
 
-The dimensionality and order of axes are fixed per field.
+The dimensionality and order of axes are fixed per field. Throughout, $n_v$ is
+the number of variables, $n_o$ of objectives, $n_c$ of nonlinear constraints,
+$n_l$ of linear constraints, $n_r$ of realizations and $n_p$ of perturbations.
 
 **Function results**
 
@@ -192,26 +194,66 @@ The dimensionality and order of axes are fixed per field.
     `variables`: the vector of variable values at which the functions were
     evaluated.
 
-    - Shape $(n_v,)$, where $n_v$ is the number of variables.
+    - Shape $(n_v,)$
     - Axes: [`VARIABLE`][ropt.enums.AxisName.VARIABLE]
+
+=== "Target objective"
+
+    `target_objective`: the single weighted value the optimizer minimizes.
+
+    - Shape $()$ — a 0-D array, so it carries no axes.
 
 === "Objectives"
 
     `evaluations.objectives`: the objective values for each realization, one
     row per realization and one column per objective.
 
-    - Shape $(n_r, n_o)$, where $n_r$ is the number of realizations and $n_o$
-      the number of objectives.
+    - Shape $(n_r, n_o)$
     - Axes: [`REALIZATION`][ropt.enums.AxisName.REALIZATION],
       [`OBJECTIVE`][ropt.enums.AxisName.OBJECTIVE]
+
+    `functions.objectives`: the same values aggregated over the ensemble.
+
+    - Shape $(n_o,)$
+    - Axes: [`OBJECTIVE`][ropt.enums.AxisName.OBJECTIVE]
 
 === "Constraints"
 
     `evaluations.constraints`: the nonlinear constraint values for each
     realization. Only present when nonlinear constraints are configured.
 
-    - Shape $(n_r, n_c)$, where $n_c$ is the number of nonlinear constraints.
+    - Shape $(n_r, n_c)$
     - Axes: [`REALIZATION`][ropt.enums.AxisName.REALIZATION],
+      [`NONLINEAR_CONSTRAINT`][ropt.enums.AxisName.NONLINEAR_CONSTRAINT]
+
+    `functions.constraints`: the same values aggregated over the ensemble.
+
+    - Shape $(n_c,)$
+    - Axes: [`NONLINEAR_CONSTRAINT`][ropt.enums.AxisName.NONLINEAR_CONSTRAINT]
+
+=== "Realizations"
+
+    `realizations.evaluated_realizations`: which realizations were evaluated.
+
+    - Shape $(n_r,)$
+    - Axes: [`REALIZATION`][ropt.enums.AxisName.REALIZATION]
+
+    `realizations.objective_weights` and `realizations.constraint_weights`:
+    per-realization weights, `None` unless a realization filter is configured.
+
+    - Shape $(n_o, n_r)$ and $(n_c, n_r)$
+    - Axes: [`OBJECTIVE`][ropt.enums.AxisName.OBJECTIVE] or
+      [`NONLINEAR_CONSTRAINT`][ropt.enums.AxisName.NONLINEAR_CONSTRAINT], then
+      [`REALIZATION`][ropt.enums.AxisName.REALIZATION]
+
+=== "Constraint info"
+
+    `constraint_info.*`: the differences and violations for each constraint
+    type. Each `bound_`, `linear_` and `nonlinear_` field has one axis.
+
+    - Shapes $(n_v,)$, $(n_l,)$ and $(n_c,)$
+    - Axes: [`VARIABLE`][ropt.enums.AxisName.VARIABLE],
+      [`LINEAR_CONSTRAINT`][ropt.enums.AxisName.LINEAR_CONSTRAINT] or
       [`NONLINEAR_CONSTRAINT`][ropt.enums.AxisName.NONLINEAR_CONSTRAINT]
 
 === "Metadata"
@@ -220,7 +262,7 @@ The dimensionality and order of axes are fixed per field.
     evaluator. Each entry is a one-dimensional array of any type `numpy`
     supports, including objects, so each key may have its own dtype.
 
-    - Shape $(n_r,)$.
+    - Shape $(n_r,)$
     - Axes: [`REALIZATION`][ropt.enums.AxisName.REALIZATION]
 
     An entry whose values are arrays rather than scalars has shape
@@ -231,10 +273,16 @@ The dimensionality and order of axes are fixed per field.
 
 === "Variables"
 
-    `variables`: the vector of unperturbed variable values; `target_gradient`
-    has the same shape and axis.
+    `variables`: the vector of unperturbed variable values.
 
-    - Shape $(n_v,)$.
+    - Shape $(n_v,)$
+    - Axes: [`VARIABLE`][ropt.enums.AxisName.VARIABLE]
+
+=== "Target gradient"
+
+    `target_gradient`: the gradient the optimizer descends.
+
+    - Shape $(n_v,)$
     - Axes: [`VARIABLE`][ropt.enums.AxisName.VARIABLE]
 
 === "Perturbed variables"
@@ -242,7 +290,7 @@ The dimensionality and order of axes are fixed per field.
     `perturbed_variables`: the perturbed variable values for each realization
     and perturbation.
 
-    - Shape $(n_r, n_p, n_v)$, where $n_p$ is the number of perturbations.
+    - Shape $(n_r, n_p, n_v)$
     - Axes: [`REALIZATION`][ropt.enums.AxisName.REALIZATION],
       [`PERTURBATION`][ropt.enums.AxisName.PERTURBATION],
       [`VARIABLE`][ropt.enums.AxisName.VARIABLE]
@@ -252,10 +300,16 @@ The dimensionality and order of axes are fixed per field.
     `evaluations.perturbed_objectives`: the objective values for each
     realization and perturbation.
 
-    - Shape $(n_r, n_p, n_o)$.
+    - Shape $(n_r, n_p, n_o)$
     - Axes: [`REALIZATION`][ropt.enums.AxisName.REALIZATION],
       [`PERTURBATION`][ropt.enums.AxisName.PERTURBATION],
       [`OBJECTIVE`][ropt.enums.AxisName.OBJECTIVE]
+
+    `gradients.objectives`: the gradient estimated from them, per objective.
+
+    - Shape $(n_o, n_v)$
+    - Axes: [`OBJECTIVE`][ropt.enums.AxisName.OBJECTIVE],
+      [`VARIABLE`][ropt.enums.AxisName.VARIABLE]
 
 === "Perturbed constraints"
 
@@ -263,40 +317,41 @@ The dimensionality and order of axes are fixed per field.
     each realization and perturbation. Only present when nonlinear constraints
     are configured.
 
-    - Shape $(n_r, n_p, n_c)$.
+    - Shape $(n_r, n_p, n_c)$
     - Axes: [`REALIZATION`][ropt.enums.AxisName.REALIZATION],
       [`PERTURBATION`][ropt.enums.AxisName.PERTURBATION],
       [`NONLINEAR_CONSTRAINT`][ropt.enums.AxisName.NONLINEAR_CONSTRAINT]
+
+    `gradients.constraints`: the gradient estimated from them, per constraint.
+
+    - Shape $(n_c, n_v)$
+    - Axes: [`NONLINEAR_CONSTRAINT`][ropt.enums.AxisName.NONLINEAR_CONSTRAINT],
+      [`VARIABLE`][ropt.enums.AxisName.VARIABLE]
+
+=== "Realizations"
+
+    `realizations.*`: the same fields and shapes as for function results.
 
 === "Metadata"
 
     `evaluations.metadata`: optional metadata per realization and
     perturbation, each entry a two-dimensional array of any `numpy` type.
 
-    - Shape $(n_r, n_p)$.
+    - Shape $(n_r, n_p)$
     - Axes: [`REALIZATION`][ropt.enums.AxisName.REALIZATION],
       [`PERTURBATION`][ropt.enums.AxisName.PERTURBATION]
 
     An entry of arrays rather than scalars has shape $(n_r, n_p, n_k)$ and a
     third, user-defined axis named after its key.
 
-**Aggregated and ensemble fields**
+**Scaled results**
 
-| Field | Shape | Axes |
-| --- | --- | --- |
-| `functions.objectives` | $(n_o,)$ | `OBJECTIVE` |
-| `functions.constraints` | $(n_c,)$ | `NONLINEAR_CONSTRAINT` |
-| `gradients.objectives` | $(n_o, n_v)$ | `OBJECTIVE`, `VARIABLE` |
-| `gradients.constraints` | $(n_c, n_v)$ | `NONLINEAR_CONSTRAINT`, `VARIABLE` |
-| `realizations.evaluated_realizations` | $(n_r,)$ | `REALIZATION` |
-| `realizations.objective_weights` | $(n_o, n_r)$ | `OBJECTIVE`, `REALIZATION` |
-| `realizations.constraint_weights` | $(n_c, n_r)$ | `NONLINEAR_CONSTRAINT`, `REALIZATION` |
-| `constraint_info.bound_*` | $(n_v,)$ | `VARIABLE` |
-| `constraint_info.linear_*` | $(n_l,)$ | `LINEAR_CONSTRAINT` |
-| `constraint_info.nonlinear_*` | $(n_c,)$ | `NONLINEAR_CONSTRAINT` |
-
-Here $n_l$ is the number of linear constraints; the other symbols are as listed
-under [What each field holds](#what-each-field-holds).
+[`ScaledFunctionResults`][ropt.results.ScaledFunctionResults] and
+[`ScaledGradientResults`][ropt.results.ScaledGradientResults] repeat a subset of
+the fields above in the optimizer's domain, with identical shapes and axes:
+`variables`, `functions` and `constraint_info` for the first, and `variables`,
+`perturbed_variables` and `gradients` for the second. See
+[Scaling of results](#scaling-of-results).
 
 ### User-defined axes
 
