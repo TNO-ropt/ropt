@@ -3006,7 +3006,8 @@ best point the previous run found.</p>
 <h2 id="why-restart">Why restart?</h2>
 <p>A single optimization run can stop before truly converging — for example
 because it hit its iteration limit while still improving. Restarting simply
-runs <code>optimize</code> again, using the previous result as the new start point. Since
+runs <a class="autorefs autorefs-internal" title="            ropt.simple.optimize" href="../../reference/simple/#ropt.simple.optimize"><code>optimize</code></a> again, using the previous result as the
+new start point. Since
 each call to <code>optimize</code> is independent, this is just a loop in your own code;
 <code>ropt</code> needs nothing special to support it.</p>
 <h2 id="collecting-every-result-with-a-handler">Collecting every result with a handler</h2>

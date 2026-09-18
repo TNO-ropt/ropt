@@ -2977,12 +2977,24 @@
 
 
 <h1 id="collecting-results-with-handlers">Collecting Results with Handlers</h1>
-<p>So far, <code>optimize</code> returned only the single best result. In many cases you want
+<p>So far, <a class="autorefs autorefs-internal" title="            ropt.simple.optimize" href="../../reference/simple/#ropt.simple.optimize"><code>optimize</code></a> returned only the single best result.
+In many cases you want
 to see every result to watch progress over the optimization. A <strong>handler</strong> does
 this: an object you attach with a <code>handlers=</code> argument that observes every
 result an optimization produces.</p>
-<p>What it collects are the full result objects — <code>FunctionResults</code> and
-<code>GradientResults</code> — rather than the summary <code>optimize</code> returns; see
+<p>What it collects are the full result objects —
+<a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="../../reference/results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> and
+<a class="autorefs autorefs-internal" title="            ropt.results.GradientResults
+
+
+  
+      dataclass
+  " href="../../reference/results/#ropt.results.GradientResults"><code>GradientResults</code></a> — rather than the summary <code>optimize</code> returns; see
 <a href="../../running/results/">Working with Results</a>.</p>
 <h2 id="a-handler-that-collects-everything">A handler that collects everything</h2>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.simple</span><span class="w"> </span><span class="kn">import</span> <span class="n">HistoryHandler</span><span class="p">,</span> <span class="n">optimize</span>
@@ -3016,10 +3028,10 @@ which <a href="../../running/restart/">Restarting from the Best Point</a> walks 
 <h2 id="other-built-in-handlers">Other built-in handlers</h2>
 <p><code>ropt</code> ships a few ready-to-use handlers, all imported from <code>ropt.simple</code>:</p>
 <ul>
-<li><strong><code>HistoryHandler</code></strong> — keeps every result, as used above.</li>
-<li><strong><code>ResultsHandler</code></strong> — keeps only one result: the best seen so far
+<li><strong><a class="autorefs autorefs-internal" title="            ropt.simple.HistoryHandler" href="../../reference/simple/#ropt.simple.HistoryHandler"><code>HistoryHandler</code></a></strong> — keeps every result, as used above.</li>
+<li><strong><a class="autorefs autorefs-internal" title="            ropt.simple.ResultsHandler" href="../../reference/simple/#ropt.simple.ResultsHandler"><code>ResultsHandler</code></a></strong> — keeps only one result: the best seen so far
   (default), or the most recent.</li>
-<li><strong><code>DataFrameHandler</code></strong> — collects results into a <code>pandas</code> or <code>polars</code> table.</li>
+<li><strong><a class="autorefs autorefs-internal" title="            ropt.simple.DataFrameHandler" href="../../reference/simple/#ropt.simple.DataFrameHandler"><code>DataFrameHandler</code></a></strong> — collects results into a <code>pandas</code> or <code>polars</code> table.</li>
 </ul>
 <p>See <a href="../../running/handlers/">Result handlers</a> for the full
 list, and how to write your own.</p>

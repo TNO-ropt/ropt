@@ -3485,8 +3485,10 @@ evaluator to a compute step (see <a href="../workflows/">Optimization Workflows<
 <h2 id="using-cachedevaluator">Using <code>CachedEvaluator</code></h2>
 <p><a class="autorefs autorefs-internal" title="            ropt.components.evaluators.CachedEvaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.CachedEvaluator"><code>CachedEvaluator</code></a> wraps another
 evaluator with result caching. It retrieves previously computed function results
-from <code>EventHandler</code> instances specified as <code>sources</code> — typically a
-<code>HistoryHandler</code> or <code>ResultsHandler</code>. For each variable vector and realization,
+from <a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventHandler" href="../../reference/components_event_handlers/#ropt.components.event_handlers.EventHandler"><code>EventHandler</code></a> instances
+specified as <code>sources</code> — typically a
+<a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.HistoryHandler" href="../../reference/components_event_handlers/#ropt.components.event_handlers.HistoryHandler"><code>HistoryHandler</code></a> or
+<a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.ResultsHandler" href="../../reference/components_event_handlers/#ropt.components.event_handlers.ResultsHandler"><code>ResultsHandler</code></a>. For each variable vector and realization,
 if a matching cached result is found, the cached objectives and constraints are
 reused without calling the wrapped evaluator. Only uncached evaluations are
 forwarded to the underlying evaluator.</p>

@@ -3131,7 +3131,18 @@ them, tabulating them, or invoking a callback.</p>
   
       dataclass
   " href="../../reference/results/#ropt.results.Results"><code>Results</code></a> objects —
-<code>FunctionResults</code> and <code>GradientResults</code> — which is what every other part of the
+<a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="../../reference/results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> and
+<a class="autorefs autorefs-internal" title="            ropt.results.GradientResults
+
+
+  
+      dataclass
+  " href="../../reference/results/#ropt.results.GradientResults"><code>GradientResults</code></a> — which is what every other part of the
 simple API hands out too: a <code>report</code> callback receives one per evaluation, and
 <code>optimize</code> puts the best one on the <code>results</code> field of what it returns.
 Everything a run produces is in them, at the field paths described in
@@ -3216,7 +3227,8 @@ completion while its results go nowhere.</p>
 <div class="admonition warning">
 <p class="admonition-title">Reach for a shared group only for real concurrency</p>
 <p>A group routes every run's events through a single, serialized
-<code>EventDispatcher</code> on a background loop. That serialization is what makes a
+<a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventDispatcher" href="../../reference/components_event_handlers/#ropt.components.event_handlers.EventDispatcher"><code>EventDispatcher</code></a> on a
+background loop. That serialization is what makes a
 handler safe to share across <em>concurrent</em> runs — but around a plain
 <strong>sequential</strong> loop it adds cost without benefit: a background loop plus a
 cross-thread hand-off per result. Prefer a reused local handler for

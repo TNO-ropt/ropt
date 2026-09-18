@@ -3202,7 +3202,7 @@ anything runs. Open the pool inside the block that uses it; see
 <td>The script has no <code>if __name__ == "__main__":</code> guard, so every worker re-ran it from the top.</td>
 </tr>
 <tr>
-<td>A <code>WorkflowError</code> about a closed pool</td>
+<td>A <a class="autorefs autorefs-internal" title="            WorkflowError" href="../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a> about a closed pool</td>
 <td>The pool outlived the <code>with session()</code> block that created it, or was closed explicitly.</td>
 </tr>
 <tr>

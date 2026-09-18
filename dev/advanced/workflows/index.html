@@ -3730,7 +3730,8 @@ There are two ways to drive one, and they are mutually exclusive:</p>
 <p><strong>Registered with an
   <a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventDispatcher" href="../../reference/components_event_handlers/#ropt.components.event_handlers.EventDispatcher"><code>EventDispatcher</code></a>.</strong> When work
   runs on several threads at once (for example, <code>ParallelEvaluator</code> with a
-  multi-worker <code>ThreadExecutor</code>), route events through a dispatcher. It
+  multi-worker <a class="autorefs autorefs-internal" title="            ropt.components.executors.ThreadExecutor" href="../../reference/components_executors/#ropt.components.executors.ThreadExecutor"><code>ThreadExecutor</code></a>),
+  route events through a dispatcher. It
   receives events from any thread and delivers them to its handlers one at a
   time, so a single handler can safely aggregate results produced on many
   threads. See <a href="#event-dispatcher">Event dispatcher</a> for the pattern.</p>
