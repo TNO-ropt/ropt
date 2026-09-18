@@ -1,8 +1,8 @@
 # Troubleshooting
 
-`ropt` tries to keep a run going rather than stop it at the first sign of
-trouble. That is usually what you want, but it means a run can end without a
-result to return, and without raising an error to say so. This page collects the
+A `ropt` run keeps going through a failed realization or an infeasible result,
+so it can end without a result to return and without raising an error to say so.
+Check `exit_code` before using what comes back. This page collects the
 behaviours that most often cause confusion.
 
 Skim it once to know what is here, then come back with a symptom and read the
@@ -19,8 +19,8 @@ set to `None`. The evaluations themselves are not lost: every result, feasible
 or not, still reaches the [handlers](../running/handlers.md) attached to the run.
 
 **The return value is a summary, not the record of the run.** It holds a single
-result, the best feasible evaluation. Most analysis works from the whole history
-instead: attach a [`HistoryHandler`][ropt.simple.HistoryHandler] or a
+result, the best feasible evaluation. The whole history is available instead:
+attach a [`HistoryHandler`][ropt.simple.HistoryHandler] or a
 [`DataFrameHandler`][ropt.simple.DataFrameHandler] to collect every result as it
 arrives. That history is also what remains when there is no best result to
 return.
@@ -47,6 +47,14 @@ evaluation recorded before it did, and is `None` only when there was none. A
 run that fails part-way therefore still hands back what it had reached. See
 [When something goes wrong](../running/running.md#when-something-goes-wrong).
 
+**`OPTIMIZER_FINISHED` does not mean a limit was reached.** It is the exit code
+for every run the backend ended by itself — because it converged, or because it
+reached `max_iterations` or `convergence_tolerance`. Those two live in the
+`backend` section and are enforced by the algorithm, not counted by `ropt`, so a
+run can stop far short of `max_functions` with nothing to say which of them
+applied. Only `MAX_FUNCTIONS_REACHED` and `MAX_BATCHES_REACHED` name a limit
+`ropt` enforced itself.
+
 **A broken machine is an error, not a failed realization.** When the machinery
 itself fails — a worker process is killed, a cluster job never writes its result
 — the run stops with an [`ExecutionError`][ropt.exceptions.ExecutionError] that
@@ -58,6 +66,7 @@ from one computed over the whole ensemble.
 | --- | --- |
 | `result.results` is `None`, but `exit_code` is `OPTIMIZER_FINISHED` | No evaluation satisfied the constraints to within `constraint_tolerance` (default `1e-10`; bounds and linear constraints count too), so there is no best feasible result to return. The evaluations are still in the handlers. Raise the tolerance, or check that the constraints can be satisfied at all. |
 | `TOO_FEW_REALIZATIONS` although only one realization failed | [`realization_min_success`](../optimizer_setup/configuration_sections.md#realizations) defaults to all of them. Lower it. |
+| The run stopped long before `max_functions`, with `OPTIMIZER_FINISHED` | The backend ended it: `max_iterations`, `convergence_tolerance`, or its own convergence test. Those are set in the `backend` section; see [Limiting the length of a run](../optimizer_setup/optimizer.md#limiting-the-length-of-a-run). |
 | `ExecutionError` part-way through a run | The machinery failed, not your objective. The message names the reason and how many evaluations went with it. |
 | Numbers do not match what you configured | Results carry the configured values and the optimizer's scaled ones side by side; see [Scaling of results](../running/results.md#scaling-of-results). |
 
@@ -117,7 +126,7 @@ anything runs. Open the pool inside the block that uses it; see
 | The program will not exit after Ctrl-C | Evaluations on a `thread_pool` are still running and cannot be interrupted. |
 | Pages of `multiprocessing` tracebacks, ending in `ExecutionError: Could not start worker processes` | The script has no `if __name__ == "__main__":` guard, so every worker re-ran it from the top. |
 | A `WorkflowError` says the pool is closed | The pool outlived the `with session()` block that created it, or was closed explicitly. |
-| More workers made everything slower | `numpy` and friends already use every core. Set `OMP_NUM_THREADS=1` and let the pool provide the parallelism; see [Which pool should I use?](../running/parallel.md#which-pool). |
+| More workers made everything slower | `numpy` and similar libraries already use every core. Set `OMP_NUM_THREADS=1` and let the pool provide the parallelism; see [Which pool should I use?](../running/parallel.md#which-pool). |
 | Simulators keep running after the run stopped | A `process_pool` kills only its own workers. Use a [`local_pool`](../running/parallel.md#local-pool), which signals the whole process group. |
 | A cluster directive has no effect | The submission script never mentions that variable, or the value was clamped to the queue's limit; see [Running on an HPC cluster](../running/parallel.md#running-on-an-hpc-cluster). |
 

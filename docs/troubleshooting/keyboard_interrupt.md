@@ -67,8 +67,8 @@ someone who knows whether the trade matters.
 
 It calls `signal.siginterrupt(signal.SIGINT, True)`, which clears the flag and
 does nothing else. In particular it does **not** replace the `SIGINT` handler,
-so a package that chained its own keeps working — which is why this is the right
-call and `signal.signal` is not.
+so a package that chained its own keeps working; `signal.signal` would replace
+it.
 
 It is a one-way switch on purpose. There is no context-manager form, because
 restoring the flag on exit would restore the hang, and a clear flag is CPython's
