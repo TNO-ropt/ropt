@@ -14,7 +14,8 @@ inner optimization over the remaining ones, returning the best value it reached.
     layer to a cluster by changing a single line.
 
 Nothing in `ropt` is dedicated to this: the outer evaluation function simply
-calls `optimize` itself. What needs care is the plumbing around it — which
+calls [`optimize`][ropt.simple.optimize] itself. What needs care is the plumbing
+around it — which
 variables each layer owns, which pool each layer evaluates on, and how to get
 the results out.
 

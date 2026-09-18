@@ -6,7 +6,8 @@ that observes an optimization and processes its results as they arrive — keepi
 them, tabulating them, or invoking a callback.
 
 A handler is given [`Results`][ropt.results.Results] objects —
-`FunctionResults` and `GradientResults` — which is what every other part of the
+[`FunctionResults`][ropt.results.FunctionResults] and
+[`GradientResults`][ropt.results.GradientResults] — which is what every other part of the
 simple API hands out too: a `report` callback receives one per evaluation, and
 `optimize` puts the best one on the `results` field of what it returns.
 Everything a run produces is in them, at the field paths described in
@@ -105,7 +106,8 @@ completion while its results go nowhere.
 
 !!! warning "Reach for a shared group only for real concurrency"
     A group routes every run's events through a single, serialized
-    `EventDispatcher` on a background loop. That serialization is what makes a
+    [`EventDispatcher`][ropt.components.event_handlers.EventDispatcher] on a
+    background loop. That serialization is what makes a
     handler safe to share across *concurrent* runs — but around a plain
     **sequential** loop it adds cost without benefit: a background loop plus a
     cross-thread hand-off per result. Prefer a reused local handler for

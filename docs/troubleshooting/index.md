@@ -126,7 +126,7 @@ anything runs. Open the pool inside the block that uses it; see
 | Ctrl-C appears to do nothing | A process-wide signal setting, changed by an imported package. Call [`restore_keyboard_interrupt`][ropt.utils.restore_keyboard_interrupt]; see [Keyboard Interrupts](keyboard_interrupt.md). |
 | The program will not exit after Ctrl-C | Evaluations on a `thread_pool` are still running and cannot be interrupted. |
 | Pages of `multiprocessing` tracebacks, ending in `ExecutionError: Could not start worker processes` | The script has no `if __name__ == "__main__":` guard, so every worker re-ran it from the top. |
-| A `WorkflowError` about a closed pool | The pool outlived the `with session()` block that created it, or was closed explicitly. |
+| A [`WorkflowError`][ropt.exceptions.WorkflowError] about a closed pool | The pool outlived the `with session()` block that created it, or was closed explicitly. |
 | More workers made everything slower | `numpy` and similar libraries already use every core. Set `OMP_NUM_THREADS=1` and let the pool provide the parallelism; see [Which pool should I use?](../running/parallel.md#which-pool). |
 | Simulators keep running after the run stopped | A `process_pool` kills only its own workers. Use a [`local_pool`](../running/parallel.md#local-pool), which signals the whole process group. |
 | A cluster directive has no effect | The submission script never mentions that variable, or the value was clamped to the queue's limit; see [Running on an HPC cluster](../running/parallel.md#running-on-an-hpc-cluster). |

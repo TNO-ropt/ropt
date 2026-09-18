@@ -1,12 +1,14 @@
 # Collecting Results with Handlers
 
-So far, `optimize` returned only the single best result. In many cases you want
+So far, [`optimize`][ropt.simple.optimize] returned only the single best result.
+In many cases you want
 to see every result to watch progress over the optimization. A **handler** does
 this: an object you attach with a `handlers=` argument that observes every
 result an optimization produces.
 
-What it collects are the full result objects — `FunctionResults` and
-`GradientResults` — rather than the summary `optimize` returns; see
+What it collects are the full result objects —
+[`FunctionResults`][ropt.results.FunctionResults] and
+[`GradientResults`][ropt.results.GradientResults] — rather than the summary `optimize` returns; see
 [Working with Results](../running/results.md).
 
 ## A handler that collects everything
@@ -51,10 +53,10 @@ which [Restarting from the Best Point](../running/restart.md) walks through.
 
 `ropt` ships a few ready-to-use handlers, all imported from `ropt.simple`:
 
-- **`HistoryHandler`** — keeps every result, as used above.
-- **`ResultsHandler`** — keeps only one result: the best seen so far
+- **[`HistoryHandler`][ropt.simple.HistoryHandler]** — keeps every result, as used above.
+- **[`ResultsHandler`][ropt.simple.ResultsHandler]** — keeps only one result: the best seen so far
   (default), or the most recent.
-- **`DataFrameHandler`** — collects results into a `pandas` or `polars` table.
+- **[`DataFrameHandler`][ropt.simple.DataFrameHandler]** — collects results into a `pandas` or `polars` table.
 
 See [Result handlers](../running/handlers.md) for the full
 list, and how to write your own.

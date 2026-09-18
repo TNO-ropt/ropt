@@ -259,8 +259,10 @@ evaluator = FunctionEvaluator(function=my_function)
 
 [`CachedEvaluator`][ropt.components.evaluators.CachedEvaluator] wraps another
 evaluator with result caching. It retrieves previously computed function results
-from `EventHandler` instances specified as `sources` — typically a
-`HistoryHandler` or `ResultsHandler`. For each variable vector and realization,
+from [`EventHandler`][ropt.components.event_handlers.EventHandler] instances
+specified as `sources` — typically a
+[`HistoryHandler`][ropt.components.event_handlers.HistoryHandler] or
+[`ResultsHandler`][ropt.components.event_handlers.ResultsHandler]. For each variable vector and realization,
 if a matching cached result is found, the cached objectives and constraints are
 reused without calling the wrapped evaluator. Only uncached evaluations are
 forwarded to the underlying evaluator.

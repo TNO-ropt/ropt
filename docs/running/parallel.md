@@ -6,7 +6,8 @@ go through a **pool**, opened from a [`session`][ropt.simple.session].
 
 ## Running in parallel
 
-By default `optimize` runs on the calling thread, one evaluation at a time. To
+By default [`optimize`][ropt.simple.optimize] runs on the calling thread, one
+evaluation at a time. To
 run the evaluations in parallel, open a [`session`][ropt.simple.session], ask it
 for a **pool**, and pass that pool to the run. [Running in
 Parallel](../getting_started/execution.md) introduces the five kinds; this page

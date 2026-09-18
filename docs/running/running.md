@@ -22,7 +22,7 @@ optimization. Everything you need is imported from a single module:
 from ropt.simple import optimize
 ```
 
-You give `optimize` three things:
+You give [`optimize`][ropt.simple.optimize] three things:
 
 - a **config** dictionary that describes the problem,
 - a **start point** (the first set of variable values),

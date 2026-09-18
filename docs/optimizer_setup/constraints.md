@@ -69,7 +69,7 @@ Because the constraint is computed per realization and uses `A[r]`, it is
 
 ## Deciding when a constraint is satisfied
 
-A constraint is rarely met exactly, so `optimize` takes a
+A constraint is rarely met exactly, so [`optimize`][ropt.simple.optimize] takes a
 `constraint_tolerance`: a result counts as feasible when no constraint is
 violated by more than that amount.
 

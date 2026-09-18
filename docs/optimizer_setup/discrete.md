@@ -34,7 +34,8 @@ section selects `differential_evolution`, the only method that will respect
 that; and `lower_bounds` / `upper_bounds` are mandatory, because that method
 searches within a box rather than stepping from a start point.
 
-`VariableType` comes from `ropt.enums`, not from `ropt.simple`:
+[`VariableType`][ropt.enums.VariableType] comes from `ropt.enums`, not from
+`ropt.simple`:
 
 ```python
 from ropt.enums import VariableType
@@ -64,7 +65,8 @@ an ensemble Rosenbrock problem, keeping two continuous and two integer:
 --8<-- "examples/simple/mixed.py:config"
 ```
 
-Nothing else changes. The realizations, the objective and the call to `optimize`
+Nothing else changes. The realizations, the objective and the call to
+[`optimize`][ropt.simple.optimize]
 are the same as in [Ensemble-Based Optimization](../getting_started/ensemble.md)
 — being partly discrete is a property of the variables, not of the problem
 around them.

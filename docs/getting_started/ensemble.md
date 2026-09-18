@@ -105,7 +105,8 @@ robust objective, which is what it optimizes.
 
 ## 6. Read the result
 
-`optimize` returns an [`OptimizationResult`][ropt.simple.OptimizationResult]:
+[`optimize`][ropt.simple.optimize] returns an
+[`OptimizationResult`][ropt.simple.OptimizationResult]:
 
 ```python
 --8<-- "examples/simple/ensemble.py:result"
