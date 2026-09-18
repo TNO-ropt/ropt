@@ -49,23 +49,19 @@ def _equality_flags(
 
 
 class EnOptContext(BaseModel):
-    """The primary context object for a single optimization run.
+    """The validated configuration of a single optimization run.
 
-    `EnOptContext` holds all information needed to run an ensemble-based
-    optimization: variables, objectives, constraints, realizations, gradient
-    settings, samplers, filters, and the optimizer/backend. It is constructed
-    from plain Python dicts or config objects and validated on creation.
+    Holds the variables, objectives, constraints, realizations, gradient
+    settings, samplers, filters, optimizer and backend that a run needs. It is
+    built from plain dictionaries or configuration objects and validated on
+    creation.
 
-    See the [Configuration guide](../optimizer_setup/configuration.md)
-    for an in-depth description of broadcasting rules, index-based sharing of
-    plugin instances, the `names` attribute, and how dicts are resolved into
-    plugin instances.
+    See [Configuration](../optimizer_setup/configuration.md).
 
     Warning:
-        `EnOptContext` objects are immutable after construction. Do not attempt
-        to serialize and round-trip them (for example to and from JSON): `numpy` arrays
-        and plugin instances cannot survive a round-trip faithfully. Persist the
-        raw input dicts instead.
+        Construction scales several settings in a way that cannot be undone.
+        Treat a context as read-only afterwards, and do not rebuild one from
+        serialized field values; persist the raw input dictionaries instead.
 
     Attributes:
         variables:                       Variable settings.
