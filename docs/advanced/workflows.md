@@ -8,34 +8,23 @@
     [Optimizer Setup](../optimizer_setup/key_concepts.md), the same whichever way you run
     it.
 
-The [simple API](../running/running.md) covers the common case with a single
-call: one optimization run, one evaluator, results returned when it finishes. The
-workflow components documented here are the layer beneath it — the same building
-blocks the simple API is assembled from, exposed directly.
+The workflow components are the layer beneath the
+[simple API](../running/running.md) — the compute steps, event handlers,
+evaluators and executors its convenience functions are assembled from, exposed
+directly. Everything those functions do is available here, along with the cases
+they cannot express; the cost is that you wire it together yourself.
 
-**When to use them.** Parallel execution, nested optimization, composing
-several runs, and custom event handlers are all already available through the
-simple API's convenience functions (`optimize`, `optimize_many`, `evaluate`,
-`evaluate_many`). The workflow components are the underlying building blocks
-those functions are assembled from — compute steps, event handlers, executors
-— exposed directly for full flexibility. Wiring one together by hand takes
-more code, but that code is where the extra flexibility lives: these
-components can express applications the simple API cannot.
-
-**Who this is for.** This is the low-level API, and it assumes you are
-comfortable with `asyncio` and threads. Parallel execution runs on an event
-loop, event handlers may be invoked from several threads at once, and you are
-responsible for respecting the concurrency and process-boundary rules spelled out
-on these pages. Those rules are real limitations, not incidental detail: ignore
-them and a workflow will raise rather than silently misbehave. In return you get
-control that the simple API deliberately hides.
+These pages assume `asyncio` and threads. Parallel execution runs on an event
+loop and event handlers may be invoked from several threads at once, so the
+concurrency and process-boundary rules stated here are binding: breaking one
+raises rather than misbehaving silently.
 
 !!! note "Embedding `ropt` in a host application"
 
     If you are building an application that already has its own batch-oriented
-    evaluation infrastructure — for example dispatching a whole ensemble of
-    runs to an external scheduler at once, the way [Everest](https://github.com/equinor/everest)
-    does — assembling these components by hand is not the only option.
+    evaluation infrastructure — dispatching a whole ensemble of runs to an
+    external scheduler at once, say — assembling these components by hand is
+    not the only option.
     [`BasicOptimizer`][ropt.workflow.BasicOptimizer] wraps a single
     `OptimizationStep` and a `ResultsHandler` into a ready-made, run-once driver
     that takes a batch evaluator directly. See the
@@ -52,6 +41,8 @@ There are four core workflow components:
 
 The first three are covered below. Executors are only relevant for asynchronous
 and parallel execution and are discussed in [Parallel Evaluation](parallel.md).
+Writing your own implementation of any of the four is covered in
+[Implementing a Component](components.md).
 
 Compute steps emit [`EnOptEvent`][ropt.events.EnOptEvent] objects at key
 points during execution — for instance when an evaluation starts or finishes.
@@ -268,7 +259,7 @@ There are two ways to drive one, and they are mutually exclusive:
   multi-worker `ThreadExecutor`), route events through a dispatcher. It
   receives events from any thread and delivers them to its handlers one at a
   time, so a single handler can safely aggregate results produced on many
-  threads. See [Event Dispatcher](parallel.md#event-dispatcher) for the pattern.
+  threads. See [Event dispatcher](#event-dispatcher) for the pattern.
 
 A handler is owned by **either** one dispatcher **or** one-or-more compute
 steps — never both — and may be registered with **at most one** dispatcher.
@@ -285,7 +276,7 @@ Mixing the two, or registering with a second dispatcher, raises a
     re-raised on that run's own stack too — synchronously, including for the
     run's last event. Either way a handler bug surfaces as a single, clean
     exception — never a `BaseExceptionGroup`. See
-    [Handler failures](parallel.md#handler-failures) for details.
+    [Handler failures](#handler-failures) for details.
 
 !!! warning "Do not share a handler across parallel steps"
 
@@ -361,7 +352,150 @@ attached to a compute step and forwards matching events to an
 dispatches them from the asyncio event loop's thread, so handlers registered on
 the dispatcher require no locking.
 
-See [Event Dispatcher](parallel.md#event-dispatcher) for the full pattern.
+## Event dispatcher
+
+When multiple compute steps run concurrently in worker threads, their event
+handlers are called from multiple threads simultaneously. **Event handlers must
+not be shared across concurrent compute steps**: doing so raises a
+[`WorkflowError`][ropt.exceptions.WorkflowError].
+
+[`EventDispatcher`][ropt.components.event_handlers.EventDispatcher] is the
+required solution: it receives events on a queue and dispatches them to its own
+handlers from the asyncio event loop's thread. Because all handler calls happen
+on a single thread, handlers registered on the dispatcher are safe even when
+events arrive from multiple concurrent steps.
+
+This is especially useful when one set of handlers needs to aggregate results
+from multiple concurrent compute steps.
+
+`EventDispatcher` follows the same lifecycle as executors:
+
+```python
+async with asyncio.TaskGroup() as tg:
+    executor = ThreadExecutor(workers=4)
+    await executor.start(tg)
+
+    event_dispatcher = EventDispatcher()
+    await event_dispatcher.start(tg)
+
+    # Attach an EventForwardHandler to the compute step.
+    step.add_event_handler(
+        EventForwardHandler(
+            event_dispatcher,
+            event_types={EnOptEventType.FINISHED_EVALUATION},
+        )
+    )
+
+    # Handlers registered on the dispatcher need no locking.
+    result_handler = ResultsHandler()
+    event_dispatcher.add_event_handler(result_handler)
+
+    await asyncio.to_thread(step.run, variables=..., context=...)
+
+    event_dispatcher.cancel()
+    executor.cancel()
+```
+
+[`EventForwardHandler`][ropt.components.event_handlers.EventForwardHandler] is a
+regular event handler that can be attached to a compute step. When the step
+emits an event it submits the event to the dispatcher and **blocks on the
+emitting run's own thread until every handler has processed it**, preserving the
+order in which events are submitted. If a handler raises, the original exception
+is re-raised there, on the run's stack (see [Handler failures](#handler-failures)).
+
+!!! warning "Event handling is a single-process mechanism"
+
+    An [`EventDispatcher`][ropt.components.event_handlers.EventDispatcher] and
+    every [`EventHandler`][ropt.components.event_handlers.EventHandler] live in
+    the process that created them. `EventForwardHandler` delivers events by
+    calling the dispatcher's `dispatch_event`, which schedules them onto its
+    event loop with `call_soon_threadsafe` — a *thread*-safe call, not a
+    *process*-safe one. A dispatcher reached from another process has no live
+    loop, so a forwarded event cannot arrive.
+
+    Event handlers can therefore only observe events emitted **within their own
+    process**. Any compute step executed out-of-process — for example a whole
+    optimization sent to a
+    [`ProcessExecutor`][ropt.components.executors.ProcessExecutor]
+    or [`HPCExecutor`][ropt.components.executors.HPCExecutor], whether as a work
+    item of its own or as the enclosing layer
+    of a nested workflow — may attach handlers local to that worker process,
+    but those handlers cannot deliver events to a dispatcher or handler in the
+    host process. To collect information from out-of-process steps, return it as
+    data (the task's return value, or result metadata) rather than through
+    shared handlers.
+
+    This is why process- and HPC-based parallelism belongs at the innermost
+    (leaf) evaluations — which return data and emit no events — while any layer
+    that drives event-producing compute steps must run in-process. See
+    [Nested workflows and process boundaries](parallel.md#nested-workflows-and-process-boundaries).
+
+### Handler failures
+
+Forwarding an event through an
+[`EventForwardHandler`][ropt.components.event_handlers.EventForwardHandler] is
+**synchronous**: the emitting run blocks until the dispatcher has run every
+handler for that event. A handler failure is therefore delivered like an
+evaluation error — on the emitting run's own call stack — and splits
+`Exception` from `BaseException` exactly as the executor does:
+
+- An ordinary `Exception` from a handler is **re-raised on the emitting run's
+  stack**, unwrapped — a single, clean exception that stops the run normally,
+  exactly as if a directly-attached handler had raised inline. It is logged
+  (with the handler and the event type) as it is caught. Because emission is
+  synchronous, this covers the run's **last** event too; nothing is deferred or
+  lost. Every handler for the event still runs before the error surfaces; if
+  several fail, the first (in registration order) is raised.
+- A `BaseException` (such as `CancelledError`) is **not** delivered this way: it
+  remains the session teardown backstop and propagates, tearing the dispatcher
+  task group down, as with the executor.
+
+### Thread-based dispatch
+
+By default, handlers registered with `EventDispatcher` are called directly in
+the asyncio event loop's thread. This is efficient for handlers that only do
+in-memory work, such as `ResultsHandler` or `HistoryHandler`.
+
+If a handler performs blocking operations — writing results to a file, pushing
+data to a database, sending over a network — pass `run_in_thread=True` when
+registering it:
+
+```python
+event_dispatcher.add_event_handler(my_handler, run_in_thread=True)
+```
+
+`CallbackHandler` and `DataFrameHandler` (when a slow callback is set via
+`set_callback`) are common cases where this is needed. When multiple handlers
+with `run_in_thread=True` match the same event they are dispatched **in
+parallel** via `asyncio.gather` — they do not block each other.
+
+### Event throughput
+
+A dispatcher processes its queue **one event at a time**: all handlers for an
+event finish before the next event is taken. `run_in_thread=True` moves a
+blocking handler off the event loop, but it does not overlap that handler with
+the handlers of any *other* event — only with the threaded handlers of the same
+event.
+
+This serialization is deliberate.
+[`EventHandler`][ropt.components.event_handlers.EventHandler] is not re-entrant,
+and a handler shared by concurrently running optimizations — one accumulating
+results across all of them, say — needs exactly this guarantee to stay
+lock-free.
+
+The price is that handler cost scales with the *total* number of events across
+all runs sharing the dispatcher, and is paid on the critical path of every
+event. Measured with eight concurrent runs emitting five events each, sharing
+one dispatcher and one handler that blocks for 50 ms: **2.02 s elapsed**,
+against 2.00 s for fully serial execution and 0.25 s if the handlers had run
+fully concurrently — never more than one handler thread active at a time.
+
+Runs share a dispatcher when they share a handler scope, which is the normal
+case for [`optimize_many`][ropt.simple.optimize_many]: it reads the current
+handler scope once on the calling thread and gives the same one to every job.
+An N-way `optimize_many` therefore pays its handler cost serially. Keep shared
+handlers cheap; if one must do heavy I/O, buffer in memory and flush once the
+runs have finished.
 
 ## Evaluators
 
@@ -372,8 +506,3 @@ in [Writing Evaluation Callbacks](evaluation_callbacks.md). For parallel,
 process-based, or HPC evaluation, see
 [`ParallelEvaluator`][ropt.components.evaluators.ParallelEvaluator] in
 [Parallel Evaluation](parallel.md).
-
-## See also
-
-- [Building a Workflow](../advanced/workflow.md) — step-by-step
-  example building a workflow from scratch.

@@ -105,7 +105,7 @@ affected.
     a separate process. If such a work item runs a compute step, that step's
     event handlers stay in the worker process and cannot deliver events to a
     dispatcher or handler in the host process — return results as data instead.
-    See [Event handling is a single-process mechanism](#event-dispatcher).
+    See [Event handling is a single-process mechanism](workflows.md#event-dispatcher).
 
 Four implementations are provided:
 
@@ -290,14 +290,6 @@ disk, submitted to the queue, polled for completion, and its result is
 deserialized back. Requires `ropt[hpc]` to be installed. Add `ropt[cloudpickle]`
 to send functions the standard `pickle` module cannot.
 
-The executor manages the full remote task lifecycle:
-
-- Serializing the task (function and arguments) to a shared filesystem.
-- Submitting the task as a job to the HPC queue.
-- Polling the queue for the job's status.
-- Retrieving results (or exceptions) once the job completes.
-- Cancelling any jobs that are still outstanding when the executor stops.
-
 Stopping the executor with `cancel()` asks the scheduler to delete every job it
 has submitted, so an interrupted optimization does not leave orphan jobs behind
 consuming the cluster allocation. Cancellation is best effort: if the scheduler
@@ -322,18 +314,12 @@ cannot be reached the failure is logged and stopping continues.
 | `cleanup`     | Whether to remove a work item's files once it settles (default: `True`). A failed work item keeps its captured output. |
 
 Jobs are described either by a `pysqa` configuration or by a `template`, and the
-two are mutually exclusive. A `template` submits without a configuration, so it
-cannot be combined with `config_path`, `cluster` or `queue`, and `scheduler` is
-what tells `pysqa` which scheduler the script is written for; combining the two
-raises a `ValueError` at construction. Note that `queue` names a queue **defined
-in the configuration**, not necessarily the scheduler's partition: it selects
-that entry's script and resource limits, and the partition is written in the
-script. Both are laid out [below](#configuring-the-scheduler).
-
-See [Parallel Execution and Many Runs](../running/parallel.md#running-on-an-hpc-cluster)
-for the same ground from the high-level API, and the
-[`pysqa` documentation](https://pysqa.readthedocs.io/en/latest/queue.html) for
-the file formats in full.
+two are mutually exclusive; combining them raises a `ValueError` at
+construction. Selecting a queue or a cluster, asking for resources and writing a
+template are covered in
+[Parallel Execution and Many Runs](../running/parallel.md#running-on-an-hpc-cluster).
+What follows is the executor's own behaviour, and the layout of a configuration
+directory.
 
 A finished job's result is not always readable at once: the job may have died
 before writing it, or the file may be caught half-written. `retries` is how many
@@ -418,31 +404,17 @@ queues:
 ```
 
 The scripts are
-[Jinja](https://jinja.palletsprojects.com/en/stable/templates/) templates, which
-`pysqa` renders through the `jinja2` package with `job_name`, `output`,
-`working_directory`, `cores`, `memory_max`, `run_time_max` and `command`, plus
-whatever the caller passes in
+[Jinja](https://jinja.palletsprojects.com/en/stable/templates/) templates,
+rendered by `pysqa` with `job_name`, `output`, `working_directory`, `cores`,
+`memory_max`, `run_time_max` and `command`, plus whatever the caller passes in
 `submit_options`. A variable the caller does not supply renders as empty, which
-is why optional directives are wrapped in `{% if %}`. The partition is *not* one
-of these variables: it is written literally, which is why each queue normally
-needs its own script.
+is why optional directives are wrapped in `{% if %}`. The partition is *not*
+among them: it is written literally, which is why each queue normally needs its
+own script.
 
 Sites with more than one cluster use a `clusters.yaml` naming a `queue.yaml` per
 cluster, each declaring its own `queue_type`; see the
 [`pysqa` documentation](https://pysqa.readthedocs.io/en/latest/advanced.html#access-to-multiple-hpcs).
-The target is resolved from `cluster` and `queue`:
-
-- If `cluster` is given, it is selected directly. When `queue` is also given,
-  it must be available on that cluster.
-- If only `queue` is given, the cluster providing it is derived automatically,
-  which requires exactly one cluster to provide it; no match, or several, is an
-  error.
-- If neither is given, the configuration's own primaries apply.
-
-A `template` replaces all of this with a script supplied directly, in which case
-`scheduler` states the queueing system, since no configuration is read to
-declare it. It is `pysqa`'s `queue_type` under a name that does not collide with
-ropt's `queue`.
 
 ## Stopping an executor
 
@@ -657,151 +629,6 @@ submitted the work, before any worker sees it. See
 [Nested workflows and process boundaries](#nested-workflows-and-process-boundaries)
 for what belongs where.
 
-## Event dispatcher
-
-When multiple compute steps run concurrently in worker threads, their event
-handlers are called from multiple threads simultaneously. **Event handlers must
-not be shared across concurrent compute steps**: doing so raises a
-[`WorkflowError`][ropt.exceptions.WorkflowError].
-
-[`EventDispatcher`][ropt.components.event_handlers.EventDispatcher] is the
-required solution: it receives events on a queue and dispatches them to its own
-handlers from the asyncio event loop's thread. Because all handler calls happen
-on a single thread, handlers registered on the dispatcher are safe even when
-events arrive from multiple concurrent steps.
-
-This is especially useful when one set of handlers needs to aggregate results
-from multiple concurrent compute steps.
-
-`EventDispatcher` follows the same lifecycle as executors:
-
-```python
-async with asyncio.TaskGroup() as tg:
-    executor = ThreadExecutor(workers=4)
-    await executor.start(tg)
-
-    event_dispatcher = EventDispatcher()
-    await event_dispatcher.start(tg)
-
-    # Attach an EventForwardHandler to the compute step.
-    step.add_event_handler(
-        EventForwardHandler(
-            event_dispatcher,
-            event_types={EnOptEventType.FINISHED_EVALUATION},
-        )
-    )
-
-    # Handlers registered on the dispatcher need no locking.
-    result_handler = ResultsHandler()
-    event_dispatcher.add_event_handler(result_handler)
-
-    await asyncio.to_thread(step.run, variables=..., context=...)
-
-    event_dispatcher.cancel()
-    executor.cancel()
-```
-
-[`EventForwardHandler`][ropt.components.event_handlers.EventForwardHandler] is a
-regular event handler that can be attached to a compute step. When the step
-emits an event it submits the event to the dispatcher and **blocks on the
-emitting run's own thread until every handler has processed it**, preserving the
-order in which events are submitted. If a handler raises, the original exception
-is re-raised there, on the run's stack (see [Handler failures](#handler-failures)).
-
-!!! warning "Event handling is a single-process mechanism"
-
-    An [`EventDispatcher`][ropt.components.event_handlers.EventDispatcher] and
-    every [`EventHandler`][ropt.components.event_handlers.EventHandler] live in
-    the process that created them. `EventForwardHandler` delivers events by
-    calling the dispatcher's `dispatch_event`, which schedules them onto its
-    event loop with `call_soon_threadsafe` — a *thread*-safe call, not a
-    *process*-safe one. A dispatcher reached from another process has no live
-    loop, so a forwarded event cannot arrive.
-
-    Event handlers can therefore only observe events emitted **within their own
-    process**. Any compute step executed out-of-process — for example a whole
-    optimization sent to a
-    [`ProcessExecutor`][ropt.components.executors.ProcessExecutor]
-    or [`HPCExecutor`][ropt.components.executors.HPCExecutor], whether as a work
-    item of its own or as the enclosing layer
-    of a nested workflow — may attach handlers local to that worker process,
-    but those handlers cannot deliver events to a dispatcher or handler in the
-    host process. To collect information from out-of-process steps, return it as
-    data (the task's return value, or result metadata) rather than through
-    shared handlers.
-
-    This is why process- and HPC-based parallelism belongs at the innermost
-    (leaf) evaluations — which return data and emit no events — while any layer
-    that drives event-producing compute steps must run in-process. See
-    [Nested workflows and process boundaries](#nested-workflows-and-process-boundaries).
-
-### Handler failures
-
-Forwarding an event through an
-[`EventForwardHandler`][ropt.components.event_handlers.EventForwardHandler] is
-**synchronous**: the emitting run blocks until the dispatcher has run every
-handler for that event. A handler failure is therefore delivered like an
-evaluation error — on the emitting run's own call stack — and splits
-`Exception` from `BaseException` exactly as the executor does:
-
-- An ordinary `Exception` from a handler is **re-raised on the emitting run's
-  stack**, unwrapped — a single, clean exception that stops the run normally,
-  exactly as if a directly-attached handler had raised inline. It is logged
-  (with the handler and the event type) as it is caught. Because emission is
-  synchronous, this covers the run's **last** event too; nothing is deferred or
-  lost. Every handler for the event still runs before the error surfaces; if
-  several fail, the first (in registration order) is raised.
-- A `BaseException` (such as `CancelledError`) is **not** delivered this way: it
-  remains the session teardown backstop and propagates, tearing the dispatcher
-  task group down, as with the executor.
-
-### Thread-based dispatch
-
-By default, handlers registered with `EventDispatcher` are called directly in
-the asyncio event loop's thread. This is efficient for handlers that only do
-in-memory work, such as `ResultsHandler` or `HistoryHandler`.
-
-If a handler performs blocking operations — writing results to a file, pushing
-data to a database, sending over a network — pass `run_in_thread=True` when
-registering it:
-
-```python
-event_dispatcher.add_event_handler(my_handler, run_in_thread=True)
-```
-
-`CallbackHandler` and `DataFrameHandler` (when a slow callback is set via
-`set_callback`) are common cases where this is needed. When multiple handlers
-with `run_in_thread=True` match the same event they are dispatched **in
-parallel** via `asyncio.gather` — they do not block each other.
-
-### Event throughput
-
-A dispatcher processes its queue **one event at a time**: all handlers for an
-event finish before the next event is taken. `run_in_thread=True` moves a
-blocking handler off the event loop, but it does not overlap that handler with
-the handlers of any *other* event — only with the threaded handlers of the same
-event.
-
-This serialization is deliberate.
-[`EventHandler`][ropt.components.event_handlers.EventHandler] is not re-entrant,
-and a handler shared by concurrently running optimizations — one accumulating
-results across all of them, say — needs exactly this guarantee to stay
-lock-free.
-
-The price is that handler cost scales with the *total* number of events across
-all runs sharing the dispatcher, and is paid on the critical path of every
-event. Measured with eight concurrent runs emitting five events each, sharing
-one dispatcher and one handler that blocks for 50 ms: **2.02 s elapsed**,
-against 2.00 s for fully serial execution and 0.25 s if the handlers had run
-fully concurrently — never more than one handler thread active at a time.
-
-Runs share a dispatcher when they share a handler scope, which is the normal
-case for [`optimize_many`][ropt.simple.optimize_many]: it reads the current
-handler scope once on the calling thread and gives the same one to every job.
-An N-way `optimize_many` therefore pays its handler cost serially. Keep shared
-handlers cheap; if one must do heavy I/O, buffer in memory and flush once the
-runs have finished.
-
 ## Two rules for using the low-level API
 
 **Run a compute step in a worker thread.** `step.run()` is an ordinary
@@ -843,7 +670,7 @@ several concurrent steps can share one asyncio event loop, and usually shared
 of these live **in a single process**.
 
 This is a consequence of the general rule that
-[event handling is a single-process mechanism](#event-dispatcher): it places a
+[event handling is a single-process mechanism](workflows.md#event-dispatcher): it places a
 hard constraint on where each layer of a nested workflow may run:
 
 !!! warning "The enclosing layer of a nested workflow must run in-process"

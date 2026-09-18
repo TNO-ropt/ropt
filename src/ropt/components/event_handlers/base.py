@@ -51,7 +51,7 @@ class EventHandler(ABC):
         [`EventDispatcher`][ropt.components.event_handlers.EventDispatcher]
         instead, which serializes the calls. See
         [Optimization Workflows](../advanced/workflows.md#event-handlers) and
-        [Parallel Evaluation](../advanced/parallel.md#event-dispatcher) for usage
+        [Event dispatcher](../advanced/workflows.md#event-dispatcher) for usage
         and pitfalls.
     """
 

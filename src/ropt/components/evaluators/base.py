@@ -30,8 +30,9 @@ class Evaluator(ABC):
 
     Note:
         Evaluators are not safe for concurrent use. An evaluator raises a
-        `RuntimeError` if two threads execute its `eval` method at the same
-        time. Serial reuse is allowed: the same instance may be reused by
+        [`WorkflowError`][ropt.exceptions.WorkflowError] if two threads execute
+        its `eval` method at the same time. Serial reuse is allowed: the same
+        instance may be reused by
         several compute steps, including on different threads, as long as each
         call fully completes before the next begins. For parallel workflows use
         a dispatching evaluator such as

@@ -305,7 +305,3 @@ executors.
     the mean of the realizations plus their standard deviation. Rather than
     evaluating all realizations twice, compute them once and return the
     values for both objectives from a single evaluator call.
-
-## See also
-
-- See it in action: [Building a Workflow](../advanced/workflow.md).
