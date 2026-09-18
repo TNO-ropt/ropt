@@ -17,77 +17,23 @@ if TYPE_CHECKING:
 class FunctionEvaluations(ResultField):
     """Per-realization objective and constraint values for an evaluation batch.
 
-    See [Working with Results](../running/results.md) for usage details.
-
-    **Result descriptions**
-
-    === "Variables"
-
-        `variables`: The vector of variable values at which the functions
-        were evaluated:
-
-        - Shape: $(n_v,)$, where:
-            - $n_v$ is the number of variables.
-        - Axis type:
-            - [`AxisName.VARIABLE`][ropt.enums.AxisName.VARIABLE]
-
-    === "Objectives"
-
-        `objectives`: The calculated objective function values for each
-        realization. This is a two-dimensional array of floating point values
-        where each row corresponds to a realization and each column corresponds
-        to an objective:
-
-        - Shape $(n_r, n_o)$, where:
-            - $n_r$ is the number of realizations.
-            - $n_o$ is the number of objectives.
-        - Axis types:
-            - [`AxisName.REALIZATION`][ropt.enums.AxisName.REALIZATION]
-            - [`AxisName.OBJECTIVE`][ropt.enums.AxisName.OBJECTIVE]
-
-    === "Constraints"
-
-        `constraints`: The calculated constraint function values for each
-        realization. Only provided if non-linear constraints are defined. This
-        is a two-dimensional array of floating point values where each row
-        corresponds to a realization and each column corresponds to a
-        constraint:
-
-        - Shape $(n_r, n_c)$, where:
-            - $n_r$ is the number of realizations.
-            - $n_c$ is the number of constraints.
-        - Axis types:
-            - [`AxisName.REALIZATION`][ropt.enums.AxisName.REALIZATION]
-            - [`AxisName.NONLINEAR_CONSTRAINT`][ropt.enums.AxisName.NONLINEAR_CONSTRAINT]
-
-    === "Metadata"
-
-        `metadata`: Optional metadata associated with each realization,
-        potentially provided by the evaluator. If provided, each value in the
-        metadata dictionary must be a one-dimensional array of arbitrary type
-        supported by `numpy` (including objects):
-
-        - Shape: $(n_r,)$, where:
-            - $n_r$ is the number of realizations.
-        - Axis type:
-            - [`AxisName.REALIZATION`][ropt.enums.AxisName.REALIZATION]
-
-        An entry whose values are arrays rather than scalars has shape
-        $(n_r, n_k)$ and carries a second, user-defined axis named after its
-        key. See [User-defined axes](../running/results.md#user-defined-axes).
-
-    Note: Metadata data type.
-        The data type of the metadata fields is not fixed. Each field in the
-        `metadata` dictionary can have its own data type, which must be a
-        one-dimensional array of any type supported by `numpy`, including object
-        arrays. This allows for maximum flexibility in the kind of metadata that
-        can be included, such as strings, integers, floats, or even complex
-        objects.
+    See [Working with Results](../running/results.md) for usage details, and
+    [User-defined axes](../running/results.md#user-defined-axes) for metadata
+    entries that carry an axis of their own.
 
     Attributes:
-        objectives:  The objective function values for each realization.
-        constraints: The constraint function values for each realization.
-        metadata:    Optional metadata for each evaluated realization.
+        objectives:  Objective values per realization, shape $(n_r, n_o)$, with
+                     axes [`REALIZATION`][ropt.enums.AxisName.REALIZATION] and
+                     [`OBJECTIVE`][ropt.enums.AxisName.OBJECTIVE].
+        constraints: Nonlinear constraint values per realization, shape
+                     $(n_r, n_c)$, with axes
+                     [`REALIZATION`][ropt.enums.AxisName.REALIZATION] and
+                     [`NONLINEAR_CONSTRAINT`][ropt.enums.AxisName.NONLINEAR_CONSTRAINT].
+                     `None` unless nonlinear constraints are configured.
+        metadata:    Optional per-realization metadata from the evaluator. Each
+                     entry is an array of shape $(n_r,)$ of any `numpy` dtype,
+                     including objects; an entry of arrays instead has shape
+                     $(n_r, n_k)$ and a second axis named after its key.
     """
 
     objectives: NDArray[np.float64] = field(

@@ -7,6 +7,8 @@ gradient values through the
 optimization from an initial variable vector. It is selected through the
 `backend` field of an [`EnOptContext`][ropt.context.EnOptContext], either as an
 instance or as a [`BackendConfig`][ropt.config.BackendConfig] naming a method.
+The context itself never reaches the backend: `ropt` reduces it to an
+`OptimizationProblem` when the run starts.
 
 `ropt` ships [`SciPyBackend`][ropt.backend.scipy.SciPyBackend] and
 [`ExternalBackend`][ropt.backend.external.ExternalBackend], which runs an
