@@ -3888,20 +3888,9 @@ cost of being wrong the other way is output escaping to the terminal.</p>
 <p>Checks that the options supplied through the
 <a class="autorefs autorefs-internal" title="            BackendConfig" href="../config/#ropt.config.BackendConfig"><code>BackendConfig</code></a> object have the expected
 type, contain only supported keys, and satisfy any method-specific
-value constraints.</p>
-<p>Concrete backends should implement validation logic for the methods
-they support, potentially using schema-validation tools such as
-Pydantic.</p>
-<p>The raised exception must be a ValueError, or derive from a ValueError.</p>
+value constraints. Options are a dictionary or a list, depending on the
+backend.</p>
 
-
-<details class="note" open>
-  <summary>Note</summary>
-  <p>Backend options may be represented as a dictionary or list,
-depending on the backend. This method should verify that the type
-matches what the backend expects and raise a <code>ValueError</code> with a
-clear message when it does not.</p>
-</details>
 
 <p><span class="doc-section-title">Raises:</span></p>
     <table>
@@ -3918,7 +3907,8 @@ clear message when it does not.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If the provided options are invalid.</p>
+                <p>If the provided options are invalid. The exception must
+        be a <code>ValueError</code>, or derive from one.</p>
               </div>
             </td>
           </tr>

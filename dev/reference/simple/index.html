@@ -4844,8 +4844,14 @@ a worker process, where it cannot work at all.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>An optional callback invoked with an
-                  <code>FunctionResults</code> for each function evaluation;
+                <p>An optional callback invoked with a
+                  <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="../results/#ropt.results.FunctionResults"><code>FunctionResults</code></a>
+                  for each function evaluation;
                   return <code>True</code> from it to stop the optimization
                   early with <code>USER_ABORT</code>. Reporting stops there,
                   so results after it in the same batch are not
@@ -4923,7 +4929,7 @@ a worker process, where it cannot work at all.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A <a class="autorefs autorefs-internal" title="            ropt.simple.OptimizationResult
+                <p>An <a class="autorefs autorefs-internal" title="            ropt.simple.OptimizationResult
 
 
   
@@ -5111,8 +5117,14 @@ a worker process, where it cannot work at all.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>An optional callback invoked with an
-                  <code>FunctionResults</code> for each function evaluation,
+                <p>An optional callback invoked with a
+                  <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="../results/#ropt.results.FunctionResults"><code>FunctionResults</code></a>
+                  for each function evaluation,
                   either shared by every run or one per run; return
                   <code>True</code> from it to stop that run early with
                   <code>USER_ABORT</code>.</p>
@@ -5973,14 +5985,9 @@ a worker process, where it cannot work at all.</p>
         <p>Open a background session that pools and shared handlers run on.</p>
 <p>The session owns one event loop, on a daemon thread, for as long as the
 block is open. Build pools on it with its factories, and pass them to the
-runs that should use them:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">fast</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">thread_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">function</span><span class="p">,</span> <span class="n">pool</span><span class="o">=</span><span class="n">fast</span><span class="p">)</span>
-</span></code></pre></div>
-<p>Closing the session releases every pool it created, so most code needs no
-further cleanup. See <a href="../../running/running/">Running Optimizations</a> for a
-walkthrough.</p>
+runs that should use them. Closing the session releases every pool it
+created, so most code needs no further cleanup. See
+<a href="../../running/running/">Running Optimizations</a> for a walkthrough.</p>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
@@ -6040,11 +6047,8 @@ walkthrough.</p>
 need that loop to run on, which is why they are built here rather than
 constructed on their own. Everything a session hands out is returned to the
 caller and passed on explicitly; nothing is discovered from the surroundings.</p>
-<p>Bind the session with <code>as</code> and call its factories inside the block:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">fast</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">thread_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">function</span><span class="p">,</span> <span class="n">pool</span><span class="o">=</span><span class="n">fast</span><span class="p">)</span>
-</span></code></pre></div>
+<p>Bind the session with <code>as</code> and call its factories inside the block. See
+<a href="../../running/running/">Running Optimizations</a>.</p>
 <p>Sessions are objects, so opening one inside another is unremarkable: each
 gets its own loop, and pools from different sessions never interact. A
 session is single use — once closed it cannot be reopened.</p>
