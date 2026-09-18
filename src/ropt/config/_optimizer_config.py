@@ -17,6 +17,11 @@ class OptimizerConfig(BaseModel):
     See [Configuration Sections](../optimizer_setup/configuration_sections.md#optimizer) for
     detailed descriptions and usage examples.
 
+    Warning:
+        Capturing output rewires process-global state, so one run at a time can
+        do it. A second run that sets `stdout` or `stderr` while another holds
+        the capture raises [`WorkflowError`][ropt.exceptions.WorkflowError].
+
     Attributes:
         max_batches:    Maximum number of batch evaluations (optional).
         max_functions:  Maximum number of function evaluations (optional).

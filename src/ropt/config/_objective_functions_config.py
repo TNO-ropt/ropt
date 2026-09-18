@@ -34,7 +34,10 @@ class ObjectiveFunctionsConfig(BaseModel):
         weights:             Weights for the objective functions (default: 1.0).
         scales:              Scale factors for the objective functions (default: 1.0).
         offsets:             Offsets for the objective functions (default: 0.0).
-        auto_scale:          Estimate additional scales from the first batch.
+        auto_scale:          Estimate additional scales from the first batch. The
+                             reported `target_objective` is divided by them, so
+                             runs that differ in this setting compare only
+                             through `functions.objectives` or their variables.
         maximize:            Which objectives to maximize (default: `False`).
         realization_filters: Realization filter to apply to each objective, by key,
                              `None` to apply none (default: `None`).

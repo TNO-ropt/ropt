@@ -24,6 +24,12 @@ class ProcessExecutor(ExecutorBase):
     See [Parallel Evaluation](../advanced/parallel.md#processexecutor) for
     details, including the `if __name__ == "__main__":` guard that the entry
     point must use.
+
+    Warning:
+        Stopping terminates the worker processes and nothing else. A program a
+        work item started itself keeps running, without an error being raised.
+        Use [`LocalJobExecutor`][ropt.components.executors.LocalJobExecutor]
+        where an evaluation launches external programs.
     """
 
     def __init__(

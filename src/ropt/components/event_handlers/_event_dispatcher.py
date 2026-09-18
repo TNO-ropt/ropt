@@ -45,6 +45,10 @@ class EventDispatcher:
     dispatcher owns and shuts down when it stops, so handler work is isolated
     from the asyncio loop's shared default pool.
 
+    A dispatcher and its handlers belong to the process that created them, so
+    they observe only the events emitted in that process. An event forwarded
+    from another process cannot arrive.
+
     See [Optimization Workflows](../advanced/workflows.md#event-dispatcher) for usage.
     """
 
