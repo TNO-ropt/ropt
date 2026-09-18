@@ -1,13 +1,8 @@
-"""This module defines utilities for validating plugin options.
+"""Schema models for describing and validating plugin options.
 
-This module provides classes and functions to define and validate options for
-plugins. It uses Pydantic to create models that represent the schema of
-plugin options, allowing for structured and type-safe configuration.
-
-Classes:
-    OptionsSchemaModel: Represents the overall schema for plugin options.
-    MethodSchemaModel: Represents the schema for a specific method within a
-        plugin, including its name and options.
+A plugin declares the options that each of its methods accepts. The schema
+turns that declaration into a pydantic model that validates the `options` field
+of a configuration section, and into a Markdown table for the documentation.
 """
 
 from __future__ import annotations
@@ -24,12 +19,11 @@ T = TypeVar("T")
 
 
 class OptionsSchemaModel(BaseModel):
-    """Represents the overall schema for plugin options.
+    """The schema for the options of every method of a plugin.
 
-    This class defines the structure for describing the methods and options
-    available for a plugin. The methods are described by a mapping of method
-    names to [`MethodSchemaModel`][ropt.config.options.MethodSchemaModel]
-    objects, each describing a method supported by the plugin.
+    The methods are described by a mapping of method names to
+    [`MethodSchemaModel`][ropt.config.options.MethodSchemaModel] objects, each
+    describing a method supported by the plugin.
 
     Attributes:
         methods: A mapping of method names to their schemas.
@@ -71,22 +65,19 @@ class OptionsSchemaModel(BaseModel):
         return self
 
     def get_options_model(self, method: str) -> type[BaseModel]:
-        """Creates a Pydantic model for validating options of a specific method.
+        """Create a pydantic model for validating the options of one method.
 
-        This method dynamically generates a Pydantic model tailored to validate
-        the options associated with a given method. The method is looked up by
-        name, case-insensitively, and its options are combined with the common
-        options that it does not exclude. The resulting model can then be used
-        to validate dictionaries of options against the defined schema.
+        The method is looked up by name, case-insensitively, and its options are
+        combined with the common options that it does not exclude.
 
         Args:
             method: The name of the method for which to create the options model.
 
         Returns:
-            A Pydantic model class capable of validating options for the specified method.
+            A model that validates the options of the given method.
 
         Raises:
-            ValueError: If the specified method is not found in the schema.
+            ValueError: If the method is not found in the schema.
         """
         method_schema = next(
             (
@@ -133,11 +124,7 @@ class OptionsSchemaModel(BaseModel):
 
 
 class MethodSchemaModel(BaseModel, Generic[T]):
-    """Represents the schema for a specific method within a plugin.
-
-    This class defines the structure for describing one or more methods
-    supported by a plugin. It contains a dictionary describing an option for
-    this method.
+    """The schema for the options of a single method.
 
     Attributes:
         options: A dictionary of option names and their types.
@@ -182,16 +169,11 @@ def _new_note(notes: dict[str, str], key: str, note: str) -> int:
 
 
 def gen_options_table(schema: dict[str, Any]) -> str:
-    """Generates a Markdown table documenting plugin options.
+    """Generate a Markdown table documenting plugin options.
 
-    This function takes a schema dictionary, validates it against the
-    [`OptionsSchemaModel`][ropt.config.options.OptionsSchemaModel], and then
-    generates a Markdown document that summarizes the available methods and
-    their options. Common options are listed first, followed by a table of
-    method-specific options. Each row in the table represents a method, and the
-    columns list the method's name and its configurable options. If a URL is
-    provided for a method, the method name will be hyperlinked to that URL in
-    the table.
+    Common options are listed first, followed by a table of method-specific
+    options, one row per method. A method whose schema provides a URL is
+    hyperlinked to it.
 
     Args:
         schema: A dictionary representing the schema of plugin options.
