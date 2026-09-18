@@ -23,7 +23,7 @@
     
     
       
-        <title>Building a Workflow - ropt Documentation</title>
+        <title>Implementing a Component - ropt Documentation</title>
       
     
     
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#building-a-workflow" class="md-skip">
+        <a href="#implementing-a-component" class="md-skip">
           Skip to content
         </a>
       
@@ -118,7 +118,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Building a Workflow
+              Implementing a Component
             
           </span>
         </div>
@@ -1697,7 +1697,7 @@
   <span class="md-ellipsis">
     
   
-    Building a Workflow
+    Implementing a Component
   
 
     
@@ -1715,7 +1715,7 @@
   <span class="md-ellipsis">
     
   
-    Building a Workflow
+    Implementing a Component
   
 
     
@@ -1741,10 +1741,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#the-evaluator" class="md-nav__link">
+  <a href="#evaluator" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The evaluator
+        Evaluator
       
     </span>
   </a>
@@ -1752,10 +1752,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#the-compute-step-and-its-handlers" class="md-nav__link">
+  <a href="#computestep" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The compute step and its handlers
+        ComputeStep
       
     </span>
   </a>
@@ -1763,10 +1763,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#run-it-and-read-the-result" class="md-nav__link">
+  <a href="#eventhandler" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Run it and read the result
+        EventHandler
       
     </span>
   </a>
@@ -1774,10 +1774,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#next" class="md-nav__link">
+  <a href="#executor" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Next
+        Executor
       
     </span>
   </a>
@@ -2971,10 +2971,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#the-evaluator" class="md-nav__link">
+  <a href="#evaluator" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The evaluator
+        Evaluator
       
     </span>
   </a>
@@ -2982,10 +2982,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#the-compute-step-and-its-handlers" class="md-nav__link">
+  <a href="#computestep" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The compute step and its handlers
+        ComputeStep
       
     </span>
   </a>
@@ -2993,10 +2993,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#run-it-and-read-the-result" class="md-nav__link">
+  <a href="#eventhandler" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Run it and read the result
+        EventHandler
       
     </span>
   </a>
@@ -3004,10 +3004,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#next" class="md-nav__link">
+  <a href="#executor" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Next
+        Executor
       
     </span>
   </a>
@@ -3034,69 +3034,153 @@
   
 
 
-<h1 id="building-a-workflow">Building a Workflow</h1>
-<p><em>Audience: advanced users who need full control over the optimization.</em></p>
-<p>The <a href="../../running/running/">simple API</a> covers most cases. When you need more —
-custom event handling, several optimizers, or nested runs — you assemble the
-low-level workflow components yourself. This page follows
-<a href="https://github.com/TNO-ropt/ropt/blob/main/examples/advanced/workflow.py">examples/advanced/workflow.py</a>.</p>
-<p>See <a href="../workflows/">Optimization Workflows</a> for the full reference on the
-components used here.</p>
-<h2 id="the-evaluator">The evaluator</h2>
-<p>At the low level the evaluation callback receives the whole batch of variable
-vectors at once (a 2-D array) and returns an
-<a class="autorefs autorefs-internal" title="            ropt.evaluation.EvaluationBatchResult
+<h1 id="implementing-a-component">Implementing a Component</h1>
+<p>The four component types share one shape: a public method holding a concurrency
+guard, and a private abstract method you implement. Override the private one
+only — the guard is what turns concurrent misuse into a
+<a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a> instead of corrupted state.</p>
+<table>
+<thead>
+<tr>
+<th>Base class</th>
+<th>You implement</th>
+<th>Callers use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a class="autorefs autorefs-internal" title="            ropt.components.evaluators.Evaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.Evaluator"><code>Evaluator</code></a></td>
+<td><code>_eval</code></td>
+<td><code>eval</code></td>
+</tr>
+<tr>
+<td><a class="autorefs autorefs-internal" title="            ropt.components.compute_steps.ComputeStep" href="../../reference/components_compute_steps/#ropt.components.compute_steps.ComputeStep"><code>ComputeStep</code></a></td>
+<td><code>_run</code></td>
+<td><code>run</code></td>
+</tr>
+<tr>
+<td><a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventHandler" href="../../reference/components_event_handlers/#ropt.components.event_handlers.EventHandler"><code>EventHandler</code></a></td>
+<td><code>event_types</code>, <code>_handle_event</code></td>
+<td><code>handle_event</code></td>
+</tr>
+<tr>
+<td><a class="autorefs autorefs-internal" title="            ropt.components.executors.ExecutorBase" href="../../reference/components_executors/#ropt.components.executors.ExecutorBase"><code>ExecutorBase</code></a></td>
+<td><code>start</code>, <code>_cleanup</code></td>
+<td><code>submit</code>, <code>is_running</code>, <code>cancel</code></td>
+</tr>
+</tbody>
+</table>
+<p>A backend, sampler, realization filter or function estimator is a <strong>plugin</strong>,
+not a component: it is selected by a method string and discovered through an
+entry point. See <a href="../writing_plugins/">Writing a Plugin</a>.</p>
+<h2 id="evaluator">Evaluator</h2>
+<p><code>_eval</code> receives the batch of variable vectors and the
+<a class="autorefs autorefs-internal" title="            ropt.evaluation.EvaluationBatchContext
 
 
   
       dataclass
-  " href="../../reference/evaluation/#ropt.evaluation.EvaluationBatchResult"><code>EvaluationBatchResult</code></a>:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">rosenbrock</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">objectives</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">variables</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">))</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="k">for</span> <span class="n">v_idx</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">realizations</span><span class="p">):</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>        <span class="o">...</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="k">return</span> <span class="n">EvaluationBatchResult</span><span class="p">(</span><span class="n">objectives</span><span class="o">=</span><span class="n">objectives</span><span class="p">)</span>
+  " href="../../reference/evaluation/#ropt.evaluation.EvaluationBatchContext"><code>EvaluationBatchContext</code></a>, and returns
+an <a class="autorefs autorefs-internal" title="            ropt.evaluation.EvaluationBatchResult
+
+
+  
+      dataclass
+  " href="../../reference/evaluation/#ropt.evaluation.EvaluationBatchResult"><code>EvaluationBatchResult</code></a>. <code>eval</code>
+asserts that return type, so a protocol violation surfaces at the boundary
+rather than inside the ensemble code.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">MyEvaluator</span><span class="p">(</span><span class="n">Evaluator</span><span class="p">):</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_eval</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>        <span class="k">return</span> <span class="n">EvaluationBatchResult</span><span class="p">(</span><span class="n">batch_id</span><span class="o">=...</span><span class="p">,</span> <span class="n">objectives</span><span class="o">=...</span><span class="p">)</span>
 </span></code></pre></div>
-<p>Wrap it in a <a class="autorefs autorefs-internal" title="            ropt.components.evaluators.BatchEvaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.BatchEvaluator"><code>BatchEvaluator</code></a>:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.components.evaluators</span><span class="w"> </span><span class="kn">import</span> <span class="n">BatchEvaluator</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">evaluator</span> <span class="o">=</span> <span class="n">BatchEvaluator</span><span class="p">(</span><span class="n">callback</span><span class="o">=</span><span class="n">partial</span><span class="p">(</span><span class="n">rosenbrock</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">b</span><span class="p">))</span>
-</span></code></pre></div>
-<p>See <a href="../evaluation_callbacks/">Writing Evaluation Callbacks</a> for the
-batch callback signature and the other evaluators.</p>
-<h2 id="the-compute-step-and-its-handlers">The compute step and its handlers</h2>
-<p>An <a class="autorefs autorefs-internal" title="            ropt.components.compute_steps.OptimizationStep" href="../../reference/components_compute_steps/#ropt.components.compute_steps.OptimizationStep"><code>OptimizationStep</code></a> runs the
-optimization. You attach event handlers to it: a
-<a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.ResultsHandler" href="../../reference/components_event_handlers/#ropt.components.event_handlers.ResultsHandler"><code>ResultsHandler</code></a> to keep the best
-result, and a <a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.CallbackHandler" href="../../reference/components_event_handlers/#ropt.components.event_handlers.CallbackHandler"><code>CallbackHandler</code></a>
-to report progress:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.components.compute_steps</span><span class="w"> </span><span class="kn">import</span> <span class="n">OptimizationStep</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.components.event_handlers</span><span class="w"> </span><span class="kn">import</span> <span class="n">CallbackHandler</span><span class="p">,</span> <span class="n">ResultsHandler</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.enums</span><span class="w"> </span><span class="kn">import</span> <span class="n">EnOptEventType</span>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="n">step</span> <span class="o">=</span> <span class="n">OptimizationStep</span><span class="p">(</span><span class="n">evaluator</span><span class="o">=</span><span class="n">evaluator</span><span class="p">)</span>
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="n">result_handler</span> <span class="o">=</span> <span class="n">ResultsHandler</span><span class="p">()</span>
-</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="n">step</span><span class="o">.</span><span class="n">add_event_handler</span><span class="p">(</span><span class="n">result_handler</span><span class="p">)</span>
-</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="n">step</span><span class="o">.</span><span class="n">add_event_handler</span><span class="p">(</span>
-</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>    <span class="n">CallbackHandler</span><span class="p">(</span><span class="n">callback</span><span class="o">=</span><span class="n">report</span><span class="p">,</span> <span class="n">event_types</span><span class="o">=</span><span class="p">{</span><span class="n">EnOptEventType</span><span class="o">.</span><span class="n">FINISHED_EVALUATION</span><span class="p">})</span>
-</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="p">)</span>
-</span></code></pre></div>
-<h2 id="run-it-and-read-the-result">Run it and read the result</h2>
-<p>The step takes the variables and an
-<a class="autorefs autorefs-internal" title="            EnOptContext" href="../../reference/context/#ropt.context.EnOptContext"><code>EnOptContext</code></a> built from the config. The best result
-is on the handler:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.context</span><span class="w"> </span><span class="kn">import</span> <span class="n">EnOptContext</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="n">step</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">variables</span><span class="o">=</span><span class="n">INITIAL_VALUES</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">EnOptContext</span><span class="o">.</span><span class="n">model_validate</span><span class="p">(</span><span class="n">CONFIG</span><span class="p">))</span>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="n">best</span> <span class="o">=</span> <span class="n">result_handler</span><span class="o">.</span><span class="n">result</span>
-</span></code></pre></div>
-<h2 id="next">Next</h2>
+<p>Wrapping evaluators — <a class="autorefs autorefs-internal" title="            ropt.components.evaluators.CachedEvaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.CachedEvaluator"><code>CachedEvaluator</code></a>
+is the built-in example — call the inner evaluator's public <code>eval</code>, so the inner
+guard applies independently.</p>
+<h2 id="computestep">ComputeStep</h2>
+<p><code>_run</code> receives the <a class="autorefs autorefs-internal" title="            EnOptContext" href="../../reference/context/#ropt.context.EnOptContext"><code>EnOptContext</code></a> and the initial
+variables, and returns whatever the step produces. Two obligations:</p>
 <ul>
-<li>The full component reference: <a href="../workflows/">Optimization Workflows</a>.</li>
-<li>Writing the evaluation callback:
-  <a href="../evaluation_callbacks/">Writing Evaluation Callbacks</a>.</li>
-<li>Running evaluations in parallel: <a href="../parallel/">Parallel Evaluation</a>.</li>
+<li>Emit events with <code>self._emit_event</code>, so attached handlers see the run. The
+  types are listed under
+  <a href="../workflows/#event-types">Event types</a>.</li>
+<li>Poll <code>self.stopped</code> at points where stopping is meaningful. <code>run</code> clears the
+  flag before each call, so a step is reusable after a stopped run.</li>
 </ul>
+<h2 id="eventhandler">EventHandler</h2>
+<p><code>event_types</code> declares which events reach <code>_handle_event</code>; the dispatch machinery
+filters on it, so a handler is never called for a type it did not ask for.
+Expose accumulated state through <code>__getitem__</code>, which is the convention the
+built-in handlers follow and what <code>handler[key]</code> reads.</p>
+<p><code>_handle_event</code> must not block for long when the handler is registered with an
+<a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventDispatcher" href="../../reference/components_event_handlers/#ropt.components.event_handlers.EventDispatcher"><code>EventDispatcher</code></a>: the
+dispatcher serializes events, so a slow handler delays every run sharing it. Use
+<code>run_in_thread=True</code> for blocking work; see
+<a href="../workflows/#event-throughput">Event throughput</a>.</p>
+<h2 id="executor">Executor</h2>
+<p>Subclass <a class="autorefs autorefs-internal" title="            ropt.components.executors.ExecutorBase" href="../../reference/components_executors/#ropt.components.executors.ExecutorBase"><code>ExecutorBase</code></a> rather than
+<a class="autorefs autorefs-internal" title="            ropt.components.executors.Executor" href="../../reference/components_executors/#ropt.components.executors.Executor"><code>Executor</code></a>: it provides <code>submit</code>,
+<code>is_running</code>, <code>cancel</code>, submission ownership, and the deadlock guard that
+refuses work submitted from the executor's own workers.</p>
+<p>You implement two methods. <code>start</code> must call <code>_begin_start</code> <strong>before</strong> creating
+any resources and <code>_finish_start</code> once they are in place — the first guards
+against a double start and rebinds the asyncio primitives to the current loop,
+the second publishes the loop and waits until the executor is ready.
+<code>_cleanup</code> releases those resources, and runs on the loop thread.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">MyExecutor</span><span class="p">(</span><span class="n">ExecutorBase</span><span class="p">):</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_group</span><span class="p">):</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_begin_start</span><span class="p">()</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>        <span class="o">...</span>                       <span class="c1"># create resources</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>        <span class="n">task_group</span><span class="o">.</span><span class="n">create_task</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_run_worker</span><span class="p">())</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_finish_start</span><span class="p">(</span><span class="n">task_group</span><span class="p">)</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>        <span class="o">...</span>                       <span class="c1"># release them</span>
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_cleanup_submissions</span><span class="p">()</span>
+</span></code></pre></div>
+<p><strong>The delivery contract is the part to get right.</strong> Every work item ends in
+exactly one of three ways, and the choice decides whether the executor survives:</p>
+<table>
+<thead>
+<tr>
+<th>Outcome</th>
+<th>Call</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>The function returned</td>
+<td><code>_deliver(submission, work_item, value)</code></td>
+<td>Normal result.</td>
+</tr>
+<tr>
+<td>The machinery failed</td>
+<td><code>_deliver(submission, work_item, ExecutorFailure(...))</code></td>
+<td>Raised as an <a class="autorefs autorefs-internal" title="            ExecutionError" href="../../reference/exceptions/#ropt.exceptions.ExecutionError"><code>ExecutionError</code></a> by the evaluator; the executor keeps running.</td>
+</tr>
+<tr>
+<td>The function raised</td>
+<td><code>_fail(submission, exc)</code></td>
+<td>The exception is re-raised unchanged in the caller; the executor keeps running.</td>
+</tr>
+</tbody>
+</table>
+<p>An <a class="autorefs autorefs-internal" title="            ropt.components.executors.ExecutorFailure
+
+
+  
+      dataclass
+  " href="../../reference/components_executors/#ropt.components.executors.ExecutorFailure"><code>ExecutorFailure</code></a> is a value, not
+an exception — deliver it, never raise it. Confusing the two rows is the common
+mistake: a bug in user code delivered as an <code>ExecutorFailure</code> would be reported
+as broken infrastructure, and a dead worker passed to <code>_fail</code> would surface as a
+user error. See
+<a href="../parallel/#error-handling">Error handling</a> for the distinction.</p>
+<p>Two further rules. Skip a submission whose <code>is_finished</code> is already <code>True</code> — its
+caller has left, so running its work items only occupies a worker. And call
+<code>_cleanup_submissions</code> from <code>_cleanup</code>, which aborts whatever is outstanding so
+no caller is left blocked in
+<a class="autorefs autorefs-internal" title="            collect" href="../../reference/components_executors/#ropt.components.executors.Submission.collect"><code>collect</code></a>.</p>
 
 
 

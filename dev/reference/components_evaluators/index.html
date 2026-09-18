@@ -1673,14 +1673,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../advanced/workflow/" class="md-nav__link">
+      <a href="../../advanced/components/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Building a Workflow
+    Implementing a Component
   
 
     
@@ -3525,8 +3525,9 @@ concurrency guard.</p>
 <details class="note" open>
   <summary>Note</summary>
   <p>Evaluators are not safe for concurrent use. An evaluator raises a
-<code>RuntimeError</code> if two threads execute its <code>eval</code> method at the same
-time. Serial reuse is allowed: the same instance may be reused by
+<a class="autorefs autorefs-internal" title="            WorkflowError" href="../exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a> if two threads execute
+its <code>eval</code> method at the same time. Serial reuse is allowed: the same
+instance may be reused by
 several compute steps, including on different threads, as long as each
 call fully completes before the next begins. For parallel workflows use
 a dispatching evaluator such as

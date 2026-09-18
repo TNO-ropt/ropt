@@ -1790,21 +1790,60 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#evaluators" class="md-nav__link">
+  <a href="#event-dispatcher" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Evaluators
+        Event dispatcher
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Event dispatcher">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#handler-failures" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Handler failures
       
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#see-also" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#thread-based-dispatch" class="md-nav__link">
     <span class="md-ellipsis">
       
-        See also
+        Thread-based dispatch
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#event-throughput" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Event throughput
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#evaluators" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Evaluators
       
     </span>
   </a>
@@ -1883,14 +1922,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../workflow/" class="md-nav__link">
+      <a href="../components/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Building a Workflow
+    Implementing a Component
   
 
     
@@ -3215,21 +3254,60 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#evaluators" class="md-nav__link">
+  <a href="#event-dispatcher" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Evaluators
+        Event dispatcher
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Event dispatcher">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#handler-failures" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Handler failures
       
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#see-also" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#thread-based-dispatch" class="md-nav__link">
     <span class="md-ellipsis">
       
-        See also
+        Thread-based dispatch
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#event-throughput" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Event throughput
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#evaluators" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Evaluators
       
     </span>
   </a>
@@ -3265,31 +3343,21 @@ its variables, objectives, constraints, and components — is set up in
 <a href="../../optimizer_setup/key_concepts/">Optimizer Setup</a>, the same whichever way you run
 it.</p>
 </div>
-<p>The <a href="../../running/running/">simple API</a> covers the common case with a single
-call: one optimization run, one evaluator, results returned when it finishes. The
-workflow components documented here are the layer beneath it — the same building
-blocks the simple API is assembled from, exposed directly.</p>
-<p><strong>When to use them.</strong> Parallel execution, nested optimization, composing
-several runs, and custom event handlers are all already available through the
-simple API's convenience functions (<code>optimize</code>, <code>optimize_many</code>, <code>evaluate</code>,
-<code>evaluate_many</code>). The workflow components are the underlying building blocks
-those functions are assembled from — compute steps, event handlers, executors
-— exposed directly for full flexibility. Wiring one together by hand takes
-more code, but that code is where the extra flexibility lives: these
-components can express applications the simple API cannot.</p>
-<p><strong>Who this is for.</strong> This is the low-level API, and it assumes you are
-comfortable with <code>asyncio</code> and threads. Parallel execution runs on an event
-loop, event handlers may be invoked from several threads at once, and you are
-responsible for respecting the concurrency and process-boundary rules spelled out
-on these pages. Those rules are real limitations, not incidental detail: ignore
-them and a workflow will raise rather than silently misbehave. In return you get
-control that the simple API deliberately hides.</p>
+<p>The workflow components are the layer beneath the
+<a href="../../running/running/">simple API</a> — the compute steps, event handlers,
+evaluators and executors its convenience functions are assembled from, exposed
+directly. Everything those functions do is available here, along with the cases
+they cannot express; the cost is that you wire it together yourself.</p>
+<p>These pages assume <code>asyncio</code> and threads. Parallel execution runs on an event
+loop and event handlers may be invoked from several threads at once, so the
+concurrency and process-boundary rules stated here are binding: breaking one
+raises rather than misbehaving silently.</p>
 <div class="admonition note">
 <p class="admonition-title">Embedding <code>ropt</code> in a host application</p>
 <p>If you are building an application that already has its own batch-oriented
-evaluation infrastructure — for example dispatching a whole ensemble of
-runs to an external scheduler at once, the way <a href="https://github.com/equinor/everest">Everest</a>
-does — assembling these components by hand is not the only option.
+evaluation infrastructure — dispatching a whole ensemble of runs to an
+external scheduler at once, say — assembling these components by hand is
+not the only option.
 <a class="autorefs autorefs-internal" title="            ropt.workflow.BasicOptimizer" href="../../reference/basic_optimizer/#ropt.workflow.BasicOptimizer"><code>BasicOptimizer</code></a> wraps a single
 <code>OptimizationStep</code> and a <code>ResultsHandler</code> into a ready-made, run-once driver
 that takes a batch evaluator directly. See the
@@ -3323,7 +3391,9 @@ that takes a batch evaluator directly. See the
 </tbody>
 </table>
 <p>The first three are covered below. Executors are only relevant for asynchronous
-and parallel execution and are discussed in <a href="../parallel/">Parallel Evaluation</a>.</p>
+and parallel execution and are discussed in <a href="../parallel/">Parallel Evaluation</a>.
+Writing your own implementation of any of the four is covered in
+<a href="../components/">Implementing a Component</a>.</p>
 <p>Compute steps emit <a class="autorefs autorefs-internal" title="            EnOptEvent
 
 
@@ -3691,7 +3761,7 @@ There are two ways to drive one, and they are mutually exclusive:</p>
   multi-worker <code>ThreadExecutor</code>), route events through a dispatcher. It
   receives events from any thread and delivers them to its handlers one at a
   time, so a single handler can safely aggregate results produced on many
-  threads. See <a href="../parallel/#event-dispatcher">Event Dispatcher</a> for the pattern.</p>
+  threads. See <a href="#event-dispatcher">Event dispatcher</a> for the pattern.</p>
 </li>
 </ul>
 <p>A handler is owned by <strong>either</strong> one dispatcher <strong>or</strong> one-or-more compute
@@ -3708,7 +3778,7 @@ the emitting run <strong>waits</strong> for the event to be handled, so its exce
 re-raised on that run's own stack too — synchronously, including for the
 run's last event. Either way a handler bug surfaces as a single, clean
 exception — never a <code>BaseExceptionGroup</code>. See
-<a href="../parallel/#handler-failures">Handler failures</a> for details.</p>
+<a href="#handler-failures">Handler failures</a> for details.</p>
 </div>
 <div class="admonition warning">
 <p class="admonition-title">Do not share a handler across parallel steps</p>
@@ -3794,7 +3864,129 @@ attached to a compute step and forwards matching events to an
 <a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventDispatcher" href="../../reference/components_event_handlers/#ropt.components.event_handlers.EventDispatcher"><code>EventDispatcher</code></a>. The dispatcher
 dispatches them from the asyncio event loop's thread, so handlers registered on
 the dispatcher require no locking.</p>
-<p>See <a href="../parallel/#event-dispatcher">Event Dispatcher</a> for the full pattern.</p>
+<h2 id="event-dispatcher">Event dispatcher</h2>
+<p>When multiple compute steps run concurrently in worker threads, their event
+handlers are called from multiple threads simultaneously. <strong>Event handlers must
+not be shared across concurrent compute steps</strong>: doing so raises a
+<a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a>.</p>
+<p><a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventDispatcher" href="../../reference/components_event_handlers/#ropt.components.event_handlers.EventDispatcher"><code>EventDispatcher</code></a> is the
+required solution: it receives events on a queue and dispatches them to its own
+handlers from the asyncio event loop's thread. Because all handler calls happen
+on a single thread, handlers registered on the dispatcher are safe even when
+events arrive from multiple concurrent steps.</p>
+<p>This is especially useful when one set of handlers needs to aggregate results
+from multiple concurrent compute steps.</p>
+<p><code>EventDispatcher</code> follows the same lifecycle as executors:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">async</span> <span class="k">with</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">TaskGroup</span><span class="p">()</span> <span class="k">as</span> <span class="n">tg</span><span class="p">:</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    <span class="n">executor</span> <span class="o">=</span> <span class="n">ThreadExecutor</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    <span class="k">await</span> <span class="n">executor</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="n">tg</span><span class="p">)</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    <span class="n">event_dispatcher</span> <span class="o">=</span> <span class="n">EventDispatcher</span><span class="p">()</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    <span class="k">await</span> <span class="n">event_dispatcher</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="n">tg</span><span class="p">)</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>    <span class="c1"># Attach an EventForwardHandler to the compute step.</span>
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>    <span class="n">step</span><span class="o">.</span><span class="n">add_event_handler</span><span class="p">(</span>
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>        <span class="n">EventForwardHandler</span><span class="p">(</span>
+</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>            <span class="n">event_dispatcher</span><span class="p">,</span>
+</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>            <span class="n">event_types</span><span class="o">=</span><span class="p">{</span><span class="n">EnOptEventType</span><span class="o">.</span><span class="n">FINISHED_EVALUATION</span><span class="p">},</span>
+</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>        <span class="p">)</span>
+</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>    <span class="p">)</span>
+</span><span id="__span-1-15"><a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>
+</span><span id="__span-1-16"><a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a>    <span class="c1"># Handlers registered on the dispatcher need no locking.</span>
+</span><span id="__span-1-17"><a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a>    <span class="n">result_handler</span> <span class="o">=</span> <span class="n">ResultsHandler</span><span class="p">()</span>
+</span><span id="__span-1-18"><a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a>    <span class="n">event_dispatcher</span><span class="o">.</span><span class="n">add_event_handler</span><span class="p">(</span><span class="n">result_handler</span><span class="p">)</span>
+</span><span id="__span-1-19"><a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a>
+</span><span id="__span-1-20"><a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a>    <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">to_thread</span><span class="p">(</span><span class="n">step</span><span class="o">.</span><span class="n">run</span><span class="p">,</span> <span class="n">variables</span><span class="o">=...</span><span class="p">,</span> <span class="n">context</span><span class="o">=...</span><span class="p">)</span>
+</span><span id="__span-1-21"><a id="__codelineno-1-21" name="__codelineno-1-21" href="#__codelineno-1-21"></a>
+</span><span id="__span-1-22"><a id="__codelineno-1-22" name="__codelineno-1-22" href="#__codelineno-1-22"></a>    <span class="n">event_dispatcher</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
+</span><span id="__span-1-23"><a id="__codelineno-1-23" name="__codelineno-1-23" href="#__codelineno-1-23"></a>    <span class="n">executor</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
+</span></code></pre></div>
+<p><a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventForwardHandler" href="../../reference/components_event_handlers/#ropt.components.event_handlers.EventForwardHandler"><code>EventForwardHandler</code></a> is a
+regular event handler that can be attached to a compute step. When the step
+emits an event it submits the event to the dispatcher and <strong>blocks on the
+emitting run's own thread until every handler has processed it</strong>, preserving the
+order in which events are submitted. If a handler raises, the original exception
+is re-raised there, on the run's stack (see <a href="#handler-failures">Handler failures</a>).</p>
+<div class="admonition warning">
+<p class="admonition-title">Event handling is a single-process mechanism</p>
+<p>An <a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventDispatcher" href="../../reference/components_event_handlers/#ropt.components.event_handlers.EventDispatcher"><code>EventDispatcher</code></a> and
+every <a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventHandler" href="../../reference/components_event_handlers/#ropt.components.event_handlers.EventHandler"><code>EventHandler</code></a> live in
+the process that created them. <code>EventForwardHandler</code> delivers events by
+calling the dispatcher's <code>dispatch_event</code>, which schedules them onto its
+event loop with <code>call_soon_threadsafe</code> — a <em>thread</em>-safe call, not a
+<em>process</em>-safe one. A dispatcher reached from another process has no live
+loop, so a forwarded event cannot arrive.</p>
+<p>Event handlers can therefore only observe events emitted <strong>within their own
+process</strong>. Any compute step executed out-of-process — for example a whole
+optimization sent to a
+<a class="autorefs autorefs-internal" title="            ropt.components.executors.ProcessExecutor" href="../../reference/components_executors/#ropt.components.executors.ProcessExecutor"><code>ProcessExecutor</code></a>
+or <a class="autorefs autorefs-internal" title="            ropt.components.executors.HPCExecutor" href="../../reference/components_executors/#ropt.components.executors.HPCExecutor"><code>HPCExecutor</code></a>, whether as a work
+item of its own or as the enclosing layer
+of a nested workflow — may attach handlers local to that worker process,
+but those handlers cannot deliver events to a dispatcher or handler in the
+host process. To collect information from out-of-process steps, return it as
+data (the task's return value, or result metadata) rather than through
+shared handlers.</p>
+<p>This is why process- and HPC-based parallelism belongs at the innermost
+(leaf) evaluations — which return data and emit no events — while any layer
+that drives event-producing compute steps must run in-process. See
+<a href="../parallel/#nested-workflows-and-process-boundaries">Nested workflows and process boundaries</a>.</p>
+</div>
+<h3 id="handler-failures">Handler failures</h3>
+<p>Forwarding an event through an
+<a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventForwardHandler" href="../../reference/components_event_handlers/#ropt.components.event_handlers.EventForwardHandler"><code>EventForwardHandler</code></a> is
+<strong>synchronous</strong>: the emitting run blocks until the dispatcher has run every
+handler for that event. A handler failure is therefore delivered like an
+evaluation error — on the emitting run's own call stack — and splits
+<code>Exception</code> from <code>BaseException</code> exactly as the executor does:</p>
+<ul>
+<li>An ordinary <code>Exception</code> from a handler is <strong>re-raised on the emitting run's
+  stack</strong>, unwrapped — a single, clean exception that stops the run normally,
+  exactly as if a directly-attached handler had raised inline. It is logged
+  (with the handler and the event type) as it is caught. Because emission is
+  synchronous, this covers the run's <strong>last</strong> event too; nothing is deferred or
+  lost. Every handler for the event still runs before the error surfaces; if
+  several fail, the first (in registration order) is raised.</li>
+<li>A <code>BaseException</code> (such as <code>CancelledError</code>) is <strong>not</strong> delivered this way: it
+  remains the session teardown backstop and propagates, tearing the dispatcher
+  task group down, as with the executor.</li>
+</ul>
+<h3 id="thread-based-dispatch">Thread-based dispatch</h3>
+<p>By default, handlers registered with <code>EventDispatcher</code> are called directly in
+the asyncio event loop's thread. This is efficient for handlers that only do
+in-memory work, such as <code>ResultsHandler</code> or <code>HistoryHandler</code>.</p>
+<p>If a handler performs blocking operations — writing results to a file, pushing
+data to a database, sending over a network — pass <code>run_in_thread=True</code> when
+registering it:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">event_dispatcher</span><span class="o">.</span><span class="n">add_event_handler</span><span class="p">(</span><span class="n">my_handler</span><span class="p">,</span> <span class="n">run_in_thread</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span></code></pre></div>
+<p><code>CallbackHandler</code> and <code>DataFrameHandler</code> (when a slow callback is set via
+<code>set_callback</code>) are common cases where this is needed. When multiple handlers
+with <code>run_in_thread=True</code> match the same event they are dispatched <strong>in
+parallel</strong> via <code>asyncio.gather</code> — they do not block each other.</p>
+<h3 id="event-throughput">Event throughput</h3>
+<p>A dispatcher processes its queue <strong>one event at a time</strong>: all handlers for an
+event finish before the next event is taken. <code>run_in_thread=True</code> moves a
+blocking handler off the event loop, but it does not overlap that handler with
+the handlers of any <em>other</em> event — only with the threaded handlers of the same
+event.</p>
+<p>This serialization is deliberate.
+<a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventHandler" href="../../reference/components_event_handlers/#ropt.components.event_handlers.EventHandler"><code>EventHandler</code></a> is not re-entrant,
+and a handler shared by concurrently running optimizations — one accumulating
+results across all of them, say — needs exactly this guarantee to stay
+lock-free.</p>
+<p>The price is that handler cost scales with the <em>total</em> number of events across
+all runs sharing the dispatcher, and is paid on the critical path of every
+event. Measured with eight concurrent runs emitting five events each, sharing
+one dispatcher and one handler that blocks for 50 ms: <strong>2.02 s elapsed</strong>,
+against 2.00 s for fully serial execution and 0.25 s if the handlers had run
+fully concurrently — never more than one handler thread active at a time.</p>
+<p>Runs share a dispatcher when they share a handler scope, which is the normal
+case for <a class="autorefs autorefs-internal" title="            ropt.simple.optimize_many" href="../../reference/simple/#ropt.simple.optimize_many"><code>optimize_many</code></a>: it reads the current
+handler scope once on the calling thread and gives the same one to every job.
+An N-way <code>optimize_many</code> therefore pays its handler cost serially. Keep shared
+handlers cheap; if one must do heavy I/O, buffer in memory and flush once the
+runs have finished.</p>
 <h2 id="evaluators">Evaluators</h2>
 <p>A compute step never evaluates the model itself — it delegates to an
 <a class="autorefs autorefs-internal" title="            ropt.components.evaluators.Evaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.Evaluator"><code>Evaluator</code></a> instance that you supply. The
@@ -3803,11 +3995,6 @@ in <a href="../evaluation_callbacks/">Writing Evaluation Callbacks</a>. For para
 process-based, or HPC evaluation, see
 <a class="autorefs autorefs-internal" title="            ropt.components.evaluators.ParallelEvaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.ParallelEvaluator"><code>ParallelEvaluator</code></a> in
 <a href="../parallel/">Parallel Evaluation</a>.</p>
-<h2 id="see-also">See also</h2>
-<ul>
-<li><a href="../workflow/">Building a Workflow</a> — step-by-step
-  example building a workflow from scratch.</li>
-</ul>
 
 
 

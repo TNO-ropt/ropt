@@ -12,7 +12,7 @@
         <link rel="prev" href="../evaluation_callbacks/">
       
       
-        <link rel="next" href="../workflow/">
+        <link rel="next" href="../components/">
       
       
         
@@ -1930,56 +1930,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#event-dispatcher" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Event dispatcher
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Event dispatcher">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#handler-failures" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Handler failures
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#thread-based-dispatch" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Thread-based dispatch
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#event-throughput" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Event throughput
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#two-rules-for-using-the-low-level-api" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2017,14 +1967,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../workflow/" class="md-nav__link">
+      <a href="../components/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Building a Workflow
+    Implementing a Component
   
 
     
@@ -3433,56 +3383,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#event-dispatcher" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Event dispatcher
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Event dispatcher">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#handler-failures" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Handler failures
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#thread-based-dispatch" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Thread-based dispatch
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#event-throughput" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Event throughput
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#two-rules-for-using-the-low-level-api" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3650,7 +3550,7 @@ work in a process of its own it can be changed safely per work item.</p>
 a separate process. If such a work item runs a compute step, that step's
 event handlers stay in the worker process and cannot deliver events to a
 dispatcher or handler in the host process — return results as data instead.
-See <a href="#event-dispatcher">Event handling is a single-process mechanism</a>.</p>
+See <a href="../workflows/#event-dispatcher">Event handling is a single-process mechanism</a>.</p>
 </div>
 <p>Four implementations are provided:</p>
 <h3 id="threadexecutor">ThreadExecutor</h3>
@@ -3855,14 +3755,6 @@ HPC scheduler (e.g. Slurm) via the <code>pysqa</code> library. Each task is seri
 disk, submitted to the queue, polled for completion, and its result is
 deserialized back. Requires <code>ropt[hpc]</code> to be installed. Add <code>ropt[cloudpickle]</code>
 to send functions the standard <code>pickle</code> module cannot.</p>
-<p>The executor manages the full remote task lifecycle:</p>
-<ul>
-<li>Serializing the task (function and arguments) to a shared filesystem.</li>
-<li>Submitting the task as a job to the HPC queue.</li>
-<li>Polling the queue for the job's status.</li>
-<li>Retrieving results (or exceptions) once the job completes.</li>
-<li>Cancelling any jobs that are still outstanding when the executor stops.</li>
-</ul>
 <p>Stopping the executor with <code>cancel()</code> asks the scheduler to delete every job it
 has submitted, so an interrupted optimization does not leave orphan jobs behind
 consuming the cluster allocation. Cancellation is best effort: if the scheduler
@@ -3938,17 +3830,12 @@ cannot be reached the failure is logged and stopping continues.</p>
 </tbody>
 </table>
 <p>Jobs are described either by a <code>pysqa</code> configuration or by a <code>template</code>, and the
-two are mutually exclusive. A <code>template</code> submits without a configuration, so it
-cannot be combined with <code>config_path</code>, <code>cluster</code> or <code>queue</code>, and <code>scheduler</code> is
-what tells <code>pysqa</code> which scheduler the script is written for; combining the two
-raises a <code>ValueError</code> at construction. Note that <code>queue</code> names a queue <strong>defined
-in the configuration</strong>, not necessarily the scheduler's partition: it selects
-that entry's script and resource limits, and the partition is written in the
-script. Both are laid out <a href="#configuring-the-scheduler">below</a>.</p>
-<p>See <a href="../../running/parallel/#running-on-an-hpc-cluster">Parallel Execution and Many Runs</a>
-for the same ground from the high-level API, and the
-<a href="https://pysqa.readthedocs.io/en/latest/queue.html"><code>pysqa</code> documentation</a> for
-the file formats in full.</p>
+two are mutually exclusive; combining them raises a <code>ValueError</code> at
+construction. Selecting a queue or a cluster, asking for resources and writing a
+template are covered in
+<a href="../../running/parallel/#running-on-an-hpc-cluster">Parallel Execution and Many Runs</a>.
+What follows is the executor's own behaviour, and the layout of a configuration
+directory.</p>
 <p>A finished job's result is not always readable at once: the job may have died
 before writing it, or the file may be caught half-written. <code>retries</code> is how many
 <strong>further</strong> polls to allow before the work item is failed with an
@@ -4022,30 +3909,16 @@ script per queue. A minimal Slurm configuration:</p>
 </span><span id="__span-5-14"><a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a><span class="cp">{{</span><span class="nv">command</span><span class="cp">}}</span>
 </span></code></pre></div>
 <p>The scripts are
-<a href="https://jinja.palletsprojects.com/en/stable/templates/">Jinja</a> templates, which
-<code>pysqa</code> renders through the <code>jinja2</code> package with <code>job_name</code>, <code>output</code>,
-<code>working_directory</code>, <code>cores</code>, <code>memory_max</code>, <code>run_time_max</code> and <code>command</code>, plus
-whatever the caller passes in
+<a href="https://jinja.palletsprojects.com/en/stable/templates/">Jinja</a> templates,
+rendered by <code>pysqa</code> with <code>job_name</code>, <code>output</code>, <code>working_directory</code>, <code>cores</code>,
+<code>memory_max</code>, <code>run_time_max</code> and <code>command</code>, plus whatever the caller passes in
 <code>submit_options</code>. A variable the caller does not supply renders as empty, which
-is why optional directives are wrapped in <code>{% if %}</code>. The partition is <em>not</em> one
-of these variables: it is written literally, which is why each queue normally
-needs its own script.</p>
+is why optional directives are wrapped in <code>{% if %}</code>. The partition is <em>not</em>
+among them: it is written literally, which is why each queue normally needs its
+own script.</p>
 <p>Sites with more than one cluster use a <code>clusters.yaml</code> naming a <code>queue.yaml</code> per
 cluster, each declaring its own <code>queue_type</code>; see the
-<a href="https://pysqa.readthedocs.io/en/latest/advanced.html#access-to-multiple-hpcs"><code>pysqa</code> documentation</a>.
-The target is resolved from <code>cluster</code> and <code>queue</code>:</p>
-<ul>
-<li>If <code>cluster</code> is given, it is selected directly. When <code>queue</code> is also given,
-  it must be available on that cluster.</li>
-<li>If only <code>queue</code> is given, the cluster providing it is derived automatically,
-  which requires exactly one cluster to provide it; no match, or several, is an
-  error.</li>
-<li>If neither is given, the configuration's own primaries apply.</li>
-</ul>
-<p>A <code>template</code> replaces all of this with a script supplied directly, in which case
-<code>scheduler</code> states the queueing system, since no configuration is read to
-declare it. It is <code>pysqa</code>'s <code>queue_type</code> under a name that does not collide with
-ropt's <code>queue</code>.</p>
+<a href="https://pysqa.readthedocs.io/en/latest/advanced.html#access-to-multiple-hpcs"><code>pysqa</code> documentation</a>.</p>
 <h2 id="stopping-an-executor">Stopping an executor</h2>
 <p><code>executor.cancel()</code> stops the executor and returns immediately; it never waits
 for work that is already running. Callers see the same thing whichever executor
@@ -4258,139 +4131,16 @@ than the lock it was caught on. The failure happens in the process that
 submitted the work, before any worker sees it. See
 <a href="#nested-workflows-and-process-boundaries">Nested workflows and process boundaries</a>
 for what belongs where.</p>
-<h2 id="event-dispatcher">Event dispatcher</h2>
-<p>When multiple compute steps run concurrently in worker threads, their event
-handlers are called from multiple threads simultaneously. <strong>Event handlers must
-not be shared across concurrent compute steps</strong>: doing so raises a
-<a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a>.</p>
-<p><a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventDispatcher" href="../../reference/components_event_handlers/#ropt.components.event_handlers.EventDispatcher"><code>EventDispatcher</code></a> is the
-required solution: it receives events on a queue and dispatches them to its own
-handlers from the asyncio event loop's thread. Because all handler calls happen
-on a single thread, handlers registered on the dispatcher are safe even when
-events arrive from multiple concurrent steps.</p>
-<p>This is especially useful when one set of handlers needs to aggregate results
-from multiple concurrent compute steps.</p>
-<p><code>EventDispatcher</code> follows the same lifecycle as executors:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">async</span> <span class="k">with</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">TaskGroup</span><span class="p">()</span> <span class="k">as</span> <span class="n">tg</span><span class="p">:</span>
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>    <span class="n">executor</span> <span class="o">=</span> <span class="n">ThreadExecutor</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>    <span class="k">await</span> <span class="n">executor</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="n">tg</span><span class="p">)</span>
-</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>
-</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>    <span class="n">event_dispatcher</span> <span class="o">=</span> <span class="n">EventDispatcher</span><span class="p">()</span>
-</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>    <span class="k">await</span> <span class="n">event_dispatcher</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="n">tg</span><span class="p">)</span>
-</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>
-</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>    <span class="c1"># Attach an EventForwardHandler to the compute step.</span>
-</span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>    <span class="n">step</span><span class="o">.</span><span class="n">add_event_handler</span><span class="p">(</span>
-</span><span id="__span-7-10"><a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a>        <span class="n">EventForwardHandler</span><span class="p">(</span>
-</span><span id="__span-7-11"><a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a>            <span class="n">event_dispatcher</span><span class="p">,</span>
-</span><span id="__span-7-12"><a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a>            <span class="n">event_types</span><span class="o">=</span><span class="p">{</span><span class="n">EnOptEventType</span><span class="o">.</span><span class="n">FINISHED_EVALUATION</span><span class="p">},</span>
-</span><span id="__span-7-13"><a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a>        <span class="p">)</span>
-</span><span id="__span-7-14"><a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a>    <span class="p">)</span>
-</span><span id="__span-7-15"><a id="__codelineno-7-15" name="__codelineno-7-15" href="#__codelineno-7-15"></a>
-</span><span id="__span-7-16"><a id="__codelineno-7-16" name="__codelineno-7-16" href="#__codelineno-7-16"></a>    <span class="c1"># Handlers registered on the dispatcher need no locking.</span>
-</span><span id="__span-7-17"><a id="__codelineno-7-17" name="__codelineno-7-17" href="#__codelineno-7-17"></a>    <span class="n">result_handler</span> <span class="o">=</span> <span class="n">ResultsHandler</span><span class="p">()</span>
-</span><span id="__span-7-18"><a id="__codelineno-7-18" name="__codelineno-7-18" href="#__codelineno-7-18"></a>    <span class="n">event_dispatcher</span><span class="o">.</span><span class="n">add_event_handler</span><span class="p">(</span><span class="n">result_handler</span><span class="p">)</span>
-</span><span id="__span-7-19"><a id="__codelineno-7-19" name="__codelineno-7-19" href="#__codelineno-7-19"></a>
-</span><span id="__span-7-20"><a id="__codelineno-7-20" name="__codelineno-7-20" href="#__codelineno-7-20"></a>    <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">to_thread</span><span class="p">(</span><span class="n">step</span><span class="o">.</span><span class="n">run</span><span class="p">,</span> <span class="n">variables</span><span class="o">=...</span><span class="p">,</span> <span class="n">context</span><span class="o">=...</span><span class="p">)</span>
-</span><span id="__span-7-21"><a id="__codelineno-7-21" name="__codelineno-7-21" href="#__codelineno-7-21"></a>
-</span><span id="__span-7-22"><a id="__codelineno-7-22" name="__codelineno-7-22" href="#__codelineno-7-22"></a>    <span class="n">event_dispatcher</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
-</span><span id="__span-7-23"><a id="__codelineno-7-23" name="__codelineno-7-23" href="#__codelineno-7-23"></a>    <span class="n">executor</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
-</span></code></pre></div>
-<p><a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventForwardHandler" href="../../reference/components_event_handlers/#ropt.components.event_handlers.EventForwardHandler"><code>EventForwardHandler</code></a> is a
-regular event handler that can be attached to a compute step. When the step
-emits an event it submits the event to the dispatcher and <strong>blocks on the
-emitting run's own thread until every handler has processed it</strong>, preserving the
-order in which events are submitted. If a handler raises, the original exception
-is re-raised there, on the run's stack (see <a href="#handler-failures">Handler failures</a>).</p>
-<div class="admonition warning">
-<p class="admonition-title">Event handling is a single-process mechanism</p>
-<p>An <a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventDispatcher" href="../../reference/components_event_handlers/#ropt.components.event_handlers.EventDispatcher"><code>EventDispatcher</code></a> and
-every <a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventHandler" href="../../reference/components_event_handlers/#ropt.components.event_handlers.EventHandler"><code>EventHandler</code></a> live in
-the process that created them. <code>EventForwardHandler</code> delivers events by
-calling the dispatcher's <code>dispatch_event</code>, which schedules them onto its
-event loop with <code>call_soon_threadsafe</code> — a <em>thread</em>-safe call, not a
-<em>process</em>-safe one. A dispatcher reached from another process has no live
-loop, so a forwarded event cannot arrive.</p>
-<p>Event handlers can therefore only observe events emitted <strong>within their own
-process</strong>. Any compute step executed out-of-process — for example a whole
-optimization sent to a
-<a class="autorefs autorefs-internal" title="            ropt.components.executors.ProcessExecutor" href="../../reference/components_executors/#ropt.components.executors.ProcessExecutor"><code>ProcessExecutor</code></a>
-or <a class="autorefs autorefs-internal" title="            ropt.components.executors.HPCExecutor" href="../../reference/components_executors/#ropt.components.executors.HPCExecutor"><code>HPCExecutor</code></a>, whether as a work
-item of its own or as the enclosing layer
-of a nested workflow — may attach handlers local to that worker process,
-but those handlers cannot deliver events to a dispatcher or handler in the
-host process. To collect information from out-of-process steps, return it as
-data (the task's return value, or result metadata) rather than through
-shared handlers.</p>
-<p>This is why process- and HPC-based parallelism belongs at the innermost
-(leaf) evaluations — which return data and emit no events — while any layer
-that drives event-producing compute steps must run in-process. See
-<a href="#nested-workflows-and-process-boundaries">Nested workflows and process boundaries</a>.</p>
-</div>
-<h3 id="handler-failures">Handler failures</h3>
-<p>Forwarding an event through an
-<a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventForwardHandler" href="../../reference/components_event_handlers/#ropt.components.event_handlers.EventForwardHandler"><code>EventForwardHandler</code></a> is
-<strong>synchronous</strong>: the emitting run blocks until the dispatcher has run every
-handler for that event. A handler failure is therefore delivered like an
-evaluation error — on the emitting run's own call stack — and splits
-<code>Exception</code> from <code>BaseException</code> exactly as the executor does:</p>
-<ul>
-<li>An ordinary <code>Exception</code> from a handler is <strong>re-raised on the emitting run's
-  stack</strong>, unwrapped — a single, clean exception that stops the run normally,
-  exactly as if a directly-attached handler had raised inline. It is logged
-  (with the handler and the event type) as it is caught. Because emission is
-  synchronous, this covers the run's <strong>last</strong> event too; nothing is deferred or
-  lost. Every handler for the event still runs before the error surfaces; if
-  several fail, the first (in registration order) is raised.</li>
-<li>A <code>BaseException</code> (such as <code>CancelledError</code>) is <strong>not</strong> delivered this way: it
-  remains the session teardown backstop and propagates, tearing the dispatcher
-  task group down, as with the executor.</li>
-</ul>
-<h3 id="thread-based-dispatch">Thread-based dispatch</h3>
-<p>By default, handlers registered with <code>EventDispatcher</code> are called directly in
-the asyncio event loop's thread. This is efficient for handlers that only do
-in-memory work, such as <code>ResultsHandler</code> or <code>HistoryHandler</code>.</p>
-<p>If a handler performs blocking operations — writing results to a file, pushing
-data to a database, sending over a network — pass <code>run_in_thread=True</code> when
-registering it:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">event_dispatcher</span><span class="o">.</span><span class="n">add_event_handler</span><span class="p">(</span><span class="n">my_handler</span><span class="p">,</span> <span class="n">run_in_thread</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</span></code></pre></div>
-<p><code>CallbackHandler</code> and <code>DataFrameHandler</code> (when a slow callback is set via
-<code>set_callback</code>) are common cases where this is needed. When multiple handlers
-with <code>run_in_thread=True</code> match the same event they are dispatched <strong>in
-parallel</strong> via <code>asyncio.gather</code> — they do not block each other.</p>
-<h3 id="event-throughput">Event throughput</h3>
-<p>A dispatcher processes its queue <strong>one event at a time</strong>: all handlers for an
-event finish before the next event is taken. <code>run_in_thread=True</code> moves a
-blocking handler off the event loop, but it does not overlap that handler with
-the handlers of any <em>other</em> event — only with the threaded handlers of the same
-event.</p>
-<p>This serialization is deliberate.
-<a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventHandler" href="../../reference/components_event_handlers/#ropt.components.event_handlers.EventHandler"><code>EventHandler</code></a> is not re-entrant,
-and a handler shared by concurrently running optimizations — one accumulating
-results across all of them, say — needs exactly this guarantee to stay
-lock-free.</p>
-<p>The price is that handler cost scales with the <em>total</em> number of events across
-all runs sharing the dispatcher, and is paid on the critical path of every
-event. Measured with eight concurrent runs emitting five events each, sharing
-one dispatcher and one handler that blocks for 50 ms: <strong>2.02 s elapsed</strong>,
-against 2.00 s for fully serial execution and 0.25 s if the handlers had run
-fully concurrently — never more than one handler thread active at a time.</p>
-<p>Runs share a dispatcher when they share a handler scope, which is the normal
-case for <a class="autorefs autorefs-internal" title="            ropt.simple.optimize_many" href="../../reference/simple/#ropt.simple.optimize_many"><code>optimize_many</code></a>: it reads the current
-handler scope once on the calling thread and gives the same one to every job.
-An N-way <code>optimize_many</code> therefore pays its handler cost serially. Keep shared
-handlers cheap; if one must do heavy I/O, buffer in memory and flush once the
-runs have finished.</p>
 <h2 id="two-rules-for-using-the-low-level-api">Two rules for using the low-level API</h2>
 <p><strong>Run a compute step in a worker thread.</strong> <code>step.run()</code> is an ordinary
 synchronous method that runs its evaluator and its handlers <strong>on whatever
 thread called it</strong>. On the event loop thread it blocks the loop, and the
 executors and dispatchers it is waiting for are tasks on that same loop:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="c1"># Wrong: run() executes here, on the loop thread.</span>
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="n">step</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="n">x0</span><span class="p">)</span>
-</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>
-</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="c1"># Right: the loop stays free to service the workers.</span>
-</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">to_thread</span><span class="p">(</span><span class="n">step</span><span class="o">.</span><span class="n">run</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="n">x0</span><span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1"># Wrong: run() executes here, on the loop thread.</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="n">step</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="n">x0</span><span class="p">)</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="c1"># Right: the loop stays free to service the workers.</span>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">to_thread</span><span class="p">(</span><span class="n">step</span><span class="o">.</span><span class="n">run</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="n">x0</span><span class="p">)</span>
 </span></code></pre></div>
 <p><code>ropt.simple</code> already does this for you; it applies when driving compute steps
 yourself. A step that dispatches to an executor detects the mistake and raises
@@ -4413,7 +4163,7 @@ several concurrent steps can share one asyncio event loop, and usually shared
 <a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventDispatcher" href="../../reference/components_event_handlers/#ropt.components.event_handlers.EventDispatcher"><code>EventDispatcher</code></a> as well. All
 of these live <strong>in a single process</strong>.</p>
 <p>This is a consequence of the general rule that
-<a href="#event-dispatcher">event handling is a single-process mechanism</a>: it places a
+<a href="../workflows/#event-dispatcher">event handling is a single-process mechanism</a>: it places a
 hard constraint on where each layer of a nested workflow may run:</p>
 <div class="admonition warning">
 <p class="admonition-title">The enclosing layer of a nested workflow must run in-process</p>
@@ -4522,13 +4272,13 @@ nested workflow. The nested examples follow exactly this shape:</p>
         
         
           
-          <a href="../workflow/" class="md-footer__link md-footer__link--next" aria-label="Next: Building a Workflow">
+          <a href="../components/" class="md-footer__link md-footer__link--next" aria-label="Next: Implementing a Component">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Building a Workflow
+                Implementing a Component
               </div>
             </div>
             <div class="md-footer__button md-icon">

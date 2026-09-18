@@ -1673,14 +1673,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../advanced/workflow/" class="md-nav__link">
+      <a href="../../advanced/components/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Building a Workflow
+    Implementing a Component
   
 
     
@@ -3927,7 +3927,7 @@ shared across concurrently running steps with an
 <a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventDispatcher" href="#ropt.components.event_handlers.EventDispatcher"><code>EventDispatcher</code></a>
 instead, which serializes the calls. See
 <a href="../../advanced/workflows/#event-handlers">Optimization Workflows</a> and
-<a href="../../advanced/parallel/#event-dispatcher">Parallel Evaluation</a> for usage
+<a href="../../advanced/workflows/#event-dispatcher">Event dispatcher</a> for usage
 and pitfalls.</p>
 </details>
 
@@ -5864,7 +5864,7 @@ etc.), register this handler with <code>run_in_thread=True</code> on the
 <p>Handlers added with <code>run_in_thread=True</code> run on a thread pool the
 dispatcher owns and shuts down when it stops, so handler work is isolated
 from the asyncio loop's shared default pool.</p>
-<p>See <a href="../../advanced/parallel/#event-dispatcher">Parallel Evaluation</a> for usage.</p>
+<p>See <a href="../../advanced/workflows/#event-dispatcher">Optimization Workflows</a> for usage.</p>
 
 
 
@@ -5902,7 +5902,7 @@ from the asyncio loop's shared default pool.</p>
         <p>Add an event handler.</p>
 <p>By default the handler is called directly on the event loop's thread.
 Pass <code>run_in_thread=True</code> for handlers that perform blocking I/O; see
-<a href="../../advanced/parallel/#thread-based-dispatch">Thread-based dispatch</a>.</p>
+<a href="../../advanced/workflows/#thread-based-dispatch">Thread-based dispatch</a>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -6082,7 +6082,7 @@ dispatcher or registered with a compute step.</p>
         <p>Submit an event and block until every handler has processed it.</p>
 <p>Events are handled in submission order. A handler exception is
 re-raised here, on the caller's own stack. See
-<a href="../../advanced/parallel/#handler-failures">Handler failures</a>.</p>
+<a href="../../advanced/workflows/#handler-failures">Handler failures</a>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
