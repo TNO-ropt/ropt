@@ -173,7 +173,6 @@ nav:
       - "Plugin System": reference/plugin_manager.md
       - "Enumerations": reference/enums.md
       - "Exceptions": reference/exceptions.md
-      - "Basic Optimizer": reference/basic_optimizer.md
 
 exclude_docs: |
   /snippets/

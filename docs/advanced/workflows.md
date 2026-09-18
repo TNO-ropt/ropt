@@ -19,17 +19,6 @@ loop and event handlers may be invoked from several threads at once, so the
 concurrency and process-boundary rules stated here are binding: breaking one
 raises rather than misbehaving silently.
 
-!!! note "Embedding `ropt` in a host application"
-
-    If you are building an application that already has its own batch-oriented
-    evaluation infrastructure — dispatching a whole ensemble of runs to an
-    external scheduler at once, say — assembling these components by hand is
-    not the only option.
-    [`BasicOptimizer`][ropt.workflow.BasicOptimizer] wraps a single
-    `OptimizationStep` and a `ResultsHandler` into a ready-made, run-once driver
-    that takes a batch evaluator directly. See the
-    [reference](../reference/basic_optimizer.md) for details.
-
 There are four core workflow components:
 
 | Concept                                                                     | Role                                                                                            |
