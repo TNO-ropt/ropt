@@ -225,15 +225,15 @@ class Session:
 
     A session owns one background event loop, on its own daemon thread. Pools
     need that loop to run on, which is why they are built here rather than
-    constructed on their own. Everything a session hands out is returned to the
+    constructed on their own. Everything a session creates is returned to the
     caller and passed on explicitly; nothing is discovered from the surroundings.
 
     Bind the session with `as` and call its factories inside the block. See
     [Running Optimizations](../running/running.md).
 
-    Sessions are objects, so opening one inside another is unremarkable: each
-    gets its own loop, and pools from different sessions never interact. A
-    session is single use — once closed it cannot be reopened.
+    A session may be opened inside another: each gets its own loop, and pools
+    from different sessions never interact. A session is single use — once
+    closed it cannot be reopened.
     """
 
     def __init__(self) -> None:
@@ -290,6 +290,11 @@ class Session:
 
         The evaluation function must be picklable. See
         [Running Optimizations](../running/running.md) for a walkthrough.
+
+        Closing the pool terminates its worker processes and nothing else. A
+        program an evaluation started itself keeps running, without an error
+        being raised; use [`local_pool`][ropt.simple.Session.local_pool] where
+        an evaluation launches external programs.
 
         Args:
             workers:     The number of worker processes.
@@ -436,8 +441,8 @@ class Session:
 
         Identical to the free [`serial_pool`][ropt.simple.serial_pool] function,
         except that this pool is closed when the session closes, so runs cannot
-        keep using it afterwards. Prefer the free function for a pool that
-        should outlive any session.
+        keep using it afterwards. The free function returns a pool that is tied
+        to no session.
 
         Returns:
             A pool without an executor.

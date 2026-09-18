@@ -167,7 +167,7 @@ which is what `cloudpickle` itself uses.
 
 Without `cloudpickle`, writing falls back to the standard `pickle` module, which
 requires the task function and its arguments to be importable, module-level
-objects. The two ways that can fail are worth telling apart:
+objects. The two ways that can fail differ:
 
 - A lambda or a closure cannot be written at all, so it is refused before it is
   sent, with an [`ExecutionError`][ropt.exceptions.ExecutionError] naming the
@@ -278,9 +278,9 @@ temporary directory has a random name, and one that is kept without being named
 is one nobody can find. A directory you passed yourself is never removed.
 
 Each run gets a directory of its own: an executor restarted after keeping one
-creates another, rather than writing into the files it just handed over. Ask
-[`workdir`][ropt.components.executors.LocalJobExecutor.workdir] for the current
-one.
+creates another, rather than writing into the files of the directory it kept.
+Read [`workdir`][ropt.components.executors.LocalJobExecutor.workdir] for the
+current one.
 
 ### HPCExecutor
 

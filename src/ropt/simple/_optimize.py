@@ -178,7 +178,8 @@ def optimize_many(  # ruff: ignore[too-many-arguments]
     The runs execute concurrently on driver threads and all evaluate on the
     same `pool`, so its workers are shared between them; `limit` bounds how
     many run simultaneously. Without a `pool` the runs still overlap, but each
-    evaluation runs in-process on its own driver thread. See
+    evaluation runs in-process on its own driver thread, so `function` is then
+    called by several threads at once and must tolerate that. See
     [Parallel Execution and Many Runs](../running/parallel.md#many-optimizations-at-once)
     for a walkthrough, and [Failure in one run](../running/parallel.md#failure-in-one-run)
     for what happens when one raises.

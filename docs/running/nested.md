@@ -6,7 +6,7 @@ method handles well. **Nested optimization** solves them in two loops. An outer
 run varies the awkward variables, and every outer evaluation runs a complete
 inner optimization over the remaining ones, returning the best value it reached.
 
-!!! tip "Worth following even if you never nest optimizations"
+!!! tip "This page also covers three things that are not nesting"
     Nesting itself is a niche, but this page puts three things that are not
     into one program small enough to read end to end: choosing a pool per
     layer, and why one of them has to stay on threads; collecting results from
@@ -113,7 +113,7 @@ Sending whole *optimizations* to the cluster, by putting the **outer** pool on
 processes or HPC, is possible but buys something different. Each outer
 evaluation is then copied into a job, and neither the inner pool nor the shared
 group can travel with it: the job has to open its own session and collect its
-own results, and hand them back as data for you to combine. Use that when the
+own results, and return them as data for you to combine. Use that when the
 outer evaluations are genuinely independent; use the shape above when you want
 one pool and one table across all of them.
 

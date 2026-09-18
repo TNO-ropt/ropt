@@ -41,8 +41,8 @@ class WorkerPool:
     walkthrough.
 
     A pool built by [`serial_pool`][ropt.simple.serial_pool] has no executor and
-    no workers to release; it exists so that runs sharing one batch-ID sequence
-    can say so, whether or not they run in parallel.
+    no workers to release; it exists to give runs one batch-ID sequence, whether
+    or not they run in parallel.
     """
 
     def __init__(

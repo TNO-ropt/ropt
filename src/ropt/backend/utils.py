@@ -38,7 +38,7 @@ def resolve_verbosity(*, verbose: bool | int | None) -> int | None:
     | `0`    | Do not report.                                             |
     | `n`    | Report at level `n`, clamped to what the optimizer offers. |
 
-    This says nothing about where the output goes: that is decided by the
+    This does not determine where the output goes: that is set by the
     `stdout` and `stderr` settings of
     [`OptimizerConfig`][ropt.config.OptimizerConfig].
 

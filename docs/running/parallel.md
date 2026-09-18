@@ -37,7 +37,7 @@ optimization batch**, and whole **optimizations against each other**. Nothing
 else overlaps — a single optimization is a sequence of batches, and the next one
 cannot start before the current one is complete.
 
-So the number of workers worth asking for is roughly
+So the number of workers that can be kept busy is roughly
 
 ```
 batch size  ×  optimizations running at once
@@ -154,7 +154,7 @@ with session() as s:
     result = optimize(config, x0, objective, pool=s.process_pool(workers=4))
 ```
 
-Reach for it when the computation is **Python code**, or when each evaluation
+This pool applies when the computation is **Python code**, or when each evaluation
 needs its own copy of something a library keeps globally. An objective that
 mostly runs an external program gains nothing here that a thread pool would not
 have given more cheaply.
@@ -171,7 +171,7 @@ only come **back** through the return value; see
     When a run is stopped — by Ctrl-C, or by closing the pool — the worker
     processes are killed, but anything they had launched themselves is not: a
     simulator or solver started by your objective keeps running, unattached,
-    after your program is gone. Nothing warns you. If your objective launches
+    after your program is gone. Nothing reports this. If your objective launches
     external programs, use a `local_pool` instead, which was built for exactly
     this.
 
@@ -386,7 +386,7 @@ set. The values available are the arguments described above — `job_name`,
 `output`, `working_directory`, `cores`, `memory_max`, `run_time_max`, `command`
 — plus whatever you pass in `submit_options`.
 
-Two of them are worth getting right: `{{command}}` is your evaluation and the
+Two of them carry the run: `{{command}}` is your evaluation and the
 script does nothing without it, and `{{output}}` is the file ropt reads back to
 explain a failed job. A script that omits `--output={{output}}` still runs, but a
 job that dies takes the only explanation with it.
@@ -531,7 +531,7 @@ indistinguishable from a hang. If an evaluation may run long and
 has to be interruptible, put it on one of the other pools.
 
 **Stopping is a request, not a guarantee.** On the pools that kill,
-everything is asked to end and not waited for. A program that ignores the
+everything is signalled to end and not waited for. A program that ignores the
 request, or that is stuck inside the operating system, keeps running. The run
 exits promptly instead of waiting out the current batch, but processes it
 started may still be alive afterwards.
@@ -776,8 +776,8 @@ processes.
       this is avoidable by sharing one pool; offloaded onto a process, local, or
       HPC pool it is not.
 
-    So reach for `offload` when a piece of work is genuinely self-contained and
-    hands its answer back as a return value. When several pieces must be
+    So `offload` fits a piece of work that is genuinely self-contained and
+    returns its answer as a return value. When several pieces must be
     coordinated — counted, collected, or held to one budget — drive them from
     your own process instead.
 

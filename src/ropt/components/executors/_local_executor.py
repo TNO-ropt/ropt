@@ -152,8 +152,8 @@ class LocalJobExecutor(JobExecutorBase):
     def workdir(self) -> Path:
         """The directory the jobs read and write.
 
-        Worth asking for when you did not pass one: that directory is temporary,
-        and this is the only way to find it while the executor is running.
+        When no directory was passed, this is a temporary one, and this property
+        is the only way to locate it while the executor is running.
 
         Returns:
             The working directory.

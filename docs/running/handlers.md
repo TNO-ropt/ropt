@@ -83,10 +83,10 @@ session.
 
 Closing a group earlier **releases its handlers**. A handler belongs to one
 group at a time, so this is what lets you put one into another group; otherwise
-only the session ending frees it. The group also hands back the dispatcher it
-runs on, together with any worker threads a `threaded` handler needed — which is
-why groups built in a loop are worth closing as you go rather than all at the
-end. Use [`close`][ropt.simple.SharedHandlers.close], or the group as a context
+only the session ending frees it. The group also releases the dispatcher it
+runs on, together with any worker threads a `threaded` handler needed, so
+closing groups built in a loop as you go frees those resources earlier than
+closing them all at the end. Use [`close`][ropt.simple.SharedHandlers.close], or the group as a context
 manager, which closes it on exit:
 
 ```python
@@ -104,14 +104,14 @@ so a run given one stops immediately with a
 [`WorkflowError`][ropt.exceptions.WorkflowError] rather than running to
 completion while its results go nowhere.
 
-!!! warning "Reach for a shared group only for real concurrency"
+!!! warning "A shared group costs more than a reused local handler"
     A group routes every run's events through a single, serialized
     [`EventDispatcher`][ropt.components.event_handlers.EventDispatcher] on a
     background loop. That serialization is what makes a
-    handler safe to share across *concurrent* runs — but around a plain
-    **sequential** loop it adds cost without benefit: a background loop plus a
-    cross-thread hand-off per result. Prefer a reused local handler for
-    sequential accumulation, and keep groups for genuinely concurrent runs. When
+    handler safe to share across *concurrent* runs. Around a plain
+    **sequential** loop it adds a background loop plus a cross-thread hand-off
+    per result, and a reused local handler accumulates the same results without
+    either. When
     you do share a group, move any slow, GIL-releasing (I/O) handler onto a
     worker thread with [`threaded`](#running-a-handler-in-a-thread) so it does
     not stall the shared loop for every run.
@@ -243,7 +243,7 @@ Convenience methods:
 `ropt.components.event_handlers` holds a few more handlers that `ropt.simple`
 does not re-export, because a run driven by `optimize` does not need them.
 
-The one you may still reach for is
+The remaining one that applies to a `optimize` run is
 [`CallbackHandler`][ropt.components.event_handlers.CallbackHandler], which
 calls a function for the event types you name. That is how you observe events
 other than results — the start or end of a run, for example; for results alone,
@@ -309,8 +309,8 @@ exactly as they do for an inline handler.
     stays in Python — building DataFrames, accumulating results, doing numerical
     work in pure Python — therefore gets **no** speed-up from `threaded`. It
     merely pays the small cost of handing work to another thread, which makes it
-    marginally *slower*, never faster. When in doubt, leave a handler inline; only
-    reach for `threaded` when you know it is busy with interruptible I/O.
+    marginally *slower*, never faster. `threaded` applies to a handler that is
+    busy with interruptible I/O, and to no other.
 
 `threaded` is only available on a shared group; a local handler always runs
 inline. To run a blocking handler on a thread for just one optimization, give it

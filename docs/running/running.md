@@ -63,7 +63,7 @@ def objective(variables: np.ndarray, context: EvaluationFunctionContext) -> floa
 - `variables` is a 1-D NumPy array: one set of variable values to evaluate.
 - `context` is an
   [`EvaluationFunctionContext`][ropt.components.evaluators.EvaluationFunctionContext]
-  that tells you *which* evaluation this is:
+  that identifies *which* evaluation this is:
     - `context.realization` — the realization number, for a problem with an
       ensemble of realizations; `optimize` then minimizes the weighted average
       objective over all of them. See
@@ -238,7 +238,7 @@ single = evaluate(config, x, objective)             # one FunctionResults
 batch = evaluate_many(config, matrix, objective)    # one per row of the matrix
 ```
 
-Both hand back [`FunctionResults`][ropt.results.FunctionResults] objects, the
+Both return [`FunctionResults`][ropt.results.FunctionResults] objects, the
 same kind `optimize` puts on `results` and a handler receives, so everything is
 read the same way wherever it came from. Here `result.variables` is just the
 point you supplied; it is only informative in a `report` callback, where the
@@ -251,14 +251,14 @@ which evaluates a single vector and then a matrix of them.
 ## When something goes wrong
 
 Not every problem is an exception. An optimization that cannot make progress
-still returns normally, and says why in `result.exit_code`:
+still returns normally, and indicates why in `result.exit_code`:
 `TOO_FEW_REALIZATIONS` when not enough realizations produced a value,
 `EXECUTOR_STOPPED` when the pool it was evaluating on was closed under it.
 `result.results` is `None` when no feasible result was ever recorded, whatever
-the reason the run ended; a run that fails part-way still hands back the best
+the reason the run ended; a run that fails part-way still returns the best
 result it had reached before that. A plain [`evaluate`][ropt.simple.evaluate]
-has no `exit_code`, and always hands back a result object; there it is
-`functions` being `None` that says nothing usable came back.
+has no `exit_code`, and always returns a result object; there, `functions` being
+`None` means that no usable result was produced.
 
 A run can also end with `OPTIMIZER_FINISHED` and still leave those fields
 `None`. Only a result that satisfies every constraint to within

@@ -133,8 +133,8 @@ class HPCExecutor(JobExecutorBase):
                             the scheduler.
             query_retries:  Number of extra attempts to query the scheduler after
                             one fails (`0` gives up at once). A run this long
-                            fails every job that is out, because nothing can be
-                            said about a job that cannot be asked after.
+                            fails every job that is out, since the state of a
+                            job that cannot be queried is unknown.
             cleanup:        Whether to remove work item files once their result is
                             retrieved or their job is cancelled. A work item that
                             failed keeps its captured output, which is the only

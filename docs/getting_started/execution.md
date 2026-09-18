@@ -71,7 +71,7 @@ Evaluating in place — with no pool, or with an explicit
 [`serial_pool`][ropt.simple.serial_pool] — is a choice rather than the absence
 of one, so there are five:
 
-| Pool | Evaluations run | Data | Reach for it when |
+| Pool | Evaluations run | Data | Applies when |
 | --- | --- | --- | --- |
 | none, or `serial_pool` | on the calling thread, one at a time | shared | evaluations are fast — this is the default |
 | `thread_pool` | on background threads in your program | shared | each evaluation mostly **waits**: an external tool, a file, a network call |
@@ -79,13 +79,12 @@ of one, so there are five:
 | `local_pool` | in one fresh process per evaluation | copied | each evaluation is a self-contained **job** on this machine |
 | `hpc_pool` | as jobs on a cluster queue | copied | each evaluation is a large **cluster job** |
 
-A pool costs something to set up and to hand work to, so the default is often
-the right answer: below a certain evaluation cost, that setup is all a pool
-adds.
+A pool costs something to set up and to hand work to. Below a certain evaluation
+cost, that setup is all a pool adds.
 
 [Parallel Execution and Many Runs](../running/parallel.md) covers each of these
 in full — how many workers to ask for, which functions can be sent where, what
-stopping does, and how to choose when the answer is not obvious.
+stopping does, and how to choose between them.
 
 ## The rule to settle first
 
@@ -126,7 +125,7 @@ from runs that overlap are all covered in
 !!! warning "Your objective is now called from several threads at once"
 
     The call above passes no pool, so each run evaluates on its own thread. The
-    question above applies here too, and nothing warns you: if your objective
+    question above applies here too, and nothing reports it: if your objective
     reads or writes anything outside its arguments and its return value, the
     runs will corrupt each other. Give the batch a pool, or keep the objective
     self-contained.

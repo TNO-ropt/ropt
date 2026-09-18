@@ -51,7 +51,7 @@ names the [`ExitCode`][ropt.enums.ExitCode] it finished with — the same one
 code means.
 
 The name at the start of each line identifies the part of `ropt` that produced
-it. That is worth having in a bug report and rarely otherwise, so leave
+it. That is what a bug report needs; leave
 `%(name)s` out of the format string if it is in the way.
 
 ## Warnings only
@@ -68,7 +68,7 @@ Typical examples are a scheduler that had to be asked twice, a cluster job that
 could not be cancelled and may still be running, a working directory kept behind
 so you can see what a failed job left, and evaluations that must finish before
 your program is allowed to exit. None of these raise, and most are reported
-nowhere else, so it is sensible to leave `WARNING` on.
+nowhere else.
 
 A failure that stops a run does not need logging to be seen: it either raises,
 or is named by the exit code the run ends with. See

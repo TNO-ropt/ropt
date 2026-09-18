@@ -38,7 +38,7 @@ Subclass the base class of the area and add one class attribute:
 
 - **`methods`** — the method names the class provides, as a set. The names are
   matched case-insensitively, so they may be written in any case. Include
-  `"default"` if the class has a sensible standard choice, so that
+  `"default"` if the class has a standard choice, so that
   `"my_package/default"` selects it; leave it out if it does not, and the name
   will correctly fail to resolve.
 
@@ -186,16 +186,16 @@ A backend runs in the caller's process, alongside whatever else is in it —
 including other optimizations, since
 [`optimize_many`][ropt.simple.optimize_many] runs several at once, each on its
 own thread with its own configuration. Anything a backend changes *per process*
-is therefore shared with runs it knows nothing about, and cannot carry per-run
+is therefore shared with unrelated runs, and cannot carry per-run
 settings.
 
 So while a run is in progress a backend must not change the working directory,
 the environment, `sys.stdout` or `sys.stderr`, or file descriptors 1 and 2.
-Where the optimizer produces a log, ask the library to write it to a named
-file — that is the per-run answer — or to be quiet.
+Where the optimizer produces a log, configure the library to write it to a named
+file — that is the per-run answer — or to produce no output.
 
-Not every library allows this, and `ropt` does not paper over the ones that do
-not. What such a backend must do instead is **say so in its own
+Not every library allows this, and `ropt` does not work around the ones that do
+not. Such a backend must instead **state this in its own
 documentation**: that it needs exclusive process state — a working directory, a
 fixed file name, or state kept in the library between calls. What that rules out
 is not "one at a time" but "anything at all at the same time": a changed working
@@ -272,5 +272,5 @@ def test_backend_declares_native_output_correctly():
     assert native == ""      # ... or `!= ""` if the declaration is True
 ```
 
-Worth having as a test rather than a one-off check: these properties drift.
+These properties drift, so a test catches a change that a one-off check does not.
 SciPy's `disp` silently became a no-op for `l-bfgs-b` and `nelder-mead` in 1.18.

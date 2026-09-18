@@ -170,7 +170,7 @@ class Submission:
 
         The submission is ended if this returns early, including when
         `on_result` itself raises, so the executor never keeps delivering to a
-        caller that has left.
+        caller that is no longer waiting.
 
         Args:
             on_result: Callback invoked with each finished work item.
@@ -219,7 +219,8 @@ class Executor(ABC):
     in flight, and one accepted before the executor was stopped.
 
     A submission that is already finished when it reaches a worker needs no work
-    done: its caller has left, so running its work items only occupies a worker.
+    done: its caller is no longer waiting, so running its work items only
+    occupies a worker.
 
     See [Error handling](../advanced/parallel.md#error-handling) for the
     distinction an implementation must make between an infrastructure failure,

@@ -58,7 +58,7 @@ coefficients for realization `r`:
 
 `ropt` calls the evaluation function once for every realization at each point it
 evaluates, so it must return the value for *its own* realization. The second
-argument tells it which one: `context.realization` is the realization number,
+argument identifies which one: `context.realization` is the realization number,
 which we use to index the parameter arrays:
 
 ```python

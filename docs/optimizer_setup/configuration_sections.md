@@ -547,8 +547,8 @@ of them accepts, and which `options` they take, is documented by the backend
 itself. For the built-in SciPy backend, see
 [`SciPyBackend`][ropt.backend.scipy.SciPyBackend]. A method configured with a
 constraint it cannot handle is only rejected when the run starts, with
-[`UnsupportedError`][ropt.exceptions.UnsupportedError], so it is worth checking
-the table before writing the rest of the configuration.
+[`UnsupportedError`][ropt.exceptions.UnsupportedError], after the rest of the
+configuration has already been written.
 
 A backend can also be run in a process of its own, by prefixing the method with
 `external/`; see [Running the optimizer in a separate

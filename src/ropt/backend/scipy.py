@@ -133,9 +133,9 @@ class SciPyBackend(Backend):
     treat them as continuous.
 
     SciPy prints its own progress report when
-    [`verbose`][ropt.config.BackendConfig] asks for it. `trust-constr` is the
+    [`verbose`][ropt.config.BackendConfig] is set. `trust-constr` is the
     only method with reporting levels of its own; for the rest the setting is
-    on or off. Note that `disp` is a no-op for `l-bfgs-b` and `nelder-mead` in
+    on or off. `disp` is a no-op for `l-bfgs-b` and `nelder-mead` in
     recent SciPy releases, which therefore report nothing.
 
     Algorithm-specific options are passed through the `options` dictionary.

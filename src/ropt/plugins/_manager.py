@@ -242,10 +242,10 @@ class PluginManager:
     def get_plugin_name(self, plugin_type: PluginType, method: str) -> str | None:
         """Return the name of the plugin that supports a given method.
 
-        Useful for checking availability before calling
-        [`get_plugin`][ropt.plugins.PluginManager.get_plugin], which
-        takes `method` in the same two forms (`"plugin-name/method-name"` or
-        just `"method-name"`).
+        Reports whether a method is available without retrieving its class.
+        `method` takes the same two forms as
+        [`get_plugin`][ropt.plugins.PluginManager.get_plugin]
+        (`"plugin-name/method-name"` or just `"method-name"`).
 
         Args:
             plugin_type: The category of the plugin (for example "backend", "sampler").

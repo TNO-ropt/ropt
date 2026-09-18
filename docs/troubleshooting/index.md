@@ -28,7 +28,7 @@ return.
 **`NaN` means "this realization failed", and one failure is already too many.**
 [`realization_min_success`](../optimizer_setup/configuration_sections.md#realizations)
 defaults to *all* realizations, so a single `NaN` ends the run with
-`TOO_FEW_REALIZATIONS`. If some realizations are allowed to fail, say so:
+`TOO_FEW_REALIZATIONS`. If some realizations are allowed to fail, set it lower:
 
 ```python
 config = {
