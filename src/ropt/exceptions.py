@@ -29,7 +29,8 @@ class ExecutionError(RoptError):
     """The execution infrastructure failed at runtime.
 
     For example a worker pool that cannot start, a broken process pool, a task
-    that cannot be serialized, or an HPC setup or submission problem.
+    that cannot be serialized, an HPC setup or submission problem, or an
+    evaluation whose worker died before producing a result.
     """
 
 

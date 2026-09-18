@@ -36,7 +36,7 @@ class BoundaryType(IntEnum):
     $$
     \hat{v_i} = \begin{cases}
         l_i & \text{if $v_i < l_i$}, \\
-        b_i & \text{if $v_i > b_i$}, \\
+        u_i & \text{if $v_i > u_i$}, \\
         v_i & \text{otherwise}
     \end{cases}
     $$
@@ -48,7 +48,7 @@ class BoundaryType(IntEnum):
     $$
     \hat{v_i} = \begin{cases}
         2l_i - v_i & \text{if $v_i < l_i$}, \\
-        2b_i - v_i & \text{if $v_i > b_i$}, \\
+        2u_i - v_i & \text{if $v_i > u_i$}, \\
         v_i        & \text{otherwise}
     \end{cases}
     $$
@@ -83,10 +83,10 @@ class EnOptEventType(IntEnum):
     """
 
     START_EVALUATION = 1
-    """Emitted before evaluating new functions."""
+    """Emitted before a batch of function or gradient evaluations."""
 
     FINISHED_EVALUATION = 2
-    """Emitted after finishing the evaluation."""
+    """Emitted after that batch completes; carries the results produced."""
 
     START_OPTIMIZER = 3
     """Emitted just before starting an optimizer."""
@@ -95,10 +95,12 @@ class EnOptEventType(IntEnum):
     """Emitted immediately after an optimizer finishes."""
 
     START_ENSEMBLE_EVALUATOR = 5
-    """Emitted just before starting an evaluation."""
+    """Emitted before an
+    [`EvaluationStep`][ropt.components.compute_steps.EvaluationStep] begins."""
 
     FINISHED_ENSEMBLE_EVALUATOR = 6
-    """Emitted immediately after an evaluation finishes."""
+    """Emitted after an
+    [`EvaluationStep`][ropt.components.compute_steps.EvaluationStep] finishes."""
 
 
 class ExitCode(IntEnum):
