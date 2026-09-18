@@ -5051,40 +5051,10 @@ of these defaults and their interactions.</p>
 
     <div class="doc doc-contents first">
 
-        <p>This module defines utilities for validating plugin options.</p>
-<p>This module provides classes and functions to define and validate options for
-plugins. It uses Pydantic to create models that represent the schema of
-plugin options, allowing for structured and type-safe configuration.</p>
-
-
-<p><span class="doc-section-title">Classes:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td><code><a class="autorefs autorefs-internal" title="            OptionsSchemaModel (ropt.config.options.OptionsSchemaModel)" href="#ropt.config.options.OptionsSchemaModel">OptionsSchemaModel</a></code></td>
-            <td>
-              <div class="doc-md-description">
-                <p>Represents the overall schema for plugin options.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><a class="autorefs autorefs-internal" title="            MethodSchemaModel (ropt.config.options.MethodSchemaModel)" href="#ropt.config.options.MethodSchemaModel">MethodSchemaModel</a></code></td>
-            <td>
-              <div class="doc-md-description">
-                <p>Represents the schema for a specific method within a
-plugin, including its name and options.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
+        <p>Schema models for describing and validating plugin options.</p>
+<p>A plugin declares the options that each of its methods accepts. The schema
+turns that declaration into a pydantic model that validates the <code>options</code> field
+of a configuration section, and into a Markdown table for the documentation.</p>
 
 
 
@@ -5120,11 +5090,10 @@ plugin, including its name and options.</p>
 
 
 
-        <p>Represents the overall schema for plugin options.</p>
-<p>This class defines the structure for describing the methods and options
-available for a plugin. The methods are described by a mapping of method
-names to <a class="autorefs autorefs-internal" title="            MethodSchemaModel" href="#ropt.config.options.MethodSchemaModel"><code>MethodSchemaModel</code></a>
-objects, each describing a method supported by the plugin.</p>
+        <p>The schema for the options of every method of a plugin.</p>
+<p>The methods are described by a mapping of method names to
+<a class="autorefs autorefs-internal" title="            MethodSchemaModel" href="#ropt.config.options.MethodSchemaModel"><code>MethodSchemaModel</code></a> objects, each
+describing a method supported by the plugin.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -5208,12 +5177,9 @@ objects, each describing a method supported by the plugin.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Creates a Pydantic model for validating options of a specific method.</p>
-<p>This method dynamically generates a Pydantic model tailored to validate
-the options associated with a given method. The method is looked up by
-name, case-insensitively, and its options are combined with the common
-options that it does not exclude. The resulting model can then be used
-to validate dictionaries of options against the defined schema.</p>
+        <p>Create a pydantic model for validating the options of one method.</p>
+<p>The method is looked up by name, case-insensitively, and its options are
+combined with the common options that it does not exclude.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -5262,7 +5228,7 @@ to validate dictionaries of options against the defined schema.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A Pydantic model class capable of validating options for the specified method.</p>
+                <p>A model that validates the options of the given method.</p>
               </div>
             </td>
           </tr>
@@ -5285,7 +5251,7 @@ to validate dictionaries of options against the defined schema.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If the specified method is not found in the schema.</p>
+                <p>If the method is not found in the schema.</p>
               </div>
             </td>
           </tr>
@@ -5328,10 +5294,7 @@ to validate dictionaries of options against the defined schema.</p>
 
 
 
-        <p>Represents the schema for a specific method within a plugin.</p>
-<p>This class defines the structure for describing one or more methods
-supported by a plugin. It contains a dictionary describing an option for
-this method.</p>
+        <p>The schema for the options of a single method.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -5442,15 +5405,10 @@ this method.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Generates a Markdown table documenting plugin options.</p>
-<p>This function takes a schema dictionary, validates it against the
-<a class="autorefs autorefs-internal" title="            OptionsSchemaModel" href="#ropt.config.options.OptionsSchemaModel"><code>OptionsSchemaModel</code></a>, and then
-generates a Markdown document that summarizes the available methods and
-their options. Common options are listed first, followed by a table of
-method-specific options. Each row in the table represents a method, and the
-columns list the method's name and its configurable options. If a URL is
-provided for a method, the method name will be hyperlinked to that URL in
-the table.</p>
+        <p>Generate a Markdown table documenting plugin options.</p>
+<p>Common options are listed first, followed by a table of method-specific
+options, one row per method. A method whose schema provides a URL is
+hyperlinked to it.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
