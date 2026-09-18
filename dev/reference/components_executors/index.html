@@ -2910,6 +2910,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#ropt.components.executors.ExecutorFailure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ExecutorFailure
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#ropt.components.executors.Submission" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3527,6 +3538,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#ropt.components.executors.ExecutorFailure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ExecutorFailure
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#ropt.components.executors.Submission" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3880,7 +3902,13 @@ done: its caller has left, so running its work items only occupies a worker.</p>
 </ul>
 <p>See <a href="../../advanced/parallel/#error-handling">Error handling</a> for the
 distinction an implementation must make between an infrastructure failure,
-delivered as an <a class="autorefs autorefs-internal" title="            ExecutorFailure" href="../exceptions/#ropt.exceptions.ExecutorFailure"><code>ExecutorFailure</code></a> result,
+delivered as an
+<a class="autorefs autorefs-internal" title="            ropt.components.executors.ExecutorFailure
+
+
+  
+      dataclass
+  " href="#ropt.components.executors.ExecutorFailure"><code>ExecutorFailure</code></a> result,
 and an exception from the work item's own function, which ends the
 submission.</p>
 
@@ -4617,8 +4645,15 @@ submission that owns it along.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The result of the function, only meaningful once the work
-      item has been delivered.</p>
+                <p>What the function returned, or an
+      <a class="autorefs autorefs-internal" title="            ropt.components.executors.ExecutorFailure
+
+
+  
+      dataclass
+  " href="#ropt.components.executors.ExecutorFailure"><code>ExecutorFailure</code></a>
+      if it could not be run. Only meaningful once the work item
+      has been delivered.</p>
               </div>
             </td>
           </tr>
@@ -4630,6 +4665,76 @@ submission that owns it along.</p>
             <td>
               <div class="doc-md-description">
                 <p>Optional unique name of the work item.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="ropt.components.executors.ExecutorFailure" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.components.executors.ExecutorFailure</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+
+
+
+        <p>The executor could not run a work item.</p>
+<p>Delivered as a work item's result rather than raised, so the executor stays
+available for further work.</p>
+
+
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.components.executors.ExecutorFailure.message">message</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>What went wrong.</p>
               </div>
             </td>
           </tr>

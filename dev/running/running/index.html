@@ -3407,7 +3407,8 @@ make still reach the <a href="../handlers/">handlers</a> attached to it.</p>
   as configured — a constraint it does not support, for instance, which is
   checked as the run starts — and
   <a class="autorefs autorefs-internal" title="            ExecutionError" href="../../reference/exceptions/#ropt.exceptions.ExecutionError"><code>ExecutionError</code></a> when the machinery that
-  runs the evaluations cannot start or breaks down.</p>
+  runs your evaluations, or a call handed to
+  <a class="autorefs autorefs-internal" title="            ropt.simple.offload" href="../../reference/simple/#ropt.simple.offload"><code>offload</code></a>, cannot start or breaks down.</p>
 </li>
 <li>
 <p><strong>Exceptions from your own evaluation function</strong> are not caught. They travel

@@ -3952,9 +3952,14 @@ the file formats in full.</p>
 <p>A finished job's result is not always readable at once: the job may have died
 before writing it, or the file may be caught half-written. <code>retries</code> is how many
 <strong>further</strong> polls to allow before the work item is failed with an
-<a class="autorefs autorefs-internal" title="            ExecutorFailure" href="../../reference/exceptions/#ropt.exceptions.ExecutorFailure"><code>ExecutorFailure</code></a>, so the grace period is
-<code>retries × interval</code> seconds — 30 seconds with the defaults. <code>retries=0</code> gives up
-on the first failed read.</p>
+<a class="autorefs autorefs-internal" title="            ropt.components.executors.ExecutorFailure
+
+
+  
+      dataclass
+  " href="../../reference/components_executors/#ropt.components.executors.ExecutorFailure"><code>ExecutorFailure</code></a>, so the grace
+period is <code>retries × interval</code> seconds — 30 seconds with the defaults.
+<code>retries=0</code> gives up on the first failed read.</p>
 <p><code>query_retries</code> bounds a separate failure: the scheduler itself being
 unreachable. Once querying the queue has failed <code>query_retries + 1</code> times <strong>in a
 row</strong>, every outstanding work item is failed rather than waited on for ever; an
@@ -4148,7 +4153,13 @@ receives, and what becomes of the executor, differ.</p>
 <p>An <em>infrastructure</em> failure is one that is not caused by the evaluation function
 itself: a worker process is killed (<code>BrokenProcessPool</code>), or an HPC job's output
 file never appears or cannot be deserialized. These are delivered as an ordinary
-result whose value is an <a class="autorefs autorefs-internal" title="            ExecutorFailure" href="../../reference/exceptions/#ropt.exceptions.ExecutorFailure"><code>ExecutorFailure</code></a>
+result whose value is an
+<a class="autorefs autorefs-internal" title="            ropt.components.executors.ExecutorFailure
+
+
+  
+      dataclass
+  " href="../../reference/components_executors/#ropt.components.executors.ExecutorFailure"><code>ExecutorFailure</code></a>
 (via <a class="autorefs autorefs-internal" title="            deliver" href="../../reference/components_executors/#ropt.components.executors.Submission.deliver"><code>deliver</code></a>), which leaves the
 executor running rather than tearing it down.</p>
 <p>The evaluator turns that result into an

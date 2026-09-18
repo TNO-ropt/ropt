@@ -6777,7 +6777,9 @@ pool.</p>
 <p>A handler in a shared group runs on the session's own event loop and cannot
 wait on it; offloading from there raises a
 <a class="autorefs autorefs-internal" title="            WorkflowError" href="../exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a>. So does a pool that is
-closed, or one carried into a worker process.</p>
+closed, or one carried into a worker process. A call that the machinery
+could not run, for instance because its worker process was killed, raises an
+<a class="autorefs autorefs-internal" title="            ExecutionError" href="../exceptions/#ropt.exceptions.ExecutionError"><code>ExecutionError</code></a>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
