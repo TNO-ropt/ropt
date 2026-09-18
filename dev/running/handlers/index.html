@@ -2709,34 +2709,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../reference/components/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Overview
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../reference/components_compute_steps/" class="md-nav__link">
         
   
@@ -3267,7 +3239,7 @@ need both, use two handlers.</p>
 <p>The handlers below are re-exported from <code>ropt.simple</code>, ready to use as they
 are.</p>
 <h3 id="resultshandler"><code>ResultsHandler</code></h3>
-<p><a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.ResultsHandler" href="../../reference/components_event_handlers/#ropt.components.event_handlers.ResultsHandler"><code>ResultsHandler</code></a> keeps a single result, read via
+<p><a class="autorefs autorefs-internal" title="            ropt.simple.ResultsHandler" href="../../reference/simple/#ropt.simple.ResultsHandler"><code>ResultsHandler</code></a> keeps a single result, read via
 <code>handler["results"]</code>:</p>
 <ul>
 <li><code>what="best"</code> (default) keeps the result with the lowest weighted objective
@@ -3284,12 +3256,12 @@ are.</p>
   drop it.</li>
 </ul>
 <h3 id="historyhandler"><code>HistoryHandler</code></h3>
-<p><a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.HistoryHandler" href="../../reference/components_event_handlers/#ropt.components.event_handlers.HistoryHandler"><code>HistoryHandler</code></a> keeps <em>every</em> result it receives,
+<p><a class="autorefs autorefs-internal" title="            ropt.simple.HistoryHandler" href="../../reference/simple/#ropt.simple.HistoryHandler"><code>HistoryHandler</code></a> keeps <em>every</em> result it receives,
 in order, as a tuple. Read it with <code>handler.results</code>, which is an empty tuple
 until the first result arrives, or with <code>handler["results"]</code>, the raw stored
 value, which is <code>None</code> until then.</p>
 <h3 id="dataframehandler"><code>DataFrameHandler</code></h3>
-<p><a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.DataFrameHandler" href="../../reference/components_event_handlers/#ropt.components.event_handlers.DataFrameHandler"><code>DataFrameHandler</code></a> collects results into named
+<p><a class="autorefs autorefs-internal" title="            ropt.simple.DataFrameHandler" href="../../reference/simple/#ropt.simple.DataFrameHandler"><code>DataFrameHandler</code></a> collects results into named
 DataFrames, using either <code>polars</code> (the default) or <code>pandas</code> as its backend; the
 corresponding package must be installed. Define a table with
 <code>add_table(name, table_type, columns)</code>, where <code>table_type</code> is

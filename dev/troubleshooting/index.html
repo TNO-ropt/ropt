@@ -2670,34 +2670,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../reference/components/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Overview
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../reference/components_compute_steps/" class="md-nav__link">
         
   
@@ -3087,8 +3059,8 @@ set to <code>None</code>. The evaluations themselves are not lost: every result,
 or not, still reaches the <a href="../running/handlers/">handlers</a> attached to the run.</p>
 <p><strong>The return value is a summary, not the record of the run.</strong> It holds a single
 result, the best feasible evaluation. The whole history is available instead:
-attach a <a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.HistoryHandler" href="../reference/components_event_handlers/#ropt.components.event_handlers.HistoryHandler"><code>HistoryHandler</code></a> or a
-<a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.DataFrameHandler" href="../reference/components_event_handlers/#ropt.components.event_handlers.DataFrameHandler"><code>DataFrameHandler</code></a> to collect every result as it
+attach a <a class="autorefs autorefs-internal" title="            ropt.simple.HistoryHandler" href="../reference/simple/#ropt.simple.HistoryHandler"><code>HistoryHandler</code></a> or a
+<a class="autorefs autorefs-internal" title="            ropt.simple.DataFrameHandler" href="../reference/simple/#ropt.simple.DataFrameHandler"><code>DataFrameHandler</code></a> to collect every result as it
 arrives. That history is also what remains when there is no best result to
 return.</p>
 <p><strong><code>NaN</code> means "this realization failed", and one failure is already too many.</strong>

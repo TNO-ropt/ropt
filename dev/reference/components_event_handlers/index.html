@@ -2572,34 +2572,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../components/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Overview
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../components_compute_steps/" class="md-nav__link">
         
   
@@ -2686,6 +2658,17 @@
       Table of contents
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.components.event_handlers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        event_handlers
+      
+    </span>
+  </a>
+  
+</li>
       
         <li class="md-nav__item">
   <a href="#ropt.components.event_handlers.EventHandler" class="md-nav__link">
@@ -3394,6 +3377,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#ropt.components.event_handlers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        event_handlers
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#ropt.components.event_handlers.EventHandler" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3874,25 +3868,53 @@
 
 
 <h1 id="event-handlers">Event Handlers</h1>
-<p>Event handlers attach to a
-<a class="autorefs autorefs-internal" title="            ropt.components.compute_steps.ComputeStep" href="../components_compute_steps/#ropt.components.compute_steps.ComputeStep"><code>ComputeStep</code></a> and react to the events
-it emits. <a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.ResultsHandler" href="#ropt.components.event_handlers.ResultsHandler"><code>ResultsHandler</code></a> keeps
-the best (or last) result,
-<a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.HistoryHandler" href="#ropt.components.event_handlers.HistoryHandler"><code>HistoryHandler</code></a> keeps
-everything, <a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.DataFrameHandler" href="#ropt.components.event_handlers.DataFrameHandler"><code>DataFrameHandler</code></a>
-writes a structured table,
-<a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.CallbackHandler" href="#ropt.components.event_handlers.CallbackHandler"><code>CallbackHandler</code></a> forwards
-selected events to a user callback, and
-<a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventForwardHandler" href="#ropt.components.event_handlers.EventForwardHandler"><code>EventForwardHandler</code></a>
-forwards events to an
-<a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventDispatcher" href="#ropt.components.event_handlers.EventDispatcher"><code>EventDispatcher</code></a> for
-lock-free dispatch.</p>
-<p>The <a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventDispatcher" href="#ropt.components.event_handlers.EventDispatcher"><code>EventDispatcher</code></a> fans
-events out to its registered handlers from the asyncio event loop's thread, so
-handlers shared across concurrent compute steps need no locking.</p>
-<p>See <a href="../../advanced/workflows/">Optimization Workflows</a> and
-<a href="../../running/results/">Working with Results</a> for usage.</p>
 
+
+<div class="doc doc-object doc-module">
+
+
+
+<h2 id="ropt.components.event_handlers" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-module"></code>            <span class="doc doc-object-name doc-module-name">ropt.components.event_handlers</span>
+
+
+</h2>
+
+    <div class="doc doc-contents first">
+
+        <p>Event handlers: objects that react to the events a compute step emits.</p>
+<p><a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.ResultsHandler" href="#ropt.components.event_handlers.ResultsHandler"><code>ResultsHandler</code></a> keeps the best
+result, <a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.HistoryHandler" href="#ropt.components.event_handlers.HistoryHandler"><code>HistoryHandler</code></a> keeps
+every result, <a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.DataFrameHandler" href="#ropt.components.event_handlers.DataFrameHandler"><code>DataFrameHandler</code></a>
+builds a table, and <a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.CallbackHandler" href="#ropt.components.event_handlers.CallbackHandler"><code>CallbackHandler</code></a>
+forwards selected events to a callback.
+<a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventForwardHandler" href="#ropt.components.event_handlers.EventForwardHandler"><code>EventForwardHandler</code></a>
+forwards them to an
+<a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventDispatcher" href="#ropt.components.event_handlers.EventDispatcher"><code>EventDispatcher</code></a>, which
+delivers events from the asyncio event loop's thread, so handlers shared across
+concurrent compute steps need no locking. See
+<a href="../../advanced/workflows/">Optimization Workflows</a> for usage.</p>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
 
 <div class="doc doc-object doc-class">
 

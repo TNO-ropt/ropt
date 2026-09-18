@@ -2572,34 +2572,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../components/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Overview
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../components_compute_steps/" class="md-nav__link">
         
   
@@ -2742,6 +2714,17 @@
       Table of contents
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.components.executors" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        executors
+      
+    </span>
+  </a>
+  
+</li>
       
         <li class="md-nav__item">
   <a href="#ropt.components.executors.Executor" class="md-nav__link">
@@ -3372,6 +3355,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#ropt.components.executors" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        executors
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#ropt.components.executors.Executor" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3830,21 +3824,55 @@
 
 
 <h1 id="executors">Executors</h1>
-<p>Executors run the <a class="autorefs autorefs-internal" title="            ropt.components.executors.WorkItem
+
+
+<div class="doc doc-object doc-module">
+
+
+
+<h2 id="ropt.components.executors" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-module"></code>            <span class="doc doc-object-name doc-module-name">ropt.components.executors</span>
+
+
+</h2>
+
+    <div class="doc doc-contents first">
+
+        <p>Executors: where an evaluator sends work to be run.</p>
+<p>An executor runs the <a class="autorefs autorefs-internal" title="            ropt.components.executors.WorkItem
 
 
   
       dataclass
-  " href="#ropt.components.executors.WorkItem"><code>WorkItem</code></a> objects of a
-<a class="autorefs autorefs-internal" title="            ropt.components.executors.Submission" href="#ropt.components.executors.Submission"><code>Submission</code></a>, produced by a
-<a class="autorefs autorefs-internal" title="            ropt.components.evaluators.ParallelEvaluator" href="../components_evaluators/#ropt.components.evaluators.ParallelEvaluator"><code>ParallelEvaluator</code></a>, on a concrete
-execution mechanism (threads, processes, local jobs, or an HPC cluster).</p>
-<p>See <a href="../../advanced/parallel/">Parallel Evaluation</a> for usage.</p>
-<p><a class="autorefs autorefs-internal" title="            ropt.components.executors.Executor" href="#ropt.components.executors.Executor"><code>Executor</code></a> is the interface a compute step
-sees; <a class="autorefs autorefs-internal" title="            ropt.components.executors.ExecutorBase" href="#ropt.components.executors.ExecutorBase"><code>ExecutorBase</code></a> implements the
-submission bookkeeping shared by the built-in executors and is the class to
-subclass when adding a new execution mechanism.</p>
+  " href="#ropt.components.executors.WorkItem"><code>WorkItem</code></a> objects of
+a <a class="autorefs autorefs-internal" title="            ropt.components.executors.Submission" href="#ropt.components.executors.Submission"><code>Submission</code></a> on a concrete mechanism:
+threads, processes, local jobs, or an HPC cluster.
+<a class="autorefs autorefs-internal" title="            ropt.components.executors.Executor" href="#ropt.components.executors.Executor"><code>Executor</code></a> is the interface a compute step
+sees; <a class="autorefs autorefs-internal" title="            ropt.components.executors.ExecutorBase" href="#ropt.components.executors.ExecutorBase"><code>ExecutorBase</code></a> adds the
+submission bookkeeping the built-in executors share. See
+<a href="../../advanced/parallel/">Parallel Evaluation</a> for usage, and
+<a href="../../advanced/components/">Implementing a Component</a> for writing one.</p>
 
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
 
 <div class="doc doc-object doc-class">
 
