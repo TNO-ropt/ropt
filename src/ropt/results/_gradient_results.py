@@ -34,6 +34,32 @@ class ScaledGradientResults(ResultField):
     [`GradientResults`][ropt.results.GradientResults], expressed in the domain
     the optimizer works in.
 
+    **Result descriptions**
+
+    === "Variables"
+
+        `variables`: The vector of unperturbed variable values in the
+        optimizer's domain:
+
+        - Shape: $(n_v,)$, where:
+            - $n_v$ is the number of variables.
+        - Axis type:
+            - [`AxisName.VARIABLE`][ropt.enums.AxisName.VARIABLE]
+
+    === "Perturbed Variables"
+
+        `perturbed_variables`: A three-dimensional array of perturbed variable
+        values for each realization and perturbation:
+
+        - Shape: $(n_r, n_p, n_v)$, where:
+            - $n_r$ is the number of realizations.
+            - $n_p$ is the number of perturbations.
+            - $n_v$ is the number of variables.
+        - Axis types:
+            - [`AxisName.REALIZATION`][ropt.enums.AxisName.REALIZATION]
+            - [`AxisName.PERTURBATION`][ropt.enums.AxisName.PERTURBATION]
+            - [`AxisName.VARIABLE`][ropt.enums.AxisName.VARIABLE]
+
     Attributes:
         variables:           The variable vector the optimizer proposed.
         perturbed_variables: The perturbed vectors in the optimizer's domain.
@@ -65,6 +91,40 @@ class GradientResults(Results):
     scaled counterpart.
 
     See [Working with Results](../running/results.md) for usage details.
+
+    **Result descriptions**
+
+    === "Variables"
+
+        `variables`: The vector of unperturbed variable values:
+
+        - Shape: $(n_v,)$, where:
+            - $n_v$ is the number of variables.
+        - Axis type:
+            - [`AxisName.VARIABLE`][ropt.enums.AxisName.VARIABLE]
+
+    === "Perturbed Variables"
+
+        `perturbed_variables`: A three-dimensional array of perturbed variable
+        values for each realization and perturbation:
+
+        - Shape: $(n_r, n_p, n_v)$, where:
+            - $n_r$ is the number of realizations.
+            - $n_p$ is the number of perturbations.
+            - $n_v$ is the number of variables.
+        - Axis types:
+            - [`AxisName.REALIZATION`][ropt.enums.AxisName.REALIZATION]
+            - [`AxisName.PERTURBATION`][ropt.enums.AxisName.PERTURBATION]
+            - [`AxisName.VARIABLE`][ropt.enums.AxisName.VARIABLE]
+
+    === "Target Gradient"
+
+        `target_gradient`: The gradient the optimizer descends:
+
+        - Shape: $(n_v,)$, where:
+            - $n_v$ is the number of variables.
+        - Axis type:
+            - [`AxisName.VARIABLE`][ropt.enums.AxisName.VARIABLE]
 
     Attributes:
         variables:           The variable vector that was perturbed.

@@ -30,6 +30,17 @@ class ScaledFunctionResults(ResultField):
     [`FunctionResults`][ropt.results.FunctionResults], expressed in the domain
     the optimizer works in.
 
+    **Result descriptions**
+
+    === "Variables"
+
+        `variables`: The vector of variable values in the optimizer's domain:
+
+        - Shape: $(n_v,)$, where:
+            - $n_v$ is the number of variables.
+        - Axis type:
+            - [`AxisName.VARIABLE`][ropt.enums.AxisName.VARIABLE]
+
     Attributes:
         variables:       The variable vector the optimizer proposed.
         functions:       Scaled aggregates, or `None` if all realizations failed.
@@ -57,6 +68,25 @@ class FunctionResults(Results):
     the optimizer's domain and has no scaled counterpart.
 
     See [Working with Results](../running/results.md) for usage details.
+
+    **Result descriptions**
+
+    === "Variables"
+
+        `variables`: The vector of variable values at which the functions were
+        evaluated:
+
+        - Shape: $(n_v,)$, where:
+            - $n_v$ is the number of variables.
+        - Axis type:
+            - [`AxisName.VARIABLE`][ropt.enums.AxisName.VARIABLE]
+
+    === "Target Objective"
+
+        `target_objective`: The single weighted value the optimizer minimizes:
+
+        - Shape: $()$ — a zero-dimensional array.
+        - Axis types: none.
 
     Attributes:
         variables:        The variable vector that was evaluated.
