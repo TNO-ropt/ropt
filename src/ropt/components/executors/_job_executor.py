@@ -130,43 +130,22 @@ class JobExecutorBase(ExecutorBase):
 
     @abstractmethod
     def _start_job(self, item_id: str | UUID, command: list[str]) -> int:
-        """Start a job running `command` and return the id that identifies it.
-
-        Runs on the poll thread. The job's output belongs in `<item_id>.txt` in
-        the working directory, which is the only record of a job that died
-        before writing a result.
-
-        Args:
-            item_id: The work item the job runs, and the stem of its files.
-            command: The command line the job must run.
-
-        Returns:
-            An id that `_live_job_ids` and `_cancel_job` accept.
-        """
+        # On the poll thread. The job's output belongs in `<item_id>.txt` in the
+        # working directory: the only record of a job that died before writing a
+        # result. Returns an id that `_live_job_ids` and `_cancel_job` accept.
+        ...
 
     @abstractmethod
     def _live_job_ids(self) -> set[int]:
-        """Return the ids of the jobs that have not finished yet.
-
-        Runs on the poll thread. An id that is absent is taken to mean the job
-        ended, whether it succeeded, failed or was killed; what became of it is
-        read from its result file.
-
-        Returns:
-            The ids of the jobs still running.
-        """
+        # On the poll thread. An absent id means the job ended, however it
+        # ended; what became of it is read from its result file.
+        ...
 
     @abstractmethod
     def _cancel_job(self, job_id: int) -> None:
-        """Cancel a job that is still running.
-
-        Runs on the loop thread, so it must not wait for the job to die: a
-        Ctrl-C that has to wait for cancellation to finish is the thing this
-        design avoids.
-
-        Args:
-            job_id: The job to cancel.
-        """
+        # On the loop thread, so it must not wait for the job to die: a Ctrl-C
+        # that waits for cancellation to finish is what this design avoids.
+        ...
 
     async def start(self, task_group: asyncio.TaskGroup) -> None:
         """Start the executor.

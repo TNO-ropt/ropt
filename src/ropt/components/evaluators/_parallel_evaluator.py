@@ -1,4 +1,4 @@
-"""This module implements the default function evaluator."""
+"""This module implements the parallel evaluator."""
 
 from __future__ import annotations
 

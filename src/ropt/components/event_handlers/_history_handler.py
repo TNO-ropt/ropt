@@ -1,4 +1,4 @@
-"""This module implements the default store event handler."""
+"""This module implements the result-history event handler."""
 
 from __future__ import annotations
 

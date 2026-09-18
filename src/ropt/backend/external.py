@@ -42,16 +42,7 @@ class _DriverStopped(Exception):  # ruff: ignore[error-suffix-on-exception-name]
 
 
 def _delegate_exists(method: str) -> bool:
-    """Report whether some other backend provides `method`.
-
-    The method is passed on verbatim, since the delegate owns its own casing.
-
-    Args:
-        method: The method name to look for, without the `external/` prefix.
-
-    Returns:
-        Whether a backend other than this one provides it.
-    """
+    # Passed on verbatim: the delegate owns its own casing.
     return get_plugin_name("backend", method) is not None
 
 
@@ -252,18 +243,9 @@ def _run(
 
 
 def _register_delegate(name: str, plugin: type[Any], method: str) -> None:
-    """Make a delegate that is not installed available in this process.
-
-    A new process rebuilds its registry from entry points, which cannot see a
-    delegate the parent registered by hand. An installed one is already there,
-    and an installed name may not be registered over, so the class is added
-    only when this process cannot resolve the method by itself.
-
-    Args:
-        name:   The name the parent resolved the delegate to.
-        plugin: The delegate class.
-        method: The method the delegate was selected for.
-    """
+    # A new process rebuilds its registry from entry points, which cannot see a
+    # delegate the parent registered by hand. An installed name may not be
+    # registered over, so add the class only when the method does not resolve.
     if get_plugin_name("backend", method) is None:
         register_plugin("backend", name, plugin)
 

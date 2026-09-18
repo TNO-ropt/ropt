@@ -1,4 +1,4 @@
-"""This module implements the default result_handler event handler."""
+"""This module implements the callback event handler."""
 
 from __future__ import annotations
 

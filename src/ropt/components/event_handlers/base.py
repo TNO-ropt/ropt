@@ -66,12 +66,6 @@ class EventHandler(ABC):
         self._owner_lock = threading.Lock()
 
     def _register_dispatcher(self) -> None:
-        """Mark this handler as owned by an event dispatcher.
-
-        Raises:
-            WorkflowError: If the handler is already registered with a dispatcher
-                          or attached to a compute step.
-        """
         if self._attached_to is _Attachment.DISPATCHER:
             msg = "This event handler is already registered with a dispatcher."
             raise WorkflowError(msg)
@@ -86,11 +80,6 @@ class EventHandler(ABC):
         self._attached_to = _Attachment.NONE
 
     def _register_compute_step(self) -> None:
-        """Mark this handler as owned by one or more compute steps.
-
-        Raises:
-            WorkflowError: If the handler is registered with a dispatcher.
-        """
         # There is no matching unregister: a step keeps its handlers for good,
         # so this is the one-way half of the attachment.
         if self._attached_to is _Attachment.DISPATCHER:
