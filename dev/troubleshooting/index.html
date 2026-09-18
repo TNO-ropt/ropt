@@ -3071,10 +3071,10 @@
 
 
 <h1 id="troubleshooting">Troubleshooting</h1>
-<p><code>ropt</code> tries to keep a run going rather than stop it at the first sign of
-trouble. That is usually what you want, but it means a run can end without a
-result to return, and without raising an error to say so. This page collects the
-behaviours that most often cause confusion.</p>
+<p>A <code>ropt</code> run keeps going through a failed realization or an infeasible result,
+so it can end without a result to return and without raising an error. Check
+<code>exit_code</code> before using what comes back. This page collects the behaviours that
+most often cause confusion.</p>
 <p>Skim it once to know what is here, then come back with a symptom and read the
 table of the section it belongs to.</p>
 <h2 id="results-and-exit-codes">Results and exit codes</h2>
@@ -3082,12 +3082,12 @@ table of the section it belongs to.</p>
 <a class="autorefs autorefs-internal" title="            ropt.simple.optimize" href="../reference/simple/#ropt.simple.optimize"><code>optimize</code></a> returns the best result that satisfies every
 constraint to within <code>constraint_tolerance</code>, which defaults to <code>1e-10</code> and
 applies to bounds and linear constraints as well as nonlinear ones. If no
-evaluation ever clears that bar, the run ends normally with <code>result.results</code>
+evaluation satisfies them, the run ends normally with <code>result.results</code>
 set to <code>None</code>. The evaluations themselves are not lost: every result, feasible
 or not, still reaches the <a href="../running/handlers/">handlers</a> attached to the run.</p>
 <p><strong>The return value is a summary, not the record of the run.</strong> It holds a single
-result, the best feasible evaluation. Most analysis works from the whole history
-instead: attach a <a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.HistoryHandler" href="../reference/components_event_handlers/#ropt.components.event_handlers.HistoryHandler"><code>HistoryHandler</code></a> or a
+result, the best feasible evaluation. The whole history is available instead:
+attach a <a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.HistoryHandler" href="../reference/components_event_handlers/#ropt.components.event_handlers.HistoryHandler"><code>HistoryHandler</code></a> or a
 <a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.DataFrameHandler" href="../reference/components_event_handlers/#ropt.components.event_handlers.DataFrameHandler"><code>DataFrameHandler</code></a> to collect every result as it
 arrives. That history is also what remains when there is no best result to
 return.</p>
@@ -3104,14 +3104,21 @@ defaults to <em>all</em> realizations, so a single <code>NaN</code> ends the run
 runs the same problem twice, once with the default and once allowing the
 failure, and prints the exit code and result of each.</p>
 <p><strong>Not everything that goes wrong raises.</strong> Check <code>exit_code</code> before using a
-result. The exit code says why the run ended; the result is the best feasible
-evaluation recorded before it did, and is <code>None</code> only when there was none. A
-run that fails part-way therefore still hands back what it had reached. See
-<a href="../running/running/#when-something-goes-wrong">When something goes wrong</a>.</p>
+result. The exit code gives the reason the run ended; the result is the best
+feasible evaluation recorded before it did, and is <code>None</code> only when there was
+none. A run that fails part-way therefore still returns what it had reached.
+See <a href="../running/running/#when-something-goes-wrong">When something goes wrong</a>.</p>
+<p><strong><code>OPTIMIZER_FINISHED</code> does not mean a limit was reached.</strong> It is the exit code
+for every run the backend ended by itself — because it converged, or because it
+reached <code>max_iterations</code> or <code>convergence_tolerance</code>. Those two live in the
+<code>backend</code> section and are enforced by the algorithm rather than counted by
+<code>ropt</code>, so a run can stop far short of <code>max_functions</code>, and the exit code does
+not distinguish which of the three applied. Only <code>MAX_FUNCTIONS_REACHED</code> and
+<code>MAX_BATCHES_REACHED</code> correspond to a limit <code>ropt</code> enforced itself.</p>
 <p><strong>A broken machine is an error, not a failed realization.</strong> When the machinery
 itself fails — a worker process is killed, a cluster job never writes its result
-— the run stops with an <a class="autorefs autorefs-internal" title="            ExecutionError" href="../reference/exceptions/#ropt.exceptions.ExecutionError"><code>ExecutionError</code></a> that
-says how many evaluations were lost and why. It is not absorbed as a <code>NaN</code>,
+— the run stops with an <a class="autorefs autorefs-internal" title="            ExecutionError" href="../reference/exceptions/#ropt.exceptions.ExecutionError"><code>ExecutionError</code></a> giving
+the number of evaluations lost and the reason. It is not absorbed as a <code>NaN</code>,
 because a result computed over the workers that survived is indistinguishable
 from one computed over the whole ensemble.</p>
 <table>
@@ -3129,6 +3136,10 @@ from one computed over the whole ensemble.</p>
 <tr>
 <td><code>TOO_FEW_REALIZATIONS</code> although only one realization failed</td>
 <td><a href="../optimizer_setup/configuration_sections/#realizations"><code>realization_min_success</code></a> defaults to all of them. Lower it.</td>
+</tr>
+<tr>
+<td>The run stopped long before <code>max_functions</code>, with <code>OPTIMIZER_FINISHED</code></td>
+<td>The backend ended it: <code>max_iterations</code>, <code>convergence_tolerance</code>, or its own convergence test. Those are set in the <code>backend</code> section; see <a href="../optimizer_setup/optimizer/#limiting-the-length-of-a-run">Limiting the length of a run</a>.</td>
 </tr>
 <tr>
 <td><code>ExecutionError</code> part-way through a run</td>
@@ -3184,10 +3195,11 @@ raises a <code>TypeError</code> in the middle of the run.</p>
 <p><strong>A run uses the pool you hand it, and no other.</strong> Nothing is picked up from the
 surrounding code. A run given no <code>pool=</code> evaluates in-process, on the thread that
 called it — even if a session is open next to it.</p>
-<p><strong>Threads cannot be hurried.</strong> Evaluations on a <code>thread_pool</code> run to completion
-even after Ctrl-C, because Python cannot interrupt a thread from outside. If an
-evaluation may run long and has to be interruptible, put it on a <code>local_pool</code> or
-an <code>hpc_pool</code>; see <a href="../running/parallel/#stopping-a-run">Stopping a run</a>.</p>
+<p><strong>Threads cannot be interrupted.</strong> Evaluations on a <code>thread_pool</code> run to
+completion even after Ctrl-C, because Python cannot interrupt a thread from
+outside. If an evaluation may run long and has to be interruptible, put it on a
+<code>local_pool</code> or an <code>hpc_pool</code>; see
+<a href="../running/parallel/#stopping-a-run">Stopping a run</a>.</p>
 <p><strong>A <code>process_pool</code> re-imports your script.</strong> Its workers are started with
 <code>spawn</code>, so each of them imports the file the run was started from, and
 everything at module level runs again in every worker. That is why the entry
@@ -3218,12 +3230,12 @@ anything runs. Open the pool inside the block that uses it; see
 <td>The script has no <code>if __name__ == "__main__":</code> guard, so every worker re-ran it from the top.</td>
 </tr>
 <tr>
-<td>A <code>WorkflowError</code> says the pool is closed</td>
+<td>A <code>WorkflowError</code> about a closed pool</td>
 <td>The pool outlived the <code>with session()</code> block that created it, or was closed explicitly.</td>
 </tr>
 <tr>
 <td>More workers made everything slower</td>
-<td><code>numpy</code> and friends already use every core. Set <code>OMP_NUM_THREADS=1</code> and let the pool provide the parallelism; see <a href="../running/parallel/#which-pool">Which pool should I use?</a>.</td>
+<td><code>numpy</code> and similar libraries already use every core. Set <code>OMP_NUM_THREADS=1</code> and let the pool provide the parallelism; see <a href="../running/parallel/#which-pool">Which pool should I use?</a>.</td>
 </tr>
 <tr>
 <td>Simulators keep running after the run stopped</td>
