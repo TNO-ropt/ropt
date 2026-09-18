@@ -60,15 +60,10 @@ class PluginManager:
     [`get_plugin_name`][ropt.plugins.PluginManager.get_plugin_name].
 
     A third-party plugin registers itself under the relevant group in its own
-    `pyproject.toml`, for example:
-
-    ```toml
-    [project.entry-points."ropt.plugins.backend"]
-    my_backend = "my_package.my_module:MyBackend"
-    ```
-
-    A plugin that is not installed, for instance one defined in a script or a
-    notebook, is added with
+    `pyproject.toml`; see
+    [Registering it](../advanced/writing_plugins.md#registering-it). A plugin
+    that is not installed, for instance one defined in a script or a notebook,
+    is added with
     [`register_plugin`][ropt.plugins.PluginManager.register_plugin].
     """
 

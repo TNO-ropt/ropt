@@ -16,14 +16,6 @@ if TYPE_CHECKING:
 class FunctionEstimator(ABC):
     """Abstract base class for function estimator implementations.
 
-    Subclasses must implement four methods:
-
-    1. `__init__` — store configuration; defer heavy work to `init`.
-    2. `init` — called once before the run; validate settings and pre-compute
-       state here.
-    3. `calculate_function` — aggregate per-realization function values.
-    4. `calculate_gradient` — aggregate per-realization gradients.
-
     See [Function Estimators](../optimizer_setup/function_estimators.md) for examples
     and further guidance.
     """

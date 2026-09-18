@@ -22,26 +22,10 @@ if TYPE_CHECKING:
 class Sampler(ABC):
     """Abstract base class for sampler implementations.
 
-    All concrete sampler implementations must inherit from this class and
-    implement the required lifecycle and sample-generation methods. Samplers
-    are responsible for generating perturbation values that are applied to
+    A sampler generates the perturbation values that are applied to the
     optimization variables when estimating gradients.
 
-    **Lifecycle**
-
-    1. Instantiation via `__init__`: Called by the plugin system with a
-       configuration object.
-    2. Setup via `init`: Called once per optimization workflow with the shape of
-       the samples to generate, a variable mask, and a random number generator.
-    3. Sampling via `generate_samples`: Called repeatedly during optimization
-       whenever perturbed variable vectors are needed.
-
-    Subclasses must implement:
-
-    - `__init__`: Stores sampler configuration and performs lightweight setup.
-    - `init`: Receives the sample shape and the random number generator.
-    - `generate_samples`: Returns perturbation samples with the expected shape
-      and masking semantics.
+    See [Stochastic Gradients](../optimizer_setup/gradients.md).
     """
 
     methods: ClassVar[MethodSpec]

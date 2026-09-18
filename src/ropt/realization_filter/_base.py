@@ -16,12 +16,6 @@ if TYPE_CHECKING:
 class RealizationFilter(ABC):
     """Abstract base class for realization filter implementations.
 
-    Subclasses must implement two methods:
-
-    1. `__init__` — store configuration and pre-compute method-specific state.
-    2. `get_realization_weights` — called at each evaluation; return a
-       non-negative weight per realization.
-
     See [Realization Filters](../optimizer_setup/realization_filters.md) for examples
     and further guidance.
     """
