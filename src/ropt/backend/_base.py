@@ -21,12 +21,11 @@ if TYPE_CHECKING:
 class Backend(ABC):
     """Abstract base class for optimizer backend implementations.
 
-    All concrete backend implementations must inherit from this class and
-    implement the required lifecycle and validation methods. A backend is
-    responsible for configuring a concrete optimization algorithm, interacting
-    with the `ropt` evaluation pipeline through an
-    [`OptimizerCallback`][ropt.core.OptimizerCallback], and executing the main
-    optimization loop.
+    A backend configures a concrete optimization algorithm, interacts with the
+    `ropt` evaluation pipeline through an
+    [`OptimizerCallback`][ropt.core.OptimizerCallback], and executes the main
+    optimization loop. See
+    [Writing plugins](../advanced/writing_plugins.md).
 
     **What a backend receives**
 
@@ -43,37 +42,12 @@ class Backend(ABC):
     whose algorithm expects the opposite convention negates the values and
     their gradients.
 
-    **Lifecycle**
-
-    1. Instantiation via `__init__`: Called with a backend configuration
-        object.
-    2. Validation via `validate_options`: Called to verify that the configured
-        backend options are supported.
-    3. Execution via `start`: Called with the problem to solve and the callback
-        that evaluates it.
-
-    Subclasses must implement:
-
-    - `__init__`: Stores backend configuration and performs lightweight setup.
-    - `start`: Runs the optimization algorithm.
-    - `validate_options`: Verifies that backend-specific options are valid.
-
-    Subclasses may optionally override:
-
-    - `bypasses_python_output`: Declares that the optimizer prints below the
-                                Python level.
-
     **Process-global state**
 
-    A backend shares its process with everything else in the program, including
-    other optimizations running at the same time. While a run is in progress it
-    must therefore not change the working directory, the environment,
-    `sys.stdout` or `sys.stderr`, or file descriptors 1 and 2. A backend wrapping
-    a library that requires this, or that prints where it cannot be redirected
-    per run, must document that it cannot run concurrently in-process and direct
-    users to the [`external`][ropt.backend.external.ExternalBackend] backend. See
-    [What a backend may not change](../advanced/writing_plugins.md#what-a-backend-may-not-change)
-    for the full contract.
+    While a run is in progress a backend must not change the working directory,
+    the environment, `sys.stdout` or `sys.stderr`, or file descriptors 1 and 2,
+    since it shares them with every other run in the process. See
+    [What a backend may not change](../advanced/writing_plugins.md#what-a-backend-may-not-change).
     """
 
     methods: ClassVar[MethodSpec]

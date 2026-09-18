@@ -97,11 +97,9 @@ class SignalEvaluationCallback(Protocol):
 class EnsembleOptimizer:
     """Backend for ensemble-based optimizations.
 
-    The [`EnsembleOptimizer`][ropt.core.EnsembleOptimizer] class provides the
-    core functionality for running ensemble-based optimizations. Direct use of
-    this class is generally discouraged. Instead, use the high-level
-    [`optimize`][ropt.simple.optimize] API or build a custom workflow
-    containing the optimization steps.
+    Direct use of this class is generally discouraged. Use the high-level
+    [`optimize`][ropt.simple.optimize] API instead, or build a custom workflow
+    from the optimization steps.
     """
 
     def __init__(
@@ -112,25 +110,11 @@ class EnsembleOptimizer:
     ) -> None:
         """Initialize the EnsembleOptimizer.
 
-        This class orchestrates ensemble-based optimizations. It requires an
-        optimization context object and an evaluator to function.
-
-        The `EnsembleOptimizer` needs the following to define a single
-        optimization run:
-
-        1.  An [`EnOptContext`][ropt.context.EnOptContext] object: This contains
-            all necessary information for the optimization.
-        2.  An [`EnsembleEvaluator`][ropt.core.EnsembleEvaluator]
-            object: This object is responsible for evaluating functions.
-
-        Additionally, an optional
-        [`callback`][ropt.core.SignalEvaluationCallback] can be provided that is
-        invoked before and after each function evaluation.
-
         Args:
             context:            The ensemble optimization context.
             ensemble_evaluator: The evaluator for function evaluations.
-            signal_evaluation:  Optional callback to signal evaluations.
+            signal_evaluation:  Optional callback, invoked before and after each
+                                function evaluation.
         """
         self._context = context
         self._function_evaluator = ensemble_evaluator
