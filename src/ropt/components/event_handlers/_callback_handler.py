@@ -14,18 +14,12 @@ if TYPE_CHECKING:
 
 
 class CallbackHandler(EventHandler):
-    """The default event handler for observing events.
+    """Forwards events of matching types to a callback.
 
-    This event handler listens for events of matching types and forwards them
-    to a callback function.
-
-    If the callback performs blocking operations (file I/O, network calls,
-    etc.), register this handler with `run_in_thread=True` on the
-    [`EventDispatcher`][ropt.components.event_handlers.EventDispatcher]:
-
-    ```python
-    event_dispatcher.add_event_handler(handler, run_in_thread=True)
-    ```
+    A callback that blocks (file I/O, network calls) should be registered with
+    `run_in_thread=True` on the
+    [`EventDispatcher`][ropt.components.event_handlers.EventDispatcher]. See
+    [Optimization Workflows](../advanced/workflows.md#event-dispatcher).
     """
 
     def __init__(

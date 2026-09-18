@@ -22,10 +22,9 @@ if TYPE_CHECKING:
 
 
 class FunctionEvaluator(Evaluator):
-    """An evaluator that calls a function.
+    """An evaluator that calls a function once for each variable vector.
 
-    This Evaluator stores a single function that returns a value for each
-    objective and constraint.
+    The function returns the objective and constraint values for that vector.
     """
 
     # NOTE: A single instance may be reused serially across threads, for example by

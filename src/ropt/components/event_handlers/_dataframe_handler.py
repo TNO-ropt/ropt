@@ -165,11 +165,8 @@ class DataFrameHandler(EventHandler):
         it is not set), and reads the tables from this handler. If it performs
         blocking operations (for example writing tables to disk), register this
         handler with `run_in_thread=True` on the
-        [`EventDispatcher`][ropt.components.event_handlers.EventDispatcher]:
-
-        ```python
-        event_dispatcher.add_event_handler(table_handler, run_in_thread=True)
-        ```
+        [`EventDispatcher`][ropt.components.event_handlers.EventDispatcher]. See
+        [Optimization Workflows](../advanced/workflows.md#event-dispatcher).
 
         Args:
             callback: A function that is called when the tables are updated.

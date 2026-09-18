@@ -12,8 +12,7 @@ class BatchIdCounter:
     returns the next integer starting from zero.
 
     Pass the same instance to multiple evaluators to share a single counter
-    across them — useful in nested or parallel optimization setups where all
-    evaluators should produce globally unique batch IDs.
+    across them, so that their batch IDs remain unique.
 
     See [Writing Evaluation Callbacks](../advanced/evaluation_callbacks.md) for
     usage details and examples.

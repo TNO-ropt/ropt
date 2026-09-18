@@ -27,7 +27,7 @@ def run_concurrent(
     """Run blocking jobs concurrently on dedicated threads and collect results.
 
     Each job runs on its own thread, so the number of jobs that run at once is
-    not capped by any shared thread pool; ``limit`` optionally bounds how many
+    not capped by any shared thread pool; `limit` optionally bounds how many
     run simultaneously. The first job to raise makes its exception propagate as
     soon as it is observed (fail-fast): jobs that have not started yet are
     skipped, while any already running are abandoned, since a Python thread
@@ -35,10 +35,10 @@ def run_concurrent(
 
     Args:
         jobs:  The zero-argument callables to run, one result each.
-        limit: The maximum number to run at once, or ``None`` for no limit.
+        limit: The maximum number to run at once, or `None` for no limit.
 
     Returns:
-        The job results, in the order of ``jobs``.
+        The job results, in the order of `jobs`.
     """
     count = len(jobs)
     if count == 0:

@@ -221,14 +221,6 @@ class Executor(ABC):
     A submission that is already finished when it reaches a worker needs no work
     done: its caller has left, so running its work items only occupies a worker.
 
-    Subclasses must implement the following abstract methods:
-
-    - [`start`][ropt.components.executors.Executor.start]: Starts the executor.
-    - [`cancel`][ropt.components.executors.Executor.cancel]: Stops the executor.
-    - [`submit`][ropt.components.executors.Executor.submit]: Hands over a submission.
-    - [`is_running`][ropt.components.executors.Executor.is_running]: Reports
-      whether the executor accepts work.
-
     See [Error handling](../advanced/parallel.md#error-handling) for the
     distinction an implementation must make between an infrastructure failure,
     delivered as an

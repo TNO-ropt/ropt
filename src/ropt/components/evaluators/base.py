@@ -142,10 +142,10 @@ class EvaluationFunctionCallback(Protocol):
 
     A function following this protocol is called once per active row of the
     evaluation batch, receiving the variable vector for that row together with
-    a `EvaluationFunctionContext` object that identifies the evaluation.
-
-    The function should return a `EvaluationFunctionResult` object containing the
-    evaluation results.
+    an
+    [`EvaluationFunctionContext`][ropt.components.evaluators.EvaluationFunctionContext]
+    object that identifies the evaluation, and returns an
+    [`EvaluationFunctionResult`][ropt.components.evaluators.EvaluationFunctionResult].
     """
 
     def __call__(
@@ -157,8 +157,8 @@ class EvaluationFunctionCallback(Protocol):
 
         Args:
             variables:    1-D variable vector for this evaluation.
-            context:      The `EvaluationFunctionContext` object identifying the evaluation.
+            context:      The context identifying the evaluation.
 
         Returns:
-            The evaluation result as a `EvaluationFunctionResult` object.
+            The objective and constraint values for this variable vector.
         """
