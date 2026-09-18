@@ -3576,11 +3576,9 @@ both, depending on the specified flags.</p>
 
 
         <p>Backend for ensemble-based optimizations.</p>
-<p>The <a class="autorefs autorefs-internal" title="            ropt.core.EnsembleOptimizer" href="#ropt.core.EnsembleOptimizer"><code>EnsembleOptimizer</code></a> class provides the
-core functionality for running ensemble-based optimizations. Direct use of
-this class is generally discouraged. Instead, use the high-level
-<a class="autorefs autorefs-internal" title="            ropt.simple.optimize" href="../simple/#ropt.simple.optimize"><code>optimize</code></a> API or build a custom workflow
-containing the optimization steps.</p>
+<p>Direct use of this class is generally discouraged. Use the high-level
+<a class="autorefs autorefs-internal" title="            ropt.simple.optimize" href="../simple/#ropt.simple.optimize"><code>optimize</code></a> API instead, or build a custom workflow
+from the optimization steps.</p>
 
 
 
@@ -3619,19 +3617,6 @@ containing the optimization steps.</p>
     <div class="doc doc-contents ">
 
         <p>Initialize the EnsembleOptimizer.</p>
-<p>This class orchestrates ensemble-based optimizations. It requires an
-optimization context object and an evaluator to function.</p>
-<p>The <code>EnsembleOptimizer</code> needs the following to define a single
-optimization run:</p>
-<ol>
-<li>An <a class="autorefs autorefs-internal" title="            EnOptContext" href="../context/#ropt.context.EnOptContext"><code>EnOptContext</code></a> object: This contains
-    all necessary information for the optimization.</li>
-<li>An <a class="autorefs autorefs-internal" title="            ropt.core.EnsembleEvaluator" href="#ropt.core.EnsembleEvaluator"><code>EnsembleEvaluator</code></a>
-    object: This object is responsible for evaluating functions.</li>
-</ol>
-<p>Additionally, an optional
-<a class="autorefs autorefs-internal" title="            ropt.core.SignalEvaluationCallback" href="#ropt.core.SignalEvaluationCallback"><code>callback</code></a> can be provided that is
-invoked before and after each function evaluation.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3686,7 +3671,8 @@ invoked before and after each function evaluation.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional callback to signal evaluations.</p>
+                <p>Optional callback, invoked before and after each
+                function evaluation.</p>
               </div>
             </td>
             <td>
