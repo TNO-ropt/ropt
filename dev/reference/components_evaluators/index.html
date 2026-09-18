@@ -3835,9 +3835,8 @@ the <a class="autorefs autorefs-internal" title="            ropt.evaluation.Eva
 
 
 
-        <p>An evaluator that calls a function.</p>
-<p>This Evaluator stores a single function that returns a value for each
-objective and constraint.</p>
+        <p>An evaluator that calls a function once for each variable vector.</p>
+<p>The function returns the objective and constraint values for that vector.</p>
 
 
 
@@ -4472,8 +4471,7 @@ cache-hit information for populating <code>metadata</code>.</p>
 <p>Provides a simple default <code>batch_id_callback</code> for evaluators. Each call
 returns the next integer starting from zero.</p>
 <p>Pass the same instance to multiple evaluators to share a single counter
-across them — useful in nested or parallel optimization setups where all
-evaluators should produce globally unique batch IDs.</p>
+across them, so that their batch IDs remain unique.</p>
 <p>See <a href="../../advanced/evaluation_callbacks/">Writing Evaluation Callbacks</a> for
 usage details and examples.</p>
 
@@ -4569,9 +4567,20 @@ usage details and examples.</p>
         <p>Defines the call signature for function callbacks.</p>
 <p>A function following this protocol is called once per active row of the
 evaluation batch, receiving the variable vector for that row together with
-a <code>EvaluationFunctionContext</code> object that identifies the evaluation.</p>
-<p>The function should return a <code>EvaluationFunctionResult</code> object containing the
-evaluation results.</p>
+an
+<a class="autorefs autorefs-internal" title="            ropt.components.evaluators.EvaluationFunctionContext
+
+
+  
+      dataclass
+  " href="#ropt.components.evaluators.EvaluationFunctionContext"><code>EvaluationFunctionContext</code></a>
+object that identifies the evaluation, and returns an
+<a class="autorefs autorefs-internal" title="            ropt.components.evaluators.EvaluationFunctionResult
+
+
+  
+      dataclass
+  " href="#ropt.components.evaluators.EvaluationFunctionResult"><code>EvaluationFunctionResult</code></a>.</p>
 
 
 
@@ -4651,7 +4660,7 @@ evaluation results.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The <code>EvaluationFunctionContext</code> object identifying the evaluation.</p>
+                <p>The context identifying the evaluation.</p>
               </div>
             </td>
             <td>
@@ -4682,7 +4691,7 @@ evaluation results.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The evaluation result as a <code>EvaluationFunctionResult</code> object.</p>
+                <p>The objective and constraint values for this variable vector.</p>
               </div>
             </td>
           </tr>

@@ -3179,14 +3179,6 @@ algorithm descriptions.</p>
 
 
         <p>Abstract base class for function estimator implementations.</p>
-<p>Subclasses must implement four methods:</p>
-<ol>
-<li><code>__init__</code> — store configuration; defer heavy work to <code>init</code>.</li>
-<li><code>init</code> — called once before the run; validate settings and pre-compute
-   state here.</li>
-<li><code>calculate_function</code> — aggregate per-realization function values.</li>
-<li><code>calculate_gradient</code> — aggregate per-realization gradients.</li>
-</ol>
 <p>See <a href="../../optimizer_setup/function_estimators/">Function Estimators</a> for examples
 and further guidance.</p>
 

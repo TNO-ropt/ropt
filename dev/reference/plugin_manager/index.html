@@ -3254,12 +3254,10 @@ plugins built into <code>ropt</code>. Retrieve a plugin class with
 name with
 <a class="autorefs autorefs-internal" title="            get_plugin_name" href="#ropt.plugins.PluginManager.get_plugin_name"><code>get_plugin_name</code></a>.</p>
 <p>A third-party plugin registers itself under the relevant group in its own
-<code>pyproject.toml</code>, for example:</p>
-<div class="language-toml highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">[project.entry-points.</span><span class="s2">"ropt.plugins.backend"</span><span class="k">]</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">my_backend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"my_package.my_module:MyBackend"</span>
-</span></code></pre></div>
-<p>A plugin that is not installed, for instance one defined in a script or a
-notebook, is added with
+<code>pyproject.toml</code>; see
+<a href="../../advanced/writing_plugins/#registering-it">Registering it</a>. A plugin
+that is not installed, for instance one defined in a script or a notebook,
+is added with
 <a class="autorefs autorefs-internal" title="            register_plugin" href="#ropt.plugins.PluginManager.register_plugin"><code>register_plugin</code></a>.</p>
 
 

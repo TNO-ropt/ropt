@@ -3257,26 +3257,9 @@ fits into the gradient pipeline, and
 
 
         <p>Abstract base class for sampler implementations.</p>
-<p>All concrete sampler implementations must inherit from this class and
-implement the required lifecycle and sample-generation methods. Samplers
-are responsible for generating perturbation values that are applied to
+<p>A sampler generates the perturbation values that are applied to the
 optimization variables when estimating gradients.</p>
-<p><strong>Lifecycle</strong></p>
-<ol>
-<li>Instantiation via <code>__init__</code>: Called by the plugin system with a
-   configuration object.</li>
-<li>Setup via <code>init</code>: Called once per optimization workflow with the shape of
-   the samples to generate, a variable mask, and a random number generator.</li>
-<li>Sampling via <code>generate_samples</code>: Called repeatedly during optimization
-   whenever perturbed variable vectors are needed.</li>
-</ol>
-<p>Subclasses must implement:</p>
-<ul>
-<li><code>__init__</code>: Stores sampler configuration and performs lightweight setup.</li>
-<li><code>init</code>: Receives the sample shape and the random number generator.</li>
-<li><code>generate_samples</code>: Returns perturbation samples with the expected shape
-  and masking semantics.</li>
-</ul>
+<p>See <a href="../../optimizer_setup/gradients/">Stochastic Gradients</a>.</p>
 
 
 
@@ -3652,26 +3635,9 @@ the perturbations applied to the variables.</p>
 
 
         <p>Abstract base class for sampler implementations.</p>
-<p>All concrete sampler implementations must inherit from this class and
-implement the required lifecycle and sample-generation methods. Samplers
-are responsible for generating perturbation values that are applied to
+<p>A sampler generates the perturbation values that are applied to the
 optimization variables when estimating gradients.</p>
-<p><strong>Lifecycle</strong></p>
-<ol>
-<li>Instantiation via <code>__init__</code>: Called by the plugin system with a
-   configuration object.</li>
-<li>Setup via <code>init</code>: Called once per optimization workflow with the shape of
-   the samples to generate, a variable mask, and a random number generator.</li>
-<li>Sampling via <code>generate_samples</code>: Called repeatedly during optimization
-   whenever perturbed variable vectors are needed.</li>
-</ol>
-<p>Subclasses must implement:</p>
-<ul>
-<li><code>__init__</code>: Stores sampler configuration and performs lightweight setup.</li>
-<li><code>init</code>: Receives the sample shape and the random number generator.</li>
-<li><code>generate_samples</code>: Returns perturbation samples with the expected shape
-  and masking semantics.</li>
-</ul>
+<p>See <a href="../../optimizer_setup/gradients/">Stochastic Gradients</a>.</p>
 
 
 
