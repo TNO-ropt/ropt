@@ -18,7 +18,7 @@ from functools import partial
 from typing import TYPE_CHECKING, Any, TypeVar, cast, overload
 
 from ropt.components.executors import Submission, WorkItem
-from ropt.exceptions import ExecutorFailure, WorkflowError
+from ropt.exceptions import ExecutionError, ExecutorFailure, WorkflowError
 
 from ._guards import check_pool
 
@@ -72,7 +72,9 @@ def offload(
     A handler in a shared group runs on the session's own event loop and cannot
     wait on it; offloading from there raises a
     [`WorkflowError`][ropt.exceptions.WorkflowError]. So does a pool that is
-    closed, or one carried into a worker process.
+    closed, or one carried into a worker process. A call that the machinery
+    could not run, for instance because its worker process was killed, raises an
+    [`ExecutionError`][ropt.exceptions.ExecutionError].
 
     Args:
         work: A single zero-argument callable, or a sequence of them.
@@ -127,8 +129,7 @@ def _dispatch(executor: Executor, functions: list[Callable[[], Any]]) -> list[An
 
 def _store(output: list[Any], work_item: WorkItem) -> None:
     assert isinstance(work_item, _IndexedWorkItem)
-    # Unlike an evaluation, a lost work item has no NaN to fall back on: there
-    # is a result to return, or there is nothing.
     if isinstance(work_item.result, ExecutorFailure):
-        raise work_item.result
+        msg = f"An offloaded call could not be run: {work_item.result}"
+        raise ExecutionError(msg)
     output[work_item.index] = work_item.result

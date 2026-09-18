@@ -17,7 +17,7 @@ import pytest
 
 from ropt.components.event_handlers import EventDispatcher, EventHandler
 from ropt.enums import EnOptEventType
-from ropt.exceptions import ExecutorFailure, WorkflowError
+from ropt.exceptions import ExecutionError, WorkflowError
 from ropt.simple import WorkerPool, offload, optimize, serial_pool, session
 from ropt.simple._session import _Session
 
@@ -115,7 +115,7 @@ def test_offload_sequence_with_a_process_pool() -> None:
 @pytest.mark.slow
 @pytest.mark.timeout(60)
 def test_dying_worker_reported_to_offload_caller() -> None:
-    with pytest.raises(ExecutorFailure, match="killed"), session() as active:
+    with pytest.raises(ExecutionError, match="could not be run"), session() as active:
         offload(_kill_worker, pool=active.process_pool(workers=1))
 
 

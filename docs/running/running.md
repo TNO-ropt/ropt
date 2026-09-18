@@ -287,7 +287,8 @@ What *is* raised falls into three groups:
   as configured — a constraint it does not support, for instance, which is
   checked as the run starts — and
   [`ExecutionError`][ropt.exceptions.ExecutionError] when the machinery that
-  runs the evaluations cannot start or breaks down.
+  runs your evaluations, or a call handed to
+  [`offload`][ropt.simple.offload], cannot start or breaks down.
 
 - **Exceptions from your own evaluation function** are not caught. They travel
   back from wherever the evaluation ran — including a worker thread or process
