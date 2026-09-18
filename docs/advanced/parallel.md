@@ -338,9 +338,9 @@ the file formats in full.
 A finished job's result is not always readable at once: the job may have died
 before writing it, or the file may be caught half-written. `retries` is how many
 **further** polls to allow before the work item is failed with an
-[`ExecutorFailure`][ropt.exceptions.ExecutorFailure], so the grace period is
-`retries × interval` seconds — 30 seconds with the defaults. `retries=0` gives up
-on the first failed read.
+[`ExecutorFailure`][ropt.components.executors.ExecutorFailure], so the grace
+period is `retries × interval` seconds — 30 seconds with the defaults.
+`retries=0` gives up on the first failed read.
 
 `query_retries` bounds a separate failure: the scheduler itself being
 unreachable. Once querying the queue has failed `query_retries + 1` times **in a
@@ -547,7 +547,8 @@ receives, and what becomes of the executor, differ.
 An *infrastructure* failure is one that is not caused by the evaluation function
 itself: a worker process is killed (`BrokenProcessPool`), or an HPC job's output
 file never appears or cannot be deserialized. These are delivered as an ordinary
-result whose value is an [`ExecutorFailure`][ropt.exceptions.ExecutorFailure]
+result whose value is an
+[`ExecutorFailure`][ropt.components.executors.ExecutorFailure]
 (via [`deliver`][ropt.components.executors.Submission.deliver]), which leaves the
 executor running rather than tearing it down.
 

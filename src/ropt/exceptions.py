@@ -72,7 +72,3 @@ class ExecutorStopped(Exception):  # ruff: ignore[error-suffix-on-exception-name
     A generic signal, carrying no exit code, raised by the parallel evaluator
     when its executor has stopped and the current evaluation cannot proceed.
     """
-
-
-class ExecutorFailure(Exception):  # ruff: ignore[error-suffix-on-exception-name]
-    """Raised when an executor fails to execute a task."""

@@ -34,6 +34,7 @@ from ropt.components.evaluators import (
 from ropt.components.evaluators._parallel_evaluator import _handle_result
 from ropt.components.event_handlers import ResultsHandler
 from ropt.components.executors import (
+    ExecutorFailure,
     HPCExecutor,
     LocalJobExecutor,
     ProcessExecutor,
@@ -48,7 +49,6 @@ from ropt.context import EnOptContext
 from ropt.evaluation import EvaluationBatchContext
 from ropt.exceptions import (
     ExecutionError,
-    ExecutorFailure,
     ExecutorStopped,
     WorkflowError,
 )

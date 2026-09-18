@@ -9,9 +9,14 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 
 from ropt._logging import get_logger
-from ropt.components.executors import Executor, Submission, WorkItem
+from ropt.components.executors import (
+    Executor,
+    ExecutorFailure,
+    Submission,
+    WorkItem,
+)
 from ropt.evaluation import EvaluationBatchContext, EvaluationBatchResult
-from ropt.exceptions import ExecutionError, ExecutorFailure, WorkflowError
+from ropt.exceptions import ExecutionError, WorkflowError
 
 from ._common import _active_evaluations, _build_metadata, _scatter_result
 from ._counter import BatchIdCounter
@@ -186,7 +191,9 @@ def _handle_result(
         work_item.args[1]
     )
     if isinstance(work_item.result, ExecutorFailure):
-        msg = f"{len(bundle)} evaluation(s) could not be run: {work_item.result}"
+        msg = (
+            f"{len(bundle)} evaluation(s) could not be run: {work_item.result.message}"
+        )
         raise ExecutionError(msg)
     if not isinstance(work_item.result, list) or len(work_item.result) != len(bundle):
         msg = (

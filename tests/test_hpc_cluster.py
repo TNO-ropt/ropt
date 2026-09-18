@@ -34,8 +34,12 @@ from typing import TYPE_CHECKING, Any
 
 import pytest
 
-from ropt.components.executors import HPCExecutor, Submission, WorkItem
-from ropt.exceptions import ExecutorFailure
+from ropt.components.executors import (
+    ExecutorFailure,
+    HPCExecutor,
+    Submission,
+    WorkItem,
+)
 
 if TYPE_CHECKING:
     from collections.abc import Iterator

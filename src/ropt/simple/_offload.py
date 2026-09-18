@@ -17,8 +17,8 @@ from dataclasses import dataclass
 from functools import partial
 from typing import TYPE_CHECKING, Any, TypeVar, cast, overload
 
-from ropt.components.executors import Submission, WorkItem
-from ropt.exceptions import ExecutionError, ExecutorFailure, WorkflowError
+from ropt.components.executors import ExecutorFailure, Submission, WorkItem
+from ropt.exceptions import ExecutionError, WorkflowError
 
 from ._guards import check_pool
 
@@ -130,6 +130,6 @@ def _dispatch(executor: Executor, functions: list[Callable[[], Any]]) -> list[An
 def _store(output: list[Any], work_item: WorkItem) -> None:
     assert isinstance(work_item, _IndexedWorkItem)
     if isinstance(work_item.result, ExecutorFailure):
-        msg = f"An offloaded call could not be run: {work_item.result}"
+        msg = f"An offloaded call could not be run: {work_item.result.message}"
         raise ExecutionError(msg)
     output[work_item.index] = work_item.result

@@ -40,8 +40,10 @@ class WorkItem:
         function: The function to execute.
         args:     The arguments to pass to the function.
         kwargs:   The keyword arguments to pass to the function.
-        result:   The result of the function, only meaningful once the work
-                  item has been delivered.
+        result:   What the function returned, or an
+                  [`ExecutorFailure`][ropt.components.executors.ExecutorFailure]
+                  if it could not be run. Only meaningful once the work item
+                  has been delivered.
         name:     Optional unique name of the work item.
     """
 
@@ -50,6 +52,20 @@ class WorkItem:
     kwargs: dict[str, Any] = field(default_factory=dict)
     result: Any = None
     name: str | None = None
+
+
+@dataclass(frozen=True)
+class ExecutorFailure:
+    """The executor could not run a work item.
+
+    Delivered as a work item's result rather than raised, so the executor stays
+    available for further work.
+
+    Attributes:
+        message: What went wrong.
+    """
+
+    message: str
 
 
 class _ResultsQueue(queue.Queue["WorkItem | BaseException | None"]):
@@ -215,7 +231,8 @@ class Executor(ABC):
 
     See [Error handling](../advanced/parallel.md#error-handling) for the
     distinction an implementation must make between an infrastructure failure,
-    delivered as an [`ExecutorFailure`][ropt.exceptions.ExecutorFailure] result,
+    delivered as an
+    [`ExecutorFailure`][ropt.components.executors.ExecutorFailure] result,
     and an exception from the work item's own function, which ends the
     submission.
     """

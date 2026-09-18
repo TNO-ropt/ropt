@@ -37,9 +37,9 @@ from uuid import uuid4
 
 from ropt._logging import get_logger
 from ropt._serialize import CANNOT_SERIALIZE, dump, load
-from ropt.exceptions import ExecutionError, ExecutorFailure, WorkflowError
+from ropt.exceptions import ExecutionError, WorkflowError
 
-from .base import ExecutorBase, Submission, WorkItem
+from .base import ExecutorBase, ExecutorFailure, Submission, WorkItem
 
 if TYPE_CHECKING:
     from uuid import UUID
@@ -261,9 +261,7 @@ class JobExecutorBase(ExecutorBase):
             if entry is None:
                 continue
             submission, work_item = entry
-            if isinstance(result, Exception) and not isinstance(
-                result, ExecutorFailure
-            ):
+            if isinstance(result, Exception):
                 # Deliver to the evaluator; keep the executor alive (no raise).
                 self._fail(submission, result)
             else:

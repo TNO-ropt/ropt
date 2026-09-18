@@ -10,10 +10,10 @@ from typing import Any
 
 from ropt._logging import get_logger
 from ropt._serialize import CANNOT_DESERIALIZE, CANNOT_SERIALIZE, dumps, loads
-from ropt.exceptions import ExecutionError, ExecutorFailure
+from ropt.exceptions import ExecutionError
 
 from ._picklable import picklable_exception
-from .base import ExecutorBase, WorkItem
+from .base import ExecutorBase, ExecutorFailure, WorkItem
 
 _logger = get_logger(__name__)
 
