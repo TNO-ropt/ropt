@@ -6079,12 +6079,12 @@ configuration details.</p>
             <td>
               <div class="doc-md-description">
                 <p>Shared-filesystem directory for each work item's
-           serialized I/O files; also passed as the job working
-           directory (template-dependent). Must be an existing
-           absolute path: there is no default, because only the
-           caller knows which directory the cluster shares. Work
-           item files are never overwritten, so concurrent
-           executors need distinct workdirs.</p>
+            serialized I/O files; also passed as the job working
+            directory (template-dependent). Must be an existing
+            absolute path: there is no default, because only the
+            caller knows which directory the cluster shares. Work
+            item files are never overwritten, so concurrent
+            executors need distinct workdirs.</p>
               </div>
             </td>
             <td>
@@ -6133,8 +6133,8 @@ configuration details.</p>
             <td>
               <div class="doc-md-description">
                 <p>The <code>pysqa</code> configuration directory, the one holding
-           <code>queue.yaml</code> or <code>clusters.yaml</code>. Defaults to the
-           site-wide configuration installed alongside ropt.</p>
+            <code>queue.yaml</code> or <code>clusters.yaml</code>. Defaults to the
+            site-wide configuration installed alongside ropt.</p>
               </div>
             </td>
             <td>
@@ -6151,7 +6151,7 @@ configuration details.</p>
             <td>
               <div class="doc-md-description">
                 <p>Optional cluster name, when the configuration defines
-           more than one. Defaults to the configured primary.</p>
+            more than one. Defaults to the configured primary.</p>
               </div>
             </td>
             <td>
@@ -6168,10 +6168,10 @@ configuration details.</p>
             <td>
               <div class="doc-md-description">
                 <p>Optional name of a queue defined in the
-           configuration. This is not necessarily the
-           scheduler's partition name: it selects a queue entry,
-           whose submission script names the partition. Defaults
-           to the configured primary.</p>
+            configuration. This is not necessarily the
+            scheduler's partition name: it selects a queue entry,
+            whose submission script names the partition. Defaults
+            to the configured primary.</p>
               </div>
             </td>
             <td>
@@ -6188,8 +6188,8 @@ configuration details.</p>
             <td>
               <div class="doc-md-description">
                 <p>A submission script template, submitted instead of
-           any configuration. Everything the scheduler needs,
-           the partition included, must be in it.</p>
+            any configuration. Everything the scheduler needs,
+            the partition included, must be in it.</p>
               </div>
             </td>
             <td>
@@ -6206,9 +6206,9 @@ configuration details.</p>
             <td>
               <div class="doc-md-description">
                 <p>The queueing system a <code>template</code> is written for, for
-           example <code>"slurm"</code> (the default). Only meaningful with
-           a <code>template</code>, since a configuration names its own.
-           <code>pysqa</code> calls this <code>queue_type</code>.</p>
+            example <code>"slurm"</code> (the default). Only meaningful with
+            a <code>template</code>, since a configuration names its own.
+            <code>pysqa</code> calls this <code>queue_type</code>.</p>
               </div>
             </td>
             <td>
@@ -6241,8 +6241,8 @@ configuration details.</p>
             <td>
               <div class="doc-md-description">
                 <p>Memory per work item. Rendered by the submission
-           script; with a configuration it is also clamped to
-           the queue's limit.</p>
+            script; with a configuration it is also clamped to
+            the queue's limit.</p>
               </div>
             </td>
             <td>
@@ -6259,8 +6259,8 @@ configuration details.</p>
             <td>
               <div class="doc-md-description">
                 <p>Run time per work item, typically in seconds. With a
-           configuration, the queue's own limit applies when
-           this is not given.</p>
+            configuration, the queue's own limit applies when
+            this is not given.</p>
               </div>
             </td>
             <td>
@@ -6277,10 +6277,10 @@ configuration details.</p>
             <td>
               <div class="doc-md-description">
                 <p>Extra variables for the submission script, for
-           whatever the script declares beyond the standard
-           names — an account, a reservation, a GPU request.
-           Entries that are <code>None</code> are dropped, so omitting a
-           key and passing <code>None</code> mean the same thing.</p>
+            whatever the script declares beyond the standard
+            names — an account, a reservation, a GPU request.
+            Entries that are <code>None</code> are dropped, so omitting a
+            key and passing <code>None</code> mean the same thing.</p>
               </div>
             </td>
             <td>
@@ -6297,9 +6297,9 @@ configuration details.</p>
             <td>
               <div class="doc-md-description">
                 <p>Number of extra polls to wait for a work item's
-           result after the first attempt fails (<code>0</code> gives up at
-           once). This is about the shared filesystem, not about
-           the scheduler.</p>
+            result after the first attempt fails (<code>0</code> gives up at
+            once). This is about the shared filesystem, not about
+            the scheduler.</p>
               </div>
             </td>
             <td>
@@ -6316,9 +6316,9 @@ configuration details.</p>
             <td>
               <div class="doc-md-description">
                 <p>Number of extra attempts to query the scheduler after
-           one fails (<code>0</code> gives up at once). A run this long
-           fails every job that is out, because nothing can be
-           said about a job that cannot be asked after.</p>
+            one fails (<code>0</code> gives up at once). A run this long
+            fails every job that is out, because nothing can be
+            said about a job that cannot be asked after.</p>
               </div>
             </td>
             <td>
@@ -6335,9 +6335,9 @@ configuration details.</p>
             <td>
               <div class="doc-md-description">
                 <p>Whether to remove work item files once their result is
-           retrieved or their job is cancelled. A work item that
-           failed keeps its captured output, which is the only
-           record of why.</p>
+            retrieved or their job is cancelled. A work item that
+            failed keeps its captured output, which is the only
+            record of why.</p>
               </div>
             </td>
             <td>
