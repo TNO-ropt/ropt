@@ -539,28 +539,35 @@ Free-threaded (no-GIL) builds of CPython are **untested and unsupported**.
 ## Error handling
 
 Executors and the [`ParallelEvaluator`][ropt.components.evaluators.ParallelEvaluator]
-distinguish two classes of failure, and treat them very differently.
+distinguish two classes of failure. Both end the evaluation, but what the caller
+receives, and what becomes of the executor, differ.
 
-### Infrastructure failure (tolerated)
+### Infrastructure failure (raised as `ExecutionError`)
 
 An *infrastructure* failure is one that is not caused by the evaluation function
 itself: a worker process is killed (`BrokenProcessPool`), or an HPC job's output
 file never appears or cannot be deserialized. These are delivered as an ordinary
 result whose value is an [`ExecutorFailure`][ropt.exceptions.ExecutorFailure]
-(via [`deliver`][ropt.components.executors.Submission.deliver]). The evaluator
-records the affected rows as failed realizations by writing `numpy.nan`. Such a
-failure is *tolerated*: the optimization continues, and only aborts (with
-`TOO_FEW_REALIZATIONS`) if too many realizations fail to satisfy the configured
-minimum.
+(via [`deliver`][ropt.components.executors.Submission.deliver]), which leaves the
+executor running rather than tearing it down.
 
-Only the `numpy.nan` survives that step — the `ExecutorFailure` and its message
-do not reach the optimizer, so an aborted run reports `TOO_FEW_REALIZATIONS`
-without saying why. The reason is logged instead, once per failed work item, at
-`WARNING` from the `ropt.components.evaluators` logger; see
-[Logging](../troubleshooting/logging.md). Because `realization_min_success` defaults to
-*all* realizations, a single failed work item is enough to end the run this way.
+The evaluator turns that result into an
+[`ExecutionError`][ropt.exceptions.ExecutionError], naming how many evaluations
+were lost and why, which ends the run. It does **not** write `numpy.nan` for the
+affected rows. A machine that broke is not a realization that failed to
+converge: absorbing it would let the optimization continue on whichever workers
+happened to survive, and produce a result that is indistinguishable from one
+computed over the whole ensemble.
 
-### User-code exception (raised)
+!!! note "A failed realization is still tolerated"
+
+    `numpy.nan` returned *by the evaluation function* keeps its meaning — that
+    realization could not produce a value — and
+    [`realization_min_success`](../optimizer_setup/configuration_sections.md#realizations)
+    still decides how many a batch may contain before the run ends with
+    `TOO_FEW_REALIZATIONS`. Only a failure of the machinery is raised.
+
+### User-code exception (re-raised unchanged)
 
 A *user-code* exception is one raised by the evaluation function itself — a bug
 in the objective, a bad configuration, an unexpected input. This must not be
@@ -733,8 +740,8 @@ Forwarding an event through an
 [`EventForwardHandler`][ropt.components.event_handlers.EventForwardHandler] is
 **synchronous**: the emitting run blocks until the dispatcher has run every
 handler for that event. A handler failure is therefore delivered like an
-evaluation error — on the emitting run's own call stack — mirroring the
-executor's tolerated-vs-fatal split:
+evaluation error — on the emitting run's own call stack — and splits
+`Exception` from `BaseException` exactly as the executor does:
 
 - An ordinary `Exception` from a handler is **re-raised on the emitting run's
   stack**, unwrapped — a single, clean exception that stops the run normally,

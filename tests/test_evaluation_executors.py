@@ -2435,7 +2435,7 @@ async def test_fatal_work_item_error_reaches_caller() -> None:
     assert isinstance(outcome[0], _FatalError)
 
 
-async def test_handle_result_records_executor_failure_as_nan() -> None:  # ruff: ignore[unused-async]
+async def test_handle_result_raises_on_executor_failure() -> None:  # ruff: ignore[unused-async]
     results = np.zeros((2, 1), dtype=np.float64)
     bundle = [
         (
@@ -2449,34 +2449,13 @@ async def test_handle_result_records_executor_failure_as_nan() -> None:  # ruff:
     work_item = WorkItem(
         function=_function,
         args=(None, bundle),
-        result=ExecutorFailure("Background process was killed"),
-    )
-    _handle_result(work_item, results, {}, objective_count=1)
-    assert np.all(np.isnan(results))
-
-
-async def test_handle_result_logs_executor_failure_reason(  # ruff: ignore[unused-async]
-    caplog: pytest.LogCaptureFixture,
-) -> None:
-    # NaN is all that reaches the optimizer, so the log is the only place the
-    # reason for a failed realization is stated.
-    results = np.zeros((1, 1), dtype=np.float64)
-    bundle = [
-        (
-            np.zeros(2, dtype=np.float64),
-            EvaluationFunctionContext(
-                realization=0, perturbation=-1, batch_id=0, eval_idx=0
-            ),
-        )
-    ]
-    work_item = WorkItem(
-        function=_function,
-        args=(None, bundle),
         result=ExecutorFailure("the job wrote to item.txt"),
     )
-    with caplog.at_level(logging.WARNING, logger="ropt"):
+    with pytest.raises(
+        ExecutionError,
+        match=r"2 evaluation\(s\) could not be run: the job wrote to item\.txt",
+    ):
         _handle_result(work_item, results, {}, objective_count=1)
-    assert "the job wrote to item.txt" in caplog.text
 
 
 @pytest.mark.parametrize(

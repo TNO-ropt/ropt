@@ -23,7 +23,7 @@ from ropt.components.event_handlers import EventDispatcher
 from ropt.components.executors import HPCExecutor, LocalJobExecutor, ThreadExecutor
 from ropt.context import EnOptContext
 from ropt.enums import ExitCode
-from ropt.exceptions import ExecutorStopped, WorkflowError
+from ropt.exceptions import ExecutionError, ExecutorStopped, WorkflowError
 from ropt.results import FunctionResults
 from ropt.simple import (
     EvaluationFunctionContext,
@@ -1754,3 +1754,31 @@ def test_local_pool_closes_with_its_session() -> None:
     assert thread is not None
     thread.join(10.0)
     assert not workdir.exists()
+
+
+_DYING_WORKER_CONFIG: dict[str, Any] = {
+    "variables": {"variable_count": 2},
+    "realizations": {"weights": [1.0] * 4, "realization_min_success": 1},
+}
+
+
+def _kill_worker_on_one_realization(
+    variables: NDArray[np.float64], context: EvaluationFunctionContext
+) -> float:
+    if context.realization == 1:
+        os._exit(1)
+    return float(np.sum(variables**2))
+
+
+@pytest.mark.slow
+@pytest.mark.timeout(60)
+def test_dying_worker_raises_instead_of_failing_a_realization() -> None:
+    # A minimum of one success is enough to absorb the loss, so without the
+    # raise this returns an answer computed from the workers that survived.
+    with pytest.raises(ExecutionError, match="could not be run"), session() as active:
+        evaluate(
+            _DYING_WORKER_CONFIG,
+            np.zeros(2),
+            _kill_worker_on_one_realization,
+            pool=active.process_pool(workers=2),
+        )

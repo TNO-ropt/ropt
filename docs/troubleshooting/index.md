@@ -47,18 +47,18 @@ evaluation recorded before it did, and is `None` only when there was none. A
 run that fails part-way therefore still hands back what it had reached. See
 [When something goes wrong](../running/running.md#when-something-goes-wrong).
 
-**Some reasons are only ever logged.** When the machinery itself fails — a
-worker process is killed, a cluster job never writes its result — the affected
-evaluations are recorded as `NaN`. The optimizer sees only the `NaN`, so the
-reason appears once, as a `WARNING` from the `ropt.components.evaluators`
-logger, and nowhere else. Turn logging on before investigating a run that ended
-in `TOO_FEW_REALIZATIONS`; see [Logging](logging.md).
+**A broken machine is an error, not a failed realization.** When the machinery
+itself fails — a worker process is killed, a cluster job never writes its result
+— the run stops with an [`ExecutionError`][ropt.exceptions.ExecutionError] that
+says how many evaluations were lost and why. It is not absorbed as a `NaN`,
+because a result computed over the workers that survived is indistinguishable
+from one computed over the whole ensemble.
 
 | What you see | Most likely cause |
 | --- | --- |
 | `result.results` is `None`, but `exit_code` is `OPTIMIZER_FINISHED` | No evaluation satisfied the constraints to within `constraint_tolerance` (default `1e-10`; bounds and linear constraints count too), so there is no best feasible result to return. The evaluations are still in the handlers. Raise the tolerance, or check that the constraints can be satisfied at all. |
 | `TOO_FEW_REALIZATIONS` although only one realization failed | [`realization_min_success`](../optimizer_setup/configuration_sections.md#realizations) defaults to all of them. Lower it. |
-| `TOO_FEW_REALIZATIONS` and nothing says why | The failures came from the machinery, not from your objective. The reason is logged at `WARNING` by `ropt.components.evaluators`; enable [logging](logging.md). |
+| `ExecutionError` part-way through a run | The machinery failed, not your objective. The message names the reason and how many evaluations went with it. |
 | Numbers do not match what you configured | Results carry the configured values and the optimizer's scaled ones side by side; see [Scaling of results](../running/results.md#scaling-of-results). |
 
 ## Your evaluation function

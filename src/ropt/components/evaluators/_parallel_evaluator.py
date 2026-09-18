@@ -11,7 +11,7 @@ import numpy as np
 from ropt._logging import get_logger
 from ropt.components.executors import Executor, Submission, WorkItem
 from ropt.evaluation import EvaluationBatchContext, EvaluationBatchResult
-from ropt.exceptions import ExecutorFailure, WorkflowError
+from ropt.exceptions import ExecutionError, ExecutorFailure, WorkflowError
 
 from ._common import _active_evaluations, _build_metadata, _scatter_result
 from ._counter import BatchIdCounter
@@ -84,10 +84,11 @@ class ParallelEvaluator(Evaluator):
     ) -> EvaluationBatchResult:
         """Evaluate all objective and constraints.
 
-        An infrastructure failure is recorded as a failed realization (NaN); a
-        user-code exception is re-raised, leaving the executor running. Raises
+        An infrastructure failure raises
+        [`ExecutionError`][ropt.exceptions.ExecutionError]; a user-code
+        exception is re-raised unchanged, leaving the executor running. Raises
         [`ExecutorStopped`][ropt.exceptions.ExecutorStopped] if the executor
-        cannot run the evaluation. See
+        stopped before every result arrived. See
         [error handling](../advanced/parallel.md#error-handling) for the full
         contract.
 
@@ -185,15 +186,8 @@ def _handle_result(
         work_item.args[1]
     )
     if isinstance(work_item.result, ExecutorFailure):
-        # Infrastructure failure: the whole bundle counts as failed
-        # realizations, which the ensemble machinery handles as NaN. NaN is all
-        # that reaches the optimizer, so the reason is only reported here.
-        _logger.warning(
-            "Recording %d evaluation(s) as failed: %s", len(bundle), work_item.result
-        )
-        for _, function_context in bundle:
-            results[function_context.eval_idx, :] = np.nan
-        return
+        msg = f"{len(bundle)} evaluation(s) could not be run: {work_item.result}"
+        raise ExecutionError(msg)
     if not isinstance(work_item.result, list) or len(work_item.result) != len(bundle):
         msg = (
             f"The evaluation function must return a list of {len(bundle)} "
