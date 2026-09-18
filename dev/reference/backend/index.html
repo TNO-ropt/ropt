@@ -3503,7 +3503,9 @@ gradient values through the
 <a class="autorefs autorefs-internal" title="            ropt.core.OptimizerCallback" href="../core/#ropt.core.OptimizerCallback"><code>OptimizerCallback</code></a> interface, and advances the
 optimization from an initial variable vector. It is selected through the
 <code>backend</code> field of an <a class="autorefs autorefs-internal" title="            EnOptContext" href="../context/#ropt.context.EnOptContext"><code>EnOptContext</code></a>, either as an
-instance or as a <a class="autorefs autorefs-internal" title="            BackendConfig" href="../config/#ropt.config.BackendConfig"><code>BackendConfig</code></a> naming a method.</p>
+instance or as a <a class="autorefs autorefs-internal" title="            BackendConfig" href="../config/#ropt.config.BackendConfig"><code>BackendConfig</code></a> naming a method.
+The context itself never reaches the backend: <code>ropt</code> reduces it to an
+<code>OptimizationProblem</code> when the run starts.</p>
 <p><code>ropt</code> ships <a class="autorefs autorefs-internal" title="            ropt.backend.scipy.SciPyBackend" href="#ropt.backend.scipy.SciPyBackend"><code>SciPyBackend</code></a> and
 <a class="autorefs autorefs-internal" title="            ropt.backend.external.ExternalBackend" href="#ropt.backend.external.ExternalBackend"><code>ExternalBackend</code></a>, which runs an
 optimizer in a separate process; further backends come from plugin packages. See
