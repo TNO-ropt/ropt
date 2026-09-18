@@ -3104,16 +3104,6 @@
 
 
 <h1 id="context-class">Context Class</h1>
-<p><a class="autorefs autorefs-internal" title="            EnOptContext" href="#ropt.context.EnOptContext"><code>EnOptContext</code></a> is the validated, frozen container
-that holds every setting needed to execute a single optimization run. It is
-typically built from a plain dict (<code>EnOptContext.model_validate(CONFIG)</code>).</p>
-<p>For a narrative overview of all fields — including broadcasting rules, sharing
-plugin instances by key, defaults, and worked examples — see the
-<a href="../../optimizer_setup/configuration/">Configuration</a> user-manual page.</p>
-<p>The scales applied to the objectives and the nonlinear constraints of a run are
-read with
-<a class="autorefs autorefs-internal" title="            get_objective_scales" href="#ropt.context.EnOptContext.get_objective_scales"><code>get_objective_scales</code></a> and
-<a class="autorefs autorefs-internal" title="            get_constraint_scales" href="#ropt.context.EnOptContext.get_constraint_scales"><code>get_constraint_scales</code></a>.</p>
 
 
 <div class="doc doc-object doc-module">
@@ -3128,7 +3118,12 @@ read with
 
     <div class="doc doc-contents first">
 
-        <p>The <code>ropt.context</code> module provides the context class used by optimization workflows.</p>
+        <p>The validated configuration of a single optimization run.</p>
+<p><a class="autorefs autorefs-internal" title="            EnOptContext" href="#ropt.context.EnOptContext"><code>EnOptContext</code></a> is the frozen container holding
+every setting a run needs, normally built from a plain dictionary with
+<code>EnOptContext.model_validate(config)</code>. See
+<a href="../../optimizer_setup/configuration/">Configuration</a> for the fields,
+broadcasting rules and defaults.</p>
 
 
 

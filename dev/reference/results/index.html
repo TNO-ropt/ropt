@@ -3560,34 +3560,6 @@
 
 
 <h1 id="evaluation-results">Evaluation Results</h1>
-<p>Every batch evaluation produces a tuple of <a class="autorefs autorefs-internal" title="            ropt.results.Results
-
-
-  
-      dataclass
-  " href="#ropt.results.Results"><code>Results</code></a>
-objects: a <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
-
-
-  
-      dataclass
-  " href="#ropt.results.FunctionResults"><code>FunctionResults</code></a> for objective and
-constraint values, and/or a <a class="autorefs autorefs-internal" title="            ropt.results.GradientResults
-
-
-  
-      dataclass
-  " href="#ropt.results.GradientResults"><code>GradientResults</code></a>
-for gradient estimates. Each is a frozen container of
-<a class="autorefs autorefs-internal" title="            ropt.results.ResultField
-
-
-  
-      dataclass
-  " href="#ropt.results.ResultField"><code>ResultField</code></a> sub-objects holding NumPy arrays
-with axis-name metadata.</p>
-<p>See <a href="../../running/results/">Working with Results</a> for a tour of the access
-patterns.</p>
 
 
 <div class="doc doc-object doc-module">
@@ -3602,7 +3574,33 @@ patterns.</p>
 
     <div class="doc doc-contents first">
 
-        <p>Data classes for storing intermediate optimization results.</p>
+        <p>The objects a batch evaluation produces.</p>
+<p>Every evaluation yields a tuple of <a class="autorefs autorefs-internal" title="            ropt.results.Results
+
+
+  
+      dataclass
+  " href="#ropt.results.Results"><code>Results</code></a>: a
+<a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="#ropt.results.FunctionResults"><code>FunctionResults</code></a> for objective and constraint
+values, a <a class="autorefs autorefs-internal" title="            ropt.results.GradientResults
+
+
+  
+      dataclass
+  " href="#ropt.results.GradientResults"><code>GradientResults</code></a> for gradient
+estimates, or both. Each is a frozen container of
+<a class="autorefs autorefs-internal" title="            ropt.results.ResultField
+
+
+  
+      dataclass
+  " href="#ropt.results.ResultField"><code>ResultField</code></a> sub-objects holding NumPy arrays with
+axis-name metadata.</p>
 <p>See <a href="../../running/results/">Working with Results</a> for a narrative overview of
 the result hierarchy, axis metadata, scaling, and pandas/polars export.</p>
 

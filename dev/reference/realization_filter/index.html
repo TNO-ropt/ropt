@@ -3148,10 +3148,6 @@
 
 
 <h1 id="realization-filters">Realization Filters</h1>
-<p>A realization filter selects which realizations contribute to a function or
-gradient value at each evaluation. The default provides CVaR-style tail
-selection, enabling risk-aware objectives.</p>
-<p>See <a href="../../optimizer_setup/realization_filters/">Realization Filters</a> for usage.</p>
 
 
 <div class="doc doc-object doc-module">
@@ -3166,7 +3162,9 @@ selection, enabling risk-aware objectives.</p>
 
     <div class="doc doc-contents first">
 
-        <p>Public API for realization filter implementations.</p>
+        <p>Realization filters: select which realizations contribute to a value.</p>
+<p>A filter is applied per evaluation, to a function or a gradient. The default
+provides CVaR-style tail selection, for risk-aware objectives.</p>
 <p>See <a href="../../optimizer_setup/realization_filters/">Realization Filters</a> for usage and
 algorithm descriptions.</p>
 

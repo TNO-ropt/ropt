@@ -3480,13 +3480,6 @@
 
 
 <h1 id="configuration-classes">Configuration Classes</h1>
-<p>The <a class="autorefs autorefs-internal" title="            ropt.config" href="#ropt.config"><code>ropt.config</code></a> package contains the Pydantic models that
-define an optimization run. Each class corresponds to a top-level section of
-the configuration dictionary consumed by
-<a class="autorefs autorefs-internal" title="            EnOptContext" href="../context/#ropt.context.EnOptContext"><code>EnOptContext</code></a> and the optimization functions.</p>
-<p>For detailed descriptions of each field, including defaults, usage patterns,
-and examples, see the <a href="../../optimizer_setup/configuration_sections/">Configuration Sections</a> user-manual
-page.</p>
 
 
 <div class="doc doc-object doc-module">
@@ -3502,10 +3495,12 @@ page.</p>
     <div class="doc doc-contents first">
 
         <p>Configuration classes for ensemble-based optimization.</p>
-<p>The <code>ropt.config</code> module provides Pydantic-based configuration classes that
-collectively define a complete optimization setup. These classes are used to
-construct an <a class="autorefs autorefs-internal" title="            EnOptContext" href="../context/#ropt.context.EnOptContext"><code>EnOptContext</code></a> object, which serves
-as the in-memory configuration for a single optimization run.</p>
+<p>Pydantic models that together define a complete optimization setup. Each
+corresponds to a top-level section of the configuration dictionary used to build
+an <a class="autorefs autorefs-internal" title="            EnOptContext" href="../context/#ropt.context.EnOptContext"><code>EnOptContext</code></a>, the in-memory configuration of a
+single run. See
+<a href="../../optimizer_setup/configuration_sections/">Configuration Sections</a> for the
+fields, their defaults and worked examples.</p>
 
 
 

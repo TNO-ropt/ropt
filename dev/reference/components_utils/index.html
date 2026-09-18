@@ -2744,10 +2744,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#concurrency" class="md-nav__link">
+  <a href="#ropt.components.concurrency" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Concurrency
+        concurrency
       
     </span>
   </a>
@@ -2928,10 +2928,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#concurrency" class="md-nav__link">
+  <a href="#ropt.components.concurrency" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Concurrency
+        concurrency
       
     </span>
   </a>
@@ -2970,14 +2970,47 @@
 
 
 <h1 id="utilities">Utilities</h1>
-<p>Helpers for scripts and applications that use <code>ropt</code> live in
-<a href="../utils/"><code>ropt.utils</code></a>. This page covers the lower-level component utilities.</p>
-<h2 id="concurrency">Concurrency</h2>
-<p><a class="autorefs autorefs-internal" title="            ropt.components.concurrency.run_concurrent" href="#ropt.components.concurrency.run_concurrent"><code>run_concurrent</code></a> runs blocking
-calls on dedicated threads rather than on the event loop's shared thread pool.
-The simple API uses it to drive many optimizations at once; a workflow that has
-to run blocking coordinators of its own can use it directly.</p>
 
+
+<div class="doc doc-object doc-module">
+
+
+
+<h2 id="ropt.components.concurrency" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-module"></code>            <span class="doc doc-object-name doc-module-name">ropt.components.concurrency</span>
+
+
+</h2>
+
+    <div class="doc doc-contents first">
+
+        <p>Concurrency primitives for workflow coordinators.</p>
+<p><a class="autorefs autorefs-internal" title="            ropt.components.concurrency.run_concurrent" href="#ropt.components.concurrency.run_concurrent"><code>run_concurrent</code></a> runs blocking
+calls on dedicated threads rather than on the event loop's shared thread pool,
+which is what lets many optimizations run at once without starving each other.
+For the helpers meant for scripts and applications, see
+<a class="autorefs autorefs-internal" title="            ropt.utils" href="../utils/#ropt.utils"><code>ropt.utils</code></a>.</p>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
 
 <div class="doc doc-object doc-function">
 

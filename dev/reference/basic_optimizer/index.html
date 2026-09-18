@@ -2862,10 +2862,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#ropt.workflow._basic_optimizer" class="md-nav__link">
+  <a href="#ropt.workflow" class="md-nav__link">
     <span class="md-ellipsis">
       
-        _basic_optimizer
+        workflow
       
     </span>
   </a>
@@ -2976,10 +2976,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#ropt.workflow._basic_optimizer" class="md-nav__link">
+  <a href="#ropt.workflow" class="md-nav__link">
     <span class="md-ellipsis">
       
-        _basic_optimizer
+        workflow
       
     </span>
   </a>
@@ -3068,29 +3068,23 @@
 
 
 <h1 id="basic-optimization-workflow">Basic Optimization Workflow</h1>
-<p><a class="autorefs autorefs-internal" title="            ropt.workflow.BasicOptimizer" href="#ropt.workflow.BasicOptimizer"><code>BasicOptimizer</code></a> is a ready-made single-run
-driver for applications that embed <code>ropt</code> and already have their own
-batch-oriented evaluation infrastructure — for example dispatching a whole
-ensemble of runs to an external scheduler at once. It wraps an
-<a class="autorefs autorefs-internal" title="            ropt.components.compute_steps.OptimizationStep" href="../components_compute_steps/#ropt.components.compute_steps.OptimizationStep"><code>OptimizationStep</code></a> and a
-<a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.ResultsHandler" href="../components_event_handlers/#ropt.components.event_handlers.ResultsHandler"><code>ResultsHandler</code></a> into a
-single class that takes a batch evaluator directly. For a Python script,
-prefer the <a href="../../running/running/">simple API</a> instead.</p>
 
 
 <div class="doc doc-object doc-module">
 
 
 
-<h2 id="ropt.workflow._basic_optimizer" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-module"></code>            <span class="doc doc-object-name doc-module-name">ropt.workflow._basic_optimizer</span>
+<h2 id="ropt.workflow" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-module"></code>            <span class="doc doc-object-name doc-module-name">ropt.workflow</span>
 
 
 </h2>
 
     <div class="doc doc-contents first">
 
-        <p>This module defines a basic optimization object.</p>
+        <p>High-level optimization driver.</p>
+<p><a class="autorefs autorefs-internal" title="            ropt.workflow.BasicOptimizer" href="#ropt.workflow.BasicOptimizer"><code>BasicOptimizer</code></a> runs a single optimization by
+assembling the low-level <code>ropt.components</code> building blocks.</p>
 
 
 

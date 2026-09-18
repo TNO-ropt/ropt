@@ -3148,10 +3148,6 @@
 
 
 <h1 id="function-estimators">Function Estimators</h1>
-<p>A function estimator aggregates per-realization function and gradient values
-into the single totals consumed by the optimizer.</p>
-<p>See <a href="../../optimizer_setup/function_estimators/">Function Estimators</a> for usage and
-algorithm descriptions.</p>
 
 
 <div class="doc doc-object doc-module">
@@ -3166,7 +3162,9 @@ algorithm descriptions.</p>
 
     <div class="doc doc-contents first">
 
-        <p>Public API for function estimator implementations.</p>
+        <p>Function estimators: aggregate per-realization values into one total.</p>
+<p>An estimator reduces the function and gradient values of the ensemble to the
+single numbers the optimizer consumes.</p>
 <p>See <a href="../../optimizer_setup/function_estimators/">Function Estimators</a> for usage and
 algorithm descriptions.</p>
 

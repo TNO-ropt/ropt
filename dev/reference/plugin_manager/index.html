@@ -2780,6 +2780,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#ropt.plugins" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        plugins
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#ropt.plugins.MethodSpec" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3022,6 +3033,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#ropt.plugins" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        plugins
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#ropt.plugins.MethodSpec" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3158,22 +3180,52 @@
 
 
 <h1 id="plugin-manager">Plugin Manager</h1>
-<p>The <a class="autorefs autorefs-internal" title="            ropt.plugins.PluginManager" href="#ropt.plugins.PluginManager"><code>PluginManager</code></a> discovers plugins
-registered through Python entry points and looks them up by method name. A
-lookup returns the plugin class itself, which is called with the configuration
-object for its area to build the component.</p>
-<p>The module-level <a class="autorefs autorefs-internal" title="            ropt.plugins.get_plugin" href="#ropt.plugins.get_plugin"><code>get_plugin</code></a> and
-<a class="autorefs autorefs-internal" title="            ropt.plugins.get_plugin_name" href="#ropt.plugins.get_plugin_name"><code>get_plugin_name</code></a> functions do the same
-lookups against one shared manager, created on first use. Every optimization
-resolves against that manager and no other, so it is the one a plugin has to be
-registered with to have any effect.</p>
-<p>Plugins are normally installed, and found through their entry points. One that
-cannot be, such as a class defined in a script or a notebook, is added to the
-shared manager with
-<a class="autorefs autorefs-internal" title="            ropt.plugins.register_plugin" href="#ropt.plugins.register_plugin"><code>register_plugin</code></a>.</p>
-<p>See <a href="../../advanced/writing_plugins/">Writing a Plugin</a> for how to implement and
-register one.</p>
 
+
+<div class="doc doc-object doc-module">
+
+
+
+<h2 id="ropt.plugins" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-module"></code>            <span class="doc doc-object-name doc-module-name">ropt.plugins</span>
+
+
+</h2>
+
+    <div class="doc doc-contents first">
+
+        <p>Plugin discovery and registration.</p>
+<p>A <a class="autorefs autorefs-internal" title="            ropt.plugins.PluginManager" href="#ropt.plugins.PluginManager"><code>PluginManager</code></a> finds plugins through their
+entry points and looks them up by method name, returning the class, which is
+called with the configuration object of its area to build the component.
+<a class="autorefs autorefs-internal" title="            ropt.plugins.get_plugin" href="#ropt.plugins.get_plugin"><code>get_plugin</code></a> and
+<a class="autorefs autorefs-internal" title="            ropt.plugins.get_plugin_name" href="#ropt.plugins.get_plugin_name"><code>get_plugin_name</code></a> do the same lookups against
+one shared manager, created on first use; every optimization resolves against
+that manager, so it is the one
+<a class="autorefs autorefs-internal" title="            ropt.plugins.register_plugin" href="#ropt.plugins.register_plugin"><code>register_plugin</code></a> has to add to for a plugin
+that cannot be installed. See
+<a href="../../advanced/writing_plugins/">Writing a Plugin</a>.</p>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
 
 <div class="doc doc-object doc-attribute">
 
