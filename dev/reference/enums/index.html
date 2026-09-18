@@ -3972,7 +3972,7 @@ range. The chosen strategy is configured in the
 <div class="arithmatex">\[
 \hat{v_i} = \begin{cases}
     l_i &amp; \text{if $v_i &lt; l_i$}, \\
-    b_i &amp; \text{if $v_i &gt; b_i$}, \\
+    u_i &amp; \text{if $v_i &gt; u_i$}, \\
     v_i &amp; \text{otherwise}
 \end{cases}
 \]</div>
@@ -4009,7 +4009,7 @@ range. The chosen strategy is configured in the
 <div class="arithmatex">\[
 \hat{v_i} = \begin{cases}
     2l_i - v_i &amp; \text{if $v_i &lt; l_i$}, \\
-    2b_i - v_i &amp; \text{if $v_i &gt; b_i$}, \\
+    2u_i - v_i &amp; \text{if $v_i &gt; u_i$}, \\
     v_i        &amp; \text{otherwise}
 \end{cases}
 \]</div>
@@ -4203,7 +4203,7 @@ description of when each event type fires and what data it carries.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Emitted before evaluating new functions.</p>
+        <p>Emitted before a batch of function or gradient evaluations.</p>
 
     </div>
 
@@ -4233,7 +4233,7 @@ description of when each event type fires and what data it carries.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Emitted after finishing the evaluation.</p>
+        <p>Emitted after that batch completes; carries the results produced.</p>
 
     </div>
 
@@ -4323,7 +4323,8 @@ description of when each event type fires and what data it carries.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Emitted just before starting an evaluation.</p>
+        <p>Emitted before an
+<a class="autorefs autorefs-internal" title="            ropt.components.compute_steps.EvaluationStep" href="../components_compute_steps/#ropt.components.compute_steps.EvaluationStep"><code>EvaluationStep</code></a> begins.</p>
 
     </div>
 
@@ -4353,7 +4354,8 @@ description of when each event type fires and what data it carries.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Emitted immediately after an evaluation finishes.</p>
+        <p>Emitted after an
+<a class="autorefs autorefs-internal" title="            ropt.components.compute_steps.EvaluationStep" href="../components_compute_steps/#ropt.components.compute_steps.EvaluationStep"><code>EvaluationStep</code></a> finishes.</p>
 
     </div>
 
