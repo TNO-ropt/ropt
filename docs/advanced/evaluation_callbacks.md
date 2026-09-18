@@ -74,8 +74,9 @@ def my_evaluator(
   [`EnOptContext`][ropt.context.EnOptContext] for the run.
 - The return value should be an
   [`EvaluationBatchResult`][ropt.evaluation.EvaluationBatchResult] object that
-  packages objective values (and optional constraint values, metadata,
-  and per-row error indicators).
+  packages objective values, and optionally constraint values and per-row
+  metadata. A failed row is marked by writing `numpy.nan` into `objectives`;
+  there is no separate error field.
 
 One advantage of this approach is that the callback receives all variable
 vectors at once as a 2-D NumPy array. This makes it possible to exploit NumPy's
@@ -91,7 +92,9 @@ The [`EvaluationBatchContext`][ropt.evaluation.EvaluationBatchContext] dataclass
 | `context`       | The full [`EnOptContext`][ropt.context.EnOptContext] (read-only).
 | `active`        | A boolean array indicating which rows actually need evaluation.
 | `realizations`  | Integer realization index for each row.
-| `perturbations` | Integer perturbation index per row, or `-1` for unperturbed rows. `None` if no perturbations are used.
+| `perturbations` | Integer perturbation index per row, negative for unperturbed rows. `None` if no perturbations are used.
+| `batch_id`      | Integer identifying the current evaluation batch.
+| `metadata`      | The metadata the run was started with, or `None`.
 
 Use `realizations` to pick the right per-realization model parameters (an
 uncertainty draw, a different simulation deck, etc.). Use `active` to skip rows

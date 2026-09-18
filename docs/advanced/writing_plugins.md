@@ -153,9 +153,9 @@ register_plugin("sampler", "my_package", UniformSampler)
 ```
 
 It is then found by exactly the same lookups as an installed one, so
-`"my_package/uniform"` works from that point on, for every optimization started
-afterwards. The class must declare its `methods` just as an installed plugin
-does.
+`"my_package/uniform"` works for every lookup that follows, including one made
+while an optimization is already running. The class must declare its `methods`
+just as an installed plugin does.
 
 Registering under the name of an installed plugin is an error, since installed
 plugins cannot be shadowed. Registering a name that was registered before
@@ -196,16 +196,14 @@ file — that is the per-run answer — or to be quiet.
 
 Not every library allows this, and `ropt` does not paper over the ones that do
 not. What such a backend must do instead is **say so in its own
-documentation**:
-
-- **It needs exclusive process state** — a working directory, a fixed file name,
-  or state kept in the library between calls. What that rules out is not "one
-  at a time" but "anything at all at the same time": a changed working directory
-  breaks another run in the process whatever backend it uses, and the user's
-  evaluation function with it. Say that the backend cannot run concurrently
-  in-process, and point users at the
-  [`external`][ropt.backend.external.ExternalBackend] backend, which gives it a
-  process of its own.
+documentation**: that it needs exclusive process state — a working directory, a
+fixed file name, or state kept in the library between calls. What that rules out
+is not "one at a time" but "anything at all at the same time": a changed working
+directory breaks another run in the process whatever backend it uses, and the
+user's evaluation function with it. Say that the backend cannot run
+concurrently in-process, and point users at the
+[`external`][ropt.backend.external.ExternalBackend] backend, which gives it a
+process of its own.
 
 Output is the exception to the rule: `ropt` captures it for you, on both levels,
 when the user configures

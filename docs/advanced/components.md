@@ -1,9 +1,7 @@
 # Implementing a Component
 
-The four component types share one shape: a public method holding a concurrency
-guard, and a private abstract method you implement. Override the private one
-only — the guard is what turns concurrent misuse into a
-[`WorkflowError`][ropt.exceptions.WorkflowError] instead of corrupted state.
+Each component type is an abstract base class providing a public surface and
+asking you for one or two private methods.
 
 | Base class                                                          | You implement                    | Callers use                     |
 | ------------------------------------------------------------------- | -------------------------------- | ------------------------------- |
@@ -11,6 +9,11 @@ only — the guard is what turns concurrent misuse into a
 | [`ComputeStep`][ropt.components.compute_steps.ComputeStep]            | `_run`                           | `run`                           |
 | [`EventHandler`][ropt.components.event_handlers.EventHandler]         | `event_types`, `_handle_event`   | `handle_event`                  |
 | [`ExecutorBase`][ropt.components.executors.ExecutorBase]              | `start`, `_cleanup`              | `submit`, `is_running`, `cancel` |
+
+For the first three the public method holds a concurrency guard, which is what
+turns concurrent misuse into a
+[`WorkflowError`][ropt.exceptions.WorkflowError] rather than corrupted state, so
+override the private method and never the public one.
 
 A backend, sampler, realization filter or function estimator is a **plugin**,
 not a component: it is selected by a method string and discovered through an
@@ -27,7 +30,7 @@ rather than inside the ensemble code.
 ```python
 class MyEvaluator(Evaluator):
     def _eval(self, variables, context):
-        return EvaluationBatchResult(batch_id=..., objectives=...)
+        return EvaluationBatchResult(objectives=..., batch_id=...)
 ```
 
 Wrapping evaluators — [`CachedEvaluator`][ropt.components.evaluators.CachedEvaluator]
@@ -62,8 +65,7 @@ dispatcher serializes events, so a slow handler delays every run sharing it. Use
 
 Subclass [`ExecutorBase`][ropt.components.executors.ExecutorBase] rather than
 [`Executor`][ropt.components.executors.Executor]: it provides `submit`,
-`is_running`, `cancel`, submission ownership, and the deadlock guard that
-refuses work submitted from the executor's own workers.
+`is_running`, `cancel` and submission ownership.
 
 You implement two methods. `start` must call `_begin_start` **before** creating
 any resources and `_finish_start` once they are in place — the first guards
@@ -105,3 +107,9 @@ caller has left, so running its work items only occupies a worker. And call
 `_cleanup_submissions` from `_cleanup`, which aborts whatever is outstanding so
 no caller is left blocked in
 [`collect`][ropt.components.executors.Submission.collect].
+
+One obligation is easy to miss. `on_worker_thread` defaults to `False`, and
+`submit` uses it to refuse work sent from the executor's own workers — a caller
+that waits there occupies a worker its own submission needs. An executor whose
+workers run in this process must override it, or that refusal never fires.
+`on_worker_loop` needs no attention: `ExecutorBase` implements it.

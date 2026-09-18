@@ -462,36 +462,14 @@ promise that nothing of the run survives it.
 
 ### Ctrl-C
 
-Ctrl-C raises `SIGINT`, which CPython turns into `KeyboardInterrupt` — but only
-once the interrupted thread returns to the interpreter. A thread parked in
-`Queue.get`, `Event.wait`, `Thread.join`, `Future.result` or `Lock.acquire` is
-not there while it waits, and whether the signal breaks the wait depends on a
-process-global flag, `SA_RESTART`.
-
-CPython leaves that flag clear, so waits are interruptible. Some third-party
-extension modules install their own `SIGINT` handler with the flag **set**, and
-because it is process-global the effect is not confined to whoever set it: from
-then on Ctrl-C appears to do nothing at all, for the entire program. The
-symptom is identical on every backend, since the thread that fails to wake is
-the one waiting for results rather than the one producing them.
-
-`ropt` does not touch the flag. It is process-global state that belongs to the
-program, and a library that quietly changes it decides for every other part of
-that program as well — including the parts that wanted the handler they
-installed. Nor would clearing it once be enough: any import that happens later
-can set it again.
-
-So this is left to you, and only if it happens to you. When it does,
-[`restore_keyboard_interrupt`][ropt.utils.restore_keyboard_interrupt] clears the
-flag, at the top of your script and after the imports:
-
-```python
-from ropt.utils import restore_keyboard_interrupt
-
-restore_keyboard_interrupt()
-```
-
-See [Keyboard Interrupts](../troubleshooting/keyboard_interrupt.md) for the whole
+An imported extension module can set the process-global `SA_RESTART` flag, after
+which Ctrl-C no longer breaks into a thread that is waiting. The thread waiting
+for results is exactly the one that then fails to wake, so the symptom is
+identical on every executor: Ctrl-C appears to do nothing at all. `ropt` does
+not touch the flag, since it belongs to the program rather than to a library;
+[`restore_keyboard_interrupt`][ropt.utils.restore_keyboard_interrupt] clears it
+if you want it cleared. See
+[Keyboard Interrupts](../troubleshooting/keyboard_interrupt.md) for the whole
 story.
 
 ### Platforms
@@ -684,7 +662,7 @@ hard constraint on where each layer of a nested workflow may run:
     subprocess or HPC job has no access to the live loop, executors, or
     dispatcher. An inner
     [`ParallelEvaluator`][ropt.components.evaluators.ParallelEvaluator] running
-    there would find `executor.loop is None` and raise
+    there would find its executor not running and raise
     [`ExecutorStopped`][ropt.exceptions.ExecutorStopped], and any events
     it emits would never reach the main-process dispatcher.
 
