@@ -13,12 +13,12 @@ it, instead of tearing down the task group the dispatcher runs in.
 from __future__ import annotations
 
 import asyncio
-import logging
 import threading
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
 from typing import TYPE_CHECKING, Final
 
+from ropt._logging import get_logger
 from ropt.components._loop import on_loop_thread, schedule
 from ropt.exceptions import WorkflowError
 
@@ -29,7 +29,7 @@ if TYPE_CHECKING:
 
     _QueueItem = tuple[EnOptEvent, asyncio.Future[None]]
 
-_logger = logging.getLogger(__name__)
+_logger = get_logger(__name__)
 
 # Deliberately generous: handlers can be added after the pool exists and pools
 # cannot be resized, while a pool smaller than the handlers matching one event
