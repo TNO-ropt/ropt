@@ -39,7 +39,7 @@ class NonlinearConstraintsConfig(BaseModel):
         auto_scale:          Which constraints to estimate an additional scale for,
                              from the first batch (default: `False`).
         realization_filters: Realization filter to apply to each constraint, by key,
-                            `None` to apply none (default: `None`).
+                             `None` to apply none (default: `None`).
         function_estimators: Function estimator to apply to each constraint, by key
                              (default: `"0"`).
     """

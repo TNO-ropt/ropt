@@ -286,7 +286,7 @@ def get_plugin(plugin_type: PluginType, method: str) -> type[Any]:
     Args:
         plugin_type: The category of the plugin (for example "backend", "sampler").
         method:      The name of the method the plugin must support, potentially
-                        prefixed with the plugin name and a slash (`/`).
+                     prefixed with the plugin name and a slash (`/`).
 
     Returns:
         The class of the plugin that matches the criteria.
@@ -307,7 +307,7 @@ def get_plugin_name(plugin_type: PluginType, method: str) -> str | None:
     Args:
         plugin_type: The category of the plugin (for example "backend", "sampler").
         method:      The name of the method to check, potentially prefixed
-                        with the plugin name and a slash (`/`).
+                     with the plugin name and a slash (`/`).
 
     Returns:
         The name of a matching plugin supporting the specified method, or `None`.

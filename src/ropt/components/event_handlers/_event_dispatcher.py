@@ -117,7 +117,7 @@ class EventDispatcher:
             WorkflowError: If the dispatcher is not running, or if the call is
                            made from the thread running its event loop, or from
                            one of its handler threads.
-            Exception:    Whatever a handler raised while processing the event.
+            Exception:     Whatever a handler raised while processing the event.
         """  # ruff: ignore[docstring-extraneous-exception]
         if not self._running.is_set():
             msg = "The event dispatcher is not running."

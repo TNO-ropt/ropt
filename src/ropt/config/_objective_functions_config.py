@@ -37,7 +37,7 @@ class ObjectiveFunctionsConfig(BaseModel):
         auto_scale:          Estimate additional scales from the first batch.
         maximize:            Which objectives to maximize (default: `False`).
         realization_filters: Realization filter to apply to each objective, by key,
-                            `None` to apply none (default: `None`).
+                             `None` to apply none (default: `None`).
         function_estimators: Function estimator to apply to each objective, by key
                              (default: `"0"`).
     """

@@ -98,7 +98,7 @@ class ParallelEvaluator(Evaluator):
         contract.
 
         Args:
-            variables:      The matrix of variables to evaluate.
+            variables:         The matrix of variables to evaluate.
             evaluator_context: The evaluation context.
 
         Returns:

@@ -50,7 +50,7 @@ class CachedEvaluator(Evaluator):
         Args:
             evaluator: The evaluator to cache.
             sources:   `EventHandler` instances for retrieving cached results.
-            hits_key:   Optional key for storing cache-hits in `metadata`.
+            hits_key:  Optional key for storing cache-hits in `metadata`.
         """
         super().__init__()
         self._evaluator = evaluator

@@ -110,9 +110,9 @@ class FunctionEvaluations(ResultField):
         """Create a `FunctionEvaluations` object with the given data.
 
         Args:
-            objectives:      The objective functions for each realization.
-            constraints:     The constraint functions for each realization.
-            metadata: Optional info for each evaluation.
+            objectives:  The objective functions for each realization.
+            constraints: The constraint functions for each realization.
+            metadata:    Optional info for each evaluation.
 
         Returns:
             A new FunctionEvaluations object.

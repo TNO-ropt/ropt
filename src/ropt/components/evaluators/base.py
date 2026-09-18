@@ -84,7 +84,7 @@ class Evaluator(ABC):
 
         Raises:
             WorkflowError: If another thread is executing this evaluator's `eval`
-                          method at the same time.
+                           method at the same time.
         """
         with self._owner_lock:
             if self._in_use:

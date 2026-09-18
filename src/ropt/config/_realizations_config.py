@@ -24,7 +24,7 @@ class RealizationsConfig(BaseModel):
     Attributes:
         weights:                 Weights for the realizations (default: 1.0).
         realization_min_success: Minimum number of successful realizations (default:
-                                equal to the number of realizations).
+                                 equal to the number of realizations).
     """
 
     weights: Array1D = np.array(1.0)
