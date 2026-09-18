@@ -3482,13 +3482,6 @@
 
 
 <h1 id="optimizer-backends">Optimizer Backends</h1>
-<p>A backend is the bridge to an external optimization library. <code>ropt</code> ships
-with a SciPy-based backend and an <code>external</code> backend for running optimizers
-in a separate Python process; additional backends are provided by plugin
-packages (see <a href="../../getting_started/installation/">Installation</a>).</p>
-<p>See <a href="../../running/parallel/#external-backend">Running the optimizer in a separate
-process</a> for when and how
-to use the <code>external</code> backend.</p>
 
 
 <div class="doc doc-object doc-module">
@@ -3503,41 +3496,18 @@ to use the <code>external</code> backend.</p>
 
     <div class="doc doc-contents first">
 
-        <p>Public API for optimizer backend implementations.</p>
-<p>Backends define how <code>ropt</code> runs an optimization algorithm against an
-<a class="autorefs autorefs-internal" title="            OptimizationProblem" href="#ropt.backend.OptimizationProblem"><code>OptimizationProblem</code></a>. A backend requests
-function and gradient evaluations through the core callback interface, and
-advances the optimization from an initial variable vector toward a solution.</p>
-<p><strong>Core Interface</strong></p>
-<p>All backend implementations inherit from the
-<a class="autorefs autorefs-internal" title="            Backend" href="#ropt.backend.Backend"><code>Backend</code></a> base class, which defines construction from a
-<a class="autorefs autorefs-internal" title="            BackendConfig" href="../config/#ropt.config.BackendConfig"><code>BackendConfig</code></a>, a validation hook
-(<code>validate_options</code>), and the single entry point <code>start</code>.</p>
-<p><strong>Integration with Optimization</strong></p>
-<p>Backends are accessed via an
-<a class="autorefs autorefs-internal" title="            EnOptContext" href="../context/#ropt.context.EnOptContext"><code>EnOptContext</code></a> object through its <code>backend</code>
-field. A backend is instantiated either directly as an object or via a
-<a class="autorefs autorefs-internal" title="            BackendConfig" href="../config/#ropt.config.BackendConfig"><code>BackendConfig</code></a> object, which is used by the
-plugin system to create an instance based on the configured backend method
-string. The context itself never reaches the backend: <code>ropt</code> reduces it to an
-<a class="autorefs autorefs-internal" title="            OptimizationProblem" href="#ropt.backend.OptimizationProblem"><code>OptimizationProblem</code></a> when the run starts.</p>
-<p>During execution, a backend uses the
-<a class="autorefs autorefs-internal" title="            ropt.core.OptimizerCallback" href="../core/#ropt.core.OptimizerCallback"><code>OptimizerCallback</code></a> interface to request
-objective, constraint, and gradient evaluations from the <code>ropt</code> core.</p>
-<p><strong>Built-in and Custom Backends</strong></p>
-<p><code>ropt</code> includes two built-in backends:</p>
-<ul>
-<li><a class="autorefs autorefs-internal" title="            ropt.backend.scipy.SciPyBackend" href="#ropt.backend.scipy.SciPyBackend"><code>SciPyBackend</code></a>: Uses optimization methods
-  provided by SciPy.</li>
-<li><a class="autorefs autorefs-internal" title="            ropt.backend.external.ExternalBackend" href="#ropt.backend.external.ExternalBackend"><code>ExternalBackend</code></a>: Delegates the
-  optimization loop to an external executable or process.</li>
-</ul>
-<p>Users can implement custom backends by subclassing <code>Backend</code>. Those subclasses
-can be instantiated directly and passed into an
-<a class="autorefs autorefs-internal" title="            EnOptContext" href="../context/#ropt.context.EnOptContext"><code>EnOptContext</code></a> object through its <code>backend</code>
-field. Registering a custom backend with the plugin system is optional and
-only required when the backend should be selected and configured via
-<code>BackendConfig</code> objects instead of being instantiated explicitly by the user.</p>
+        <p>Optimizer backends: the bridge to an external optimization library.</p>
+<p>A backend receives an
+<a class="autorefs autorefs-internal" title="            OptimizationProblem" href="#ropt.backend.OptimizationProblem"><code>OptimizationProblem</code></a>, requests function and
+gradient values through the
+<a class="autorefs autorefs-internal" title="            ropt.core.OptimizerCallback" href="../core/#ropt.core.OptimizerCallback"><code>OptimizerCallback</code></a> interface, and advances the
+optimization from an initial variable vector. It is selected through the
+<code>backend</code> field of an <a class="autorefs autorefs-internal" title="            EnOptContext" href="../context/#ropt.context.EnOptContext"><code>EnOptContext</code></a>, either as an
+instance or as a <a class="autorefs autorefs-internal" title="            BackendConfig" href="../config/#ropt.config.BackendConfig"><code>BackendConfig</code></a> naming a method.</p>
+<p><code>ropt</code> ships <a class="autorefs autorefs-internal" title="            ropt.backend.scipy.SciPyBackend" href="#ropt.backend.scipy.SciPyBackend"><code>SciPyBackend</code></a> and
+<a class="autorefs autorefs-internal" title="            ropt.backend.external.ExternalBackend" href="#ropt.backend.external.ExternalBackend"><code>ExternalBackend</code></a>, which runs an
+optimizer in a separate process; further backends come from plugin packages. See
+<a href="../../advanced/writing_plugins/">Writing a Plugin</a> for implementing one.</p>
 
 
 

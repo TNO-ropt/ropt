@@ -2982,19 +2982,6 @@
 
 
 <h1 id="optimization-events">Optimization Events</h1>
-<p>Compute steps emit <a class="autorefs autorefs-internal" title="            EnOptEvent
-
-
-  
-      dataclass
-  " href="#ropt.events.EnOptEvent"><code>EnOptEvent</code></a> objects at lifecycle
-milestones. Event handlers
-(<a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.ResultsHandler" href="../components_event_handlers/#ropt.components.event_handlers.ResultsHandler"><code>ResultsHandler</code></a>,
-<a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.CallbackHandler" href="../components_event_handlers/#ropt.components.event_handlers.CallbackHandler"><code>CallbackHandler</code></a>, etc.) consume
-these events to track progress, store results, or trigger user logic.</p>
-<p>See <a href="../../running/results/">Working with Results</a> for an example of subscribing to
-events, and <a class="autorefs autorefs-internal" title="            EnOptEventType" href="../enums/#ropt.enums.EnOptEventType"><code>EnOptEventType</code></a> for the available
-event types.</p>
 
 
 <div class="doc doc-object doc-module">
@@ -3009,7 +2996,17 @@ event types.</p>
 
     <div class="doc doc-contents first">
 
-        <p>Optimization event data structures.</p>
+        <p>The events a compute step emits at lifecycle milestones.</p>
+<p>An <a class="autorefs autorefs-internal" title="            EnOptEvent
+
+
+  
+      dataclass
+  " href="#ropt.events.EnOptEvent"><code>EnOptEvent</code></a> carries the event type, the context of
+the run, and any results produced. Event handlers consume these to track
+progress, store results, or stop the run. See
+<a class="autorefs autorefs-internal" title="            EnOptEventType" href="../enums/#ropt.enums.EnOptEventType"><code>EnOptEventType</code></a> for the available types, and
+<a href="../../advanced/workflows/">Optimization Workflows</a> for usage.</p>
 
 
 

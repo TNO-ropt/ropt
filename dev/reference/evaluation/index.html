@@ -2362,6 +2362,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#ropt.evaluation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        evaluation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#ropt.evaluation.EvaluationBatchContext" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2984,6 +2995,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#ropt.evaluation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        evaluation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#ropt.evaluation.EvaluationBatchContext" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3082,15 +3104,62 @@
 
 
 <h1 id="evaluation-classes">Evaluation Classes</h1>
-<p>The <code>ropt.evaluation</code> module defines the data structures exchanged between <code>ropt</code>
-and user-provided evaluation functions: an input context describing which rows
-must be evaluated, an output container for the objective and constraint values,
-and the protocol that user callables must follow.</p>
-<p>For detailed usage, including examples of handling inactive rows and partial
-failures, see <a href="../../advanced/evaluation_callbacks/">Writing Evaluation Callbacks</a>.
-For higher-level <code>Evaluator</code> <em>classes</em> used by the workflow components, see
-<a href="../components_evaluators/">Evaluators</a>.</p>
 
+
+<div class="doc doc-object doc-module">
+
+
+
+<h2 id="ropt.evaluation" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-module"></code>            <span class="doc doc-object-name doc-module-name">ropt.evaluation</span>
+
+
+</h2>
+
+    <div class="doc doc-contents first">
+
+        <p>The data exchanged between <code>ropt</code> and a user evaluation function.</p>
+<p>An <a class="autorefs autorefs-internal" title="            ropt.evaluation.EvaluationBatchContext
+
+
+  
+      dataclass
+  " href="#ropt.evaluation.EvaluationBatchContext"><code>EvaluationBatchContext</code></a> describes
+which rows must be evaluated, an
+<a class="autorefs autorefs-internal" title="            ropt.evaluation.EvaluationBatchResult
+
+
+  
+      dataclass
+  " href="#ropt.evaluation.EvaluationBatchResult"><code>EvaluationBatchResult</code></a> carries the
+objective and constraint values back, and
+<a class="autorefs autorefs-internal" title="            ropt.evaluation.EvaluationBatchCallback" href="#ropt.evaluation.EvaluationBatchCallback"><code>EvaluationBatchCallback</code></a> is the
+protocol such a callable must follow. For the
+<a class="autorefs autorefs-internal" title="            ropt.components.evaluators.Evaluator" href="../components_evaluators/#ropt.components.evaluators.Evaluator"><code>Evaluator</code></a> classes that wrap them, see
+<a href="../components_evaluators/">Evaluators</a>.</p>
+<p>See <a href="../../advanced/evaluation_callbacks/">Writing Evaluation Callbacks</a> for
+usage.</p>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
 
 <div class="doc doc-object doc-class">
 
