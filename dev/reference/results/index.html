@@ -4276,6 +4276,38 @@ The <code>target_objective</code> is the exception. It is a weighted total over
 objectives that may differ in both scale and direction, so it exists only in
 the optimizer's domain and has no scaled counterpart.</p>
 <p>See <a href="../../running/results/">Working with Results</a> for usage details.</p>
+<p><strong>Result descriptions</strong></p>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="ropt.results.FunctionResults--__tabbed_1_1" name="ropt.results.FunctionResults--__tabbed_1" type="radio" /><input id="ropt.results.FunctionResults--__tabbed_1_2" name="ropt.results.FunctionResults--__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="ropt.results.FunctionResults--__tabbed_1_1">Variables</label><label for="ropt.results.FunctionResults--__tabbed_1_2">Target Objective</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p><code>variables</code>: The vector of variable values at which the functions were
+evaluated:</p>
+<ul>
+<li>Shape: <span class="arithmatex">\((n_v,)\)</span>, where:<ul>
+<li><span class="arithmatex">\(n_v\)</span> is the number of variables.</li>
+</ul>
+</li>
+<li>Axis type:<ul>
+<li><a class="autorefs autorefs-internal" title="            VARIABLE
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.AxisName.VARIABLE"><code>AxisName.VARIABLE</code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="tabbed-block">
+<p><code>target_objective</code>: The single weighted value the optimizer minimizes:</p>
+<ul>
+<li>Shape: <span class="arithmatex">\(()\)</span> — a zero-dimensional array.</li>
+<li>Axis types: none.</li>
+</ul>
+</div>
+</div>
+</div>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -4450,6 +4482,30 @@ the optimizer's domain and has no scaled counterpart.</p>
       dataclass
   " href="#ropt.results.FunctionResults"><code>FunctionResults</code></a>, expressed in the domain
 the optimizer works in.</p>
+<p><strong>Result descriptions</strong></p>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:1"><input checked="checked" id="ropt.results.ScaledFunctionResults--__tabbed_1_1" name="ropt.results.ScaledFunctionResults--__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="ropt.results.ScaledFunctionResults--__tabbed_1_1">Variables</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p><code>variables</code>: The vector of variable values in the optimizer's domain:</p>
+<ul>
+<li>Shape: <span class="arithmatex">\((n_v,)\)</span>, where:<ul>
+<li><span class="arithmatex">\(n_v\)</span> is the number of variables.</li>
+</ul>
+</li>
+<li>Axis type:<ul>
+<li><a class="autorefs autorefs-internal" title="            VARIABLE
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.AxisName.VARIABLE"><code>AxisName.VARIABLE</code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</div>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -4564,6 +4620,85 @@ over objectives that may differ in both scale and direction, with respect to
 the scaled variables, so it exists only in the optimizer's domain and has no
 scaled counterpart.</p>
 <p>See <a href="../../running/results/">Working with Results</a> for usage details.</p>
+<p><strong>Result descriptions</strong></p>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:3"><input checked="checked" id="ropt.results.GradientResults--__tabbed_1_1" name="ropt.results.GradientResults--__tabbed_1" type="radio" /><input id="ropt.results.GradientResults--__tabbed_1_2" name="ropt.results.GradientResults--__tabbed_1" type="radio" /><input id="ropt.results.GradientResults--__tabbed_1_3" name="ropt.results.GradientResults--__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="ropt.results.GradientResults--__tabbed_1_1">Variables</label><label for="ropt.results.GradientResults--__tabbed_1_2">Perturbed Variables</label><label for="ropt.results.GradientResults--__tabbed_1_3">Target Gradient</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p><code>variables</code>: The vector of unperturbed variable values:</p>
+<ul>
+<li>Shape: <span class="arithmatex">\((n_v,)\)</span>, where:<ul>
+<li><span class="arithmatex">\(n_v\)</span> is the number of variables.</li>
+</ul>
+</li>
+<li>Axis type:<ul>
+<li><a class="autorefs autorefs-internal" title="            VARIABLE
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.AxisName.VARIABLE"><code>AxisName.VARIABLE</code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="tabbed-block">
+<p><code>perturbed_variables</code>: A three-dimensional array of perturbed variable
+values for each realization and perturbation:</p>
+<ul>
+<li>Shape: <span class="arithmatex">\((n_r, n_p, n_v)\)</span>, where:<ul>
+<li><span class="arithmatex">\(n_r\)</span> is the number of realizations.</li>
+<li><span class="arithmatex">\(n_p\)</span> is the number of perturbations.</li>
+<li><span class="arithmatex">\(n_v\)</span> is the number of variables.</li>
+</ul>
+</li>
+<li>Axis types:<ul>
+<li><a class="autorefs autorefs-internal" title="            REALIZATION
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.AxisName.REALIZATION"><code>AxisName.REALIZATION</code></a></li>
+<li><a class="autorefs autorefs-internal" title="            PERTURBATION
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.AxisName.PERTURBATION"><code>AxisName.PERTURBATION</code></a></li>
+<li><a class="autorefs autorefs-internal" title="            VARIABLE
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.AxisName.VARIABLE"><code>AxisName.VARIABLE</code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="tabbed-block">
+<p><code>target_gradient</code>: The gradient the optimizer descends:</p>
+<ul>
+<li>Shape: <span class="arithmatex">\((n_v,)\)</span>, where:<ul>
+<li><span class="arithmatex">\(n_v\)</span> is the number of variables.</li>
+</ul>
+</li>
+<li>Axis type:<ul>
+<li><a class="autorefs autorefs-internal" title="            VARIABLE
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.AxisName.VARIABLE"><code>AxisName.VARIABLE</code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</div>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -4733,6 +4868,67 @@ scaled counterpart.</p>
       dataclass
   " href="#ropt.results.GradientResults"><code>GradientResults</code></a>, expressed in the domain
 the optimizer works in.</p>
+<p><strong>Result descriptions</strong></p>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="ropt.results.ScaledGradientResults--__tabbed_1_1" name="ropt.results.ScaledGradientResults--__tabbed_1" type="radio" /><input id="ropt.results.ScaledGradientResults--__tabbed_1_2" name="ropt.results.ScaledGradientResults--__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="ropt.results.ScaledGradientResults--__tabbed_1_1">Variables</label><label for="ropt.results.ScaledGradientResults--__tabbed_1_2">Perturbed Variables</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p><code>variables</code>: The vector of unperturbed variable values in the
+optimizer's domain:</p>
+<ul>
+<li>Shape: <span class="arithmatex">\((n_v,)\)</span>, where:<ul>
+<li><span class="arithmatex">\(n_v\)</span> is the number of variables.</li>
+</ul>
+</li>
+<li>Axis type:<ul>
+<li><a class="autorefs autorefs-internal" title="            VARIABLE
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.AxisName.VARIABLE"><code>AxisName.VARIABLE</code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="tabbed-block">
+<p><code>perturbed_variables</code>: A three-dimensional array of perturbed variable
+values for each realization and perturbation:</p>
+<ul>
+<li>Shape: <span class="arithmatex">\((n_r, n_p, n_v)\)</span>, where:<ul>
+<li><span class="arithmatex">\(n_r\)</span> is the number of realizations.</li>
+<li><span class="arithmatex">\(n_p\)</span> is the number of perturbations.</li>
+<li><span class="arithmatex">\(n_v\)</span> is the number of variables.</li>
+</ul>
+</li>
+<li>Axis types:<ul>
+<li><a class="autorefs autorefs-internal" title="            REALIZATION
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.AxisName.REALIZATION"><code>AxisName.REALIZATION</code></a></li>
+<li><a class="autorefs autorefs-internal" title="            PERTURBATION
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.AxisName.PERTURBATION"><code>AxisName.PERTURBATION</code></a></li>
+<li><a class="autorefs autorefs-internal" title="            VARIABLE
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.AxisName.VARIABLE"><code>AxisName.VARIABLE</code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</div>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -5362,9 +5558,98 @@ floating point values:</p>
 
 
         <p>Per-realization objective and constraint values for an evaluation batch.</p>
-<p>See <a href="../../running/results/">Working with Results</a> for usage details, and
-<a href="../../running/results/#user-defined-axes">User-defined axes</a> for metadata
-entries that carry an axis of their own.</p>
+<p>See <a href="../../running/results/">Working with Results</a> for usage details.</p>
+<p><strong>Result descriptions</strong></p>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:3"><input checked="checked" id="ropt.results.FunctionEvaluations--__tabbed_1_1" name="ropt.results.FunctionEvaluations--__tabbed_1" type="radio" /><input id="ropt.results.FunctionEvaluations--__tabbed_1_2" name="ropt.results.FunctionEvaluations--__tabbed_1" type="radio" /><input id="ropt.results.FunctionEvaluations--__tabbed_1_3" name="ropt.results.FunctionEvaluations--__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="ropt.results.FunctionEvaluations--__tabbed_1_1">Objectives</label><label for="ropt.results.FunctionEvaluations--__tabbed_1_2">Constraints</label><label for="ropt.results.FunctionEvaluations--__tabbed_1_3">Metadata</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p><code>objectives</code>: The calculated objective function values for each
+realization. This is a two-dimensional array of floating point values
+where each row corresponds to a realization and each column corresponds
+to an objective:</p>
+<ul>
+<li>Shape <span class="arithmatex">\((n_r, n_o)\)</span>, where:<ul>
+<li><span class="arithmatex">\(n_r\)</span> is the number of realizations.</li>
+<li><span class="arithmatex">\(n_o\)</span> is the number of objectives.</li>
+</ul>
+</li>
+<li>Axis types:<ul>
+<li><a class="autorefs autorefs-internal" title="            REALIZATION
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.AxisName.REALIZATION"><code>AxisName.REALIZATION</code></a></li>
+<li><a class="autorefs autorefs-internal" title="            OBJECTIVE
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.AxisName.OBJECTIVE"><code>AxisName.OBJECTIVE</code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="tabbed-block">
+<p><code>constraints</code>: The calculated constraint function values for each
+realization. Only provided if non-linear constraints are defined. This
+is a two-dimensional array of floating point values where each row
+corresponds to a realization and each column corresponds to a
+constraint:</p>
+<ul>
+<li>Shape <span class="arithmatex">\((n_r, n_c)\)</span>, where:<ul>
+<li><span class="arithmatex">\(n_r\)</span> is the number of realizations.</li>
+<li><span class="arithmatex">\(n_c\)</span> is the number of constraints.</li>
+</ul>
+</li>
+<li>Axis types:<ul>
+<li><a class="autorefs autorefs-internal" title="            REALIZATION
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.AxisName.REALIZATION"><code>AxisName.REALIZATION</code></a></li>
+<li><a class="autorefs autorefs-internal" title="            NONLINEAR_CONSTRAINT
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.AxisName.NONLINEAR_CONSTRAINT"><code>AxisName.NONLINEAR_CONSTRAINT</code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="tabbed-block">
+<p><code>metadata</code>: Optional metadata associated with each realization,
+potentially provided by the evaluator. Each value is a one-dimensional
+array of any type supported by <code>numpy</code>, including objects, so each key
+may carry its own dtype:</p>
+<ul>
+<li>Shape: <span class="arithmatex">\((n_r,)\)</span>, where:<ul>
+<li><span class="arithmatex">\(n_r\)</span> is the number of realizations.</li>
+</ul>
+</li>
+<li>Axis type:<ul>
+<li><a class="autorefs autorefs-internal" title="            REALIZATION
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.AxisName.REALIZATION"><code>AxisName.REALIZATION</code></a></li>
+</ul>
+</li>
+</ul>
+<p>An entry whose values are arrays rather than scalars has shape
+<span class="arithmatex">\((n_r, n_k)\)</span> and carries a second, user-defined axis named after its
+key. See <a href="../../running/results/#user-defined-axes">User-defined axes</a>.</p>
+</div>
+</div>
+</div>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -5384,21 +5669,7 @@ entries that carry an axis of their own.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Objective values per realization, shape <span class="arithmatex">\((n_r, n_o)\)</span>, with
-         axes <a class="autorefs autorefs-internal" title="            REALIZATION
-
-
-  
-      class-attribute
-      instance-attribute
-  " href="../enums/#ropt.enums.AxisName.REALIZATION"><code>REALIZATION</code></a> and
-         <a class="autorefs autorefs-internal" title="            OBJECTIVE
-
-
-  
-      class-attribute
-      instance-attribute
-  " href="../enums/#ropt.enums.AxisName.OBJECTIVE"><code>OBJECTIVE</code></a>.</p>
+                <p>The objective function values for each realization.</p>
               </div>
             </td>
           </tr>
@@ -5409,23 +5680,7 @@ entries that carry an axis of their own.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Nonlinear constraint values per realization, shape
-         <span class="arithmatex">\((n_r, n_c)\)</span>, with axes
-         <a class="autorefs autorefs-internal" title="            REALIZATION
-
-
-  
-      class-attribute
-      instance-attribute
-  " href="../enums/#ropt.enums.AxisName.REALIZATION"><code>REALIZATION</code></a> and
-         <a class="autorefs autorefs-internal" title="            NONLINEAR_CONSTRAINT
-
-
-  
-      class-attribute
-      instance-attribute
-  " href="../enums/#ropt.enums.AxisName.NONLINEAR_CONSTRAINT"><code>NONLINEAR_CONSTRAINT</code></a>.
-         <code>None</code> unless nonlinear constraints are configured.</p>
+                <p>The constraint function values for each realization.</p>
               </div>
             </td>
           </tr>
@@ -5436,10 +5691,7 @@ entries that carry an axis of their own.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional per-realization metadata from the evaluator. Each
-         entry is an array of shape <span class="arithmatex">\((n_r,)\)</span> of any <code>numpy</code> dtype,
-         including objects; an entry of arrays instead has shape
-         <span class="arithmatex">\((n_r, n_k)\)</span> and a second axis named after its key.</p>
+                <p>Optional metadata for each evaluated realization.</p>
               </div>
             </td>
           </tr>
@@ -5619,9 +5871,120 @@ entries that carry an axis of their own.</p>
 
 
         <p>Per-realization evaluation data for perturbed variables.</p>
-<p>See <a href="../../running/results/">Working with Results</a> for usage details, and
-<a href="../../running/results/#user-defined-axes">User-defined axes</a> for metadata
-entries that carry an axis of their own.</p>
+<p>See <a href="../../running/results/">Working with Results</a> for usage details.</p>
+<p><strong>Result descriptions</strong></p>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:3"><input checked="checked" id="ropt.results.GradientEvaluations--__tabbed_1_1" name="ropt.results.GradientEvaluations--__tabbed_1" type="radio" /><input id="ropt.results.GradientEvaluations--__tabbed_1_2" name="ropt.results.GradientEvaluations--__tabbed_1" type="radio" /><input id="ropt.results.GradientEvaluations--__tabbed_1_3" name="ropt.results.GradientEvaluations--__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="ropt.results.GradientEvaluations--__tabbed_1_1">Perturbed Objectives</label><label for="ropt.results.GradientEvaluations--__tabbed_1_2">Perturbed Constraints</label><label for="ropt.results.GradientEvaluations--__tabbed_1_3">Metadata</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p><code>perturbed_objectives</code>: A three-dimensional array of perturbed
+calculated objective function values for each realization and
+perturbation:</p>
+<ul>
+<li>Shape <span class="arithmatex">\((n_r, n_p, n_o)\)</span>, where:<ul>
+<li><span class="arithmatex">\(n_r\)</span> is the number of realizations.</li>
+<li><span class="arithmatex">\(n_p\)</span> is the number of perturbations.</li>
+<li><span class="arithmatex">\(n_o\)</span> is the number of objectives.</li>
+</ul>
+</li>
+<li>Axis types:<ul>
+<li><a class="autorefs autorefs-internal" title="            REALIZATION
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.AxisName.REALIZATION"><code>AxisName.REALIZATION</code></a></li>
+<li><a class="autorefs autorefs-internal" title="            PERTURBATION
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.AxisName.PERTURBATION"><code>AxisName.PERTURBATION</code></a></li>
+<li><a class="autorefs autorefs-internal" title="            OBJECTIVE
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.AxisName.OBJECTIVE"><code>AxisName.OBJECTIVE</code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="tabbed-block">
+<p><code>perturbed_constraints</code>: A three-dimensional array of perturbed
+calculated non-linear constraint values for each realization and
+perturbation:</p>
+<ul>
+<li>Shape <span class="arithmatex">\((n_r, n_p, n_c)\)</span>, where:<ul>
+<li><span class="arithmatex">\(n_r\)</span> is the number of realizations.</li>
+<li><span class="arithmatex">\(n_p\)</span> is the number of perturbations.</li>
+<li><span class="arithmatex">\(n_c\)</span> is the number of constraints.</li>
+</ul>
+</li>
+<li>Axis types:<ul>
+<li><a class="autorefs autorefs-internal" title="            REALIZATION
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.AxisName.REALIZATION"><code>AxisName.REALIZATION</code></a></li>
+<li><a class="autorefs autorefs-internal" title="            PERTURBATION
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.AxisName.PERTURBATION"><code>AxisName.PERTURBATION</code></a></li>
+<li><a class="autorefs autorefs-internal" title="            NONLINEAR_CONSTRAINT
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.AxisName.NONLINEAR_CONSTRAINT"><code>AxisName.NONLINEAR_CONSTRAINT</code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="tabbed-block">
+<p><code>metadata</code>: Optional metadata associated with each realization,
+potentially provided by the evaluator. Each value is a two-dimensional
+array of any type supported by <code>numpy</code>, including objects, so each key
+may carry its own dtype:</p>
+<ul>
+<li>Shape: <span class="arithmatex">\((n_r, n_p)\)</span>, where:<ul>
+<li><span class="arithmatex">\(n_r\)</span> is the number of realizations.</li>
+<li><span class="arithmatex">\(n_p\)</span> is the number of perturbations.</li>
+</ul>
+</li>
+<li>Axis types:<ul>
+<li><a class="autorefs autorefs-internal" title="            REALIZATION
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.AxisName.REALIZATION"><code>AxisName.REALIZATION</code></a></li>
+<li><a class="autorefs autorefs-internal" title="            PERTURBATION
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.AxisName.PERTURBATION"><code>AxisName.PERTURBATION</code></a></li>
+</ul>
+</li>
+</ul>
+<p>An entry whose values are arrays rather than scalars has shape
+<span class="arithmatex">\((n_r, n_p, n_k)\)</span> and carries a third, user-defined axis named after
+its key. See
+<a href="../../running/results/#user-defined-axes">User-defined axes</a>.</p>
+</div>
+</div>
+</div>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -5641,29 +6004,8 @@ entries that carry an axis of their own.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Objective values per realization and
-                   perturbation, shape <span class="arithmatex">\((n_r, n_p, n_o)\)</span>, with axes
-                   <a class="autorefs autorefs-internal" title="            REALIZATION
-
-
-  
-      class-attribute
-      instance-attribute
-  " href="../enums/#ropt.enums.AxisName.REALIZATION"><code>REALIZATION</code></a>,
-                   <a class="autorefs autorefs-internal" title="            PERTURBATION
-
-
-  
-      class-attribute
-      instance-attribute
-  " href="../enums/#ropt.enums.AxisName.PERTURBATION"><code>PERTURBATION</code></a>
-                   and <a class="autorefs autorefs-internal" title="            OBJECTIVE
-
-
-  
-      class-attribute
-      instance-attribute
-  " href="../enums/#ropt.enums.AxisName.OBJECTIVE"><code>OBJECTIVE</code></a>.</p>
+                <p>The objective function values for each
+                   realization and perturbation.</p>
               </div>
             </td>
           </tr>
@@ -5674,32 +6016,8 @@ entries that carry an axis of their own.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Nonlinear constraint values per realization and
-                   perturbation, shape <span class="arithmatex">\((n_r, n_p, n_c)\)</span>, with axes
-                   <a class="autorefs autorefs-internal" title="            REALIZATION
-
-
-  
-      class-attribute
-      instance-attribute
-  " href="../enums/#ropt.enums.AxisName.REALIZATION"><code>REALIZATION</code></a>,
-                   <a class="autorefs autorefs-internal" title="            PERTURBATION
-
-
-  
-      class-attribute
-      instance-attribute
-  " href="../enums/#ropt.enums.AxisName.PERTURBATION"><code>PERTURBATION</code></a>
-                   and
-                   <a class="autorefs autorefs-internal" title="            NONLINEAR_CONSTRAINT
-
-
-  
-      class-attribute
-      instance-attribute
-  " href="../enums/#ropt.enums.AxisName.NONLINEAR_CONSTRAINT"><code>NONLINEAR_CONSTRAINT</code></a>.
-                   <code>None</code> unless nonlinear constraints are
-                   configured.</p>
+                <p>The constraint function values for each
+                   realization and perturbation.</p>
               </div>
             </td>
           </tr>
@@ -5710,11 +6028,8 @@ entries that carry an axis of their own.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional metadata from the evaluator. Each entry
-                   is an array of shape <span class="arithmatex">\((n_r, n_p)\)</span> of any <code>numpy</code>
-                   dtype, including objects; an entry of arrays
-                   instead has shape <span class="arithmatex">\((n_r, n_p, n_k)\)</span> and a third
-                   axis named after its key.</p>
+                <p>Optional metadata for each evaluated
+                   realization and perturbation.</p>
               </div>
             </td>
           </tr>
