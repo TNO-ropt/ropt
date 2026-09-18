@@ -1,4 +1,17 @@
-"""Export the builtin event handlers."""
+"""Event handlers: objects that react to the events a compute step emits.
+
+[`ResultsHandler`][ropt.components.event_handlers.ResultsHandler] keeps the best
+result, [`HistoryHandler`][ropt.components.event_handlers.HistoryHandler] keeps
+every result, [`DataFrameHandler`][ropt.components.event_handlers.DataFrameHandler]
+builds a table, and [`CallbackHandler`][ropt.components.event_handlers.CallbackHandler]
+forwards selected events to a callback.
+[`EventForwardHandler`][ropt.components.event_handlers.EventForwardHandler]
+forwards them to an
+[`EventDispatcher`][ropt.components.event_handlers.EventDispatcher], which
+delivers events from the asyncio event loop's thread, so handlers shared across
+concurrent compute steps need no locking. See
+[Optimization Workflows](../advanced/workflows.md) for usage.
+"""
 
 from __future__ import annotations
 

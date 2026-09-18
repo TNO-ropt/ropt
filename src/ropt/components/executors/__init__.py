@@ -1,4 +1,14 @@
-"""Export the builtin executors."""
+"""Executors: where an evaluator sends work to be run.
+
+An executor runs the [`WorkItem`][ropt.components.executors.WorkItem] objects of
+a [`Submission`][ropt.components.executors.Submission] on a concrete mechanism:
+threads, processes, local jobs, or an HPC cluster.
+[`Executor`][ropt.components.executors.Executor] is the interface a compute step
+sees; [`ExecutorBase`][ropt.components.executors.ExecutorBase] adds the
+submission bookkeeping the built-in executors share. See
+[Parallel Evaluation](../advanced/parallel.md) for usage, and
+[Implementing a Component](../advanced/components.md) for writing one.
+"""
 
 from __future__ import annotations
 

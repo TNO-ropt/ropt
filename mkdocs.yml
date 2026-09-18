@@ -165,7 +165,6 @@ nav:
         - "Optimizer Backends": reference/backend.md
         - "Samplers": reference/sampler.md
       - "Workflow Components":
-        - "Overview": reference/components.md
         - "Compute Steps": reference/components_compute_steps.md
         - "Event Handlers": reference/components_event_handlers.md
         - "Evaluators": reference/components_evaluators.md

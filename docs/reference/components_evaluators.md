@@ -1,11 +1,8 @@
 # Evaluators
 
-These are the [`Evaluator`][ropt.components.evaluators.Evaluator] subclasses
-used by the workflow components' compute steps. For the plain callable
-protocols, see [Evaluation Classes](evaluation.md).
-
-See [Writing Evaluation Callbacks](../advanced/evaluation_callbacks.md) and
-[Parallel Evaluation](../advanced/parallel.md) for usage.
+::: ropt.components.evaluators
+    options:
+        members: []
 
 ::: ropt.components.evaluators.Evaluator
 ::: ropt.components.evaluators.BatchEvaluator

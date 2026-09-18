@@ -14,6 +14,11 @@
 ::: ropt.simple.evaluate
 ::: ropt.simple.evaluate_many
 
+## Evaluation functions
+
+::: ropt.simple.EvaluationFunctionContext
+::: ropt.simple.EvaluationFunctionResult
+
 ## Sessions and pools
 
 ::: ropt.simple.session
@@ -25,10 +30,14 @@
 
 ::: ropt.simple.offload
 
-## Aggregating results across runs
+## Handlers
 
-[`Session.shared_handlers`][ropt.simple.Session.shared_handlers] builds the
-group; the group itself is a `SharedHandlers` object.
+::: ropt.simple.EventHandler
+::: ropt.simple.ResultsHandler
+::: ropt.simple.HistoryHandler
+::: ropt.simple.DataFrameHandler
+
+## Aggregating results across runs
 
 ::: ropt.simple.SharedHandlers
 
