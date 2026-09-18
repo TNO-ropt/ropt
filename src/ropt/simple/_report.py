@@ -20,6 +20,7 @@ if TYPE_CHECKING:
 
 
 ReportCallback = Callable[[FunctionResults], bool | None]
+"""Called with each function evaluation; returning `True` stops the run."""
 
 
 def make_report_handler(report: ReportCallback) -> EventHandler:

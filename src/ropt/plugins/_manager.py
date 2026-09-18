@@ -27,11 +27,7 @@ PluginType = Literal[
     "realization_filter",
     "function_estimator",
 ]
-"""Represents the valid types of plugins supported by `ropt`.
-
-This type alias defines the string identifiers used to categorize different
-plugins within the `ropt` framework.
-"""
+"""The plugin areas a method string can select from."""
 
 
 _DEFAULT_PLUGINS: Final = {
