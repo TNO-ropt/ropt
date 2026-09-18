@@ -12,7 +12,7 @@
         <link rel="prev" href="../optimizer_setup/function_estimators/">
       
       
-        <link rel="next" href="logging/">
+        <link rel="next" href="keyboard_interrupt/">
       
       
         
@@ -848,6 +848,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../running/logging/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Logging
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../running/parallel/" class="md-nav__link">
         
   
@@ -1522,34 +1550,6 @@
   
 </nav>
       
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="logging/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Logging
-  
-
-    
-  </span>
-  
-  
-
-      </a>
     </li>
   
 
@@ -3108,12 +3108,12 @@ result. The exit code says why the run ended; the result is the best feasible
 evaluation recorded before it did, and is <code>None</code> only when there was none. A
 run that fails part-way therefore still hands back what it had reached. See
 <a href="../running/running/#when-something-goes-wrong">When something goes wrong</a>.</p>
-<p><strong>Some reasons are only ever logged.</strong> When the machinery itself fails — a
-worker process is killed, a cluster job never writes its result — the affected
-evaluations are recorded as <code>NaN</code>. The optimizer sees only the <code>NaN</code>, so the
-reason appears once, as a <code>WARNING</code> from the <code>ropt.components.evaluators</code>
-logger, and nowhere else. Turn logging on before investigating a run that ended
-in <code>TOO_FEW_REALIZATIONS</code>; see <a href="logging/">Logging</a>.</p>
+<p><strong>A broken machine is an error, not a failed realization.</strong> When the machinery
+itself fails — a worker process is killed, a cluster job never writes its result
+— the run stops with an <a class="autorefs autorefs-internal" title="            ExecutionError" href="../reference/exceptions/#ropt.exceptions.ExecutionError"><code>ExecutionError</code></a> that
+says how many evaluations were lost and why. It is not absorbed as a <code>NaN</code>,
+because a result computed over the workers that survived is indistinguishable
+from one computed over the whole ensemble.</p>
 <table>
 <thead>
 <tr>
@@ -3131,8 +3131,8 @@ in <code>TOO_FEW_REALIZATIONS</code>; see <a href="logging/">Logging</a>.</p>
 <td><a href="../optimizer_setup/configuration_sections/#realizations"><code>realization_min_success</code></a> defaults to all of them. Lower it.</td>
 </tr>
 <tr>
-<td><code>TOO_FEW_REALIZATIONS</code> and nothing says why</td>
-<td>The failures came from the machinery, not from your objective. The reason is logged at <code>WARNING</code> by <code>ropt.components.evaluators</code>; enable <a href="logging/">logging</a>.</td>
+<td><code>ExecutionError</code> part-way through a run</td>
+<td>The machinery failed, not your objective. The message names the reason and how many evaluations went with it.</td>
 </tr>
 <tr>
 <td>Numbers do not match what you configured</td>
@@ -3368,13 +3368,13 @@ error from pandas or polars when a result is turned into a table.</p>
         
         
           
-          <a href="logging/" class="md-footer__link md-footer__link--next" aria-label="Next: Logging">
+          <a href="keyboard_interrupt/" class="md-footer__link md-footer__link--next" aria-label="Next: Keyboard Interrupts">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Logging
+                Keyboard Interrupts
               </div>
             </div>
             <div class="md-footer__button md-icon">

@@ -850,6 +850,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../running/logging/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Logging
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../running/parallel/" class="md-nav__link">
         
   
@@ -1420,34 +1448,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../troubleshooting/logging/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Logging
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../troubleshooting/keyboard_interrupt/" class="md-nav__link">
         
   
@@ -1892,10 +1892,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#infrastructure-failure-tolerated" class="md-nav__link">
+  <a href="#infrastructure-failure-raised-as-executionerror" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Infrastructure failure (tolerated)
+        Infrastructure failure (raised as ExecutionError)
       
     </span>
   </a>
@@ -1903,10 +1903,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#user-code-exception-raised" class="md-nav__link">
+  <a href="#user-code-exception-re-raised-unchanged" class="md-nav__link">
     <span class="md-ellipsis">
       
-        User-code exception (raised)
+        User-code exception (re-raised unchanged)
       
     </span>
   </a>
@@ -3395,10 +3395,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#infrastructure-failure-tolerated" class="md-nav__link">
+  <a href="#infrastructure-failure-raised-as-executionerror" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Infrastructure failure (tolerated)
+        Infrastructure failure (raised as ExecutionError)
       
     </span>
   </a>
@@ -3406,10 +3406,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#user-code-exception-raised" class="md-nav__link">
+  <a href="#user-code-exception-re-raised-unchanged" class="md-nav__link">
     <span class="md-ellipsis">
       
-        User-code exception (raised)
+        User-code exception (re-raised unchanged)
       
     </span>
   </a>
@@ -4142,24 +4142,31 @@ problem does not exist.</p>
 <p>Free-threaded (no-GIL) builds of CPython are <strong>untested and unsupported</strong>.</p>
 <h2 id="error-handling">Error handling</h2>
 <p>Executors and the <a class="autorefs autorefs-internal" title="            ropt.components.evaluators.ParallelEvaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.ParallelEvaluator"><code>ParallelEvaluator</code></a>
-distinguish two classes of failure, and treat them very differently.</p>
-<h3 id="infrastructure-failure-tolerated">Infrastructure failure (tolerated)</h3>
+distinguish two classes of failure. Both end the evaluation, but what the caller
+receives, and what becomes of the executor, differ.</p>
+<h3 id="infrastructure-failure-raised-as-executionerror">Infrastructure failure (raised as <code>ExecutionError</code>)</h3>
 <p>An <em>infrastructure</em> failure is one that is not caused by the evaluation function
 itself: a worker process is killed (<code>BrokenProcessPool</code>), or an HPC job's output
 file never appears or cannot be deserialized. These are delivered as an ordinary
 result whose value is an <a class="autorefs autorefs-internal" title="            ExecutorFailure" href="../../reference/exceptions/#ropt.exceptions.ExecutorFailure"><code>ExecutorFailure</code></a>
-(via <a class="autorefs autorefs-internal" title="            deliver" href="../../reference/components_executors/#ropt.components.executors.Submission.deliver"><code>deliver</code></a>). The evaluator
-records the affected rows as failed realizations by writing <code>numpy.nan</code>. Such a
-failure is <em>tolerated</em>: the optimization continues, and only aborts (with
-<code>TOO_FEW_REALIZATIONS</code>) if too many realizations fail to satisfy the configured
-minimum.</p>
-<p>Only the <code>numpy.nan</code> survives that step — the <code>ExecutorFailure</code> and its message
-do not reach the optimizer, so an aborted run reports <code>TOO_FEW_REALIZATIONS</code>
-without saying why. The reason is logged instead, once per failed work item, at
-<code>WARNING</code> from the <code>ropt.components.evaluators</code> logger; see
-<a href="../../troubleshooting/logging/">Logging</a>. Because <code>realization_min_success</code> defaults to
-<em>all</em> realizations, a single failed work item is enough to end the run this way.</p>
-<h3 id="user-code-exception-raised">User-code exception (raised)</h3>
+(via <a class="autorefs autorefs-internal" title="            deliver" href="../../reference/components_executors/#ropt.components.executors.Submission.deliver"><code>deliver</code></a>), which leaves the
+executor running rather than tearing it down.</p>
+<p>The evaluator turns that result into an
+<a class="autorefs autorefs-internal" title="            ExecutionError" href="../../reference/exceptions/#ropt.exceptions.ExecutionError"><code>ExecutionError</code></a>, naming how many evaluations
+were lost and why, which ends the run. It does <strong>not</strong> write <code>numpy.nan</code> for the
+affected rows. A machine that broke is not a realization that failed to
+converge: absorbing it would let the optimization continue on whichever workers
+happened to survive, and produce a result that is indistinguishable from one
+computed over the whole ensemble.</p>
+<div class="admonition note">
+<p class="admonition-title">A failed realization is still tolerated</p>
+<p><code>numpy.nan</code> returned <em>by the evaluation function</em> keeps its meaning — that
+realization could not produce a value — and
+<a href="../../optimizer_setup/configuration_sections/#realizations"><code>realization_min_success</code></a>
+still decides how many a batch may contain before the run ends with
+<code>TOO_FEW_REALIZATIONS</code>. Only a failure of the machinery is raised.</p>
+</div>
+<h3 id="user-code-exception-re-raised-unchanged">User-code exception (re-raised unchanged)</h3>
 <p>A <em>user-code</em> exception is one raised by the evaluation function itself — a bug
 in the objective, a bad configuration, an unexpected input. This must not be
 silently turned into a failed realization; it signals a genuine error the user
@@ -4313,8 +4320,8 @@ that drives event-producing compute steps must run in-process. See
 <a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventForwardHandler" href="../../reference/components_event_handlers/#ropt.components.event_handlers.EventForwardHandler"><code>EventForwardHandler</code></a> is
 <strong>synchronous</strong>: the emitting run blocks until the dispatcher has run every
 handler for that event. A handler failure is therefore delivered like an
-evaluation error — on the emitting run's own call stack — mirroring the
-executor's tolerated-vs-fatal split:</p>
+evaluation error — on the emitting run's own call stack — and splits
+<code>Exception</code> from <code>BaseException</code> exactly as the executor does:</p>
 <ul>
 <li>An ordinary <code>Exception</code> from a handler is <strong>re-raised on the emitting run's
   stack</strong>, unwrapped — a single, clean exception that stops the run normally,
