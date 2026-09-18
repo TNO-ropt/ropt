@@ -1,14 +1,8 @@
 # Core Classes
 
-The `ropt.core` package contains the low-level engines used by
-the workflow components: an ensemble evaluator that orchestrates per-realization
-function calls, an ensemble optimizer that drives the chosen backend, and the
-callback protocols connecting them. Most users will not interact with these
-classes directly; they are exposed for plugin authors and advanced workflow
-developers.
-
-See [Optimization Workflows](../advanced/workflows.md) for the higher-level
-framework that wraps these engines.
+::: ropt.core
+    options:
+        members: []
 
 ::: ropt.core.EnsembleEvaluator
 ::: ropt.core.EnsembleOptimizer

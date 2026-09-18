@@ -1,46 +1,17 @@
-"""Public API for optimizer backend implementations.
+"""Optimizer backends: the bridge to an external optimization library.
 
-Backends define how `ropt` runs an optimization algorithm against an
-[`OptimizationProblem`][ropt.backend.OptimizationProblem]. A backend requests
-function and gradient evaluations through the core callback interface, and
-advances the optimization from an initial variable vector toward a solution.
+A backend receives an
+[`OptimizationProblem`][ropt.backend.OptimizationProblem], requests function and
+gradient values through the
+[`OptimizerCallback`][ropt.core.OptimizerCallback] interface, and advances the
+optimization from an initial variable vector. It is selected through the
+`backend` field of an [`EnOptContext`][ropt.context.EnOptContext], either as an
+instance or as a [`BackendConfig`][ropt.config.BackendConfig] naming a method.
 
-**Core Interface**
-
-All backend implementations inherit from the
-[`Backend`][ropt.backend.Backend] base class, which defines construction from a
-[`BackendConfig`][ropt.config.BackendConfig], a validation hook
-(`validate_options`), and the single entry point `start`.
-
-**Integration with Optimization**
-
-Backends are accessed via an
-[`EnOptContext`][ropt.context.EnOptContext] object through its `backend`
-field. A backend is instantiated either directly as an object or via a
-[`BackendConfig`][ropt.config.BackendConfig] object, which is used by the
-plugin system to create an instance based on the configured backend method
-string. The context itself never reaches the backend: `ropt` reduces it to an
-[`OptimizationProblem`][ropt.backend.OptimizationProblem] when the run starts.
-
-During execution, a backend uses the
-[`OptimizerCallback`][ropt.core.OptimizerCallback] interface to request
-objective, constraint, and gradient evaluations from the `ropt` core.
-
-**Built-in and Custom Backends**
-
-`ropt` includes two built-in backends:
-
-- [`SciPyBackend`][ropt.backend.scipy.SciPyBackend]: Uses optimization methods
-  provided by SciPy.
-- [`ExternalBackend`][ropt.backend.external.ExternalBackend]: Delegates the
-  optimization loop to an external executable or process.
-
-Users can implement custom backends by subclassing `Backend`. Those subclasses
-can be instantiated directly and passed into an
-[`EnOptContext`][ropt.context.EnOptContext] object through its `backend`
-field. Registering a custom backend with the plugin system is optional and
-only required when the backend should be selected and configured via
-`BackendConfig` objects instead of being instantiated explicitly by the user.
+`ropt` ships [`SciPyBackend`][ropt.backend.scipy.SciPyBackend] and
+[`ExternalBackend`][ropt.backend.external.ExternalBackend], which runs an
+optimizer in a separate process; further backends come from plugin packages. See
+[Writing a Plugin](../advanced/writing_plugins.md) for implementing one.
 """
 
 from ._base import Backend

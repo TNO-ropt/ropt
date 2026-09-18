@@ -1,4 +1,17 @@
-"""Function evaluation protocols and classes."""
+"""The data exchanged between `ropt` and a user evaluation function.
+
+An [`EvaluationBatchContext`][ropt.evaluation.EvaluationBatchContext] describes
+which rows must be evaluated, an
+[`EvaluationBatchResult`][ropt.evaluation.EvaluationBatchResult] carries the
+objective and constraint values back, and
+[`EvaluationBatchCallback`][ropt.evaluation.EvaluationBatchCallback] is the
+protocol such a callable must follow. For the
+[`Evaluator`][ropt.components.evaluators.Evaluator] classes that wrap them, see
+[Evaluators](../reference/components_evaluators.md).
+
+See [Writing Evaluation Callbacks](../advanced/evaluation_callbacks.md) for
+usage.
+"""
 
 from dataclasses import dataclass, field
 from typing import Any, Protocol, TypeVar

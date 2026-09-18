@@ -1,4 +1,11 @@
-"""Optimization event data structures."""
+"""The events a compute step emits at lifecycle milestones.
+
+An [`EnOptEvent`][ropt.events.EnOptEvent] carries the event type, the context of
+the run, and any results produced. Event handlers consume these to track
+progress, store results, or stop the run. See
+[`EnOptEventType`][ropt.enums.EnOptEventType] for the available types, and
+[Optimization Workflows](../advanced/workflows.md) for usage.
+"""
 
 from __future__ import annotations
 
