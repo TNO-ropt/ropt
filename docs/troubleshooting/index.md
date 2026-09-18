@@ -42,8 +42,9 @@ runs the same problem twice, once with the default and once allowing the
 failure, and prints the exit code and result of each.
 
 **Not everything that goes wrong raises.** Check `exit_code` before using a
-result, and remember that `TOO_FEW_REALIZATIONS` and `EXECUTOR_STOPPED` leave
-every field `None`. See
+result. The exit code says why the run ended; the result is the best feasible
+evaluation recorded before it did, and is `None` only when there was none. A
+run that fails part-way therefore still hands back what it had reached. See
 [When something goes wrong](../running/running.md#when-something-goes-wrong).
 
 **Some reasons are only ever logged.** When the machinery itself fails — a
@@ -99,6 +100,12 @@ even after Ctrl-C, because Python cannot interrupt a thread from outside. If an
 evaluation may run long and has to be interruptible, put it on a `local_pool` or
 an `hpc_pool`; see [Stopping a run](../running/parallel.md#stopping-a-run).
 
+**A `process_pool` re-imports your script.** Its workers are started with
+`spawn`, so each of them imports the file the run was started from, and
+everything at module level runs again in every worker. That is why the entry
+point has to sit behind `if __name__ == "__main__":`. Without the guard the
+workers try to start workers of their own, and the pool never opens.
+
 **A pool does not outlive its session.** Closing the session, or the pool itself,
 releases its workers, and a run started on it afterwards is refused before
 anything runs. Open the pool inside the block that uses it; see
@@ -108,6 +115,7 @@ anything runs. Open the pool inside the block that uses it; see
 | --- | --- |
 | Ctrl-C appears to do nothing | A process-wide signal setting, changed by an imported package. Call [`restore_keyboard_interrupt`][ropt.utils.restore_keyboard_interrupt]; see [Keyboard Interrupts](keyboard_interrupt.md). |
 | The program will not exit after Ctrl-C | Evaluations on a `thread_pool` are still running and cannot be interrupted. |
+| Pages of `multiprocessing` tracebacks, ending in `ExecutionError: Could not start worker processes` | The script has no `if __name__ == "__main__":` guard, so every worker re-ran it from the top. |
 | A `WorkflowError` says the pool is closed | The pool outlived the `with session()` block that created it, or was closed explicitly. |
 | More workers made everything slower | `numpy` and friends already use every core. Set `OMP_NUM_THREADS=1` and let the pool provide the parallelism; see [Which pool should I use?](../running/parallel.md#which-pool). |
 | Simulators keep running after the run stopped | A `process_pool` kills only its own workers. Use a [`local_pool`](../running/parallel.md#local-pool), which signals the whole process group. |
@@ -152,6 +160,10 @@ process of its own. Optimizer output capture is likewise for one run at a time.
 Change the seed when you deliberately want an independent repetition of the same
 problem.
 
+**Label tuples are checked at export, not at the start.** A tuple in
+[`names`](../optimizer_setup/configuration_sections.md#names) that is not as long as the
+axis it labels lets the run finish normally; the mismatch surfaces later, as an
+error from pandas or polars when a result is turned into a table.
 
 | What you see | Most likely cause |
 | --- | --- |

@@ -490,10 +490,11 @@ to the terminal as usual.
 
 !!! note "What else lands in the file"
     Capture is scoped to a period of time, not to a source, so anything the
-    process writes while the optimizer is working is captured with it. In
-    practice that means Python warnings raised by the optimizer, which belong
-    there, and output from your own threads, which does not. Log records are
-    unaffected unless they go to a console handler; see
+    process writes through `sys.stdout` or `sys.stderr` while the optimizer is
+    working is captured with it. In practice that means Python warnings raised
+    by the optimizer, which belong there, and output from your own threads,
+    which does not. Log records are normally left alone, because a handler
+    writes to the stream it was given when it was created; see
     [Logging](../troubleshooting/logging.md#logging-during-an-optimization).
 
 ## `backend` { #backend }

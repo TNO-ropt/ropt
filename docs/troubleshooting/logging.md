@@ -1,106 +1,17 @@
 # Logging
 
-`ropt` uses Python's standard [`logging`](https://docs.python.org/3/library/logging.html)
-module to report what is happening during an optimization workflow. By default
-it produces **no output at all** — a `NullHandler` is installed on the `ropt`
-logger so that log records are silently discarded unless an application
-explicitly enables them.
+`ropt` reports what a run is doing through Python's standard
+[`logging`](https://docs.python.org/3/library/logging.html) module. It produces
+**no output at all** until an application asks for it: a `NullHandler` on the
+`ropt` logger discards every record until you attach a handler of your own.
 
-Logging gives a human-readable *trace* of a run. To *react* to results
-programmatically — collect them, tabulate them, or stop early — use
-[result handlers](../running/handlers.md) instead.
+What logging gives you is a *trace* — a readable account of a run as it
+happens. It is not a way to get at results: to collect them, tabulate them, or
+stop a run early, use [result handlers](../running/handlers.md) instead.
 
-## Logger hierarchy
+## Turning it on
 
-Every module in `ropt` creates its own logger whose name is derived from the
-public package path:
-
-```
-ropt
-├── ropt.backend                         ← backend-specific messages (SciPy, external)
-├── ropt.components
-│   ├── ropt.components.compute_steps    ← OptimizationStep, EvaluationStep
-│   ├── ropt.components.evaluators       ← CachedEvaluator, ParallelEvaluator
-│   ├── ropt.components.event_handlers   ← ResultsHandler
-│   └── ropt.components.executors        ← Threading/Multiprocessing/HPCExecutor
-├── ropt.core                            ← EnsembleOptimizer, EnsembleEvaluator
-└── ropt.plugins                         ← PluginManager
-```
-
-This means you can enable logging for the entire library by configuring the
-`ropt` logger, or limit output to a sub-tree such as `ropt.core` or
-`ropt.components.executors` (useful when debugging HPC job submission without
-the noise of per-batch statistics).
-
-## What is logged
-
-### `INFO` — workflow milestones and batch statistics
-
-These messages tell you what the optimization is doing at a human level.
-
-| Source | Example message |
-|--------|----------------|
-| `OptimizationStep`  | `Starting optimization` |
-| `OptimizationStep`  | `Optimization finished: OPTIMIZER_FINISHED` (the [`ExitCode`][ropt.enums.ExitCode] name) |
-| `EvaluationStep`    | `Starting evaluation` |
-| `EvaluationStep`    | `Evaluation finished` |
-| `EnsembleOptimizer` | `Stopping: Maximum number of function evaluations reached (500)` |
-| `EnsembleOptimizer` | `Stopping: Maximum number of evaluation batches reached (50)` |
-| `EnsembleEvaluator` | `Function evaluation: 9/10 realizations succeeded` |
-| `EnsembleEvaluator` | `Gradient evaluation: 8/10 realizations succeeded` |
-| `ResultsHandler`    | `New best objective: 1.23456` |
-| `HPCExecutor`       | `Starting HPC executor (4 max workers, 1.0s poll interval)` |
-| `external` (backend) | `Starting external optimization in subprocess` |
-
-The batch statistics after each evaluation are especially useful for monitoring
-realization failures without having to write a custom event handler. Note that
-a run stopped by [`TooFewRealizations`][ropt.exceptions.TooFewRealizations]
-(exit code `TOO_FEW_REALIZATIONS`) logs no separate "stopping" message of its
-own — only the final `Optimization finished: TOO_FEW_REALIZATIONS` line.
-
-### `WARNING` — recoverable problems
-
-These signal something went wrong that `ropt` could recover from (a retry, a
-dropped job, a lost worker) — usually worth surfacing even when you otherwise
-run at `INFO` or above.
-
-| Source | Example message |
-|--------|----------------|
-| `HPCExecutor`               | `HPC work item <id> failed: output file never appeared` |
-| `HPCExecutor`               | `HPC work item <id> failed: no valid result after 30 retries` |
-| `HPCExecutor`               | `Querying the HPC scheduler failed (2/31): <error>` |
-| `HPCExecutor`               | `Could not cancel HPC job <id> (job id: <job>): <error>` |
-| `ParallelEvaluator`         | `Recording 1 evaluation(s) as failed: <reason>` |
-| `ProcessExecutor`   | `Worker process pool broken; work item result lost` |
-| `external` (backend)        | `External backend subprocess died unexpectedly (exit code <code>)` |
-
-The `ParallelEvaluator` message is the only place an infrastructure failure
-states its reason: the optimizer sees nothing but `numpy.nan`, so a run that
-ends in `TOO_FEW_REALIZATIONS` explains itself here and nowhere else.
-
-### `DEBUG` — per-callback and per-task trace
-
-These messages are emitted once per optimizer callback invocation, or once per
-dispatched task, and are useful for detailed diagnostics. They can be
-**verbose**: a gradient-based optimizer typically calls the evaluation
-callback once for functions and once for gradients per iteration.
-
-| Source | Example message |
-|--------|----------------|
-| `EnsembleOptimizer`         | `Optimizer callback: requesting functions` |
-| `EnsembleOptimizer`         | `Optimizer callback: requesting gradients` |
-| `EnsembleOptimizer`         | `Optimizer callback: requesting functions and gradients` |
-| `PluginManager`             | `Registering plugin: backend/scipy` |
-| `scipy` (backend)           | `Using SciPy optimizer: SLSQP` |
-| `ThreadExecutor`            | `Starting thread executor with 4 worker(s)` |
-| `ProcessExecutor`           | `Starting process executor with 4 worker(s)` |
-| `HPCExecutor`               | `Submitted HPC job <id> (job id: <job>)` |
-| `ParallelEvaluator`         | `Dispatching 10 work item(s) to executor` |
-| `CachedEvaluator`           | `Cache: 4/10 evaluations served from cache` |
-
-## Enabling logging
-
-### Minimal — see everything from `ropt`
+One line, before the run:
 
 ```python
 import logging
@@ -108,124 +19,148 @@ import logging
 logging.basicConfig(level=logging.INFO, format="%(name)s - %(levelname)s - %(message)s")
 ```
 
-This outputs `INFO` and above from all loggers, including `ropt`. Example
-output during a short optimization run:
+A short optimization over four realizations then reports:
 
 ```
 ropt.components.compute_steps - INFO - Starting optimization
-ropt.core - INFO - Function evaluation: 10/10 realizations succeeded
-ropt.core - INFO - Gradient evaluation: 10/10 realizations succeeded
-ropt.core - INFO - Function evaluation: 10/10 realizations succeeded
-ropt.core - INFO - Gradient evaluation: 9/10 realizations succeeded
-...
+ropt.core - INFO - Function evaluation: 4/4 realizations succeeded
+ropt.components.event_handlers - INFO - New best objective: 3
+ropt.core - INFO - Gradient evaluation: 3/4 realizations succeeded
+ropt.core - INFO - Function evaluation: 4/4 realizations succeeded
+ropt.components.event_handlers - INFO - New best objective: 2.99998
+ropt.components.compute_steps - INFO - Optimization finished: OPTIMIZER_FINISHED
+```
+
+Every record comes from a logger under `ropt`, named after the part of the
+library that emitted it.
+
+## What each level carries
+
+**`INFO` follows the run.** A line when the run starts and another when it
+ends, carrying the [`ExitCode`][ropt.enums.ExitCode] name; one line per batch
+giving how many realizations produced a value; and a line each time the best
+objective improves. A run that stops on a limit you set says so before it
+finishes:
+
+```
 ropt.core - INFO - Stopping: Maximum number of function evaluations reached (200)
-ropt.components.compute_steps - INFO - Optimization finished: Maximum number of function evaluations reached (200)
 ```
 
-### High-level only — workflow messages without core detail
+The per-batch counts are the most useful of these. A `3/4` after a line that
+said `4/4` tells you a realization failed, without writing a handler to find
+out.
 
-Because `ropt.core` covers both stopping conditions and per-batch statistics,
-you cannot suppress one without the other by logger name alone. To see only
-workflow start/stop messages, enable `INFO` on `ropt.components.compute_steps`
-and leave `ropt.core` at `WARNING`:
+**`WARNING` reports trouble the run survived.** A worker process that died, a
+cluster job that never produced a result, a scheduler query that had to be
+retried, a working directory kept because something in it failed.
+
+One property of these is worth knowing. When the machinery itself fails, the
+affected evaluations are recorded as `NaN`, and the optimizer sees nothing but
+the `NaN`. The reason is stated once, in a warning, and nowhere else — so a run
+that ends in `TOO_FEW_REALIZATIONS` either explains itself here or not at all.
+
+**`DEBUG` traces the mechanism.** One record per optimizer callback, per
+dispatched batch and per cluster job, plus the configuration the run started
+from. It is verbose: a gradient-based method asks for functions and gradients
+separately on most iterations, and each request is a line.
+
+## Choosing how much you see
+
+Setting the level on `ropt` covers the whole library. The loggers beneath it
+narrow that down, and two of them account for most of what appears at `INFO`:
+`ropt.components.compute_steps` emits the start and finish of a run, while
+`ropt.core` emits the per-batch counts and the stopping reason.
+
+Those two cannot be separated by level alone, because `ropt.core` carries both.
+To keep the milestones without a line per batch, silence everything and raise
+only the step logger:
 
 ```python
 import logging
 
-logging.basicConfig(level=logging.WARNING)  # silence everything by default
-
+logging.basicConfig(level=logging.WARNING)
 logging.getLogger("ropt.components.compute_steps").setLevel(logging.INFO)
-# ropt.core stays at WARNING → no batch statistics and no stopping conditions
 ```
 
-To also include stopping conditions and batch statistics, add `ropt.core`:
+Adding `logging.getLogger("ropt.core").setLevel(logging.INFO)` brings the batch
+counts and the stopping conditions back.
 
-```python
-logging.getLogger("ropt.core").setLevel(logging.INFO)
-```
+## Keeping `ropt`'s records separate
 
-### Verbose — include per-callback trace
+Records travel up from each logger to its parent until they reach the root
+logger, which is where `logging.basicConfig()` installs its handler. That is
+why the single line above is enough to see `ropt` output — and why attaching a
+handler to `ropt` *as well* prints everything twice.
 
-```python
-import logging
-
-logging.basicConfig(level=logging.DEBUG, format="%(name)s - %(levelname)s - %(message)s")
-```
-
-### `ropt` only, leaving other loggers at their current level
-
-By default, every logger passes its records up to its parent until they reach
-the **root logger**. This is called *propagation*. If the root logger already
-has a handler — for example because the application called
-`logging.basicConfig()` — then adding a handler to `ropt` as well would send
-each `ropt` record through *two* handlers and print it twice.
-
-Setting `propagate = False` on the `ropt` logger cuts the chain: records from
-`ropt` and all its children are handled exclusively by the handlers you attach
-to `ropt` and never reach the root.
+Setting `propagate = False` on the `ropt` logger stops records there, so they
+reach only the handlers you attach to it:
 
 ```python
 import logging
 
-handler = logging.StreamHandler()
-handler.setFormatter(logging.Formatter("%(name)s - %(levelname)s - %(message)s"))
-
-ropt_logger = logging.getLogger("ropt")
-ropt_logger.setLevel(logging.INFO)
-ropt_logger.addHandler(handler)
-ropt_logger.propagate = False  # records stop here; root logger is not involved
-```
-
-Use this pattern whenever you want `ropt` output to go to a specific
-destination (a file, a widget, a queue) independently of whatever the rest of
-the application is doing with logging.
-
-## Integration with log file and console simultaneously
-
-```python
-import logging
-
-# Console: INFO and above
 console = logging.StreamHandler()
 console.setLevel(logging.INFO)
 console.setFormatter(logging.Formatter("%(levelname)s %(message)s"))
 
-# File: everything including DEBUG
-file_handler = logging.FileHandler("optimization.log")
-file_handler.setLevel(logging.DEBUG)
-file_handler.setFormatter(
-    logging.Formatter("%(asctime)s %(name)s %(levelname)s %(message)s")
-)
+log_file = logging.FileHandler("optimization.log")
+log_file.setLevel(logging.DEBUG)
+log_file.setFormatter(logging.Formatter("%(asctime)s %(name)s %(levelname)s %(message)s"))
 
 ropt_logger = logging.getLogger("ropt")
 ropt_logger.setLevel(logging.DEBUG)
 ropt_logger.addHandler(console)
-ropt_logger.addHandler(file_handler)
+ropt_logger.addHandler(log_file)
 ropt_logger.propagate = False
 ```
 
-## Logging during an optimization { #logging-during-an-optimization }
+Use this whenever `ropt`'s output should go somewhere of its own — a file, a
+widget, a queue — independently of what the rest of the application does with
+logging.
 
-Configuring [`stdout` or
-`stderr`](../optimizer_setup/configuration_sections.md#optimizer) captures the
-optimizer's output for the duration of a run. That capture is scoped to a period
-of time rather than to a source, so **log records written to a console handler
-while the optimizer is working end up in the capture file** along with the
-optimizer's own output.
+## Logging while the optimizer is running { #logging-during-an-optimization }
 
-Handlers that write anywhere else are unaffected — a `FileHandler`, a
-`RotatingFileHandler`, a socket or a queue all have their own destination and
-never touch the captured streams. Only handlers on `sys.stdout` or `sys.stderr`
-are involved, which includes the one `logging.basicConfig()` installs; note that
-this catches `ropt`'s records by propagation even if you never configure the
-`ropt` logger yourself.
+Setting [`stdout` or
+`stderr`](../optimizer_setup/configuration_sections.md#optimizer) sends the
+optimizer's own output to a file. That capture is scoped to a period of time
+rather than to a source, so it is fair to ask what else ends up in the file.
+For log records, almost nothing does.
 
-Most of what `ropt` logs is emitted outside the captured region — every batch
-statistic, every executor message and both workflow milestones — so in practice
-this affects a handful of records. If you want them kept apart regardless, give
-the `ropt` logger a file handler of its own and set `propagate = False`, as in
-the example above.
+Two things keep them out. `ropt` lifts the capture for the whole evaluation
+phase, so everything logged around a batch — and everything your own code
+prints there — goes where it normally goes. And a `StreamHandler` writes to the
+stream object it was given when it was created, so rebinding `sys.stderr`
+underneath it, which is what the capture does, does not reach it.
 
-Python warnings are a separate matter: `warnings.warn` writes to `sys.stderr` at
-the moment it fires, so warnings raised while the optimizer runs are captured.
-That is usually what you want, since they generally come from the optimizer.
+The exception is an optimizer that prints from compiled code. `ropt` then
+redirects file descriptors 1 and 2 as well, and at that level a console handler
+*is* caught: its records land in the capture file along with the optimizer's
+output. Among the SciPy methods this applies to `tnc`.
+
+Giving the `ropt` logger a destination of its own — a file, a socket, a queue —
+and setting `propagate = False`, as above, keeps its records out of the capture
+file in that case too.
+
+Python warnings go the other way: `warnings.warn` looks up `sys.stderr` when it
+fires, so a warning raised while the optimizer is working is captured. That is
+usually what you want, since it generally comes from the optimizer.
+
+??? info "Which part of `ropt` emits what"
+
+    A logger is named after the public package path of the module that emits
+    the record, so the names map onto the component API:
+
+    | Logger | Emits |
+    | --- | --- |
+    | `ropt.components.compute_steps` | the configuration a step started from, and its start and finish |
+    | `ropt.core` | optimizer callbacks, per-batch realization counts, stopping conditions, and reuse of cached function results |
+    | `ropt.components.evaluators` | work-item dispatch, cache statistics, and the reason evaluations were recorded as failed |
+    | `ropt.components.executors` | executor start-up, job submission and cancellation, retention of a working directory, and the thread-pool drain warning |
+    | `ropt.components.event_handlers` | each new best objective, and an event handler that raised |
+    | `ropt.backend.scipy`, `ropt.backend.external` | the method in use, and the external subprocess lifecycle |
+    | `ropt.plugins` | plugin registration |
+
+    Scoping to one sub-tree is the quickest way to watch a single mechanism:
+    put `ropt.components.executors` at `DEBUG` to follow job submission without
+    the per-batch traffic. See
+    [Optimization Workflows](../advanced/workflows.md) for what these
+    components are.

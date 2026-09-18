@@ -133,6 +133,10 @@ nav:
       - "Samplers": optimizer_setup/samplers.md
       - "Realization Filters": optimizer_setup/realization_filters.md
       - "Function Estimators": optimizer_setup/function_estimators.md
+  - "Troubleshooting":
+      - "Troubleshooting": troubleshooting/index.md
+      - "Logging": troubleshooting/logging.md
+      - "Keyboard Interrupts": troubleshooting/keyboard_interrupt.md
   - "Advanced":
       - "Workflows":
           - "Optimization Workflows": advanced/workflows.md
@@ -143,10 +147,6 @@ nav:
       - "Plugins":
           - "Plugin Discovery": advanced/plugin_discovery.md
           - "Writing a Plugin": advanced/writing_plugins.md
-  - "Troubleshooting":
-      - "Troubleshooting": troubleshooting/index.md
-      - "Logging": troubleshooting/logging.md
-      - "Keyboard Interrupts": troubleshooting/keyboard_interrupt.md
   - "Reference":
       - "Simple API": reference/simple.md
       - "Utility Functions": reference/utils.md
