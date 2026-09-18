@@ -1,7 +1,7 @@
 """The high-level convenience API for running optimizations.
 
 This module builds on the low-level `ropt` primitives. Import its names
-directly, for example ``from ropt.simple import optimize, session``. See
+directly, for example `from ropt.simple import optimize, session`. See
 [Running Optimizations](../running/running.md) for a walkthrough.
 
 Enumerations used in the configuration and results (for example

@@ -228,13 +228,8 @@ class Session:
     constructed on their own. Everything a session hands out is returned to the
     caller and passed on explicitly; nothing is discovered from the surroundings.
 
-    Bind the session with `as` and call its factories inside the block:
-
-    ```python
-    with session() as s:
-        fast = s.thread_pool(workers=8)
-        optimize(config, x0, function, pool=fast)
-    ```
+    Bind the session with `as` and call its factories inside the block. See
+    [Running Optimizations](../running/running.md).
 
     Sessions are objects, so opening one inside another is unremarkable: each
     gets its own loop, and pools from different sessions never interact. A
@@ -513,17 +508,9 @@ def session() -> Session:
 
     The session owns one event loop, on a daemon thread, for as long as the
     block is open. Build pools on it with its factories, and pass them to the
-    runs that should use them:
-
-    ```python
-    with session() as s:
-        fast = s.thread_pool(workers=8)
-        optimize(config, x0, function, pool=fast)
-    ```
-
-    Closing the session releases every pool it created, so most code needs no
-    further cleanup. See [Running Optimizations](../running/running.md) for a
-    walkthrough.
+    runs that should use them. Closing the session releases every pool it
+    created, so most code needs no further cleanup. See
+    [Running Optimizations](../running/running.md) for a walkthrough.
 
     Returns:
         A context manager owning the session, which binds the

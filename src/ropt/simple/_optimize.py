@@ -91,8 +91,9 @@ def optimize(  # ruff: ignore[too-many-arguments]
                               [`SharedHandlers`][ropt.simple.SharedHandlers]
                               group. A group is shared: this run feeds it
                               alongside every other run that lists it.
-        report:               An optional callback invoked with an
-                              `FunctionResults` for each function evaluation;
+        report:               An optional callback invoked with a
+                              [`FunctionResults`][ropt.results.FunctionResults]
+                              for each function evaluation;
                               return `True` from it to stop the optimization
                               early with `USER_ABORT`. Reporting stops there,
                               so results after it in the same batch are not
@@ -107,7 +108,7 @@ def optimize(  # ruff: ignore[too-many-arguments]
                               reaches `function` as `context.metadata`.
 
     Returns:
-        A [`OptimizationResult`][ropt.simple.OptimizationResult] describing the outcome.
+        An [`OptimizationResult`][ropt.simple.OptimizationResult] describing the outcome.
     """
     check_pool(pool)
     check_handlers(handlers)
@@ -207,8 +208,9 @@ def optimize_many(  # ruff: ignore[too-many-arguments]
                               work.
         handlers:             Optional [`SharedHandlers`][ropt.simple.SharedHandlers]
                               groups, fed by every run.
-        report:               An optional callback invoked with an
-                              `FunctionResults` for each function evaluation,
+        report:               An optional callback invoked with a
+                              [`FunctionResults`][ropt.results.FunctionResults]
+                              for each function evaluation,
                               either shared by every run or one per run; return
                               `True` from it to stop that run early with
                               `USER_ABORT`.

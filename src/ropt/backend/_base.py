@@ -140,20 +140,10 @@ class Backend(ABC):
         Checks that the options supplied through the
         [`BackendConfig`][ropt.config.BackendConfig] object have the expected
         type, contain only supported keys, and satisfy any method-specific
-        value constraints.
-
-        Concrete backends should implement validation logic for the methods
-        they support, potentially using schema-validation tools such as
-        Pydantic.
-
-        The raised exception must be a ValueError, or derive from a ValueError.
-
-        Note:
-            Backend options may be represented as a dictionary or list,
-            depending on the backend. This method should verify that the type
-            matches what the backend expects and raise a `ValueError` with a
-            clear message when it does not.
+        value constraints. Options are a dictionary or a list, depending on the
+        backend.
 
         Raises:
-            ValueError: If the provided options are invalid.
+            ValueError: If the provided options are invalid. The exception must
+                        be a `ValueError`, or derive from one.
         """

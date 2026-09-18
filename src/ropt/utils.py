@@ -4,8 +4,7 @@ Nothing in `ropt` calls anything here. Three kinds of helper live here: a check
 on the options a backend accepts, for code that builds configurations
 dynamically or checks them before starting a long run; a converter from variable
 bounds to the scales and offsets that a configuration expects; and escape
-hatches for problems that come from outside the library, offered because the fix
-is easy to get wrong and hard to find.
+hatches for problems that come from outside the library.
 """
 
 from __future__ import annotations
@@ -37,7 +36,10 @@ def validate_backend_options(method: str, options: dict[str, Any] | list[str]) -
     Args:
         method:  The specific optimization method name.
         options: The dictionary or a list of strings of options.
-    """
+
+    Raises:
+        ValueError: If the options are not valid for the method.
+    """  # ruff: ignore[docstring-extraneous-exception]
     plugin = get_plugin("backend", method)
     backend_config = BackendConfig.model_validate(
         {"method": method, "options": options}
