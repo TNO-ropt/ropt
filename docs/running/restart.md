@@ -8,10 +8,10 @@ best point the previous run found.
 ## Why restart?
 
 A single optimization run can stop before truly converging — for example
-because it hit its iteration limit while still improving. Restarting simply
+because it hit its iteration limit while still improving. Restarting
 runs [`optimize`][ropt.simple.optimize] again, using the previous result as the
 new start point. Since
-each call to `optimize` is independent, this is just a loop in your own code;
+each call to `optimize` is independent, this is a loop in your own code;
 `ropt` needs nothing special to support it.
 
 ## Collecting every result with a handler

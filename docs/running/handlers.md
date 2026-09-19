@@ -8,7 +8,7 @@ them, tabulating them, or invoking a callback.
 A handler is given [`Results`][ropt.results.Results] objects —
 [`FunctionResults`][ropt.results.FunctionResults] and
 [`GradientResults`][ropt.results.GradientResults] — which is what every other part of the
-simple API hands out too: a `report` callback receives one per evaluation, and
+simple API provides too: a `report` callback receives one per evaluation, and
 `optimize` puts the best one on the `results` field of what it returns.
 Everything a run produces is in them, at the field paths described in
 [Working with Results](results.md), which is the vocabulary the handlers below
@@ -16,7 +16,7 @@ are configured in.
 
 The [`report`](running.md#reporting-progress) callback you may already be using
 is only shorthand for this: `report=` builds a handler for you behind the
-scenes. Where you pass it decides which kind. Given to a run, as
+scenes. Where you pass it determines which kind. Given to a run, as
 `optimize(..., report=...)`, it becomes a **local** handler of that run. Given
 to [`shared_handlers`][ropt.simple.Session.shared_handlers], as
 `shared_handlers(..., report=...)`, it joins that
@@ -77,8 +77,8 @@ feeds two groups from the same set of concurrent runs:
 --8<-- "examples/simple/handlers.py:groups"
 ```
 
-Like a pool, a group lives until its session closes, which releases it and hands
-its handlers back; the same handler objects can then join a group on a later
+Like a pool, a group lives until its session closes, which releases it and its
+handlers; the same handler objects can then join a group on a later
 session.
 
 Closing a group earlier **releases its handlers**. A handler belongs to one

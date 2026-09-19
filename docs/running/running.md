@@ -15,8 +15,8 @@
     [Optimizer Setup](../optimizer_setup/key_concepts.md), the same whichever way you run
     it.
 
-The `ropt.simple` module is the recommended entry point for running an
-optimization. Everything you need is imported from a single module:
+The `ropt.simple` module covers running an optimization. Everything you need is
+imported from a single module:
 
 ```python
 from ropt.simple import optimize
@@ -189,7 +189,7 @@ You can attach arbitrary **metadata** to a run, from two sources:
 
   The same dict also reaches the evaluation function itself, as
   `context.metadata` — useful when the evaluation needs to know which run it is
-  part of. With `optimize_many`, this is the natural way to tell runs apart:
+  part of. With `optimize_many`, this is how runs are told apart:
   give one dict (shared by all runs) or a list with one dict per run; see
   [Give each run an ID](parallel.md#many-optimizations-at-once).
 

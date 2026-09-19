@@ -69,7 +69,7 @@ machine's core count.
     [Nested Optimization](nested.md#two-pools-not-one).
 
     `workers` and `bundle_size` are the two halves of matching work to capacity.
-    `workers` says how many tasks may be in flight; `bundle_size` says how much
+    `workers` sets how many tasks may be in flight; `bundle_size` sets how much
     work one task should carry. With a batch of 100 cheap evaluations and
     8 workers, the default sends 100 separate tasks and pays 100 transfer costs
     to keep 8 workers busy; `bundle_size=13` sends 8 and pays 8. Raise it when
@@ -92,7 +92,7 @@ with session() as s:
 !!! note "Pools inside an evaluation"
     An evaluation function may start a run of its own, but open its pool
     **once**, in the calling code, and pass it to every evaluation. Opening one
-    per evaluation gives each a budget nobody else knows about: ten evaluations
+    per evaluation gives each a budget separate from every other: ten evaluations
     each opening a ten-worker pool put a hundred workers on the machine, where
     one shared pool puts ten. Which pool it may be is a separate question, and
     the rules are in
@@ -209,8 +209,8 @@ evaluation is a job rather than a function call:
 
 !!! note "Where the working directory goes"
     With no `workdir`, the pool works in a temporary directory of its own and
-    removes it when it closes — but only when there is nothing left in it worth
-    reading. If an evaluation **failed**, its captured output is kept, so the
+    removes it when it closes, unless something in it is still readable. If an
+    evaluation **failed**, its captured output is kept, so the
     directory is kept with it and its path is logged:
 
     ```
@@ -337,7 +337,7 @@ pool = s.hpc_pool(
 ```
 
 For `account` to have any effect the script must reference it. A variable a
-script never mentions is simply ignored, and one the script mentions but nobody
+script never mentions is ignored, and one the script mentions but nobody
 supplies renders as empty — so a misspelling on either side drops the directive
 silently rather than failing. Entries that are `None` are dropped, so omitting a
 key and passing `None` mean the same thing. A name the executor sets itself,
@@ -349,10 +349,10 @@ queue allows quietly gets you the queue's maximum.
 
 #### Submitting with your own template
 
-A `template` is simply the script that gets run on the cluster, written by you
+A `template` is the script that gets run on the cluster, written by you
 instead of taken from a configuration. Since there is no configuration to say
-what kind of cluster this is, `scheduler` tells ropt which queueing system to
-submit to — that is what decides whether it runs `sbatch` or `bsub`. It defaults
+what kind of cluster this is, `scheduler` names the queueing system to
+submit to — that is what determines whether it runs `sbatch` or `bsub`. It defaults
 to `"slurm"`.
 
 Nothing else is resolved for you: **the queue is not an argument here**, it has
@@ -421,7 +421,7 @@ evaluations happen in-process on the calling thread. It needs no session, and
 needs no releasing.
 
 Use it to give several runs one continuous batch-ID sequence without running
-their evaluations in parallel, or simply to say in the code that a run is meant
+their evaluations in parallel, or to state in the code that a run is meant
 to evaluate in-process.
 
 ### Which pool should I use? { #which-pool }
@@ -509,7 +509,7 @@ item is sent, rather than failing somewhere deep inside the run.
 
 ## Stopping a run
 
-Press Ctrl-C, or close the pool, and `ropt` stops handing out new work at once.
+Press Ctrl-C, or close the pool, and `ropt` stops dispatching new work at once.
 What happens to the evaluations already running depends on the pool, because
 what *can* be done to them differs:
 
@@ -584,7 +584,7 @@ There are two independent levels of concurrency here:
   This is built into `optimize_many` and does not depend on the pool;
   the `limit` argument caps how many run at the same time.
 - **The function evaluations** inside those runs all happen on the one pool you
-  pass, and the pool decides how they are parallelized. With
+  pass, and the pool determines how they are parallelized. With
   `thread_pool(workers=1)` the runs still progress together, but their
   evaluations are executed one at a time. A larger pool — `thread_pool(workers=n)`,
   `process_pool`, `local_pool`, or `hpc_pool` — runs several evaluations at
@@ -603,7 +603,8 @@ each with its own metadata:
 ```
 
 The two callback arguments differ in the same way. `report=` is **per run**: one
-callback watches every run, or pass a list with one callback per run. `handlers=`
+callback receives the results of every run, or pass a list with one callback per
+run. `handlers=`
 is **shared**: one list of groups that all runs feed together, which is why a
 plain handler is refused there — see [Sharing a handler across concurrent
 runs](handlers.md#sharing-a-handler-across-concurrent-runs).

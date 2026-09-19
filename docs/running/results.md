@@ -8,8 +8,8 @@ delivered to your code.
 
 !!! note "One kind of result object"
 
-    [`Results`][ropt.results.Results] is the record every part of `ropt` hands
-    out: one object per variable vector evaluated, carrying every field
+    [`Results`][ropt.results.Results] is the record every part of `ropt`
+    returns: one object per variable vector evaluated, carrying every field
     described below. Result handlers receive these, a `report` callback is given
     one per evaluation, [`evaluate`][ropt.simple.evaluate] returns one, and
     [`optimize`](running.md) puts the best one on the `results` field of the
@@ -809,5 +809,5 @@ batch_id  metadata.run_id  target_objective
     at different granularities — for example a per-batch gradient with
     per-perturbation evaluations — by repeating the coarser values across the
     finer rows. Pandas cannot align such fields and returns them as disjoint
-    blocks of rows padded with missing values instead, so prefer polars when a
-    single table has to mix granularities.
+    blocks of rows padded with missing values instead. Only polars produces a
+    single table that mixes granularities.
