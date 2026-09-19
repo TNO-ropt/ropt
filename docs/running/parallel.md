@@ -343,9 +343,12 @@ silently rather than failing. Entries that are `None` are dropped, so omitting a
 key and passing `None` mean the same thing. A name the executor sets itself,
 such as `cores` or `queue`, is rejected rather than allowed to override it.
 
-With a configuration, `cores` and `run_time_max` are also **clamped** to the
-selected queue's limits rather than rejected: asking for more cores than the
-queue allows quietly gets you the queue's maximum.
+With a configuration, resource requests are **clamped** to the selected queue's
+limits rather than rejected: asking for more cores than the queue allows quietly
+gets you the queue's maximum. `cores` is held to the queue's minimum and
+maximum, `run_time_max` to its maximum — and takes that maximum when you give no
+value at all — and `memory_max` to its maximum, but only when you pass a number.
+A memory string such as `"4G"` is passed to the submission script unchanged.
 
 #### Submitting with your own template
 

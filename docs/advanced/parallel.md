@@ -306,7 +306,7 @@ cannot be reached the failure is logged and stopping continues.
 | `template`    | A submission script template, submitted instead of any configuration.    |
 | `scheduler`   | The queueing system a `template` is written for, e.g. `"slurm"` (default). Only meaningful with a `template`.|
 | `cores`       | CPUs per work item (default: 1).                                         |
-| `memory_max`  | Memory per work item. Rendered by the submission script, and clamped to the queue's limit when there is a configuration. |
+| `memory_max`  | Memory per work item. Rendered by the submission script, and clamped to the queue's limit when there is a configuration and the value is a number rather than a string. |
 | `run_time_max` | Run time per work item, typically in seconds. Defaults to the queue's own limit. |
 | `submit_options` | Extra variables for the submission script, for whatever it declares beyond the standard names. `None` entries are dropped. |
 | `retries`     | Extra polls to wait for a result that is missing or unreadable (default: 30). |

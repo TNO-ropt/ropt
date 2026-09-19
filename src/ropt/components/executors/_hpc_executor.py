@@ -93,6 +93,22 @@ class HPCExecutor(JobExecutorBase):
         that cannot be reached; the grace period each allows is its count times
         `interval`.
 
+        `config_path` is the directory holding `queue.yaml` or `clusters.yaml`,
+        and defaults to the configuration installed alongside `ropt`; `cluster`
+        and `queue` default to the configured primary. `scheduler` is what
+        `pysqa` calls `queue_type`, defaults to `"slurm"`, and is meaningful
+        only with a `template`, which must itself carry everything the scheduler
+        needs, the partition included.
+
+        With a configuration, `cores` is clamped to the queue's minimum and
+        maximum, `run_time_max` to its maximum and defaults to it when not
+        given, and a numeric `memory_max` to its maximum — a string such as
+        `"4G"` is passed through unchanged. Entries of `submit_options` that are
+        `None` are dropped, so omitting a key and passing `None` mean the same
+        thing; a name the executor sets itself is rejected. A work item that
+        failed keeps its captured output even under `cleanup`, which is the only
+        record of why.
+
         See [Parallel Evaluation](../advanced/parallel.md#hpcexecutor) for
         configuration details.
 
