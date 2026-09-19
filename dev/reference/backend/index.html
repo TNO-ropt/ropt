@@ -3658,8 +3658,7 @@ should be mapped to the backend's actual default method.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Configuration object specifying the backend method
-and any method-specific options.</p>
+                <p>Configuration specifying the method and its options.</p>
               </div>
             </td>
             <td>
@@ -3709,6 +3708,9 @@ and any method-specific options.</p>
 implementation uses <code>optimizer_callback</code> to request any objective,
 constraint, or gradient evaluations its algorithm needs.</p>
 <p>Called at most once per backend instance.</p>
+<p><code>evaluation_policy</code> is whether functions and gradients should be asked
+for together (<code>"speculative"</code>), in separate calls (<code>"separate"</code>), or as
+the algorithm happens to need them (<code>"auto"</code>).</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3747,8 +3749,7 @@ constraint, or gradient evaluations its algorithm needs.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Callback used to request objective, constraint,
-                and gradient evaluations from the <code>ropt</code> core.</p>
+                <p>Callback for requesting evaluations from <code>ropt</code>.</p>
               </div>
             </td>
             <td>
@@ -3764,10 +3765,7 @@ constraint, or gradient evaluations its algorithm needs.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Whether functions and gradients should be asked
-                for together (<code>"speculative"</code>), in separate
-                calls (<code>"separate"</code>), or as the algorithm
-                happens to need them (<code>"auto"</code>).</p>
+                <p>How functions and gradients are requested.</p>
               </div>
             </td>
             <td>
@@ -3783,8 +3781,7 @@ constraint, or gradient evaluations its algorithm needs.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Directory for any files the optimizer writes,
-                or <code>None</code> if none was configured.</p>
+                <p>Directory for files the optimizer writes, or <code>None</code>.</p>
               </div>
             </td>
             <td>
@@ -3889,7 +3886,7 @@ cost of being wrong the other way is output escaping to the terminal.</p>
 <a class="autorefs autorefs-internal" title="            BackendConfig" href="../config/#ropt.config.BackendConfig"><code>BackendConfig</code></a> object have the expected
 type, contain only supported keys, and satisfy any method-specific
 value constraints. Options are a dictionary or a list, depending on the
-backend.</p>
+backend. The exception raised must be a <code>ValueError</code>, or derive from one.</p>
 
 
 <p><span class="doc-section-title">Raises:</span></p>
@@ -3907,8 +3904,7 @@ backend.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If the provided options are invalid. The exception must
-        be a <code>ValueError</code>, or derive from one.</p>
+                <p>If the provided options are invalid.</p>
               </div>
             </td>
           </tr>
@@ -4338,8 +4334,7 @@ one, and a constraint with no finite bound none.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Maps each constraint type to the methods
-                   that support it.</p>
+                <p>The methods supporting each constraint type.</p>
               </div>
             </td>
             <td>
@@ -4355,8 +4350,7 @@ one, and a constraint with no finite bound none.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Maps each constraint type to the methods
-                   that require it.</p>
+                <p>The methods requiring each constraint type.</p>
               </div>
             </td>
             <td>
@@ -4382,9 +4376,7 @@ one, and a constraint with no finite bound none.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If a constraint present in the problem is not
-              supported by the method, or a constraint the
-              method requires is absent.</p>
+                <p>If the constraints do not match the method.</p>
               </div>
             </td>
           </tr>
@@ -4860,6 +4852,8 @@ be sent as well.</p>
     <div class="doc doc-contents ">
 
         <p>Initialize the external backend.</p>
+<p>The <code>method</code> field of the configuration must be prefixed with
+<code>external/</code>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -4882,8 +4876,7 @@ be sent as well.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The backend configuration; its <code>method</code> field must
-            be prefixed with <code>external/</code>.</p>
+                <p>The backend configuration.</p>
               </div>
             </td>
             <td>
@@ -5209,8 +5202,7 @@ appended or incremented until a non-existing path is found.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Parent directory. If <code>None</code>, the path is relative to the
-       current working directory.</p>
+                <p>Parent directory, or <code>None</code> for the working directory.</p>
               </div>
             </td>
             <td>

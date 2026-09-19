@@ -4461,6 +4461,8 @@ details on selection criteria and scaling.</p>
     <div class="doc doc-contents ">
 
         <p>Initialize the ResultsHandler.</p>
+<p>Constraint violations are compared in the domain the optimizer works in,
+so a scale applies to them as well.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -4499,10 +4501,7 @@ details on selection criteria and scaling.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional threshold for filtering constraint
-                  violations. Violations are compared in the
-                  domain the optimizer works in, so a scale
-                  applies to them as well.</p>
+                <p>Optional threshold for constraint violations.</p>
               </div>
             </td>
             <td>
@@ -5126,6 +5125,8 @@ handler with <code>run_in_thread=True</code> on the
     <div class="doc doc-contents ">
 
         <p>Register a new table to be populated from incoming results.</p>
+<p>Column keys are result-field attribute names, in dotted attribute
+syntax.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -5164,8 +5165,7 @@ handler with <code>run_in_thread=True</code> on the
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Whether this table is filled from function results
-        (<code>"functions"</code>) or gradient results (<code>"gradients"</code>).</p>
+                <p>Fill from <code>"functions"</code> or from <code>"gradients"</code>.</p>
               </div>
             </td>
             <td>
@@ -5181,8 +5181,7 @@ handler with <code>run_in_thread=True</code> on the
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Mapping from result-field attribute names (using dotted
-        attribute syntax) to display titles.</p>
+                <p>Mapping from field paths to display titles.</p>
               </div>
             </td>
             <td>
@@ -5934,8 +5933,7 @@ Pass <code>run_in_thread=True</code> for handlers that perform blocking I/O; see
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If True, dispatch via the dispatcher's thread pool
-           instead of the event loop.</p>
+                <p>Dispatch via the thread pool instead of the loop.</p>
               </div>
             </td>
             <td>
@@ -6076,6 +6074,8 @@ dispatcher or registered with a compute step.</p>
 <p>Events are handled in submission order. A handler exception is
 re-raised here, on the caller's own stack. See
 <a href="../../advanced/workflows/#handler-failures">Handler failures</a>.</p>
+<p>Calling this from the thread running the dispatcher's event loop, or
+from one of its handler threads, would deadlock and raises instead.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -6129,9 +6129,7 @@ re-raised here, on the caller's own stack. See
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If the dispatcher is not running, or if the call is
-           made from the thread running its event loop, or from
-           one of its handler threads.</p>
+                <p>If the dispatcher is not running, or would deadlock.</p>
               </div>
             </td>
           </tr>

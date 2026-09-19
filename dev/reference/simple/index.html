@@ -4723,6 +4723,18 @@ the run is started from, including a thread you spawn yourself.</p>
 because its session ended — is refused here with a
 <a class="autorefs autorefs-internal" title="            WorkflowError" href="../exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a>, as is one carried into
 a worker process, where it cannot work at all.</p>
+<p>Without a <code>pool</code> the evaluations run in-process, on the calling thread. A
+run started from inside an evaluation needs a <em>different</em> pool: the pool it
+is already running on refuses the work.</p>
+<p><code>handlers</code> mixes two kinds. An
+<a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventHandler" href="../components_event_handlers/#ropt.components.event_handlers.EventHandler"><code>EventHandler</code></a> is local: it
+is claimed for the duration of this run, and may be reused by a later run to
+accumulate results, but not shared with a concurrent one, and never
+afterwards with a <a class="autorefs autorefs-internal" title="            ropt.simple.SharedHandlers" href="#ropt.simple.SharedHandlers"><code>SharedHandlers</code></a> group. A
+group is shared: this run feeds it alongside every other run that lists it.</p>
+<p>Returning <code>True</code> from <code>report</code> stops the optimization early with
+<code>USER_ABORT</code>. Reporting stops there, so results after it in the same batch
+are not passed on.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -4793,13 +4805,7 @@ a worker process, where it cannot work at all.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The pool to evaluate on, from a session factory
-                  such as
-                  <a class="autorefs autorefs-internal" title="            thread_pool" href="#ropt.simple.Session.thread_pool"><code>thread_pool</code></a>.
-                  Without one the evaluations run in-process, on
-                  the calling thread. A run started from inside an
-                  evaluation needs a <em>different</em> pool: the pool it
-                  is already running on refuses the work.</p>
+                <p>The pool to evaluate on, from a session factory.</p>
               </div>
             </td>
             <td>
@@ -4815,15 +4821,7 @@ a worker process, where it cannot work at all.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional result handlers, mixing two kinds. An
-                  <a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventHandler" href="../components_event_handlers/#ropt.components.event_handlers.EventHandler"><code>EventHandler</code></a>
-                  is local: it is claimed for the duration of this
-                  run, and may be reused by a later run to
-                  accumulate results, but not shared with a
-                  concurrent one, and never afterwards with a
-                  <a class="autorefs autorefs-internal" title="            ropt.simple.SharedHandlers" href="#ropt.simple.SharedHandlers"><code>SharedHandlers</code></a>
-                  group. A group is shared: this run feeds it
-                  alongside every other run that lists it.</p>
+                <p>Optional local handlers and shared groups.</p>
               </div>
             </td>
             <td>
@@ -4844,18 +4842,7 @@ a worker process, where it cannot work at all.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>An optional callback invoked with a
-                  <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
-
-
-  
-      dataclass
-  " href="../results/#ropt.results.FunctionResults"><code>FunctionResults</code></a>
-                  for each function evaluation;
-                  return <code>True</code> from it to stop the optimization
-                  early with <code>USER_ABORT</code>. Reporting stops there,
-                  so results after it in the same batch are not
-                  passed on.</p>
+                <p>Optional callback invoked per function evaluation.</p>
               </div>
             </td>
             <td>
@@ -4871,10 +4858,7 @@ a worker process, where it cannot work at all.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The tolerance within which a constraint is
-                  considered satisfied. Violations are compared in
-                  the domain the optimizer works in, so a scale
-                  applies to them as well.</p>
+                <p>The tolerance within which a constraint is satisfied.</p>
               </div>
             </td>
             <td>
@@ -4890,15 +4874,7 @@ a worker process, where it cannot work at all.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>An optional dictionary attached to every
-                  <a class="autorefs autorefs-internal" title="            ropt.results.Results
-
-
-  
-      dataclass
-  " href="../results/#ropt.results.Results"><code>Results</code></a> this run emits,
-                  for example to tag or identify the run. It also
-                  reaches <code>function</code> as <code>context.metadata</code>.</p>
+                <p>Optional dictionary attached to every emitted result.</p>
               </div>
             </td>
             <td>
@@ -4998,6 +4974,11 @@ run, or broadcast to all of them.</p>
 because its session ended — is refused here with a
 <a class="autorefs autorefs-internal" title="            WorkflowError" href="../exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a>, as is one carried into
 a worker process, where it cannot work at all.</p>
+<p>A run started from inside an evaluation needs a <em>different</em> pool: the pool
+it is already running on refuses the work. Returning <code>True</code> from a <code>report</code>
+callback stops that run early with <code>USER_ABORT</code>. <code>metadata</code> also reaches
+each run's <code>function</code> as <code>context.metadata</code>, which makes it a way to tag a
+run, for example with <code>{"run_id": i}</code>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -5068,14 +5049,7 @@ a worker process, where it cannot work at all.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The pool every run evaluates on, from a session
-                  factory such as
-                  <a class="autorefs autorefs-internal" title="            thread_pool" href="#ropt.simple.Session.thread_pool"><code>thread_pool</code></a>.
-                  Without one the evaluations run in-process, each
-                  on its own driver thread. A run started from
-                  inside an evaluation needs a <em>different</em> pool:
-                  the pool it is already running on refuses the
-                  work.</p>
+                <p>The pool every run evaluates on.</p>
               </div>
             </td>
             <td>
@@ -5091,8 +5065,7 @@ a worker process, where it cannot work at all.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional <a class="autorefs autorefs-internal" title="            ropt.simple.SharedHandlers" href="#ropt.simple.SharedHandlers"><code>SharedHandlers</code></a>
-                  groups, fed by every run.</p>
+                <p>Optional shared groups, fed by every run.</p>
               </div>
             </td>
             <td>
@@ -5118,17 +5091,7 @@ a worker process, where it cannot work at all.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>An optional callback invoked with a
-                  <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
-
-
-  
-      dataclass
-  " href="../results/#ropt.results.FunctionResults"><code>FunctionResults</code></a>
-                  for each function evaluation,
-                  either shared by every run or one per run; return
-                  <code>True</code> from it to stop that run early with
-                  <code>USER_ABORT</code>.</p>
+                <p>Optional callback per evaluation, shared or one per run.</p>
               </div>
             </td>
             <td>
@@ -5160,10 +5123,7 @@ a worker process, where it cannot work at all.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The tolerance within which a constraint is
-                  considered satisfied. Violations are compared in
-                  the domain the optimizer works in, so a scale
-                  applies to them as well.</p>
+                <p>The tolerance within which a constraint is satisfied.</p>
               </div>
             </td>
             <td>
@@ -5179,17 +5139,7 @@ a worker process, where it cannot work at all.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>An optional dictionary attached to every
-                  <a class="autorefs autorefs-internal" title="            ropt.results.Results
-
-
-  
-      dataclass
-  " href="../results/#ropt.results.Results"><code>Results</code></a> a run emits,
-                  shared by all runs or given one per run — for
-                  example to tag each run with <code>{"run_id": i}</code>. It
-                  also reaches each run's <code>function</code> as
-                  <code>context.metadata</code>.</p>
+                <p>Optional dictionary attached to every emitted result.</p>
               </div>
             </td>
             <td>
@@ -5292,6 +5242,17 @@ walkthrough.</p>
 because its session ended — is refused here with a
 <a class="autorefs autorefs-internal" title="            WorkflowError" href="../exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a>, as is one carried into
 a worker process, where it cannot work at all.</p>
+<p>Without a <code>pool</code> the evaluations run in-process, on the calling thread. A
+run started from inside an evaluation needs a <em>different</em> pool: the pool it
+is already running on refuses the work. <code>handlers</code> mixes local
+<a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventHandler" href="../components_event_handlers/#ropt.components.event_handlers.EventHandler"><code>EventHandler</code></a> objects with
+shared <a class="autorefs autorefs-internal" title="            ropt.simple.SharedHandlers" href="#ropt.simple.SharedHandlers"><code>SharedHandlers</code></a> groups, as
+<a class="autorefs autorefs-internal" title="            ropt.simple.optimize" href="#ropt.simple.optimize"><code>optimize</code></a> takes them.</p>
+<p>An evaluation is a single batch that has already run by the time <code>report</code>
+sees it, and there is no optimizer loop to interrupt, so unlike on
+<a class="autorefs autorefs-internal" title="            ropt.simple.optimize" href="#ropt.simple.optimize"><code>optimize</code></a> returning <code>True</code> cannot stop anything: it
+only ends the reporting, and every result is still returned. <code>metadata</code> also
+reaches <code>function</code> as <code>context.metadata</code>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -5362,11 +5323,7 @@ a worker process, where it cannot work at all.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The pool to evaluate on, from a session factory such as
-       <a class="autorefs autorefs-internal" title="            thread_pool" href="#ropt.simple.Session.thread_pool"><code>thread_pool</code></a>. Without one
-       the evaluations run in-process, on the calling thread. A run
-       started from inside an evaluation needs a <em>different</em> pool:
-       the pool it is already running on refuses the work.</p>
+                <p>The pool to evaluate on, from a session factory.</p>
               </div>
             </td>
             <td>
@@ -5382,11 +5339,7 @@ a worker process, where it cannot work at all.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional result handlers, mixing local
-       <a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventHandler" href="../components_event_handlers/#ropt.components.event_handlers.EventHandler"><code>EventHandler</code></a>
-       objects with shared
-       <a class="autorefs autorefs-internal" title="            ropt.simple.SharedHandlers" href="#ropt.simple.SharedHandlers"><code>SharedHandlers</code></a> groups, as
-       <a class="autorefs autorefs-internal" title="            ropt.simple.optimize" href="#ropt.simple.optimize"><code>optimize</code></a> takes them.</p>
+                <p>Optional local handlers and shared groups.</p>
               </div>
             </td>
             <td>
@@ -5407,19 +5360,7 @@ a worker process, where it cannot work at all.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>An optional callback invoked with a
-       <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
-
-
-  
-      dataclass
-  " href="../results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> for
-       each evaluation. An evaluation is a single batch that has
-       already run by the time the callback sees it, and there is no
-       optimizer loop to interrupt, so unlike on
-       <a class="autorefs autorefs-internal" title="            ropt.simple.optimize" href="#ropt.simple.optimize"><code>optimize</code></a> returning <code>True</code> cannot
-       stop anything: it only ends the reporting, and every result
-       is still returned.</p>
+                <p>Optional callback invoked with each evaluation's results.</p>
               </div>
             </td>
             <td>
@@ -5435,14 +5376,7 @@ a worker process, where it cannot work at all.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>An optional dictionary attached to the emitted
-       <a class="autorefs autorefs-internal" title="            ropt.results.Results
-
-
-  
-      dataclass
-  " href="../results/#ropt.results.Results"><code>Results</code></a>. It also reaches
-       <code>function</code> as <code>context.metadata</code>.</p>
+                <p>Optional dictionary attached to the emitted results.</p>
               </div>
             </td>
             <td>
@@ -5544,6 +5478,17 @@ walkthrough.</p>
 because its session ended — is refused here with a
 <a class="autorefs autorefs-internal" title="            WorkflowError" href="../exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a>, as is one carried into
 a worker process, where it cannot work at all.</p>
+<p>Without a <code>pool</code> the evaluations run in-process, on the calling thread. A
+run started from inside an evaluation needs a <em>different</em> pool: the pool it
+is already running on refuses the work. <code>handlers</code> mixes local
+<a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventHandler" href="../components_event_handlers/#ropt.components.event_handlers.EventHandler"><code>EventHandler</code></a> objects with
+shared <a class="autorefs autorefs-internal" title="            ropt.simple.SharedHandlers" href="#ropt.simple.SharedHandlers"><code>SharedHandlers</code></a> groups, as
+<a class="autorefs autorefs-internal" title="            ropt.simple.optimize" href="#ropt.simple.optimize"><code>optimize</code></a> takes them.</p>
+<p>An evaluation is a single batch that has already run by the time <code>report</code>
+sees it, and there is no optimizer loop to interrupt, so unlike on
+<a class="autorefs autorefs-internal" title="            ropt.simple.optimize" href="#ropt.simple.optimize"><code>optimize</code></a> returning <code>True</code> cannot stop anything: it
+only ends the reporting, and every result is still returned. <code>metadata</code> also
+reaches <code>function</code> as <code>context.metadata</code>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -5614,11 +5559,7 @@ a worker process, where it cannot work at all.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The pool to evaluate on, from a session factory such as
-       <a class="autorefs autorefs-internal" title="            thread_pool" href="#ropt.simple.Session.thread_pool"><code>thread_pool</code></a>. Without one
-       the evaluations run in-process, on the calling thread. A run
-       started from inside an evaluation needs a <em>different</em> pool:
-       the pool it is already running on refuses the work.</p>
+                <p>The pool to evaluate on, from a session factory.</p>
               </div>
             </td>
             <td>
@@ -5634,11 +5575,7 @@ a worker process, where it cannot work at all.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional result handlers, mixing local
-       <a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventHandler" href="../components_event_handlers/#ropt.components.event_handlers.EventHandler"><code>EventHandler</code></a>
-       objects with shared
-       <a class="autorefs autorefs-internal" title="            ropt.simple.SharedHandlers" href="#ropt.simple.SharedHandlers"><code>SharedHandlers</code></a> groups, as
-       <a class="autorefs autorefs-internal" title="            ropt.simple.optimize" href="#ropt.simple.optimize"><code>optimize</code></a> takes them.</p>
+                <p>Optional local handlers and shared groups.</p>
               </div>
             </td>
             <td>
@@ -5659,19 +5596,7 @@ a worker process, where it cannot work at all.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>An optional callback invoked with a
-       <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
-
-
-  
-      dataclass
-  " href="../results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> for
-       each evaluation. An evaluation is a single batch that has
-       already run by the time the callback sees it, and there is no
-       optimizer loop to interrupt, so unlike on
-       <a class="autorefs autorefs-internal" title="            ropt.simple.optimize" href="#ropt.simple.optimize"><code>optimize</code></a> returning <code>True</code> cannot
-       stop anything: it only ends the reporting, and every result
-       is still returned.</p>
+                <p>Optional callback invoked with each evaluation's results.</p>
               </div>
             </td>
             <td>
@@ -5687,14 +5612,7 @@ a worker process, where it cannot work at all.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>An optional dictionary attached to every emitted
-       <a class="autorefs autorefs-internal" title="            ropt.results.Results
-
-
-  
-      dataclass
-  " href="../results/#ropt.results.Results"><code>Results</code></a>. It also reaches
-       <code>function</code> as <code>context.metadata</code>.</p>
+                <p>Optional dictionary attached to every emitted result.</p>
               </div>
             </td>
             <td>
@@ -5939,8 +5857,7 @@ a worker process, where it cannot work at all.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional dictionary containing additional information
-         about the evaluation.</p>
+                <p>Optional dictionary with extra information.</p>
               </div>
             </td>
           </tr>
@@ -6006,17 +5923,7 @@ created, so most code needs no further cleanup. See
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A context manager owning the session, which binds the</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.simple.Session (ropt.simple._session.Session)" href="#ropt.simple.Session">Session</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p><a class="autorefs autorefs-internal" title="            ropt.simple.Session" href="#ropt.simple.Session"><code>Session</code></a> itself when used with <code>as</code>.</p>
+                <p>A context manager binding the <a class="autorefs autorefs-internal" title="            ropt.simple.Session" href="#ropt.simple.Session"><code>Session</code></a>.</p>
               </div>
             </td>
           </tr>
@@ -6210,6 +6117,9 @@ closed it cannot be reopened.</p>
 
         <p>Create a pool that runs evaluations in worker threads.</p>
 <p>See <a href="../../running/running/">Running Optimizations</a> for a walkthrough.</p>
+<p><code>bundle_size</code> matters more on a
+<a class="autorefs autorefs-internal" title="            process_pool" href="#ropt.simple.Session.process_pool"><code>process_pool</code></a>, where a task is
+transferred between processes.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -6248,10 +6158,7 @@ closed it cannot be reopened.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>How many evaluations go to a worker as one task, <code>0</code>
-         for the whole batch. See
-         <a class="autorefs autorefs-internal" title="            process_pool" href="#ropt.simple.Session.process_pool"><code>process_pool</code></a>,
-         where it matters more.</p>
+                <p>Evaluations per task, <code>0</code> for the whole batch.</p>
               </div>
             </td>
             <td>
@@ -6316,6 +6223,13 @@ closed it cannot be reopened.</p>
 program an evaluation started itself keeps running, without an error
 being raised; use <a class="autorefs autorefs-internal" title="            local_pool" href="#ropt.simple.Session.local_pool"><code>local_pool</code></a> where
 an evaluation launches external programs.</p>
+<p>Every task is transferred to a worker separately, and the evaluations
+within one run after another, so <code>bundle_size</code> is a trade between
+spreading a batch and the cost of moving it. The default of 1 gives
+every evaluation its own task, spreading a batch as widely as the
+workers allow; a larger value groups that many per task; and <code>0</code> sends
+the whole batch as a single task, which suits a pool whose parallelism
+comes from the runs above it rather than from within a batch.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -6354,16 +6268,7 @@ an evaluation launches external programs.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>How many evaluations go to a worker as one task. Every
-         task is transferred to a worker separately, and the
-         evaluations within one run after another, so this is a
-         trade between spreading a batch and the cost of moving
-         it. The default of 1 gives every evaluation its own
-         task, spreading a batch as widely as the workers allow;
-         a larger value groups that many per task; and <code>0</code> sends
-         the whole batch as a single task, which suits a pool
-         whose parallelism comes from the runs above it rather
-         than from within a batch.</p>
+                <p>Evaluations per task, <code>0</code> for the whole batch.</p>
               </div>
             </td>
             <td>
@@ -6438,6 +6343,11 @@ the <code>ropt[cloudpickle]</code> extra must be installed — which is the
 recommended way to use this pool.</p>
 <p>POSIX only. See <a href="../../running/running/">Running Optimizations</a> for a
 walkthrough.</p>
+<p>The default <code>workdir</code> is a temporary directory that is removed when the
+pool closes, unless an evaluation failed, in which case it is kept, with
+that evaluation's output in it, and its path logged. The <code>retries</code>
+default of <code>0</code> is enough here: a local job writes its result before it
+exits.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -6476,11 +6386,7 @@ walkthrough.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The directory holding each evaluation's files. The
-         default is a temporary directory that is removed when
-         the pool closes — unless an evaluation failed, in which
-         case it is kept, with that evaluation's output in it,
-         and its path logged.</p>
+                <p>The directory holding each evaluation's files.</p>
               </div>
             </td>
             <td>
@@ -6496,8 +6402,7 @@ walkthrough.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Extra polls to wait for a result. The default of <code>0</code> is
-         enough: a local job writes its result before it exits.</p>
+                <p>Extra polls to wait for a result.</p>
               </div>
             </td>
             <td>
@@ -6513,10 +6418,7 @@ walkthrough.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>How many evaluations go to a worker as one task, <code>0</code>
-         for the whole batch. See
-         <a class="autorefs autorefs-internal" title="            process_pool" href="#ropt.simple.Session.process_pool"><code>process_pool</code></a>;
-         each task here is a local process.</p>
+                <p>Evaluations per task, <code>0</code> for the whole batch.</p>
               </div>
             </td>
             <td>
@@ -6816,10 +6718,7 @@ configuration layout and Slurm examples.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>How many evaluations go to a worker as one task, <code>0</code>
-            for the whole batch. See
-            <a class="autorefs autorefs-internal" title="            process_pool" href="#ropt.simple.Session.process_pool"><code>process_pool</code></a>;
-            each task here is a cluster job.</p>
+                <p>Evaluations per task, <code>0</code> for the whole batch.</p>
               </div>
             </td>
             <td>
@@ -6940,6 +6839,14 @@ feed several groups, and mix them with handlers of its own.</p>
 to a run as a local handler cannot join a group at all; decide per
 handler whether it is local or shared. See
 <a href="../../running/running/">Running Optimizations</a> for a walkthrough.</p>
+<p>Handlers run on the session's event-loop thread unless listed in
+<code>threaded</code>. Running one on a worker thread only helps if it spends real
+time in blocking, GIL-releasing I/O (files, databases, network); for
+in-memory work it gives no benefit under CPython's GIL. See
+<a href="../../running/handlers/#running-a-handler-in-a-thread">Result Handlers</a>.</p>
+<p>Returning <code>True</code> from <code>report</code> stops the emitting run early with
+<code>USER_ABORT</code> if it is an optimization; an evaluation has no optimizer
+loop to interrupt, so there the return value is ignored.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -6962,8 +6869,7 @@ handler whether it is local or shared. See
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The result handlers to share, each run on the session's
-      event-loop thread.</p>
+                <p>The result handlers to share.</p>
               </div>
             </td>
             <td>
@@ -6979,12 +6885,7 @@ handler whether it is local or shared. See
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Handlers (one, or a sequence) to run on a worker thread
-      instead of the loop. This only helps handlers that spend
-      real time in blocking, GIL-releasing I/O (files,
-      databases, network); for in-memory work it gives no
-      benefit under CPython's GIL. See
-      <a href="../../running/handlers/#running-a-handler-in-a-thread">Result Handlers</a>.</p>
+                <p>Handlers to run on a worker thread instead of the loop.</p>
               </div>
             </td>
             <td>
@@ -7005,12 +6906,7 @@ handler whether it is local or shared. See
             </td>
             <td>
               <div class="doc-md-description">
-                <p>An optional callback invoked with a <code>FunctionResults</code> for
-      each function evaluation across the group's runs.
-      Returning <code>True</code> stops the emitting run early with
-      <code>USER_ABORT</code> if it is an optimization; an evaluation has
-      no optimizer loop to interrupt, so there the return value
-      is ignored.</p>
+                <p>Optional callback invoked per evaluation across the group.</p>
               </div>
             </td>
             <td>
@@ -8275,6 +8171,8 @@ details on selection criteria and scaling.</p>
     <div class="doc doc-contents ">
 
         <p>Initialize the ResultsHandler.</p>
+<p>Constraint violations are compared in the domain the optimizer works in,
+so a scale applies to them as well.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -8313,10 +8211,7 @@ details on selection criteria and scaling.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional threshold for filtering constraint
-                  violations. Violations are compared in the
-                  domain the optimizer works in, so a scale
-                  applies to them as well.</p>
+                <p>Optional threshold for constraint violations.</p>
               </div>
             </td>
             <td>
@@ -8940,6 +8835,8 @@ handler with <code>run_in_thread=True</code> on the
     <div class="doc doc-contents ">
 
         <p>Register a new table to be populated from incoming results.</p>
+<p>Column keys are result-field attribute names, in dotted attribute
+syntax.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -8978,8 +8875,7 @@ handler with <code>run_in_thread=True</code> on the
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Whether this table is filled from function results
-        (<code>"functions"</code>) or gradient results (<code>"gradients"</code>).</p>
+                <p>Fill from <code>"functions"</code> or from <code>"gradients"</code>.</p>
               </div>
             </td>
             <td>
@@ -8995,8 +8891,7 @@ handler with <code>run_in_thread=True</code> on the
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Mapping from result-field attribute names (using dotted
-        attribute syntax) to display titles.</p>
+                <p>Mapping from field paths to display titles.</p>
               </div>
             </td>
             <td>

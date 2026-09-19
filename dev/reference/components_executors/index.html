@@ -4564,7 +4564,15 @@ waiting callers from a single place.</p>
         <p>A single unit of work to run on a worker.</p>
 <p>A work item is a plain description of a call. It carries no delivery
 channel, so it can be handed to a worker process without dragging the
-submission that owns it along.</p>
+submission that owns it along. <code>result</code> is only meaningful once the work
+item has been delivered, and holds an
+<a class="autorefs autorefs-internal" title="            ropt.components.executors.ExecutorFailure
+
+
+  
+      dataclass
+  " href="#ropt.components.executors.ExecutorFailure"><code>ExecutorFailure</code></a> if the call
+could not be run at all.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -4617,15 +4625,7 @@ submission that owns it along.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>What the function returned, or an
-      <a class="autorefs autorefs-internal" title="            ropt.components.executors.ExecutorFailure
-
-
-  
-      dataclass
-  " href="#ropt.components.executors.ExecutorFailure"><code>ExecutorFailure</code></a>
-      if it could not be run. Only meaningful once the work item
-      has been delivered.</p>
+                <p>What the function returned, or why it could not be run.</p>
               </div>
             </td>
           </tr>
@@ -5178,8 +5178,7 @@ caller that is no longer waiting.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If the submission ended before every result was
-             delivered.</p>
+                <p>If the submission ended before every result arrived.</p>
               </div>
             </td>
           </tr>
@@ -5511,8 +5510,7 @@ where an evaluation launches external programs.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Restart workers after this many work items
-                 (<code>None</code> = never).</p>
+                <p>Restart workers after this many items, or never.</p>
               </div>
             </td>
             <td>
@@ -5658,6 +5656,14 @@ the job started itself goes with it, and Windows has no equivalent.</p>
     <div class="doc doc-contents ">
 
         <p>Initialize the local job executor.</p>
+<p>The default <code>workdir</code> is a private temporary directory that this
+executor creates and removes when it closes, unless there is something
+in it to read: if a work item failed, or <code>cleanup</code> is off, the directory
+is kept and its path logged. A work item that failed keeps its captured
+output, which is the only record of why.</p>
+<p>A local process is finished the moment it exits, and writes and renames
+its result before it does, so the small <code>interval</code> is dead time rather
+than restraint towards a scheduler, and <code>retries=0</code> is enough.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -5680,12 +5686,7 @@ the job started itself goes with it, and Windows has no equivalent.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Directory for each work item's serialized I/O files and
-      captured output. The default is a private temporary
-      directory that this executor creates and removes when it
-      closes — unless there is something in it to read, that is:
-      if a work item failed, or <code>cleanup</code> is off, the directory
-      is kept and its path logged.</p>
+                <p>Directory for each work item's files and captured output.</p>
               </div>
             </td>
             <td>
@@ -5717,9 +5718,7 @@ the job started itself goes with it, and Windows has no equivalent.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Polling interval in seconds. Small by default: a local
-      process is finished the moment it exits, so this is dead
-      time rather than politeness towards a scheduler.</p>
+                <p>Polling interval in seconds.</p>
               </div>
             </td>
             <td>
@@ -5735,10 +5734,7 @@ the job started itself goes with it, and Windows has no equivalent.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Number of extra polls to wait for a work item's result.
-      The default of <code>0</code> is enough, because a local job writes
-      and renames its result before it exits, so the result is
-      there the moment the process is gone.</p>
+                <p>Number of extra polls to wait for a work item's result.</p>
               </div>
             </td>
             <td>
@@ -5754,9 +5750,7 @@ the job started itself goes with it, and Windows has no equivalent.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Whether to remove a work item's files once its result is
-      retrieved or its job is cancelled. A work item that failed
-      keeps its captured output, which is the only record of why.</p>
+                <p>Whether to remove a work item's files once it settles.</p>
               </div>
             </td>
             <td>
@@ -5782,8 +5776,7 @@ the job started itself goes with it, and Windows has no equivalent.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If <code>workdir</code> is not an existing directory, or if
-            <code>workers</code>, <code>interval</code> or <code>retries</code> is out of range.</p>
+                <p>If <code>workdir</code> is missing or an argument is out of range.</p>
               </div>
             </td>
           </tr>
@@ -6006,6 +5999,13 @@ queues and their submission scripts — the normal case on an installed
 cluster, where only <code>queue</code> need be given — or a <code>template</code> supplies the
 submission script directly, in which case nothing is configured and
 <code>scheduler</code> names the queueing system.</p>
+<p><code>workdir</code> must be an existing absolute path, and concurrently running
+executors need distinct ones: work item files are never overwritten. A
+<code>queue</code> is not a scheduler partition; it selects a configured entry
+whose submission script names the partition. <code>retries</code> covers a result
+the shared filesystem does not yet show, <code>query_retries</code> a scheduler
+that cannot be reached; the grace period each allows is its count times
+<code>interval</code>.</p>
 <p>See <a href="../../advanced/parallel/#hpcexecutor">Parallel Evaluation</a> for
 configuration details.</p>
 
@@ -6030,13 +6030,7 @@ configuration details.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Shared-filesystem directory for each work item's
-            serialized I/O files; also passed as the job working
-            directory (template-dependent). Must be an existing
-            absolute path: there is no default, because only the
-            caller knows which directory the cluster shares. Work
-            item files are never overwritten, so concurrent
-            executors need distinct workdirs.</p>
+                <p>Shared-filesystem directory for each work item's files.</p>
               </div>
             </td>
             <td>
@@ -6084,9 +6078,7 @@ configuration details.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The <code>pysqa</code> configuration directory, the one holding
-            <code>queue.yaml</code> or <code>clusters.yaml</code>. Defaults to the
-            site-wide configuration installed alongside ropt.</p>
+                <p>The <code>pysqa</code> configuration directory.</p>
               </div>
             </td>
             <td>
@@ -6102,8 +6094,7 @@ configuration details.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional cluster name, when the configuration defines
-            more than one. Defaults to the configured primary.</p>
+                <p>Optional cluster name, for a multi-cluster configuration.</p>
               </div>
             </td>
             <td>
@@ -6119,11 +6110,7 @@ configuration details.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional name of a queue defined in the
-            configuration. This is not necessarily the
-            scheduler's partition name: it selects a queue entry,
-            whose submission script names the partition. Defaults
-            to the configured primary.</p>
+                <p>Optional name of a queue defined in the configuration.</p>
               </div>
             </td>
             <td>
@@ -6139,9 +6126,7 @@ configuration details.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A submission script template, submitted instead of
-            any configuration. Everything the scheduler needs,
-            the partition included, must be in it.</p>
+                <p>A submission script template, used instead of a configuration.</p>
               </div>
             </td>
             <td>
@@ -6157,10 +6142,7 @@ configuration details.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The queueing system a <code>template</code> is written for, for
-            example <code>"slurm"</code> (the default). Only meaningful with
-            a <code>template</code>, since a configuration names its own.
-            <code>pysqa</code> calls this <code>queue_type</code>.</p>
+                <p>The queueing system a <code>template</code> is written for.</p>
               </div>
             </td>
             <td>
@@ -6192,9 +6174,7 @@ configuration details.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Memory per work item. Rendered by the submission
-            script; with a configuration it is also clamped to
-            the queue's limit.</p>
+                <p>Memory per work item.</p>
               </div>
             </td>
             <td>
@@ -6210,9 +6190,7 @@ configuration details.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Run time per work item, typically in seconds. With a
-            configuration, the queue's own limit applies when
-            this is not given.</p>
+                <p>Run time per work item, typically in seconds.</p>
               </div>
             </td>
             <td>
@@ -6228,11 +6206,7 @@ configuration details.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Extra variables for the submission script, for
-            whatever the script declares beyond the standard
-            names — an account, a reservation, a GPU request.
-            Entries that are <code>None</code> are dropped, so omitting a
-            key and passing <code>None</code> mean the same thing.</p>
+                <p>Extra variables for the submission script.</p>
               </div>
             </td>
             <td>
@@ -6248,10 +6222,7 @@ configuration details.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Number of extra polls to wait for a work item's
-            result after the first attempt fails (<code>0</code> gives up at
-            once). This is about the shared filesystem, not about
-            the scheduler.</p>
+                <p>Extra polls to wait for a work item's result.</p>
               </div>
             </td>
             <td>
@@ -6267,10 +6238,7 @@ configuration details.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Number of extra attempts to query the scheduler after
-            one fails (<code>0</code> gives up at once). A run this long
-            fails every job that is out, since the state of a
-            job that cannot be queried is unknown.</p>
+                <p>Extra attempts to query the scheduler after one fails.</p>
               </div>
             </td>
             <td>
@@ -6286,10 +6254,7 @@ configuration details.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Whether to remove work item files once their result is
-            retrieved or their job is cancelled. A work item that
-            failed keeps its captured output, which is the only
-            record of why.</p>
+                <p>Whether to remove a work item's files once it settles.</p>
               </div>
             </td>
             <td>
@@ -6315,11 +6280,7 @@ configuration details.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If <code>workdir</code> is not an existing absolute path, if
-            <code>workers</code>, <code>interval</code>, <code>retries</code> or <code>query_retries</code>
-            is out of range, if arguments from both submission
-            modes are combined, or if <code>submit_options</code> names
-            something the executor already passes.</p>
+                <p>If an argument is out of range or the modes are mixed.</p>
               </div>
             </td>
           </tr>
@@ -6329,10 +6290,7 @@ configuration details.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If no configuration can be found, if the requested
-            cluster is unknown, if the queue is not available on
-            the requested cluster, or if the queue cannot be
-            resolved to exactly one cluster.</p>
+                <p>If the configuration, cluster or queue cannot be resolved.</p>
               </div>
             </td>
           </tr>

@@ -3620,8 +3620,7 @@ for usage and pitfalls.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The matrix of variables to evaluate. Each row represents
-       a variable vector.</p>
+                <p>The matrix of variables to evaluate, one vector per row.</p>
               </div>
             </td>
             <td>
@@ -3642,8 +3641,7 @@ for usage and pitfalls.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The evaluation context, providing additional information
-       about the evaluation.</p>
+                <p>The evaluation context.</p>
               </div>
             </td>
             <td>
@@ -3697,8 +3695,7 @@ for usage and pitfalls.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If another thread is executing this evaluator's <code>eval</code>
-           method at the same time.</p>
+                <p>If another thread is already executing <code>eval</code>.</p>
               </div>
             </td>
           </tr>
@@ -4349,31 +4346,21 @@ cache-hit information for populating <code>metadata</code>.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.evaluation.EvaluationBatchResult
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple">tuple</a>[<a class="autorefs autorefs-internal" title="            ropt.evaluation.EvaluationBatchResult
 
 
   
       dataclass
-  " href="../evaluation/#ropt.evaluation.EvaluationBatchResult">EvaluationBatchResult</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>An <code>EvaluationBatchResult</code> and the cache hits, keyed by evaluation</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/functions.html#int">int</a>, <a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple">tuple</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/functions.html#int">int</a>, <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+  " href="../evaluation/#ropt.evaluation.EvaluationBatchResult">EvaluationBatchResult</a>, <a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/functions.html#int">int</a>, <a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple">tuple</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/functions.html#int">int</a>, <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
 
 
   
       dataclass
-  " href="../results/#ropt.results.FunctionResults">FunctionResults</a>]]</code>
+  " href="../results/#ropt.results.FunctionResults">FunctionResults</a>]]]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>index, of <code>(realization index, cached FunctionResults)</code>.</p>
+                <p>The batch result, and the cache hits keyed by evaluation index.</p>
               </div>
             </td>
           </tr>
@@ -4885,8 +4872,7 @@ object that identifies the evaluation, and returns an
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional dictionary containing additional information
-         about the evaluation.</p>
+                <p>Optional dictionary with extra information.</p>
               </div>
             </td>
           </tr>
