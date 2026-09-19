@@ -57,8 +57,8 @@ side when the optimizer requests gradients separately from functions. Set
 
 Custom filters are plugins implementing the
 [`RealizationFilter`][ropt.realization_filter.RealizationFilter] base class,
-whose docstring documents the methods to implement. A filter defined where an
-entry point cannot reach it — in a script or a notebook — is added with
+whose abstract methods define what a filter must provide. A filter defined where
+an entry point cannot reach it — in a script or a notebook — is added with
 [`register_plugin`][ropt.plugins.register_plugin], after which it is
 selected by its `"plugin/method"` string exactly like an installed one. An
 instance can also be passed directly in the `realization_filters` field of
@@ -92,12 +92,12 @@ The `cvar-objective` method:
    fraction instead. All other realizations receive zero.
 5. Failed realizations (NaN values) are excluded.
 
-The `cvar-constraint` variant applies CVaR to a single constraint function,
-with "worst" defined by constraint type:
-
-- **LE (`<=`):** largest positive values (most violated).
-- **GE (`>=`):** smallest negative values (most violated).
-- **EQ (`==`):** largest absolute values (furthest from zero).
+The `cvar-constraint` variant applies the same steps to a single constraint
+function, named by `sort`, ranking realizations by that constraint's value with
+the **largest first**. For a constraint bounded from above those are the most
+violated realizations. The ranking does not depend on the bound the constraint
+was given, so for a constraint bounded from below, or an equality, the
+realizations selected are the largest values rather than the most violated ones.
 
 !!! note
     Realizations reach a filter with their objectives exactly as the evaluator

@@ -101,7 +101,7 @@ optimum.
 
 An `offsets` entry is subtracted before the division. It cannot move the optimum
 or change the gradient, but it changes the magnitude the optimizer tests against
-its tolerances, which is what makes it useful for an objective that is large and
+its tolerances, which matters for an objective that is large and
 varies little. See [Scaling
 objectives](configuration_sections.md#objective-scales) and
 [Offsetting objectives](configuration_sections.md#objective-offsets) for the

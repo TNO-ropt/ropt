@@ -50,7 +50,7 @@ class CVaRConstraintOptions(_ConfigBaseModel):
     """Options for the `cvar-constraint` filter method.
 
     Assigns CVaR-derived weights based on a single constraint function value,
-    with "worst" defined by the constraint type (LE/GE/EQ).
+    ranking realizations by that value with the largest first.
     See [Realization Filters](../optimizer_setup/realization_filters.md#how-cvar-filters-work)
     for the algorithm.
 

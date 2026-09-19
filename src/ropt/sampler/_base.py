@@ -102,12 +102,11 @@ class Sampler(ABC):
             element-wise by the `perturbation_magnitudes` defined in the
             [`VariablesConfig`][ropt.config.VariablesConfig].
 
-            Therefore, it is generally recommended that sampler implementations
-            produce samples with a characteristic scale of approximately one
-            (for example drawn from a distribution with a standard deviation of 1, or
-            uniformly distributed within `[-1, 1]`). This allows the
-            `perturbation_magnitudes` to directly control the effective size of
-            the perturbations applied to the variables.
+            Samples with a characteristic scale of approximately one — drawn,
+            for example, from a distribution with a standard deviation of 1, or
+            uniformly from `[-1, 1]` — let the
+            `perturbation_magnitudes` control the effective size of the
+            perturbations applied to the variables directly.
 
         Returns:
             A 3D NumPy array of perturbation values.

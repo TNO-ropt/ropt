@@ -53,9 +53,9 @@ from the same two arrays, so they cannot disagree.
 This matters when variables differ by orders of magnitude. An optimizer takes a
 step of the same size in every direction and judges convergence with a single
 tolerance for all of them, and neither is meaningful unless the variables are
-comparable in size. Deriving the scales from the bounds is the usual remedy, and
+comparable in size. The bounds are one source of scales, and
 [`scales_and_offsets_from_bounds`][ropt.utils.scales_and_offsets_from_bounds]
-does it:
+derives them:
 
 ```python
 from ropt.utils import scales_and_offsets_from_bounds
@@ -89,8 +89,3 @@ The remaining fields of the section — `perturbation_magnitudes`,
 variables are perturbed when a gradient is estimated, rather than the variables
 themselves. They are covered in
 [Stochastic Gradients](gradients.md) and [Samplers](samplers.md).
-
-## See also
-
-- Reading variables back in either domain:
-  [Working with Results](../running/results.md#scaling-of-results).

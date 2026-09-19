@@ -67,8 +67,9 @@ sampler whose values do not depend on the realization in the first place.
 ## Writing a custom sampler
 
 A custom sampler is a plugin implementing the [`Sampler`][ropt.sampler.Sampler]
-base class, whose docstring documents the shape the samples must have and how
-the `mask` and `shared` settings affect them. Like the other component kinds, a
+base class, whose `generate_samples` documents the shape the samples must have
+and how the `mask` and `shared` settings affect them. Like the other component
+kinds, a
 sampler defined in a script or a notebook is made selectable with
 [`register_plugin`][ropt.plugins.register_plugin].
 

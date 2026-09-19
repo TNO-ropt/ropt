@@ -1,8 +1,7 @@
 # Constraints
 
 A constraint restricts which variable vectors count as a valid solution. `ropt`
-distinguishes three kinds, and the difference that matters in practice is *who
-computes them*:
+distinguishes three kinds, and they differ in *who computes them*:
 
 | Kind | Declared | Computed by |
 | --- | --- | --- |
@@ -77,7 +76,7 @@ violated by more than that amount.
 --8<-- "examples/simple/constrained.py:run"
 ```
 
-This matters more than it looks. `result.results` is only ever the best
+`result.results` is only ever the best
 **feasible** evaluation; if none satisfied the constraints to within the
 tolerance, the run returns `None` instead of a best result. A tolerance that is
 too tight is a common reason for an empty result — see

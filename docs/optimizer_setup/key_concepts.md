@@ -47,7 +47,7 @@ chosen this way:
 A component is always an **object**. You can provide it in one of two ways:
 
 - **Yourself** — construct the object (an instance of a built-in class or of your
-  own subclass) and pass it to the configuration directly. This is useful when a
+  own subclass) and pass it to the configuration directly. This applies when a
   component needs custom Python logic.
 - **Through the plugin system** — let `ropt` build the object for you. You refer
   to the plugin by a short `method` string, such as `"slsqp"`, or by a

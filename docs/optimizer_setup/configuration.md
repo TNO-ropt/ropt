@@ -397,8 +397,3 @@ Expand the block below to see every field and its default value.
     ]
 
     ```
-
-## See also
-
-- Every field of every section, with its default:
-  [Configuration Sections](configuration_sections.md).
