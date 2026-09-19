@@ -3010,8 +3010,7 @@ a stochastic nature and is represented by an ensemble of functions
 (realizations) for different values of some (possibly unknown) random
 parameters. The optimal solution is then determined by optimizing the value of a
 statistic, such as the mean, over the ensemble.</p>
-<p><code>ropt</code> provides several features for efficiently solving complex robust
-optimization problems:</p>
+<p><code>ropt</code> provides the following features for robust optimization problems:</p>
 <ul>
 <li>Robust optimization over an ensemble of models, i.e., optimizing the average
   of a set of objective functions. Alternative objectives can be implemented
@@ -3030,12 +3029,12 @@ optimization problems:</p>
   mechanism. The most common options of these optimizers can be configured in a
   uniform manner, although algorithm- or package-specific options can still be
   passed.</li>
-<li>Efficient estimation of gradients using a Stochastic Simplex Approximate
+<li>Estimation of gradients using a Stochastic Simplex Approximate
   Gradient (StoSAG) approach. Additional samplers for generating perturbed
   values for gradient estimation can be added via a plugin mechanism.</li>
 <li>Support for linear and non-linear constraints, if supported by the chosen
   optimizer.</li>
-<li>Flexible configuration of the optimization process using
+<li>Configuration of the optimization process using
   <a href="https://docs.pydantic.dev/"><code>pydantic</code></a>.</li>
 <li>Support for tracking and processing optimization results generated during the
   optimization process.</li>

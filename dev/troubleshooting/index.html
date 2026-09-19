@@ -3038,7 +3038,7 @@ return.</p>
 <p><strong><code>NaN</code> means "this realization failed", and one failure is already too many.</strong>
 <a href="../optimizer_setup/configuration_sections/#realizations"><code>realization_min_success</code></a>
 defaults to <em>all</em> realizations, so a single <code>NaN</code> ends the run with
-<code>TOO_FEW_REALIZATIONS</code>. If some realizations are allowed to fail, say so:</p>
+<code>TOO_FEW_REALIZATIONS</code>. If some realizations are allowed to fail, set it lower:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">config</span> <span class="o">=</span> <span class="p">{</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="s2">"variables"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"variable_count"</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">"perturbation_magnitudes"</span><span class="p">:</span> <span class="mf">1e-6</span><span class="p">},</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="s2">"realizations"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"weights"</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">]</span> <span class="o">*</span> <span class="mi">10</span><span class="p">,</span> <span class="s2">"realization_min_success"</span><span class="p">:</span> <span class="mi">8</span><span class="p">},</span>

@@ -5854,6 +5854,9 @@ variable.</p>
 <p>Handlers added with <code>run_in_thread=True</code> run on a thread pool the
 dispatcher owns and shuts down when it stops, so handler work is isolated
 from the asyncio loop's shared default pool.</p>
+<p>A dispatcher and its handlers belong to the process that created them, so
+they observe only the events emitted in that process. An event forwarded
+from another process cannot arrive.</p>
 <p>See <a href="../../advanced/workflows/#event-dispatcher">Optimization Workflows</a> for usage.</p>
 
 

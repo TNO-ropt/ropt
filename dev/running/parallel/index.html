@@ -3389,7 +3389,7 @@ thread you started yourself.</p>
 optimization batch</strong>, and whole <strong>optimizations against each other</strong>. Nothing
 else overlaps — a single optimization is a sequence of batches, and the next one
 cannot start before the current one is complete.</p>
-<p>So the number of workers worth asking for is roughly</p>
+<p>So the number of workers that can be kept busy is roughly</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>batch size  ×  optimizations running at once
 </span></code></pre></div>
 <p>capped by what the machine or the queue will actually give you. Beyond that
@@ -3486,7 +3486,7 @@ interpreter, so this is where heavy Python computation actually gets faster:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">pool</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">process_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
 </span></code></pre></div>
-<p>Reach for it when the computation is <strong>Python code</strong>, or when each evaluation
+<p>This pool applies when the computation is <strong>Python code</strong>, or when each evaluation
 needs its own copy of something a library keeps globally. An objective that
 mostly runs an external program gains nothing here that a thread pool would not
 have given more cheaply.</p>
@@ -3502,7 +3502,7 @@ only come <strong>back</strong> through the return value; see
 <p>When a run is stopped — by Ctrl-C, or by closing the pool — the worker
 processes are killed, but anything they had launched themselves is not: a
 simulator or solver started by your objective keeps running, unattached,
-after your program is gone. Nothing warns you. If your objective launches
+after your program is gone. Nothing reports this. If your objective launches
 external programs, use a <code>local_pool</code> instead, which was built for exactly
 this.</p>
 </div>
@@ -3729,7 +3729,7 @@ given, which is how the memory directive above disappears unless <code>memory_ma
 set. The values available are the arguments described above — <code>job_name</code>,
 <code>output</code>, <code>working_directory</code>, <code>cores</code>, <code>memory_max</code>, <code>run_time_max</code>, <code>command</code>
 — plus whatever you pass in <code>submit_options</code>.</p>
-<p>Two of them are worth getting right: <code>{{command}}</code> is your evaluation and the
+<p>Two of them carry the run: <code>{{command}}</code> is your evaluation and the
 script does nothing without it, and <code>{{output}}</code> is the file ropt reads back to
 explain a failed job. A script that omits <code>--output={{output}}</code> still runs, but a
 job that dies takes the only explanation with it.</p>
@@ -3962,7 +3962,7 @@ naming how many evaluations it is waiting for, because the wait is otherwise
 indistinguishable from a hang. If an evaluation may run long and
 has to be interruptible, put it on one of the other pools.</p>
 <p><strong>Stopping is a request, not a guarantee.</strong> On the pools that kill,
-everything is asked to end and not waited for. A program that ignores the
+everything is signalled to end and not waited for. A program that ignores the
 request, or that is stuck inside the operating system, keeps running. The run
 exits promptly instead of waiting out the current batch, but processes it
 started may still be alive afterwards.</p>
@@ -4189,8 +4189,8 @@ of its own, but they are <em>its</em> handlers and <em>its</em> pools.</p>
   this is avoidable by sharing one pool; offloaded onto a process, local, or
   HPC pool it is not.</li>
 </ul>
-<p>So reach for <code>offload</code> when a piece of work is genuinely self-contained and
-hands its answer back as a return value. When several pieces must be
+<p>So <code>offload</code> fits a piece of work that is genuinely self-contained and
+returns its answer as a return value. When several pieces must be
 coordinated — counted, collected, or held to one budget — drive them from
 your own process instead.</p>
 </div>

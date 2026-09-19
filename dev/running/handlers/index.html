@@ -3179,10 +3179,10 @@ its handlers back; the same handler objects can then join a group on a later
 session.</p>
 <p>Closing a group earlier <strong>releases its handlers</strong>. A handler belongs to one
 group at a time, so this is what lets you put one into another group; otherwise
-only the session ending frees it. The group also hands back the dispatcher it
-runs on, together with any worker threads a <code>threaded</code> handler needed — which is
-why groups built in a loop are worth closing as you go rather than all at the
-end. Use <a class="autorefs autorefs-internal" title="            close" href="../../reference/simple/#ropt.simple.SharedHandlers.close"><code>close</code></a>, or the group as a context
+only the session ending frees it. The group also releases the dispatcher it
+runs on, together with any worker threads a <code>threaded</code> handler needed, so
+closing groups built in a loop as you go frees those resources earlier than
+closing them all at the end. Use <a class="autorefs autorefs-internal" title="            close" href="../../reference/simple/#ropt.simple.SharedHandlers.close"><code>close</code></a>, or the group as a context
 manager, which closes it on exit:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="k">for</span> <span class="n">start_points</span> <span class="ow">in</span> <span class="n">cases</span><span class="p">:</span>
@@ -3197,14 +3197,14 @@ so a run given one stops immediately with a
 <a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a> rather than running to
 completion while its results go nowhere.</p>
 <div class="admonition warning">
-<p class="admonition-title">Reach for a shared group only for real concurrency</p>
+<p class="admonition-title">A shared group costs more than a reused local handler</p>
 <p>A group routes every run's events through a single, serialized
 <a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventDispatcher" href="../../reference/components_event_handlers/#ropt.components.event_handlers.EventDispatcher"><code>EventDispatcher</code></a> on a
 background loop. That serialization is what makes a
-handler safe to share across <em>concurrent</em> runs — but around a plain
-<strong>sequential</strong> loop it adds cost without benefit: a background loop plus a
-cross-thread hand-off per result. Prefer a reused local handler for
-sequential accumulation, and keep groups for genuinely concurrent runs. When
+handler safe to share across <em>concurrent</em> runs. Around a plain
+<strong>sequential</strong> loop it adds a background loop plus a cross-thread hand-off
+per result, and a reused local handler accumulates the same results without
+either. When
 you do share a group, move any slow, GIL-releasing (I/O) handler onto a
 worker thread with <a href="#running-a-handler-in-a-thread"><code>threaded</code></a> so it does
 not stall the shared loop for every run.</p>
@@ -3323,7 +3323,7 @@ if you have <code>tabulate</code> installed:</p>
 <h3 id="other-handlers">Other handlers</h3>
 <p><code>ropt.components.event_handlers</code> holds a few more handlers that <code>ropt.simple</code>
 does not re-export, because a run driven by <code>optimize</code> does not need them.</p>
-<p>The one you may still reach for is
+<p>The remaining one that applies to a <code>optimize</code> run is
 <a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.CallbackHandler" href="../../reference/components_event_handlers/#ropt.components.event_handlers.CallbackHandler"><code>CallbackHandler</code></a>, which
 calls a function for the event types you name. That is how you observe events
 other than results — the start or end of a run, for example; for results alone,
@@ -3379,8 +3379,8 @@ is in flight.</p>
 stays in Python — building DataFrames, accumulating results, doing numerical
 work in pure Python — therefore gets <strong>no</strong> speed-up from <code>threaded</code>. It
 merely pays the small cost of handing work to another thread, which makes it
-marginally <em>slower</em>, never faster. When in doubt, leave a handler inline; only
-reach for <code>threaded</code> when you know it is busy with interruptible I/O.</p>
+marginally <em>slower</em>, never faster. <code>threaded</code> applies to a handler that is
+busy with interruptible I/O, and to no other.</p>
 </div>
 <p><code>threaded</code> is only available on a shared group; a local handler always runs
 inline. To run a blocking handler on a thread for just one optimization, give it

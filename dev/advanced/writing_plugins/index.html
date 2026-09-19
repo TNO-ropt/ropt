@@ -3139,7 +3139,7 @@ and its own base class:</p>
 <ul>
 <li><strong><code>methods</code></strong> — the method names the class provides, as a set. The names are
   matched case-insensitively, so they may be written in any case. Include
-  <code>"default"</code> if the class has a sensible standard choice, so that
+  <code>"default"</code> if the class has a standard choice, so that
   <code>"my_package/default"</code> selects it; leave it out if it does not, and the name
   will correctly fail to resolve.</li>
 </ul>
@@ -3262,14 +3262,14 @@ documentation table for them. The built-in SciPy backend uses it; see
 including other optimizations, since
 <a class="autorefs autorefs-internal" title="            ropt.simple.optimize_many" href="../../reference/simple/#ropt.simple.optimize_many"><code>optimize_many</code></a> runs several at once, each on its
 own thread with its own configuration. Anything a backend changes <em>per process</em>
-is therefore shared with runs it knows nothing about, and cannot carry per-run
+is therefore shared with unrelated runs, and cannot carry per-run
 settings.</p>
 <p>So while a run is in progress a backend must not change the working directory,
 the environment, <code>sys.stdout</code> or <code>sys.stderr</code>, or file descriptors 1 and 2.
-Where the optimizer produces a log, ask the library to write it to a named
-file — that is the per-run answer — or to be quiet.</p>
-<p>Not every library allows this, and <code>ropt</code> does not paper over the ones that do
-not. What such a backend must do instead is <strong>say so in its own
+Where the optimizer produces a log, configure the library to write it to a named
+file — that is the per-run answer — or to produce no output.</p>
+<p>Not every library allows this, and <code>ropt</code> does not work around the ones that do
+not. Such a backend must instead <strong>state this in its own
 documentation</strong>: that it needs exclusive process state — a working directory, a
 fixed file name, or state kept in the library between calls. What that rules out
 is not "one at a time" but "anything at all at the same time": a changed working
@@ -3334,7 +3334,7 @@ whatever it returns was written below Python:</p>
 </span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>    <span class="n">native</span> <span class="o">=</span> <span class="n">collect_native_output</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">))</span>
 </span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>    <span class="k">assert</span> <span class="n">native</span> <span class="o">==</span> <span class="s2">""</span>      <span class="c1"># ... or `!= ""` if the declaration is True</span>
 </span></code></pre></div>
-<p>Worth having as a test rather than a one-off check: these properties drift.
+<p>These properties drift, so a test catches a change that a one-off check does not.
 SciPy's <code>disp</code> silently became a no-op for <code>l-bfgs-b</code> and <code>nelder-mead</code> in 1.18.</p>
 
 

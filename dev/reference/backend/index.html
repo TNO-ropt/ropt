@@ -4595,9 +4595,9 @@ it does not support raises
 is the only method that handles integer variables; the others silently
 treat them as continuous.</p>
 <p>SciPy prints its own progress report when
-<a class="autorefs autorefs-internal" title="            BackendConfig" href="../config/#ropt.config.BackendConfig"><code>verbose</code></a> asks for it. <code>trust-constr</code> is the
+<a class="autorefs autorefs-internal" title="            BackendConfig" href="../config/#ropt.config.BackendConfig"><code>verbose</code></a> is set. <code>trust-constr</code> is the
 only method with reporting levels of its own; for the rest the setting is
-on or off. Note that <code>disp</code> is a no-op for <code>l-bfgs-b</code> and <code>nelder-mead</code> in
+on or off. <code>disp</code> is a no-op for <code>l-bfgs-b</code> and <code>nelder-mead</code> in
 recent SciPy releases, which therefore report nothing.</p>
 <p>Algorithm-specific options are passed through the <code>options</code> dictionary.
 Click on the common options or the method name for the corresponding
@@ -4986,7 +4986,7 @@ backends need not distinguish <code>True</code> from <code>1</code> themselves:<
 </tr>
 </tbody>
 </table>
-<p>This says nothing about where the output goes: that is decided by the
+<p>This does not determine where the output goes: that is set by the
 <code>stdout</code> and <code>stderr</code> settings of
 <a class="autorefs autorefs-internal" title="            OptimizerConfig" href="../config/#ropt.config.OptimizerConfig"><code>OptimizerConfig</code></a>.</p>
 

@@ -3036,7 +3036,7 @@ of one, so there are five:</p>
 <th>Pool</th>
 <th>Evaluations run</th>
 <th>Data</th>
-<th>Reach for it when</th>
+<th>Applies when</th>
 </tr>
 </thead>
 <tbody>
@@ -3072,12 +3072,11 @@ of one, so there are five:</p>
 </tr>
 </tbody>
 </table>
-<p>A pool costs something to set up and to hand work to, so the default is often
-the right answer: below a certain evaluation cost, that setup is all a pool
-adds.</p>
+<p>A pool costs something to set up and to hand work to. Below a certain evaluation
+cost, that setup is all a pool adds.</p>
 <p><a href="../../running/parallel/">Parallel Execution and Many Runs</a> covers each of these
 in full — how many workers to ask for, which functions can be sent where, what
-stopping does, and how to choose when the answer is not obvious.</p>
+stopping does, and how to choose between them.</p>
 <h2 id="the-rule-to-settle-first">The rule to settle first</h2>
 <p>One question rules choices <em>out</em>, and it is the only one you can answer by
 reading your own code rather than by measuring:</p>
@@ -3111,7 +3110,7 @@ from runs that overlap are all covered in
 <div class="admonition warning">
 <p class="admonition-title">Your objective is now called from several threads at once</p>
 <p>The call above passes no pool, so each run evaluates on its own thread. The
-question above applies here too, and nothing warns you: if your objective
+question above applies here too, and nothing reports it: if your objective
 reads or writes anything outside its arguments and its return value, the
 runs will corrupt each other. Give the batch a pool, or keep the objective
 self-contained.</p>

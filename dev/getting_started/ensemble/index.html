@@ -3091,7 +3091,7 @@ coefficients for realization <code>r</code>:</p>
 <h2 id="3-write-the-evaluation-function">3. Write the evaluation function</h2>
 <p><code>ropt</code> calls the evaluation function once for every realization at each point it
 evaluates, so it must return the value for <em>its own</em> realization. The second
-argument tells it which one: <code>context.realization</code> is the realization number,
+argument identifies which one: <code>context.realization</code> is the realization number,
 which we use to index the parameter arrays:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">rosenbrock</span><span class="p">(</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    <span class="n">variables</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">context</span><span class="p">:</span> <span class="n">EvaluationFunctionContext</span>

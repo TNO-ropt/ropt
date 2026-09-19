@@ -3780,7 +3780,10 @@ detailed descriptions and usage examples.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Estimate additional scales from the first batch.</p>
+                <p>Estimate additional scales from the first batch. The
+                 reported <code>target_objective</code> is divided by them, so
+                 runs that differ in this setting compare only
+                 through <code>functions.objectives</code> or their variables.</p>
               </div>
             </td>
           </tr>
@@ -4208,6 +4211,13 @@ configured as the <code>optimizer</code> field of
 <p>See <a href="../../optimizer_setup/configuration_sections/#optimizer">Configuration Sections</a> for
 detailed descriptions and usage examples.</p>
 
+
+<details class="warning" open>
+  <summary>Warning</summary>
+  <p>Capturing output rewires process-global state, so one run at a time can
+do it. A second run that sets <code>stdout</code> or <code>stderr</code> while another holds
+the capture raises <a class="autorefs autorefs-internal" title="            WorkflowError" href="../exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a>.</p>
+</details>
 
 <p><span class="doc-section-title">Attributes:</span></p>
     <table>

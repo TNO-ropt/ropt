@@ -3031,7 +3031,7 @@ names the <a class="autorefs autorefs-internal" title="            ExitCode" hre
 <a href="../running/#when-something-goes-wrong">When something goes wrong</a> for what each
 code means.</p>
 <p>The name at the start of each line identifies the part of <code>ropt</code> that produced
-it. That is worth having in a bug report and rarely otherwise, so leave
+it. That is what a bug report needs; leave
 <code>%(name)s</code> out of the format string if it is in the way.</p>
 <h2 id="warnings-only">Warnings only</h2>
 <p><code>INFO</code> is one line per batch, which adds up on a long run. Setting the level to
@@ -3043,7 +3043,7 @@ only events that did not stop it:</p>
 could not be cancelled and may still be running, a working directory kept behind
 so you can see what a failed job left, and evaluations that must finish before
 your program is allowed to exit. None of these raise, and most are reported
-nowhere else, so it is sensible to leave <code>WARNING</code> on.</p>
+nowhere else.</p>
 <p>A failure that stops a run does not need logging to be seen: it either raises,
 or is named by the exit code the run ends with. See
 <a href="../../troubleshooting/">Troubleshooting</a>.</p>

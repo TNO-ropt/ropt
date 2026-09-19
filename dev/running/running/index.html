@@ -3129,7 +3129,7 @@ additional options.</p>
   
       dataclass
   " href="../../reference/components_evaluators/#ropt.components.evaluators.EvaluationFunctionContext"><code>EvaluationFunctionContext</code></a>
-  that tells you <em>which</em> evaluation this is:<ul>
+  that identifies <em>which</em> evaluation this is:<ul>
 <li><code>context.realization</code> — the realization number, for a problem with an
   ensemble of realizations; <code>optimize</code> then minimizes the weighted average
   objective over all of them. See
@@ -3300,7 +3300,7 @@ optimizer. Use <a class="autorefs autorefs-internal" title="            ropt.sim
 </span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="n">single</span> <span class="o">=</span> <span class="n">evaluate</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>             <span class="c1"># one FunctionResults</span>
 </span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="n">batch</span> <span class="o">=</span> <span class="n">evaluate_many</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">matrix</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>    <span class="c1"># one per row of the matrix</span>
 </span></code></pre></div>
-<p>Both hand back <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+<p>Both return <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
 
 
   
@@ -3315,14 +3315,14 @@ optimizer chose the point.</p>
 which evaluates a single vector and then a matrix of them.</p>
 <h2 id="when-something-goes-wrong">When something goes wrong</h2>
 <p>Not every problem is an exception. An optimization that cannot make progress
-still returns normally, and says why in <code>result.exit_code</code>:
+still returns normally, and indicates why in <code>result.exit_code</code>:
 <code>TOO_FEW_REALIZATIONS</code> when not enough realizations produced a value,
 <code>EXECUTOR_STOPPED</code> when the pool it was evaluating on was closed under it.
 <code>result.results</code> is <code>None</code> when no feasible result was ever recorded, whatever
-the reason the run ended; a run that fails part-way still hands back the best
+the reason the run ended; a run that fails part-way still returns the best
 result it had reached before that. A plain <a class="autorefs autorefs-internal" title="            ropt.simple.evaluate" href="../../reference/simple/#ropt.simple.evaluate"><code>evaluate</code></a>
-has no <code>exit_code</code>, and always hands back a result object; there it is
-<code>functions</code> being <code>None</code> that says nothing usable came back.</p>
+has no <code>exit_code</code>, and always returns a result object; there, <code>functions</code> being
+<code>None</code> means that no usable result was produced.</p>
 <p>A run can also end with <code>OPTIMIZER_FINISHED</code> and still leave those fields
 <code>None</code>. Only a result that satisfies every constraint to within
 <code>constraint_tolerance</code> can be returned as the best one, and that tolerance —

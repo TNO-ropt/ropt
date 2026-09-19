@@ -4984,7 +4984,8 @@ A sequence that is empty gives no runs, and returns no results.</p>
 <p>The runs execute concurrently on driver threads and all evaluate on the
 same <code>pool</code>, so its workers are shared between them; <code>limit</code> bounds how
 many run simultaneously. Without a <code>pool</code> the runs still overlap, but each
-evaluation runs in-process on its own driver thread. See
+evaluation runs in-process on its own driver thread, so <code>function</code> is then
+called by several threads at once and must tolerate that. See
 <a href="../../running/parallel/#many-optimizations-at-once">Parallel Execution and Many Runs</a>
 for a walkthrough, and <a href="../../running/parallel/#failure-in-one-run">Failure in one run</a>
 for what happens when one raises.</p>
@@ -6045,13 +6046,13 @@ created, so most code needs no further cleanup. See
         <p>An open session, and the factories that build on it.</p>
 <p>A session owns one background event loop, on its own daemon thread. Pools
 need that loop to run on, which is why they are built here rather than
-constructed on their own. Everything a session hands out is returned to the
+constructed on their own. Everything a session creates is returned to the
 caller and passed on explicitly; nothing is discovered from the surroundings.</p>
 <p>Bind the session with <code>as</code> and call its factories inside the block. See
 <a href="../../running/running/">Running Optimizations</a>.</p>
-<p>Sessions are objects, so opening one inside another is unremarkable: each
-gets its own loop, and pools from different sessions never interact. A
-session is single use — once closed it cannot be reopened.</p>
+<p>A session may be opened inside another: each gets its own loop, and pools
+from different sessions never interact. A session is single use — once
+closed it cannot be reopened.</p>
 
 
 
@@ -6311,6 +6312,10 @@ session is single use — once closed it cannot be reopened.</p>
         <p>Create a pool that runs evaluations in worker processes.</p>
 <p>The evaluation function must be picklable. See
 <a href="../../running/running/">Running Optimizations</a> for a walkthrough.</p>
+<p>Closing the pool terminates its worker processes and nothing else. A
+program an evaluation started itself keeps running, without an error
+being raised; use <a class="autorefs autorefs-internal" title="            local_pool" href="#ropt.simple.Session.local_pool"><code>local_pool</code></a> where
+an evaluation launches external programs.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -6873,8 +6878,8 @@ configuration layout and Slurm examples.</p>
         <p>Create a pool that evaluates in-process, on the calling thread.</p>
 <p>Identical to the free <a class="autorefs autorefs-internal" title="            ropt.simple.serial_pool" href="#ropt.simple.serial_pool"><code>serial_pool</code></a> function,
 except that this pool is closed when the session closes, so runs cannot
-keep using it afterwards. Prefer the free function for a pool that
-should outlive any session.</p>
+keep using it afterwards. The free function returns a pool that is tied
+to no session.</p>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
@@ -7077,8 +7082,8 @@ with <a class="autorefs autorefs-internal" title="            close" href="#ropt
 manager. See <a href="../../running/running/">Running Optimizations</a> for a
 walkthrough.</p>
 <p>A pool built by <a class="autorefs autorefs-internal" title="            ropt.simple.serial_pool" href="#ropt.simple.serial_pool"><code>serial_pool</code></a> has no executor and
-no workers to release; it exists so that runs sharing one batch-ID sequence
-can say so, whether or not they run in parallel.</p>
+no workers to release; it exists to give runs one batch-ID sequence, whether
+or not they run in parallel.</p>
 
 
 
