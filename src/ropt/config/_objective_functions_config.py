@@ -30,19 +30,18 @@ class ObjectiveFunctionsConfig(BaseModel):
     See [Configuration Sections](../optimizer_setup/configuration_sections.md#objectives) for
     detailed descriptions and usage examples.
 
+    The reported `target_objective` is divided by the estimated `auto_scale`
+    factors, so runs that differ in that setting compare only through
+    `functions.objectives` or their variables.
+
     Attributes:
         weights:             Weights for the objective functions (default: 1.0).
         scales:              Scale factors for the objective functions (default: 1.0).
         offsets:             Offsets for the objective functions (default: 0.0).
-        auto_scale:          Estimate additional scales from the first batch. The
-                             reported `target_objective` is divided by them, so
-                             runs that differ in this setting compare only
-                             through `functions.objectives` or their variables.
+        auto_scale:          Estimate additional scales from the first batch.
         maximize:            Which objectives to maximize (default: `False`).
-        realization_filters: Realization filter to apply to each objective, by key,
-                             `None` to apply none (default: `None`).
-        function_estimators: Function estimator to apply to each objective, by key
-                             (default: `"0"`).
+        realization_filters: Realization filter per objective, by key (default: none).
+        function_estimators: Function estimator per objective, by key (default: `"0"`).
     """
 
     weights: Array1D = np.array(1.0)

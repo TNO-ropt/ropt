@@ -72,12 +72,9 @@ class EnOptContext(BaseModel):
         optimizer:                       Optimizer settings.
         backend:                         Backend plugin instance used for function evaluations.
         gradient:                        Gradient estimation settings.
-        realization_filters:             Realization filter plugin instances, by key.
-                                         A sequence is keyed by position.
-        function_estimators:             Function estimator plugin instances, by key.
-                                         A sequence is keyed by position.
-        samplers:                        Sampler plugin instances, by key. A sequence
-                                         is keyed by position.
+        realization_filters:             Realization filter instances, by key.
+        function_estimators:             Function estimator instances, by key.
+        samplers:                        Sampler instances, by key.
         names:                           Optional mapping of axis names to label sequences.
     """
 

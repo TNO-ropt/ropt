@@ -45,8 +45,7 @@ class Sampler(ABC):
         run-dependent setup should usually be deferred to `init`.
 
         Args:
-            sampler_config: Configuration object specifying the sampler method
-                and any method-specific options.
+            sampler_config: Configuration specifying the method and its options.
         """
 
     @abstractmethod
@@ -63,17 +62,15 @@ class Sampler(ABC):
 
         Called once at the start of each optimization workflow, after all
         configuration is finalized. The three counts are the shape of the array
-        `generate_samples` must return.
+        `generate_samples` must return. A `mask` of `None` makes the sampler
+        responsible for every variable.
 
         Args:
             realization_count:  The number of realizations in the ensemble.
             perturbation_count: The number of perturbations to generate.
             variable_count:     The total number of optimization variables.
-            mask:               Optional boolean mask selecting the variables
-                                handled by this sampler. If `None`, the sampler
-                                is responsible for all variables.
-            rng:                NumPy random number generator instance for
-                                stochastic sampling methods.
+            mask:               Optional mask selecting this sampler's variables.
+            rng:                NumPy random number generator.
         """
 
     @abstractmethod

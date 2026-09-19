@@ -43,12 +43,13 @@ class Results(AxisMetadata, ABC):
 
     See [Working with Results](../running/results.md) for a narrative overview.
 
+    The keys of `names` are [`AxisName`][ropt.enums.AxisName] values, or the
+    name of a metadata key that defines a user axis.
+
     Attributes:
         batch_id: Identifier for the evaluation batch.
         metadata: Dictionary of additional information (not used internally).
-        names:    Mapping from axis name to label tuples for DataFrame export.
-                  Keys are [`AxisName`][ropt.enums.AxisName] values, or the name
-                  of a metadata key that defines a user axis.
+        names:    Mapping from axis name to label tuples, for DataFrame export.
     """
 
     batch_id: int
@@ -87,8 +88,7 @@ class Results(AxisMetadata, ABC):
             A DataFrame with the selected fields as columns.
 
         Raises:
-            TypeError:        If `select` is a set rather than an ordered
-                              sequence.
+            TypeError:        If `select` is not an ordered sequence.
             ValueError:       If `select` names the same path more than once.
             UnsupportedError: If the `pandas` module is not installed.
         """
@@ -128,8 +128,7 @@ class Results(AxisMetadata, ABC):
             A DataFrame with axis labels and the selected fields as columns.
 
         Raises:
-            TypeError:        If `select` is a set rather than an ordered
-                              sequence.
+            TypeError:        If `select` is not an ordered sequence.
             ValueError:       If `select` names the same path more than once.
             UnsupportedError: If the `polars` module is not installed.
         """

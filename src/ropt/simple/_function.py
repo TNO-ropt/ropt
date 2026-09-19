@@ -39,7 +39,7 @@ class EvaluationFunction(Protocol):
 
         Returns:
             An [`EvaluationFunctionResult`][ropt.components.evaluators.EvaluationFunctionResult],
-            a scalar, or a flat sequence of objectives followed by constraints.
+            a scalar, or objectives followed by constraints.
         """
 
 

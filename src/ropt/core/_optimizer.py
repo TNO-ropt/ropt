@@ -89,8 +89,7 @@ class SignalEvaluationCallback(Protocol):
         output of the evaluation.
 
         Args:
-            results: The results produced by the evaluation, or `None` if the
-                     evaluation has not yet started.
+            results: The evaluation results, or `None` before it starts.
         """
 
 
@@ -113,8 +112,7 @@ class EnsembleOptimizer:
         Args:
             context:            The ensemble optimization context.
             ensemble_evaluator: The evaluator for function evaluations.
-            signal_evaluation:  Optional callback, invoked before and after each
-                                function evaluation.
+            signal_evaluation:  Optional callback, invoked around each evaluation.
         """
         self._context = context
         self._function_evaluator = ensemble_evaluator

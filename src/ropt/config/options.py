@@ -27,8 +27,7 @@ class OptionsSchemaModel(BaseModel):
 
     Attributes:
         methods: A mapping of method names to their schemas.
-        common:  An optional list of method schemas that define common options
-                 shared by all methods.
+        common:  Optional method schemas defining options shared by all methods.
 
     **Example**:
     ```py

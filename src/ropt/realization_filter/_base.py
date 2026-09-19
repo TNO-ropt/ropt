@@ -75,14 +75,13 @@ class RealizationFilter(ABC):
         [`TooFewRealizations`][ropt.exceptions.TooFewRealizations] to record
         the evaluation as failed.
 
+        `objective_scales` is passed on every call because auto-scaling only
+        fixes the scales after the first batch.
+
         Args:
             objectives:        Objectives, shape `(n_realizations, n_objectives)`.
-            constraints:       Nonlinear constraints, shape
-                               `(n_realizations, n_constraints)`, or `None` if no
-                               nonlinear constraints are configured.
-            objective_scales:  The scale applied to each objective. Passed on
-                               every call because auto-scaling only fixes these
-                               after the first batch.
+            constraints:       Constraints, shape `(n_realizations, n_constraints)`.
+            objective_scales:  The scale applied to each objective.
             maximize:          Which objectives are maximized.
             objective_weights: The configured weight of each objective.
 

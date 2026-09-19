@@ -27,8 +27,9 @@ class EnOptEvent:
         event_type:  Type of event that occurred.
         context:     Optimizer context associated with the event.
         results:     Tuple of result objects associated with the event.
-        source:      The compute step that emitted the event; a handler may call
-                     its `stop()` to stop that run.
+        source:      The compute step that emitted the event.
+
+    A handler may call `source.stop()` to stop the run that emitted the event.
 
     See [Optimization Workflows](../advanced/workflows.md#the-enoptevent-object)
     for a detailed description of events and their lifecycle.

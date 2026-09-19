@@ -31,8 +31,7 @@ def missing_engine_message(engine: DataFrameEngine, what: str, alternative: str)
     Args:
         engine:      The frame library that `what` needs.
         what:        The function, method or class that needs it.
-        alternative: How to use the other library instead, named only when that
-                     library is itself installed.
+        alternative: How to use the other library, if it is installed.
 
     Returns:
         The message.

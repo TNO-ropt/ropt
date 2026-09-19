@@ -36,12 +36,9 @@ class NonlinearConstraintsConfig(BaseModel):
         lower_bounds:        Lower bounds for the right-hand-side values.
         upper_bounds:        Upper bounds for the right-hand-side values.
         scales:              Scale factors for the constraint functions (default: 1.0).
-        auto_scale:          Which constraints to estimate an additional scale for,
-                             from the first batch (default: `False`).
-        realization_filters: Realization filter to apply to each constraint, by key,
-                             `None` to apply none (default: `None`).
-        function_estimators: Function estimator to apply to each constraint, by key
-                             (default: `"0"`).
+        auto_scale:          Which constraints to auto-scale (default: `False`).
+        realization_filters: Realization filter per constraint, by key (default: none).
+        function_estimators: Function estimator per constraint, by key (default: `"0"`).
     """
 
     lower_bounds: Array1D

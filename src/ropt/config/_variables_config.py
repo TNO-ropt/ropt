@@ -40,6 +40,13 @@ class VariablesConfig(BaseModel):
     See [Configuration Sections](../optimizer_setup/configuration_sections.md#variables) for
     detailed descriptions and usage examples.
 
+    The perturbation defaults are
+    [`DEFAULT_PERTURBATION_MAGNITUDE`][ropt.config.constants.DEFAULT_PERTURBATION_MAGNITUDE],
+    [`DEFAULT_PERTURBATION_TYPE`][ropt.config.constants.DEFAULT_PERTURBATION_TYPE]
+    (one of [`PerturbationType`][ropt.enums.PerturbationType]) and
+    [`DEFAULT_PERTURBATION_BOUNDARY_TYPE`][ropt.config.constants.DEFAULT_PERTURBATION_BOUNDARY_TYPE]
+    (one of [`BoundaryType`][ropt.enums.BoundaryType]).
+
     Attributes:
         variable_count:           Number of variables.
         lower_bounds:             Lower bounds for the variables (default: $-\infty$).
@@ -48,17 +55,10 @@ class VariablesConfig(BaseModel):
         mask:                     Optional boolean mask indicating free variables.
         scales:                   Scale factors for the variables (default: 1.0).
         offsets:                  Offsets for the variables (default: 0.0).
-        perturbation_magnitudes:  Magnitudes of the perturbations for each variable
-            (default:
-            [`DEFAULT_PERTURBATION_MAGNITUDE`][ropt.config.constants.DEFAULT_PERTURBATION_MAGNITUDE]).
-        perturbation_types:       Type of perturbation for each variable (see
-            [`PerturbationType`][ropt.enums.PerturbationType], default:
-            [`DEFAULT_PERTURBATION_TYPE`][ropt.config.constants.DEFAULT_PERTURBATION_TYPE]).
-        boundary_types:           How to handle perturbations that violate boundary
-            conditions (see [`BoundaryType`][ropt.enums.BoundaryType], default:
-            [`DEFAULT_PERTURBATION_BOUNDARY_TYPE`][ropt.config.constants.DEFAULT_PERTURBATION_BOUNDARY_TYPE]).
-        samplers:                 Sampler to apply to each variable, by key
-                                  (default: `"0"`).
+        perturbation_magnitudes:  Magnitude of the perturbation of each variable.
+        perturbation_types:       Type of perturbation for each variable.
+        boundary_types:           Handling of perturbations that violate a bound.
+        samplers:                 Sampler for each variable, by key (default: `"0"`).
         seed:                     Seed for the random number generator used by the samplers.
     """
 

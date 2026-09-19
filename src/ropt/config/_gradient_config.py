@@ -24,13 +24,14 @@ class GradientConfig(BaseModel):
     See [Configuration Sections](../optimizer_setup/configuration_sections.md#gradient) for
     detailed descriptions and usage examples.
 
+    `number_of_perturbations` defaults to
+    [`DEFAULT_NUMBER_OF_PERTURBATIONS`][ropt.config.constants.DEFAULT_NUMBER_OF_PERTURBATIONS],
+    and `perturbation_min_success` to `number_of_perturbations`.
+
     Attributes:
-        number_of_perturbations:  Number of perturbations (default:
-            [`DEFAULT_NUMBER_OF_PERTURBATIONS`][ropt.config.constants.DEFAULT_NUMBER_OF_PERTURBATIONS]).
-        perturbation_min_success: Minimum number of successful function evaluations
-            for perturbed variables (default: equal to `number_of_perturbations`).
-        merge_realizations:       Merge all realizations for the final gradient
-            calculation (default: `False`).
+        number_of_perturbations:  Number of perturbations.
+        perturbation_min_success: Minimum number of successful perturbations.
+        merge_realizations:       Merge realizations for the final gradient.
         evaluation_policy:        How to evaluate functions and gradients.
     """
 

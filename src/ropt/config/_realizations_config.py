@@ -21,10 +21,12 @@ class RealizationsConfig(BaseModel):
     See [Configuration Sections](../optimizer_setup/configuration_sections.md#realizations) for
     detailed descriptions and usage examples.
 
+    `realization_min_success` defaults to the number of realizations, so a
+    single failure ends the run.
+
     Attributes:
         weights:                 Weights for the realizations (default: 1.0).
-        realization_min_success: Minimum number of successful realizations (default:
-                                 equal to the number of realizations).
+        realization_min_success: Minimum number of successful realizations.
     """
 
     weights: Array1D = np.array(1.0)

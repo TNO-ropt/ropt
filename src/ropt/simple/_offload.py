@@ -74,13 +74,13 @@ def offload(
     [`WorkflowError`][ropt.exceptions.WorkflowError]. So does a pool that is
     closed, or one carried into a worker process. A call that the machinery
     could not run, for instance because its worker process was killed, raises an
-    [`ExecutionError`][ropt.exceptions.ExecutionError].
+    [`ExecutionError`][ropt.exceptions.ExecutionError]. Work offloaded from
+    inside an evaluation needs a *different* pool: the pool it is already
+    running on refuses it.
 
     Args:
         work: A single zero-argument callable, or a sequence of them.
-        pool: The pool to dispatch to, or `None` to run inline. Work offloaded
-              from inside an evaluation needs a *different* pool: the pool it is
-              already running on refuses it.
+        pool: The pool to dispatch to, or `None` to run inline.
 
     Returns:
         The single result, or a tuple of results in the order of `work`.

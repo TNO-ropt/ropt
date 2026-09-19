@@ -20,9 +20,7 @@ class OptimizationResult:
 
     Attributes:
         exit_code: The exit code describing how the optimization terminated.
-        results:   The [`FunctionResults`][ropt.results.FunctionResults] of the
-                   best evaluation, or `None` if the run produced no valid
-                   result.
+        results:   The best evaluation, or `None` if there was no valid result.
     """
 
     exit_code: ExitCode

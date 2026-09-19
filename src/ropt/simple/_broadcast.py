@@ -35,8 +35,7 @@ def broadcast_runs(
         One `(config, x0, function)` triple per run.
 
     Raises:
-        ValueError: If `x0` is not a vector or a matrix, or if the sequences
-                    given disagree on the number of runs.
+        ValueError: If `x0` has the wrong shape, or the sequences disagree.
     """
     configs = [config] if isinstance(config, Mapping) else list(config)
     functions = [function] if callable(function) else list(function)

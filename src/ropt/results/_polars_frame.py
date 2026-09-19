@@ -64,19 +64,15 @@ def results_to_polars(
 
     Args:
         results:     A sequence of [`Results`][ropt.results.Results] objects.
-        fields:      Field names to include, in column order (dot notation for
-                     nested fields).
+        fields:      Field names to include, in column order (dot notation).
         result_type: `"functions"` or `"gradients"`.
         sep:         Separator used to join unstacked column names.
 
     Returns:
-        A DataFrame with the requested fields as columns, keyed by `batch_id`
-        and by any axes that stay stacked.
+        A DataFrame keyed by `batch_id` and by any axes that stay stacked.
 
     Raises:
-        TypeError:        If `result_type` is invalid, if `fields` is a set
-                          rather than an ordered sequence, or if results
-                          contain unexpected types.
+        TypeError:        If an argument or a result has an unexpected type.
         ValueError:       If `fields` names the same path more than once.
         UnsupportedError: If the `polars` module is not installed.
     """

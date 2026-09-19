@@ -45,11 +45,10 @@ class FunctionEstimator(ABC):
 
         Called once after configuration is finalized. Use for validation
         (for example compatibility with `merge_realizations`) and precomputation.
+        `merge_realizations` is described under `calculate_gradient`.
 
         Args:
-            merge_realizations: Whether gradients arrive merged across
-                                realizations, as described in
-                                `calculate_gradient`.
+            merge_realizations: Whether gradients arrive merged across realizations.
         """
 
     @abstractmethod
@@ -89,10 +88,8 @@ class FunctionEstimator(ABC):
         `init`.
 
         Args:
-            functions: Shape `(n_realizations,)` — needed for chain-rule
-                estimators (for example standard deviation).
-            gradient:  Shape `(n_variables, n_realizations)` or
-                `(n_variables,)` if merged.
+            functions: Shape `(n_realizations,)` — the per-realization values.
+            gradient:  Shape `(n_variables, n_realizations)`, or `(n_variables,)`.
             weights:   Shape `(n_realizations,)` — realization weights.
 
         Returns:

@@ -71,12 +71,9 @@ class GradientEvaluations(ResultField):
         [User-defined axes](../running/results.md#user-defined-axes).
 
     Attributes:
-        perturbed_objectives:  The objective function values for each
-                               realization and perturbation.
-        perturbed_constraints: The constraint function values for each
-                               realization and perturbation.
-        metadata:              Optional metadata for each evaluated
-                               realization and perturbation.
+        perturbed_objectives:  Objective values per realization and perturbation.
+        perturbed_constraints: Constraint values per realization and perturbation.
+        metadata:              Optional metadata per realization and perturbation.
     """
 
     perturbed_objectives: NDArray[np.float64] = field(
@@ -122,10 +119,8 @@ class GradientEvaluations(ResultField):
         """Create a `GradientEvaluations` object with the given data.
 
         Args:
-            perturbed_objectives:  Objective function values for each
-                                   realization and perturbation.
-            perturbed_constraints: Constraint function values for each
-                                   realization and perturbation.
+            perturbed_objectives:  Objective values per realization and perturbation.
+            perturbed_constraints: Constraint values per realization and perturbation.
             metadata:              Optional info for each evaluation.
 
         Returns:

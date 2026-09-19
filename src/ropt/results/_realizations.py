@@ -63,10 +63,8 @@ class Realizations(ResultField):
 
     Attributes:
         evaluated_realizations: Boolean array indicating evaluated realizations.
-        objective_weights:      Weights for each objective in each realization,
-                                if available.
-        constraint_weights:     Weights for each constraint in each realization,
-                                if available.
+        objective_weights:      Objective weights per realization, if available.
+        constraint_weights:     Constraint weights per realization, if available.
     """
 
     evaluated_realizations: NDArray[np.bool_] = field(

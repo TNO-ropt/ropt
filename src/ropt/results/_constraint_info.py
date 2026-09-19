@@ -158,8 +158,7 @@ class ConstraintInfo(ResultField):
             constraints:  Non-linear constraint values, if present.
 
         Returns:
-            A newly created `ConstraintInfo` object, or `None` if no bounds
-            are available.
+            A new `ConstraintInfo`, or `None` if no bounds are available.
         """
         bound_lower: NDArray[np.float64] | None = None
         bound_upper: NDArray[np.float64] | None = None

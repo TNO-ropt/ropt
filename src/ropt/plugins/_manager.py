@@ -222,16 +222,13 @@ class PluginManager:
 
         Args:
             plugin_type: The category of the plugin (for example "backend", "sampler").
-            method:      The name of the method the plugin must support, potentially
-                         prefixed with the plugin name and a slash (`/`).
+            method:      The name of the method the plugin must support.
 
         Returns:
             The class of the plugin that matches the criteria.
 
         Raises:
-            ValueError: If no matching plugin is found for the given type and
-                        method, or if "default" is used as a method name without
-                        specifying a plugin name.
+            ValueError: If no plugin of that type supports the method.
         """
         found = self._get_plugin(plugin_type, method)
         if found is not None:
@@ -249,8 +246,7 @@ class PluginManager:
 
         Args:
             plugin_type: The category of the plugin (for example "backend", "sampler").
-            method:      The name of the method to check, potentially prefixed
-                         with the plugin name and a slash (`/`).
+            method:      The name of the method to check.
 
         Returns:
             The name of a matching plugin supporting the specified method, or `None`.
@@ -280,8 +276,7 @@ def get_plugin(plugin_type: PluginType, method: str) -> type[Any]:
 
     Args:
         plugin_type: The category of the plugin (for example "backend", "sampler").
-        method:      The name of the method the plugin must support, potentially
-                     prefixed with the plugin name and a slash (`/`).
+        method:      The name of the method the plugin must support.
 
     Returns:
         The class of the plugin that matches the criteria.
@@ -301,8 +296,7 @@ def get_plugin_name(plugin_type: PluginType, method: str) -> str | None:
 
     Args:
         plugin_type: The category of the plugin (for example "backend", "sampler").
-        method:      The name of the method to check, potentially prefixed
-                     with the plugin name and a slash (`/`).
+        method:      The name of the method to check.
 
     Returns:
         The name of a matching plugin supporting the specified method, or `None`.
