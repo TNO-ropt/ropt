@@ -333,8 +333,7 @@ class Session:
 
         Each job is a fresh command rather than a re-import of your script, so
         the evaluation function must live in a module the job can import, or
-        the `ropt[cloudpickle]` extra must be installed — which is the
-        recommended way to use this pool.
+        the `ropt[cloudpickle]` extra must be installed.
 
         POSIX only. See [Running Optimizations](../running/running.md) for a
         walkthrough.
@@ -382,7 +381,7 @@ class Session:
         requires the `ropt[hpc]` extra. Each evaluation is a job started as its
         own command, so the evaluation function must live in a module the
         compute nodes can import, or the `ropt[cloudpickle]` extra must be
-        installed — which is the recommended way to use this pool. Develop
+        installed. Develop
         against [`local_pool`][ropt.simple.Session.local_pool] first: it has the
         same shape and the same rule, without a cluster. The cluster is selected
         from `cluster`/`queue`: give a queue to search for its cluster, a

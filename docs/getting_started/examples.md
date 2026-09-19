@@ -3,7 +3,7 @@
 Every script in the
 [examples/simple](https://github.com/TNO-ropt/ropt/tree/main/examples/simple)
 folder is listed here. They are short, and the test suite keeps them working, so
-they are a reliable starting point to copy from.
+they can be copied and adapted as they stand.
 
 They all use the [simple API](../running/running.md), which covers most
 optimization tasks. The last column links the page of the manual that walks

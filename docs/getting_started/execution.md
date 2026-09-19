@@ -15,7 +15,7 @@ with session() as s:
     result = optimize(config, x0, objective, pool=s.thread_pool(workers=4))
 ```
 
-That is the whole pattern. A session can hand out as many pools as you like, of
+That is the whole pattern. A session can create as many pools as you like, of
 any kind, and each run uses the one you give it — and only that one. Closing the
 session releases them all. The runnable script is
 [examples/simple/parallel.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/parallel.py),
@@ -57,7 +57,7 @@ called `optimize`.
     *Python* code at a time. Work that **waits** — for a file, a network reply,
     an external tool — overlaps freely, because a waiting thread is not running
     Python code; and so does work a library performs outside Python, as `numpy`
-    does while it crunches an array. What is stuck one-at-a-time is arithmetic
+    does while it works on an array. What is stuck one-at-a-time is arithmetic
     written in Python itself. Separate **processes** each have their own
     interpreter and always run truly in parallel, but they do not share memory,
     so data has to be copied between them, and starting one takes noticeably

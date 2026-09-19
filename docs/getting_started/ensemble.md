@@ -70,8 +70,8 @@ objective uses `context.realization` to select the parameters for the
 realization it is computing. `ropt` combines the per-realization values into the
 robust objective for you.
 
-Returning a single number, as here, is the simplest case. A function that has
-multiple objectives and has constraints returns a sequence instead — the
+Returning a single number, as here, is the simplest case. A function with
+multiple objectives, or with constraints, returns a sequence instead — the
 objectives first, then the constraints; see
 [Constraints](../optimizer_setup/constraints.md).
 
@@ -112,7 +112,7 @@ robust objective, which is what it optimizes.
 --8<-- "examples/simple/ensemble.py:result"
 ```
 
-- `result.exit_code` says why the run stopped (a member of the
+- `result.exit_code` indicates why the run stopped (a member of the
   [`ExitCode`][ropt.enums.ExitCode] enumeration).
 - `result.results` is the best evaluation the run reached, a
   [`FunctionResults`][ropt.results.FunctionResults] carrying every value that

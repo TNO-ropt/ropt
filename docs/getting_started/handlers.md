@@ -6,7 +6,7 @@ to see every result to watch progress over the optimization. A **handler** does
 this: an object you attach with a `handlers=` argument that observes every
 result an optimization produces.
 
-What it collects are the full result objects —
+It collects the full result objects —
 [`FunctionResults`][ropt.results.FunctionResults] and
 [`GradientResults`][ropt.results.GradientResults] — rather than the summary `optimize` returns; see
 [Working with Results](../running/results.md).
@@ -45,7 +45,7 @@ print(f"collected {len(history.results)} results across all restarts")
 
 Restarting needs nothing special from `ropt`: each call to `optimize` is
 independent, so `result.results.variables` — the best point a run found — is
-simply the start point for the next one. The runnable script is
+the start point for the next one. The runnable script is
 [examples/simple/restart.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/restart.py),
 which [Restarting from the Best Point](../running/restart.md) walks through.
 

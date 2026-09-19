@@ -5,10 +5,10 @@ Research (TNO) and released under the GNU General Public License v3.0.
 
 ## Overview
 
-`ropt` is a module designed for implementing and executing robust optimization
+`ropt` is a module for implementing and executing robust optimization
 workflows. In classical optimization problems, a deterministic function is
-optimized. However, in robust optimization, the function is expected to exhibit
-a stochastic nature and is represented by an ensemble of functions
+optimized. In robust optimization, the function is stochastic and is
+represented by an ensemble of functions
 (realizations) for different values of some (possibly unknown) random
 parameters. The optimal solution is then determined by optimizing the value of a
 statistic, such as the mean, over the ensemble.
@@ -45,10 +45,10 @@ statistic, such as the mean, over the ensemble.
   [`pandas`](https://pandas.pydata.org/) or [`polars`](https://pola.rs/) data
   frames.
 
-`ropt` can be employed to construct optimization workflows directly in Python
+`ropt` can be used to construct optimization workflows directly in Python
 scripts or as a building block in optimization applications. At a minimum, the
 user needs to provide additional code to calculate the values for each function
-realization in the ensemble. This can range from simply calling a Python
+realization in the ensemble. This can range from calling a Python
 function that returns the objective values to initiating a long-running
 simulation on an HPC cluster and reading the results. Furthermore, `ropt`
 exposes all intermediate results of the optimization, such as objective and
@@ -62,22 +62,21 @@ the optimization — and is the same no matter how you run it; it is covered in
 the [Optimizer Setup](optimizer_setup/key_concepts.md) section. There are two options
 covering *how* to run a configured optimization:
 
-1. [Running Optimizations](running/running.md) is the recommended starting
-   point: a single function call covers most optimization tasks, including
+1. [Running Optimizations](running/running.md) covers most optimization tasks
+   in a single function call, including
    parallel evaluation across threads, processes, or an HPC cluster, custom
    result handling, and running multiple optimization steps sequentially or
    in parallel, possibly nested within each other.
 2. [Optimization Workflows](advanced/workflows.md) expose the individual
-   building blocks — compute steps, event handlers, executors — directly, for
-   full flexibility.
+   building blocks — compute steps, event handlers, executors — directly.
 
 ## Getting started
 
 - Read the [Background](getting_started/background.md) for the ideas behind
   `ropt`, then work through [Installation](getting_started/installation.md) and
   the [Quickstart](getting_started/quickstart.md).
-- [Running Optimizations](running/running.md) is the recommended starting point
-  for running an optimization and covers most cases.
+- [Running Optimizations](running/running.md) covers running an optimization,
+  and most cases with it.
 - The [Key Concepts](optimizer_setup/key_concepts.md) page introduces the terms used
   throughout the documentation.
 - The [Configuration](optimizer_setup/configuration.md) page describes the
@@ -93,11 +92,11 @@ Additional backend optimizers can be installed separately and used via the plugi
 - The [`ropt-nomad`](https://tno-ropt.github.io/ropt-nomad/) plugin implements
   the MADS algorithm based on the
   [NOMAD](https://www.gerad.ca/en/software/nomad/) package.
-- The [`ropt-pymoo`](https://tno-ropt.github.io/ropt-pymoo/) makes the
+- The [`ropt-pymoo`](https://tno-ropt.github.io/ropt-pymoo/) plugin makes the
   algorithms from the [`pymoo`](https://pymoo.org/) package available to `ropt`.
 
 
 ### Applications
-The `ropt` package is used  by the
+The `ropt` package is used by the
 [Everest](https://everest.readthedocs.io/en/latest/) decision-making tool as its
 core optimization engine.

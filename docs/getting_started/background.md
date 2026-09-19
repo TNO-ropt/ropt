@@ -12,8 +12,8 @@ h_k(\mathbf{x}) = 0, \quad \quad k=1, \ldots, K \\
 Here, $f(\mathbf{x})$ is deterministic: for a given $\mathbf{x}$ it always
 returns the same value. In practice, however, $f(\mathbf{x})$ often depends on
 uncertain parameters drawn from some — possibly unknown — probability
-distribution. In that case, a single evaluation of $f(\mathbf{x})$ is really
-just one member of a larger set of possible functions.
+distribution. In that case, a single evaluation of $f(\mathbf{x})$ is one
+member of a larger set of possible functions.
 
 Ensemble-based robust optimization optimizes such a set, or *ensemble*, of
 functions $f_i(\mathbf{x})$ at once. Each $f_i$ is called a *realization*: one
@@ -40,18 +40,17 @@ process.
 [SciPy](https://www.scipy.org) package. These algorithms work iteratively,
 evaluating the objective function — and usually its gradient — many times
 over the course of the optimization. `ropt` assumes that gradients cannot be
-calculated analytically, and one of its core features is estimating them
-efficiently using stochastic methods.
+calculated analytically, and estimates them using stochastic methods.
 
 `ropt` sets up and runs the optimization algorithm, combines the individual
 realizations into overall function and gradient values, and keeps track of
 intermediate and final results. Calculating the functions themselves — for
 example, running a simulation — is left to code that you provide.
 
-Most optimization problems only need a single run of one method. Sometimes,
-though, it helps to combine several runs, possibly with different algorithms
+Most optimization problems only need a single run of one method. Some are
+solved by combining several runs, possibly with different algorithms
 — for example, when a problem mixes continuous and discrete variables, each
-kind may be best handled by its own method. `ropt` supports this too: several
+kind needs its own method. `ropt` supports this: several
 optimization runs can be combined sequentially, in parallel, or nested within
 each other.
 
