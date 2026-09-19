@@ -47,6 +47,12 @@ class VariablesConfig(BaseModel):
     [`DEFAULT_PERTURBATION_BOUNDARY_TYPE`][ropt.config.constants.DEFAULT_PERTURBATION_BOUNDARY_TYPE]
     (one of [`BoundaryType`][ropt.enums.BoundaryType]).
 
+    Variables reach the optimizer as $y = (x - o)/s$ and are reported back as
+    $x = s\,y + o$, using `scales` and `offsets`. A scale is a change of units,
+    so every entry must be positive. There is no `auto_scale` here:
+    [`scales_and_offsets_from_bounds`][ropt.utils.scales_and_offsets_from_bounds]
+    derives scales from the bounds when that is what is wanted.
+
     Attributes:
         variable_count:           Number of variables.
         lower_bounds:             Lower bounds for the variables (default: $-\infty$).
