@@ -3096,7 +3096,7 @@ as the runnable version.</p>
 <p>Backends can report their own progress, which is disabled by default:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="s2">"backend"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"verbose"</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
 </span></code></pre></div>
-<p><code>verbose</code> decides whether output is produced at all. Where it goes is separate:
+<p><code>verbose</code> determines whether output is produced at all. Where it goes is separate:
 <code>optimizer.stdout</code> and <code>optimizer.stderr</code> capture it to files, resolved against
 <code>optimizer.output_dir</code>. Capture rewires process-global state, so only one run at
 a time can use it — leave those unset on runs that overlap. See

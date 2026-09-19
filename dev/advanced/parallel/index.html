@@ -3382,7 +3382,7 @@ same pool of workers, the event loop dispatches evaluation tasks as they
 arrive, and results flow back without blocking other work.</p>
 <p>The <a class="autorefs autorefs-internal" title="            ropt.components.evaluators.ParallelEvaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.ParallelEvaluator"><code>ParallelEvaluator</code></a> is the
 evaluator that bridges the synchronous compute-step <code>run()</code> call and the
-asynchronous world. It hands the rows of the variable batch to an
+asynchronous world. It submits the rows of the variable batch to an
 <a class="autorefs autorefs-internal" title="            ropt.components.executors.Executor" href="../../reference/components_executors/#ropt.components.executors.Executor"><code>Executor</code></a> as a single
 <a class="autorefs autorefs-internal" title="            ropt.components.executors.Submission" href="../../reference/components_executors/#ropt.components.executors.Submission"><code>Submission</code></a>. The executor runs the
 submission's work items on its workers and delivers each result back to the
@@ -3477,8 +3477,8 @@ the worker, which reports the name it could not find. Whether that name resolves
 depends on the worker: <code>ProcessExecutor</code> re-imports <code>__main__</code>, so a script's
 functions are found again, while the local and HPC executors run a fresh command
 whose <code>__main__</code> is ropt's own, so they are not. Installing
-<code>ropt[cloudpickle]</code> lifts the restriction for all of them, and is recommended
-whenever work runs as a job. <code>ThreadExecutor</code> serializes nothing and is never
+<code>ropt[cloudpickle]</code> lifts the restriction for all of them.
+<code>ThreadExecutor</code> serializes nothing and is never
 affected.</p>
 <div class="admonition note">
 <p class="admonition-title">Working directory</p>
@@ -3634,7 +3634,7 @@ extras and no configuration.</p>
 <p>It shares all of its machinery with
 <a class="autorefs autorefs-internal" title="            ropt.components.executors.HPCExecutor" href="../../reference/components_executors/#ropt.components.executors.HPCExecutor"><code>HPCExecutor</code></a> — the same <code>.in</code>/<code>.out</code>
 files, the same poll loop, the same failure reporting — and differs only in what
-starts a job. Where the HPC executor hands a command to a scheduler, this one
+starts a job. Where the HPC executor submits a command to a scheduler, this one
 starts it directly.</p>
 <table>
 <thead>
@@ -3902,7 +3902,7 @@ running afterwards, because what <em>can</em> be done to running work differs:</
 </table>
 <p><strong>Threads run to completion because a thread cannot be cancelled.</strong> Python
 offers no way to interrupt one from outside, so an evaluation on a
-<code>ThreadExecutor</code> decides for itself when it stops. <code>cancel()</code> returns at once,
+<code>ThreadExecutor</code> stops only when it returns. <code>cancel()</code> returns at once,
 but the program cannot leave until those evaluations return — the pool joins its
 threads at interpreter shutdown. Rather than let that look like a hang, the
 executor logs a <code>WARNING</code> naming how many are still running. An evaluation that
@@ -3919,7 +3919,7 @@ promise that nothing of the run survives it.</p>
 its own worker processes and nothing else. It installs no process groups, so
 a subprocess an evaluation started — a simulator, a solver, a shell
 pipeline — is never signalled: it keeps running, and is re-parented when the
-worker holding it dies. Nothing reports this, and the work simply continues
+worker holding it dies. Nothing reports this, and the work continues
 after the program that asked for it has gone.</p>
 <p><a class="autorefs autorefs-internal" title="            ropt.components.executors.LocalJobExecutor" href="../../reference/components_executors/#ropt.components.executors.LocalJobExecutor"><code>LocalJobExecutor</code></a> is the
 backend that handles this, by giving each work item a session of its own and
@@ -3975,7 +3975,7 @@ computed over the whole ensemble.</p>
 <p><code>numpy.nan</code> returned <em>by the evaluation function</em> keeps its meaning — that
 realization could not produce a value — and
 <a href="../../optimizer_setup/configuration_sections/#realizations"><code>realization_min_success</code></a>
-still decides how many a batch may contain before the run ends with
+still sets how many a batch may contain before the run ends with
 <code>TOO_FEW_REALIZATIONS</code>. Only a failure of the machinery is raised.</p>
 </div>
 <h3 id="user-code-exception-re-raised-unchanged">User-code exception (re-raised unchanged)</h3>

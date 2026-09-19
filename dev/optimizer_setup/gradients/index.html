@@ -3169,7 +3169,7 @@ the Configuration Reference.</p>
 </span></code></pre></div>
 <h2 id="perturbation-magnitude-and-scaling">Perturbation magnitude and scaling</h2>
 <p><code>perturbation_magnitudes</code> sets the scale of the sample applied to each
-variable. The <code>perturbation_types</code> field decides how that scale is interpreted:</p>
+variable. The <code>perturbation_types</code> field sets how that scale is interpreted:</p>
 <ul>
 <li><a class="autorefs autorefs-internal" title="            ABSOLUTE
 
@@ -3259,14 +3259,14 @@ realizations that did work.</p>
   realizations and reduce gradient work.</li>
 </ul>
 <h2 id="samplers">Samplers</h2>
-<p>A sampler decides <em>where</em> the perturbed points are placed, while
-<code>perturbation_magnitudes</code> decides how far away they are. The default draws from
+<p>A sampler determines <em>where</em> the perturbed points are placed, while
+<code>perturbation_magnitudes</code> determines how far away they are. The default draws from
 a standard normal distribution, and quasi-random alternatives are available.
 Selecting one, perturbing different variables differently, sharing samples
 across realizations and writing your own are all covered in
 <a href="../samplers/">Samplers</a>.</p>
 <h2 id="function-estimators">Function estimators</h2>
-<p>A function estimator decides <em>how</em> the per-realization values and gradients are
+<p>A function estimator determines <em>how</em> the per-realization values and gradients are
 combined into the single estimate the optimizer receives. The default is a
 weighted mean; alternatives, including a measure of dispersion rather than an
 average, are covered in <a href="../function_estimators/">Function Estimators</a>.</p>

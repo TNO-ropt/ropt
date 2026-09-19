@@ -3617,7 +3617,7 @@ them apart. What differs is whether a process is a <em>worker</em> or a <em>job<
 </tr>
 </tbody>
 </table>
-<p>One question decides it: <strong>is an evaluation a function call, or a job?</strong> A call
+<p>One question separates them: <strong>is an evaluation a function call, or a job?</strong> A call
 is too short to pay for a process each time, so reuse a few workers and take
 <code>process_pool</code>. A job runs a simulator, writes files, and lasts long enough that
 one process start is negligible — take <code>local_pool</code>, or an <code>hpc_pool</code> if it belongs
@@ -3662,7 +3662,7 @@ their queues, so all you do is pick one and say how much of it you want:</p>
 </span></code></pre></div>
 <p><code>queue</code> names a queue <strong>defined in the configuration</strong>, which is not necessarily
 your scheduler's partition name — it selects a configured entry, and that
-entry's script decides which partition the job lands on. Ask your site which
+entry's script determines which partition the job lands on. Ask your site which
 queues exist, or read them off the configuration.</p>
 <p>When the configuration defines several clusters, <code>cluster</code> picks one:</p>
 <ul>

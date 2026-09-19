@@ -2973,7 +2973,7 @@
 <h1 id="samplers">Samplers</h1>
 <p>A sampler draws the perturbations that <a href="../gradients/">stochastic gradient
 estimation</a> evaluates around the current point. Which sampler is
-used decides <em>where</em> those points are placed; how far they are placed is decided
+used determines <em>where</em> those points are placed; how far they are placed is set
 separately, by <code>perturbation_magnitudes</code>.</p>
 <p>The default is <a class="autorefs autorefs-internal" title="            ropt.sampler.scipy.SciPySampler" href="../../reference/sampler/#ropt.sampler.scipy.SciPySampler"><code>SciPySampler</code></a>, drawing from a
 standard normal distribution <span class="arithmatex">\(N(0, 1)\)</span>. It also offers uniform and truncated

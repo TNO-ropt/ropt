@@ -3089,7 +3089,7 @@
 
 
 <h1 id="writing-evaluation-callbacks">Writing Evaluation Callbacks</h1>
-<p>During optimization <code>ropt</code> decides which variable vectors need values for the
+<p>During optimization <code>ropt</code> determines which variable vectors need values for the
 objectives and optional nonlinear-constraints. A compute step does not compute
 these values itself — it delegates to an
 <a class="autorefs autorefs-internal" title="            ropt.components.evaluators.Evaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.Evaluator"><code>Evaluator</code></a> instance that you supply. This
@@ -3138,7 +3138,7 @@ share one evaluator across steps that run in parallel; give each parallel
 step its own evaluator. For the constraints on where each layer of a nested
 workflow may run, see
 <a href="../parallel/#nested-workflows-and-process-boundaries">Nested workflows and process boundaries</a>.
-Note that the parallelism of
+The parallelism of
 <a class="autorefs autorefs-internal" title="            ropt.components.evaluators.ParallelEvaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.ParallelEvaluator"><code>ParallelEvaluator</code></a> happens
 <em>below</em> <code>eval</code> — it dispatches tasks to an executor, so its own <code>eval</code> is
 still called on a single thread. An evaluator cannot be transferred to
