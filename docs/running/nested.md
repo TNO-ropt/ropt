@@ -98,7 +98,8 @@ preference:
 
 The outer pool is a **thread** pool. Outer evaluations therefore stay inside
 this process, where the inner pool and the shared handler group are live
-objects; on a process pool they would arrive as copies and be useless. The inner
+objects; on a process pool they would arrive as copies, which `ropt` refuses.
+The inner
 pool is a **process** pool, which is where the real work goes.
 
 That is also where a cluster belongs. Swapping the inner pool for an
@@ -110,7 +111,7 @@ inner_pool = active.hpc_pool(workers=50)
 ```
 
 Sending whole *optimizations* to the cluster, by putting the **outer** pool on
-processes or HPC, is possible but buys something different. Each outer
+processes or HPC, is possible but gives something different. Each outer
 evaluation is then copied into a job, and neither the inner pool nor the shared
 group can travel with it: the job has to open its own session and collect its
 own results, and return them as data for you to combine. Use that when the
@@ -132,7 +133,7 @@ Handing the inner run the pool it is already running on would deadlock, and
 ## Collecting results from runs that overlap
 
 The inner runs are concurrent, so a plain handler cannot collect them: a handler
-is claimed by one run at a time, and the second run to ask for it is refused. A
+is claimed by one run at a time, and the second run to claim it is refused. A
 [**shared group**](handlers.md#sharing-a-handler-across-concurrent-runs) can,
 because it routes every run's results through one dispatcher. Feed it a
 [`DataFrameHandler`](handlers.md#dataframehandler) and every inner evaluation

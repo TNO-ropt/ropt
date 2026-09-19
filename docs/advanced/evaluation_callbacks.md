@@ -78,10 +78,9 @@ def my_evaluator(
   metadata. A failed row is marked by writing `numpy.nan` into `objectives`;
   there is no separate error field.
 
-One advantage of this approach is that the callback receives all variable
-vectors at once as a 2-D NumPy array. This makes it possible to exploit NumPy's
-vectorized operations to evaluate all rows in a single pass, avoiding explicit
-Python loops and achieving better performance.
+The callback receives all variable vectors at once as a 2-D NumPy array, so the
+rows can be evaluated in a single vectorized pass rather than in an explicit
+Python loop.
 
 ## What is in `EvaluationBatchContext`
 

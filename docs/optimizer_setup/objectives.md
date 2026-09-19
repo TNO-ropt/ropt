@@ -1,7 +1,7 @@
 # Objectives
 
 An optimizer needs a single number to minimize. When a problem has more than one
-quantity worth improving — a cost and a risk, a yield and an emission — `ropt`
+quantity to optimize — a cost and a risk, a yield and an emission — `ropt`
 forms that number for you, as a weighted sum of the objectives you declare.
 
 This page covers how many objectives there are, how they are weighted, which

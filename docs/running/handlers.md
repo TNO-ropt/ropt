@@ -268,10 +268,10 @@ the emitting step is affected, so concurrent runs continue. See
 
 By default every handler runs **inline**, on the thread that drives the
 optimization: each result is delivered to the handlers one after another, and the
-run waits for `handle_event` to return before it continues. That is exactly what
-you want for handlers that only touch memory — storing results, updating a
-DataFrame, keeping a running statistic — because the work is fast and there is no
-reason to hand it off.
+run waits for `handle_event` to return before it continues. For a handler that
+only touches memory — storing results, updating a
+DataFrame, keeping a running statistic — that work is fast, and a hand-off to
+another thread would cost more than it saves.
 
 A [shared group](#sharing-a-handler-across-concurrent-runs) can instead run one
 or more handlers on a **worker thread** with the `threaded` keyword. Pass it a

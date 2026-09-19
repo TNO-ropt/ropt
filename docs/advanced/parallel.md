@@ -140,15 +140,15 @@ inside a library that has let the GIL go.
 uses a `ProcessPoolExecutor` with a `"spawn"` context. Use this for CPU-bound
 evaluations where true parallelism is needed.
 
-It is a narrow tool, not a general execution mode. It earns its cost in exactly
-two cases: **pure-Python computation**, which threads cannot speed up, and
-**isolating process-global state**, where each evaluation needs its own copy of
-something a library keeps in module scope. Everything else it does — copying
-arguments and results, re-importing the entry module in every worker, losing all
-contact with the host process — is a price paid, not a feature. An evaluation
-that mostly runs an external program gets no benefit from it whatsoever, and is
-better served by a thread pool or by
-[`LocalJobExecutor`][ropt.components.executors.LocalJobExecutor].
+Two cases call for it: **pure-Python computation**, which threads cannot speed
+up, and **isolating process-global state**, where each evaluation needs its own
+copy of something a library keeps in module scope. Its other effects — copying
+arguments and results, re-importing the entry module in every worker, and losing
+all contact with the host process — are costs of the process boundary. An
+evaluation that mostly runs an external program gains nothing from it, since
+waiting on that program already releases the GIL: a thread pool or
+[`LocalJobExecutor`][ropt.components.executors.LocalJobExecutor] covers that
+case.
 
 | Parameter             | Description                                                    |
 | --------------------- | -------------------------------------------------------------- |

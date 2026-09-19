@@ -22,8 +22,8 @@ just the final result — attach a **handler**. A handler is an object you pass
 with `handlers=` that observes every result an optimization produces; unlike
 the `report` callback (see
 [Running Optimizations](running.md#reporting-progress)), the same
-handler can be reused across several calls to `optimize`, accumulating results
-as it goes. See [Result handlers](handlers.md) for
+handler can be reused across several sequential calls to `optimize`, accumulating
+results as it goes. See [Result handlers](handlers.md) for
 the full explanation.
 
 Here we use [`HistoryHandler`][ropt.simple.HistoryHandler], which keeps every
@@ -57,10 +57,8 @@ print(f"evaluations collected across all restarts: {len(history.results)}")
 print(f"best objective after {RESTARTS} restarts: {result.results.target_objective}")
 ```
 
-## Next
+## See also
 
-- The full simple API, including other built-in handlers:
-  [Result Handlers](handlers.md).
 - Restarting concurrent, rather than sequential, runs needs a **shared**
   handler group instead of a reused one:
   [Result Handlers](handlers.md#sharing-a-handler-across-concurrent-runs).

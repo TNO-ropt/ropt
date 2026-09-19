@@ -118,8 +118,8 @@ realizations that did work.
 
 [`GradientConfig.evaluation_policy`][ropt.config.GradientConfig] picks one of:
 
-- `"auto"` — compute objectives and gradients strictly when the backend asks
-  for them. Default and most efficient.
+- `"auto"` — compute objectives and gradients strictly when the backend requests
+  them. The default, and the policy that evaluates least.
 - `"speculative"` — also compute the gradient whenever an objective is
   requested. Improves load balancing on HPC clusters when gradient evaluations
   are likely to be needed soon.

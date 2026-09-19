@@ -15,7 +15,7 @@ where continuous and integer variables appear in one problem.
 !!! warning
 
     Only `differential_evolution` handles integer variables. **The other SciPy
-    methods silently treat them as continuous** — no error, just a fractional
+    methods silently treat them as continuous** — no error, only a fractional
     answer to a problem you meant to be discrete. Choosing the method is not
     optional here.
 

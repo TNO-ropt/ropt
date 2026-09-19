@@ -7,7 +7,7 @@
     Getting Started, which covers most optimization tasks. The other is
     [Optimization Workflows](../advanced/workflows.md), a low-level API that
     exposes the building blocks — compute steps, event handlers, executors —
-    directly: full flexibility, at the cost of assembling the run yourself, and
+    directly, at the cost of assembling the run yourself, and
     written for readers at home in Python, threads and asyncio included.
 
     What the optimization *does* — its variables, objectives, constraints, and
@@ -41,8 +41,9 @@ def objective(variables, context):
 
 
 result = optimize(config, np.zeros(3), objective)
-print(result.variables)          # the best variables found
-print(result.target_objective)   # the objective value there
+if result.results is not None:
+    print(result.results.variables)         # the best variables found
+    print(result.results.target_objective)  # the objective value there
 ```
 
 That is the basic pattern. The rest of this page explains each part and the
@@ -180,7 +181,7 @@ You can attach arbitrary **metadata** to a run, from two sources:
 
 - **Constant, per run** — pass a `metadata` dict to `optimize`, `optimize_many`,
   `evaluate`, or `evaluate_many`. `ropt` copies it onto every result the run
-  produces, which is a convenient way to tag a run:
+  produces, which is one way to tag a run:
 
   ```python
   result = optimize(config, x0, objective, metadata={"run_id": 7})

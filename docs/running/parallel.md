@@ -47,7 +47,7 @@ capped by what the machine or the queue will actually give you. Beyond that
 figure the extra workers have nothing to do and sit idle.
 
 Batch size follows from the problem, not from a setting: it is how many
-evaluations the optimizer asks for at once. For a gradient-based run over an
+evaluations the optimizer requests at once. For a gradient-based run over an
 ensemble that is one per realization, plus their perturbations on the batches
 where a gradient is estimated. The second factor is `1` unless you use
 [`optimize_many`][ropt.simple.optimize_many], where it is the `limit` argument
@@ -193,7 +193,7 @@ with session() as s:
 | ------------- | ------------------------------------------------------------------------- |
 | `workers`     | Maximum number of concurrent local jobs (default: 1).                     |
 | `workdir`     | Directory holding each evaluation's files. Defaults to a temporary directory the pool removes again, unless something is left in it to read. |
-| `retries`     | Extra polls to wait for a result (default: 0, which is enough).           |
+| `retries`     | Extra polls to wait for a result (default: 0; a local job writes its result before it exits). |
 | `bundle_size` | Evaluations bundled into one local process, `0` for the whole batch as one (default: 1). See [How a batch is split across workers](#how-many-workers) above. |
 
 Two things distinguish it from a `process_pool`, and both matter when an

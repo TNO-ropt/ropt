@@ -64,7 +64,7 @@ only events that did not stop it:
 logging.basicConfig(level=logging.WARNING)
 ```
 
-Typical examples are a scheduler that had to be asked twice, a cluster job that
+Typical examples are a scheduler that had to be queried twice, a cluster job that
 could not be cancelled and may still be running, a working directory kept behind
 so you can see what a failed job left, and evaluations that must finish before
 your program is allowed to exit. None of these raise, and most are reported
@@ -139,7 +139,7 @@ generally comes from the optimizer.
 
     `DEBUG` traces the mechanism: one line per optimizer callback, per
     dispatched batch and per cluster job, plus the configuration the run
-    started from. It is verbose — a gradient-based method asks for functions
+    started from. It is verbose — a gradient-based method requests functions
     and gradients separately on most iterations, and each request is a line —
     but it is what to attach to a bug report. See
     [Optimization Workflows](../advanced/workflows.md) for what these
