@@ -273,12 +273,13 @@ class Session:
 
         See [Running Optimizations](../running/running.md) for a walkthrough.
 
+        `bundle_size` matters more on a
+        [`process_pool`][ropt.simple.Session.process_pool], where a task is
+        transferred between processes.
+
         Args:
             workers:     The number of worker threads.
-            bundle_size: How many evaluations go to a worker as one task, `0`
-                         for the whole batch. See
-                         [`process_pool`][ropt.simple.Session.process_pool],
-                         where it matters more.
+            bundle_size: Evaluations per task, `0` for the whole batch.
 
         Returns:
             A pool backed by a thread pool.
@@ -296,18 +297,17 @@ class Session:
         being raised; use [`local_pool`][ropt.simple.Session.local_pool] where
         an evaluation launches external programs.
 
+        Every task is transferred to a worker separately, and the evaluations
+        within one run after another, so `bundle_size` is a trade between
+        spreading a batch and the cost of moving it. The default of 1 gives
+        every evaluation its own task, spreading a batch as widely as the
+        workers allow; a larger value groups that many per task; and `0` sends
+        the whole batch as a single task, which suits a pool whose parallelism
+        comes from the runs above it rather than from within a batch.
+
         Args:
             workers:     The number of worker processes.
-            bundle_size: How many evaluations go to a worker as one task. Every
-                         task is transferred to a worker separately, and the
-                         evaluations within one run after another, so this is a
-                         trade between spreading a batch and the cost of moving
-                         it. The default of 1 gives every evaluation its own
-                         task, spreading a batch as widely as the workers allow;
-                         a larger value groups that many per task; and `0` sends
-                         the whole batch as a single task, which suits a pool
-                         whose parallelism comes from the runs above it rather
-                         than from within a batch.
+            bundle_size: Evaluations per task, `0` for the whole batch.
 
         Returns:
             A pool backed by a process pool.
@@ -339,19 +339,17 @@ class Session:
         POSIX only. See [Running Optimizations](../running/running.md) for a
         walkthrough.
 
+        The default `workdir` is a temporary directory that is removed when the
+        pool closes, unless an evaluation failed, in which case it is kept, with
+        that evaluation's output in it, and its path logged. The `retries`
+        default of `0` is enough here: a local job writes its result before it
+        exits.
+
         Args:
             workers:     The maximum number of concurrent local jobs.
-            workdir:     The directory holding each evaluation's files. The
-                         default is a temporary directory that is removed when
-                         the pool closes — unless an evaluation failed, in which
-                         case it is kept, with that evaluation's output in it,
-                         and its path logged.
-            retries:     Extra polls to wait for a result. The default of `0` is
-                         enough: a local job writes its result before it exits.
-            bundle_size: How many evaluations go to a worker as one task, `0`
-                         for the whole batch. See
-                         [`process_pool`][ropt.simple.Session.process_pool];
-                         each task here is a local process.
+            workdir:     The directory holding each evaluation's files.
+            retries:     Extra polls to wait for a result.
+            bundle_size: Evaluations per task, `0` for the whole batch.
 
         Returns:
             A pool backed by local processes.
@@ -409,10 +407,7 @@ class Session:
             run_time_max:   The run time per job.
             submit_options: Extra variables for the submission script.
             retries:        Number of retries for polling the cluster for results.
-            bundle_size:    How many evaluations go to a worker as one task, `0`
-                            for the whole batch. See
-                            [`process_pool`][ropt.simple.Session.process_pool];
-                            each task here is a cluster job.
+            bundle_size:    Evaluations per task, `0` for the whole batch.
 
         Returns:
             A pool backed by an HPC cluster.
@@ -470,21 +465,20 @@ class Session:
         handler whether it is local or shared. See
         [Running Optimizations](../running/running.md) for a walkthrough.
 
+        Handlers run on the session's event-loop thread unless listed in
+        `threaded`. Running one on a worker thread only helps if it spends real
+        time in blocking, GIL-releasing I/O (files, databases, network); for
+        in-memory work it gives no benefit under CPython's GIL. See
+        [Result Handlers](../running/handlers.md#running-a-handler-in-a-thread).
+
+        Returning `True` from `report` stops the emitting run early with
+        `USER_ABORT` if it is an optimization; an evaluation has no optimizer
+        loop to interrupt, so there the return value is ignored.
+
         Args:
-            handler:  The result handlers to share, each run on the session's
-                      event-loop thread.
-            threaded: Handlers (one, or a sequence) to run on a worker thread
-                      instead of the loop. This only helps handlers that spend
-                      real time in blocking, GIL-releasing I/O (files,
-                      databases, network); for in-memory work it gives no
-                      benefit under CPython's GIL. See
-                      [Result Handlers](../running/handlers.md#running-a-handler-in-a-thread).
-            report:   An optional callback invoked with a `FunctionResults` for
-                      each function evaluation across the group's runs.
-                      Returning `True` stops the emitting run early with
-                      `USER_ABORT` if it is an optimization; an evaluation has
-                      no optimizer loop to interrupt, so there the return value
-                      is ignored.
+            handler:  The result handlers to share.
+            threaded: Handlers to run on a worker thread instead of the loop.
+            report:   Optional callback invoked per evaluation across the group.
 
         Returns:
             A [`SharedHandlers`][ropt.simple.SharedHandlers] group.
@@ -518,7 +512,6 @@ def session() -> Session:
     [Running Optimizations](../running/running.md) for a walkthrough.
 
     Returns:
-        A context manager owning the session, which binds the
-        [`Session`][ropt.simple.Session] itself when used with `as`.
+        A context manager binding the [`Session`][ropt.simple.Session].
     """
     return Session()

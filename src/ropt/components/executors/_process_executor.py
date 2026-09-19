@@ -42,8 +42,7 @@ class ProcessExecutor(ExecutorBase):
 
         Args:
             workers:             Number of worker processes.
-            max_tasks_per_child: Restart workers after this many work items
-                                 (`None` = never).
+            max_tasks_per_child: Restart workers after this many items, or never.
         """
         super().__init__()
         self._workers = workers

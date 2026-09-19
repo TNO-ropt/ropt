@@ -113,8 +113,7 @@ def create_output_path(
 
     Args:
         base_name: Base file or directory name.
-        base_dir:  Parent directory. If `None`, the path is relative to the
-                   current working directory.
+        base_dir:  Parent directory, or `None` for the working directory.
         name:      Optional label appended to `base_name` with a `-` separator.
         suffix:    Optional file extension including the leading dot
 

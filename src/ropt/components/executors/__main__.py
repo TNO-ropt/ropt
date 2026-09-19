@@ -56,8 +56,7 @@ def run_task(input_path: str, output_path: str) -> int:
         output_path: File the serialized result is written to.
 
     Returns:
-        `0` if the task succeeded, `1` if it raised or its result could not be
-            written.
+        `0` if the task succeeded, `1` if it failed.
     """
     try:
         function, args, kwargs = _load_task(input_path)

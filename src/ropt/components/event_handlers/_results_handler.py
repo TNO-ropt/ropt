@@ -43,12 +43,12 @@ class ResultsHandler(EventHandler):
     ) -> None:
         """Initialize the ResultsHandler.
 
+        Constraint violations are compared in the domain the optimizer works in,
+        so a scale applies to them as well.
+
         Args:
             what:                 Criterion for selecting results ('best' or 'last').
-            constraint_tolerance: Optional threshold for filtering constraint
-                                  violations. Violations are compared in the
-                                  domain the optimizer works in, so a scale
-                                  applies to them as well.
+            constraint_tolerance: Optional threshold for constraint violations.
             filter:               Optional callable to filter results based on custom logic.
         """
         super().__init__()

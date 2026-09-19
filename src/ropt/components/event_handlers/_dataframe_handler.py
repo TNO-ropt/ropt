@@ -181,12 +181,13 @@ class DataFrameHandler(EventHandler):
     ) -> None:
         """Register a new table to be populated from incoming results.
 
+        Column keys are result-field attribute names, in dotted attribute
+        syntax.
+
         Args:
             name:       Key under which the table is stored and looked up.
-            table_type: Whether this table is filled from function results
-                        (`"functions"`) or gradient results (`"gradients"`).
-            columns:    Mapping from result-field attribute names (using dotted
-                        attribute syntax) to display titles.
+            table_type: Fill from `"functions"` or from `"gradients"`.
+            columns:    Mapping from field paths to display titles.
         """
         self._tables[name] = _ResultsTable(
             columns,

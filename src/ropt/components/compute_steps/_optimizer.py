@@ -58,12 +58,13 @@ class OptimizationStep(ComputeStep[ExitCode]):
     ) -> ExitCode:
         """Run the optimization.
 
+        `metadata` is attached to the emitted
+        [`Results`][ropt.results.Results] via the `FINISHED_EVALUATION` event.
+
         Args:
             context:    The optimizer context.
             variables:  Initial variable vector(s).
-            metadata:   Optional dictionary attached to emitted
-                [`Results`][ropt.results.Results] via the `FINISHED_EVALUATION`
-                event.
+            metadata:   Optional dictionary attached to emitted results.
 
         Returns:
             An exit code describing the outcome of the optimization.

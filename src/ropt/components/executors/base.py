@@ -34,16 +34,16 @@ class WorkItem:
 
     A work item is a plain description of a call. It carries no delivery
     channel, so it can be handed to a worker process without dragging the
-    submission that owns it along.
+    submission that owns it along. `result` is only meaningful once the work
+    item has been delivered, and holds an
+    [`ExecutorFailure`][ropt.components.executors.ExecutorFailure] if the call
+    could not be run at all.
 
     Attributes:
         function: The function to execute.
         args:     The arguments to pass to the function.
         kwargs:   The keyword arguments to pass to the function.
-        result:   What the function returned, or an
-                  [`ExecutorFailure`][ropt.components.executors.ExecutorFailure]
-                  if it could not be run. Only meaningful once the work item
-                  has been delivered.
+        result:   What the function returned, or why it could not be run.
         name:     Optional unique name of the work item.
     """
 
@@ -176,8 +176,7 @@ class Submission:
             on_result: Callback invoked with each finished work item.
 
         Raises:
-            ExecutorStopped: If the submission ended before every result was
-                             delivered.
+            ExecutorStopped: If the submission ended before every result arrived.
         """  # ruff: ignore[docstring-extraneous-exception]
         try:
             self._drain(on_result)

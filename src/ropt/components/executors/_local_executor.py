@@ -89,28 +89,25 @@ class LocalJobExecutor(JobExecutorBase):
     ) -> None:
         """Initialize the local job executor.
 
+        The default `workdir` is a private temporary directory that this
+        executor creates and removes when it closes, unless there is something
+        in it to read: if a work item failed, or `cleanup` is off, the directory
+        is kept and its path logged. A work item that failed keeps its captured
+        output, which is the only record of why.
+
+        A local process is finished the moment it exits, and writes and renames
+        its result before it does, so the small `interval` is dead time rather
+        than restraint towards a scheduler, and `retries=0` is enough.
+
         Args:
-            workdir:  Directory for each work item's serialized I/O files and
-                      captured output. The default is a private temporary
-                      directory that this executor creates and removes when it
-                      closes — unless there is something in it to read, that is:
-                      if a work item failed, or `cleanup` is off, the directory
-                      is kept and its path logged.
+            workdir:  Directory for each work item's files and captured output.
             workers:  Maximum number of jobs running at once.
-            interval: Polling interval in seconds. Small by default: a local
-                      process is finished the moment it exits, so this is dead
-                      time rather than politeness towards a scheduler.
+            interval: Polling interval in seconds.
             retries:  Number of extra polls to wait for a work item's result.
-                      The default of `0` is enough, because a local job writes
-                      and renames its result before it exits, so the result is
-                      there the moment the process is gone.
-            cleanup:  Whether to remove a work item's files once its result is
-                      retrieved or its job is cancelled. A work item that failed
-                      keeps its captured output, which is the only record of why.
+            cleanup:  Whether to remove a work item's files once it settles.
 
         Raises:
-            ValueError:     If `workdir` is not an existing directory, or if
-                            `workers`, `interval` or `retries` is out of range.
+            ValueError:     If `workdir` is missing or an argument is out of range.
             ExecutionError: If the system is not POSIX.
         """
         if os.name != "posix":

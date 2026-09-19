@@ -71,41 +71,30 @@ def optimize(  # ruff: ignore[too-many-arguments]
     [`WorkflowError`][ropt.exceptions.WorkflowError], as is one carried into
     a worker process, where it cannot work at all.
 
+    Without a `pool` the evaluations run in-process, on the calling thread. A
+    run started from inside an evaluation needs a *different* pool: the pool it
+    is already running on refuses the work.
+
+    `handlers` mixes two kinds. An
+    [`EventHandler`][ropt.components.event_handlers.EventHandler] is local: it
+    is claimed for the duration of this run, and may be reused by a later run to
+    accumulate results, but not shared with a concurrent one, and never
+    afterwards with a [`SharedHandlers`][ropt.simple.SharedHandlers] group. A
+    group is shared: this run feeds it alongside every other run that lists it.
+
+    Returning `True` from `report` stops the optimization early with
+    `USER_ABORT`. Reporting stops there, so results after it in the same batch
+    are not passed on.
+
     Args:
         config:               The optimization configuration.
         x0:                   The initial variable vector.
         function:             The per-realization evaluation function.
-        pool:                 The pool to evaluate on, from a session factory
-                              such as
-                              [`thread_pool`][ropt.simple.Session.thread_pool].
-                              Without one the evaluations run in-process, on
-                              the calling thread. A run started from inside an
-                              evaluation needs a *different* pool: the pool it
-                              is already running on refuses the work.
-        handlers:             Optional result handlers, mixing two kinds. An
-                              [`EventHandler`][ropt.components.event_handlers.EventHandler]
-                              is local: it is claimed for the duration of this
-                              run, and may be reused by a later run to
-                              accumulate results, but not shared with a
-                              concurrent one, and never afterwards with a
-                              [`SharedHandlers`][ropt.simple.SharedHandlers]
-                              group. A group is shared: this run feeds it
-                              alongside every other run that lists it.
-        report:               An optional callback invoked with a
-                              [`FunctionResults`][ropt.results.FunctionResults]
-                              for each function evaluation;
-                              return `True` from it to stop the optimization
-                              early with `USER_ABORT`. Reporting stops there,
-                              so results after it in the same batch are not
-                              passed on.
-        constraint_tolerance: The tolerance within which a constraint is
-                              considered satisfied. Violations are compared in
-                              the domain the optimizer works in, so a scale
-                              applies to them as well.
-        metadata:             An optional dictionary attached to every
-                              [`Results`][ropt.results.Results] this run emits,
-                              for example to tag or identify the run. It also
-                              reaches `function` as `context.metadata`.
+        pool:                 The pool to evaluate on, from a session factory.
+        handlers:             Optional local handlers and shared groups.
+        report:               Optional callback invoked per function evaluation.
+        constraint_tolerance: The tolerance within which a constraint is satisfied.
+        metadata:             Optional dictionary attached to every emitted result.
 
     Returns:
         An [`OptimizationResult`][ropt.simple.OptimizationResult] describing the outcome.
@@ -195,37 +184,22 @@ def optimize_many(  # ruff: ignore[too-many-arguments]
     [`WorkflowError`][ropt.exceptions.WorkflowError], as is one carried into
     a worker process, where it cannot work at all.
 
+    A run started from inside an evaluation needs a *different* pool: the pool
+    it is already running on refuses the work. Returning `True` from a `report`
+    callback stops that run early with `USER_ABORT`. `metadata` also reaches
+    each run's `function` as `context.metadata`, which makes it a way to tag a
+    run, for example with `{"run_id": i}`.
+
     Args:
         config:               The configuration, or one per run.
         x0:                   The initial variable vector, or one per row.
         function:             The evaluation function, or one per run.
-        pool:                 The pool every run evaluates on, from a session
-                              factory such as
-                              [`thread_pool`][ropt.simple.Session.thread_pool].
-                              Without one the evaluations run in-process, each
-                              on its own driver thread. A run started from
-                              inside an evaluation needs a *different* pool:
-                              the pool it is already running on refuses the
-                              work.
-        handlers:             Optional [`SharedHandlers`][ropt.simple.SharedHandlers]
-                              groups, fed by every run.
-        report:               An optional callback invoked with a
-                              [`FunctionResults`][ropt.results.FunctionResults]
-                              for each function evaluation,
-                              either shared by every run or one per run; return
-                              `True` from it to stop that run early with
-                              `USER_ABORT`.
+        pool:                 The pool every run evaluates on.
+        handlers:             Optional shared groups, fed by every run.
+        report:               Optional callback per evaluation, shared or one per run.
         limit:                The maximum number of runs to execute at once.
-        constraint_tolerance: The tolerance within which a constraint is
-                              considered satisfied. Violations are compared in
-                              the domain the optimizer works in, so a scale
-                              applies to them as well.
-        metadata:             An optional dictionary attached to every
-                              [`Results`][ropt.results.Results] a run emits,
-                              shared by all runs or given one per run — for
-                              example to tag each run with `{"run_id": i}`. It
-                              also reaches each run's `function` as
-                              `context.metadata`.
+        constraint_tolerance: The tolerance within which a constraint is satisfied.
+        metadata:             Optional dictionary attached to every emitted result.
 
     Returns:
         One [`OptimizationResult`][ropt.simple.OptimizationResult] per run, in order.

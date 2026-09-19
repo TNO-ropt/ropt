@@ -77,8 +77,7 @@ class Backend(ABC):
             should be mapped to the backend's actual default method.
 
         Args:
-            backend_config: Configuration object specifying the backend method
-                and any method-specific options.
+            backend_config: Configuration specifying the method and its options.
         """
 
     @abstractmethod
@@ -98,16 +97,15 @@ class Backend(ABC):
 
         Called at most once per backend instance.
 
+        `evaluation_policy` is whether functions and gradients should be asked
+        for together (`"speculative"`), in separate calls (`"separate"`), or as
+        the algorithm happens to need them (`"auto"`).
+
         Args:
             problem:            The problem to solve, in free-variable space.
-            optimizer_callback: Callback used to request objective, constraint,
-                                and gradient evaluations from the `ropt` core.
-            evaluation_policy:  Whether functions and gradients should be asked
-                                for together (`"speculative"`), in separate
-                                calls (`"separate"`), or as the algorithm
-                                happens to need them (`"auto"`).
-            output_dir:         Directory for any files the optimizer writes,
-                                or `None` if none was configured.
+            optimizer_callback: Callback for requesting evaluations from `ropt`.
+            evaluation_policy:  How functions and gradients are requested.
+            output_dir:         Directory for files the optimizer writes, or `None`.
         """
 
     @property
@@ -141,9 +139,8 @@ class Backend(ABC):
         [`BackendConfig`][ropt.config.BackendConfig] object have the expected
         type, contain only supported keys, and satisfy any method-specific
         value constraints. Options are a dictionary or a list, depending on the
-        backend.
+        backend. The exception raised must be a `ValueError`, or derive from one.
 
         Raises:
-            ValueError: If the provided options are invalid. The exception must
-                        be a `ValueError`, or derive from one.
+            ValueError: If the provided options are invalid.
         """

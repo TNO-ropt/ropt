@@ -58,12 +58,14 @@ class EvaluationStep(ComputeStep[None]):
     ) -> None:
         """Run the ensemble evaluation.
 
+        `metadata` is attached to the emitted
+        [`FunctionResults`][ropt.results.FunctionResults] via the
+        `FINISHED_EVALUATION` event.
+
         Args:
             context:   Optimizer context.
             variables: Variable vector(s) to evaluate.
-            metadata:  Optional dictionary attached to emitted
-                       [`FunctionResults`][ropt.results.FunctionResults] via the
-                       `FINISHED_EVALUATION` event.
+            metadata:  Optional dictionary attached to emitted results.
 
         Raises:
             ValueError: If the input variables have the wrong shape.

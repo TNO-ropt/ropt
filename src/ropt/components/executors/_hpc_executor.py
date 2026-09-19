@@ -85,71 +85,37 @@ class HPCExecutor(JobExecutorBase):
         submission script directly, in which case nothing is configured and
         `scheduler` names the queueing system.
 
+        `workdir` must be an existing absolute path, and concurrently running
+        executors need distinct ones: work item files are never overwritten. A
+        `queue` is not a scheduler partition; it selects a configured entry
+        whose submission script names the partition. `retries` covers a result
+        the shared filesystem does not yet show, `query_retries` a scheduler
+        that cannot be reached; the grace period each allows is its count times
+        `interval`.
+
         See [Parallel Evaluation](../advanced/parallel.md#hpcexecutor) for
         configuration details.
 
         Args:
-            workdir:        Shared-filesystem directory for each work item's
-                            serialized I/O files; also passed as the job working
-                            directory (template-dependent). Must be an existing
-                            absolute path: there is no default, because only the
-                            caller knows which directory the cluster shares. Work
-                            item files are never overwritten, so concurrent
-                            executors need distinct workdirs.
+            workdir:        Shared-filesystem directory for each work item's files.
             workers:        Maximum concurrent HPC jobs.
             interval:       Polling interval in seconds.
-            config_path:    The `pysqa` configuration directory, the one holding
-                            `queue.yaml` or `clusters.yaml`. Defaults to the
-                            site-wide configuration installed alongside ropt.
-            cluster:        Optional cluster name, when the configuration defines
-                            more than one. Defaults to the configured primary.
-            queue:          Optional name of a queue defined in the
-                            configuration. This is not necessarily the
-                            scheduler's partition name: it selects a queue entry,
-                            whose submission script names the partition. Defaults
-                            to the configured primary.
-            template:       A submission script template, submitted instead of
-                            any configuration. Everything the scheduler needs,
-                            the partition included, must be in it.
-            scheduler:      The queueing system a `template` is written for, for
-                            example `"slurm"` (the default). Only meaningful with
-                            a `template`, since a configuration names its own.
-                            `pysqa` calls this `queue_type`.
+            config_path:    The `pysqa` configuration directory.
+            cluster:        Optional cluster name, for a multi-cluster configuration.
+            queue:          Optional name of a queue defined in the configuration.
+            template:       A submission script template, used instead of a configuration.
+            scheduler:      The queueing system a `template` is written for.
             cores:          CPUs per work item.
-            memory_max:     Memory per work item. Rendered by the submission
-                            script; with a configuration it is also clamped to
-                            the queue's limit.
-            run_time_max:   Run time per work item, typically in seconds. With a
-                            configuration, the queue's own limit applies when
-                            this is not given.
-            submit_options: Extra variables for the submission script, for
-                            whatever the script declares beyond the standard
-                            names — an account, a reservation, a GPU request.
-                            Entries that are `None` are dropped, so omitting a
-                            key and passing `None` mean the same thing.
-            retries:        Number of extra polls to wait for a work item's
-                            result after the first attempt fails (`0` gives up at
-                            once). This is about the shared filesystem, not about
-                            the scheduler.
-            query_retries:  Number of extra attempts to query the scheduler after
-                            one fails (`0` gives up at once). A run this long
-                            fails every job that is out, since the state of a
-                            job that cannot be queried is unknown.
-            cleanup:        Whether to remove work item files once their result is
-                            retrieved or their job is cancelled. A work item that
-                            failed keeps its captured output, which is the only
-                            record of why.
+            memory_max:     Memory per work item.
+            run_time_max:   Run time per work item, typically in seconds.
+            submit_options: Extra variables for the submission script.
+            retries:        Extra polls to wait for a work item's result.
+            query_retries:  Extra attempts to query the scheduler after one fails.
+            cleanup:        Whether to remove a work item's files once it settles.
 
         Raises:
-            ValueError:     If `workdir` is not an existing absolute path, if
-                            `workers`, `interval`, `retries` or `query_retries`
-                            is out of range, if arguments from both submission
-                            modes are combined, or if `submit_options` names
-                            something the executor already passes.
-            ExecutionError: If no configuration can be found, if the requested
-                            cluster is unknown, if the queue is not available on
-                            the requested cluster, or if the queue cannot be
-                            resolved to exactly one cluster.
+            ValueError:     If an argument is out of range or the modes are mixed.
+            ExecutionError: If the configuration, cluster or queue cannot be resolved.
         """
         workdir = Path(workdir)
         if not workdir.is_absolute():

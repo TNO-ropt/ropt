@@ -75,8 +75,7 @@ class EventDispatcher:
 
         Args:
             handler:       The handler to add.
-            run_in_thread: If True, dispatch via the dispatcher's thread pool
-                           instead of the event loop.
+            run_in_thread: Dispatch via the thread pool instead of the loop.
         """
         handler._register_dispatcher()  # ruff: ignore[private-member-access]
         # Replaced rather than appended to: the loop thread iterates this list
@@ -114,13 +113,14 @@ class EventDispatcher:
         re-raised here, on the caller's own stack. See
         [Handler failures](../advanced/workflows.md#handler-failures).
 
+        Calling this from the thread running the dispatcher's event loop, or
+        from one of its handler threads, would deadlock and raises instead.
+
         Args:
             event: The event to submit.
 
         Raises:
-            WorkflowError: If the dispatcher is not running, or if the call is
-                           made from the thread running its event loop, or from
-                           one of its handler threads.
+            WorkflowError: If the dispatcher is not running, or would deadlock.
             Exception:     Whatever a handler raised while processing the event.
         """  # ruff: ignore[docstring-extraneous-exception]
         if not self._running.is_set():

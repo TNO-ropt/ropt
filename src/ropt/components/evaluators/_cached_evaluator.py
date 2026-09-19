@@ -70,8 +70,7 @@ class CachedEvaluator(Evaluator):
             evaluator_context: The evaluation context.
 
         Returns:
-            An `EvaluationBatchResult` and the cache hits, keyed by evaluation
-            index, of `(realization index, cached FunctionResults)`.
+            The batch result, and the cache hits keyed by evaluation index.
         """
         cached: dict[int, tuple[int, FunctionResults]] = {}
 

@@ -57,10 +57,8 @@ class Evaluator(ABC):
         concurrency guard.
 
         Args:
-            variables: The matrix of variables to evaluate. Each row represents
-                       a variable vector.
-            context:   The evaluation context, providing additional information
-                       about the evaluation.
+            variables: The matrix of variables to evaluate, one vector per row.
+            context:   The evaluation context.
 
         Returns:
             An evaluation results object containing the calculated values.
@@ -74,17 +72,14 @@ class Evaluator(ABC):
         This follows the [`EvaluationBatchCallback`][ropt.evaluation.EvaluationBatchCallback] protocol.
 
         Args:
-            variables: The matrix of variables to evaluate. Each row represents
-                       a variable vector.
-            context:   The evaluation context, providing additional information
-                       about the evaluation.
+            variables: The matrix of variables to evaluate, one vector per row.
+            context:   The evaluation context.
 
         Returns:
             An evaluation results object containing the calculated values.
 
         Raises:
-            WorkflowError: If another thread is executing this evaluator's `eval`
-                           method at the same time.
+            WorkflowError: If another thread is already executing `eval`.
         """
         with self._owner_lock:
             if self._in_use:
@@ -128,8 +123,7 @@ class EvaluationFunctionResult:
     Attributes:
         objectives:  The objective values as an array.
         constraints: Optional constraint values as an array.
-        metadata:    Optional dictionary containing additional information
-                     about the evaluation.
+        metadata:    Optional dictionary with extra information.
     """
 
     objectives: NDArray[np.float64] | float

@@ -142,15 +142,11 @@ class OptimizationProblem:
 
         Args:
             method:                The name of the optimization method used.
-            supported_constraints: Maps each constraint type to the methods
-                                   that support it.
-            required_constraints:  Maps each constraint type to the methods
-                                   that require it.
+            supported_constraints: The methods supporting each constraint type.
+            required_constraints:  The methods requiring each constraint type.
 
         Raises:
-            UnsupportedError: If a constraint present in the problem is not
-                              supported by the method, or a constraint the
-                              method requires is absent.
+            UnsupportedError: If the constraints do not match the method.
         """
         for constraint_type, have_constraint in self._have.items():
             supported = {

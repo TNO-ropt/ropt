@@ -88,9 +88,11 @@ class ExternalBackend(Backend):
     def __init__(self, backend_config: BackendConfig) -> None:
         """Initialize the external backend.
 
+        The `method` field of the configuration must be prefixed with
+        `external/`.
+
         Args:
-            backend_config: The backend configuration; its `method` field must
-                            be prefixed with `external/`.
+            backend_config: The backend configuration.
         """
         self._backend_config = backend_config.model_copy(
             update={"method": backend_config.method.split("/", maxsplit=1)[1]}

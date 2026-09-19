@@ -56,31 +56,27 @@ def evaluate(  # ruff: ignore[too-many-arguments]
     [`WorkflowError`][ropt.exceptions.WorkflowError], as is one carried into
     a worker process, where it cannot work at all.
 
+    Without a `pool` the evaluations run in-process, on the calling thread. A
+    run started from inside an evaluation needs a *different* pool: the pool it
+    is already running on refuses the work. `handlers` mixes local
+    [`EventHandler`][ropt.components.event_handlers.EventHandler] objects with
+    shared [`SharedHandlers`][ropt.simple.SharedHandlers] groups, as
+    [`optimize`][ropt.simple.optimize] takes them.
+
+    An evaluation is a single batch that has already run by the time `report`
+    sees it, and there is no optimizer loop to interrupt, so unlike on
+    [`optimize`][ropt.simple.optimize] returning `True` cannot stop anything: it
+    only ends the reporting, and every result is still returned. `metadata` also
+    reaches `function` as `context.metadata`.
+
     Args:
         config:    The optimization configuration.
         variables: The variable vector to evaluate.
         function:  The per-realization evaluation function.
-        pool:      The pool to evaluate on, from a session factory such as
-                   [`thread_pool`][ropt.simple.Session.thread_pool]. Without one
-                   the evaluations run in-process, on the calling thread. A run
-                   started from inside an evaluation needs a *different* pool:
-                   the pool it is already running on refuses the work.
-        handlers:  Optional result handlers, mixing local
-                   [`EventHandler`][ropt.components.event_handlers.EventHandler]
-                   objects with shared
-                   [`SharedHandlers`][ropt.simple.SharedHandlers] groups, as
-                   [`optimize`][ropt.simple.optimize] takes them.
-        report:    An optional callback invoked with a
-                   [`FunctionResults`][ropt.results.FunctionResults] for
-                   each evaluation. An evaluation is a single batch that has
-                   already run by the time the callback sees it, and there is no
-                   optimizer loop to interrupt, so unlike on
-                   [`optimize`][ropt.simple.optimize] returning `True` cannot
-                   stop anything: it only ends the reporting, and every result
-                   is still returned.
-        metadata:  An optional dictionary attached to the emitted
-                   [`Results`][ropt.results.Results]. It also reaches
-                   `function` as `context.metadata`.
+        pool:      The pool to evaluate on, from a session factory.
+        handlers:  Optional local handlers and shared groups.
+        report:    Optional callback invoked with each evaluation's results.
+        metadata:  Optional dictionary attached to the emitted results.
 
     Returns:
         The [`FunctionResults`][ropt.results.FunctionResults] for the vector.
@@ -127,31 +123,27 @@ def evaluate_many(  # ruff: ignore[too-many-arguments]
     [`WorkflowError`][ropt.exceptions.WorkflowError], as is one carried into
     a worker process, where it cannot work at all.
 
+    Without a `pool` the evaluations run in-process, on the calling thread. A
+    run started from inside an evaluation needs a *different* pool: the pool it
+    is already running on refuses the work. `handlers` mixes local
+    [`EventHandler`][ropt.components.event_handlers.EventHandler] objects with
+    shared [`SharedHandlers`][ropt.simple.SharedHandlers] groups, as
+    [`optimize`][ropt.simple.optimize] takes them.
+
+    An evaluation is a single batch that has already run by the time `report`
+    sees it, and there is no optimizer loop to interrupt, so unlike on
+    [`optimize`][ropt.simple.optimize] returning `True` cannot stop anything: it
+    only ends the reporting, and every result is still returned. `metadata` also
+    reaches `function` as `context.metadata`.
+
     Args:
         config:    The optimization configuration.
         variables: The variable vectors to evaluate, one per row.
         function:  The per-realization evaluation function.
-        pool:      The pool to evaluate on, from a session factory such as
-                   [`thread_pool`][ropt.simple.Session.thread_pool]. Without one
-                   the evaluations run in-process, on the calling thread. A run
-                   started from inside an evaluation needs a *different* pool:
-                   the pool it is already running on refuses the work.
-        handlers:  Optional result handlers, mixing local
-                   [`EventHandler`][ropt.components.event_handlers.EventHandler]
-                   objects with shared
-                   [`SharedHandlers`][ropt.simple.SharedHandlers] groups, as
-                   [`optimize`][ropt.simple.optimize] takes them.
-        report:    An optional callback invoked with a
-                   [`FunctionResults`][ropt.results.FunctionResults] for
-                   each evaluation. An evaluation is a single batch that has
-                   already run by the time the callback sees it, and there is no
-                   optimizer loop to interrupt, so unlike on
-                   [`optimize`][ropt.simple.optimize] returning `True` cannot
-                   stop anything: it only ends the reporting, and every result
-                   is still returned.
-        metadata:  An optional dictionary attached to every emitted
-                   [`Results`][ropt.results.Results]. It also reaches
-                   `function` as `context.metadata`.
+        pool:      The pool to evaluate on, from a session factory.
+        handlers:  Optional local handlers and shared groups.
+        report:    Optional callback invoked with each evaluation's results.
+        metadata:  Optional dictionary attached to every emitted result.
 
     Returns:
         One [`FunctionResults`][ropt.results.FunctionResults] per input vector.
