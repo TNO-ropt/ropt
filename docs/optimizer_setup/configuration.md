@@ -244,8 +244,8 @@ metadata spans.
 
 Labels are not purely decorative. Some components use them to identify the items
 they are given instead of relying on position, which lets results be matched
-between runs whose ordering differs. Naming the realizations therefore buys more
-than naming the variables, even though both make a printed table easier to read.
+between runs whose ordering differs. That applies to the realization names; the
+others affect only how a printed table reads.
 
 [examples/simple/export.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/export.py)
 names variables, objectives and realizations before exporting to a frame, and
@@ -306,7 +306,7 @@ Expand the block below to see every field and its default value.
             "perturbation_magnitudes": 0.005,
             "perturbation_types": PerturbationType.ABSOLUTE,
             "boundary_types": BoundaryType.MIRROR_BOTH,
-            "samplers": 0,                                    # default: use first sampler for all
+            "samplers": "0",                                  # default: use first sampler for all
             "seed": 1,
         },
         "objectives": {
@@ -316,7 +316,7 @@ Expand the block below to see every field and its default value.
             "auto_scale": False,                              # default: do not estimate scales
             "maximize": False,                                # default: minimize
             "realization_filters": None,                       # default: no filter
-            "function_estimators": 0,                         # default: use first estimator for all
+            "function_estimators": "0",                       # default: use first estimator for all
         },
         "linear_constraints": None,                           # No linear constraints
         "nonlinear_constraints": None,                        # No non-linear constraints
@@ -385,7 +385,7 @@ Expand the block below to see every field and its default value.
         "scales": 1.0,                            # default: no scaling
         "auto_scale": False,                      # default: do not estimate scales
         "realization_filters": None,               # default: no filter
-        "function_estimators": 0,                 # default: use first estimator
+        "function_estimators": "0",                # default: use first estimator
     }
 
     # realization_filters entries (method is required):
