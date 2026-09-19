@@ -247,7 +247,7 @@ them apart. What differs is whether a process is a *worker* or a *job*:
 | Sending the objective | your script is re-imported, so a function defined in it can be found by name | a fresh command; needs an importable module or `ropt[cloudpickle]` |
 | Platform | anywhere | POSIX only |
 
-One question decides it: **is an evaluation a function call, or a job?** A call
+One question separates them: **is an evaluation a function call, or a job?** A call
 is too short to pay for a process each time, so reuse a few workers and take
 `process_pool`. A job runs a simulator, writes files, and lasts long enough that
 one process start is negligible — take `local_pool`, or an `hpc_pool` if it belongs
@@ -305,7 +305,7 @@ pool = s.hpc_pool(workers=10, queue="long", cores=4)
 
 `queue` names a queue **defined in the configuration**, which is not necessarily
 your scheduler's partition name — it selects a configured entry, and that
-entry's script decides which partition the job lands on. Ask your site which
+entry's script determines which partition the job lands on. Ask your site which
 queues exist, or read them off the configuration.
 
 When the configuration defines several clusters, `cluster` picks one:

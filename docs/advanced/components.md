@@ -87,7 +87,7 @@ class MyExecutor(ExecutorBase):
 ```
 
 **The delivery contract is the part to get right.** Every work item ends in
-exactly one of three ways, and the choice decides whether the executor survives:
+exactly one of three ways, and the choice determines whether the executor survives:
 
 | Outcome | Call | Effect |
 | --- | --- | --- |

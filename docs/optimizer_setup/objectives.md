@@ -66,7 +66,7 @@ average. Negating the inputs of a standard deviation leaves it unchanged, so
 flipping first would silently minimize the dispersion that was declared for
 maximization; flipping the combined value is correct whatever produced it.
 
-## Weights and scales decide the trade-off together
+## Weights and scales determine the trade-off together
 
 Objectives reach the optimizer divided by their `scales`, so what is actually
 minimized is

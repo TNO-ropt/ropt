@@ -104,7 +104,7 @@ Backends can report their own progress, which is disabled by default:
 "backend": {"verbose": True}
 ```
 
-`verbose` decides whether output is produced at all. Where it goes is separate:
+`verbose` determines whether output is produced at all. Where it goes is separate:
 `optimizer.stdout` and `optimizer.stderr` capture it to files, resolved against
 `optimizer.output_dir`. Capture rewires process-global state, so only one run at
 a time can use it — leave those unset on runs that overlap. See

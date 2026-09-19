@@ -2,7 +2,7 @@
 
 A sampler draws the perturbations that [stochastic gradient
 estimation](gradients.md) evaluates around the current point. Which sampler is
-used decides *where* those points are placed; how far they are placed is decided
+used determines *where* those points are placed; how far they are placed is set
 separately, by `perturbation_magnitudes`.
 
 The default is [`SciPySampler`][ropt.sampler.scipy.SciPySampler], drawing from a

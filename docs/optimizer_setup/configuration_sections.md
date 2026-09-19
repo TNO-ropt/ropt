@@ -456,7 +456,7 @@ redirection):
 - **`max_functions`**: Sets a hard limit on the total *number* of individual
   objective function evaluations performed across all batches. Since a single
   batch can involve multiple function evaluations, this gives finer control
-  over total computational effort. Note that exceeding this limit might
+  over total computational effort. Exceeding this limit might
   cause the optimization to terminate mid-batch.
 
 - **`output_dir`** (default: `None`): An optional output directory where the
@@ -469,7 +469,7 @@ redirection):
   the given file. May be set on its own, in which case standard output is left
   alone.
 
-These settings decide **where** the optimizer's output goes, not whether there
+These settings determine **where** the optimizer's output goes, not whether there
 is any: that is [`verbose`](#backend). The evaluation callback is excluded
 either way — anything your objective function or your result handlers print goes
 to the terminal as usual.
@@ -484,7 +484,7 @@ to the terminal as usual.
 
     Whether an optimizer reports at all is decided by [`verbose`](#backend),
     independently of capture. To silence one, set `verbose=False`; to discard
-    output you cannot switch off, capture to `os.devnull` — but note that this
+    output you cannot switch off, capture to `os.devnull` — but this
     discards anything *else* the process writes during the run, which a
     throwaway file would not.
 

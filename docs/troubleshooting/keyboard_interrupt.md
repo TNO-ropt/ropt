@@ -51,7 +51,7 @@ lazily, inside a function, call it after that import instead.
 ## Why `ropt` does not do this for you
 
 `SA_RESTART` is process-global state that belongs to your program. A library
-that quietly changes it decides on behalf of every other part of that program,
+that quietly changes it does so for every other part of that program,
 including parts that deliberately installed the handler in question — and it
 cannot put the flag back afterwards without restoring the very problem it was
 called to fix.
@@ -60,7 +60,7 @@ There is also no point at which a library could do it reliably. Any import that
 happens later can set the flag again, and `ropt` does not control when your
 program imports things.
 
-So the decision is left where it can actually be made: in the application, by
+So the decision is left where it can be made: in the application, by
 someone who knows whether the trade matters.
 
 ## What it does, exactly

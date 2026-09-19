@@ -17,7 +17,7 @@ arrive, and results flow back without blocking other work.
 
 The [`ParallelEvaluator`][ropt.components.evaluators.ParallelEvaluator] is the
 evaluator that bridges the synchronous compute-step `run()` call and the
-asynchronous world. It hands the rows of the variable batch to an
+asynchronous world. It submits the rows of the variable batch to an
 [`Executor`][ropt.components.executors.Executor] as a single
 [`Submission`][ropt.components.executors.Submission]. The executor runs the
 submission's work items on its workers and delivers each result back to the
@@ -87,8 +87,8 @@ the worker, which reports the name it could not find. Whether that name resolves
 depends on the worker: `ProcessExecutor` re-imports `__main__`, so a script's
 functions are found again, while the local and HPC executors run a fresh command
 whose `__main__` is ropt's own, so they are not. Installing
-`ropt[cloudpickle]` lifts the restriction for all of them, and is recommended
-whenever work runs as a job. `ThreadExecutor` serializes nothing and is never
+`ropt[cloudpickle]` lifts the restriction for all of them.
+`ThreadExecutor` serializes nothing and is never
 affected.
 
 !!! note "Working directory"
@@ -244,7 +244,7 @@ extras and no configuration.
 It shares all of its machinery with
 [`HPCExecutor`][ropt.components.executors.HPCExecutor] — the same `.in`/`.out`
 files, the same poll loop, the same failure reporting — and differs only in what
-starts a job. Where the HPC executor hands a command to a scheduler, this one
+starts a job. Where the HPC executor submits a command to a scheduler, this one
 starts it directly.
 
 | Parameter  | Description                                                                 |
@@ -433,7 +433,7 @@ running afterwards, because what *can* be done to running work differs:
 
 **Threads run to completion because a thread cannot be cancelled.** Python
 offers no way to interrupt one from outside, so an evaluation on a
-`ThreadExecutor` decides for itself when it stops. `cancel()` returns at once,
+`ThreadExecutor` stops only when it returns. `cancel()` returns at once,
 but the program cannot leave until those evaluations return — the pool joins its
 threads at interpreter shutdown. Rather than let that look like a hang, the
 executor logs a `WARNING` naming how many are still running. An evaluation that
@@ -452,7 +452,7 @@ promise that nothing of the run survives it.
     its own worker processes and nothing else. It installs no process groups, so
     a subprocess an evaluation started — a simulator, a solver, a shell
     pipeline — is never signalled: it keeps running, and is re-parented when the
-    worker holding it dies. Nothing reports this, and the work simply continues
+    worker holding it dies. Nothing reports this, and the work continues
     after the program that asked for it has gone.
 
     [`LocalJobExecutor`][ropt.components.executors.LocalJobExecutor] is the
@@ -515,7 +515,7 @@ computed over the whole ensemble.
     `numpy.nan` returned *by the evaluation function* keeps its meaning — that
     realization could not produce a value — and
     [`realization_min_success`](../optimizer_setup/configuration_sections.md#realizations)
-    still decides how many a batch may contain before the run ends with
+    still sets how many a batch may contain before the run ends with
     `TOO_FEW_REALIZATIONS`. Only a failure of the machinery is raised.
 
 ### User-code exception (re-raised unchanged)

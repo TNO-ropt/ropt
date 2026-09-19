@@ -1,6 +1,6 @@
 # Writing Evaluation Callbacks
 
-During optimization `ropt` decides which variable vectors need values for the
+During optimization `ropt` determines which variable vectors need values for the
 objectives and optional nonlinear-constraints. A compute step does not compute
 these values itself — it delegates to an
 [`Evaluator`][ropt.components.evaluators.Evaluator] instance that you supply. This
@@ -33,7 +33,7 @@ work to an [`Executor`][ropt.components.executors.Executor] and is described in
     step its own evaluator. For the constraints on where each layer of a nested
     workflow may run, see
     [Nested workflows and process boundaries](parallel.md#nested-workflows-and-process-boundaries).
-    Note that the parallelism of
+    The parallelism of
     [`ParallelEvaluator`][ropt.components.evaluators.ParallelEvaluator] happens
     *below* `eval` — it dispatches tasks to an executor, so its own `eval` is
     still called on a single thread. An evaluator cannot be transferred to

@@ -55,7 +55,7 @@ CONFIG = {
 ## Perturbation magnitude and scaling
 
 `perturbation_magnitudes` sets the scale of the sample applied to each
-variable. The `perturbation_types` field decides how that scale is interpreted:
+variable. The `perturbation_types` field sets how that scale is interpreted:
 
 - [`PerturbationType.ABSOLUTE`][ropt.enums.PerturbationType.ABSOLUTE] — the
   magnitude is added directly to the variable value.
@@ -129,8 +129,8 @@ realizations that did work.
 
 ## Samplers
 
-A sampler decides *where* the perturbed points are placed, while
-`perturbation_magnitudes` decides how far away they are. The default draws from
+A sampler determines *where* the perturbed points are placed, while
+`perturbation_magnitudes` determines how far away they are. The default draws from
 a standard normal distribution, and quasi-random alternatives are available.
 Selecting one, perturbing different variables differently, sharing samples
 across realizations and writing your own are all covered in
@@ -138,7 +138,7 @@ across realizations and writing your own are all covered in
 
 ## Function estimators
 
-A function estimator decides *how* the per-realization values and gradients are
+A function estimator determines *how* the per-realization values and gradients are
 combined into the single estimate the optimizer receives. The default is a
 weighted mean; alternatives, including a measure of dispersion rather than an
 average, are covered in [Function Estimators](function_estimators.md).
