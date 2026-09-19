@@ -3003,10 +3003,10 @@
 <p><code>ropt</code> is developed by the Netherlands Organisation for Applied Scientific
 Research (TNO) and released under the GNU General Public License v3.0.</p>
 <h2 id="overview">Overview</h2>
-<p><code>ropt</code> is a module designed for implementing and executing robust optimization
+<p><code>ropt</code> is a module for implementing and executing robust optimization
 workflows. In classical optimization problems, a deterministic function is
-optimized. However, in robust optimization, the function is expected to exhibit
-a stochastic nature and is represented by an ensemble of functions
+optimized. In robust optimization, the function is stochastic and is
+represented by an ensemble of functions
 (realizations) for different values of some (possibly unknown) random
 parameters. The optimal solution is then determined by optimizing the value of a
 statistic, such as the mean, over the ensemble.</p>
@@ -3042,10 +3042,10 @@ statistic, such as the mean, over the ensemble.</p>
   <a href="https://pandas.pydata.org/"><code>pandas</code></a> or <a href="https://pola.rs/"><code>polars</code></a> data
   frames.</li>
 </ul>
-<p><code>ropt</code> can be employed to construct optimization workflows directly in Python
+<p><code>ropt</code> can be used to construct optimization workflows directly in Python
 scripts or as a building block in optimization applications. At a minimum, the
 user needs to provide additional code to calculate the values for each function
-realization in the ensemble. This can range from simply calling a Python
+realization in the ensemble. This can range from calling a Python
 function that returns the objective values to initiating a long-running
 simulation on an HPC cluster and reading the results. Furthermore, <code>ropt</code>
 exposes all intermediate results of the optimization, such as objective and
@@ -3058,22 +3058,21 @@ the optimization — and is the same no matter how you run it; it is covered in
 the <a href="optimizer_setup/key_concepts/">Optimizer Setup</a> section. There are two options
 covering <em>how</em> to run a configured optimization:</p>
 <ol>
-<li><a href="running/running/">Running Optimizations</a> is the recommended starting
-   point: a single function call covers most optimization tasks, including
+<li><a href="running/running/">Running Optimizations</a> covers most optimization tasks
+   in a single function call, including
    parallel evaluation across threads, processes, or an HPC cluster, custom
    result handling, and running multiple optimization steps sequentially or
    in parallel, possibly nested within each other.</li>
 <li><a href="advanced/workflows/">Optimization Workflows</a> expose the individual
-   building blocks — compute steps, event handlers, executors — directly, for
-   full flexibility.</li>
+   building blocks — compute steps, event handlers, executors — directly.</li>
 </ol>
 <h2 id="getting-started">Getting started</h2>
 <ul>
 <li>Read the <a href="getting_started/background/">Background</a> for the ideas behind
   <code>ropt</code>, then work through <a href="getting_started/installation/">Installation</a> and
   the <a href="getting_started/quickstart/">Quickstart</a>.</li>
-<li><a href="running/running/">Running Optimizations</a> is the recommended starting point
-  for running an optimization and covers most cases.</li>
+<li><a href="running/running/">Running Optimizations</a> covers running an optimization,
+  and most cases with it.</li>
 <li>The <a href="optimizer_setup/key_concepts/">Key Concepts</a> page introduces the terms used
   throughout the documentation.</li>
 <li>The <a href="optimizer_setup/configuration/">Configuration</a> page describes the
@@ -3088,11 +3087,11 @@ covering <em>how</em> to run a configured optimization:</p>
 <li>The <a href="https://tno-ropt.github.io/ropt-nomad/"><code>ropt-nomad</code></a> plugin implements
   the MADS algorithm based on the
   <a href="https://www.gerad.ca/en/software/nomad/">NOMAD</a> package.</li>
-<li>The <a href="https://tno-ropt.github.io/ropt-pymoo/"><code>ropt-pymoo</code></a> makes the
+<li>The <a href="https://tno-ropt.github.io/ropt-pymoo/"><code>ropt-pymoo</code></a> plugin makes the
   algorithms from the <a href="https://pymoo.org/"><code>pymoo</code></a> package available to <code>ropt</code>.</li>
 </ul>
 <h3 id="applications">Applications</h3>
-<p>The <code>ropt</code> package is used  by the
+<p>The <code>ropt</code> package is used by the
 <a href="https://everest.readthedocs.io/en/latest/">Everest</a> decision-making tool as its
 core optimization engine.</p>
 

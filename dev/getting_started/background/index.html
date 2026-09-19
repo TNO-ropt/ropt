@@ -2916,8 +2916,8 @@ h_k(\mathbf{x}) = 0, \quad \quad k=1, \ldots, K \\
 <p>Here, <span class="arithmatex">\(f(\mathbf{x})\)</span> is deterministic: for a given <span class="arithmatex">\(\mathbf{x}\)</span> it always
 returns the same value. In practice, however, <span class="arithmatex">\(f(\mathbf{x})\)</span> often depends on
 uncertain parameters drawn from some — possibly unknown — probability
-distribution. In that case, a single evaluation of <span class="arithmatex">\(f(\mathbf{x})\)</span> is really
-just one member of a larger set of possible functions.</p>
+distribution. In that case, a single evaluation of <span class="arithmatex">\(f(\mathbf{x})\)</span> is one
+member of a larger set of possible functions.</p>
 <p>Ensemble-based robust optimization optimizes such a set, or <em>ensemble</em>, of
 functions <span class="arithmatex">\(f_i(\mathbf{x})\)</span> at once. Each <span class="arithmatex">\(f_i\)</span> is called a <em>realization</em>: one
 possible version of the function, for instance obtained by drawing a set of
@@ -2939,16 +2939,15 @@ process.</p>
 <a href="https://www.scipy.org">SciPy</a> package. These algorithms work iteratively,
 evaluating the objective function — and usually its gradient — many times
 over the course of the optimization. <code>ropt</code> assumes that gradients cannot be
-calculated analytically, and one of its core features is estimating them
-efficiently using stochastic methods.</p>
+calculated analytically, and estimates them using stochastic methods.</p>
 <p><code>ropt</code> sets up and runs the optimization algorithm, combines the individual
 realizations into overall function and gradient values, and keeps track of
 intermediate and final results. Calculating the functions themselves — for
 example, running a simulation — is left to code that you provide.</p>
-<p>Most optimization problems only need a single run of one method. Sometimes,
-though, it helps to combine several runs, possibly with different algorithms
+<p>Most optimization problems only need a single run of one method. Some are
+solved by combining several runs, possibly with different algorithms
 — for example, when a problem mixes continuous and discrete variables, each
-kind may be best handled by its own method. <code>ropt</code> supports this too: several
+kind needs its own method. <code>ropt</code> supports this: several
 optimization runs can be combined sequentially, in parallel, or nested within
 each other.</p>
 <h2 id="see-also">See also</h2>

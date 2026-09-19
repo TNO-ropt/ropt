@@ -3415,7 +3415,7 @@ gives up parallelism inside the batch entirely: it is for a pool whose
 parallelism comes from the runs above it, as in
 <a href="../nested/#two-pools-not-one">Nested Optimization</a>.</p>
 <p><code>workers</code> and <code>bundle_size</code> are the two halves of matching work to capacity.
-<code>workers</code> says how many tasks may be in flight; <code>bundle_size</code> says how much
+<code>workers</code> sets how many tasks may be in flight; <code>bundle_size</code> sets how much
 work one task should carry. With a batch of 100 cheap evaluations and
 8 workers, the default sends 100 separate tasks and pays 100 transfer costs
 to keep 8 workers busy; <code>bundle_size=13</code> sends 8 and pays 8. Raise it when
@@ -3436,7 +3436,7 @@ holding all the slow ones.</p>
 <p class="admonition-title">Pools inside an evaluation</p>
 <p>An evaluation function may start a run of its own, but open its pool
 <strong>once</strong>, in the calling code, and pass it to every evaluation. Opening one
-per evaluation gives each a budget nobody else knows about: ten evaluations
+per evaluation gives each a budget separate from every other: ten evaluations
 each opening a ten-worker pool put a hundred workers on the machine, where
 one shared pool puts ten. Which pool it may be is a separate question, and
 the rules are in
@@ -3556,8 +3556,8 @@ evaluation is a job rather than a function call:</p>
 <div class="admonition note">
 <p class="admonition-title">Where the working directory goes</p>
 <p>With no <code>workdir</code>, the pool works in a temporary directory of its own and
-removes it when it closes — but only when there is nothing left in it worth
-reading. If an evaluation <strong>failed</strong>, its captured output is kept, so the
+removes it when it closes, unless something in it is still readable. If an
+evaluation <strong>failed</strong>, its captured output is kept, so the
 directory is kept with it and its path is logged:</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>WARNING  ropt.components.executors: Keeping the local working directory
 </span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>         /tmp/ropt-local-8f3a1c: a work item failed.
@@ -3688,7 +3688,7 @@ and <code>submit_options</code> carries anything else that script declares:</p>
 </span><span id="__span-12-8"><a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a><span class="p">)</span>
 </span></code></pre></div>
 <p>For <code>account</code> to have any effect the script must reference it. A variable a
-script never mentions is simply ignored, and one the script mentions but nobody
+script never mentions is ignored, and one the script mentions but nobody
 supplies renders as empty — so a misspelling on either side drops the directive
 silently rather than failing. Entries that are <code>None</code> are dropped, so omitting a
 key and passing <code>None</code> mean the same thing. A name the executor sets itself,
@@ -3697,10 +3697,10 @@ such as <code>cores</code> or <code>queue</code>, is rejected rather than allowe
 selected queue's limits rather than rejected: asking for more cores than the
 queue allows quietly gets you the queue's maximum.</p>
 <h4 id="submitting-with-your-own-template">Submitting with your own template</h4>
-<p>A <code>template</code> is simply the script that gets run on the cluster, written by you
+<p>A <code>template</code> is the script that gets run on the cluster, written by you
 instead of taken from a configuration. Since there is no configuration to say
-what kind of cluster this is, <code>scheduler</code> tells ropt which queueing system to
-submit to — that is what decides whether it runs <code>sbatch</code> or <code>bsub</code>. It defaults
+what kind of cluster this is, <code>scheduler</code> names the queueing system to
+submit to — that is what determines whether it runs <code>sbatch</code> or <code>bsub</code>. It defaults
 to <code>"slurm"</code>.</p>
 <p>Nothing else is resolved for you: <strong>the queue is not an argument here</strong>, it has
 to be written into the script, along with everything else the scheduler needs.
@@ -3805,7 +3805,7 @@ only the batch-ID counter that the runs sharing it draw from, and their
 evaluations happen in-process on the calling thread. It needs no session, and
 needs no releasing.</p>
 <p>Use it to give several runs one continuous batch-ID sequence without running
-their evaluations in parallel, or simply to say in the code that a run is meant
+their evaluations in parallel, or to state in the code that a run is meant
 to evaluate in-process.</p>
 <h3 id="which-pool">Which pool should I use?</h3>
 <p><a href="../../getting_started/execution/">Running in Parallel</a> asks the question that
@@ -3921,7 +3921,7 @@ worker, from a session opened there, or run the inner optimization without one.
 An evaluation function that carries a pool along anyway is refused when the work
 item is sent, rather than failing somewhere deep inside the run.</p>
 <h2 id="stopping-a-run">Stopping a run</h2>
-<p>Press Ctrl-C, or close the pool, and <code>ropt</code> stops handing out new work at once.
+<p>Press Ctrl-C, or close the pool, and <code>ropt</code> stops dispatching new work at once.
 What happens to the evaluations already running depends on the pool, because
 what <em>can</em> be done to them differs:</p>
 <table>
@@ -4010,7 +4010,7 @@ identifier that travels with its results (and shows up in a
   This is built into <code>optimize_many</code> and does not depend on the pool;
   the <code>limit</code> argument caps how many run at the same time.</li>
 <li><strong>The function evaluations</strong> inside those runs all happen on the one pool you
-  pass, and the pool decides how they are parallelized. With
+  pass, and the pool determines how they are parallelized. With
   <code>thread_pool(workers=1)</code> the runs still progress together, but their
   evaluations are executed one at a time. A larger pool — <code>thread_pool(workers=n)</code>,
   <code>process_pool</code>, <code>local_pool</code>, or <code>hpc_pool</code> — runs several evaluations at
@@ -4033,7 +4033,8 @@ each with its own metadata:</p>
 </span><span id="__span-17-9"><a id="__codelineno-17-9" name="__codelineno-17-9" href="#__codelineno-17-9"></a>    <span class="p">)</span>
 </span></code></pre></div>
 <p>The two callback arguments differ in the same way. <code>report=</code> is <strong>per run</strong>: one
-callback watches every run, or pass a list with one callback per run. <code>handlers=</code>
+callback receives the results of every run, or pass a list with one callback per
+run. <code>handlers=</code>
 is <strong>shared</strong>: one list of groups that all runs feed together, which is why a
 plain handler is refused there — see <a href="../handlers/#sharing-a-handler-across-concurrent-runs">Sharing a handler across concurrent
 runs</a>.</p>

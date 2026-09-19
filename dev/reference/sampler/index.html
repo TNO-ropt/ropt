@@ -3359,8 +3359,7 @@ run-dependent setup should usually be deferred to <code>init</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Configuration object specifying the sampler method
-and any method-specific options.</p>
+                <p>Configuration specifying the method and its options.</p>
               </div>
             </td>
             <td>
@@ -3407,7 +3406,8 @@ and any method-specific options.</p>
         <p>Finalize initialization before the optimization starts.</p>
 <p>Called once at the start of each optimization workflow, after all
 configuration is finalized. The three counts are the shape of the array
-<code>generate_samples</code> must return.</p>
+<code>generate_samples</code> must return. A <code>mask</code> of <code>None</code> makes the sampler
+responsible for every variable.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3478,9 +3478,7 @@ configuration is finalized. The three counts are the shape of the array
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional boolean mask selecting the variables
-                handled by this sampler. If <code>None</code>, the sampler
-                is responsible for all variables.</p>
+                <p>Optional mask selecting this sampler's variables.</p>
               </div>
             </td>
             <td>
@@ -3496,8 +3494,7 @@ configuration is finalized. The three counts are the shape of the array
             </td>
             <td>
               <div class="doc-md-description">
-                <p>NumPy random number generator instance for
-                stochastic sampling methods.</p>
+                <p>NumPy random number generator.</p>
               </div>
             </td>
             <td>
@@ -3737,8 +3734,7 @@ run-dependent setup should usually be deferred to <code>init</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Configuration object specifying the sampler method
-and any method-specific options.</p>
+                <p>Configuration specifying the method and its options.</p>
               </div>
             </td>
             <td>
@@ -3785,7 +3781,8 @@ and any method-specific options.</p>
         <p>Finalize initialization before the optimization starts.</p>
 <p>Called once at the start of each optimization workflow, after all
 configuration is finalized. The three counts are the shape of the array
-<code>generate_samples</code> must return.</p>
+<code>generate_samples</code> must return. A <code>mask</code> of <code>None</code> makes the sampler
+responsible for every variable.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3856,9 +3853,7 @@ configuration is finalized. The three counts are the shape of the array
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional boolean mask selecting the variables
-                handled by this sampler. If <code>None</code>, the sampler
-                is responsible for all variables.</p>
+                <p>Optional mask selecting this sampler's variables.</p>
               </div>
             </td>
             <td>
@@ -3874,8 +3869,7 @@ configuration is finalized. The three counts are the shape of the array
             </td>
             <td>
               <div class="doc-md-description">
-                <p>NumPy random number generator instance for
-                stochastic sampling methods.</p>
+                <p>NumPy random number generator.</p>
               </div>
             </td>
             <td>

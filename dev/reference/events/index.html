@@ -3090,14 +3090,14 @@ progress, store results, or stop the run. See
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The compute step that emitted the event; a handler may call
-         its <code>stop()</code> to stop that run.</p>
+                <p>The compute step that emitted the event.</p>
               </div>
             </td>
           </tr>
       </tbody>
     </table>
-        <p>See <a href="../../advanced/workflows/#the-enoptevent-object">Optimization Workflows</a>
+        <p>A handler may call <code>source.stop()</code> to stop the run that emitted the event.</p>
+<p>See <a href="../../advanced/workflows/#the-enoptevent-object">Optimization Workflows</a>
 for a detailed description of events and their lifecycle.</p>
 
 

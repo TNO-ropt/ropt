@@ -3300,8 +3300,8 @@ delivered to your code.</p>
 
   
       dataclass
-  " href="../../reference/results/#ropt.results.Results"><code>Results</code></a> is the record every part of <code>ropt</code> hands
-out: one object per variable vector evaluated, carrying every field
+  " href="../../reference/results/#ropt.results.Results"><code>Results</code></a> is the record every part of <code>ropt</code>
+returns: one object per variable vector evaluated, carrying every field
 described below. Result handlers receive these, a <code>report</code> callback is given
 one per evaluation, <a class="autorefs autorefs-internal" title="            ropt.simple.evaluate" href="../../reference/simple/#ropt.simple.evaluate"><code>evaluate</code></a> returns one, and
 <a href="../running/"><code>optimize</code></a> puts the best one on the <code>results</code> field of the
@@ -4391,8 +4391,8 @@ are reachable from either function:</p>
 at different granularities — for example a per-batch gradient with
 per-perturbation evaluations — by repeating the coarser values across the
 finer rows. Pandas cannot align such fields and returns them as disjoint
-blocks of rows padded with missing values instead, so prefer polars when a
-single table has to mix granularities.</p>
+blocks of rows padded with missing values instead. Only polars produces a
+single table that mixes granularities.</p>
 </div>
 
 

@@ -3344,6 +3344,8 @@ realizations a weight of zero.</p>
 no realization can be given a positive weight, raise
 <a class="autorefs autorefs-internal" title="            TooFewRealizations" href="../exceptions/#ropt.exceptions.TooFewRealizations"><code>TooFewRealizations</code></a> to record
 the evaluation as failed.</p>
+<p><code>objective_scales</code> is passed on every call because auto-scaling only
+fixes the scales after the first batch.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3382,9 +3384,7 @@ the evaluation as failed.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Nonlinear constraints, shape
-               <code>(n_realizations, n_constraints)</code>, or <code>None</code> if no
-               nonlinear constraints are configured.</p>
+                <p>Constraints, shape <code>(n_realizations, n_constraints)</code>.</p>
               </div>
             </td>
             <td>
@@ -3400,9 +3400,7 @@ the evaluation as failed.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The scale applied to each objective. Passed on
-               every call because auto-scaling only fixes these
-               after the first batch.</p>
+                <p>The scale applied to each objective.</p>
               </div>
             </td>
             <td>

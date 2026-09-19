@@ -3085,8 +3085,8 @@ components — is set up in
 <a href="../../optimizer_setup/key_concepts/">Optimizer Setup</a>, the same whichever way you run
 it.</p>
 </div>
-<p>The <code>ropt.simple</code> module is the recommended entry point for running an
-optimization. Everything you need is imported from a single module:</p>
+<p>The <code>ropt.simple</code> module covers running an optimization. Everything you need is
+imported from a single module:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.simple</span><span class="w"> </span><span class="kn">import</span> <span class="n">optimize</span>
 </span></code></pre></div>
 <p>You give <a class="autorefs autorefs-internal" title="            ropt.simple.optimize" href="../../reference/simple/#ropt.simple.optimize"><code>optimize</code></a> three things:</p>
@@ -3255,7 +3255,7 @@ no optimizer loop to interrupt, so the callback reports and nothing more.</p>
 </span></code></pre></div>
 <p>The same dict also reaches the evaluation function itself, as
   <code>context.metadata</code> — useful when the evaluation needs to know which run it is
-  part of. With <code>optimize_many</code>, this is the natural way to tell runs apart:
+  part of. With <code>optimize_many</code>, this is how runs are told apart:
   give one dict (shared by all runs) or a list with one dict per run; see
   <a href="../parallel/#many-optimizations-at-once">Give each run an ID</a>.</p>
 <ul>

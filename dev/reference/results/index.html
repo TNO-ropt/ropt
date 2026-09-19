@@ -3632,6 +3632,8 @@ the result hierarchy, axis metadata, scaling, and pandas/polars export.</p>
       dataclass
   " href="#ropt.results.GradientResults"><code>GradientResults</code></a>.</p>
 <p>See <a href="../../running/results/">Working with Results</a> for a narrative overview.</p>
+<p>The keys of <code>names</code> are <a class="autorefs autorefs-internal" title="            AxisName" href="../enums/#ropt.enums.AxisName"><code>AxisName</code></a> values, or the
+name of a metadata key that defines a user axis.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -3673,9 +3675,7 @@ the result hierarchy, axis metadata, scaling, and pandas/polars export.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Mapping from axis name to label tuples for DataFrame export.
-      Keys are <a class="autorefs autorefs-internal" title="            AxisName" href="../enums/#ropt.enums.AxisName"><code>AxisName</code></a> values, or the name
-      of a metadata key that defines a user axis.</p>
+                <p>Mapping from axis name to label tuples, for DataFrame export.</p>
               </div>
             </td>
           </tr>
@@ -3817,8 +3817,7 @@ further details and examples.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If <code>select</code> is a set rather than an ordered
-              sequence.</p>
+                <p>If <code>select</code> is not an ordered sequence.</p>
               </div>
             </td>
           </tr>
@@ -3981,8 +3980,7 @@ for details.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If <code>select</code> is a set rather than an ordered
-              sequence.</p>
+                <p>If <code>select</code> is not an ordered sequence.</p>
               </div>
             </td>
           </tr>
@@ -5976,8 +5974,7 @@ its key. See
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The objective function values for each
-                   realization and perturbation.</p>
+                <p>Objective values per realization and perturbation.</p>
               </div>
             </td>
           </tr>
@@ -5988,8 +5985,7 @@ its key. See
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The constraint function values for each
-                   realization and perturbation.</p>
+                <p>Constraint values per realization and perturbation.</p>
               </div>
             </td>
           </tr>
@@ -6000,8 +5996,7 @@ its key. See
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional metadata for each evaluated
-                   realization and perturbation.</p>
+                <p>Optional metadata per realization and perturbation.</p>
               </div>
             </td>
           </tr>
@@ -6070,8 +6065,7 @@ its key. See
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Objective function values for each
-                   realization and perturbation.</p>
+                <p>Objective values per realization and perturbation.</p>
               </div>
             </td>
             <td>
@@ -6087,8 +6081,7 @@ its key. See
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Constraint function values for each
-                   realization and perturbation.</p>
+                <p>Constraint values per realization and perturbation.</p>
               </div>
             </td>
             <td>
@@ -6299,8 +6292,7 @@ constraint calculation.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Weights for each objective in each realization,
-                    if available.</p>
+                <p>Objective weights per realization, if available.</p>
               </div>
             </td>
           </tr>
@@ -6311,8 +6303,7 @@ constraint calculation.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Weights for each constraint in each realization,
-                    if available.</p>
+                <p>Constraint weights per realization, if available.</p>
               </div>
             </td>
           </tr>
@@ -6692,22 +6683,7 @@ default to <code>None</code> and are only populated if bounds are present and fi
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A newly created <code>ConstraintInfo</code> object, or <code>None</code> if no bounds</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.results.ConstraintInfo
-
-
-  
-      dataclass
-   (ropt.results._constraint_info.ConstraintInfo)" href="#ropt.results.ConstraintInfo">ConstraintInfo</a> | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>are available.</p>
+                <p>A new <code>ConstraintInfo</code>, or <code>None</code> if no bounds are available.</p>
               </div>
             </td>
           </tr>
@@ -6920,8 +6896,7 @@ for field selection and unstacking.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Field names to include, in column order (dot notation for
-         nested fields).</p>
+                <p>Field names to include, in column order (dot notation).</p>
               </div>
             </td>
             <td>
@@ -6963,17 +6938,7 @@ for field selection and unstacking.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A DataFrame with the requested fields as columns, indexed by <code>batch_id</code></p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                  <code><span title="pandas.DataFrame">DataFrame</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>and by any axes that stay stacked.</p>
+                <p>A DataFrame indexed by <code>batch_id</code> and by any axes that stay stacked.</p>
               </div>
             </td>
           </tr>
@@ -6996,9 +6961,7 @@ for field selection and unstacking.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If <code>result_type</code> is invalid, if <code>fields</code> is a set
-              rather than an ordered sequence, or if results
-              contain unexpected types.</p>
+                <p>If an argument or a result has an unexpected type.</p>
               </div>
             </td>
           </tr>
@@ -7104,8 +7067,7 @@ for details.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Field names to include, in column order (dot notation for
-         nested fields).</p>
+                <p>Field names to include, in column order (dot notation).</p>
               </div>
             </td>
             <td>
@@ -7163,17 +7125,7 @@ for details.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A DataFrame with the requested fields as columns, keyed by <code>batch_id</code></p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                  <code><span title="polars.DataFrame">DataFrame</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>and by any axes that stay stacked.</p>
+                <p>A DataFrame keyed by <code>batch_id</code> and by any axes that stay stacked.</p>
               </div>
             </td>
           </tr>
@@ -7196,9 +7148,7 @@ for details.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If <code>result_type</code> is invalid, if <code>fields</code> is a set
-              rather than an ordered sequence, or if results
-              contain unexpected types.</p>
+                <p>If an argument or a result has an unexpected type.</p>
               </div>
             </td>
           </tr>

@@ -3048,14 +3048,14 @@ works without it:</p>
 </tr>
 </tbody>
 </table>
-<p>The two pool rows differ, and the difference matters in practice. A process pool
+<p>The two pool rows differ. A process pool
 starts its workers with <code>spawn</code>, which re-imports the script you launched, so a
 function defined there can be looked up again. A local or cluster job is a fresh
 command whose <code>__main__</code> is <code>ropt</code>'s own worker module, so a function defined in
 your script cannot be found by name — it has to live in a module the worker can
-import, which on a cluster means installed on the compute nodes. <strong>Installing
-<code>cloudpickle</code> is the recommended way to use local and cluster jobs</strong>, unless
-your evaluation function already lives in such a module.</p>
+import, which on a cluster means installed on the compute nodes. Without
+<code>cloudpickle</code>, local and cluster jobs therefore accept only an evaluation
+function that already lives in such a module.</p>
 <p>Install with:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"ropt[pandas]"</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"ropt[polars]"</span>

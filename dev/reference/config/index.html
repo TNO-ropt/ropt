@@ -3512,6 +3512,27 @@ fields, their defaults and worked examples.</p>
 perturbation settings.</p>
 <p>See <a href="../../optimizer_setup/configuration_sections/#variables">Configuration Sections</a> for
 detailed descriptions and usage examples.</p>
+<p>The perturbation defaults are
+<a class="autorefs autorefs-internal" title="            DEFAULT_PERTURBATION_MAGNITUDE
+
+
+  
+      module-attribute
+  " href="#ropt.config.constants.DEFAULT_PERTURBATION_MAGNITUDE"><code>DEFAULT_PERTURBATION_MAGNITUDE</code></a>,
+<a class="autorefs autorefs-internal" title="            DEFAULT_PERTURBATION_TYPE
+
+
+  
+      module-attribute
+  " href="#ropt.config.constants.DEFAULT_PERTURBATION_TYPE"><code>DEFAULT_PERTURBATION_TYPE</code></a>
+(one of <a class="autorefs autorefs-internal" title="            PerturbationType" href="../enums/#ropt.enums.PerturbationType"><code>PerturbationType</code></a>) and
+<a class="autorefs autorefs-internal" title="            DEFAULT_PERTURBATION_BOUNDARY_TYPE
+
+
+  
+      module-attribute
+  " href="#ropt.config.constants.DEFAULT_PERTURBATION_BOUNDARY_TYPE"><code>DEFAULT_PERTURBATION_BOUNDARY_TYPE</code></a>
+(one of <a class="autorefs autorefs-internal" title="            BoundaryType" href="../enums/#ropt.enums.BoundaryType"><code>BoundaryType</code></a>).</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -3608,14 +3629,7 @@ detailed descriptions and usage examples.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Magnitudes of the perturbations for each variable
-(default:
-<a class="autorefs autorefs-internal" title="            DEFAULT_PERTURBATION_MAGNITUDE
-
-
-  
-      module-attribute
-  " href="#ropt.config.constants.DEFAULT_PERTURBATION_MAGNITUDE"><code>DEFAULT_PERTURBATION_MAGNITUDE</code></a>).</p>
+                <p>Magnitude of the perturbation of each variable.</p>
               </div>
             </td>
           </tr>
@@ -3626,14 +3640,7 @@ detailed descriptions and usage examples.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Type of perturbation for each variable (see
-<a class="autorefs autorefs-internal" title="            PerturbationType" href="../enums/#ropt.enums.PerturbationType"><code>PerturbationType</code></a>, default:
-<a class="autorefs autorefs-internal" title="            DEFAULT_PERTURBATION_TYPE
-
-
-  
-      module-attribute
-  " href="#ropt.config.constants.DEFAULT_PERTURBATION_TYPE"><code>DEFAULT_PERTURBATION_TYPE</code></a>).</p>
+                <p>Type of perturbation for each variable.</p>
               </div>
             </td>
           </tr>
@@ -3644,14 +3651,7 @@ detailed descriptions and usage examples.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>How to handle perturbations that violate boundary
-conditions (see <a class="autorefs autorefs-internal" title="            BoundaryType" href="../enums/#ropt.enums.BoundaryType"><code>BoundaryType</code></a>, default:
-<a class="autorefs autorefs-internal" title="            DEFAULT_PERTURBATION_BOUNDARY_TYPE
-
-
-  
-      module-attribute
-  " href="#ropt.config.constants.DEFAULT_PERTURBATION_BOUNDARY_TYPE"><code>DEFAULT_PERTURBATION_BOUNDARY_TYPE</code></a>).</p>
+                <p>Handling of perturbations that violate a bound.</p>
               </div>
             </td>
           </tr>
@@ -3662,8 +3662,7 @@ conditions (see <a class="autorefs autorefs-internal" title="            Boundar
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Sampler to apply to each variable, by key
-                      (default: <code>"0"</code>).</p>
+                <p>Sampler for each variable, by key (default: <code>"0"</code>).</p>
               </div>
             </td>
           </tr>
@@ -3728,6 +3727,9 @@ conditions (see <a class="autorefs autorefs-internal" title="            Boundar
 <a class="autorefs autorefs-internal" title="            EnOptContext" href="../context/#ropt.context.EnOptContext"><code>EnOptContext</code></a> object.</p>
 <p>See <a href="../../optimizer_setup/configuration_sections/#objectives">Configuration Sections</a> for
 detailed descriptions and usage examples.</p>
+<p>The reported <code>target_objective</code> is divided by the estimated <code>auto_scale</code>
+factors, so runs that differ in that setting compare only through
+<code>functions.objectives</code> or their variables.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -3780,10 +3782,7 @@ detailed descriptions and usage examples.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Estimate additional scales from the first batch. The
-                 reported <code>target_objective</code> is divided by them, so
-                 runs that differ in this setting compare only
-                 through <code>functions.objectives</code> or their variables.</p>
+                <p>Estimate additional scales from the first batch.</p>
               </div>
             </td>
           </tr>
@@ -3805,8 +3804,7 @@ detailed descriptions and usage examples.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Realization filter to apply to each objective, by key,
-                 <code>None</code> to apply none (default: <code>None</code>).</p>
+                <p>Realization filter per objective, by key (default: none).</p>
               </div>
             </td>
           </tr>
@@ -3817,8 +3815,7 @@ detailed descriptions and usage examples.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Function estimator to apply to each objective, by key
-                 (default: <code>"0"</code>).</p>
+                <p>Function estimator per objective, by key (default: <code>"0"</code>).</p>
               </div>
             </td>
           </tr>
@@ -4045,8 +4042,7 @@ descriptions and usage examples.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Which constraints to estimate an additional scale for,
-                 from the first batch (default: <code>False</code>).</p>
+                <p>Which constraints to auto-scale (default: <code>False</code>).</p>
               </div>
             </td>
           </tr>
@@ -4057,8 +4053,7 @@ descriptions and usage examples.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Realization filter to apply to each constraint, by key,
-                 <code>None</code> to apply none (default: <code>None</code>).</p>
+                <p>Realization filter per constraint, by key (default: none).</p>
               </div>
             </td>
           </tr>
@@ -4069,8 +4064,7 @@ descriptions and usage examples.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Function estimator to apply to each constraint, by key
-                 (default: <code>"0"</code>).</p>
+                <p>Function estimator per constraint, by key (default: <code>"0"</code>).</p>
               </div>
             </td>
           </tr>
@@ -4124,6 +4118,8 @@ descriptions and usage examples.</p>
 <a class="autorefs autorefs-internal" title="            EnOptContext" href="../context/#ropt.context.EnOptContext"><code>EnOptContext</code></a> object.</p>
 <p>See <a href="../../optimizer_setup/configuration_sections/#realizations">Configuration Sections</a> for
 detailed descriptions and usage examples.</p>
+<p><code>realization_min_success</code> defaults to the number of realizations, so a
+single failure ends the run.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -4154,8 +4150,7 @@ detailed descriptions and usage examples.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Minimum number of successful realizations (default:
-                     equal to the number of realizations).</p>
+                <p>Minimum number of successful realizations.</p>
               </div>
             </td>
           </tr>
@@ -4375,8 +4370,7 @@ detailed descriptions and usage examples.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Convergence tolerance, compared against scaled
-                   quantities (optional).</p>
+                <p>Convergence tolerance, on scaled quantities (optional).</p>
               </div>
             </td>
           </tr>
@@ -4464,6 +4458,14 @@ optimizers. It is used as the <code>gradient</code> field of
 <a class="autorefs autorefs-internal" title="            EnOptContext" href="../context/#ropt.context.EnOptContext"><code>EnOptContext</code></a>.</p>
 <p>See <a href="../../optimizer_setup/configuration_sections/#gradient">Configuration Sections</a> for
 detailed descriptions and usage examples.</p>
+<p><code>number_of_perturbations</code> defaults to
+<a class="autorefs autorefs-internal" title="            DEFAULT_NUMBER_OF_PERTURBATIONS
+
+
+  
+      module-attribute
+  " href="#ropt.config.constants.DEFAULT_NUMBER_OF_PERTURBATIONS"><code>DEFAULT_NUMBER_OF_PERTURBATIONS</code></a>,
+and <code>perturbation_min_success</code> to <code>number_of_perturbations</code>.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -4483,13 +4485,7 @@ detailed descriptions and usage examples.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Number of perturbations (default:
-<a class="autorefs autorefs-internal" title="            DEFAULT_NUMBER_OF_PERTURBATIONS
-
-
-  
-      module-attribute
-  " href="#ropt.config.constants.DEFAULT_NUMBER_OF_PERTURBATIONS"><code>DEFAULT_NUMBER_OF_PERTURBATIONS</code></a>).</p>
+                <p>Number of perturbations.</p>
               </div>
             </td>
           </tr>
@@ -4500,8 +4496,7 @@ detailed descriptions and usage examples.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Minimum number of successful function evaluations
-for perturbed variables (default: equal to <code>number_of_perturbations</code>).</p>
+                <p>Minimum number of successful perturbations.</p>
               </div>
             </td>
           </tr>
@@ -4512,8 +4507,7 @@ for perturbed variables (default: equal to <code>number_of_perturbations</code>)
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Merge all realizations for the final gradient
-calculation (default: <code>False</code>).</p>
+                <p>Merge realizations for the final gradient.</p>
               </div>
             </td>
           </tr>
@@ -5106,8 +5100,7 @@ describing a method supported by the plugin.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>An optional list of method schemas that define common options
-     shared by all methods.</p>
+                <p>Optional method schemas defining options shared by all methods.</p>
               </div>
             </td>
           </tr>

@@ -3116,8 +3116,8 @@ which we use to index the parameter arrays:</p>
 objective uses <code>context.realization</code> to select the parameters for the
 realization it is computing. <code>ropt</code> combines the per-realization values into the
 robust objective for you.</p>
-<p>Returning a single number, as here, is the simplest case. A function that has
-multiple objectives and has constraints returns a sequence instead — the
+<p>Returning a single number, as here, is the simplest case. A function with
+multiple objectives, or with constraints, returns a sequence instead — the
 objectives first, then the constraints; see
 <a href="../../optimizer_setup/constraints/">Constraints</a>.</p>
 <h2 id="4-follow-the-progress-optional">4. Follow the progress (optional)</h2>
@@ -3164,7 +3164,7 @@ robust objective, which is what it optimizes.</p>
 </span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"optimal objective: </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">target_objective</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </span></code></pre></div>
 <ul>
-<li><code>result.exit_code</code> says why the run stopped (a member of the
+<li><code>result.exit_code</code> indicates why the run stopped (a member of the
   <a class="autorefs autorefs-internal" title="            ExitCode" href="../../reference/enums/#ropt.enums.ExitCode"><code>ExitCode</code></a> enumeration).</li>
 <li><code>result.results</code> is the best evaluation the run reached, a
   <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults

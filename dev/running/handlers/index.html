@@ -3115,14 +3115,14 @@ them, tabulating them, or invoking a callback.</p>
   
       dataclass
   " href="../../reference/results/#ropt.results.GradientResults"><code>GradientResults</code></a> — which is what every other part of the
-simple API hands out too: a <code>report</code> callback receives one per evaluation, and
+simple API provides too: a <code>report</code> callback receives one per evaluation, and
 <code>optimize</code> puts the best one on the <code>results</code> field of what it returns.
 Everything a run produces is in them, at the field paths described in
 <a href="../results/">Working with Results</a>, which is the vocabulary the handlers below
 are configured in.</p>
 <p>The <a href="../running/#reporting-progress"><code>report</code></a> callback you may already be using
 is only shorthand for this: <code>report=</code> builds a handler for you behind the
-scenes. Where you pass it decides which kind. Given to a run, as
+scenes. Where you pass it determines which kind. Given to a run, as
 <code>optimize(..., report=...)</code>, it becomes a <strong>local</strong> handler of that run. Given
 to <a class="autorefs autorefs-internal" title="            shared_handlers" href="../../reference/simple/#ropt.simple.Session.shared_handlers"><code>shared_handlers</code></a>, as
 <code>shared_handlers(..., report=...)</code>, it joins that
@@ -3174,8 +3174,8 @@ feeds two groups from the same set of concurrent runs:</p>
 </span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    <span class="n">tagged</span> <span class="o">=</span> <span class="n">active</span><span class="o">.</span><span class="n">shared_handlers</span><span class="p">(</span><span class="n">per_run</span><span class="p">)</span>
 </span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    <span class="n">optimize_many</span><span class="p">(</span><span class="n">CONFIG</span><span class="p">,</span> <span class="n">STARTS</span><span class="p">,</span> <span class="n">rosenbrock</span><span class="p">,</span> <span class="n">pool</span><span class="o">=</span><span class="n">pool</span><span class="p">,</span> <span class="n">handlers</span><span class="o">=</span><span class="p">[</span><span class="n">shared</span><span class="p">,</span> <span class="n">tagged</span><span class="p">])</span>
 </span></code></pre></div>
-<p>Like a pool, a group lives until its session closes, which releases it and hands
-its handlers back; the same handler objects can then join a group on a later
+<p>Like a pool, a group lives until its session closes, which releases it and its
+handlers; the same handler objects can then join a group on a later
 session.</p>
 <p>Closing a group earlier <strong>releases its handlers</strong>. A handler belongs to one
 group at a time, so this is what lets you put one into another group; otherwise

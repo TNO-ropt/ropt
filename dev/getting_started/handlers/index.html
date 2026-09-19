@@ -2954,7 +2954,7 @@ In many cases you want
 to see every result to watch progress over the optimization. A <strong>handler</strong> does
 this: an object you attach with a <code>handlers=</code> argument that observes every
 result an optimization produces.</p>
-<p>What it collects are the full result objects —
+<p>It collects the full result objects —
 <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
 
 
@@ -2994,7 +2994,7 @@ run found, while collecting every result from every restart in one handler:</p>
 </span></code></pre></div>
 <p>Restarting needs nothing special from <code>ropt</code>: each call to <code>optimize</code> is
 independent, so <code>result.results.variables</code> — the best point a run found — is
-simply the start point for the next one. The runnable script is
+the start point for the next one. The runnable script is
 <a href="https://github.com/TNO-ropt/ropt/blob/main/examples/simple/restart.py">examples/simple/restart.py</a>,
 which <a href="../../running/restart/">Restarting from the Best Point</a> walks through.</p>
 <h2 id="other-built-in-handlers">Other built-in handlers</h2>

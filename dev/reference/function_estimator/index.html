@@ -3318,7 +3318,8 @@ Run-dependent setup belongs in <code>init</code>.</p>
 
         <p>Finalize initialization before the optimization starts.</p>
 <p>Called once after configuration is finalized. Use for validation
-(for example compatibility with <code>merge_realizations</code>) and precomputation.</p>
+(for example compatibility with <code>merge_realizations</code>) and precomputation.
+<code>merge_realizations</code> is described under <code>calculate_gradient</code>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3341,9 +3342,7 @@ Run-dependent setup belongs in <code>init</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Whether gradients arrive merged across
-                realizations, as described in
-                <code>calculate_gradient</code>.</p>
+                <p>Whether gradients arrive merged across realizations.</p>
               </div>
             </td>
             <td>
@@ -3519,8 +3518,7 @@ rule) are incompatible with merging and should raise <code>ValueError</code> fro
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Shape <code>(n_realizations,)</code> — needed for chain-rule
-estimators (for example standard deviation).</p>
+                <p>Shape <code>(n_realizations,)</code> — the per-realization values.</p>
               </div>
             </td>
             <td>
@@ -3536,8 +3534,7 @@ estimators (for example standard deviation).</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Shape <code>(n_variables, n_realizations)</code> or
-<code>(n_variables,)</code> if merged.</p>
+                <p>Shape <code>(n_variables, n_realizations)</code>, or <code>(n_variables,)</code>.</p>
               </div>
             </td>
             <td>

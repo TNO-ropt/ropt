@@ -6339,8 +6339,7 @@ install. This is the local stand-in for
 evaluation function that works here works there.</p>
 <p>Each job is a fresh command rather than a re-import of your script, so
 the evaluation function must live in a module the job can import, or
-the <code>ropt[cloudpickle]</code> extra must be installed — which is the
-recommended way to use this pool.</p>
+the <code>ropt[cloudpickle]</code> extra must be installed.</p>
 <p>POSIX only. See <a href="../../running/running/">Running Optimizations</a> for a
 walkthrough.</p>
 <p>The default <code>workdir</code> is a temporary directory that is removed when the
@@ -6494,7 +6493,7 @@ exits.</p>
 requires the <code>ropt[hpc]</code> extra. Each evaluation is a job started as its
 own command, so the evaluation function must live in a module the
 compute nodes can import, or the <code>ropt[cloudpickle]</code> extra must be
-installed — which is the recommended way to use this pool. Develop
+installed. Develop
 against <a class="autorefs autorefs-internal" title="            local_pool" href="#ropt.simple.Session.local_pool"><code>local_pool</code></a> first: it has the
 same shape and the same rule, without a cluster. The cluster is selected
 from <code>cluster</code>/<code>queue</code>: give a queue to search for its cluster, a
@@ -7518,7 +7517,9 @@ wait on it; offloading from there raises a
 <a class="autorefs autorefs-internal" title="            WorkflowError" href="../exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a>. So does a pool that is
 closed, or one carried into a worker process. A call that the machinery
 could not run, for instance because its worker process was killed, raises an
-<a class="autorefs autorefs-internal" title="            ExecutionError" href="../exceptions/#ropt.exceptions.ExecutionError"><code>ExecutionError</code></a>.</p>
+<a class="autorefs autorefs-internal" title="            ExecutionError" href="../exceptions/#ropt.exceptions.ExecutionError"><code>ExecutionError</code></a>. Work offloaded from
+inside an evaluation needs a <em>different</em> pool: the pool it is already
+running on refuses it.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -7557,9 +7558,7 @@ could not run, for instance because its worker process was killed, raises an
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The pool to dispatch to, or <code>None</code> to run inline. Work offloaded
-  from inside an evaluation needs a <em>different</em> pool: the pool it is
-  already running on refuses it.</p>
+                <p>The pool to dispatch to, or <code>None</code> to run inline.</p>
               </div>
             </td>
             <td>
@@ -9612,14 +9611,7 @@ carried unchanged on <code>results</code>. See
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
-
-
-  
-      dataclass
-  " href="../results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> of the
-       best evaluation, or <code>None</code> if the run produced no valid
-       result.</p>
+                <p>The best evaluation, or <code>None</code> if there was no valid result.</p>
               </div>
             </td>
           </tr>
@@ -9787,7 +9779,7 @@ carried unchanged on <code>results</code>. See
             </td>
             <td>
               <div class="doc-md-description">
-                <p>a scalar, or a flat sequence of objectives followed by constraints.</p>
+                <p>a scalar, or objectives followed by constraints.</p>
               </div>
             </td>
           </tr>
