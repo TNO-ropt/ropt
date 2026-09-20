@@ -93,20 +93,26 @@ The `cvar-objective` method:
 5. Failed realizations (NaN values) are excluded.
 
 The `cvar-constraint` variant applies the same steps to a single constraint
-function, named by `sort`, ranking realizations by that constraint's value with
-the **largest first**. For a constraint bounded from above those are the most
-violated realizations. The ranking does not depend on the bound the constraint
-was given, so for a constraint bounded from below, or an equality, the
-realizations selected are the largest values rather than the most violated ones.
+function, named by `sort`, ranking realizations by their violation of that
+constraint, largest first. The violation is the distance to the violated side,
+`maximum(lower - c, c - upper)`, where `c` is the constraint value and `lower`
+and `upper` are the bounds it was configured with. It is positive when the
+constraint is violated and negative by the amount of slack otherwise, and one
+expression covers the three kinds of constraint:
+
+- Bounded from above: the largest values are the most violated.
+- Bounded from below: the smallest values are the most violated.
+- An equality: the values furthest from the bound, in either direction.
 
 !!! note
-    Realizations reach a filter with their objectives exactly as the evaluator
-    returned them: neither scaled nor flipped for direction, since both belong
-    to the aggregate and these are per-realization values. A filter that ranks
-    by what the optimizer minimizes applies them itself, as the CVaR filter
-    does. Constraint filters need no such step, since a constraint is a bound
-    and has no direction, and ranking by a single constraint is unaffected by
-    its scale.
+    Realizations reach a filter with their objectives and constraints exactly
+    as the evaluator returned them: neither scaled nor flipped for direction,
+    since both belong to the aggregate and these are per-realization values. A
+    filter that ranks by what the optimizer minimizes applies them itself, as
+    the CVaR filter does. A constraint has no direction to apply, and the
+    constraint bounds reach the filter in the same unscaled domain as the
+    values, so the two can be subtracted directly. A constraint scale, being
+    positive, leaves the order within one constraint unchanged.
 
 !!! note "Weight normalization"
     The optimizer normalizes all filter-produced weights to sum to one before

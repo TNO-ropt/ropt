@@ -50,7 +50,7 @@ class CVaRConstraintOptions(_ConfigBaseModel):
     """Options for the `cvar-constraint` filter method.
 
     Assigns CVaR-derived weights based on a single constraint function value,
-    ranking realizations by that value with the largest first.
+    ranking realizations by how far each violates that constraint.
     See [Realization Filters](../optimizer_setup/realization_filters.md#how-cvar-filters-work)
     for the algorithm.
 
@@ -85,7 +85,7 @@ class DefaultRealizationFilter(RealizationFilter):
         assert isinstance(self._filter_config, RealizationFilterConfig)
         _, _, self._method = self._filter_config.method.lower().rpartition("/")
 
-    def get_realization_weights(  # D107  # ruff: ignore[undocumented-public-method]
+    def get_realization_weights(  # D107  # ruff: ignore[undocumented-public-method, too-many-arguments]
         self,
         objectives: NDArray[np.float64],
         constraints: NDArray[np.float64] | None,
@@ -93,6 +93,8 @@ class DefaultRealizationFilter(RealizationFilter):
         objective_scales: NDArray[np.float64],
         maximize: NDArray[np.bool_],
         objective_weights: NDArray[np.float64],
+        constraint_lower_bounds: NDArray[np.float64] | None,
+        constraint_upper_bounds: NDArray[np.float64] | None,
     ) -> NDArray[np.float64]:
         match self._method:
             case "cvar-objective":
@@ -103,10 +105,14 @@ class DefaultRealizationFilter(RealizationFilter):
                     objectives, objective_scales, maximize, objective_weights
                 )
             case "cvar-constraint" if constraints is not None:
+                assert constraint_lower_bounds is not None
+                assert constraint_upper_bounds is not None
                 self._filter_options = CVaRConstraintOptions.model_validate(
                     self._filter_config.options
                 )
-                weights = self._cvar_constraint(constraints)
+                weights = self._cvar_constraint(
+                    constraints, constraint_lower_bounds, constraint_upper_bounds
+                )
             case _:
                 msg = f"Realization filter not supported: {self._method}"
                 raise ValueError(msg)
@@ -138,12 +144,21 @@ class DefaultRealizationFilter(RealizationFilter):
             self._filter_options.percentile,
         )
 
-    def _cvar_constraint(self, constraints: NDArray[np.float64]) -> NDArray[np.float64]:
+    def _cvar_constraint(
+        self,
+        constraints: NDArray[np.float64],
+        lower_bounds: NDArray[np.float64],
+        upper_bounds: NDArray[np.float64],
+    ) -> NDArray[np.float64]:
         assert isinstance(self._filter_options, CVaRConstraintOptions)
-        failed_realizations = np.isnan(constraints[..., 0])
-        constraints = zero_failures(constraints[..., self._filter_options.sort])
+        sort = self._filter_options.sort
+        failed_realizations = np.isnan(constraints[..., sort])
+        values = zero_failures(constraints[..., sort])
+        # Distance to the violated side: positive when violated, negative slack
+        # otherwise, and the absolute difference when the bounds are equal.
+        violation = np.maximum(lower_bounds[sort] - values, values - upper_bounds[sort])
         return _get_cvar_weights_from_percentile(
-            -constraints, failed_realizations, self._filter_options.percentile
+            -violation, failed_realizations, self._filter_options.percentile
         )
 
 

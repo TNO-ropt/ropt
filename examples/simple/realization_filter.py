@@ -44,7 +44,7 @@ class MedianFilter(RealizationFilter):
             filter_config: The filter configuration, unused by this filter.
         """
 
-    def get_realization_weights(  # ruff: ignore[no-self-use]
+    def get_realization_weights(  # ruff: ignore[no-self-use, too-many-arguments]
         self,
         objectives: NDArray[np.float64],
         constraints: NDArray[np.float64] | None,  # ruff: ignore[unused-method-argument]
@@ -52,15 +52,19 @@ class MedianFilter(RealizationFilter):
         objective_scales: NDArray[np.float64],  # ruff: ignore[unused-method-argument]
         maximize: NDArray[np.bool_],  # ruff: ignore[unused-method-argument]
         objective_weights: NDArray[np.float64],  # ruff: ignore[unused-method-argument]
+        constraint_lower_bounds: NDArray[np.float64] | None,  # ruff: ignore[unused-method-argument]
+        constraint_upper_bounds: NDArray[np.float64] | None,  # ruff: ignore[unused-method-argument]
     ) -> NDArray[np.float64]:
         """Give the realization with the median objective a weight of one.
 
         Args:
-            objectives:        The objective values for each realization.
-            constraints:       The constraint values, unused by this filter.
-            objective_scales:  The objective scales, unused by this filter.
-            maximize:          The objective directions, unused by this filter.
-            objective_weights: The objective weights, unused by this filter.
+            objectives:              The objective values for each realization.
+            constraints:             The constraint values, unused by this filter.
+            objective_scales:        The objective scales, unused by this filter.
+            maximize:                The objective directions, unused by this filter.
+            objective_weights:       The objective weights, unused by this filter.
+            constraint_lower_bounds: The lower bounds, unused by this filter.
+            constraint_upper_bounds: The upper bounds, unused by this filter.
 
         Returns:
             The weights for each realization, zero for all but the median.

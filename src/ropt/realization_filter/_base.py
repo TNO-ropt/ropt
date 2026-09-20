@@ -39,7 +39,7 @@ class RealizationFilter(ABC):
         """
 
     @abstractmethod
-    def get_realization_weights(
+    def get_realization_weights(  # ruff: ignore[too-many-arguments]
         self,
         objectives: NDArray[np.float64],
         constraints: NDArray[np.float64] | None,
@@ -47,6 +47,8 @@ class RealizationFilter(ABC):
         objective_scales: NDArray[np.float64],
         maximize: NDArray[np.bool_],
         objective_weights: NDArray[np.float64],
+        constraint_lower_bounds: NDArray[np.float64] | None,
+        constraint_upper_bounds: NDArray[np.float64] | None,
     ) -> NDArray[np.float64]:
         """Compute one weight per realization from current evaluation results.
 
@@ -65,6 +67,12 @@ class RealizationFilter(ABC):
         per-realization. A filter that ranks by what the optimizer minimizes
         should apply `objective_scales` and `maximize` itself.
 
+        The constraint bounds are given in the same domain as `constraints`, so
+        a filter that ranks by constraint violation can subtract them directly.
+        A constraint is violated below `constraint_lower_bounds` and above
+        `constraint_upper_bounds`; equal bounds make it an equality. Both are
+        `None` when no nonlinear constraints are configured.
+
         A realization that failed to evaluate carries `nan` values. The filter
         should check for these and handle them, for instance by assigning such
         realizations a weight of zero.
@@ -79,11 +87,13 @@ class RealizationFilter(ABC):
         fixes the scales after the first batch.
 
         Args:
-            objectives:        Objectives, shape `(n_realizations, n_objectives)`.
-            constraints:       Constraints, shape `(n_realizations, n_constraints)`.
-            objective_scales:  The scale applied to each objective.
-            maximize:          Which objectives are maximized.
-            objective_weights: The configured weight of each objective.
+            objectives:              Objectives, shape `(n_realizations, n_objectives)`.
+            constraints:             Constraints, shape `(n_realizations, n_constraints)`.
+            objective_scales:        The scale applied to each objective.
+            maximize:                Which objectives are maximized.
+            objective_weights:       The configured weight of each objective.
+            constraint_lower_bounds: The lower bound of each constraint.
+            constraint_upper_bounds: The upper bound of each constraint.
 
         Returns:
             The non-negative weights, shape `(n_realizations,)`.

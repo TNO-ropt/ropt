@@ -109,6 +109,8 @@ def _weights(
         objective_scales=context.get_objective_scales(),
         maximize=context.objectives.maximize,
         objective_weights=context.objectives.weights,
+        constraint_lower_bounds=None,
+        constraint_upper_bounds=None,
     )
 
 
@@ -183,6 +185,58 @@ def test_cvar_filter_applies_the_objective_scales_before_the_weighted_sum() -> N
     # worst. Ranking the unscaled values would give 0.0, 0.5 and 4.0, and pick
     # realization 2.
     assert np.allclose(weights, [0.0, 1 / 3, 0.0])
+
+
+def _constraint_weights(
+    constraints: NDArray[np.float64],
+    lower_bounds: list[float],
+    upper_bounds: list[float],
+    sort: int = 0,
+) -> NDArray[np.float64]:
+    realization_filter = DefaultRealizationFilter(
+        RealizationFilterConfig(
+            method="cvar-constraint", options={"sort": sort, "percentile": 1 / 3}
+        )
+    )
+    return realization_filter.get_realization_weights(
+        np.zeros((constraints.shape[0], 1)),
+        constraints,
+        objective_scales=np.array([1.0]),
+        maximize=np.array([False]),
+        objective_weights=np.array([1.0]),
+        constraint_lower_bounds=np.array(lower_bounds),
+        constraint_upper_bounds=np.array(upper_bounds),
+    )
+
+
+def test_cvar_filter_ranks_an_upper_bounded_constraint_by_its_largest_values() -> None:
+    weights = _constraint_weights(np.array([[1.0], [2.0], [3.0]]), [-np.inf], [1.5])
+    assert np.allclose(weights, [0.0, 0.0, 1 / 3])
+
+
+def test_cvar_filter_ranks_a_lower_bounded_constraint_by_its_smallest_values() -> None:
+    weights = _constraint_weights(np.array([[1.0], [2.0], [3.0]]), [2.5], [np.inf])
+    # Violations are 1.5, 0.5 and -0.5: realization 0 is the most violated.
+    # Ranking by value alone would pick realization 2, the only feasible one.
+    assert np.allclose(weights, [1 / 3, 0.0, 0.0])
+
+
+def test_cvar_filter_ranks_an_equality_constraint_by_distance_to_the_bound() -> None:
+    weights = _constraint_weights(np.array([[-5.0], [1.0], [3.0]]), [1.0], [1.0])
+    # Realization 0 is furthest from the bound, on the low side.
+    assert np.allclose(weights, [1 / 3, 0.0, 0.0])
+
+
+def test_cvar_filter_detects_failures_in_the_constraint_it_sorts_by() -> None:
+    weights = _constraint_weights(
+        np.array([[np.nan, 5.0], [1.0, 1.0], [1.0, 2.0]]),
+        [-np.inf, -np.inf],
+        [0.0, 0.0],
+        sort=1,
+    )
+    # Realization 0 violates constraint 1 the most, and takes part in the
+    # ranking although its other constraint failed.
+    assert np.allclose(weights, [1 / 3, 0.0, 0.0])
 
 
 def _objective_function(
@@ -530,6 +584,8 @@ class CustomRealizationFilter(RealizationFilter):
         objective_scales: NDArray[np.float64],  # ruff: ignore[unused-method-argument]
         maximize: NDArray[np.bool_],  # ruff: ignore[unused-method-argument]
         objective_weights: NDArray[np.float64],  # ruff: ignore[unused-method-argument]
+        constraint_lower_bounds: NDArray[np.float64] | None,  # ruff: ignore[unused-method-argument]
+        constraint_upper_bounds: NDArray[np.float64] | None,  # ruff: ignore[unused-method-argument]
     ) -> NDArray[np.float64]:
         return np.ones(objectives.shape[0])
 
@@ -558,6 +614,8 @@ class _ScaleRecordingFilter(RealizationFilter):
         objective_scales: NDArray[np.float64],
         maximize: NDArray[np.bool_],  # ruff: ignore[unused-method-argument]
         objective_weights: NDArray[np.float64],  # ruff: ignore[unused-method-argument]
+        constraint_lower_bounds: NDArray[np.float64] | None,  # ruff: ignore[unused-method-argument]
+        constraint_upper_bounds: NDArray[np.float64] | None,  # ruff: ignore[unused-method-argument]
     ) -> NDArray[np.float64]:
         self.received.append(objective_scales)
         return np.ones(objectives.shape[0])

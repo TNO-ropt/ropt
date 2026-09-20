@@ -693,6 +693,17 @@ class EnsembleEvaluator:
             if self._context.nonlinear_constraints is None
             else self._context.nonlinear_constraints.realization_filters
         )
+        # The configured bounds, matching the unscaled values a filter is given.
+        constraint_lower_bounds = (
+            None
+            if self._context.nonlinear_constraints is None
+            else self._context.nonlinear_constraints.lower_bounds
+        )
+        constraint_upper_bounds = (
+            None
+            if self._context.nonlinear_constraints is None
+            else self._context.nonlinear_constraints.upper_bounds
+        )
 
         for key, realization_filter in self._realization_filters.items():
             apply_to_objectives = (
@@ -716,6 +727,8 @@ class EnsembleEvaluator:
                 objective_scales=self._context.get_objective_scales(),
                 maximize=self._context.objectives.maximize,
                 objective_weights=self._context.objectives.weights,
+                constraint_lower_bounds=constraint_lower_bounds,
+                constraint_upper_bounds=constraint_upper_bounds,
             )
             if apply_to_objectives is not None:
                 if objective_weights is None:
