@@ -1,7 +1,7 @@
 # Parallel Evaluation
 
-For non-trivial problems, function evaluations dominate runtime and are often
-best run in parallel, either on a single machine or on a cluster. `ropt` uses
+For non-trivial problems, function evaluations dominate runtime and are commonly
+run in parallel, either on a single machine or on a cluster. `ropt` uses
 Python's `asyncio` framework to enable this.
 
 This page assumes familiarity with [Optimization Workflows](workflows.md).
@@ -9,9 +9,9 @@ This page assumes familiarity with [Optimization Workflows](workflows.md).
 ## Why asyncio?
 
 A single compute step could in principle run its evaluations in parallel
-without an event loop — for example by spawning threads directly. However,
-the real power of an asynchronous approach emerges when **multiple compute
-steps run concurrently**. With `asyncio`, several optimizations can share the
+without an event loop — for example by spawning threads directly. What an
+asynchronous approach adds is **multiple compute
+steps running concurrently**. With `asyncio`, several optimizations can share the
 same pool of workers, the event loop dispatches evaluation tasks as they
 arrive, and results flow back without blocking other work.
 
@@ -47,7 +47,7 @@ Constructor parameters:
 
 By default each row of the variable batch is submitted as its own task. The
 `bundle_size` parameter allows several active evaluations to be grouped into a
-single task that the worker executes sequentially. This is useful when per-task
+single task that the worker executes sequentially. This applies when per-task
 overhead (thread/process startup, HPC job submission) dominates the cost of an
 individual evaluation, or when the total number of active evaluations in a batch
 is much larger than the number of available workers.
@@ -116,7 +116,7 @@ Four implementations are provided:
 `loop.run_in_executor`. Use this for I/O-bound evaluations or when the
 evaluation function releases the GIL (e.g. calls into C/Fortran).
 
-The private pool is the point: `asyncio.to_thread` would use the event loop's
+The pool is private for a reason: `asyncio.to_thread` would use the event loop's
 *shared* default executor, the same one every other `to_thread` call in the
 process draws from — including the one that dispatches each compute step's
 `run()`. Filling it with evaluations would starve the steps waiting on them,

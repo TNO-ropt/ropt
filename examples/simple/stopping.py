@@ -2,7 +2,7 @@
 
 A run normally ends when the optimizer converges or hits its own budget. The
 ``report`` callback sees every result as it arrives, so it can also end the run
-itself: returning ``True`` asks the run to stop, and it finishes with
+itself: returning ``True`` stops the run, and it finishes with
 ``USER_ABORT``.
 
 Stopping this way is graceful rather than abrupt. The run keeps the best result

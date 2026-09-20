@@ -86,7 +86,7 @@ class MyExecutor(ExecutorBase):
         self._cleanup_submissions()
 ```
 
-**The delivery contract is the part to get right.** Every work item ends in
+Every work item ends in
 exactly one of three ways, and the choice determines whether the executor survives:
 
 | Outcome | Call | Effect |
@@ -103,12 +103,12 @@ user error. See
 [Error handling](parallel.md#error-handling) for the distinction.
 
 Two further rules. Skip a submission whose `is_finished` is already `True` — its
-caller has left, so running its work items only occupies a worker. And call
+caller is no longer waiting, so running its work items only occupies a worker. And call
 `_cleanup_submissions` from `_cleanup`, which aborts whatever is outstanding so
 no caller is left blocked in
 [`collect`][ropt.components.executors.Submission.collect].
 
-One obligation is easy to miss. `on_worker_thread` defaults to `False`, and
+One obligation is less obvious. `on_worker_thread` defaults to `False`, and
 `submit` uses it to refuse work sent from the executor's own workers — a caller
 that waits there occupies a worker its own submission needs. An executor whose
 workers run in this process must override it, or that refusal never fires.

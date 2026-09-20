@@ -447,16 +447,16 @@ redirection):
 
 - **`max_batches`**: Limits the total number of *calls* made to the evaluation
   function. An optimizer might request a batch containing multiple function
-  and/or gradient evaluations within a single call. This is particularly useful
-  for managing resource usage when batches are evaluated in parallel (for example, on
-  an HPC cluster), as it controls the number of sequential submission steps. The
+  and/or gradient evaluations within a single call. Where batches are evaluated
+  in parallel (for example, on
+  an HPC cluster), this bounds the number of sequential submission steps. The
   number of batches does not necessarily correspond directly to the number of
   optimizer iterations.
 
 - **`max_functions`**: Sets a hard limit on the total *number* of individual
   objective function evaluations performed across all batches. Since a single
-  batch can involve multiple function evaluations, this gives finer control
-  over total computational effort. Exceeding this limit might
+  batch can involve multiple function evaluations, this bounds the total
+  computational effort more closely than `max_batches`. Exceeding this limit might
   cause the optimization to terminate mid-batch.
 
 - **`output_dir`** (default: `None`): An optional output directory where the
@@ -586,8 +586,8 @@ objective functions and gradients are calculated:
   requested, even if the optimizer hasn't explicitly asked for it. This can
   improve load balancing on HPC clusters by initiating gradient work earlier.
 - **`"separate"`**: Always launch function and gradient evaluations as distinct
-  operations, even if the optimizer requests both simultaneously. Useful when
-  using [realization filters](realization_filters.md) that might disable
+  operations, even if the optimizer requests both simultaneously. This applies
+  with [realization filters](realization_filters.md) that might disable
   certain realizations, as it can reduce the number of gradient evaluations
   needed based on information obtained from the function evaluations.
 
@@ -624,8 +624,8 @@ key](configuration.md#sharing-optimizer-components-by-key)).
 
 [Realization filters](realization_filters.md) modify the weights of individual
 realizations. For example, they can select a subset of realizations by setting
-the weights of the others to zero — useful for constructing risk-aware
-objectives.
+the weights of the others to zero, which is how a risk-aware objective is
+constructed.
 
 Fields:
 

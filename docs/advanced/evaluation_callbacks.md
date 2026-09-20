@@ -116,7 +116,7 @@ help filter the input and re-expand the output.
 
 `constraints` is required when `nonlinear_constraints` is configured in the
 problem. `metadata` is stored verbatim on the resulting
-[`Results`][ropt.results.Results] object and is useful for linking results back
+[`Results`][ropt.results.Results] object, which is what links results back
 to the input vectors that produced them. `batch_id` defaults to `0`; all
 results will carry this label unless you set it yourself. For
 auto-incrementing IDs pass a

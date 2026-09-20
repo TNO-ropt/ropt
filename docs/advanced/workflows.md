@@ -349,14 +349,14 @@ handlers are called from multiple threads simultaneously. **Event handlers must
 not be shared across concurrent compute steps**: doing so raises a
 [`WorkflowError`][ropt.exceptions.WorkflowError].
 
-[`EventDispatcher`][ropt.components.event_handlers.EventDispatcher] is the
-required solution: it receives events on a queue and dispatches them to its own
+[`EventDispatcher`][ropt.components.event_handlers.EventDispatcher] is what
+makes sharing possible: it receives events on a queue and dispatches them to its own
 handlers from the asyncio event loop's thread. Because all handler calls happen
 on a single thread, handlers registered on the dispatcher are safe even when
 events arrive from multiple concurrent steps.
 
-This is especially useful when one set of handlers needs to aggregate results
-from multiple concurrent compute steps.
+That is what lets one set of handlers aggregate results from multiple
+concurrent compute steps.
 
 `EventDispatcher` follows the same lifecycle as executors:
 
@@ -443,7 +443,7 @@ evaluation error — on the emitting run's own call stack — and splits
 ### Thread-based dispatch
 
 By default, handlers registered with `EventDispatcher` are called directly in
-the asyncio event loop's thread. This is efficient for handlers that only do
+the asyncio event loop's thread, which costs nothing for handlers that only do
 in-memory work, such as `ResultsHandler` or `HistoryHandler`.
 
 If a handler performs blocking operations — writing results to a file, pushing

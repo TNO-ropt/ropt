@@ -12,10 +12,10 @@ The class provides two methods, which the configuration selects by name:
   random.
 - ``random`` stretches or shrinks each step by a random factor.
 
-The two also differ in the ``shared`` flag, which asks a sampler to hand the
-same perturbations to every realization. For ``forward`` that changes nothing,
+The two also differ in the ``shared`` flag, which gives every realization the
+same perturbations. For ``forward`` that changes nothing,
 because a unit step does not depend on the realization it belongs to; for
-``random`` it decides whether the realizations get their own step sizes.
+``random`` it determines whether the realizations get their own step sizes.
 
 The sampler is **registered** with ``register_plugin``, which makes it available
 exactly like an installed one: it is selected from the configuration by its
