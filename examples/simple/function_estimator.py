@@ -1,8 +1,8 @@
-"""A custom function estimator with the high-level ``ropt.simple`` API.
+"""A custom function estimator with the high-level `ropt.simple` API.
 
 A function estimator reduces the objective values of all realizations to the
 single value the optimizer works with, together with the matching gradient. This
-example implements ``GeometricMean``, which replaces the built-in weighted mean
+example implements `GeometricMean`, which replaces the built-in weighted mean
 with a weighted geometric mean.
 
 The geometric mean averages relative rather than absolute differences: it is the
@@ -12,9 +12,9 @@ is defined for positive numbers only, which is why this example is tied to the
 Rosenbrock function, a sum of squares that is never negative. See
 [Geometric mean](https://en.wikipedia.org/wiki/Geometric_mean).
 
-The estimator is **registered** with ``register_plugin``, which makes it
+The estimator is **registered** with `register_plugin`, which makes it
 available exactly like an installed one: it is selected from the configuration
-by its ``"plugin/method"`` string. An estimator defined in a script or a
+by its `"plugin/method"` string. An estimator defined in a script or a
 notebook cannot be found through an entry point, and registering is what closes
 that gap.
 """
@@ -39,7 +39,7 @@ INITIAL_VALUES = 2 * np.arange(DIM) / DIM + 0.5
 class GeometricMean(FunctionEstimator):
     """Reduce the realizations to their weighted geometric mean.
 
-    The mean is evaluated as ``exp(sum(weights * log(functions)))``, the
+    The mean is evaluated as `exp(sum(weights * log(functions)))`, the
     logarithmic form that avoids the overflow of a long product. See
     [Geometric mean](https://en.wikipedia.org/wiki/Geometric_mean).
     """
@@ -93,8 +93,8 @@ class GeometricMean(FunctionEstimator):
     ) -> NDArray[np.float64]:
         """Aggregate the realization gradients with the chain rule.
 
-        Differentiating ``exp(sum(weights * log(functions)))`` scales each
-        realization gradient by ``weights / functions`` and multiplies the sum
+        Differentiating `exp(sum(weights * log(functions)))` scales each
+        realization gradient by `weights / functions` and multiplies the sum
         by the geometric mean itself.
 
         Args:

@@ -1,13 +1,13 @@
-"""Attach metadata to a run with the high-level ``ropt.simple`` API.
+"""Attach metadata to a run with the high-level `ropt.simple` API.
 
-Metadata comes from two independent sources. Passing a ``metadata`` dict to
-``optimize`` tags the run: the same dict is copied onto every result as
-``result.metadata``. Returning an ``EvaluationFunctionResult`` with a
-``metadata`` field instead records per-realization metadata, stored as one array
-entry per realization on ``result.evaluations.metadata``.
+Metadata comes from two independent sources. Passing a `metadata` dict to
+`optimize` tags the run: the same dict is copied onto every result as
+`result.metadata`. Returning an `EvaluationFunctionResult` with a
+`metadata` field instead records per-realization metadata, stored as one array
+entry per realization on `result.evaluations.metadata`.
 
 A per-realization value may also be an array rather than a scalar. It then spans
-an extra axis named after the metadata key, which the ``names`` section of the
+an extra axis named after the metadata key, which the `names` section of the
 configuration can label, and which the table handler unstacks into columns.
 """
 

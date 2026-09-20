@@ -1,12 +1,12 @@
-"""Constrained ensemble optimization with the high-level ``ropt.simple`` API.
+"""Constrained ensemble optimization with the high-level `ropt.simple` API.
 
 The problem adds a stochastic *nonlinear constraint* to the ensemble Rosenbrock
 function. In the high-level API a single objective callback returns the
 objective **and** the constraint (objectives first, then constraints); the
-config declares the constraint bounds under ``nonlinear_constraints``, and
-``constraint_tolerance`` sets when a constraint counts as satisfied. A
-``report`` callback flags any evaluation that violates the constraint. Pass
-``--linear`` to additionally impose a deterministic linear equality constraint
+config declares the constraint bounds under `nonlinear_constraints`, and
+`constraint_tolerance` sets when a constraint counts as satisfied. A
+`report` callback flags any evaluation that violates the constraint. Pass
+`--linear` to additionally impose a deterministic linear equality constraint
 (declared in the config rather than returned by the objective).
 """
 

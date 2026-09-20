@@ -1,9 +1,9 @@
-"""Mixed-integer optimization with the high-level ``ropt.simple`` API.
+"""Mixed-integer optimization with the high-level `ropt.simple` API.
 
 Two of the four variables are continuous and two are discrete (integer-valued),
 so the problem is solved with a gradient-free *differential evolution* backend
-selected in the config. Discreteness is declared through ``variables.types``;
-everything else is the same ensemble Rosenbrock setup. A ``report`` callback
+selected in the config. Discreteness is declared through `variables.types`;
+everything else is the same ensemble Rosenbrock setup. A `report` callback
 prints each evaluation as the search proceeds.
 """
 
@@ -54,14 +54,14 @@ B = _RNG.normal(loc=100.0, scale=100 * UNCERTAINTY, size=REALIZATIONS)
 def rosenbrock(
     variables: NDArray[np.float64], context: EvaluationFunctionContext
 ) -> float:
-    """The Rosenbrock function for one realization, minimized at ``[1, 2, 3, 4]``.
+    """The Rosenbrock function for one realization, minimized at `[1, 2, 3, 4]`.
 
     Args:
         variables: The variable vector to evaluate.
         context:   Identifies the realization being evaluated.
 
     Returns:
-        The Rosenbrock objective for ``context.realization``.
+        The Rosenbrock objective for `context.realization`.
     """
     r = context.realization
     objective = 0.0

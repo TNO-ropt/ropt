@@ -1,4 +1,4 @@
-"""Evaluate variable vectors without optimizing, via ``evaluate``/``evaluate_many``.
+"""Evaluate variable vectors without optimizing, via `evaluate`/`evaluate_many`.
 
 `evaluate` runs a single vector; `evaluate_many` runs the rows of a matrix and
 returns one result per row. Neither runs an optimizer — they just compute the
@@ -30,7 +30,7 @@ def rosenbrock(
         variables: The variable vector to evaluate.
 
     Returns:
-        The Rosenbrock objective at ``variables``.
+        The Rosenbrock objective at `variables`.
     """
     objective = 0.0
     for d_idx in range(DIM - 1):

@@ -82,7 +82,7 @@ def rosenbrock(
         context:   Identifies the realization being evaluated.
 
     Returns:
-        The Rosenbrock objective for ``context.realization``.
+        The Rosenbrock objective for `context.realization`.
     """
     x, y = variables
     r = context.realization

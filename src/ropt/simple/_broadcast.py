@@ -1,4 +1,4 @@
-"""Spread ``optimize_many``'s arguments over its runs.
+"""Spread `optimize_many`'s arguments over its runs.
 
 Each argument is either a single value shared by every run, or a sequence with
 one entry per run. The sequences set the number of runs and must agree; single

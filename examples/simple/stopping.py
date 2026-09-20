@@ -1,9 +1,9 @@
-"""Stopping an optimization from the ``report`` callback.
+"""Stopping an optimization from the `report` callback.
 
 A run normally ends when the optimizer converges or hits its own budget. The
-``report`` callback sees every result as it arrives, so it can also end the run
-itself: returning ``True`` stops the run, and it finishes with
-``USER_ABORT``.
+`report` callback sees every result as it arrives, so it can also end the run
+itself: returning `True` stops the run, and it finishes with
+`USER_ABORT`.
 
 Stopping this way is graceful rather than abrupt. The run keeps the best result
 it has found, so a stopped run still returns a usable answer -- unlike a run
@@ -49,7 +49,7 @@ def objective(
         variables: The variable vector to evaluate.
 
     Returns:
-        The objective at ``variables``.
+        The objective at `variables`.
     """
     total = 0.0
     for idx in range(DIM - 1):

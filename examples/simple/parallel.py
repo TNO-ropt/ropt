@@ -1,7 +1,7 @@
 """Run one optimization with parallel evaluation on a worker pool.
 
 A session creates pools; passing one to `optimize` makes that call evaluate
-its realizations and gradient perturbations on it. Pass ``-m``/``--multiprocessing``
+its realizations and gradient perturbations on it. Pass `-m`/`--multiprocessing`
 to use a process pool instead of a thread pool.
 """
 
@@ -38,7 +38,7 @@ def rosenbrock(
         variables: The variable vector to evaluate.
 
     Returns:
-        The Rosenbrock objective at ``variables``.
+        The Rosenbrock objective at `variables`.
     """
     objective = 0.0
     for d_idx in range(DIM - 1):

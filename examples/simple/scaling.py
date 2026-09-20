@@ -1,19 +1,19 @@
 """Scaling, and the two domains a result is reported in.
 
 `ropt` does not hand your numbers to the optimizer unchanged. Variables are
-divided by their ``scales``, and objectives can be scaled too: setting
-``auto_scale`` divides each objective by its own value in the first batch, which
+divided by their `scales`, and objectives can be scaled too: setting
+`auto_scale` divides each objective by its own value in the first batch, which
 brings an objective of any magnitude close to one.
 
-A result therefore carries the same quantity twice. ``variables`` and
-``functions.objectives`` are in the units configured here, while
-``scaled.variables`` and ``scaled.functions.objectives`` are in the units the
-optimizer works in. The ``target_objective`` that a run reports is the
+A result therefore carries the same quantity twice. `variables` and
+`functions.objectives` are in the units configured here, while
+`scaled.variables` and `scaled.functions.objectives` are in the units the
+optimizer works in. The `target_objective` that a run reports is the
 optimizer's number, and has no counterpart in the configured units.
 
-The distinction matters when comparing runs. Switching ``auto_scale`` on makes
+The distinction matters when comparing runs. Switching `auto_scale` on makes
 the reported objective much smaller while the solution stays where it was, so
-two runs are only comparable through ``functions.objectives`` or the variables
+two runs are only comparable through `functions.objectives` or the variables
 themselves.
 """
 

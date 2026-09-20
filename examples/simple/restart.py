@@ -1,8 +1,8 @@
 """Restart an optimization from its own best point, collecting every result.
 
-Each call to ``optimize`` starts a fresh run, so restarting from the previous
-best point is just a loop: feed the returned ``result.results.variables`` back
-in as the next start point. A ``HistoryHandler`` reused across the loop collects
+Each call to `optimize` starts a fresh run, so restarting from the previous
+best point is just a loop: feed the returned `result.results.variables` back
+in as the next start point. A `HistoryHandler` reused across the loop collects
 every result from every restart, not just the final one.
 """
 
@@ -33,7 +33,7 @@ def rosenbrock(
         variables: The variable vector to evaluate.
 
     Returns:
-        The Rosenbrock objective at ``variables``.
+        The Rosenbrock objective at `variables`.
     """
     objective = 0.0
     for d_idx in range(DIM - 1):

@@ -7,7 +7,7 @@ process and can reach the inner pool, and the inner evaluations run on a process
 pool of their own. Handing the inner run the pool it is already running on would
 instead be refused, since it would wait for the workers it occupies.
 
-The inner runs all feed one shared ``DataFrameHandler``. They overlap, so a
+The inner runs all feed one shared `DataFrameHandler`. They overlap, so a
 shared group is what makes that safe: the group serializes every run's results
 through a single dispatcher. Each inner run tags its results with the outer
 evaluation that started it, so every row in the frame can be traced back.
@@ -82,11 +82,11 @@ def rosenbrock(
     Args:
         variables: The variable vector to evaluate.
         context:   The evaluation context, giving the realization index.
-        a:         The per-realization ``a`` parameters.
-        b:         The per-realization ``b`` parameters.
+        a:         The per-realization `a` parameters.
+        b:         The per-realization `b` parameters.
 
     Returns:
-        The Rosenbrock objective at ``variables``.
+        The Rosenbrock objective at `variables`.
     """
     objective = 0.0
     scaled = variables / np.arange(1, DIM + 1)

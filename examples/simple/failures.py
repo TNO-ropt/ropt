@@ -1,10 +1,10 @@
 """What a failing realization does to a run, and how to allow some failures.
 
-An evaluation reports failure by returning ``NaN`` for a realization; nothing
+An evaluation reports failure by returning `NaN` for a realization; nothing
 raises. The optimizer needs a minimum number of successful realizations to form
-an aggregate, set by ``realization_min_success``, which defaults to *all* of
-them. So one ``NaN`` is already enough to end a run with
-``TOO_FEW_REALIZATIONS`` and no result at all.
+an aggregate, set by `realization_min_success`, which defaults to *all* of
+them. So one `NaN` is already enough to end a run with
+`TOO_FEW_REALIZATIONS` and no result at all.
 
 This example runs the same problem twice: once with the default, where a single
 failing realization stops everything, and once allowing that failure, where the
@@ -50,7 +50,7 @@ def objective(
         context:   Identifies the realization being evaluated.
 
     Returns:
-        The objective, or ``NaN`` for the realization that fails.
+        The objective, or `NaN` for the realization that fails.
     """
     if context.realization == FAILING:
         return float("nan")

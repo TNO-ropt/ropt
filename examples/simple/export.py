@@ -1,16 +1,16 @@
-"""Export results to a pandas or polars frame with the ``ropt.simple`` API.
+"""Export results to a pandas or polars frame with the `ropt.simple` API.
 
-A ``Results`` object holds everything one evaluated variable vector produced,
-with each field indexed by its own axes. ``to_pandas`` and ``to_polars`` turn a
-single result into a frame, while ``results_to_pandas`` and
-``results_to_polars`` turn a sequence of them into one aggregated frame.
+A `Results` object holds everything one evaluated variable vector produced,
+with each field indexed by its own axes. `to_pandas` and `to_polars` turn a
+single result into a frame, while `results_to_pandas` and
+`results_to_polars` turn a sequence of them into one aggregated frame.
 
 Fields are named by dotted paths and given as an ordered sequence, so the
 columns come out in the order asked for. Axes stay as row labels unless
-``unstack`` pivots them into columns; an aggregated frame pivots every axis
-except ``realization`` and ``perturbation``.
+`unstack` pivots them into columns; an aggregated frame pivots every axis
+except `realization` and `perturbation`.
 
-The example runs on polars by default; pass ``-p``/``--pandas`` to use pandas
+The example runs on polars by default; pass `-p`/`--pandas` to use pandas
 instead. Only the library actually used needs to be installed.
 """
 
@@ -64,7 +64,7 @@ def objective(
         context:   Identifies the realization being evaluated.
 
     Returns:
-        The squared and the worst-case residual at ``variables``.
+        The squared and the worst-case residual at `variables`.
     """
     residual = variables - SHIFTS[context.realization]
     return EvaluationFunctionResult(

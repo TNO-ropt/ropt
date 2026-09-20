@@ -1,13 +1,13 @@
-"""A custom realization filter with the high-level ``ropt.simple`` API.
+"""A custom realization filter with the high-level `ropt.simple` API.
 
 A realization filter reweights the realizations of an ensemble at each
 evaluation, letting the optimizer target a robust statistic instead of the mean.
-This example implements ``MedianFilter``, which puts all weight on the
+This example implements `MedianFilter`, which puts all weight on the
 realization with the median objective.
 
-The filter is **registered** with ``register_plugin``, which makes it available
+The filter is **registered** with `register_plugin`, which makes it available
 exactly like an installed one: it is selected from the configuration by its
-``"plugin/method"`` string. A filter defined in a script or a notebook cannot be
+`"plugin/method"` string. A filter defined in a script or a notebook cannot be
 found through an entry point, and registering is what closes that gap.
 """
 

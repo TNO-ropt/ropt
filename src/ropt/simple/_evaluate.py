@@ -1,4 +1,4 @@
-"""The high-level ``evaluate`` and ``evaluate_many`` entry points.
+"""The high-level `evaluate` and `evaluate_many` entry points.
 
 The same shape as `optimize`, with an evaluation step in place of the optimizer:
 one batch of variable vectors, evaluated once, with no loop around it. The two

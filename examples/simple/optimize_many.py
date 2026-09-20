@@ -1,10 +1,10 @@
-"""Run several optimizations concurrently with ``optimize_many``.
+"""Run several optimizations concurrently with `optimize_many`.
 
 `optimize_many` runs a batch of optimizations on driver threads that all
-evaluate on the pool it is given. Any of ``config``/``x0``/``objective`` may be a
+evaluate on the pool it is given. Any of `config`/`x0`/`objective` may be a
 single value (broadcast to every run) or a per-run sequence; here a matrix of
 start vectors sets the number of runs while the config and objective are re-used
-by all runs. Each run is tagged with a ``metadata`` dictionary (``run_id``) that
+by all runs. Each run is tagged with a `metadata` dictionary (`run_id`) that
 is attached to its results, so the runs can be told apart afterwards.
 """
 
@@ -35,7 +35,7 @@ def rosenbrock(
         variables: The variable vector to evaluate.
 
     Returns:
-        The Rosenbrock objective at ``variables``.
+        The Rosenbrock objective at `variables`.
     """
     objective = 0.0
     for d_idx in range(DIM - 1):

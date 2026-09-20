@@ -1,10 +1,10 @@
-"""Ensemble optimization with the high-level ``ropt.simple`` API.
+"""Ensemble optimization with the high-level `ropt.simple` API.
 
 An *ensemble* optimization minimizes the mean objective over a set of
 realizations with uncertain parameters. Compared to a deterministic run, the
-config gains a ``realizations`` section, and the per-realization objective uses
-``context.realization`` to return the value for its own realization. A
-``report`` callback prints each evaluation as it lands.
+config gains a `realizations` section, and the per-realization objective uses
+`context.realization` to return the value for its own realization. A
+`report` callback prints each evaluation as it lands.
 """
 
 from typing import Any

@@ -1,11 +1,11 @@
-"""The high-level ``optimize`` entry point.
+"""The high-level `optimize` entry point.
 
 One call builds a whole workflow and throws it away again: a context from the
 configuration, an evaluator wired to the pool, an optimization step, and the
 handlers around it. Nothing survives the call, which is what lets these
 functions be called concurrently without any coordination between them.
 
-``optimize_many`` is the same thing run several times over, on driver threads,
+`optimize_many` is the same thing run several times over, on driver threads,
 sharing one pool. Sharing the pool is what makes its runs cooperate: they draw
 their batch IDs from one counter and send their evaluations to the same workers.
 """

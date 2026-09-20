@@ -1,9 +1,9 @@
 """Constrained integer optimization with differential evolution.
 
 A small integer problem solved with the gradient-free *differential evolution*
-backend: maximize ``min(3 * x, y)`` (by minimizing its negation) over two
-integer variables subject to ``x + y <= 10``. Integer variables are declared
-through ``variables.types``. Pass ``--linear`` to impose the ``x + y <= 10``
+backend: maximize `min(3 * x, y)` (by minimizing its negation) over two
+integer variables subject to `x + y <= 10`. Integer variables are declared
+through `variables.types`. Pass `--linear` to impose the `x + y <= 10`
 bound as a deterministic *linear* constraint (declared in the config) instead of
 a *nonlinear* one (returned by the objective).
 """
@@ -36,7 +36,7 @@ def main(*, linear: bool = False) -> None:
     """Run the differential evolution optimization and check the result.
 
     Args:
-        linear: Impose ``x + y <= 10`` as a linear rather than nonlinear
+        linear: Impose `x + y <= 10` as a linear rather than nonlinear
                 constraint.
     """
     # --8<-- [start:config]

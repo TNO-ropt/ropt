@@ -1,25 +1,25 @@
-"""A custom sampler with the high-level ``ropt.simple`` API.
+"""A custom sampler with the high-level `ropt.simple` API.
 
 A sampler draws the perturbations that `ropt` uses to estimate stochastic
-gradients. This example implements ``OneAtATime``, which perturbs a single
+gradients. This example implements `OneAtATime`, which perturbs a single
 variable per sample, the pattern of a forward finite difference. It therefore
 needs exactly one perturbation per variable, and rejects any other number.
 
 The class provides two methods, which the configuration selects by name:
 
-- ``forward`` perturbs every variable by the same amount, so the gradient
+- `forward` perturbs every variable by the same amount, so the gradient
   estimate is a plain forward difference. Perturbations do not have to be
   random.
-- ``random`` stretches or shrinks each step by a random factor.
+- `random` stretches or shrinks each step by a random factor.
 
-The two also differ in the ``shared`` flag, which gives every realization the
-same perturbations. For ``forward`` that changes nothing,
+The two also differ in the `shared` flag, which gives every realization the
+same perturbations. For `forward` that changes nothing,
 because a unit step does not depend on the realization it belongs to; for
-``random`` it determines whether the realizations get their own step sizes.
+`random` it determines whether the realizations get their own step sizes.
 
-The sampler is **registered** with ``register_plugin``, which makes it available
+The sampler is **registered** with `register_plugin`, which makes it available
 exactly like an installed one: it is selected from the configuration by its
-``"plugin/method"`` string. A sampler defined in a script or a notebook cannot
+`"plugin/method"` string. A sampler defined in a script or a notebook cannot
 be found through an entry point, and registering is what closes that gap.
 """
 

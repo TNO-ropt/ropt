@@ -2,7 +2,7 @@
 
 A local handler belongs to one run at a time, so it cannot safely collect
 results from optimizations that run concurrently -- the runs of
-``optimize_many``. A group built with ``shared_handlers()`` can: it routes
+`optimize_many`. A group built with `shared_handlers()` can: it routes
 every run's results through one dispatcher, so several concurrent runs can
 feed it safely. A run may feed several groups at once, for different
 purposes.
@@ -40,7 +40,7 @@ def rosenbrock(
         variables: The variable vector to evaluate.
 
     Returns:
-        The Rosenbrock objective at ``variables``.
+        The Rosenbrock objective at `variables`.
     """
     objective = 0.0
     for d_idx in range(DIM - 1):
