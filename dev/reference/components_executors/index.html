@@ -6006,6 +6006,20 @@ whose submission script names the partition. <code>retries</code> covers a resul
 the shared filesystem does not yet show, <code>query_retries</code> a scheduler
 that cannot be reached; the grace period each allows is its count times
 <code>interval</code>.</p>
+<p><code>config_path</code> is the directory holding <code>queue.yaml</code> or <code>clusters.yaml</code>,
+and defaults to the configuration installed alongside <code>ropt</code>; <code>cluster</code>
+and <code>queue</code> default to the configured primary. <code>scheduler</code> is what
+<code>pysqa</code> calls <code>queue_type</code>, defaults to <code>"slurm"</code>, and is meaningful
+only with a <code>template</code>, which must itself carry everything the scheduler
+needs, the partition included.</p>
+<p>With a configuration, <code>cores</code> is clamped to the queue's minimum and
+maximum, <code>run_time_max</code> to its maximum and defaults to it when not
+given, and a numeric <code>memory_max</code> to its maximum — a string such as
+<code>"4G"</code> is passed through unchanged. Entries of <code>submit_options</code> that are
+<code>None</code> are dropped, so omitting a key and passing <code>None</code> mean the same
+thing; a name the executor sets itself is rejected. A work item that
+failed keeps its captured output even under <code>cleanup</code>, which is the only
+record of why.</p>
 <p>See <a href="../../advanced/parallel/#hpcexecutor">Parallel Evaluation</a> for
 configuration details.</p>
 

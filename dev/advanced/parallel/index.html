@@ -3369,15 +3369,15 @@
 
 
 <h1 id="parallel-evaluation">Parallel Evaluation</h1>
-<p>For non-trivial problems, function evaluations dominate runtime and are often
-best run in parallel, either on a single machine or on a cluster. <code>ropt</code> uses
+<p>For non-trivial problems, function evaluations dominate runtime and are commonly
+run in parallel, either on a single machine or on a cluster. <code>ropt</code> uses
 Python's <code>asyncio</code> framework to enable this.</p>
 <p>This page assumes familiarity with <a href="../workflows/">Optimization Workflows</a>.</p>
 <h2 id="why-asyncio">Why asyncio?</h2>
 <p>A single compute step could in principle run its evaluations in parallel
-without an event loop — for example by spawning threads directly. However,
-the real power of an asynchronous approach emerges when <strong>multiple compute
-steps run concurrently</strong>. With <code>asyncio</code>, several optimizations can share the
+without an event loop — for example by spawning threads directly. What an
+asynchronous approach adds is <strong>multiple compute
+steps running concurrently</strong>. With <code>asyncio</code>, several optimizations can share the
 same pool of workers, the event loop dispatches evaluation tasks as they
 arrive, and results flow back without blocking other work.</p>
 <p>The <a class="autorefs autorefs-internal" title="            ropt.components.evaluators.ParallelEvaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.ParallelEvaluator"><code>ParallelEvaluator</code></a> is the
@@ -3431,7 +3431,7 @@ for the submission's results.</p>
 </table>
 <p>By default each row of the variable batch is submitted as its own task. The
 <code>bundle_size</code> parameter allows several active evaluations to be grouped into a
-single task that the worker executes sequentially. This is useful when per-task
+single task that the worker executes sequentially. This applies when per-task
 overhead (thread/process startup, HPC job submission) dominates the cost of an
 individual evaluation, or when the total number of active evaluations in a batch
 is much larger than the number of available workers.</p>
@@ -3502,7 +3502,7 @@ See <a href="../workflows/#event-dispatcher">Event handling is a single-process 
 <code>ThreadPoolExecutor</code> of its own and dispatches tasks to it with
 <code>loop.run_in_executor</code>. Use this for I/O-bound evaluations or when the
 evaluation function releases the GIL (e.g. calls into C/Fortran).</p>
-<p>The private pool is the point: <code>asyncio.to_thread</code> would use the event loop's
+<p>The pool is private for a reason: <code>asyncio.to_thread</code> would use the event loop's
 <em>shared</em> default executor, the same one every other <code>to_thread</code> call in the
 process draws from — including the one that dispatches each compute step's
 <code>run()</code>. Filling it with evaluations would starve the steps waiting on them,
@@ -3532,15 +3532,15 @@ inside a library that has let the GIL go.</p>
 <p><a class="autorefs autorefs-internal" title="            ropt.components.executors.ProcessExecutor" href="../../reference/components_executors/#ropt.components.executors.ProcessExecutor"><code>ProcessExecutor</code></a>
 uses a <code>ProcessPoolExecutor</code> with a <code>"spawn"</code> context. Use this for CPU-bound
 evaluations where true parallelism is needed.</p>
-<p>It is a narrow tool, not a general execution mode. It earns its cost in exactly
-two cases: <strong>pure-Python computation</strong>, which threads cannot speed up, and
-<strong>isolating process-global state</strong>, where each evaluation needs its own copy of
-something a library keeps in module scope. Everything else it does — copying
-arguments and results, re-importing the entry module in every worker, losing all
-contact with the host process — is a price paid, not a feature. An evaluation
-that mostly runs an external program gets no benefit from it whatsoever, and is
-better served by a thread pool or by
-<a class="autorefs autorefs-internal" title="            ropt.components.executors.LocalJobExecutor" href="../../reference/components_executors/#ropt.components.executors.LocalJobExecutor"><code>LocalJobExecutor</code></a>.</p>
+<p>Two cases call for it: <strong>pure-Python computation</strong>, which threads cannot speed
+up, and <strong>isolating process-global state</strong>, where each evaluation needs its own
+copy of something a library keeps in module scope. Its other effects — copying
+arguments and results, re-importing the entry module in every worker, and losing
+all contact with the host process — are costs of the process boundary. An
+evaluation that mostly runs an external program gains nothing from it, since
+waiting on that program already releases the GIL: a thread pool or
+<a class="autorefs autorefs-internal" title="            ropt.components.executors.LocalJobExecutor" href="../../reference/components_executors/#ropt.components.executors.LocalJobExecutor"><code>LocalJobExecutor</code></a> covers that
+case.</p>
 <table>
 <thead>
 <tr>
@@ -3749,7 +3749,7 @@ cannot be reached the failure is logged and stopping continues.</p>
 </tr>
 <tr>
 <td><code>memory_max</code></td>
-<td>Memory per work item. Rendered by the submission script, and clamped to the queue's limit when there is a configuration.</td>
+<td>Memory per work item. Rendered by the submission script, and clamped to the queue's limit when there is a configuration and the value is a number rather than a string.</td>
 </tr>
 <tr>
 <td><code>run_time_max</code></td>

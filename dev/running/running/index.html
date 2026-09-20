@@ -3078,7 +3078,7 @@ used by the <a href="../../getting_started/quickstart/">Quickstart</a> and the r
 Getting Started, which covers most optimization tasks. The other is
 <a href="../../advanced/workflows/">Optimization Workflows</a>, a low-level API that
 exposes the building blocks — compute steps, event handlers, executors —
-directly: full flexibility, at the cost of assembling the run yourself, and
+directly, at the cost of assembling the run yourself, and
 written for readers at home in Python, threads and asyncio included.</p>
 <p>What the optimization <em>does</em> — its variables, objectives, constraints, and
 components — is set up in
@@ -3107,8 +3107,9 @@ imported from a single module:</p>
 </span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>
 </span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>
 </span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="n">objective</span><span class="p">)</span>
-</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">variables</span><span class="p">)</span>          <span class="c1"># the best variables found</span>
-</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">target_objective</span><span class="p">)</span>   <span class="c1"># the objective value there</span>
+</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">results</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>    <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">variables</span><span class="p">)</span>         <span class="c1"># the best variables found</span>
+</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>    <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">target_objective</span><span class="p">)</span>  <span class="c1"># the objective value there</span>
 </span></code></pre></div>
 <p>That is the basic pattern. The rest of this page explains each part and the
 additional options.</p>
@@ -3248,7 +3249,7 @@ no optimizer loop to interrupt, so the callback reports and nothing more.</p>
 <ul>
 <li><strong>Constant, per run</strong> — pass a <code>metadata</code> dict to <code>optimize</code>, <code>optimize_many</code>,
   <code>evaluate</code>, or <code>evaluate_many</code>. <code>ropt</code> copies it onto every result the run
-  produces, which is a convenient way to tag a run:</li>
+  produces, which is one way to tag a run:</li>
 </ul>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">"run_id"</span><span class="p">:</span> <span class="mi">7</span><span class="p">})</span>
 </span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">"run_id"</span><span class="p">])</span>   <span class="c1"># 7</span>

@@ -3533,6 +3533,11 @@ detailed descriptions and usage examples.</p>
       module-attribute
   " href="#ropt.config.constants.DEFAULT_PERTURBATION_BOUNDARY_TYPE"><code>DEFAULT_PERTURBATION_BOUNDARY_TYPE</code></a>
 (one of <a class="autorefs autorefs-internal" title="            BoundaryType" href="../enums/#ropt.enums.BoundaryType"><code>BoundaryType</code></a>).</p>
+<p>Variables reach the optimizer as <span class="arithmatex">\(y = (x - o)/s\)</span> and are reported back as
+<span class="arithmatex">\(x = s\,y + o\)</span>, using <code>scales</code> and <code>offsets</code>. A scale is a change of units,
+so every entry must be positive. There is no <code>auto_scale</code> here:
+<a class="autorefs autorefs-internal" title="            scales_and_offsets_from_bounds" href="../utils/#ropt.utils.scales_and_offsets_from_bounds"><code>scales_and_offsets_from_bounds</code></a>
+derives scales from the bounds when that is what is wanted.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>

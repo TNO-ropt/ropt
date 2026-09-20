@@ -3017,8 +3017,8 @@ side when the optimizer requests gradients separately from functions. Set
 <h2 id="writing-a-custom-filter">Writing a custom filter</h2>
 <p>Custom filters are plugins implementing the
 <a class="autorefs autorefs-internal" title="            ropt.realization_filter.RealizationFilter" href="../../reference/realization_filter/#ropt.realization_filter.RealizationFilter"><code>RealizationFilter</code></a> base class,
-whose docstring documents the methods to implement. A filter defined where an
-entry point cannot reach it — in a script or a notebook — is added with
+whose abstract methods define what a filter must provide. A filter defined where
+an entry point cannot reach it — in a script or a notebook — is added with
 <a class="autorefs autorefs-internal" title="            ropt.plugins.register_plugin" href="../../reference/plugin_manager/#ropt.plugins.register_plugin"><code>register_plugin</code></a>, after which it is
 selected by its <code>"plugin/method"</code> string exactly like an installed one. An
 instance can also be passed directly in the <code>realization_filters</code> field of
@@ -3049,22 +3049,28 @@ registers it, and selects it from the configuration as <code>"custom/median"</co
    fraction instead. All other realizations receive zero.</li>
 <li>Failed realizations (NaN values) are excluded.</li>
 </ol>
-<p>The <code>cvar-constraint</code> variant applies CVaR to a single constraint function,
-with "worst" defined by constraint type:</p>
+<p>The <code>cvar-constraint</code> variant applies the same steps to a single constraint
+function, named by <code>sort</code>, ranking realizations by their violation of that
+constraint, largest first. The violation is the distance to the violated side,
+<code>maximum(lower - c, c - upper)</code>, where <code>c</code> is the constraint value and <code>lower</code>
+and <code>upper</code> are the bounds it was configured with. It is positive when the
+constraint is violated and negative by the amount of slack otherwise, and one
+expression covers the three kinds of constraint:</p>
 <ul>
-<li><strong>LE (<code>&lt;=</code>):</strong> largest positive values (most violated).</li>
-<li><strong>GE (<code>&gt;=</code>):</strong> smallest negative values (most violated).</li>
-<li><strong>EQ (<code>==</code>):</strong> largest absolute values (furthest from zero).</li>
+<li>Bounded from above: the largest values are the most violated.</li>
+<li>Bounded from below: the smallest values are the most violated.</li>
+<li>An equality: the values furthest from the bound, in either direction.</li>
 </ul>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Realizations reach a filter with their objectives exactly as the evaluator
-returned them: neither scaled nor flipped for direction, since both belong
-to the aggregate and these are per-realization values. A filter that ranks
-by what the optimizer minimizes applies them itself, as the CVaR filter
-does. Constraint filters need no such step, since a constraint is a bound
-and has no direction, and ranking by a single constraint is unaffected by
-its scale.</p>
+<p>Realizations reach a filter with their objectives and constraints exactly
+as the evaluator returned them: neither scaled nor flipped for direction,
+since both belong to the aggregate and these are per-realization values. A
+filter that ranks by what the optimizer minimizes applies them itself, as
+the CVaR filter does. A constraint has no direction to apply, and the
+constraint bounds reach the filter in the same unscaled domain as the
+values, so the two can be subtracted directly. A constraint scale, being
+positive, leaves the order within one constraint unchanged.</p>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Weight normalization</p>

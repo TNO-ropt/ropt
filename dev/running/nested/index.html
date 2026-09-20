@@ -3127,7 +3127,8 @@ preference:</p>
 </span></code></pre></div>
 <p>The outer pool is a <strong>thread</strong> pool. Outer evaluations therefore stay inside
 this process, where the inner pool and the shared handler group are live
-objects; on a process pool they would arrive as copies and be useless. The inner
+objects; on a process pool they would arrive as copies, which <code>ropt</code> refuses.
+The inner
 pool is a <strong>process</strong> pool, which is where the real work goes.</p>
 <p>That is also where a cluster belongs. Swapping the inner pool for an
 <a class="autorefs autorefs-internal" title="            hpc_pool" href="../../reference/simple/#ropt.simple.Session.hpc_pool"><code>hpc_pool</code></a> is the whole change — the inner
@@ -3135,7 +3136,7 @@ evaluations become cluster jobs, and the layer above is untouched:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">inner_pool</span> <span class="o">=</span> <span class="n">active</span><span class="o">.</span><span class="n">hpc_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
 </span></code></pre></div>
 <p>Sending whole <em>optimizations</em> to the cluster, by putting the <strong>outer</strong> pool on
-processes or HPC, is possible but buys something different. Each outer
+processes or HPC, is possible but gives something different. Each outer
 evaluation is then copied into a job, and neither the inner pool nor the shared
 group can travel with it: the job has to open its own session and collect its
 own results, and return them as data for you to combine. Use that when the
@@ -3153,7 +3154,7 @@ costs one transfer instead of five. See
 <a href="../parallel/#pools-inside-an-evaluation">Pools inside an evaluation</a> for why.</p>
 <h2 id="collecting-results-from-runs-that-overlap">Collecting results from runs that overlap</h2>
 <p>The inner runs are concurrent, so a plain handler cannot collect them: a handler
-is claimed by one run at a time, and the second run to ask for it is refused. A
+is claimed by one run at a time, and the second run to claim it is refused. A
 <a href="../handlers/#sharing-a-handler-across-concurrent-runs"><strong>shared group</strong></a> can,
 because it routes every run's results through one dispatcher. Feed it a
 <a href="../handlers/#dataframehandler"><code>DataFrameHandler</code></a> and every inner evaluation

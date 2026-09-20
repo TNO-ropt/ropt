@@ -3001,7 +3001,7 @@ diagnose from scratch. Read on only if it has happened to you.</p>
 <p>You press Ctrl-C and nothing happens. Not "it takes a while" — nothing at all,
 however many times you press it. The run keeps going, and the only way out is
 to kill the process from another terminal.</p>
-<p>The give-away is that it affects the <em>whole</em> program, not just the optimization:
+<p>It affects the <em>whole</em> program, not just the optimization:
 anything else that waits stops responding to Ctrl-C too.</p>
 <h2 id="what-causes-it">What causes it</h2>
 <p>Ctrl-C raises <code>SIGINT</code>, which CPython turns into a <code>KeyboardInterrupt</code> — but

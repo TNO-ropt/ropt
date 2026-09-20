@@ -1211,17 +1211,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#see-also" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        See also
-      
-    </span>
-  </a>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -2961,17 +2950,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#see-also" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        See also
-      
-    </span>
-  </a>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -3033,9 +3011,9 @@ from the same two arrays, so they cannot disagree.</p>
 <p>This matters when variables differ by orders of magnitude. An optimizer takes a
 step of the same size in every direction and judges convergence with a single
 tolerance for all of them, and neither is meaningful unless the variables are
-comparable in size. Deriving the scales from the bounds is the usual remedy, and
+comparable in size. The bounds are one source of scales, and
 <a class="autorefs autorefs-internal" title="            scales_and_offsets_from_bounds" href="../../reference/utils/#ropt.utils.scales_and_offsets_from_bounds"><code>scales_and_offsets_from_bounds</code></a>
-does it:</p>
+derives them:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">scales_and_offsets_from_bounds</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
 </span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">scales</span><span class="p">,</span> <span class="n">offsets</span> <span class="o">=</span> <span class="n">scales_and_offsets_from_bounds</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">100.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">600.0</span><span class="p">])</span>
@@ -3063,11 +3041,6 @@ describes which fields have two domains.</p>
 variables are perturbed when a gradient is estimated, rather than the variables
 themselves. They are covered in
 <a href="../gradients/">Stochastic Gradients</a> and <a href="../samplers/">Samplers</a>.</p>
-<h2 id="see-also">See also</h2>
-<ul>
-<li>Reading variables back in either domain:
-  <a href="../../running/results/#scaling-of-results">Working with Results</a>.</li>
-</ul>
 
 
 

@@ -3184,10 +3184,9 @@ For instance an evaluator function should look like this:</p>
   metadata. A failed row is marked by writing <code>numpy.nan</code> into <code>objectives</code>;
   there is no separate error field.</li>
 </ul>
-<p>One advantage of this approach is that the callback receives all variable
-vectors at once as a 2-D NumPy array. This makes it possible to exploit NumPy's
-vectorized operations to evaluate all rows in a single pass, avoiding explicit
-Python loops and achieving better performance.</p>
+<p>The callback receives all variable vectors at once as a 2-D NumPy array, so the
+rows can be evaluated in a single vectorized pass rather than in an explicit
+Python loop.</p>
 <h2 id="what-is-in-evaluationbatchcontext">What is in <code>EvaluationBatchContext</code></h2>
 <p>The <a class="autorefs autorefs-internal" title="            ropt.evaluation.EvaluationBatchContext
 
@@ -3276,7 +3275,7 @@ problem. <code>metadata</code> is stored verbatim on the resulting
 
   
       dataclass
-  " href="../../reference/results/#ropt.results.Results"><code>Results</code></a> object and is useful for linking results back
+  " href="../../reference/results/#ropt.results.Results"><code>Results</code></a> object, which is what links results back
 to the input vectors that produced them. <code>batch_id</code> defaults to <code>0</code>; all
 results will carry this label unless you set it yourself. For
 auto-incrementing IDs pass a

@@ -3395,7 +3395,7 @@ cannot start before the current one is complete.</p>
 <p>capped by what the machine or the queue will actually give you. Beyond that
 figure the extra workers have nothing to do and sit idle.</p>
 <p>Batch size follows from the problem, not from a setting: it is how many
-evaluations the optimizer asks for at once. For a gradient-based run over an
+evaluations the optimizer requests at once. For a gradient-based run over an
 ensemble that is one per realization, plus their perturbations on the batches
 where a gradient is estimated. The second factor is <code>1</code> unless you use
 <a class="autorefs autorefs-internal" title="            ropt.simple.optimize_many" href="../../reference/simple/#ropt.simple.optimize_many"><code>optimize_many</code></a>, where it is the <code>limit</code> argument
@@ -3534,7 +3534,7 @@ the scheduler — so an objective that works on one works on the other:</p>
 </tr>
 <tr>
 <td><code>retries</code></td>
-<td>Extra polls to wait for a result (default: 0, which is enough).</td>
+<td>Extra polls to wait for a result (default: 0; a local job writes its result before it exits).</td>
 </tr>
 <tr>
 <td><code>bundle_size</code></td>
@@ -3693,9 +3693,12 @@ supplies renders as empty — so a misspelling on either side drops the directiv
 silently rather than failing. Entries that are <code>None</code> are dropped, so omitting a
 key and passing <code>None</code> mean the same thing. A name the executor sets itself,
 such as <code>cores</code> or <code>queue</code>, is rejected rather than allowed to override it.</p>
-<p>With a configuration, <code>cores</code> and <code>run_time_max</code> are also <strong>clamped</strong> to the
-selected queue's limits rather than rejected: asking for more cores than the
-queue allows quietly gets you the queue's maximum.</p>
+<p>With a configuration, resource requests are <strong>clamped</strong> to the selected queue's
+limits rather than rejected: asking for more cores than the queue allows quietly
+gets you the queue's maximum. <code>cores</code> is held to the queue's minimum and
+maximum, <code>run_time_max</code> to its maximum — and takes that maximum when you give no
+value at all — and <code>memory_max</code> to its maximum, but only when you pass a number.
+A memory string such as <code>"4G"</code> is passed to the submission script unchanged.</p>
 <h4 id="submitting-with-your-own-template">Submitting with your own template</h4>
 <p>A <code>template</code> is the script that gets run on the cluster, written by you
 instead of taken from a configuration. Since there is no configuration to say

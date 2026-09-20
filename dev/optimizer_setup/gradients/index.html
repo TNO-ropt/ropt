@@ -3249,14 +3249,14 @@ realizations that did work.</p>
 <h2 id="evaluation-policy">Evaluation policy</h2>
 <p><a class="autorefs autorefs-internal" title="            GradientConfig" href="../../reference/config/#ropt.config.GradientConfig"><code>GradientConfig.evaluation_policy</code></a> picks one of:</p>
 <ul>
-<li><code>"auto"</code> — compute objectives and gradients strictly when the backend asks
-  for them. Default and most efficient.</li>
+<li><code>"auto"</code> — compute objectives and gradients strictly when the backend requests
+  them. The default, and the policy that evaluates least.</li>
 <li><code>"speculative"</code> — also compute the gradient whenever an objective is
   requested. Improves load balancing on HPC clusters when gradient evaluations
   are likely to be needed soon.</li>
 <li><code>"separate"</code> — never combine function and gradient evaluations into a single
-  batch. Useful with <a href="../realization_filters/">realization filters</a> that disable
-  realizations and reduce gradient work.</li>
+  batch. This applies with <a href="../realization_filters/">realization filters</a> that
+  disable realizations and reduce gradient work.</li>
 </ul>
 <h2 id="samplers">Samplers</h2>
 <p>A sampler determines <em>where</em> the perturbed points are placed, while

@@ -3557,12 +3557,11 @@ size along the last axis. However, values corresponding to variables
 gradient estimation process, these samples are multiplied
 element-wise by the <code>perturbation_magnitudes</code> defined in the
 <a class="autorefs autorefs-internal" title="            VariablesConfig" href="../config/#ropt.config.VariablesConfig"><code>VariablesConfig</code></a>.</p>
-<p>Therefore, it is generally recommended that sampler implementations
-produce samples with a characteristic scale of approximately one
-(for example drawn from a distribution with a standard deviation of 1, or
-uniformly distributed within <code>[-1, 1]</code>). This allows the
-<code>perturbation_magnitudes</code> to directly control the effective size of
-the perturbations applied to the variables.</p>
+<p>Samples with a characteristic scale of approximately one — drawn,
+for example, from a distribution with a standard deviation of 1, or
+uniformly from <code>[-1, 1]</code> — let the
+<code>perturbation_magnitudes</code> control the effective size of the
+perturbations applied to the variables directly.</p>
 </details>
 
     <p><span class="doc-section-title">Returns:</span></p>
@@ -3932,12 +3931,11 @@ size along the last axis. However, values corresponding to variables
 gradient estimation process, these samples are multiplied
 element-wise by the <code>perturbation_magnitudes</code> defined in the
 <a class="autorefs autorefs-internal" title="            VariablesConfig" href="../config/#ropt.config.VariablesConfig"><code>VariablesConfig</code></a>.</p>
-<p>Therefore, it is generally recommended that sampler implementations
-produce samples with a characteristic scale of approximately one
-(for example drawn from a distribution with a standard deviation of 1, or
-uniformly distributed within <code>[-1, 1]</code>). This allows the
-<code>perturbation_magnitudes</code> to directly control the effective size of
-the perturbations applied to the variables.</p>
+<p>Samples with a characteristic scale of approximately one — drawn,
+for example, from a distribution with a standard deviation of 1, or
+uniformly from <code>[-1, 1]</code> — let the
+<code>perturbation_magnitudes</code> control the effective size of the
+perturbations applied to the variables directly.</p>
 </details>
 
     <p><span class="doc-section-title">Returns:</span></p>

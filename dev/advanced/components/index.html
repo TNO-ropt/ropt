@@ -3082,7 +3082,7 @@ the second publishes the loop and waits until the executor is ready.
 </span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>        <span class="o">...</span>                       <span class="c1"># release them</span>
 </span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_cleanup_submissions</span><span class="p">()</span>
 </span></code></pre></div>
-<p><strong>The delivery contract is the part to get right.</strong> Every work item ends in
+<p>Every work item ends in
 exactly one of three ways, and the choice determines whether the executor survives:</p>
 <table>
 <thead>
@@ -3122,11 +3122,11 @@ as broken infrastructure, and a dead worker passed to <code>_fail</code> would s
 user error. See
 <a href="../parallel/#error-handling">Error handling</a> for the distinction.</p>
 <p>Two further rules. Skip a submission whose <code>is_finished</code> is already <code>True</code> — its
-caller has left, so running its work items only occupies a worker. And call
+caller is no longer waiting, so running its work items only occupies a worker. And call
 <code>_cleanup_submissions</code> from <code>_cleanup</code>, which aborts whatever is outstanding so
 no caller is left blocked in
 <a class="autorefs autorefs-internal" title="            collect" href="../../reference/components_executors/#ropt.components.executors.Submission.collect"><code>collect</code></a>.</p>
-<p>One obligation is easy to miss. <code>on_worker_thread</code> defaults to <code>False</code>, and
+<p>One obligation is less obvious. <code>on_worker_thread</code> defaults to <code>False</code>, and
 <code>submit</code> uses it to refuse work sent from the executor's own workers — a caller
 that waits there occupies a worker its own submission needs. An executor whose
 workers run in this process must override it, or that refusal never fires.

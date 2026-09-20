@@ -3022,8 +3022,9 @@ objective and not also in where it was sampled. The flag has no effect on a
 sampler whose values do not depend on the realization in the first place.</p>
 <h2 id="writing-a-custom-sampler">Writing a custom sampler</h2>
 <p>A custom sampler is a plugin implementing the <a class="autorefs autorefs-internal" title="            Sampler" href="../../reference/sampler/#ropt.sampler.Sampler"><code>Sampler</code></a>
-base class, whose docstring documents the shape the samples must have and how
-the <code>mask</code> and <code>shared</code> settings affect them. Like the other component kinds, a
+base class, whose <code>generate_samples</code> documents the shape the samples must have
+and how the <code>mask</code> and <code>shared</code> settings affect them. Like the other component
+kinds, a
 sampler defined in a script or a notebook is made selectable with
 <a class="autorefs autorefs-internal" title="            ropt.plugins.register_plugin" href="../../reference/plugin_manager/#ropt.plugins.register_plugin"><code>register_plugin</code></a>.</p>
 <p>The runnable script is

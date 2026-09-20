@@ -3758,17 +3758,17 @@ redirection):</p>
 <li>
 <p><strong><code>max_batches</code></strong>: Limits the total number of <em>calls</em> made to the evaluation
   function. An optimizer might request a batch containing multiple function
-  and/or gradient evaluations within a single call. This is particularly useful
-  for managing resource usage when batches are evaluated in parallel (for example, on
-  an HPC cluster), as it controls the number of sequential submission steps. The
+  and/or gradient evaluations within a single call. Where batches are evaluated
+  in parallel (for example, on
+  an HPC cluster), this bounds the number of sequential submission steps. The
   number of batches does not necessarily correspond directly to the number of
   optimizer iterations.</p>
 </li>
 <li>
 <p><strong><code>max_functions</code></strong>: Sets a hard limit on the total <em>number</em> of individual
   objective function evaluations performed across all batches. Since a single
-  batch can involve multiple function evaluations, this gives finer control
-  over total computational effort. Exceeding this limit might
+  batch can involve multiple function evaluations, this bounds the total
+  computational effort more closely than <code>max_batches</code>. Exceeding this limit might
   cause the optimization to terminate mid-batch.</p>
 </li>
 <li>
@@ -3894,8 +3894,8 @@ objective functions and gradients are calculated:</p>
   requested, even if the optimizer hasn't explicitly asked for it. This can
   improve load balancing on HPC clusters by initiating gradient work earlier.</li>
 <li><strong><code>"separate"</code></strong>: Always launch function and gradient evaluations as distinct
-  operations, even if the optimizer requests both simultaneously. Useful when
-  using <a href="../realization_filters/">realization filters</a> that might disable
+  operations, even if the optimizer requests both simultaneously. This applies
+  with <a href="../realization_filters/">realization filters</a> that might disable
   certain realizations, as it can reduce the number of gradient evaluations
   needed based on information obtained from the function evaluations.</li>
 </ul>
@@ -3925,8 +3925,8 @@ use it (see <a href="../configuration/#sharing-optimizer-components-by-key">Shar
 key</a>).</p>
 <p><a href="../realization_filters/">Realization filters</a> modify the weights of individual
 realizations. For example, they can select a subset of realizations by setting
-the weights of the others to zero — useful for constructing risk-aware
-objectives.</p>
+the weights of the others to zero, which is how a risk-aware objective is
+constructed.</p>
 <p>Fields:</p>
 <ul>
 <li><code>method</code> (required, no default): Selects the filter plugin.</li>

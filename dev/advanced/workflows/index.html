@@ -3803,13 +3803,13 @@ the dispatcher require no locking.</p>
 handlers are called from multiple threads simultaneously. <strong>Event handlers must
 not be shared across concurrent compute steps</strong>: doing so raises a
 <a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a>.</p>
-<p><a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventDispatcher" href="../../reference/components_event_handlers/#ropt.components.event_handlers.EventDispatcher"><code>EventDispatcher</code></a> is the
-required solution: it receives events on a queue and dispatches them to its own
+<p><a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventDispatcher" href="../../reference/components_event_handlers/#ropt.components.event_handlers.EventDispatcher"><code>EventDispatcher</code></a> is what
+makes sharing possible: it receives events on a queue and dispatches them to its own
 handlers from the asyncio event loop's thread. Because all handler calls happen
 on a single thread, handlers registered on the dispatcher are safe even when
 events arrive from multiple concurrent steps.</p>
-<p>This is especially useful when one set of handlers needs to aggregate results
-from multiple concurrent compute steps.</p>
+<p>That is what lets one set of handlers aggregate results from multiple
+concurrent compute steps.</p>
 <p><code>EventDispatcher</code> follows the same lifecycle as executors:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">async</span> <span class="k">with</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">TaskGroup</span><span class="p">()</span> <span class="k">as</span> <span class="n">tg</span><span class="p">:</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    <span class="n">executor</span> <span class="o">=</span> <span class="n">ThreadExecutor</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
@@ -3887,7 +3887,7 @@ evaluation error — on the emitting run's own call stack — and splits
 </ul>
 <h3 id="thread-based-dispatch">Thread-based dispatch</h3>
 <p>By default, handlers registered with <code>EventDispatcher</code> are called directly in
-the asyncio event loop's thread. This is efficient for handlers that only do
+the asyncio event loop's thread, which costs nothing for handlers that only do
 in-memory work, such as <code>ResultsHandler</code> or <code>HistoryHandler</code>.</p>
 <p>If a handler performs blocking operations — writing results to a file, pushing
 data to a database, sending over a network — pass <code>run_in_thread=True</code> when

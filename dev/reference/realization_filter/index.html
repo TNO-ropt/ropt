@@ -3317,7 +3317,9 @@ set if this class has one. See <a class="autorefs autorefs-internal" title="    
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">objective_scales</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span>
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">maximize</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">bool_</span><span class="p">],</span>
 </span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">objective_weights</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">constraint_lower_bounds</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="n">constraint_upper_bounds</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -3336,6 +3338,11 @@ values are as the evaluator returned them: neither scaled nor negated
 for maximization, since both apply to aggregates and these are
 per-realization. A filter that ranks by what the optimizer minimizes
 should apply <code>objective_scales</code> and <code>maximize</code> itself.</p>
+<p>The constraint bounds are given in the same domain as <code>constraints</code>, so
+a filter that ranks by constraint violation can subtract them directly.
+A constraint is violated below <code>constraint_lower_bounds</code> and above
+<code>constraint_upper_bounds</code>; equal bounds make it an equality. Both are
+<code>None</code> when no nonlinear constraints are configured.</p>
 <p>A realization that failed to evaluate carries <code>nan</code> values. The filter
 should check for these and handle them, for instance by assigning such
 realizations a weight of zero.</p>
@@ -3433,6 +3440,38 @@ fixes the scales after the first batch.</p>
             <td>
               <div class="doc-md-description">
                 <p>The configured weight of each objective.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>constraint_lower_bounds</code>
+            </td>
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The lower bound of each constraint.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>constraint_upper_bounds</code>
+            </td>
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The upper bound of each constraint.</p>
               </div>
             </td>
             <td>
@@ -3679,7 +3718,7 @@ for the algorithm.</p>
 
         <p>Options for the <code>cvar-constraint</code> filter method.</p>
 <p>Assigns CVaR-derived weights based on a single constraint function value,
-with "worst" defined by the constraint type (LE/GE/EQ).
+ranking realizations by how far each violates that constraint.
 See <a href="../../optimizer_setup/realization_filters/#how-cvar-filters-work">Realization Filters</a>
 for the algorithm.</p>
 

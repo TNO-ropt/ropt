@@ -1249,17 +1249,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#see-also" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        See also
-      
-    </span>
-  </a>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -3149,17 +3138,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#see-also" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        See also
-      
-    </span>
-  </a>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -3397,8 +3375,8 @@ name of a metadata entry holding array values, which labels the axis that
 metadata spans.</p>
 <p>Labels are not purely decorative. Some components use them to identify the items
 they are given instead of relying on position, which lets results be matched
-between runs whose ordering differs. Naming the realizations therefore buys more
-than naming the variables, even though both make a printed table easier to read.</p>
+between runs whose ordering differs. That applies to the realization names; the
+others affect only how a printed table reads.</p>
 <p><a href="https://github.com/TNO-ropt/ropt/blob/main/examples/simple/export.py">examples/simple/export.py</a>
 names variables, objectives and realizations before exporting to a frame, and
 <a href="https://github.com/TNO-ropt/ropt/blob/main/examples/simple/metadata.py">examples/simple/metadata.py</a>
@@ -3449,7 +3427,7 @@ fields you want to override — everything else is filled in automatically.</p>
 </span><span id="__span-8-12"><a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a>        <span class="s2">"perturbation_magnitudes"</span><span class="p">:</span> <span class="mf">0.005</span><span class="p">,</span>
 </span><span id="__span-8-13"><a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a>        <span class="s2">"perturbation_types"</span><span class="p">:</span> <span class="n">PerturbationType</span><span class="o">.</span><span class="n">ABSOLUTE</span><span class="p">,</span>
 </span><span id="__span-8-14"><a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a>        <span class="s2">"boundary_types"</span><span class="p">:</span> <span class="n">BoundaryType</span><span class="o">.</span><span class="n">MIRROR_BOTH</span><span class="p">,</span>
-</span><span id="__span-8-15"><a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a>        <span class="s2">"samplers"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>                                    <span class="c1"># default: use first sampler for all</span>
+</span><span id="__span-8-15"><a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a>        <span class="s2">"samplers"</span><span class="p">:</span> <span class="s2">"0"</span><span class="p">,</span>                                  <span class="c1"># default: use first sampler for all</span>
 </span><span id="__span-8-16"><a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a>        <span class="s2">"seed"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
 </span><span id="__span-8-17"><a id="__codelineno-8-17" name="__codelineno-8-17" href="#__codelineno-8-17"></a>    <span class="p">},</span>
 </span><span id="__span-8-18"><a id="__codelineno-8-18" name="__codelineno-8-18" href="#__codelineno-8-18"></a>    <span class="s2">"objectives"</span><span class="p">:</span> <span class="p">{</span>
@@ -3459,7 +3437,7 @@ fields you want to override — everything else is filled in automatically.</p>
 </span><span id="__span-8-22"><a id="__codelineno-8-22" name="__codelineno-8-22" href="#__codelineno-8-22"></a>        <span class="s2">"auto_scale"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>                              <span class="c1"># default: do not estimate scales</span>
 </span><span id="__span-8-23"><a id="__codelineno-8-23" name="__codelineno-8-23" href="#__codelineno-8-23"></a>        <span class="s2">"maximize"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>                                <span class="c1"># default: minimize</span>
 </span><span id="__span-8-24"><a id="__codelineno-8-24" name="__codelineno-8-24" href="#__codelineno-8-24"></a>        <span class="s2">"realization_filters"</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>                       <span class="c1"># default: no filter</span>
-</span><span id="__span-8-25"><a id="__codelineno-8-25" name="__codelineno-8-25" href="#__codelineno-8-25"></a>        <span class="s2">"function_estimators"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>                         <span class="c1"># default: use first estimator for all</span>
+</span><span id="__span-8-25"><a id="__codelineno-8-25" name="__codelineno-8-25" href="#__codelineno-8-25"></a>        <span class="s2">"function_estimators"</span><span class="p">:</span> <span class="s2">"0"</span><span class="p">,</span>                       <span class="c1"># default: use first estimator for all</span>
 </span><span id="__span-8-26"><a id="__codelineno-8-26" name="__codelineno-8-26" href="#__codelineno-8-26"></a>    <span class="p">},</span>
 </span><span id="__span-8-27"><a id="__codelineno-8-27" name="__codelineno-8-27" href="#__codelineno-8-27"></a>    <span class="s2">"linear_constraints"</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>                           <span class="c1"># No linear constraints</span>
 </span><span id="__span-8-28"><a id="__codelineno-8-28" name="__codelineno-8-28" href="#__codelineno-8-28"></a>    <span class="s2">"nonlinear_constraints"</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>                        <span class="c1"># No non-linear constraints</span>
@@ -3525,7 +3503,7 @@ follows:</p>
 </span><span id="__span-9-14"><a id="__codelineno-9-14" name="__codelineno-9-14" href="#__codelineno-9-14"></a>    <span class="s2">"scales"</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>                            <span class="c1"># default: no scaling</span>
 </span><span id="__span-9-15"><a id="__codelineno-9-15" name="__codelineno-9-15" href="#__codelineno-9-15"></a>    <span class="s2">"auto_scale"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>                      <span class="c1"># default: do not estimate scales</span>
 </span><span id="__span-9-16"><a id="__codelineno-9-16" name="__codelineno-9-16" href="#__codelineno-9-16"></a>    <span class="s2">"realization_filters"</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>               <span class="c1"># default: no filter</span>
-</span><span id="__span-9-17"><a id="__codelineno-9-17" name="__codelineno-9-17" href="#__codelineno-9-17"></a>    <span class="s2">"function_estimators"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>                 <span class="c1"># default: use first estimator</span>
+</span><span id="__span-9-17"><a id="__codelineno-9-17" name="__codelineno-9-17" href="#__codelineno-9-17"></a>    <span class="s2">"function_estimators"</span><span class="p">:</span> <span class="s2">"0"</span><span class="p">,</span>                <span class="c1"># default: use first estimator</span>
 </span><span id="__span-9-18"><a id="__codelineno-9-18" name="__codelineno-9-18" href="#__codelineno-9-18"></a><span class="p">}</span>
 </span><span id="__span-9-19"><a id="__codelineno-9-19" name="__codelineno-9-19" href="#__codelineno-9-19"></a>
 </span><span id="__span-9-20"><a id="__codelineno-9-20" name="__codelineno-9-20" href="#__codelineno-9-20"></a><span class="c1"># realization_filters entries (method is required):</span>
@@ -3537,11 +3515,6 @@ follows:</p>
 </span><span id="__span-9-26"><a id="__codelineno-9-26" name="__codelineno-9-26" href="#__codelineno-9-26"></a><span class="p">]</span>
 </span></code></pre></div>
 </details>
-<h2 id="see-also">See also</h2>
-<ul>
-<li>Every field of every section, with its default:
-  <a href="../configuration_sections/">Configuration Sections</a>.</li>
-</ul>
 
 
 

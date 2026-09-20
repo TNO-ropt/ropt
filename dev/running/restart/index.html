@@ -1028,10 +1028,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#next" class="md-nav__link">
+  <a href="#see-also" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Next
+        See also
       
     </span>
   </a>
@@ -2940,10 +2940,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#next" class="md-nav__link">
+  <a href="#see-also" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Next
+        See also
       
     </span>
   </a>
@@ -2989,8 +2989,8 @@ just the final result — attach a <strong>handler</strong>. A handler is an obj
 with <code>handlers=</code> that observes every result an optimization produces; unlike
 the <code>report</code> callback (see
 <a href="../running/#reporting-progress">Running Optimizations</a>), the same
-handler can be reused across several calls to <code>optimize</code>, accumulating results
-as it goes. See <a href="../handlers/">Result handlers</a> for
+handler can be reused across several sequential calls to <code>optimize</code>, accumulating
+results as it goes. See <a href="../handlers/">Result handlers</a> for
 the full explanation.</p>
 <p>Here we use <a class="autorefs autorefs-internal" title="            ropt.simple.HistoryHandler" href="../../reference/simple/#ropt.simple.HistoryHandler"><code>HistoryHandler</code></a>, which keeps every
 result it sees, in order:</p>
@@ -3013,10 +3013,8 @@ every evaluation from every restart, not just the last run's:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"evaluations collected across all restarts: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">history</span><span class="o">.</span><span class="n">results</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"best objective after </span><span class="si">{</span><span class="n">RESTARTS</span><span class="si">}</span><span class="s2"> restarts: </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">target_objective</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </span></code></pre></div>
-<h2 id="next">Next</h2>
+<h2 id="see-also">See also</h2>
 <ul>
-<li>The full simple API, including other built-in handlers:
-  <a href="../handlers/">Result Handlers</a>.</li>
 <li>Restarting concurrent, rather than sequential, runs needs a <strong>shared</strong>
   handler group instead of a reused one:
   <a href="../handlers/#sharing-a-handler-across-concurrent-runs">Result Handlers</a>.</li>

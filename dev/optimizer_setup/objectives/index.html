@@ -2972,7 +2972,7 @@
 
 <h1 id="objectives">Objectives</h1>
 <p>An optimizer needs a single number to minimize. When a problem has more than one
-quantity worth improving — a cost and a risk, a yield and an emission — <code>ropt</code>
+quantity to optimize — a cost and a risk, a yield and an emission — <code>ropt</code>
 forms that number for you, as a weighted sum of the objectives you declare.</p>
 <p>This page covers how many objectives there are, how they are weighted, which
 direction each is optimized in, and how scaling interacts with the weights. For
@@ -3047,7 +3047,7 @@ or their variables. The runnable demonstration is
 </div>
 <p>An <code>offsets</code> entry is subtracted before the division. It cannot move the optimum
 or change the gradient, but it changes the magnitude the optimizer tests against
-its tolerances, which is what makes it useful for an objective that is large and
+its tolerances, which matters for an objective that is large and
 varies little. See <a href="../configuration_sections/#objective-scales">Scaling
 objectives</a> and
 <a href="../configuration_sections/#objective-offsets">Offsetting objectives</a> for the
