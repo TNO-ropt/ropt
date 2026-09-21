@@ -1,0 +1,55 @@
+.md-grid {
+    max-width: initial;
+}
+
+.md-typeset .tabbed-set {
+    border: 0.5px solid var(--md-typeset-table-color);
+}
+
+.md-typeset .tabbed-content {
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+/* Make Python comments stand out more */
+:root > * {
+    --md-code-hl-comment-color: #c62828;
+}
+
+[data-md-color-scheme="slate"] {
+    --md-code-hl-comment-color: #ff8a80;
+}
+
+/* Docstrings use string color (green) and italic */
+.highlight .sd {
+    color: var(--md-code-hl-string-color);
+    font-style: italic;
+}
+
+/* Make comments italic */
+.highlight .c,
+.highlight .c1,
+.highlight .cm,
+.highlight .cp,
+.highlight .cs {
+    font-style: italic;
+}
+
+/* Check and cross icons in the backend capability tables */
+:root {
+    --ropt-supported-color: #2e7d32;
+    --ropt-unsupported-color: #c62828;
+}
+
+[data-md-color-scheme="slate"] {
+    --ropt-supported-color: #81c784;
+    --ropt-unsupported-color: #ef9a9a;
+}
+
+.md-typeset .supported {
+    color: var(--ropt-supported-color);
+}
+
+.md-typeset .unsupported {
+    color: var(--ropt-unsupported-color);
+}

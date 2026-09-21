@@ -1,0 +1,4327 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../logging/">
+      
+      
+        <link rel="next" href="../nested/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Parallel Execution and Many Runs - ropt Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="blue">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#parallel-execution-and-many-runs" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="ropt Documentation" class="md-header__button md-logo" aria-label="ropt Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            ropt Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Parallel Execution and Many Runs
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="blue"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="teal" data-md-color-accent="lime"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/TNO-ropt/ropt" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    TNO-ropt/ropt
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  About
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../getting_started/background/" class="md-tabs__link">
+          
+  
+  
+  Getting Started
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../running/" class="md-tabs__link">
+          
+  
+  
+  Running
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../optimizer_setup/key_concepts/" class="md-tabs__link">
+          
+  
+  
+  Optimizer Setup
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../troubleshooting/" class="md-tabs__link">
+          
+  
+  
+  Troubleshooting
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../advanced/workflows/" class="md-tabs__link">
+          
+  
+  
+  Advanced
+
+        </a>
+      </li>
+    
+  
+
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../reference/simple/" class="md-tabs__link">
+          
+  
+  
+  Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="ropt Documentation" class="md-nav__button md-logo" aria-label="ropt Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    ropt Documentation
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/TNO-ropt/ropt" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    TNO-ropt/ropt
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    About
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Getting Started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting_started/background/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Background
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting_started/installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting_started/quickstart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quickstart
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting_started/ensemble/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ensemble-Based Optimization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting_started/handlers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Collecting Results with Handlers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting_started/execution/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Running in Parallel
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting_started/examples/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Examples
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Running
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Running
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../running/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Running Optimizations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../results/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Working with Results
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../handlers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Result Handlers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../logging/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Logging
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Parallel Execution and Many Runs
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Parallel Execution and Many Runs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#running-in-parallel" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Running in parallel
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Running in parallel">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#how-many-workers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How many workers?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#thread-pool" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Evaluating on threads
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#process-pool" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Evaluating in worker processes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#local-pool" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Running each evaluation as a local job
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Running each evaluation as a local job">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#process-or-local" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Worker or job: process_pool or local_pool?
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#running-on-an-hpc-cluster" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Running on an HPC cluster
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Running on an HPC cluster">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#using-an-installed-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Using an installed configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#asking-for-resources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Asking for resources
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#submitting-with-your-own-template" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Submitting with your own template
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#evaluating-in-process-on-purpose" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Evaluating in-process, on purpose
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#which-pool" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Which pool should I use?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pools-inside-an-evaluation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pools inside an evaluation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#stopping-a-run" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Stopping a run
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#many-optimizations-at-once" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Many optimizations at once
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Many optimizations at once">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#failure-in-one-run" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Failure in one run
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#external-backend" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Running the optimizer in a separate process
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#offloading-your-own-work" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Offloading your own work
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Offloading your own work">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#without-a-pool" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Without a pool
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../nested/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Nested Optimization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../restart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Restarting from the Best Point
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Optimizer Setup
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Optimizer Setup
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../optimizer_setup/key_concepts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Key Concepts
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../optimizer_setup/configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../optimizer_setup/configuration_sections/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration Sections
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../optimizer_setup/variables/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Variables
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../optimizer_setup/objectives/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Objectives
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../optimizer_setup/constraints/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Constraints
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../optimizer_setup/discrete/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Discrete and Mixed-Integer Variables
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../optimizer_setup/optimizer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Choosing an Optimizer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../optimizer_setup/gradients/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Stochastic Gradients
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../optimizer_setup/samplers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Samplers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../optimizer_setup/realization_filters/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Realization Filters
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../optimizer_setup/function_estimators/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Function Estimators
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Troubleshooting
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Troubleshooting
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../troubleshooting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Troubleshooting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../troubleshooting/keyboard_interrupt/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Keyboard Interrupts
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Advanced
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Advanced
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_6_1" id="__nav_6_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Workflows
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_6_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Workflows
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../advanced/workflows/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Optimization Workflows
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../advanced/evaluation_callbacks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Writing Evaluation Callbacks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../advanced/parallel/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Parallel Evaluation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../advanced/components/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Implementing a Component
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../advanced/examples/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Workflow Examples
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_6_2" id="__nav_6_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plugins
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_6_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Plugins
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../advanced/plugin_discovery/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plugin Discovery
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../advanced/writing_plugins/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Writing a Plugin
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/simple/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Simple API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/utils/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Utility Functions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_7_3" id="__nav_7_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_7_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Configuration
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/context/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Context Class
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/config/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration Classes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_7_4" id="__nav_7_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Results & Events
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_7_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Results & Events
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/results/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evaluation Results
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/events/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Optimization Events
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_7_5" id="__nav_7_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Optimization Engine
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_7_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Optimization Engine
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/core/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Core Classes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/evaluation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evaluation Classes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_7_6" id="__nav_7_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Optimizer Components
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_7_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Optimizer Components
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/function_estimator/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Function Estimators
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/realization_filter/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Realization Filters
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/backend/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Optimizer Backends
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/sampler/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Samplers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7_7" id="__nav_7_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Workflow Components
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_7_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Workflow Components
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/components_compute_steps/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Compute Steps
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/components_event_handlers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Event Handlers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/components_evaluators/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evaluators
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/components_executors/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Executors
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/components_utils/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Utilities
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/plugin_manager/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plugin System
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/enums/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Enumerations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/exceptions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Exceptions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#running-in-parallel" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Running in parallel
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Running in parallel">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#how-many-workers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How many workers?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#thread-pool" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Evaluating on threads
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#process-pool" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Evaluating in worker processes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#local-pool" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Running each evaluation as a local job
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Running each evaluation as a local job">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#process-or-local" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Worker or job: process_pool or local_pool?
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#running-on-an-hpc-cluster" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Running on an HPC cluster
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Running on an HPC cluster">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#using-an-installed-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Using an installed configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#asking-for-resources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Asking for resources
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#submitting-with-your-own-template" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Submitting with your own template
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#evaluating-in-process-on-purpose" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Evaluating in-process, on purpose
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#which-pool" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Which pool should I use?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pools-inside-an-evaluation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pools inside an evaluation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#stopping-a-run" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Stopping a run
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#many-optimizations-at-once" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Many optimizations at once
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Many optimizations at once">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#failure-in-one-run" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Failure in one run
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#external-backend" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Running the optimizer in a separate process
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#offloading-your-own-work" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Offloading your own work
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Offloading your own work">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#without-a-pool" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Without a pool
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="parallel-execution-and-many-runs">Parallel Execution and Many Runs</h1>
+<p>Evaluations within one optimization can run in parallel, whole optimizations
+can run at once, and work of your own can be offloaded the same way. All three
+go through a <strong>pool</strong>, opened from a <a class="autorefs autorefs-internal" title="            ropt.simple.session" href="../../reference/simple/#ropt.simple.session"><code>session</code></a>.</p>
+<h2 id="running-in-parallel">Running in parallel</h2>
+<p>By default <a class="autorefs autorefs-internal" title="            ropt.simple.optimize" href="../../reference/simple/#ropt.simple.optimize"><code>optimize</code></a> runs on the calling thread, one
+evaluation at a time. To
+run the evaluations in parallel, open a <a class="autorefs autorefs-internal" title="            ropt.simple.session" href="../../reference/simple/#ropt.simple.session"><code>session</code></a>, ask it
+for a <strong>pool</strong>, and pass that pool to the run. <a href="../../getting_started/execution/">Running in
+Parallel</a> introduces the five kinds; this page
+is the full account of each:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.simple</span><span class="w"> </span><span class="kn">import</span> <span class="n">session</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">pool</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">thread_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">8</span><span class="p">))</span>
+</span></code></pre></div>
+<p>The runnable script for this section is
+<a href="https://github.com/TNO-ropt/ropt/blob/main/examples/simple/parallel.py">examples/simple/parallel.py</a>,
+which takes <code>-m</code> to swap its thread pool for a process pool.</p>
+<p>A session is a background event loop that the pools run on. Closing it releases
+every pool it created, so that is normally all the cleanup you need. Nothing is
+implicit: a run evaluates on the pool you hand it, and on no other. A run given
+no pool evaluates in-process, wherever it is called from — including from a
+thread you started yourself.</p>
+<h3 id="how-many-workers">How many workers?</h3>
+<p><code>ropt</code> parallelizes two things, and only these two: the <strong>evaluations within one
+optimization batch</strong>, and whole <strong>optimizations against each other</strong>. Nothing
+else overlaps — a single optimization is a sequence of batches, and the next one
+cannot start before the current one is complete.</p>
+<p>So the number of workers that can be kept busy is roughly</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>batch size  ×  optimizations running at once
+</span></code></pre></div>
+<p>capped by what the machine or the queue will actually give you. Beyond that
+figure the extra workers have nothing to do and sit idle.</p>
+<p>Batch size follows from the problem, not from a setting: it is how many
+evaluations the optimizer requests at once. For a gradient-based run over an
+ensemble that is one per realization, plus their perturbations on the batches
+where a gradient is estimated. The second factor is <code>1</code> unless you use
+<a class="autorefs autorefs-internal" title="            ropt.simple.optimize_many" href="../../reference/simple/#ropt.simple.optimize_many"><code>optimize_many</code></a>, where it is the <code>limit</code> argument
+(or the number of runs, if you set no limit).</p>
+<p>A worker is not free, so this is an upper bound rather than a target. Ask for
+what the work needs; the useful number is usually much smaller than the
+machine's core count.</p>
+<div class="admonition tip">
+<p class="admonition-title">How a batch is split across workers</p>
+<p>Each evaluation in a batch is transferred to a worker as its own task by
+default, which spreads the batch as widely as the pool allows. Every
+transfer costs something, though, so when the evaluations are cheap the
+transfers can dominate. Set <code>bundle_size=</code> on the pool to group several
+evaluations into one task, or <code>bundle_size=0</code> to send the whole batch as a
+single task. The evaluations within a task run one after another, so <code>0</code>
+gives up parallelism inside the batch entirely: it is for a pool whose
+parallelism comes from the runs above it, as in
+<a href="../nested/#two-pools-not-one">Nested Optimization</a>.</p>
+<p><code>workers</code> and <code>bundle_size</code> are the two halves of matching work to capacity.
+<code>workers</code> sets how many tasks may be in flight; <code>bundle_size</code> sets how much
+work one task should carry. With a batch of 100 cheap evaluations and
+8 workers, the default sends 100 separate tasks and pays 100 transfer costs
+to keep 8 workers busy; <code>bundle_size=13</code> sends 8 and pays 8. Raise it when
+the evaluations are cheap relative to a transfer — above all on a
+<code>process_pool</code>, a <code>local_pool</code> or an <code>hpc_pool</code>, where a transfer means
+copying data and starting something. Leave it at <code>1</code> when they are
+expensive, or when they vary in cost and bundling would leave one worker
+holding all the slow ones.</p>
+</div>
+<p>You can keep several pools open at once and choose per run:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    <span class="n">fast</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">thread_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    <span class="n">heavy</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">process_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    <span class="n">cheap</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">pool</span><span class="o">=</span><span class="n">fast</span><span class="p">)</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    <span class="n">costly</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">expensive_objective</span><span class="p">,</span> <span class="n">pool</span><span class="o">=</span><span class="n">heavy</span><span class="p">)</span>
+</span></code></pre></div>
+<div class="admonition note">
+<p class="admonition-title">Pools inside an evaluation</p>
+<p>An evaluation function may start a run of its own, but open its pool
+<strong>once</strong>, in the calling code, and pass it to every evaluation. Opening one
+per evaluation gives each a budget separate from every other: ten evaluations
+each opening a ten-worker pool put a hundred workers on the machine, where
+one shared pool puts ten. Which pool it may be is a separate question, and
+the rules are in
+<a href="#pools-inside-an-evaluation">Pools inside an evaluation</a> below.</p>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Releasing a pool early</p>
+<p>A pool holds its workers until the session closes. That is usually fine, but
+if you build pools in a loop inside one long-lived session — above all
+process pools, which hold worker interpreters — release each one when you
+are done with it, either with <code>pool.close()</code> or by using it as a context
+manager:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="k">for</span> <span class="n">case</span> <span class="ow">in</span> <span class="n">cases</span><span class="p">:</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>        <span class="k">with</span> <span class="n">s</span><span class="o">.</span><span class="n">process_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="k">as</span> <span class="n">pool</span><span class="p">:</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>            <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">case</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">pool</span><span class="o">=</span><span class="n">pool</span><span class="p">)</span>
+</span></code></pre></div>
+<p>A closed pool cannot be reopened, and a run still using it returns with
+<a class="autorefs autorefs-internal" title="            ExitCode" href="../../reference/enums/#ropt.enums.ExitCode"><code>ExitCode.EXECUTOR_STOPPED</code></a> rather than raising —
+though on a thread pool the evaluations already running still finish first,
+since a thread cannot be interrupted; see
+<a href="#stopping-a-run">Stopping a run</a>. Starting a <em>new</em> run
+on it is refused before anything runs, with a
+<a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a> saying the pool is closed —
+which is what you get if a pool outlives the <code>with session()</code> block that
+created it.</p>
+</div>
+<h3 id="thread-pool">Evaluating on threads</h3>
+<p>A <a class="autorefs autorefs-internal" title="            thread_pool" href="../../reference/simple/#ropt.simple.Session.thread_pool"><code>thread_pool</code></a> runs the evaluations on
+background threads inside your own process. Nothing is copied, so any Python
+function works as the objective and it can freely use the data around it:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">pool</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">thread_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
+</span></code></pre></div>
+<p>Use it when each evaluation spends most of its time <strong>waiting</strong> — starting an
+external program, reading a file, calling a network service. While one waits,
+the others run.</p>
+<p>Threads share one Python interpreter, so arithmetic written in Python itself
+does not get faster on more threads. Array libraries are a different matter:
+<code>numpy</code> and its kin do their work outside Python and let the other threads run
+meanwhile. "My objective computes" is therefore not on its own a reason to reach
+past this pool — see <a href="#which-pool">Which pool should I use?</a>.</p>
+<h3 id="process-pool">Evaluating in worker processes</h3>
+<p>A <a class="autorefs autorefs-internal" title="            process_pool" href="../../reference/simple/#ropt.simple.Session.process_pool"><code>process_pool</code></a> runs the evaluations in a
+handful of separate processes, reused across the run. Each has its own
+interpreter, so this is where heavy Python computation actually gets faster:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">pool</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">process_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
+</span></code></pre></div>
+<p>This pool applies when the computation is <strong>Python code</strong>, or when each evaluation
+needs its own copy of something a library keeps globally. An objective that
+mostly runs an external program gains nothing here that a thread pool would not
+have given more cheaply.</p>
+<p>The objective and its data are <strong>copied</strong> to the workers, so they must be
+serializable. An objective defined at module level — or in the script you ran,
+which each worker re-imports — works as is; a lambda, a closure, or a
+function defined in a notebook cell needs the <code>cloudpickle</code> extra (see
+<a href="../../getting_started/installation/#optional-extras">Installation</a>). Results can
+only come <strong>back</strong> through the return value; see
+<a href="../handlers/#handlers-and-the-process-boundary">Handlers and the process boundary</a>.</p>
+<div class="admonition warning">
+<p class="admonition-title">This pool does not clean up programs your objective started</p>
+<p>When a run is stopped — by Ctrl-C, or by closing the pool — the worker
+processes are killed, but anything they had launched themselves is not: a
+simulator or solver started by your objective keeps running, unattached,
+after your program is gone. Nothing reports this. If your objective launches
+external programs, use a <code>local_pool</code> instead, which was built for exactly
+this.</p>
+</div>
+<h3 id="local-pool">Running each evaluation as a local job</h3>
+<p>A <a class="autorefs autorefs-internal" title="            local_pool" href="../../reference/simple/#ropt.simple.Session.local_pool"><code>local_pool</code></a> runs each evaluation as a
+separate process on this machine, with its output captured to a file. It needs
+no extras and no configuration, and it is the same shape as an <code>hpc_pool</code> minus
+the scheduler — so an objective that works on one works on the other:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.simple</span><span class="w"> </span><span class="kn">import</span> <span class="n">session</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">pool</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">local_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
+</span></code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>workers</code></td>
+<td>Maximum number of concurrent local jobs (default: 1).</td>
+</tr>
+<tr>
+<td><code>workdir</code></td>
+<td>Directory holding each evaluation's files. Defaults to a temporary directory the pool removes again, unless something is left in it to read.</td>
+</tr>
+<tr>
+<td><code>retries</code></td>
+<td>Extra polls to wait for a result (default: 0; a local job writes its result before it exits).</td>
+</tr>
+<tr>
+<td><code>bundle_size</code></td>
+<td>Evaluations bundled into one local process, <code>0</code> for the whole batch as one (default: 1). See <a href="#how-many-workers">How a batch is split across workers</a> above.</td>
+</tr>
+</tbody>
+</table>
+<p>Two things distinguish it from a <code>process_pool</code>, and both matter when an
+evaluation is a job rather than a function call:</p>
+<ul>
+<li><strong>Stopping reaches what the evaluation started.</strong> Each job runs in a process
+  group of its own, so cancelling one signals the simulator or solver it
+  launched as well. A <code>process_pool</code> kills only its own workers and orphans the
+  rest.</li>
+<li><strong>Output survives failure.</strong> Whatever the evaluation printed is captured, and
+  the last lines are attached to the error, which is often the only trace a job
+  that died before returning anything leaves behind.</li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Where the working directory goes</p>
+<p>With no <code>workdir</code>, the pool works in a temporary directory of its own and
+removes it when it closes, unless something in it is still readable. If an
+evaluation <strong>failed</strong>, its captured output is kept, so the
+directory is kept with it and its path is logged:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>WARNING  ropt.components.executors: Keeping the local working directory
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>         /tmp/ropt-local-8f3a1c: a work item failed.
+</span></code></pre></div>
+<p>A <code>workdir</code> you pass yourself is never removed, which is the way to choose
+the location rather than be told it:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">pool</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">local_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">workdir</span><span class="o">=</span><span class="s2">"/scratch/my-run"</span><span class="p">)</span>
+</span></code></pre></div>
+<p>Give each pool that runs at the same time a directory of its own; files are
+named after the evaluations, and the pool refuses to overwrite one that
+already exists.</p>
+</div>
+<p>This pool needs process groups and is therefore <strong>POSIX only</strong>: creating it on
+another platform raises an <a class="autorefs autorefs-internal" title="            ExecutionError" href="../../reference/exceptions/#ropt.exceptions.ExecutionError"><code>ExecutionError</code></a>
+rather than quietly giving a weaker guarantee.</p>
+<h4 id="process-or-local">Worker or job: <code>process_pool</code> or <code>local_pool</code>?</h4>
+<p>Both run your objective in a separate process, so "is it copied?" does not tell
+them apart. What differs is whether a process is a <em>worker</em> or a <em>job</em>:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><code>process_pool</code></th>
+<th><code>local_pool</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Processes</td>
+<td>a few, <strong>reused</strong> for many evaluations</td>
+<td>one <strong>fresh</strong> process per evaluation</td>
+</tr>
+<tr>
+<td>Start-up cost</td>
+<td>paid once, when the pool opens</td>
+<td>paid again on every evaluation</td>
+</tr>
+<tr>
+<td>Programs your objective starts</td>
+<td>keep running when the run stops</td>
+<td>killed along with the evaluation</td>
+</tr>
+<tr>
+<td>Output of a failed evaluation</td>
+<td>lost</td>
+<td>captured, and attached to the error</td>
+</tr>
+<tr>
+<td>Sending the objective</td>
+<td>your script is re-imported, so a function defined in it can be found by name</td>
+<td>a fresh command; needs an importable module or <code>ropt[cloudpickle]</code></td>
+</tr>
+<tr>
+<td>Platform</td>
+<td>anywhere</td>
+<td>POSIX only</td>
+</tr>
+</tbody>
+</table>
+<p>One question separates them: <strong>is an evaluation a function call, or a job?</strong> A call
+is too short to pay for a process each time, so reuse a few workers and take
+<code>process_pool</code>. A job runs a simulator, writes files, and lasts long enough that
+one process start is negligible — take <code>local_pool</code>, or an <code>hpc_pool</code> if it belongs
+on a cluster.</p>
+<div class="admonition tip">
+<p class="admonition-title">Heading for a cluster? Develop on a <code>local_pool</code></p>
+<p>A <code>local_pool</code> is an <code>hpc_pool</code> without the scheduler: both run each
+evaluation as a job, one fresh process at a time, and both capture its
+output and attach the tail to the error. An objective that runs on one runs
+on the other, so you can get the job itself right on your own machine —
+without a queue, the <code>ropt[hpc]</code> extra, or a cluster configuration — and
+switch when it works:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">pool</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">local_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>     <span class="c1"># develop and test here</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="n">pool</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">hpc_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>     <span class="c1"># then run here</span>
+</span></code></pre></div>
+<p>A <code>process_pool</code> is the wrong rehearsal: it reuses workers, keeps your
+objective in Python, and leaves the programs it starts running when the run
+stops — none of which is how a cluster job behaves.</p>
+</div>
+<h3 id="running-on-an-hpc-cluster">Running on an HPC cluster</h3>
+<p>An <a class="autorefs autorefs-internal" title="            hpc_pool" href="../../reference/simple/#ropt.simple.Session.hpc_pool"><code>hpc_pool</code></a> submits each evaluation as a job to
+an HPC queue through <a href="https://pysqa.readthedocs.io/"><code>pysqa</code></a>; it needs the
+<code>ropt[hpc]</code> extra. With no further arguments it uses the default cluster and
+queue from the <code>pysqa</code> configuration of your <code>ropt</code> installation:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.simple</span><span class="w"> </span><span class="kn">import</span> <span class="n">session</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">pool</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">hpc_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">10</span><span class="p">))</span>
+</span></code></pre></div>
+<p>The runnable script is
+<a href="https://github.com/TNO-ropt/ropt/blob/main/examples/simple/hpc.py">examples/simple/hpc.py</a>.
+Pass it <code>--local</code> and it runs the identical optimization on a <code>local_pool</code>,
+which is the rehearsal described above, so the example works with or without a
+cluster to hand.</p>
+<p>A job is nothing more than a submission script with your evaluation command in
+it, and there are <strong>two mutually exclusive ways</strong> to say what that script should
+be: a <code>pysqa</code> configuration, or a <code>template</code> you write yourself.</p>
+<h4 id="using-an-installed-configuration">Using an installed configuration</h4>
+<p>This is the usual case. The configuration already describes the clusters and
+their queues, so all you do is pick one and say how much of it you want:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="n">pool</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">hpc_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">queue</span><span class="o">=</span><span class="s2">"long"</span><span class="p">,</span> <span class="n">cores</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+</span></code></pre></div>
+<p><code>queue</code> names a queue <strong>defined in the configuration</strong>, which is not necessarily
+your scheduler's partition name — it selects a configured entry, and that
+entry's script determines which partition the job lands on. Ask your site which
+queues exist, or read them off the configuration.</p>
+<p>When the configuration defines several clusters, <code>cluster</code> picks one:</p>
+<ul>
+<li>Give <code>cluster</code> to select it directly; adding <code>queue</code> requires that queue to
+  exist on it.</li>
+<li>Give only <code>queue</code> and the cluster providing it is found automatically, which
+  needs exactly one cluster to provide it — no match, or several, is an error.</li>
+<li>Give neither and the configuration's own defaults apply.</li>
+</ul>
+<p><code>config_path</code> points at a configuration other than the installed one. See
+<a href="../../advanced/parallel/#hpcexecutor">HPCExecutor</a> for how such a directory is
+laid out and where the installed one lives.</p>
+<h4 id="asking-for-resources">Asking for resources</h4>
+<p><code>cores</code>, <code>memory_max</code> and <code>run_time_max</code> are passed to the submission script,
+and <code>submit_options</code> carries anything else that script declares:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="n">pool</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">hpc_pool</span><span class="p">(</span>
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>    <span class="n">workers</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>    <span class="n">queue</span><span class="o">=</span><span class="s2">"long"</span><span class="p">,</span>
+</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>    <span class="n">cores</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>    <span class="n">memory_max</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
+</span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>    <span class="n">run_time_max</span><span class="o">=</span><span class="mi">7200</span><span class="p">,</span>
+</span><span id="__span-12-7"><a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a>    <span class="n">submit_options</span><span class="o">=</span><span class="p">{</span><span class="s2">"account"</span><span class="p">:</span> <span class="s2">"my-project"</span><span class="p">},</span>
+</span><span id="__span-12-8"><a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a><span class="p">)</span>
+</span></code></pre></div>
+<p>For <code>account</code> to have any effect the script must reference it. A variable a
+script never mentions is ignored, and one the script mentions but nobody
+supplies renders as empty — so a misspelling on either side drops the directive
+silently rather than failing. Entries that are <code>None</code> are dropped, so omitting a
+key and passing <code>None</code> mean the same thing. A name the executor sets itself,
+such as <code>cores</code> or <code>queue</code>, is rejected rather than allowed to override it.</p>
+<p>With a configuration, resource requests are <strong>clamped</strong> to the selected queue's
+limits rather than rejected: asking for more cores than the queue allows quietly
+gets you the queue's maximum. <code>cores</code> is held to the queue's minimum and
+maximum, <code>run_time_max</code> to its maximum — and takes that maximum when you give no
+value at all — and <code>memory_max</code> to its maximum, but only when you pass a number.
+A memory string such as <code>"4G"</code> is passed to the submission script unchanged.</p>
+<h4 id="submitting-with-your-own-template">Submitting with your own template</h4>
+<p>A <code>template</code> is the script that gets run on the cluster, written by you
+instead of taken from a configuration. Since there is no configuration to say
+what kind of cluster this is, <code>scheduler</code> names the queueing system to
+submit to — that is what determines whether it runs <code>sbatch</code> or <code>bsub</code>. It defaults
+to <code>"slurm"</code>.</p>
+<p>Nothing else is resolved for you: <strong>the queue is not an argument here</strong>, it has
+to be written into the script, along with everything else the scheduler needs.
+For Slurm that looks like this — other systems use entirely different
+directives:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="n">TEMPLATE</span> <span class="o">=</span> <span class="s2">"""</span><span class="se">\</span>
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="s2">#!/bin/bash</span>
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="s2">#SBATCH --partition=long</span>
+</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="s2">#SBATCH --job-name={{job_name}}</span>
+</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="s2">#SBATCH --output={{output}}</span>
+</span><span id="__span-13-6"><a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a><span class="s2">#SBATCH --chdir={{working_directory}}</span>
+</span><span id="__span-13-7"><a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a><span class="s2">#SBATCH --ntasks={{cores}}</span>
+</span><span id="__span-13-8"><a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a><span class="s2">{</span><span class="si">%- i</span><span class="s2">f memory_max %}</span>
+</span><span id="__span-13-9"><a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a><span class="s2">#SBATCH --mem={{memory_max}}G</span>
+</span><span id="__span-13-10"><a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a><span class="s2">{</span><span class="si">%- e</span><span class="s2">ndif %}</span>
+</span><span id="__span-13-11"><a id="__codelineno-13-11" name="__codelineno-13-11" href="#__codelineno-13-11"></a>
+</span><span id="__span-13-12"><a id="__codelineno-13-12" name="__codelineno-13-12" href="#__codelineno-13-12"></a><span class="s2">{{command}}</span>
+</span><span id="__span-13-13"><a id="__codelineno-13-13" name="__codelineno-13-13" href="#__codelineno-13-13"></a><span class="s2">"""</span>
+</span><span id="__span-13-14"><a id="__codelineno-13-14" name="__codelineno-13-14" href="#__codelineno-13-14"></a>
+</span><span id="__span-13-15"><a id="__codelineno-13-15" name="__codelineno-13-15" href="#__codelineno-13-15"></a><span class="n">pool</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">hpc_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">template</span><span class="o">=</span><span class="n">TEMPLATE</span><span class="p">,</span> <span class="n">scheduler</span><span class="o">=</span><span class="s2">"slurm"</span><span class="p">,</span> <span class="n">cores</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+</span></code></pre></div>
+<p>The script is a <a href="https://jinja.palletsprojects.com/en/stable/templates/">Jinja</a>
+template, rendered by <code>pysqa</code> through the <code>jinja2</code> package. <code>{{name}}</code>
+inserts a value and <code>{% if name %}...{% endif %}</code> leaves a line out when none was
+given, which is how the memory directive above disappears unless <code>memory_max</code> is
+set. The values available are the arguments described above — <code>job_name</code>,
+<code>output</code>, <code>working_directory</code>, <code>cores</code>, <code>memory_max</code>, <code>run_time_max</code>, <code>command</code>
+— plus whatever you pass in <code>submit_options</code>.</p>
+<p>Two of them carry the run: <code>{{command}}</code> is your evaluation and the
+script does nothing without it, and <code>{{output}}</code> is the file ropt reads back to
+explain a failed job. A script that omits <code>--output={{output}}</code> still runs, but a
+job that dies takes the only explanation with it.</p>
+<p>Because a template submits without a configuration, it <strong>cannot be combined</strong>
+with <code>config_path</code>, <code>cluster</code> or <code>queue</code>; passing them together raises a
+<code>ValueError</code> when the pool is created.</p>
+<p><code>hpc_pool</code> accepts the following parameters:</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>workers</code></td>
+<td>Maximum number of concurrent cluster jobs (default: 1).</td>
+</tr>
+<tr>
+<td><code>cores</code></td>
+<td>Number of CPUs per job (default: 1).</td>
+</tr>
+<tr>
+<td><code>cluster</code></td>
+<td>Cluster name, when the <code>pysqa</code> config defines several.</td>
+</tr>
+<tr>
+<td><code>queue</code></td>
+<td>Name of a queue defined in the configuration.</td>
+</tr>
+<tr>
+<td><code>workdir</code></td>
+<td>Shared-filesystem working directory (defaults to the current directory).</td>
+</tr>
+<tr>
+<td><code>config_path</code></td>
+<td>The <code>pysqa</code> configuration directory.</td>
+</tr>
+<tr>
+<td><code>template</code></td>
+<td>A submission-script template, used instead of a configuration.</td>
+</tr>
+<tr>
+<td><code>scheduler</code></td>
+<td>The queueing system a <code>template</code> is written for; only meaningful with one.</td>
+</tr>
+<tr>
+<td><code>memory_max</code></td>
+<td>Memory per job.</td>
+</tr>
+<tr>
+<td><code>run_time_max</code></td>
+<td>Run time per job, typically in seconds.</td>
+</tr>
+<tr>
+<td><code>submit_options</code></td>
+<td>Extra variables for the submission script. <code>None</code> entries are dropped.</td>
+</tr>
+<tr>
+<td><code>retries</code></td>
+<td>Extra polls to wait for a result that is missing or unreadable (default: 30).</td>
+</tr>
+<tr>
+<td><code>bundle_size</code></td>
+<td>Evaluations bundled into one cluster job, <code>0</code> for the whole batch as one job (default: 1). See <a href="#how-many-workers">How a batch is split across workers</a> above.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="evaluating-in-process-on-purpose">Evaluating in-process, on purpose</h3>
+<p><a class="autorefs autorefs-internal" title="            ropt.simple.serial_pool" href="../../reference/simple/#ropt.simple.serial_pool"><code>serial_pool</code></a> is a pool with no workers: it carries
+only the batch-ID counter that the runs sharing it draw from, and their
+evaluations happen in-process on the calling thread. It needs no session, and
+needs no releasing.</p>
+<p>Use it to give several runs one continuous batch-ID sequence without running
+their evaluations in parallel, or to state in the code that a run is meant
+to evaluate in-process.</p>
+<h3 id="which-pool">Which pool should I use?</h3>
+<p><a href="../../getting_started/execution/">Running in Parallel</a> asks the question that
+rules choices <em>out</em>: whether your objective touches anything beyond its
+arguments and its return value. If it does, stay with threads or with no pool,
+because the others work on a copy. Once that is settled, the choice is about
+speed:</p>
+<table>
+<thead>
+<tr>
+<th>Pool</th>
+<th>Where evaluations run</th>
+<th>Data</th>
+<th>Speeds up heavy Python?</th>
+<th>Use when</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>none / <code>serial_pool</code></td>
+<td>the calling thread, one at a time</td>
+<td>shared</td>
+<td>no</td>
+<td>evaluations are fast</td>
+</tr>
+<tr>
+<td><code>thread_pool</code></td>
+<td>background threads, one process</td>
+<td>shared</td>
+<td>no — one interpreter</td>
+<td>each evaluation mostly <strong>waits</strong> (external tool, I/O), or spends its time in <code>numpy</code></td>
+</tr>
+<tr>
+<td><code>process_pool</code></td>
+<td>a few reused processes</td>
+<td>copied</td>
+<td>yes</td>
+<td>each evaluation is heavy <strong>Python computation</strong></td>
+</tr>
+<tr>
+<td><code>local_pool</code></td>
+<td>one process per evaluation</td>
+<td>copied</td>
+<td>yes</td>
+<td>each evaluation is a self-contained <strong>job</strong> on this machine</td>
+</tr>
+<tr>
+<td><code>hpc_pool</code></td>
+<td>jobs on a cluster</td>
+<td>copied</td>
+<td>yes</td>
+<td>each evaluation is a big <strong>cluster job</strong></td>
+</tr>
+</tbody>
+</table>
+<details class="tip">
+<summary>How to decide, without guessing</summary>
+<p>There is no reliable rule for whether threads will scale on a given
+objective. "I use <code>numpy</code>" says almost nothing: whether the GIL is released
+depends on the operation, the dtype and the array size, and a real objective
+is a mixture whose Python-level share is invisible to the person who wrote
+it.</p>
+<p>What makes the answer cheap is an asymmetry: <strong>threads are the cheap thing
+to try, processes are the expensive commitment.</strong> Trying a thread pool costs
+one argument, and its failure mode is <em>no speedup</em> — not breakage. So:</p>
+<ol>
+<li>Start with <code>thread_pool</code>. Time <code>workers=1</code> against <code>workers=4</code> on a
+   shortened run.</li>
+<li>If it scales, you are done, and you never needed to know what the GIL was
+   doing.</li>
+<li>If it does not, set <code>OMP_NUM_THREADS=1</code> (see below) and time it again.</li>
+<li>Only then pay for processes.</li>
+</ol>
+<p>Directional guidance is fine as orientation — waiting on an external program
+almost always scales, arithmetic written in Python never does, array-heavy
+work depends — but treat it as a place to start, and decide on the timings.</p>
+</details>
+<details class="tip">
+<summary>If more workers makes it <em>slower</em></summary>
+<p><code>numpy</code>, <code>scipy</code> and similar are already multi-threaded underneath, through
+a BLAS library that by default takes <strong>every core on the machine</strong>. Run four
+evaluations at once and you have four such libraries each doing that: the
+machine is oversubscribed several times over, the threads fight for cores,
+and everything slows down.</p>
+<p>The symptom is misleading, because it reads as "parallelism does
+not help here" and pushes people towards processes — where the identical
+problem is waiting one layer down.</p>
+<p>The fix is to give each evaluation one core's worth of library threads,
+before <code>numpy</code> is imported:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">OMP_NUM_THREADS</span><span class="o">=</span><span class="m">1</span>
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">OPENBLAS_NUM_THREADS</span><span class="o">=</span><span class="m">1</span>
+</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="nb">export</span><span class="w"> </span><span class="nv">MKL_NUM_THREADS</span><span class="o">=</span><span class="m">1</span>
+</span></code></pre></div>
+<p>Then let the pool provide the parallelism instead.</p>
+</details>
+<h3 id="pools-inside-an-evaluation">Pools inside an evaluation</h3>
+<p>An evaluation function may start a run of its own — that is how
+<a href="../nested/">Nested Optimization</a> works — and give it a pool, on two conditions.</p>
+<p>It must be a <strong>different</strong> pool. A nested run waits for its own evaluations to
+finish, so one handed the pool it is already running on would wait for the
+workers it is itself occupying — a deadlock as soon as they are all busy, which
+is the normal case, since a run fills its pool with one work item per
+realization. Rather than hang, the pool refuses work submitted by the evaluation
+itself with a <a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a>. A thread the
+evaluation starts is on its own: it is not recognized as a worker, so it can
+still deadlock on the pool. Give the inner run its own pool, or a
+<a class="autorefs autorefs-internal" title="            ropt.simple.serial_pool" href="../../reference/simple/#ropt.simple.serial_pool"><code>serial_pool</code></a>, which evaluates inline and can always
+be reused.</p>
+<p>The evaluation must stay <strong>in your process</strong>, so on a thread pool or a serial
+pool. On a process, local, or HPC pool the evaluation function is copied into a
+worker, and a pool cannot be copied with it: build the inner pool inside the
+worker, from a session opened there, or run the inner optimization without one.
+An evaluation function that carries a pool along anyway is refused when the work
+item is sent, rather than failing somewhere deep inside the run.</p>
+<h2 id="stopping-a-run">Stopping a run</h2>
+<p>Press Ctrl-C, or close the pool, and <code>ropt</code> stops dispatching new work at once.
+What happens to the evaluations already running depends on the pool, because
+what <em>can</em> be done to them differs:</p>
+<table>
+<thead>
+<tr>
+<th>Pool</th>
+<th>Evaluations already running</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>none / <code>serial_pool</code></td>
+<td>the current one finishes</td>
+</tr>
+<tr>
+<td><code>thread_pool</code></td>
+<td>they <strong>run to completion</strong> — a thread cannot be interrupted</td>
+</tr>
+<tr>
+<td><code>process_pool</code></td>
+<td>the worker processes are <strong>killed</strong>, but not what they launched</td>
+</tr>
+<tr>
+<td><code>local_pool</code></td>
+<td>each evaluation <strong>and everything it launched</strong> is killed</td>
+</tr>
+<tr>
+<td><code>hpc_pool</code></td>
+<td>the jobs are <strong>deleted from the queue</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Two consequences follow.</p>
+<p><strong>A thread pool cannot be hurried.</strong> Python provides no way to interrupt a
+running thread from outside, so a long evaluation on a <code>thread_pool</code> ends when
+it ends, and your program cannot exit before it does. <code>ropt</code> logs a warning
+naming how many evaluations it is waiting for, because the wait is otherwise
+indistinguishable from a hang. If an evaluation may run long and
+has to be interruptible, put it on one of the other pools.</p>
+<p><strong>Stopping is a request, not a guarantee.</strong> On the pools that kill,
+everything is signalled to end and not waited for. A program that ignores the
+request, or that is stuck inside the operating system, keeps running. The run
+exits promptly instead of waiting out the current batch, but processes it
+started may still be alive afterwards.</p>
+<div class="admonition tip">
+<p class="admonition-title">If Ctrl-C seems to do nothing at all</p>
+<p>Some third-party packages change a process-wide setting when imported that
+stops Ctrl-C from breaking into a program that is <em>waiting</em> — and it then
+affects your whole program, not just <code>ropt</code>. Importing <code>ropt.simple</code> is
+enough to trigger it. One line undoes it; see
+<a href="../../troubleshooting/keyboard_interrupt/">Keyboard Interrupts</a>.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Platforms</p>
+<p><code>local_pool</code> is <strong>POSIX only</strong> and refuses to be created elsewhere. The rest
+of <code>ropt</code> is not known to be broken on Windows, but it is not tested there.
+Free-threaded (no-GIL) builds of Python are untested and unsupported.</p>
+</div>
+<h2 id="many-optimizations-at-once">Many optimizations at once</h2>
+<p>To run several optimizations together, use
+<a class="autorefs autorefs-internal" title="            ropt.simple.optimize_many" href="../../reference/simple/#ropt.simple.optimize_many"><code>optimize_many</code></a>. Any of <code>config</code>, <code>x0</code>, or
+<code>objective</code> may be a single value (used for every run) or a list (one per run):</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.simple</span><span class="w"> </span><span class="kn">import</span> <span class="n">optimize_many</span><span class="p">,</span> <span class="n">session</span>
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>
+</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
+</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>    <span class="n">pool</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">thread_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>    <span class="n">results</span> <span class="o">=</span> <span class="n">optimize_many</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">start_points</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">pool</span><span class="o">=</span><span class="n">pool</span><span class="p">)</span>  <span class="c1"># one run per start</span>
+</span></code></pre></div>
+<div class="admonition tip">
+<p class="admonition-title">Give each run an ID</p>
+<p>Pass a per-run <code>metadata</code> list to tag every run with a user-defined
+identifier that travels with its results (and shows up in a
+<a href="../handlers/#dataframehandler"><code>DataFrameHandler</code></a>'s tables):</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"low"</span><span class="p">,</span> <span class="s2">"mid"</span><span class="p">,</span> <span class="s2">"high"</span><span class="p">]</span>
+</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="n">results</span> <span class="o">=</span> <span class="n">optimize_many</span><span class="p">(</span>
+</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>    <span class="n">config</span><span class="p">,</span> <span class="n">start_points</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">[{</span><span class="s2">"run_id"</span><span class="p">:</span> <span class="n">x</span><span class="p">}</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">labels</span><span class="p">]</span>
+</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="p">)</span>
+</span><span id="__span-16-5"><a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
+</span><span id="__span-16-6"><a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a>    <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">"run_id"</span><span class="p">])</span>
+</span></code></pre></div>
+<p>See <a href="../running/#attaching-metadata">Attaching metadata</a> for details.</p>
+</div>
+<p>There are two independent levels of concurrency here:</p>
+<ul>
+<li><strong>The optimizations</strong> always run concurrently, each on its own driver thread.
+  This is built into <code>optimize_many</code> and does not depend on the pool;
+  the <code>limit</code> argument caps how many run at the same time.</li>
+<li><strong>The function evaluations</strong> inside those runs all happen on the one pool you
+  pass, and the pool determines how they are parallelized. With
+  <code>thread_pool(workers=1)</code> the runs still progress together, but their
+  evaluations are executed one at a time. A larger pool — <code>thread_pool(workers=n)</code>,
+  <code>process_pool</code>, <code>local_pool</code>, or <code>hpc_pool</code> — runs several evaluations at
+  once.</li>
+</ul>
+<p>Sharing one pool is also what keeps the runs' batch IDs apart, since they draw
+from its single counter. It is one budget as well: <code>workers=10</code> means ten
+evaluations at a time across the whole batch of runs, not ten per run.</p>
+<p><a href="https://github.com/TNO-ropt/ropt/blob/main/examples/simple/optimize_many.py">examples/simple/optimize_many.py</a>
+runs one optimization per start vector, capping how many go at once and tagging
+each with its own metadata:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">active</span><span class="p">:</span>
+</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>    <span class="n">results</span> <span class="o">=</span> <span class="n">optimize_many</span><span class="p">(</span>
+</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>        <span class="n">CONFIG</span><span class="p">,</span>
+</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a>        <span class="n">STARTS</span><span class="p">,</span>
+</span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a>        <span class="n">rosenbrock</span><span class="p">,</span>
+</span><span id="__span-17-6"><a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a>        <span class="n">pool</span><span class="o">=</span><span class="n">active</span><span class="o">.</span><span class="n">thread_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">3</span><span class="p">),</span>
+</span><span id="__span-17-7"><a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a>        <span class="n">metadata</span><span class="o">=</span><span class="n">run_metadata</span><span class="p">,</span>
+</span><span id="__span-17-8"><a id="__codelineno-17-8" name="__codelineno-17-8" href="#__codelineno-17-8"></a>        <span class="n">limit</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+</span><span id="__span-17-9"><a id="__codelineno-17-9" name="__codelineno-17-9" href="#__codelineno-17-9"></a>    <span class="p">)</span>
+</span></code></pre></div>
+<p>The two callback arguments differ in the same way. <code>report=</code> is <strong>per run</strong>: one
+callback receives the results of every run, or pass a list with one callback per
+run. <code>handlers=</code>
+is <strong>shared</strong>: one list of groups that all runs feed together, which is why a
+plain handler is refused there — see <a href="../handlers/#sharing-a-handler-across-concurrent-runs">Sharing a handler across concurrent
+runs</a>.</p>
+<div class="admonition warning">
+<p class="admonition-title">One <code>report=</code> callback is called by every run at once</p>
+<p>A single callback is wired into each run separately, and each run calls it
+on its own thread. Nothing serializes those calls, so a callback that
+appends to a list, updates a counter, or writes a file needs a lock of its
+own. Give each run its own callback when they must stay apart, or collect
+the results in a <a href="../handlers/#sharing-a-handler-across-concurrent-runs">shared
+group</a>, where the
+dispatcher serializes them for you.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">A shared group makes the runs wait for each other</p>
+<p>That serialization is not free. A group processes events <strong>one at a time</strong>,
+in submission order, and the run that emitted one waits until every handler
+has finished with it. Never seeing two results at once is exactly what makes
+a handler safe to share — but it means a slow handler throttles the whole
+batch, since every run queues behind the others, once per result produced.</p>
+<p>So keep shared handlers cheap. If one must do slow work — writing a file,
+talking to a database — register it with
+<a href="../handlers/#running-a-handler-in-a-thread"><code>threaded</code></a>, which moves it off
+the session's event loop so the pools keep working meanwhile. That does
+<strong>not</strong> make handling concurrent: the events are still processed one at a
+time.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Without a pool the driver threads do the evaluating</p>
+<p><code>optimize_many</code> needs no session and no pool. Without one, the runs still
+execute concurrently, but each evaluates in-process on its own driver
+thread — so your evaluation function is called by several threads at once
+and must tolerate that. Give the call a pool, or a
+<a class="autorefs autorefs-internal" title="            ropt.simple.serial_pool" href="../../reference/simple/#ropt.simple.serial_pool"><code>serial_pool</code></a> if you want one shared batch-ID
+sequence, when it must not be.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Not every backend can take part</p>
+<p>An optimizer that needs a working directory of its own, writes to a file
+whose name is fixed, or keeps state inside its library between calls cannot
+run while anything else is running in the same process — another run of its
+own kind included. Each backend documents whether this applies to it.
+Select it as
+<a href="#external-backend"><code>external/...</code></a> and
+it gets a process of its own, where none of that is shared.</p>
+<p>Optimizer output capture is likewise for one run at a time. If more than
+one of these runs sets
+<a href="../../optimizer_setup/configuration_sections/#optimizer"><code>stdout</code> or <code>stderr</code></a>, the
+second to start raises <a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a>.
+Leave both unset here, and set <a href="../../optimizer_setup/configuration_sections/#backend"><code>verbose=False</code></a>
+unless you want the runs' reports interleaved on the terminal.</p>
+</div>
+<h3 id="failure-in-one-run">Failure in one run</h3>
+<p>The first run to raise propagates its exception immediately (fail-fast). Runs
+that have not started yet are skipped, but a run already in progress cannot be
+stopped from the outside: it is abandoned, and keeps going until it finishes on
+its own — so returning after a failure can still take as long as a full
+optimization. Closing the pool cuts that short: the abandoned run then stops at
+its next evaluation and returns rather than raising, usually with
+<a class="autorefs autorefs-internal" title="            ExitCode" href="../../reference/enums/#ropt.enums.ExitCode"><code>ExitCode.EXECUTOR_STOPPED</code></a>, though a run that ends its
+own optimizer loop first reports that reason instead. Either way its result is
+discarded.</p>
+<h2 id="external-backend">Running the optimizer in a separate process</h2>
+<p>Prefix the method with <code>external/</code> to run the optimization algorithm in a
+process of its own:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="s2">"backend"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"method"</span><span class="p">:</span> <span class="s2">"external/scipy/slsqp"</span><span class="p">}</span>
+</span></code></pre></div>
+<p><code>ropt</code> spawns a child process, creates the named backend there, and lets it
+drive the optimization. The function and gradient evaluations still happen in
+the original process: the child sends each set of variables back, the parent
+evaluates it as usual, and the values are passed to the child. An error raised
+in the child is re-raised in the parent.</p>
+<p>This is useful when a backend cannot safely share a process with the rest of
+your program — for example one that crashes the interpreter, leaks memory,
+keeps state between runs, or links against native libraries that clash with
+your other dependencies.</p>
+<p>It is also the answer for a backend that <strong>cannot run concurrently in-process</strong>.
+Some optimizers need a working directory of their own, write to a file whose
+name is fixed, or keep state inside the library that a second simultaneous run
+corrupts. What such a backend rules out is not merely a second run of its own
+kind: changing the working directory applies to the whole process, so it breaks
+another run's relative output path, and any file your evaluation function opens
+by relative name, just as surely. Each backend states in its own documentation
+whether this applies to it; where it does, <code>external/</code> is what lets it run
+alongside anything else, because the state it needs is then its own. This
+matters as soon as runs overlap — see <a href="#many-optimizations-at-once">Many optimizations at
+once</a>.</p>
+<p>Two details differ from the other backends:</p>
+<ul>
+<li>The method must name the delegate in full, as <code>external/plugin/method</code> or
+  <code>external/method</code>. The <code>external/</code> prefix is removed and the rest is resolved
+  like any other method string. <code>external</code> is never selected implicitly, so it
+  is used only when you ask for it by name.</li>
+<li>The problem is sent to the child process, so everything describing it must be
+  serializable. The built-in plugins are, and so is any plugin class defined in
+  a module that can be imported. Only if you pass a plugin instance of a class
+  defined inside a function or a notebook do you need the optional
+  <code>cloudpickle</code> extra (see
+  <a href="../../getting_started/installation/#optional-extras">Installation</a>). Without
+  it the two differ in <em>where</em> they fail: a class defined inside a function
+  cannot be sent at all, and is refused here with an
+  <a class="autorefs autorefs-internal" title="            ExecutionError" href="../../reference/exceptions/#ropt.exceptions.ExecutionError"><code>ExecutionError</code></a>; a class defined in a
+  notebook is sent by name, and the failure arrives from the child, which
+  reports the name it could not find. Your objective function is never
+  affected: it stays in this process.</li>
+</ul>
+<p>This has nothing to do with evaluating in parallel; for that see <a href="../../getting_started/execution/">Running in
+Parallel</a>.</p>
+<h2 id="offloading-your-own-work">Offloading your own work</h2>
+<p>You can hand <strong>your own</strong> functions to a pool with
+<a class="autorefs autorefs-internal" title="            ropt.simple.offload" href="../../reference/simple/#ropt.simple.offload"><code>offload</code></a>. It is useful when code you control — a custom
+step, a custom component, or a helper you call between optimizations — has an
+expensive, self-contained piece of work you want to run on a pool instead of
+inline.</p>
+<p>Pass a single callable to run one call and get its result back:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
+</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>
+</span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.simple</span><span class="w"> </span><span class="kn">import</span> <span class="n">offload</span><span class="p">,</span> <span class="n">session</span>
+</span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a>
+</span><span id="__span-19-5"><a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a><span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
+</span><span id="__span-19-6"><a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">offload</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="n">expensive</span><span class="p">,</span> <span class="n">data</span><span class="p">),</span> <span class="n">pool</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">process_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
+</span></code></pre></div>
+<p><code>offload</code> takes <strong>zero-argument</strong> callables — bind arguments with
+<code>functools.partial</code> (or a closure). Pass a <strong>sequence</strong> of callables to run them
+concurrently and get a tuple of results in order; they may be entirely different
+functions:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
+</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>    <span class="n">pool</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">process_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+</span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a>    <span class="n">first</span><span class="p">,</span> <span class="n">second</span> <span class="o">=</span> <span class="n">offload</span><span class="p">([</span><span class="n">partial</span><span class="p">(</span><span class="n">expensive</span><span class="p">,</span> <span class="n">x</span><span class="p">),</span> <span class="n">partial</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">y</span><span class="p">)],</span> <span class="n">pool</span><span class="o">=</span><span class="n">pool</span><span class="p">)</span>
+</span></code></pre></div>
+<p>As with the evaluation function on a process, local, or HPC pool, the callables
+and their arguments are <strong>copied to the workers</strong>, since they run in separate
+processes.</p>
+<div class="admonition warning">
+<p class="admonition-title">Offloaded work coordinates with nothing</p>
+<p>An offloaded callable runs wherever its pool puts it, and on a process,
+local, or HPC pool that is somewhere else. It may create handlers and pools
+of its own, but they are <em>its</em> handlers and <em>its</em> pools.</p>
+<ul>
+<li><strong>Results cannot be tracked across offloaded calls.</strong> A handler created
+  inside one sees only that call's results and cannot be brought back:
+  handlers refuse to cross a process boundary, so the return value is all
+  that comes back. Following several concurrent pieces of work in one place
+  is something <a href="#many-optimizations-at-once"><code>optimize_many</code></a> can do and
+  <code>offload</code> cannot.</li>
+<li><strong>Worker budgets multiply, with no way around it.</strong> A pool cannot be
+  carried into a worker process, so a callable that needs one opens its own.
+  Four callables that each open a ten-worker pool put <strong>forty</strong> workers on
+  the machine in four independent groups — and they do not pool their
+  effort: one with twenty pieces of work still runs ten at a time while
+  another group sits idle. The machine carries forty workers, and never
+  forty working on the same thing. Where evaluations stay in your process
+  this is avoidable by sharing one pool; offloaded onto a process, local, or
+  HPC pool it is not.</li>
+</ul>
+<p>So <code>offload</code> fits a piece of work that is genuinely self-contained and
+returns its answer as a return value. When several pieces must be
+coordinated — counted, collected, or held to one budget — drive them from
+your own process instead.</p>
+</div>
+<h3 id="without-a-pool">Without a pool</h3>
+<p><code>offload</code> with no pool — or with a <a class="autorefs autorefs-internal" title="            ropt.simple.serial_pool" href="../../reference/simple/#ropt.simple.serial_pool"><code>serial_pool</code></a> —
+runs the callables inline, on the calling thread. So code that may or may not
+have a pool to hand needs no guard and no fallback: pass along whatever it has,
+including <code>None</code>.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">transform</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">pool</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>    <span class="k">return</span> <span class="n">offload</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="n">expensive</span><span class="p">,</span> <span class="n">x</span><span class="p">),</span> <span class="n">pool</span><span class="o">=</span><span class="n">pool</span><span class="p">)</span>
+</span></code></pre></div>
+<div class="admonition note">
+<p class="admonition-title">An inline handler in a shared group cannot offload</p>
+<p>A handler in a <a href="../handlers/#sharing-a-handler-across-concurrent-runs">shared group</a>
+that runs inline is on the session's event loop; offloading to a pool on
+that same session would starve the very loop it is waiting on, so it raises
+a <a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a>. A
+<a href="../handlers/#running-a-handler-in-a-thread"><code>threaded</code></a> handler runs on a dispatcher
+worker instead and can offload, as can a local handler, which runs on the
+thread driving the run.</p>
+<p>Better still, do parallel work from your optimization code and leave
+handlers to handle results.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../logging/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Logging">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Logging
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../nested/" class="md-footer__link md-footer__link--next" aria-label="Next: Nested Optimization">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Nested Optimization
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.expand", "navigation.footer", "navigation.sections", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="../../javascripts/mathjax.js"></script>
+      
+        <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>
