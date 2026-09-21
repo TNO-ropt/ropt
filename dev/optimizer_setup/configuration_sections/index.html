@@ -3765,11 +3765,12 @@ redirection):</p>
   optimizer iterations.</p>
 </li>
 <li>
-<p><strong><code>max_functions</code></strong>: Sets a hard limit on the total <em>number</em> of individual
-  objective function evaluations performed across all batches. Since a single
-  batch can involve multiple function evaluations, this bounds the total
-  computational effort more closely than <code>max_batches</code>. Exceeding this limit might
-  cause the optimization to terminate mid-batch.</p>
+<p><strong><code>max_functions</code></strong>: Limits the total <em>number</em> of function evaluations
+  performed across all batches. A single batch can contain several function
+  evaluations, so this bounds the computational effort more directly than
+  <code>max_batches</code>. The limit is not exact: when it is reached, the optimization
+  stops only after the batch in progress is finalized, so the number of
+  completed function evaluations may exceed <code>max_functions</code>.</p>
 </li>
 <li>
 <p><strong><code>output_dir</code></strong> (default: <code>None</code>): An optional output directory where the

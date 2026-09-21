@@ -3562,7 +3562,7 @@ the full list of fields.</p>
 <p>Common access patterns:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">result</span><span class="o">.</span><span class="n">variables</span>                   <span class="c1"># variable vector evaluated</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">result</span><span class="o">.</span><span class="n">target_objective</span>            <span class="c1"># weighted scalar objective</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">result</span><span class="o">.</span><span class="n">functions</span><span class="o">.</span><span class="n">objectives</span>        <span class="c1"># per-objective values (after weighting)</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">result</span><span class="o">.</span><span class="n">functions</span><span class="o">.</span><span class="n">objectives</span>        <span class="c1"># per-objective values</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">result</span><span class="o">.</span><span class="n">functions</span><span class="o">.</span><span class="n">constraints</span>       <span class="c1"># per-constraint values</span>
 </span></code></pre></div>
 <p>If <code>functions</code> is <code>None</code>, the result represents a request that produced no
