@@ -11,6 +11,11 @@ The inner runs all feed one shared `DataFrameHandler`. They overlap, so a
 shared group is what makes that safe: the group serializes every run's results
 through a single dispatcher. Each inner run tags its results with the outer
 evaluation that started it, so every row in the frame can be traced back.
+
+The outer optimizer works on integer variables and revisits points it has
+already tried. The outer evaluation function keeps a memo of the objectives it
+has computed, so a repeat returns the stored value instead of running another
+inner optimization.
 """
 
 from functools import partial
@@ -97,18 +102,19 @@ def rosenbrock(
     return float(objective)
 
 
-def inner_optimization(
+def inner_optimization(  # ruff: ignore[too-many-arguments]
     variables: NDArray[np.float64],
     context: EvaluationFunctionContext,
     *,
     pool: WorkerPool,
     group: SharedHandlers,
     function: EvaluationFunction,
+    memo: dict[tuple[float, ...], float],
 ) -> float:
     """Evaluate one outer point by optimizing the inner variables at it.
 
-    Runs in a thread of the outer pool, so the inner pool and the shared group
-    are live objects here rather than copies.
+    Runs in a thread of the outer pool, so the inner pool, the shared group and
+    the memo are live objects here rather than copies.
 
     Args:
         variables: The outer variable vector to evaluate.
@@ -116,11 +122,16 @@ def inner_optimization(
         pool:      The pool the inner evaluations run on.
         group:     The shared handlers every inner run feeds.
         function:  The objective the inner optimization minimizes.
+        memo:      Objectives already computed, keyed by outer point.
 
     Returns:
         The best inner objective found at this outer point.
     """
     # --8<-- [start:inner]
+    key = (context.realization, *variables.tolist())
+    if key in memo:
+        return memo[key]
+
     result = optimize(
         INNER_CONFIG,
         np.where(MASK, INITIAL_VALUES, variables),
@@ -133,7 +144,8 @@ def inner_optimization(
     )
     assert result.results is not None
     assert result.results.target_objective is not None
-    return float(result.results.target_objective)
+    memo[key] = float(result.results.target_objective)
+    return memo[key]
     # --8<-- [end:inner]
 
 
@@ -159,6 +171,9 @@ def main() -> None:
     )
 
     # --8<-- [start:run]
+    # A plain dict reaches the outer evaluations because they run on threads, in
+    # this process; on a process pool each worker would get an empty copy.
+    memo: dict[tuple[float, ...], float] = {}
     with session() as active:
         inner_pool = active.process_pool(workers=2, bundle_size=0)
         outer_pool = active.thread_pool(workers=2)
@@ -171,6 +186,7 @@ def main() -> None:
                 pool=inner_pool,
                 group=group,
                 function=partial(rosenbrock, a=a, b=b),
+                memo=memo,
             ),
             pool=outer_pool,
         )

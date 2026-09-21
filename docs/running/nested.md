@@ -6,12 +6,13 @@ method handles well. **Nested optimization** solves them in two loops. An outer
 run varies the awkward variables, and every outer evaluation runs a complete
 inner optimization over the remaining ones, returning the best value it reached.
 
-!!! tip "This page also covers three things that are not nesting"
-    Nesting itself is a niche, but this page puts three things that are not
+!!! tip "This page also covers four things that are not nesting"
+    Nesting itself is a niche, but this page puts four things that are not
     into one program small enough to read end to end: choosing a pool per
     layer, and why one of them has to stay on threads; collecting results from
-    runs that overlap in time, through a shared group; and moving the expensive
-    layer to a cluster by changing a single line.
+    runs that overlap in time, through a shared group; reusing an evaluation
+    the optimizer has already made; and moving the expensive layer to a cluster
+    by changing a single line.
 
 Nothing in `ropt` is dedicated to this: the outer evaluation function
 calls [`optimize`][ropt.simple.optimize] itself. What needs care is the plumbing
@@ -85,7 +86,9 @@ objective it found:
 `np.where(MASK, INITIAL_VALUES, variables)` builds the inner start point: the
 inner variables begin where they always do, and the outer ones carry the values
 being tried. The `metadata` tags every inner result with the outer evaluation
-that caused it, which is what makes the collected results traceable.
+that caused it, which is what makes the collected results traceable. The `memo`
+lookup above it is covered in
+[Reusing an outer evaluation](#reusing-an-outer-evaluation).
 
 ## Two pools, not one
 
@@ -129,6 +132,34 @@ costs one transfer instead of five. See
 Handing the inner run the pool it is already running on would deadlock, and
 `ropt` refuses it rather than hanging — see
 [Pools inside an evaluation](parallel.md#pools-inside-an-evaluation) for why.
+
+## Reusing an outer evaluation
+
+The outer variables are integers and the outer method is population-based, so
+the optimizer proposes points it has already evaluated. Each repeat would run a
+complete inner optimization for a value that is already known. The two lines at
+the top of the evaluation function return the stored value instead. The memo is
+an ordinary dictionary, created beside the pools and passed to the function
+through `partial`.
+
+The key is exact. Integer variables arrive as whole-numbered doubles and are
+re-proposed unchanged, so a repeated vector is identical bit for bit. The
+realization index is part of the key because a memo keyed on the variables alone
+gives the wrong value for a problem with more than one realization.
+
+The dictionary is reachable only because the outer evaluations run on threads,
+in this process. On a `process_pool` or an `hpc_pool` the function is copied
+into a worker, which starts from an empty dictionary and discards it when it
+finishes, without raising. See
+[the rule to settle first](../getting_started/execution.md#the-rule-to-settle-first).
+
+Two outer evaluations run at the same time, so both can find the same key
+missing and both compute it. The stored value is the same either way, so the
+cost is one repeated evaluation. A lock would close that window and serialize
+the outer layer with it.
+
+A repeat starts no inner run, so the table described next holds rows for the
+outer evaluations that were computed, not for every outer evaluation.
 
 ## Collecting results from runs that overlap
 
