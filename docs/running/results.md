@@ -140,7 +140,7 @@ Common access patterns:
 ```python
 result.variables                   # variable vector evaluated
 result.target_objective            # weighted scalar objective
-result.functions.objectives        # per-objective values (after weighting)
+result.functions.objectives        # per-objective values
 result.functions.constraints       # per-constraint values
 ```
 

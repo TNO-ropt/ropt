@@ -453,11 +453,12 @@ redirection):
   number of batches does not necessarily correspond directly to the number of
   optimizer iterations.
 
-- **`max_functions`**: Sets a hard limit on the total *number* of individual
-  objective function evaluations performed across all batches. Since a single
-  batch can involve multiple function evaluations, this bounds the total
-  computational effort more closely than `max_batches`. Exceeding this limit might
-  cause the optimization to terminate mid-batch.
+- **`max_functions`**: Limits the total *number* of function evaluations
+  performed across all batches. A single batch can contain several function
+  evaluations, so this bounds the computational effort more directly than
+  `max_batches`. The limit is not exact: when it is reached, the optimization
+  stops only after the batch in progress is finalized, so the number of
+  completed function evaluations may exceed `max_functions`.
 
 - **`output_dir`** (default: `None`): An optional output directory where the
   optimizer can store files. When `None`, no output directory is used. A
