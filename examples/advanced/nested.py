@@ -20,14 +20,12 @@ from numpy.typing import NDArray
 
 from ropt.components.compute_steps import OptimizationStep
 from ropt.components.evaluators import (
-    CachedEvaluator,
     EvaluationFunctionContext,
     EvaluationFunctionResult,
     FunctionEvaluator,
 )
 from ropt.components.event_handlers import (
     CallbackHandler,
-    HistoryHandler,
     ResultsHandler,
 )
 from ropt.context import EnOptContext
@@ -119,10 +117,20 @@ def main() -> None:
     # ids keep counting across the whole run.
     inner_evaluator = FunctionEvaluator(function=partial(rosenbrock, a=a, b=b))
 
+    # The outer variables are integers and differential evolution re-proposes
+    # points it has already tried as identical doubles, so an exact key catches
+    # every repeat. The memo is reachable because these evaluations stay in this
+    # process; under a process executor each worker would get an empty copy.
+    memo: dict[tuple[float, ...], float] = {}
+
     def _optimize(
         variables: NDArray[np.float64],
-        context: EvaluationFunctionContext,  # ruff: ignore[unused-function-argument]
+        context: EvaluationFunctionContext,
     ) -> EvaluationFunctionResult:
+        key = (context.realization, *variables.tolist())
+        if key in memo:
+            return EvaluationFunctionResult(objectives=np.array(memo[key]))
+
         new_variables = np.where(MASK, INITIAL_VALUES, variables)
 
         step = OptimizationStep(evaluator=inner_evaluator)
@@ -143,22 +151,11 @@ def main() -> None:
 
         inner_result = result_handler["results"]
         assert inner_result is not None
-        assert inner_result.functions is not None
-        return EvaluationFunctionResult(
-            objectives=np.array(inner_result.target_objective)
-        )
+        assert inner_result.target_objective is not None
+        memo[key] = float(inner_result.target_objective)
+        return EvaluationFunctionResult(objectives=np.array(memo[key]))
 
-    # Outer evaluator: caches the (discrete) variable combinations seen so the
-    # differential evolution optimizer does not re-run an inner optimization
-    # for inputs it has already evaluated.
-    outer_evaluator = FunctionEvaluator(function=_optimize)
-    history = HistoryHandler()
-    cache = CachedEvaluator(
-        evaluator=outer_evaluator, hits_key="cached", sources={history}
-    )
-
-    outer_step = OptimizationStep(evaluator=cache)
-    outer_step.add_event_handler(history)
+    outer_step = OptimizationStep(evaluator=FunctionEvaluator(function=_optimize))
     outer_step.run(EnOptContext.model_validate(OUTER_CONFIG), INITIAL_VALUES)
 
     optimal_result = global_results["results"]

@@ -8,7 +8,6 @@
 ::: ropt.components.evaluators.BatchEvaluator
 ::: ropt.components.evaluators.FunctionEvaluator
 ::: ropt.components.evaluators.ParallelEvaluator
-::: ropt.components.evaluators.CachedEvaluator
 ::: ropt.components.evaluators.BatchIdCounter
 ::: ropt.components.evaluators.EvaluationFunctionCallback
 ::: ropt.components.evaluators.EvaluationFunctionContext

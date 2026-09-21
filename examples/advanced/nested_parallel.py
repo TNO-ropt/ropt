@@ -23,7 +23,6 @@ from numpy.typing import NDArray
 from ropt.components.compute_steps import OptimizationStep
 from ropt.components.evaluators import (
     BatchIdCounter,
-    CachedEvaluator,
     EvaluationFunctionContext,
     EvaluationFunctionResult,
     ParallelEvaluator,
@@ -32,7 +31,6 @@ from ropt.components.event_handlers import (
     CallbackHandler,
     EventDispatcher,
     EventForwardHandler,
-    HistoryHandler,
     ResultsHandler,
 )
 from ropt.components.executors import ProcessExecutor, ThreadExecutor
@@ -143,10 +141,20 @@ def main() -> None:
     # Shared counter keeps batch IDs unique across all concurrent inner runs.
     inner_batch_id_counter = BatchIdCounter()
 
+    # The outer variables are integers and differential evolution re-proposes
+    # points it has already tried as identical doubles, so an exact key catches
+    # every repeat. Two outer threads can miss the same key and both compute it,
+    # which costs one repeated evaluation and yields the same value.
+    memo: dict[tuple[float, ...], float] = {}
+
     def _optimize(
         variables: NDArray[np.float64],
-        context: EvaluationFunctionContext,  # ruff: ignore[unused-function-argument]
+        context: EvaluationFunctionContext,
     ) -> EvaluationFunctionResult:
+        key = (context.realization, *variables.tolist())
+        if key in memo:
+            return EvaluationFunctionResult(objectives=np.array(memo[key]))
+
         new_variables = np.where(MASK, INITIAL_VALUES, variables)
 
         # Create a fresh evaluator per call; share only the executor and counter.
@@ -176,23 +184,16 @@ def main() -> None:
 
         inner_result = result_handler["results"]
         assert inner_result is not None
-        assert inner_result.functions is not None
-        return EvaluationFunctionResult(
-            objectives=np.array(inner_result.target_objective)
-        )
+        assert inner_result.target_objective is not None
+        memo[key] = float(inner_result.target_objective)
+        return EvaluationFunctionResult(objectives=np.array(memo[key]))
 
     # Outer evaluator: thread pool so multiple inner optimizations are in
-    # flight at once. Cached so the discrete-variable combinations seen by the
-    # differential evolution optimizer are not re-evaluated.
+    # flight at once.
     outer_executor = ThreadExecutor(workers=2)
     outer_evaluator = ParallelEvaluator(function=_optimize, executor=outer_executor)
-    history = HistoryHandler()
-    cache = CachedEvaluator(
-        evaluator=outer_evaluator, hits_key="cached", sources={history}
-    )
 
-    outer_step = OptimizationStep(evaluator=cache)
-    outer_step.add_event_handler(history)
+    outer_step = OptimizationStep(evaluator=outer_evaluator)
 
     outer_context = EnOptContext.model_validate(OUTER_CONFIG)
 

@@ -11,12 +11,11 @@ code they wrap.
 
 | Evaluator                                                                      | Interface                                                                                                                     |
 | ------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------- |
-| [`BatchEvaluator`][ropt.components.evaluators.BatchEvaluator]                    | Batch: `f(variables_2d, context)` → `EvaluationBatchResult`.                                                                  |
-| [`FunctionEvaluator`][ropt.components.evaluators.FunctionEvaluator]              | Per-row: `f(variables_1d, context)` → `EvaluationFunctionResult`.                                                             |
-| [`CachedEvaluator`][ropt.components.evaluators.CachedEvaluator]                  | Wraps another evaluator, caching results by variable vector.                                                                  |
-| [`ParallelEvaluator`][ropt.components.evaluators.ParallelEvaluator]              | Parallel evaluation via an [`Executor`][ropt.components.executors.Executor] — see [Parallel Evaluation](parallel.md).           |
+| [`BatchEvaluator`][ropt.components.evaluators.BatchEvaluator]                  | Batch: `f(variables_2d, context)` → `EvaluationBatchResult`.                                                                  |
+| [`FunctionEvaluator`][ropt.components.evaluators.FunctionEvaluator]            | Per-row: `f(variables_1d, context)` → `EvaluationFunctionResult`.                                                             |
+| [`ParallelEvaluator`][ropt.components.evaluators.ParallelEvaluator]            | Parallel evaluation via an [`Executor`][ropt.components.executors.Executor] — see [Parallel Evaluation](parallel.md).         |
 
-The first three run synchronously in the calling thread;
+The first two run synchronously in the calling thread;
 [`ParallelEvaluator`][ropt.components.evaluators.ParallelEvaluator] dispatches
 work to an [`Executor`][ropt.components.executors.Executor] and is described in
 [Parallel Evaluation](parallel.md).
@@ -45,9 +44,7 @@ You write evaluation code for two of them.
 [`BatchEvaluator`][ropt.components.evaluators.BatchEvaluator] takes a callback
 that receives the full 2-D batch of variable vectors;
 [`FunctionEvaluator`][ropt.components.evaluators.FunctionEvaluator] wraps a
-simpler function called once per row. Both are covered below, followed by
-[`CachedEvaluator`][ropt.components.evaluators.CachedEvaluator], which wraps
-another evaluator to reuse previously computed results.
+simpler function called once per row. Both are covered below.
 
 ## Writing a batch callback
 
@@ -253,45 +250,6 @@ from ropt.components.evaluators import FunctionEvaluator
 
 evaluator = FunctionEvaluator(function=my_function)
 ```
-
-## Using `CachedEvaluator`
-
-[`CachedEvaluator`][ropt.components.evaluators.CachedEvaluator] wraps another
-evaluator with result caching. It retrieves previously computed function results
-from [`EventHandler`][ropt.components.event_handlers.EventHandler] instances
-specified as `sources` — typically a
-[`HistoryHandler`][ropt.components.event_handlers.HistoryHandler] or
-[`ResultsHandler`][ropt.components.event_handlers.ResultsHandler]. For each variable vector and realization,
-if a matching cached result is found, the cached objectives and constraints are
-reused without calling the wrapped evaluator. Only uncached evaluations are
-forwarded to the underlying evaluator.
-
-Cache matching works as follows: for each requested variable vector and
-realization, the evaluator searches through the `"results"` stored by its
-sources. A match is found when the variables are equal (within floating-point
-tolerance) and the realization matches. If realization names are configured,
-they are used for matching (allowing cache hits across different optimization
-runs with the same realization names). Otherwise, realization indices are used.
-
-If some but not all evaluations are found in cache, the cached ones are
-marked as inactive and only the missing evaluations are delegated to the
-wrapped evaluator. The final combined result contains both cached and newly
-computed values.
-
-Sources can be added dynamically with `add_sources()`.
-
-To record which evaluations were served from cache, pass a `hits_key` string
-at construction time. When set, the returned
-[`EvaluationBatchResult`][ropt.evaluation.EvaluationBatchResult] will contain
-a boolean NumPy array in its `metadata` dictionary under that key —
-`True` for evaluations that came from the cache, `False` for those that were
-freshly computed.
-
-The `eval_cached()` method is available for derived classes that need access to
-which evaluations were cache hits — it returns both the
-[`EvaluationBatchResult`][ropt.evaluation.EvaluationBatchResult] and a
-dictionary mapping evaluation indices to their cached
-[`FunctionResults`][ropt.results.FunctionResults].
 
 ## Using `ParallelEvaluator`
 

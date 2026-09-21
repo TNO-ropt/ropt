@@ -33,8 +33,7 @@ class MyEvaluator(Evaluator):
         return EvaluationBatchResult(objectives=..., batch_id=...)
 ```
 
-Wrapping evaluators — [`CachedEvaluator`][ropt.components.evaluators.CachedEvaluator]
-is the built-in example — call the inner evaluator's public `eval`, so the inner
+A wrapping evaluator calls the inner evaluator's public `eval`, so the inner
 guard applies independently.
 
 ## ComputeStep

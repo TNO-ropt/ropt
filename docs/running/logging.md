@@ -132,7 +132,7 @@ generally comes from the optimizer.
     | `ropt.components.compute_steps` | the start and finish of a run, and the configuration it started from |
     | `ropt.core` | per-batch realization counts, stopping conditions, optimizer callbacks, and reuse of cached results |
     | `ropt.components.executors` | executor start-up, job submission and cancellation, retained working directories, and the thread-pool drain warning |
-    | `ropt.components.evaluators` | work-item dispatch and cache statistics |
+    | `ropt.components.evaluators` | work-item dispatch |
     | `ropt.components.event_handlers` | each new best objective, and any handler that raised |
     | `ropt.backend.scipy`, `ropt.backend.external` | the method in use, and the external subprocess lifecycle |
     | `ropt.plugins` | plugin registration |
