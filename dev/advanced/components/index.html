@@ -3039,8 +3039,7 @@ rather than inside the ensemble code.</p>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_eval</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>        <span class="k">return</span> <span class="n">EvaluationBatchResult</span><span class="p">(</span><span class="n">objectives</span><span class="o">=...</span><span class="p">,</span> <span class="n">batch_id</span><span class="o">=...</span><span class="p">)</span>
 </span></code></pre></div>
-<p>Wrapping evaluators — <a class="autorefs autorefs-internal" title="            ropt.components.evaluators.CachedEvaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.CachedEvaluator"><code>CachedEvaluator</code></a>
-is the built-in example — call the inner evaluator's public <code>eval</code>, so the inner
+<p>A wrapping evaluator calls the inner evaluator's public <code>eval</code>, so the inner
 guard applies independently.</p>
 <h2 id="computestep">ComputeStep</h2>
 <p><code>_run</code> receives the <a class="autorefs autorefs-internal" title="            EnOptContext" href="../../reference/context/#ropt.context.EnOptContext"><code>EnOptContext</code></a> and the initial
