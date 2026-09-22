@@ -3446,11 +3446,14 @@ submission's results.</p>
 <td><code>batch_id_callback</code></td>
 <td>Callable returning the next batch ID each time it is called (default: an internal <a class="autorefs autorefs-internal" title="            ropt.components.evaluators.BatchIdCounter" href="../../reference/components_evaluators/#ropt.components.evaluators.BatchIdCounter"><code>BatchIdCounter</code></a>).</td>
 </tr>
+<tr>
+<td><code>bundle_size</code></td>
+<td>Evaluations sent to a worker together, <code>0</code> for a whole batch (default: 1).</td>
+</tr>
 </tbody>
 </table>
-<p>How many of those work items travel to a worker together is the executor's
-<code>bundle_size</code>, not the evaluator's business. See
-<a href="#bundling">Bundling</a>.</p>
+<p>How many of those work items travel to a worker together follows
+<code>bundle_size</code>. See <a href="#bundling">Bundling</a>.</p>
 <p>If the executor is not running when <code>eval()</code> is called, the evaluator raises an
 <a class="autorefs autorefs-internal" title="            ExecutorStopped" href="../../reference/exceptions/#ropt.exceptions.ExecutorStopped"><code>ExecutorStopped</code></a> exception.</p>
 <h2 id="executors">Executors</h2>
@@ -3504,17 +3507,17 @@ dispatcher or handler in the host process — return results as data instead.
 See <a href="../workflows/#event-dispatcher">Event handling is a single-process mechanism</a>.</p>
 </div>
 <h3 id="bundling">Bundling</h3>
-<p>Every executor except <code>ThreadExecutor</code> takes a <code>bundle_size</code>: how many of a
-submission's work items are sent to a worker together, to be run one after
+<p>A <a class="autorefs autorefs-internal" title="            ropt.components.executors.Submission" href="../../reference/components_executors/#ropt.components.executors.Submission"><code>Submission</code></a> carries a <code>bundle_size</code>:
+how many of its work items are sent to a worker together, to be run one after
 another there. The default of <code>1</code> sends each item on its own, spreading a
 submission as widely as the workers allow; a larger value amortizes the cost of
 a transfer when the items are cheap relative to it; <code>0</code> sends a whole submission
 at once. A bundle never spans submissions, so <code>0</code> is bounded by the submission.</p>
-<p>A <a class="autorefs autorefs-internal" title="            ropt.components.executors.Submission" href="../../reference/components_executors/#ropt.components.executors.Submission"><code>Submission</code></a> may override the
-executor's setting with a <code>bundle_size</code> of its own. <code>ThreadExecutor</code> takes no
-<code>bundle_size</code> and so bundles nothing unless a submission asks for it: there is
-no transfer to amortize, and a fixed bundle would keep a thread that finishes
-early from picking up more work.</p>
+<p>The submission is the only place the size is set. An executor takes no
+<code>bundle_size</code> of its own, and <a href="#parallelevaluator"><code>ParallelEvaluator</code></a> passes
+on the size it was given. <code>ThreadExecutor</code> ignores it: it has no transfer to
+amortize, and a fixed bundle would keep a thread that finishes early from
+picking up more work.</p>
 <p>Four implementations are provided:</p>
 <h3 id="threadexecutor">ThreadExecutor</h3>
 <p><a class="autorefs autorefs-internal" title="            ropt.components.executors.ThreadExecutor" href="../../reference/components_executors/#ropt.components.executors.ThreadExecutor"><code>ThreadExecutor</code></a> owns a
