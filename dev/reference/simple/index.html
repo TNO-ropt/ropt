@@ -2283,17 +2283,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.simple.WorkerPool.bundle_size" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        bundle_size
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ropt.simple.WorkerPool.close" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -4048,17 +4037,6 @@
     <span class="md-ellipsis">
       
         batch_ids
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.simple.WorkerPool.bundle_size" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        bundle_size
       
     </span>
   </a>
@@ -6108,18 +6086,16 @@ closed it cannot be reopened.</p>
 
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">thread_pool</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="o">*</span><span class="p">,</span> <span class="n">workers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">bundle_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WorkerPool</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">thread_pool</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">workers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WorkerPool</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
 
         <p>Create a pool that runs evaluations in worker threads.</p>
 <p>See <a href="../../running/running/">Running Optimizations</a> for a walkthrough.</p>
-<p><code>bundle_size</code> matters more on a
-<a class="autorefs autorefs-internal" title="            process_pool" href="#ropt.simple.Session.process_pool"><code>process_pool</code></a>, where a task is
-transferred between processes.</p>
+<p>Threads have no transfer to amortize, so evaluations are never bundled
+here; a <a class="autorefs autorefs-internal" title="            process_pool" href="#ropt.simple.Session.process_pool"><code>process_pool</code></a> takes a
+<code>bundle_size</code>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -6143,22 +6119,6 @@ transferred between processes.</p>
             <td>
               <div class="doc-md-description">
                 <p>The number of worker threads.</p>
-              </div>
-            </td>
-            <td>
-                  <code>1</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>bundle_size</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/functions.html#int">int</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Evaluations per task, <code>0</code> for the whole batch.</p>
               </div>
             </td>
             <td>
@@ -6228,7 +6188,7 @@ within one run after another, so <code>bundle_size</code> is a trade between
 spreading a batch and the cost of moving it. The default of 1 gives
 every evaluation its own task, spreading a batch as widely as the
 workers allow; a larger value groups that many per task; and <code>0</code> sends
-the whole batch as a single task, which suits a pool whose parallelism
+a whole batch as a single task, which suits a pool whose parallelism
 comes from the runs above it rather than from within a batch.</p>
 
 
@@ -6268,7 +6228,7 @@ comes from the runs above it rather than from within a batch.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Evaluations per task, <code>0</code> for the whole batch.</p>
+                <p>Evaluations per task, <code>0</code> for a whole batch.</p>
               </div>
             </td>
             <td>
@@ -6417,7 +6377,7 @@ exits.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Evaluations per task, <code>0</code> for the whole batch.</p>
+                <p>Evaluations per task, <code>0</code> for a whole batch.</p>
               </div>
             </td>
             <td>
@@ -6717,7 +6677,7 @@ configuration layout and Slurm examples.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Evaluations per task, <code>0</code> for the whole batch.</p>
+                <p>Evaluations per task, <code>0</code> for a whole batch.</p>
               </div>
             </td>
             <td>
@@ -7009,8 +6969,7 @@ or not they run in parallel.</p>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">__init__</span><span class="p">(</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">executor</span><span class="p">:</span> <span class="n">Executor</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">session</span><span class="p">:</span> <span class="n">_Session</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">bundle_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -7059,45 +7018,6 @@ or not they run in parallel.</p>
             </td>
             <td>
                   <code>None</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>bundle_size</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/functions.html#int">int</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Evaluations per worker task, <code>0</code> for the whole batch.</p>
-              </div>
-            </td>
-            <td>
-                  <code>1</code>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-<p><span class="doc-section-title">Raises:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/exceptions.html#ValueError">ValueError</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>If <code>bundle_size</code> is negative.</p>
-              </div>
             </td>
           </tr>
       </tbody>
@@ -7254,58 +7174,6 @@ or not they run in parallel.</p>
             <td>
               <div class="doc-md-description">
                 <p>The batch ID counter.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-    </div>
-
-</div>
-
-
-
-
-
-
-<div class="doc doc-object doc-attribute">
-
-
-
-<h3 id="ropt.simple.WorkerPool.bundle_size" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">bundle_size</span>
-
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-property"><code>property</code></small>
-  </span>
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">bundle_size</span><span class="p">:</span> <span class="nb">int</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>How many evaluations are sent to a worker as one task.</p>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/functions.html#int">int</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The number of evaluations per task, <code>0</code> meaning the whole batch.</p>
               </div>
             </td>
           </tr>

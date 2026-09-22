@@ -1747,6 +1747,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#bundling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bundling
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#threadexecutor" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3144,6 +3155,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#bundling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bundling
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#threadexecutor" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3394,14 +3416,15 @@ the executor's workers and other concurrent steps.</p>
 <p><a class="autorefs autorefs-internal" title="            ropt.components.evaluators.ParallelEvaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.ParallelEvaluator"><code>ParallelEvaluator</code></a> wraps a
 per-realization function — the same kind of callable used by
 <a class="autorefs autorefs-internal" title="            ropt.components.evaluators.FunctionEvaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.FunctionEvaluator"><code>FunctionEvaluator</code></a> — and submits
-the rows of the evaluation batch as <a class="autorefs autorefs-internal" title="            ropt.components.executors.WorkItem
+each active row of the evaluation batch as its own
+<a class="autorefs autorefs-internal" title="            ropt.components.executors.WorkItem
 
 
   
       dataclass
-  " href="../../reference/components_executors/#ropt.components.executors.WorkItem"><code>WorkItem</code></a>
-objects in one <a class="autorefs autorefs-internal" title="            ropt.components.executors.Submission" href="../../reference/components_executors/#ropt.components.executors.Submission"><code>Submission</code></a>. It then waits
-for the submission's results.</p>
+  " href="../../reference/components_executors/#ropt.components.executors.WorkItem"><code>WorkItem</code></a> in one
+<a class="autorefs autorefs-internal" title="            ropt.components.executors.Submission" href="../../reference/components_executors/#ropt.components.executors.Submission"><code>Submission</code></a>. It then waits for the
+submission's results.</p>
 <p>Constructor parameters:</p>
 <table>
 <thead>
@@ -3420,30 +3443,14 @@ for the submission's results.</p>
 <td>The <a class="autorefs autorefs-internal" title="            ropt.components.executors.Executor" href="../../reference/components_executors/#ropt.components.executors.Executor"><code>Executor</code></a> to dispatch work to.</td>
 </tr>
 <tr>
-<td><code>bundle_size</code></td>
-<td>Number of active evaluations to group into a single work item (default: <code>1</code>). Use an integer <code>&gt; 1</code> for a fixed maximum bundle size, or <code>0</code> to bundle all active evaluations of a batch into one work item.</td>
-</tr>
-<tr>
 <td><code>batch_id_callback</code></td>
 <td>Callable returning the next batch ID each time it is called (default: an internal <a class="autorefs autorefs-internal" title="            ropt.components.evaluators.BatchIdCounter" href="../../reference/components_evaluators/#ropt.components.evaluators.BatchIdCounter"><code>BatchIdCounter</code></a>).</td>
 </tr>
 </tbody>
 </table>
-<p>By default each row of the variable batch is submitted as its own task. The
-<code>bundle_size</code> parameter allows several active evaluations to be grouped into a
-single task that the worker executes sequentially. This applies when per-task
-overhead (thread/process startup, HPC job submission) dominates the cost of an
-individual evaluation, or when the total number of active evaluations in a batch
-is much larger than the number of available workers.</p>
-<p>The work items it submits carry no name, so the <code>HPCExecutor</code> identifies each
-with a generated UUID. Name them yourself by building the
-<a class="autorefs autorefs-internal" title="            ropt.components.executors.WorkItem
-
-
-  
-      dataclass
-  " href="../../reference/components_executors/#ropt.components.executors.WorkItem"><code>WorkItem</code></a> objects and submitting them to
-the executor directly.</p>
+<p>How many of those work items travel to a worker together is the executor's
+<code>bundle_size</code>, not the evaluator's business. See
+<a href="#bundling">Bundling</a>.</p>
 <p>If the executor is not running when <code>eval()</code> is called, the evaluator raises an
 <a class="autorefs autorefs-internal" title="            ExecutorStopped" href="../../reference/exceptions/#ropt.exceptions.ExecutorStopped"><code>ExecutorStopped</code></a> exception.</p>
 <h2 id="executors">Executors</h2>
@@ -3496,6 +3503,17 @@ event handlers stay in the worker process and cannot deliver events to a
 dispatcher or handler in the host process — return results as data instead.
 See <a href="../workflows/#event-dispatcher">Event handling is a single-process mechanism</a>.</p>
 </div>
+<h3 id="bundling">Bundling</h3>
+<p>Every executor except <code>ThreadExecutor</code> takes a <code>bundle_size</code>: how many of a
+submission's work items are sent to a worker together, to be run one after
+another there. The default of <code>1</code> sends each item on its own, spreading a
+submission as widely as the workers allow; a larger value amortizes the cost of
+a transfer when the items are cheap relative to it; <code>0</code> sends a whole submission
+at once. A bundle never spans submissions, so <code>0</code> is bounded by the submission.</p>
+<p>A <a class="autorefs autorefs-internal" title="            ropt.components.executors.Submission" href="../../reference/components_executors/#ropt.components.executors.Submission"><code>Submission</code></a> may override the
+executor's setting with a <code>bundle_size</code> of its own. <code>ThreadExecutor</code> bundles
+nothing either way: it has no transfer to amortize, and a fixed bundle would
+keep a thread that finishes early from picking up more work.</p>
 <p>Four implementations are provided:</p>
 <h3 id="threadexecutor">ThreadExecutor</h3>
 <p><a class="autorefs autorefs-internal" title="            ropt.components.executors.ThreadExecutor" href="../../reference/components_executors/#ropt.components.executors.ThreadExecutor"><code>ThreadExecutor</code></a> owns a

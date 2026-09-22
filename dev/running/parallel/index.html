@@ -3405,25 +3405,25 @@ what the work needs; the useful number is usually much smaller than the
 machine's core count.</p>
 <div class="admonition tip">
 <p class="admonition-title">How a batch is split across workers</p>
-<p>Each evaluation in a batch is transferred to a worker as its own task by
+<p>Each evaluation in a batch is transferred to a worker on its own by
 default, which spreads the batch as widely as the pool allows. Every
 transfer costs something, though, so when the evaluations are cheap the
-transfers can dominate. Set <code>bundle_size=</code> on the pool to group several
-evaluations into one task, or <code>bundle_size=0</code> to send the whole batch as a
-single task. The evaluations within a task run one after another, so <code>0</code>
+transfers can dominate. Set <code>bundle_size=</code> on the pool to send several
+evaluations to a worker together, or <code>bundle_size=0</code> to send a whole batch
+at once. The evaluations in one bundle run after each other, so <code>0</code>
 gives up parallelism inside the batch entirely: it is for a pool whose
 parallelism comes from the runs above it, as in
 <a href="../nested/#two-pools-not-one">Nested Optimization</a>.</p>
 <p><code>workers</code> and <code>bundle_size</code> are the two halves of matching work to capacity.
-<code>workers</code> sets how many tasks may be in flight; <code>bundle_size</code> sets how much
-work one task should carry. With a batch of 100 cheap evaluations and
-8 workers, the default sends 100 separate tasks and pays 100 transfer costs
-to keep 8 workers busy; <code>bundle_size=13</code> sends 8 and pays 8. Raise it when
-the evaluations are cheap relative to a transfer — above all on a
-<code>process_pool</code>, a <code>local_pool</code> or an <code>hpc_pool</code>, where a transfer means
-copying data and starting something. Leave it at <code>1</code> when they are
-expensive, or when they vary in cost and bundling would leave one worker
-holding all the slow ones.</p>
+<code>workers</code> sets how many bundles may be in flight; <code>bundle_size</code> sets how
+much work one of them carries. With a batch of 100 cheap evaluations and
+8 workers, the default sends 100 separate transfers to keep 8 workers busy;
+<code>bundle_size=13</code> sends 8. Raise it when the evaluations are cheap relative
+to a transfer. A <code>thread_pool</code> has no transfer to amortize and takes no
+<code>bundle_size</code>; <code>process_pool</code>, <code>local_pool</code> and <code>hpc_pool</code> do, since a
+transfer there means copying data and starting something. Leave it at <code>1</code>
+when the evaluations are expensive, or when they vary in cost and bundling
+would leave one worker holding all the slow ones.</p>
 </div>
 <p>You can keep several pools open at once and choose per run:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
