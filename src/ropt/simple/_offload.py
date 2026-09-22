@@ -75,8 +75,10 @@ def offload(
     closed, or one carried into a worker process. A call that the machinery
     could not run, for instance because its worker process was killed, raises an
     [`ExecutionError`][ropt.exceptions.ExecutionError]. Work offloaded from
-    inside an evaluation needs a *different* pool: the pool it is already
-    running on refuses it.
+    inside an evaluation needs a pool with workers of its own: the pool it is
+    already running on refuses it. A
+    [`serial_pool`][ropt.simple.serial_pool] runs the callables inline and has
+    no workers to occupy, so it can be reused.
 
     Args:
         work: A single zero-argument callable, or a sequence of them.

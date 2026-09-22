@@ -11,9 +11,12 @@ and ends the way it always has.
 
 Two checks are not here. Work submitted to the pool it is already running on is
 refused by the executor, at submit time, that being the only point nested runs
-and [`offload`][ropt.simple.offload] both pass through. A pool carried into a
-worker is refused earlier still: it cannot be serialized, so the submission that
-carried it fails before any worker sees it.
+and [`offload`][ropt.simple.offload] both pass through. A serial pool never
+reaches that point, having no executor, and needs no refusal either: it has no
+workers for a waiting caller to occupy, so a nested run on it evaluates inline
+like any other. A pool carried into a worker is refused earlier still: it cannot
+be serialized, so the submission that carried it fails before any worker sees
+it.
 """
 
 from __future__ import annotations

@@ -58,8 +58,10 @@ def evaluate(  # ruff: ignore[too-many-arguments]
     a worker process, where it cannot work at all.
 
     Without a `pool` the evaluations run in-process, on the calling thread. A
-    run started from inside an evaluation needs a *different* pool: the pool it
-    is already running on refuses the work. `handlers` mixes local
+    run started from inside an evaluation needs a pool with workers of its own:
+    the pool it is already running on refuses the work. A
+    [`serial_pool`][ropt.simple.serial_pool] evaluates inline and has no workers
+    to occupy, so it can be reused. `handlers` mixes local
     [`EventHandler`][ropt.components.event_handlers.EventHandler] objects with
     shared [`SharedHandlers`][ropt.simple.SharedHandlers] groups, as
     [`optimize`][ropt.simple.optimize] takes them.
@@ -128,8 +130,10 @@ def evaluate_many(  # ruff: ignore[too-many-arguments]
     a worker process, where it cannot work at all.
 
     Without a `pool` the evaluations run in-process, on the calling thread. A
-    run started from inside an evaluation needs a *different* pool: the pool it
-    is already running on refuses the work. `handlers` mixes local
+    run started from inside an evaluation needs a pool with workers of its own:
+    the pool it is already running on refuses the work. A
+    [`serial_pool`][ropt.simple.serial_pool] evaluates inline and has no workers
+    to occupy, so it can be reused. `handlers` mixes local
     [`EventHandler`][ropt.components.event_handlers.EventHandler] objects with
     shared [`SharedHandlers`][ropt.simple.SharedHandlers] groups, as
     [`optimize`][ropt.simple.optimize] takes them.

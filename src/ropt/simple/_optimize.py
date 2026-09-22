@@ -78,8 +78,10 @@ def optimize(  # ruff: ignore[too-many-arguments]
     a worker process, where it cannot work at all.
 
     Without a `pool` the evaluations run in-process, on the calling thread. A
-    run started from inside an evaluation needs a *different* pool: the pool it
-    is already running on refuses the work.
+    run started from inside an evaluation needs a pool with workers of its own:
+    the pool it is already running on refuses the work. A
+    [`serial_pool`][ropt.simple.serial_pool] evaluates inline and has no workers
+    to occupy, so it can be reused.
 
     `handlers` mixes two kinds. An
     [`EventHandler`][ropt.components.event_handlers.EventHandler] is local: it
@@ -194,8 +196,10 @@ def optimize_many(  # ruff: ignore[too-many-arguments]
     [`WorkflowError`][ropt.exceptions.WorkflowError], as is one carried into
     a worker process, where it cannot work at all.
 
-    A run started from inside an evaluation needs a *different* pool: the pool
-    it is already running on refuses the work. Returning `True` from a `report`
+    A run started from inside an evaluation needs a pool with workers of its
+    own: the pool it is already running on refuses the work. A
+    [`serial_pool`][ropt.simple.serial_pool] evaluates inline and has no workers
+    to occupy, so it can be reused. Returning `True` from a `report`
     callback stops that run early with `USER_ABORT`. `metadata` also reaches
     each run's `function` as `context.metadata`, which makes it a way to tag a
     run, for example with `{"run_id": i}`.
