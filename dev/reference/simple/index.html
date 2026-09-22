@@ -4703,8 +4703,10 @@ because its session ended — is refused here with a
 <a class="autorefs autorefs-internal" title="            WorkflowError" href="../exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a>, as is one carried into
 a worker process, where it cannot work at all.</p>
 <p>Without a <code>pool</code> the evaluations run in-process, on the calling thread. A
-run started from inside an evaluation needs a <em>different</em> pool: the pool it
-is already running on refuses the work.</p>
+run started from inside an evaluation needs a pool with workers of its own:
+the pool it is already running on refuses the work. A
+<a class="autorefs autorefs-internal" title="            ropt.simple.serial_pool" href="#ropt.simple.serial_pool"><code>serial_pool</code></a> evaluates inline and has no workers
+to occupy, so it can be reused.</p>
 <p><code>handlers</code> mixes two kinds. An
 <a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventHandler" href="../components_event_handlers/#ropt.components.event_handlers.EventHandler"><code>EventHandler</code></a> is local: it
 is claimed for the duration of this run, and may be reused by a later run to
@@ -4970,8 +4972,10 @@ run, or broadcast to all of them.</p>
 because its session ended — is refused here with a
 <a class="autorefs autorefs-internal" title="            WorkflowError" href="../exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a>, as is one carried into
 a worker process, where it cannot work at all.</p>
-<p>A run started from inside an evaluation needs a <em>different</em> pool: the pool
-it is already running on refuses the work. Returning <code>True</code> from a <code>report</code>
+<p>A run started from inside an evaluation needs a pool with workers of its
+own: the pool it is already running on refuses the work. A
+<a class="autorefs autorefs-internal" title="            ropt.simple.serial_pool" href="#ropt.simple.serial_pool"><code>serial_pool</code></a> evaluates inline and has no workers
+to occupy, so it can be reused. Returning <code>True</code> from a <code>report</code>
 callback stops that run early with <code>USER_ABORT</code>. <code>metadata</code> also reaches
 each run's <code>function</code> as <code>context.metadata</code>, which makes it a way to tag a
 run, for example with <code>{"run_id": i}</code>.</p>
@@ -5256,8 +5260,10 @@ because its session ended — is refused here with a
 <a class="autorefs autorefs-internal" title="            WorkflowError" href="../exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a>, as is one carried into
 a worker process, where it cannot work at all.</p>
 <p>Without a <code>pool</code> the evaluations run in-process, on the calling thread. A
-run started from inside an evaluation needs a <em>different</em> pool: the pool it
-is already running on refuses the work. <code>handlers</code> mixes local
+run started from inside an evaluation needs a pool with workers of its own:
+the pool it is already running on refuses the work. A
+<a class="autorefs autorefs-internal" title="            ropt.simple.serial_pool" href="#ropt.simple.serial_pool"><code>serial_pool</code></a> evaluates inline and has no workers
+to occupy, so it can be reused. <code>handlers</code> mixes local
 <a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventHandler" href="../components_event_handlers/#ropt.components.event_handlers.EventHandler"><code>EventHandler</code></a> objects with
 shared <a class="autorefs autorefs-internal" title="            ropt.simple.SharedHandlers" href="#ropt.simple.SharedHandlers"><code>SharedHandlers</code></a> groups, as
 <a class="autorefs autorefs-internal" title="            ropt.simple.optimize" href="#ropt.simple.optimize"><code>optimize</code></a> takes them.</p>
@@ -5509,8 +5515,10 @@ because its session ended — is refused here with a
 <a class="autorefs autorefs-internal" title="            WorkflowError" href="../exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a>, as is one carried into
 a worker process, where it cannot work at all.</p>
 <p>Without a <code>pool</code> the evaluations run in-process, on the calling thread. A
-run started from inside an evaluation needs a <em>different</em> pool: the pool it
-is already running on refuses the work. <code>handlers</code> mixes local
+run started from inside an evaluation needs a pool with workers of its own:
+the pool it is already running on refuses the work. A
+<a class="autorefs autorefs-internal" title="            ropt.simple.serial_pool" href="#ropt.simple.serial_pool"><code>serial_pool</code></a> evaluates inline and has no workers
+to occupy, so it can be reused. <code>handlers</code> mixes local
 <a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventHandler" href="../components_event_handlers/#ropt.components.event_handlers.EventHandler"><code>EventHandler</code></a> objects with
 shared <a class="autorefs autorefs-internal" title="            ropt.simple.SharedHandlers" href="#ropt.simple.SharedHandlers"><code>SharedHandlers</code></a> groups, as
 <a class="autorefs autorefs-internal" title="            ropt.simple.optimize" href="#ropt.simple.optimize"><code>optimize</code></a> takes them.</p>
@@ -7396,8 +7404,10 @@ wait on it; offloading from there raises a
 closed, or one carried into a worker process. A call that the machinery
 could not run, for instance because its worker process was killed, raises an
 <a class="autorefs autorefs-internal" title="            ExecutionError" href="../exceptions/#ropt.exceptions.ExecutionError"><code>ExecutionError</code></a>. Work offloaded from
-inside an evaluation needs a <em>different</em> pool: the pool it is already
-running on refuses it.</p>
+inside an evaluation needs a pool with workers of its own: the pool it is
+already running on refuses it. A
+<a class="autorefs autorefs-internal" title="            ropt.simple.serial_pool" href="#ropt.simple.serial_pool"><code>serial_pool</code></a> runs the callables inline and has
+no workers to occupy, so it can be reused.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
