@@ -163,19 +163,19 @@ async def test_hpc_cluster_cancelled_job_disappears_from_the_scheduler(
 async def test_hpc_cluster_concurrent_jobs_each_return_their_own_result(
     executor: Any,
 ) -> None:
-    expected = {f"item-{index}": index * 10 for index in range(1, _CONCURRENT_JOBS + 1)}
-    submission = Submission(
-        [
-            WorkItem(
-                function=eval,  # ruff: ignore[suspicious-eval-usage]
-                args=(_holding_job(value),),
-                name=name,
-            )
-            for name, value in expected.items()
-        ]
-    )
+    values = [index * 10 for index in range(1, _CONCURRENT_JOBS + 1)]
+    work_items = [
+        WorkItem(
+            function=eval,  # ruff: ignore[suspicious-eval-usage]
+            args=(_holding_job(value),),
+        )
+        for value in values
+    ]
+    # Keyed by identity, so a result reaching the wrong work item is caught.
+    expected = {id(item): value for item, value in zip(work_items, values, strict=True)}
+    submission = Submission(work_items)
     hpc = executor(workers=_CONCURRENT_JOBS)
-    collected: dict[str | None, Any] = {}
+    collected: dict[int, Any] = {}
     async with asyncio.TaskGroup() as tg:
         await hpc.start(tg)
         hpc.submit(submission)
@@ -183,7 +183,7 @@ async def test_hpc_cluster_concurrent_jobs_each_return_their_own_result(
             asyncio.to_thread(_peak_live_jobs, hpc),
             asyncio.to_thread(
                 submission.collect,
-                lambda item: collected.update({item.name: item.result}),
+                lambda item: collected.update({id(item): item.result}),
             ),
         )
         hpc.cancel()

@@ -44,14 +44,12 @@ class WorkItem:
         args:     The arguments to pass to the function.
         kwargs:   The keyword arguments to pass to the function.
         result:   What the function returned, or why it could not be run.
-        name:     Optional unique name of the work item.
     """
 
     function: Callable[..., Any]
     args: tuple[Any, ...] = field(default_factory=tuple)
     kwargs: dict[str, Any] = field(default_factory=dict)
     result: Any = None
-    name: str | None = None
 
 
 @dataclass(frozen=True)

@@ -182,10 +182,10 @@ class HPCExecutor(JobExecutorBase):
                 queue_type=_DEFAULT_SCHEDULER if scheduler is None else scheduler
             )
 
-    def _start_job(self, item_id: str | UUID, command: list[str]) -> int:
+    def _start_job(self, item_id: UUID, command: list[str]) -> int:
         return int(
             self._queue_adapter.submit_job(
-                job_name=item_id,
+                job_name=str(item_id),
                 output=f"{item_id}.txt",
                 working_directory=str(self._workdir),
                 command=" ".join(command),

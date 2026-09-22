@@ -19,6 +19,7 @@ from concurrent.futures.process import BrokenProcessPool
 from functools import partial
 from multiprocessing.connection import Client, Listener
 from typing import TYPE_CHECKING, Any, cast
+from uuid import uuid4
 
 import numpy as np
 import pytest
@@ -790,7 +791,7 @@ async def test_hpc_failed_work_keeps_job_output(
             return set()
 
     _mock_scheduler(monkeypatch, _CrashingJob(tmp_path))
-    submission = Submission([WorkItem(function=_function, args=(0,), name="item")])
+    submission = Submission([WorkItem(function=_function, args=(0,))])
     executor = HPCExecutor(
         workdir=tmp_path, workers=1, interval=0, retries=2, template=""
     )
@@ -801,8 +802,8 @@ async def test_hpc_failed_work_keeps_job_output(
         executor.cancel()
     assert isinstance(collected[0], ExecutorFailure)
     assert "No module named 'ropt'" in str(collected[0])
-    assert (tmp_path / "item.txt").exists()
-    assert not (tmp_path / "item.in").exists()
+    assert await asyncio.to_thread(lambda: list(tmp_path.glob("*.txt")))
+    assert not await asyncio.to_thread(lambda: list(tmp_path.glob("*.in")))
 
 
 @pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
@@ -814,7 +815,12 @@ async def test_hpc_failure_names_the_output_file_it_could_not_quote(
     # may never have redirected it. Saying nothing would leave the one place
     # worth looking unnamed.
     class _SilentJob(MockedHPCAdapter):
+        def __init__(self, path: Path) -> None:
+            super().__init__(path)
+            self.submitted = ""
+
         def submit_job(self, job_name: str, command: str, **kwargs: Any) -> int:  # ruff: ignore[unused-method-argument]
+            self.submitted = job_name
             self._job_id += 1
             self._jobs[self._job_id] = job_name
             if captured:
@@ -824,8 +830,9 @@ async def test_hpc_failure_names_the_output_file_it_could_not_quote(
         def live_job_ids(self) -> set[int]:  # ruff: ignore[no-self-use]
             return set()
 
-    _mock_scheduler(monkeypatch, _SilentJob(tmp_path))
-    submission = Submission([WorkItem(function=_function, args=(0,), name="item")])
+    adapter = _SilentJob(tmp_path)
+    _mock_scheduler(monkeypatch, adapter)
+    submission = Submission([WorkItem(function=_function, args=(0,))])
     executor = HPCExecutor(
         workdir=tmp_path, workers=1, interval=0, retries=0, template=""
     )
@@ -835,7 +842,7 @@ async def test_hpc_failure_names_the_output_file_it_could_not_quote(
         collected = await asyncio.to_thread(_collect, submission)
         executor.cancel()
     assert isinstance(collected[0], ExecutorFailure)
-    assert str(tmp_path / "item.txt") in str(collected[0])
+    assert str(tmp_path / f"{adapter.submitted}.txt") in str(collected[0])
 
 
 @pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
@@ -885,7 +892,7 @@ async def test_stopping_hpc_executor_cancels_jobs(
 
     adapter = _StuckAdapter(tmp_path)
     _mock_scheduler(monkeypatch, adapter)
-    submission = Submission([WorkItem(function=_function, args=(0,), name="job1")])
+    submission = Submission([WorkItem(function=_function, args=(0,))])
     executor = HPCExecutor(workdir=tmp_path, workers=1, interval=0, template="")
     async with asyncio.TaskGroup() as tg:
         await executor.start(tg)
@@ -894,7 +901,7 @@ async def test_stopping_hpc_executor_cancels_jobs(
         executor.cancel()
     assert await asyncio.to_thread(cancelled.wait, 5)
     assert adapter.deleted == [1]
-    assert not await asyncio.to_thread(lambda: list(tmp_path.glob("job1.*")))
+    assert not await asyncio.to_thread(lambda: list(tmp_path.iterdir()))
 
 
 @pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
@@ -914,7 +921,7 @@ async def test_hpc_job_submitted_during_stop_is_cancelled(
 
     adapter = _SlowAdapter(tmp_path)
     _mock_scheduler(monkeypatch, adapter)
-    submission = Submission([WorkItem(function=_function, args=(0,), name="job1")])
+    submission = Submission([WorkItem(function=_function, args=(0,))])
     executor = HPCExecutor(workdir=tmp_path, workers=1, interval=0, template="")
     async with asyncio.TaskGroup() as tg:
         await executor.start(tg)
@@ -929,7 +936,7 @@ async def test_hpc_job_submitted_during_stop_is_cancelled(
     assert pool is not None
     await asyncio.to_thread(pool.shutdown, wait=True)
     assert adapter.deleted == [1]
-    assert not await asyncio.to_thread(lambda: list(tmp_path.glob("job1.*")))
+    assert not await asyncio.to_thread(lambda: list(tmp_path.iterdir()))
 
 
 @pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
@@ -965,7 +972,7 @@ async def test_hpc_poll_loop_honours_interval_when_busy(
     executor = HPCExecutor(workdir=tmp_path, workers=1, interval=3600, template="")
     work_item = WorkItem(function=_function, args=(0,))
     submission = Submission([work_item])
-    executor._items["busy"] = (submission, work_item)  # ruff: ignore[private-member-access]
+    executor._items[uuid4()] = (submission, work_item)  # ruff: ignore[private-member-access]
     executor._work_queue.put_nowait((submission, work_item))  # ruff: ignore[private-member-access]
 
     busy = asyncio.create_task(executor._wait_for_work())  # ruff: ignore[private-member-access]
@@ -1004,28 +1011,40 @@ async def test_hpc_executor_refuses_to_overwrite_existing_work_item_files(
 ) -> None:
     _mock_scheduler(monkeypatch, MockedHPCAdapter(tmp_path))
     executor = HPCExecutor(workdir=tmp_path, workers=1, interval=0, template="")
-    (tmp_path / "job1.out").touch()  # a stale file, e.g. from another executor
-    work_item = WorkItem(function=_function, args=(0,), name="job1")
+    item_id = uuid4()
+    (tmp_path / f"{item_id}.out").touch()  # a stale file, e.g. another executor's
+    work_item = WorkItem(function=_function, args=(0,))
     await asyncio.sleep(0)  # this module runs tests on the event loop
     with pytest.raises(ExecutionError, match="already exist"):
-        executor._submit("job1", work_item)  # ruff: ignore[private-member-access]
+        executor._submit(item_id, work_item)  # ruff: ignore[private-member-access]
 
 
 @pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
 async def test_hpc_failing_submission_fails_own_work(
     tmp_path: Path, monkeypatch: Any
 ) -> None:
-    _mock_scheduler(monkeypatch, MockedHPCAdapter(tmp_path))
-    (tmp_path / "job1.out").touch()  # a stale file blocks submission of job1
-    blocked = Submission([WorkItem(function=_function, args=(0,), name="job1")])
+    class _RejectsFirst(MockedHPCAdapter):
+        def __init__(self, path: Path) -> None:
+            super().__init__(path)
+            self.rejected = False
+
+        def submit_job(self, job_name: str, command: str, **kwargs: Any) -> int:
+            if not self.rejected:
+                self.rejected = True
+                msg = "sbatch: error: Batch job submission failed"
+                raise RuntimeError(msg)
+            return super().submit_job(job_name, command, **kwargs)
+
+    _mock_scheduler(monkeypatch, _RejectsFirst(tmp_path))
+    blocked = Submission([WorkItem(function=_function, args=(0,))])
     executor = HPCExecutor(workdir=tmp_path, workers=1, interval=0, template="")
     async with asyncio.TaskGroup() as tg:
         await executor.start(tg)
         executor.submit(blocked)
-        with pytest.raises(ExecutionError, match="already exist"):
+        with pytest.raises(RuntimeError, match="submission failed"):
             await asyncio.to_thread(_collect, blocked)
         assert executor._running.is_set()  # ruff: ignore[private-member-access]
-        accepted = Submission([WorkItem(function=_function, args=(1,), name="job2")])
+        accepted = Submission([WorkItem(function=_function, args=(1,))])
         executor.submit(accepted)
         assert await asyncio.to_thread(_collect, accepted) == [2]
         executor.cancel()
@@ -1043,7 +1062,7 @@ async def test_rejected_hpc_submission_leaves_no_input_file(
             raise RuntimeError(msg)
 
     _mock_scheduler(monkeypatch, _RejectingScheduler(tmp_path))
-    submission = Submission([WorkItem(function=_function, args=(0,), name="job1")])
+    submission = Submission([WorkItem(function=_function, args=(0,))])
     executor = HPCExecutor(workdir=tmp_path, workers=1, interval=0, template="")
     async with asyncio.TaskGroup() as tg:
         await executor.start(tg)
@@ -1051,26 +1070,7 @@ async def test_rejected_hpc_submission_leaves_no_input_file(
         with pytest.raises(RuntimeError, match="submission failed"):
             await asyncio.to_thread(_collect, submission)
         executor.cancel()
-    assert not await asyncio.to_thread(lambda: list(tmp_path.glob("job1.*")))
-
-
-@pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
-async def test_hpc_duplicate_name_fails_own_submission(
-    tmp_path: Path, monkeypatch: Any
-) -> None:
-    # A name clash must abort the offending submission rather than tear down
-    # the session, and must not leave its caller waiting.
-    _mock_scheduler(monkeypatch, MockedHPCAdapter(tmp_path))
-    submission = Submission(
-        [WorkItem(function=_function, args=(idx,), name="same") for idx in range(2)]
-    )
-    executor = HPCExecutor(workdir=tmp_path, workers=2, interval=0, template="")
-    async with asyncio.TaskGroup() as tg:
-        await executor.start(tg)
-        executor.submit(submission)
-        with pytest.raises(Exception, match="already in use"):
-            await asyncio.to_thread(_collect, submission)
-        executor.cancel()
+    assert not await asyncio.to_thread(lambda: list(tmp_path.iterdir()))
 
 
 async def test_worker_records_the_worker_traceback_as_a_note() -> None:
@@ -1231,9 +1231,7 @@ async def test_hpc_unserializable_work_item_fails_work(
     # Serializing happens before the job exists, so this failure belongs to the
     # work item, and it says what to install rather than what broke inside.
     _mock_scheduler(monkeypatch, MockedHPCAdapter(tmp_path))
-    submission = Submission(
-        [WorkItem(function=_function, args=(threading.Lock(),), name="job1")]
-    )
+    submission = Submission([WorkItem(function=_function, args=(threading.Lock(),))])
     executor = HPCExecutor(workdir=tmp_path, workers=1, interval=0, template="")
     async with asyncio.TaskGroup() as tg:
         await executor.start(tg)
@@ -2278,7 +2276,7 @@ async def test_hpc_submit_options_reach_the_submission(
         run_time_max=600,
         submit_options={"account": "proj", "reservation": None},
     )
-    submission = Submission([WorkItem(function=_function, args=(1,), name="item")])
+    submission = Submission([WorkItem(function=_function, args=(1,))])
     async with asyncio.TaskGroup() as tg:
         await executor.start(tg)
         executor.submit(submission)
@@ -2317,10 +2315,7 @@ async def test_no_hpc_jobs_for_ended_submission(
 
     _mock_scheduler(monkeypatch, _NamingAdapter(tmp_path))
     submission = Submission(
-        [
-            WorkItem(function=_function, args=(idx,), name=f"item{idx}")
-            for idx in range(6)
-        ]
+        [WorkItem(function=_function, args=(idx,)) for idx in range(6)]
     )
     executor = HPCExecutor(workdir=tmp_path, workers=1, interval=0, template="")
     async with asyncio.TaskGroup() as tg:
@@ -2328,12 +2323,12 @@ async def test_no_hpc_jobs_for_ended_submission(
         executor.submit(submission)
         with pytest.raises(ValueError, match="caller gave up"):
             await asyncio.to_thread(submission.collect, _give_up)
-        sentinel = Submission([WorkItem(function=_function, args=(9,), name="last")])
+        sentinel = Submission([WorkItem(function=_function, args=(9,))])
         executor.submit(sentinel)
         assert await asyncio.to_thread(_collect, sentinel) == [10]
         executor.cancel()
-    assert "last" in _NamingAdapter.names
-    assert "item5" not in _NamingAdapter.names
+    # Seven jobs would mean the abandoned submission was run out in full.
+    assert len(_NamingAdapter.names) < 7
 
 
 async def test_starting_running_executor_leaves_it_untouched() -> None:

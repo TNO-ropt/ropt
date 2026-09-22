@@ -358,10 +358,10 @@ The `workdir` holds each work item's serialized `.in`/`.out` files (written at
 absolute paths) and its captured stdout. It is also passed to `pysqa` as the
 job's `working_directory`, which the standard scheduler templates turn into a
 `chdir` directive (e.g. `#SBATCH --chdir=...`) — but whether a job actually runs
-there depends on the submission template, so do not rely on it. Because work item
-filenames derive from work item names, the executor **refuses to overwrite**
-pre-existing files; give each concurrently-running executor its own
-`workdir`.
+there depends on the submission template, so do not rely on it. The files are
+named after a generated id, so executors sharing a `workdir` do not collide on
+them; a file already under that name is a leftover, and the executor
+**refuses to overwrite** it.
 
 #### Configuring the scheduler
 

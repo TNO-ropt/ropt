@@ -37,7 +37,7 @@ from uuid import uuid4
 
 from ropt._logging import get_logger
 from ropt._serialize import CANNOT_SERIALIZE, dump, load
-from ropt.exceptions import ExecutionError, WorkflowError
+from ropt.exceptions import ExecutionError
 
 from .base import ExecutorBase, ExecutorFailure, Submission, WorkItem
 
@@ -113,9 +113,9 @@ class JobExecutorBase(ExecutorBase):
         self._worker_task: asyncio.Task[None] | None = None
         self._pool: ThreadPoolExecutor | None = None
 
-        self._items: dict[str | UUID, tuple[Submission, WorkItem]] = {}
-        self._jobs: dict[str | UUID, int] = {}
-        self._retries: dict[str | UUID, int] = {}
+        self._items: dict[UUID, tuple[Submission, WorkItem]] = {}
+        self._jobs: dict[UUID, int] = {}
+        self._retries: dict[UUID, int] = {}
         # The started jobs are reached from the poll thread and from cleanup on
         # the loop thread; `_jobs_closed` closes the door between them, so a job
         # cannot be started after cleanup has passed it by.
@@ -129,7 +129,7 @@ class JobExecutorBase(ExecutorBase):
         self._output_kept = False
 
     @abstractmethod
-    def _start_job(self, item_id: str | UUID, command: list[str]) -> int:
+    def _start_job(self, item_id: UUID, command: list[str]) -> int:
         # On the poll thread. The job's output belongs in `<item_id>.txt` in the
         # working directory: the only record of a job that died before writing a
         # result. Returns an id that `_live_job_ids` and `_cancel_job` accept.
@@ -203,10 +203,10 @@ class JobExecutorBase(ExecutorBase):
         super()._accept(submission)
         self._work_arrived.set()
 
-    def _take_work_items(self) -> list[tuple[str | UUID, WorkItem]]:
+    def _take_work_items(self) -> list[tuple[UUID, WorkItem]]:
         # Takes no more than there is room for: `_items` holds the jobs that are
         # out, so `workers` caps how many run at once.
-        pending: list[tuple[str | UUID, WorkItem]] = []
+        pending: list[tuple[UUID, WorkItem]] = []
         while len(self._items) < self._workers:
             try:
                 submission, work_item = self._work_queue.get_nowait()
@@ -216,25 +216,13 @@ class JobExecutorBase(ExecutorBase):
                 # Its caller has already left, so this would be a job whose
                 # result nobody reads.
                 continue
-            try:
-                item_id = self._register(submission, work_item)
-            except WorkflowError as exc:
-                self._fail(submission, exc)
-                continue
+            # The id is the stem of the files this job reads and writes.
+            item_id = uuid4()
+            self._items[item_id] = (submission, work_item)
             pending.append((item_id, work_item))
         return pending
 
-    def _register(self, submission: Submission, work_item: WorkItem) -> str | UUID:
-        # The ID is the file name the job reads and writes, so a caller-given
-        # name is refused if it is already in flight, rather than overwritten.
-        item_id = work_item.name or uuid4()
-        if item_id in self._items:
-            msg = f"Work item ID '{item_id}' is already in use; names must be unique."
-            raise WorkflowError(msg)
-        self._items[item_id] = (submission, work_item)
-        return item_id
-
-    def _deliver_results(self, results: dict[str | UUID, Any]) -> None:
+    def _deliver_results(self, results: dict[UUID, Any]) -> None:
         for item_id, result in results.items():
             entry = self._items.pop(item_id, None)
             if entry is None:
@@ -266,7 +254,7 @@ class JobExecutorBase(ExecutorBase):
         for item_id, job_id in jobs.items():
             self._delete_job(item_id, job_id)
 
-    def _delete_job(self, item_id: str | UUID, job_id: int) -> None:
+    def _delete_job(self, item_id: UUID, job_id: int) -> None:
         try:
             self._cancel_job(job_id)
         except Exception as exc:  # ruff: ignore[blind-except]
@@ -285,12 +273,10 @@ class JobExecutorBase(ExecutorBase):
         if self._remove_files:
             self._cleanup_files(item_id)
 
-    def _run_work_items(
-        self, pending: list[tuple[str | UUID, WorkItem]]
-    ) -> dict[str | UUID, Any]:
+    def _run_work_items(self, pending: list[tuple[UUID, WorkItem]]) -> dict[UUID, Any]:
         # Runs on the poll thread: start what was taken, then ask the backend
         # about everything that is out.
-        results: dict[str | UUID, Any] = {}
+        results: dict[UUID, Any] = {}
         for item_id, work_item in pending:
             try:
                 if not self._submit(item_id, work_item):
@@ -300,7 +286,7 @@ class JobExecutorBase(ExecutorBase):
                 results[item_id] = exc
         return results | self._poll()
 
-    def _submit(self, item_id: str | UUID, work_item: WorkItem) -> bool:
+    def _submit(self, item_id: UUID, work_item: WorkItem) -> bool:
         with self._jobs_lock:
             if self._jobs_closed:
                 return False
@@ -309,10 +295,7 @@ class JobExecutorBase(ExecutorBase):
             for suffix in (".in", ".out", ".txt")
         )
         if existing:
-            msg = (
-                f"Work item files for '{item_id}' already exist in {self._workdir}; "
-                "give each executor its own working directory."
-            )
+            msg = f"Work item files for '{item_id}' already exist in {self._workdir}."
             raise ExecutionError(msg)
         input_file = self._workdir / f"{item_id}.in"
         output_file = self._workdir / f"{item_id}.out"
@@ -347,7 +330,7 @@ class JobExecutorBase(ExecutorBase):
         return True
 
     def _write_input(
-        self, item_id: str | UUID, input_file: Path, work_item: WorkItem
+        self, item_id: UUID, input_file: Path, work_item: WorkItem
     ) -> None:
         # Written to a temporary file and renamed, so the job can never observe
         # a half-written input: on a shared filesystem the rename is what makes
@@ -370,8 +353,8 @@ class JobExecutorBase(ExecutorBase):
             tmp_path.unlink(missing_ok=True)
             raise
 
-    def _poll(self) -> dict[str | UUID, Any]:
-        results: dict[str | UUID, Any] = {}
+    def _poll(self) -> dict[UUID, Any]:
+        results: dict[UUID, Any] = {}
         try:
             jobs = self._live_job_ids()
         except Exception as exc:  # ruff: ignore[blind-except]
@@ -396,7 +379,7 @@ class JobExecutorBase(ExecutorBase):
                 )
         return results
 
-    def _read_result(self, item_id: str | UUID) -> Any:  # ruff: ignore[any-type]
+    def _read_result(self, item_id: UUID) -> Any:  # ruff: ignore[any-type]
         output_file = self._workdir / f"{item_id}.out"
         try:
             with output_file.open("rb") as fp:
@@ -439,7 +422,7 @@ class JobExecutorBase(ExecutorBase):
         self._drop_job(item_id)
         return result
 
-    def _retry_or_fail(self, item_id: str | UUID, msg: str, reason: str) -> Any:  # ruff: ignore[any-type]
+    def _retry_or_fail(self, item_id: UUID, msg: str, reason: str) -> Any:  # ruff: ignore[any-type]
         # A shared filesystem may take a while to show a finished job's result,
         # so the same bounded budget covers "not there yet" and "not whole yet".
         retry_count = self._retries.get(item_id, 0) + 1
@@ -448,9 +431,7 @@ class JobExecutorBase(ExecutorBase):
             return _PENDING
         return self._fail_item(item_id, msg, reason)
 
-    def _fail_item(
-        self, item_id: str | UUID, msg: str, reason: object
-    ) -> ExecutorFailure:
+    def _fail_item(self, item_id: UUID, msg: str, reason: object) -> ExecutorFailure:
         # Give up on this work item: its retry budget is either spent or beside
         # the point, and its job is no longer something to wait for.
         self._retries.pop(item_id, None)
@@ -459,7 +440,7 @@ class JobExecutorBase(ExecutorBase):
         _logger.warning("%s work item %s failed: %s", self._kind, item_id, reason)
         return ExecutorFailure(msg + self._job_output(item_id))
 
-    def _job_output(self, item_id: str | UUID) -> str:
+    def _job_output(self, item_id: UUID) -> str:
         # A job that died before writing a result left its only trace here, so
         # the tail travels with the failure and the file itself is kept. A
         # shared filesystem may not show the content yet, and a submission
@@ -476,12 +457,12 @@ class JobExecutorBase(ExecutorBase):
         body = "\n".join(tail)
         return f"; the job wrote to {output_file}:\n{body}"
 
-    def _handle_query_failure(self, exc: BaseException) -> dict[str | UUID, Any]:
+    def _handle_query_failure(self, exc: BaseException) -> dict[UUID, Any]:
         # Only a run of failures is fatal where a backend can have a bad moment:
         # giving up at the first would end runs it is still working on. Once the
         # run is long enough, every job that is out fails, because nothing can
         # be said about a job that cannot be asked after.
-        results: dict[str | UUID, Any] = {}
+        results: dict[UUID, Any] = {}
         self._query_failures += 1
         _logger.warning(
             "Querying the %s failed (%d/%d): %s",
@@ -509,11 +490,11 @@ class JobExecutorBase(ExecutorBase):
             self._query_failures = 0
         return results
 
-    def _drop_job(self, item_id: str | UUID) -> None:
+    def _drop_job(self, item_id: UUID) -> None:
         with self._jobs_lock:
             self._jobs.pop(item_id, None)
 
-    def _cleanup_files(self, item_id: str | UUID, *, keep_output: bool = False) -> None:
+    def _cleanup_files(self, item_id: UUID, *, keep_output: bool = False) -> None:
         suffixes = (".in", ".out") if keep_output else (".in", ".out", ".txt")
         for suffix in suffixes:
             path = self._workdir / f"{item_id}{suffix}"

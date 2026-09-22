@@ -179,7 +179,7 @@ class LocalJobExecutor(JobExecutorBase):
         self._teardown_thread.start()
         await super().start(task_group)
 
-    def _start_job(self, item_id: str | UUID, command: list[str]) -> int:
+    def _start_job(self, item_id: UUID, command: list[str]) -> int:
         output_file = self._workdir / f"{item_id}.txt"
         with output_file.open("wb") as fp:
             process = subprocess.Popen(  # ruff: ignore[subprocess-without-shell-equals-true]
