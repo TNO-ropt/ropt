@@ -3511,9 +3511,10 @@ submission as widely as the workers allow; a larger value amortizes the cost of
 a transfer when the items are cheap relative to it; <code>0</code> sends a whole submission
 at once. A bundle never spans submissions, so <code>0</code> is bounded by the submission.</p>
 <p>A <a class="autorefs autorefs-internal" title="            ropt.components.executors.Submission" href="../../reference/components_executors/#ropt.components.executors.Submission"><code>Submission</code></a> may override the
-executor's setting with a <code>bundle_size</code> of its own. <code>ThreadExecutor</code> bundles
-nothing either way: it has no transfer to amortize, and a fixed bundle would
-keep a thread that finishes early from picking up more work.</p>
+executor's setting with a <code>bundle_size</code> of its own. <code>ThreadExecutor</code> takes no
+<code>bundle_size</code> and so bundles nothing unless a submission asks for it: there is
+no transfer to amortize, and a fixed bundle would keep a thread that finishes
+early from picking up more work.</p>
 <p>Four implementations are provided:</p>
 <h3 id="threadexecutor">ThreadExecutor</h3>
 <p><a class="autorefs autorefs-internal" title="            ropt.components.executors.ThreadExecutor" href="../../reference/components_executors/#ropt.components.executors.ThreadExecutor"><code>ThreadExecutor</code></a> owns a
