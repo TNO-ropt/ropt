@@ -115,11 +115,14 @@ def _dispatchable(pool: WorkerPool | None) -> Executor | None:
 
 
 def _dispatch(executor: Executor, functions: list[Callable[[], Any]]) -> list[Any]:
+    # A sequence of offloaded callables is documented to run concurrently, so
+    # they must not be bundled onto one worker.
     submission = Submission(
         [
             _IndexedWorkItem(function=function, index=index)
             for index, function in enumerate(functions)
-        ]
+        ],
+        bundle_size=1,
     )
     output: list[Any] = [None] * len(functions)
     executor.submit(submission)

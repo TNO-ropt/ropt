@@ -6,14 +6,14 @@ import asyncio
 import multiprocessing
 from concurrent.futures import ProcessPoolExecutor
 from concurrent.futures.process import BrokenProcessPool
-from typing import Any
+from typing import Any, cast
 
 from ropt._logging import get_logger
 from ropt._serialize import CANNOT_DESERIALIZE, CANNOT_SERIALIZE, dumps, loads
 from ropt.exceptions import ExecutionError
 
 from ._picklable import picklable_exception
-from .base import ExecutorBase, ExecutorFailure, WorkItem
+from .base import ExecutorBase, ExecutorFailure, WorkItem, _calls, _run_bundle
 
 _logger = get_logger(__name__)
 
@@ -99,22 +99,24 @@ class ProcessExecutor(ExecutorBase):
 
     async def _run_worker(self, executor: ProcessPoolExecutor) -> None:
         while True:
-            submission, work_item = await self._work_queue.get()
+            submission, bundle = await self._work_queue.get()
             if submission.is_finished:
                 continue
             try:
-                result = await _run_work_item(work_item, executor)
-                self._deliver(submission, work_item, result)
+                results = await _run_bundle_in_pool(bundle, executor)
+                for work_item, result in zip(bundle, results, strict=True):
+                    self._deliver(submission, work_item, result)
             except BrokenProcessPool:
                 if self._running.is_set():
                     _logger.warning("Worker process pool broken; work item result lost")
                 else:
                     _logger.debug("Work item dropped: the executor was stopped")
-                self._deliver(
-                    submission,
-                    work_item,
-                    ExecutorFailure("Background process was killed"),
-                )
+                for work_item in bundle:
+                    self._deliver(
+                        submission,
+                        work_item,
+                        ExecutorFailure("Background process was killed"),
+                    )
             except asyncio.CancelledError:
                 self._abort(submission)
                 raise
@@ -156,10 +158,12 @@ def _terminate_workers(executor: ProcessPoolExecutor) -> None:
             continue
 
 
-async def _run_work_item(work_item: WorkItem, executor: ProcessPoolExecutor) -> Any:  # ruff: ignore[any-type]
+async def _run_bundle_in_pool(
+    bundle: list[WorkItem], executor: ProcessPoolExecutor
+) -> list[Any]:
     loop = asyncio.get_running_loop()
     try:
-        payload = dumps((work_item.function, work_item.args, work_item.kwargs))
+        payload = dumps((_run_bundle, (_calls(bundle),), {}))
     except Exception as exc:
         msg = (
             f"The work item could not be sent to a worker process: {CANNOT_SERIALIZE}."
@@ -169,7 +173,7 @@ async def _run_work_item(work_item: WorkItem, executor: ProcessPoolExecutor) -> 
     value = loads(blob)
     if not ok:
         raise value
-    return value
+    return cast("list[Any]", value)
 
 
 def _run_payload(payload: bytes) -> tuple[bool, bytes]:

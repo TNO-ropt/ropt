@@ -43,6 +43,7 @@ def evaluate(  # ruff: ignore[too-many-arguments]
     pool: WorkerPool | None = None,
     handlers: Sequence[EventHandler | SharedHandlers] | None = None,
     report: ReportCallback | None = None,
+    bundle_size: int = 1,
     metadata: dict[str, Any] | None = None,
 ) -> FunctionResults:
     """Evaluate a single variable vector without optimizing.
@@ -70,13 +71,14 @@ def evaluate(  # ruff: ignore[too-many-arguments]
     reaches `function` as `context.metadata`.
 
     Args:
-        config:    The optimization configuration.
-        variables: The variable vector to evaluate.
-        function:  The per-realization evaluation function.
-        pool:      The pool to evaluate on, from a session factory.
-        handlers:  Optional local handlers and shared groups.
-        report:    Optional callback invoked with each evaluation's results.
-        metadata:  Optional dictionary attached to the emitted results.
+        config:      The optimization configuration.
+        variables:   The variable vector to evaluate.
+        function:    The per-realization evaluation function.
+        pool:        The pool to evaluate on, from a session factory.
+        handlers:    Optional local handlers and shared groups.
+        report:      Optional callback invoked with each evaluation's results.
+        bundle_size: Evaluations per worker task, `0` for a whole batch.
+        metadata:    Optional dictionary attached to the emitted results.
 
     Returns:
         The [`FunctionResults`][ropt.results.FunctionResults] for the vector.
@@ -97,6 +99,7 @@ def evaluate(  # ruff: ignore[too-many-arguments]
         function,
         handlers=handlers,
         report=report,
+        bundle_size=bundle_size,
         metadata=metadata,
     )
     return results[0]
@@ -110,6 +113,7 @@ def evaluate_many(  # ruff: ignore[too-many-arguments]
     pool: WorkerPool | None = None,
     handlers: Sequence[EventHandler | SharedHandlers] | None = None,
     report: ReportCallback | None = None,
+    bundle_size: int = 1,
     metadata: dict[str, Any] | None = None,
 ) -> tuple[FunctionResults, ...]:
     """Evaluate a batch of variable vectors without optimizing.
@@ -137,13 +141,14 @@ def evaluate_many(  # ruff: ignore[too-many-arguments]
     reaches `function` as `context.metadata`.
 
     Args:
-        config:    The optimization configuration.
-        variables: The variable vectors to evaluate, one per row.
-        function:  The per-realization evaluation function.
-        pool:      The pool to evaluate on, from a session factory.
-        handlers:  Optional local handlers and shared groups.
-        report:    Optional callback invoked with each evaluation's results.
-        metadata:  Optional dictionary attached to every emitted result.
+        config:      The optimization configuration.
+        variables:   The variable vectors to evaluate, one per row.
+        function:    The per-realization evaluation function.
+        pool:        The pool to evaluate on, from a session factory.
+        handlers:    Optional local handlers and shared groups.
+        report:      Optional callback invoked with each evaluation's results.
+        bundle_size: Evaluations per worker task, `0` for a whole batch.
+        metadata:    Optional dictionary attached to every emitted result.
 
     Returns:
         One [`FunctionResults`][ropt.results.FunctionResults] per input vector.
@@ -167,6 +172,7 @@ def evaluate_many(  # ruff: ignore[too-many-arguments]
         function,
         handlers=handlers,
         report=report,
+        bundle_size=bundle_size,
         metadata=metadata,
     )
     return tuple(results)
@@ -180,11 +186,12 @@ def _run_evaluation(  # ruff: ignore[too-many-arguments]
     *,
     handlers: Sequence[EventHandler | SharedHandlers] | None,
     report: ReportCallback | None,
+    bundle_size: int,
     metadata: dict[str, Any] | None,
 ) -> tuple[FunctionResults, ...]:
     context = EnOptContext.model_validate(config)
     evaluator = make_evaluator(
-        context, function, pool if pool is not None else serial_pool()
+        context, function, pool if pool is not None else serial_pool(), bundle_size
     )
     # The results are collected by this run's own handler, in the order the
     # vectors were given, which is the order they are returned in.

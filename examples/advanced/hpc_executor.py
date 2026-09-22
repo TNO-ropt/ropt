@@ -118,7 +118,7 @@ def main(*, workdir: Path, local: bool = False, queue: str | None = None) -> Non
     )
     step = OptimizationStep(
         evaluator=ParallelEvaluator(
-            function=rosenbrock, executor=executor, bundle_size=0 if local else 1
+            function=rosenbrock, executor=executor, bundle_size=0
         )
     )
     results = ResultsHandler()

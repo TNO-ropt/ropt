@@ -99,6 +99,21 @@ def broadcast_metadata(
     return _sized(list(metadata), count, "metadata")
 
 
+def broadcast_bundle_sizes(bundle_size: int | Sequence[int], count: int) -> list[int]:
+    """Give each run its bundle size.
+
+    Args:
+        bundle_size: A size shared by every run, or one per run.
+        count:       The number of runs.
+
+    Returns:
+        One size per run.
+    """
+    if isinstance(bundle_size, int):
+        return [bundle_size] * count
+    return _sized(list(bundle_size), count, "bundle_size")
+
+
 def _sized(values: list[Any], count: int, name: str) -> list[Any]:
     if len(values) != count:
         msg = f"{name} sequence length must match the number of runs."

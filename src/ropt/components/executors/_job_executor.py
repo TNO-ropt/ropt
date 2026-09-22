@@ -39,7 +39,14 @@ from ropt._logging import get_logger
 from ropt._serialize import CANNOT_SERIALIZE, dump, load
 from ropt.exceptions import ExecutionError
 
-from .base import ExecutorBase, ExecutorFailure, Submission, WorkItem
+from .base import (
+    ExecutorBase,
+    ExecutorFailure,
+    Submission,
+    WorkItem,
+    _calls,
+    _run_bundle,
+)
 
 if TYPE_CHECKING:
     from uuid import UUID
@@ -113,7 +120,7 @@ class JobExecutorBase(ExecutorBase):
         self._worker_task: asyncio.Task[None] | None = None
         self._pool: ThreadPoolExecutor | None = None
 
-        self._items: dict[UUID, tuple[Submission, WorkItem]] = {}
+        self._items: dict[UUID, tuple[Submission, list[WorkItem]]] = {}
         self._jobs: dict[UUID, int] = {}
         self._retries: dict[UUID, int] = {}
         # The started jobs are reached from the poll thread and from cleanup on
@@ -203,13 +210,13 @@ class JobExecutorBase(ExecutorBase):
         super()._accept(submission)
         self._work_arrived.set()
 
-    def _take_work_items(self) -> list[tuple[UUID, WorkItem]]:
+    def _take_work_items(self) -> list[tuple[UUID, list[WorkItem]]]:
         # Takes no more than there is room for: `_items` holds the jobs that are
         # out, so `workers` caps how many run at once.
-        pending: list[tuple[UUID, WorkItem]] = []
+        pending: list[tuple[UUID, list[WorkItem]]] = []
         while len(self._items) < self._workers:
             try:
-                submission, work_item = self._work_queue.get_nowait()
+                submission, bundle = self._work_queue.get_nowait()
             except asyncio.QueueEmpty:
                 break
             if submission.is_finished:
@@ -218,8 +225,8 @@ class JobExecutorBase(ExecutorBase):
                 continue
             # The id is the stem of the files this job reads and writes.
             item_id = uuid4()
-            self._items[item_id] = (submission, work_item)
-            pending.append((item_id, work_item))
+            self._items[item_id] = (submission, bundle)
+            pending.append((item_id, bundle))
         return pending
 
     def _deliver_results(self, results: dict[UUID, Any]) -> None:
@@ -227,12 +234,32 @@ class JobExecutorBase(ExecutorBase):
             entry = self._items.pop(item_id, None)
             if entry is None:
                 continue
-            submission, work_item = entry
+            submission, bundle = entry
             if isinstance(result, Exception):
                 # Deliver to the evaluator; keep the executor alive (no raise).
                 self._fail(submission, result)
+            elif isinstance(result, ExecutorFailure):
+                for work_item in bundle:
+                    self._deliver(submission, work_item, result)
             else:
-                self._deliver(submission, work_item, result)
+                self._deliver_bundle(submission, bundle, result)
+
+    def _deliver_bundle(
+        self,
+        submission: Submission,
+        bundle: list[WorkItem],
+        result: Any,  # ruff: ignore[any-type]
+    ) -> None:
+        if not isinstance(result, list) or len(result) != len(bundle):
+            failure = ExecutorFailure(
+                f"A job returned a result that does not match its {len(bundle)} "
+                "work item(s)."
+            )
+            for work_item in bundle:
+                self._deliver(submission, work_item, failure)
+            return
+        for work_item, value in zip(bundle, result, strict=True):
+            self._deliver(submission, work_item, value)
 
     def _cleanup(self) -> None:
         """Clean up the executor resources."""
@@ -273,20 +300,22 @@ class JobExecutorBase(ExecutorBase):
         if self._remove_files:
             self._cleanup_files(item_id)
 
-    def _run_work_items(self, pending: list[tuple[UUID, WorkItem]]) -> dict[UUID, Any]:
+    def _run_work_items(
+        self, pending: list[tuple[UUID, list[WorkItem]]]
+    ) -> dict[UUID, Any]:
         # Runs on the poll thread: start what was taken, then ask the backend
         # about everything that is out.
         results: dict[UUID, Any] = {}
-        for item_id, work_item in pending:
+        for item_id, bundle in pending:
             try:
-                if not self._submit(item_id, work_item):
+                if not self._submit(item_id, bundle):
                     # Shutting down: leave the rest, cleanup releases them.
                     return results
             except Exception as exc:  # ruff: ignore[blind-except]
                 results[item_id] = exc
         return results | self._poll()
 
-    def _submit(self, item_id: UUID, work_item: WorkItem) -> bool:
+    def _submit(self, item_id: UUID, bundle: list[WorkItem]) -> bool:
         with self._jobs_lock:
             if self._jobs_closed:
                 return False
@@ -299,7 +328,7 @@ class JobExecutorBase(ExecutorBase):
             raise ExecutionError(msg)
         input_file = self._workdir / f"{item_id}.in"
         output_file = self._workdir / f"{item_id}.out"
-        self._write_input(item_id, input_file, work_item)
+        self._write_input(item_id, input_file, bundle)
         try:
             job_id = self._start_job(
                 item_id,
@@ -330,7 +359,7 @@ class JobExecutorBase(ExecutorBase):
         return True
 
     def _write_input(
-        self, item_id: UUID, input_file: Path, work_item: WorkItem
+        self, item_id: UUID, input_file: Path, bundle: list[WorkItem]
     ) -> None:
         # Written to a temporary file and renamed, so the job can never observe
         # a half-written input: on a shared filesystem the rename is what makes
@@ -339,7 +368,7 @@ class JobExecutorBase(ExecutorBase):
         tmp_path = Path(tmp_path_str)
         try:
             with os.fdopen(tmp_fd, "wb") as fp:
-                dump((work_item.function, work_item.args, work_item.kwargs), fp)
+                dump((_run_bundle, (_calls(bundle),), {}), fp)
                 fp.flush()
                 os.fsync(fp.fileno())
             tmp_path.rename(input_file)

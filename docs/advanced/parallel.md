@@ -32,9 +32,10 @@ the executor's workers and other concurrent steps.
 [`ParallelEvaluator`][ropt.components.evaluators.ParallelEvaluator] wraps a
 per-realization function — the same kind of callable used by
 [`FunctionEvaluator`][ropt.components.evaluators.FunctionEvaluator] — and submits
-the rows of the evaluation batch as [`WorkItem`][ropt.components.executors.WorkItem]
-objects in one [`Submission`][ropt.components.executors.Submission]. It then waits
-for the submission's results.
+each active row of the evaluation batch as its own
+[`WorkItem`][ropt.components.executors.WorkItem] in one
+[`Submission`][ropt.components.executors.Submission]. It then waits for the
+submission's results.
 
 Constructor parameters:
 
@@ -42,20 +43,11 @@ Constructor parameters:
 | ------------- | -------------------------------------------------------------------- |
 | `function`    | Per-realization callable (same interface as `FunctionEvaluator`).    |
 | `executor`    | The [`Executor`][ropt.components.executors.Executor] to dispatch work to. |
-| `bundle_size` | Number of active evaluations to group into a single work item (default: `1`). Use an integer `> 1` for a fixed maximum bundle size, or `0` to bundle all active evaluations of a batch into one work item. |
 | `batch_id_callback` | Callable returning the next batch ID each time it is called (default: an internal [`BatchIdCounter`][ropt.components.evaluators.BatchIdCounter]). |
+| `bundle_size` | Evaluations sent to a worker together, `0` for a whole batch (default: 1). |
 
-By default each row of the variable batch is submitted as its own task. The
-`bundle_size` parameter allows several active evaluations to be grouped into a
-single task that the worker executes sequentially. This applies when per-task
-overhead (thread/process startup, HPC job submission) dominates the cost of an
-individual evaluation, or when the total number of active evaluations in a batch
-is much larger than the number of available workers.
-
-The work items it submits carry no name, so the `HPCExecutor` identifies each
-with a generated UUID. Name them yourself by building the
-[`WorkItem`][ropt.components.executors.WorkItem] objects and submitting them to
-the executor directly.
+How many of those work items travel to a worker together follows
+`bundle_size`. See [Bundling](#bundling).
 
 If the executor is not running when `eval()` is called, the evaluator raises an
 [`ExecutorStopped`][ropt.exceptions.ExecutorStopped] exception.
@@ -106,6 +98,21 @@ affected.
     event handlers stay in the worker process and cannot deliver events to a
     dispatcher or handler in the host process — return results as data instead.
     See [Event handling is a single-process mechanism](workflows.md#event-dispatcher).
+
+### Bundling
+
+A [`Submission`][ropt.components.executors.Submission] carries a `bundle_size`:
+how many of its work items are sent to a worker together, to be run one after
+another there. The default of `1` sends each item on its own, spreading a
+submission as widely as the workers allow; a larger value amortizes the cost of
+a transfer when the items are cheap relative to it; `0` sends a whole submission
+at once. A bundle never spans submissions, so `0` is bounded by the submission.
+
+The submission is the only place the size is set. An executor takes no
+`bundle_size` of its own, and [`ParallelEvaluator`](#parallelevaluator) passes
+on the size it was given. `ThreadExecutor` ignores it: it has no transfer to
+amortize, and a fixed bundle would keep a thread that finishes early from
+picking up more work.
 
 Four implementations are provided:
 

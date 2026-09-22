@@ -158,11 +158,13 @@ def main() -> None:
         new_variables = np.where(MASK, INITIAL_VALUES, variables)
 
         # Create a fresh evaluator per call; share only the executor and counter.
+        # A whole inner batch goes to one worker: the parallelism comes from the
+        # outer runs.
         inner_evaluator = ParallelEvaluator(
             function=partial(rosenbrock, a=a, b=b),
             executor=inner_executor,
-            bundle_size=0,
             batch_id_callback=inner_batch_id_counter,
+            bundle_size=0,
         )
         step = OptimizationStep(evaluator=inner_evaluator)
         result_handler = ResultsHandler()

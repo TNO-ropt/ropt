@@ -66,6 +66,20 @@ class ExecutorFailure:
     message: str
 
 
+def _calls(
+    bundle: Sequence[WorkItem],
+) -> list[tuple[Callable[..., Any], tuple[Any, ...], dict[str, Any]]]:
+    return [(item.function, item.args, item.kwargs) for item in bundle]
+
+
+def _run_bundle(
+    calls: Sequence[tuple[Callable[..., Any], tuple[Any, ...], dict[str, Any]]],
+) -> list[Any]:
+    # Runs a whole bundle in one worker, so it must be reachable by name in a
+    # worker process and in a job interpreter.
+    return [function(*args, **kwargs) for function, args, kwargs in calls]
+
+
 class _ResultsQueue(queue.Queue["WorkItem | BaseException | None"]):
     # Results are delivered from the event loop, so putting must never block:
     # this queue is deliberately unbounded and cannot be configured otherwise.
@@ -105,16 +119,33 @@ class Submission:
     are distinguished.
     """
 
-    def __init__(self, work_items: Sequence[WorkItem]) -> None:
+    def __init__(self, work_items: Sequence[WorkItem], bundle_size: int = 1) -> None:
         """Initialize the submission.
 
         Args:
-            work_items: The work items to run.
+            work_items:  The work items to run.
+            bundle_size: Items per worker task, `0` for all of them.
+
+        Raises:
+            ValueError: If `bundle_size` is negative.
         """
+        if bundle_size < 0:
+            msg = f"bundle_size must be >= 0, got {bundle_size}"
+            raise ValueError(msg)
         self._work_items = list(work_items)
+        self._bundle_size = bundle_size
         self._results = _ResultsQueue()
         self._outstanding = len(self._work_items)
         self._ended = False
+
+    @property
+    def bundle_size(self) -> int:
+        """How many of these items go to a worker together.
+
+        Returns:
+            The requested size, `0` for all of them.
+        """
+        return self._bundle_size
 
     @property
     def work_items(self) -> list[WorkItem]:
@@ -319,7 +350,9 @@ class ExecutorBase(Executor):
     def __init__(self) -> None:
         """Initialize the executor."""
         super().__init__()
-        self._work_queue: asyncio.Queue[tuple[Submission, WorkItem]] = asyncio.Queue()
+        self._work_queue: asyncio.Queue[tuple[Submission, list[WorkItem]]] = (
+            asyncio.Queue()
+        )
         self._loop: asyncio.AbstractEventLoop | None = None
         self._task_group: asyncio.TaskGroup | None = None
         # An Event, not a bool: read from whatever thread submits, asks whether
@@ -382,8 +415,19 @@ class ExecutorBase(Executor):
             # Its caller has already left, so there is nothing to deliver to.
             return
         self._submissions.add(submission)
-        for work_item in submission.work_items:
-            self._work_queue.put_nowait((submission, work_item))
+        items = submission.work_items
+        size = self._resolve_bundle_size(submission)
+        for start in range(0, len(items), size):
+            self._work_queue.put_nowait((submission, items[start : start + size]))
+
+    def _resolve_bundle_size(self, submission: Submission) -> int:  # ruff: ignore[no-self-use]
+        # A bundle never spans submissions, so zero is the whole submission. An
+        # executor that gains nothing from bundling overrides this.
+        return (
+            len(submission.work_items)
+            if submission.bundle_size == 0
+            else submission.bundle_size
+        )
 
     def _begin_start(self) -> None:
         """Guard against starting twice, before any resources are created.

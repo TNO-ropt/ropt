@@ -32,7 +32,10 @@ from ropt.components.evaluators import (
     EvaluationFunctionResult,
     ParallelEvaluator,
 )
-from ropt.components.evaluators._parallel_evaluator import _handle_result
+from ropt.components.evaluators._parallel_evaluator import (
+    _EvaluationItem,
+    _handle_result,
+)
 from ropt.components.event_handlers import ResultsHandler
 from ropt.components.executors import (
     ExecutorFailure,
@@ -972,8 +975,8 @@ async def test_hpc_poll_loop_honours_interval_when_busy(
     executor = HPCExecutor(workdir=tmp_path, workers=1, interval=3600, template="")
     work_item = WorkItem(function=_function, args=(0,))
     submission = Submission([work_item])
-    executor._items[uuid4()] = (submission, work_item)  # ruff: ignore[private-member-access]
-    executor._work_queue.put_nowait((submission, work_item))  # ruff: ignore[private-member-access]
+    executor._items[uuid4()] = (submission, [work_item])  # ruff: ignore[private-member-access]
+    executor._work_queue.put_nowait((submission, [work_item]))  # ruff: ignore[private-member-access]
 
     busy = asyncio.create_task(executor._wait_for_work())  # ruff: ignore[private-member-access]
     for _ in range(10):
@@ -1016,7 +1019,7 @@ async def test_hpc_executor_refuses_to_overwrite_existing_work_item_files(
     work_item = WorkItem(function=_function, args=(0,))
     await asyncio.sleep(0)  # this module runs tests on the event loop
     with pytest.raises(ExecutionError, match="already exist"):
-        executor._submit(item_id, work_item)  # ruff: ignore[private-member-access]
+        executor._submit(item_id, [work_item])  # ruff: ignore[private-member-access]
 
 
 @pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
@@ -1725,43 +1728,28 @@ async def test_executor_evaluator_two_optimizations(
         assert np.allclose(results.variables, [0.0, 0.0, 0.5], atol=0.02)
 
 
+@pytest.mark.slow
 @pytest.mark.parametrize("bundle_size", [1, 2, 4, 0])
-@pytest.mark.parametrize(
-    "executor_name",
-    [
-        "threading",
-        pytest.param("multiprocessing", marks=pytest.mark.slow),
-    ],
-)
-async def test_groups_work_items(
+async def test_process_executor_bundles_work_items(
     config: dict[str, Any],
     eval_func: Any,
-    executor_name: str,
     bundle_size: int,
 ) -> None:
-    match executor_name:
-        case "threading":
-            executor: Executor = ThreadExecutor(workers=2)
-        case "multiprocessing":
-            executor = ProcessExecutor(workers=2)
-
-    bundle_sizes: list[int] = []
-    original_submit = executor.submit
-
-    def _counting_submit(submission: Submission) -> None:
-        bundle_sizes.extend(
-            len(work_item.args[1]) for work_item in submission.work_items
-        )
-        original_submit(submission)
-
-    executor.submit = _counting_submit  # type: ignore[method-assign]
+    executor = ProcessExecutor(workers=2)
+    sizes: list[int] = []
 
     async with asyncio.TaskGroup() as tg:
         await executor.start(tg)
+        queue = executor._work_queue  # ruff: ignore[private-member-access]
+        original_put = queue.put_nowait
+
+        def _recording_put(item: Any) -> None:
+            sizes.append(len(item[1]))
+            original_put(item)
+
+        queue.put_nowait = _recording_put  # type: ignore[method-assign]
         evaluator = ParallelEvaluator(
-            function=eval_func(),
-            executor=executor,
-            bundle_size=bundle_size,
+            function=eval_func(), executor=executor, bundle_size=bundle_size
         )
         result_handler = ResultsHandler()
         step = OptimizationStep(evaluator=evaluator)
@@ -1776,22 +1764,15 @@ async def test_groups_work_items(
     results = result_handler["results"]
     assert results is not None
     assert np.allclose(results.variables, [0.0, 0.0, 0.5], atol=0.02)
-    assert bundle_sizes, "No work items were submitted"
-    expected_max = max(bundle_sizes) if bundle_size == 0 else bundle_size
-    for size in bundle_sizes:
+    assert sizes, "No work items were submitted"
+    expected_max = max(sizes) if bundle_size == 0 else bundle_size
+    for size in sizes:
         assert 1 <= size <= expected_max
 
 
 async def test_invalid_bundle_size() -> None:  # ruff: ignore[unused-async]
-    executor = ThreadExecutor(workers=1)
     with pytest.raises(ValueError, match="bundle_size"):
-        ParallelEvaluator(
-            function=lambda variables, context: EvaluationFunctionResult(  # ruff: ignore[unused-lambda-argument]
-                objectives=0.0
-            ),
-            executor=executor,
-            bundle_size=-1,
-        )
+        Submission([], bundle_size=-1)
 
 
 async def test_failing_submission_reraises() -> None:  # ruff: ignore[unused-async]
@@ -2117,6 +2098,59 @@ async def test_accepting_submission_twice_queues_work_once() -> None:  # ruff: i
     assert executor._work_queue.qsize() == 3  # ruff: ignore[private-member-access]
 
 
+@pytest.mark.parametrize(
+    ("submission_size", "expected"),
+    [
+        pytest.param(1, [1, 1, 1, 1, 1], id="one_by_one"),
+        pytest.param(2, [2, 2, 1], id="two_at_a_time"),
+        pytest.param(3, [3, 2], id="uneven_tail"),
+        pytest.param(0, [5], id="whole_submission"),
+    ],
+)
+async def test_accept_splits_a_submission_into_bundles(  # ruff: ignore[unused-async]
+    submission_size: int, expected: list[int]
+) -> None:
+    submission = Submission(
+        [WorkItem(function=_function, args=(idx,)) for idx in range(5)],
+        bundle_size=submission_size,
+    )
+    executor = ProcessExecutor()
+    executor._running.set()  # ruff: ignore[private-member-access]
+    executor._accept(submission)  # ruff: ignore[private-member-access]
+    queue = executor._work_queue  # ruff: ignore[private-member-access]
+    assert [len(queue.get_nowait()[1]) for _ in range(queue.qsize())] == expected
+
+
+async def test_thread_executor_never_bundles() -> None:  # ruff: ignore[unused-async]
+    submission = Submission(
+        [WorkItem(function=_function, args=(idx,)) for idx in range(3)], bundle_size=0
+    )
+    executor = ThreadExecutor(workers=1)
+    executor._running.set()  # ruff: ignore[private-member-access]
+    executor._accept(submission)  # ruff: ignore[private-member-access]
+    queue = executor._work_queue  # ruff: ignore[private-member-access]
+    assert [len(queue.get_nowait()[1]) for _ in range(queue.qsize())] == [1, 1, 1]
+
+
+async def test_bundled_work_items_each_get_their_own_result() -> None:
+    class _BundlingThreadExecutor(ThreadExecutor):
+        # Threads never bundle; skipping that override exercises the bundle
+        # path in-process, which is otherwise only reachable out of process.
+        def _resolve_bundle_size(self, submission: Submission) -> int:
+            return super(ThreadExecutor, self)._resolve_bundle_size(submission)
+
+    submission = Submission(
+        [WorkItem(function=_function, args=(idx,)) for idx in range(5)], bundle_size=2
+    )
+    executor = _BundlingThreadExecutor(workers=2)
+    async with asyncio.TaskGroup() as tg:
+        await executor.start(tg)
+        executor.submit(submission)
+        collected = await asyncio.to_thread(_collect, submission)
+        executor.cancel()
+    assert sorted(collected) == [1, 2, 3, 4, 5]
+
+
 async def test_submission_after_stopping_is_aborted() -> None:
     # submit() hands over on the loop, where stopping is decided; this is the
     # guard that makes "every submission settles" hold when the two race.
@@ -2431,66 +2465,25 @@ async def test_fatal_work_item_error_reaches_caller() -> None:
 
 
 async def test_handle_result_raises_on_executor_failure() -> None:  # ruff: ignore[unused-async]
-    results = np.zeros((2, 1), dtype=np.float64)
-    bundle = [
-        (
-            np.zeros(2, dtype=np.float64),
-            EvaluationFunctionContext(
-                realization=0, perturbation=-1, batch_id=0, eval_idx=idx
-            ),
-        )
-        for idx in range(2)
-    ]
-    work_item = WorkItem(
+    work_item = _EvaluationItem(
         function=_function,
-        args=(None, bundle),
+        eval_idx=0,
         result=ExecutorFailure("the job wrote to item.txt"),
     )
     with pytest.raises(
         ExecutionError,
-        match=r"2 evaluation\(s\) could not be run: the job wrote to item\.txt",
+        match=r"An evaluation could not be run: the job wrote to item\.txt",
     ):
-        _handle_result(work_item, results, {}, objective_count=1)
-
-
-@pytest.mark.parametrize(
-    "returned",
-    [
-        pytest.param("not a list", id="not_a_list"),
-        pytest.param([], id="too_short"),
-    ],
-)
-async def test_evaluation_function_wrong_shape_rejected(  # ruff: ignore[unused-async]
-    returned: Any,
-) -> None:
-    bundle = [
-        (
-            np.zeros(2, dtype=np.float64),
-            EvaluationFunctionContext(
-                realization=0, perturbation=-1, batch_id=0, eval_idx=0
-            ),
-        )
-    ]
-    work_item = WorkItem(function=_function, args=(None, bundle), result=returned)
-    with pytest.raises(WorkflowError, match="must return a list of 1"):
         _handle_result(
             work_item,
-            np.zeros((1, 1), dtype=np.float64),
+            np.zeros((2, 1), dtype=np.float64),
             {},
             objective_count=1,
         )
 
 
 async def test_wrong_evaluation_result_type_rejected() -> None:  # ruff: ignore[unused-async]
-    bundle = [
-        (
-            np.zeros(2, dtype=np.float64),
-            EvaluationFunctionContext(
-                realization=0, perturbation=-1, batch_id=0, eval_idx=0
-            ),
-        )
-    ]
-    work_item = WorkItem(function=_function, args=(None, bundle), result=["not one"])
+    work_item = _EvaluationItem(function=_function, eval_idx=0, result="not one")
     with pytest.raises(WorkflowError, match="got str"):
         _handle_result(
             work_item,

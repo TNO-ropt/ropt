@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from functools import partial
-from itertools import starmap
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
@@ -20,12 +20,7 @@ from ropt.exceptions import ExecutionError, WorkflowError
 
 from ._common import _active_evaluations, _build_metadata, _scatter_result
 from ._counter import BatchIdCounter
-from .base import (
-    EvaluationFunctionCallback,
-    EvaluationFunctionContext,
-    EvaluationFunctionResult,
-    Evaluator,
-)
+from .base import EvaluationFunctionCallback, EvaluationFunctionResult, Evaluator
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -35,14 +30,18 @@ if TYPE_CHECKING:
 _logger = get_logger(__name__)
 
 
+@dataclass(kw_only=True)
+class _EvaluationItem(WorkItem):
+    # Results arrive as they finish, so each item carries the row it fills.
+    eval_idx: int
+
+
 class ParallelEvaluator(Evaluator):
     """An evaluator that dispatches tasks to an executor via asyncio.
 
-    Submits the rows of the evaluation batch as tasks to the executor's task
-    queue and collects results from a results queue. By default each row is
-    submitted as its own task; the `bundle_size` constructor argument can be
-    used to group several active evaluations into a single task that the worker
-    executes sequentially.
+    Submits each active row of the evaluation batch as its own work item and
+    collects the results. How many of them travel to a worker together follows
+    `bundle_size`.
 
     See [Parallel Evaluation](../advanced/parallel.md#parallelevaluator) for
     details on how this integrates with the asyncio event loop.
@@ -53,22 +52,16 @@ class ParallelEvaluator(Evaluator):
         *,
         function: EvaluationFunctionCallback,
         executor: Executor,
-        bundle_size: int = 1,
         batch_id_callback: Callable[[], int] | None = None,
+        bundle_size: int = 1,
     ) -> None:
         """Initialize the ParallelEvaluator.
-
-        With `bundle_size=1` (the default) every active evaluation is sent as
-        its own executor task. Setting `bundle_size` to an integer `> 1` groups
-        up to that many active evaluations into one task that the worker runs
-        sequentially; `0` packs all active evaluations of a batch into a single
-        task.
 
         Args:
             function:          The function used for objectives and constraints.
             executor:          The executor to dispatch tasks to.
-            bundle_size:       Number of active evaluations per executor task.
             batch_id_callback: Callable that returns the next batch ID each time it is called.
+            bundle_size:       Evaluations per worker task, `0` for a whole batch.
 
         Raises:
             ValueError: If `bundle_size` is negative.
@@ -127,15 +120,23 @@ class ParallelEvaluator(Evaluator):
         results = np.zeros((variables.shape[0], no + nc), dtype=np.float64)
         metadata: dict[str, dict[int, Any]] = {}
 
-        bundles = self._make_bundles(variables, evaluator_context, batch_id)
-        _logger.debug("Dispatching %d work item(s) to executor", len(bundles))
-        # Only the function and the bundle cross to the worker; the delivery
-        # channel stays here, on the submission.
+        # Only the function and one row's arguments cross to the worker; the
+        # delivery channel stays here, on the submission.
         submission = Submission(
             [
-                WorkItem(function=_run_bundle, args=(self._function, bundle))
-                for bundle in bundles
-            ]
+                _EvaluationItem(
+                    function=self._function,
+                    args=(variables[eval_idx, :], function_context),
+                    eval_idx=eval_idx,
+                )
+                for eval_idx, function_context in _active_evaluations(
+                    evaluator_context, batch_id
+                )
+            ],
+            bundle_size=self._bundle_size,
+        )
+        _logger.debug(
+            "Dispatching %d work item(s) to executor", len(submission.work_items)
         )
         self._executor.submit(submission)
         # Blocks until every work item is delivered; a user-code exception from
@@ -156,30 +157,6 @@ class ParallelEvaluator(Evaluator):
             metadata=_build_metadata(metadata, variables.shape[0]),
         )
 
-    def _make_bundles(
-        self,
-        variables: NDArray[np.float64],
-        context: EvaluationBatchContext,
-        batch_id: int,
-    ) -> list[list[tuple[NDArray[np.float64], EvaluationFunctionContext]]]:
-        bundles: list[list[tuple[NDArray[np.float64], EvaluationFunctionContext]]] = []
-        bundle: list[tuple[NDArray[np.float64], EvaluationFunctionContext]] = []
-        for eval_idx, function_context in _active_evaluations(context, batch_id):
-            bundle.append((variables[eval_idx, :], function_context))
-            if self._bundle_size and len(bundle) >= self._bundle_size:
-                bundles.append(bundle)
-                bundle = []
-        if bundle:
-            bundles.append(bundle)
-        return bundles
-
-
-def _run_bundle(
-    function: EvaluationFunctionCallback,
-    bundle: list[tuple[NDArray[np.float64], EvaluationFunctionContext]],
-) -> list[EvaluationFunctionResult]:
-    return list(starmap(function, bundle))
-
 
 def _handle_result(
     work_item: WorkItem,
@@ -187,31 +164,20 @@ def _handle_result(
     metadata: dict[str, dict[int, Any]],
     objective_count: int,
 ) -> None:
-    bundle: list[tuple[NDArray[np.float64], EvaluationFunctionContext]] = (
-        work_item.args[1]
-    )
+    assert isinstance(work_item, _EvaluationItem)
     if isinstance(work_item.result, ExecutorFailure):
-        msg = (
-            f"{len(bundle)} evaluation(s) could not be run: {work_item.result.message}"
-        )
+        msg = f"An evaluation could not be run: {work_item.result.message}"
         raise ExecutionError(msg)
-    if not isinstance(work_item.result, list) or len(work_item.result) != len(bundle):
+    if not isinstance(work_item.result, EvaluationFunctionResult):
         msg = (
-            f"The evaluation function must return a list of {len(bundle)} "
-            f"EvaluationFunctionResult objects."
+            "The evaluation function must return EvaluationFunctionResult "
+            f"objects, got {type(work_item.result).__name__}."
         )
         raise WorkflowError(msg)
-    for (_, function_context), result in zip(bundle, work_item.result, strict=True):
-        if not isinstance(result, EvaluationFunctionResult):
-            msg = (
-                "The evaluation function must return EvaluationFunctionResult "
-                f"objects, got {type(result).__name__}."
-            )
-            raise WorkflowError(msg)
-        _scatter_result(
-            function_context.eval_idx,
-            result,
-            results,
-            metadata,
-            objective_count,
-        )
+    _scatter_result(
+        work_item.eval_idx,
+        work_item.result,
+        results,
+        metadata,
+        objective_count,
+    )

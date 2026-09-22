@@ -23,7 +23,12 @@ from ropt.components.event_handlers import ResultsHandler
 from ropt.context import EnOptContext
 from ropt.exceptions import WorkflowError
 
-from ._broadcast import broadcast_metadata, broadcast_reports, broadcast_runs
+from ._broadcast import (
+    broadcast_bundle_sizes,
+    broadcast_metadata,
+    broadcast_reports,
+    broadcast_runs,
+)
 from ._evaluator import make_evaluator
 from ._guards import check_handlers, check_pool
 from ._handlers import SharedHandlers, attach_handlers, split_handlers
@@ -60,6 +65,7 @@ def optimize(  # ruff: ignore[too-many-arguments]
     handlers: Sequence[EventHandler | SharedHandlers] | None = None,
     report: ReportCallback | None = None,
     constraint_tolerance: float = 1e-10,
+    bundle_size: int = 1,
     metadata: dict[str, Any] | None = None,
 ) -> OptimizationResult:
     """Run a single optimization.
@@ -94,6 +100,7 @@ def optimize(  # ruff: ignore[too-many-arguments]
         handlers:             Optional local handlers and shared groups.
         report:               Optional callback invoked per function evaluation.
         constraint_tolerance: The tolerance within which a constraint is satisfied.
+        bundle_size:          Evaluations per worker task, `0` for a whole batch.
         metadata:             Optional dictionary attached to every emitted result.
 
     Returns:
@@ -109,6 +116,7 @@ def optimize(  # ruff: ignore[too-many-arguments]
         handlers=handlers,
         report=report,
         constraint_tolerance=constraint_tolerance,
+        bundle_size=bundle_size,
         metadata=metadata,
     )
 
@@ -122,10 +130,11 @@ def _optimize(  # ruff: ignore[too-many-arguments]
     handlers: Sequence[EventHandler | SharedHandlers] | None,
     report: ReportCallback | None,
     constraint_tolerance: float,
+    bundle_size: int,
     metadata: dict[str, Any] | None = None,
 ) -> OptimizationResult:
     context = EnOptContext.model_validate(config)
-    evaluator = make_evaluator(context, function, pool)
+    evaluator = make_evaluator(context, function, pool, bundle_size)
     # This run's own handler, tracking the result the call returns; it is added
     # directly, so it stays out of the handlers the caller manages.
     result_handler = ResultsHandler(constraint_tolerance=constraint_tolerance)
@@ -154,6 +163,7 @@ def optimize_many(  # ruff: ignore[too-many-arguments]
     report: ReportCallback | Sequence[ReportCallback] | None = None,
     limit: int | None = None,
     constraint_tolerance: float = 1e-10,
+    bundle_size: int | Sequence[int] = 1,
     metadata: dict[str, Any] | Sequence[dict[str, Any]] | None = None,
 ) -> tuple[OptimizationResult, ...]:
     """Run several optimizations concurrently, sharing one pool.
@@ -199,6 +209,7 @@ def optimize_many(  # ruff: ignore[too-many-arguments]
         report:               Optional callback per evaluation, shared or one per run.
         limit:                The maximum number of runs to execute at once.
         constraint_tolerance: The tolerance within which a constraint is satisfied.
+        bundle_size:          Evaluations per worker task, shared or one per run.
         metadata:             Optional dictionary attached to every emitted result.
 
     Returns:
@@ -220,6 +231,7 @@ def optimize_many(  # ruff: ignore[too-many-arguments]
     runs = broadcast_runs(config, x0, function)
     reports = broadcast_reports(report, len(runs))
     metadatas = broadcast_metadata(metadata, len(runs))
+    bundle_sizes = broadcast_bundle_sizes(bundle_size, len(runs))
     jobs: list[Callable[[], OptimizationResult]] = [
         partial(
             _optimize,
@@ -230,11 +242,15 @@ def optimize_many(  # ruff: ignore[too-many-arguments]
             handlers=groups,
             report=run_report,
             constraint_tolerance=constraint_tolerance,
+            bundle_size=run_bundle_size,
             metadata=run_metadata,
         )
-        for (run_config, run_x0, run_function), run_report, run_metadata in zip(
-            runs, reports, metadatas, strict=True
-        )
+        for (
+            (run_config, run_x0, run_function),
+            run_report,
+            run_metadata,
+            run_bundle_size,
+        ) in zip(runs, reports, metadatas, bundle_sizes, strict=True)
     ]
     # Dedicated threads, not a shared thread pool: each run blocks its thread
     # while waiting for evaluations that would queue behind it in such a pool.

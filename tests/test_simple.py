@@ -20,7 +20,12 @@ from ropt.components.compute_steps import EvaluationStep, OptimizationStep
 from ropt.components.concurrency import run_concurrent
 from ropt.components.evaluators import FunctionEvaluator
 from ropt.components.event_handlers import EventDispatcher
-from ropt.components.executors import HPCExecutor, LocalJobExecutor, ThreadExecutor
+from ropt.components.executors import (
+    HPCExecutor,
+    LocalJobExecutor,
+    ProcessExecutor,
+    ThreadExecutor,
+)
 from ropt.context import EnOptContext
 from ropt.enums import ExitCode
 from ropt.exceptions import ExecutionError, ExecutorStopped, WorkflowError
@@ -938,32 +943,105 @@ _BUNDLE_CONFIG: dict[str, Any] = {
     "variables": {"variable_count": 2},
     "realizations": {"weights": [1.0] * 4},
 }
-_BUNDLE_THREADS: set[int] = set()
 
 
-def _record_thread(
+def _bundle_pid(
     variables: NDArray[np.float64], _context: EvaluationFunctionContext
-) -> float:
-    _BUNDLE_THREADS.add(threading.get_ident())
-    return float(np.sum(variables**2))
+) -> EvaluationFunctionResult:
+    return EvaluationFunctionResult(
+        objectives=float(np.sum(variables**2)), metadata={"pid": os.getpid()}
+    )
 
 
-def test_negative_bundle_size_refused() -> None:
-    # A serial pool builds no evaluator, so nothing downstream would catch it.
-    with pytest.raises(ValueError, match="bundle_size must be >= 0"):
-        WorkerPool(bundle_size=-1)
-
-
-@pytest.mark.timeout(30)
-def test_bundle_size_sends_the_whole_batch_as_one_task() -> None:
-    # The evaluations in one task run after each other, so a whole-batch bundle
-    # is observable as a single worker doing all four realizations.
+@pytest.mark.slow
+@pytest.mark.timeout(60)
+def test_bundle_size_sends_the_whole_batch_to_one_worker() -> None:
+    # The evaluations in one bundle run after each other, so a whole-batch
+    # bundle is observable as a single worker doing all four realizations.
+    history = HistoryHandler()
     with session() as active:
-        pool = active.thread_pool(workers=4, bundle_size=0)
-        assert pool.bundle_size == 0
-        _BUNDLE_THREADS.clear()
-        evaluate(_BUNDLE_CONFIG, np.zeros(2), _record_thread, pool=pool)
-    assert len(_BUNDLE_THREADS) == 1
+        pool = active.process_pool(workers=4)
+        evaluate(
+            _BUNDLE_CONFIG,
+            np.zeros(2),
+            _bundle_pid,
+            pool=pool,
+            handlers=[history],
+            bundle_size=0,
+        )
+    pids: set[int] = set()
+    for item in history["results"]:
+        recorded = item.evaluations.metadata.get("pid")
+        if recorded is not None:
+            pids.update(int(pid) for pid in np.ravel(recorded))
+    assert len(pids) == 1
+
+
+@pytest.mark.slow
+@pytest.mark.timeout(60)
+def test_call_bundle_size_reaches_the_executor() -> None:
+    sizes: list[int] = []
+    with session() as active:
+        pool = active.process_pool(workers=4)
+        executor = pool.executor
+        assert isinstance(executor, ProcessExecutor)
+        queue = executor._work_queue  # ruff: ignore[private-member-access]
+        original_put = queue.put_nowait
+
+        def _recording_put(item: Any) -> None:
+            sizes.append(len(item[1]))
+            original_put(item)
+
+        queue.put_nowait = _recording_put  # type: ignore[method-assign]
+        evaluate(_BUNDLE_CONFIG, np.zeros(2), _bundle_pid, pool=pool, bundle_size=0)
+    # Without the argument this would have been [1, 1, 1, 1].
+    assert sizes == [4]
+
+
+def test_negative_call_bundle_size_refused() -> None:
+    with (
+        session() as active,
+        pytest.raises(ValueError, match="bundle_size must be >= 0"),
+    ):
+        evaluate(
+            _BUNDLE_CONFIG,
+            np.zeros(2),
+            _bundle_pid,
+            pool=active.thread_pool(),
+            bundle_size=-1,
+        )
+
+
+def test_thread_pool_ignores_bundle_size() -> None:
+    # Bundled evaluations run one after another in a single thread, so a batch
+    # that only completes once all four are in flight proves they were not.
+    barrier = threading.Barrier(4)
+
+    def _wait_for_all(
+        variables: NDArray[np.float64], _context: EvaluationFunctionContext
+    ) -> EvaluationFunctionResult:
+        barrier.wait(timeout=10)
+        return EvaluationFunctionResult(objectives=float(np.sum(variables**2)))
+
+    with session() as active:
+        results = evaluate(
+            _BUNDLE_CONFIG,
+            np.zeros(2),
+            _wait_for_all,
+            pool=active.thread_pool(workers=4),
+            bundle_size=0,
+        )
+    assert results.functions is not None
+
+
+def test_bundle_size_sequence_length_must_match_runs() -> None:
+    with pytest.raises(ValueError, match="bundle_size sequence length"):
+        optimize_many(
+            _BUNDLE_CONFIG,
+            np.zeros(2),
+            [_bundle_pid, _bundle_pid],
+            bundle_size=[1, 2, 3],
+        )
 
 
 _NESTED_INNER: dict[str, Any] = {

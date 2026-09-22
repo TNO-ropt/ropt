@@ -20,21 +20,23 @@ def make_evaluator(
     context: EnOptContext,
     function: EvaluationFunction,
     pool: WorkerPool,
+    bundle_size: int = 1,
 ) -> Evaluator:
     """Wire an evaluator for a validated configuration.
 
     The number of objectives and constraints the evaluation function must
     produce follows from the context. A pool with an executor spreads the
     evaluations over its workers; a serial pool has none, so they run in-process
-    on the calling thread.
+    on the calling thread, and `bundle_size` does not apply.
 
     Batch IDs come from the pool's counter either way, so runs sharing a pool
     cannot land on the same ID.
 
     Args:
-        context:  The validated optimizer context.
-        function: The user-supplied evaluation function.
-        pool:     The pool the evaluations run on.
+        context:     The validated optimizer context.
+        function:    The user-supplied evaluation function.
+        pool:        The pool the evaluations run on.
+        bundle_size: Evaluations per worker task, `0` for a whole batch.
 
     Returns:
         The evaluator to run with.
@@ -51,6 +53,6 @@ def make_evaluator(
     return ParallelEvaluator(
         function=callback,
         executor=pool.executor,
-        bundle_size=pool.bundle_size,
         batch_id_callback=pool.batch_ids,
+        bundle_size=bundle_size,
     )

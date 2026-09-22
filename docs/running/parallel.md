@@ -58,26 +58,40 @@ what the work needs; the useful number is usually much smaller than the
 machine's core count.
 
 !!! tip "How a batch is split across workers"
-    Each evaluation in a batch is transferred to a worker as its own task by
+    Each evaluation in a batch is transferred to a worker on its own by
     default, which spreads the batch as widely as the pool allows. Every
     transfer costs something, though, so when the evaluations are cheap the
-    transfers can dominate. Set `bundle_size=` on the pool to group several
-    evaluations into one task, or `bundle_size=0` to send the whole batch as a
-    single task. The evaluations within a task run one after another, so `0`
-    gives up parallelism inside the batch entirely: it is for a pool whose
-    parallelism comes from the runs above it, as in
+    transfers can dominate. Pass `bundle_size=` to
+    [`optimize`][ropt.simple.optimize], [`optimize_many`][ropt.simple.optimize_many],
+    [`evaluate`][ropt.simple.evaluate] or
+    [`evaluate_many`][ropt.simple.evaluate_many] to send several evaluations to
+    a worker together, or `bundle_size=0` to send a whole batch at once. The
+    evaluations in one bundle run after each other, so `0` gives up parallelism
+    inside the batch entirely: it is for a run whose parallelism comes from the
+    layer above it, as in
     [Nested Optimization](nested.md#two-pools-not-one).
 
-    `workers` and `bundle_size` are the two halves of matching work to capacity.
-    `workers` sets how many tasks may be in flight; `bundle_size` sets how much
-    work one task should carry. With a batch of 100 cheap evaluations and
-    8 workers, the default sends 100 separate tasks and pays 100 transfer costs
-    to keep 8 workers busy; `bundle_size=13` sends 8 and pays 8. Raise it when
-    the evaluations are cheap relative to a transfer — above all on a
-    `process_pool`, a `local_pool` or an `hpc_pool`, where a transfer means
-    copying data and starting something. Leave it at `1` when they are
-    expensive, or when they vary in cost and bundling would leave one worker
-    holding all the slow ones.
+    `workers` and `bundle_size` are the two halves of matching work to capacity,
+    one on the pool and one on the run. `workers` sets how many bundles may be
+    in flight; `bundle_size` sets how much work one of them carries. With a
+    batch of 100 cheap evaluations and 8 workers, the default sends 100 separate
+    transfers to keep 8 workers busy; `bundle_size=13` sends 8. Raise it when
+    the evaluations are cheap relative to a transfer, which on a
+    `process_pool`, `local_pool` or `hpc_pool` means copying data and starting
+    something. Leave it at `1` when the evaluations are expensive, or when they
+    vary in cost and bundling would leave one worker holding all the slow ones.
+
+    It belongs to the run rather than to the pool because it describes the
+    evaluation function, and one pool may serve several. Runs of
+    `optimize_many` that differ in cost can each state their own, either as one
+    size for every run or as a sequence with one per run:
+
+    ```python
+    optimize_many(config, x0, [cheap, costly], pool=workers, bundle_size=[25, 1])
+    ```
+
+    A `thread_pool` and a run without a pool ignore it: neither has a transfer
+    to amortize, so there is nothing for a bundle to save.
 
 You can keep several pools open at once and choose per run:
 
@@ -194,7 +208,6 @@ with session() as s:
 | `workers`     | Maximum number of concurrent local jobs (default: 1).                     |
 | `workdir`     | Directory holding each evaluation's files. Defaults to a temporary directory the pool removes again, unless something is left in it to read. |
 | `retries`     | Extra polls to wait for a result (default: 0; a local job writes its result before it exits). |
-| `bundle_size` | Evaluations bundled into one local process, `0` for the whole batch as one (default: 1). See [How a batch is split across workers](#how-many-workers) above. |
 
 Two things distinguish it from a `process_pool`, and both matter when an
 evaluation is a job rather than a function call:
@@ -414,7 +427,6 @@ with `config_path`, `cluster` or `queue`; passing them together raises a
 | `run_time_max` | Run time per job, typically in seconds.                                  |
 | `submit_options` | Extra variables for the submission script. `None` entries are dropped. |
 | `retries`     | Extra polls to wait for a result that is missing or unreadable (default: 30). |
-| `bundle_size` | Evaluations bundled into one cluster job, `0` for the whole batch as one job (default: 1). See [How a batch is split across workers](#how-many-workers) above. |
 
 ### Evaluating in-process, on purpose
 

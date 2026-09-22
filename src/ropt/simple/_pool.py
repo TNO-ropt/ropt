@@ -1,6 +1,6 @@
 """The worker pool: where evaluations run, and which batch IDs they draw from.
 
-A pool bundles the two things that always travel together: the
+A pool carries the two things that always travel together: the
 [`Executor`][ropt.components.executors.Executor] that runs the evaluations, and
 the [`BatchIdCounter`][ropt.components.evaluators.BatchIdCounter] their batch IDs
 come from. Runs that share a pool therefore share a batch-ID sequence without
@@ -49,25 +49,15 @@ class WorkerPool:
         self,
         executor: Executor | None = None,
         session: _Session | None = None,
-        bundle_size: int = 1,
     ) -> None:
         """Initialize the pool.
 
         Args:
-            executor:    The started executor, or `None` to evaluate in-process.
-            session:     The session that owns the pool, if it has one.
-            bundle_size: Evaluations per worker task, `0` for the whole batch.
-
-        Raises:
-            ValueError: If `bundle_size` is negative.
+            executor: The started executor, or `None` to evaluate in-process.
+            session:  The session that owns the pool, if it has one.
         """
-        if bundle_size < 0:
-            # A serial pool builds no evaluator, so nothing downstream checks it.
-            msg = f"bundle_size must be >= 0, got {bundle_size}"
-            raise ValueError(msg)
         self._executor = executor
         self._session = session
-        self._bundle_size = bundle_size
         self._batch_ids = BatchIdCounter()
         self._closed = False
 
@@ -97,15 +87,6 @@ class WorkerPool:
             The batch ID counter.
         """
         return self._batch_ids
-
-    @property
-    def bundle_size(self) -> int:
-        """How many evaluations are sent to a worker as one task.
-
-        Returns:
-            The number of evaluations per task, `0` meaning the whole batch.
-        """
-        return self._bundle_size
 
     def close(self) -> None:
         """Release the pool's workers without waiting for the session to close.

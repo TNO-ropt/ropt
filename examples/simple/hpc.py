@@ -105,11 +105,18 @@ def main(
     """
     with session() as active:
         pool = (
-            active.local_pool(workers=WORKERS, workdir=workdir, bundle_size=0)
+            active.local_pool(workers=WORKERS, workdir=workdir)
             if local
             else active.hpc_pool(workers=WORKERS, queue=queue, workdir=workdir)
         )
-        result = optimize(CONFIG, INITIAL_VALUES, rosenbrock, pool=pool, report=report)
+        result = optimize(
+            CONFIG,
+            INITIAL_VALUES,
+            rosenbrock,
+            pool=pool,
+            report=report,
+            bundle_size=0,
+        )
     assert result.results is not None
     print(f"optimal variables: {result.results.variables}")
     print(f"optimal objective: {result.results.target_objective}")

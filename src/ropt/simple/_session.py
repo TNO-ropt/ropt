@@ -172,21 +172,18 @@ class _Session:
             raise WorkflowError(_STOPPED)
         return self._task_group
 
-    def open_pool(
-        self, make_executor: Callable[[], Executor], bundle_size: int = 1
-    ) -> WorkerPool:
+    def open_pool(self, make_executor: Callable[[], Executor]) -> WorkerPool:
         """Start an executor on this session and wrap it in a pool.
 
         Args:
             make_executor: Builds the executor once the task group is known.
-            bundle_size:   Evaluations per worker task, `0` for the whole batch.
 
         Returns:
             The pool, already running.
         """
         task_group = self._require_task_group()
         executor = make_executor()
-        pool = WorkerPool(executor, self, bundle_size)
+        pool = WorkerPool(executor, self)
         # Registered before starting, so a session that shuts down during the
         # start still has the pool to cancel.
         self.add_extra(pool)
@@ -268,25 +265,25 @@ class Session:
         if session is not None:
             session.stop()
 
-    def thread_pool(self, *, workers: int = 1, bundle_size: int = 1) -> WorkerPool:
+    def thread_pool(self, *, workers: int = 1) -> WorkerPool:
         """Create a pool that runs evaluations in worker threads.
 
         See [Running Optimizations](../running/running.md) for a walkthrough.
 
-        `bundle_size` matters more on a
-        [`process_pool`][ropt.simple.Session.process_pool], where a task is
-        transferred between processes.
+        Threads have no transfer to amortize, so evaluations are never bundled
+        here: this pool ignores a `bundle_size` given to
+        [`optimize`][ropt.simple.optimize] or
+        [`evaluate`][ropt.simple.evaluate].
 
         Args:
-            workers:     The number of worker threads.
-            bundle_size: Evaluations per task, `0` for the whole batch.
+            workers: The number of worker threads.
 
         Returns:
             A pool backed by a thread pool.
         """
-        return self._open_pool(lambda: ThreadExecutor(workers=workers), bundle_size)
+        return self._open_pool(lambda: ThreadExecutor(workers=workers))
 
-    def process_pool(self, *, workers: int = 1, bundle_size: int = 1) -> WorkerPool:
+    def process_pool(self, *, workers: int = 1) -> WorkerPool:
         """Create a pool that runs evaluations in worker processes.
 
         The evaluation function must be picklable. See
@@ -297,22 +294,13 @@ class Session:
         being raised; use [`local_pool`][ropt.simple.Session.local_pool] where
         an evaluation launches external programs.
 
-        Every task is transferred to a worker separately, and the evaluations
-        within one run after another, so `bundle_size` is a trade between
-        spreading a batch and the cost of moving it. The default of 1 gives
-        every evaluation its own task, spreading a batch as widely as the
-        workers allow; a larger value groups that many per task; and `0` sends
-        the whole batch as a single task, which suits a pool whose parallelism
-        comes from the runs above it rather than from within a batch.
-
         Args:
-            workers:     The number of worker processes.
-            bundle_size: Evaluations per task, `0` for the whole batch.
+            workers: The number of worker processes.
 
         Returns:
             A pool backed by a process pool.
         """
-        return self._open_pool(lambda: ProcessExecutor(workers=workers), bundle_size)
+        return self._open_pool(lambda: ProcessExecutor(workers=workers))
 
     def local_pool(
         self,
@@ -320,7 +308,6 @@ class Session:
         workers: int = 1,
         workdir: Path | str | None = None,
         retries: int = 0,
-        bundle_size: int = 1,
     ) -> WorkerPool:
         """Create a pool that runs each evaluation as a separate local process.
 
@@ -345,17 +332,19 @@ class Session:
         exits.
 
         Args:
-            workers:     The maximum number of concurrent local jobs.
-            workdir:     The directory holding each evaluation's files.
-            retries:     Extra polls to wait for a result.
-            bundle_size: Evaluations per task, `0` for the whole batch.
+            workers:  The maximum number of concurrent local jobs.
+            workdir:  The directory holding each evaluation's files.
+            retries:  Extra polls to wait for a result.
 
         Returns:
             A pool backed by local processes.
         """
         return self._open_pool(
-            lambda: LocalJobExecutor(workers=workers, workdir=workdir, retries=retries),
-            bundle_size,
+            lambda: LocalJobExecutor(
+                workers=workers,
+                workdir=workdir,
+                retries=retries,
+            )
         )
 
     def hpc_pool(  # ruff: ignore[too-many-arguments]
@@ -373,7 +362,6 @@ class Session:
         run_time_max: int | None = None,
         submit_options: dict[str, Any] | None = None,
         retries: int = 30,
-        bundle_size: int = 1,
     ) -> WorkerPool:
         """Create a pool that runs evaluations on an HPC cluster.
 
@@ -406,7 +394,6 @@ class Session:
             run_time_max:   The run time per job.
             submit_options: Extra variables for the submission script.
             retries:        Number of retries for polling the cluster for results.
-            bundle_size:    Evaluations per task, `0` for the whole batch.
 
         Returns:
             A pool backed by an HPC cluster.
@@ -426,8 +413,7 @@ class Session:
                 run_time_max=run_time_max,
                 submit_options=submit_options,
                 retries=retries,
-            ),
-            bundle_size,
+            )
         )
 
     def serial_pool(self) -> WorkerPool:
@@ -486,10 +472,8 @@ class Session:
             group_entries(handler, threaded, report), self._require_open()
         )
 
-    def _open_pool(
-        self, make_executor: Callable[[], Executor], bundle_size: int
-    ) -> WorkerPool:
-        return self._require_open().open_pool(make_executor, bundle_size)
+    def _open_pool(self, make_executor: Callable[[], Executor]) -> WorkerPool:
+        return self._require_open().open_pool(make_executor)
 
     def _require_open(self) -> _Session:
         if self._session is None:

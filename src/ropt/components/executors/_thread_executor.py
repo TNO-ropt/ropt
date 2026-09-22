@@ -10,7 +10,7 @@ from typing import Any
 
 from ropt._logging import get_logger
 
-from .base import ExecutorBase, WorkItem
+from .base import ExecutorBase, Submission, WorkItem, _calls, _run_bundle
 
 _logger = get_logger(__name__)
 
@@ -59,6 +59,11 @@ class ThreadExecutor(ExecutorBase):
         ]
         await self._finish_start(task_group)
 
+    def _resolve_bundle_size(self, submission: Submission) -> int:  # ruff: ignore[no-self-use, unused-method-argument]
+        # There is no transfer to amortize here, and a fixed bundle would keep a
+        # thread that finishes early from picking up more.
+        return 1
+
     def on_worker_thread(self) -> bool:
         """Report whether the caller is running as one of this executor's workers.
 
@@ -100,26 +105,28 @@ class ThreadExecutor(ExecutorBase):
         self._worker_tasks = []
         self._cleanup_submissions()
 
-    async def _run_in_pool(self, pool: ThreadPoolExecutor, work_item: WorkItem) -> Any:  # ruff: ignore[any-type]
+    async def _run_in_pool(
+        self, pool: ThreadPoolExecutor, bundle: list[WorkItem]
+    ) -> list[Any]:
         loop = asyncio.get_running_loop()
-        self._in_flight += 1
+        self._in_flight += len(bundle)
         try:
             return await loop.run_in_executor(
-                pool,
-                partial(work_item.function, *work_item.args, **work_item.kwargs),
+                pool, partial(_run_bundle, _calls(bundle))
             )
         finally:
-            self._in_flight -= 1
+            self._in_flight -= len(bundle)
 
     async def _run_worker(self, pool: ThreadPoolExecutor) -> None:
         while True:
-            submission, work_item = await self._work_queue.get()
+            submission, bundle = await self._work_queue.get()
             if submission.is_finished:
                 # Its caller has already left, so running this wastes a worker.
                 continue
             try:
-                result = await self._run_in_pool(pool, work_item)
-                self._deliver(submission, work_item, result)
+                results = await self._run_in_pool(pool, bundle)
+                for work_item, result in zip(bundle, results, strict=True):
+                    self._deliver(submission, work_item, result)
             except asyncio.CancelledError:
                 self._abort(submission)
                 raise

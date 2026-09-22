@@ -138,6 +138,9 @@ def inner_optimization(  # ruff: ignore[too-many-arguments]
         function,
         pool=pool,
         handlers=[group],
+        # A whole inner batch goes to one worker: the parallelism comes from the
+        # outer runs.
+        bundle_size=0,
         # Within a batch only (batch_id, eval_idx) is unique: several rows share
         # a realization, so realization alone would not identify the caller.
         metadata={"outer_batch": context.batch_id, "outer_eval": context.eval_idx},
@@ -175,7 +178,7 @@ def main() -> None:
     # this process; on a process pool each worker would get an empty copy.
     memo: dict[tuple[float, ...], float] = {}
     with session() as active:
-        inner_pool = active.process_pool(workers=2, bundle_size=0)
+        inner_pool = active.process_pool(workers=2)
         outer_pool = active.thread_pool(workers=2)
         group = active.shared_handlers(tables)
         optimize(

@@ -121,11 +121,11 @@ own results, and return them as data for you to combine. Use that when the
 outer evaluations are genuinely independent; use the shape above when you want
 one pool and one table across all of them.
 
-The inner pool takes `bundle_size=0`, which sends a whole inner batch to one
-worker as a single task. Within one inner run that gives up parallelism
+The inner run passes `bundle_size=0`, which sends a whole inner batch to one
+worker at once. Within one inner run that gives up parallelism
 completely — its five realizations are evaluated one after another — but the
 parallelism here comes from the layer above: two outer evaluations run at once,
-each feeding the inner pool one task, so both workers are busy and each batch
+each feeding the inner pool one bundle, so both workers are busy and each batch
 costs one transfer instead of five. See
 [How a batch is split across workers](parallel.md#how-many-workers).
 
