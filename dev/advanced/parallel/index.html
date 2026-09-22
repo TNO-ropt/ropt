@@ -3817,10 +3817,10 @@ compute node, provided the interpreter's path is valid there.</p>
 absolute paths) and its captured stdout. It is also passed to <code>pysqa</code> as the
 job's <code>working_directory</code>, which the standard scheduler templates turn into a
 <code>chdir</code> directive (e.g. <code>#SBATCH --chdir=...</code>) — but whether a job actually runs
-there depends on the submission template, so do not rely on it. Because work item
-filenames derive from work item names, the executor <strong>refuses to overwrite</strong>
-pre-existing files; give each concurrently-running executor its own
-<code>workdir</code>.</p>
+there depends on the submission template, so do not rely on it. The files are
+named after a generated id, so executors sharing a <code>workdir</code> do not collide on
+them; a file already under that name is a leftover, and the executor
+<strong>refuses to overwrite</strong> it.</p>
 <h4 id="configuring-the-scheduler">Configuring the scheduler</h4>
 <p><code>config_path</code> is the directory <code>pysqa</code> reads. Without it the executor uses the
 site-wide configuration installed alongside ropt, at <code>&lt;prefix&gt;/share/ropt/pysqa/</code>,
