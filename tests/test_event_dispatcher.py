@@ -691,19 +691,24 @@ async def test_event_dispatcher_base_exception_tears_down(
     assert matched is not None
 
 
-def test_dispatcher_owned_handler_rejects_concurrent_handle_event(
+def test_dispatcher_owned_handler_serializes_concurrent_handle_event(
     config: dict[str, Any],
 ) -> None:
-    # The dispatcher serializes calls, but the concurrency guard still applies to
-    # a dispatcher-owned handler, so a stray direct call entering handle_event
-    # while it is already running (bypassing the dispatcher) is rejected.
+    # The dispatcher serializes calls, and the handler's own lock covers a stray
+    # direct call that bypasses it: the second call waits for the first.
     event = _event(EnOptContext.model_validate(config))
     entered = threading.Event()
     release = threading.Event()
+    calls: list[str] = []
+    calls_lock = threading.Lock()
 
     def _block(_event: EnOptEvent) -> None:
+        with calls_lock:
+            calls.append("enter")
         entered.set()
-        release.wait()
+        release.wait(timeout=5.0)
+        with calls_lock:
+            calls.append("exit")
 
     handler = CallbackHandler(
         event_types={EnOptEventType.FINISHED_EVALUATION}, callback=_block
@@ -712,13 +717,19 @@ def test_dispatcher_owned_handler_rejects_concurrent_handle_event(
 
     first = threading.Thread(target=handler.handle_event, args=(event,))
     first.start()
-    entered.wait()
+    entered.wait(timeout=5.0)
+    second = threading.Thread(target=handler.handle_event, args=(event,))
+    second.start()
     try:
-        with pytest.raises(WorkflowError, match="already running on another thread"):
-            handler.handle_event(event)
+        second.join(timeout=0.1)
+        assert second.is_alive()
+        assert calls == ["enter"]
     finally:
         release.set()
-        first.join()
+        first.join(timeout=5.0)
+        second.join(timeout=5.0)
+
+    assert calls == ["enter", "exit", "enter", "exit"]
 
 
 @pytest.mark.asyncio

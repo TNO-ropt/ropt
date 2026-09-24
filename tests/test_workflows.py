@@ -979,10 +979,11 @@ def test_evaluator_allows_repeated_use_on_same_thread() -> None:
     assert len(evaluator.threads) == 2
 
 
-def test_event_handler_raises_on_concurrent_use() -> None:
+def test_event_handler_serializes_concurrent_use() -> None:
     in_handle = threading.Event()
     can_finish = threading.Event()
-    thread2_error: list[BaseException | None] = [None]
+    calls: list[str] = []
+    calls_lock = threading.Lock()
 
     class _BlockingHandler(EventHandler):
         @property
@@ -990,32 +991,59 @@ def test_event_handler_raises_on_concurrent_use() -> None:
             return {EnOptEventType.FINISHED_EVALUATION}
 
         def _handle_event(self, _event: EnOptEvent) -> None:  # ruff: ignore[no-self-use]
+            with calls_lock:
+                calls.append("enter")
             in_handle.set()
-            can_finish.wait()
+            can_finish.wait(timeout=5.0)
+            with calls_lock:
+                calls.append("exit")
 
     handler = _BlockingHandler()
     mock_event = object()
 
-    def _thread1() -> None:
+    def _call() -> None:
         handler.handle_event(mock_event)  # type: ignore[arg-type]
 
-    def _thread2() -> None:
-        in_handle.wait()
-        try:
-            handler.handle_event(mock_event)  # type: ignore[arg-type]
-        except WorkflowError as exc:
-            thread2_error[0] = exc
+    first = threading.Thread(target=_call)
+    second = threading.Thread(target=_call)
+    first.start()
+    in_handle.wait(timeout=5.0)
+    second.start()
+    try:
+        # Blocked on the lock the first call holds, so it cannot get in.
+        second.join(timeout=0.1)
+        assert second.is_alive()
+        assert calls == ["enter"]
+    finally:
+        can_finish.set()
+        first.join(timeout=5.0)
+        second.join(timeout=5.0)
 
-    t1 = threading.Thread(target=_thread1)
-    t2 = threading.Thread(target=_thread2)
-    t1.start()
-    t2.start()
-    t2.join(timeout=5.0)
-    can_finish.set()
-    t1.join(timeout=5.0)
+    assert calls == ["enter", "exit", "enter", "exit"]
 
-    assert isinstance(thread2_error[0], WorkflowError)
-    assert "thread" in str(thread2_error[0])
+
+def test_event_handler_raises_on_reentrant_use() -> None:
+    class _ReentrantHandler(EventHandler):
+        def __init__(self) -> None:
+            super().__init__()
+            self.error: WorkflowError | None = None
+
+        @property
+        def event_types(self) -> set[EnOptEventType]:
+            return {EnOptEventType.FINISHED_EVALUATION}
+
+        def _handle_event(self, event: EnOptEvent) -> None:
+            try:
+                self.handle_event(event)
+            except WorkflowError as exc:
+                self.error = exc
+
+    handler = _ReentrantHandler()
+    mock_event = object()
+    handler.handle_event(mock_event)  # type: ignore[arg-type]
+
+    assert handler.error is not None
+    assert "further up this call stack" in str(handler.error)
 
 
 class _RecordingHandler(EventHandler):

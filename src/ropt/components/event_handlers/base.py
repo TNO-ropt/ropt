@@ -1,10 +1,11 @@
 """Base classes for event handler plugins and event handlers.
 
 A handler carries three separate pieces of state, which are easy to confuse
-because all three refuse something:
+because two of them refuse something:
 
-- `_in_use` covers one call to `handle_event`, and refuses a second one from
-  another thread.
+- `_event_lock` covers one call to `handle_event`, and makes a second one from
+  another thread wait. `_event_owner` records the thread inside it, so that a
+  re-entrant call raises instead of deadlocking on a lock it already holds.
 - `claim`/`release` cover a whole run, and are what a caller uses to say that a
   handler belongs to that run alone. A released handler can be claimed again,
   by a later run and by a different compute step.
@@ -45,11 +46,10 @@ class EventHandler(ABC):
     Handlers may store state using dictionary-like access (`[]`).
 
     Note:
-        A handler's `handle_event` is not re-entrant, and not safe to call from
-        two threads at once: both raise `WorkflowError`. Register a handler
-        shared across concurrently running steps with an
-        [`EventDispatcher`][ropt.components.event_handlers.EventDispatcher]
-        instead, which serializes the calls. See
+        A handler's `handle_event` serializes itself: a call from a second
+        thread waits for the first to finish. It is not re-entrant, so a call
+        that reaches the same handler again on the same stack raises
+        `WorkflowError` rather than deadlocking. See
         [Optimization Workflows](../advanced/workflows.md#event-handlers) and
         [Event dispatcher](../advanced/workflows.md#event-dispatcher) for usage
         and pitfalls.
@@ -61,9 +61,12 @@ class EventHandler(ABC):
         # access stays the only way in.
         self.__stored_values: dict[str, Any] = {}
         self._attached_to: _Attachment = _Attachment.NONE
-        self._in_use = False
         self._claimed = False
         self._owner_lock = threading.Lock()
+        # Separate from `_owner_lock`, which also guards claim/release: holding
+        # that one across `_handle_event` would block a release in another run.
+        self._event_lock = threading.Lock()
+        self._event_owner: int | None = None
 
     def _register_dispatcher(self) -> None:
         if self._attached_to is _Attachment.DISPATCHER:
@@ -146,22 +149,26 @@ class EventHandler(ABC):
     def handle_event(self, event: EnOptEvent) -> None:
         """React to an emitted event.
 
+        Calls from other threads are serialized: the second waits for the first
+        to finish.
+
         Args:
             event: The event object.
 
         Raises:
-            WorkflowError: If this handler is already running on another thread.
+            WorkflowError: If this handler is already running on this call stack.
         """
-        with self._owner_lock:
-            if self._in_use:
-                msg = "The event handler is already running on another thread."
-                raise WorkflowError(msg)
-            self._in_use = True
-        try:
-            self._handle_event(event)
-        finally:
-            with self._owner_lock:
-                self._in_use = False
+        # Read before acquiring, without synchronization: the only owner id a
+        # thread can read that equals its own is one it wrote itself.
+        if self._event_owner == threading.get_ident():
+            msg = "This event handler is already running further up this call stack."
+            raise WorkflowError(msg)
+        with self._event_lock:
+            self._event_owner = threading.get_ident()
+            try:
+                self._handle_event(event)
+            finally:
+                self._event_owner = None
 
     def __getitem__(self, key: str) -> Any:  # ruff: ignore[any-type]
         """Retrieve a stored value by key (`handler[key]`).
