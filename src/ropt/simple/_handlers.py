@@ -1,238 +1,42 @@
-"""Result handlers: local to one run, or shared by a group of runs.
+"""Wiring a run's result handlers to its compute step.
 
-Every entry point takes `handlers=`, a list that may mix two kinds of item:
+Every entry point takes `handlers=`, a list of
+[`EventHandler`][ropt.components.event_handlers.EventHandler] objects. The same
+handler may be given to several runs at once, sequential or concurrent, because
+[`handle_event`][ropt.components.event_handlers.EventHandler.handle_event]
+serializes its own calls.
 
-- an [`EventHandler`][ropt.components.event_handlers.EventHandler] is attached
-  to the run's compute step directly. Its `handle_event` serializes itself, so
-  the same handler may be given to several runs at once.
-- a [`SharedHandlers`][ropt.simple.SharedHandlers] group is **shared**. The run
-  forwards its events to the group's dispatcher, which serializes them across
-  every run feeding it, so its handlers accumulate results without locking.
-
-A group is built on a session with
-[`shared_handlers`][ropt.simple.Session.shared_handlers] and passed to runs
-explicitly, exactly like a pool.
-
-See [Result Handlers](../running/handlers.md) for the local-vs-shared
-distinction and lifecycle.
+See [Result Handlers](../running/handlers.md).
 """
 
 from __future__ import annotations
 
-from contextlib import contextmanager
-from typing import TYPE_CHECKING, Any, Self
-
-from ropt.components.event_handlers import (
-    EventDispatcher,
-    EventForwardHandler,
-    EventHandler,
-)
-from ropt.exceptions import WorkflowError
+from typing import TYPE_CHECKING, Any
 
 from ._report import make_report_handler
 
 if TYPE_CHECKING:
-    from collections.abc import Iterator, Sequence
+    from collections.abc import Sequence
 
     from ropt.components.compute_steps import ComputeStep
-    from ropt.enums import EnOptEventType
+    from ropt.components.event_handlers import EventHandler
 
     from ._report import ReportCallback
-    from ._session import _Session
 
 
-_IN_USE = (
-    "This handler already belongs to a group of shared handlers, and one "
-    "already held by another group cannot be shared twice. Use a separate "
-    "handler here."
-)
-
-_LISTED_TWICE = (
-    "This handler is listed more than once in the same group of shared "
-    "handlers. List it once."
-)
-
-
-class SharedHandlers:
-    """A group of result handlers that several runs share.
-
-    Created by [`shared_handlers`][ropt.simple.Session.shared_handlers] and
-    passed to the runs that should feed it. Each handler in the group sees the
-    results of every one of those runs, sequential or concurrent, and the
-    group's dispatcher serializes them, so a handler that accumulates across
-    runs needs no locking of its own.
-
-    A group lives until its session closes, which releases it and its handlers.
-    Release it earlier with [`close`][ropt.simple.SharedHandlers.close], or by
-    using it as a context manager. See
-    [Running Optimizations](../running/running.md) for a walkthrough.
-    """
-
-    def __init__(self, entries: Sequence[EventHandler], session: _Session) -> None:
-        """Initialize the group and start its dispatcher.
-
-        Args:
-            entries: The handlers of the group.
-            session: The session whose event loop the dispatcher runs on.
-        """
-        self._session = session
-        self._dispatcher = EventDispatcher()
-        self._handlers: list[EventHandler] = []
-        self._closed = False
-        try:
-            self._claim(entries)
-            # Registered before starting, so a session that shuts down during
-            # the start still has the group to close.
-            session.add_extra(self)
-            session.open_dispatcher(self._dispatcher)
-        except BaseException:
-            session.discard_extra(self)
-            self._release()
-            raise
-
-    @property
-    def closed(self) -> bool:
-        """Whether the group has been released.
-
-        Returns:
-            `True` once the group, or the session that built it, was closed.
-        """
-        return self._closed
-
-    def attach_to(self, step: ComputeStep[Any]) -> None:
-        """Forward the events of a run's compute step to this group's handlers.
-
-        A fresh forwarding handler is added per step (one handler cannot serve
-        several steps), carrying only the event types the group's handlers want.
-
-        Args:
-            step: The compute step whose events feed the shared handlers.
-        """
-        event_types: set[EnOptEventType] = set()
-        for handler in self._handlers:
-            event_types |= handler.event_types
-        # Only what some handler in the group asked for: forwarding blocks the
-        # run until the dispatcher is done, so events nobody wants cost it time.
-        if event_types:
-            step.add_event_handler(
-                EventForwardHandler(self._dispatcher, event_types=event_types)
-            )
-
-    def close(self) -> None:
-        """Release the group's handlers without waiting for the session to close.
-
-        See [Sharing a handler across concurrent runs](../running/handlers.md#sharing-a-handler-across-concurrent-runs)
-        for when this matters and the resulting lifecycle.
-        """
-        if self._closed:
-            return
-        self._closed = True
-        self._session.discard_extra(self)
-        try:
-            # Before cancelling, so the dispatcher is still there to remove them
-            # from; anything queued has already been handled, because
-            # `dispatch_event` blocks its caller until it has.
-            self._release()
-        finally:
-            self._session.close_dispatcher(self._dispatcher)
-
-    def __enter__(self) -> Self:
-        """Enter a block that closes the group on exit.
-
-        Returns:
-            The group itself.
-        """
-        return self
-
-    def __exit__(self, *_exc: object) -> None:
-        """Close the group."""
-        self.close()
-
-    def _claim(self, entries: Sequence[EventHandler]) -> None:
-        for handler in entries:
-            try:
-                self._dispatcher.add_event_handler(handler)
-            except WorkflowError as exc:
-                # The low-level refusal is phrased in terms of dispatchers,
-                # which this API never hands out, so both causes are restated
-                # here in its own vocabulary.
-                message = _LISTED_TWICE if handler in self._handlers else _IN_USE
-                raise WorkflowError(message) from exc
-            self._handlers.append(handler)
-
-    def _release(self) -> None:
-        # Cancelling a dispatcher does not unregister its handlers, so without
-        # this they would stay marked as attached and could never be used again.
-        handlers, self._handlers = self._handlers, []
-        for handler in handlers:
-            self._dispatcher.remove_event_handler(handler)
-
-
-def group_entries(
-    handlers: Sequence[EventHandler],
-    report: ReportCallback | None,
-) -> list[EventHandler]:
-    """Collect the handlers of a group.
-
-    Args:
-        handlers: The handlers of the group.
-        report:   An optional callback added to the group as a report handler.
-
-    Returns:
-        The handlers of the group.
-    """
-    entries = list(handlers)
-    if report is not None:
-        entries.append(make_report_handler(report))
-    return entries
-
-
-def split_handlers(
-    handlers: Sequence[EventHandler | SharedHandlers] | None,
-) -> tuple[list[EventHandler], list[SharedHandlers]]:
-    """Separate a run's local handlers from the groups it feeds.
-
-    Args:
-        handlers: The mixed list passed to an entry point, if any.
-
-    Returns:
-        The local handlers, and the shared groups, each in the given order.
-    """
-    local: list[EventHandler] = []
-    groups: list[SharedHandlers] = []
-    for item in handlers or ():
-        if isinstance(item, SharedHandlers):
-            groups.append(item)
-        else:
-            local.append(item)
-    return local, groups
-
-
-@contextmanager
 def attach_handlers(
     step: ComputeStep[Any],
-    handlers: Sequence[EventHandler | SharedHandlers] | None,
+    handlers: Sequence[EventHandler] | None,
     report: ReportCallback | None,
-) -> Iterator[None]:
-    """Wire a run's handlers to its compute step for the duration of the run.
-
-    Local handlers are attached to the step directly; shared groups get a
-    forwarding handler each. A handler may be given to several concurrent runs,
-    since `handle_event` serializes its own calls.
+) -> None:
+    """Wire a run's handlers to its compute step.
 
     Args:
         step:     The compute step of the run.
-        handlers: The local handlers and shared groups to wire up.
-        report:   An optional callback wired up as a local report handler.
-
-    Yields:
-        Nothing; the handlers stay attached for the body of the block.
+        handlers: The handlers to wire up, in the order they are called in.
+        report:   An optional callback wired up as a report handler.
     """
-    local, groups = split_handlers(handlers)
-    if report is not None:
-        local.append(make_report_handler(report))
-    for handler in local:
+    for handler in handlers or ():
         step.add_event_handler(handler)
-    for group in groups:
-        group.attach_to(step)
-    yield
+    if report is not None:
+        step.add_event_handler(make_report_handler(report))

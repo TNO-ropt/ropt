@@ -69,8 +69,8 @@ def offload(
 
     See [Running Optimizations](../running/running.md) for a walkthrough.
 
-    A handler in a shared group runs on the session's own event loop and cannot
-    wait on it; offloading from there raises a
+    A caller running on the pool's own event loop cannot wait on it, and
+    offloading from there raises a
     [`WorkflowError`][ropt.exceptions.WorkflowError]. So does a pool that is
     closed, or one carried into a worker process. A call that the machinery
     could not run, for instance because its worker process was killed, raises an
@@ -109,8 +109,8 @@ def _dispatchable(pool: WorkerPool | None) -> Executor | None:
     executor = None if pool is None else pool.executor
     if executor is not None and executor.on_worker_loop():
         msg = (
-            "offload() cannot be called from a result handler "
-            "(it runs on the session's event loop)."
+            "offload() cannot be called from the event loop that runs the "
+            "pool's work; waiting there would starve that work."
         )
         raise WorkflowError(msg)
     return executor

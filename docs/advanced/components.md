@@ -54,10 +54,10 @@ filters on it, so a handler is never called for a type it did not ask for.
 Expose accumulated state through `__getitem__`, which is the convention the
 built-in handlers follow and what `handler[key]` reads.
 
-`_handle_event` must not block for long when the handler is registered with an
-[`EventDispatcher`][ropt.components.event_handlers.EventDispatcher]: the
-dispatcher serializes events, so a slow handler delays every run sharing it. See
-[Event throughput](workflows.md#event-throughput).
+`_handle_event` runs on the thread that emitted the event, under a lock the
+handler takes for every call. A slow `_handle_event` therefore delays the
+emitting run, and every other run waiting on the same handler. See
+[Using handlers safely](workflows.md#using-handlers-safely).
 
 ## Executor
 

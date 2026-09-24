@@ -1,4 +1,4 @@
-"""Tests for the checks the entry points run on pools and handler groups."""
+"""Tests for the checks the entry points run on pools."""
 
 # Every check is asserted at every entry point that takes the argument. The
 # entry points do not share a single code path, so a check added to one is
@@ -80,16 +80,6 @@ _TAKES_A_POOL = pytest.mark.parametrize(
     ],
 )
 
-_TAKES_HANDLERS = pytest.mark.parametrize(
-    "entry_point",
-    [
-        pytest.param(_optimize, id="optimize"),
-        pytest.param(_optimize_many, id="optimize_many"),
-        pytest.param(_evaluate, id="evaluate"),
-        pytest.param(_evaluate_many, id="evaluate_many"),
-    ],
-)
-
 
 @_TAKES_A_POOL
 def test_live_pool_accepted(entry_point: Callable[..., None]) -> None:
@@ -112,23 +102,6 @@ def test_pool_from_a_closed_session_refused(entry_point: Callable[..., None]) ->
         pool = active.thread_pool(workers=1)
     with pytest.raises(WorkflowError, match="closed"):
         entry_point(pool=pool)
-
-
-@_TAKES_HANDLERS
-def test_closed_group_refused(entry_point: Callable[..., None]) -> None:
-    with session() as active:
-        group = active.shared_handlers(HistoryHandler())
-        group.close()
-        with pytest.raises(WorkflowError, match="closed"):
-            entry_point(handlers=[group])
-
-
-@_TAKES_HANDLERS
-def test_group_from_a_closed_session_refused(entry_point: Callable[..., None]) -> None:
-    with session() as active:
-        group = active.shared_handlers(HistoryHandler())
-    with pytest.raises(WorkflowError, match="closed"):
-        entry_point(handlers=[group])
 
 
 def _offload_again(pool: WorkerPool) -> int:
@@ -205,8 +178,8 @@ def _executor_of(active: Session) -> Any:
     return active.thread_pool(workers=1).executor
 
 
-def _group_of(active: Session) -> Any:
-    return active.shared_handlers(HistoryHandler())
+def _handler_of(_active: Session) -> Any:
+    return HistoryHandler()
 
 
 @pytest.mark.slow
@@ -215,7 +188,7 @@ def _group_of(active: Session) -> Any:
     [
         pytest.param(_pool_of, id="pool"),
         pytest.param(_executor_of, id="executor"),
-        pytest.param(_group_of, id="handlers"),
+        pytest.param(_handler_of, id="handler"),
     ],
 )
 def test_carrying_a_session_object_into_a_worker(

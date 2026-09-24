@@ -59,6 +59,6 @@ print(f"best objective after {RESTARTS} restarts: {result.results.target_objecti
 
 ## See also
 
-- Restarting concurrent, rather than sequential, runs needs a **shared**
-  handler group instead of a reused one:
+- Restarting concurrent, rather than sequential, runs collects into the same
+  handler:
   [Result Handlers](handlers.md#sharing-a-handler-across-concurrent-runs).

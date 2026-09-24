@@ -10,7 +10,7 @@ inner optimization over the remaining ones, returning the best value it reached.
     Nesting itself is a niche, but this page puts four things that are not
     into one program small enough to read end to end: choosing a pool per
     layer, and why one of them has to stay on threads; collecting results from
-    runs that overlap in time, through a shared group; reusing an evaluation
+    runs that overlap in time, in one handler; reusing an evaluation
     the optimizer has already made; and moving the expensive layer to a cluster
     by changing a single line.
 
@@ -30,7 +30,7 @@ flowchart TB
             in1["outer eval →<br/>inner optimize"]
             in2["outer eval →<br/>inner optimize"]
         end
-        grp["shared group →<br/>DataFrameHandler"]
+        grp["shared<br/>DataFrameHandler"]
         outer --> in1
         outer --> in2
         in1 -.->|"results"| grp
@@ -100,8 +100,8 @@ preference:
 ```
 
 The outer pool is a **thread** pool. Outer evaluations therefore stay inside
-this process, where the inner pool and the shared handler group are live
-objects; on a process pool they would arrive as copies, which `ropt` refuses.
+this process, where the inner pool and the shared handler are live objects; on
+a process pool they would arrive as copies, which `ropt` refuses.
 The inner
 pool is a **process** pool, which is where the real work goes.
 
@@ -163,10 +163,10 @@ outer evaluations that were computed, not for every outer evaluation.
 
 ## Collecting results from runs that overlap
 
-The inner runs are concurrent, so a plain handler cannot collect them: a handler
-is claimed by one run at a time, and the second run to claim it is refused. A
-[**shared group**](handlers.md#sharing-a-handler-across-concurrent-runs) can,
-because it routes every run's results through one dispatcher. Feed it a
+The inner runs are concurrent, and [one
+handler](handlers.md#sharing-a-handler-across-concurrent-runs) collects them
+all: it takes a lock around every call, so the runs wait for each other rather
+than interleaving. Give every inner run the same
 [`DataFrameHandler`](handlers.md#dataframehandler) and every inner evaluation
 from every inner run lands in one table, keyed by the outer evaluation it
 belongs to.

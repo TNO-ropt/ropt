@@ -7,10 +7,10 @@ process and can reach the inner pool, and the inner evaluations run on a process
 pool of their own. Handing the inner run the pool it is already running on would
 instead be refused, since it would wait for the workers it occupies.
 
-The inner runs all feed one shared `DataFrameHandler`. They overlap, so a
-shared group is what makes that safe: the group serializes every run's results
-through a single dispatcher. Each inner run tags its results with the outer
-evaluation that started it, so every row in the frame can be traced back.
+The inner runs all feed one `DataFrameHandler`. They overlap, which the handler
+allows: `handle_event` serializes its own calls, so a second run waits for the
+first. Each inner run tags its results with the outer evaluation that started
+it, so every row in the frame can be traced back.
 
 The outer optimizer works on integer variables and revisits points it has
 already tried. The outer evaluation function keeps a memo of the objectives it
@@ -30,7 +30,6 @@ from ropt.simple import (
     DataFrameHandler,
     EvaluationFunction,
     EvaluationFunctionContext,
-    SharedHandlers,
     WorkerPool,
     optimize,
     session,
@@ -107,20 +106,20 @@ def inner_optimization(  # ruff: ignore[too-many-arguments]
     context: EvaluationFunctionContext,
     *,
     pool: WorkerPool,
-    group: SharedHandlers,
+    tables: DataFrameHandler,
     function: EvaluationFunction,
     memo: dict[tuple[float, ...], float],
 ) -> float:
     """Evaluate one outer point by optimizing the inner variables at it.
 
-    Runs in a thread of the outer pool, so the inner pool, the shared group and
-    the memo are live objects here rather than copies.
+    Runs in a thread of the outer pool, so the inner pool, the handler and the
+    memo are live objects here rather than copies.
 
     Args:
         variables: The outer variable vector to evaluate.
         context:   The evaluation context, identifying this outer evaluation.
         pool:      The pool the inner evaluations run on.
-        group:     The shared handlers every inner run feeds.
+        tables:    The handler every inner run feeds.
         function:  The objective the inner optimization minimizes.
         memo:      Objectives already computed, keyed by outer point.
 
@@ -137,7 +136,7 @@ def inner_optimization(  # ruff: ignore[too-many-arguments]
         np.where(MASK, INITIAL_VALUES, variables),
         function,
         pool=pool,
-        handlers=[group],
+        handlers=[tables],
         # A whole inner batch goes to one worker: the parallelism comes from the
         # outer runs.
         bundle_size=0,
@@ -180,14 +179,13 @@ def main() -> None:
     with session() as active:
         inner_pool = active.process_pool(workers=2)
         outer_pool = active.thread_pool(workers=2)
-        group = active.shared_handlers(tables)
         optimize(
             OUTER_CONFIG,
             INITIAL_VALUES,
             partial(
                 inner_optimization,
                 pool=inner_pool,
-                group=group,
+                tables=tables,
                 function=partial(rosenbrock, a=a, b=b),
                 memo=memo,
             ),

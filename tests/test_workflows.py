@@ -18,7 +18,6 @@ from ropt.components.evaluators import (
 )
 from ropt.components.event_handlers import (
     CallbackHandler,
-    EventDispatcher,
     EventHandler,
     HistoryHandler,
     ResultsHandler,
@@ -1086,74 +1085,3 @@ def test_event_handler_allows_repeated_use_on_same_thread() -> None:
     handler.handle_event(event)  # type: ignore[arg-type]
 
     assert len(handler.threads) == 2
-
-
-def test_dispatcher_handler_is_not_thread_pinned() -> None:
-    handler = _RecordingHandler()
-    handler._register_dispatcher()  # ruff: ignore[private-member-access]
-    event = object()
-    errors: list[BaseException] = []
-
-    def _use() -> None:
-        try:
-            handler.handle_event(event)  # type: ignore[arg-type]
-        except WorkflowError as exc:  # pragma: no cover - should not happen
-            errors.append(exc)
-
-    _run_in_thread(_use)
-    _run_in_thread(_use)
-
-    assert errors == []
-    assert len(handler.threads) == 2
-
-
-def test_register_dispatcher_twice_raises() -> None:
-    handler = _RecordingHandler()
-    handler._register_dispatcher()  # ruff: ignore[private-member-access]
-    with pytest.raises(WorkflowError, match="already registered with a dispatcher"):
-        handler._register_dispatcher()  # ruff: ignore[private-member-access]
-
-
-def test_register_dispatcher_via_add_event_handler_twice_raises() -> None:
-    handler = _RecordingHandler()
-    dispatcher = EventDispatcher()
-    dispatcher.add_event_handler(handler)
-    with pytest.raises(WorkflowError, match="already registered with a dispatcher"):
-        dispatcher.add_event_handler(handler)
-
-
-def test_handler_may_be_attached_to_a_dispatcher_and_a_compute_step(
-    evaluator: Any,
-) -> None:
-    handler = _RecordingHandler()
-    handler._register_dispatcher()  # ruff: ignore[private-member-access]
-    OptimizationStep(evaluator=evaluator()).add_event_handler(handler)
-
-
-def test_claim_marks_handler_as_claimed() -> None:
-    handler = _RecordingHandler()
-    assert handler._claimed is False  # ruff: ignore[private-member-access]
-    handler.claim()
-    assert handler._claimed is True  # ruff: ignore[private-member-access]
-
-
-def test_claim_twice_raises() -> None:
-    handler = _RecordingHandler()
-    handler.claim()
-    with pytest.raises(WorkflowError, match="already been claimed for exclusive use"):
-        handler.claim()
-
-
-def test_release_allows_reclaiming() -> None:
-    handler = _RecordingHandler()
-    handler.claim()
-    handler.release()
-    assert handler._claimed is False  # ruff: ignore[private-member-access]
-    handler.claim()  # allowed once released
-    assert handler._claimed is True  # ruff: ignore[private-member-access]
-
-
-def test_release_without_claim_is_a_noop() -> None:
-    handler = _RecordingHandler()
-    handler.release()
-    assert handler._claimed is False  # ruff: ignore[private-member-access]

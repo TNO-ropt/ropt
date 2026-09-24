@@ -16,16 +16,10 @@ are configured in.
 
 The [`report`](running.md#reporting-progress) callback you may already be using
 is only shorthand for this: `report=` builds a handler for you behind the
-scenes. Where you pass it determines which kind. Given to a run, as
-`optimize(..., report=...)`, it becomes a **local** handler of that run. Given
-to [`shared_handlers`][ropt.simple.Session.shared_handlers], as
-`shared_handlers(..., report=...)`, it joins that
-[group](#sharing-a-handler-across-concurrent-runs) instead, and sees the results
-of every run feeding it.
+scenes, added to the run it is given to.
 
 Attach handlers to a run with the `handlers` argument. The same handler can be
-passed to several **sequential** `optimize` calls, accumulating the results of
-each in turn:
+passed to several `optimize` calls, accumulating the results of each in turn:
 
 ```python
 from ropt.simple import HistoryHandler, optimize
@@ -44,12 +38,12 @@ Handlers that store results expose them through `handler["results"]` (and, for
 
 ## Sharing a handler across concurrent runs
 
-A local handler belongs to one run at a time, so it cannot collect from
-optimizations that run **concurrently** — the runs of an
-[`optimize_many`](parallel.md#many-optimizations-at-once). Put it
-in a **shared group** instead, built on the session with
-[`shared_handlers`][ropt.simple.Session.shared_handlers], and pass the group
-where you would pass the handler:
+The same handler may also be given to runs that execute **concurrently** — the
+runs of an [`optimize_many`](parallel.md#many-optimizations-at-once), or runs
+you start on threads of your own. A handler's
+[`handle_event`][ropt.components.event_handlers.EventHandler.handle_event]
+takes a lock around each call, so a second run waits for the first to finish
+rather than interleaving with it:
 
 ```python
 from ropt.simple import HistoryHandler, optimize_many, session
@@ -57,70 +51,37 @@ from ropt.simple import HistoryHandler, optimize_many, session
 history = HistoryHandler()
 with session() as s:
     pool = s.thread_pool(workers=4)
-    collected = s.shared_handlers(history)
-    optimize_many(config, start_points, objective, pool=pool, handlers=[collected])
+    optimize_many(config, start_points, objective, pool=pool, handlers=[history])
 
 print(history.results)
 ```
 
-A group takes as many handlers as you like — `shared_handlers(history, tables)` —
-and every one of them sees the results of every run feeding the group. A group
-is passed around exactly like a pool: it is an object, so a run can feed
-several groups at once, mix them with local handlers of its own, and nothing is
-picked up from the surrounding code. `optimize_many` accepts *only* groups in
-`handlers=` — a bare handler there is rejected, because its runs overlap.
+The results of the concurrent runs arrive interleaved, in an order that depends
+on which run reaches the handler first. Take the order from the results
+themselves — `batch_id`, or a `metadata` field you set per run — rather than
+from the order they arrive in.
 
 [examples/simple/handlers.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/handlers.py)
-feeds two groups from the same set of concurrent runs:
+feeds two handlers from the same set of concurrent runs:
 
 ```python
---8<-- "examples/simple/handlers.py:groups"
+--8<-- "examples/simple/handlers.py:shared"
 ```
 
-Like a pool, a group lives until its session closes, which releases it and its
-handlers; the same handler objects can then join a group on a later
-session.
+!!! warning "Do not start a run from inside a handler that the run can reach"
+    A handler is free to start a run of its own, but its own lock is held while
+    it does. If that run lists the same handler, the handler is entered a
+    second time. On the thread that emitted the event this raises a
+    [`WorkflowError`][ropt.exceptions.WorkflowError]; on another thread — the
+    driver threads of an [`optimize_many`][ropt.simple.optimize_many] — it
+    waits for a lock the first thread will not release until the run ends, and
+    both stop. The same holds for two handlers that each start a run reaching
+    the other. Give the inner run handlers of its own.
 
-Closing a group earlier **releases its handlers**. A handler belongs to one
-group at a time, so this is what lets you put one into another group; otherwise
-only the session ending frees it. The group also releases the dispatcher it
-runs on, so closing groups built in a loop as you go frees those resources
-earlier than closing them all at the end. Use [`close`][ropt.simple.SharedHandlers.close], or the group as a context
-manager, which closes it on exit:
-
-```python
-with session() as s:
-    for start_points in cases:
-        with s.shared_handlers(history) as collected:
-            optimize_many(config, start_points, objective, handlers=[collected])
-```
-
-Closing discards nothing: the handlers are your own objects, and a released
-`HistoryHandler` still holds everything it collected. Nor can it lose a result,
-since a run waits for its events to be handled before it goes on. What ends is
-the group's use as a destination — a closed group is refused like a closed pool,
-so a run given one stops immediately with a
-[`WorkflowError`][ropt.exceptions.WorkflowError] rather than running to
-completion while its results go nowhere.
-
-!!! warning "A shared group costs more than a reused local handler"
-    A group routes every run's events through a single, serialized
-    [`EventDispatcher`][ropt.components.event_handlers.EventDispatcher] on a
-    background loop. That serialization is what makes a
-    handler safe to share across *concurrent* runs. Around a plain
-    **sequential** loop it adds a background loop plus a cross-thread hand-off
-    per result, and a reused local handler accumulates the same results without
-    either. A handler in a group runs on the shared loop, so a slow one holds
-    up every run feeding the group.
-
-!!! warning "Local first, shared never after"
-    The two roles are not interchangeable, and a handler can move from one to
-    the other in only one direction. A group releases its handlers when it
-    closes, so a handler that has only ever been shared can afterwards be used
-    either way. But passing a handler to a run as a local handler binds it to
-    that run's compute step permanently, and `shared_handlers` will refuse it
-    from then on. Decide per handler which of the two roles it plays; if you
-    need both, use two handlers.
+Two handlers that write to the same external state are each serialized on their
+own, but not as a pair: a run can be inside one while another run is inside the
+other. Take a [`threading.Lock`][threading.Lock] of your own inside both
+`_handle_event` implementations if they must not overlap.
 
 ## Built-in handlers
 
@@ -313,11 +274,11 @@ object — happened **inside the worker** and is discarded when it finishes; you
 handlers and your main program never see it.
 
 !!! note "Sessions stay in the main process"
-    A pool, a shared group, and the session behind them are tied to the main
-    process, so they are not usable in a worker. An objective that closes over
-    one — to offload work, or to start an inner run on it — is stopped in the
-    worker, which reports the object by name. Do that work in the objective
-    itself, or return what you need and act on it in the main process.
+    A pool, and the session behind it, are tied to the main process, so they
+    are not usable in a worker. An objective that closes over one — to offload
+    work, or to start an inner run on it — is stopped in the worker, which
+    reports the object by name. Do that work in the objective itself, or return
+    what you need and act on it in the main process.
 
 So to get extra information from an evaluation to a handler (or to a later part
 of your program), **return it** instead of stashing it in shared state: attach it

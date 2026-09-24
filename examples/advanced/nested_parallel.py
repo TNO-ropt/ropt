@@ -29,8 +29,6 @@ from ropt.components.evaluators import (
 )
 from ropt.components.event_handlers import (
     CallbackHandler,
-    EventDispatcher,
-    EventForwardHandler,
     ResultsHandler,
 )
 from ropt.components.executors import ProcessExecutor, ThreadExecutor
@@ -123,17 +121,13 @@ def main() -> None:
     a = rng.normal(loc=1.0, scale=UNCERTAINTY, size=REALIZATIONS)
     b = rng.normal(loc=100.0, scale=100 * UNCERTAINTY, size=REALIZATIONS)
 
-    # Create a global results handler and event dispatcher to collect all inner
-    # results. It runs in a separate thread so that the inner jobs can submit
-    # events to it from any thread.
+    # Global handlers collecting the results of every inner optimization. They
+    # are attached to each inner step, which the outer threads run at the same
+    # time; `handle_event` serializes its own calls, so one waits for the other.
     global_results = ResultsHandler()
-    event_dispatcher = EventDispatcher()
-    event_dispatcher.add_event_handler(global_results)
-    event_dispatcher.add_event_handler(
-        CallbackHandler(
-            callback=report,
-            event_types={EnOptEventType.FINISHED_EVALUATION},
-        )
+    global_report = CallbackHandler(
+        callback=report,
+        event_types={EnOptEventType.FINISHED_EVALUATION},
     )
 
     # Subprocess pool, shared across all outer evaluations.
@@ -169,12 +163,8 @@ def main() -> None:
         step = OptimizationStep(evaluator=inner_evaluator)
         result_handler = ResultsHandler()
         step.add_event_handler(result_handler)
-        step.add_event_handler(
-            EventForwardHandler(
-                event_dispatcher,
-                event_types={EnOptEventType.FINISHED_EVALUATION},
-            )
-        )
+        step.add_event_handler(global_results)
+        step.add_event_handler(global_report)
 
         # Tag every inner result with the outer worker thread that ran this
         # _optimize call, so the report can show parallelism at both layers.
@@ -203,11 +193,9 @@ def main() -> None:
         async with asyncio.TaskGroup() as tg:
             await inner_executor.start(tg)
             await outer_executor.start(tg)
-            await event_dispatcher.start(tg)
             await asyncio.to_thread(outer_step.run, outer_context, INITIAL_VALUES)
             outer_executor.cancel()
             inner_executor.cancel()
-            event_dispatcher.cancel()
 
     asyncio.run(_run())
 

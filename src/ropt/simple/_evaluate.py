@@ -17,8 +17,8 @@ from ropt.components.event_handlers import HistoryHandler
 from ropt.context import EnOptContext
 
 from ._evaluator import make_evaluator
-from ._guards import check_handlers, check_pool
-from ._handlers import SharedHandlers, attach_handlers
+from ._guards import check_pool
+from ._handlers import attach_handlers
 from ._pool import serial_pool
 
 if TYPE_CHECKING:
@@ -41,7 +41,7 @@ def evaluate(  # ruff: ignore[too-many-arguments]
     function: EvaluationFunction,
     *,
     pool: WorkerPool | None = None,
-    handlers: Sequence[EventHandler | SharedHandlers] | None = None,
+    handlers: Sequence[EventHandler] | None = None,
     report: ReportCallback | None = None,
     bundle_size: int = 1,
     metadata: dict[str, Any] | None = None,
@@ -52,8 +52,8 @@ def evaluate(  # ruff: ignore[too-many-arguments]
     vectors at once. See [Running Optimizations](../running/running.md) for a
     walkthrough.
 
-    A pool or group that is closed — because it was closed directly, or
-    because its session ended — is refused here with a
+    A pool that is closed — because it was closed directly, or because its
+    session ended — is refused here with a
     [`WorkflowError`][ropt.exceptions.WorkflowError], as is one carried into
     a worker process, where it cannot work at all.
 
@@ -61,10 +61,9 @@ def evaluate(  # ruff: ignore[too-many-arguments]
     run started from inside an evaluation needs a pool with workers of its own:
     the pool it is already running on refuses the work. A
     [`serial_pool`][ropt.simple.serial_pool] evaluates inline and has no workers
-    to occupy, so it can be reused. `handlers` mixes local
-    [`EventHandler`][ropt.components.event_handlers.EventHandler] objects with
-    shared [`SharedHandlers`][ropt.simple.SharedHandlers] groups, as
-    [`optimize`][ropt.simple.optimize] takes them.
+    to occupy, so it can be reused. `handlers` takes
+    [`EventHandler`][ropt.components.event_handlers.EventHandler] objects, as
+    [`optimize`][ropt.simple.optimize] does.
 
     An evaluation is a single batch that has already run by the time `report`
     sees it, and there is no optimizer loop to interrupt, so unlike on
@@ -77,7 +76,7 @@ def evaluate(  # ruff: ignore[too-many-arguments]
         variables:   The variable vector to evaluate.
         function:    The per-realization evaluation function.
         pool:        The pool to evaluate on, from a session factory.
-        handlers:    Optional local handlers and shared groups.
+        handlers:    Optional handlers, called in the order listed.
         report:      Optional callback invoked with each evaluation's results.
         bundle_size: Evaluations per worker task, `0` for a whole batch.
         metadata:    Optional dictionary attached to the emitted results.
@@ -89,7 +88,6 @@ def evaluate(  # ruff: ignore[too-many-arguments]
         ValueError: If `variables` is not a single vector.
     """
     check_pool(pool)
-    check_handlers(handlers)
     array = np.asarray(variables, dtype=np.float64)
     if array.ndim != 1:
         msg = "evaluate() takes a single vector; use evaluate_many() for a batch."
@@ -113,7 +111,7 @@ def evaluate_many(  # ruff: ignore[too-many-arguments]
     function: EvaluationFunction,
     *,
     pool: WorkerPool | None = None,
-    handlers: Sequence[EventHandler | SharedHandlers] | None = None,
+    handlers: Sequence[EventHandler] | None = None,
     report: ReportCallback | None = None,
     bundle_size: int = 1,
     metadata: dict[str, Any] | None = None,
@@ -124,8 +122,8 @@ def evaluate_many(  # ruff: ignore[too-many-arguments]
     the same order. See [Running Optimizations](../running/running.md) for a
     walkthrough.
 
-    A pool or group that is closed — because it was closed directly, or
-    because its session ended — is refused here with a
+    A pool that is closed — because it was closed directly, or because its
+    session ended — is refused here with a
     [`WorkflowError`][ropt.exceptions.WorkflowError], as is one carried into
     a worker process, where it cannot work at all.
 
@@ -133,10 +131,9 @@ def evaluate_many(  # ruff: ignore[too-many-arguments]
     run started from inside an evaluation needs a pool with workers of its own:
     the pool it is already running on refuses the work. A
     [`serial_pool`][ropt.simple.serial_pool] evaluates inline and has no workers
-    to occupy, so it can be reused. `handlers` mixes local
-    [`EventHandler`][ropt.components.event_handlers.EventHandler] objects with
-    shared [`SharedHandlers`][ropt.simple.SharedHandlers] groups, as
-    [`optimize`][ropt.simple.optimize] takes them.
+    to occupy, so it can be reused. `handlers` takes
+    [`EventHandler`][ropt.components.event_handlers.EventHandler] objects, as
+    [`optimize`][ropt.simple.optimize] does.
 
     An evaluation is a single batch that has already run by the time `report`
     sees it, and there is no optimizer loop to interrupt, so unlike on
@@ -149,7 +146,7 @@ def evaluate_many(  # ruff: ignore[too-many-arguments]
         variables:   The variable vectors to evaluate, one per row.
         function:    The per-realization evaluation function.
         pool:        The pool to evaluate on, from a session factory.
-        handlers:    Optional local handlers and shared groups.
+        handlers:    Optional handlers, called in the order listed.
         report:      Optional callback invoked with each evaluation's results.
         bundle_size: Evaluations per worker task, `0` for a whole batch.
         metadata:    Optional dictionary attached to every emitted result.
@@ -161,7 +158,6 @@ def evaluate_many(  # ruff: ignore[too-many-arguments]
         ValueError: If `variables` is not a 2-D matrix.
     """
     check_pool(pool)
-    check_handlers(handlers)
     array = np.asarray(variables, dtype=np.float64)
     if array.ndim != 2:  # ruff: ignore[magic-value-comparison]
         msg = (
@@ -188,7 +184,7 @@ def _run_evaluation(  # ruff: ignore[too-many-arguments]
     variables: ArrayLike,
     function: EvaluationFunction,
     *,
-    handlers: Sequence[EventHandler | SharedHandlers] | None,
+    handlers: Sequence[EventHandler] | None,
     report: ReportCallback | None,
     bundle_size: int,
     metadata: dict[str, Any] | None,
@@ -202,10 +198,10 @@ def _run_evaluation(  # ruff: ignore[too-many-arguments]
     history = HistoryHandler()
     step = EvaluationStep(evaluator=evaluator)
     step.add_event_handler(history)
-    with attach_handlers(step, handlers, report):
-        step.run(
-            context=context,
-            variables=np.asarray(variables, dtype=np.float64),
-            metadata=metadata,
-        )
+    attach_handlers(step, handlers, report)
+    step.run(
+        context=context,
+        variables=np.asarray(variables, dtype=np.float64),
+        metadata=metadata,
+    )
     return history["results"] or ()

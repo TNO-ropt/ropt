@@ -15,7 +15,8 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 import pytest
 
-from ropt.components.event_handlers import EventDispatcher, EventHandler
+from ropt.components.event_handlers import EventHandler
+from ropt.components.executors import ThreadExecutor
 from ropt.enums import EnOptEventType
 from ropt.exceptions import ExecutionError, WorkflowError
 from ropt.simple import WorkerPool, offload, optimize, serial_pool, session
@@ -199,7 +200,7 @@ def test_dying_session_leaves_no_unretrieved_exception(
 
 
 @pytest.mark.timeout(30)
-def test_group_on_dead_session_reports_stopped() -> None:
+def test_pool_on_dead_session_reports_stopped() -> None:
     captured: list[BaseException] = []
 
     def _reopen_after_the_session_dies(active: Session) -> None:
@@ -207,7 +208,7 @@ def test_group_on_dead_session_reports_stopped() -> None:
         with pytest.raises(SystemExit):
             offload(_exit_process, pool=pool)
         try:
-            active.shared_handlers()
+            active.thread_pool(workers=1)
         except BaseException as exc:  # ruff: ignore[blind-except]
             captured.append(exc)
 
@@ -239,7 +240,7 @@ def test_shutdown_race_reports_stopped_session(
         lambda: next(seen, True),
     )
     with pytest.raises(WorkflowError, match="is not running"):
-        sess.open_dispatcher(EventDispatcher())
+        sess.open_pool(lambda: ThreadExecutor(workers=1))
 
 
 class _OffloadingHandler(EventHandler):
@@ -274,20 +275,9 @@ def _run_one(**kwargs: Any) -> None:
 
 
 @pytest.mark.timeout(60)
-def test_inline_handler_in_shared_group_cannot_offload() -> None:
-    handler = _OffloadingHandler()
-    with session() as active:
-        group = active.shared_handlers(handler)
-        handler.pool = active.thread_pool(workers=2)
-        _run_one(pool=handler.pool, handlers=[group])
-    assert handler.outcome is not None
-    assert "event loop" in handler.outcome
-
-
-@pytest.mark.timeout(60)
-def test_local_handler_can_offload() -> None:
-    # A handler passed straight to `optimize` is not on any event loop: it runs
-    # on the thread driving the run, where the pool it is given works as usual.
+def test_handler_can_offload() -> None:
+    # A handler runs on the thread driving the run, not on any event loop, so
+    # the pool it is given works there as usual.
     handler = _OffloadingHandler()
     with session() as active:
         pool = active.thread_pool(workers=2)

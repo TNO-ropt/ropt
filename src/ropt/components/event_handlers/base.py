@@ -1,16 +1,8 @@
 """Base classes for event handler plugins and event handlers.
 
-A handler carries three separate pieces of state, which are easy to confuse
-because two of them refuse something:
-
-- `_event_lock` covers one call to `handle_event`, and makes a second one from
-  another thread wait. `_event_owner` records the thread inside it, so that a
-  re-entrant call raises instead of deadlocking on a lock it already holds.
-- `claim`/`release` cover a whole run, and are what a caller uses to say that a
-  handler belongs to that run alone. A released handler can be claimed again,
-  by a later run and by a different compute step.
-- `_in_dispatcher` records whether the handler is fed by a dispatcher, which
-  one dispatcher at a time may be.
+`_event_lock` covers one call to `handle_event`, and makes a second one from
+another thread wait. `_event_owner` records the thread inside it, so that a
+re-entrant call raises instead of deadlocking on a lock it already holds.
 """
 
 from __future__ import annotations
@@ -37,12 +29,12 @@ class EventHandler(ABC):
 
     Note:
         A handler's `handle_event` serializes itself: a call from a second
-        thread waits for the first to finish. It is not re-entrant, so a call
-        that reaches the same handler again on the same stack raises
-        `WorkflowError` rather than deadlocking. See
-        [Optimization Workflows](../advanced/workflows.md#event-handlers) and
-        [Event dispatcher](../advanced/workflows.md#event-dispatcher) for usage
-        and pitfalls.
+        thread waits for the first to finish, so the same handler may be
+        attached to several compute steps running at once. It is not
+        re-entrant, so a call that reaches the same handler again on the same
+        stack raises `WorkflowError` rather than deadlocking. See
+        [Optimization Workflows](../advanced/workflows.md#event-handlers) for
+        usage and pitfalls.
     """
 
     def __init__(self) -> None:
@@ -50,58 +42,8 @@ class EventHandler(ABC):
         # Name-mangled, so a subclass cannot reach it by accident and the `[]`
         # access stays the only way in.
         self.__stored_values: dict[str, Any] = {}
-        self._in_dispatcher = False
-        self._claimed = False
-        self._owner_lock = threading.Lock()
-        # Separate from `_owner_lock`, which also guards claim/release: holding
-        # that one across `_handle_event` would block a release in another run.
         self._event_lock = threading.Lock()
         self._event_owner: int | None = None
-
-    def _register_dispatcher(self) -> None:
-        if self._in_dispatcher:
-            msg = "This event handler is already registered with a dispatcher."
-            raise WorkflowError(msg)
-        self._in_dispatcher = True
-
-    def _unregister_dispatcher(self) -> None:
-        self._in_dispatcher = False
-
-    def claim(self) -> None:
-        """Claim this handler for exclusive use by one run at a time.
-
-        Claiming marks the handler as dedicated to a single consumer, such as
-        one optimization run, until it is released with
-        [`release`][ropt.components.event_handlers.EventHandler.release]. While a
-        claim is held, a second claim raises, so a handler can never be shared by
-        two runs at once; releasing it at the end of a run lets the same handler
-        be reused by a later, sequential run, for example to accumulate results.
-        Handlers meant to aggregate across *concurrent* runs are not claimed;
-        they are shared explicitly through an
-        [`EventDispatcher`][ropt.components.event_handlers.EventDispatcher].
-
-        This claim is independent of the attachment to a dispatcher or a compute
-        step, and of the transient concurrency guard on `handle_event`.
-
-        Raises:
-            WorkflowError: If the handler is currently claimed.
-        """
-        with self._owner_lock:
-            if self._claimed:
-                msg = "This event handler has already been claimed for exclusive use."
-                raise WorkflowError(msg)
-            self._claimed = True
-
-    def release(self) -> None:
-        """Release a claim taken with `claim` so the handler can be reused.
-
-        Clears the exclusive-use flag, letting a later run claim the handler
-        again, for example to accumulate results across sequential runs. The
-        attachment to a dispatcher or a compute step is left untouched.
-        Releasing an unclaimed handler is a no-op.
-        """
-        with self._owner_lock:
-            self._claimed = False
 
     @property
     @abstractmethod

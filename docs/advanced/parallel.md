@@ -96,8 +96,8 @@ affected.
     `HPCExecutor` runs in
     a separate process. If such a work item runs a compute step, that step's
     event handlers stay in the worker process and cannot deliver events to a
-    dispatcher or handler in the host process — return results as data instead.
-    See [Event handling is a single-process mechanism](workflows.md#event-dispatcher).
+    handler in the host process — return results as data instead.
+    See [Events are a single-process mechanism](workflows.md#events-are-a-single-process-mechanism).
 
 ### Bundling
 
@@ -573,9 +573,8 @@ affect performance, it determines what a dispatched compute step can still
 *do*. One principle governs the difference.
 
 - A **thread** shares memory with the process that started it. A step's control
-  channels — the event handlers it invokes and the live asyncio loop, executors,
-  and [`EventDispatcher`][ropt.components.event_handlers.EventDispatcher] it relies
-  on — all keep working across threads within one process.
+  channels — the event handlers it invokes and the live asyncio loop and
+  executors it relies on — all keep working across threads within one process.
 - A **process** — a
   [`ProcessExecutor`][ropt.components.executors.ProcessExecutor]
   worker, a [`LocalJobExecutor`][ropt.components.executors.LocalJobExecutor] job
@@ -586,7 +585,7 @@ affect performance, it determines what a dispatched compute step can still
   evaluation that produces a value the optimizer needs.
 
 The rule that follows is: anything that must **communicate back** — emit events
-to a dispatcher or *drive* a nested compute step — must stay **in the host
+to a handler or *drive* a nested compute step — must stay **in the host
 process**. A different *thread* is fine; a different *process* is not. Only
 **self-contained, data-in / data-out** work belongs across a process boundary.
 
@@ -598,15 +597,14 @@ Two places where this matters in practice:
   the innermost leaf evaluations may go to a process or HPC worker. See
   [Nested workflows and process boundaries](#nested-workflows-and-process-boundaries).
 - **Dispatching functions to workers.** A function sent to a process or HPC
-  worker cannot use handlers or a dispatcher that live in the host process. If
+  worker cannot use handlers that live in the host process. If
   it runs an optimization there, that optimization must be self-contained and
   return its outcome as data. See [Executors](#executors).
 
 `ropt` enforces this at the process boundary. The workflow objects that hold
 in-process state or a process-local communication channel — compute steps,
-evaluators, event handlers, and the
-[`EventDispatcher`][ropt.components.event_handlers.EventDispatcher] — each own a
-lock, so none of them can be serialized at all. A task that captures one is
+evaluators, and event handlers — each own a lock, so none of them can be
+serialized at all. A task that captures one is
 refused when it is submitted, with an
 [`ExecutionError`][ropt.exceptions.ExecutionError] that names the object rather
 than the lock it was caught on. The failure happens in the process that
@@ -619,7 +617,7 @@ for what belongs where.
 **Run a compute step in a worker thread.** `step.run()` is an ordinary
 synchronous method that runs its evaluator and its handlers **on whatever
 thread called it**. On the event loop thread it blocks the loop, and the
-executors and dispatchers it is waiting for are tasks on that same loop:
+executors it is waiting for are tasks on that same loop:
 
 ```python
 # Wrong: run() executes here, on the loop thread.
@@ -631,18 +629,12 @@ await asyncio.to_thread(step.run, context=context, variables=x0)
 
 `ropt.simple` already does this for you; it applies when driving compute steps
 yourself. A step that dispatches to an executor detects the mistake and raises
-[`WorkflowError`][ropt.exceptions.WorkflowError] instead of hanging. A step that
-only forwards events to a dispatcher on that same loop cannot detect it, so the
-rule has to be followed rather than relied upon.
+[`WorkflowError`][ropt.exceptions.WorkflowError] instead of hanging.
 
-**Do not emit events from an event handler.** Events are processed one at a
-time, so an event dispatched from inside a handler waits for the handler that
-dispatched it. This is enforced, whether the handler runs on the event loop or
-on the dispatcher's thread pool.
-
-To feed one run's events into a shared dispatcher, register an
-[`EventForwardHandler`][ropt.components.event_handlers.EventForwardHandler] on a
-**compute step** rather than on a dispatcher.
+**Do not run a compute step from inside a handler that the step can reach.** A
+handler holds its own lock while `_handle_event` runs, so a step started there
+that is attached to the same handler re-enters it. See
+[Two hazards](workflows.md#two-hazards).
 
 ## Nested workflows and process boundaries
 
@@ -650,13 +642,12 @@ A *nested* workflow is a compute step whose evaluation function itself runs
 another compute step — for example an outer optimizer whose objective is the
 outcome of an inner optimization. As noted in [Why asyncio?](#why-asyncio),
 several concurrent steps can share one asyncio event loop, and usually shared
-[`Executor`][ropt.components.executors.Executor]s and an
-[`EventDispatcher`][ropt.components.event_handlers.EventDispatcher] as well. All
-of these live **in a single process**.
+[`Executor`][ropt.components.executors.Executor]s and event handlers as well.
+All of these live **in a single process**.
 
 This is a consequence of the general rule that
-[event handling is a single-process mechanism](workflows.md#event-dispatcher): it places a
-hard constraint on where each layer of a nested workflow may run:
+[events are a single-process mechanism](workflows.md#events-are-a-single-process-mechanism):
+it places a hard constraint on where each layer of a nested workflow may run:
 
 !!! warning "The enclosing layer of a nested workflow must run in-process"
 
@@ -666,12 +657,11 @@ hard constraint on where each layer of a nested workflow may run:
     synchronously. It cannot run inside a
     [`ProcessExecutor`][ropt.components.executors.ProcessExecutor]
     or [`HPCExecutor`][ropt.components.executors.HPCExecutor] worker, because a
-    subprocess or HPC job has no access to the live loop, executors, or
-    dispatcher. An inner
+    subprocess or HPC job has no access to the live loop or executors. An inner
     [`ParallelEvaluator`][ropt.components.evaluators.ParallelEvaluator] running
     there would find its executor not running and raise
     [`ExecutorStopped`][ropt.exceptions.ExecutorStopped], and any events
-    it emits would never reach the main-process dispatcher.
+    it emits would never reach the main-process handlers.
 
 [`OptimizationStep`][ropt.components.compute_steps.OptimizationStep] enforces this
 rule: a step is **bound to its process, not to the thread that created it**. The
@@ -681,9 +671,9 @@ created." Concretely:
 - **Across threads (allowed).** A step may be created on one thread and run on
   another within the same process — for example created on the main thread and
   driven with `asyncio.to_thread` or a
-  [`ThreadExecutor`][ropt.components.executors.ThreadExecutor] while a
-  main-thread [`EventDispatcher`][ropt.components.event_handlers.EventDispatcher]
-  collects its events. Event handling keeps working because memory is shared.
+  [`ThreadExecutor`][ropt.components.executors.ThreadExecutor] while handlers
+  created on the main thread collect its events. Event handling keeps working
+  because memory is shared.
 - **Across processes (forbidden).** A step must not be *transferred* into a
   [`ProcessExecutor`][ropt.components.executors.ProcessExecutor]
   or [`HPCExecutor`][ropt.components.executors.HPCExecutor] worker. A step owns a

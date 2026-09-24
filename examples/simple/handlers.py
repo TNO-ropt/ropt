@@ -1,11 +1,9 @@
-"""Aggregate results from concurrent runs with shared handler groups.
+"""Aggregate results from concurrent runs with one shared handler.
 
-A local handler belongs to one run at a time, so it cannot safely collect
-results from optimizations that run concurrently -- the runs of
-`optimize_many`. A group built with `shared_handlers()` can: it routes
-every run's results through one dispatcher, so several concurrent runs can
-feed it safely. A run may feed several groups at once, for different
-purposes.
+The same handler may be given to optimizations that run concurrently -- the
+runs of `optimize_many`. Its `handle_event` serializes its own calls, so a
+second run waits for the first instead of interleaving with it. A run may feed
+several handlers at once, for different purposes.
 """
 
 from typing import Any
@@ -50,16 +48,16 @@ def rosenbrock(
 
 
 def main() -> None:
-    """Collect every result from concurrent runs, in two groups at once."""
+    """Collect every result from concurrent runs, in two handlers at once."""
     history = HistoryHandler()
     per_run = HistoryHandler()
-    # --8<-- [start:groups]
+    # --8<-- [start:shared]
     with session() as active:
         pool = active.thread_pool(workers=len(STARTS))
-        shared = active.shared_handlers(history)
-        tagged = active.shared_handlers(per_run)
-        optimize_many(CONFIG, STARTS, rosenbrock, pool=pool, handlers=[shared, tagged])
-    # --8<-- [end:groups]
+        optimize_many(
+            CONFIG, STARTS, rosenbrock, pool=pool, handlers=[history, per_run]
+        )
+    # --8<-- [end:shared]
     print(
         f"collected results across {len(STARTS)} concurrent runs: "
         f"{len(history['results'])}"

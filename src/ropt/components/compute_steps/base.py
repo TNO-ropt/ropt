@@ -60,9 +60,8 @@ class ComputeStep(ABC, Generic[_ResultT]):
         return self._event_handlers
 
     def _emit_event(self, event: EnOptEvent) -> None:
-        # Handlers run inline, on this run's own stack: a local handler that
-        # raises unwinds this run, and one behind a dispatcher blocks here until
-        # the dispatcher has finished with the event.
+        # Handlers run inline, on this run's own stack, so one that raises
+        # unwinds this run and the handlers after it never see the event.
         event.source = self
         for handler in self.event_handlers:
             if event.event_type in handler.event_types:
@@ -74,7 +73,7 @@ class ComputeStep(ABC, Generic[_ResultT]):
         Intended for an event handler that decides, after inspecting an event,
         that its optimization should stop; the run then ends with
         `ExitCode.USER_ABORT`. Setting the request is thread-safe, so a handler
-        running behind an event dispatcher may call it too. A new `run` clears
+        attached to several steps at once may call it too. A new `run` clears
         any earlier request.
         """
         self._stop_flag.set()

@@ -1,9 +1,8 @@
-"""Checks that turn a misused pool or handler group into a clear message.
+"""Checks that turn a misused pool into a clear message.
 
-A pool or group whose session has closed is still a live object, so without a
-check here the run would get an
-[`ExecutorStopped`][ropt.exceptions.ExecutorStopped] from inside its first
-evaluation, or silently drop its events.
+A pool whose session has closed is still a live object, so without a check here
+the run would get an [`ExecutorStopped`][ropt.exceptions.ExecutorStopped] from
+inside its first evaluation.
 
 The checks run once, at the entry point, before any work starts. A pool that
 dies *while* a run is using it is a different case: that run is already going,
@@ -25,13 +24,7 @@ from typing import TYPE_CHECKING
 
 from ropt.exceptions import WorkflowError
 
-from ._handlers import SharedHandlers
-
 if TYPE_CHECKING:
-    from collections.abc import Sequence
-
-    from ropt.components.event_handlers import EventHandler
-
     from ._pool import WorkerPool
 
 
@@ -53,24 +46,3 @@ def check_pool(pool: WorkerPool | None) -> None:
             "session, or run without one to evaluate in-process."
         )
         raise WorkflowError(msg)
-
-
-def check_handlers(
-    handlers: Sequence[EventHandler | SharedHandlers] | None,
-) -> None:
-    """Reject a handler group that cannot receive a new run's results.
-
-    Args:
-        handlers: The handlers and groups the run was given, if any.
-
-    Raises:
-        WorkflowError: If a group is closed.
-    """
-    for item in handlers or ():
-        if isinstance(item, SharedHandlers) and item.closed:
-            msg = (
-                "This group of shared handlers is closed and cannot take new "
-                "runs; its session has ended, or it was closed directly. Group "
-                "the handlers again on an open session."
-            )
-            raise WorkflowError(msg)

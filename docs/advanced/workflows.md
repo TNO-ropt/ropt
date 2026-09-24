@@ -213,8 +213,7 @@ deciding no further evaluations are worthwhile. The remaining handlers for that
 event still run, and the optimizer then stops with `USER_ABORT` before the next
 evaluation. Only the run that owns the emitting step is affected, so concurrent
 optimizations continue. `stop()` merely sets a thread-safe flag, so it is safe
-to call from a handler running behind an
-[`EventDispatcher`][ropt.components.event_handlers.EventDispatcher] as well.
+to call from a handler attached to several steps at once.
 
 ## Event handlers
 
@@ -232,75 +231,71 @@ specific to workflows.
 
 ### Using handlers safely
 
-An event handler is a stateful object that is **not safe for concurrent use**.
-There are two ways to drive one, and they are mutually exclusive:
+[`handle_event`][ropt.components.event_handlers.EventHandler.handle_event]
+takes a lock around each call to the handler's `_handle_event`. A handler may
+therefore be attached to any number of compute steps, including steps that run
+at the same time on different threads: a second call waits for the first to
+finish, and a single instance accumulates state across all of them. Handler
+code sees one event at a time and needs no locking of its own.
 
-- **Attached directly to compute steps.** A handler may be attached to several
-  compute steps, and a single instance can accumulate state across them — as
-  long as those steps do not run it concurrently. Serial reuse is fine, even
-  across different threads: each `handle_event` call must fully complete before
-  the next begins. If two threads execute `handle_event` at the same time, a
-  [`WorkflowError`][ropt.exceptions.WorkflowError] is raised.
+The lock is not re-entrant. A call that reaches the same handler again while it
+is still inside `_handle_event` raises a
+[`WorkflowError`][ropt.exceptions.WorkflowError] if it is on the thread that
+emitted the first event, and blocks on the lock if it is on another thread.
+Both are described under [Two hazards](#two-hazards) below.
 
-- **Registered with an
-  [`EventDispatcher`][ropt.components.event_handlers.EventDispatcher].** When work
-  runs on several threads at once (for example, `ParallelEvaluator` with a
-  multi-worker [`ThreadExecutor`][ropt.components.executors.ThreadExecutor]),
-  route events through a dispatcher. It
-  receives events from any thread and delivers them to its handlers one at a
-  time, so a single handler can safely aggregate results produced on many
-  threads. See [Event dispatcher](#event-dispatcher) for the pattern.
-
-A handler is owned by **either** one dispatcher **or** one-or-more compute
-steps — never both — and may be registered with **at most one** dispatcher.
-Mixing the two, or registering with a second dispatcher, raises a
-[`WorkflowError`][ropt.exceptions.WorkflowError].
+Handlers are called on the thread that emits the event, in the order they were
+attached, and the emitting step waits until every handler for that event has
+returned. A handler that blocks therefore holds up the run that emitted the
+event, and any run waiting on the same handler's lock. The cost of a handler
+scales with the number of events that reach it across every step it is attached
+to. Keep a handler shared by concurrent runs cheap; if one must do heavy I/O,
+buffer in memory and flush once the runs have finished.
 
 !!! note "A handler failure is fatal"
 
-    An exception raised by a handler is a fatal error that stops the run. A
-    directly-attached handler raises on the optimizer's own stack, so it
-    propagates normally. A handler behind an
-    [`EventDispatcher`][ropt.components.event_handlers.EventDispatcher] runs while
-    the emitting run **waits** for the event to be handled, so its exception is
-    re-raised on that run's own stack too — synchronously, including for the
-    run's last event. Either way a handler bug surfaces as a single, clean
-    exception — never a `BaseExceptionGroup`. See
-    [Handler failures](#handler-failures) for details.
+    An exception raised by a handler is a fatal error that stops the run. It is
+    raised on the optimizer's own stack, so it propagates normally, as a single
+    exception — never a `BaseExceptionGroup`. The handlers attached after it do
+    not see that event: `_emit_event` stops at the first failure.
 
-!!! warning "Do not share a handler across parallel steps"
+### Two hazards
 
-    Never attach the same handler instance to compute steps that may run at the
-    same time on different threads; the moment a second thread executes it while
-    the first is still inside `handle_event`, a
-    [`WorkflowError`][ropt.exceptions.WorkflowError] is raised. Give
-    each parallel step its own handler, or route events through an
-    `EventDispatcher`.
+**Two handlers that touch the same external state.** Each handler is serialized
+on its own, but not as a pair: a run can be inside one while another run is
+inside the other. Take a [`threading.Lock`][threading.Lock] of your own inside
+both `_handle_event` implementations. Each handler takes its own lock first and
+the shared one second, so the acquisition order is the same for every caller.
 
-    Serial reuse is allowed: the same handler may be reused across steps that
-    run one after another, even on different threads, as long as their calls
-    never overlap.
+Such a lock does not give the handlers an agreed order. If order matters, take
+it from data in the event — `batch_id` and similar — rather than from the order
+events arrive in, which depends on which run gets there first.
 
-!!! note "Handlers are process-local"
+**A run started from inside a handler.** Nothing refuses this, and it is safe as
+long as the run cannot reach a handler that is already running. If it does, the
+handler is entered a second time while its lock is held:
 
-    An event handler cannot be transferred to another process. It holds a lock,
-    so serializing one — for example when a task dispatched to a worker
-    captures it — fails, and the submission is refused with an
-    [`ExecutionError`][ropt.exceptions.ExecutionError].
-    Create handlers inside the worker and return their results
-    as data. See
-    [Nested workflows and process boundaries](parallel.md#nested-workflows-and-process-boundaries).
+- On the thread that emitted the event — a run driven by
+  [`optimize`][ropt.simple.optimize], or a `step.run()` called from
+  `_handle_event` — the re-entrancy check fires and a
+  [`WorkflowError`][ropt.exceptions.WorkflowError] is raised.
+- On another thread — the driver threads of
+  [`optimize_many`][ropt.simple.optimize_many] or
+  [`run_concurrent`][ropt.components.concurrency.run_concurrent] — the call
+  waits for a lock the emitting thread holds until the nested run ends, and
+  both stop.
+
+Two handlers that each start a run reaching the other behave the same way:
+raising when the cycle stays on one thread, blocking when it does not. Give a
+nested run handlers of its own.
 
 !!! note "Reading results is not thread-guarded"
 
     Handler state exposed through `handler[key]` is deliberately *not* bound to
     a thread, so results can be read after a run from any thread. Read a
     handler's stored values only **after its producer has finished**: after
-    `step.run()` returns for a directly-attached handler, or after the
-    [`EventDispatcher`][ropt.components.event_handlers.EventDispatcher] has been
-    cancelled and its task group has exited for a handler registered with a
-    dispatcher. Both are synchronization points that make the latest values
-    visible.
+    `step.run()` has returned for every step the handler is attached to. That
+    return is the synchronization point that makes the latest values visible.
 
     Reading a handler's state *while it is still processing events on another
     thread* returns a valid object, but possibly a stale one — do not rely on it
@@ -319,12 +314,11 @@ They expose their state through dictionary access (`handler[key]`);
 and the optimizer's domain; see
 [Working with Results](../running/results.md#scaling-of-results).
 
-Two more handlers exist only at this level, for wiring events:
+One more handler exists only at this level, for wiring events:
 
-| Handler                                                                    | Purpose                                                                                                          |
-| -------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| [`CallbackHandler`][ropt.components.event_handlers.CallbackHandler]        | Forward selected event types to a user callback.                                                                |
-| [`EventForwardHandler`][ropt.components.event_handlers.EventForwardHandler]| Forward events to an [`EventDispatcher`][ropt.components.event_handlers.EventDispatcher] for lock-free dispatch. |
+| Handler                                                             | Purpose                                          |
+| ------------------------------------------------------------------- | ------------------------------------------------ |
+| [`CallbackHandler`][ropt.components.event_handlers.CallbackHandler] | Forward selected event types to a user callback. |
 
 ### CallbackHandler
 
@@ -334,138 +328,29 @@ events and forwards them to a callback function. It is constructed with a set of
 matching type arrives, the callback is called with the
 [`EnOptEvent`][ropt.events.EnOptEvent].
 
-### EventForwardHandler
+## Events are a single-process mechanism
 
-[`EventForwardHandler`][ropt.components.event_handlers.EventForwardHandler] is
-attached to a compute step and forwards matching events to an
-[`EventDispatcher`][ropt.components.event_handlers.EventDispatcher]. The dispatcher
-dispatches them from the asyncio event loop's thread, so handlers registered on
-the dispatcher require no locking.
+Every [`EventHandler`][ropt.components.event_handlers.EventHandler] lives in the
+process that created it, and is called on a thread of that process. Handlers
+can therefore only observe events emitted **within their own process**.
 
-## Event dispatcher
+A compute step executed out-of-process — for example a whole optimization sent
+to a [`ProcessExecutor`][ropt.components.executors.ProcessExecutor] or
+[`HPCExecutor`][ropt.components.executors.HPCExecutor], whether as a work item
+of its own or as the enclosing layer of a nested workflow — may attach handlers
+created inside that worker process, but those handlers cannot deliver anything
+to a handler in the host process. To collect information from out-of-process
+steps, return it as data: the task's return value, or result metadata.
 
-When multiple compute steps run concurrently in worker threads, their event
-handlers are called from multiple threads simultaneously. **Event handlers must
-not be shared across concurrent compute steps**: doing so raises a
-[`WorkflowError`][ropt.exceptions.WorkflowError].
+This is why process- and HPC-based parallelism belongs at the innermost (leaf)
+evaluations — which return data and emit no events — while any layer that
+drives event-producing compute steps must run in-process. See
+[Nested workflows and process boundaries](parallel.md#nested-workflows-and-process-boundaries).
 
-[`EventDispatcher`][ropt.components.event_handlers.EventDispatcher] is what
-makes sharing possible: it receives events on a queue and dispatches them to its own
-handlers from the asyncio event loop's thread. Because all handler calls happen
-on a single thread, handlers registered on the dispatcher are safe even when
-events arrive from multiple concurrent steps.
-
-That is what lets one set of handlers aggregate results from multiple
-concurrent compute steps.
-
-`EventDispatcher` follows the same lifecycle as executors:
-
-```python
-async with asyncio.TaskGroup() as tg:
-    executor = ThreadExecutor(workers=4)
-    await executor.start(tg)
-
-    event_dispatcher = EventDispatcher()
-    await event_dispatcher.start(tg)
-
-    # Attach an EventForwardHandler to the compute step.
-    step.add_event_handler(
-        EventForwardHandler(
-            event_dispatcher,
-            event_types={EnOptEventType.FINISHED_EVALUATION},
-        )
-    )
-
-    # Handlers registered on the dispatcher need no locking.
-    result_handler = ResultsHandler()
-    event_dispatcher.add_event_handler(result_handler)
-
-    await asyncio.to_thread(step.run, variables=..., context=...)
-
-    event_dispatcher.cancel()
-    executor.cancel()
-```
-
-[`EventForwardHandler`][ropt.components.event_handlers.EventForwardHandler] is a
-regular event handler that can be attached to a compute step. When the step
-emits an event it submits the event to the dispatcher and **blocks on the
-emitting run's own thread until every handler has processed it**, preserving the
-order in which events are submitted. If a handler raises, the original exception
-is re-raised there, on the run's stack (see [Handler failures](#handler-failures)).
-
-!!! warning "Event handling is a single-process mechanism"
-
-    An [`EventDispatcher`][ropt.components.event_handlers.EventDispatcher] and
-    every [`EventHandler`][ropt.components.event_handlers.EventHandler] live in
-    the process that created them. `EventForwardHandler` delivers events by
-    calling the dispatcher's `dispatch_event`, which schedules them onto its
-    event loop with `call_soon_threadsafe` — a *thread*-safe call, not a
-    *process*-safe one. A dispatcher reached from another process has no live
-    loop, so a forwarded event cannot arrive.
-
-    Event handlers can therefore only observe events emitted **within their own
-    process**. Any compute step executed out-of-process — for example a whole
-    optimization sent to a
-    [`ProcessExecutor`][ropt.components.executors.ProcessExecutor]
-    or [`HPCExecutor`][ropt.components.executors.HPCExecutor], whether as a work
-    item of its own or as the enclosing layer
-    of a nested workflow — may attach handlers local to that worker process,
-    but those handlers cannot deliver events to a dispatcher or handler in the
-    host process. To collect information from out-of-process steps, return it as
-    data (the task's return value, or result metadata) rather than through
-    shared handlers.
-
-    This is why process- and HPC-based parallelism belongs at the innermost
-    (leaf) evaluations — which return data and emit no events — while any layer
-    that drives event-producing compute steps must run in-process. See
-    [Nested workflows and process boundaries](parallel.md#nested-workflows-and-process-boundaries).
-
-### Handler failures
-
-Forwarding an event through an
-[`EventForwardHandler`][ropt.components.event_handlers.EventForwardHandler] is
-**synchronous**: the emitting run blocks until the dispatcher has run every
-handler for that event. A handler failure is therefore delivered like an
-evaluation error — on the emitting run's own call stack — and splits
-`Exception` from `BaseException` exactly as the executor does:
-
-- An ordinary `Exception` from a handler is **re-raised on the emitting run's
-  stack**, unwrapped — a single, clean exception that stops the run normally,
-  exactly as if a directly-attached handler had raised inline. It is logged
-  (with the handler and the event type) as it is caught. Because emission is
-  synchronous, this covers the run's **last** event too; nothing is deferred or
-  lost. Every handler for the event still runs before the error surfaces; if
-  several fail, the first (in registration order) is raised.
-- A `BaseException` (such as `CancelledError`) is **not** delivered this way: it
-  remains the session teardown backstop and propagates, tearing the dispatcher
-  task group down, as with the executor.
-
-### Event throughput
-
-A dispatcher processes its queue **one event at a time**: all handlers for an
-event finish before the next event is taken, and every handler runs on the event
-loop's thread. A handler that blocks therefore holds up every run feeding the
-dispatcher.
-
-This serialization is deliberate.
-[`EventHandler`][ropt.components.event_handlers.EventHandler] is not re-entrant,
-and a handler shared by concurrently running optimizations — one accumulating
-results across all of them, say — needs exactly this guarantee to stay
-lock-free.
-
-The price is that handler cost scales with the *total* number of events across
-all runs sharing the dispatcher, and is paid on the critical path of every
-event. Measured with eight concurrent runs emitting five events each, sharing
-one dispatcher and one handler that blocks for 50 ms: **2.02 s elapsed**,
-against 2.00 s for fully serial execution and 0.25 s if the handlers had run
-fully concurrently — never more than one handler thread active at a time.
-
-Runs share a dispatcher when they share a handler scope, which is the normal
-case for [`optimize_many`][ropt.simple.optimize_many]: it reads the current
-handler scope once on the calling thread and gives the same one to every job.
-An N-way `optimize_many` therefore pays its handler cost serially. Keep shared
-handlers cheap; if one must do heavy I/O, buffer in memory and flush once the
-runs have finished.
+A handler cannot be carried into a worker either. It holds a lock, so
+serializing one — for example when a task dispatched to a worker captures it —
+fails, and the submission is refused with an
+[`ExecutionError`][ropt.exceptions.ExecutionError].
 
 ## Evaluators
 

@@ -619,30 +619,25 @@ each with its own metadata:
 
 The two callback arguments differ in the same way. `report=` is **per run**: one
 callback receives the results of every run, or pass a list with one callback per
-run. `handlers=`
-is **shared**: one list of groups that all runs feed together, which is why a
-plain handler is refused there — see [Sharing a handler across concurrent
+run. `handlers=` is **shared**: one list of handlers that all runs feed
+together — see [Sharing a handler across concurrent
 runs](handlers.md#sharing-a-handler-across-concurrent-runs).
 
 !!! warning "One `report=` callback is called by every run at once"
     A single callback is wired into each run separately, and each run calls it
     on its own thread. Nothing serializes those calls, so a callback that
     appends to a list, updates a counter, or writes a file needs a lock of its
-    own. Give each run its own callback when they must stay apart, or collect
-    the results in a [shared
-    group](handlers.md#sharing-a-handler-across-concurrent-runs), where the
-    dispatcher serializes them for you.
+    own. Give each run its own callback when they must stay apart, or pass a
+    [handler](handlers.md#sharing-a-handler-across-concurrent-runs) in
+    `handlers=`, which takes a lock around every call for you.
 
-!!! warning "A shared group makes the runs wait for each other"
-    That serialization is not free. A group processes events **one at a time**,
-    in submission order, and the run that emitted one waits until every handler
-    has finished with it. Never seeing two results at once is exactly what makes
-    a handler safe to share — but it means a slow handler throttles the whole
-    batch, since every run queues behind the others, once per result produced.
+!!! warning "A shared handler makes the runs wait for each other"
+    That lock is not free. A run that emits a result waits until the handler
+    has finished with it, and a second run waits for the first. A slow handler
+    therefore throttles the whole batch, once per result produced.
 
-    So keep shared handlers cheap. A handler that must do slow work — writing
-    a file, talking to a database — runs on the session's event loop like any
-    other, so the whole batch waits for it.
+    So keep a shared handler cheap. A handler that must do slow work — writing
+    a file, talking to a database — holds up every run feeding it.
 
 !!! warning "Without a pool the driver threads do the evaluating"
     `optimize_many` needs no session and no pool. Without one, the runs still
@@ -806,12 +801,10 @@ def transform(x, pool=None):
     return offload(partial(expensive, x), pool=pool)
 ```
 
-!!! note "A handler in a shared group cannot offload"
-    A handler in a [shared group](handlers.md#sharing-a-handler-across-concurrent-runs)
-    runs on the session's event loop; offloading to a pool on that same session
-    would starve the very loop it is waiting on, so it raises a
-    [`WorkflowError`][ropt.exceptions.WorkflowError]. A local handler can
-    offload, since it runs on the thread driving the run.
+!!! note "Offloading from a handler holds up the runs feeding it"
+    A handler runs on the thread driving the run, so it can offload to a pool.
+    While it waits, it holds its own lock, so every other run waiting on that
+    handler waits too.
 
     Better still, do parallel work from your optimization code and leave
     handlers to handle results.

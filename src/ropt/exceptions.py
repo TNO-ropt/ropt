@@ -19,9 +19,8 @@ class RoptError(Exception):
 class WorkflowError(RoptError):
     """A workflow or runtime object was used incorrectly.
 
-    For example a compute step, evaluator, or event handler used concurrently or
-    out of order, an ownership or registration conflict, submitting to a
-    dispatcher that is not running, or reusing a locked context.
+    For example a compute step or evaluator used concurrently, an event handler
+    re-entered from inside itself, or a pool whose session has stopped.
     """
 
 

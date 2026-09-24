@@ -16,10 +16,9 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 import pytest
 
-from ropt.components.compute_steps import EvaluationStep, OptimizationStep
+from ropt.components.compute_steps import OptimizationStep
 from ropt.components.concurrency import run_concurrent
 from ropt.components.evaluators import FunctionEvaluator
-from ropt.components.event_handlers import EventDispatcher
 from ropt.components.executors import (
     HPCExecutor,
     LocalJobExecutor,
@@ -35,7 +34,6 @@ from ropt.simple import (
     EvaluationFunctionResult,
     HistoryHandler,
     OptimizationResult,
-    SharedHandlers,
     WorkerPool,
     evaluate,
     evaluate_many,
@@ -175,37 +173,6 @@ def test_optimize_result_carries_the_best_evaluation(
     assert result.results.variables is not None
 
 
-def test_group_report_callback_reports_across_runs(
-    config: Any, test_functions: Any
-) -> None:
-    reported: list[FunctionResults] = []
-    with session() as active:
-        group = active.shared_handlers(report=reported.append)
-        optimize(config, initial_values, test_functions[0], handlers=[group])
-        after_first = len(reported)
-        optimize(config, initial_values, test_functions[0], handlers=[group])
-    assert after_first > 0
-    assert len(reported) > after_first
-    assert all(isinstance(item, FunctionResults) for item in reported)
-
-
-def test_empty_group_adds_no_forwarding_handler(
-    config: Any, test_functions: Any
-) -> None:
-    with session() as active:
-        group = active.shared_handlers()
-        step = EvaluationStep(
-            evaluator=FunctionEvaluator(
-                function=adapt_function(test_functions[0], 1, 0)
-            )
-        )
-        # Nothing wants events, so the run must not be given a forwarding handler.
-        group.attach_to(step)
-        assert step.event_handlers == []
-        result = optimize(config, initial_values, test_functions[0])
-    assert result.exit_code == ExitCode.OPTIMIZER_FINISHED
-
-
 def test_hand_assembled_step_runs(config: Any, test_functions: Any) -> None:
     # A step built by hand runs exactly the way optimize() runs its own: it
     # takes its context and nothing from its surroundings.
@@ -221,110 +188,10 @@ def test_hand_assembled_step_runs(config: Any, test_functions: Any) -> None:
     assert len(history["results"]) > 1
 
 
-def test_handler_reusable_after_group_closes() -> None:
-    handler = HistoryHandler()
-    with session() as active:
-        active.shared_handlers(handler)
-    # A new session, since a group cannot be reopened once its own has closed.
-    with session() as active:
-        group = active.shared_handlers(handler)
-        assert set(group._dispatcher._handlers) == {handler}  # ruff: ignore[private-member-access]
-
-
-def test_handler_reusable_after_group_fails_to_open() -> None:
-    good = HistoryHandler()
-    bad = HistoryHandler()
-    with session() as active:
-        with pytest.raises(WorkflowError, match="listed more than once"):
-            active.shared_handlers(good, bad, bad)
-        group = active.shared_handlers(good, bad)
-        assert set(group._dispatcher._handlers) == {good, bad}  # ruff: ignore[private-member-access]
-
-
-def test_local_handler_accepted_by_group(config: Any, test_functions: Any) -> None:
-    handler = HistoryHandler()
-    optimize(config, initial_values, test_functions[0], handlers=[handler])
-    after_run = len(handler["results"])
-    with session() as active:
-        group = active.shared_handlers(handler)
-        assert set(group._dispatcher._handlers) == {handler}  # ruff: ignore[private-member-access]
-    assert after_run > 0
-
-
-def test_handler_in_open_group_refused_by_another_group() -> None:
-    handler = HistoryHandler()
-    with session() as active:
-        active.shared_handlers(handler)
-        with pytest.raises(
-            WorkflowError, match="already belongs to a group"
-        ) as excinfo:
-            active.shared_handlers(handler)
-    assert "dispatcher" not in str(excinfo.value)
-    assert "separate handler" in str(excinfo.value)
-
-
-def test_shared_handlers_releases_on_rollback_failure(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    def _failing_remove(*_args: object, **_kwargs: object) -> None:
-        msg = "rollback failed"
-        raise RuntimeError(msg)
-
-    monkeypatch.setattr(EventDispatcher, "remove_event_handler", _failing_remove)
-    handler = HistoryHandler()
-    with (
-        session() as active,
-        pytest.raises(RuntimeError, match="rollback failed"),
-    ):
-        active.shared_handlers(handler, handler)
-
-
-def test_group_close_is_idempotent() -> None:
-    with session() as active:
-        group = active.shared_handlers(HistoryHandler())
-        group.close()
-        group.close()
-
-
-def test_group_context_manager_closes_the_group() -> None:
-    handler = HistoryHandler()
-    with session() as active:
-        with active.shared_handlers(handler) as group:
-            assert set(group._dispatcher._handlers) == {handler}  # ruff: ignore[private-member-access]
-        # Released, so a plain dispatcher can claim it again.
-        EventDispatcher().add_event_handler(handler)
-
-
-def test_group_handler_reusable_as_local_after_close(
-    config: Any, test_functions: Any
-) -> None:
-    handler = HistoryHandler()
-    with session() as active:
-        active.shared_handlers(handler).close()
-    optimize(config, initial_values, test_functions[0], handlers=[handler])
-    assert len(handler["results"]) > 0
-
-
-def test_optimize_mixes_local_handler_and_group(
-    config: Any, test_functions: Any
-) -> None:
-    local = HistoryHandler()
-    shared = HistoryHandler()
-    with session() as active:
-        group = active.shared_handlers(shared)
-        optimize(config, initial_values, test_functions[0], handlers=[local, group])
-    assert local["results"]
-    assert shared["results"]
-    assert local._claimed is False  # ruff: ignore[private-member-access]
-
-
-def test_optimize_feeds_two_groups_at_once(config: Any, test_functions: Any) -> None:
+def test_optimize_feeds_two_handlers_at_once(config: Any, test_functions: Any) -> None:
     first = HistoryHandler()
     second = HistoryHandler()
-    with session() as active:
-        group_a = active.shared_handlers(first)
-        group_b = active.shared_handlers(second)
-        optimize(config, initial_values, test_functions[0], handlers=[group_a, group_b])
+    optimize(config, initial_values, test_functions[0], handlers=[first, second])
     assert first["results"]
     assert second["results"]
     assert len(first["results"]) == len(second["results"])
@@ -471,34 +338,32 @@ def test_thread_run_sees_only_the_handlers_it_is_given(
     config: Any, test_functions: Any
 ) -> None:
     handler = HistoryHandler()
-    with session() as active:
-        group = active.shared_handlers(handler)
 
-        def _without_handlers() -> None:
-            optimize(config, initial_values, test_functions[0])
+    def _without_handlers() -> None:
+        optimize(config, initial_values, test_functions[0])
 
-        thread = threading.Thread(target=_without_handlers)
-        thread.start()
-        thread.join()
-        assert handler["results"] is None
+    thread = threading.Thread(target=_without_handlers)
+    thread.start()
+    thread.join()
+    assert handler["results"] is None
 
-        def _with_handlers() -> None:
-            optimize(config, initial_values, test_functions[0], handlers=[group])
+    def _with_handlers() -> None:
+        optimize(config, initial_values, test_functions[0], handlers=[handler])
 
-        thread = threading.Thread(target=_with_handlers)
-        thread.start()
-        thread.join()
+    thread = threading.Thread(target=_with_handlers)
+    thread.start()
+    thread.join()
     assert handler["results"] is not None
 
 
-def test_evaluate_feeds_a_shared_group(config: Any, test_functions: Any) -> None:
+def test_evaluate_feeds_one_handler_across_calls(
+    config: Any, test_functions: Any
+) -> None:
     handler = HistoryHandler()
-    with session() as active:
-        group = active.shared_handlers(handler)
-        evaluate(config, initial_values, test_functions[0], handlers=[group])
-        evaluate(
-            config, np.zeros(initial_values.size), test_functions[0], handlers=[group]
-        )
+    evaluate(config, initial_values, test_functions[0], handlers=[handler])
+    evaluate(
+        config, np.zeros(initial_values.size), test_functions[0], handlers=[handler]
+    )
     assert len(handler["results"]) == 2
 
 
@@ -506,7 +371,6 @@ def test_evaluate_accepts_a_local_handler(config: Any, test_functions: Any) -> N
     history = HistoryHandler()
     evaluate(config, initial_values, test_functions[0], handlers=[history])
     assert len(history["results"]) == 1
-    assert history._claimed is False  # ruff: ignore[private-member-access]
 
 
 def test_evaluate_many_accepts_a_local_handler(
@@ -1040,7 +904,7 @@ def _nested_run(
     context: EvaluationFunctionContext,
     *,
     pool: WorkerPool,
-    group: SharedHandlers,
+    history: HistoryHandler,
     barrier: threading.Barrier,
 ) -> float:
     # Neither outer evaluation can pass until both have arrived, so if they were
@@ -1051,7 +915,7 @@ def _nested_run(
         variables,
         _pid_sphere,
         pool=pool,
-        handlers=[group],
+        handlers=[history],
         metadata={"outer": context.eval_idx},
     )
     assert result.results is not None
@@ -1067,7 +931,7 @@ def _nested_run(
     ],
 )
 @pytest.mark.timeout(120)
-def test_concurrent_inner_runs_on_a_second_pool_feed_one_group(
+def test_concurrent_inner_runs_on_a_second_pool_feed_one_handler(
     processes: Any,
 ) -> None:
     history = HistoryHandler()
@@ -1079,11 +943,10 @@ def test_concurrent_inner_runs_on_a_second_pool_feed_one_group(
             else active.thread_pool(workers=2)
         )
         outer = active.thread_pool(workers=len(_NESTED_POINTS))
-        group = active.shared_handlers(history)
         evaluate_many(
             _NESTED_OUTER,
             _NESTED_POINTS,
-            partial(_nested_run, pool=inner, group=group, barrier=barrier),
+            partial(_nested_run, pool=inner, history=history, barrier=barrier),
             pool=outer,
         )
 
@@ -1094,7 +957,7 @@ def test_concurrent_inner_runs_on_a_second_pool_feed_one_group(
         recorded = item.evaluations.metadata.get("pid")
         if recorded is not None:
             pids.update(int(pid) for pid in np.ravel(recorded))
-    # Both inner runs reached the one group, each tagged with the outer
+    # Both inner runs reached the one handler, each tagged with the outer
     # evaluation that started it.
     assert set(batches) == {0, 1}
     # They drew from the pool's single counter, so their batches never collided.
@@ -1195,12 +1058,10 @@ def _offload_in_own_pool(variables: NDArray[np.float64], _context: Any) -> float
 
 
 def _own_handlers_in_evaluation(variables: NDArray[np.float64], _context: Any) -> float:
-    # A run's evaluation function is plain code: it may open a session and a
-    # shared handlers group of its own, nested inside whatever pool is running it.
+    # A run's evaluation function is plain code: it may start a run with
+    # handlers of its own, nested inside whatever pool is running it.
     history = HistoryHandler()
-    with session() as active:
-        group = active.shared_handlers(history)
-        optimize(_INNER_CONFIG, variables, _sphere, handlers=[group])
+    optimize(_INNER_CONFIG, variables, _sphere, handlers=[history])
     assert len(history.results) > 0
     return float(variables @ variables)
 
@@ -1216,7 +1077,7 @@ def test_offload_in_evaluation_uses_its_own_pool(config: Any) -> None:
     assert result.results is not None
 
 
-def test_group_in_an_evaluation(config: Any) -> None:
+def test_handlers_in_an_evaluation(config: Any) -> None:
     with session() as active:
         result = optimize(
             config,
@@ -1251,8 +1112,6 @@ def test_sequential_pools_are_allowed(config: Any, test_functions: Any) -> None:
 
 def test_session_without_task_group_reports_stopped() -> None:
     sess = _Session()
-    with pytest.raises(WorkflowError, match="is not running"):
-        sess.open_dispatcher(EventDispatcher())
     with pytest.raises(WorkflowError, match="is not running"):
         sess.open_pool(lambda: ThreadExecutor(workers=1))
 
@@ -1669,22 +1528,12 @@ def test_run_abandoned_by_fail_fast_returns(config: Any, test_functions: Any) ->
     assert set(outcomes) <= {ExitCode.EXECUTOR_STOPPED, ExitCode.OPTIMIZER_FINISHED}
 
 
-def test_shared_handler_aggregates_single_run(config: Any, test_functions: Any) -> None:
-    history = HistoryHandler()
-    with session() as active:
-        group = active.shared_handlers(history)
-        optimize(config, initial_values, test_functions[0], handlers=[group])
-    assert history["results"]
-
-
 def test_shared_handler_without_a_pool_aggregates_runs(
     config: Any, test_functions: Any
 ) -> None:
     history = HistoryHandler()
-    with session() as active:
-        group = active.shared_handlers(history)
-        optimize(config, initial_values, test_functions[0], handlers=[group])
-        optimize(config, initial_values, test_functions[0], handlers=[group])
+    optimize(config, initial_values, test_functions[0], handlers=[history])
+    optimize(config, initial_values, test_functions[0], handlers=[history])
     assert history["results"]
 
 
@@ -1692,20 +1541,17 @@ def test_shared_handler_aggregates_across_optimize_many(
     config: Any, test_functions: Any
 ) -> None:
     single = HistoryHandler()
-    with session() as active:
-        group = active.shared_handlers(single)
-        optimize(config, initial_values, test_functions[0], handlers=[group])
+    optimize(config, initial_values, test_functions[0], handlers=[single])
 
     shared = HistoryHandler()
     starts = np.tile(initial_values, (3, 1))
     with session() as active:
-        group = active.shared_handlers(shared)
         optimize_many(
             config,
             starts,
             test_functions[0],
             pool=active.thread_pool(workers=2),
-            handlers=[group],
+            handlers=[shared],
         )
 
     assert len(shared["results"]) > len(single["results"])

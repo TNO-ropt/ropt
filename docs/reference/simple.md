@@ -37,10 +37,6 @@
 ::: ropt.simple.HistoryHandler
 ::: ropt.simple.DataFrameHandler
 
-## Aggregating results across runs
-
-::: ropt.simple.SharedHandlers
-
 ## Result objects
 
 ::: ropt.simple.OptimizationResult

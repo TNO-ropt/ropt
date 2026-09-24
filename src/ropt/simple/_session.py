@@ -3,11 +3,11 @@
 A **session** is a background event loop on its own daemon thread, with a
 long-lived `TaskGroup`. The public [`session`][ropt.simple.session] block opens
 one and hands out the pools built on it; closing the block releases the pools
-and stops the loop. The same holds for the shared-handler groups built on it.
+and stops the loop.
 
 Everything a session hands out is passed to a run explicitly, never discovered
-by it, so any number of pools and groups — and any number of sessions — can be
-open at once, and nothing here is ambient.
+by it, so any number of pools — and any number of sessions — can be open at
+once, and nothing here is ambient.
 """
 
 from __future__ import annotations
@@ -26,16 +26,12 @@ from ropt.components.executors import (
 )
 from ropt.exceptions import WorkflowError
 
-from ._handlers import SharedHandlers, group_entries
 from ._pool import WorkerPool
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Coroutine
 
-    from ropt.components.event_handlers import EventDispatcher, EventHandler
     from ropt.components.executors import Executor
-
-    from ._report import ReportCallback
 
 _STOPPED = "The background session is not running; open a new one."
 
@@ -45,7 +41,7 @@ class _Closable(Protocol):
 
 
 class _Session:
-    """A background event loop and task group hosting pools and dispatchers.
+    """A background event loop and task group hosting pools.
 
     Whatever the session hands out is registered with it as an *extra*: any
     number may be open at once, and the session closes every one that is still
@@ -209,12 +205,6 @@ class _Session:
             extras, self._extras = self._extras, []
         for extra in extras:
             extra.close()
-
-    def open_dispatcher(self, dispatcher: EventDispatcher) -> None:
-        self._start_on_loop(dispatcher.start(self._require_task_group()))
-
-    def close_dispatcher(self, dispatcher: EventDispatcher) -> None:
-        schedule(self._loop, dispatcher.cancel)
 
 
 class Session:
@@ -432,36 +422,6 @@ class Session:
         session.add_extra(pool)
         return pool
 
-    def shared_handlers(
-        self,
-        *handler: EventHandler,
-        report: ReportCallback | None = None,
-    ) -> SharedHandlers:
-        """Group result handlers that several runs share.
-
-        Pass the group to every run that should feed it, in `handlers=`. Each
-        handler then sees the results of all those runs, serialized across them,
-        which is what makes accumulating over concurrent runs safe. A run may
-        feed several groups, and mix them with handlers of its own.
-
-        A handler joins one group at a time. See
-        [Running Optimizations](../running/running.md) for a walkthrough.
-
-        Handlers run on the session's event-loop thread.
-
-        Returning `True` from `report` stops the emitting run early with
-        `USER_ABORT` if it is an optimization; an evaluation has no optimizer
-        loop to interrupt, so there the return value is ignored.
-
-        Args:
-            handler: The result handlers to share.
-            report:  Optional callback invoked per evaluation across the group.
-
-        Returns:
-            A [`SharedHandlers`][ropt.simple.SharedHandlers] group.
-        """
-        return SharedHandlers(group_entries(handler, report), self._require_open())
-
     def _open_pool(self, make_executor: Callable[[], Executor]) -> WorkerPool:
         return self._require_open().open_pool(make_executor)
 
@@ -476,7 +436,7 @@ class Session:
 
 
 def session() -> Session:
-    """Open a background session that pools and shared handlers run on.
+    """Open a background session that pools run on.
 
     The session owns one event loop, on a daemon thread, for as long as the
     block is open. Build pools on it with its factories, and pass them to the

@@ -11,8 +11,8 @@ are not re-exported here; import them from [`ropt.enums`][ropt.enums].
 Nothing about a run depends on where it is called from. Where its evaluations
 happen is decided by the pool it is given with `pool=`, and which handlers see
 its results by the `handlers=` it is given. A [`session`][ropt.simple.session]
-hands out both; a run given no pool evaluates in-process. This holds wherever
-the run is started from, including a thread you spawn yourself.
+hands out the pools; a run given no pool evaluates in-process. This holds
+wherever the run is started from, including a thread you spawn yourself.
 """
 
 from __future__ import annotations
@@ -30,7 +30,6 @@ from ropt.components.event_handlers import (
 
 from ._evaluate import evaluate, evaluate_many
 from ._function import EvaluationFunction
-from ._handlers import SharedHandlers
 from ._offload import offload
 from ._optimize import optimize, optimize_many
 from ._pool import WorkerPool, serial_pool
@@ -49,7 +48,6 @@ __all__ = [
     "ReportCallback",
     "ResultsHandler",
     "Session",
-    "SharedHandlers",
     "WorkerPool",
     "evaluate",
     "evaluate_many",

@@ -29,8 +29,8 @@ from ._broadcast import (
     broadcast_runs,
 )
 from ._evaluator import make_evaluator
-from ._guards import check_handlers, check_pool
-from ._handlers import SharedHandlers, attach_handlers
+from ._guards import check_pool
+from ._handlers import attach_handlers
 from ._pool import serial_pool
 from ._result import OptimizationResult
 
@@ -53,7 +53,7 @@ def optimize(  # ruff: ignore[too-many-arguments]
     function: EvaluationFunction,
     *,
     pool: WorkerPool | None = None,
-    handlers: Sequence[EventHandler | SharedHandlers] | None = None,
+    handlers: Sequence[EventHandler] | None = None,
     report: ReportCallback | None = None,
     constraint_tolerance: float = 1e-10,
     bundle_size: int = 1,
@@ -74,12 +74,9 @@ def optimize(  # ruff: ignore[too-many-arguments]
     [`serial_pool`][ropt.simple.serial_pool] evaluates inline and has no workers
     to occupy, so it can be reused.
 
-    `handlers` mixes two kinds. An
-    [`EventHandler`][ropt.components.event_handlers.EventHandler] is local: it
-    is claimed for the duration of this run, and may be reused by a later run to
-    accumulate results, but not shared with a concurrent one, and never
-    afterwards with a [`SharedHandlers`][ropt.simple.SharedHandlers] group. A
-    group is shared: this run feeds it alongside every other run that lists it.
+    The handlers in `handlers` are called in the order they are listed, and
+    the same handler may also be given to other runs, sequential or concurrent,
+    to accumulate results across them.
 
     Returning `True` from `report` stops the optimization early with
     `USER_ABORT`. Reporting stops there, so results after it in the same batch
@@ -90,7 +87,7 @@ def optimize(  # ruff: ignore[too-many-arguments]
         x0:                   The initial variable vector.
         function:             The per-realization evaluation function.
         pool:                 The pool to evaluate on, from a session factory.
-        handlers:             Optional local handlers and shared groups.
+        handlers:             Optional handlers, called in the order listed.
         report:               Optional callback invoked per function evaluation.
         constraint_tolerance: The tolerance within which a constraint is satisfied.
         bundle_size:          Evaluations per worker task, `0` for a whole batch.
@@ -100,7 +97,6 @@ def optimize(  # ruff: ignore[too-many-arguments]
         An [`OptimizationResult`][ropt.simple.OptimizationResult] describing the outcome.
     """
     check_pool(pool)
-    check_handlers(handlers)
     return _optimize(
         pool if pool is not None else serial_pool(),
         config,
@@ -120,7 +116,7 @@ def _optimize(  # ruff: ignore[too-many-arguments]
     x0: ArrayLike,
     function: EvaluationFunction,
     *,
-    handlers: Sequence[EventHandler | SharedHandlers] | None,
+    handlers: Sequence[EventHandler] | None,
     report: ReportCallback | None,
     constraint_tolerance: float,
     bundle_size: int,
@@ -133,12 +129,12 @@ def _optimize(  # ruff: ignore[too-many-arguments]
     result_handler = ResultsHandler(constraint_tolerance=constraint_tolerance)
     step = OptimizationStep(evaluator=evaluator)
     step.add_event_handler(result_handler)
-    with attach_handlers(step, handlers, report):
-        exit_code = step.run(
-            context=context,
-            variables=np.asarray(x0, dtype=np.float64),
-            metadata=metadata,
-        )
+    attach_handlers(step, handlers, report)
+    exit_code = step.run(
+        context=context,
+        variables=np.asarray(x0, dtype=np.float64),
+        metadata=metadata,
+    )
     results = result_handler["results"]
     return OptimizationResult(
         exit_code=exit_code,
@@ -152,7 +148,7 @@ def optimize_many(  # ruff: ignore[too-many-arguments]
     function: EvaluationFunction | Sequence[EvaluationFunction],
     *,
     pool: WorkerPool | None = None,
-    handlers: Sequence[EventHandler | SharedHandlers] | None = None,
+    handlers: Sequence[EventHandler] | None = None,
     report: ReportCallback | Sequence[ReportCallback] | None = None,
     limit: int | None = None,
     constraint_tolerance: float = 1e-10,
@@ -177,14 +173,13 @@ def optimize_many(  # ruff: ignore[too-many-arguments]
     for what happens when one raises.
 
     A handler passed here is fed by every run, since `handle_event` serializes
-    its own calls; a [`SharedHandlers`][ropt.simple.SharedHandlers] group does
-    the same through its dispatcher. A handler that combines the events of
-    overlapping runs sees them in an order that depends on which run gets there
-    first. `report=`, being local by nature, is the opposite: it is given per
-    run, or broadcast to all of them.
+    its own calls. A handler that combines the events of overlapping runs sees
+    them in an order that depends on which run gets there first. `report=`,
+    being local by nature, is the opposite: it is given per run, or broadcast
+    to all of them.
 
-    A pool or group that is closed — because it was closed directly, or
-    because its session ended — is refused here with a
+    A pool that is closed — because it was closed directly, or because its
+    session ended — is refused here with a
     [`WorkflowError`][ropt.exceptions.WorkflowError], as is one carried into
     a worker process, where it cannot work at all.
 
@@ -201,7 +196,7 @@ def optimize_many(  # ruff: ignore[too-many-arguments]
         x0:                   The initial variable vector, or one per row.
         function:             The evaluation function, or one per run.
         pool:                 The pool every run evaluates on.
-        handlers:             Optional handlers and shared groups, fed by every run.
+        handlers:             Optional handlers, fed by every run.
         report:               Optional callback per evaluation, shared or one per run.
         limit:                The maximum number of runs to execute at once.
         constraint_tolerance: The tolerance within which a constraint is satisfied.
@@ -212,7 +207,6 @@ def optimize_many(  # ruff: ignore[too-many-arguments]
         One [`OptimizationResult`][ropt.simple.OptimizationResult] per run, in order.
     """
     check_pool(pool)
-    check_handlers(handlers)
     # One pool for the whole call, even a private serial one, so that
     # concurrent runs draw their batch IDs from a single counter.
     shared_pool = pool if pool is not None else serial_pool()
