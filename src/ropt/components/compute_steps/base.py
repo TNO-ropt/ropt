@@ -48,7 +48,6 @@ class ComputeStep(ABC, Generic[_ResultT]):
         if not isinstance(handler, EventHandler):
             msg = f"Not an event handler: {type(handler).__name__}"
             raise TypeError(msg)
-        handler._register_compute_step()  # ruff: ignore[private-member-access]
         self._event_handlers.append(handler)
 
     @property

@@ -2,9 +2,9 @@
 
 Every entry point takes `handlers=`, a list that may mix two kinds of item:
 
-- an [`EventHandler`][ropt.components.event_handlers.EventHandler] is **local**.
-  It is claimed for the duration of the run, so it belongs to that run alone,
-  and released afterwards, so a later run can reuse it.
+- an [`EventHandler`][ropt.components.event_handlers.EventHandler] is attached
+  to the run's compute step directly. Its `handle_event` serializes itself, so
+  the same handler may be given to several runs at once.
 - a [`SharedHandlers`][ropt.simple.SharedHandlers] group is **shared**. The run
   forwards its events to the group's dispatcher, which serializes them across
   every run feeding it, so its handlers accumulate results without locking.
@@ -42,8 +42,7 @@ if TYPE_CHECKING:
 
 
 _IN_USE = (
-    "This handler is already in use and cannot join a group of shared handlers. "
-    "A handler passed to a run in `handlers=` stays bound to that run, and one "
+    "This handler already belongs to a group of shared handlers, and one "
     "already held by another group cannot be shared twice. Use a separate "
     "handler here."
 )
@@ -156,9 +155,9 @@ class SharedHandlers:
             try:
                 self._dispatcher.add_event_handler(handler, run_in_thread=run_in_thread)
             except WorkflowError as exc:
-                # The low-level refusal is phrased in terms of dispatchers and
-                # compute steps, neither of which this API ever hands out, so
-                # both causes are restated here in its own vocabulary.
+                # The low-level refusal is phrased in terms of dispatchers,
+                # which this API never hands out, so both causes are restated
+                # here in its own vocabulary.
                 message = _LISTED_TWICE if handler in self._handlers else _IN_USE
                 raise WorkflowError(message) from exc
             self._handlers.append(handler)
@@ -225,10 +224,9 @@ def attach_handlers(
 ) -> Iterator[None]:
     """Wire a run's handlers to its compute step for the duration of the run.
 
-    Local handlers are claimed before any is attached, so a run that cannot have
-    all of them leaves every one of them free, and released again afterwards, so
-    a later run can reuse them. Shared groups are attached instead of claimed,
-    since they are not exclusive to one run.
+    Local handlers are attached to the step directly; shared groups get a
+    forwarding handler each. A handler may be given to several concurrent runs,
+    since `handle_event` serializes its own calls.
 
     Args:
         step:     The compute step of the run.
@@ -241,20 +239,8 @@ def attach_handlers(
     local, groups = split_handlers(handlers)
     if report is not None:
         local.append(make_report_handler(report))
-    claimed: list[EventHandler] = []
-    try:
-        # Claimed first, all of them, before anything is attached: a run that
-        # cannot have every handler it asked for must leave them all free.
-        for handler in local:
-            handler.claim()
-            claimed.append(handler)
-        # Attaching is what binds a handler to compute steps for good, which is
-        # why a handler used locally can never join a shared group afterwards.
-        for handler in local:
-            step.add_event_handler(handler)
-        for group in groups:
-            group.attach_to(step)
-        yield
-    finally:
-        for handler in claimed:
-            handler.release()
+    for handler in local:
+        step.add_event_handler(handler)
+    for group in groups:
+        group.attach_to(step)
+    yield

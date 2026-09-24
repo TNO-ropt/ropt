@@ -261,27 +261,26 @@ def test_handler_reusable_after_group_fails_to_open() -> None:
         assert set(dict(group._dispatcher._handlers)) == {good, bad}  # ruff: ignore[private-member-access]
 
 
-def test_local_handler_refused_by_group(config: Any, test_functions: Any) -> None:
+def test_local_handler_accepted_by_group(config: Any, test_functions: Any) -> None:
     handler = HistoryHandler()
     optimize(config, initial_values, test_functions[0], handlers=[handler])
-    with (
-        session() as active,
-        pytest.raises(WorkflowError, match="already in use") as excinfo,
-    ):
-        active.shared_handlers(handler)
-    # The low-level refusal names a compute step, which this API never hands
-    # out; a reader cannot act on it.
-    assert "compute step" not in str(excinfo.value)
-    assert "separate handler" in str(excinfo.value)
+    after_run = len(handler["results"])
+    with session() as active:
+        group = active.shared_handlers(handler)
+        assert set(dict(group._dispatcher._handlers)) == {handler}  # ruff: ignore[private-member-access]
+    assert after_run > 0
 
 
 def test_handler_in_open_group_refused_by_another_group() -> None:
     handler = HistoryHandler()
     with session() as active:
         active.shared_handlers(handler)
-        with pytest.raises(WorkflowError, match="already in use") as excinfo:
+        with pytest.raises(
+            WorkflowError, match="already belongs to a group"
+        ) as excinfo:
             active.shared_handlers(handler)
-    assert "compute step" not in str(excinfo.value)
+    assert "dispatcher" not in str(excinfo.value)
+    assert "separate handler" in str(excinfo.value)
 
 
 def test_shared_handlers_releases_on_rollback_failure(
@@ -361,15 +360,21 @@ def test_optimize_local_handler_accumulates_across_sequential_calls(
     assert len(history["results"]) > after_first
 
 
-def test_optimize_local_handler_released_after_run(
+def test_optimize_local_handler_reused_by_concurrent_runs(
     config: Any, test_functions: Any
 ) -> None:
     history = HistoryHandler()
-    optimize(config, initial_values, test_functions[0], handlers=[history])
-    assert history._claimed is False  # ruff: ignore[private-member-access]
+    results = optimize_many(
+        [config, config],
+        initial_values,
+        test_functions[0],
+        handlers=[history],
+    )
+    assert len(results) == 2
+    assert len(history["results"]) > 0
 
 
-def test_optimize_local_handler_released_after_error(config: Any) -> None:
+def test_optimize_local_handler_usable_after_error(config: Any) -> None:
     history = HistoryHandler()
 
     def _boom(_v: Any, _c: Any) -> float:
@@ -378,19 +383,18 @@ def test_optimize_local_handler_released_after_error(config: Any) -> None:
 
     with pytest.raises(RuntimeError, match="boom"):
         optimize(config, initial_values, _boom, handlers=[history])
-    assert history._claimed is False  # ruff: ignore[private-member-access]
+    # The failed run leaves nothing held, so the handler still takes events.
+    assert history._event_owner is None  # ruff: ignore[private-member-access]
 
 
-def test_optimize_local_handler_claimed_during_run(
+def test_optimize_local_handler_owned_during_run(
     config: Any, test_functions: Any
 ) -> None:
     history = HistoryHandler()
-    observed: list[bool] = []
+    observed: list[int | None] = []
 
     def _report(_: FunctionResults) -> None:
-        observed.append(history._claimed)  # ruff: ignore[private-member-access]
-        with pytest.raises(WorkflowError, match="already been claimed"):
-            history.claim()
+        observed.append(history._event_owner)  # ruff: ignore[private-member-access]
 
     optimize(
         config,
@@ -399,20 +403,9 @@ def test_optimize_local_handler_claimed_during_run(
         handlers=[history],
         report=_report,
     )
+    # The report handler runs between calls into `history`, so nothing holds it.
     assert observed
-    assert all(observed)
-    assert history._claimed is False  # ruff: ignore[private-member-access]
-
-
-def test_optimize_local_handler_claim_rolls_back_on_failure(
-    config: Any, test_functions: Any
-) -> None:
-    first = HistoryHandler()
-    second = HistoryHandler()
-    second.claim()  # stands in for a handler already in use by another run
-    with pytest.raises(WorkflowError, match="already been claimed"):
-        optimize(config, initial_values, test_functions[0], handlers=[first, second])
-    assert first._claimed is False  # ruff: ignore[private-member-access]
+    assert all(owner is None for owner in observed)
 
 
 def test_report_callback_stops_optimization(config: Any, test_functions: Any) -> None:
@@ -1738,15 +1731,17 @@ def test_shared_handler_aggregates_across_optimize_many(
     assert len(shared["results"]) > len(single["results"])
 
 
-def test_optimize_many_rejects_bare_handler(config: Any, test_functions: Any) -> None:
+def test_optimize_many_accepts_bare_handler(config: Any, test_functions: Any) -> None:
     handler = HistoryHandler()
-    with pytest.raises(WorkflowError, match="takes shared handlers only"):
-        optimize_many(
-            config,
-            initial_values,
-            test_functions[0],
-            handlers=[handler],  # type: ignore[list-item]
-        )
+    results = optimize_many(
+        [config, config, config],
+        initial_values,
+        test_functions[0],
+        handlers=[handler],
+    )
+    assert len(results) == 3
+    # Every run feeds the same handler, which serializes the calls itself.
+    assert len(handler["results"]) > 0
 
 
 if _TEST_HPC:

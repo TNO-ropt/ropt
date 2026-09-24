@@ -1122,24 +1122,12 @@ def test_register_dispatcher_via_add_event_handler_twice_raises() -> None:
         dispatcher.add_event_handler(handler)
 
 
-def test_dispatcher_then_compute_step_raises() -> None:
+def test_handler_may_be_attached_to_a_dispatcher_and_a_compute_step(
+    evaluator: Any,
+) -> None:
     handler = _RecordingHandler()
     handler._register_dispatcher()  # ruff: ignore[private-member-access]
-    with pytest.raises(WorkflowError, match="registered with a dispatcher"):
-        handler._register_compute_step()  # ruff: ignore[private-member-access]
-
-
-def test_compute_step_then_dispatcher_raises() -> None:
-    handler = _RecordingHandler()
-    handler._register_compute_step()  # ruff: ignore[private-member-access]
-    with pytest.raises(WorkflowError, match="compute step"):
-        handler._register_dispatcher()  # ruff: ignore[private-member-access]
-
-
-def test_handler_may_be_attached_to_multiple_compute_steps() -> None:
-    handler = _RecordingHandler()
-    handler._register_compute_step()  # ruff: ignore[private-member-access]
-    handler._register_compute_step()  # allowed, no error  # ruff: ignore[private-member-access]
+    OptimizationStep(evaluator=evaluator()).add_event_handler(handler)
 
 
 def test_claim_marks_handler_as_claimed() -> None:
@@ -1154,13 +1142,6 @@ def test_claim_twice_raises() -> None:
     handler.claim()
     with pytest.raises(WorkflowError, match="already been claimed for exclusive use"):
         handler.claim()
-
-
-def test_claim_is_independent_of_attachment() -> None:
-    handler = _RecordingHandler()
-    handler.claim()
-    handler._register_compute_step()  # ruff: ignore[private-member-access]
-    assert handler._claimed is True  # ruff: ignore[private-member-access]
 
 
 def test_release_allows_reclaiming() -> None:

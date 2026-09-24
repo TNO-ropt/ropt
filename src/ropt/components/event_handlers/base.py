@@ -9,16 +9,14 @@ because two of them refuse something:
 - `claim`/`release` cover a whole run, and are what a caller uses to say that a
   handler belongs to that run alone. A released handler can be claimed again,
   by a later run and by a different compute step.
-- `_attached_to` is neither a lock nor an owner: it records whether the handler
-  is fed by a dispatcher or by compute steps, and the compute-step half never
-  resets. That is what makes local-or-shared a once-per-handler decision.
+- `_in_dispatcher` records whether the handler is fed by a dispatcher, which
+  one dispatcher at a time may be.
 """
 
 from __future__ import annotations
 
 import threading
 from abc import ABC, abstractmethod
-from enum import Enum, auto
 from typing import TYPE_CHECKING, Any
 
 from ropt.exceptions import WorkflowError
@@ -26,14 +24,6 @@ from ropt.exceptions import WorkflowError
 if TYPE_CHECKING:
     from ropt.enums import EnOptEventType
     from ropt.events import EnOptEvent
-
-
-class _Attachment(Enum):
-    """How an event handler is attached within a workflow."""
-
-    NONE = auto()
-    DISPATCHER = auto()
-    COMPUTE_STEP = auto()
 
 
 class EventHandler(ABC):
@@ -60,7 +50,7 @@ class EventHandler(ABC):
         # Name-mangled, so a subclass cannot reach it by accident and the `[]`
         # access stays the only way in.
         self.__stored_values: dict[str, Any] = {}
-        self._attached_to: _Attachment = _Attachment.NONE
+        self._in_dispatcher = False
         self._claimed = False
         self._owner_lock = threading.Lock()
         # Separate from `_owner_lock`, which also guards claim/release: holding
@@ -69,26 +59,13 @@ class EventHandler(ABC):
         self._event_owner: int | None = None
 
     def _register_dispatcher(self) -> None:
-        if self._attached_to is _Attachment.DISPATCHER:
+        if self._in_dispatcher:
             msg = "This event handler is already registered with a dispatcher."
             raise WorkflowError(msg)
-        if self._attached_to is _Attachment.COMPUTE_STEP:
-            msg = (
-                "This event handler is already registered directly with a compute step."
-            )
-            raise WorkflowError(msg)
-        self._attached_to = _Attachment.DISPATCHER
+        self._in_dispatcher = True
 
     def _unregister_dispatcher(self) -> None:
-        self._attached_to = _Attachment.NONE
-
-    def _register_compute_step(self) -> None:
-        # There is no matching unregister: a step keeps its handlers for good,
-        # so this is the one-way half of the attachment.
-        if self._attached_to is _Attachment.DISPATCHER:
-            msg = "This event handler is already registered with a dispatcher."
-            raise WorkflowError(msg)
-        self._attached_to = _Attachment.COMPUTE_STEP
+        self._in_dispatcher = False
 
     def claim(self) -> None:
         """Claim this handler for exclusive use by one run at a time.
