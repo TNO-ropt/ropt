@@ -30,7 +30,7 @@ from ._handlers import SharedHandlers, group_entries
 from ._pool import WorkerPool
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Coroutine, Sequence
+    from collections.abc import Callable, Coroutine
 
     from ropt.components.event_handlers import EventDispatcher, EventHandler
     from ropt.components.executors import Executor
@@ -435,7 +435,6 @@ class Session:
     def shared_handlers(
         self,
         *handler: EventHandler,
-        threaded: EventHandler | Sequence[EventHandler] = (),
         report: ReportCallback | None = None,
     ) -> SharedHandlers:
         """Group result handlers that several runs share.
@@ -445,32 +444,23 @@ class Session:
         which is what makes accumulating over concurrent runs safe. A run may
         feed several groups, and mix them with handlers of its own.
 
-        A handler joins one group at a time, and a handler that was ever passed
-        to a run as a local handler cannot join a group at all; decide per
-        handler whether it is local or shared. See
+        A handler joins one group at a time. See
         [Running Optimizations](../running/running.md) for a walkthrough.
 
-        Handlers run on the session's event-loop thread unless listed in
-        `threaded`. Running one on a worker thread only helps if it spends real
-        time in blocking, GIL-releasing I/O (files, databases, network); for
-        in-memory work it gives no benefit under CPython's GIL. See
-        [Result Handlers](../running/handlers.md#running-a-handler-in-a-thread).
+        Handlers run on the session's event-loop thread.
 
         Returning `True` from `report` stops the emitting run early with
         `USER_ABORT` if it is an optimization; an evaluation has no optimizer
         loop to interrupt, so there the return value is ignored.
 
         Args:
-            handler:  The result handlers to share.
-            threaded: Handlers to run on a worker thread instead of the loop.
-            report:   Optional callback invoked per evaluation across the group.
+            handler: The result handlers to share.
+            report:  Optional callback invoked per evaluation across the group.
 
         Returns:
             A [`SharedHandlers`][ropt.simple.SharedHandlers] group.
         """
-        return SharedHandlers(
-            group_entries(handler, threaded, report), self._require_open()
-        )
+        return SharedHandlers(group_entries(handler, report), self._require_open())
 
     def _open_pool(self, make_executor: Callable[[], Executor]) -> WorkerPool:
         return self._require_open().open_pool(make_executor)

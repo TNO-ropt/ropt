@@ -285,19 +285,6 @@ def test_inline_handler_in_shared_group_cannot_offload() -> None:
 
 
 @pytest.mark.timeout(60)
-def test_threaded_handler_in_shared_group_can_offload() -> None:
-    # A threaded handler runs on a dispatcher worker thread, not the session's
-    # own loop thread, so a pool sharing that session is not "its own loop"
-    # from there: the offload dispatches and returns a real result.
-    handler = _OffloadingHandler()
-    with session() as active:
-        group = active.shared_handlers(threaded=handler)
-        handler.pool = active.thread_pool(workers=2)
-        _run_one(pool=handler.pool, handlers=[group])
-    assert handler.outcome == "returned 16"
-
-
-@pytest.mark.timeout(60)
 def test_local_handler_can_offload() -> None:
     # A handler passed straight to `optimize` is not on any event loop: it runs
     # on the thread driving the run, where the pool it is given works as usual.

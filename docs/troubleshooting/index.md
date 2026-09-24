@@ -145,8 +145,7 @@ Decide per handler which role it plays; if you need both, use two handlers.
 
 **A slow shared handler holds up every run.** A group processes events one at a
 time, and the run that emitted one waits until every handler has finished with
-it. Keep shared handlers cheap, or register a slow one with
-[`threaded`](../running/handlers.md#running-a-handler-in-a-thread).
+it. Keep shared handlers cheap.
 
 **Not every optimizer can run beside another.** A backend that needs its own
 working directory, writes to a fixed file name, or keeps state inside its
@@ -159,7 +158,7 @@ process of its own. Optimizer output capture is likewise for one run at a time.
 | A handler collects nothing from `optimize_many` | A plain handler belongs to one run. Put it in a [shared group](../running/handlers.md#sharing-a-handler-across-concurrent-runs). |
 | `shared_handlers` refuses a handler that worked before | It was used as a local handler once, which binds it permanently. Use a second handler. |
 | Results from a shared `report=` callback are jumbled or lost | The callback is called from every run's thread at once. Use a shared group, or one callback per run. |
-| Many runs are slower than expected while the pool sits idle | A shared handler is serializing them. Make it cheaper, or run it [`threaded`](../running/handlers.md#running-a-handler-in-a-thread). |
+| Many runs are slower than expected while the pool sits idle | A shared handler is serializing them. Make it cheaper. |
 | A second concurrent run raises `WorkflowError` about output capture | Only one run at a time may set `stdout` or `stderr`; see [Many optimizations at once](../running/parallel.md#many-optimizations-at-once). |
 
 ## Configuration

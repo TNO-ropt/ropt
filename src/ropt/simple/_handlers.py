@@ -68,13 +68,11 @@ class SharedHandlers:
     [Running Optimizations](../running/running.md) for a walkthrough.
     """
 
-    def __init__(
-        self, entries: Sequence[tuple[EventHandler, bool]], session: _Session
-    ) -> None:
+    def __init__(self, entries: Sequence[EventHandler], session: _Session) -> None:
         """Initialize the group and start its dispatcher.
 
         Args:
-            entries: The handlers, each with whether to run it in a thread.
+            entries: The handlers of the group.
             session: The session whose event loop the dispatcher runs on.
         """
         self._session = session
@@ -150,10 +148,10 @@ class SharedHandlers:
         """Close the group."""
         self.close()
 
-    def _claim(self, entries: Sequence[tuple[EventHandler, bool]]) -> None:
-        for handler, run_in_thread in entries:
+    def _claim(self, entries: Sequence[EventHandler]) -> None:
+        for handler in entries:
             try:
-                self._dispatcher.add_event_handler(handler, run_in_thread=run_in_thread)
+                self._dispatcher.add_event_handler(handler)
             except WorkflowError as exc:
                 # The low-level refusal is phrased in terms of dispatchers,
                 # which this API never hands out, so both causes are restated
@@ -172,26 +170,20 @@ class SharedHandlers:
 
 def group_entries(
     handlers: Sequence[EventHandler],
-    threaded: EventHandler | Sequence[EventHandler],
     report: ReportCallback | None,
-) -> list[tuple[EventHandler, bool]]:
-    """Pair each handler of a group with whether it runs in a thread.
+) -> list[EventHandler]:
+    """Collect the handlers of a group.
 
     Args:
-        handlers: The handlers to run on the session's event-loop thread.
-        threaded: The handlers to run on a worker thread instead.
+        handlers: The handlers of the group.
         report:   An optional callback added to the group as a report handler.
 
     Returns:
-        The handlers of the group, each with its threading choice.
+        The handlers of the group.
     """
-    in_thread = (threaded,) if isinstance(threaded, EventHandler) else tuple(threaded)
-    entries: list[tuple[EventHandler, bool]] = [
-        *((item, False) for item in handlers),
-        *((item, True) for item in in_thread),
-    ]
+    entries = list(handlers)
     if report is not None:
-        entries.append((make_report_handler(report), False))
+        entries.append(make_report_handler(report))
     return entries
 
 

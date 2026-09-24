@@ -16,10 +16,8 @@ if TYPE_CHECKING:
 class CallbackHandler(EventHandler):
     """Forwards events of matching types to a callback.
 
-    A callback that blocks (file I/O, network calls) should be registered with
-    `run_in_thread=True` on the
-    [`EventDispatcher`][ropt.components.event_handlers.EventDispatcher]. See
-    [Optimization Workflows](../advanced/workflows.md#event-dispatcher).
+    A callback that blocks, for example on file I/O or network calls, holds up
+    the run that emitted the event.
     """
 
     def __init__(

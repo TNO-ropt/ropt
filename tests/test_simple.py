@@ -189,26 +189,6 @@ def test_group_report_callback_reports_across_runs(
     assert all(isinstance(item, FunctionResults) for item in reported)
 
 
-def test_group_threaded_handlers_run_in_thread() -> None:
-    loop_handler = HistoryHandler()
-    io_handler = HistoryHandler()
-    with session() as active:
-        group = active.shared_handlers(loop_handler, threaded=io_handler)
-        in_thread = dict(group._dispatcher._handlers)  # ruff: ignore[private-member-access]
-    assert in_thread[loop_handler] is False
-    assert in_thread[io_handler] is True
-
-
-def test_group_threaded_accepts_handler_sequence() -> None:
-    first = HistoryHandler()
-    second = HistoryHandler()
-    with session() as active:
-        group = active.shared_handlers(threaded=[first, second])
-        in_thread = dict(group._dispatcher._handlers)  # ruff: ignore[private-member-access]
-    assert in_thread[first] is True
-    assert in_thread[second] is True
-
-
 def test_empty_group_adds_no_forwarding_handler(
     config: Any, test_functions: Any
 ) -> None:
@@ -248,7 +228,7 @@ def test_handler_reusable_after_group_closes() -> None:
     # A new session, since a group cannot be reopened once its own has closed.
     with session() as active:
         group = active.shared_handlers(handler)
-        assert set(dict(group._dispatcher._handlers)) == {handler}  # ruff: ignore[private-member-access]
+        assert set(group._dispatcher._handlers) == {handler}  # ruff: ignore[private-member-access]
 
 
 def test_handler_reusable_after_group_fails_to_open() -> None:
@@ -258,7 +238,7 @@ def test_handler_reusable_after_group_fails_to_open() -> None:
         with pytest.raises(WorkflowError, match="listed more than once"):
             active.shared_handlers(good, bad, bad)
         group = active.shared_handlers(good, bad)
-        assert set(dict(group._dispatcher._handlers)) == {good, bad}  # ruff: ignore[private-member-access]
+        assert set(group._dispatcher._handlers) == {good, bad}  # ruff: ignore[private-member-access]
 
 
 def test_local_handler_accepted_by_group(config: Any, test_functions: Any) -> None:
@@ -267,7 +247,7 @@ def test_local_handler_accepted_by_group(config: Any, test_functions: Any) -> No
     after_run = len(handler["results"])
     with session() as active:
         group = active.shared_handlers(handler)
-        assert set(dict(group._dispatcher._handlers)) == {handler}  # ruff: ignore[private-member-access]
+        assert set(group._dispatcher._handlers) == {handler}  # ruff: ignore[private-member-access]
     assert after_run > 0
 
 
@@ -310,7 +290,7 @@ def test_group_context_manager_closes_the_group() -> None:
     handler = HistoryHandler()
     with session() as active:
         with active.shared_handlers(handler) as group:
-            assert set(dict(group._dispatcher._handlers)) == {handler}  # ruff: ignore[private-member-access]
+            assert set(group._dispatcher._handlers) == {handler}  # ruff: ignore[private-member-access]
         # Released, so a plain dispatcher can claim it again.
         EventDispatcher().add_event_handler(handler)
 

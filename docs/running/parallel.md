@@ -640,12 +640,9 @@ runs](handlers.md#sharing-a-handler-across-concurrent-runs).
     a handler safe to share — but it means a slow handler throttles the whole
     batch, since every run queues behind the others, once per result produced.
 
-    So keep shared handlers cheap. If one must do slow work — writing a file,
-    talking to a database — register it with
-    [`threaded`](handlers.md#running-a-handler-in-a-thread), which moves it off
-    the session's event loop so the pools keep working meanwhile. That does
-    **not** make handling concurrent: the events are still processed one at a
-    time.
+    So keep shared handlers cheap. A handler that must do slow work — writing
+    a file, talking to a database — runs on the session's event loop like any
+    other, so the whole batch waits for it.
 
 !!! warning "Without a pool the driver threads do the evaluating"
     `optimize_many` needs no session and no pool. Without one, the runs still
@@ -809,14 +806,12 @@ def transform(x, pool=None):
     return offload(partial(expensive, x), pool=pool)
 ```
 
-!!! note "An inline handler in a shared group cannot offload"
+!!! note "A handler in a shared group cannot offload"
     A handler in a [shared group](handlers.md#sharing-a-handler-across-concurrent-runs)
-    that runs inline is on the session's event loop; offloading to a pool on
-    that same session would starve the very loop it is waiting on, so it raises
-    a [`WorkflowError`][ropt.exceptions.WorkflowError]. A
-    [`threaded`](handlers.md#running-a-handler-in-a-thread) handler runs on a dispatcher
-    worker instead and can offload, as can a local handler, which runs on the
-    thread driving the run.
+    runs on the session's event loop; offloading to a pool on that same session
+    would starve the very loop it is waiting on, so it raises a
+    [`WorkflowError`][ropt.exceptions.WorkflowError]. A local handler can
+    offload, since it runs on the thread driving the run.
 
     Better still, do parallel work from your optimization code and leave
     handlers to handle results.

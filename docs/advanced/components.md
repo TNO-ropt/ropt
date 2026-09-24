@@ -56,8 +56,7 @@ built-in handlers follow and what `handler[key]` reads.
 
 `_handle_event` must not block for long when the handler is registered with an
 [`EventDispatcher`][ropt.components.event_handlers.EventDispatcher]: the
-dispatcher serializes events, so a slow handler delays every run sharing it. Use
-`run_in_thread=True` for blocking work; see
+dispatcher serializes events, so a slow handler delays every run sharing it. See
 [Event throughput](workflows.md#event-throughput).
 
 ## Executor

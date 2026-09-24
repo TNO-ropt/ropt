@@ -440,32 +440,12 @@ evaluation error — on the emitting run's own call stack — and splits
   remains the session teardown backstop and propagates, tearing the dispatcher
   task group down, as with the executor.
 
-### Thread-based dispatch
-
-By default, handlers registered with `EventDispatcher` are called directly in
-the asyncio event loop's thread, which costs nothing for handlers that only do
-in-memory work, such as `ResultsHandler` or `HistoryHandler`.
-
-If a handler performs blocking operations — writing results to a file, pushing
-data to a database, sending over a network — pass `run_in_thread=True` when
-registering it:
-
-```python
-event_dispatcher.add_event_handler(my_handler, run_in_thread=True)
-```
-
-`CallbackHandler` and `DataFrameHandler` (when a slow callback is set via
-`set_callback`) are common cases where this is needed. When multiple handlers
-with `run_in_thread=True` match the same event they are dispatched **in
-parallel** via `asyncio.gather` — they do not block each other.
-
 ### Event throughput
 
 A dispatcher processes its queue **one event at a time**: all handlers for an
-event finish before the next event is taken. `run_in_thread=True` moves a
-blocking handler off the event loop, but it does not overlap that handler with
-the handlers of any *other* event — only with the threaded handlers of the same
-event.
+event finish before the next event is taken, and every handler runs on the event
+loop's thread. A handler that blocks therefore holds up every run feeding the
+dispatcher.
 
 This serialization is deliberate.
 [`EventHandler`][ropt.components.event_handlers.EventHandler] is not re-entrant,

@@ -162,11 +162,9 @@ class DataFrameHandler(EventHandler):
 
         The callback receives the output directory configured for the run
         ([`OptimizerConfig.output_dir`][ropt.config.OptimizerConfig], `None` if
-        it is not set), and reads the tables from this handler. If it performs
-        blocking operations (for example writing tables to disk), register this
-        handler with `run_in_thread=True` on the
-        [`EventDispatcher`][ropt.components.event_handlers.EventDispatcher]. See
-        [Optimization Workflows](../advanced/workflows.md#event-dispatcher).
+        it is not set), and reads the tables from this handler. A callback that
+        performs blocking operations, for example writing tables to disk, holds
+        up the run that emitted the event.
 
         Args:
             callback: A function that is called when the tables are updated.

@@ -84,9 +84,8 @@ session.
 Closing a group earlier **releases its handlers**. A handler belongs to one
 group at a time, so this is what lets you put one into another group; otherwise
 only the session ending frees it. The group also releases the dispatcher it
-runs on, together with any worker threads a `threaded` handler needed, so
-closing groups built in a loop as you go frees those resources earlier than
-closing them all at the end. Use [`close`][ropt.simple.SharedHandlers.close], or the group as a context
+runs on, so closing groups built in a loop as you go frees those resources
+earlier than closing them all at the end. Use [`close`][ropt.simple.SharedHandlers.close], or the group as a context
 manager, which closes it on exit:
 
 ```python
@@ -111,10 +110,8 @@ completion while its results go nowhere.
     handler safe to share across *concurrent* runs. Around a plain
     **sequential** loop it adds a background loop plus a cross-thread hand-off
     per result, and a reused local handler accumulates the same results without
-    either. When
-    you do share a group, move any slow, GIL-releasing (I/O) handler onto a
-    worker thread with [`threaded`](#running-a-handler-in-a-thread) so it does
-    not stall the shared loop for every run.
+    either. A handler in a group runs on the shared loop, so a slow one holds
+    up every run feeding the group.
 
 !!! warning "Local first, shared never after"
     The two roles are not interchangeable, and a handler can move from one to
@@ -235,8 +232,8 @@ Convenience methods:
     optimize(config, x0, objective, handlers=[tables])
     ```
 
-    Because this writes to disk on every update, it is a good candidate for
-    [running on a worker thread](#running-a-handler-in-a-thread).
+    Because this writes to disk on every update, the run that emitted the
+    result waits for the write to finish.
 
 ### Other handlers
 
@@ -263,63 +260,6 @@ ends that run gracefully with `USER_ABORT` (the [`report`](running.md#stopping-e
 callback above is just a convenience wrapper around this). Only the run that owns
 the emitting step is affected, so concurrent runs continue. See
 [Optimization Workflows](../advanced/workflows.md#exit-codes).
-
-## Running a handler in a thread
-
-By default every handler runs **inline**, on the thread that drives the
-optimization: each result is delivered to the handlers one after another, and the
-run waits for `handle_event` to return before it continues. For a handler that
-only touches memory — storing results, updating a
-DataFrame, keeping a running statistic — that work is fast, and a hand-off to
-another thread would cost more than it saves.
-
-A [shared group](#sharing-a-handler-across-concurrent-runs) can instead run one
-or more handlers on a **worker thread** with the `threaded` keyword. Pass it a
-single handler or a sequence of handlers; those handlers run off the driving
-thread, while positional handlers stay inline:
-
-```python
-from ropt.simple import DataFrameHandler, HistoryHandler, optimize, session
-
-history = HistoryHandler()          # cheap, in-memory  -> inline
-tables = DataFrameHandler()         # writes a report to disk -> worker thread
-tables.set_default_tables()
-tables.set_callback(dump_to_disk)   # some function that writes a file
-
-with session() as s:
-    collected = s.shared_handlers(history, threaded=tables)
-    for x0 in start_points:
-        optimize(config, x0, objective, handlers=[collected])
-```
-
-Moving a handler to a thread changes **where** its code runs, nothing else: the
-run still waits for every handler to finish before delivering the next result,
-results still arrive in order, and an exception raised by a threaded handler is
-re-raised on the run's own stack, so early stops and fatal errors propagate
-exactly as they do for an inline handler.
-
-!!! warning "Only I/O-bound handlers benefit"
-    `threaded` helps in **one** situation: a handler that spends most of its time
-    waiting on an operation that *releases* CPython's global interpreter lock
-    (GIL) — writing to a file, a socket or a database, or a NumPy/C routine that
-    drops the lock. Only then can the optimization make progress while that work
-    is in flight.
-
-    Under the GIL only one thread runs Python bytecode at a time. A handler that
-    stays in Python — building DataFrames, accumulating results, doing numerical
-    work in pure Python — therefore gets **no** speed-up from `threaded`. It
-    merely pays the small cost of handing work to another thread, which makes it
-    marginally *slower*, never faster. `threaded` applies to a handler that is
-    busy with interruptible I/O, and to no other.
-
-`threaded` is only available on a shared group; a local handler always runs
-inline. To run a blocking handler on a thread for just one optimization, give it
-a group of its own:
-
-```python
-with session() as s:
-    optimize(config, x0, objective, handlers=[s.shared_handlers(threaded=slow_writer)])
-```
 
 ## Handlers and the process boundary
 
