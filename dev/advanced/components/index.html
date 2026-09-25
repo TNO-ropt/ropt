@@ -3056,11 +3056,10 @@ variables, and returns whatever the step produces. Two obligations:</p>
 filters on it, so a handler is never called for a type it did not ask for.
 Expose accumulated state through <code>__getitem__</code>, which is the convention the
 built-in handlers follow and what <code>handler[key]</code> reads.</p>
-<p><code>_handle_event</code> must not block for long when the handler is registered with an
-<a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventDispatcher" href="../../reference/components_event_handlers/#ropt.components.event_handlers.EventDispatcher"><code>EventDispatcher</code></a>: the
-dispatcher serializes events, so a slow handler delays every run sharing it. Use
-<code>run_in_thread=True</code> for blocking work; see
-<a href="../workflows/#event-throughput">Event throughput</a>.</p>
+<p><code>_handle_event</code> runs on the thread that emitted the event, under a lock the
+handler takes for every call. A slow <code>_handle_event</code> therefore delays the
+emitting run, and every other run waiting on the same handler. See
+<a href="../workflows/#using-handlers-safely">Using handlers safely</a>.</p>
 <h2 id="executor">Executor</h2>
 <p>Subclass <a class="autorefs autorefs-internal" title="            ropt.components.executors.ExecutorBase" href="../../reference/components_executors/#ropt.components.executors.ExecutorBase"><code>ExecutorBase</code></a> rather than
 <a class="autorefs autorefs-internal" title="            ropt.components.executors.Executor" href="../../reference/components_executors/#ropt.components.executors.Executor"><code>Executor</code></a>: it provides <code>submit</code>,

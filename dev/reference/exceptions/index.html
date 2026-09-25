@@ -3216,9 +3216,8 @@ errors, and are excluded too.</p>
 
 
         <p>A workflow or runtime object was used incorrectly.</p>
-<p>For example a compute step, evaluator, or event handler used concurrently or
-out of order, an ownership or registration conflict, submitting to a
-dispatcher that is not running, or reusing a locked context.</p>
+<p>For example a compute step or evaluator used concurrently, an event handler
+re-entered from inside itself, or a pool whose session has stopped.</p>
 
 
 

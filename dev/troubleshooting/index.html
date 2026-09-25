@@ -3192,18 +3192,19 @@ anything runs. Open the pool inside the block that uses it; see
 </tbody>
 </table>
 <h2 id="running-many-at-once">Running many at once</h2>
-<p><strong><code>optimize_many</code> really does run everything at once.</strong> A handler must be in a
-<a href="../running/handlers/#sharing-a-handler-across-concurrent-runs">shared group</a>, and a
-single <code>report=</code> callback given to all the runs is called by several threads at
-the same time. Keep such a callback free of shared state, or give each run its
-own.</p>
-<p><strong>A handler cannot move from local to shared.</strong> Passing a handler to a run binds
-it to that run's compute step, and <code>shared_handlers</code> refuses it from then on.
-Decide per handler which role it plays; if you need both, use two handlers.</p>
-<p><strong>A slow shared handler holds up every run.</strong> A group processes events one at a
-time, and the run that emitted one waits until every handler has finished with
-it. Keep shared handlers cheap, or register a slow one with
-<a href="../running/handlers/#running-a-handler-in-a-thread"><code>threaded</code></a>.</p>
+<p><strong><code>optimize_many</code> really does run everything at once.</strong> A handler given to all
+the runs takes a lock around every call, so it collects them safely, but a
+single <code>report=</code> callback does not: it is called by several threads at the same
+time. Keep such a callback free of shared state, or give each run its own.</p>
+<p><strong>A slow shared handler holds up every run.</strong> The run that emitted a result
+waits until the handler has finished with it, and the next run waits for the
+lock. Keep a shared handler cheap.</p>
+<p><strong>A handler must not start a run that reaches it again.</strong> The handler holds its
+own lock while it runs. A nested <a class="autorefs autorefs-internal" title="            ropt.simple.optimize" href="../reference/simple/#ropt.simple.optimize"><code>optimize</code></a> emits on
+that same thread and raises; a nested
+<a class="autorefs autorefs-internal" title="            ropt.simple.optimize_many" href="../reference/simple/#ropt.simple.optimize_many"><code>optimize_many</code></a> emits on its own driver threads
+and blocks. See <a href="../running/handlers/#sharing-a-handler-across-concurrent-runs">Result
+Handlers</a>.</p>
 <p><strong>Not every optimizer can run beside another.</strong> A backend that needs its own
 working directory, writes to a fixed file name, or keeps state inside its
 library cannot run concurrently in one process; select it as
@@ -3218,20 +3219,16 @@ process of its own. Optimizer output capture is likewise for one run at a time.<
 </thead>
 <tbody>
 <tr>
-<td>A handler collects nothing from <code>optimize_many</code></td>
-<td>A plain handler belongs to one run. Put it in a <a href="../running/handlers/#sharing-a-handler-across-concurrent-runs">shared group</a>.</td>
-</tr>
-<tr>
-<td><code>shared_handlers</code> refuses a handler that worked before</td>
-<td>It was used as a local handler once, which binds it permanently. Use a second handler.</td>
-</tr>
-<tr>
 <td>Results from a shared <code>report=</code> callback are jumbled or lost</td>
-<td>The callback is called from every run's thread at once. Use a shared group, or one callback per run.</td>
+<td>The callback is called from every run's thread at once. Collect the results in a <a href="../running/handlers/#sharing-a-handler-across-concurrent-runs">handler</a> instead, or use one callback per run.</td>
+</tr>
+<tr>
+<td>A run started from a handler raises <code>WorkflowError</code> about the call stack, or hangs</td>
+<td>Its handler list reaches a handler that is already running; see <a href="../running/handlers/#sharing-a-handler-across-concurrent-runs">Result Handlers</a>.</td>
 </tr>
 <tr>
 <td>Many runs are slower than expected while the pool sits idle</td>
-<td>A shared handler is serializing them. Make it cheaper, or run it <a href="../running/handlers/#running-a-handler-in-a-thread"><code>threaded</code></a>.</td>
+<td>A shared handler is serializing them. Make it cheaper.</td>
 </tr>
 <tr>
 <td>A second concurrent run raises <code>WorkflowError</code> about output capture</td>

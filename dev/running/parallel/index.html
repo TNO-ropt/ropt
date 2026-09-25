@@ -4039,33 +4039,25 @@ each with its own metadata:</p>
 </span></code></pre></div>
 <p>The two callback arguments differ in the same way. <code>report=</code> is <strong>per run</strong>: one
 callback receives the results of every run, or pass a list with one callback per
-run. <code>handlers=</code>
-is <strong>shared</strong>: one list of groups that all runs feed together, which is why a
-plain handler is refused there — see <a href="../handlers/#sharing-a-handler-across-concurrent-runs">Sharing a handler across concurrent
+run. <code>handlers=</code> is <strong>shared</strong>: one list of handlers that all runs feed
+together — see <a href="../handlers/#sharing-a-handler-across-concurrent-runs">Sharing a handler across concurrent
 runs</a>.</p>
 <div class="admonition warning">
 <p class="admonition-title">One <code>report=</code> callback is called by every run at once</p>
 <p>A single callback is wired into each run separately, and each run calls it
 on its own thread. Nothing serializes those calls, so a callback that
 appends to a list, updates a counter, or writes a file needs a lock of its
-own. Give each run its own callback when they must stay apart, or collect
-the results in a <a href="../handlers/#sharing-a-handler-across-concurrent-runs">shared
-group</a>, where the
-dispatcher serializes them for you.</p>
+own. Give each run its own callback when they must stay apart, or pass a
+<a href="../handlers/#sharing-a-handler-across-concurrent-runs">handler</a> in
+<code>handlers=</code>, which takes a lock around every call for you.</p>
 </div>
 <div class="admonition warning">
-<p class="admonition-title">A shared group makes the runs wait for each other</p>
-<p>That serialization is not free. A group processes events <strong>one at a time</strong>,
-in submission order, and the run that emitted one waits until every handler
-has finished with it. Never seeing two results at once is exactly what makes
-a handler safe to share — but it means a slow handler throttles the whole
-batch, since every run queues behind the others, once per result produced.</p>
-<p>So keep shared handlers cheap. If one must do slow work — writing a file,
-talking to a database — register it with
-<a href="../handlers/#running-a-handler-in-a-thread"><code>threaded</code></a>, which moves it off
-the session's event loop so the pools keep working meanwhile. That does
-<strong>not</strong> make handling concurrent: the events are still processed one at a
-time.</p>
+<p class="admonition-title">A shared handler makes the runs wait for each other</p>
+<p>That lock is not free. A run that emits a result waits until the handler
+has finished with it, and a second run waits for the first. A slow handler
+therefore throttles the whole batch, once per result produced.</p>
+<p>So keep a shared handler cheap. A handler that must do slow work — writing
+a file, talking to a database — holds up every run feeding it.</p>
 </div>
 <div class="admonition warning">
 <p class="admonition-title">Without a pool the driver threads do the evaluating</p>
@@ -4208,17 +4200,23 @@ including <code>None</code>.</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">transform</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">pool</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 </span><span id="__span-22-2"><a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a>    <span class="k">return</span> <span class="n">offload</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="n">expensive</span><span class="p">,</span> <span class="n">x</span><span class="p">),</span> <span class="n">pool</span><span class="o">=</span><span class="n">pool</span><span class="p">)</span>
 </span></code></pre></div>
-<div class="admonition note">
-<p class="admonition-title">An inline handler in a shared group cannot offload</p>
-<p>A handler in a <a href="../handlers/#sharing-a-handler-across-concurrent-runs">shared group</a>
-that runs inline is on the session's event loop; offloading to a pool on
-that same session would starve the very loop it is waiting on, so it raises
-a <a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a>. A
-<a href="../handlers/#running-a-handler-in-a-thread"><code>threaded</code></a> handler runs on a dispatcher
-worker instead and can offload, as can a local handler, which runs on the
-thread driving the run.</p>
-<p>Better still, do parallel work from your optimization code and leave
-handlers to handle results.</p>
+<div class="admonition warning">
+<p class="admonition-title">Offloading from a handler holds up the runs feeding it</p>
+<p>A handler runs on the thread driving the run, so it can offload to a pool.
+While it waits, it holds its own lock, so every other run waiting on that
+handler waits too.</p>
+<p>An offloaded callable that reaches back into the same handler — by starting
+a run that carries it in <code>handlers=</code> — fails differently per pool. On a
+thread pool it blocks: the handler waits for the offloaded call, and the
+call waits for the lock the handler holds. Without a pool, or on a
+<a class="autorefs autorefs-internal" title="            ropt.simple.serial_pool" href="../../reference/simple/#ropt.simple.serial_pool"><code>serial_pool</code></a>, the call runs on the handler's
+own thread and raises a
+<a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a>. On a process pool it
+raises an <a class="autorefs autorefs-internal" title="            ExecutionError" href="../../reference/exceptions/#ropt.exceptions.ExecutionError"><code>ExecutionError</code></a>, since a
+handler holds a lock and cannot be serialized. See
+<a href="../../advanced/workflows/#two-hazards">Two hazards</a>.</p>
+<p>Work offloaded from the evaluation function runs without that lock held,
+so it does not make the other runs wait.</p>
 </div>
 
 

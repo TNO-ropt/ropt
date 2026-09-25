@@ -3457,7 +3457,7 @@ guard that a step instance may only have one active run at a time, raising a
 <p>Intended for an event handler that decides, after inspecting an event,
 that its optimization should stop; the run then ends with
 <code>ExitCode.USER_ABORT</code>. Setting the request is thread-safe, so a handler
-running behind an event dispatcher may call it too. A new <code>run</code> clears
+attached to several steps at once may call it too. A new <code>run</code> clears
 any earlier request.</p>
 
 

@@ -3025,7 +3025,7 @@ inner optimization over the remaining ones, returning the best value it reached.
 <p>Nesting itself is a niche, but this page puts four things that are not
 into one program small enough to read end to end: choosing a pool per
 layer, and why one of them has to stay on threads; collecting results from
-runs that overlap in time, through a shared group; reusing an evaluation
+runs that overlap in time, in one handler; reusing an evaluation
 the optimizer has already made; and moving the expensive layer to a cluster
 by changing a single line.</p>
 </div>
@@ -3043,7 +3043,7 @@ the results out.</p>
             in1["outer eval →&lt;br/&gt;inner optimize"]
             in2["outer eval →&lt;br/&gt;inner optimize"]
         end
-        grp["shared group →&lt;br/&gt;DataFrameHandler"]
+        grp["shared&lt;br/&gt;DataFrameHandler"]
         outer --&gt; in1
         outer --&gt; in2
         in1 -.-&gt;|"results"| grp
@@ -3120,7 +3120,7 @@ objective it found:</p>
 </span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>    <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">MASK</span><span class="p">,</span> <span class="n">INITIAL_VALUES</span><span class="p">,</span> <span class="n">variables</span><span class="p">),</span>
 </span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>    <span class="n">function</span><span class="p">,</span>
 </span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>    <span class="n">pool</span><span class="o">=</span><span class="n">pool</span><span class="p">,</span>
-</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>    <span class="n">handlers</span><span class="o">=</span><span class="p">[</span><span class="n">group</span><span class="p">],</span>
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>    <span class="n">handlers</span><span class="o">=</span><span class="p">[</span><span class="n">tables</span><span class="p">],</span>
 </span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>    <span class="c1"># A whole inner batch goes to one worker: the parallelism comes from the</span>
 </span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>    <span class="c1"># outer runs.</span>
 </span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>    <span class="n">bundle_size</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
@@ -3148,24 +3148,22 @@ preference:</p>
 </span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">active</span><span class="p">:</span>
 </span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    <span class="n">inner_pool</span> <span class="o">=</span> <span class="n">active</span><span class="o">.</span><span class="n">process_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 </span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>    <span class="n">outer_pool</span> <span class="o">=</span> <span class="n">active</span><span class="o">.</span><span class="n">thread_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>    <span class="n">group</span> <span class="o">=</span> <span class="n">active</span><span class="o">.</span><span class="n">shared_handlers</span><span class="p">(</span><span class="n">tables</span><span class="p">)</span>
-</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>    <span class="n">optimize</span><span class="p">(</span>
-</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>        <span class="n">OUTER_CONFIG</span><span class="p">,</span>
-</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>        <span class="n">INITIAL_VALUES</span><span class="p">,</span>
-</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>        <span class="n">partial</span><span class="p">(</span>
-</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>            <span class="n">inner_optimization</span><span class="p">,</span>
-</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>            <span class="n">pool</span><span class="o">=</span><span class="n">inner_pool</span><span class="p">,</span>
-</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>            <span class="n">group</span><span class="o">=</span><span class="n">group</span><span class="p">,</span>
-</span><span id="__span-2-15"><a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a>            <span class="n">function</span><span class="o">=</span><span class="n">partial</span><span class="p">(</span><span class="n">rosenbrock</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">b</span><span class="p">),</span>
-</span><span id="__span-2-16"><a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a>            <span class="n">memo</span><span class="o">=</span><span class="n">memo</span><span class="p">,</span>
-</span><span id="__span-2-17"><a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a>        <span class="p">),</span>
-</span><span id="__span-2-18"><a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a>        <span class="n">pool</span><span class="o">=</span><span class="n">outer_pool</span><span class="p">,</span>
-</span><span id="__span-2-19"><a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a>    <span class="p">)</span>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>    <span class="n">optimize</span><span class="p">(</span>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>        <span class="n">OUTER_CONFIG</span><span class="p">,</span>
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>        <span class="n">INITIAL_VALUES</span><span class="p">,</span>
+</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>        <span class="n">partial</span><span class="p">(</span>
+</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>            <span class="n">inner_optimization</span><span class="p">,</span>
+</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>            <span class="n">pool</span><span class="o">=</span><span class="n">inner_pool</span><span class="p">,</span>
+</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>            <span class="n">tables</span><span class="o">=</span><span class="n">tables</span><span class="p">,</span>
+</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>            <span class="n">function</span><span class="o">=</span><span class="n">partial</span><span class="p">(</span><span class="n">rosenbrock</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">b</span><span class="p">),</span>
+</span><span id="__span-2-15"><a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a>            <span class="n">memo</span><span class="o">=</span><span class="n">memo</span><span class="p">,</span>
+</span><span id="__span-2-16"><a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a>        <span class="p">),</span>
+</span><span id="__span-2-17"><a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a>        <span class="n">pool</span><span class="o">=</span><span class="n">outer_pool</span><span class="p">,</span>
+</span><span id="__span-2-18"><a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a>    <span class="p">)</span>
 </span></code></pre></div>
 <p>The outer pool is a <strong>thread</strong> pool. Outer evaluations therefore stay inside
-this process, where the inner pool and the shared handler group are live
-objects; on a process pool they would arrive as copies, which <code>ropt</code> refuses.
-The inner
+this process, where the inner pool and the shared handler are live objects; on
+a process pool they would arrive as copies, which <code>ropt</code> refuses. The inner
 pool is a <strong>process</strong> pool, which is where the real work goes.</p>
 <p>That is also where a cluster belongs. Swapping the inner pool for an
 <a class="autorefs autorefs-internal" title="            hpc_pool" href="../../reference/simple/#ropt.simple.Session.hpc_pool"><code>hpc_pool</code></a> is the whole change — the inner
@@ -3212,10 +3210,10 @@ the outer layer with it.</p>
 <p>A repeat starts no inner run, so the table described next holds rows for the
 outer evaluations that were computed, not for every outer evaluation.</p>
 <h2 id="collecting-results-from-runs-that-overlap">Collecting results from runs that overlap</h2>
-<p>The inner runs are concurrent, so a plain handler cannot collect them: a handler
-is claimed by one run at a time, and the second run to claim it is refused. A
-<a href="../handlers/#sharing-a-handler-across-concurrent-runs"><strong>shared group</strong></a> can,
-because it routes every run's results through one dispatcher. Feed it a
+<p>The inner runs are concurrent, and <a href="../handlers/#sharing-a-handler-across-concurrent-runs">one
+handler</a> collects them
+all: it takes a lock around every call, so the runs wait for each other rather
+than interleaving. Give every inner run the same
 <a href="../handlers/#dataframehandler"><code>DataFrameHandler</code></a> and every inner evaluation
 from every inner run lands in one table, keyed by the outer evaluation it
 belongs to.</p>

@@ -1763,10 +1763,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#callbackhandler" class="md-nav__link">
+  <a href="#two-hazards" class="md-nav__link">
     <span class="md-ellipsis">
       
-        CallbackHandler
+        Two hazards
       
     </span>
   </a>
@@ -1774,10 +1774,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#eventforwardhandler" class="md-nav__link">
+  <a href="#callbackhandler" class="md-nav__link">
     <span class="md-ellipsis">
       
-        EventForwardHandler
+        CallbackHandler
       
     </span>
   </a>
@@ -1790,52 +1790,13 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#event-dispatcher" class="md-nav__link">
+  <a href="#events-are-a-single-process-mechanism" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Event dispatcher
+        Events are a single-process mechanism
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="Event dispatcher">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#handler-failures" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Handler failures
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#thread-based-dispatch" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Thread-based dispatch
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#event-throughput" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Event throughput
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -3171,10 +3132,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#callbackhandler" class="md-nav__link">
+  <a href="#two-hazards" class="md-nav__link">
     <span class="md-ellipsis">
       
-        CallbackHandler
+        Two hazards
       
     </span>
   </a>
@@ -3182,10 +3143,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#eventforwardhandler" class="md-nav__link">
+  <a href="#callbackhandler" class="md-nav__link">
     <span class="md-ellipsis">
       
-        EventForwardHandler
+        CallbackHandler
       
     </span>
   </a>
@@ -3198,52 +3159,13 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#event-dispatcher" class="md-nav__link">
+  <a href="#events-are-a-single-process-mechanism" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Event dispatcher
+        Events are a single-process mechanism
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="Event dispatcher">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#handler-failures" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Handler failures
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#thread-based-dispatch" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Thread-based dispatch
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#event-throughput" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Event throughput
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -3662,8 +3584,7 @@ deciding no further evaluations are worthwhile. The remaining handlers for that
 event still run, and the optimizer then stops with <code>USER_ABORT</code> before the next
 evaluation. Only the run that owns the emitting step is affected, so concurrent
 optimizations continue. <code>stop()</code> merely sets a thread-safe flag, so it is safe
-to call from a handler running behind an
-<a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventDispatcher" href="../../reference/components_event_handlers/#ropt.components.event_handlers.EventDispatcher"><code>EventDispatcher</code></a> as well.</p>
+to call from a handler attached to several steps at once.</p>
 <h2 id="event-handlers">Event handlers</h2>
 <p>Event handlers are attached to a compute step via its <code>add_event_handler</code>
 method. Once attached, the handler receives every event the step emits.</p>
@@ -3676,76 +3597,64 @@ where they are described in full — there they are attached with
 identically. This section covers the underlying event model and the handlers
 specific to workflows.</p>
 <h3 id="using-handlers-safely">Using handlers safely</h3>
-<p>An event handler is a stateful object that is <strong>not safe for concurrent use</strong>.
-There are two ways to drive one, and they are mutually exclusive:</p>
-<ul>
-<li>
-<p><strong>Attached directly to compute steps.</strong> A handler may be attached to several
-  compute steps, and a single instance can accumulate state across them — as
-  long as those steps do not run it concurrently. Serial reuse is fine, even
-  across different threads: each <code>handle_event</code> call must fully complete before
-  the next begins. If two threads execute <code>handle_event</code> at the same time, a
-  <a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a> is raised.</p>
-</li>
-<li>
-<p><strong>Registered with an
-  <a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventDispatcher" href="../../reference/components_event_handlers/#ropt.components.event_handlers.EventDispatcher"><code>EventDispatcher</code></a>.</strong> When work
-  runs on several threads at once (for example, <code>ParallelEvaluator</code> with a
-  multi-worker <a class="autorefs autorefs-internal" title="            ropt.components.executors.ThreadExecutor" href="../../reference/components_executors/#ropt.components.executors.ThreadExecutor"><code>ThreadExecutor</code></a>),
-  route events through a dispatcher. It
-  receives events from any thread and delivers them to its handlers one at a
-  time, so a single handler can safely aggregate results produced on many
-  threads. See <a href="#event-dispatcher">Event dispatcher</a> for the pattern.</p>
-</li>
-</ul>
-<p>A handler is owned by <strong>either</strong> one dispatcher <strong>or</strong> one-or-more compute
-steps — never both — and may be registered with <strong>at most one</strong> dispatcher.
-Mixing the two, or registering with a second dispatcher, raises a
-<a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a>.</p>
+<p><a class="autorefs autorefs-internal" title="            handle_event" href="../../reference/components_event_handlers/#ropt.components.event_handlers.EventHandler.handle_event"><code>handle_event</code></a>
+takes a lock around each call to the handler's <code>_handle_event</code>. A handler may
+therefore be attached to any number of compute steps, including steps that run
+at the same time on different threads: a second call waits for the first to
+finish, and a single instance accumulates state across all of them. Handler
+code sees one event at a time and needs no locking of its own.</p>
+<p>The lock is not re-entrant. A call that reaches the same handler again while it
+is still inside <code>_handle_event</code> raises a
+<a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a> if it is on the thread that
+emitted the first event, and blocks on the lock if it is on another thread.
+Both are described under <a href="#two-hazards">Two hazards</a> below.</p>
+<p>Handlers are called on the thread that emits the event, in the order they were
+attached, and the emitting step waits until every handler for that event has
+returned. A handler that blocks therefore holds up the run that emitted the
+event, and any run waiting on the same handler's lock. The cost of a handler
+scales with the number of events that reach it across every step it is attached
+to. Keep a handler shared by concurrent runs cheap; if one must do heavy I/O,
+buffer in memory and flush once the runs have finished.</p>
 <div class="admonition note">
 <p class="admonition-title">A handler failure is fatal</p>
-<p>An exception raised by a handler is a fatal error that stops the run. A
-directly-attached handler raises on the optimizer's own stack, so it
-propagates normally. A handler behind an
-<a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventDispatcher" href="../../reference/components_event_handlers/#ropt.components.event_handlers.EventDispatcher"><code>EventDispatcher</code></a> runs while
-the emitting run <strong>waits</strong> for the event to be handled, so its exception is
-re-raised on that run's own stack too — synchronously, including for the
-run's last event. Either way a handler bug surfaces as a single, clean
-exception — never a <code>BaseExceptionGroup</code>. See
-<a href="#handler-failures">Handler failures</a> for details.</p>
+<p>An exception raised by a handler is a fatal error that stops the run. It is
+raised on the optimizer's own stack, so it propagates normally, as a single
+exception — never a <code>BaseExceptionGroup</code>. The handlers attached after it do
+not see that event: <code>_emit_event</code> stops at the first failure.</p>
 </div>
-<div class="admonition warning">
-<p class="admonition-title">Do not share a handler across parallel steps</p>
-<p>Never attach the same handler instance to compute steps that may run at the
-same time on different threads; the moment a second thread executes it while
-the first is still inside <code>handle_event</code>, a
-<a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a> is raised. Give
-each parallel step its own handler, or route events through an
-<code>EventDispatcher</code>.</p>
-<p>Serial reuse is allowed: the same handler may be reused across steps that
-run one after another, even on different threads, as long as their calls
-never overlap.</p>
-</div>
-<div class="admonition note">
-<p class="admonition-title">Handlers are process-local</p>
-<p>An event handler cannot be transferred to another process. It holds a lock,
-so serializing one — for example when a task dispatched to a worker
-captures it — fails, and the submission is refused with an
-<a class="autorefs autorefs-internal" title="            ExecutionError" href="../../reference/exceptions/#ropt.exceptions.ExecutionError"><code>ExecutionError</code></a>.
-Create handlers inside the worker and return their results
-as data. See
-<a href="../parallel/#nested-workflows-and-process-boundaries">Nested workflows and process boundaries</a>.</p>
-</div>
+<h3 id="two-hazards">Two hazards</h3>
+<p><strong>Two handlers that touch the same external state.</strong> Each handler is serialized
+on its own, but not as a pair: a run can be inside one while another run is
+inside the other. Take a <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/threading.html#threading.Lock"><code>threading.Lock</code></a> of your own inside
+both <code>_handle_event</code> implementations. Each handler takes its own lock first and
+the shared one second, so the acquisition order is the same for every caller.</p>
+<p>Such a lock does not give the handlers an agreed order. If order matters, take
+it from data in the event — <code>batch_id</code> and similar — rather than from the order
+events arrive in, which depends on which run gets there first.</p>
+<p><strong>A run started from inside a handler.</strong> Nothing refuses this, and it is safe as
+long as the run cannot reach a handler that is already running. If it does, the
+handler is entered a second time while its lock is held. The outcome depends on
+the run the handler starts, not on the call that is feeding the handler:</p>
+<ul>
+<li>A nested <a class="autorefs autorefs-internal" title="            ropt.simple.optimize" href="../../reference/simple/#ropt.simple.optimize"><code>optimize</code></a>, or a <code>step.run()</code> called from
+  <code>_handle_event</code>, emits on the thread that called it — the one already inside
+  the handler — so the re-entrancy check fires and a
+  <a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a> is raised.</li>
+<li>A nested <a class="autorefs autorefs-internal" title="            ropt.simple.optimize_many" href="../../reference/simple/#ropt.simple.optimize_many"><code>optimize_many</code></a>, or a nested
+  <a class="autorefs autorefs-internal" title="            ropt.components.concurrency.run_concurrent" href="../../reference/components_utils/#ropt.components.concurrency.run_concurrent"><code>run_concurrent</code></a>, emits on
+  driver threads of its own, which wait for a lock the emitting thread holds
+  until the nested run ends, and both stop.</li>
+</ul>
+<p>Two handlers that each start a run reaching the other behave the same way:
+raising when the cycle stays on one thread, blocking when it does not. Give a
+nested run handlers of its own.</p>
 <div class="admonition note">
 <p class="admonition-title">Reading results is not thread-guarded</p>
 <p>Handler state exposed through <code>handler[key]</code> is deliberately <em>not</em> bound to
 a thread, so results can be read after a run from any thread. Read a
 handler's stored values only <strong>after its producer has finished</strong>: after
-<code>step.run()</code> returns for a directly-attached handler, or after the
-<a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventDispatcher" href="../../reference/components_event_handlers/#ropt.components.event_handlers.EventDispatcher"><code>EventDispatcher</code></a> has been
-cancelled and its task group has exited for a handler registered with a
-dispatcher. Both are synchronization points that make the latest values
-visible.</p>
+<code>step.run()</code> has returned for every step the handler is attached to. That
+return is the synchronization point that makes the latest values visible.</p>
 <p>Reading a handler's state <em>while it is still processing events on another
 thread</em> returns a valid object, but possibly a stale one — do not rely on it
 for the latest result. For live progress during a parallel run, use a
@@ -3762,7 +3671,7 @@ They expose their state through dictionary access (<code>handler[key]</code>);
 <code>DataFrameHandler</code> uses the table name. Stored results carry both the configured
 and the optimizer's domain; see
 <a href="../../running/results/#scaling-of-results">Working with Results</a>.</p>
-<p>Two more handlers exist only at this level, for wiring events:</p>
+<p>One more handler exists only at this level, for wiring events:</p>
 <table>
 <thead>
 <tr>
@@ -3774,10 +3683,6 @@ and the optimizer's domain; see
 <tr>
 <td><a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.CallbackHandler" href="../../reference/components_event_handlers/#ropt.components.event_handlers.CallbackHandler"><code>CallbackHandler</code></a></td>
 <td>Forward selected event types to a user callback.</td>
-</tr>
-<tr>
-<td><a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventForwardHandler" href="../../reference/components_event_handlers/#ropt.components.event_handlers.EventForwardHandler"><code>EventForwardHandler</code></a></td>
-<td>Forward events to an <a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventDispatcher" href="../../reference/components_event_handlers/#ropt.components.event_handlers.EventDispatcher"><code>EventDispatcher</code></a> for lock-free dispatch.</td>
 </tr>
 </tbody>
 </table>
@@ -3792,135 +3697,25 @@ matching type arrives, the callback is called with the
   
       dataclass
   " href="../../reference/events/#ropt.events.EnOptEvent"><code>EnOptEvent</code></a>.</p>
-<h3 id="eventforwardhandler">EventForwardHandler</h3>
-<p><a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventForwardHandler" href="../../reference/components_event_handlers/#ropt.components.event_handlers.EventForwardHandler"><code>EventForwardHandler</code></a> is
-attached to a compute step and forwards matching events to an
-<a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventDispatcher" href="../../reference/components_event_handlers/#ropt.components.event_handlers.EventDispatcher"><code>EventDispatcher</code></a>. The dispatcher
-dispatches them from the asyncio event loop's thread, so handlers registered on
-the dispatcher require no locking.</p>
-<h2 id="event-dispatcher">Event dispatcher</h2>
-<p>When multiple compute steps run concurrently in worker threads, their event
-handlers are called from multiple threads simultaneously. <strong>Event handlers must
-not be shared across concurrent compute steps</strong>: doing so raises a
-<a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a>.</p>
-<p><a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventDispatcher" href="../../reference/components_event_handlers/#ropt.components.event_handlers.EventDispatcher"><code>EventDispatcher</code></a> is what
-makes sharing possible: it receives events on a queue and dispatches them to its own
-handlers from the asyncio event loop's thread. Because all handler calls happen
-on a single thread, handlers registered on the dispatcher are safe even when
-events arrive from multiple concurrent steps.</p>
-<p>That is what lets one set of handlers aggregate results from multiple
-concurrent compute steps.</p>
-<p><code>EventDispatcher</code> follows the same lifecycle as executors:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">async</span> <span class="k">with</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">TaskGroup</span><span class="p">()</span> <span class="k">as</span> <span class="n">tg</span><span class="p">:</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    <span class="n">executor</span> <span class="o">=</span> <span class="n">ThreadExecutor</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    <span class="k">await</span> <span class="n">executor</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="n">tg</span><span class="p">)</span>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    <span class="n">event_dispatcher</span> <span class="o">=</span> <span class="n">EventDispatcher</span><span class="p">()</span>
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    <span class="k">await</span> <span class="n">event_dispatcher</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="n">tg</span><span class="p">)</span>
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>
-</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>    <span class="c1"># Attach an EventForwardHandler to the compute step.</span>
-</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>    <span class="n">step</span><span class="o">.</span><span class="n">add_event_handler</span><span class="p">(</span>
-</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>        <span class="n">EventForwardHandler</span><span class="p">(</span>
-</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>            <span class="n">event_dispatcher</span><span class="p">,</span>
-</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>            <span class="n">event_types</span><span class="o">=</span><span class="p">{</span><span class="n">EnOptEventType</span><span class="o">.</span><span class="n">FINISHED_EVALUATION</span><span class="p">},</span>
-</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>        <span class="p">)</span>
-</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>    <span class="p">)</span>
-</span><span id="__span-1-15"><a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>
-</span><span id="__span-1-16"><a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a>    <span class="c1"># Handlers registered on the dispatcher need no locking.</span>
-</span><span id="__span-1-17"><a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a>    <span class="n">result_handler</span> <span class="o">=</span> <span class="n">ResultsHandler</span><span class="p">()</span>
-</span><span id="__span-1-18"><a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a>    <span class="n">event_dispatcher</span><span class="o">.</span><span class="n">add_event_handler</span><span class="p">(</span><span class="n">result_handler</span><span class="p">)</span>
-</span><span id="__span-1-19"><a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a>
-</span><span id="__span-1-20"><a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a>    <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">to_thread</span><span class="p">(</span><span class="n">step</span><span class="o">.</span><span class="n">run</span><span class="p">,</span> <span class="n">variables</span><span class="o">=...</span><span class="p">,</span> <span class="n">context</span><span class="o">=...</span><span class="p">)</span>
-</span><span id="__span-1-21"><a id="__codelineno-1-21" name="__codelineno-1-21" href="#__codelineno-1-21"></a>
-</span><span id="__span-1-22"><a id="__codelineno-1-22" name="__codelineno-1-22" href="#__codelineno-1-22"></a>    <span class="n">event_dispatcher</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
-</span><span id="__span-1-23"><a id="__codelineno-1-23" name="__codelineno-1-23" href="#__codelineno-1-23"></a>    <span class="n">executor</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
-</span></code></pre></div>
-<p><a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventForwardHandler" href="../../reference/components_event_handlers/#ropt.components.event_handlers.EventForwardHandler"><code>EventForwardHandler</code></a> is a
-regular event handler that can be attached to a compute step. When the step
-emits an event it submits the event to the dispatcher and <strong>blocks on the
-emitting run's own thread until every handler has processed it</strong>, preserving the
-order in which events are submitted. If a handler raises, the original exception
-is re-raised there, on the run's stack (see <a href="#handler-failures">Handler failures</a>).</p>
-<div class="admonition warning">
-<p class="admonition-title">Event handling is a single-process mechanism</p>
-<p>An <a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventDispatcher" href="../../reference/components_event_handlers/#ropt.components.event_handlers.EventDispatcher"><code>EventDispatcher</code></a> and
-every <a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventHandler" href="../../reference/components_event_handlers/#ropt.components.event_handlers.EventHandler"><code>EventHandler</code></a> live in
-the process that created them. <code>EventForwardHandler</code> delivers events by
-calling the dispatcher's <code>dispatch_event</code>, which schedules them onto its
-event loop with <code>call_soon_threadsafe</code> — a <em>thread</em>-safe call, not a
-<em>process</em>-safe one. A dispatcher reached from another process has no live
-loop, so a forwarded event cannot arrive.</p>
-<p>Event handlers can therefore only observe events emitted <strong>within their own
-process</strong>. Any compute step executed out-of-process — for example a whole
-optimization sent to a
-<a class="autorefs autorefs-internal" title="            ropt.components.executors.ProcessExecutor" href="../../reference/components_executors/#ropt.components.executors.ProcessExecutor"><code>ProcessExecutor</code></a>
-or <a class="autorefs autorefs-internal" title="            ropt.components.executors.HPCExecutor" href="../../reference/components_executors/#ropt.components.executors.HPCExecutor"><code>HPCExecutor</code></a>, whether as a work
-item of its own or as the enclosing layer
-of a nested workflow — may attach handlers local to that worker process,
-but those handlers cannot deliver events to a dispatcher or handler in the
-host process. To collect information from out-of-process steps, return it as
-data (the task's return value, or result metadata) rather than through
-shared handlers.</p>
-<p>This is why process- and HPC-based parallelism belongs at the innermost
-(leaf) evaluations — which return data and emit no events — while any layer
-that drives event-producing compute steps must run in-process. See
+<h2 id="events-are-a-single-process-mechanism">Events are a single-process mechanism</h2>
+<p>Every <a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventHandler" href="../../reference/components_event_handlers/#ropt.components.event_handlers.EventHandler"><code>EventHandler</code></a> lives in the
+process that created it, and is called on a thread of that process. Handlers
+can therefore only observe events emitted <strong>within their own process</strong>.</p>
+<p>A compute step executed out-of-process — for example a whole optimization sent
+to a <a class="autorefs autorefs-internal" title="            ropt.components.executors.ProcessExecutor" href="../../reference/components_executors/#ropt.components.executors.ProcessExecutor"><code>ProcessExecutor</code></a> or
+<a class="autorefs autorefs-internal" title="            ropt.components.executors.HPCExecutor" href="../../reference/components_executors/#ropt.components.executors.HPCExecutor"><code>HPCExecutor</code></a>, whether as a work item
+of its own or as the enclosing layer of a nested workflow — may attach handlers
+created inside that worker process, but those handlers cannot deliver anything
+to a handler in the host process. To collect information from out-of-process
+steps, return it as data: the task's return value, or result metadata.</p>
+<p>This is why process- and HPC-based parallelism belongs at the innermost (leaf)
+evaluations — which return data and emit no events — while any layer that
+drives event-producing compute steps must run in-process. See
 <a href="../parallel/#nested-workflows-and-process-boundaries">Nested workflows and process boundaries</a>.</p>
-</div>
-<h3 id="handler-failures">Handler failures</h3>
-<p>Forwarding an event through an
-<a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventForwardHandler" href="../../reference/components_event_handlers/#ropt.components.event_handlers.EventForwardHandler"><code>EventForwardHandler</code></a> is
-<strong>synchronous</strong>: the emitting run blocks until the dispatcher has run every
-handler for that event. A handler failure is therefore delivered like an
-evaluation error — on the emitting run's own call stack — and splits
-<code>Exception</code> from <code>BaseException</code> exactly as the executor does:</p>
-<ul>
-<li>An ordinary <code>Exception</code> from a handler is <strong>re-raised on the emitting run's
-  stack</strong>, unwrapped — a single, clean exception that stops the run normally,
-  exactly as if a directly-attached handler had raised inline. It is logged
-  (with the handler and the event type) as it is caught. Because emission is
-  synchronous, this covers the run's <strong>last</strong> event too; nothing is deferred or
-  lost. Every handler for the event still runs before the error surfaces; if
-  several fail, the first (in registration order) is raised.</li>
-<li>A <code>BaseException</code> (such as <code>CancelledError</code>) is <strong>not</strong> delivered this way: it
-  remains the session teardown backstop and propagates, tearing the dispatcher
-  task group down, as with the executor.</li>
-</ul>
-<h3 id="thread-based-dispatch">Thread-based dispatch</h3>
-<p>By default, handlers registered with <code>EventDispatcher</code> are called directly in
-the asyncio event loop's thread, which costs nothing for handlers that only do
-in-memory work, such as <code>ResultsHandler</code> or <code>HistoryHandler</code>.</p>
-<p>If a handler performs blocking operations — writing results to a file, pushing
-data to a database, sending over a network — pass <code>run_in_thread=True</code> when
-registering it:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">event_dispatcher</span><span class="o">.</span><span class="n">add_event_handler</span><span class="p">(</span><span class="n">my_handler</span><span class="p">,</span> <span class="n">run_in_thread</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</span></code></pre></div>
-<p><code>CallbackHandler</code> and <code>DataFrameHandler</code> (when a slow callback is set via
-<code>set_callback</code>) are common cases where this is needed. When multiple handlers
-with <code>run_in_thread=True</code> match the same event they are dispatched <strong>in
-parallel</strong> via <code>asyncio.gather</code> — they do not block each other.</p>
-<h3 id="event-throughput">Event throughput</h3>
-<p>A dispatcher processes its queue <strong>one event at a time</strong>: all handlers for an
-event finish before the next event is taken. <code>run_in_thread=True</code> moves a
-blocking handler off the event loop, but it does not overlap that handler with
-the handlers of any <em>other</em> event — only with the threaded handlers of the same
-event.</p>
-<p>This serialization is deliberate.
-<a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventHandler" href="../../reference/components_event_handlers/#ropt.components.event_handlers.EventHandler"><code>EventHandler</code></a> is not re-entrant,
-and a handler shared by concurrently running optimizations — one accumulating
-results across all of them, say — needs exactly this guarantee to stay
-lock-free.</p>
-<p>The price is that handler cost scales with the <em>total</em> number of events across
-all runs sharing the dispatcher, and is paid on the critical path of every
-event. Measured with eight concurrent runs emitting five events each, sharing
-one dispatcher and one handler that blocks for 50 ms: <strong>2.02 s elapsed</strong>,
-against 2.00 s for fully serial execution and 0.25 s if the handlers had run
-fully concurrently — never more than one handler thread active at a time.</p>
-<p>Runs share a dispatcher when they share a handler scope, which is the normal
-case for <a class="autorefs autorefs-internal" title="            ropt.simple.optimize_many" href="../../reference/simple/#ropt.simple.optimize_many"><code>optimize_many</code></a>: it reads the current
-handler scope once on the calling thread and gives the same one to every job.
-An N-way <code>optimize_many</code> therefore pays its handler cost serially. Keep shared
-handlers cheap; if one must do heavy I/O, buffer in memory and flush once the
-runs have finished.</p>
+<p>A handler cannot be carried into a worker either. It holds a lock, so
+serializing one — for example when a task dispatched to a worker captures it —
+fails, and the submission is refused with an
+<a class="autorefs autorefs-internal" title="            ExecutionError" href="../../reference/exceptions/#ropt.exceptions.ExecutionError"><code>ExecutionError</code></a>.</p>
 <h2 id="evaluators">Evaluators</h2>
 <p>A compute step never evaluates the model itself — it delegates to an
 <a class="autorefs autorefs-internal" title="            ropt.components.evaluators.Evaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.Evaluator"><code>Evaluator</code></a> instance that you supply. The
