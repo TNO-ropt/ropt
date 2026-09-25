@@ -19,6 +19,7 @@ import pytest
 from ropt.components.compute_steps import OptimizationStep
 from ropt.components.concurrency import run_concurrent
 from ropt.components.evaluators import FunctionEvaluator
+from ropt.components.event_handlers import EventHandler
 from ropt.components.executors import (
     HPCExecutor,
     LocalJobExecutor,
@@ -26,7 +27,7 @@ from ropt.components.executors import (
     ThreadExecutor,
 )
 from ropt.context import EnOptContext
-from ropt.enums import ExitCode
+from ropt.enums import EnOptEventType, ExitCode
 from ropt.exceptions import ExecutionError, ExecutorStopped, WorkflowError
 from ropt.results import FunctionResults
 from ropt.simple import (
@@ -50,6 +51,8 @@ if TYPE_CHECKING:
     from pathlib import Path
 
     from numpy.typing import NDArray
+
+    from ropt.events import EnOptEvent
 
 try:
     # The job path needs no extras of its own, so these tests run either way.
@@ -210,6 +213,9 @@ def test_optimize_local_handler_accumulates_across_sequential_calls(
 def test_optimize_local_handler_reused_by_concurrent_runs(
     config: Any, test_functions: Any
 ) -> None:
+    single = HistoryHandler()
+    optimize(config, initial_values, test_functions[0], handlers=[single])
+
     history = HistoryHandler()
     results = optimize_many(
         [config, config],
@@ -218,7 +224,7 @@ def test_optimize_local_handler_reused_by_concurrent_runs(
         handlers=[history],
     )
     assert len(results) == 2
-    assert len(history["results"]) > 0
+    assert len(history["results"]) > len(single["results"])
 
 
 def test_optimize_local_handler_usable_after_error(config: Any) -> None:
@@ -234,7 +240,7 @@ def test_optimize_local_handler_usable_after_error(config: Any) -> None:
     assert history._event_owner is None  # ruff: ignore[private-member-access]
 
 
-def test_optimize_local_handler_owned_during_run(
+def test_optimize_handlers_do_not_nest_during_a_run(
     config: Any, test_functions: Any
 ) -> None:
     history = HistoryHandler()
@@ -250,9 +256,61 @@ def test_optimize_local_handler_owned_during_run(
         handlers=[history],
         report=_report,
     )
-    # The report handler runs between calls into `history`, so nothing holds it.
+    # Handlers run one after the other, not nested, and each clears its owner
+    # on the way out. Drop that reset and `history` reports itself as running
+    # while the report handler is called.
     assert observed
     assert all(owner is None for owner in observed)
+
+
+def test_optimize_from_a_handler_reaching_itself_raises(
+    config: Any, test_functions: Any
+) -> None:
+    class _NestingHandler(EventHandler):
+        def __init__(self) -> None:
+            super().__init__()
+            self.nested = False
+
+        @property
+        def event_types(self) -> set[EnOptEventType]:
+            return {EnOptEventType.FINISHED_EVALUATION}
+
+        def _handle_event(self, _event: EnOptEvent) -> None:
+            if self.nested:
+                return
+            self.nested = True
+            optimize(config, initial_values, test_functions[0], handlers=[self])
+
+    handler = _NestingHandler()
+    with pytest.raises(WorkflowError, match="already running further up this call"):
+        optimize(config, initial_values, test_functions[0], handlers=[handler])
+    assert handler.nested
+
+
+def test_optimize_from_a_handler_with_a_separate_handler_succeeds(
+    config: Any, test_functions: Any
+) -> None:
+    inner = HistoryHandler()
+
+    class _NestingHandler(EventHandler):
+        def __init__(self) -> None:
+            super().__init__()
+            self.nested = False
+
+        @property
+        def event_types(self) -> set[EnOptEventType]:
+            return {EnOptEventType.FINISHED_EVALUATION}
+
+        def _handle_event(self, _event: EnOptEvent) -> None:
+            if self.nested:
+                return
+            self.nested = True
+            optimize(config, initial_values, test_functions[0], handlers=[inner])
+
+    handler = _NestingHandler()
+    optimize(config, initial_values, test_functions[0], handlers=[handler])
+    assert handler.nested
+    assert inner["results"]
 
 
 def test_report_callback_stops_optimization(config: Any, test_functions: Any) -> None:
@@ -1558,6 +1616,9 @@ def test_shared_handler_aggregates_across_optimize_many(
 
 
 def test_optimize_many_accepts_bare_handler(config: Any, test_functions: Any) -> None:
+    single = HistoryHandler()
+    optimize(config, initial_values, test_functions[0], handlers=[single])
+
     handler = HistoryHandler()
     results = optimize_many(
         [config, config, config],
@@ -1567,7 +1628,7 @@ def test_optimize_many_accepts_bare_handler(config: Any, test_functions: Any) ->
     )
     assert len(results) == 3
     # Every run feeds the same handler, which serializes the calls itself.
-    assert len(handler["results"]) > 0
+    assert len(handler["results"]) > len(single["results"])
 
 
 if _TEST_HPC:
