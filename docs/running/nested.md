@@ -101,8 +101,7 @@ preference:
 
 The outer pool is a **thread** pool. Outer evaluations therefore stay inside
 this process, where the inner pool and the shared handler are live objects; on
-a process pool they would arrive as copies, which `ropt` refuses.
-The inner
+a process pool they would arrive as copies, which `ropt` refuses. The inner
 pool is a **process** pool, which is where the real work goes.
 
 That is also where a cluster belongs. Swapping the inner pool for an
