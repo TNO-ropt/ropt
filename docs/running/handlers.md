@@ -71,12 +71,15 @@ feeds two handlers from the same set of concurrent runs:
 !!! warning "Do not start a run from inside a handler that the run can reach"
     A handler is free to start a run of its own, but its own lock is held while
     it does. If that run lists the same handler, the handler is entered a
-    second time. On the thread that emitted the event this raises a
-    [`WorkflowError`][ropt.exceptions.WorkflowError]; on another thread — the
-    driver threads of an [`optimize_many`][ropt.simple.optimize_many] — it
-    waits for a lock the first thread will not release until the run ends, and
-    both stop. The same holds for two handlers that each start a run reaching
-    the other. Give the inner run handlers of its own.
+    second time. The outcome depends on the run the handler starts, not on the
+    call that is feeding the handler. A nested
+    [`optimize`][ropt.simple.optimize] emits on the thread that called it — the
+    one already inside the handler — so this raises a
+    [`WorkflowError`][ropt.exceptions.WorkflowError]. A nested
+    [`optimize_many`][ropt.simple.optimize_many] emits on driver threads of its
+    own, which wait for a lock the first thread will not release until the run
+    ends, and both stop. The same holds for two handlers that each start a run
+    reaching the other. Give the inner run handlers of its own.
 
 Two handlers that write to the same external state are each serialized on their
 own, but not as a pair: a run can be inside one while another run is inside the

@@ -143,8 +143,10 @@ waits until the handler has finished with it, and the next run waits for the
 lock. Keep a shared handler cheap.
 
 **A handler must not start a run that reaches it again.** The handler holds its
-own lock while it runs, so the second entry raises on the emitting thread and
-blocks on any other; see [Result
+own lock while it runs. A nested [`optimize`][ropt.simple.optimize] emits on
+that same thread and raises; a nested
+[`optimize_many`][ropt.simple.optimize_many] emits on its own driver threads
+and blocks. See [Result
 Handlers](../running/handlers.md#sharing-a-handler-across-concurrent-runs).
 
 **Not every optimizer can run beside another.** A backend that needs its own

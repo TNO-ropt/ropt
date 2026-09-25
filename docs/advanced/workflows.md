@@ -273,17 +273,17 @@ events arrive in, which depends on which run gets there first.
 
 **A run started from inside a handler.** Nothing refuses this, and it is safe as
 long as the run cannot reach a handler that is already running. If it does, the
-handler is entered a second time while its lock is held:
+handler is entered a second time while its lock is held. The outcome depends on
+the run the handler starts, not on the call that is feeding the handler:
 
-- On the thread that emitted the event — a run driven by
-  [`optimize`][ropt.simple.optimize], or a `step.run()` called from
-  `_handle_event` — the re-entrancy check fires and a
+- A nested [`optimize`][ropt.simple.optimize], or a `step.run()` called from
+  `_handle_event`, emits on the thread that called it — the one already inside
+  the handler — so the re-entrancy check fires and a
   [`WorkflowError`][ropt.exceptions.WorkflowError] is raised.
-- On another thread — the driver threads of
-  [`optimize_many`][ropt.simple.optimize_many] or
-  [`run_concurrent`][ropt.components.concurrency.run_concurrent] — the call
-  waits for a lock the emitting thread holds until the nested run ends, and
-  both stop.
+- A nested [`optimize_many`][ropt.simple.optimize_many], or a nested
+  [`run_concurrent`][ropt.components.concurrency.run_concurrent], emits on
+  driver threads of its own, which wait for a lock the emitting thread holds
+  until the nested run ends, and both stop.
 
 Two handlers that each start a run reaching the other behave the same way:
 raising when the cycle stays on one thread, blocking when it does not. Give a
