@@ -801,10 +801,21 @@ def transform(x, pool=None):
     return offload(partial(expensive, x), pool=pool)
 ```
 
-!!! note "Offloading from a handler holds up the runs feeding it"
+!!! warning "Offloading from a handler holds up the runs feeding it"
     A handler runs on the thread driving the run, so it can offload to a pool.
     While it waits, it holds its own lock, so every other run waiting on that
     handler waits too.
 
-    Better still, do parallel work from your optimization code and leave
-    handlers to handle results.
+    An offloaded callable that reaches back into the same handler — by starting
+    a run that carries it in `handlers=` — fails differently per pool. On a
+    thread pool it blocks: the handler waits for the offloaded call, and the
+    call waits for the lock the handler holds. Without a pool, or on a
+    [`serial_pool`][ropt.simple.serial_pool], the call runs on the handler's
+    own thread and raises a
+    [`WorkflowError`][ropt.exceptions.WorkflowError]. On a process pool it
+    raises an [`ExecutionError`][ropt.exceptions.ExecutionError], since a
+    handler holds a lock and cannot be serialized. See
+    [Two hazards](../advanced/workflows.md#two-hazards).
+
+    Work offloaded from the evaluation function runs without that lock held,
+    so it does not make the other runs wait.
