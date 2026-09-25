@@ -1003,11 +1003,20 @@ def test_event_handler_serializes_concurrent_use() -> None:
     def _call() -> None:
         handler.handle_event(mock_event)  # type: ignore[arg-type]
 
+    second_calling = threading.Event()
+
+    def _call_second() -> None:
+        second_calling.set()
+        handler.handle_event(mock_event)  # type: ignore[arg-type]
+
     first = threading.Thread(target=_call)
-    second = threading.Thread(target=_call)
+    second = threading.Thread(target=_call_second)
     first.start()
     in_handle.wait(timeout=5.0)
     second.start()
+    # Without this the assertions below also pass while `second` has not run at
+    # all, which is not what they are meant to show.
+    second_calling.wait(timeout=5.0)
     try:
         # Blocked on the lock the first call holds, so it cannot get in.
         second.join(timeout=0.1)
