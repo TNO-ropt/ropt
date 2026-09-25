@@ -263,6 +263,7 @@ def test_optimize_handlers_do_not_nest_during_a_run(
     assert all(owner is None for owner in observed)
 
 
+@pytest.mark.timeout(60)
 def test_optimize_from_a_handler_reaching_itself_raises(
     config: Any, test_functions: Any
 ) -> None:
@@ -287,6 +288,7 @@ def test_optimize_from_a_handler_reaching_itself_raises(
     assert handler.nested
 
 
+@pytest.mark.timeout(60)
 def test_optimize_from_a_handler_with_a_separate_handler_succeeds(
     config: Any, test_functions: Any
 ) -> None:
