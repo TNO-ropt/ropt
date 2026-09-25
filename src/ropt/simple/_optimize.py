@@ -76,7 +76,9 @@ def optimize(  # ruff: ignore[too-many-arguments]
 
     The handlers in `handlers` are called in the order they are listed, and
     the same handler may also be given to other runs, sequential or concurrent,
-    to accumulate results across them.
+    to accumulate results across them. A run started from inside a handler must
+    not be given that same handler: reaching it again on the same call stack
+    raises a [`WorkflowError`][ropt.exceptions.WorkflowError].
 
     Returning `True` from `report` stops the optimization early with
     `USER_ABORT`. Reporting stops there, so results after it in the same batch
@@ -174,7 +176,10 @@ def optimize_many(  # ruff: ignore[too-many-arguments]
 
     A handler passed here is fed by every run, since `handle_event` serializes
     its own calls. A handler that combines the events of overlapping runs sees
-    them in an order that depends on which run gets there first. `report=`,
+    them in an order that depends on which run gets there first. A run started
+    from inside a handler must not be given that same handler: reaching it
+    again on the same call stack raises a
+    [`WorkflowError`][ropt.exceptions.WorkflowError]. `report=`,
     being local by nature, is the opposite: it is given per run, or broadcast
     to all of them.
 
