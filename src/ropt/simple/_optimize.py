@@ -77,8 +77,10 @@ def optimize(  # ruff: ignore[too-many-arguments]
     The handlers in `handlers` are called in the order they are listed, and
     the same handler may also be given to other runs, sequential or concurrent,
     to accumulate results across them. A run started from inside a handler must
-    not be given that same handler: reaching it again on the same call stack
-    raises a [`WorkflowError`][ropt.exceptions.WorkflowError].
+    not be given that same handler: a nested `optimize` emits on the calling
+    thread and raises a [`WorkflowError`][ropt.exceptions.WorkflowError], while
+    a nested [`optimize_many`][ropt.simple.optimize_many] emits on its own
+    driver threads, which then wait for a lock the calling thread holds.
 
     Returning `True` from `report` stops the optimization early with
     `USER_ABORT`. Reporting stops there, so results after it in the same batch
@@ -177,11 +179,12 @@ def optimize_many(  # ruff: ignore[too-many-arguments]
     A handler passed here is fed by every run, since `handle_event` serializes
     its own calls. A handler that combines the events of overlapping runs sees
     them in an order that depends on which run gets there first. A run started
-    from inside a handler must not be given that same handler: reaching it
-    again on the same call stack raises a
-    [`WorkflowError`][ropt.exceptions.WorkflowError]. `report=`,
-    being local by nature, is the opposite: it is given per run, or broadcast
-    to all of them.
+    from inside a handler must not be given that same handler: a nested
+    [`optimize`][ropt.simple.optimize] emits on the calling thread and raises a
+    [`WorkflowError`][ropt.exceptions.WorkflowError], while a nested
+    `optimize_many` emits on its own driver threads, which then wait for a lock
+    the calling thread holds. `report=`, being local by nature, is the
+    opposite: it is given per run, or broadcast to all of them.
 
     A pool that is closed — because it was closed directly, or because its
     session ended — is refused here with a
