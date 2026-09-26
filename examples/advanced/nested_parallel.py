@@ -11,7 +11,6 @@ it (via `metadata["thread"]`), so the report can show the outer step dispatching
 inner optimizations from several threads at once.
 """
 
-import asyncio
 import threading
 from functools import partial
 from typing import Any
@@ -130,7 +129,7 @@ def main() -> None:
         event_types={EnOptEventType.FINISHED_EVALUATION},
     )
 
-    # Subprocess pool, shared across all outer evaluations.
+    # One subprocess executor, shared across all outer evaluations.
     inner_executor = ProcessExecutor(workers=2)
     # Shared counter keeps batch IDs unique across all concurrent inner runs.
     inner_batch_id_counter = BatchIdCounter()
@@ -180,8 +179,8 @@ def main() -> None:
         memo[key] = float(inner_result.target_objective)
         return EvaluationFunctionResult(objectives=np.array(memo[key]))
 
-    # Outer evaluator: thread pool so multiple inner optimizations are in
-    # flight at once.
+    # Outer evaluator: a thread executor, so multiple inner optimizations are
+    # in flight at once.
     outer_executor = ThreadExecutor(workers=2)
     outer_evaluator = ParallelEvaluator(function=_optimize, executor=outer_executor)
 
@@ -189,15 +188,8 @@ def main() -> None:
 
     outer_context = EnOptContext.model_validate(OUTER_CONFIG)
 
-    async def _run() -> None:
-        async with asyncio.TaskGroup() as tg:
-            await inner_executor.start(tg)
-            await outer_executor.start(tg)
-            await asyncio.to_thread(outer_step.run, outer_context, INITIAL_VALUES)
-            outer_executor.cancel()
-            inner_executor.cancel()
-
-    asyncio.run(_run())
+    with inner_executor, outer_executor:
+        outer_step.run(outer_context, INITIAL_VALUES)
 
     optimal_result = global_results["results"]
     assert optimal_result is not None

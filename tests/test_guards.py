@@ -1,14 +1,10 @@
-"""Tests for the checks the entry points run on pools."""
+"""Tests for how the entry points behave with an executor that cannot serve them."""
 
-# Every check is asserted at every entry point that takes the argument. The
-# entry points do not share a single code path, so a check added to one is
-# easy to forget in another, and the parametrization is what makes that
-# visible. test_live_pool_accepted is the control: without it a refusal test
-# would still pass if the entry point had stopped working for any pool at all.
-#
-# Carrying a session object into a worker is not checked at the entry point at
-# all: it cannot be serialized, so the submission that carried it fails first.
-# test_carrying_a_session_object_into_a_worker covers that path.
+# Every case is asserted at every entry point that takes `executor=`. The entry
+# points do not share a single code path, so a behaviour that changes for one is
+# easy to miss in another, and the parametrization is what makes that visible.
+# test_live_executor_accepted is the control: without it a refusal test would
+# still pass if the entry point had stopped working for any executor at all.
 
 from __future__ import annotations
 
@@ -22,12 +18,13 @@ from ropt.enums import ExitCode
 from ropt.exceptions import ExecutionError, WorkflowError
 from ropt.simple import (
     HistoryHandler,
+    ProcessExecutor,
+    ThreadExecutor,
     evaluate,
     evaluate_many,
     offload,
     optimize,
     optimize_many,
-    session,
 )
 
 if TYPE_CHECKING:
@@ -35,7 +32,8 @@ if TYPE_CHECKING:
 
     from numpy.typing import NDArray
 
-    from ropt.simple import EvaluationFunctionContext, Session, WorkerPool
+    from ropt.components.executors import Executor
+    from ropt.simple import EvaluationFunctionContext
 
 _CONFIG: dict[str, Any] = {
     "optimizer": {"max_functions": 2},
@@ -69,7 +67,7 @@ def _offload(**kwargs: Any) -> None:
     offload(partial(pow, 2, 3), **kwargs)
 
 
-_TAKES_A_POOL = pytest.mark.parametrize(
+_TAKES_AN_EXECUTOR = pytest.mark.parametrize(
     "entry_point",
     [
         pytest.param(_optimize, id="optimize"),
@@ -81,37 +79,28 @@ _TAKES_A_POOL = pytest.mark.parametrize(
 )
 
 
-@_TAKES_A_POOL
-def test_live_pool_accepted(entry_point: Callable[..., None]) -> None:
-    with session() as active:
-        entry_point(pool=active.thread_pool(workers=2))
+@_TAKES_AN_EXECUTOR
+def test_live_executor_accepted(entry_point: Callable[..., None]) -> None:
+    with ThreadExecutor(workers=2) as executor:
+        entry_point(executor=executor)
 
 
-@_TAKES_A_POOL
-def test_closed_pool_refused(entry_point: Callable[..., None]) -> None:
-    with session() as active:
-        pool = active.thread_pool(workers=1)
-        pool.close()
-        with pytest.raises(WorkflowError, match="closed"):
-            entry_point(pool=pool)
-
-
-@_TAKES_A_POOL
-def test_pool_from_a_closed_session_refused(entry_point: Callable[..., None]) -> None:
-    with session() as active:
-        pool = active.thread_pool(workers=1)
+@_TAKES_AN_EXECUTOR
+def test_closed_executor_refused(entry_point: Callable[..., None]) -> None:
+    executor = ThreadExecutor(workers=1)
+    executor.close()
     with pytest.raises(WorkflowError, match="closed"):
-        entry_point(pool=pool)
+        entry_point(executor=executor)
 
 
-def _offload_again(pool: WorkerPool) -> int:
-    return offload(partial(pow, 2, 3), pool=pool)
+def _offload_again(executor: Executor) -> int:
+    return offload(partial(pow, 2, 3), executor=executor)
 
 
 def _optimize_again(
-    pool: WorkerPool, variables: NDArray[np.float64], _: EvaluationFunctionContext
+    executor: Executor, variables: NDArray[np.float64], _: EvaluationFunctionContext
 ) -> float:
-    optimize(_CONFIG, _INITIAL, _sphere, pool=pool)
+    optimize(_CONFIG, _INITIAL, _sphere, executor=executor)
     return float(np.sum(variables**2))
 
 
@@ -120,49 +109,79 @@ def _optimize_again(
 
 
 @pytest.mark.timeout(30)
-def test_offload_to_the_pool_it_runs_on_refused() -> None:
-    with session() as active:
-        pool = active.thread_pool(workers=1)
-        with pytest.raises(WorkflowError, match="already running on it"):
-            offload(partial(_offload_again, pool), pool=pool)
+def test_offload_to_the_executor_it_runs_on_refused() -> None:
+    with (
+        ThreadExecutor(workers=1) as executor,
+        pytest.raises(WorkflowError, match="already running on it"),
+    ):
+        offload(partial(_offload_again, executor), executor=executor)
 
 
 @pytest.mark.timeout(30)
-def test_nested_run_on_the_pool_it_runs_on_refused() -> None:
-    with session() as active:
-        pool = active.thread_pool(workers=1)
-        with pytest.raises(WorkflowError, match="already running on it"):
-            optimize(_CONFIG, _INITIAL, partial(_optimize_again, pool), pool=pool)
+def test_nested_run_on_the_executor_it_runs_on_refused() -> None:
+    with (
+        ThreadExecutor(workers=1) as executor,
+        pytest.raises(WorkflowError, match="already running on it"),
+    ):
+        optimize(
+            _CONFIG, _INITIAL, partial(_optimize_again, executor), executor=executor
+        )
 
 
 @pytest.mark.timeout(30)
-def test_nested_run_on_a_second_pool_allowed() -> None:
-    # The control: what makes the refusal above about *this* pool rather than
-    # about nesting, which is supported.
-    with session() as active:
-        inner = active.thread_pool(workers=1)
-        outer = active.thread_pool(workers=1)
-        optimize(_CONFIG, _INITIAL, partial(_optimize_again, inner), pool=outer)
+def test_nested_run_on_a_second_executor_allowed() -> None:
+    # The control: what makes the refusal above about *this* executor rather
+    # than about nesting, which is supported.
+    with ThreadExecutor(workers=1) as inner, ThreadExecutor(workers=1) as outer:
+        optimize(_CONFIG, _INITIAL, partial(_optimize_again, inner), executor=outer)
 
 
-def _close_and_evaluate(
-    pool: WorkerPool, variables: NDArray[np.float64], _: EvaluationFunctionContext
+def _close_on_call(
+    executor: Executor,
+    calls: list[int],
+    call: int,
+    variables: NDArray[np.float64],
+    _: EvaluationFunctionContext,
 ) -> float:
-    pool.close()
+    calls.append(1)
+    if len(calls) == call:
+        executor.close()
     return float(np.sum(variables**2))
 
 
-def test_pool_closed_during_a_run_still_stops_the_run() -> None:
-    # The checks run once, when the run starts. A pool that dies later is not a
-    # misuse of the API but a failure of the workers, and it keeps reporting
-    # itself as one: the run ends, it is not refused.
-    config = _CONFIG | {"optimizer": {"max_functions": 20}}
-    with session() as active:
-        pool = active.thread_pool(workers=2)
+_CLOSING_CONFIG = _CONFIG | {
+    "optimizer": {"max_functions": 20},
+    "gradient": {"number_of_perturbations": 5},
+}
+
+
+def test_executor_closed_under_a_waiting_run_stops_the_run() -> None:
+    # Closing while a batch is outstanding is not a misuse of the API but a
+    # failure of the workers, and it is reported as one. One worker, so the rest
+    # of the gradient batch is still queued when the first perturbation closes.
+    with ThreadExecutor(workers=1) as executor:
         result = optimize(
-            config, _INITIAL, partial(_close_and_evaluate, pool), pool=pool
+            _CLOSING_CONFIG,
+            _INITIAL,
+            partial(_close_on_call, executor, [], 2),
+            executor=executor,
         )
     assert result.exit_code == ExitCode.EXECUTOR_STOPPED
+
+
+def test_executor_closed_between_batches_refuses_the_next_one() -> None:
+    # The counterpart: nothing was outstanding at the close, so the next batch
+    # meets an executor that is simply closed.
+    with (
+        ThreadExecutor(workers=1) as executor,
+        pytest.raises(WorkflowError, match="closed"),
+    ):
+        optimize(
+            _CLOSING_CONFIG,
+            _INITIAL,
+            partial(_close_on_call, executor, [], 1),
+            executor=executor,
+        )
 
 
 def _evaluate_with(carried: Any, variables: NDArray[np.float64], _: Any) -> float:
@@ -170,15 +189,11 @@ def _evaluate_with(carried: Any, variables: NDArray[np.float64], _: Any) -> floa
     return float(np.sum(variables**2))
 
 
-def _pool_of(active: Session) -> Any:
-    return active.thread_pool(workers=1)
+def _executor_of() -> Any:
+    return ThreadExecutor(workers=1)
 
 
-def _executor_of(active: Session) -> Any:
-    return active.thread_pool(workers=1).executor
-
-
-def _handler_of(_active: Session) -> Any:
+def _handler_of() -> Any:
     return HistoryHandler()
 
 
@@ -186,17 +201,16 @@ def _handler_of(_active: Session) -> Any:
 @pytest.mark.parametrize(
     "carry",
     [
-        pytest.param(_pool_of, id="pool"),
         pytest.param(_executor_of, id="executor"),
         pytest.param(_handler_of, id="handler"),
     ],
 )
-def test_carrying_a_session_object_into_a_worker(
-    carry: Callable[[Session], Any],
-) -> None:
-    # An evaluation function that closes over a session object cannot be sent:
+def test_carrying_a_workflow_object_into_a_worker(carry: Callable[[], Any]) -> None:
+    # An evaluation function that closes over a workflow object cannot be sent:
     # the object holds a lock, so serializing the work item fails.
-    with session() as active:
-        function = partial(_evaluate_with, carry(active))
-        with pytest.raises(ExecutionError, match="could not be sent to a worker"):
-            optimize(_CONFIG, _INITIAL, function, pool=active.process_pool(workers=2))
+    function = partial(_evaluate_with, carry())
+    with (
+        ProcessExecutor(workers=2) as executor,
+        pytest.raises(ExecutionError, match="could not be sent to a worker"),
+    ):
+        optimize(_CONFIG, _INITIAL, function, executor=executor)

@@ -1,8 +1,8 @@
-"""Run one optimization with parallel evaluation on a worker pool.
+"""Run one optimization with parallel evaluation on an executor.
 
-A session creates pools; passing one to `optimize` makes that call evaluate
-its realizations and gradient perturbations on it. Pass `-m`/`--multiprocessing`
-to use a process pool instead of a thread pool.
+Passing an executor to `optimize` makes that call evaluate its realizations and
+gradient perturbations on it. Pass `-m`/`--multiprocessing` to use a process
+executor instead of a thread executor.
 """
 
 from __future__ import annotations
@@ -12,7 +12,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from ropt.simple import optimize, session
+from ropt.simple import ProcessExecutor, ThreadExecutor, optimize
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray
@@ -48,18 +48,14 @@ def rosenbrock(
 
 
 def main(*, multiprocessing: bool = False) -> None:
-    """Run the optimization on a thread or process pool.
+    """Run the optimization on a thread or process executor.
 
     Args:
-        multiprocessing: Use a process pool instead of a thread pool.
+        multiprocessing: Use a process executor instead of a thread executor.
     """
-    with session() as active:
-        pool = (
-            active.process_pool(workers=4)
-            if multiprocessing
-            else active.thread_pool(workers=4)
-        )
-        result = optimize(CONFIG, INITIAL_VALUES, rosenbrock, pool=pool)
+    build = ProcessExecutor if multiprocessing else ThreadExecutor
+    with build(workers=4) as executor:
+        result = optimize(CONFIG, INITIAL_VALUES, rosenbrock, executor=executor)
     assert result.results is not None
     print(f"optimal variables: {result.results.variables}")
     assert np.allclose(result.results.variables, 1.0, atol=1e-2)
@@ -71,6 +67,6 @@ if __name__ == "__main__":
         "-m",
         "--multiprocessing",
         action="store_true",
-        help="Use a process pool instead of a thread pool.",
+        help="Use a process executor instead of a thread executor.",
     )
     main(multiprocessing=parser.parse_args().multiprocessing)

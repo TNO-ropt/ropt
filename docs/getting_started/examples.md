@@ -29,7 +29,7 @@ Scripts that assemble a workflow by hand are listed under
 | [`stopping.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/stopping.py) | Stopping a run from the `report` callback | [Running Optimizations](../running/running.md) |
 | [`failures.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/failures.py) | What a failing realization does, and how to allow some | [Common Pitfalls](../troubleshooting/index.md) |
 | [`restart.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/restart.py) | Restarting from the best point, collecting every result | [Restarting from the Best Point](../running/restart.md) |
-| [`parallel.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/parallel.py) | Evaluating on a thread or process pool | [Parallel Execution and Many Runs](../running/parallel.md) |
+| [`parallel.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/parallel.py) | Evaluating on a thread or process executor | [Parallel Execution and Many Runs](../running/parallel.md) |
 | [`optimize_many.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/optimize_many.py) | Running several optimizations concurrently | [Parallel Execution and Many Runs](../running/parallel.md) |
-| [`nested_optimization.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/nested_optimization.py) | An inner optimization per outer evaluation, on its own pool | [Nested Optimization](../running/nested.md) |
+| [`nested_optimization.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/nested_optimization.py) | An inner optimization per outer evaluation, on its own executor | [Nested Optimization](../running/nested.md) |
 | [`hpc.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/hpc.py) | Submitting evaluations to a cluster queue | [Parallel Execution and Many Runs](../running/parallel.md) |

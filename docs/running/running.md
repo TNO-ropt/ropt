@@ -8,7 +8,7 @@
     [Optimization Workflows](../advanced/workflows.md), a low-level API that
     exposes the building blocks — compute steps, event handlers, executors —
     directly, at the cost of assembling the run yourself, and
-    written for readers at home in Python, threads and asyncio included.
+    written for readers at home in Python and threads.
 
     What the optimization *does* — its variables, objectives, constraints, and
     components — is set up in
@@ -254,7 +254,7 @@ which evaluates a single vector and then a matrix of them.
 Not every problem is an exception. An optimization that cannot make progress
 still returns normally, and indicates why in `result.exit_code`:
 `TOO_FEW_REALIZATIONS` when not enough realizations produced a value,
-`EXECUTOR_STOPPED` when the pool it was evaluating on was closed under it.
+`EXECUTOR_STOPPED` when the executor it was evaluating on was closed under it.
 `result.results` is `None` when no feasible result was ever recorded, whatever
 the reason the run ended; a run that fails part-way still returns the best
 result it had reached before that. A plain [`evaluate`][ropt.simple.evaluate]
@@ -280,8 +280,8 @@ What *is* raised falls into three groups:
 - **Mistakes in the call itself** raise a `ValueError` — a start point of the
   wrong shape, an evaluation function returning the wrong number of values —
   or one of the [`RoptError`][ropt.exceptions.RoptError] types:
-  [`WorkflowError`][ropt.exceptions.WorkflowError] when a pool or handler is
-  used in a way it cannot be (a closed pool, a handler already claimed by
+  [`WorkflowError`][ropt.exceptions.WorkflowError] when an executor or handler
+  is used in a way it cannot be (a closed executor, a handler already claimed by
   another run),
   [`UnsupportedError`][ropt.exceptions.UnsupportedError] when an optional
   dependency is missing, or when the chosen method cannot handle the problem

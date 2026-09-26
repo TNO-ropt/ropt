@@ -62,52 +62,50 @@ emitting run, and every other run waiting on the same handler. See
 ## Executor
 
 Subclass [`ExecutorBase`][ropt.components.executors.ExecutorBase] rather than
-[`Executor`][ropt.components.executors.Executor]: it provides `submit`,
-`is_running`, `cancel` and submission ownership.
+[`Executor`][ropt.components.executors.Executor]: it provides
+[`run`][ropt.components.executors.Executor.run],
+[`close`][ropt.components.executors.Executor.close], the `closed` flag, the
+refusal of a caller that is one of its own workers, and the split of a batch
+into bundles.
 
-You implement two methods. `start` must call `_begin_start` **before** creating
-any resources and `_finish_start` once they are in place — the first guards
-against a double start and rebinds the asyncio primitives to the current loop,
-the second publishes the loop and waits until the executor is ready.
-`_cleanup` releases those resources, and runs on the loop thread.
+You implement two methods. `_run_bundles` runs the bundles and passes each
+result to `store` as it arrives; it must release whatever the batch started
+before it returns, including when `store` raises. `_release` releases the
+executor's own resources, and runs with the lock not held.
 
 ```python
 class MyExecutor(ExecutorBase):
-    async def start(self, task_group):
-        self._begin_start()
-        ...                       # create resources
-        task_group.create_task(self._run_worker())
-        await self._finish_start(task_group)
+    def _run_bundles(self, bundles, store):
+        for index, bundle in enumerate(bundles):
+            results = [
+                item.function(*item.args, **item.kwargs) for item in bundle
+            ]
+            store(index, results)
 
-    def _cleanup(self) -> None:
-        ...                       # release them
-        self._cleanup_submissions()
+    def _release(self) -> None:
+        ...                       # release the executor's resources
 ```
 
-Every work item ends in
-exactly one of three ways, and the choice determines whether the executor survives:
+Every bundle ends in exactly one of three ways, and the choice determines
+whether the executor survives:
 
-| Outcome | Call | Effect |
+| Outcome | Passed to `store` | Effect |
 | --- | --- | --- |
-| The function returned | `_deliver(submission, work_item, value)` | Normal result. |
-| The machinery failed | `_deliver(submission, work_item, ExecutorFailure(...))` | Raised as an [`ExecutionError`][ropt.exceptions.ExecutionError] by the evaluator; the executor keeps running. |
-| The function raised | `_fail(submission, exc)` | The exception is re-raised unchanged in the caller; the executor keeps running. |
+| The functions returned | the list of their results | Normal result. |
+| The machinery failed | an [`ExecutorFailure`][ropt.components.executors.ExecutorFailure] | Raised as an [`ExecutionError`][ropt.exceptions.ExecutionError] by the evaluator; the executor keeps running. |
+| A function raised | `store` is not called; raise the exception out of `_run_bundles` | The exception is re-raised unchanged in the caller; the executor keeps running. |
 
 An [`ExecutorFailure`][ropt.components.executors.ExecutorFailure] is a value, not
-an exception — deliver it, never raise it. Confusing the two rows is the common
-mistake: a bug in user code delivered as an `ExecutorFailure` would be reported
-as broken infrastructure, and a dead worker passed to `_fail` would surface as a
-user error. See
+an exception — store it, never raise it. Confusing the first two rows is the
+common mistake: a bug in user code stored as an `ExecutorFailure` would be
+reported as broken infrastructure, and a dead worker raised out of
+`_run_bundles` would surface as a user error. See
 [Error handling](parallel.md#error-handling) for the distinction.
 
-Two further rules. Skip a submission whose `is_finished` is already `True` — its
-caller is no longer waiting, so running its work items only occupies a worker. And call
-`_cleanup_submissions` from `_cleanup`, which aborts whatever is outstanding so
-no caller is left blocked in
-[`collect`][ropt.components.executors.Submission.collect].
-
-One obligation is less obvious. `on_worker_thread` defaults to `False`, and
-`submit` uses it to refuse work sent from the executor's own workers — a caller
-that waits there occupies a worker its own submission needs. An executor whose
-workers run in this process must override it, or that refusal never fires.
-`on_worker_loop` needs no attention: `ExecutorBase` implements it.
+Two further rules. State of the executor's own that must stay in step with
+closing goes under `_lock`, which `ExecutorBase` exposes for that purpose; the
+`_on_close` hook runs with it held. `run` refuses work sent from the executor's
+own workers — a caller that waits there occupies a worker its own batch needs —
+by reading `_thread_state.running_work_item`, a thread-local flag. An executor
+whose workers are threads in this process sets that flag for as long as a work
+item runs on one; one whose workers run elsewhere never sets it.

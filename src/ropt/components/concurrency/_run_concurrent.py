@@ -1,13 +1,10 @@
-"""A loop-independent primitive for running blocking jobs concurrently.
+"""A primitive for running blocking jobs concurrently.
 
-The coordinators in the high-level API (the `optimize_many` drivers) must run
-many blocking calls at once without funneling them through the asyncio loop's
-shared default thread pool: that pool
-is bounded, and a blocking coordinator that waits there for the leaf work it
-submits to the same pool deadlocks once the pool fills. `run_concurrent` runs
-each job on its own dedicated thread instead, so it imposes no shared-pool
-ceiling and works with or without a running event loop, which lets any
-low-level consumer reuse it directly.
+The drivers of `optimize_many` each block for the whole of one run, waiting for
+evaluations that the executor runs elsewhere. On a shared, bounded thread pool
+they would occupy every slot and the work they wait for would queue behind
+them. `run_concurrent` gives each job a thread of its own, so the number of
+jobs that run at once is capped only by its own `limit`.
 """
 
 from __future__ import annotations

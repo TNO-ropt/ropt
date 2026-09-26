@@ -2,19 +2,12 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
-from functools import partial
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
 from ropt._logging import get_logger
-from ropt.components.executors import (
-    Executor,
-    ExecutorFailure,
-    Submission,
-    WorkItem,
-)
+from ropt.components.executors import ExecutorFailure, WorkItem
 from ropt.evaluation import EvaluationBatchContext, EvaluationBatchResult
 from ropt.exceptions import ExecutionError, WorkflowError
 
@@ -27,24 +20,20 @@ if TYPE_CHECKING:
 
     from numpy.typing import NDArray
 
+    from ropt.components.executors import Executor
+
 _logger = get_logger(__name__)
 
 
-@dataclass(kw_only=True)
-class _EvaluationItem(WorkItem):
-    # Results arrive as they finish, so each item carries the row it fills.
-    eval_idx: int
-
-
 class ParallelEvaluator(Evaluator):
-    """An evaluator that dispatches tasks to an executor via asyncio.
+    """An evaluator that dispatches evaluations to an executor.
 
-    Submits each active row of the evaluation batch as its own work item and
-    collects the results. How many of them travel to a worker together follows
-    `bundle_size`.
+    Sends each active row of the evaluation batch to the executor as its own
+    work item and returns once every result is back. How many of them travel to
+    a worker together follows `bundle_size`.
 
     See [Parallel Evaluation](../advanced/parallel.md#parallelevaluator) for
-    details on how this integrates with the asyncio event loop.
+    details.
     """
 
     def __init__(
@@ -53,23 +42,17 @@ class ParallelEvaluator(Evaluator):
         function: EvaluationFunctionCallback,
         executor: Executor,
         batch_id_callback: Callable[[], int] | None = None,
-        bundle_size: int = 1,
+        bundle_size: int | None = None,
     ) -> None:
         """Initialize the ParallelEvaluator.
 
         Args:
             function:          The function used for objectives and constraints.
-            executor:          The executor to dispatch tasks to.
+            executor:          The executor to dispatch evaluations to.
             batch_id_callback: Callable that returns the next batch ID each time it is called.
-            bundle_size:       Evaluations per worker task, `0` for a whole batch.
-
-        Raises:
-            ValueError: If `bundle_size` is negative.
+            bundle_size:       Evaluations per worker task, `None` for the executor's own.
         """
         super().__init__()
-        if bundle_size < 0:
-            msg = f"bundle_size must be >= 0, got {bundle_size}"
-            raise ValueError(msg)
         self._function = function
         self._executor = executor
         self._bundle_size = bundle_size
@@ -84,9 +67,9 @@ class ParallelEvaluator(Evaluator):
 
         An infrastructure failure raises
         [`ExecutionError`][ropt.exceptions.ExecutionError]; a user-code
-        exception is re-raised unchanged, leaving the executor running. Raises
-        [`ExecutorStopped`][ropt.exceptions.ExecutorStopped] if the executor
-        stopped before every result arrived. See
+        exception is re-raised unchanged, leaving the executor open. Raises
+        [`ExecutorStopped`][ropt.exceptions.ExecutorStopped] if the executor was
+        closed before every result arrived. See
         [error handling](../advanced/parallel.md#error-handling) for the full
         contract.
 
@@ -96,18 +79,7 @@ class ParallelEvaluator(Evaluator):
 
         Returns:
             The result of calling the wrapped evaluator function.
-
-        Raises:
-            WorkflowError: If called on the executor's own event loop thread.
         """
-        # This call blocks until every work item is back, so running it on the
-        # loop would starve the very tasks it waits for.
-        if self._executor.on_worker_loop():
-            msg = (
-                "A compute step must run in a thread, for example with "
-                "asyncio.to_thread."
-            )
-            raise WorkflowError(msg)
         batch_id = self._batch_id_callback()
 
         no = evaluator_context.context.objectives.weights.size
@@ -120,35 +92,20 @@ class ParallelEvaluator(Evaluator):
         results = np.zeros((variables.shape[0], no + nc), dtype=np.float64)
         metadata: dict[str, dict[int, Any]] = {}
 
-        # Only the function and one row's arguments cross to the worker; the
-        # delivery channel stays here, on the submission.
-        submission = Submission(
+        active = list(_active_evaluations(evaluator_context, batch_id))
+        _logger.debug("Dispatching %d work item(s) to executor", len(active))
+        # Only the function and one row's arguments cross to the worker.
+        values = self._executor.run(
             [
-                _EvaluationItem(
-                    function=self._function,
-                    args=(variables[eval_idx, :], function_context),
-                    eval_idx=eval_idx,
+                WorkItem(
+                    function=self._function, args=(variables[eval_idx, :], run_context)
                 )
-                for eval_idx, function_context in _active_evaluations(
-                    evaluator_context, batch_id
-                )
+                for eval_idx, run_context in active
             ],
             bundle_size=self._bundle_size,
         )
-        _logger.debug(
-            "Dispatching %d work item(s) to executor", len(submission.work_items)
-        )
-        self._executor.submit(submission)
-        # Blocks until every work item is delivered; a user-code exception from
-        # a worker is re-raised here, unchanged, ending this evaluation.
-        submission.collect(
-            partial(
-                _handle_result,
-                results=results,
-                metadata=metadata,
-                objective_count=no,
-            ),
-        )
+        for (eval_idx, _), value in zip(active, values, strict=True):
+            _handle_result(eval_idx, value, results, metadata, no)
 
         return EvaluationBatchResult(
             batch_id=batch_id,
@@ -159,25 +116,19 @@ class ParallelEvaluator(Evaluator):
 
 
 def _handle_result(
-    work_item: WorkItem,
+    eval_idx: int,
+    value: Any,  # ruff: ignore[any-type]
     results: NDArray[np.float64],
     metadata: dict[str, dict[int, Any]],
     objective_count: int,
 ) -> None:
-    assert isinstance(work_item, _EvaluationItem)
-    if isinstance(work_item.result, ExecutorFailure):
-        msg = f"An evaluation could not be run: {work_item.result.message}"
+    if isinstance(value, ExecutorFailure):
+        msg = f"An evaluation could not be run: {value.message}"
         raise ExecutionError(msg)
-    if not isinstance(work_item.result, EvaluationFunctionResult):
+    if not isinstance(value, EvaluationFunctionResult):
         msg = (
             "The evaluation function must return EvaluationFunctionResult "
-            f"objects, got {type(work_item.result).__name__}."
+            f"objects, got {type(value).__name__}."
         )
         raise WorkflowError(msg)
-    _scatter_result(
-        work_item.eval_idx,
-        work_item.result,
-        results,
-        metadata,
-        objective_count,
-    )
+    _scatter_result(eval_idx, value, results, metadata, objective_count)

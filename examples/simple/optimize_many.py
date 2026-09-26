@@ -1,7 +1,7 @@
 """Run several optimizations concurrently with `optimize_many`.
 
 `optimize_many` runs a batch of optimizations on driver threads that all
-evaluate on the pool it is given. Any of `config`/`x0`/`objective` may be a
+evaluate on the executor it is given. Any of `config`/`x0`/`objective` may be a
 single value (broadcast to every run) or a per-run sequence; here a matrix of
 start vectors sets the number of runs while the config and objective are re-used
 by all runs. Each run is tagged with a `metadata` dictionary (`run_id`) that
@@ -13,7 +13,11 @@ from typing import Any
 import numpy as np
 from numpy.typing import NDArray
 
-from ropt.simple import EvaluationFunctionContext, optimize_many, session
+from ropt.simple import (
+    EvaluationFunctionContext,
+    ThreadExecutor,
+    optimize_many,
+)
 
 DIM = 5
 CONFIG: dict[str, Any] = {
@@ -48,12 +52,12 @@ def main() -> None:
     """Run one optimization per start vector, concurrently, tagging each run."""
     run_metadata = [{"run_id": idx} for idx in range(len(STARTS))]
     # --8<-- [start:run]
-    with session() as active:
+    with ThreadExecutor(workers=3) as executor:
         results = optimize_many(
             CONFIG,
             STARTS,
             rosenbrock,
-            pool=active.thread_pool(workers=3),
+            executor=executor,
             metadata=run_metadata,
             limit=2,
         )

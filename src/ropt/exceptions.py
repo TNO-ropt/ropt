@@ -20,14 +20,14 @@ class WorkflowError(RoptError):
     """A workflow or runtime object was used incorrectly.
 
     For example a compute step or evaluator used concurrently, an event handler
-    re-entered from inside itself, or a pool whose session has stopped.
+    re-entered from inside itself, or a closed executor.
     """
 
 
 class ExecutionError(RoptError):
     """The execution infrastructure failed at runtime.
 
-    For example a worker pool that cannot start, a broken process pool, a task
+    For example an executor that cannot start, a broken process pool, a task
     that cannot be serialized, an HPC setup or submission problem, or an
     evaluation whose worker died before producing a result.
     """

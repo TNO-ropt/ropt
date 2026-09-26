@@ -1,94 +1,74 @@
-"""Offload arbitrary callables to a pool.
+"""Offload arbitrary callables to an executor.
 
 `offload` runs a single callable, or a sequence of callables concurrently (which
-may be entirely different functions), on the pool it is given. Without a pool,
-or with a serial pool, it runs them inline on the calling thread — so a call
-site works the same whether or not the caller has a pool to offer, and needs no
-guard. The callables must be picklable for a process or HPC pool.
+may be entirely different functions), on the executor it is given. Without one,
+it runs them inline on the calling thread — so a call site works the same
+whether or not the caller has an executor to offer, and needs no guard. The
+callables must be picklable for a process or job executor.
 
-Which pool the work lands on is decided entirely by the argument: `offload`
-called from inside an evaluation function dispatches to the pool that evaluation
-was handed, not to the one running the evaluation.
+Which executor the work lands on is decided entirely by the argument: `offload`
+called from inside an evaluation function dispatches to the executor that
+evaluation was handed, not to the one running the evaluation.
 """
 
 from __future__ import annotations
 
-from dataclasses import dataclass
-from functools import partial
 from typing import TYPE_CHECKING, Any, TypeVar, cast, overload
 
-from ropt.components.executors import ExecutorFailure, Submission, WorkItem
-from ropt.exceptions import ExecutionError, WorkflowError
-
-from ._guards import check_pool
+from ropt.components.executors import ExecutorFailure, WorkItem
+from ropt.exceptions import ExecutionError
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
 
     from ropt.components.executors import Executor
 
-    from ._pool import WorkerPool
-
 _T = TypeVar("_T")
 
 
-@dataclass(kw_only=True)
-class _IndexedWorkItem(WorkItem):
-    # Results come back as they finish, so each item carries the position its
-    # result belongs in.
-    index: int
-
-
 @overload
-def offload(work: Callable[[], _T], *, pool: WorkerPool | None = ...) -> _T: ...
+def offload(work: Callable[[], _T], *, executor: Executor | None = ...) -> _T: ...
 
 
 @overload
 def offload(
-    work: Sequence[Callable[[], _T]], *, pool: WorkerPool | None = ...
+    work: Sequence[Callable[[], _T]], *, executor: Executor | None = ...
 ) -> tuple[_T, ...]: ...
 
 
 def offload(
     work: Callable[[], _T] | Sequence[Callable[[], _T]],
     *,
-    pool: WorkerPool | None = None,
+    executor: Executor | None = None,
 ) -> _T | tuple[_T, ...]:
-    """Offload one or more callables to a pool.
+    """Offload one or more callables to an executor.
 
     Pass a single zero-argument callable to run one call and return its result,
     or a sequence of callables to run them concurrently (they may be entirely
     different functions) and return a tuple of results in the order of `work`.
     Bind arguments with `functools.partial`.
 
-    Without a pool, or with a [`serial_pool`][ropt.simple.serial_pool], the
-    callables run inline on the calling thread, one after another. Code that may
-    or may not have a pool to hand therefore needs no fallback: pass whatever it
-    has, including `None`. The callables must be picklable for a process or HPC
-    pool.
+    Without an executor the callables run inline on the calling thread, one
+    after another. Code that may or may not have an executor to hand therefore
+    needs no fallback: pass whatever it has, including `None`. The callables
+    must be picklable for a process or job executor.
 
     See [Running Optimizations](../running/running.md) for a walkthrough.
 
-    A caller running on the pool's own event loop cannot wait on it, and
-    offloading from there raises a
-    [`WorkflowError`][ropt.exceptions.WorkflowError]. So does a pool that is
-    closed, or one carried into a worker process. A call that the machinery
+    A closed executor raises a
+    [`WorkflowError`][ropt.exceptions.WorkflowError]. A call that the machinery
     could not run, for instance because its worker process was killed, raises an
     [`ExecutionError`][ropt.exceptions.ExecutionError]. Work offloaded from
-    inside an evaluation needs a pool with workers of its own: the pool it is
-    already running on refuses it. A
-    [`serial_pool`][ropt.simple.serial_pool] runs the callables inline and has
-    no workers to occupy, so it can be reused.
+    inside an evaluation needs an executor with workers of its own: the one it
+    is already running on refuses it.
 
     Args:
-        work: A single zero-argument callable, or a sequence of them.
-        pool: The pool to dispatch to, or `None` to run inline.
+        work:     A single zero-argument callable, or a sequence of them.
+        executor: The executor to dispatch to, or `None` to run inline.
 
     Returns:
         The single result, or a tuple of results in the order of `work`.
     """
-    check_pool(pool)
-    executor = _dispatchable(pool)
     if callable(work):
         functions = [work]
         results = _run(executor, functions)
@@ -102,39 +82,13 @@ def offload(
 def _run(executor: Executor | None, functions: list[Callable[[], Any]]) -> list[Any]:
     if executor is None:
         return [function() for function in functions]
-    return _dispatch(executor, functions)
-
-
-def _dispatchable(pool: WorkerPool | None) -> Executor | None:
-    executor = None if pool is None else pool.executor
-    if executor is not None and executor.on_worker_loop():
-        msg = (
-            "offload() cannot be called from the event loop that runs the "
-            "pool's work; waiting there would starve that work."
-        )
-        raise WorkflowError(msg)
-    return executor
-
-
-def _dispatch(executor: Executor, functions: list[Callable[[], Any]]) -> list[Any]:
     # A sequence of offloaded callables is documented to run concurrently, so
     # they must not be bundled onto one worker.
-    submission = Submission(
-        [
-            _IndexedWorkItem(function=function, index=index)
-            for index, function in enumerate(functions)
-        ],
-        bundle_size=1,
+    values = executor.run(
+        [WorkItem(function=function) for function in functions], bundle_size=1
     )
-    output: list[Any] = [None] * len(functions)
-    executor.submit(submission)
-    submission.collect(partial(_store, output))
-    return output
-
-
-def _store(output: list[Any], work_item: WorkItem) -> None:
-    assert isinstance(work_item, _IndexedWorkItem)
-    if isinstance(work_item.result, ExecutorFailure):
-        msg = f"An offloaded call could not be run: {work_item.result.message}"
-        raise ExecutionError(msg)
-    output[work_item.index] = work_item.result
+    for value in values:
+        if isinstance(value, ExecutorFailure):
+            msg = f"An offloaded call could not be run: {value.message}"
+            raise ExecutionError(msg)
+    return values

@@ -2,18 +2,30 @@
 
 from __future__ import annotations
 
-import asyncio
 import multiprocessing
-from concurrent.futures import ProcessPoolExecutor
+import queue
+import threading
+from collections import deque
+from concurrent.futures import CancelledError, Future, ProcessPoolExecutor
 from concurrent.futures.process import BrokenProcessPool
-from typing import Any, cast
+from typing import TYPE_CHECKING, Any, cast
 
 from ropt._logging import get_logger
 from ropt._serialize import CANNOT_DESERIALIZE, CANNOT_SERIALIZE, dumps, loads
 from ropt.exceptions import ExecutionError
 
 from ._picklable import picklable_exception
-from .base import ExecutorBase, ExecutorFailure, WorkItem, _calls, _run_bundle
+from .base import (
+    ExecutorBase,
+    ExecutorFailure,
+    WorkItem,
+    _calls,
+    _run_bundle,
+    _stopped,
+)
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 _logger = get_logger(__name__)
 
@@ -26,7 +38,7 @@ class ProcessExecutor(ExecutorBase):
     point must use.
 
     Warning:
-        Stopping terminates the worker processes and nothing else. A program a
+        Closing terminates the worker processes and nothing else. A program a
         work item started itself keeps running, without an error being raised.
         Use [`LocalJobExecutor`][ropt.components.executors.LocalJobExecutor]
         where an evaluation launches external programs.
@@ -37,94 +49,124 @@ class ProcessExecutor(ExecutorBase):
         *,
         workers: int = 1,
         max_tasks_per_child: int | None = None,
+        bundle_size: int = 1,
     ) -> None:
         """Initialize the executor.
+
+        The worker processes are started here, so an entry point that is not
+        guarded with `if __name__ == "__main__":` fails at this call.
 
         Args:
             workers:             Number of worker processes.
             max_tasks_per_child: Restart workers after this many items, or never.
-        """
-        super().__init__()
-        self._workers = workers
-        self._max_tasks_per_child = max_tasks_per_child
-        self._worker_tasks: list[asyncio.Task[None]] = []
-        self._executor: ProcessPoolExecutor | None = None
+            bundle_size:         Calls per worker task, `0` for a whole batch.
 
-    async def start(self, task_group: asyncio.TaskGroup) -> None:
-        """Start the executor.
-
-        Args:
-            task_group:          The task group to use.
-        """
-        self._begin_start()
-        executor = ProcessPoolExecutor(
-            max_workers=self._workers,
+        Raises:
+            ValueError:     If `workers` is less than one.
+            ExecutionError: If the worker processes could not be started.
+        """  # ruff: ignore[docstring-extraneous-exception]
+        super().__init__(bundle_size=bundle_size)
+        if workers < 1:
+            msg = f"The number of workers must be at least one: {workers}"
+            raise ValueError(msg)
+        self._pool = ProcessPoolExecutor(
+            max_workers=workers,
             mp_context=multiprocessing.get_context("spawn"),
-            max_tasks_per_child=self._max_tasks_per_child,
+            max_tasks_per_child=max_tasks_per_child,
         )
-        self._executor = executor
-        _logger.debug("Starting process executor with %d worker(s)", self._workers)
-        await self._check_worker_startup()
-        self._worker_tasks = [
-            task_group.create_task(self._run_worker(executor))
-            for _ in range(self._workers)
-        ]
-        await self._finish_start(task_group)
+        # A submitted bundle's pickled bytes stay in memory until its result
+        # comes back, so this caps how many are submitted at once: one for each
+        # worker, plus one so a worker that finishes finds the next bundle
+        # already waiting.
+        self._payload_limit = threading.Semaphore(workers + 1)
+        self._check_worker_startup()
+        _logger.debug("Started process executor with %d worker(s)", workers)
 
-    async def _check_worker_startup(self) -> None:
-        assert self._executor is not None
-        loop = asyncio.get_running_loop()
+    def _check_worker_startup(self) -> None:
         try:
-            await loop.run_in_executor(self._executor, _dummy)
+            self._pool.submit(_dummy).result()
         except BrokenProcessPool as exc:
-            self._executor.shutdown(wait=False, cancel_futures=True)
-            self._executor = None
+            self.close()
             msg = (
                 "Could not start worker processes; guard the program entry point "
                 'with `if __name__ == "__main__":`.'
             )
             raise ExecutionError(msg) from exc
 
-    def _cleanup(self) -> None:
-        """Clean up the executor."""
-        if self._executor is not None:
-            # Terminate the workers, or we have to wait for them.
-            _terminate_workers(self._executor)
-            self._executor = None
-        for worker_task in self._worker_tasks:
-            if not worker_task.done():
-                worker_task.cancel()
-        self._worker_tasks = []
-        self._cleanup_submissions()
+    def _release(self) -> None:
+        _terminate_workers(self._pool)
 
-    async def _run_worker(self, executor: ProcessPoolExecutor) -> None:
-        while True:
-            submission, bundle = await self._work_queue.get()
-            if submission.is_finished:
-                continue
+    def _run_bundles(
+        self,
+        bundles: list[list[WorkItem]],
+        store: Callable[[int, Any], None],
+    ) -> None:
+        pending = deque(enumerate(bundles))
+        # Finished bundles arrive here rather than through
+        # `concurrent.futures.wait`, which would block forever on a future
+        # cancelled before the pool dispatched it; a done callback still fires.
+        done: queue.SimpleQueue[Future[tuple[bool, bytes]]] = queue.SimpleQueue()
+        futures: dict[Future[tuple[bool, bytes]], int] = {}
+        try:
+            while pending or futures:
+                # Waiting is safe only with nothing in flight: the slots this
+                # batch holds are given back further down, by this same loop.
+                while pending and self._payload_limit.acquire(blocking=not futures):
+                    index, bundle = pending.popleft()
+                    try:
+                        future = self._submit(bundle)
+                    except BaseException:
+                        self._payload_limit.release()
+                        raise
+                    futures[future] = index
+                    future.add_done_callback(done.put)
+                future = done.get()
+                index = futures.pop(future)
+                self._payload_limit.release()
+                store(index, self._bundle_result(future))
+        finally:
+            for future in futures:
+                future.cancel()
+                self._payload_limit.release()
+
+    def _submit(self, bundle: list[WorkItem]) -> Future[tuple[bool, bytes]]:
+        # The payload is built here rather than in a worker, so that `ropt`'s
+        # own serialization is used and a failure to build it is raised in the
+        # caller instead of surfacing as an opaque pool failure.
+        try:
+            payload = dumps((_run_bundle, (_calls(bundle),), {}))
+        except Exception as exc:
+            msg = (
+                "The work item could not be sent to a worker process: "
+                f"{CANNOT_SERIALIZE}."
+            )
+            raise ExecutionError(msg) from exc
+        with self._lock:
+            if self._closed:
+                raise _stopped()
             try:
-                results = await _run_bundle_in_pool(bundle, executor)
-                for work_item, result in zip(bundle, results, strict=True):
-                    self._deliver(submission, work_item, result)
-            except BrokenProcessPool:
-                if self._running.is_set():
-                    _logger.warning("Worker process pool broken; work item result lost")
-                else:
-                    _logger.debug("Work item dropped: the executor was stopped")
-                for work_item in bundle:
-                    self._deliver(
-                        submission,
-                        work_item,
-                        ExecutorFailure("Background process was killed"),
-                    )
-            except asyncio.CancelledError:
-                self._abort(submission)
-                raise
-            except BaseException as exc:
-                #  Reraise `Exception` (SystemExit, KeyboardInterrupt).
-                self._fail(submission, exc)
-                if not isinstance(exc, Exception):
-                    raise
+                return self._pool.submit(_run_payload, payload)
+            except RuntimeError:
+                raise _stopped() from None
+
+    def _bundle_result(
+        self, future: Future[tuple[bool, bytes]]
+    ) -> list[Any] | ExecutorFailure:
+        try:
+            ok, blob = future.result()
+        except CancelledError:
+            raise _stopped() from None
+        except BrokenProcessPool:
+            if self.closed:
+                # Closing is what killed the worker, so this is the stop the
+                # caller asked for rather than infrastructure that broke.
+                raise _stopped() from None
+            _logger.warning("Worker process pool broken; work item result lost")
+            return ExecutorFailure("Background process was killed")
+        value = loads(blob)
+        if not ok:
+            raise value
+        return cast("list[Any]", value)
 
 
 def _terminate_workers(executor: ProcessPoolExecutor) -> None:
@@ -156,24 +198,6 @@ def _terminate_workers(executor: ProcessPoolExecutor) -> None:
             process.terminate()
         except (ValueError, ProcessLookupError):
             continue
-
-
-async def _run_bundle_in_pool(
-    bundle: list[WorkItem], executor: ProcessPoolExecutor
-) -> list[Any]:
-    loop = asyncio.get_running_loop()
-    try:
-        payload = dumps((_run_bundle, (_calls(bundle),), {}))
-    except Exception as exc:
-        msg = (
-            f"The work item could not be sent to a worker process: {CANNOT_SERIALIZE}."
-        )
-        raise ExecutionError(msg) from exc
-    ok, blob = await loop.run_in_executor(executor, _run_payload, payload)
-    value = loads(blob)
-    if not ok:
-        raise value
-    return cast("list[Any]", value)
 
 
 def _run_payload(payload: bytes) -> tuple[bool, bytes]:

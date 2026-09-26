@@ -17,9 +17,7 @@ from ropt.components.event_handlers import HistoryHandler
 from ropt.context import EnOptContext
 
 from ._evaluator import make_evaluator
-from ._guards import check_pool
 from ._handlers import attach_handlers
-from ._pool import serial_pool
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -28,10 +26,10 @@ if TYPE_CHECKING:
     from numpy.typing import ArrayLike
 
     from ropt.components.event_handlers import EventHandler
+    from ropt.components.executors import Executor
     from ropt.results import FunctionResults
 
     from ._function import EvaluationFunction
-    from ._pool import WorkerPool
     from ._report import ReportCallback
 
 
@@ -40,10 +38,10 @@ def evaluate(  # ruff: ignore[too-many-arguments]
     variables: ArrayLike,
     function: EvaluationFunction,
     *,
-    pool: WorkerPool | None = None,
+    executor: Executor | None = None,
     handlers: Sequence[EventHandler] | None = None,
     report: ReportCallback | None = None,
-    bundle_size: int = 1,
+    bundle_size: int | None = None,
     metadata: dict[str, Any] | None = None,
 ) -> FunctionResults:
     """Evaluate a single variable vector without optimizing.
@@ -52,16 +50,11 @@ def evaluate(  # ruff: ignore[too-many-arguments]
     vectors at once. See [Running Optimizations](../running/running.md) for a
     walkthrough.
 
-    A pool that is closed — because it was closed directly, or because its
-    session ended — is refused here with a
-    [`WorkflowError`][ropt.exceptions.WorkflowError], as is one carried into
-    a worker process, where it cannot work at all.
-
-    Without a `pool` the evaluations run in-process, on the calling thread. A
-    run started from inside an evaluation needs a pool with workers of its own:
-    the pool it is already running on refuses the work. A
-    [`serial_pool`][ropt.simple.serial_pool] evaluates inline and has no workers
-    to occupy, so it can be reused. `handlers` takes
+    Without an `executor` the evaluations run in-process, on the calling thread,
+    and `bundle_size` does not apply. A closed executor raises a
+    [`WorkflowError`][ropt.exceptions.WorkflowError] at the first evaluation. A
+    run started from inside an evaluation needs an executor with workers of its
+    own: the one it is already running on refuses the work. `handlers` takes
     [`EventHandler`][ropt.components.event_handlers.EventHandler] objects, as
     [`optimize`][ropt.simple.optimize] does.
 
@@ -75,10 +68,10 @@ def evaluate(  # ruff: ignore[too-many-arguments]
         config:      The optimization configuration.
         variables:   The variable vector to evaluate.
         function:    The per-realization evaluation function.
-        pool:        The pool to evaluate on, from a session factory.
+        executor:    The executor to evaluate on, or `None`.
         handlers:    Optional handlers, called in the order listed.
         report:      Optional callback invoked with each evaluation's results.
-        bundle_size: Evaluations per worker task, `0` for a whole batch.
+        bundle_size: Evaluations per worker task, `None` for the executor's own.
         metadata:    Optional dictionary attached to the emitted results.
 
     Returns:
@@ -87,13 +80,12 @@ def evaluate(  # ruff: ignore[too-many-arguments]
     Raises:
         ValueError: If `variables` is not a single vector.
     """
-    check_pool(pool)
     array = np.asarray(variables, dtype=np.float64)
     if array.ndim != 1:
         msg = "evaluate() takes a single vector; use evaluate_many() for a batch."
         raise ValueError(msg)
     results = _run_evaluation(
-        pool,
+        executor,
         config,
         array,
         function,
@@ -110,10 +102,10 @@ def evaluate_many(  # ruff: ignore[too-many-arguments]
     variables: ArrayLike,
     function: EvaluationFunction,
     *,
-    pool: WorkerPool | None = None,
+    executor: Executor | None = None,
     handlers: Sequence[EventHandler] | None = None,
     report: ReportCallback | None = None,
-    bundle_size: int = 1,
+    bundle_size: int | None = None,
     metadata: dict[str, Any] | None = None,
 ) -> tuple[FunctionResults, ...]:
     """Evaluate a batch of variable vectors without optimizing.
@@ -122,16 +114,11 @@ def evaluate_many(  # ruff: ignore[too-many-arguments]
     the same order. See [Running Optimizations](../running/running.md) for a
     walkthrough.
 
-    A pool that is closed — because it was closed directly, or because its
-    session ended — is refused here with a
-    [`WorkflowError`][ropt.exceptions.WorkflowError], as is one carried into
-    a worker process, where it cannot work at all.
-
-    Without a `pool` the evaluations run in-process, on the calling thread. A
-    run started from inside an evaluation needs a pool with workers of its own:
-    the pool it is already running on refuses the work. A
-    [`serial_pool`][ropt.simple.serial_pool] evaluates inline and has no workers
-    to occupy, so it can be reused. `handlers` takes
+    Without an `executor` the evaluations run in-process, on the calling thread,
+    and `bundle_size` does not apply. A closed executor raises a
+    [`WorkflowError`][ropt.exceptions.WorkflowError] at the first evaluation. A
+    run started from inside an evaluation needs an executor with workers of its
+    own: the one it is already running on refuses the work. `handlers` takes
     [`EventHandler`][ropt.components.event_handlers.EventHandler] objects, as
     [`optimize`][ropt.simple.optimize] does.
 
@@ -145,10 +132,10 @@ def evaluate_many(  # ruff: ignore[too-many-arguments]
         config:      The optimization configuration.
         variables:   The variable vectors to evaluate, one per row.
         function:    The per-realization evaluation function.
-        pool:        The pool to evaluate on, from a session factory.
+        executor:    The executor to evaluate on, or `None`.
         handlers:    Optional handlers, called in the order listed.
         report:      Optional callback invoked with each evaluation's results.
-        bundle_size: Evaluations per worker task, `0` for a whole batch.
+        bundle_size: Evaluations per worker task, `None` for the executor's own.
         metadata:    Optional dictionary attached to every emitted result.
 
     Returns:
@@ -157,7 +144,6 @@ def evaluate_many(  # ruff: ignore[too-many-arguments]
     Raises:
         ValueError: If `variables` is not a 2-D matrix.
     """
-    check_pool(pool)
     array = np.asarray(variables, dtype=np.float64)
     if array.ndim != 2:  # ruff: ignore[magic-value-comparison]
         msg = (
@@ -166,7 +152,7 @@ def evaluate_many(  # ruff: ignore[too-many-arguments]
         )
         raise ValueError(msg)
     results = _run_evaluation(
-        pool,
+        executor,
         config,
         array,
         function,
@@ -179,20 +165,18 @@ def evaluate_many(  # ruff: ignore[too-many-arguments]
 
 
 def _run_evaluation(  # ruff: ignore[too-many-arguments]
-    pool: WorkerPool | None,
+    executor: Executor | None,
     config: dict[str, Any],
     variables: ArrayLike,
     function: EvaluationFunction,
     *,
     handlers: Sequence[EventHandler] | None,
     report: ReportCallback | None,
-    bundle_size: int,
+    bundle_size: int | None,
     metadata: dict[str, Any] | None,
 ) -> tuple[FunctionResults, ...]:
     context = EnOptContext.model_validate(config)
-    evaluator = make_evaluator(
-        context, function, pool if pool is not None else serial_pool(), bundle_size
-    )
+    evaluator = make_evaluator(context, function, executor, bundle_size)
     # The results are collected by this run's own handler, in the order the
     # vectors were given, which is the order they are returned in.
     history = HistoryHandler()

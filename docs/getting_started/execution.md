@@ -3,37 +3,36 @@
 An optimization calls your evaluation function many times. By default these calls
 happen one after another, on the same thread that called
 [`optimize`][ropt.simple.optimize]. If each call is slow, you can run several at
-the same time by evaluating on a **worker pool**.
+the same time by evaluating on an **executor**.
 
-Pools come from a [`session`][ropt.simple.session]. Open one using a `with`
-statement, ask it for the kind of pool you want, and pass that pool to the run:
+Build one with a `with` statement and pass it to the run:
 
 ```python
-from ropt.simple import optimize, session
+from ropt.simple import ThreadExecutor, optimize
 
-with session() as s:
-    result = optimize(config, x0, objective, pool=s.thread_pool(workers=4))
+with ThreadExecutor(workers=4) as executor:
+    result = optimize(config, x0, objective, executor=executor)
 ```
 
-That is the whole pattern. A session can create as many pools as you like, of
-any kind, and each run uses the one you give it — and only that one. Closing the
-session releases them all. The runnable script is
+That is the whole pattern. You can build as many executors as you like, of any
+kind, and each run uses the one you give it — and only that one. Leaving the
+`with` block releases its workers. The runnable script is
 [examples/simple/parallel.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/parallel.py),
-which evaluates one optimization on a thread pool, or on a process pool when it
-is passed `--multiprocessing`.
+which evaluates one optimization on a thread executor, or on a process executor
+when it is passed `--multiprocessing`.
 
-Where your objective runs depends on which pool you pass (or none):
+Where your objective runs depends on which executor you pass (or none):
 
 ```mermaid
 flowchart TB
     subgraph proc["your program (one process)"]
         main(["your code<br/>(main thread)"])
-        seq["no pool / serial_pool —<br/>one eval at a time"]
-        th["thread_pool —<br/>worker threads<br/>(share memory)"]
+        seq["no executor —<br/>one eval at a time"]
+        th["ThreadExecutor —<br/>worker threads<br/>(share memory)"]
     end
-    wp["process_pool —<br/>a few reused processes<br/>(data copied)"]
-    loc["local_pool —<br/>one process per eval<br/>(data copied)"]
-    clu["hpc_pool —<br/>cluster jobs<br/>(data copied)"]
+    wp["ProcessExecutor —<br/>a few reused processes<br/>(data copied)"]
+    loc["LocalJobExecutor —<br/>one process per eval<br/>(data copied)"]
+    clu["HPCExecutor —<br/>cluster jobs<br/>(data copied)"]
     main --> seq
     main --> th
     main --> wp
@@ -45,9 +44,9 @@ Threads stay **inside** your program and share its memory, so any Python
 function works and nothing is copied. The other three run the work **outside**
 it, so the objective and its data are copied there.
 
-Only the evaluations ever leave. The optimizer itself, the session, the pool
-object and your handlers all stay put, whichever pool you choose. Below, **your
-program** always means that one process — the one that opened the session and
+Only the evaluations ever leave. The optimizer itself, the executor object and
+your handlers all stay put, whichever executor you choose. Below, **your
+program** always means that one process — the one that built the executor and
 called `optimize`.
 
 ??? info "New to threads and processes?"
@@ -62,25 +61,23 @@ called `optimize`.
     interpreter and always run truly in parallel, but they do not share memory,
     so data has to be copied between them, and starting one takes noticeably
     longer than starting a thread. A process also need not be on this machine:
-    an `hpc_pool` runs each evaluation as a job on a cluster, which is the same
-    arrangement spread over more machines.
+    an `HPCExecutor` runs each evaluation as a job on a cluster, which is the
+    same arrangement spread over more machines.
 
-## The five choices
+## The four choices
 
-Evaluating in place — with no pool, or with an explicit
-[`serial_pool`][ropt.simple.serial_pool] — is a choice rather than the absence
-of one, so there are five:
+Passing no executor evaluates in place, so there are four:
 
-| Pool | Evaluations run | Data | Applies when |
+| Executor | Evaluations run | Data | Applies when |
 | --- | --- | --- | --- |
-| none, or `serial_pool` | on the calling thread, one at a time | shared | evaluations are fast — this is the default |
-| `thread_pool` | on background threads in your program | shared | each evaluation mostly **waits**: an external tool, a file, a network call |
-| `process_pool` | in a few reused processes | copied | each evaluation is heavy **Python computation** |
-| `local_pool` | in one fresh process per evaluation | copied | each evaluation is a self-contained **job** on this machine |
-| `hpc_pool` | as jobs on a cluster queue | copied | each evaluation is a large **cluster job** |
+| none | on the calling thread, one at a time | shared | evaluations are fast — this is the default |
+| `ThreadExecutor` | on background threads in your program | shared | each evaluation mostly **waits**: an external tool, a file, a network call |
+| `ProcessExecutor` | in a few reused processes | copied | each evaluation is heavy **Python computation** |
+| `LocalJobExecutor` | in one fresh process per evaluation | copied | each evaluation is a self-contained **job** on this machine |
+| `HPCExecutor` | as jobs on a cluster queue | copied | each evaluation is a large **cluster job** |
 
-A pool costs something to set up and to hand work to. Below a certain evaluation
-cost, that setup is all a pool adds.
+An executor costs something to set up and to hand work to. Below a certain
+evaluation cost, that setup is all it adds.
 
 [Parallel Execution and Many Runs](../running/parallel.md) covers each of these
 in full — how many workers to ask for, which functions can be sent where, what
@@ -97,11 +94,11 @@ reading your own code rather than by measuring:
     event handler, a counter it increments — anything at all that outlives one
     call.
 
-    - **No.** Every pool works. Choose on speed alone, and you can swap between
-      them freely later.
-    - **Yes.** Stay with threads, or with no pool at all: either way the
+    - **No.** Every executor works. Choose on speed alone, and you can swap
+      between them freely later.
+    - **Yes.** Stay with threads, or with no executor at all: either way the
       objective runs in your program, where it sees the same memory.
-      `process_pool`, `local_pool` and `hpc_pool` run the
+      `ProcessExecutor`, `LocalJobExecutor` and `HPCExecutor` run the
       objective somewhere else, on a *copy* of everything it touched — so the
       writes land in that copy and vanish, and the reads see whatever the copy
       was made from. Nothing raises; the numbers just come out wrong.
@@ -118,17 +115,17 @@ results = optimize_many(config, start_points, objective)   # one run per start p
 ```
 
 The runs are concurrent, and there is more to it than this call shows: how many
-run at a time, which pool their evaluations share, and how to collect results
-from runs that overlap are all covered in
+run at a time, which executor their evaluations share, and how to collect
+results from runs that overlap are all covered in
 [Parallel Execution and Many Runs](../running/parallel.md#many-optimizations-at-once).
 
 !!! warning "Your objective is now called from several threads at once"
 
-    The call above passes no pool, so each run evaluates on its own thread. The
-    question above applies here too, and nothing reports it: if your objective
-    reads or writes anything outside its arguments and its return value, the
-    runs will corrupt each other. Give the batch a pool, or keep the objective
-    self-contained.
+    The call above passes no executor, so each run evaluates on its own thread.
+    The question above applies here too, and nothing reports it: if your
+    objective reads or writes anything outside its arguments and its return
+    value, the runs will corrupt each other. Give the batch an executor, or keep
+    the objective self-contained.
 
 ## See also
 

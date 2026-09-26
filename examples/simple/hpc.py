@@ -1,20 +1,20 @@
 """Ensemble optimization on an HPC cluster with the high-level `ropt.simple` API.
 
-An HPC pool submits evaluations to a cluster queue (through `pysqa`), so an
+An `HPCExecutor` submits evaluations to a cluster queue (through `pysqa`), so an
 `optimize` call given one runs its ensemble evaluations as cluster jobs. This
 is what the example does by default; it needs the `ropt[hpc]` extra and a
 reachable cluster. The cluster and queue come from the `pysqa` configuration
-of the `ropt` installation unless `--queue` names one; other cluster
-parameters (such as `cluster` and `cores`) can be passed to `hpc_pool`
-when needed.
+of the `ropt` installation unless `--queue` names one; other cluster parameters
+(such as `cluster` and `cores`) can be passed to `HPCExecutor` when needed.
 
 If you have no cluster available, pass `--local` to run the identical
-optimization on a local pool instead. That pool runs each evaluation as its own
-process, exactly as a cluster job does, so it is the local stand-in for
-`hpc_pool` and lets the example be exercised anywhere.
+optimization on a `LocalJobExecutor` instead. That executor runs each evaluation
+as its own process, exactly as a cluster job does, so it is the local stand-in
+for `HPCExecutor` and lets the example be exercised anywhere.
 
-Both pools send the evaluation function to a separate interpreter that cannot
-import this script, so this example needs the `ropt[cloudpickle]` extra.
+Both executors send the evaluation function to a separate interpreter that
+cannot import this script, so this example needs the `ropt[cloudpickle]`
+extra.
 """
 
 import argparse
@@ -28,8 +28,10 @@ from numpy.typing import NDArray
 from ropt.results import FunctionResults
 from ropt.simple import (
     EvaluationFunctionContext,
+    Executor,
+    HPCExecutor,
+    LocalJobExecutor,
     optimize,
-    session,
 )
 
 DIM = 2
@@ -95,25 +97,30 @@ def main(
     queue: str | None = None,
     workdir: Path | None = None,
 ) -> None:
-    """Run the optimization on the cluster, or on a local pool.
+    """Run the optimization on the cluster, or in local processes.
 
     Args:
-        local:   Run on a local pool instead of submitting to a cluster.
+        local:   Run on a local executor instead of submitting to a cluster.
         queue:   The cluster queue to submit to; the configured default if None.
-        workdir: Directory for the job files. On a cluster it must be on a
-                 filesystem the compute nodes share.
+        workdir: Directory for the job files, the current directory by default.
+                 On a cluster it must be on a filesystem the compute nodes
+                 share.
     """
-    with session() as active:
-        pool = (
-            active.local_pool(workers=WORKERS, workdir=workdir)
-            if local
-            else active.hpc_pool(workers=WORKERS, queue=queue, workdir=workdir)
+    executor: Executor = (
+        LocalJobExecutor(workers=WORKERS, workdir=workdir)
+        if local
+        else HPCExecutor(
+            workers=WORKERS,
+            queue=queue,
+            workdir=Path.cwd() if workdir is None else workdir.resolve(),
         )
+    )
+    with executor:
         result = optimize(
             CONFIG,
             INITIAL_VALUES,
             rosenbrock,
-            pool=pool,
+            executor=executor,
             report=report,
             bundle_size=0,
         )
@@ -128,7 +135,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--local",
         action="store_true",
-        help="run on a local pool instead of submitting to a cluster",
+        help="run in local processes instead of submitting to a cluster",
     )
     parser.add_argument(
         "--queue",

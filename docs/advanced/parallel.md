@@ -1,41 +1,36 @@
 # Parallel Evaluation
 
 For non-trivial problems, function evaluations dominate runtime and are commonly
-run in parallel, either on a single machine or on a cluster. `ropt` uses
-Python's `asyncio` framework to enable this.
+run in parallel, either on a single machine or on a cluster. `ropt` does this
+with **executors**: objects that run a batch of calls elsewhere and return the
+results.
 
 This page assumes familiarity with [Optimization Workflows](workflows.md).
 
-## Why asyncio?
+## The blocking model
 
-A single compute step could in principle run its evaluations in parallel
-without an event loop — for example by spawning threads directly. What an
-asynchronous approach adds is **multiple compute
-steps running concurrently**. With `asyncio`, several optimizations can share the
-same pool of workers, the event loop dispatches evaluation tasks as they
-arrive, and results flow back without blocking other work.
+An [`Executor`][ropt.components.executors.Executor] has one method for work,
+[`run`][ropt.components.executors.Executor.run]. It takes a sequence of
+[`WorkItem`][ropt.components.executors.WorkItem] objects, blocks until every one
+of them has an outcome, and returns the results in the order the items were
+given. A compute step calls it on the thread it is already on.
 
-The [`ParallelEvaluator`][ropt.components.evaluators.ParallelEvaluator] is the
-evaluator that bridges the synchronous compute-step `run()` call and the
-asynchronous world. It submits the rows of the variable batch to an
-[`Executor`][ropt.components.executors.Executor] as a single
-[`Submission`][ropt.components.executors.Submission]. The executor runs the
-submission's work items on its workers and delivers each result back to the
-submission, which the evaluator collects.
-
-Because compute steps call `run()` synchronously, the step itself is typically
-dispatched with `asyncio.to_thread` so the event loop remains free to service
-the executor's workers and other concurrent steps.
+Several compute steps can share one executor. Each blocks in its own `run()`
+call on its own thread, and each gets back the results of its own batch. Running
+several optimizations at once is therefore a matter of starting a thread per
+optimization — [`run_concurrent`][ropt.components.concurrency.run_concurrent]
+does that, and is what [`optimize_many`][ropt.simple.optimize_many] is built
+on.
 
 ## ParallelEvaluator
 
 [`ParallelEvaluator`][ropt.components.evaluators.ParallelEvaluator] wraps a
 per-realization function — the same kind of callable used by
-[`FunctionEvaluator`][ropt.components.evaluators.FunctionEvaluator] — and submits
-each active row of the evaluation batch as its own
-[`WorkItem`][ropt.components.executors.WorkItem] in one
-[`Submission`][ropt.components.executors.Submission]. It then waits for the
-submission's results.
+[`FunctionEvaluator`][ropt.components.evaluators.FunctionEvaluator] — and turns
+each active row of the evaluation batch into its own
+[`WorkItem`][ropt.components.executors.WorkItem]. It passes them all to
+[`run`][ropt.components.executors.Executor.run] in one call and blocks until the
+results come back.
 
 Constructor parameters:
 
@@ -43,29 +38,35 @@ Constructor parameters:
 | ------------- | -------------------------------------------------------------------- |
 | `function`    | Per-realization callable (same interface as `FunctionEvaluator`).    |
 | `executor`    | The [`Executor`][ropt.components.executors.Executor] to dispatch work to. |
-| `batch_id_callback` | Callable returning the next batch ID each time it is called (default: an internal [`BatchIdCounter`][ropt.components.evaluators.BatchIdCounter]). |
-| `bundle_size` | Evaluations sent to a worker together, `0` for a whole batch (default: 1). |
+| `batch_id_callback` | Callable returning the next batch ID each time it is called (default: the program-wide batch-ID counter). |
+| `bundle_size` | Evaluations sent to a worker together, `0` for a whole batch, `None` for the executor's own default (default: `None`). |
 
 How many of those work items travel to a worker together follows
 `bundle_size`. See [Bundling](#bundling).
 
-If the executor is not running when `eval()` is called, the evaluator raises an
-[`ExecutorStopped`][ropt.exceptions.ExecutorStopped] exception.
+If the executor is closed when `eval()` is called, the evaluator raises a
+[`WorkflowError`][ropt.exceptions.WorkflowError]; if it closes while the call is
+waiting, an [`ExecutorStopped`][ropt.exceptions.ExecutorStopped] is raised
+instead.
 
 ## Executors
 
-An [`Executor`][ropt.components.executors.Executor] accepts
-[`Submission`][ropt.components.executors.Submission] objects and dispatches their
-[`WorkItem`][ropt.components.executors.WorkItem] objects to a pool of workers.
-All executors share the same lifecycle:
+An [`Executor`][ropt.components.executors.Executor] runs
+[`WorkItem`][ropt.components.executors.WorkItem] objects on its workers. All
+executors share the same lifecycle:
 
 1. Create the executor instance.
-2. Start it inside an `asyncio.TaskGroup` with `await executor.start(tg)`.
-3. Use it (via `ParallelEvaluator`, or by submitting
-   [`Submission`][ropt.components.executors.Submission] objects directly).
-4. Shut it down with `executor.cancel()` — see
-   [Stopping an executor](#stopping-an-executor) for what that does to work
+2. Use it (via `ParallelEvaluator`, or by calling `run()` directly).
+3. Release its workers with `close()`, or by using it as a context manager —
+   see [Stopping an executor](#stopping-an-executor) for what that does to work
    that is already running.
+
+An executor that is dropped without being closed still releases its workers when
+it is collected: the thread and process pools shut down with the executor, and a
+[`LocalJobExecutor`][ropt.components.executors.LocalJobExecutor] stops its
+teardown thread and removes a temporary directory it created, if nothing is left
+in it. The local case reports a `ResourceWarning`. Python ignores that category
+by default; run with `-W default::ResourceWarning` or `-X dev` to see it.
 
 One rule covers every executor that leaves the process: **out-of-process work
 needs importable, module-level callables.** A work item's function and arguments
@@ -78,10 +79,9 @@ a script you ran, a notebook cell, an interactive session — is different: it
 the worker, which reports the name it could not find. Whether that name resolves
 depends on the worker: `ProcessExecutor` re-imports `__main__`, so a script's
 functions are found again, while the local and HPC executors run a fresh command
-whose `__main__` is ropt's own, so they are not. Installing
-`ropt[cloudpickle]` lifts the restriction for all of them.
-`ThreadExecutor` serializes nothing and is never
-affected.
+whose `__main__` is ropt's own, so they are not. Installing `ropt[cloudpickle]`
+lifts the restriction for all of them. `ThreadExecutor` serializes nothing and
+is never affected.
 
 !!! note "Working directory"
 
@@ -93,41 +93,40 @@ affected.
 !!! note "No event handling across process boundaries"
 
     A work item sent to a `ProcessExecutor`, a `LocalJobExecutor` or an
-    `HPCExecutor` runs in
-    a separate process. If such a work item runs a compute step, that step's
-    event handlers stay in the worker process and cannot deliver events to a
-    handler in the host process — return results as data instead.
+    `HPCExecutor` runs in a separate process. If such a work item runs a compute
+    step, that step's event handlers stay in the worker process and cannot
+    deliver events to a handler in the host process — return results as data
+    instead.
     See [Events are a single-process mechanism](workflows.md#events-are-a-single-process-mechanism).
 
 ### Bundling
 
-A [`Submission`][ropt.components.executors.Submission] carries a `bundle_size`:
-how many of its work items are sent to a worker together, to be run one after
-another there. The default of `1` sends each item on its own, spreading a
-submission as widely as the workers allow; a larger value amortizes the cost of
-a transfer when the items are cheap relative to it; `0` sends a whole submission
-at once. A bundle never spans submissions, so `0` is bounded by the submission.
+A `bundle_size` says how many work items are sent to a worker together, to be
+run one after another there. The default of `1` sends each item on its own,
+spreading a batch as widely as the workers allow; a larger value amortizes the
+cost of a transfer when the items are cheap relative to it; `0` sends a whole
+batch at once. A bundle never spans batches, so `0` is bounded by one `run()`
+call.
 
-The submission is the only place the size is set. An executor takes no
-`bundle_size` of its own, and [`ParallelEvaluator`](#parallelevaluator) passes
-on the size it was given. `ThreadExecutor` ignores it: it has no transfer to
-amortize, and a fixed bundle would keep a thread that finishes early from
-picking up more work.
+It can be set in two places. Every executor takes a `bundle_size` at
+construction, used by any call that does not state one, and
+[`run`][ropt.components.executors.Executor.run] takes one that overrides it for
+that call. [`ParallelEvaluator`](#parallelevaluator) passes on the size it was
+given, or `None` to leave the choice to the executor. Every executor honours it,
+`ThreadExecutor` included: a bundle is one worker task there as well.
 
 Four implementations are provided:
 
 ### ThreadExecutor
 
-[`ThreadExecutor`][ropt.components.executors.ThreadExecutor] owns a
-`ThreadPoolExecutor` of its own and dispatches tasks to it with
-`loop.run_in_executor`. Use this for I/O-bound evaluations or when the
-evaluation function releases the GIL (e.g. calls into C/Fortran).
+[`ThreadExecutor`][ropt.components.executors.ThreadExecutor] owns a private
+`ThreadPoolExecutor` and runs each bundle as a task on it. Use this for I/O-bound
+evaluations or when the evaluation function releases the GIL (e.g. calls into
+C/Fortran).
 
-The pool is private for a reason: `asyncio.to_thread` would use the event loop's
-*shared* default executor, the same one every other `to_thread` call in the
-process draws from — including the one that dispatches each compute step's
-`run()`. Filling it with evaluations would starve the steps waiting on them,
-which is precisely the deadlock
+The thread pool is private for a reason: a shared one would also hold the
+threads that concurrent compute steps block on, and filling it with evaluations
+would starve the steps waiting on them. That is the deadlock
 [`run_concurrent`][ropt.components.concurrency.run_concurrent] exists to avoid.
 
 Threads are not a lesser form of parallelism here. Python runs one thread's
@@ -137,9 +136,10 @@ several optimizations sharing a `ThreadExecutor` genuinely overlap whenever
 their evaluations wait — on a subprocess, a file, a socket — or spend their time
 inside a library that has let the GIL go.
 
-| Parameter    | Description                                       |
-| ------------ | ------------------------------------------------- |
-| `workers`    | Number of concurrent worker threads (default: 1). |
+| Parameter     | Description                                                          |
+| ------------- | -------------------------------------------------------------------- |
+| `workers`     | Number of concurrent worker threads (default: 1).                    |
+| `bundle_size` | Default calls per worker task, `0` for a whole batch (default: 1).   |
 
 ### ProcessExecutor
 
@@ -161,6 +161,7 @@ case.
 | --------------------- | -------------------------------------------------------------- |
 | `workers`             | Number of worker processes (default: 1).                       |
 | `max_tasks_per_child` | Restart workers after this many work items (default: `None` = never). Useful if evaluations leak memory, but adds significant overhead. |
+| `bundle_size`         | Default calls per worker task, `0` for a whole batch (default: 1). |
 
 #### Work item serialization
 
@@ -201,27 +202,26 @@ before the interpreter has finished bootstrapping. Python aborts this, the
 workers never start, and `ProcessExecutor` raises an
 [`ExecutionError`][ropt.exceptions.ExecutionError] at startup.
 
-The fix is to keep the code that creates and runs the executor behind an
+`ProcessExecutor` checks for the guard when it is constructed, so the failure
+arrives at construction rather than at the first evaluation. The fix is to keep
+the code that creates and uses the executor behind an
 `if __name__ == "__main__":` guard (or inside a function called from there):
 
 ```python
-async def main():
-    executor = ProcessExecutor(workers=4)
-    async with asyncio.TaskGroup() as tg:
-        await executor.start(tg)
-        ...  # submit work here
-        executor.cancel()
+def main():
+    with ProcessExecutor(workers=4) as executor:
+        ...  # run work here
 ```
 
 ```python
 # Wrong: run at module top level. Each worker re-imports this and fails.
-asyncio.run(main())
+main()
 ```
 
 ```python
 # Right: the guarded block is skipped during the worker re-import.
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()
 ```
 
 This is the standard "safe importing of main module" contract of Python's
@@ -261,6 +261,7 @@ starts it directly.
 | `interval` | Polling interval in seconds (default: 0.1).                                 |
 | `retries`  | Extra polls to wait for a result (default: 0).                              |
 | `cleanup`  | Whether to remove a work item's files once it settles (default: `True`).    |
+| `bundle_size` | Default calls per job, `0` for a whole batch (default: 1).               |
 
 The defaults differ from the HPC ones for reasons that follow from where the
 jobs run. `interval` is small because a local process is finished the moment it
@@ -269,14 +270,13 @@ exits, so waiting is dead time rather than politeness towards a scheduler.
 there is no shared filesystem that might not have caught up yet.
 
 **Stopping kills the job's whole process group.** Each job is started in a
-session of its own, so `cancel()` reaches whatever the job started itself,
-rather than leaving those orphaned. This needs process groups, so the executor
-is **POSIX only** and refuses to be constructed elsewhere.
+session of its own, so `close()` reaches whatever the job started itself, rather
+than leaving those orphaned. This needs process groups, so the executor is
+**POSIX only** and refuses to be constructed elsewhere.
 
-Waiting for a killed job to actually die happens on a thread of its own, never
-on the event loop: a Ctrl-C that has to wait for cancellation to finish is the
-thing this arrangement avoids. That same thread removes a working directory this
-executor created, once the jobs writing to it are gone.
+Waiting for a killed job to actually die happens on a thread of its own, so
+`close()` returns without waiting it out. That same thread removes a working
+directory this executor created, once the jobs writing to it are gone.
 
 It removes it only when there is nothing left in it to read, though. A work item
 that failed keeps its captured output, and `cleanup=False` keeps everything, so
@@ -284,10 +284,9 @@ in either case the directory is **kept** and its path logged at `WARNING` — a
 temporary directory has a random name, and one that is kept without being named
 is one nobody can find. A directory you passed yourself is never removed.
 
-Each run gets a directory of its own: an executor restarted after keeping one
-creates another, rather than writing into the files of the directory it kept.
-Read [`workdir`][ropt.components.executors.LocalJobExecutor.workdir] for the
-current one.
+Each executor gets a directory of its own, rather than writing into the files of
+a directory another one kept. Read
+[`workdir`][ropt.components.executors.LocalJobExecutor.workdir] for it.
 
 ### HPCExecutor
 
@@ -297,10 +296,10 @@ disk, submitted to the queue, polled for completion, and its result is
 deserialized back. Requires `ropt[hpc]` to be installed. Add `ropt[cloudpickle]`
 to send functions the standard `pickle` module cannot.
 
-Stopping the executor with `cancel()` asks the scheduler to delete every job it
-has submitted, so an interrupted optimization does not leave orphan jobs behind
-consuming the cluster allocation. Cancellation is best effort: if the scheduler
-cannot be reached the failure is logged and stopping continues.
+Closing the executor asks the scheduler to delete every job it has submitted, so
+an interrupted optimization does not leave orphan jobs behind consuming the
+cluster allocation. Cancellation is best effort: if the scheduler cannot be
+reached the failure is logged and closing continues.
 
 | Parameter     | Description                                                              |
 | ------------- | ------------------------------------------------------------------------ |
@@ -425,11 +424,13 @@ cluster, each declaring its own `queue_type`; see the
 
 ## Stopping an executor
 
-`executor.cancel()` stops the executor and returns immediately; it never waits
-for work that is already running. Callers see the same thing whichever executor
-they used — a submission still in progress ends with
-[`ExecutorStopped`][ropt.exceptions.ExecutorStopped]. What differs is what keeps
-running afterwards, because what *can* be done to running work differs:
+`executor.close()` releases the executor's workers and returns immediately; it
+never waits for work that is already running. A caller blocked in `run()` when
+it happens is released with
+[`ExecutorStopped`][ropt.exceptions.ExecutorStopped]; a `run()` started after it
+is refused with a [`WorkflowError`][ropt.exceptions.WorkflowError]. What differs
+per executor is what keeps running afterwards, because what *can* be done to
+running work differs:
 
 | Executor | Work already running | Work not yet started |
 | --- | --- | --- |
@@ -440,11 +441,12 @@ running afterwards, because what *can* be done to running work differs:
 
 **Threads run to completion because a thread cannot be cancelled.** Python
 offers no way to interrupt one from outside, so an evaluation on a
-`ThreadExecutor` stops only when it returns. `cancel()` returns at once,
-but the program cannot leave until those evaluations return — the pool joins its
+`ThreadExecutor` stops only when it returns. `close()` returns at once, but the
+program cannot leave until those evaluations return — the thread pool joins its
 threads at interpreter shutdown. Rather than let that look like a hang, the
-executor logs a `WARNING` naming how many are still running. An evaluation that
-may run long and has to be interruptible belongs on one of the other three.
+executor logs a `WARNING` naming how many are still running. An
+evaluation that may run long and has to be interruptible belongs on one of the
+other three.
 
 **The kill is a `SIGTERM`, and the guarantee is partial.** In each of the other
 three cases the target is *asked* to end and is not waited for, so a process
@@ -453,7 +455,7 @@ call, outlives the request. Stopping is a strong best effort — enough that an
 interrupted program exits instead of waiting for the current batch — not a
 promise that nothing of the run survives it.
 
-!!! warning "A process pool orphans whatever an evaluation launched itself"
+!!! warning "A process executor orphans whatever an evaluation launched itself"
 
     [`ProcessExecutor`][ropt.components.executors.ProcessExecutor] terminates
     its own worker processes and nothing else. It installs no process groups, so
@@ -506,8 +508,8 @@ itself: a worker process is killed (`BrokenProcessPool`), or an HPC job's output
 file never appears or cannot be deserialized. These are delivered as an ordinary
 result whose value is an
 [`ExecutorFailure`][ropt.components.executors.ExecutorFailure]
-(via [`deliver`][ropt.components.executors.Submission.deliver]), which leaves the
-executor running rather than tearing it down.
+rather than raised, which leaves the executor usable rather than tearing it
+down.
 
 The evaluator turns that result into an
 [`ExecutionError`][ropt.exceptions.ExecutionError], naming how many evaluations
@@ -530,10 +532,9 @@ computed over the whole ensemble.
 A *user-code* exception is one raised by the evaluation function itself — a bug
 in the objective, a bad configuration, an unexpected input. This must not be
 silently turned into a failed realization; it signals a genuine error the user
-needs to see and fix. When the work item's function raises, the worker ends the
-submission with the exception (via
-[`fail`][ropt.components.executors.Submission.fail]) and returns to serving
-further work. It does **not** tear the executor down.
+needs to see and fix. When the work item's function raises, the worker abandons
+the rest of that batch, hands the exception to the caller of `run()` and returns
+to serving further work. It does **not** tear the executor down.
 
 The owning
 [`ParallelEvaluator.eval`][ropt.components.evaluators.Evaluator.eval]
@@ -547,16 +548,13 @@ Because the executor keeps running, its lifetime is owned by the **consumer's
 scope**, not by the error:
 
 - Left unhandled, the exception propagates out of the block that owns the
-  executor (for example an `async with asyncio.TaskGroup()` that a compute step
-  runs inside), whose unwinding cancels the workers and stops the executor —
-  "abort everything".
-- Caught before it reaches that block, the executor stays alive and can be
+  executor — a `with` statement on it, for example — whose unwinding closes it.
+- Caught before it reaches that block, the executor stays open and can be
   reused for further evaluations. This is what lets several compute steps share
   one executor and lets a bug in one be isolated from the others.
 
-Only a `BaseException` (for example a cancellation) still propagates out of the
-worker directly, tearing the executor down — that is the intended teardown
-signal and is left untouched.
+A `BaseException` — a `KeyboardInterrupt`, say — travels the same way and
+reaches the caller unwrapped, rather than in a `BaseExceptionGroup`.
 
 For the [`HPCExecutor`][ropt.components.executors.HPCExecutor] the exception
 crosses a process boundary. It is serialized with `cloudpickle` when that is
@@ -573,8 +571,8 @@ affect performance, it determines what a dispatched compute step can still
 *do*. One principle governs the difference.
 
 - A **thread** shares memory with the process that started it. A step's control
-  channels — the event handlers it invokes and the live asyncio loop and
-  executors it relies on — all keep working across threads within one process.
+  channels — the event handlers it invokes and the executors it relies on — all
+  keep working across threads within one process.
 - A **process** — a
   [`ProcessExecutor`][ropt.components.executors.ProcessExecutor]
   worker, a [`LocalJobExecutor`][ropt.components.executors.LocalJobExecutor] job
@@ -614,22 +612,15 @@ for what belongs where.
 
 ## Two rules for using the low-level API
 
-**Run a compute step in a worker thread.** `step.run()` is an ordinary
-synchronous method that runs its evaluator and its handlers **on whatever
-thread called it**. On the event loop thread it blocks the loop, and the
-executors it is waiting for are tasks on that same loop:
-
-```python
-# Wrong: run() executes here, on the loop thread.
-step.run(context=context, variables=x0)
-
-# Right: the loop stays free to service the workers.
-await asyncio.to_thread(step.run, context=context, variables=x0)
-```
-
-`ropt.simple` already does this for you; it applies when driving compute steps
-yourself. A step that dispatches to an executor detects the mistake and raises
-[`WorkflowError`][ropt.exceptions.WorkflowError] instead of hanging.
+**Do not submit to an executor from one of its own workers.** A step running on
+a [`ThreadExecutor`][ropt.components.executors.ThreadExecutor] worker occupies
+that worker for as long as it waits, so work it submits to the same executor can
+only start once it stops waiting — with one worker that is a deadlock, and with
+several it is one whenever the waiting steps outnumber the free workers. `run()`
+detects the caller and raises
+[`WorkflowError`][ropt.exceptions.WorkflowError] instead of hanging. Give the
+inner work an executor of its own; see
+[Two executors, not one](../running/nested.md#two-executors-not-one).
 
 **Do not run a compute step from inside a handler that the step can reach.** A
 handler holds its own lock while `_handle_event` runs, so a step started there
@@ -640,10 +631,9 @@ that is attached to the same handler re-enters it. See
 
 A *nested* workflow is a compute step whose evaluation function itself runs
 another compute step — for example an outer optimizer whose objective is the
-outcome of an inner optimization. As noted in [Why asyncio?](#why-asyncio),
-several concurrent steps can share one asyncio event loop, and usually shared
-[`Executor`][ropt.components.executors.Executor]s and event handlers as well.
-All of these live **in a single process**.
+outcome of an inner optimization. Several concurrent steps usually share
+[`Executor`][ropt.components.executors.Executor]s and event handlers, all of
+which live **in a single process**.
 
 This is a consequence of the general rule that
 [events are a single-process mechanism](workflows.md#events-are-a-single-process-mechanism):
@@ -651,17 +641,14 @@ it places a hard constraint on where each layer of a nested workflow may run:
 
 !!! warning "The enclosing layer of a nested workflow must run in-process"
 
-    The step that *runs* an inner workflow must execute in the same process as
-    the shared event loop — dispatch it via a
+    The step that *runs* an inner workflow must execute in the host process —
+    dispatch it via a
     [`ThreadExecutor`][ropt.components.executors.ThreadExecutor], or run it
     synchronously. It cannot run inside a
     [`ProcessExecutor`][ropt.components.executors.ProcessExecutor]
     or [`HPCExecutor`][ropt.components.executors.HPCExecutor] worker, because a
-    subprocess or HPC job has no access to the live loop or executors. An inner
-    [`ParallelEvaluator`][ropt.components.evaluators.ParallelEvaluator] running
-    there would find its executor not running and raise
-    [`ExecutorStopped`][ropt.exceptions.ExecutorStopped], and any events
-    it emits would never reach the main-process handlers.
+    subprocess or HPC job has no access to the host process's executors, and any
+    events it emits would never reach the main-process handlers.
 
 [`OptimizationStep`][ropt.components.compute_steps.OptimizationStep] enforces this
 rule: a step is **bound to its process, not to the thread that created it**. The
@@ -670,10 +657,11 @@ created." Concretely:
 
 - **Across threads (allowed).** A step may be created on one thread and run on
   another within the same process — for example created on the main thread and
-  driven with `asyncio.to_thread` or a
-  [`ThreadExecutor`][ropt.components.executors.ThreadExecutor] while handlers
-  created on the main thread collect its events. Event handling keeps working
-  because memory is shared.
+  driven on a thread started by
+  [`run_concurrent`][ropt.components.concurrency.run_concurrent] or on a
+  [`ThreadExecutor`][ropt.components.executors.ThreadExecutor] worker, while
+  handlers created on the main thread collect its events. Event handling keeps
+  working because memory is shared.
 - **Across processes (forbidden).** A step must not be *transferred* into a
   [`ProcessExecutor`][ropt.components.executors.ProcessExecutor]
   or [`HPCExecutor`][ropt.components.executors.HPCExecutor] worker. A step owns a

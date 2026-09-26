@@ -14,10 +14,9 @@ evaluators and executors its convenience functions are assembled from, exposed
 directly. Everything those functions do is available here, along with the cases
 they cannot express; the cost is that you wire it together yourself.
 
-These pages assume `asyncio` and threads. Parallel execution runs on an event
-loop and event handlers may be invoked from several threads at once, so the
-concurrency and process-boundary rules stated here are binding: breaking one
-raises rather than misbehaving silently.
+These pages assume threads. Event handlers may be invoked from several threads
+at once, so the concurrency and process-boundary rules stated here are binding:
+breaking one raises rather than misbehaving silently.
 
 There are four core workflow components:
 

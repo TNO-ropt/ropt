@@ -55,7 +55,7 @@ class HPCExecutor(JobExecutorBase):
     """
 
     _kind = "HPC"
-    _backend = "HPC scheduler"
+    _backend_name = "HPC scheduler"
 
     def __init__(  # ruff: ignore[too-many-arguments]
         self,
@@ -75,6 +75,7 @@ class HPCExecutor(JobExecutorBase):
         retries: int = 30,
         query_retries: int = 30,
         cleanup: bool = True,
+        bundle_size: int = 1,
     ) -> None:
         """Initialize the HPC executor.
 
@@ -128,6 +129,7 @@ class HPCExecutor(JobExecutorBase):
             retries:        Extra polls to wait for a work item's result.
             query_retries:  Extra attempts to query the scheduler after one fails.
             cleanup:        Whether to remove a work item's files once it settles.
+            bundle_size:    Calls per job, `0` for a whole batch.
 
         Raises:
             ValueError:     If an argument is out of range or the modes are mixed.
@@ -145,19 +147,21 @@ class HPCExecutor(JobExecutorBase):
                 f"The number of HPC query retries must not be negative: {query_retries}"
             )
             raise ValueError(msg)
+        # Set before the base builds its shared state, which reads it.
+        self._query_retries = query_retries
         super().__init__(
             workdir=workdir,
             workers=workers,
             interval=interval,
             retries=retries,
             cleanup=cleanup,
+            bundle_size=bundle_size,
         )
         self._queue = queue
         self._cores = cores
         self._memory_max = memory_max
         self._run_time_max = run_time_max
         self._submit_options = _checked_submit_options(submit_options)
-        self._query_retries = query_retries
 
         self._template = template
         if template is None:

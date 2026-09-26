@@ -33,14 +33,13 @@ def test_example_workflow(tmp_path: Path, monkeypatch: Any, merge: Any) -> None:
 
 
 @pytest.mark.slow
-@pytest.mark.asyncio
 @pytest.mark.parametrize("multiprocessing", [True, False])
-async def test_example_parallel_evaluator(
+def test_example_parallel_evaluator(
     tmp_path: Path, monkeypatch: Any, multiprocessing: Any
 ) -> None:
     monkeypatch.chdir(tmp_path)
     module = _load_from_file("parallel_evaluator")
-    await module.main(multiprocessing=multiprocessing)
+    module.main(multiprocessing=multiprocessing)
 
 
 @pytest.mark.slow

@@ -6,30 +6,38 @@ and an `<id>.out` file it writes, with `<id>.txt` for whatever it printed. The
 job runs `ropt.components.executors` as a module, with the interpreter that
 started it, which is the one `ropt` is installed in.
 
-So there is nothing to await, only a backend to ask. One thread does all the
-blocking work — starting jobs and asking after them — while the async worker
-loop alternates between handing it work and waiting for more. A job that
-disappeared without leaving a readable result is retried a bounded number of
-times, because a shared filesystem may take a while to show it.
+So there is nothing to await, only a backend to ask, and asking blocks. The
+executor owns no thread for it. Every caller blocked in `run` loops over two
+steps: take the results that are ready for it, or else claim the backend and
+launch the queued jobs and collect the finished ones on everyone's behalf. Only
+one caller holds the backend at a time, which is what keeps launching jobs and
+asking after them in one order.
 
-Two threads reach the backend, and which one matters. `_start_job` and
-`_live_job_ids` run on the single poll thread, one after the other. `_cancel_job`
-runs on the loop thread, because `_cleanup` does. Anything kept between those
-calls is therefore shared by two threads and needs its own lock: `_jobs_closed`
-is this module's instance of that problem, and a subclass that keeps state of
-its own has the same obligation.
+Three things carry that. `_Results` is a plain list, one per `run` call, where
+whichever caller collected a result leaves it for the call waiting on it.
+`_State` is the bookkeeping they all share, and the only thing its lock guards.
+`_StateUpdate` is what one caller changed while the backend was its own: filled
+with no lock held, then merged by `apply_update`. That merge is not an
+overwrite, because the others change the state meanwhile, so each entry is
+written only if it is still wanted.
+
+The lock is never held across a backend call or across user code. Cancelling a
+job is the one backend call that may run while another caller holds the backend:
+making it wait would put a cancellation behind a status query, which is what a
+caller pressing Ctrl-C is waiting for.
 """
 
 from __future__ import annotations
 
-import asyncio
 import contextlib
 import os
 import sys
 import tempfile
 import threading
+import time
 from abc import abstractmethod
-from concurrent.futures import ThreadPoolExecutor
+from collections import deque
+from dataclasses import dataclass, field
 from pathlib import Path
 from pickle import UnpicklingError  # ruff: ignore[suspicious-pickle-import]
 from typing import TYPE_CHECKING, Any, Final
@@ -42,13 +50,14 @@ from ropt.exceptions import ExecutionError
 from .base import (
     ExecutorBase,
     ExecutorFailure,
-    Submission,
     WorkItem,
     _calls,
     _run_bundle,
+    _stopped,
 )
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
     from uuid import UUID
 
 _logger = get_logger(__name__)
@@ -56,9 +65,254 @@ _logger = get_logger(__name__)
 # How much of a failed job's captured output travels with its failure.
 _OUTPUT_TAIL_LINES: Final = 20
 
-# Returned for a work item that has not settled: its result is either not there
-# yet, or not whole yet with budget left to wait for the rest of it.
-_PENDING: Final = object()
+# Returned for a work item whose result is not there yet, or not whole yet.
+_NOT_READY: Final = object()
+
+# One `run` call's finished results, each with the position it was asked for.
+# The list object also identifies the call: whichever caller collects a result
+# appends to it, and the call itself empties it.
+_Results = list[tuple[int, Any]]
+
+
+@dataclass
+class _StateUpdate:
+    # What one caller changed while the backend was its own. Every field names
+    # the shared state it feeds. It is filled with no lock held, so that the
+    # slow work does not block anyone, and merged by `apply_update`.
+    jobs_to_launch: list[tuple[UUID, _Results, int, list[WorkItem]]] = field(
+        default_factory=list
+    )
+    launched_jobs: dict[UUID, int] = field(default_factory=dict)
+    results: dict[UUID, Any] = field(default_factory=dict)
+    retries: set[UUID] = field(default_factory=set)
+    queried: bool = False
+    query_error: BaseException | None = None
+    # Why the caller stopped early, used as the reason for whatever it was
+    # given to launch but never did.
+    error: BaseException | None = None
+
+
+class _State:
+    # The bookkeeping every caller shares, and the only thing the lock guards.
+    # Nothing outside this class touches it: a caller claims the backend, works
+    # with no lock held, and hands back an `_StateUpdate` to be merged.
+    #
+    # The merge cannot be a wholesale overwrite, because other callers change
+    # this state meanwhile: one may leave, or queue new work, or close the
+    # executor. So every entry is written only if it is still wanted.
+
+    def __init__(
+        self, *, workers: int, interval: float, query_retries: int, backend_name: str
+    ) -> None:
+        self._workers = workers
+        self._interval = interval
+        self._query_retries = query_retries
+        self._backend_name = backend_name
+        self._lock = threading.Lock()
+        self._condition = threading.Condition(self._lock)
+        self._closed = False
+        self._queue: deque[tuple[_Results, int, list[WorkItem]]] = deque()
+        self._active: dict[UUID, tuple[_Results, int]] = {}
+        self._jobs: dict[UUID, int] = {}
+        self._retries: dict[UUID, int] = {}
+        self._last_query = time.monotonic() - interval
+        self._query_failures = 0
+        self._backend_busy = False
+        self._output_kept = False
+
+    @property
+    def output_kept(self) -> bool:
+        # A subclass that owns its working directory needs to know: removing it
+        # would take the kept output with it.
+        with self._lock:
+            return self._output_kept
+
+    def close(self) -> None:
+        with self._condition:
+            self._closed = True
+            self._condition.notify_all()
+
+    def clear(self) -> list[tuple[UUID, int]]:
+        with self._lock:
+            jobs = list(self._jobs.items())
+            self._jobs.clear()
+            self._active.clear()
+            self._retries.clear()
+            self._queue.clear()
+            return jobs
+
+    def queue(self, results: _Results, bundles: list[list[WorkItem]]) -> None:
+        with self._condition:
+            self._check_open()
+            for index, bundle in enumerate(bundles):
+                self._queue.append((results, index, bundle))
+            self._condition.notify_all()
+
+    def pop_results(self, results: _Results) -> _Results:
+        # Emptied in place, because whichever caller has the backend holds this
+        # same list. Handed over before the caller stores them, so user code
+        # that raises does not do so under the lock.
+        with self._lock:
+            self._check_open()
+            ready = list(results)
+            results.clear()
+            return ready
+
+    def claim_backend(
+        self, results: _Results, update: _StateUpdate
+    ) -> tuple[bool, bool]:
+        # Returns whether the backend is now this caller's, and whether it
+        # should ask which jobs have finished.
+        with self._condition:
+            self._check_open()
+            # Re-checked under the acquisition that does the waiting: a result
+            # arriving between the two would otherwise be slept through.
+            if results:
+                return False, False
+            if self._backend_busy:
+                # Everything that could release this caller notifies, so unlike
+                # the wait below this one needs no timeout.
+                self._condition.wait()
+                return False, False
+            self._pick_jobs_to_launch(update)
+            waited = time.monotonic() - self._last_query
+            if not update.jobs_to_launch and waited < self._interval:
+                self._condition.wait(self._interval - waited)
+                return False, False
+            # Eager while the backend is answering, which is the rate without
+            # this check; paced by the interval once a query has failed, so the
+            # query budget spans the grace period it names.
+            query_due = waited >= self._interval or self._query_failures == 0
+            self._backend_busy = True
+            return True, query_due
+
+    def jobs_to_check(self) -> list[tuple[UUID, int, int]]:
+        # Jobs launched by earlier claims, with the polls each has already been
+        # given. What this caller just launched is still in its update, so it
+        # never asks after a job that cannot have finished.
+        with self._lock:
+            return [
+                (item_id, job_id, self._retries.get(item_id, 0))
+                for item_id, job_id in self._jobs.items()
+            ]
+
+    def apply_update(
+        self, update: _StateUpdate, *, release_backend: bool
+    ) -> list[tuple[UUID, int]]:
+        with self._condition:
+            if release_backend:
+                self._backend_busy = False
+            cancel: list[tuple[UUID, int]] = []
+            for item_id, job_id in update.launched_jobs.items():
+                if item_id in self._active and not self._closed:
+                    self._jobs[item_id] = job_id
+                else:
+                    # Its run left, or the executor closed, while it was being
+                    # launched: nobody is waiting for it now.
+                    cancel.append((item_id, job_id))
+            for item_id, result in update.results.items():
+                if item_id in self._active:
+                    self._complete(item_id, result)
+                    self._output_kept |= isinstance(result, ExecutorFailure)
+            for item_id in update.retries:
+                if item_id in self._active:
+                    self._retries[item_id] = self._retries.get(item_id, 0) + 1
+            if update.queried:
+                self._last_query = time.monotonic()
+                self._note_query(update.query_error)
+            self._fail_unlaunched(update)
+            self._condition.notify_all()
+            return cancel
+
+    def drop(self, results: _Results) -> list[tuple[UUID, int]]:
+        # A run leaving is the only thing that takes its work out of here, so
+        # nothing can write into its list afterwards.
+        with self._condition:
+            results.clear()
+            self._queue = deque(
+                entry for entry in self._queue if entry[0] is not results
+            )
+            jobs: list[tuple[UUID, int]] = []
+            for item_id in [
+                item_id
+                for item_id, (item_results, _) in self._active.items()
+                if item_results is results
+            ]:
+                del self._active[item_id]
+                self._retries.pop(item_id, None)
+                job_id = self._jobs.pop(item_id, None)
+                if job_id is not None:
+                    jobs.append((item_id, job_id))
+            self._condition.notify_all()
+            return jobs
+
+    def _check_open(self) -> None:
+        if self._closed:
+            raise _stopped()
+
+    def _pick_jobs_to_launch(self, update: _StateUpdate) -> None:
+        # `_active` holds the work that is out, so `workers` caps how many run
+        # at once, and the slot must be claimed before the job exists. The
+        # update records them, so work that never starts can still be failed
+        # back to the run waiting for it.
+        while len(self._active) < self._workers and self._queue:
+            results, index, bundle = self._queue.popleft()
+            # The id is the stem of the files this job reads and writes.
+            item_id = uuid4()
+            update.jobs_to_launch.append((item_id, results, index, bundle))
+            self._active[item_id] = (results, index)
+
+    def _complete(self, item_id: UUID, result: Any) -> None:  # ruff: ignore[any-type]
+        results, index = self._active.pop(item_id)
+        self._jobs.pop(item_id, None)
+        self._retries.pop(item_id, None)
+        results.append((index, result))
+
+    def _fail_unlaunched(self, update: _StateUpdate) -> None:
+        # Given a slot but never launched: the caller stopped on close, or
+        # raised before reaching them.
+        reason = (
+            "the executor was closed" if update.error is None else f"{update.error}"
+        )
+        for item_id, _results, _index, _bundle in update.jobs_to_launch:
+            if item_id in update.launched_jobs or item_id in update.results:
+                continue
+            if item_id not in self._active:
+                continue
+            self._complete(
+                item_id, ExecutorFailure(f"The work item was not run: {reason}")
+            )
+
+    def _note_query(self, error: BaseException | None) -> None:
+        if error is None:
+            self._query_failures = 0
+            return
+        # Only a run of failures is fatal where a backend can have a bad moment:
+        # giving up at the first would end runs it is still working on. Once the
+        # run is long enough, every job that is out fails, because nothing can
+        # be said about a job that cannot be asked after.
+        self._query_failures += 1
+        _logger.warning(
+            "Querying the %s failed (%d/%d): %s",
+            self._backend_name,
+            self._query_failures,
+            self._query_retries + 1,
+            error,
+        )
+        if self._query_failures <= self._query_retries:
+            return
+        msg = (
+            f"The {self._backend_name} could not be queried after "
+            f"{self._query_retries + 1} attempts: {error}"
+        )
+        outstanding = list(self._active)
+        for item_id in outstanding:
+            self._complete(item_id, ExecutorFailure(msg))
+        if outstanding:
+            # These never reach the cleanup in `_collect_finished`, so their
+            # output survives here too.
+            self._output_kept = True
+        self._query_failures = 0
 
 
 class JobExecutorBase(ExecutorBase):
@@ -66,19 +320,19 @@ class JobExecutorBase(ExecutorBase):
 
     Subclasses decide what a job is: how one is started, how to tell which are
     still running, and how to cancel one. Everything between those three
-    answers — the file layout, the poll loop, the worker cap, cancellation on
-    shutdown — lives here.
+    answers — the file layout, the worker cap, starting and collecting,
+    cancellation — lives here.
     """
 
     # Names this kind of job in log messages, and the thing that runs them.
     _kind = "job"
-    _backend = "backend"
+    _backend_name = "backend"
 
     # Extra attempts to query the backend after one fails. A backend that can
     # have a bad moment raises this; one that cannot has nothing to wait for.
     _query_retries = 0
 
-    def __init__(
+    def __init__(  # ruff: ignore[too-many-arguments]
         self,
         *,
         workdir: Path,
@@ -86,6 +340,7 @@ class JobExecutorBase(ExecutorBase):
         interval: float,
         retries: int,
         cleanup: bool,
+        bundle_size: int = 1,
     ) -> None:
         """Initialize the shared state.
 
@@ -93,16 +348,17 @@ class JobExecutorBase(ExecutorBase):
         job may read and write is the one thing they do not agree on.
 
         Args:
-            workers:  Maximum number of jobs running at once.
-            workdir:  Directory holding each work item's files.
-            interval: Polling interval in seconds.
-            retries:  Extra polls to wait for a result after the first attempt.
-            cleanup:  Whether to remove work item files once they are done with.
+            workdir:     Directory holding each work item's files.
+            workers:     Maximum number of jobs running at once.
+            interval:    Polling interval in seconds.
+            retries:     Extra polls to wait for a result after the first attempt.
+            cleanup:     Whether to remove work item files once they are done with.
+            bundle_size: Calls per job, `0` for a whole batch.
 
         Raises:
             ValueError: If `workers`, `interval` or `retries` is out of range.
         """
-        super().__init__()
+        super().__init__(bundle_size=bundle_size)
         if workers < 1:
             msg = f"The number of workers must be at least one: {workers}"
             raise ValueError(msg)
@@ -113,212 +369,169 @@ class JobExecutorBase(ExecutorBase):
             msg = f"The number of retries must not be negative: {retries}"
             raise ValueError(msg)
         self._workdir = workdir
-        self._workers = workers
-        self._interval = interval
         self._retries_limit = retries
         self._remove_files = cleanup
-        self._worker_task: asyncio.Task[None] | None = None
-        self._pool: ThreadPoolExecutor | None = None
-
-        self._items: dict[UUID, tuple[Submission, list[WorkItem]]] = {}
-        self._jobs: dict[UUID, int] = {}
-        self._retries: dict[UUID, int] = {}
-        # The started jobs are reached from the poll thread and from cleanup on
-        # the loop thread; `_jobs_closed` closes the door between them, so a job
-        # cannot be started after cleanup has passed it by.
-        self._jobs_lock = threading.Lock()
-        self._jobs_closed = False
-        self._work_arrived = asyncio.Event()
-        self._query_failures = 0
-        # Set once a work item's captured output has been kept for the user to
-        # read. A subclass that owns its working directory needs to know, since
-        # removing the directory would take that output with it.
-        self._output_kept = False
+        self._state = _State(
+            workers=workers,
+            interval=interval,
+            query_retries=self._query_retries,
+            backend_name=self._backend_name,
+        )
+        _logger.info(
+            "Started %s executor (%d max workers, %.2fs poll interval)",
+            self._kind,
+            workers,
+            interval,
+        )
 
     @abstractmethod
     def _start_job(self, item_id: UUID, command: list[str]) -> int:
-        # On the poll thread. The job's output belongs in `<item_id>.txt` in the
-        # working directory: the only record of a job that died before writing a
-        # result. Returns an id that `_live_job_ids` and `_cancel_job` accept.
+        # On the caller that has claimed the backend. The job's output belongs
+        # in `<item_id>.txt` in the working directory: the only record of a job
+        # that died before writing a result. Returns an id that `_live_job_ids`
+        # and `_cancel_job` accept.
         ...
 
     @abstractmethod
     def _live_job_ids(self) -> set[int]:
-        # On the poll thread. An absent id means the job ended, however it
-        # ended; what became of it is read from its result file.
+        # On the caller that has claimed the backend. An absent id means the
+        # job ended, however it ended; what became of it is read from its result
+        # file.
         ...
 
     @abstractmethod
     def _cancel_job(self, job_id: int) -> None:
-        # On the loop thread, so it must not wait for the job to die: a Ctrl-C
-        # that waits for cancellation to finish is what this design avoids.
+        # On a departing caller's own thread, so it must not wait for the job to
+        # die: a Ctrl-C that waits for cancellation to finish is what this
+        # design avoids. It may run while another caller has claimed the
+        # backend, so a subclass keeping state of its own needs a lock for it.
         ...
 
-    async def start(self, task_group: asyncio.TaskGroup) -> None:
-        """Start the executor.
+    def _on_close(self) -> None:
+        self._state.close()
 
-        Args:
-            task_group: The task group to use.
-        """
-        self._begin_start()
-        self._work_arrived = asyncio.Event()
-        with self._jobs_lock:
-            self._jobs_closed = False
-        # A new run answers this question again from scratch; the previous run's
-        # verdict says nothing about the files this one will write.
-        self._output_kept = False
-        # A single thread, because it is the only one that talks to the backend:
-        # starting and polling stay in one order, and off the loop thread.
-        self._pool = ThreadPoolExecutor(
-            max_workers=1, thread_name_prefix="ropt-job-poll"
-        )
-        self._worker_task = task_group.create_task(self._worker(self._pool))
-        _logger.info(
-            "Starting %s executor (%d max workers, %.2fs poll interval)",
-            self._kind,
-            self._workers,
-            self._interval,
-        )
-        await self._finish_start(task_group)
+    def _release(self) -> None:
+        self._cancel_jobs(self._state.clear())
 
-    async def _worker(self, pool: ThreadPoolExecutor) -> None:
-        # Every backend call blocks, so the whole start-and-poll round trip is
-        # handed to the single poll thread; this loop only decides when.
-        loop = asyncio.get_running_loop()
-        while self._running.is_set():
-            pending = self._take_work_items()
-            if self._items:
-                results = await loop.run_in_executor(
-                    pool, self._run_work_items, pending
-                )
-                self._deliver_results(results)
-            await self._wait_for_work()
-
-    async def _wait_for_work(self) -> None:
-        self._work_arrived.clear()
-        # There is room and work waiting: go round again without pausing.
-        if len(self._items) < self._workers and not self._work_queue.empty():
-            return
-        # Poll while jobs are out, but wait indefinitely when there is nothing
-        # to poll for, so an idle executor costs nothing.
-        idle = not self._items and self._work_queue.empty()
-        timeout = None if idle else self._interval
-        with contextlib.suppress(TimeoutError):
-            await asyncio.wait_for(self._work_arrived.wait(), timeout)
-
-    def _accept(self, submission: Submission) -> None:
-        super()._accept(submission)
-        self._work_arrived.set()
-
-    def _take_work_items(self) -> list[tuple[UUID, list[WorkItem]]]:
-        # Takes no more than there is room for: `_items` holds the jobs that are
-        # out, so `workers` caps how many run at once.
-        pending: list[tuple[UUID, list[WorkItem]]] = []
-        while len(self._items) < self._workers:
-            try:
-                submission, bundle = self._work_queue.get_nowait()
-            except asyncio.QueueEmpty:
-                break
-            if submission.is_finished:
-                # Its caller has already left, so this would be a job whose
-                # result nobody reads.
-                continue
-            # The id is the stem of the files this job reads and writes.
-            item_id = uuid4()
-            self._items[item_id] = (submission, bundle)
-            pending.append((item_id, bundle))
-        return pending
-
-    def _deliver_results(self, results: dict[UUID, Any]) -> None:
-        for item_id, result in results.items():
-            entry = self._items.pop(item_id, None)
-            if entry is None:
-                continue
-            submission, bundle = entry
-            if isinstance(result, Exception):
-                # Deliver to the evaluator; keep the executor alive (no raise).
-                self._fail(submission, result)
-            elif isinstance(result, ExecutorFailure):
-                for work_item in bundle:
-                    self._deliver(submission, work_item, result)
-            else:
-                self._deliver_bundle(submission, bundle, result)
-
-    def _deliver_bundle(
+    def _run_bundles(
         self,
-        submission: Submission,
-        bundle: list[WorkItem],
-        result: Any,  # ruff: ignore[any-type]
+        bundles: list[list[WorkItem]],
+        store: Callable[[int, Any], None],
     ) -> None:
-        if not isinstance(result, list) or len(result) != len(bundle):
-            failure = ExecutorFailure(
-                f"A job returned a result that does not match its {len(bundle)} "
-                "work item(s)."
-            )
-            for work_item in bundle:
-                self._deliver(submission, work_item, failure)
-            return
-        for work_item, value in zip(bundle, result, strict=True):
-            self._deliver(submission, work_item, value)
-
-    def _cleanup(self) -> None:
-        """Clean up the executor resources."""
-        if self._pool is not None:
-            self._pool.shutdown(wait=False, cancel_futures=True)
-            self._pool = None
-        if self._worker_task is not None and not self._worker_task.done():
-            self._worker_task.cancel()
-        self._worker_task = None
-        self._cancel_jobs()
-        self._items.clear()
-        self._cleanup_submissions()
-
-    def _cancel_jobs(self) -> None:
-        with self._jobs_lock:
-            self._jobs_closed = True
-            jobs = dict(self._jobs)
-            self._jobs.clear()
-        for item_id, job_id in jobs.items():
-            self._delete_job(item_id, job_id)
-
-    def _delete_job(self, item_id: UUID, job_id: int) -> None:
+        results: _Results = []
         try:
-            self._cancel_job(job_id)
-        except Exception as exc:  # ruff: ignore[blind-except]
-            _logger.warning(
-                "Could not cancel %s job %s (job id: %s): %s",
-                self._kind,
-                item_id,
-                job_id,
-                exc,
-            )
-        else:
-            _logger.debug(
-                "Cancelled %s job %s (job id: %s)", self._kind, item_id, job_id
-            )
-        self._retries.pop(item_id, None)
-        if self._remove_files:
-            self._cleanup_files(item_id)
+            self._state.queue(results, bundles)
+            remaining = len(bundles)
+            while remaining > 0:
+                ready = self._state.pop_results(results)
+                if ready:
+                    remaining -= len(ready)
+                    for index, result in ready:
+                        if isinstance(result, BaseException):
+                            raise result
+                        store(index, result)
+                else:
+                    self._launch_and_collect(results)
+        finally:
+            self._cancel_jobs(self._state.drop(results))
 
-    def _run_work_items(
-        self, pending: list[tuple[UUID, list[WorkItem]]]
-    ) -> dict[UUID, Any]:
-        # Runs on the poll thread: start what was taken, then ask the backend
-        # about everything that is out.
-        results: dict[UUID, Any] = {}
-        for item_id, bundle in pending:
+    def _launch_and_collect(self, results: _Results) -> None:
+        # Launch the queued jobs and collect the finished ones, for every caller
+        # at once. Only one caller does this at a time; the rest wait here.
+        update = _StateUpdate()
+        claimed = False
+        try:
+            claimed, query_due = self._state.claim_backend(results, update)
+            if claimed:
+                self._launch_jobs(update)
+                if query_due:
+                    self._collect_finished(update)
+        except BaseException as exc:
+            update.error = exc
+            raise
+        finally:
+            # Work may have been given a slot without the backend being
+            # claimed, and the runs waiting for it must still be released.
+            if claimed or update.jobs_to_launch:
+                self._cancel_jobs(
+                    self._state.apply_update(update, release_backend=claimed)
+                )
+
+    def _launch_jobs(self, update: _StateUpdate) -> None:
+        for item_id, _results, _index, bundle in update.jobs_to_launch:
+            if self.closed:
+                # `apply_update` fails what is left back to its callers.
+                break
             try:
-                if not self._submit(item_id, bundle):
-                    # Shutting down: leave the rest, cleanup releases them.
-                    return results
+                update.launched_jobs[item_id] = self._launch_job(item_id, bundle)
             except Exception as exc:  # ruff: ignore[blind-except]
-                results[item_id] = exc
-        return results | self._poll()
+                update.results[item_id] = exc
 
-    def _submit(self, item_id: UUID, bundle: list[WorkItem]) -> bool:
-        with self._jobs_lock:
-            if self._jobs_closed:
-                return False
+    def _collect_finished(self, update: _StateUpdate) -> None:
+        update.queried = True
+        try:
+            live = self._live_job_ids()
+        except Exception as exc:  # ruff: ignore[blind-except]
+            # A backend that cannot be reached looks exactly like "nothing has
+            # finished", so failed queries are acted on rather than ignored.
+            update.query_error = exc
+            return
+        for item_id, job_id, retries_used in self._state.jobs_to_check():
+            # Gone from the backend is the only sign that a job has ended; what
+            # became of it has to be read from its output file.
+            if job_id in live:
+                continue
+            result = self._read_result(item_id, retries_used)
+            if result is _NOT_READY:
+                update.retries.add(item_id)
+                continue
+            update.results[item_id] = result
+            if self._remove_files:
+                self._cleanup_files(
+                    item_id, keep_output=isinstance(result, ExecutorFailure)
+                )
+
+    def _cancel_jobs(self, jobs: list[tuple[UUID, int]]) -> None:
+        if not jobs:
+            return
+        # On a thread of its own, joined: cancelling is one backend call per
+        # job, and this runs on a thread that may have been interrupted. A
+        # second interrupt then breaks the join rather than the cancelling, and
+        # the thread is not a daemon, so the interpreter still waits for it.
+        thread = threading.Thread(
+            target=self._cancel_jobs_now,
+            args=(jobs,),
+            name=f"ropt-{self._kind}-cancel",
+            daemon=False,
+        )
+        try:
+            thread.start()
+        except RuntimeError:
+            # No new threads at interpreter shutdown.
+            self._cancel_jobs_now(jobs)
+            return
+        thread.join()
+
+    def _cancel_jobs_now(self, jobs: list[tuple[UUID, int]]) -> None:
+        for item_id, job_id in jobs:
+            try:
+                self._cancel_job(job_id)
+            except Exception as exc:  # ruff: ignore[blind-except]
+                _logger.warning(
+                    "Could not cancel %s job %s (job id: %s): %s",
+                    self._kind,
+                    item_id,
+                    job_id,
+                    exc,
+                )
+            else:
+                _logger.debug(
+                    "Cancelled %s job %s (job id: %s)", self._kind, item_id, job_id
+                )
+            if self._remove_files:
+                self._cleanup_files(item_id)
+
+    def _launch_job(self, item_id: UUID, bundle: list[WorkItem]) -> int:
         existing = any(
             (self._workdir / f"{item_id}{suffix}").exists()
             for suffix in (".in", ".out", ".txt")
@@ -346,17 +559,8 @@ class JobExecutorBase(ExecutorBase):
             if self._remove_files:
                 self._cleanup_files(item_id)
             raise
-        with self._jobs_lock:
-            stopped = self._jobs_closed
-            if not stopped:
-                self._jobs[item_id] = job_id
-        if stopped:
-            # Cleanup ran while this job was being started, so it never made the
-            # list it would have been cancelled from: cancel it here.
-            self._delete_job(item_id, job_id)
-            return False
         _logger.debug("Started %s job %s (job id: %s)", self._kind, item_id, job_id)
-        return True
+        return job_id
 
     def _write_input(
         self, item_id: UUID, input_file: Path, bundle: list[WorkItem]
@@ -382,42 +586,17 @@ class JobExecutorBase(ExecutorBase):
             tmp_path.unlink(missing_ok=True)
             raise
 
-    def _poll(self) -> dict[UUID, Any]:
-        results: dict[UUID, Any] = {}
-        try:
-            jobs = self._live_job_ids()
-        except Exception as exc:  # ruff: ignore[blind-except]
-            # A backend that cannot be reached looks exactly like "nothing has
-            # finished", so failed queries are acted on rather than ignored.
-            return self._handle_query_failure(exc)
-        self._query_failures = 0
-        with self._jobs_lock:
-            submitted = dict(self._jobs)
-        for item_id, job_id in submitted.items():
-            # Gone from the backend is the only sign that a job has ended; what
-            # became of it has to be read from its output file.
-            if job_id in jobs:
-                continue
-            result = self._read_result(item_id)
-            if result is not _PENDING:
-                results[item_id] = result
-        if self._remove_files:
-            for item_id, result in results.items():
-                self._cleanup_files(
-                    item_id, keep_output=isinstance(result, ExecutorFailure)
-                )
-        return results
-
-    def _read_result(self, item_id: UUID) -> Any:  # ruff: ignore[any-type]
+    def _read_result(self, item_id: UUID, retries_used: int) -> Any:  # ruff: ignore[any-type]
         output_file = self._workdir / f"{item_id}.out"
         try:
             with output_file.open("rb") as fp:
-                result = load(fp)
+                return load(fp)
         except FileNotFoundError:
             # The file may simply not be visible yet, so give the filesystem a
             # bounded number of further polls to show it.
             return self._retry_or_fail(
                 item_id,
+                retries_used,
                 f"Output file for work item {item_id} never appeared",
                 "output file never appeared",
             )
@@ -426,7 +605,9 @@ class JobExecutorBase(ExecutorBase):
             # like: retried on the same budget before giving up.
             return self._retry_or_fail(
                 item_id,
-                f"No valid result for work item {item_id} after {self._retries_limit} retries",
+                retries_used,
+                f"No valid result for work item {item_id} after "
+                f"{self._retries_limit} retries",
                 f"no valid result after {self._retries_limit} retries",
             )
         except (ImportError, AttributeError) as exc:
@@ -439,37 +620,29 @@ class JobExecutorBase(ExecutorBase):
                 f"{exc}. This process must be able to import whatever the job "
                 "returned."
             )
-            return self._fail_item(item_id, msg, exc)
+            return self._failure_for(item_id, msg, exc)
         except Exception as exc:  # ruff: ignore[blind-except]
             # Unpickling runs the code that rebuilds the object, and that can
             # raise anything at all. Whatever it was belongs to this work item
             # rather than to the executor, which anything escaping here would
-            # take down: `_poll` runs outside `_run_work_items`' own guard.
+            # take down.
             msg = f"The result of work item {item_id} could not be read: {exc}"
-            return self._fail_item(item_id, msg, exc)
-        self._retries.pop(item_id, None)
-        self._drop_job(item_id)
-        return result
+            return self._failure_for(item_id, msg, exc)
 
-    def _retry_or_fail(self, item_id: UUID, msg: str, reason: str) -> Any:  # ruff: ignore[any-type]
+    def _retry_or_fail(
+        self, item_id: UUID, retries_used: int, msg: str, reason: str
+    ) -> Any:  # ruff: ignore[any-type]
         # A shared filesystem may take a while to show a finished job's result,
         # so the same bounded budget covers "not there yet" and "not whole yet".
-        retry_count = self._retries.get(item_id, 0) + 1
-        self._retries[item_id] = retry_count
-        if retry_count <= self._retries_limit:
-            return _PENDING
-        return self._fail_item(item_id, msg, reason)
+        if retries_used < self._retries_limit:
+            return _NOT_READY
+        return self._failure_for(item_id, msg, reason)
 
-    def _fail_item(self, item_id: UUID, msg: str, reason: object) -> ExecutorFailure:
-        # Give up on this work item: its retry budget is either spent or beside
-        # the point, and its job is no longer something to wait for.
-        self._retries.pop(item_id, None)
-        self._drop_job(item_id)
-        self._output_kept = True
+    def _failure_for(self, item_id: UUID, msg: str, reason: object) -> ExecutorFailure:
         _logger.warning("%s work item %s failed: %s", self._kind, item_id, reason)
-        return ExecutorFailure(msg + self._job_output(item_id))
+        return ExecutorFailure(msg + self._job_output_tail(item_id))
 
-    def _job_output(self, item_id: UUID) -> str:
+    def _job_output_tail(self, item_id: UUID) -> str:
         # A job that died before writing a result left its only trace here, so
         # the tail travels with the failure and the file itself is kept. A
         # shared filesystem may not show the content yet, and a submission
@@ -485,43 +658,6 @@ class JobExecutorBase(ExecutorBase):
             return f"; the job wrote nothing to {output_file}"
         body = "\n".join(tail)
         return f"; the job wrote to {output_file}:\n{body}"
-
-    def _handle_query_failure(self, exc: BaseException) -> dict[UUID, Any]:
-        # Only a run of failures is fatal where a backend can have a bad moment:
-        # giving up at the first would end runs it is still working on. Once the
-        # run is long enough, every job that is out fails, because nothing can
-        # be said about a job that cannot be asked after.
-        results: dict[UUID, Any] = {}
-        self._query_failures += 1
-        _logger.warning(
-            "Querying the %s failed (%d/%d): %s",
-            self._backend,
-            self._query_failures,
-            self._query_retries + 1,
-            exc,
-        )
-        if self._query_failures > self._query_retries:
-            msg = (
-                f"The {self._backend} could not be queried after "
-                f"{self._query_retries + 1} attempts: {exc}"
-            )
-            with self._jobs_lock:
-                submitted = list(self._jobs)
-            for item_id in submitted:
-                self._drop_job(item_id)
-                self._retries.pop(item_id, None)
-                results[item_id] = ExecutorFailure(msg)
-            if submitted:
-                # These items never reach the cleanup pass in `_poll`, so their
-                # output survives here too, and a directory holding it must not
-                # be removed.
-                self._output_kept = True
-            self._query_failures = 0
-        return results
-
-    def _drop_job(self, item_id: UUID) -> None:
-        with self._jobs_lock:
-            self._jobs.pop(item_id, None)
 
     def _cleanup_files(self, item_id: UUID, *, keep_output: bool = False) -> None:
         suffixes = (".in", ".out") if keep_output else (".in", ".out", ".txt")

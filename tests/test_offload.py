@@ -1,10 +1,8 @@
-"""Tests for the offload pool-dispatch helper."""
+"""Tests for the offload executor-dispatch helper."""
 
 from __future__ import annotations
 
 import asyncio
-import gc
-import logging
 import os
 import sys
 import threading
@@ -16,17 +14,15 @@ import numpy as np
 import pytest
 
 from ropt.components.event_handlers import EventHandler
-from ropt.components.executors import ThreadExecutor
 from ropt.enums import EnOptEventType
 from ropt.exceptions import ExecutionError, WorkflowError
-from ropt.simple import WorkerPool, offload, optimize, serial_pool, session
-from ropt.simple._session import _Session
+from ropt.simple import ProcessExecutor, ThreadExecutor, offload, optimize
 
 if TYPE_CHECKING:
     from collections.abc import Callable
 
+    from ropt.components.executors import Executor
     from ropt.events import EnOptEvent
-    from ropt.simple import Session
 
 
 def _square(x: int) -> int:
@@ -49,64 +45,48 @@ def _kill_worker() -> int:
     os._exit(1)
 
 
-def test_offload_without_a_pool_runs_inline() -> None:
-    # No pool used to mean "no execution block is open", which offload()
-    # refused. Now it just means "run here", so the call succeeds inline.
+def test_offload_without_an_executor_runs_inline() -> None:
+    # Passing no executor means "run here", so a call site that may or may not
+    # have one needs no fallback of its own.
     assert offload(partial(add, 3, 4)) == 7
 
 
-def test_offload_sequence_without_a_pool_runs_inline() -> None:
+def test_offload_sequence_without_an_executor_runs_inline() -> None:
     assert offload([partial(_square, 1), partial(_square, 2)]) == (1, 4)
 
 
-def test_offload_empty_sequence_without_a_pool_returns_empty() -> None:
+def test_offload_empty_sequence_without_an_executor_returns_empty() -> None:
     assert offload([]) == ()
 
 
-def test_offload_with_a_serial_pool_runs_inline() -> None:
-    # A serial pool has no executor, so it is the explicit spelling of "run
-    # inline" -- distinct from passing no pool at all, but behaviourally the
-    # same.
-    assert offload(partial(add, 3, 4), pool=serial_pool()) == 7
+def test_offload_empty_sequence_returns_empty_with_an_executor() -> None:
+    with ThreadExecutor(workers=1) as executor:
+        assert offload([], executor=executor) == ()
 
 
-def test_offload_empty_sequence_returns_empty_with_a_pool() -> None:
-    with session() as active:
-        pool = active.thread_pool(workers=1)
-        assert offload([], pool=pool) == ()
+def test_offload_single_call_with_a_thread_executor() -> None:
+    with ThreadExecutor(workers=2) as executor:
+        assert offload(partial(add, 3, 4), executor=executor) == 7
 
 
-def test_offload_single_call_with_a_thread_pool() -> None:
-    with session() as active:
-        pool = active.thread_pool(workers=2)
-        assert offload(partial(add, 3, 4), pool=pool) == 7
+def test_offload_sequence_with_a_thread_executor() -> None:
+    with ThreadExecutor(workers=3) as executor:
+        assert offload(
+            [partial(_square, i) for i in range(1, 6)], executor=executor
+        ) == (1, 4, 9, 16, 25)
 
 
-def test_offload_sequence_with_a_thread_pool() -> None:
-    with session() as active:
-        pool = active.thread_pool(workers=3)
-        assert offload([partial(_square, i) for i in range(1, 6)], pool=pool) == (
-            1,
-            4,
-            9,
-            16,
-            25,
-        )
+def test_offload_sequence_of_different_functions() -> None:
+    with ThreadExecutor(workers=2) as executor:
+        assert offload(
+            [partial(_square, 3), partial(_double, 5)], executor=executor
+        ) == (9, 10)
 
 
-def test_offload_runs_different_functions() -> None:
-    with session() as active:
-        pool = active.thread_pool(workers=2)
-        assert offload([partial(_square, 3), partial(_double, 5)], pool=pool) == (
-            9,
-            10,
-        )
-
-
-def test_offload_sequence_with_a_process_pool() -> None:
-    with session() as active:
-        pool = active.process_pool(workers=2)
-        assert offload([partial(_square, i) for i in (1, 2, 3)], pool=pool) == (
+@pytest.mark.slow
+def test_offload_sequence_with_a_process_executor() -> None:
+    with ProcessExecutor(workers=2) as executor:
+        assert offload([partial(_square, i) for i in (1, 2, 3)], executor=executor) == (
             1,
             4,
             9,
@@ -116,17 +96,18 @@ def test_offload_sequence_with_a_process_pool() -> None:
 @pytest.mark.slow
 @pytest.mark.timeout(60)
 def test_dying_worker_reported_to_offload_caller() -> None:
-    with pytest.raises(ExecutionError, match="could not be run"), session() as active:
-        offload(_kill_worker, pool=active.process_pool(workers=1))
+    with (
+        ProcessExecutor(workers=1) as executor,
+        pytest.raises(ExecutionError, match="could not be run"),
+    ):
+        offload(_kill_worker, executor=executor)
 
 
 def test_offload_preserves_order_across_workers() -> None:
     # Each job waits for its successor, so the jobs finish in exactly the
     # reverse of the order they were submitted in and a result tuple in
-    # submission order can only come from reordering by index. Staggered sleeps
-    # only make that reversal likely: a scramble under load would let results
-    # returned in completion order pass. One worker per job, or the chain
-    # deadlocks on the pool.
+    # submission order can only come from reordering by index. One worker per
+    # job, or the chain deadlocks on the executor.
     count = 5
     finished = [threading.Event() for _ in range(count)]
 
@@ -136,111 +117,31 @@ def test_offload_preserves_order_across_workers() -> None:
         finished[index].set()
         return (index + 1) * (index + 1)
 
-    with session() as active:
-        pool = active.thread_pool(workers=count)
+    with ThreadExecutor(workers=count) as executor:
         jobs = [partial(square, index) for index in range(count)]
-        assert offload(jobs, pool=pool) == (1, 4, 9, 16, 25)
+        assert offload(jobs, executor=executor) == (1, 4, 9, 16, 25)
 
 
-def test_offload_raises_on_the_pools_event_loop() -> None:
-    async def _offload_on_loop(pool: WorkerPool) -> int:  # ruff: ignore[unused-async]
-        return offload(partial(_square, 5), pool=pool)
+def test_offload_from_an_event_loop() -> None:
+    # Nothing in the executors touches asyncio, so a call from inside a
+    # coroutine -- a notebook cell, say -- is an ordinary blocking call.
+    async def _offload_in_a_cell(executor: Executor) -> int:  # ruff: ignore[unused-async]
+        return offload(partial(_square, 4), executor=executor)
 
-    with session() as active:
-        pool = active.thread_pool(workers=1)
-        inner = active._session  # ruff: ignore[private-member-access]
-        assert inner is not None
-        assert inner._loop is not None  # ruff: ignore[private-member-access]
-        future = asyncio.run_coroutine_threadsafe(
-            _offload_on_loop(pool),
-            inner._loop,  # ruff: ignore[private-member-access]
-        )
-        with pytest.raises(WorkflowError, match="event loop"):
-            future.result(timeout=5)
-
-
-def test_offload_from_unrelated_event_loop() -> None:
-    async def _offload_in_a_cell(pool: WorkerPool) -> int:  # ruff: ignore[unused-async]
-        return offload(partial(_square, 4), pool=pool)
-
-    with session() as active:
-        pool = active.thread_pool(workers=1)
-        assert asyncio.run(_offload_in_a_cell(pool)) == 16
+    with ThreadExecutor(workers=1) as executor:
+        assert asyncio.run(_offload_in_a_cell(executor)) == 16
 
 
 @pytest.mark.timeout(30)
 @pytest.mark.parametrize("work", [_exit_process, _interrupt])
-def test_offload_base_exception_reaches_caller(
-    work: Callable[[], int],
-) -> None:
-    with pytest.raises(BaseException) as raised, session() as active:  # ruff: ignore[pytest-raises-too-broad]
-        offload(work, pool=active.thread_pool(workers=2))
-    assert not isinstance(raised.value, Exception)
-
-
-@pytest.mark.timeout(30)
-def test_dying_session_stops_the_pool() -> None:
-    with pytest.raises(SystemExit), session() as active:  # ruff: ignore[pytest-raises-with-multiple-statements]
-        pool = active.thread_pool(workers=2)
-        offload(_exit_process, pool=pool)
-    assert pool.executor is not None
-    assert not pool.executor.is_running()
-
-
-@pytest.mark.timeout(30)
-def test_dying_session_leaves_no_unretrieved_exception(
-    caplog: pytest.LogCaptureFixture,
-) -> None:
-    # asyncio reports this through logging, not warnings:
-    with caplog.at_level(logging.ERROR, logger="asyncio"):
-        with pytest.raises(SystemExit), session() as active:
-            offload(_exit_process, pool=active.thread_pool(workers=2))
-        gc.collect()
-    assert "never retrieved" not in caplog.text
-
-
-@pytest.mark.timeout(30)
-def test_pool_on_dead_session_reports_stopped() -> None:
-    captured: list[BaseException] = []
-
-    def _reopen_after_the_session_dies(active: Session) -> None:
-        pool = active.thread_pool(workers=2)
-        with pytest.raises(SystemExit):
-            offload(_exit_process, pool=pool)
-        try:
-            active.thread_pool(workers=1)
-        except BaseException as exc:  # ruff: ignore[blind-except]
-            captured.append(exc)
-
-    # The block exit re-raises the failure that killed the session, so what the
-    # reopen attempt raised has to be carried out of the block to be asserted.
-    with pytest.raises(SystemExit), session() as active:
-        _reopen_after_the_session_dies(active)
-    assert len(captured) == 1
-    assert isinstance(captured[0], WorkflowError)
-    assert "is not running" in str(captured[0])
-
-
-def test_shutdown_race_reports_stopped_session(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    sess = _Session()
-    sess.start()
-    sess.stop()
-    # Only a race reaches the late translation, so every check before the work
-    # is handed to the loop has to see a session that is still alive: one in
-    # `_require_task_group`, one at the top of `_start_on_loop`. The loop is
-    # already closed, so the hand-off raises RuntimeError, and the next check --
-    # the one inside the handler -- reports the truth. Feeding one `False` too
-    # few stops at the up-front check and never reaches the handler at all.
-    seen = iter([False, False])
-    monkeypatch.setattr(
-        sess._stopped,  # ruff: ignore[private-member-access]
-        "is_set",
-        lambda: next(seen, True),
-    )
-    with pytest.raises(WorkflowError, match="is not running"):
-        sess.open_pool(lambda: ThreadExecutor(workers=1))
+def test_offload_base_exception_reaches_caller(work: Callable[[], int]) -> None:
+    # A worker thread cannot exit the interpreter on its own, so the exception
+    # is delivered to the caller, which is where it means something.
+    with (
+        ThreadExecutor(workers=2) as executor,
+        pytest.raises((SystemExit, KeyboardInterrupt)),
+    ):
+        offload(work, executor=executor)
 
 
 class _OffloadingHandler(EventHandler):
@@ -248,7 +149,7 @@ class _OffloadingHandler(EventHandler):
 
     def __init__(self) -> None:
         super().__init__()
-        self.pool: WorkerPool | None = None
+        self.executor: Executor | None = None
         self.outcome: str | None = None
 
     @property
@@ -259,9 +160,11 @@ class _OffloadingHandler(EventHandler):
         if self.outcome is not None:
             return
         try:
-            self.outcome = f"returned {offload(partial(_square, 4), pool=self.pool)}"
+            offloaded = offload(partial(_square, 4), executor=self.executor)
         except WorkflowError as exc:
             self.outcome = f"raised {exc}"
+        else:
+            self.outcome = f"returned {offloaded}"
 
 
 def _run_one(**kwargs: Any) -> None:
@@ -276,11 +179,10 @@ def _run_one(**kwargs: Any) -> None:
 
 @pytest.mark.timeout(60)
 def test_handler_can_offload() -> None:
-    # A handler runs on the thread driving the run, not on any event loop, so
-    # the pool it is given works there as usual.
+    # A handler runs on the thread driving the run, not on a worker, so the
+    # executor it is given works there as usual.
     handler = _OffloadingHandler()
-    with session() as active:
-        pool = active.thread_pool(workers=2)
-        handler.pool = pool
-        _run_one(pool=pool, handlers=[handler])
+    with ThreadExecutor(workers=2) as executor:
+        handler.executor = executor
+        _run_one(executor=executor, handlers=[handler])
     assert handler.outcome == "returned 16"

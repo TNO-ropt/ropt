@@ -39,11 +39,11 @@ works without it:
 
 | Where | Works without `cloudpickle` | What `cloudpickle` adds |
 | ----- | --------------------------- | ----------------------- |
-| [Process pools](../running/parallel.md#process-pool) | Evaluation functions at the top level of a module *or of the script you ran* | Lambdas, closures, and notebook-defined evaluation functions |
-| [Local and cluster jobs](../running/parallel.md#local-pool) | Evaluation functions at the top level of a module the worker can **import** | The same, plus functions defined in the script you ran, and results built from locally defined classes |
+| [Process executors](../running/parallel.md#process-executor) | Evaluation functions at the top level of a module *or of the script you ran* | Lambdas, closures, and notebook-defined evaluation functions |
+| [Local and cluster jobs](../running/parallel.md#local-executor) | Evaluation functions at the top level of a module the worker can **import** | The same, plus functions defined in the script you ran, and results built from locally defined classes |
 | [The external backend](../running/parallel.md#external-backend) | The built-in plugins, and any plugin class at the top level of a module *or of the script you ran* | Plugin instances of classes defined in a function or a notebook |
 
-The two pool rows differ. A process pool
+The two executor rows differ. A process executor
 starts its workers with `spawn`, which re-imports the script you launched, so a
 function defined there can be looked up again. A local or cluster job is a fresh
 command whose `__main__` is `ropt`'s own worker module, so a function defined in

@@ -22,29 +22,25 @@ the job, so a compute node can import them by name.
 
 from __future__ import annotations
 
-import asyncio
 import importlib
 import operator
 import os
 import shutil
 import sys
 import time
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 import pytest
 
-from ropt.components.executors import (
-    ExecutorFailure,
-    HPCExecutor,
-    Submission,
-    WorkItem,
-)
+from ropt.components.executors import ExecutorFailure, HPCExecutor, WorkItem
+from ropt.exceptions import ExecutorStopped
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
 
-pytestmark = [pytest.mark.hpc, pytest.mark.asyncio, pytest.mark.timeout(600)]
+pytestmark = [pytest.mark.hpc, pytest.mark.timeout(600)]
 
 _EXAMPLES = Path(__file__).parent.parent / "examples"
 
@@ -104,7 +100,7 @@ def executor_fixture(workdir: Path, hpc_queue: str) -> Iterator[Any]:
         yield _make
     finally:
         for executor in executors:
-            executor.cancel()
+            executor.close()
 
 
 @pytest.fixture(name="example")
@@ -121,46 +117,34 @@ def example_fixture(monkeypatch: pytest.MonkeyPatch) -> Any:
     return _load
 
 
-async def test_hpc_cluster_resolves_the_requested_queue(  # ruff: ignore[unused-async]
-    executor: Any,
-) -> None:
+def test_hpc_cluster_resolves_the_requested_queue(executor: Any) -> None:
     adapter = executor()._queue_adapter  # ruff: ignore[private-member-access]
     assert adapter.queue_list is not None
 
 
-async def test_hpc_cluster_submitted_job_returns_its_result(
-    executor: Any,
-) -> None:
-    submission = Submission([WorkItem(function=operator.add, args=(40, 2))])
-    hpc = executor()
-    async with asyncio.TaskGroup() as tg:
-        await hpc.start(tg)
-        hpc.submit(submission)
-        collected: list[Any] = []
-        await asyncio.to_thread(
-            submission.collect, lambda item: collected.append(item.result)
-        )
-        hpc.cancel()
-    assert collected == [42]
+def test_hpc_cluster_submitted_job_returns_its_result(executor: Any) -> None:
+    with executor() as hpc:
+        assert hpc.run([WorkItem(function=operator.add, args=(40, 2))]) == [42]
 
 
-async def test_hpc_cluster_cancelled_job_disappears_from_the_scheduler(
+def test_hpc_cluster_cancelled_job_disappears_from_the_scheduler(
     executor: Any,
 ) -> None:
-    submission = Submission([WorkItem(function=time.sleep, args=(_SLEEP_SECONDS,))])
     hpc = executor()
-    async with asyncio.TaskGroup() as tg:
-        await hpc.start(tg)
-        hpc.submit(submission)
-        live = await asyncio.to_thread(_wait_for_live_jobs, hpc)
-        assert live, "the scheduler reported no job for a submission still running"
+    items = [WorkItem(function=time.sleep, args=(_SLEEP_SECONDS,))]
+    with ThreadPoolExecutor(max_workers=1) as threads:
+        running = threads.submit(hpc.run, items)
+        live = _wait_for_live_jobs(hpc)
+        assert live, "the scheduler reported no job for work that is still running"
         assert all(isinstance(job_id, int) for job_id in live)
-        hpc.cancel()
-    gone = await asyncio.to_thread(_wait_until_gone, hpc, live)
+        hpc.close()
+        with pytest.raises(ExecutorStopped):
+            running.result()
+    gone = _wait_until_gone(hpc, live)
     assert gone, f"cancelled jobs are still queued: {live}"
 
 
-async def test_hpc_cluster_concurrent_jobs_each_return_their_own_result(
+def test_hpc_cluster_concurrent_jobs_each_return_their_own_result(
     executor: Any,
 ) -> None:
     values = [index * 10 for index in range(1, _CONCURRENT_JOBS + 1)]
@@ -171,23 +155,16 @@ async def test_hpc_cluster_concurrent_jobs_each_return_their_own_result(
         )
         for value in values
     ]
-    # Keyed by identity, so a result reaching the wrong work item is caught.
-    expected = {id(item): value for item, value in zip(work_items, values, strict=True)}
-    submission = Submission(work_items)
-    hpc = executor(workers=_CONCURRENT_JOBS)
-    collected: dict[int, Any] = {}
-    async with asyncio.TaskGroup() as tg:
-        await hpc.start(tg)
-        hpc.submit(submission)
-        peak, _ = await asyncio.gather(
-            asyncio.to_thread(_peak_live_jobs, hpc),
-            asyncio.to_thread(
-                submission.collect,
-                lambda item: collected.update({id(item): item.result}),
-            ),
-        )
-        hpc.cancel()
-    assert collected == expected
+    with (
+        executor(workers=_CONCURRENT_JOBS) as hpc,
+        ThreadPoolExecutor(max_workers=1) as threads,
+    ):
+        running = threads.submit(hpc.run, work_items)
+        peak = _peak_live_jobs(hpc)
+        collected = running.result()
+    # Results come back by position, so a result reaching the wrong work item
+    # shows up here.
+    assert collected == values
     # Pending jobs are queued too, so this holds on a cluster too busy to run
     # them side by side; only a scheduler reporting one job at a time fails it.
     assert peak > 1, (
@@ -196,19 +173,11 @@ async def test_hpc_cluster_concurrent_jobs_each_return_their_own_result(
     )
 
 
-async def test_hpc_cluster_failed_job_reports_where_its_output_is(
+def test_hpc_cluster_failed_job_reports_where_its_output_is(
     executor: Any, workdir: Path
 ) -> None:
-    submission = Submission([WorkItem(function=exec, args=(_FAILING_JOB,))])
-    hpc = executor(retries=3)
-    async with asyncio.TaskGroup() as tg:
-        await hpc.start(tg)
-        hpc.submit(submission)
-        collected: list[Any] = []
-        await asyncio.to_thread(
-            submission.collect, lambda item: collected.append(item.result)
-        )
-        hpc.cancel()
+    with executor(retries=3) as hpc:
+        collected = hpc.run([WorkItem(function=exec, args=(_FAILING_JOB,))])
     assert len(collected) == 1
     failure = collected[0]
     assert isinstance(failure, ExecutorFailure), failure
@@ -227,19 +196,16 @@ async def test_hpc_cluster_failed_job_reports_where_its_output_is(
     )
 
 
-async def test_hpc_cluster_runs_the_simple_example(
+def test_hpc_cluster_runs_the_simple_example(
     example: Any, hpc_queue: str, workdir: Path
 ) -> None:
-    # `main` drives its own event loop, so it cannot be called on this one.
-    await asyncio.to_thread(example("hpc").main, queue=hpc_queue, workdir=workdir)
+    example("hpc").main(queue=hpc_queue, workdir=workdir)
 
 
-async def test_hpc_cluster_runs_the_advanced_example(
+def test_hpc_cluster_runs_the_advanced_example(
     example: Any, hpc_queue: str, workdir: Path
 ) -> None:
-    await asyncio.to_thread(
-        example("hpc_executor").main, workdir=workdir, queue=hpc_queue
-    )
+    example("hpc_executor").main(workdir=workdir, queue=hpc_queue)
 
 
 def _listing(workdir: Path, pattern: str = "*") -> list[str]:

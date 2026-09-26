@@ -1,13 +1,12 @@
 """The high-level `optimize` entry point.
 
 One call builds a whole workflow and throws it away again: a context from the
-configuration, an evaluator wired to the pool, an optimization step, and the
+configuration, an evaluator wired to the executor, an optimization step, and the
 handlers around it. Nothing survives the call, which is what lets these
 functions be called concurrently without any coordination between them.
 
 `optimize_many` is the same thing run several times over, on driver threads,
-sharing one pool. Sharing the pool is what makes its runs cooperate: they draw
-their batch IDs from one counter and send their evaluations to the same workers.
+sharing one executor, whose workers are spread over the runs.
 """
 
 from __future__ import annotations
@@ -29,9 +28,7 @@ from ._broadcast import (
     broadcast_runs,
 )
 from ._evaluator import make_evaluator
-from ._guards import check_pool
 from ._handlers import attach_handlers
-from ._pool import serial_pool
 from ._result import OptimizationResult
 
 if TYPE_CHECKING:
@@ -41,9 +38,9 @@ if TYPE_CHECKING:
     from numpy.typing import ArrayLike
 
     from ropt.components.event_handlers import EventHandler
+    from ropt.components.executors import Executor
 
     from ._function import EvaluationFunction
-    from ._pool import WorkerPool
     from ._report import ReportCallback
 
 
@@ -52,27 +49,22 @@ def optimize(  # ruff: ignore[too-many-arguments]
     x0: ArrayLike,
     function: EvaluationFunction,
     *,
-    pool: WorkerPool | None = None,
+    executor: Executor | None = None,
     handlers: Sequence[EventHandler] | None = None,
     report: ReportCallback | None = None,
     constraint_tolerance: float = 1e-10,
-    bundle_size: int = 1,
+    bundle_size: int | None = None,
     metadata: dict[str, Any] | None = None,
 ) -> OptimizationResult:
     """Run a single optimization.
 
     See [Running Optimizations](../running/running.md) for a walkthrough.
 
-    A pool or group that is closed — because it was closed directly, or
-    because its session ended — is refused here with a
-    [`WorkflowError`][ropt.exceptions.WorkflowError], as is one carried into
-    a worker process, where it cannot work at all.
-
-    Without a `pool` the evaluations run in-process, on the calling thread. A
-    run started from inside an evaluation needs a pool with workers of its own:
-    the pool it is already running on refuses the work. A
-    [`serial_pool`][ropt.simple.serial_pool] evaluates inline and has no workers
-    to occupy, so it can be reused.
+    Without an `executor` the evaluations run in-process, on the calling thread,
+    and `bundle_size` does not apply. A closed executor raises a
+    [`WorkflowError`][ropt.exceptions.WorkflowError] at the first evaluation. A
+    run started from inside an evaluation needs an executor with workers of its
+    own: the one it is already running on refuses the work.
 
     The handlers in `handlers` are called in the order they are listed, and
     the same handler may also be given to other runs, sequential or concurrent,
@@ -90,19 +82,18 @@ def optimize(  # ruff: ignore[too-many-arguments]
         config:               The optimization configuration.
         x0:                   The initial variable vector.
         function:             The per-realization evaluation function.
-        pool:                 The pool to evaluate on, from a session factory.
+        executor:             The executor to evaluate on, or `None`.
         handlers:             Optional handlers, called in the order listed.
         report:               Optional callback invoked per function evaluation.
         constraint_tolerance: The tolerance within which a constraint is satisfied.
-        bundle_size:          Evaluations per worker task, `0` for a whole batch.
+        bundle_size:          Evaluations per worker task, `None` for the executor's own.
         metadata:             Optional dictionary attached to every emitted result.
 
     Returns:
         An [`OptimizationResult`][ropt.simple.OptimizationResult] describing the outcome.
     """
-    check_pool(pool)
     return _optimize(
-        pool if pool is not None else serial_pool(),
+        executor,
         config,
         x0,
         function,
@@ -115,7 +106,7 @@ def optimize(  # ruff: ignore[too-many-arguments]
 
 
 def _optimize(  # ruff: ignore[too-many-arguments]
-    pool: WorkerPool,
+    executor: Executor | None,
     config: dict[str, Any],
     x0: ArrayLike,
     function: EvaluationFunction,
@@ -123,11 +114,11 @@ def _optimize(  # ruff: ignore[too-many-arguments]
     handlers: Sequence[EventHandler] | None,
     report: ReportCallback | None,
     constraint_tolerance: float,
-    bundle_size: int,
+    bundle_size: int | None,
     metadata: dict[str, Any] | None = None,
 ) -> OptimizationResult:
     context = EnOptContext.model_validate(config)
-    evaluator = make_evaluator(context, function, pool, bundle_size)
+    evaluator = make_evaluator(context, function, executor, bundle_size)
     # This run's own handler, tracking the result the call returns; it is added
     # directly, so it stays out of the handlers the caller manages.
     result_handler = ResultsHandler(constraint_tolerance=constraint_tolerance)
@@ -151,15 +142,15 @@ def optimize_many(  # ruff: ignore[too-many-arguments]
     x0: ArrayLike,
     function: EvaluationFunction | Sequence[EvaluationFunction],
     *,
-    pool: WorkerPool | None = None,
+    executor: Executor | None = None,
     handlers: Sequence[EventHandler] | None = None,
     report: ReportCallback | Sequence[ReportCallback] | None = None,
     limit: int | None = None,
     constraint_tolerance: float = 1e-10,
-    bundle_size: int | Sequence[int] = 1,
+    bundle_size: int | Sequence[int | None] | None = None,
     metadata: dict[str, Any] | Sequence[dict[str, Any]] | None = None,
 ) -> tuple[OptimizationResult, ...]:
-    """Run several optimizations concurrently, sharing one pool.
+    """Run several optimizations concurrently, sharing one executor.
 
     Each of `config`, `x0`, and `function` may be a single value (used for
     every run) or a sequence (one per run). Sequences set the number of runs and
@@ -168,10 +159,10 @@ def optimize_many(  # ruff: ignore[too-many-arguments]
     A sequence that is empty gives no runs, and returns no results.
 
     The runs execute concurrently on driver threads and all evaluate on the
-    same `pool`, so its workers are shared between them; `limit` bounds how
-    many run simultaneously. Without a `pool` the runs still overlap, but each
-    evaluation runs in-process on its own driver thread, so `function` is then
-    called by several threads at once and must tolerate that. See
+    same `executor`, so its workers are shared between them; `limit` bounds how
+    many run simultaneously. Without an `executor` the runs still overlap, but
+    each evaluation runs in-process on its own driver thread, so `function` is
+    then called by several threads at once and must tolerate that. See
     [Parallel Execution and Many Runs](../running/parallel.md#many-optimizations-at-once)
     for a walkthrough, and [Failure in one run](../running/parallel.md#failure-in-one-run)
     for what happens when one raises.
@@ -186,16 +177,11 @@ def optimize_many(  # ruff: ignore[too-many-arguments]
     the calling thread holds. `report=`, being local by nature, is the
     opposite: it is given per run, or broadcast to all of them.
 
-    A pool that is closed — because it was closed directly, or because its
-    session ended — is refused here with a
-    [`WorkflowError`][ropt.exceptions.WorkflowError], as is one carried into
-    a worker process, where it cannot work at all.
-
-    A run started from inside an evaluation needs a pool with workers of its
-    own: the pool it is already running on refuses the work. A
-    [`serial_pool`][ropt.simple.serial_pool] evaluates inline and has no workers
-    to occupy, so it can be reused. Returning `True` from a `report`
-    callback stops that run early with `USER_ABORT`. `metadata` also reaches
+    A closed executor raises a
+    [`WorkflowError`][ropt.exceptions.WorkflowError] at the first evaluation. A
+    run started from inside an evaluation needs an executor with workers of its
+    own: the one it is already running on refuses the work. Returning `True`
+    from a `report` callback stops that run early with `USER_ABORT`. `metadata` also reaches
     each run's `function` as `context.metadata`, which makes it a way to tag a
     run, for example with `{"run_id": i}`.
 
@@ -203,7 +189,7 @@ def optimize_many(  # ruff: ignore[too-many-arguments]
         config:               The configuration, or one per run.
         x0:                   The initial variable vector, or one per row.
         function:             The evaluation function, or one per run.
-        pool:                 The pool every run evaluates on.
+        executor:             The executor every run evaluates on, or `None`.
         handlers:             Optional handlers, fed by every run.
         report:               Optional callback per evaluation, shared or one per run.
         limit:                The maximum number of runs to execute at once.
@@ -214,10 +200,6 @@ def optimize_many(  # ruff: ignore[too-many-arguments]
     Returns:
         One [`OptimizationResult`][ropt.simple.OptimizationResult] per run, in order.
     """
-    check_pool(pool)
-    # One pool for the whole call, even a private serial one, so that
-    # concurrent runs draw their batch IDs from a single counter.
-    shared_pool = pool if pool is not None else serial_pool()
     runs = broadcast_runs(config, x0, function)
     reports = broadcast_reports(report, len(runs))
     metadatas = broadcast_metadata(metadata, len(runs))
@@ -225,7 +207,7 @@ def optimize_many(  # ruff: ignore[too-many-arguments]
     jobs: list[Callable[[], OptimizationResult]] = [
         partial(
             _optimize,
-            shared_pool,
+            executor,
             run_config,
             run_x0,
             run_function,

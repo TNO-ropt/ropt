@@ -19,14 +19,15 @@
 ::: ropt.simple.EvaluationFunctionContext
 ::: ropt.simple.EvaluationFunctionResult
 
-## Sessions and pools
+## Executors
 
-::: ropt.simple.session
-::: ropt.simple.Session
-::: ropt.simple.WorkerPool
-::: ropt.simple.serial_pool
+::: ropt.simple.Executor
+::: ropt.simple.ThreadExecutor
+::: ropt.simple.ProcessExecutor
+::: ropt.simple.LocalJobExecutor
+::: ropt.simple.HPCExecutor
 
-## Offloading work to a pool
+## Offloading work to an executor
 
 ::: ropt.simple.offload
 

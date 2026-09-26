@@ -2,9 +2,8 @@
 
 Advanced counterpart of [hpc.py][]: the same optimization, assembled from
 `HPCExecutor`, `ParallelEvaluator` and `OptimizationStep` rather than hidden
-behind a session and `optimize`. Every ensemble evaluation is submitted to the
-cluster as a job, and the executor's lifetime is managed explicitly, which is
-what the high-level API does for you.
+behind `optimize`. Every ensemble evaluation is submitted to the cluster as a
+job.
 
 Running it needs the `ropt[hpc]` extra, a reachable cluster, and a working
 directory on a filesystem the compute nodes share. If you have no cluster
@@ -21,7 +20,6 @@ installation unless `--queue` names one; pass `cluster` or `cores` to
 """
 
 import argparse
-import asyncio
 from pathlib import Path
 from typing import Any
 
@@ -36,7 +34,7 @@ from ropt.components.evaluators import (
     ParallelEvaluator,
 )
 from ropt.components.event_handlers import CallbackHandler, ResultsHandler
-from ropt.components.executors import HPCExecutor, LocalJobExecutor
+from ropt.components.executors import Executor, HPCExecutor, LocalJobExecutor
 from ropt.context import EnOptContext
 from ropt.enums import EnOptEventType
 from ropt.events import EnOptEvent
@@ -111,7 +109,7 @@ def main(*, workdir: Path, local: bool = False, queue: str | None = None) -> Non
         local:   Run the jobs on this machine instead of submitting them.
         queue:   The cluster queue to submit to; the configured default if None.
     """
-    executor = (
+    executor: Executor = (
         LocalJobExecutor(workdir=workdir, workers=WORKERS)
         if local
         else HPCExecutor(workdir=workdir, workers=WORKERS, queue=queue)
@@ -130,17 +128,8 @@ def main(*, workdir: Path, local: bool = False, queue: str | None = None) -> Non
         )
     )
 
-    async def _run() -> None:
-        async with asyncio.TaskGroup() as tg:
-            await executor.start(tg)
-            # `run` blocks, so it goes to a thread to leave the loop free to
-            # drive the executor that is submitting its evaluations.
-            await asyncio.to_thread(
-                step.run, EnOptContext.model_validate(CONFIG), INITIAL_VALUES
-            )
-            executor.cancel()
-
-    asyncio.run(_run())
+    with executor:
+        step.run(EnOptContext.model_validate(CONFIG), INITIAL_VALUES)
 
     optimal_result = results.result
     assert optimal_result is not None

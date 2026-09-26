@@ -6,37 +6,38 @@ from typing import TYPE_CHECKING
 
 from ropt.components.evaluators import FunctionEvaluator, ParallelEvaluator
 
+from ._batch_ids import next_batch_id
 from ._function import adapt_function
 
 if TYPE_CHECKING:
     from ropt.components.evaluators import Evaluator
+    from ropt.components.executors import Executor
     from ropt.context import EnOptContext
 
     from ._function import EvaluationFunction
-    from ._pool import WorkerPool
 
 
 def make_evaluator(
     context: EnOptContext,
     function: EvaluationFunction,
-    pool: WorkerPool,
-    bundle_size: int = 1,
+    executor: Executor | None,
+    bundle_size: int | None = None,
 ) -> Evaluator:
     """Wire an evaluator for a validated configuration.
 
     The number of objectives and constraints the evaluation function must
-    produce follows from the context. A pool with an executor spreads the
-    evaluations over its workers; a serial pool has none, so they run in-process
-    on the calling thread, and `bundle_size` does not apply.
+    produce follows from the context. An executor spreads the evaluations over
+    its workers; without one they run in-process on the calling thread, and
+    `bundle_size` does not apply.
 
-    Batch IDs come from the pool's counter either way, so runs sharing a pool
-    cannot land on the same ID.
+    Batch IDs come from the program-wide counter either way, so no two runs in
+    this process land on the same ID.
 
     Args:
         context:     The validated optimizer context.
         function:    The user-supplied evaluation function.
-        pool:        The pool the evaluations run on.
-        bundle_size: Evaluations per worker task, `0` for a whole batch.
+        executor:    The executor the evaluations run on, or `None`.
+        bundle_size: Evaluations per worker task, `None` for the executor's own.
 
     Returns:
         The evaluator to run with.
@@ -48,11 +49,11 @@ def make_evaluator(
         else context.nonlinear_constraints.lower_bounds.size
     )
     callback = adapt_function(function, n_obj, n_con)
-    if pool.executor is None:
-        return FunctionEvaluator(function=callback, batch_id_callback=pool.batch_ids)
+    if executor is None:
+        return FunctionEvaluator(function=callback, batch_id_callback=next_batch_id)
     return ParallelEvaluator(
         function=callback,
-        executor=pool.executor,
-        batch_id_callback=pool.batch_ids,
+        executor=executor,
+        batch_id_callback=next_batch_id,
         bundle_size=bundle_size,
     )

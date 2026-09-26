@@ -1,11 +1,12 @@
-"""Nested optimization: an inner run per outer evaluation, on its own pool.
+"""Nested optimization: an inner run per outer evaluation, on its own executor.
 
 Each evaluation of the outer optimization runs an inner optimization over the
-remaining variables. The two layers use **different** pools, which is what makes
-this safe: the outer evaluations run on a thread pool, so each stays in this
-process and can reach the inner pool, and the inner evaluations run on a process
-pool of their own. Handing the inner run the pool it is already running on would
-instead be refused, since it would wait for the workers it occupies.
+remaining variables. The two layers use **different** executors, which is what
+makes this safe: the outer evaluations run on a thread executor, so each stays
+in this process and can reach the inner executor, and the inner evaluations run
+on a process executor of their own. Handing the inner run the executor it is
+already running on would instead be refused, since it would wait for the workers
+it occupies.
 
 The inner runs all feed one `DataFrameHandler`. They overlap, which the handler
 allows: `handle_event` serializes its own calls, so a second run waits for the
@@ -30,9 +31,10 @@ from ropt.simple import (
     DataFrameHandler,
     EvaluationFunction,
     EvaluationFunctionContext,
-    WorkerPool,
+    Executor,
+    ProcessExecutor,
+    ThreadExecutor,
     optimize,
-    session,
 )
 
 # --8<-- [start:configs]
@@ -81,7 +83,7 @@ def rosenbrock(
     """The Rosenbrock objective for one realization of the inner problem.
 
     Defined at module level, and closing over nothing, so it can be pickled
-    into the inner process pool.
+    into the inner process executor.
 
     Args:
         variables: The variable vector to evaluate.
@@ -105,20 +107,20 @@ def inner_optimization(  # ruff: ignore[too-many-arguments]
     variables: NDArray[np.float64],
     context: EvaluationFunctionContext,
     *,
-    pool: WorkerPool,
+    executor: Executor,
     tables: DataFrameHandler,
     function: EvaluationFunction,
     memo: dict[tuple[float, ...], float],
 ) -> float:
     """Evaluate one outer point by optimizing the inner variables at it.
 
-    Runs in a thread of the outer pool, so the inner pool, the handler and the
-    memo are live objects here rather than copies.
+    Runs in a thread of the outer executor, so the inner executor, the handler
+    and the memo are live objects here rather than copies.
 
     Args:
         variables: The outer variable vector to evaluate.
         context:   The evaluation context, identifying this outer evaluation.
-        pool:      The pool the inner evaluations run on.
+        executor:  The executor the inner evaluations run on.
         tables:    The handler every inner run feeds.
         function:  The objective the inner optimization minimizes.
         memo:      Objectives already computed, keyed by outer point.
@@ -135,7 +137,7 @@ def inner_optimization(  # ruff: ignore[too-many-arguments]
         INNER_CONFIG,
         np.where(MASK, INITIAL_VALUES, variables),
         function,
-        pool=pool,
+        executor=executor,
         handlers=[tables],
         # A whole inner batch goes to one worker: the parallelism comes from the
         # outer runs.
@@ -174,22 +176,23 @@ def main() -> None:
 
     # --8<-- [start:run]
     # A plain dict reaches the outer evaluations because they run on threads, in
-    # this process; on a process pool each worker would get an empty copy.
+    # this process; on a process executor each worker would get an empty copy.
     memo: dict[tuple[float, ...], float] = {}
-    with session() as active:
-        inner_pool = active.process_pool(workers=2)
-        outer_pool = active.thread_pool(workers=2)
+    with (
+        ProcessExecutor(workers=2) as inner_executor,
+        ThreadExecutor(workers=2) as outer_executor,
+    ):
         optimize(
             OUTER_CONFIG,
             INITIAL_VALUES,
             partial(
                 inner_optimization,
-                pool=inner_pool,
+                executor=inner_executor,
                 tables=tables,
                 function=partial(rosenbrock, a=a, b=b),
                 memo=memo,
             ),
-            pool=outer_pool,
+            executor=outer_executor,
         )
     # --8<-- [end:run]
 
@@ -212,7 +215,7 @@ def main() -> None:
     assert best["Objective"] < 1.0
 
     # Every inner result carries the outer evaluation that produced it, and the
-    # inner runs share one pool, so their batch IDs never collide.
+    # inner runs share one executor, so their batch IDs never collide.
     assert frame.height > 0
     assert frame["Inner-batch"].n_unique() == frame.height
     assert frame["Outer-batch"].null_count() == 0

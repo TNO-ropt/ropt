@@ -14,7 +14,7 @@ usage: parallel_evaluator.py [-h] [-m] [-d DELAY] [-w WORKERS] [-o OPTIMIZATIONS
 options:
   -h, --help            show this help message and exit
   -m, --multiprocessing
-                        Use multiprocessing instead of asyncio for function evaluation
+                        Use a process executor instead of a thread executor
   -d DELAY, --delay DELAY
                         Delay in seconds before evaluating the rosenbrock function
                         (default: 0.0)
@@ -26,7 +26,6 @@ options:
 """
 
 import argparse
-import asyncio
 import time
 from functools import partial
 from typing import Any
@@ -36,6 +35,7 @@ from numpy.random import default_rng
 from numpy.typing import NDArray
 
 from ropt.components.compute_steps import OptimizationStep
+from ropt.components.concurrency import run_concurrent
 from ropt.components.evaluators import (
     EvaluationFunctionCallback,
     EvaluationFunctionContext,
@@ -120,7 +120,7 @@ def run_optimization(
     return result
 
 
-async def async_run(  # ruff: ignore[too-many-arguments]
+def run_all(  # ruff: ignore[too-many-arguments]
     config: dict[str, Any],
     a_list: list[NDArray[np.float64]],
     b_list: list[NDArray[np.float64]],
@@ -129,43 +129,34 @@ async def async_run(  # ruff: ignore[too-many-arguments]
     delay: float = 0.0,
     workers: int = 4,
 ) -> list[FunctionResults]:
-    """Run the asynchronous code.
+    """Run every optimization concurrently on one executor.
 
     Args:
         config:          The configuration of the optimizer.
         a_list:          The list of 'a' parameters.
         b_list:          The list of 'b' parameters.
-        multiprocessing: If True, use multiprocessing for function evaluations.
+        multiprocessing: If True, use a process executor for the evaluations.
         delay:           Delay in seconds while running the rosenbrock function.
         workers:         The number of workers to use.
 
     Returns:
         The optimal results.
     """
-    executor = (
-        ProcessExecutor(workers=workers)
-        if multiprocessing
-        else ThreadExecutor(workers=workers)
-    )
-    assert isinstance(executor, Executor)
-    async with asyncio.TaskGroup() as tg:
-        await executor.start(tg)
-        results = await asyncio.gather(
-            *(
-                asyncio.to_thread(
-                    run_optimization,
-                    executor,
-                    partial(rosenbrock, a=a, b=b, delay=delay),
-                    config,
-                )
-                for a, b in zip(a_list, b_list, strict=True)
-            ),
-        )
-        executor.cancel()
-    return results
+    build = ProcessExecutor if multiprocessing else ThreadExecutor
+    with build(workers=workers) as executor:
+        jobs = [
+            partial(
+                run_optimization,
+                executor,
+                partial(rosenbrock, a=a, b=b, delay=delay),
+                config,
+            )
+            for a, b in zip(a_list, b_list, strict=True)
+        ]
+        return run_concurrent(jobs)
 
 
-async def main(
+def main(
     *,
     multiprocessing: bool = False,
     delay: float = 0.0,
@@ -185,7 +176,7 @@ async def main(
     ]
 
     start_time = time.perf_counter()
-    results = await async_run(
+    results = run_all(
         CONFIG,
         a,
         b,
@@ -214,7 +205,7 @@ if __name__ == "__main__":
         "-m",
         "--multiprocessing",
         action="store_true",
-        help="Use multiprocessing instead of asyncio for function evaluation",
+        help="Use a process executor instead of a thread executor",
     )
     parser.add_argument(
         "-d",
@@ -238,11 +229,9 @@ if __name__ == "__main__":
         help="The number of parallel optimizations (default: 2)",
     )
     args = parser.parse_args()
-    asyncio.run(
-        main(
-            multiprocessing=args.multiprocessing,
-            delay=args.delay,
-            workers=args.workers,
-            optimizations=args.optimizations,
-        )
+    main(
+        multiprocessing=args.multiprocessing,
+        delay=args.delay,
+        workers=args.workers,
+        optimizations=args.optimizations,
     )

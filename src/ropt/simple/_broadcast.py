@@ -99,7 +99,9 @@ def broadcast_metadata(
     return _sized(list(metadata), count, "metadata")
 
 
-def broadcast_bundle_sizes(bundle_size: int | Sequence[int], count: int) -> list[int]:
+def broadcast_bundle_sizes(
+    bundle_size: int | Sequence[int | None] | None, count: int
+) -> list[int | None]:
     """Give each run its bundle size.
 
     Args:
@@ -109,7 +111,7 @@ def broadcast_bundle_sizes(bundle_size: int | Sequence[int], count: int) -> list
     Returns:
         One size per run.
     """
-    if isinstance(bundle_size, int):
+    if bundle_size is None or isinstance(bundle_size, int):
         return [bundle_size] * count
     return _sized(list(bundle_size), count, "bundle_size")
 
