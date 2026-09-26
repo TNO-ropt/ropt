@@ -3062,48 +3062,65 @@ emitting run, and every other run waiting on the same handler. See
 <a href="../workflows/#using-handlers-safely">Using handlers safely</a>.</p>
 <h2 id="executor">Executor</h2>
 <p>Subclass <a class="autorefs autorefs-internal" title="            ropt.components.executors.ExecutorBase" href="../../reference/components_executors/#ropt.components.executors.ExecutorBase"><code>ExecutorBase</code></a> rather than
-<a class="autorefs autorefs-internal" title="            ropt.components.executors.Executor" href="../../reference/components_executors/#ropt.components.executors.Executor"><code>Executor</code></a>: it provides <code>submit</code>,
-<code>is_running</code>, <code>cancel</code> and submission ownership.</p>
-<p>You implement two methods. <code>start</code> must call <code>_begin_start</code> <strong>before</strong> creating
-any resources and <code>_finish_start</code> once they are in place — the first guards
-against a double start and rebinds the asyncio primitives to the current loop,
-the second publishes the loop and waits until the executor is ready.
-<code>_cleanup</code> releases those resources, and runs on the loop thread.</p>
+<a class="autorefs autorefs-internal" title="            ropt.components.executors.Executor" href="../../reference/components_executors/#ropt.components.executors.Executor"><code>Executor</code></a>: it provides
+<a class="autorefs autorefs-internal" title="            run
+
+
+  
+      abstractmethod
+  " href="../../reference/components_executors/#ropt.components.executors.Executor.run"><code>run</code></a>,
+<a class="autorefs autorefs-internal" title="            close
+
+
+  
+      abstractmethod
+  " href="../../reference/components_executors/#ropt.components.executors.Executor.close"><code>close</code></a>, the <code>closed</code> flag, the
+refusal of a caller that is one of its own workers, and the split of a batch
+into bundles.</p>
+<p>You implement two methods. <code>_run_bundles</code> runs the bundles and passes each
+result to <code>store</code> as it arrives; it must release whatever the batch started
+before it returns, including when <code>store</code> raises. <code>_release</code> releases the
+executor's own resources, and runs with the lock not held.</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">MyExecutor</span><span class="p">(</span><span class="n">ExecutorBase</span><span class="p">):</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_group</span><span class="p">):</span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_begin_start</span><span class="p">()</span>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>        <span class="o">...</span>                       <span class="c1"># create resources</span>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>        <span class="n">task_group</span><span class="o">.</span><span class="n">create_task</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_run_worker</span><span class="p">())</span>
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_finish_start</span><span class="p">(</span><span class="n">task_group</span><span class="p">)</span>
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>
-</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>        <span class="o">...</span>                       <span class="c1"># release them</span>
-</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_cleanup_submissions</span><span class="p">()</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_run_bundles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bundles</span><span class="p">,</span> <span class="n">store</span><span class="p">):</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>        <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">bundle</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">bundles</span><span class="p">):</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>            <span class="n">results</span> <span class="o">=</span> <span class="p">[</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>                <span class="n">item</span><span class="o">.</span><span class="n">function</span><span class="p">(</span><span class="o">*</span><span class="n">item</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">item</span><span class="o">.</span><span class="n">kwargs</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">bundle</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>            <span class="p">]</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>            <span class="n">store</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">results</span><span class="p">)</span>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_release</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>        <span class="o">...</span>                       <span class="c1"># release the executor's resources</span>
 </span></code></pre></div>
-<p>Every work item ends in
-exactly one of three ways, and the choice determines whether the executor survives:</p>
+<p>Every bundle ends in exactly one of three ways, and the choice determines
+whether the executor survives:</p>
 <table>
 <thead>
 <tr>
 <th>Outcome</th>
-<th>Call</th>
+<th>Passed to <code>store</code></th>
 <th>Effect</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>The function returned</td>
-<td><code>_deliver(submission, work_item, value)</code></td>
+<td>The functions returned</td>
+<td>the list of their results</td>
 <td>Normal result.</td>
 </tr>
 <tr>
 <td>The machinery failed</td>
-<td><code>_deliver(submission, work_item, ExecutorFailure(...))</code></td>
+<td>an <a class="autorefs autorefs-internal" title="            ropt.components.executors.ExecutorFailure
+
+
+  
+      dataclass
+  " href="../../reference/components_executors/#ropt.components.executors.ExecutorFailure"><code>ExecutorFailure</code></a></td>
 <td>Raised as an <a class="autorefs autorefs-internal" title="            ExecutionError" href="../../reference/exceptions/#ropt.exceptions.ExecutionError"><code>ExecutionError</code></a> by the evaluator; the executor keeps running.</td>
 </tr>
 <tr>
-<td>The function raised</td>
-<td><code>_fail(submission, exc)</code></td>
+<td>A function raised</td>
+<td><code>store</code> is not called; raise the exception out of <code>_run_bundles</code></td>
 <td>The exception is re-raised unchanged in the caller; the executor keeps running.</td>
 </tr>
 </tbody>
@@ -3114,21 +3131,18 @@ exactly one of three ways, and the choice determines whether the executor surviv
   
       dataclass
   " href="../../reference/components_executors/#ropt.components.executors.ExecutorFailure"><code>ExecutorFailure</code></a> is a value, not
-an exception — deliver it, never raise it. Confusing the two rows is the common
-mistake: a bug in user code delivered as an <code>ExecutorFailure</code> would be reported
-as broken infrastructure, and a dead worker passed to <code>_fail</code> would surface as a
-user error. See
+an exception — store it, never raise it. Confusing the first two rows is the
+common mistake: a bug in user code stored as an <code>ExecutorFailure</code> would be
+reported as broken infrastructure, and a dead worker raised out of
+<code>_run_bundles</code> would surface as a user error. See
 <a href="../parallel/#error-handling">Error handling</a> for the distinction.</p>
-<p>Two further rules. Skip a submission whose <code>is_finished</code> is already <code>True</code> — its
-caller is no longer waiting, so running its work items only occupies a worker. And call
-<code>_cleanup_submissions</code> from <code>_cleanup</code>, which aborts whatever is outstanding so
-no caller is left blocked in
-<a class="autorefs autorefs-internal" title="            collect" href="../../reference/components_executors/#ropt.components.executors.Submission.collect"><code>collect</code></a>.</p>
-<p>One obligation is less obvious. <code>on_worker_thread</code> defaults to <code>False</code>, and
-<code>submit</code> uses it to refuse work sent from the executor's own workers — a caller
-that waits there occupies a worker its own submission needs. An executor whose
-workers run in this process must override it, or that refusal never fires.
-<code>on_worker_loop</code> needs no attention: <code>ExecutorBase</code> implements it.</p>
+<p>Two further rules. State of the executor's own that must stay in step with
+closing goes under <code>_lock</code>, which <code>ExecutorBase</code> exposes for that purpose; the
+<code>_on_close</code> hook runs with it held. <code>run</code> refuses work sent from the executor's
+own workers — a caller that waits there occupies a worker its own batch needs —
+by reading <code>_thread_state.running_work_item</code>, a thread-local flag. An executor
+whose workers are threads in this process sets that flag for as long as a work
+item runs on one; one whose workers run elsewhere never sets it.</p>
 
 
 

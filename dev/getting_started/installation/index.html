@@ -3032,12 +3032,12 @@ works without it:</p>
 </thead>
 <tbody>
 <tr>
-<td><a href="../../running/parallel/#process-pool">Process pools</a></td>
+<td><a href="../../running/parallel/#process-executor">Process executors</a></td>
 <td>Evaluation functions at the top level of a module <em>or of the script you ran</em></td>
 <td>Lambdas, closures, and notebook-defined evaluation functions</td>
 </tr>
 <tr>
-<td><a href="../../running/parallel/#local-pool">Local and cluster jobs</a></td>
+<td><a href="../../running/parallel/#local-executor">Local and cluster jobs</a></td>
 <td>Evaluation functions at the top level of a module the worker can <strong>import</strong></td>
 <td>The same, plus functions defined in the script you ran, and results built from locally defined classes</td>
 </tr>
@@ -3048,7 +3048,7 @@ works without it:</p>
 </tr>
 </tbody>
 </table>
-<p>The two pool rows differ. A process pool
+<p>The two executor rows differ. A process executor
 starts its workers with <code>spawn</code>, which re-imports the script you launched, so a
 function defined there can be looked up again. A local or cluster job is a fresh
 command whose <code>__main__</code> is <code>ropt</code>'s own worker module, so a function defined in

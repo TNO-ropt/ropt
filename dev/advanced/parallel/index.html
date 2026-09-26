@@ -1713,10 +1713,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#why-asyncio" class="md-nav__link">
+  <a href="#the-blocking-model" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Why asyncio?
+        The blocking model
       
     </span>
   </a>
@@ -3121,10 +3121,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#why-asyncio" class="md-nav__link">
+  <a href="#the-blocking-model" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Why asyncio?
+        The blocking model
       
     </span>
   </a>
@@ -3392,39 +3392,50 @@
 
 <h1 id="parallel-evaluation">Parallel Evaluation</h1>
 <p>For non-trivial problems, function evaluations dominate runtime and are commonly
-run in parallel, either on a single machine or on a cluster. <code>ropt</code> uses
-Python's <code>asyncio</code> framework to enable this.</p>
+run in parallel, either on a single machine or on a cluster. <code>ropt</code> does this
+with <strong>executors</strong>: objects that run a batch of calls elsewhere and return the
+results.</p>
 <p>This page assumes familiarity with <a href="../workflows/">Optimization Workflows</a>.</p>
-<h2 id="why-asyncio">Why asyncio?</h2>
-<p>A single compute step could in principle run its evaluations in parallel
-without an event loop — for example by spawning threads directly. What an
-asynchronous approach adds is <strong>multiple compute
-steps running concurrently</strong>. With <code>asyncio</code>, several optimizations can share the
-same pool of workers, the event loop dispatches evaluation tasks as they
-arrive, and results flow back without blocking other work.</p>
-<p>The <a class="autorefs autorefs-internal" title="            ropt.components.evaluators.ParallelEvaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.ParallelEvaluator"><code>ParallelEvaluator</code></a> is the
-evaluator that bridges the synchronous compute-step <code>run()</code> call and the
-asynchronous world. It submits the rows of the variable batch to an
-<a class="autorefs autorefs-internal" title="            ropt.components.executors.Executor" href="../../reference/components_executors/#ropt.components.executors.Executor"><code>Executor</code></a> as a single
-<a class="autorefs autorefs-internal" title="            ropt.components.executors.Submission" href="../../reference/components_executors/#ropt.components.executors.Submission"><code>Submission</code></a>. The executor runs the
-submission's work items on its workers and delivers each result back to the
-submission, which the evaluator collects.</p>
-<p>Because compute steps call <code>run()</code> synchronously, the step itself is typically
-dispatched with <code>asyncio.to_thread</code> so the event loop remains free to service
-the executor's workers and other concurrent steps.</p>
-<h2 id="parallelevaluator">ParallelEvaluator</h2>
-<p><a class="autorefs autorefs-internal" title="            ropt.components.evaluators.ParallelEvaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.ParallelEvaluator"><code>ParallelEvaluator</code></a> wraps a
-per-realization function — the same kind of callable used by
-<a class="autorefs autorefs-internal" title="            ropt.components.evaluators.FunctionEvaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.FunctionEvaluator"><code>FunctionEvaluator</code></a> — and submits
-each active row of the evaluation batch as its own
+<h2 id="the-blocking-model">The blocking model</h2>
+<p>An <a class="autorefs autorefs-internal" title="            ropt.components.executors.Executor" href="../../reference/components_executors/#ropt.components.executors.Executor"><code>Executor</code></a> has one method for work,
+<a class="autorefs autorefs-internal" title="            run
+
+
+  
+      abstractmethod
+  " href="../../reference/components_executors/#ropt.components.executors.Executor.run"><code>run</code></a>. It takes a sequence of
 <a class="autorefs autorefs-internal" title="            ropt.components.executors.WorkItem
 
 
   
       dataclass
-  " href="../../reference/components_executors/#ropt.components.executors.WorkItem"><code>WorkItem</code></a> in one
-<a class="autorefs autorefs-internal" title="            ropt.components.executors.Submission" href="../../reference/components_executors/#ropt.components.executors.Submission"><code>Submission</code></a>. It then waits for the
-submission's results.</p>
+  " href="../../reference/components_executors/#ropt.components.executors.WorkItem"><code>WorkItem</code></a> objects, blocks until every one
+of them has an outcome, and returns the results in the order the items were
+given. A compute step calls it on the thread it is already on.</p>
+<p>Several compute steps can share one executor. Each blocks in its own <code>run()</code>
+call on its own thread, and each gets back the results of its own batch. Running
+several optimizations at once is therefore a matter of starting a thread per
+optimization — <a class="autorefs autorefs-internal" title="            ropt.components.concurrency.run_concurrent" href="../../reference/components_utils/#ropt.components.concurrency.run_concurrent"><code>run_concurrent</code></a>
+does that, and is what <a class="autorefs autorefs-internal" title="            ropt.simple.optimize_many" href="../../reference/simple/#ropt.simple.optimize_many"><code>optimize_many</code></a> is built
+on.</p>
+<h2 id="parallelevaluator">ParallelEvaluator</h2>
+<p><a class="autorefs autorefs-internal" title="            ropt.components.evaluators.ParallelEvaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.ParallelEvaluator"><code>ParallelEvaluator</code></a> wraps a
+per-realization function — the same kind of callable used by
+<a class="autorefs autorefs-internal" title="            ropt.components.evaluators.FunctionEvaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.FunctionEvaluator"><code>FunctionEvaluator</code></a> — and turns
+each active row of the evaluation batch into its own
+<a class="autorefs autorefs-internal" title="            ropt.components.executors.WorkItem
+
+
+  
+      dataclass
+  " href="../../reference/components_executors/#ropt.components.executors.WorkItem"><code>WorkItem</code></a>. It passes them all to
+<a class="autorefs autorefs-internal" title="            run
+
+
+  
+      abstractmethod
+  " href="../../reference/components_executors/#ropt.components.executors.Executor.run"><code>run</code></a> in one call and blocks until the
+results come back.</p>
 <p>Constructor parameters:</p>
 <table>
 <thead>
@@ -3444,37 +3455,42 @@ submission's results.</p>
 </tr>
 <tr>
 <td><code>batch_id_callback</code></td>
-<td>Callable returning the next batch ID each time it is called (default: an internal <a class="autorefs autorefs-internal" title="            ropt.components.evaluators.BatchIdCounter" href="../../reference/components_evaluators/#ropt.components.evaluators.BatchIdCounter"><code>BatchIdCounter</code></a>).</td>
+<td>Callable returning the next batch ID each time it is called (default: the program-wide batch-ID counter).</td>
 </tr>
 <tr>
 <td><code>bundle_size</code></td>
-<td>Evaluations sent to a worker together, <code>0</code> for a whole batch (default: 1).</td>
+<td>Evaluations sent to a worker together, <code>0</code> for a whole batch, <code>None</code> for the executor's own default (default: <code>None</code>).</td>
 </tr>
 </tbody>
 </table>
 <p>How many of those work items travel to a worker together follows
 <code>bundle_size</code>. See <a href="#bundling">Bundling</a>.</p>
-<p>If the executor is not running when <code>eval()</code> is called, the evaluator raises an
-<a class="autorefs autorefs-internal" title="            ExecutorStopped" href="../../reference/exceptions/#ropt.exceptions.ExecutorStopped"><code>ExecutorStopped</code></a> exception.</p>
+<p>If the executor is closed when <code>eval()</code> is called, the evaluator raises a
+<a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a>; if it closes while the call is
+waiting, an <a class="autorefs autorefs-internal" title="            ExecutorStopped" href="../../reference/exceptions/#ropt.exceptions.ExecutorStopped"><code>ExecutorStopped</code></a> is raised
+instead.</p>
 <h2 id="executors">Executors</h2>
-<p>An <a class="autorefs autorefs-internal" title="            ropt.components.executors.Executor" href="../../reference/components_executors/#ropt.components.executors.Executor"><code>Executor</code></a> accepts
-<a class="autorefs autorefs-internal" title="            ropt.components.executors.Submission" href="../../reference/components_executors/#ropt.components.executors.Submission"><code>Submission</code></a> objects and dispatches their
+<p>An <a class="autorefs autorefs-internal" title="            ropt.components.executors.Executor" href="../../reference/components_executors/#ropt.components.executors.Executor"><code>Executor</code></a> runs
 <a class="autorefs autorefs-internal" title="            ropt.components.executors.WorkItem
 
 
   
       dataclass
-  " href="../../reference/components_executors/#ropt.components.executors.WorkItem"><code>WorkItem</code></a> objects to a pool of workers.
-All executors share the same lifecycle:</p>
+  " href="../../reference/components_executors/#ropt.components.executors.WorkItem"><code>WorkItem</code></a> objects on its workers. All
+executors share the same lifecycle:</p>
 <ol>
 <li>Create the executor instance.</li>
-<li>Start it inside an <code>asyncio.TaskGroup</code> with <code>await executor.start(tg)</code>.</li>
-<li>Use it (via <code>ParallelEvaluator</code>, or by submitting
-   <a class="autorefs autorefs-internal" title="            ropt.components.executors.Submission" href="../../reference/components_executors/#ropt.components.executors.Submission"><code>Submission</code></a> objects directly).</li>
-<li>Shut it down with <code>executor.cancel()</code> — see
-   <a href="#stopping-an-executor">Stopping an executor</a> for what that does to work
+<li>Use it (via <code>ParallelEvaluator</code>, or by calling <code>run()</code> directly).</li>
+<li>Release its workers with <code>close()</code>, or by using it as a context manager —
+   see <a href="#stopping-an-executor">Stopping an executor</a> for what that does to work
    that is already running.</li>
 </ol>
+<p>An executor that is dropped without being closed still releases its workers when
+it is collected: the thread and process pools shut down with the executor, and a
+<a class="autorefs autorefs-internal" title="            ropt.components.executors.LocalJobExecutor" href="../../reference/components_executors/#ropt.components.executors.LocalJobExecutor"><code>LocalJobExecutor</code></a> stops its
+teardown thread and removes a temporary directory it created, if nothing is left
+in it. The local case reports a <code>ResourceWarning</code>. Python ignores that category
+by default; run with <code>-W default::ResourceWarning</code> or <code>-X dev</code> to see it.</p>
 <p>One rule covers every executor that leaves the process: <strong>out-of-process work
 needs importable, module-level callables.</strong> A work item's function and arguments
 are serialized, and the standard <code>pickle</code> module can only send what it can look
@@ -3486,10 +3502,9 @@ a script you ran, a notebook cell, an interactive session — is different: it
 the worker, which reports the name it could not find. Whether that name resolves
 depends on the worker: <code>ProcessExecutor</code> re-imports <code>__main__</code>, so a script's
 functions are found again, while the local and HPC executors run a fresh command
-whose <code>__main__</code> is ropt's own, so they are not. Installing
-<code>ropt[cloudpickle]</code> lifts the restriction for all of them.
-<code>ThreadExecutor</code> serializes nothing and is never
-affected.</p>
+whose <code>__main__</code> is ropt's own, so they are not. Installing <code>ropt[cloudpickle]</code>
+lifts the restriction for all of them. <code>ThreadExecutor</code> serializes nothing and
+is never affected.</p>
 <div class="admonition note">
 <p class="admonition-title">Working directory</p>
 <p>Work items cannot rely on the current directory being set consistently.
@@ -3500,35 +3515,39 @@ work in a process of its own it can be changed safely per work item.</p>
 <div class="admonition note">
 <p class="admonition-title">No event handling across process boundaries</p>
 <p>A work item sent to a <code>ProcessExecutor</code>, a <code>LocalJobExecutor</code> or an
-<code>HPCExecutor</code> runs in
-a separate process. If such a work item runs a compute step, that step's
-event handlers stay in the worker process and cannot deliver events to a
-handler in the host process — return results as data instead.
+<code>HPCExecutor</code> runs in a separate process. If such a work item runs a compute
+step, that step's event handlers stay in the worker process and cannot
+deliver events to a handler in the host process — return results as data
+instead.
 See <a href="../workflows/#events-are-a-single-process-mechanism">Events are a single-process mechanism</a>.</p>
 </div>
 <h3 id="bundling">Bundling</h3>
-<p>A <a class="autorefs autorefs-internal" title="            ropt.components.executors.Submission" href="../../reference/components_executors/#ropt.components.executors.Submission"><code>Submission</code></a> carries a <code>bundle_size</code>:
-how many of its work items are sent to a worker together, to be run one after
-another there. The default of <code>1</code> sends each item on its own, spreading a
-submission as widely as the workers allow; a larger value amortizes the cost of
-a transfer when the items are cheap relative to it; <code>0</code> sends a whole submission
-at once. A bundle never spans submissions, so <code>0</code> is bounded by the submission.</p>
-<p>The submission is the only place the size is set. An executor takes no
-<code>bundle_size</code> of its own, and <a href="#parallelevaluator"><code>ParallelEvaluator</code></a> passes
-on the size it was given. <code>ThreadExecutor</code> ignores it: it has no transfer to
-amortize, and a fixed bundle would keep a thread that finishes early from
-picking up more work.</p>
+<p>A <code>bundle_size</code> says how many work items are sent to a worker together, to be
+run one after another there. The default of <code>1</code> sends each item on its own,
+spreading a batch as widely as the workers allow; a larger value amortizes the
+cost of a transfer when the items are cheap relative to it; <code>0</code> sends a whole
+batch at once. A bundle never spans batches, so <code>0</code> is bounded by one <code>run()</code>
+call.</p>
+<p>It can be set in two places. Every executor takes a <code>bundle_size</code> at
+construction, used by any call that does not state one, and
+<a class="autorefs autorefs-internal" title="            run
+
+
+  
+      abstractmethod
+  " href="../../reference/components_executors/#ropt.components.executors.Executor.run"><code>run</code></a> takes one that overrides it for
+that call. <a href="#parallelevaluator"><code>ParallelEvaluator</code></a> passes on the size it was
+given, or <code>None</code> to leave the choice to the executor. Every executor honours it,
+<code>ThreadExecutor</code> included: a bundle is one worker task there as well.</p>
 <p>Four implementations are provided:</p>
 <h3 id="threadexecutor">ThreadExecutor</h3>
-<p><a class="autorefs autorefs-internal" title="            ropt.components.executors.ThreadExecutor" href="../../reference/components_executors/#ropt.components.executors.ThreadExecutor"><code>ThreadExecutor</code></a> owns a
-<code>ThreadPoolExecutor</code> of its own and dispatches tasks to it with
-<code>loop.run_in_executor</code>. Use this for I/O-bound evaluations or when the
-evaluation function releases the GIL (e.g. calls into C/Fortran).</p>
-<p>The pool is private for a reason: <code>asyncio.to_thread</code> would use the event loop's
-<em>shared</em> default executor, the same one every other <code>to_thread</code> call in the
-process draws from — including the one that dispatches each compute step's
-<code>run()</code>. Filling it with evaluations would starve the steps waiting on them,
-which is precisely the deadlock
+<p><a class="autorefs autorefs-internal" title="            ropt.components.executors.ThreadExecutor" href="../../reference/components_executors/#ropt.components.executors.ThreadExecutor"><code>ThreadExecutor</code></a> owns a private
+<code>ThreadPoolExecutor</code> and runs each bundle as a task on it. Use this for I/O-bound
+evaluations or when the evaluation function releases the GIL (e.g. calls into
+C/Fortran).</p>
+<p>The thread pool is private for a reason: a shared one would also hold the
+threads that concurrent compute steps block on, and filling it with evaluations
+would starve the steps waiting on them. That is the deadlock
 <a class="autorefs autorefs-internal" title="            ropt.components.concurrency.run_concurrent" href="../../reference/components_utils/#ropt.components.concurrency.run_concurrent"><code>run_concurrent</code></a> exists to avoid.</p>
 <p>Threads are not a lesser form of parallelism here. Python runs one thread's
 <em>bytecode</em> at a time, but a thread that is <strong>waiting</strong> holds nothing: the GIL is
@@ -3547,6 +3566,10 @@ inside a library that has let the GIL go.</p>
 <tr>
 <td><code>workers</code></td>
 <td>Number of concurrent worker threads (default: 1).</td>
+</tr>
+<tr>
+<td><code>bundle_size</code></td>
+<td>Default calls per worker task, <code>0</code> for a whole batch (default: 1).</td>
 </tr>
 </tbody>
 </table>
@@ -3578,6 +3601,10 @@ case.</p>
 <tr>
 <td><code>max_tasks_per_child</code></td>
 <td>Restart workers after this many work items (default: <code>None</code> = never). Useful if evaluations leak memory, but adds significant overhead.</td>
+</tr>
+<tr>
+<td><code>bundle_size</code></td>
+<td>Default calls per worker task, <code>0</code> for a whole batch (default: 1).</td>
 </tr>
 </tbody>
 </table>
@@ -3616,21 +3643,20 @@ runs the same code again in each worker, which tries to start yet more processes
 before the interpreter has finished bootstrapping. Python aborts this, the
 workers never start, and <code>ProcessExecutor</code> raises an
 <a class="autorefs autorefs-internal" title="            ExecutionError" href="../../reference/exceptions/#ropt.exceptions.ExecutionError"><code>ExecutionError</code></a> at startup.</p>
-<p>The fix is to keep the code that creates and runs the executor behind an
+<p><code>ProcessExecutor</code> checks for the guard when it is constructed, so the failure
+arrives at construction rather than at the first evaluation. The fix is to keep
+the code that creates and uses the executor behind an
 <code>if __name__ == "__main__":</code> guard (or inside a function called from there):</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">executor</span> <span class="o">=</span> <span class="n">ProcessExecutor</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="k">async</span> <span class="k">with</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">TaskGroup</span><span class="p">()</span> <span class="k">as</span> <span class="n">tg</span><span class="p">:</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>        <span class="k">await</span> <span class="n">executor</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="n">tg</span><span class="p">)</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>        <span class="o">...</span>  <span class="c1"># submit work here</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>        <span class="n">executor</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="k">with</span> <span class="n">ProcessExecutor</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="k">as</span> <span class="n">executor</span><span class="p">:</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>        <span class="o">...</span>  <span class="c1"># run work here</span>
 </span></code></pre></div>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Wrong: run at module top level. Each worker re-imports this and fails.</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">main</span><span class="p">()</span>
 </span></code></pre></div>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># Right: the guarded block is skipped during the worker re-import.</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    <span class="n">main</span><span class="p">()</span>
 </span></code></pre></div>
 <p>This is the standard "safe importing of main module" contract of Python's
 <code>multiprocessing</code>. Interactive sessions (Jupyter/IPython) and test
@@ -3686,6 +3712,10 @@ starts it directly.</p>
 <td><code>cleanup</code></td>
 <td>Whether to remove a work item's files once it settles (default: <code>True</code>).</td>
 </tr>
+<tr>
+<td><code>bundle_size</code></td>
+<td>Default calls per job, <code>0</code> for a whole batch (default: 1).</td>
+</tr>
 </tbody>
 </table>
 <p>The defaults differ from the HPC ones for reasons that follow from where the
@@ -3694,37 +3724,35 @@ exits, so waiting is dead time rather than politeness towards a scheduler.
 <code>retries</code> is <code>0</code> because a job writes and renames its result before exiting, so
 there is no shared filesystem that might not have caught up yet.</p>
 <p><strong>Stopping kills the job's whole process group.</strong> Each job is started in a
-session of its own, so <code>cancel()</code> reaches whatever the job started itself,
-rather than leaving those orphaned. This needs process groups, so the executor
-is <strong>POSIX only</strong> and refuses to be constructed elsewhere.</p>
-<p>Waiting for a killed job to actually die happens on a thread of its own, never
-on the event loop: a Ctrl-C that has to wait for cancellation to finish is the
-thing this arrangement avoids. That same thread removes a working directory this
-executor created, once the jobs writing to it are gone.</p>
+session of its own, so <code>close()</code> reaches whatever the job started itself, rather
+than leaving those orphaned. This needs process groups, so the executor is
+<strong>POSIX only</strong> and refuses to be constructed elsewhere.</p>
+<p>Waiting for a killed job to actually die happens on a thread of its own, so
+<code>close()</code> returns without waiting it out. That same thread removes a working
+directory this executor created, once the jobs writing to it are gone.</p>
 <p>It removes it only when there is nothing left in it to read, though. A work item
 that failed keeps its captured output, and <code>cleanup=False</code> keeps everything, so
 in either case the directory is <strong>kept</strong> and its path logged at <code>WARNING</code> — a
 temporary directory has a random name, and one that is kept without being named
 is one nobody can find. A directory you passed yourself is never removed.</p>
-<p>Each run gets a directory of its own: an executor restarted after keeping one
-creates another, rather than writing into the files of the directory it kept.
-Read <a class="autorefs autorefs-internal" title="            workdir
+<p>Each executor gets a directory of its own, rather than writing into the files of
+a directory another one kept. Read
+<a class="autorefs autorefs-internal" title="            workdir
 
 
   
       property
-  " href="../../reference/components_executors/#ropt.components.executors.LocalJobExecutor.workdir"><code>workdir</code></a> for the
-current one.</p>
+  " href="../../reference/components_executors/#ropt.components.executors.LocalJobExecutor.workdir"><code>workdir</code></a> for it.</p>
 <h3 id="hpcexecutor">HPCExecutor</h3>
 <p><a class="autorefs autorefs-internal" title="            ropt.components.executors.HPCExecutor" href="../../reference/components_executors/#ropt.components.executors.HPCExecutor"><code>HPCExecutor</code></a> submits tasks as jobs to an
 HPC scheduler (e.g. Slurm) via the <code>pysqa</code> library. Each task is serialized to
 disk, submitted to the queue, polled for completion, and its result is
 deserialized back. Requires <code>ropt[hpc]</code> to be installed. Add <code>ropt[cloudpickle]</code>
 to send functions the standard <code>pickle</code> module cannot.</p>
-<p>Stopping the executor with <code>cancel()</code> asks the scheduler to delete every job it
-has submitted, so an interrupted optimization does not leave orphan jobs behind
-consuming the cluster allocation. Cancellation is best effort: if the scheduler
-cannot be reached the failure is logged and stopping continues.</p>
+<p>Closing the executor asks the scheduler to delete every job it has submitted, so
+an interrupted optimization does not leave orphan jobs behind consuming the
+cluster allocation. Cancellation is best effort: if the scheduler cannot be
+reached the failure is logged and closing continues.</p>
 <table>
 <thead>
 <tr>
@@ -3886,11 +3914,13 @@ own script.</p>
 cluster, each declaring its own <code>queue_type</code>; see the
 <a href="https://pysqa.readthedocs.io/en/latest/advanced.html#access-to-multiple-hpcs"><code>pysqa</code> documentation</a>.</p>
 <h2 id="stopping-an-executor">Stopping an executor</h2>
-<p><code>executor.cancel()</code> stops the executor and returns immediately; it never waits
-for work that is already running. Callers see the same thing whichever executor
-they used — a submission still in progress ends with
-<a class="autorefs autorefs-internal" title="            ExecutorStopped" href="../../reference/exceptions/#ropt.exceptions.ExecutorStopped"><code>ExecutorStopped</code></a>. What differs is what keeps
-running afterwards, because what <em>can</em> be done to running work differs:</p>
+<p><code>executor.close()</code> releases the executor's workers and returns immediately; it
+never waits for work that is already running. A caller blocked in <code>run()</code> when
+it happens is released with
+<a class="autorefs autorefs-internal" title="            ExecutorStopped" href="../../reference/exceptions/#ropt.exceptions.ExecutorStopped"><code>ExecutorStopped</code></a>; a <code>run()</code> started after it
+is refused with a <a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a>. What differs
+per executor is what keeps running afterwards, because what <em>can</em> be done to
+running work differs:</p>
 <table>
 <thead>
 <tr>
@@ -3924,11 +3954,12 @@ running afterwards, because what <em>can</em> be done to running work differs:</
 </table>
 <p><strong>Threads run to completion because a thread cannot be cancelled.</strong> Python
 offers no way to interrupt one from outside, so an evaluation on a
-<code>ThreadExecutor</code> stops only when it returns. <code>cancel()</code> returns at once,
-but the program cannot leave until those evaluations return — the pool joins its
+<code>ThreadExecutor</code> stops only when it returns. <code>close()</code> returns at once, but the
+program cannot leave until those evaluations return — the thread pool joins its
 threads at interpreter shutdown. Rather than let that look like a hang, the
-executor logs a <code>WARNING</code> naming how many are still running. An evaluation that
-may run long and has to be interruptible belongs on one of the other three.</p>
+executor logs a <code>WARNING</code> naming how many are still running. An
+evaluation that may run long and has to be interruptible belongs on one of the
+other three.</p>
 <p><strong>The kill is a <code>SIGTERM</code>, and the guarantee is partial.</strong> In each of the other
 three cases the target is <em>asked</em> to end and is not waited for, so a process
 that blocks or ignores <code>SIGTERM</code>, or that sits in an uninterruptible system
@@ -3936,7 +3967,7 @@ call, outlives the request. Stopping is a strong best effort — enough that an
 interrupted program exits instead of waiting for the current batch — not a
 promise that nothing of the run survives it.</p>
 <div class="admonition warning">
-<p class="admonition-title">A process pool orphans whatever an evaluation launched itself</p>
+<p class="admonition-title">A process executor orphans whatever an evaluation launched itself</p>
 <p><a class="autorefs autorefs-internal" title="            ropt.components.executors.ProcessExecutor" href="../../reference/components_executors/#ropt.components.executors.ProcessExecutor"><code>ProcessExecutor</code></a> terminates
 its own worker processes and nothing else. It installs no process groups, so
 a subprocess an evaluation started — a simulator, a solver, a shell
@@ -3983,8 +4014,8 @@ result whose value is an
   
       dataclass
   " href="../../reference/components_executors/#ropt.components.executors.ExecutorFailure"><code>ExecutorFailure</code></a>
-(via <a class="autorefs autorefs-internal" title="            deliver" href="../../reference/components_executors/#ropt.components.executors.Submission.deliver"><code>deliver</code></a>), which leaves the
-executor running rather than tearing it down.</p>
+rather than raised, which leaves the executor usable rather than tearing it
+down.</p>
 <p>The evaluator turns that result into an
 <a class="autorefs autorefs-internal" title="            ExecutionError" href="../../reference/exceptions/#ropt.exceptions.ExecutionError"><code>ExecutionError</code></a>, naming how many evaluations
 were lost and why, which ends the run. It does <strong>not</strong> write <code>numpy.nan</code> for the
@@ -4004,10 +4035,9 @@ still sets how many a batch may contain before the run ends with
 <p>A <em>user-code</em> exception is one raised by the evaluation function itself — a bug
 in the objective, a bad configuration, an unexpected input. This must not be
 silently turned into a failed realization; it signals a genuine error the user
-needs to see and fix. When the work item's function raises, the worker ends the
-submission with the exception (via
-<a class="autorefs autorefs-internal" title="            fail" href="../../reference/components_executors/#ropt.components.executors.Submission.fail"><code>fail</code></a>) and returns to serving
-further work. It does <strong>not</strong> tear the executor down.</p>
+needs to see and fix. When the work item's function raises, the worker abandons
+the rest of that batch, hands the exception to the caller of <code>run()</code> and returns
+to serving further work. It does <strong>not</strong> tear the executor down.</p>
 <p>The owning
 <a class="autorefs autorefs-internal" title="            eval" href="../../reference/components_evaluators/#ropt.components.evaluators.Evaluator.eval"><code>ParallelEvaluator.eval</code></a>
 call receives the exception and <strong>re-raises the original unchanged</strong>, aborting
@@ -4019,16 +4049,13 @@ propagating out of <code>eval()</code> (and out of the compute step) on the call
 scope</strong>, not by the error:</p>
 <ul>
 <li>Left unhandled, the exception propagates out of the block that owns the
-  executor (for example an <code>async with asyncio.TaskGroup()</code> that a compute step
-  runs inside), whose unwinding cancels the workers and stops the executor —
-  "abort everything".</li>
-<li>Caught before it reaches that block, the executor stays alive and can be
+  executor — a <code>with</code> statement on it, for example — whose unwinding closes it.</li>
+<li>Caught before it reaches that block, the executor stays open and can be
   reused for further evaluations. This is what lets several compute steps share
   one executor and lets a bug in one be isolated from the others.</li>
 </ul>
-<p>Only a <code>BaseException</code> (for example a cancellation) still propagates out of the
-worker directly, tearing the executor down — that is the intended teardown
-signal and is left untouched.</p>
+<p>A <code>BaseException</code> — a <code>KeyboardInterrupt</code>, say — travels the same way and
+reaches the caller unwrapped, rather than in a <code>BaseExceptionGroup</code>.</p>
 <p>For the <a class="autorefs autorefs-internal" title="            ropt.components.executors.HPCExecutor" href="../../reference/components_executors/#ropt.components.executors.HPCExecutor"><code>HPCExecutor</code></a> the exception
 crosses a process boundary. It is serialized with <code>cloudpickle</code> when that is
 installed and with the standard <code>pickle</code> module otherwise; neither serializes
@@ -4042,8 +4069,8 @@ affect performance, it determines what a dispatched compute step can still
 <em>do</em>. One principle governs the difference.</p>
 <ul>
 <li>A <strong>thread</strong> shares memory with the process that started it. A step's control
-  channels — the event handlers it invokes and the live asyncio loop and
-  executors it relies on — all keep working across threads within one process.</li>
+  channels — the event handlers it invokes and the executors it relies on — all
+  keep working across threads within one process.</li>
 <li>A <strong>process</strong> — a
   <a class="autorefs autorefs-internal" title="            ropt.components.executors.ProcessExecutor" href="../../reference/components_executors/#ropt.components.executors.ProcessExecutor"><code>ProcessExecutor</code></a>
   worker, a <a class="autorefs autorefs-internal" title="            ropt.components.executors.LocalJobExecutor" href="../../reference/components_executors/#ropt.components.executors.LocalJobExecutor"><code>LocalJobExecutor</code></a> job
@@ -4080,19 +4107,15 @@ submitted the work, before any worker sees it. See
 <a href="#nested-workflows-and-process-boundaries">Nested workflows and process boundaries</a>
 for what belongs where.</p>
 <h2 id="two-rules-for-using-the-low-level-api">Two rules for using the low-level API</h2>
-<p><strong>Run a compute step in a worker thread.</strong> <code>step.run()</code> is an ordinary
-synchronous method that runs its evaluator and its handlers <strong>on whatever
-thread called it</strong>. On the event loop thread it blocks the loop, and the
-executors it is waiting for are tasks on that same loop:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1"># Wrong: run() executes here, on the loop thread.</span>
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="n">step</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="n">x0</span><span class="p">)</span>
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>
-</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="c1"># Right: the loop stays free to service the workers.</span>
-</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">to_thread</span><span class="p">(</span><span class="n">step</span><span class="o">.</span><span class="n">run</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="n">x0</span><span class="p">)</span>
-</span></code></pre></div>
-<p><code>ropt.simple</code> already does this for you; it applies when driving compute steps
-yourself. A step that dispatches to an executor detects the mistake and raises
-<a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a> instead of hanging.</p>
+<p><strong>Do not submit to an executor from one of its own workers.</strong> A step running on
+a <a class="autorefs autorefs-internal" title="            ropt.components.executors.ThreadExecutor" href="../../reference/components_executors/#ropt.components.executors.ThreadExecutor"><code>ThreadExecutor</code></a> worker occupies
+that worker for as long as it waits, so work it submits to the same executor can
+only start once it stops waiting — with one worker that is a deadlock, and with
+several it is one whenever the waiting steps outnumber the free workers. <code>run()</code>
+detects the caller and raises
+<a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a> instead of hanging. Give the
+inner work an executor of its own; see
+<a href="../../running/nested/#two-executors-not-one">Two executors, not one</a>.</p>
 <p><strong>Do not run a compute step from inside a handler that the step can reach.</strong> A
 handler holds its own lock while <code>_handle_event</code> runs, so a step started there
 that is attached to the same handler re-enters it. See
@@ -4100,26 +4123,22 @@ that is attached to the same handler re-enters it. See
 <h2 id="nested-workflows-and-process-boundaries">Nested workflows and process boundaries</h2>
 <p>A <em>nested</em> workflow is a compute step whose evaluation function itself runs
 another compute step — for example an outer optimizer whose objective is the
-outcome of an inner optimization. As noted in <a href="#why-asyncio">Why asyncio?</a>,
-several concurrent steps can share one asyncio event loop, and usually shared
-<a class="autorefs autorefs-internal" title="            ropt.components.executors.Executor" href="../../reference/components_executors/#ropt.components.executors.Executor"><code>Executor</code></a>s and event handlers as well.
-All of these live <strong>in a single process</strong>.</p>
+outcome of an inner optimization. Several concurrent steps usually share
+<a class="autorefs autorefs-internal" title="            ropt.components.executors.Executor" href="../../reference/components_executors/#ropt.components.executors.Executor"><code>Executor</code></a>s and event handlers, all of
+which live <strong>in a single process</strong>.</p>
 <p>This is a consequence of the general rule that
 <a href="../workflows/#events-are-a-single-process-mechanism">events are a single-process mechanism</a>:
 it places a hard constraint on where each layer of a nested workflow may run:</p>
 <div class="admonition warning">
 <p class="admonition-title">The enclosing layer of a nested workflow must run in-process</p>
-<p>The step that <em>runs</em> an inner workflow must execute in the same process as
-the shared event loop — dispatch it via a
+<p>The step that <em>runs</em> an inner workflow must execute in the host process —
+dispatch it via a
 <a class="autorefs autorefs-internal" title="            ropt.components.executors.ThreadExecutor" href="../../reference/components_executors/#ropt.components.executors.ThreadExecutor"><code>ThreadExecutor</code></a>, or run it
 synchronously. It cannot run inside a
 <a class="autorefs autorefs-internal" title="            ropt.components.executors.ProcessExecutor" href="../../reference/components_executors/#ropt.components.executors.ProcessExecutor"><code>ProcessExecutor</code></a>
 or <a class="autorefs autorefs-internal" title="            ropt.components.executors.HPCExecutor" href="../../reference/components_executors/#ropt.components.executors.HPCExecutor"><code>HPCExecutor</code></a> worker, because a
-subprocess or HPC job has no access to the live loop or executors. An inner
-<a class="autorefs autorefs-internal" title="            ropt.components.evaluators.ParallelEvaluator" href="../../reference/components_evaluators/#ropt.components.evaluators.ParallelEvaluator"><code>ParallelEvaluator</code></a> running
-there would find its executor not running and raise
-<a class="autorefs autorefs-internal" title="            ExecutorStopped" href="../../reference/exceptions/#ropt.exceptions.ExecutorStopped"><code>ExecutorStopped</code></a>, and any events
-it emits would never reach the main-process handlers.</p>
+subprocess or HPC job has no access to the host process's executors, and any
+events it emits would never reach the main-process handlers.</p>
 </div>
 <p><a class="autorefs autorefs-internal" title="            ropt.components.compute_steps.OptimizationStep" href="../../reference/components_compute_steps/#ropt.components.compute_steps.OptimizationStep"><code>OptimizationStep</code></a> enforces this
 rule: a step is <strong>bound to its process, not to the thread that created it</strong>. The
@@ -4128,10 +4147,11 @@ created." Concretely:</p>
 <ul>
 <li><strong>Across threads (allowed).</strong> A step may be created on one thread and run on
   another within the same process — for example created on the main thread and
-  driven with <code>asyncio.to_thread</code> or a
-  <a class="autorefs autorefs-internal" title="            ropt.components.executors.ThreadExecutor" href="../../reference/components_executors/#ropt.components.executors.ThreadExecutor"><code>ThreadExecutor</code></a> while handlers
-  created on the main thread collect its events. Event handling keeps working
-  because memory is shared.</li>
+  driven on a thread started by
+  <a class="autorefs autorefs-internal" title="            ropt.components.concurrency.run_concurrent" href="../../reference/components_utils/#ropt.components.concurrency.run_concurrent"><code>run_concurrent</code></a> or on a
+  <a class="autorefs autorefs-internal" title="            ropt.components.executors.ThreadExecutor" href="../../reference/components_executors/#ropt.components.executors.ThreadExecutor"><code>ThreadExecutor</code></a> worker, while
+  handlers created on the main thread collect its events. Event handling keeps
+  working because memory is shared.</li>
 <li><strong>Across processes (forbidden).</strong> A step must not be <em>transferred</em> into a
   <a class="autorefs autorefs-internal" title="            ropt.components.executors.ProcessExecutor" href="../../reference/components_executors/#ropt.components.executors.ProcessExecutor"><code>ProcessExecutor</code></a>
   or <a class="autorefs autorefs-internal" title="            ropt.components.executors.HPCExecutor" href="../../reference/components_executors/#ropt.components.executors.HPCExecutor"><code>HPCExecutor</code></a> worker. A step owns a

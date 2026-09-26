@@ -3122,14 +3122,13 @@ you start on threads of your own. A handler's
 <a class="autorefs autorefs-internal" title="            handle_event" href="../../reference/components_event_handlers/#ropt.components.event_handlers.EventHandler.handle_event"><code>handle_event</code></a>
 takes a lock around each call, so a second run waits for the first to finish
 rather than interleaving with it:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.simple</span><span class="w"> </span><span class="kn">import</span> <span class="n">HistoryHandler</span><span class="p">,</span> <span class="n">optimize_many</span><span class="p">,</span> <span class="n">session</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.simple</span><span class="w"> </span><span class="kn">import</span> <span class="n">HistoryHandler</span><span class="p">,</span> <span class="n">ThreadExecutor</span><span class="p">,</span> <span class="n">optimize_many</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
 </span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">history</span> <span class="o">=</span> <span class="n">HistoryHandler</span><span class="p">()</span>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    <span class="n">pool</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">thread_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    <span class="n">optimize_many</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">start_points</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">pool</span><span class="o">=</span><span class="n">pool</span><span class="p">,</span> <span class="n">handlers</span><span class="o">=</span><span class="p">[</span><span class="n">history</span><span class="p">])</span>
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>
-</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="nb">print</span><span class="p">(</span><span class="n">history</span><span class="o">.</span><span class="n">results</span><span class="p">)</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="k">with</span> <span class="n">ThreadExecutor</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="k">as</span> <span class="n">executor</span><span class="p">:</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    <span class="n">optimize_many</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">start_points</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">executor</span><span class="o">=</span><span class="n">executor</span><span class="p">,</span> <span class="n">handlers</span><span class="o">=</span><span class="p">[</span><span class="n">history</span><span class="p">])</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="nb">print</span><span class="p">(</span><span class="n">history</span><span class="o">.</span><span class="n">results</span><span class="p">)</span>
 </span></code></pre></div>
 <p>The results of the concurrent runs arrive interleaved, in an order that depends
 on which run reaches the handler first. Take the order from the results
@@ -3137,11 +3136,10 @@ themselves — <code>batch_id</code>, or a <code>metadata</code> field you set p
 from the order they arrive in.</p>
 <p><a href="https://github.com/TNO-ropt/ropt/blob/main/examples/simple/handlers.py">examples/simple/handlers.py</a>
 feeds two handlers from the same set of concurrent runs:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">active</span><span class="p">:</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    <span class="n">pool</span> <span class="o">=</span> <span class="n">active</span><span class="o">.</span><span class="n">thread_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">STARTS</span><span class="p">))</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    <span class="n">optimize_many</span><span class="p">(</span>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>        <span class="n">CONFIG</span><span class="p">,</span> <span class="n">STARTS</span><span class="p">,</span> <span class="n">rosenbrock</span><span class="p">,</span> <span class="n">pool</span><span class="o">=</span><span class="n">pool</span><span class="p">,</span> <span class="n">handlers</span><span class="o">=</span><span class="p">[</span><span class="n">history</span><span class="p">,</span> <span class="n">per_run</span><span class="p">]</span>
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    <span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">with</span> <span class="n">ThreadExecutor</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">STARTS</span><span class="p">))</span> <span class="k">as</span> <span class="n">executor</span><span class="p">:</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    <span class="n">optimize_many</span><span class="p">(</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>        <span class="n">CONFIG</span><span class="p">,</span> <span class="n">STARTS</span><span class="p">,</span> <span class="n">rosenbrock</span><span class="p">,</span> <span class="n">executor</span><span class="o">=</span><span class="n">executor</span><span class="p">,</span> <span class="n">handlers</span><span class="o">=</span><span class="p">[</span><span class="n">history</span><span class="p">,</span> <span class="n">per_run</span><span class="p">]</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    <span class="p">)</span>
 </span></code></pre></div>
 <div class="admonition warning">
 <p class="admonition-title">Do not start a run from inside a handler that the run can reach</p>
@@ -3283,10 +3281,11 @@ callback above is just a convenience wrapper around this). Only the run that own
 the emitting step is affected, so concurrent runs continue. See
 <a href="../../advanced/workflows/#exit-codes">Optimization Workflows</a>.</p>
 <h2 id="handlers-and-the-process-boundary">Handlers and the process boundary</h2>
-<p>On a thread pool (or with no pool) your objective and your handlers run in the
-<strong>same process</strong> and share memory: a handler can see anything the objective left
-behind — a global it set, a list it appended to, an object it mutated.</p>
-<p>A process, local, or HPC pool breaks that. The objective runs in a <strong>separate
+<p>On a thread executor (or with no executor) your objective and your handlers run
+in the <strong>same process</strong> and share memory: a handler can see anything the
+objective left behind — a global it set, a list it appended to, an object it
+mutated.</p>
+<p>A process, local, or HPC executor breaks that. The objective runs in a <strong>separate
 worker process</strong>, while the optimizer, your handlers, and the rest of your
 program stay
 in the <strong>main process</strong>. They cannot share memory. The objective's <em>only</em> way to
@@ -3299,7 +3298,7 @@ process:</p>
         hand["handlers +&lt;br/&gt;your code"]
         opt --&gt; hand
     end
-    subgraph worker["worker process (process / HPC pool)"]
+    subgraph worker["worker process (process / local / HPC executor)"]
         obj["objective"]
     end
     opt --&gt;|"variables"| obj
@@ -3308,14 +3307,14 @@ process:</p>
 <summary>How data crosses the boundary</summary>
 <p>To move work and results between processes, <code>ropt</code> <strong>serializes</strong> them —
 turns the objects into bytes and rebuilds them on the other side. Both a
-process pool and an HPC pool use Python's standard <code>pickle</code> by default, so
+process executor and an HPC executor use Python's standard <code>pickle</code> by default, so
 an objective defined at module level works as is; a lambda, a closure, or a
 notebook-defined objective needs the optional <code>cloudpickle</code> extra. Most
 functions and data serialize fine, but things like open files, locks, or
 database connections may not.</p>
-<p>On a process pool the bytes travel over an in-machine channel. On an HPC pool
-they are written as <strong>files on a shared filesystem</strong> that the cluster nodes
-read, so an HPC pool needs such a shared filesystem (its <code>workdir</code>).</p>
+<p>On a process executor the bytes travel over an in-machine channel. On an
+HPC executor they are written as <strong>files on a shared filesystem</strong> that the
+cluster nodes read, so it needs such a filesystem (its <code>workdir</code>).</p>
 <p>Serialization is only the mechanism <code>ropt</code> uses today; the essential
 requirement is that the data can be <em>carried across the boundary</em>, so a
 future version could use a different transport — for example one that works
@@ -3326,19 +3325,19 @@ only in memory — setting a module global, appending to a shared list, updating
 object — happened <strong>inside the worker</strong> and is discarded when it finishes; your
 handlers and your main program never see it.</p>
 <div class="admonition note">
-<p class="admonition-title">Sessions stay in the main process</p>
-<p>A pool, and the session behind it, are tied to the main process, so they
-are not usable in a worker. An objective that closes over one — to offload
-work, or to start an inner run on it — is stopped in the worker, which
-reports the object by name. Do that work in the objective itself, or return
-what you need and act on it in the main process.</p>
+<p class="admonition-title">Executors stay in the main process</p>
+<p>An executor is tied to the main process, so it is not usable in a worker. An
+objective that closes over one — to offload work, or to start an inner run
+on it — is stopped in the worker, which reports the object by name. Do that
+work in the objective itself, or return what you need and act on it in the
+main process.</p>
 </div>
 <p>So to get extra information from an evaluation to a handler (or to a later part
 of your program), <strong>return it</strong> instead of stashing it in shared state: attach it
 to the result's <code>metadata</code> (see <a href="../running/#attaching-metadata">Attaching metadata</a>), which
 is returned with the result. Relying on shared state happens to work on a
-thread pool, but breaks the moment you switch to a process pool; returning the
-data works everywhere.</p>
+thread executor, but breaks the moment you switch to a process executor;
+returning the data works everywhere.</p>
 
 
 

@@ -3079,7 +3079,7 @@ Getting Started, which covers most optimization tasks. The other is
 <a href="../../advanced/workflows/">Optimization Workflows</a>, a low-level API that
 exposes the building blocks — compute steps, event handlers, executors —
 directly, at the cost of assembling the run yourself, and
-written for readers at home in Python, threads and asyncio included.</p>
+written for readers at home in Python and threads.</p>
 <p>What the optimization <em>does</em> — its variables, objectives, constraints, and
 components — is set up in
 <a href="../../optimizer_setup/key_concepts/">Optimizer Setup</a>, the same whichever way you run
@@ -3318,7 +3318,7 @@ which evaluates a single vector and then a matrix of them.</p>
 <p>Not every problem is an exception. An optimization that cannot make progress
 still returns normally, and indicates why in <code>result.exit_code</code>:
 <code>TOO_FEW_REALIZATIONS</code> when not enough realizations produced a value,
-<code>EXECUTOR_STOPPED</code> when the pool it was evaluating on was closed under it.
+<code>EXECUTOR_STOPPED</code> when the executor it was evaluating on was closed under it.
 <code>result.results</code> is <code>None</code> when no feasible result was ever recorded, whatever
 the reason the run ended; a run that fails part-way still returns the best
 result it had reached before that. A plain <a class="autorefs autorefs-internal" title="            ropt.simple.evaluate" href="../../reference/simple/#ropt.simple.evaluate"><code>evaluate</code></a>
@@ -3344,8 +3344,8 @@ make still reach the <a href="../handlers/">handlers</a> attached to it.</p>
 <p><strong>Mistakes in the call itself</strong> raise a <code>ValueError</code> — a start point of the
   wrong shape, an evaluation function returning the wrong number of values —
   or one of the <a class="autorefs autorefs-internal" title="            RoptError" href="../../reference/exceptions/#ropt.exceptions.RoptError"><code>RoptError</code></a> types:
-  <a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a> when a pool or handler is
-  used in a way it cannot be (a closed pool, a handler already claimed by
+  <a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a> when an executor or handler
+  is used in a way it cannot be (a closed executor, a handler already claimed by
   another run),
   <a class="autorefs autorefs-internal" title="            UnsupportedError" href="../../reference/exceptions/#ropt.exceptions.UnsupportedError"><code>UnsupportedError</code></a> when an optional
   dependency is missing, or when the chosen method cannot handle the problem

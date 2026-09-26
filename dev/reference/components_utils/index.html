@@ -2958,10 +2958,9 @@
 
         <p>Concurrency primitives for workflow coordinators.</p>
 <p><a class="autorefs autorefs-internal" title="            ropt.components.concurrency.run_concurrent" href="#ropt.components.concurrency.run_concurrent"><code>run_concurrent</code></a> runs blocking
-calls on dedicated threads rather than on the event loop's shared thread pool,
-which is what lets many optimizations run at once without starving each other.
-For the helpers meant for scripts and applications, see
-<a class="autorefs autorefs-internal" title="            ropt.utils" href="../utils/#ropt.utils"><code>ropt.utils</code></a>.</p>
+calls on dedicated threads rather than on a shared, bounded thread pool, which
+is what lets many optimizations run at once without starving each other. For
+the helpers meant for scripts and applications, see <a class="autorefs autorefs-internal" title="            ropt.utils" href="../utils/#ropt.utils"><code>ropt.utils</code></a>.</p>
 
 
 

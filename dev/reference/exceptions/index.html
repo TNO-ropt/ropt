@@ -3217,7 +3217,7 @@ errors, and are excluded too.</p>
 
         <p>A workflow or runtime object was used incorrectly.</p>
 <p>For example a compute step or evaluator used concurrently, an event handler
-re-entered from inside itself, or a pool whose session has stopped.</p>
+re-entered from inside itself, or a closed executor.</p>
 
 
 
@@ -3254,7 +3254,7 @@ re-entered from inside itself, or a pool whose session has stopped.</p>
 
 
         <p>The execution infrastructure failed at runtime.</p>
-<p>For example a worker pool that cannot start, a broken process pool, a task
+<p>For example an executor that cannot start, a broken process pool, a task
 that cannot be serialized, an HPC setup or submission problem, or an
 evaluation whose worker died before producing a result.</p>
 
