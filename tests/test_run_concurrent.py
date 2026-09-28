@@ -1,16 +1,9 @@
 """Tests for the loop-independent concurrent-job primitive."""
 
-# test_run_concurrent_skips_pending_jobs_after_a_failure is the authoritative
-# statement of the skip: it asserts at the point the decision is made, with no
-# waiting. test_simple.py can only wait for the effect, so if the two ever
-# disagree, this one is right.
-
 from __future__ import annotations
 
 import threading
 from functools import partial
-
-import pytest
 
 from ropt.components.concurrency import run_concurrent
 
@@ -55,29 +48,21 @@ def test_run_concurrent_respects_the_concurrency_limit() -> None:
     assert peak == limit
 
 
-def test_run_concurrent_propagates_the_first_error_without_awaiting_siblings() -> None:
-    release = threading.Event()
-    sibling_finished = threading.Event()
-
+def test_run_concurrent_returns_the_exception_a_job_raised() -> None:
     def _fail() -> int:
         msg = "boom"
         raise RuntimeError(msg)
 
-    def _blocking_sibling() -> int:
-        release.wait(timeout=10.0)
-        sibling_finished.set()
+    def _succeed() -> int:
         return 1
 
-    try:
-        with pytest.raises(RuntimeError, match="boom"):
-            run_concurrent([_fail, _blocking_sibling])
-        # The error surfaced while the sibling was still blocked (abandoned).
-        assert not sibling_finished.is_set()
-    finally:
-        release.set()
+    outcomes = run_concurrent([_fail, _succeed])
+    assert isinstance(outcomes[0], RuntimeError)
+    assert str(outcomes[0]) == "boom"
+    assert outcomes[1] == 1
 
 
-def test_run_concurrent_skips_pending_jobs_after_a_failure() -> None:
+def test_run_concurrent_starts_pending_jobs_after_a_failure() -> None:
     started: list[int] = []
     lock = threading.Lock()
 
@@ -90,8 +75,7 @@ def test_run_concurrent_skips_pending_jobs_after_a_failure() -> None:
             raise RuntimeError(msg)
         return index
 
-    with pytest.raises(RuntimeError, match="boom"):
-        run_concurrent([partial(_job, i) for i in range(5)], limit=1)
-    # With limit=1 the first job to run fails and sets the stop flag before
-    # releasing its slot, so no pending job is ever started.
-    assert len(started) == 1
+    outcomes = run_concurrent([partial(_job, i) for i in range(5)], limit=1)
+    assert len(started) == 5
+    assert isinstance(outcomes[0], RuntimeError)
+    assert outcomes[1:] == [1, 2, 3, 4]

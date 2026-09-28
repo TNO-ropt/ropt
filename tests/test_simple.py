@@ -17,7 +17,6 @@ import numpy as np
 import pytest
 
 from ropt.components.compute_steps import OptimizationStep
-from ropt.components.concurrency import run_concurrent
 from ropt.components.evaluators import FunctionEvaluator
 from ropt.components.event_handlers import EventHandler
 from ropt.components.executors import (
@@ -1384,7 +1383,7 @@ def test_optimize_many_without_a_pool(config: Any, test_functions: Any) -> None:
         assert np.allclose(result.results.variables, 0.5, atol=0.02)
 
 
-def test_optimize_many_fail_fast(
+def test_optimize_many_raises_the_error_of_a_failing_run(
     pools: Callable[..., WorkerPool], config: Any, test_functions: Any
 ) -> None:
     def boom(_v: Any, _c: Any) -> float:
@@ -1402,36 +1401,28 @@ def test_optimize_many_fail_fast(
 
 
 @pytest.mark.timeout(60)
-def test_optimize_many_skips_runs_that_have_not_started(
+def test_optimize_many_starts_every_run_after_one_fails(
     pools: Callable[..., WorkerPool], config: Any
 ) -> None:
     calls = 0
     lock = threading.Lock()
-    ran_again = threading.Event()
 
     def boom(_v: Any, _c: Any) -> float:
         nonlocal calls
         with lock:
             calls += 1
-            if calls > 1:
-                ran_again.set()
         msg = "boom"
         raise ValueError(msg)
 
-    # One at a time, so the first run to be let through fails before any other
-    # is admitted, and `run_concurrent` sets its stop flag inside the slot
-    # before releasing it. A pending run therefore cannot start -- but that is
-    # a negative, and the runs that would disprove it are released just after
-    # the failure propagates, so asserting straight away proves nothing. Wait
-    # on the event a second run would set: it returns the moment one does, and
-    # only costs the ceiling when no run does.
+    # One at a time, so the first run fails before any other is admitted. A
+    # failing run no longer closes the gate behind it: the four that follow are
+    # still let through, each reaching its first evaluation.
     starts = np.tile(initial_values, (5, 1))
     pool = pools(workers=2)
     with pytest.raises(ValueError, match="boom"):
         optimize_many(config, starts, boom, limit=1, pool=pool)
-    assert not ran_again.wait(timeout=0.2)
     with lock:
-        assert calls == 1
+        assert calls == 5
 
 
 @pytest.mark.timeout(60)
@@ -1439,10 +1430,9 @@ def test_optimize_many_leaves_the_pool_usable_after_a_failure(
     pools: Callable[..., WorkerPool], config: Any, test_functions: Any
 ) -> None:
     # Every run reaches its first evaluation before any of them returns, so the
-    # three siblings are provably in flight when the fourth fails and are
-    # abandoned rather than skipped. A barrier gives that ordering outright;
-    # sleeping for it only makes it likely. One worker per run, so the
-    # rendezvous cannot starve on the pool.
+    # three siblings are provably in flight when the fourth fails. A barrier
+    # gives that ordering outright; sleeping for it only makes it likely. One
+    # worker per run, so the rendezvous cannot starve on the pool.
     started = threading.Barrier(4)
 
     def boom(_v: Any, _c: Any) -> float:
@@ -1476,79 +1466,10 @@ def test_optimize_many_leaves_the_pool_usable_after_a_failure(
             ],
             pool=pool,
         )
-    # Siblings are abandoned, not cancelled, so they may still be running
-    # here; the pool must stay usable and must not deadlock against them.
+    # The siblings keep their workers until they finish, so the pool must stay
+    # usable and must not deadlock against them.
     result = optimize(config, initial_values, test_functions[0], pool=pool)
     assert result.exit_code == ExitCode.OPTIMIZER_FINISHED
-
-
-@pytest.mark.timeout(60)
-def test_run_abandoned_by_fail_fast_returns(
-    pools: Callable[..., WorkerPool], config: Any, test_functions: Any
-) -> None:
-    # `run_concurrent` is the primitive `optimize_many` runs its drivers on. A
-    # run already in flight when a sibling fails cannot be cancelled, and
-    # nothing takes its pool away, so it runs to completion and *returns* a
-    # result. That is why a fail-fast failure never sprays exceptions out of
-    # its driver threads.
-    outcomes: list[Any] = []
-    lock = threading.Lock()
-    started = threading.Barrier(4)
-    finished = threading.Semaphore(0)
-
-    def first_evaluation_waits() -> Any:
-        # The rendezvous sits inside the run, not on the driver thread before
-        # it: reaching it proves the run is past the entry check and is really
-        # in flight when the sibling below fails.
-        waited = False
-
-        def objective(variables: Any, context: Any) -> float:
-            nonlocal waited
-            if not waited:
-                waited = True
-                started.wait(timeout=30)
-            return float(test_functions[0](variables, context))
-
-        return objective
-
-    def record(pool: WorkerPool) -> None:
-        try:
-            result = optimize(
-                config, initial_values, first_evaluation_waits(), pool=pool
-            )
-        except BaseException as exc:  # ruff: ignore[blind-except]
-            with lock:
-                outcomes.append(exc)
-        else:
-            with lock:
-                outcomes.append(result.exit_code)
-        finally:
-            finished.release()
-
-    def boom() -> None:
-        # Every sibling is inside its first evaluation by the time this passes
-        # the barrier, so all three are genuinely abandoned rather than never
-        # run. One worker per run, so the rendezvous cannot starve on it.
-        started.wait(timeout=30)
-        msg = "boom"
-        raise ValueError(msg)
-
-    pool = pools(workers=4)
-    jobs: list[Callable[[], None]] = [
-        partial(record, pool),
-        partial(record, pool),
-        boom,
-        partial(record, pool),
-    ]
-    with pytest.raises(ValueError, match="boom"):
-        run_concurrent(jobs)
-
-    # Each abandoned run releases the semaphore as it ends, so this returns as
-    # soon as the last one does; the timeout is only a ceiling on a hang.
-    for _ in range(3):
-        assert finished.acquire(timeout=30), "abandoned runs never finished"
-
-    assert outcomes == [ExitCode.OPTIMIZER_FINISHED] * 3
 
 
 def test_shared_handler_without_a_pool_aggregates_runs(

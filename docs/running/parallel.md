@@ -658,16 +658,14 @@ runs](handlers.md#sharing-a-handler-across-concurrent-runs).
 
 ### Failure in one run
 
-The first run to raise propagates its exception immediately (fail-fast). Runs
-that have not started yet are skipped, but a run already in progress cannot be
-stopped from the outside: it is abandoned, and keeps going until it finishes on
-its own. Its result is discarded, but until it ends it keeps calling your
-evaluation function, keeps the pool busy, and keeps feeding any handler you
-passed in `handlers`. Nothing can currently cut that short.
+A run that raises does not affect its siblings. Every run is carried through to
+its end, and when they have all finished the first exception that was raised is
+raised from the `optimize_many` call. The results of the runs that succeeded are
+not returned.
 
-The abandoned runs are driven from daemon threads, so a program that stops at
-the failure is unaffected: the interpreter exits and takes them with it. A
-program that catches the exception and carries on keeps them running.
+While a failed run's siblings continue they keep calling your evaluation
+function, keep the pool busy, and keep feeding any handler you passed in
+`handlers`. Nothing can currently cut that short.
 
 ## Running the optimizer in a separate process { #external-backend }
 

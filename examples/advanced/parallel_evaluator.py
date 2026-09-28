@@ -28,7 +28,7 @@ options:
 import argparse
 import time
 from functools import partial
-from typing import Any
+from typing import Any, cast
 
 import numpy as np
 from numpy.random import default_rng
@@ -153,7 +153,13 @@ def run_all(  # ruff: ignore[too-many-arguments]
         )
         for a, b in zip(a_list, b_list, strict=True)
     ]
-    return run_concurrent(jobs)
+    # Every run is carried through, and a run that raised has its exception in
+    # place of its result.
+    outcomes = run_concurrent(jobs)
+    for outcome in outcomes:
+        if isinstance(outcome, BaseException):
+            raise outcome
+    return cast("list[FunctionResults]", outcomes)
 
 
 def main(

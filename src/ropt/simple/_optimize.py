@@ -12,7 +12,7 @@ sharing one executor, whose workers are spread over the runs.
 from __future__ import annotations
 
 from functools import partial
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 import numpy as np
 
@@ -166,7 +166,9 @@ def optimize_many(  # ruff: ignore[too-many-arguments]
     same `pool`, so its workers are shared between them; `limit` bounds how
     many run simultaneously. Without a `pool` the runs still overlap, but
     each evaluation runs in-process on its own driver thread, so `function` is
-    then called by several threads at once and must tolerate that. See
+    then called by several threads at once and must tolerate that. Every run is
+    carried through; if any of them raised, the first of those exceptions is
+    raised here. See
     [Parallel Execution and Many Runs](../running/parallel.md#many-optimizations-at-once)
     for a walkthrough, and [Failure in one run](../running/parallel.md#failure-in-one-run)
     for what happens when one raises.
@@ -232,4 +234,8 @@ def optimize_many(  # ruff: ignore[too-many-arguments]
     ]
     # Dedicated threads, not a shared thread pool: each run blocks its thread
     # while waiting for evaluations that would queue behind it in such a pool.
-    return tuple(run_concurrent(jobs, limit))
+    outcomes = run_concurrent(jobs, limit)
+    for outcome in outcomes:
+        if isinstance(outcome, BaseException):
+            raise outcome
+    return cast("tuple[OptimizationResult, ...]", tuple(outcomes))
