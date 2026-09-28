@@ -3068,19 +3068,11 @@ emitting run, and every other run waiting on the same handler. See
 
   
       abstractmethod
-  " href="../../reference/components_executors/#ropt.components.executors.Executor.run"><code>run</code></a>,
-<a class="autorefs autorefs-internal" title="            close
-
-
-  
-      abstractmethod
-  " href="../../reference/components_executors/#ropt.components.executors.Executor.close"><code>close</code></a>, the <code>closed</code> flag, the
-refusal of a caller that is one of its own workers, and the split of a batch
-into bundles.</p>
-<p>You implement two methods. <code>_run_bundles</code> runs the bundles and passes each
+  " href="../../reference/components_executors/#ropt.components.executors.Executor.run"><code>run</code></a>, the refusal of a caller that
+is one of its own workers, and the split of a batch into bundles.</p>
+<p>You implement one method. <code>_run_bundles</code> runs the bundles and passes each
 result to <code>store</code> as it arrives; it must release whatever the batch started
-before it returns, including when <code>store</code> raises. <code>_release</code> releases the
-executor's own resources, and runs with the lock not held.</p>
+before it returns, including when <code>store</code> raises.</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">MyExecutor</span><span class="p">(</span><span class="n">ExecutorBase</span><span class="p">):</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_run_bundles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bundles</span><span class="p">,</span> <span class="n">store</span><span class="p">):</span>
 </span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>        <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">bundle</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">bundles</span><span class="p">):</span>
@@ -3088,9 +3080,6 @@ executor's own resources, and runs with the lock not held.</p>
 </span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>                <span class="n">item</span><span class="o">.</span><span class="n">function</span><span class="p">(</span><span class="o">*</span><span class="n">item</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">item</span><span class="o">.</span><span class="n">kwargs</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">bundle</span>
 </span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>            <span class="p">]</span>
 </span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>            <span class="n">store</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">results</span><span class="p">)</span>
-</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>
-</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_release</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>        <span class="o">...</span>                       <span class="c1"># release the executor's resources</span>
 </span></code></pre></div>
 <p>Every bundle ends in exactly one of three ways, and the choice determines
 whether the executor survives:</p>
@@ -3136,13 +3125,13 @@ common mistake: a bug in user code stored as an <code>ExecutorFailure</code> wou
 reported as broken infrastructure, and a dead worker raised out of
 <code>_run_bundles</code> would surface as a user error. See
 <a href="../parallel/#error-handling">Error handling</a> for the distinction.</p>
-<p>Two further rules. State of the executor's own that must stay in step with
-closing goes under <code>_lock</code>, which <code>ExecutorBase</code> exposes for that purpose; the
-<code>_on_close</code> hook runs with it held. <code>run</code> refuses work sent from the executor's
-own workers — a caller that waits there occupies a worker its own batch needs —
-by reading <code>_thread_state.running_work_item</code>, a thread-local flag. An executor
-whose workers are threads in this process sets that flag for as long as a work
-item runs on one; one whose workers run elsewhere never sets it.</p>
+<p>Two further rules. Resources of the executor's own are released in <code>__del__</code>,
+not in a method a caller is expected to call: an executor is constructed, run
+on, and dropped. <code>run</code> refuses work sent from the executor's own workers — a
+caller that waits there occupies a worker its own batch needs — by reading
+<code>_thread_state.running_work_item</code>, a thread-local flag. An executor whose
+workers are threads in this process sets that flag for as long as a work item
+runs on one; one whose workers run elsewhere never sets it.</p>
 
 
 

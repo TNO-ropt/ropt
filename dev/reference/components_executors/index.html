@@ -2749,50 +2749,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#ropt.components.executors.Executor.close" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        close
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.components.executors.Executor.closed" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        closed
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.components.executors.Executor.__enter__" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        __enter__
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.components.executors.Executor.__exit__" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        __exit__
-      
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -2822,32 +2778,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.components.executors.ExecutorBase.closed" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        closed
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ropt.components.executors.ExecutorBase.run" class="md-nav__link">
     <span class="md-ellipsis">
       
         run
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.components.executors.ExecutorBase.close" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        close
       
     </span>
   </a>
@@ -3211,50 +3145,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#ropt.components.executors.Executor.close" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        close
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.components.executors.Executor.closed" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        closed
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.components.executors.Executor.__enter__" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        __enter__
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.components.executors.Executor.__exit__" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        __exit__
-      
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -3284,32 +3174,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.components.executors.ExecutorBase.closed" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        closed
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ropt.components.executors.ExecutorBase.run" class="md-nav__link">
     <span class="md-ellipsis">
       
         run
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.components.executors.ExecutorBase.close" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        close
       
     </span>
   </a>
@@ -3565,8 +3433,8 @@ lifecycle and bundling the built-in executors share. See
 
 
         <p>Abstract base class for executor components within an optimization workflow.</p>
-<p>An executor is used like a file: construct it, run work on it, close it.
-Closing is final, and releases the workers.</p>
+<p>An executor is constructed, run on, and dropped. Its workers are released
+when it is collected, so there is nothing to close.</p>
 <p>See <a href="../../advanced/parallel/#error-handling">Error handling</a> for the
 distinction an implementation must make between an infrastructure failure,
 returned in the call's position as an
@@ -3725,8 +3593,7 @@ returns.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If the executor is closed, or the caller is one of
-             its workers.</p>
+                <p>If the caller is one of the executor's workers.</p>
               </div>
             </td>
           </tr>
@@ -3736,176 +3603,12 @@ returns.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If the executor was closed while the work ran.</p>
+                <p>If the executor could no longer run the work.</p>
               </div>
             </td>
           </tr>
       </tbody>
     </table>
-
-
-    </div>
-
-</div>
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="ropt.components.executors.Executor.close" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">close</span>
-
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
-  </span>
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">close</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Release the executor's workers.</p>
-<p>Closing is final and may be called more than once. A caller blocked in
-<a class="autorefs autorefs-internal" title="            run
-
-
-  
-      abstractmethod
-  " href="#ropt.components.executors.Executor.run"><code>run</code></a> is released with
-<a class="autorefs autorefs-internal" title="            ExecutorStopped" href="../exceptions/#ropt.exceptions.ExecutorStopped"><code>ExecutorStopped</code></a>.</p>
-<p>May be called from any thread.</p>
-
-
-    </div>
-
-</div>
-
-
-
-
-
-
-<div class="doc doc-object doc-attribute">
-
-
-
-<h3 id="ropt.components.executors.Executor.closed" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">closed</span>
-
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
-      <small class="doc doc-label doc-label-property"><code>property</code></small>
-  </span>
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">closed</span><span class="p">:</span> <span class="nb">bool</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Whether the executor has been closed.</p>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/functions.html#bool">bool</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p><code>True</code> once the executor was closed.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-    </div>
-
-</div>
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="ropt.components.executors.Executor.__enter__" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">__enter__</span>
-
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">__enter__</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Enter a block that closes the executor on exit.</p>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-external" title="typing.Self" href="https://docs.python.org/3/library/typing.html#typing.Self">Self</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The executor itself.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="ropt.components.executors.Executor.__exit__" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">__exit__</span>
-
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">__exit__</span><span class="p">(</span><span class="o">*</span><span class="n">_exc</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Close the executor.</p>
 
 
     </div>
@@ -3939,13 +3642,9 @@ returns.</p>
 
 
         <p>A base class for executors.</p>
-<p>Handles the lifecycle, the refusal of a caller that is one of the workers,
-and the split of a batch into bundles. Subclasses implement <code>_run_bundles</code>,
-which must release whatever the batch started before it returns, and
-<code>_release</code>, which releases the executor's own resources.</p>
-<p>The lock is available to subclasses as <code>_lock</code>: an implementation with
-shared state of its own keeps it under the same lock, so that closing and
-that state cannot be observed out of step.</p>
+<p>Handles the refusal of a caller that is one of the workers, and the split of
+a batch into bundles. Subclasses implement <code>_run_bundles</code>, which must
+release whatever the batch started before it returns.</p>
 <p>A subclass whose workers are threads in this process sets
 <code>_thread_state.running_work_item</code> for as long as a work item runs on one,
 and <code>run</code> refuses a caller that has it set. Workers in another interpreter
@@ -4038,58 +3737,6 @@ cannot reach the executor, so it stays <code>False</code> there.</p>
       </tbody>
     </table>
 
-
-    </div>
-
-</div>
-
-
-
-
-
-
-<div class="doc doc-object doc-attribute">
-
-
-
-<h3 id="ropt.components.executors.ExecutorBase.closed" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">closed</span>
-
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-property"><code>property</code></small>
-  </span>
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">closed</span><span class="p">:</span> <span class="nb">bool</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Whether the executor has been closed.</p>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/functions.html#bool">bool</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p><code>True</code> once the executor was closed.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
 
     </div>
 
@@ -4210,39 +3857,12 @@ cannot reach the executor, so it stays <code>False</code> there.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If the executor is closed, or the caller is one of
-           its workers.</p>
+                <p>If the caller is one of the executor's workers.</p>
               </div>
             </td>
           </tr>
       </tbody>
     </table>
-
-
-    </div>
-
-</div>
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="ropt.components.executors.ExecutorBase.close" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">close</span>
-
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">close</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Release the executor's workers.</p>
-<p>May be called from any thread, and more than once.</p>
 
 
     </div>
@@ -4444,7 +4064,7 @@ concurrent callers.</p>
 
 <details class="warning" open>
   <summary>Warning</summary>
-  <p>Closing cannot interrupt a thread. Work that has already started runs to
+  <p>A thread cannot be interrupted. Work that has already started runs to
 completion, and the interpreter waits for it before exiting.</p>
 </details>
 
@@ -4589,10 +4209,10 @@ point must use.</p>
 
 <details class="warning" open>
   <summary>Warning</summary>
-  <p>Closing terminates the worker processes and nothing else. A program a
-work item started itself keeps running, without an error being raised.
-Use <a class="autorefs autorefs-internal" title="            ropt.components.executors.LocalJobExecutor" href="#ropt.components.executors.LocalJobExecutor"><code>LocalJobExecutor</code></a>
-where an evaluation launches external programs.</p>
+  <p>A worker process runs its work item to the end. A program a work item
+started itself keeps running, without an error being raised. Use
+<a class="autorefs autorefs-internal" title="            ropt.components.executors.LocalJobExecutor" href="#ropt.components.executors.LocalJobExecutor"><code>LocalJobExecutor</code></a> where
+an evaluation launches external programs.</p>
 </details>
 
 
@@ -4808,10 +4428,10 @@ the job started itself goes with it, and Windows has no equivalent.</p>
 
         <p>Initialize the local job executor.</p>
 <p>The default <code>workdir</code> is a private temporary directory that this
-executor creates and removes when it closes, unless there is something
-in it to read: if a work item failed, or <code>cleanup</code> is off, the directory
-is kept and its path logged. A work item that failed keeps its captured
-output, which is the only record of why.</p>
+executor creates and removes again when it is dropped, unless there is
+something in it to read: if a work item failed, or <code>cleanup</code> is off, the
+directory is kept and its path logged. A work item that failed keeps its
+captured output, which is the only record of why.</p>
 <p>A local process is finished the moment it exits, and writes and renames
 its result before it does, so the small <code>interval</code> is dead time rather
 than restraint towards a scheduler, and <code>retries=0</code> is enough.</p>
@@ -4983,7 +4603,7 @@ than restraint towards a scheduler, and <code>retries=0</code> is enough.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Stop the teardown thread of an executor that was never closed.</p>
+        <p>Cancel whatever is left and remove a temporary working directory.</p>
 
 
     </div>

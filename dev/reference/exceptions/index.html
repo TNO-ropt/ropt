@@ -3217,7 +3217,8 @@ errors, and are excluded too.</p>
 
         <p>A workflow or runtime object was used incorrectly.</p>
 <p>For example a compute step or evaluator used concurrently, an event handler
-re-entered from inside itself, or a closed executor.</p>
+re-entered from inside itself, or an executor asked to run work from one of
+its own workers.</p>
 
 
 
@@ -3472,9 +3473,10 @@ or the selected plugin does not support the requested method.</p>
 
 
 
-        <p>Raised when the evaluation executor is no longer running.</p>
-<p>A generic signal, carrying no exit code, raised by the parallel evaluator
-when its executor has stopped and the current evaluation cannot proceed.</p>
+        <p>Raised when the evaluation executor can no longer run the work.</p>
+<p>A generic signal, carrying no exit code. In practice this happens at
+interpreter shutdown, when the worker pool is gone and a run that outlived
+its program is released rather than left waiting.</p>
 
 
 

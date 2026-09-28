@@ -3350,14 +3350,14 @@ Parallel</a> introduces the four kinds; this page
 is the full account of each:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.simple</span><span class="w"> </span><span class="kn">import</span> <span class="n">ThreadExecutor</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="k">with</span> <span class="n">ThreadExecutor</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span> <span class="k">as</span> <span class="n">executor</span><span class="p">:</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">executor</span><span class="o">=</span><span class="n">executor</span><span class="p">)</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">executor</span> <span class="o">=</span> <span class="n">ThreadExecutor</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">executor</span><span class="o">=</span><span class="n">executor</span><span class="p">)</span>
 </span></code></pre></div>
 <p>The runnable script for this section is
 <a href="https://github.com/TNO-ropt/ropt/blob/main/examples/simple/parallel.py">examples/simple/parallel.py</a>,
 which takes <code>-m</code> to swap its thread executor for a process executor.</p>
-<p>An executor is a context manager: leaving the <code>with</code> block releases its
-workers. Nothing is implicit: a run evaluates on the executor you hand it, and
+<p>An executor releases its workers when it is collected, so there is nothing to
+close. Nothing is implicit: a run evaluates on the executor you hand it, and
 on no other. A run given no executor evaluates in-process, wherever it is
 called from — including from a thread you started yourself.</p>
 <h3 id="how-many-workers">How many workers?</h3>
@@ -3417,9 +3417,10 @@ has nothing to save.</p>
 not state one.</p>
 </div>
 <p>You can keep several executors open at once and choose per run:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">with</span> <span class="n">ThreadExecutor</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span> <span class="k">as</span> <span class="n">fast</span><span class="p">,</span> <span class="n">ProcessExecutor</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="k">as</span> <span class="n">heavy</span><span class="p">:</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="n">cheap</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">executor</span><span class="o">=</span><span class="n">fast</span><span class="p">)</span>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    <span class="n">costly</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">expensive_objective</span><span class="p">,</span> <span class="n">executor</span><span class="o">=</span><span class="n">heavy</span><span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">fast</span> <span class="o">=</span> <span class="n">ThreadExecutor</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">heavy</span> <span class="o">=</span> <span class="n">ProcessExecutor</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="n">cheap</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">executor</span><span class="o">=</span><span class="n">fast</span><span class="p">)</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="n">costly</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">expensive_objective</span><span class="p">,</span> <span class="n">executor</span><span class="o">=</span><span class="n">heavy</span><span class="p">)</span>
 </span></code></pre></div>
 <div class="admonition note">
 <p class="admonition-title">Executors inside an evaluation</p>
@@ -3433,29 +3434,24 @@ question, and the rules are in
 </div>
 <div class="admonition tip">
 <p class="admonition-title">Releasing an executor early</p>
-<p>An executor holds its workers until it is closed. Build it in a <code>with</code>
-block, or call <code>close()</code>, as soon as you are done with it — above all a
-<code>ProcessExecutor</code>, which holds worker interpreters:</p>
+<p>An executor holds its workers for as long as anything refers to it, and
+releases them when the last reference goes. In a loop that means building it
+inside the loop rather than outside, above all for a <code>ProcessExecutor</code>,
+which holds a worker interpreter per worker:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">for</span> <span class="n">case</span> <span class="ow">in</span> <span class="n">cases</span><span class="p">:</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>    <span class="k">with</span> <span class="n">ProcessExecutor</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="k">as</span> <span class="n">executor</span><span class="p">:</span>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>        <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">case</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">executor</span><span class="o">=</span><span class="n">executor</span><span class="p">)</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>    <span class="n">executor</span> <span class="o">=</span> <span class="n">ProcessExecutor</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">case</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">executor</span><span class="o">=</span><span class="n">executor</span><span class="p">)</span>
 </span></code></pre></div>
-<p>A closed executor cannot be reopened. A run that is <em>waiting</em> on it when it
-closes returns with
-<a class="autorefs autorefs-internal" title="            ExitCode" href="../../reference/enums/#ropt.enums.ExitCode"><code>ExitCode.EXECUTOR_STOPPED</code></a> rather than raising —
-though on a thread executor the evaluations already running still finish
-first, since a thread cannot be interrupted; see
-<a href="#stopping-a-run">Stopping a run</a>. A run that asks a closed executor for its
-<em>next</em> batch is refused with a
-<a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a> saying the executor is
-closed.</p>
+<p>A name kept alive keeps the workers alive with it: a module-level executor,
+or one held by a traceback or a notebook's output history, is released only
+when that reference goes. <code>del</code> is then the way to release it.</p>
 </div>
 <h3 id="thread-executor">Evaluating on threads</h3>
 <p>A <a class="autorefs autorefs-internal" title="            ropt.simple.ThreadExecutor" href="../../reference/simple/#ropt.simple.ThreadExecutor"><code>ThreadExecutor</code></a> runs the evaluations on
 background threads inside your own process. Nothing is copied, so any Python
 function works as the objective and it can freely use the data around it:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">with</span> <span class="n">ThreadExecutor</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="k">as</span> <span class="n">executor</span><span class="p">:</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">executor</span><span class="o">=</span><span class="n">executor</span><span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">executor</span> <span class="o">=</span> <span class="n">ThreadExecutor</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">executor</span><span class="o">=</span><span class="n">executor</span><span class="p">)</span>
 </span></code></pre></div>
 <p>Use it when each evaluation spends most of its time <strong>waiting</strong> — starting an
 external program, reading a file, calling a network service. While one waits,
@@ -3469,8 +3465,8 @@ past this executor — see <a href="#which-executor">Which executor should I use
 <p>A <a class="autorefs autorefs-internal" title="            ropt.simple.ProcessExecutor" href="../../reference/simple/#ropt.simple.ProcessExecutor"><code>ProcessExecutor</code></a> runs the evaluations in a
 handful of separate processes, reused across the run. Each has its own
 interpreter, so this is where heavy Python computation actually gets faster:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">with</span> <span class="n">ProcessExecutor</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="k">as</span> <span class="n">executor</span><span class="p">:</span>
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">executor</span><span class="o">=</span><span class="n">executor</span><span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">executor</span> <span class="o">=</span> <span class="n">ProcessExecutor</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">executor</span><span class="o">=</span><span class="n">executor</span><span class="p">)</span>
 </span></code></pre></div>
 <p>This executor applies when the computation is <strong>Python code</strong>, or when each
 evaluation needs its own copy of something a library keeps globally. An
@@ -3485,12 +3481,11 @@ only come <strong>back</strong> through the return value; see
 <a href="../handlers/#handlers-and-the-process-boundary">Handlers and the process boundary</a>.</p>
 <div class="admonition warning">
 <p class="admonition-title">This executor does not clean up programs your objective started</p>
-<p>When a run is stopped — by Ctrl-C, or by closing the executor — the worker
-processes are killed, but anything they had launched themselves is not: a
-simulator or solver started by your objective keeps running, unattached,
-after your program is gone. Nothing reports this. If your objective launches
-external programs, use a <code>LocalJobExecutor</code> instead, which was built for
-exactly this.</p>
+<p>When a run is stopped by Ctrl-C the worker processes are killed, but
+anything they had launched themselves is not: a simulator or solver started
+by your objective keeps running, unattached, after your program is gone.
+Nothing reports this. If your objective launches external programs, use a
+<code>LocalJobExecutor</code> instead, which was built for exactly this.</p>
 </div>
 <h3 id="local-executor">Running each evaluation as a local job</h3>
 <p>A <a class="autorefs autorefs-internal" title="            ropt.simple.LocalJobExecutor" href="../../reference/simple/#ropt.simple.LocalJobExecutor"><code>LocalJobExecutor</code></a> runs each evaluation as a
@@ -3499,8 +3494,8 @@ no extras and no configuration, and it is the same shape as an <code>HPCExecutor
 minus the scheduler — so an objective that works on one works on the other:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.simple</span><span class="w"> </span><span class="kn">import</span> <span class="n">LocalJobExecutor</span>
 </span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="k">with</span> <span class="n">LocalJobExecutor</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="k">as</span> <span class="n">executor</span><span class="p">:</span>
-</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">executor</span><span class="o">=</span><span class="n">executor</span><span class="p">)</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="n">executor</span> <span class="o">=</span> <span class="n">LocalJobExecutor</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">executor</span><span class="o">=</span><span class="n">executor</span><span class="p">)</span>
 </span></code></pre></div>
 <table>
 <thead>
@@ -3538,8 +3533,8 @@ evaluation is a job rather than a function call:</p>
 <div class="admonition note">
 <p class="admonition-title">Where the working directory goes</p>
 <p>With no <code>workdir</code>, the executor works in a temporary directory of its own
-and removes it when it closes, unless something in it is still readable. If
-an evaluation <strong>failed</strong>, its captured output is kept, so the
+and removes it again when it is dropped, unless something in it is still
+readable. If an evaluation <strong>failed</strong>, its captured output is kept, so the
 directory is kept with it and its path is logged:</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>WARNING  ropt.components.executors: Keeping the local working directory
 </span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>         /tmp/ropt-local-8f3a1c: a work item failed.
@@ -3631,8 +3626,8 @@ uses the default cluster and queue from the <code>pysqa</code> configuration of 
 installation:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.simple</span><span class="w"> </span><span class="kn">import</span> <span class="n">HPCExecutor</span>
 </span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>
-</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="k">with</span> <span class="n">HPCExecutor</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">workdir</span><span class="o">=</span><span class="s2">"/scratch/my-run"</span><span class="p">)</span> <span class="k">as</span> <span class="n">executor</span><span class="p">:</span>
-</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">executor</span><span class="o">=</span><span class="n">executor</span><span class="p">)</span>
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="n">executor</span> <span class="o">=</span> <span class="n">HPCExecutor</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">workdir</span><span class="o">=</span><span class="s2">"/scratch/my-run"</span><span class="p">)</span>
+</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">executor</span><span class="o">=</span><span class="n">executor</span><span class="p">)</span>
 </span></code></pre></div>
 <p>The runnable script is
 <a href="https://github.com/TNO-ropt/ropt/blob/main/examples/simple/hpc.py">examples/simple/hpc.py</a>.
@@ -3906,9 +3901,9 @@ executor inside the worker, or run the inner optimization without one. An
 evaluation function that carries an executor along anyway is refused when the
 work item is sent, rather than failing somewhere deep inside the run.</p>
 <h2 id="stopping-a-run">Stopping a run</h2>
-<p>Press Ctrl-C, or close the executor, and <code>ropt</code> stops dispatching new work at
-once. What happens to the evaluations already running depends on the executor,
-because what <em>can</em> be done to them differs:</p>
+<p>Press Ctrl-C and <code>ropt</code> stops dispatching new work at once. What happens to the
+evaluations already running depends on the executor, because what <em>can</em> be done
+to them differs:</p>
 <table>
 <thead>
 <tr>
@@ -3927,7 +3922,7 @@ because what <em>can</em> be done to them differs:</p>
 </tr>
 <tr>
 <td><code>ProcessExecutor</code></td>
-<td>the worker processes are <strong>killed</strong>, but not what they launched</td>
+<td>they run to completion in their worker</td>
 </tr>
 <tr>
 <td><code>LocalJobExecutor</code></td>
@@ -3942,10 +3937,8 @@ because what <em>can</em> be done to them differs:</p>
 <p>Two consequences follow.</p>
 <p><strong>A thread executor cannot be hurried.</strong> Python provides no way to interrupt a
 running thread from outside, so a long evaluation on a <code>ThreadExecutor</code> ends
-when it ends, and your program cannot exit before it does. <code>ropt</code> warns naming
-how many evaluations it is waiting for, because the wait is otherwise
-indistinguishable from a hang. If an evaluation may run long and has to be
-interruptible, put it on one of the other executors.</p>
+when it ends, and your program cannot exit before it does. If an evaluation may
+run long and has to be interruptible, put it on one of the other executors.</p>
 <p><strong>Stopping is a request, not a guarantee.</strong> On the executors that kill,
 everything is signalled to end and not waited for. A program that ignores the
 request, or that is stuck inside the operating system, keeps running. The run
@@ -3972,9 +3965,9 @@ unsupported.</p>
 <code>objective</code> may be a single value (used for every run) or a list (one per run):</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.simple</span><span class="w"> </span><span class="kn">import</span> <span class="n">ThreadExecutor</span><span class="p">,</span> <span class="n">optimize_many</span>
 </span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>
-</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="k">with</span> <span class="n">ThreadExecutor</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="k">as</span> <span class="n">executor</span><span class="p">:</span>
-</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a>    <span class="c1"># One run per start point.</span>
-</span><span id="__span-16-5"><a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a>    <span class="n">results</span> <span class="o">=</span> <span class="n">optimize_many</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">start_points</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">executor</span><span class="o">=</span><span class="n">executor</span><span class="p">)</span>
+</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="n">executor</span> <span class="o">=</span> <span class="n">ThreadExecutor</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="c1"># One run per start point.</span>
+</span><span id="__span-16-5"><a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="n">results</span> <span class="o">=</span> <span class="n">optimize_many</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">start_points</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">executor</span><span class="o">=</span><span class="n">executor</span><span class="p">)</span>
 </span></code></pre></div>
 <div class="admonition tip">
 <p class="admonition-title">Give each run an ID</p>
@@ -4008,15 +4001,15 @@ pass, since every run in the program draws them from one counter.</p>
 <p><a href="https://github.com/TNO-ropt/ropt/blob/main/examples/simple/optimize_many.py">examples/simple/optimize_many.py</a>
 runs one optimization per start vector, capping how many go at once and tagging
 each with its own metadata:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="k">with</span> <span class="n">ThreadExecutor</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span> <span class="k">as</span> <span class="n">executor</span><span class="p">:</span>
-</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>    <span class="n">results</span> <span class="o">=</span> <span class="n">optimize_many</span><span class="p">(</span>
-</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a>        <span class="n">CONFIG</span><span class="p">,</span>
-</span><span id="__span-18-4"><a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a>        <span class="n">STARTS</span><span class="p">,</span>
-</span><span id="__span-18-5"><a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a>        <span class="n">rosenbrock</span><span class="p">,</span>
-</span><span id="__span-18-6"><a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a>        <span class="n">executor</span><span class="o">=</span><span class="n">executor</span><span class="p">,</span>
-</span><span id="__span-18-7"><a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a>        <span class="n">metadata</span><span class="o">=</span><span class="n">run_metadata</span><span class="p">,</span>
-</span><span id="__span-18-8"><a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a>        <span class="n">limit</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-</span><span id="__span-18-9"><a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a>    <span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="n">executor</span> <span class="o">=</span> <span class="n">ThreadExecutor</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="n">results</span> <span class="o">=</span> <span class="n">optimize_many</span><span class="p">(</span>
+</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a>    <span class="n">CONFIG</span><span class="p">,</span>
+</span><span id="__span-18-4"><a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a>    <span class="n">STARTS</span><span class="p">,</span>
+</span><span id="__span-18-5"><a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a>    <span class="n">rosenbrock</span><span class="p">,</span>
+</span><span id="__span-18-6"><a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a>    <span class="n">executor</span><span class="o">=</span><span class="n">executor</span><span class="p">,</span>
+</span><span id="__span-18-7"><a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a>    <span class="n">metadata</span><span class="o">=</span><span class="n">run_metadata</span><span class="p">,</span>
+</span><span id="__span-18-8"><a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a>    <span class="n">limit</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+</span><span id="__span-18-9"><a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a><span class="p">)</span>
 </span></code></pre></div>
 <p>The two callback arguments differ in the same way. <code>report=</code> is <strong>per run</strong>: one
 callback receives the results of every run, or pass a list with one callback per
@@ -4067,12 +4060,12 @@ unless you want the runs' reports interleaved on the terminal.</p>
 <p>The first run to raise propagates its exception immediately (fail-fast). Runs
 that have not started yet are skipped, but a run already in progress cannot be
 stopped from the outside: it is abandoned, and keeps going until it finishes on
-its own — so returning after a failure can still take as long as a full
-optimization. Closing the executor cuts that short: an abandoned run waiting on
-it returns with <a class="autorefs autorefs-internal" title="            ExitCode" href="../../reference/enums/#ropt.enums.ExitCode"><code>ExitCode.EXECUTOR_STOPPED</code></a>, and one that
-asks for its next batch afterwards raises a
-<a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a> on its own driver thread.
-Either way its result is discarded.</p>
+its own. Its result is discarded, but until it ends it keeps calling your
+evaluation function, keeps the executor busy, and keeps feeding any handler you
+passed in <code>handlers</code>. Nothing can currently cut that short.</p>
+<p>The abandoned runs are driven from daemon threads, so a program that stops at
+the failure is unaffected: the interpreter exits and takes them with it. A
+program that catches the exception and carries on keeps them running.</p>
 <h2 id="external-backend">Running the optimizer in a separate process</h2>
 <p>Prefix the method with <code>external/</code> to run the optimization algorithm in a
 process of its own:</p>
@@ -4130,17 +4123,15 @@ of inline.</p>
 </span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>
 </span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.simple</span><span class="w"> </span><span class="kn">import</span> <span class="n">ProcessExecutor</span><span class="p">,</span> <span class="n">offload</span>
 </span><span id="__span-20-4"><a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a>
-</span><span id="__span-20-5"><a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a><span class="k">with</span> <span class="n">ProcessExecutor</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="k">as</span> <span class="n">executor</span><span class="p">:</span>
-</span><span id="__span-20-6"><a id="__codelineno-20-6" name="__codelineno-20-6" href="#__codelineno-20-6"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">offload</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="n">expensive</span><span class="p">,</span> <span class="n">data</span><span class="p">),</span> <span class="n">executor</span><span class="o">=</span><span class="n">executor</span><span class="p">)</span>
+</span><span id="__span-20-5"><a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a><span class="n">executor</span> <span class="o">=</span> <span class="n">ProcessExecutor</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+</span><span id="__span-20-6"><a id="__codelineno-20-6" name="__codelineno-20-6" href="#__codelineno-20-6"></a><span class="n">result</span> <span class="o">=</span> <span class="n">offload</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="n">expensive</span><span class="p">,</span> <span class="n">data</span><span class="p">),</span> <span class="n">executor</span><span class="o">=</span><span class="n">executor</span><span class="p">)</span>
 </span></code></pre></div>
 <p><code>offload</code> takes <strong>zero-argument</strong> callables — bind arguments with
 <code>functools.partial</code> (or a closure). Pass a <strong>sequence</strong> of callables to run them
 concurrently and get a tuple of results in order; they may be entirely different
 functions:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="k">with</span> <span class="n">ProcessExecutor</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="k">as</span> <span class="n">executor</span><span class="p">:</span>
-</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>    <span class="n">first</span><span class="p">,</span> <span class="n">second</span> <span class="o">=</span> <span class="n">offload</span><span class="p">(</span>
-</span><span id="__span-21-3"><a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a>        <span class="p">[</span><span class="n">partial</span><span class="p">(</span><span class="n">expensive</span><span class="p">,</span> <span class="n">x</span><span class="p">),</span> <span class="n">partial</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">y</span><span class="p">)],</span> <span class="n">executor</span><span class="o">=</span><span class="n">executor</span>
-</span><span id="__span-21-4"><a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a>    <span class="p">)</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="n">executor</span> <span class="o">=</span> <span class="n">ProcessExecutor</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="n">first</span><span class="p">,</span> <span class="n">second</span> <span class="o">=</span> <span class="n">offload</span><span class="p">([</span><span class="n">partial</span><span class="p">(</span><span class="n">expensive</span><span class="p">,</span> <span class="n">x</span><span class="p">),</span> <span class="n">partial</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">y</span><span class="p">)],</span> <span class="n">executor</span><span class="o">=</span><span class="n">executor</span><span class="p">)</span>
 </span></code></pre></div>
 <p>As with the evaluation function on a process, local, or HPC executor, the
 callables and their arguments are <strong>copied to the workers</strong>, since they run in

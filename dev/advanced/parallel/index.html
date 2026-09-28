@@ -1852,15 +1852,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#stopping-an-executor" class="md-nav__link">
+  <a href="#releasing-a-batch" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Stopping an executor
+        Releasing a batch
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Stopping an executor">
+    <nav class="md-nav" aria-label="Releasing a batch">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -3260,15 +3260,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#stopping-an-executor" class="md-nav__link">
+  <a href="#releasing-a-batch" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Stopping an executor
+        Releasing a batch
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Stopping an executor">
+    <nav class="md-nav" aria-label="Releasing a batch">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -3465,10 +3465,6 @@ results come back.</p>
 </table>
 <p>How many of those work items travel to a worker together follows
 <code>bundle_size</code>. See <a href="#bundling">Bundling</a>.</p>
-<p>If the executor is closed when <code>eval()</code> is called, the evaluator raises a
-<a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a>; if it closes while the call is
-waiting, an <a class="autorefs autorefs-internal" title="            ExecutorStopped" href="../../reference/exceptions/#ropt.exceptions.ExecutorStopped"><code>ExecutorStopped</code></a> is raised
-instead.</p>
 <h2 id="executors">Executors</h2>
 <p>An <a class="autorefs autorefs-internal" title="            ropt.components.executors.Executor" href="../../reference/components_executors/#ropt.components.executors.Executor"><code>Executor</code></a> runs
 <a class="autorefs autorefs-internal" title="            ropt.components.executors.WorkItem
@@ -3481,16 +3477,18 @@ executors share the same lifecycle:</p>
 <ol>
 <li>Create the executor instance.</li>
 <li>Use it (via <code>ParallelEvaluator</code>, or by calling <code>run()</code> directly).</li>
-<li>Release its workers with <code>close()</code>, or by using it as a context manager —
-   see <a href="#stopping-an-executor">Stopping an executor</a> for what that does to work
-   that is already running.</li>
+<li>Drop it. There is nothing to close.</li>
 </ol>
-<p>An executor that is dropped without being closed still releases its workers when
-it is collected: the thread and process pools shut down with the executor, and a
-<a class="autorefs autorefs-internal" title="            ropt.components.executors.LocalJobExecutor" href="../../reference/components_executors/#ropt.components.executors.LocalJobExecutor"><code>LocalJobExecutor</code></a> stops its
-teardown thread and removes a temporary directory it created, if nothing is left
-in it. The local case reports a <code>ResourceWarning</code>. Python ignores that category
-by default; run with <code>-W default::ResourceWarning</code> or <code>-X dev</code> to see it.</p>
+<p>Its workers are released when the last reference to it goes: the thread and
+process pools shut down with the executor, and a
+<a class="autorefs autorefs-internal" title="            ropt.components.executors.LocalJobExecutor" href="../../reference/components_executors/#ropt.components.executors.LocalJobExecutor"><code>LocalJobExecutor</code></a> cancels
+whatever it still has out, stops its teardown thread, and removes a temporary
+directory it created. CPython releases on the last reference rather than at some
+later collection, so an executor built inside a function is released when that
+function returns.</p>
+<p>A batch is a scope of its own: <code>run()</code> releases whatever it started before it
+returns, however it returns, so a failing or interrupted batch leaves no job
+behind and takes no worker with it.</p>
 <p>One rule covers every executor that leaves the process: <strong>out-of-process work
 needs importable, module-level callables.</strong> A work item's function and arguments
 are serialized, and the standard <code>pickle</code> module can only send what it can look
@@ -3648,8 +3646,8 @@ arrives at construction rather than at the first evaluation. The fix is to keep
 the code that creates and uses the executor behind an
 <code>if __name__ == "__main__":</code> guard (or inside a function called from there):</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="k">with</span> <span class="n">ProcessExecutor</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="k">as</span> <span class="n">executor</span><span class="p">:</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>        <span class="o">...</span>  <span class="c1"># run work here</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">executor</span> <span class="o">=</span> <span class="n">ProcessExecutor</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="o">...</span>  <span class="c1"># run work here</span>
 </span></code></pre></div>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Wrong: run at module top level. Each worker re-imports this and fails.</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">main</span><span class="p">()</span>
@@ -3723,12 +3721,12 @@ jobs run. <code>interval</code> is small because a local process is finished the
 exits, so waiting is dead time rather than politeness towards a scheduler.
 <code>retries</code> is <code>0</code> because a job writes and renames its result before exiting, so
 there is no shared filesystem that might not have caught up yet.</p>
-<p><strong>Stopping kills the job's whole process group.</strong> Each job is started in a
-session of its own, so <code>close()</code> reaches whatever the job started itself, rather
-than leaving those orphaned. This needs process groups, so the executor is
-<strong>POSIX only</strong> and refuses to be constructed elsewhere.</p>
-<p>Waiting for a killed job to actually die happens on a thread of its own, so
-<code>close()</code> returns without waiting it out. That same thread removes a working
+<p><strong>Cancelling a job kills its whole process group.</strong> Each job is started in a
+session of its own, so cancelling reaches whatever the job started itself,
+rather than leaving those orphaned. This needs process groups, so the executor
+is <strong>POSIX only</strong> and refuses to be constructed elsewhere.</p>
+<p>Waiting for a killed job to actually die happens on a thread of its own, so the
+caller that cancels never waits it out. That same thread removes a working
 directory this executor created, once the jobs writing to it are gone.</p>
 <p>It removes it only when there is nothing left in it to read, though. A work item
 that failed keeps its captured output, and <code>cleanup=False</code> keeps everything, so
@@ -3749,10 +3747,10 @@ HPC scheduler (e.g. Slurm) via the <code>pysqa</code> library. Each task is seri
 disk, submitted to the queue, polled for completion, and its result is
 deserialized back. Requires <code>ropt[hpc]</code> to be installed. Add <code>ropt[cloudpickle]</code>
 to send functions the standard <code>pickle</code> module cannot.</p>
-<p>Closing the executor asks the scheduler to delete every job it has submitted, so
-an interrupted optimization does not leave orphan jobs behind consuming the
-cluster allocation. Cancellation is best effort: if the scheduler cannot be
-reached the failure is logged and closing continues.</p>
+<p>A batch that leaves asks the scheduler to delete every job it submitted, so an
+interrupted optimization does not leave orphan jobs behind consuming the cluster
+allocation. Cancellation is best effort: if the scheduler cannot be reached the
+failure is logged and the rest are still cancelled.</p>
 <table>
 <thead>
 <tr>
@@ -3913,14 +3911,13 @@ own script.</p>
 <p>Sites with more than one cluster use a <code>clusters.yaml</code> naming a <code>queue.yaml</code> per
 cluster, each declaring its own <code>queue_type</code>; see the
 <a href="https://pysqa.readthedocs.io/en/latest/advanced.html#access-to-multiple-hpcs"><code>pysqa</code> documentation</a>.</p>
-<h2 id="stopping-an-executor">Stopping an executor</h2>
-<p><code>executor.close()</code> releases the executor's workers and returns immediately; it
-never waits for work that is already running. A caller blocked in <code>run()</code> when
-it happens is released with
-<a class="autorefs autorefs-internal" title="            ExecutorStopped" href="../../reference/exceptions/#ropt.exceptions.ExecutorStopped"><code>ExecutorStopped</code></a>; a <code>run()</code> started after it
-is refused with a <a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a>. What differs
-per executor is what keeps running afterwards, because what <em>can</em> be done to
-running work differs:</p>
+<h2 id="releasing-a-batch">Releasing a batch</h2>
+<p><code>run()</code> releases whatever the batch started before it returns, however it
+returns. A caller that leaves — because a work item raised, or because the
+thread was interrupted — drops the bundles it had queued and cancels the jobs it
+had launched, without waiting for them. What differs per executor is what
+happens to work that had already begun, because what <em>can</em> be done to it
+differs:</p>
 <table>
 <thead>
 <tr>
@@ -3933,12 +3930,12 @@ running work differs:</p>
 <tr>
 <td><code>ThreadExecutor</code></td>
 <td><strong>runs to completion</strong></td>
-<td>dropped</td>
+<td>cancelled</td>
 </tr>
 <tr>
 <td><code>ProcessExecutor</code></td>
-<td>the worker processes are <strong>killed</strong></td>
-<td>dropped</td>
+<td><strong>runs to completion</strong> in its worker</td>
+<td>never submitted</td>
 </tr>
 <tr>
 <td><code>LocalJobExecutor</code></td>
@@ -3952,28 +3949,28 @@ running work differs:</p>
 </tr>
 </tbody>
 </table>
+<p>At most <code>workers × bundle_size</code> evaluations are in that first column, so that is
+what a leaving batch has to wait out or leave behind. With <code>bundle_size=0</code> the
+whole batch is one bundle, and nothing can be dropped once it starts.</p>
 <p><strong>Threads run to completion because a thread cannot be cancelled.</strong> Python
 offers no way to interrupt one from outside, so an evaluation on a
-<code>ThreadExecutor</code> stops only when it returns. <code>close()</code> returns at once, but the
-program cannot leave until those evaluations return — the thread pool joins its
-threads at interpreter shutdown. Rather than let that look like a hang, the
-executor logs a <code>WARNING</code> naming how many are still running. An
+<code>ThreadExecutor</code> stops only when it returns, and the program cannot leave until
+it does — the thread pool joins its threads at interpreter shutdown. An
 evaluation that may run long and has to be interruptible belongs on one of the
-other three.</p>
-<p><strong>The kill is a <code>SIGTERM</code>, and the guarantee is partial.</strong> In each of the other
-three cases the target is <em>asked</em> to end and is not waited for, so a process
-that blocks or ignores <code>SIGTERM</code>, or that sits in an uninterruptible system
-call, outlives the request. Stopping is a strong best effort — enough that an
+job executors.</p>
+<p><strong>The kill is a <code>SIGTERM</code>, and the guarantee is partial.</strong> For the two job
+executors the target is <em>asked</em> to end and is not waited for, so a process that
+blocks or ignores <code>SIGTERM</code>, or that sits in an uninterruptible system call,
+outlives the request. Cancelling is a strong best effort — enough that an
 interrupted program exits instead of waiting for the current batch — not a
 promise that nothing of the run survives it.</p>
 <div class="admonition warning">
 <p class="admonition-title">A process executor orphans whatever an evaluation launched itself</p>
-<p><a class="autorefs autorefs-internal" title="            ropt.components.executors.ProcessExecutor" href="../../reference/components_executors/#ropt.components.executors.ProcessExecutor"><code>ProcessExecutor</code></a> terminates
-its own worker processes and nothing else. It installs no process groups, so
-a subprocess an evaluation started — a simulator, a solver, a shell
-pipeline — is never signalled: it keeps running, and is re-parented when the
-worker holding it dies. Nothing reports this, and the work continues
-after the program that asked for it has gone.</p>
+<p><a class="autorefs autorefs-internal" title="            ropt.components.executors.ProcessExecutor" href="../../reference/components_executors/#ropt.components.executors.ProcessExecutor"><code>ProcessExecutor</code></a> installs no
+process groups, so a subprocess an evaluation started — a simulator, a
+solver, a shell pipeline — is never signalled: it keeps running, and is
+re-parented when the worker holding it dies. Nothing reports this, and the
+work continues after the program that asked for it has gone.</p>
 <p><a class="autorefs autorefs-internal" title="            ropt.components.executors.LocalJobExecutor" href="../../reference/components_executors/#ropt.components.executors.LocalJobExecutor"><code>LocalJobExecutor</code></a> is the
 backend that handles this, by giving each work item a session of its own and
 signalling the whole group. Use it when an evaluation launches external
@@ -4048,9 +4045,10 @@ propagating out of <code>eval()</code> (and out of the compute step) on the call
 <p>Because the executor keeps running, its lifetime is owned by the <strong>consumer's
 scope</strong>, not by the error:</p>
 <ul>
-<li>Left unhandled, the exception propagates out of the block that owns the
-  executor — a <code>with</code> statement on it, for example — whose unwinding closes it.</li>
-<li>Caught before it reaches that block, the executor stays open and can be
+<li>Left unhandled, the exception propagates out of the scope that owns the
+  executor, whose unwinding drops the last reference to it and releases its
+  workers.</li>
+<li>Caught before it reaches that scope, the executor stays usable and can be
   reused for further evaluations. This is what lets several compute steps share
   one executor and lets a bug in one be isolated from the others.</li>
 </ul>

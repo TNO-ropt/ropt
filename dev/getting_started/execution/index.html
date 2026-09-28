@@ -2975,15 +2975,16 @@
 happen one after another, on the same thread that called
 <a class="autorefs autorefs-internal" title="            ropt.simple.optimize" href="../../reference/simple/#ropt.simple.optimize"><code>optimize</code></a>. If each call is slow, you can run several at
 the same time by evaluating on an <strong>executor</strong>.</p>
-<p>Build one with a <code>with</code> statement and pass it to the run:</p>
+<p>Build one and pass it to the run:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.simple</span><span class="w"> </span><span class="kn">import</span> <span class="n">ThreadExecutor</span><span class="p">,</span> <span class="n">optimize</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="k">with</span> <span class="n">ThreadExecutor</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="k">as</span> <span class="n">executor</span><span class="p">:</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">executor</span><span class="o">=</span><span class="n">executor</span><span class="p">)</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">executor</span> <span class="o">=</span> <span class="n">ThreadExecutor</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">executor</span><span class="o">=</span><span class="n">executor</span><span class="p">)</span>
 </span></code></pre></div>
 <p>That is the whole pattern. You can build as many executors as you like, of any
-kind, and each run uses the one you give it — and only that one. Leaving the
-<code>with</code> block releases its workers. The runnable script is
+kind, and each run uses the one you give it — and only that one. An executor
+releases its workers when it is collected, so there is nothing to close. The
+runnable script is
 <a href="https://github.com/TNO-ropt/ropt/blob/main/examples/simple/parallel.py">examples/simple/parallel.py</a>,
 which evaluates one optimization on a thread executor, or on a process executor
 when it is passed <code>--multiprocessing</code>.</p>

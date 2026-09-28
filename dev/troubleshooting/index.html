@@ -3149,9 +3149,9 @@ outside. If an evaluation may run long and has to be interruptible, put it on a
 everything at module level runs again in every worker. That is why the entry
 point has to sit behind <code>if __name__ == "__main__":</code>. Without the guard the
 workers try to start workers of their own, and building the executor raises.</p>
-<p><strong>A closed executor cannot be reopened.</strong> Closing one releases its workers, and
-a run that asks it for work afterwards is refused. Build it inside the block
-that uses it; see
+<p><strong>An executor holds its workers while anything refers to it.</strong> They are
+released when the last reference goes, so a name kept alive keeps the workers
+alive with it. Build it inside the loop or function that uses it; see
 <a href="../running/parallel/#how-many-workers">Releasing an executor early</a>.</p>
 <table>
 <thead>
@@ -3174,8 +3174,8 @@ that uses it; see
 <td>The script has no <code>if __name__ == "__main__":</code> guard, so every worker re-ran it from the top.</td>
 </tr>
 <tr>
-<td>A <a class="autorefs autorefs-internal" title="            WorkflowError" href="../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a> about a closed executor</td>
-<td>The executor outlived the <code>with</code> block that built it, or was closed explicitly.</td>
+<td>A <code>ProcessExecutor</code> keeps hundreds of megabytes resident</td>
+<td>Each worker is a separate interpreter. Drop the executor, or the name holding it, when the runs that use it are done.</td>
 </tr>
 <tr>
 <td>More workers made everything slower</td>
