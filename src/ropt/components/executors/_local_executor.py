@@ -184,8 +184,8 @@ class LocalJobExecutor(JobExecutorBase):
         """
         return self._workdir
 
-    def _start_job(self, item_id: UUID, command: list[str]) -> int:
-        output_file = self._workdir / f"{item_id}.txt"
+    def _start_job(self, bundle_id: UUID, command: list[str]) -> int:
+        output_file = self._workdir / f"{bundle_id}.txt"
         # Started and registered under one acquisition, so that a poll never
         # sees a job whose id has been handed out but is not yet in the
         # register.

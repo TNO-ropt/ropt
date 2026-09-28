@@ -182,8 +182,8 @@ class _State:
         # never asks after a job that cannot have finished.
         with self._lock:
             return [
-                (item_id, job_id, self._retries.get(item_id, 0))
-                for item_id, job_id in self._jobs.items()
+                (bundle_id, job_id, self._retries.get(bundle_id, 0))
+                for bundle_id, job_id in self._jobs.items()
             ]
 
     def apply_update(
@@ -193,20 +193,20 @@ class _State:
             if release_backend:
                 self._backend_busy = False
             cancel: list[tuple[UUID, int]] = []
-            for item_id, job_id in update.launched_jobs.items():
-                if item_id in self._active:
-                    self._jobs[item_id] = job_id
+            for bundle_id, job_id in update.launched_jobs.items():
+                if bundle_id in self._active:
+                    self._jobs[bundle_id] = job_id
                 else:
                     # Its run left while it was being launched: nobody is
                     # waiting for it now.
-                    cancel.append((item_id, job_id))
-            for item_id, result in update.results.items():
-                if item_id in self._active:
-                    self._complete(item_id, result)
+                    cancel.append((bundle_id, job_id))
+            for bundle_id, result in update.results.items():
+                if bundle_id in self._active:
+                    self._complete(bundle_id, result)
                     self._output_kept |= isinstance(result, ExecutorFailure)
-            for item_id in update.retries:
-                if item_id in self._active:
-                    self._retries[item_id] = self._retries.get(item_id, 0) + 1
+            for bundle_id in update.retries:
+                if bundle_id in self._active:
+                    self._retries[bundle_id] = self._retries.get(bundle_id, 0) + 1
             if update.queried:
                 self._last_query = time.monotonic()
                 self._note_query(update.query_error)
@@ -223,16 +223,16 @@ class _State:
                 entry for entry in self._queue if entry[0] is not results
             )
             jobs: list[tuple[UUID, int]] = []
-            for item_id in [
-                item_id
-                for item_id, (item_results, _) in self._active.items()
+            for bundle_id in [
+                bundle_id
+                for bundle_id, (item_results, _) in self._active.items()
                 if item_results is results
             ]:
-                del self._active[item_id]
-                self._retries.pop(item_id, None)
-                job_id = self._jobs.pop(item_id, None)
+                del self._active[bundle_id]
+                self._retries.pop(bundle_id, None)
+                job_id = self._jobs.pop(bundle_id, None)
                 if job_id is not None:
-                    jobs.append((item_id, job_id))
+                    jobs.append((bundle_id, job_id))
             self._condition.notify_all()
             return jobs
 
@@ -244,27 +244,27 @@ class _State:
         while len(self._active) < self._workers and self._queue:
             results, index, bundle = self._queue.popleft()
             # The id is the stem of the files this job reads and writes.
-            item_id = uuid4()
-            update.jobs_to_launch.append((item_id, results, index, bundle))
-            self._active[item_id] = (results, index)
+            bundle_id = uuid4()
+            update.jobs_to_launch.append((bundle_id, results, index, bundle))
+            self._active[bundle_id] = (results, index)
 
-    def _complete(self, item_id: UUID, result: Any) -> None:  # ruff: ignore[any-type]
-        results, index = self._active.pop(item_id)
-        self._jobs.pop(item_id, None)
-        self._retries.pop(item_id, None)
+    def _complete(self, bundle_id: UUID, result: Any) -> None:  # ruff: ignore[any-type]
+        results, index = self._active.pop(bundle_id)
+        self._jobs.pop(bundle_id, None)
+        self._retries.pop(bundle_id, None)
         results.append((index, result))
 
     def _fail_unlaunched(self, update: _StateUpdate) -> None:
         # Given a slot but never launched: the caller raised before reaching
         # them.
         reason = "the caller stopped" if update.error is None else f"{update.error}"
-        for item_id, _results, _index, _bundle in update.jobs_to_launch:
-            if item_id in update.launched_jobs or item_id in update.results:
+        for bundle_id, _results, _index, _bundle in update.jobs_to_launch:
+            if bundle_id in update.launched_jobs or bundle_id in update.results:
                 continue
-            if item_id not in self._active:
+            if bundle_id not in self._active:
                 continue
             self._complete(
-                item_id, ExecutorFailure(f"The work item was not run: {reason}")
+                bundle_id, ExecutorFailure(f"The work item was not run: {reason}")
             )
 
     def _note_query(self, error: BaseException | None) -> None:
@@ -290,8 +290,8 @@ class _State:
             f"{self._query_retries + 1} attempts: {error}"
         )
         outstanding = list(self._active)
-        for item_id in outstanding:
-            self._complete(item_id, ExecutorFailure(msg))
+        for bundle_id in outstanding:
+            self._complete(bundle_id, ExecutorFailure(msg))
         if outstanding:
             # These never reach the cleanup in `_collect_finished`, so their
             # output survives here too.
@@ -369,9 +369,9 @@ class JobExecutorBase(ExecutorBase):
         )
 
     @abstractmethod
-    def _start_job(self, item_id: UUID, command: list[str]) -> int:
+    def _start_job(self, bundle_id: UUID, command: list[str]) -> int:
         # On the caller that has claimed the backend. The job's output belongs
-        # in `<item_id>.txt` in the working directory: the only record of a job
+        # in `<bundle_id>.txt` in the working directory: the only record of a job
         # that died before writing a result. Returns an id that `_live_job_ids`
         # and `_cancel_job` accept.
         ...
@@ -441,11 +441,11 @@ class JobExecutorBase(ExecutorBase):
                 )
 
     def _launch_jobs(self, update: _StateUpdate) -> None:
-        for item_id, _results, _index, bundle in update.jobs_to_launch:
+        for bundle_id, _results, _index, bundle in update.jobs_to_launch:
             try:
-                update.launched_jobs[item_id] = self._launch_job(item_id, bundle)
+                update.launched_jobs[bundle_id] = self._launch_job(bundle_id, bundle)
             except Exception as exc:  # ruff: ignore[blind-except]
-                update.results[item_id] = exc
+                update.results[bundle_id] = exc
 
     def _collect_finished(self, update: _StateUpdate) -> None:
         update.queried = True
@@ -456,19 +456,19 @@ class JobExecutorBase(ExecutorBase):
             # finished", so failed queries are acted on rather than ignored.
             update.query_error = exc
             return
-        for item_id, job_id, retries_used in self._state.jobs_to_check():
+        for bundle_id, job_id, retries_used in self._state.jobs_to_check():
             # Gone from the backend is the only sign that a job has ended; what
             # became of it has to be read from its output file.
             if job_id in live:
                 continue
-            result = self._read_result(item_id, retries_used)
+            result = self._read_result(bundle_id, retries_used)
             if result is _NOT_READY:
-                update.retries.add(item_id)
+                update.retries.add(bundle_id)
                 continue
-            update.results[item_id] = result
+            update.results[bundle_id] = result
             if self._remove_files:
                 self._cleanup_files(
-                    item_id, keep_output=isinstance(result, ExecutorFailure)
+                    bundle_id, keep_output=isinstance(result, ExecutorFailure)
                 )
 
     def _cancel_jobs(self, jobs: list[tuple[UUID, int]]) -> None:
@@ -493,38 +493,38 @@ class JobExecutorBase(ExecutorBase):
         thread.join()
 
     def _cancel_jobs_now(self, jobs: list[tuple[UUID, int]]) -> None:
-        for item_id, job_id in jobs:
+        for bundle_id, job_id in jobs:
             try:
                 self._cancel_job(job_id)
             except Exception as exc:  # ruff: ignore[blind-except]
                 _logger.warning(
                     "Could not cancel %s job %s (job id: %s): %s",
                     self._kind,
-                    item_id,
+                    bundle_id,
                     job_id,
                     exc,
                 )
             else:
                 _logger.debug(
-                    "Cancelled %s job %s (job id: %s)", self._kind, item_id, job_id
+                    "Cancelled %s job %s (job id: %s)", self._kind, bundle_id, job_id
                 )
             if self._remove_files:
-                self._cleanup_files(item_id)
+                self._cleanup_files(bundle_id)
 
-    def _launch_job(self, item_id: UUID, bundle: list[WorkItem]) -> int:
+    def _launch_job(self, bundle_id: UUID, bundle: list[WorkItem]) -> int:
         existing = any(
-            (self._workdir / f"{item_id}{suffix}").exists()
+            (self._workdir / f"{bundle_id}{suffix}").exists()
             for suffix in (".in", ".out", ".txt")
         )
         if existing:
-            msg = f"Work item files for '{item_id}' already exist in {self._workdir}."
+            msg = f"Work item files for '{bundle_id}' already exist in {self._workdir}."
             raise ExecutionError(msg)
-        input_file = self._workdir / f"{item_id}.in"
-        output_file = self._workdir / f"{item_id}.out"
-        self._write_input(item_id, input_file, bundle)
+        input_file = self._workdir / f"{bundle_id}.in"
+        output_file = self._workdir / f"{bundle_id}.out"
+        self._write_input(bundle_id, input_file, bundle)
         try:
             job_id = self._start_job(
-                item_id,
+                bundle_id,
                 # The interpreter that started this, not whatever `python` the
                 # job's PATH resolves to: only this one is known to import ropt.
                 [
@@ -537,13 +537,13 @@ class JobExecutorBase(ExecutorBase):
             )
         except BaseException:
             if self._remove_files:
-                self._cleanup_files(item_id)
+                self._cleanup_files(bundle_id)
             raise
-        _logger.debug("Started %s job %s (job id: %s)", self._kind, item_id, job_id)
+        _logger.debug("Started %s job %s (job id: %s)", self._kind, bundle_id, job_id)
         return job_id
 
     def _write_input(
-        self, item_id: UUID, input_file: Path, bundle: list[WorkItem]
+        self, bundle_id: UUID, input_file: Path, bundle: list[WorkItem]
     ) -> None:
         # Written to a temporary file and renamed, so the job can never observe
         # a half-written input: on a shared filesystem the rename is what makes
@@ -559,15 +559,16 @@ class JobExecutorBase(ExecutorBase):
         except Exception as exc:
             tmp_path.unlink(missing_ok=True)
             msg = (
-                f"Work item '{item_id}' could not be sent to a job: {CANNOT_SERIALIZE}."
+                f"Work item '{bundle_id}' could not be sent to a job: "
+                f"{CANNOT_SERIALIZE}."
             )
             raise ExecutionError(msg) from exc
         except BaseException:
             tmp_path.unlink(missing_ok=True)
             raise
 
-    def _read_result(self, item_id: UUID, retries_used: int) -> Any:  # ruff: ignore[any-type]
-        output_file = self._workdir / f"{item_id}.out"
+    def _read_result(self, bundle_id: UUID, retries_used: int) -> Any:  # ruff: ignore[any-type]
+        output_file = self._workdir / f"{bundle_id}.out"
         try:
             with output_file.open("rb") as fp:
                 return load(fp)
@@ -575,18 +576,18 @@ class JobExecutorBase(ExecutorBase):
             # The file may simply not be visible yet, so give the filesystem a
             # bounded number of further polls to show it.
             return self._retry_or_fail(
-                item_id,
+                bundle_id,
                 retries_used,
-                f"Output file for work item {item_id} never appeared",
+                f"Output file for work item {bundle_id} never appeared",
                 "output file never appeared",
             )
         except (OSError, EOFError, UnpicklingError):
             # Present but unreadable, which a partially visible file also looks
             # like: retried on the same budget before giving up.
             return self._retry_or_fail(
-                item_id,
+                bundle_id,
                 retries_used,
-                f"No valid result for work item {item_id} after "
+                f"No valid result for work item {bundle_id} after "
                 f"{self._retries_limit} retries",
                 f"no valid result after {self._retries_limit} retries",
             )
@@ -596,39 +597,41 @@ class JobExecutorBase(ExecutorBase):
             # spending the retry budget here would only delay the failure and
             # then blame the filesystem, which is the one thing not at fault.
             msg = (
-                f"The result of work item {item_id} could not be reconstructed: "
+                f"The result of work item {bundle_id} could not be reconstructed: "
                 f"{exc}. This process must be able to import whatever the job "
                 "returned."
             )
-            return self._failure_for(item_id, msg, exc)
+            return self._failure_for(bundle_id, msg, exc)
         except Exception as exc:  # ruff: ignore[blind-except]
             # Unpickling runs the code that rebuilds the object, and that can
             # raise anything at all. Whatever it was belongs to this work item
             # rather than to the executor, which anything escaping here would
             # take down.
-            msg = f"The result of work item {item_id} could not be read: {exc}"
-            return self._failure_for(item_id, msg, exc)
+            msg = f"The result of work item {bundle_id} could not be read: {exc}"
+            return self._failure_for(bundle_id, msg, exc)
 
     def _retry_or_fail(
-        self, item_id: UUID, retries_used: int, msg: str, reason: str
+        self, bundle_id: UUID, retries_used: int, msg: str, reason: str
     ) -> Any:  # ruff: ignore[any-type]
         # A shared filesystem may take a while to show a finished job's result,
         # so the same bounded budget covers "not there yet" and "not whole yet".
         if retries_used < self._retries_limit:
             return _NOT_READY
-        return self._failure_for(item_id, msg, reason)
+        return self._failure_for(bundle_id, msg, reason)
 
-    def _failure_for(self, item_id: UUID, msg: str, reason: object) -> ExecutorFailure:
-        _logger.warning("%s work item %s failed: %s", self._kind, item_id, reason)
-        return ExecutorFailure(msg + self._job_output_tail(item_id))
+    def _failure_for(
+        self, bundle_id: UUID, msg: str, reason: object
+    ) -> ExecutorFailure:
+        _logger.warning("%s work item %s failed: %s", self._kind, bundle_id, reason)
+        return ExecutorFailure(msg + self._job_output_tail(bundle_id))
 
-    def _job_output_tail(self, item_id: UUID) -> str:
+    def _job_output_tail(self, bundle_id: UUID) -> str:
         # A job that died before writing a result left its only trace here, so
         # the tail travels with the failure and the file itself is kept. A
         # shared filesystem may not show the content yet, and a submission
         # script may not have redirected the job's output at all, so the path is
         # named either way: it is the one place left to look.
-        output_file = self._workdir / f"{item_id}.txt"
+        output_file = self._workdir / f"{bundle_id}.txt"
         try:
             lines = output_file.read_text(errors="replace").splitlines()
         except OSError:
@@ -639,9 +642,9 @@ class JobExecutorBase(ExecutorBase):
         body = "\n".join(tail)
         return f"; the job wrote to {output_file}:\n{body}"
 
-    def _cleanup_files(self, item_id: UUID, *, keep_output: bool = False) -> None:
+    def _cleanup_files(self, bundle_id: UUID, *, keep_output: bool = False) -> None:
         suffixes = (".in", ".out") if keep_output else (".in", ".out", ".txt")
         for suffix in suffixes:
-            path = self._workdir / f"{item_id}{suffix}"
+            path = self._workdir / f"{bundle_id}{suffix}"
             with contextlib.suppress(OSError):
                 path.unlink(missing_ok=True)

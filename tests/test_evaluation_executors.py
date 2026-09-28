@@ -620,10 +620,10 @@ def test_hpc_executor_refuses_to_overwrite_existing_work_item_files(
 ) -> None:
     _mock_scheduler(monkeypatch, MockedHPCAdapter(tmp_path))
     executor = HPCExecutor(workdir=tmp_path, workers=1, interval=0, template="")
-    item_id = uuid4()
-    (tmp_path / f"{item_id}.out").touch()
+    bundle_id = uuid4()
+    (tmp_path / f"{bundle_id}.out").touch()
     with pytest.raises(ExecutionError, match="already exist"):
-        executor._launch_job(item_id, [WorkItem(function=_function, args=(0,))])
+        executor._launch_job(bundle_id, [WorkItem(function=_function, args=(0,))])
 
 
 @pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
@@ -1926,13 +1926,13 @@ class _ControlledJobExecutor(JobExecutorBase):
         self.pass_entered = threading.Event()
         self.release_pass = threading.Event()
 
-    def _start_job(self, item_id: UUID, command: list[str]) -> int:
-        raise AssertionError((item_id, command))
+    def _start_job(self, bundle_id: UUID, command: list[str]) -> int:
+        raise AssertionError((bundle_id, command))
 
-    def _launch_job(self, item_id: UUID, bundle: list[WorkItem]) -> int:
+    def _launch_job(self, bundle_id: UUID, bundle: list[WorkItem]) -> int:
         job_id = len(self.started) + 1
-        self.started.append((item_id, job_id))
-        self.results[item_id] = [
+        self.started.append((bundle_id, job_id))
+        self.results[bundle_id] = [
             item.function(*item.args, **item.kwargs) for item in bundle
         ]
         return job_id
@@ -1956,9 +1956,9 @@ class _ControlledJobExecutor(JobExecutorBase):
                 error = self.raise_in_pass
                 self.raise_in_pass = None
                 raise error
-            for item_id, _caller, _index, bundle in update.jobs_to_launch:
-                update.launched_jobs[item_id] = self._launch_job(item_id, bundle)
-                update.results[item_id] = self.results[item_id]
+            for bundle_id, _caller, _index, bundle in update.jobs_to_launch:
+                update.launched_jobs[bundle_id] = self._launch_job(bundle_id, bundle)
+                update.results[bundle_id] = self.results[bundle_id]
         finally:
             with self._state._lock:
                 self.active_passes -= 1
@@ -2102,14 +2102,14 @@ def test_job_executor_drops_late_results_after_a_caller_left(tmp_path: Path) -> 
     executor = _ControlledJobExecutor(tmp_path)
     state = executor._state
     caller: list[tuple[int, Any]] = [(0, [1])]
-    item_id = uuid4()
+    bundle_id = uuid4()
     with state._lock:
-        state._active[item_id] = (caller, 0)
-        state._jobs[item_id] = 7
-    assert state.drop(caller) == [(item_id, 7)]
-    state.apply_update(_StateUpdate(results={item_id: [2]}), release_backend=False)
+        state._active[bundle_id] = (caller, 0)
+        state._jobs[bundle_id] = 7
+    assert state.drop(caller) == [(bundle_id, 7)]
+    state.apply_update(_StateUpdate(results={bundle_id: [2]}), release_backend=False)
     assert caller == []
-    assert item_id not in state._active
+    assert bundle_id not in state._active
 
 
 def test_job_executor_failed_query_spends_one_retry_per_interval(
