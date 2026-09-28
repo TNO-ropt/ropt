@@ -3319,7 +3319,7 @@ which evaluates a single vector and then a matrix of them.</p>
 still returns normally, and indicates why in <code>result.exit_code</code>:
 <code>TOO_FEW_REALIZATIONS</code> when not enough realizations produced a value,
 <code>EXECUTOR_STOPPED</code> when the executor it was evaluating on could no longer run
-the work.
+the work, which in practice means the interpreter was shutting down under it.
 <code>result.results</code> is <code>None</code> when no feasible result was ever recorded, whatever
 the reason the run ended; a run that fails part-way still returns the best
 result it had reached before that. A plain <a class="autorefs autorefs-internal" title="            ropt.simple.evaluate" href="../../reference/simple/#ropt.simple.evaluate"><code>evaluate</code></a>
