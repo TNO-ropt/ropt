@@ -28,10 +28,8 @@ from numpy.typing import NDArray
 from ropt.results import FunctionResults
 from ropt.simple import (
     EvaluationFunctionContext,
-    Executor,
-    HPCExecutor,
-    LocalJobExecutor,
     optimize,
+    session,
 )
 
 DIM = 2
@@ -100,29 +98,30 @@ def main(
     """Run the optimization on the cluster, or in local processes.
 
     Args:
-        local:   Run on a local executor instead of submitting to a cluster.
+        local:   Run on a local pool instead of submitting to a cluster.
         queue:   The cluster queue to submit to; the configured default if None.
         workdir: Directory for the job files, the current directory by default.
                  On a cluster it must be on a filesystem the compute nodes
                  share.
     """
-    executor: Executor = (
-        LocalJobExecutor(workers=WORKERS, workdir=workdir)
-        if local
-        else HPCExecutor(
-            workers=WORKERS,
-            queue=queue,
-            workdir=Path.cwd() if workdir is None else workdir.resolve(),
+    with session() as s:
+        pool = (
+            s.local_pool(workers=WORKERS, workdir=workdir)
+            if local
+            else s.hpc_pool(
+                workers=WORKERS,
+                queue=queue,
+                workdir=Path.cwd() if workdir is None else workdir.resolve(),
+            )
         )
-    )
-    result = optimize(
-        CONFIG,
-        INITIAL_VALUES,
-        rosenbrock,
-        executor=executor,
-        report=report,
-        bundle_size=0,
-    )
+        result = optimize(
+            CONFIG,
+            INITIAL_VALUES,
+            rosenbrock,
+            pool=pool,
+            report=report,
+            bundle_size=0,
+        )
     assert result.results is not None
     print(f"optimal variables: {result.results.variables}")
     print(f"optimal objective: {result.results.target_objective}")

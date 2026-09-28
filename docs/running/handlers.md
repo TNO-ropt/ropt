@@ -46,11 +46,17 @@ takes a lock around each call, so a second run waits for the first to finish
 rather than interleaving with it:
 
 ```python
-from ropt.simple import HistoryHandler, ThreadExecutor, optimize_many
+from ropt.simple import HistoryHandler, optimize_many, session
 
 history = HistoryHandler()
-executor = ThreadExecutor(workers=4)
-optimize_many(config, start_points, objective, executor=executor, handlers=[history])
+with session() as s:
+    optimize_many(
+        config,
+        start_points,
+        objective,
+        pool=s.thread_pool(workers=4),
+        handlers=[history],
+    )
 
 print(history.results)
 ```
@@ -226,12 +232,12 @@ the emitting step is affected, so concurrent runs continue. See
 
 ## Handlers and the process boundary
 
-On a thread executor (or with no executor) your objective and your handlers run
+On a thread pool (or with no pool) your objective and your handlers run
 in the **same process** and share memory: a handler can see anything the
 objective left behind — a global it set, a list it appended to, an object it
 mutated.
 
-A process, local, or HPC executor breaks that. The objective runs in a **separate
+A process, local, or HPC pool breaks that. The objective runs in a **separate
 worker process**, while the optimizer, your handlers, and the rest of your
 program stay
 in the **main process**. They cannot share memory. The objective's *only* way to
@@ -246,7 +252,7 @@ flowchart LR
         hand["handlers +<br/>your code"]
         opt --> hand
     end
-    subgraph worker["worker process (process / local / HPC executor)"]
+    subgraph worker["worker process (process / local / HPC pool)"]
         obj["objective"]
     end
     opt -->|"variables"| obj
@@ -256,14 +262,14 @@ flowchart LR
 ??? info "How data crosses the boundary"
     To move work and results between processes, `ropt` **serializes** them —
     turns the objects into bytes and rebuilds them on the other side. Both a
-    process executor and an HPC executor use Python's standard `pickle` by default, so
+    process pool and an HPC pool use Python's standard `pickle` by default, so
     an objective defined at module level works as is; a lambda, a closure, or a
     notebook-defined objective needs the optional `cloudpickle` extra. Most
     functions and data serialize fine, but things like open files, locks, or
     database connections may not.
 
-    On a process executor the bytes travel over an in-machine channel. On an
-    HPC executor they are written as **files on a shared filesystem** that the
+    On a process pool the bytes travel over an in-machine channel. On an
+    HPC pool they are written as **files on a shared filesystem** that the
     cluster nodes read, so it needs such a filesystem (its `workdir`).
 
     Serialization is only the mechanism `ropt` uses today; the essential
@@ -276,16 +282,16 @@ only in memory — setting a module global, appending to a shared list, updating
 object — happened **inside the worker** and is discarded when it finishes; your
 handlers and your main program never see it.
 
-!!! note "Executors stay in the main process"
-    An executor is tied to the main process, so it is not usable in a worker. An
-    objective that closes over one — to offload work, or to start an inner run
-    on it — is stopped in the worker, which reports the object by name. Do that
-    work in the objective itself, or return what you need and act on it in the
-    main process.
+!!! note "Pools stay in the main process"
+    A pool is tied to the process that opened its session, so it is not usable
+    in a worker. An objective that closes over one — to offload work, or to
+    start an inner run on it — is stopped in the worker, which reports the
+    object by name. Do that work in the objective itself, or return what you
+    need and act on it in the main process.
 
 So to get extra information from an evaluation to a handler (or to a later part
 of your program), **return it** instead of stashing it in shared state: attach it
 to the result's `metadata` (see [Attaching metadata](running.md#attaching-metadata)), which
 is returned with the result. Relying on shared state happens to work on a
-thread executor, but breaks the moment you switch to a process executor;
+thread pool, but breaks the moment you switch to a process pool;
 returning the data works everywhere.

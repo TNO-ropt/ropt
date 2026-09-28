@@ -18,6 +18,7 @@ from ropt.context import EnOptContext
 
 from ._evaluator import make_evaluator
 from ._handlers import attach_handlers
+from ._pool import SerialPool
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -30,6 +31,7 @@ if TYPE_CHECKING:
     from ropt.results import FunctionResults
 
     from ._function import EvaluationFunction
+    from ._pool import WorkerPool
     from ._report import ReportCallback
 
 
@@ -38,7 +40,7 @@ def evaluate(  # ruff: ignore[too-many-arguments]
     variables: ArrayLike,
     function: EvaluationFunction,
     *,
-    executor: Executor | None = None,
+    pool: WorkerPool | None = None,
     handlers: Sequence[EventHandler] | None = None,
     report: ReportCallback | None = None,
     bundle_size: int | None = None,
@@ -50,10 +52,10 @@ def evaluate(  # ruff: ignore[too-many-arguments]
     vectors at once. See [Running Optimizations](../running/running.md) for a
     walkthrough.
 
-    Without an `executor` the evaluations run in-process, on the calling thread,
-    and `bundle_size` does not apply. A
-    run started from inside an evaluation needs an executor with workers of its
-    own: the one it is already running on refuses the work. `handlers` takes
+    Without a `pool` the evaluations run in-process, on the calling thread, and
+    `bundle_size` does not apply. A run started from inside an evaluation needs
+    a pool with workers of its own: the one it is already running on refuses the
+    work. `handlers` takes
     [`EventHandler`][ropt.components.event_handlers.EventHandler] objects, as
     [`optimize`][ropt.simple.optimize] does.
 
@@ -67,24 +69,25 @@ def evaluate(  # ruff: ignore[too-many-arguments]
         config:      The optimization configuration.
         variables:   The variable vector to evaluate.
         function:    The per-realization evaluation function.
-        executor:    The executor to evaluate on, or `None`.
+        pool:        The pool to evaluate on, or `None`.
         handlers:    Optional handlers, called in the order listed.
         report:      Optional callback invoked with each evaluation's results.
-        bundle_size: Evaluations per worker task, `None` for the executor's own.
+        bundle_size: Evaluations per worker task, `None` for the pool's own.
         metadata:    Optional dictionary attached to the emitted results.
 
     Returns:
         The [`FunctionResults`][ropt.results.FunctionResults] for the vector.
 
     Raises:
-        ValueError: If `variables` is not a single vector.
-    """
+        ValueError:    If `variables` is not a single vector.
+        WorkflowError: If the pool's session has closed.
+    """  # ruff: ignore[docstring-extraneous-exception]
     array = np.asarray(variables, dtype=np.float64)
     if array.ndim != 1:
         msg = "evaluate() takes a single vector; use evaluate_many() for a batch."
         raise ValueError(msg)
     results = _run_evaluation(
-        executor,
+        (SerialPool() if pool is None else pool).executor,
         config,
         array,
         function,
@@ -101,7 +104,7 @@ def evaluate_many(  # ruff: ignore[too-many-arguments]
     variables: ArrayLike,
     function: EvaluationFunction,
     *,
-    executor: Executor | None = None,
+    pool: WorkerPool | None = None,
     handlers: Sequence[EventHandler] | None = None,
     report: ReportCallback | None = None,
     bundle_size: int | None = None,
@@ -113,10 +116,10 @@ def evaluate_many(  # ruff: ignore[too-many-arguments]
     the same order. See [Running Optimizations](../running/running.md) for a
     walkthrough.
 
-    Without an `executor` the evaluations run in-process, on the calling thread,
-    and `bundle_size` does not apply. A
-    run started from inside an evaluation needs an executor with workers of its
-    own: the one it is already running on refuses the work. `handlers` takes
+    Without a `pool` the evaluations run in-process, on the calling thread, and
+    `bundle_size` does not apply. A run started from inside an evaluation needs
+    a pool with workers of its own: the one it is already running on refuses the
+    work. `handlers` takes
     [`EventHandler`][ropt.components.event_handlers.EventHandler] objects, as
     [`optimize`][ropt.simple.optimize] does.
 
@@ -130,18 +133,19 @@ def evaluate_many(  # ruff: ignore[too-many-arguments]
         config:      The optimization configuration.
         variables:   The variable vectors to evaluate, one per row.
         function:    The per-realization evaluation function.
-        executor:    The executor to evaluate on, or `None`.
+        pool:        The pool to evaluate on, or `None`.
         handlers:    Optional handlers, called in the order listed.
         report:      Optional callback invoked with each evaluation's results.
-        bundle_size: Evaluations per worker task, `None` for the executor's own.
+        bundle_size: Evaluations per worker task, `None` for the pool's own.
         metadata:    Optional dictionary attached to every emitted result.
 
     Returns:
         One [`FunctionResults`][ropt.results.FunctionResults] per input vector.
 
     Raises:
-        ValueError: If `variables` is not a 2-D matrix.
-    """
+        ValueError:    If `variables` is not a 2-D matrix.
+        WorkflowError: If the pool's session has closed.
+    """  # ruff: ignore[docstring-extraneous-exception]
     array = np.asarray(variables, dtype=np.float64)
     if array.ndim != 2:  # ruff: ignore[magic-value-comparison]
         msg = (
@@ -150,7 +154,7 @@ def evaluate_many(  # ruff: ignore[too-many-arguments]
         )
         raise ValueError(msg)
     results = _run_evaluation(
-        executor,
+        (SerialPool() if pool is None else pool).executor,
         config,
         array,
         function,

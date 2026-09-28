@@ -31,10 +31,9 @@ from ropt.simple import (
     DataFrameHandler,
     EvaluationFunction,
     EvaluationFunctionContext,
-    Executor,
-    ProcessExecutor,
-    ThreadExecutor,
+    WorkerPool,
     optimize,
+    session,
 )
 
 # --8<-- [start:configs]
@@ -107,20 +106,20 @@ def inner_optimization(  # ruff: ignore[too-many-arguments]
     variables: NDArray[np.float64],
     context: EvaluationFunctionContext,
     *,
-    executor: Executor,
+    pool: WorkerPool,
     tables: DataFrameHandler,
     function: EvaluationFunction,
     memo: dict[tuple[float, ...], float],
 ) -> float:
     """Evaluate one outer point by optimizing the inner variables at it.
 
-    Runs in a thread of the outer executor, so the inner executor, the handler
+    Runs in a thread of the outer pool, so the inner pool, the handler
     and the memo are live objects here rather than copies.
 
     Args:
         variables: The outer variable vector to evaluate.
         context:   The evaluation context, identifying this outer evaluation.
-        executor:  The executor the inner evaluations run on.
+        pool:      The pool the inner evaluations run on.
         tables:    The handler every inner run feeds.
         function:  The objective the inner optimization minimizes.
         memo:      Objectives already computed, keyed by outer point.
@@ -137,7 +136,7 @@ def inner_optimization(  # ruff: ignore[too-many-arguments]
         INNER_CONFIG,
         np.where(MASK, INITIAL_VALUES, variables),
         function,
-        executor=executor,
+        pool=pool,
         handlers=[tables],
         # A whole inner batch goes to one worker: the parallelism comes from the
         # outer runs.
@@ -176,22 +175,21 @@ def main() -> None:
 
     # --8<-- [start:run]
     # A plain dict reaches the outer evaluations because they run on threads, in
-    # this process; on a process executor each worker would get an empty copy.
+    # this process; on a process pool each worker would get an empty copy.
     memo: dict[tuple[float, ...], float] = {}
-    inner_executor = ProcessExecutor(workers=2)
-    outer_executor = ThreadExecutor(workers=2)
-    optimize(
-        OUTER_CONFIG,
-        INITIAL_VALUES,
-        partial(
-            inner_optimization,
-            executor=inner_executor,
-            tables=tables,
-            function=partial(rosenbrock, a=a, b=b),
-            memo=memo,
-        ),
-        executor=outer_executor,
-    )
+    with session() as s:
+        optimize(
+            OUTER_CONFIG,
+            INITIAL_VALUES,
+            partial(
+                inner_optimization,
+                pool=s.process_pool(workers=2),
+                tables=tables,
+                function=partial(rosenbrock, a=a, b=b),
+                memo=memo,
+            ),
+            pool=s.thread_pool(workers=2),
+        )
     # --8<-- [end:run]
 
     frame = tables["inner"]

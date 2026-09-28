@@ -254,7 +254,7 @@ which evaluates a single vector and then a matrix of them.
 Not every problem is an exception. An optimization that cannot make progress
 still returns normally, and indicates why in `result.exit_code`:
 `TOO_FEW_REALIZATIONS` when not enough realizations produced a value,
-`EXECUTOR_STOPPED` when the executor it was evaluating on could no longer run
+`EXECUTOR_STOPPED` when the pool it was evaluating on could no longer run
 the work, which in practice means the interpreter was shutting down under it.
 `result.results` is `None` when no feasible result was ever recorded, whatever
 the reason the run ended; a run that fails part-way still returns the best
@@ -281,9 +281,10 @@ What *is* raised falls into three groups:
 - **Mistakes in the call itself** raise a `ValueError` — a start point of the
   wrong shape, an evaluation function returning the wrong number of values —
   or one of the [`RoptError`][ropt.exceptions.RoptError] types:
-  [`WorkflowError`][ropt.exceptions.WorkflowError] when an executor or handler
-  is used in a way it cannot be (an executor asked to run work from one of its
-  own workers, a handler already claimed by another run),
+  [`WorkflowError`][ropt.exceptions.WorkflowError] when a pool or handler
+  is used in a way it cannot be (a pool asked to run work from one of its
+  own workers, a pool whose session has closed, a handler already claimed by
+  another run),
   [`UnsupportedError`][ropt.exceptions.UnsupportedError] when an optional
   dependency is missing, or when the chosen method cannot handle the problem
   as configured — a constraint it does not support, for instance, which is

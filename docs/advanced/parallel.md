@@ -619,7 +619,7 @@ several it is one whenever the waiting steps outnumber the free workers. `run()`
 detects the caller and raises
 [`WorkflowError`][ropt.exceptions.WorkflowError] instead of hanging. Give the
 inner work an executor of its own; see
-[Two executors, not one](../running/nested.md#two-executors-not-one).
+[Two pools, not one](../running/nested.md#two-pools-not-one).
 
 **Do not run a compute step from inside a handler that the step can reach.** A
 handler holds its own lock while `_handle_event` runs, so a step started there

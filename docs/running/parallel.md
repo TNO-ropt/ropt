@@ -2,31 +2,32 @@
 
 Evaluations within one optimization can run in parallel, whole optimizations
 can run at once, and work of your own can be offloaded the same way. All three
-go through an **executor**.
+go through a **pool**.
 
 ## Running in parallel
 
 By default [`optimize`][ropt.simple.optimize] runs on the calling thread, one
-evaluation at a time. To run the evaluations in parallel, build an **executor**
-and pass it to the run. [Running in
-Parallel](../getting_started/execution.md) introduces the four kinds; this page
-is the full account of each:
+evaluation at a time. To run the evaluations in parallel, open a
+[`session`][ropt.simple.session], build a **pool** on it and pass that to the
+run. [Running in Parallel](../getting_started/execution.md) introduces the four
+kinds; this page is the full account of each:
 
 ```python
-from ropt.simple import ThreadExecutor
+from ropt.simple import optimize, session
 
-executor = ThreadExecutor(workers=8)
-result = optimize(config, x0, objective, executor=executor)
+with session() as s:
+    result = optimize(config, x0, objective, pool=s.thread_pool(workers=8))
 ```
 
 The runnable script for this section is
 [examples/simple/parallel.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/parallel.py),
-which takes `-m` to swap its thread executor for a process executor.
+which takes `-m` to swap its thread pool for a process pool.
 
-An executor releases its workers when it is collected, so there is nothing to
-close. Nothing is implicit: a run evaluates on the executor you hand it, and
-on no other. A run given no executor evaluates in-process, wherever it is
-called from — including from a thread you started yourself.
+The session owns the pools built on it and releases their workers when its
+block ends, so most code needs no further cleanup. Nothing is implicit: a run
+evaluates on the pool you hand it, and on no other. A run given no pool
+evaluates in-process and needs no session, wherever it is called from —
+including from a thread you started yourself.
 
 ### How many workers?
 
@@ -57,7 +58,7 @@ machine's core count.
 
 !!! tip "How a batch is split across workers"
     Each evaluation in a batch is transferred to a worker on its own by
-    default, which spreads the batch as widely as the executor allows. Every
+    default, which spreads the batch as widely as the pool allows. Every
     transfer costs something, though, so when the evaluations are cheap the
     transfers can dominate. Pass `bundle_size=` to
     [`optimize`][ropt.simple.optimize], [`optimize_many`][ropt.simple.optimize_many],
@@ -67,79 +68,78 @@ machine's core count.
     evaluations in one bundle run after each other, so `0` gives up parallelism
     inside the batch entirely: it is for a run whose parallelism comes from the
     layer above it, as in
-    [Nested Optimization](nested.md#two-executors-not-one).
+    [Nested Optimization](nested.md#two-pools-not-one).
 
     `workers` and `bundle_size` are the two halves of matching work to capacity,
-    one on the executor and one on the run. `workers` sets how many bundles may
+    one on the pool and one on the run. `workers` sets how many bundles may
     be in flight; `bundle_size` sets how much work one of them carries. With a
     batch of 100 cheap evaluations and 8 workers, the default sends 100 separate
     transfers to keep 8 workers busy; `bundle_size=13` sends 8. Raise it when
-    the evaluations are cheap relative to a transfer, which on a
-    `ProcessExecutor`, `LocalJobExecutor` or `HPCExecutor` means copying data
-    and starting something. Leave it at `1` when the evaluations are expensive,
-    or when they vary in cost and bundling would leave one worker holding all
-    the slow ones.
+    the evaluations are cheap relative to a transfer, which on a process, local
+    or HPC pool means copying data and starting something. Leave it at `1` when
+    the evaluations are expensive, or when they vary in cost and bundling would
+    leave one worker holding all the slow ones.
 
-    It belongs to the run rather than to the executor because it describes the
-    evaluation function, and one executor may serve several. Runs of
+    It belongs to the run rather than to the pool because it describes the
+    evaluation function, and one pool may serve several. Runs of
     `optimize_many` that differ in cost can each state their own, either as one
     size for every run or as a sequence with one per run:
 
     ```python
-    optimize_many(config, x0, [cheap, costly], executor=executor, bundle_size=[25, 1])
+    optimize_many(config, x0, [cheap, costly], pool=pool, bundle_size=[25, 1])
     ```
 
-    Every executor honours it, including a `ThreadExecutor`: a bundle is one
-    worker task, so `bundle_size=0` on a thread executor runs the whole batch on
-    a single thread. A run without an executor evaluates inline, where a bundle
-    has nothing to save.
+    Every pool honours it, including a thread pool: a bundle is one worker
+    task, so `bundle_size=0` on a thread pool runs the whole batch on a single
+    thread. A run without a pool evaluates inline, where a bundle has nothing
+    to save.
 
-    An executor also takes a `bundle_size` of its own, used by any run that does
+    A pool also takes a `bundle_size` of its own, used by any run that does
     not state one.
 
-You can keep several executors open at once and choose per run:
+You can keep several pools open at once and choose per run:
 
 ```python
-fast = ThreadExecutor(workers=8)
-heavy = ProcessExecutor(workers=4)
-cheap = optimize(config, x0, objective, executor=fast)
-costly = optimize(config, x0, expensive_objective, executor=heavy)
+with session() as s:
+    fast = s.thread_pool(workers=8)
+    heavy = s.process_pool(workers=4)
+    cheap = optimize(config, x0, objective, pool=fast)
+    costly = optimize(config, x0, expensive_objective, pool=heavy)
 ```
 
-!!! note "Executors inside an evaluation"
-    An evaluation function may start a run of its own, but build its executor
+!!! note "Pools inside an evaluation"
+    An evaluation function may start a run of its own, but build its pool
     **once**, in the calling code, and pass it to every evaluation. Building one
     per evaluation gives each a budget separate from every other: ten evaluations
-    each building a ten-worker executor put a hundred workers on the machine,
-    where one shared executor puts ten. Which executor it may be is a separate
+    each building a ten-worker pool put a hundred workers on the machine,
+    where one shared pool puts ten. Which pool it may be is a separate
     question, and the rules are in
-    [Executors inside an evaluation](#executors-inside-an-evaluation) below.
+    [Pools inside an evaluation](#pools-inside-an-evaluation) below.
 
-!!! tip "Releasing an executor early"
-    An executor holds its workers for as long as anything refers to it, and
-    releases them when the last reference goes. In a loop that means building it
-    inside the loop rather than outside, above all for a `ProcessExecutor`,
-    which holds a worker interpreter per worker:
+!!! tip "Releasing a pool early"
+    A pool holds its workers until the session that built it closes. In a loop
+    that means opening the session inside the loop rather than around it, above
+    all for a process pool, which holds a worker interpreter per worker:
 
     ```python
     for case in cases:
-        executor = ProcessExecutor(workers=4)
-        optimize(config, case, objective, executor=executor)
+        with session() as s:
+            optimize(config, case, objective, pool=s.process_pool(workers=4))
     ```
 
-    A name kept alive keeps the workers alive with it: a module-level executor,
-    or one held by a traceback or a notebook's output history, is released only
-    when that reference goes. `del` is then the way to release it.
+    A pool used after its session has closed raises a
+    [`WorkflowError`][ropt.exceptions.WorkflowError] rather than quietly
+    evaluating in-process.
 
-### Evaluating on threads { #thread-executor }
+### Evaluating on threads { #thread-pool }
 
-A [`ThreadExecutor`][ropt.simple.ThreadExecutor] runs the evaluations on
+A [`thread_pool`][ropt.simple.Session.thread_pool] runs the evaluations on
 background threads inside your own process. Nothing is copied, so any Python
 function works as the objective and it can freely use the data around it:
 
 ```python
-executor = ThreadExecutor(workers=4)
-result = optimize(config, x0, objective, executor=executor)
+with session() as s:
+    result = optimize(config, x0, objective, pool=s.thread_pool(workers=4))
 ```
 
 Use it when each evaluation spends most of its time **waiting** — starting an
@@ -150,23 +150,23 @@ Threads share one Python interpreter, so arithmetic written in Python itself
 does not get faster on more threads. Array libraries are a different matter:
 `numpy` and its kin do their work outside Python and let the other threads run
 meanwhile. "My objective computes" is therefore not on its own a reason to reach
-past this executor — see [Which executor should I use?](#which-executor).
+past this pool — see [Which pool should I use?](#which-pool).
 
-### Evaluating in worker processes { #process-executor }
+### Evaluating in worker processes { #process-pool }
 
-A [`ProcessExecutor`][ropt.simple.ProcessExecutor] runs the evaluations in a
+A [`process_pool`][ropt.simple.Session.process_pool] runs the evaluations in a
 handful of separate processes, reused across the run. Each has its own
 interpreter, so this is where heavy Python computation actually gets faster:
 
 ```python
-executor = ProcessExecutor(workers=4)
-result = optimize(config, x0, objective, executor=executor)
+with session() as s:
+    result = optimize(config, x0, objective, pool=s.process_pool(workers=4))
 ```
 
-This executor applies when the computation is **Python code**, or when each
+This pool applies when the computation is **Python code**, or when each
 evaluation needs its own copy of something a library keeps globally. An
 objective that mostly runs an external program gains nothing here that a thread
-executor would not have given more cheaply.
+pool would not have given more cheaply.
 
 The objective and its data are **copied** to the workers, so they must be
 serializable. An objective defined at module level — or in the script you ran,
@@ -176,47 +176,47 @@ function defined in a notebook cell needs the `cloudpickle` extra (see
 only come **back** through the return value; see
 [Handlers and the process boundary](handlers.md#handlers-and-the-process-boundary).
 
-!!! warning "This executor does not clean up programs your objective started"
+!!! warning "This pool does not clean up programs your objective started"
     When a run is stopped by Ctrl-C the worker processes are killed, but
     anything they had launched themselves is not: a simulator or solver started
     by your objective keeps running, unattached, after your program is gone.
     Nothing reports this. If your objective launches external programs, use a
-    `LocalJobExecutor` instead, which was built for exactly this.
+    [`local_pool`][ropt.simple.Session.local_pool] instead, which was built for
+    exactly this.
 
-### Running each evaluation as a local job { #local-executor }
+### Running each evaluation as a local job { #local-pool }
 
-A [`LocalJobExecutor`][ropt.simple.LocalJobExecutor] runs each evaluation as a
+A [`local_pool`][ropt.simple.Session.local_pool] runs each evaluation as a
 separate process on this machine, with its output captured to a file. It needs
-no extras and no configuration, and it is the same shape as an `HPCExecutor`
-minus the scheduler — so an objective that works on one works on the other:
+no extras and no configuration, and it is the same shape as an
+[`hpc_pool`][ropt.simple.Session.hpc_pool] minus the scheduler — so an objective
+that works on one works on the other:
 
 ```python
-from ropt.simple import LocalJobExecutor
-
-executor = LocalJobExecutor(workers=4)
-result = optimize(config, x0, objective, executor=executor)
+with session() as s:
+    result = optimize(config, x0, objective, pool=s.local_pool(workers=4))
 ```
 
 | Parameter     | Description                                                                |
 | ------------- | ------------------------------------------------------------------------- |
 | `workers`     | Maximum number of concurrent local jobs (default: 1).                     |
-| `workdir`     | Directory holding each evaluation's files. Defaults to a temporary directory the executor removes again, unless something is left in it to read. |
+| `workdir`     | Directory holding each evaluation's files. Defaults to a temporary directory the pool removes again, unless something is left in it to read. |
 | `retries`     | Extra polls to wait for a result (default: 0; a local job writes its result before it exits). |
 
-Two things distinguish it from a `ProcessExecutor`, and both matter when an
+Two things distinguish it from a process pool, and both matter when an
 evaluation is a job rather than a function call:
 
 - **Stopping reaches what the evaluation started.** Each job runs in a process
   group of its own, so cancelling one signals the simulator or solver it
-  launched as well. A `ProcessExecutor` kills only its own workers and orphans
+  launched as well. A process pool kills only its own workers and orphans
   the rest.
 - **Output survives failure.** Whatever the evaluation printed is captured, and
   the last lines are attached to the error, which is often the only trace a job
   that died before returning anything leaves behind.
 
 !!! note "Where the working directory goes"
-    With no `workdir`, the executor works in a temporary directory of its own
-    and removes it again when it is dropped, unless something in it is still
+    With no `workdir`, the pool works in a temporary directory of its own
+    and removes it again when it is released, unless something in it is still
     readable. If an evaluation **failed**, its captured output is kept, so the
     directory is kept with it and its path is logged:
 
@@ -229,40 +229,40 @@ evaluation is a job rather than a function call:
     the location rather than be told it:
 
     ```python
-    executor = LocalJobExecutor(workers=4, workdir="/scratch/my-run")
+    pool = s.local_pool(workers=4, workdir="/scratch/my-run")
     ```
 
-    Give each executor that runs at the same time a directory of its own; files
-    are named after the evaluations, and the executor refuses to overwrite one
+    Give each pool that runs at the same time a directory of its own; files
+    are named after the evaluations, and the pool refuses to overwrite one
     that already exists.
 
-This executor needs process groups and is therefore **POSIX only**: creating it
+This pool needs process groups and is therefore **POSIX only**: creating it
 on another platform raises an
 [`ExecutionError`][ropt.exceptions.ExecutionError] rather than quietly giving a
 weaker guarantee.
 
-#### Worker or job: `ProcessExecutor` or `LocalJobExecutor`? { #process-or-local }
+#### Worker or job: process pool or local pool? { #process-or-local }
 
 Both run your objective in a separate process, so "is it copied?" does not tell
 them apart. What differs is whether a process is a *worker* or a *job*:
 
-|  | `ProcessExecutor` | `LocalJobExecutor` |
+|  | `process_pool` | `local_pool` |
 | --- | --- | --- |
 | Processes | a few, **reused** for many evaluations | one **fresh** process per evaluation |
-| Start-up cost | paid once, when the executor is built | paid again on every evaluation |
+| Start-up cost | paid once, when the pool is built | paid again on every evaluation |
 | Programs your objective starts | keep running when the run stops | killed along with the evaluation |
 | Output of a failed evaluation | lost | captured, and attached to the error |
 | Sending the objective | your script is re-imported, so a function defined in it can be found by name | a fresh command; needs an importable module or `ropt[cloudpickle]` |
 | Platform | anywhere | POSIX only |
 
 One question separates them: **is an evaluation a function call, or a job?** A call
-is too short to pay for a process each time, so reuse a few workers and take
-`ProcessExecutor`. A job runs a simulator, writes files, and lasts long enough
-that one process start is negligible — take `LocalJobExecutor`, or an
-`HPCExecutor` if it belongs on a cluster.
+is too short to pay for a process each time, so reuse a few workers and take a
+process pool. A job runs a simulator, writes files, and lasts long enough
+that one process start is negligible — take a local pool, or an HPC pool if it
+belongs on a cluster.
 
-!!! tip "Heading for a cluster? Develop on a `LocalJobExecutor`"
-    A `LocalJobExecutor` is an `HPCExecutor` without the scheduler: both run
+!!! tip "Heading for a cluster? Develop on a local pool"
+    A local pool is an HPC pool without the scheduler: both run
     each evaluation as a job, one fresh process at a time, and both capture its
     output and attach the tail to the error. An objective that runs on one runs
     on the other, so you can get the job itself right on your own machine —
@@ -271,18 +271,18 @@ that one process start is negligible — take `LocalJobExecutor`, or an
 
     ```python
     # Develop and test here:
-    executor = LocalJobExecutor(workers=4)
+    pool = s.local_pool(workers=4)
     # Then run here:
-    executor = HPCExecutor(workers=100, workdir="/scratch/my-run")
+    pool = s.hpc_pool(workers=100, workdir="/scratch/my-run")
     ```
 
-    A `ProcessExecutor` is the wrong rehearsal: it reuses workers, keeps your
+    A process pool is the wrong rehearsal: it reuses workers, keeps your
     objective in Python, and leaves the programs it starts running when the run
     stops — none of which is how a cluster job behaves.
 
 ### Running on an HPC cluster
 
-An [`HPCExecutor`][ropt.simple.HPCExecutor] submits each evaluation as a job to
+An [`hpc_pool`][ropt.simple.Session.hpc_pool] submits each evaluation as a job to
 an HPC queue through [`pysqa`](https://pysqa.readthedocs.io/); it needs the
 `ropt[hpc]` extra. `workdir` is required and must be an existing absolute
 directory on a filesystem the compute nodes share. With no further arguments it
@@ -290,16 +290,15 @@ uses the default cluster and queue from the `pysqa` configuration of your `ropt`
 installation:
 
 ```python
-from ropt.simple import HPCExecutor
-
-executor = HPCExecutor(workers=10, workdir="/scratch/my-run")
-result = optimize(config, x0, objective, executor=executor)
+with session() as s:
+    pool = s.hpc_pool(workers=10, workdir="/scratch/my-run")
+    result = optimize(config, x0, objective, pool=pool)
 ```
 
 The runnable script is
 [examples/simple/hpc.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/hpc.py).
 Pass it `--local` and it runs the identical optimization on a
-`LocalJobExecutor`, which is the rehearsal described above, so the example works
+local pool, which is the rehearsal described above, so the example works
 with or without a cluster to hand.
 
 A job is nothing more than a submission script with your evaluation command in
@@ -312,7 +311,7 @@ This is the usual case. The configuration already describes the clusters and
 their queues, so all you do is pick one and say how much of it you want:
 
 ```python
-executor = HPCExecutor(workers=10, workdir="/scratch/my-run", queue="long", cores=4)
+pool = s.hpc_pool(workers=10, workdir="/scratch/my-run", queue="long", cores=4)
 ```
 
 `queue` names a queue **defined in the configuration**, which is not necessarily
@@ -338,7 +337,7 @@ laid out and where the installed one lives.
 and `submit_options` carries anything else that script declares:
 
 ```python
-executor = HPCExecutor(
+pool = s.hpc_pool(
     workers=10,
     workdir="/scratch/my-run",
     queue="long",
@@ -353,7 +352,7 @@ For `account` to have any effect the script must reference it. A variable a
 script never mentions is ignored, and one the script mentions but nobody
 supplies renders as empty — so a misspelling on either side drops the directive
 silently rather than failing. Entries that are `None` are dropped, so omitting a
-key and passing `None` mean the same thing. A name the executor sets itself,
+key and passing `None` mean the same thing. A name the pool sets itself,
 such as `cores` or `queue`, is rejected rather than allowed to override it.
 
 With a configuration, resource requests are **clamped** to the selected queue's
@@ -391,7 +390,7 @@ TEMPLATE = """\
 {{command}}
 """
 
-executor = HPCExecutor(
+pool = s.hpc_pool(
     workers=10,
     workdir="/scratch/my-run",
     template=TEMPLATE,
@@ -415,9 +414,9 @@ job that dies takes the only explanation with it.
 
 Because a template submits without a configuration, it **cannot be combined**
 with `config_path`, `cluster` or `queue`; passing them together raises a
-`ValueError` when the executor is created.
+`ValueError` when the pool is created.
 
-`HPCExecutor` accepts the following parameters:
+[`hpc_pool`][ropt.simple.Session.hpc_pool] accepts the following parameters:
 
 | Parameter     | Description                                                                |
 | ------------- | ------------------------------------------------------------------------- |
@@ -434,21 +433,21 @@ with `config_path`, `cluster` or `queue`; passing them together raises a
 | `submit_options` | Extra variables for the submission script. `None` entries are dropped. |
 | `retries`     | Extra polls to wait for a result that is missing or unreadable (default: 30). |
 
-### Which executor should I use? { #which-executor }
+### Which pool should I use? { #which-pool }
 
 [Running in Parallel](../getting_started/execution.md) asks the question that
 rules choices *out*: whether your objective touches anything beyond its
 arguments and its return value. If it does, stay with threads or with no
-executor, because the others work on a copy. Once that is settled, the choice is
+pool, because the others work on a copy. Once that is settled, the choice is
 about speed:
 
-| Executor | Where evaluations run | Data | Speeds up heavy Python? | Use when |
+| Pool | Where evaluations run | Data | Speeds up heavy Python? | Use when |
 | --- | --- | --- | --- | --- |
 | none | the calling thread, one at a time | shared | no | evaluations are fast |
-| `ThreadExecutor` | background threads, one process | shared | no — one interpreter | each evaluation mostly **waits** (external tool, I/O), or spends its time in `numpy` |
-| `ProcessExecutor` | a few reused processes | copied | yes | each evaluation is heavy **Python computation** |
-| `LocalJobExecutor` | one process per evaluation | copied | yes | each evaluation is a self-contained **job** on this machine |
-| `HPCExecutor` | jobs on a cluster | copied | yes | each evaluation is a big **cluster job** |
+| `thread_pool` | background threads, one process | shared | no — one interpreter | each evaluation mostly **waits** (external tool, I/O), or spends its time in `numpy` |
+| `process_pool` | a few reused processes | copied | yes | each evaluation is heavy **Python computation** |
+| `local_pool` | one process per evaluation | copied | yes | each evaluation is a self-contained **job** on this machine |
+| `hpc_pool` | jobs on a cluster | copied | yes | each evaluation is a big **cluster job** |
 
 ??? tip "How to decide, without guessing"
     There is no reliable rule for whether threads will scale on a given
@@ -458,10 +457,10 @@ about speed:
     it.
 
     What makes the answer cheap is an asymmetry: **threads are the cheap thing
-    to try, processes are the expensive commitment.** Trying a thread executor
+    to try, processes are the expensive commitment.** Trying a thread pool
     costs one argument, and its failure mode is *no speedup* — not breakage. So:
 
-    1. Start with `ThreadExecutor`. Time `workers=1` against `workers=4` on a
+    1. Start with a thread pool. Time `workers=1` against `workers=4` on a
        shortened run.
     2. If it scales, you are done, and you never needed to know what the GIL was
        doing.
@@ -492,53 +491,53 @@ about speed:
     export MKL_NUM_THREADS=1
     ```
 
-    Then let the executor provide the parallelism instead.
+    Then let the pool provide the parallelism instead.
 
-### Executors inside an evaluation { #executors-inside-an-evaluation }
+### Pools inside an evaluation { #pools-inside-an-evaluation }
 
 An evaluation function may start a run of its own — that is how
-[Nested Optimization](nested.md) works — and give it an executor, on two
+[Nested Optimization](nested.md) works — and give it a pool, on two
 conditions.
 
-It must be a **different** executor. A nested run waits for its own evaluations
-to finish, so one handed the executor it is already running on would wait for
+It must be a **different** pool. A nested run waits for its own evaluations
+to finish, so one handed the pool it is already running on would wait for
 the workers it is itself occupying — a deadlock as soon as they are all busy,
-which is the normal case, since a run fills its executor with one work item per
-realization. Rather than hang, the executor refuses work submitted by the
+which is the normal case, since a run fills its pool with one work item per
+realization. Rather than hang, the pool refuses work submitted by the
 evaluation itself with a [`WorkflowError`][ropt.exceptions.WorkflowError]. A
 thread the evaluation starts is on its own: it is not recognized as a worker, so
-it can still deadlock on the executor. Give the inner run its own executor, or
+it can still deadlock on the pool. Give the inner run its own pool, or
 none at all, which evaluates inline.
 
-The evaluation must stay **in your process**, so on a thread executor or with no
-executor. On a process, local, or HPC executor the evaluation function is copied
-into a worker, and an executor cannot be copied with it: build the inner
-executor inside the worker, or run the inner optimization without one. An
-evaluation function that carries an executor along anyway is refused when the
+The evaluation must stay **in your process**, so on a thread pool or with no
+pool. On a process, local, or HPC pool the evaluation function is copied
+into a worker, and a pool cannot be copied with it: open a session and build
+the inner pool inside the worker, or run the inner optimization without one. An
+evaluation function that carries a pool along anyway is refused when the
 work item is sent, rather than failing somewhere deep inside the run.
 
 ## Stopping a run
 
 Press Ctrl-C and `ropt` stops dispatching new work at once. What happens to the
-evaluations already running depends on the executor, because what *can* be done
+evaluations already running depends on the pool, because what *can* be done
 to them differs:
 
-| Executor | Evaluations already running |
+| Pool | Evaluations already running |
 | --- | --- |
 | none | the current one finishes |
-| `ThreadExecutor` | they **run to completion** — a thread cannot be interrupted |
-| `ProcessExecutor` | they run to completion in their worker |
-| `LocalJobExecutor` | each evaluation **and everything it launched** is killed |
-| `HPCExecutor` | the jobs are **deleted from the queue** |
+| `thread_pool` | they **run to completion** — a thread cannot be interrupted |
+| `process_pool` | they run to completion in their worker |
+| `local_pool` | each evaluation **and everything it launched** is killed |
+| `hpc_pool` | the jobs are **deleted from the queue** |
 
 Two consequences follow.
 
-**A thread executor cannot be hurried.** Python provides no way to interrupt a
-running thread from outside, so a long evaluation on a `ThreadExecutor` ends
+**A thread pool cannot be hurried.** Python provides no way to interrupt a
+running thread from outside, so a long evaluation on a thread pool ends
 when it ends, and your program cannot exit before it does. If an evaluation may
-run long and has to be interruptible, put it on one of the other executors.
+run long and has to be interruptible, put it on one of the other pools.
 
-**Stopping is a request, not a guarantee.** On the executors that kill,
+**Stopping is a request, not a guarantee.** On the pools that kill,
 everything is signalled to end and not waited for. A program that ignores the
 request, or that is stuck inside the operating system, keeps running. The run
 exits promptly instead of waiting out the current batch, but processes it
@@ -552,7 +551,7 @@ started may still be alive afterwards.
     [Keyboard Interrupts](../troubleshooting/keyboard_interrupt.md).
 
 !!! note "Platforms"
-    `LocalJobExecutor` is **POSIX only** and refuses to be created elsewhere.
+    A local pool is **POSIX only** and refuses to be created elsewhere.
     The rest of `ropt` is not known to be broken on Windows, but it is not
     tested there. Free-threaded (no-GIL) builds of Python are untested and
     unsupported.
@@ -564,11 +563,13 @@ To run several optimizations together, use
 `objective` may be a single value (used for every run) or a list (one per run):
 
 ```python
-from ropt.simple import ThreadExecutor, optimize_many
+from ropt.simple import optimize_many, session
 
-executor = ThreadExecutor(workers=4)
-# One run per start point.
-results = optimize_many(config, start_points, objective, executor=executor)
+with session() as s:
+    # One run per start point.
+    results = optimize_many(
+        config, start_points, objective, pool=s.thread_pool(workers=4)
+    )
 ```
 
 !!! tip "Give each run an ID"
@@ -590,16 +591,16 @@ results = optimize_many(config, start_points, objective, executor=executor)
 There are two independent levels of concurrency here:
 
 - **The optimizations** always run concurrently, each on its own driver thread.
-  This is built into `optimize_many` and does not depend on the executor;
+  This is built into `optimize_many` and does not depend on the pool;
   the `limit` argument caps how many run at the same time.
-- **The function evaluations** inside those runs all happen on the one executor
-  you pass, and the executor determines how they are parallelized. With
-  `ThreadExecutor(workers=1)` the runs still progress together, but their
-  evaluations are executed one at a time. A larger executor —
-  `ThreadExecutor(workers=n)`, `ProcessExecutor`, `LocalJobExecutor`, or
-  `HPCExecutor` — runs several evaluations at once.
+- **The function evaluations** inside those runs all happen on the one pool
+  you pass, and the pool determines how they are parallelized. With
+  `thread_pool(workers=1)` the runs still progress together, but their
+  evaluations are executed one at a time. A larger pool —
+  `thread_pool(workers=n)`, or a process, local or HPC pool — runs several
+  evaluations at once.
 
-One executor is one budget: `workers=10` means ten evaluations at a time across
+One pool is one budget: `workers=10` means ten evaluations at a time across
 the whole batch of runs, not ten per run. Batch IDs stay distinct whatever you
 pass, since every run in the program draws them from one counter.
 
@@ -633,11 +634,11 @@ runs](handlers.md#sharing-a-handler-across-concurrent-runs).
     So keep a shared handler cheap. A handler that must do slow work — writing
     a file, talking to a database — holds up every run feeding it.
 
-!!! warning "Without an executor the driver threads do the evaluating"
-    `optimize_many` needs no executor. Without one, the runs still execute
+!!! warning "Without a pool the driver threads do the evaluating"
+    `optimize_many` needs no pool. Without one, the runs still execute
     concurrently, but each evaluates in-process on its own driver thread — so
     your evaluation function is called by several threads at once and must
-    tolerate that. Give the call an executor when it must not be.
+    tolerate that. Give the call a pool when it must not be.
 
 !!! warning "Not every backend can take part"
     An optimizer that needs a working directory of its own, writes to a file
@@ -661,7 +662,7 @@ The first run to raise propagates its exception immediately (fail-fast). Runs
 that have not started yet are skipped, but a run already in progress cannot be
 stopped from the outside: it is abandoned, and keeps going until it finishes on
 its own. Its result is discarded, but until it ends it keeps calling your
-evaluation function, keeps the executor busy, and keeps feeding any handler you
+evaluation function, keeps the pool busy, and keeps feeding any handler you
 passed in `handlers`. Nothing can currently cut that short.
 
 The abandoned runs are driven from daemon threads, so a program that stops at
@@ -724,10 +725,10 @@ Parallel](../getting_started/execution.md).
 
 ## Offloading your own work
 
-You can hand **your own** functions to an executor with
+You can hand **your own** functions to a pool with
 [`offload`][ropt.simple.offload]. It is useful when code you control — a custom
 step, a custom component, or a helper you call between optimizations — has an
-expensive, self-contained piece of work you want to run on an executor instead
+expensive, self-contained piece of work you want to run on a pool instead
 of inline.
 
 Pass a single callable to run one call and get its result back:
@@ -735,10 +736,10 @@ Pass a single callable to run one call and get its result back:
 ```python
 from functools import partial
 
-from ropt.simple import ProcessExecutor, offload
+from ropt.simple import offload, session
 
-executor = ProcessExecutor(workers=4)
-result = offload(partial(expensive, data), executor=executor)
+with session() as s:
+    result = offload(partial(expensive, data), pool=s.process_pool(workers=4))
 ```
 
 `offload` takes **zero-argument** callables — bind arguments with
@@ -747,18 +748,19 @@ concurrently and get a tuple of results in order; they may be entirely different
 functions:
 
 ```python
-executor = ProcessExecutor(workers=4)
-first, second = offload([partial(expensive, x), partial(other, y)], executor=executor)
+with session() as s:
+    pool = s.process_pool(workers=4)
+    first, second = offload([partial(expensive, x), partial(other, y)], pool=pool)
 ```
 
-As with the evaluation function on a process, local, or HPC executor, the
+As with the evaluation function on a process, local, or HPC pool, the
 callables and their arguments are **copied to the workers**, since they run in
 separate processes.
 
 !!! warning "Offloaded work coordinates with nothing"
-    An offloaded callable runs wherever its executor puts it, and on a process,
-    local, or HPC executor that is somewhere else. It may create handlers and
-    executors of its own, but they are *its* handlers and *its* executors.
+    An offloaded callable runs wherever its pool puts it, and on a process,
+    local, or HPC pool that is somewhere else. It may create handlers and
+    pools of its own, but they are *its* handlers and *its* pools.
 
     - **Results cannot be tracked across offloaded calls.** A handler created
       inside one sees only that call's results and cannot be brought back:
@@ -766,43 +768,43 @@ separate processes.
       that comes back. Following several concurrent pieces of work in one place
       is something [`optimize_many`](#many-optimizations-at-once) can do and
       `offload` cannot.
-    - **Worker budgets multiply, with no way around it.** An executor cannot be
+    - **Worker budgets multiply, with no way around it.** A pool cannot be
       carried into a worker process, so a callable that needs one builds its
-      own. Four callables that each build a ten-worker executor put **forty**
+      own. Four callables that each build a ten-worker pool put **forty**
       workers on the machine in four independent groups — and they do not share
       their effort: one with twenty pieces of work still runs ten at a time
       while another group sits idle. The machine carries forty workers, and
       never forty working on the same thing. Where evaluations stay in your
-      process this is avoidable by sharing one executor; offloaded onto a
-      process, local, or HPC executor it is not.
+      process this is avoidable by sharing one pool; offloaded onto a
+      process, local, or HPC pool it is not.
 
     So `offload` fits a piece of work that is genuinely self-contained and
     returns its answer as a return value. When several pieces must be
     coordinated — counted, collected, or held to one budget — drive them from
     your own process instead.
 
-### Without an executor
+### Without a pool
 
-`offload` with no executor runs the callables inline, on the calling thread. So
-code that may or may not have an executor to hand needs no guard and no
+`offload` with no pool runs the callables inline, on the calling thread. So
+code that may or may not have a pool to hand needs no guard and no
 fallback: pass along whatever it has, including `None`.
 
 ```python
-def transform(x, executor=None):
-    return offload(partial(expensive, x), executor=executor)
+def transform(x, pool=None):
+    return offload(partial(expensive, x), pool=pool)
 ```
 
 !!! warning "Offloading from a handler holds up the runs feeding it"
-    A handler runs on the thread driving the run, so it can offload to an
-    executor. While it waits, it holds its own lock, so every other run waiting
+    A handler runs on the thread driving the run, so it can offload to a
+    pool. While it waits, it holds its own lock, so every other run waiting
     on that handler waits too.
 
     An offloaded callable that reaches back into the same handler — by starting
-    a run that carries it in `handlers=` — fails differently per executor. On a
-    thread executor it blocks: the handler waits for the offloaded call, and the
-    call waits for the lock the handler holds. Without an executor the call runs
+    a run that carries it in `handlers=` — fails differently per pool. On a
+    thread pool it blocks: the handler waits for the offloaded call, and the
+    call waits for the lock the handler holds. Without a pool the call runs
     on the handler's own thread and raises a
-    [`WorkflowError`][ropt.exceptions.WorkflowError]. On a process executor it
+    [`WorkflowError`][ropt.exceptions.WorkflowError]. On a process pool it
     raises an [`ExecutionError`][ropt.exceptions.ExecutionError], since a
     handler holds a lock and cannot be serialized. See
     [Two hazards](../advanced/workflows.md#two-hazards).

@@ -73,8 +73,8 @@ from one computed over the whole ensemble.
 ## Your evaluation function
 
 **Outside your process, your objective works on a copy.** On a
-[`ProcessExecutor`](../running/parallel.md#process-executor), a
-[`LocalJobExecutor`](../running/parallel.md#local-executor) or an `HPCExecutor`,
+[process pool](../running/parallel.md#process-pool), a
+[local pool](../running/parallel.md#local-pool) or an HPC pool,
 your evaluation function is sent to a worker together with the data it uses. Anything
 it writes there — a global, a cache, a list it appends to — is thrown away when
 the worker finishes. Return what you need instead; see
@@ -82,7 +82,7 @@ the worker finishes. Return what you need instead; see
 
 **Several runs may call your objective at the same time.**
 [`optimize_many`][ropt.simple.optimize_many] always runs its optimizations
-concurrently. Given an executor, their evaluations go there; given none, each run
+concurrently. Given a pool, their evaluations go there; given none, each run
 evaluates on its own driver thread, so your evaluation function is called from
 several threads at once and has to tolerate that. See
 [Many optimizations at once](../running/parallel.md#many-optimizations-at-once).
@@ -98,37 +98,37 @@ raises a `TypeError` in the middle of the run.
 | An objective that works alone misbehaves under `optimize_many` | It is being called from several threads at once. Remove the shared mutable state, or guard it with a lock of its own. |
 | `TypeError: cannot pickle ...` part-way through a run | Something in `metadata` cannot be deep-copied. |
 
-## Executors, stopping and processes
+## Pools, stopping and processes
 
-**A run uses the executor you hand it, and no other.** Nothing is picked up from
-the surrounding code. A run given no `executor=` evaluates in-process, on the
-thread that called it — even if an executor exists next to it.
+**A run uses the pool you hand it, and no other.** Nothing is picked up from
+the surrounding code. A run given no `pool=` evaluates in-process, on the
+thread that called it — even if a pool exists next to it.
 
-**Threads cannot be interrupted.** Evaluations on a `ThreadExecutor` run to
+**Threads cannot be interrupted.** Evaluations on a thread pool run to
 completion even after Ctrl-C, because Python cannot interrupt a thread from
 outside. If an evaluation may run long and has to be interruptible, put it on a
-`LocalJobExecutor` or an `HPCExecutor`; see
+local pool or an HPC pool; see
 [Stopping a run](../running/parallel.md#stopping-a-run).
 
-**A `ProcessExecutor` re-imports your script.** Its workers are started with
+**A process pool re-imports your script.** Its workers are started with
 `spawn`, so each of them imports the file the run was started from, and
 everything at module level runs again in every worker. That is why the entry
 point has to sit behind `if __name__ == "__main__":`. Without the guard the
-workers try to start workers of their own, and building the executor raises.
+workers try to start workers of their own, and building the pool raises.
 
-**An executor holds its workers while anything refers to it.** They are
-released when the last reference goes, so a name kept alive keeps the workers
-alive with it. Build it inside the loop or function that uses it; see
-[Releasing an executor early](../running/parallel.md#how-many-workers).
+**A pool holds its workers until its session closes.** Open the session inside
+the loop or function that uses it rather than around the whole program; see
+[Releasing a pool early](../running/parallel.md#how-many-workers).
 
 | What you see | Most likely cause |
 | --- | --- |
 | Ctrl-C appears to do nothing | A process-wide signal setting, changed by an imported package. Call [`restore_keyboard_interrupt`][ropt.utils.restore_keyboard_interrupt]; see [Keyboard Interrupts](keyboard_interrupt.md). |
-| The program will not exit after Ctrl-C | Evaluations on a `ThreadExecutor` are still running and cannot be interrupted. |
+| The program will not exit after Ctrl-C | Evaluations on a thread pool are still running and cannot be interrupted. |
 | Pages of `multiprocessing` tracebacks, ending in `ExecutionError: Could not start worker processes` | The script has no `if __name__ == "__main__":` guard, so every worker re-ran it from the top. |
-| A `ProcessExecutor` keeps hundreds of megabytes resident | Each worker is a separate interpreter. Drop the executor, or the name holding it, when the runs that use it are done. |
-| More workers made everything slower | `numpy` and similar libraries already use every core. Set `OMP_NUM_THREADS=1` and let the executor provide the parallelism; see [Which executor should I use?](../running/parallel.md#which-executor). |
-| Simulators keep running after the run stopped | A `ProcessExecutor` kills only its own workers. Use a [`LocalJobExecutor`](../running/parallel.md#local-executor), which signals the whole process group. |
+| A process pool keeps hundreds of megabytes resident | Each worker is a separate interpreter. Close the session that built the pool when the runs that use it are done. |
+| `WorkflowError` about a pool released when its session closed | The pool outlived its `with session()` block. Build a new one inside an open session. |
+| More workers made everything slower | `numpy` and similar libraries already use every core. Set `OMP_NUM_THREADS=1` and let the pool provide the parallelism; see [Which pool should I use?](../running/parallel.md#which-pool). |
+| Simulators keep running after the run stopped | A process pool kills only its own workers. Use a [local pool](../running/parallel.md#local-pool), which signals the whole process group. |
 | A cluster directive has no effect | The submission script never mentions that variable, or the value was clamped to the queue's limit; see [Running on an HPC cluster](../running/parallel.md#running-on-an-hpc-cluster). |
 
 ## Running many at once

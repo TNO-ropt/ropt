@@ -12,7 +12,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from ropt.simple import ProcessExecutor, ThreadExecutor, optimize
+from ropt.simple import optimize, session
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray
@@ -48,14 +48,14 @@ def rosenbrock(
 
 
 def main(*, multiprocessing: bool = False) -> None:
-    """Run the optimization on a thread or process executor.
+    """Run the optimization on a thread or process pool.
 
     Args:
-        multiprocessing: Use a process executor instead of a thread executor.
+        multiprocessing: Use a process pool instead of a thread pool.
     """
-    build = ProcessExecutor if multiprocessing else ThreadExecutor
-    executor = build(workers=4)
-    result = optimize(CONFIG, INITIAL_VALUES, rosenbrock, executor=executor)
+    with session() as s:
+        build = s.process_pool if multiprocessing else s.thread_pool
+        result = optimize(CONFIG, INITIAL_VALUES, rosenbrock, pool=build(workers=4))
     assert result.results is not None
     print(f"optimal variables: {result.results.variables}")
     assert np.allclose(result.results.variables, 1.0, atol=1e-2)
@@ -67,6 +67,6 @@ if __name__ == "__main__":
         "-m",
         "--multiprocessing",
         action="store_true",
-        help="Use a process executor instead of a thread executor.",
+        help="Use a process pool instead of a thread pool.",
     )
     main(multiprocessing=parser.parse_args().multiprocessing)

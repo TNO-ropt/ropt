@@ -1,7 +1,7 @@
 """The high-level convenience API for running optimizations.
 
 This module builds on the low-level `ropt` primitives. Import its names
-directly, for example `from ropt.simple import optimize, ProcessExecutor`. See
+directly, for example `from ropt.simple import optimize, session`. See
 [Running Optimizations](../running/running.md) for a walkthrough.
 
 Enumerations used in the configuration and results (for example
@@ -9,10 +9,13 @@ Enumerations used in the configuration and results (for example
 are not re-exported here; import them from [`ropt.enums`][ropt.enums].
 
 Nothing about a run depends on where it is called from. Where its evaluations
-happen is decided by the executor it is given with `executor=`, and which
-handlers see its results by the `handlers=` it is given. A run given no executor
-evaluates in-process. This holds wherever the run is started from, including a
-thread you spawn yourself.
+happen is decided by the pool it is given with `pool=`, and which handlers see
+its results by the `handlers=` it is given. A run given no pool evaluates
+in-process. This holds wherever the run is started from, including a thread you
+spawn yourself.
+
+Pools come from a [`session`][ropt.simple.session], which releases them when it
+closes. A run that evaluates in-process needs no session.
 """
 
 from __future__ import annotations
@@ -27,20 +30,15 @@ from ropt.components.event_handlers import (
     HistoryHandler,
     ResultsHandler,
 )
-from ropt.components.executors import (
-    Executor,
-    HPCExecutor,
-    LocalJobExecutor,
-    ProcessExecutor,
-    ThreadExecutor,
-)
 
 from ._evaluate import evaluate, evaluate_many
 from ._function import EvaluationFunction
 from ._offload import offload
 from ._optimize import optimize, optimize_many
+from ._pool import SerialPool, WorkerPool
 from ._report import ReportCallback
 from ._result import OptimizationResult
+from ._session import Session, session
 
 __all__ = [
     "DataFrameHandler",
@@ -48,18 +46,17 @@ __all__ = [
     "EvaluationFunctionContext",
     "EvaluationFunctionResult",
     "EventHandler",
-    "Executor",
-    "HPCExecutor",
     "HistoryHandler",
-    "LocalJobExecutor",
     "OptimizationResult",
-    "ProcessExecutor",
     "ReportCallback",
     "ResultsHandler",
-    "ThreadExecutor",
+    "SerialPool",
+    "Session",
+    "WorkerPool",
     "evaluate",
     "evaluate_many",
     "offload",
     "optimize",
     "optimize_many",
+    "session",
 ]

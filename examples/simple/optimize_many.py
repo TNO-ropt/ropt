@@ -15,8 +15,8 @@ from numpy.typing import NDArray
 
 from ropt.simple import (
     EvaluationFunctionContext,
-    ThreadExecutor,
     optimize_many,
+    session,
 )
 
 DIM = 5
@@ -52,15 +52,15 @@ def main() -> None:
     """Run one optimization per start vector, concurrently, tagging each run."""
     run_metadata = [{"run_id": idx} for idx in range(len(STARTS))]
     # --8<-- [start:run]
-    executor = ThreadExecutor(workers=3)
-    results = optimize_many(
-        CONFIG,
-        STARTS,
-        rosenbrock,
-        executor=executor,
-        metadata=run_metadata,
-        limit=2,
-    )
+    with session() as s:
+        results = optimize_many(
+            CONFIG,
+            STARTS,
+            rosenbrock,
+            pool=s.thread_pool(workers=3),
+            metadata=run_metadata,
+            limit=2,
+        )
     # --8<-- [end:run]
     for result in results:
         assert result.results is not None
