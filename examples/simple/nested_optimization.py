@@ -26,7 +26,7 @@ import numpy as np
 from numpy.random import default_rng
 from numpy.typing import NDArray
 
-from ropt.enums import VariableType
+from ropt.enums import ExitCode, VariableType
 from ropt.simple import (
     DataFrameHandler,
     EvaluationFunction,
@@ -125,7 +125,8 @@ def inner_optimization(  # ruff: ignore[too-many-arguments]
         memo:      Objectives already computed, keyed by outer point.
 
     Returns:
-        The best inner objective found at this outer point.
+        The best inner objective found at this outer point, or `NaN` if the
+        inner run ended with too few successful realizations.
     """
     # --8<-- [start:inner]
     key = (context.realization, *variables.tolist())
@@ -145,9 +146,12 @@ def inner_optimization(  # ruff: ignore[too-many-arguments]
         # a realization, so realization alone would not identify the caller.
         metadata={"outer_batch": context.batch_id, "outer_eval": context.eval_idx},
     )
-    assert result.results is not None
-    assert result.results.target_objective is not None
-    memo[key] = float(result.results.target_objective)
+    if result.exit_code is ExitCode.TOO_FEW_REALIZATIONS:
+        memo[key] = float("nan")
+    else:
+        assert result.results is not None
+        assert result.results.target_objective is not None
+        memo[key] = float(result.results.target_objective)
     return memo[key]
     # --8<-- [end:inner]
 

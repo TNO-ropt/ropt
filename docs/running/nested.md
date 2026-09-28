@@ -90,6 +90,12 @@ that caused it, which is what makes the collected results traceable. The `memo`
 lookup above it is covered in
 [Reusing an outer evaluation](#reusing-an-outer-evaluation).
 
+An inner run that ends with `TOO_FEW_REALIZATIONS` has no result, and the outer
+evaluation reports `NaN` for it. That is the same value an ordinary evaluation
+function returns for a realization that failed, so the outer run applies its own
+[`realization_min_success`](../optimizer_setup/configuration_sections.md#realizations)
+to it.
+
 ## Two pools, not one { #two-pools-not-one }
 
 Each layer evaluates on its own pool, and that is a requirement rather than
