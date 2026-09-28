@@ -143,17 +143,17 @@ def run_all(  # ruff: ignore[too-many-arguments]
         The optimal results.
     """
     build = ProcessExecutor if multiprocessing else ThreadExecutor
-    with build(workers=workers) as executor:
-        jobs = [
-            partial(
-                run_optimization,
-                executor,
-                partial(rosenbrock, a=a, b=b, delay=delay),
-                config,
-            )
-            for a, b in zip(a_list, b_list, strict=True)
-        ]
-        return run_concurrent(jobs)
+    executor = build(workers=workers)
+    jobs = [
+        partial(
+            run_optimization,
+            executor,
+            partial(rosenbrock, a=a, b=b, delay=delay),
+            config,
+        )
+        for a, b in zip(a_list, b_list, strict=True)
+    ]
+    return run_concurrent(jobs)
 
 
 def main(

@@ -178,22 +178,20 @@ def main() -> None:
     # A plain dict reaches the outer evaluations because they run on threads, in
     # this process; on a process executor each worker would get an empty copy.
     memo: dict[tuple[float, ...], float] = {}
-    with (
-        ProcessExecutor(workers=2) as inner_executor,
-        ThreadExecutor(workers=2) as outer_executor,
-    ):
-        optimize(
-            OUTER_CONFIG,
-            INITIAL_VALUES,
-            partial(
-                inner_optimization,
-                executor=inner_executor,
-                tables=tables,
-                function=partial(rosenbrock, a=a, b=b),
-                memo=memo,
-            ),
-            executor=outer_executor,
-        )
+    inner_executor = ProcessExecutor(workers=2)
+    outer_executor = ThreadExecutor(workers=2)
+    optimize(
+        OUTER_CONFIG,
+        INITIAL_VALUES,
+        partial(
+            inner_optimization,
+            executor=inner_executor,
+            tables=tables,
+            function=partial(rosenbrock, a=a, b=b),
+            memo=memo,
+        ),
+        executor=outer_executor,
+    )
     # --8<-- [end:run]
 
     frame = tables["inner"]

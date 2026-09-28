@@ -35,7 +35,6 @@ from typing import TYPE_CHECKING, Any
 import pytest
 
 from ropt.components.executors import ExecutorFailure, HPCExecutor, WorkItem
-from ropt.exceptions import ExecutorStopped
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
@@ -51,6 +50,8 @@ _HOLD_SECONDS = 8
 _CONCURRENT_JOBS = 4
 
 _FAILING_JOB = "import os, sys; print('ropt-marker'); sys.stdout.flush(); os._exit(1)"
+
+_RAISING_JOB = "raise RuntimeError('ropt-marker')"
 
 
 def _holding_job(value: int) -> str:
@@ -85,22 +86,14 @@ def workdir_fixture(hpc_root: Path, request: pytest.FixtureRequest) -> Path:
 
 
 @pytest.fixture(name="executor")
-def executor_fixture(workdir: Path, hpc_queue: str) -> Iterator[Any]:
-    executors: list[HPCExecutor] = []
-
+def executor_fixture(workdir: Path, hpc_queue: str) -> Any:
     def _make(**kwargs: Any) -> HPCExecutor:
         kwargs.setdefault("workers", 1)
         kwargs.setdefault("interval", 2)
         kwargs.setdefault("cores", 1)
-        executor = HPCExecutor(workdir=workdir, queue=hpc_queue, **kwargs)
-        executors.append(executor)
-        return executor
+        return HPCExecutor(workdir=workdir, queue=hpc_queue, **kwargs)
 
-    try:
-        yield _make
-    finally:
-        for executor in executors:
-            executor.close()
+    return _make
 
 
 @pytest.fixture(name="example")
@@ -123,22 +116,27 @@ def test_hpc_cluster_resolves_the_requested_queue(executor: Any) -> None:
 
 
 def test_hpc_cluster_submitted_job_returns_its_result(executor: Any) -> None:
-    with executor() as hpc:
-        assert hpc.run([WorkItem(function=operator.add, args=(40, 2))]) == [42]
+    hpc = executor()
+    assert hpc.run([WorkItem(function=operator.add, args=(40, 2))]) == [42]
 
 
 def test_hpc_cluster_cancelled_job_disappears_from_the_scheduler(
     executor: Any,
 ) -> None:
-    hpc = executor()
-    items = [WorkItem(function=time.sleep, args=(_SLEEP_SECONDS,))]
+    # A batch releases what it started, however it ends: the raising item takes
+    # the caller out of `run`, and the sleeper it leaves behind is cancelled on
+    # the way.
+    hpc = executor(workers=2)
+    items = [
+        WorkItem(function=time.sleep, args=(_SLEEP_SECONDS,)),
+        WorkItem(function=exec, args=(_RAISING_JOB,)),
+    ]
     with ThreadPoolExecutor(max_workers=1) as threads:
         running = threads.submit(hpc.run, items)
         live = _wait_for_live_jobs(hpc)
         assert live, "the scheduler reported no job for work that is still running"
         assert all(isinstance(job_id, int) for job_id in live)
-        hpc.close()
-        with pytest.raises(ExecutorStopped):
+        with pytest.raises(RuntimeError, match="ropt-marker"):
             running.result()
     gone = _wait_until_gone(hpc, live)
     assert gone, f"cancelled jobs are still queued: {live}"
@@ -155,10 +153,8 @@ def test_hpc_cluster_concurrent_jobs_each_return_their_own_result(
         )
         for value in values
     ]
-    with (
-        executor(workers=_CONCURRENT_JOBS) as hpc,
-        ThreadPoolExecutor(max_workers=1) as threads,
-    ):
+    with ThreadPoolExecutor(max_workers=1) as threads:
+        hpc = executor(workers=_CONCURRENT_JOBS)
         running = threads.submit(hpc.run, work_items)
         peak = _peak_live_jobs(hpc)
         collected = running.result()
@@ -176,8 +172,8 @@ def test_hpc_cluster_concurrent_jobs_each_return_their_own_result(
 def test_hpc_cluster_failed_job_reports_where_its_output_is(
     executor: Any, workdir: Path
 ) -> None:
-    with executor(retries=3) as hpc:
-        collected = hpc.run([WorkItem(function=exec, args=(_FAILING_JOB,))])
+    hpc = executor(retries=3)
+    collected = hpc.run([WorkItem(function=exec, args=(_FAILING_JOB,))])
     assert len(collected) == 1
     failure = collected[0]
     assert isinstance(failure, ExecutorFailure), failure

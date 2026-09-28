@@ -63,15 +63,12 @@ emitting run, and every other run waiting on the same handler. See
 
 Subclass [`ExecutorBase`][ropt.components.executors.ExecutorBase] rather than
 [`Executor`][ropt.components.executors.Executor]: it provides
-[`run`][ropt.components.executors.Executor.run],
-[`close`][ropt.components.executors.Executor.close], the `closed` flag, the
-refusal of a caller that is one of its own workers, and the split of a batch
-into bundles.
+[`run`][ropt.components.executors.Executor.run], the refusal of a caller that
+is one of its own workers, and the split of a batch into bundles.
 
-You implement two methods. `_run_bundles` runs the bundles and passes each
+You implement one method. `_run_bundles` runs the bundles and passes each
 result to `store` as it arrives; it must release whatever the batch started
-before it returns, including when `store` raises. `_release` releases the
-executor's own resources, and runs with the lock not held.
+before it returns, including when `store` raises.
 
 ```python
 class MyExecutor(ExecutorBase):
@@ -81,9 +78,6 @@ class MyExecutor(ExecutorBase):
                 item.function(*item.args, **item.kwargs) for item in bundle
             ]
             store(index, results)
-
-    def _release(self) -> None:
-        ...                       # release the executor's resources
 ```
 
 Every bundle ends in exactly one of three ways, and the choice determines
@@ -102,10 +96,10 @@ reported as broken infrastructure, and a dead worker raised out of
 `_run_bundles` would surface as a user error. See
 [Error handling](parallel.md#error-handling) for the distinction.
 
-Two further rules. State of the executor's own that must stay in step with
-closing goes under `_lock`, which `ExecutorBase` exposes for that purpose; the
-`_on_close` hook runs with it held. `run` refuses work sent from the executor's
-own workers — a caller that waits there occupies a worker its own batch needs —
-by reading `_thread_state.running_work_item`, a thread-local flag. An executor
-whose workers are threads in this process sets that flag for as long as a work
-item runs on one; one whose workers run elsewhere never sets it.
+Two further rules. Resources of the executor's own are released in `__del__`,
+not in a method a caller is expected to call: an executor is constructed, run
+on, and dropped. `run` refuses work sent from the executor's own workers — a
+caller that waits there occupies a worker its own batch needs — by reading
+`_thread_state.running_work_item`, a thread-local flag. An executor whose
+workers are threads in this process sets that flag for as long as a work item
+runs on one; one whose workers run elsewhere never sets it.

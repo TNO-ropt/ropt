@@ -52,10 +52,10 @@ def main() -> None:
     history = HistoryHandler()
     per_run = HistoryHandler()
     # --8<-- [start:shared]
-    with ThreadExecutor(workers=len(STARTS)) as executor:
-        optimize_many(
-            CONFIG, STARTS, rosenbrock, executor=executor, handlers=[history, per_run]
-        )
+    executor = ThreadExecutor(workers=len(STARTS))
+    optimize_many(
+        CONFIG, STARTS, rosenbrock, executor=executor, handlers=[history, per_run]
+    )
     # --8<-- [end:shared]
     print(
         f"collected results across {len(STARTS)} concurrent runs: "

@@ -128,8 +128,7 @@ def main(*, workdir: Path, local: bool = False, queue: str | None = None) -> Non
         )
     )
 
-    with executor:
-        step.run(EnOptContext.model_validate(CONFIG), INITIAL_VALUES)
+    step.run(EnOptContext.model_validate(CONFIG), INITIAL_VALUES)
 
     optimal_result = results.result
     assert optimal_result is not None

@@ -52,15 +52,15 @@ def main() -> None:
     """Run one optimization per start vector, concurrently, tagging each run."""
     run_metadata = [{"run_id": idx} for idx in range(len(STARTS))]
     # --8<-- [start:run]
-    with ThreadExecutor(workers=3) as executor:
-        results = optimize_many(
-            CONFIG,
-            STARTS,
-            rosenbrock,
-            executor=executor,
-            metadata=run_metadata,
-            limit=2,
-        )
+    executor = ThreadExecutor(workers=3)
+    results = optimize_many(
+        CONFIG,
+        STARTS,
+        rosenbrock,
+        executor=executor,
+        metadata=run_metadata,
+        limit=2,
+    )
     # --8<-- [end:run]
     for result in results:
         assert result.results is not None

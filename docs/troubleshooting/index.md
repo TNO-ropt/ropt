@@ -116,9 +116,9 @@ everything at module level runs again in every worker. That is why the entry
 point has to sit behind `if __name__ == "__main__":`. Without the guard the
 workers try to start workers of their own, and building the executor raises.
 
-**A closed executor cannot be reopened.** Closing one releases its workers, and
-a run that asks it for work afterwards is refused. Build it inside the block
-that uses it; see
+**An executor holds its workers while anything refers to it.** They are
+released when the last reference goes, so a name kept alive keeps the workers
+alive with it. Build it inside the loop or function that uses it; see
 [Releasing an executor early](../running/parallel.md#how-many-workers).
 
 | What you see | Most likely cause |
@@ -126,7 +126,7 @@ that uses it; see
 | Ctrl-C appears to do nothing | A process-wide signal setting, changed by an imported package. Call [`restore_keyboard_interrupt`][ropt.utils.restore_keyboard_interrupt]; see [Keyboard Interrupts](keyboard_interrupt.md). |
 | The program will not exit after Ctrl-C | Evaluations on a `ThreadExecutor` are still running and cannot be interrupted. |
 | Pages of `multiprocessing` tracebacks, ending in `ExecutionError: Could not start worker processes` | The script has no `if __name__ == "__main__":` guard, so every worker re-ran it from the top. |
-| A [`WorkflowError`][ropt.exceptions.WorkflowError] about a closed executor | The executor outlived the `with` block that built it, or was closed explicitly. |
+| A `ProcessExecutor` keeps hundreds of megabytes resident | Each worker is a separate interpreter. Drop the executor, or the name holding it, when the runs that use it are done. |
 | More workers made everything slower | `numpy` and similar libraries already use every core. Set `OMP_NUM_THREADS=1` and let the executor provide the parallelism; see [Which executor should I use?](../running/parallel.md#which-executor). |
 | Simulators keep running after the run stopped | A `ProcessExecutor` kills only its own workers. Use a [`LocalJobExecutor`](../running/parallel.md#local-executor), which signals the whole process group. |
 | A cluster directive has no effect | The submission script never mentions that variable, or the value was clamped to the queue's limit; see [Running on an HPC cluster](../running/parallel.md#running-on-an-hpc-cluster). |

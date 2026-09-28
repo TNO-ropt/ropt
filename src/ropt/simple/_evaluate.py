@@ -51,8 +51,7 @@ def evaluate(  # ruff: ignore[too-many-arguments]
     walkthrough.
 
     Without an `executor` the evaluations run in-process, on the calling thread,
-    and `bundle_size` does not apply. A closed executor raises a
-    [`WorkflowError`][ropt.exceptions.WorkflowError] at the first evaluation. A
+    and `bundle_size` does not apply. A
     run started from inside an evaluation needs an executor with workers of its
     own: the one it is already running on refuses the work. `handlers` takes
     [`EventHandler`][ropt.components.event_handlers.EventHandler] objects, as
@@ -115,8 +114,7 @@ def evaluate_many(  # ruff: ignore[too-many-arguments]
     walkthrough.
 
     Without an `executor` the evaluations run in-process, on the calling thread,
-    and `bundle_size` does not apply. A closed executor raises a
-    [`WorkflowError`][ropt.exceptions.WorkflowError] at the first evaluation. A
+    and `bundle_size` does not apply. A
     run started from inside an evaluation needs an executor with workers of its
     own: the one it is already running on refuses the work. `handlers` takes
     [`EventHandler`][ropt.components.event_handlers.EventHandler] objects, as

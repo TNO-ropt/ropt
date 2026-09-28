@@ -6,7 +6,7 @@ import multiprocessing
 import queue
 import threading
 from collections import deque
-from concurrent.futures import CancelledError, Future, ProcessPoolExecutor
+from concurrent.futures import Future, ProcessPoolExecutor
 from concurrent.futures.process import BrokenProcessPool
 from typing import TYPE_CHECKING, Any, cast
 
@@ -38,10 +38,10 @@ class ProcessExecutor(ExecutorBase):
     point must use.
 
     Warning:
-        Closing terminates the worker processes and nothing else. A program a
-        work item started itself keeps running, without an error being raised.
-        Use [`LocalJobExecutor`][ropt.components.executors.LocalJobExecutor]
-        where an evaluation launches external programs.
+        A worker process runs its work item to the end. A program a work item
+        started itself keeps running, without an error being raised. Use
+        [`LocalJobExecutor`][ropt.components.executors.LocalJobExecutor] where
+        an evaluation launches external programs.
     """
 
     def __init__(
@@ -86,15 +86,12 @@ class ProcessExecutor(ExecutorBase):
         try:
             self._pool.submit(_dummy).result()
         except BrokenProcessPool as exc:
-            self.close()
+            _terminate_workers(self._pool)
             msg = (
                 "Could not start worker processes; guard the program entry point "
                 'with `if __name__ == "__main__":`.'
             )
             raise ExecutionError(msg) from exc
-
-    def _release(self) -> None:
-        _terminate_workers(self._pool)
 
     def _run_bundles(
         self,
@@ -123,7 +120,7 @@ class ProcessExecutor(ExecutorBase):
                 future = done.get()
                 index = futures.pop(future)
                 self._payload_limit.release()
-                store(index, self._bundle_result(future))
+                store(index, _bundle_result(future))
         finally:
             for future in futures:
                 future.cancel()
@@ -141,32 +138,26 @@ class ProcessExecutor(ExecutorBase):
                 f"{CANNOT_SERIALIZE}."
             )
             raise ExecutionError(msg) from exc
-        with self._lock:
-            if self._closed:
-                raise _stopped()
-            try:
-                return self._pool.submit(_run_payload, payload)
-            except RuntimeError:
-                raise _stopped() from None
-
-    def _bundle_result(
-        self, future: Future[tuple[bool, bytes]]
-    ) -> list[Any] | ExecutorFailure:
         try:
-            ok, blob = future.result()
-        except CancelledError:
+            return self._pool.submit(_run_payload, payload)
+        except RuntimeError:
+            # The pool is gone, which at interpreter shutdown is how a caller
+            # that outlived its program is released rather than left waiting.
             raise _stopped() from None
-        except BrokenProcessPool:
-            if self.closed:
-                # Closing is what killed the worker, so this is the stop the
-                # caller asked for rather than infrastructure that broke.
-                raise _stopped() from None
-            _logger.warning("Worker process pool broken; work item result lost")
-            return ExecutorFailure("Background process was killed")
-        value = loads(blob)
-        if not ok:
-            raise value
-        return cast("list[Any]", value)
+
+
+def _bundle_result(
+    future: Future[tuple[bool, bytes]],
+) -> list[Any] | ExecutorFailure:
+    try:
+        ok, blob = future.result()
+    except BrokenProcessPool:
+        _logger.warning("Worker process pool broken; work item result lost")
+        return ExecutorFailure("Background process was killed")
+    value = loads(blob)
+    if not ok:
+        raise value
+    return cast("list[Any]", value)
 
 
 def _terminate_workers(executor: ProcessPoolExecutor) -> None:

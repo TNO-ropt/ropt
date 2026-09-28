@@ -188,8 +188,7 @@ def main() -> None:
 
     outer_context = EnOptContext.model_validate(OUTER_CONFIG)
 
-    with inner_executor, outer_executor:
-        outer_step.run(outer_context, INITIAL_VALUES)
+    outer_step.run(outer_context, INITIAL_VALUES)
 
     optimal_result = global_results["results"]
     assert optimal_result is not None

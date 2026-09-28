@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import queue
-from concurrent.futures import CancelledError, Future, ThreadPoolExecutor
+from concurrent.futures import Future, ThreadPoolExecutor
 from functools import partial
 from typing import TYPE_CHECKING, Any
 
@@ -24,7 +24,7 @@ class ThreadExecutor(ExecutorBase):
     concurrent callers.
 
     Warning:
-        Closing cannot interrupt a thread. Work that has already started runs to
+        A thread cannot be interrupted. Work that has already started runs to
         completion, and the interpreter waits for it before exiting.
     """
 
@@ -43,24 +43,7 @@ class ThreadExecutor(ExecutorBase):
             msg = f"The number of workers must be at least one: {workers}"
             raise ValueError(msg)
         self._pool = ThreadPoolExecutor(max_workers=workers)
-        # Bundles running in a worker thread right now, over the whole executor.
-        self._in_flight = 0
         _logger.debug("Started thread executor with %d worker(s)", workers)
-
-    def _on_close(self) -> None:
-        if self._in_flight > 0:
-            # A thread cannot be cancelled, and the pool joins its threads when
-            # the interpreter exits, so these work items decide when the program
-            # is allowed to leave. Said out loud, because otherwise it is
-            # indistinguishable from a hang.
-            _logger.warning(
-                "Closing with %d evaluation(s) still running: a thread cannot "
-                "be interrupted, so they run to completion first.",
-                self._in_flight,
-            )
-
-    def _release(self) -> None:
-        _shutdown_pool(self._pool)
 
     def _run_bundles(
         self,
@@ -79,42 +62,26 @@ class ThreadExecutor(ExecutorBase):
                 future.add_done_callback(done.put)
             for _ in range(len(bundles)):
                 future = done.get()
-                store(futures.pop(future), _bundle_result(future))
+                store(futures.pop(future), future.result())
         finally:
             for future in futures:
                 future.cancel()
 
     def _submit(self, bundle: list[WorkItem]) -> Future[list[Any]]:
-        with self._lock:
-            if self._closed:
-                raise _stopped()
-            try:
-                return self._pool.submit(partial(self._run_tracked, _calls(bundle)))
-            except RuntimeError:
-                raise _stopped() from None
+        try:
+            return self._pool.submit(partial(self._run_tracked, _calls(bundle)))
+        except RuntimeError:
+            # The pool is gone, which at interpreter shutdown is how a caller
+            # that outlived its program is released rather than left waiting.
+            raise _stopped() from None
 
     def _run_tracked(
         self,
         calls: Sequence[tuple[Callable[..., Any], tuple[Any, ...], dict[str, Any]]],
     ) -> list[Any]:
-        with self._lock:
-            self._in_flight += 1
         # Runs on the pool thread, so it marks that thread, not the submitter.
         self._thread_state.running_work_item = True
         try:
             return _run_bundle(calls)
         finally:
             self._thread_state.running_work_item = False
-            with self._lock:
-                self._in_flight -= 1
-
-
-def _shutdown_pool(pool: ThreadPoolExecutor) -> None:
-    pool.shutdown(wait=False, cancel_futures=True)
-
-
-def _bundle_result(future: Future[list[Any]]) -> list[Any]:
-    try:
-        return future.result()
-    except CancelledError:
-        raise _stopped() from None

@@ -61,8 +61,7 @@ def optimize(  # ruff: ignore[too-many-arguments]
     See [Running Optimizations](../running/running.md) for a walkthrough.
 
     Without an `executor` the evaluations run in-process, on the calling thread,
-    and `bundle_size` does not apply. A closed executor raises a
-    [`WorkflowError`][ropt.exceptions.WorkflowError] at the first evaluation. A
+    and `bundle_size` does not apply. A
     run started from inside an evaluation needs an executor with workers of its
     own: the one it is already running on refuses the work.
 
@@ -177,10 +176,8 @@ def optimize_many(  # ruff: ignore[too-many-arguments]
     the calling thread holds. `report=`, being local by nature, is the
     opposite: it is given per run, or broadcast to all of them.
 
-    A closed executor raises a
-    [`WorkflowError`][ropt.exceptions.WorkflowError] at the first evaluation. A
-    run started from inside an evaluation needs an executor with workers of its
-    own: the one it is already running on refuses the work. Returning `True`
+    A run started from inside an evaluation needs an executor with workers of
+    its own: the one it is already running on refuses the work. Returning `True`
     from a `report` callback stops that run early with `USER_ABORT`. `metadata` also reaches
     each run's `function` as `context.metadata`, which makes it a way to tag a
     run, for example with `{"run_id": i}`.

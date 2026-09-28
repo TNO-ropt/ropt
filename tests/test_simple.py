@@ -10,7 +10,6 @@ from __future__ import annotations
 import os
 import pickle  # ruff: ignore[suspicious-pickle-import]
 import threading
-from contextlib import ExitStack
 from functools import partial
 from typing import TYPE_CHECKING, Any
 
@@ -45,7 +44,7 @@ from ropt.simple import (
 from ropt.simple._function import adapt_function
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Iterator
+    from collections.abc import Callable
     from pathlib import Path
 
     from numpy.typing import NDArray
@@ -67,19 +66,18 @@ initial_values = np.array([0.0, 0.0, 0.1])
 
 
 @pytest.fixture(name="executors")
-def executors_fixture() -> Iterator[Callable[..., Executor]]:
-    """Build executors that are closed when the test ends.
+def executors_fixture() -> Callable[..., Executor]:
+    """Build executors.
 
-    Yields:
+    Returns:
         A factory taking an executor class (`ThreadExecutor` by default) and its
         keyword arguments.
     """
-    with ExitStack() as stack:
 
-        def _make(kind: type[Executor] = ThreadExecutor, **kwargs: Any) -> Executor:
-            return stack.enter_context(kind(**kwargs))
+    def _make(kind: type[Executor] = ThreadExecutor, **kwargs: Any) -> Executor:
+        return kind(**kwargs)
 
-        yield _make
+    return _make
 
 
 @pytest.fixture(name="config")
@@ -754,8 +752,8 @@ def _run_inner_optimization(variables: NDArray[np.float64], _context: Any) -> fl
     # A run's evaluation function is plain code: it may build an executor of its
     # own, nested inside whatever executor is running it. Nothing ambient needs
     # to be threaded through for that to work.
-    with ThreadExecutor(workers=1) as executor:
-        result = optimize(_INNER_CONFIG, variables, _sphere, executor=executor)
+    executor = ThreadExecutor(workers=1)
+    result = optimize(_INNER_CONFIG, variables, _sphere, executor=executor)
     assert result.results is not None
     assert result.results.target_objective is not None
     return float(result.results.target_objective)
@@ -1026,13 +1024,13 @@ def _inner_objective(
 
 def _bilevel_outer(variables: NDArray[np.float64], _context: Any) -> float:
     a = float(variables[0])
-    with ThreadExecutor(workers=1) as executor:
-        inner = optimize(
-            _BILEVEL_CONFIG,
-            [0.0],
-            partial(_inner_objective, outer_value=a),
-            executor=executor,
-        )
+    executor = ThreadExecutor(workers=1)
+    inner = optimize(
+        _BILEVEL_CONFIG,
+        [0.0],
+        partial(_inner_objective, outer_value=a),
+        executor=executor,
+    )
     assert inner.results is not None
     assert inner.results.target_objective is not None
     return float(inner.results.target_objective)
@@ -1087,10 +1085,8 @@ def _double(value: float) -> float:
 
 
 def _offload_in_own_executor(variables: NDArray[np.float64], _context: Any) -> float:
-    with ThreadExecutor(workers=2) as executor:
-        doubled = offload(
-            [partial(_double, 3.0), partial(_double, 4.0)], executor=executor
-        )
+    executor = ThreadExecutor(workers=2)
+    doubled = offload([partial(_double, 3.0), partial(_double, 4.0)], executor=executor)
     assert doubled == (6.0, 8.0)
     return float(variables @ variables)
 
@@ -1419,8 +1415,7 @@ def test_optimize_many_skips_runs_that_have_not_started(
     # a negative, and the runs that would disprove it are released just after
     # the failure propagates, so asserting straight away proves nothing. Wait
     # on the event a second run would set: it returns the moment one does, and
-    # only costs the ceiling when no run does. The executor outlives the wait,
-    # so a pending run is refused by the stop flag, not by a closed executor.
+    # only costs the ceiling when no run does.
     starts = np.tile(initial_values, (5, 1))
     executor = executors(workers=2)
     with pytest.raises(ValueError, match="boom"):
@@ -1474,7 +1469,6 @@ def test_optimize_many_leaves_the_executor_usable_after_a_failure(
         )
     # Siblings are abandoned, not cancelled, so they may still be running
     # here; the executor must stay usable and must not deadlock against them.
-    assert not executor.closed
     result = optimize(config, initial_values, test_functions[0], executor=executor)
     assert result.exit_code == ExitCode.OPTIMIZER_FINISHED
 
@@ -1487,8 +1481,7 @@ def test_run_abandoned_by_fail_fast_returns(
     # run already in flight when a sibling fails cannot be cancelled, and
     # nothing takes its executor away, so it runs to completion and *returns* a
     # result. That is why a fail-fast failure never sprays exceptions out of
-    # its driver threads. (A close under an abandoned run is a different case;
-    # `test_guards.py` covers it.)
+    # its driver threads.
     outcomes: list[Any] = []
     lock = threading.Lock()
     started = threading.Barrier(4)

@@ -8,8 +8,8 @@ does the work of getting them, and an executor owns no thread of its own.
 
 Whatever a scope acquires, that scope releases. A batch acquires cluster jobs
 and worker processes, and `run`'s `finally` releases them, so nothing a batch
-started outlives it. An executor acquires its workers, and
-[`close`][ropt.components.executors.Executor.close] releases them.
+started outlives it. An executor acquires its workers, and releases them when it
+is collected, so there is nothing for a caller to close.
 
 Reading the caller's own location to refuse a call that could only hang leaves
 the meaning of an operation fixed by its arguments: a thread already running one
@@ -22,7 +22,7 @@ from __future__ import annotations
 import threading
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Any, Self
+from typing import TYPE_CHECKING, Any
 
 from ropt.exceptions import ExecutorStopped, WorkflowError
 
@@ -36,9 +36,7 @@ _ON_WORKER = (
     "at all."
 )
 
-_CLOSED = "This executor is closed and cannot take new work; build a new one."
-
-_STOPPED = "The executor was closed while the work was running."
+_STOPPED = "The executor can no longer run this work."
 
 
 @dataclass(kw_only=True)
@@ -90,8 +88,8 @@ def _run_bundle(
 class Executor(ABC):
     """Abstract base class for executor components within an optimization workflow.
 
-    An executor is used like a file: construct it, run work on it, close it.
-    Closing is final, and releases the workers.
+    An executor is constructed, run on, and dropped. Its workers are released
+    when it is collected, so there is nothing to close.
 
     See [Error handling](../advanced/parallel.md#error-handling) for the
     distinction an implementation must make between an infrastructure failure,
@@ -127,42 +125,9 @@ class Executor(ABC):
             One result per call, in the order of `calls`.
 
         Raises:
-            WorkflowError:   If the executor is closed, or the caller is one of
-                             its workers.
-            ExecutorStopped: If the executor was closed while the work ran.
+            WorkflowError:   If the caller is one of the executor's workers.
+            ExecutorStopped: If the executor could no longer run the work.
         """
-
-    @abstractmethod
-    def close(self) -> None:
-        """Release the executor's workers.
-
-        Closing is final and may be called more than once. A caller blocked in
-        [`run`][ropt.components.executors.Executor.run] is released with
-        [`ExecutorStopped`][ropt.exceptions.ExecutorStopped].
-
-        May be called from any thread.
-        """
-
-    @property
-    @abstractmethod
-    def closed(self) -> bool:
-        """Whether the executor has been closed.
-
-        Returns:
-            `True` once the executor was closed.
-        """
-
-    def __enter__(self) -> Self:
-        """Enter a block that closes the executor on exit.
-
-        Returns:
-            The executor itself.
-        """
-        return self
-
-    def __exit__(self, *_exc: object) -> None:
-        """Close the executor."""
-        self.close()
 
 
 class _ThreadState(threading.local):
@@ -174,14 +139,9 @@ class _ThreadState(threading.local):
 class ExecutorBase(Executor):
     """A base class for executors.
 
-    Handles the lifecycle, the refusal of a caller that is one of the workers,
-    and the split of a batch into bundles. Subclasses implement `_run_bundles`,
-    which must release whatever the batch started before it returns, and
-    `_release`, which releases the executor's own resources.
-
-    The lock is available to subclasses as `_lock`: an implementation with
-    shared state of its own keeps it under the same lock, so that closing and
-    that state cannot be observed out of step.
+    Handles the refusal of a caller that is one of the workers, and the split of
+    a batch into bundles. Subclasses implement `_run_bundles`, which must
+    release whatever the batch started before it returns.
 
     A subclass whose workers are threads in this process sets
     `_thread_state.running_work_item` for as long as a work item runs on one,
@@ -201,19 +161,7 @@ class ExecutorBase(Executor):
         super().__init__()
         _check_bundle_size(bundle_size)
         self._default_bundle_size = bundle_size
-        self._lock = threading.Lock()
-        self._closed = False
         self._thread_state = _ThreadState()
-
-    @property
-    def closed(self) -> bool:
-        """Whether the executor has been closed.
-
-        Returns:
-            `True` once the executor was closed.
-        """
-        with self._lock:
-            return self._closed
 
     def run(
         self, calls: Sequence[WorkItem], *, bundle_size: int | None = None
@@ -228,14 +176,10 @@ class ExecutorBase(Executor):
             One result per call, in the order of `calls`.
 
         Raises:
-            WorkflowError: If the executor is closed, or the caller is one of
-                           its workers.
+            WorkflowError: If the caller is one of the executor's workers.
         """
         if self._thread_state.running_work_item:
             raise WorkflowError(_ON_WORKER)
-        with self._lock:
-            if self._closed:
-                raise WorkflowError(_CLOSED)
         items = list(calls)
         if not items:
             return []
@@ -249,18 +193,6 @@ class ExecutorBase(Executor):
         self._run_bundles(bundles, store)
         return results
 
-    def close(self) -> None:
-        """Release the executor's workers.
-
-        May be called from any thread, and more than once.
-        """
-        with self._lock:
-            if self._closed:
-                return
-            self._closed = True
-            self._on_close()
-        self._release()
-
     def _resolve_bundle_size(self, count: int, bundle_size: int | None) -> int:
         if bundle_size is None:
             size = self._default_bundle_size
@@ -269,13 +201,6 @@ class ExecutorBase(Executor):
             size = bundle_size
         # A bundle never spans batches, so zero is the whole batch.
         return count if size == 0 else size
-
-    def _on_close(self) -> None:
-        """Note the close while the lock is held."""
-
-    @abstractmethod
-    def _release(self) -> None:
-        """Release the executor's resources, with the lock not held."""
 
     @abstractmethod
     def _run_bundles(

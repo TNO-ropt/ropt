@@ -5,18 +5,19 @@ happen one after another, on the same thread that called
 [`optimize`][ropt.simple.optimize]. If each call is slow, you can run several at
 the same time by evaluating on an **executor**.
 
-Build one with a `with` statement and pass it to the run:
+Build one and pass it to the run:
 
 ```python
 from ropt.simple import ThreadExecutor, optimize
 
-with ThreadExecutor(workers=4) as executor:
-    result = optimize(config, x0, objective, executor=executor)
+executor = ThreadExecutor(workers=4)
+result = optimize(config, x0, objective, executor=executor)
 ```
 
 That is the whole pattern. You can build as many executors as you like, of any
-kind, and each run uses the one you give it — and only that one. Leaving the
-`with` block releases its workers. The runnable script is
+kind, and each run uses the one you give it — and only that one. An executor
+releases its workers when it is collected, so there is nothing to close. The
+runnable script is
 [examples/simple/parallel.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/parallel.py),
 which evaluates one optimization on a thread executor, or on a process executor
 when it is passed `--multiprocessing`.

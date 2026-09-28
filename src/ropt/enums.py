@@ -125,7 +125,7 @@ class ExitCode(IntEnum):
     """Returned when an optimization step terminates normally."""
 
     EXECUTOR_STOPPED = 6
-    """Returned when the executor stopped before the evaluation could finish."""
+    """Returned when the executor could no longer run the evaluation."""
 
 
 class AxisName(StrEnum):

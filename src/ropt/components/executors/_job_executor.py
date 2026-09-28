@@ -53,7 +53,6 @@ from .base import (
     WorkItem,
     _calls,
     _run_bundle,
-    _stopped,
 )
 
 if TYPE_CHECKING:
@@ -98,8 +97,8 @@ class _State:
     # with no lock held, and hands back an `_StateUpdate` to be merged.
     #
     # The merge cannot be a wholesale overwrite, because other callers change
-    # this state meanwhile: one may leave, or queue new work, or close the
-    # executor. So every entry is written only if it is still wanted.
+    # this state meanwhile: one may leave, or queue new work. So every entry is
+    # written only if it is still wanted.
 
     def __init__(
         self, *, workers: int, interval: float, query_retries: int, backend_name: str
@@ -110,7 +109,6 @@ class _State:
         self._backend_name = backend_name
         self._lock = threading.Lock()
         self._condition = threading.Condition(self._lock)
-        self._closed = False
         self._queue: deque[tuple[_Results, int, list[WorkItem]]] = deque()
         self._active: dict[UUID, tuple[_Results, int]] = {}
         self._jobs: dict[UUID, int] = {}
@@ -127,11 +125,6 @@ class _State:
         with self._lock:
             return self._output_kept
 
-    def close(self) -> None:
-        with self._condition:
-            self._closed = True
-            self._condition.notify_all()
-
     def clear(self) -> list[tuple[UUID, int]]:
         with self._lock:
             jobs = list(self._jobs.items())
@@ -143,7 +136,6 @@ class _State:
 
     def queue(self, results: _Results, bundles: list[list[WorkItem]]) -> None:
         with self._condition:
-            self._check_open()
             for index, bundle in enumerate(bundles):
                 self._queue.append((results, index, bundle))
             self._condition.notify_all()
@@ -153,7 +145,6 @@ class _State:
         # same list. Handed over before the caller stores them, so user code
         # that raises does not do so under the lock.
         with self._lock:
-            self._check_open()
             ready = list(results)
             results.clear()
             return ready
@@ -164,7 +155,6 @@ class _State:
         # Returns whether the backend is now this caller's, and whether it
         # should ask which jobs have finished.
         with self._condition:
-            self._check_open()
             # Re-checked under the acquisition that does the waiting: a result
             # arriving between the two would otherwise be slept through.
             if results:
@@ -204,11 +194,11 @@ class _State:
                 self._backend_busy = False
             cancel: list[tuple[UUID, int]] = []
             for item_id, job_id in update.launched_jobs.items():
-                if item_id in self._active and not self._closed:
+                if item_id in self._active:
                     self._jobs[item_id] = job_id
                 else:
-                    # Its run left, or the executor closed, while it was being
-                    # launched: nobody is waiting for it now.
+                    # Its run left while it was being launched: nobody is
+                    # waiting for it now.
                     cancel.append((item_id, job_id))
             for item_id, result in update.results.items():
                 if item_id in self._active:
@@ -246,10 +236,6 @@ class _State:
             self._condition.notify_all()
             return jobs
 
-    def _check_open(self) -> None:
-        if self._closed:
-            raise _stopped()
-
     def _pick_jobs_to_launch(self, update: _StateUpdate) -> None:
         # `_active` holds the work that is out, so `workers` caps how many run
         # at once, and the slot must be claimed before the job exists. The
@@ -269,11 +255,9 @@ class _State:
         results.append((index, result))
 
     def _fail_unlaunched(self, update: _StateUpdate) -> None:
-        # Given a slot but never launched: the caller stopped on close, or
-        # raised before reaching them.
-        reason = (
-            "the executor was closed" if update.error is None else f"{update.error}"
-        )
+        # Given a slot but never launched: the caller raised before reaching
+        # them.
+        reason = "the caller stopped" if update.error is None else f"{update.error}"
         for item_id, _results, _index, _bundle in update.jobs_to_launch:
             if item_id in update.launched_jobs or item_id in update.results:
                 continue
@@ -407,10 +391,9 @@ class JobExecutorBase(ExecutorBase):
         # backend, so a subclass keeping state of its own needs a lock for it.
         ...
 
-    def _on_close(self) -> None:
-        self._state.close()
-
-    def _release(self) -> None:
+    def _cancel_all_jobs(self) -> None:
+        # For a subclass with a teardown of its own; a batch cancels its own
+        # jobs when it leaves, so this finds only what outlived one.
         self._cancel_jobs(self._state.clear())
 
     def _run_bundles(
@@ -459,9 +442,6 @@ class JobExecutorBase(ExecutorBase):
 
     def _launch_jobs(self, update: _StateUpdate) -> None:
         for item_id, _results, _index, bundle in update.jobs_to_launch:
-            if self.closed:
-                # `apply_update` fails what is left back to its callers.
-                break
             try:
                 update.launched_jobs[item_id] = self._launch_job(item_id, bundle)
             except Exception as exc:  # ruff: ignore[blind-except]

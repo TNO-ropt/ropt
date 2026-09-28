@@ -115,15 +115,14 @@ def main(
             workdir=Path.cwd() if workdir is None else workdir.resolve(),
         )
     )
-    with executor:
-        result = optimize(
-            CONFIG,
-            INITIAL_VALUES,
-            rosenbrock,
-            executor=executor,
-            report=report,
-            bundle_size=0,
-        )
+    result = optimize(
+        CONFIG,
+        INITIAL_VALUES,
+        rosenbrock,
+        executor=executor,
+        report=report,
+        bundle_size=0,
+    )
     assert result.results is not None
     print(f"optimal variables: {result.results.variables}")
     print(f"optimal objective: {result.results.target_objective}")

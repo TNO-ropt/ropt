@@ -60,46 +60,49 @@ def test_offload_empty_sequence_without_an_executor_returns_empty() -> None:
 
 
 def test_offload_empty_sequence_returns_empty_with_an_executor() -> None:
-    with ThreadExecutor(workers=1) as executor:
-        assert offload([], executor=executor) == ()
+    executor = ThreadExecutor(workers=1)
+    assert offload([], executor=executor) == ()
 
 
 def test_offload_single_call_with_a_thread_executor() -> None:
-    with ThreadExecutor(workers=2) as executor:
-        assert offload(partial(add, 3, 4), executor=executor) == 7
+    executor = ThreadExecutor(workers=2)
+    assert offload(partial(add, 3, 4), executor=executor) == 7
 
 
 def test_offload_sequence_with_a_thread_executor() -> None:
-    with ThreadExecutor(workers=3) as executor:
-        assert offload(
-            [partial(_square, i) for i in range(1, 6)], executor=executor
-        ) == (1, 4, 9, 16, 25)
+    executor = ThreadExecutor(workers=3)
+    assert offload([partial(_square, i) for i in range(1, 6)], executor=executor) == (
+        1,
+        4,
+        9,
+        16,
+        25,
+    )
 
 
 def test_offload_sequence_of_different_functions() -> None:
-    with ThreadExecutor(workers=2) as executor:
-        assert offload(
-            [partial(_square, 3), partial(_double, 5)], executor=executor
-        ) == (9, 10)
+    executor = ThreadExecutor(workers=2)
+    assert offload([partial(_square, 3), partial(_double, 5)], executor=executor) == (
+        9,
+        10,
+    )
 
 
 @pytest.mark.slow
 def test_offload_sequence_with_a_process_executor() -> None:
-    with ProcessExecutor(workers=2) as executor:
-        assert offload([partial(_square, i) for i in (1, 2, 3)], executor=executor) == (
-            1,
-            4,
-            9,
-        )
+    executor = ProcessExecutor(workers=2)
+    assert offload([partial(_square, i) for i in (1, 2, 3)], executor=executor) == (
+        1,
+        4,
+        9,
+    )
 
 
 @pytest.mark.slow
 @pytest.mark.timeout(60)
 def test_dying_worker_reported_to_offload_caller() -> None:
-    with (
-        ProcessExecutor(workers=1) as executor,
-        pytest.raises(ExecutionError, match="could not be run"),
-    ):
+    executor = ProcessExecutor(workers=1)
+    with pytest.raises(ExecutionError, match="could not be run"):
         offload(_kill_worker, executor=executor)
 
 
@@ -117,9 +120,9 @@ def test_offload_preserves_order_across_workers() -> None:
         finished[index].set()
         return (index + 1) * (index + 1)
 
-    with ThreadExecutor(workers=count) as executor:
-        jobs = [partial(square, index) for index in range(count)]
-        assert offload(jobs, executor=executor) == (1, 4, 9, 16, 25)
+    executor = ThreadExecutor(workers=count)
+    jobs = [partial(square, index) for index in range(count)]
+    assert offload(jobs, executor=executor) == (1, 4, 9, 16, 25)
 
 
 def test_offload_from_an_event_loop() -> None:
@@ -128,8 +131,8 @@ def test_offload_from_an_event_loop() -> None:
     async def _offload_in_a_cell(executor: Executor) -> int:  # ruff: ignore[unused-async]
         return offload(partial(_square, 4), executor=executor)
 
-    with ThreadExecutor(workers=1) as executor:
-        assert asyncio.run(_offload_in_a_cell(executor)) == 16
+    executor = ThreadExecutor(workers=1)
+    assert asyncio.run(_offload_in_a_cell(executor)) == 16
 
 
 @pytest.mark.timeout(30)
@@ -137,10 +140,8 @@ def test_offload_from_an_event_loop() -> None:
 def test_offload_base_exception_reaches_caller(work: Callable[[], int]) -> None:
     # A worker thread cannot exit the interpreter on its own, so the exception
     # is delivered to the caller, which is where it means something.
-    with (
-        ThreadExecutor(workers=2) as executor,
-        pytest.raises((SystemExit, KeyboardInterrupt)),
-    ):
+    executor = ThreadExecutor(workers=2)
+    with pytest.raises((SystemExit, KeyboardInterrupt)):
         offload(work, executor=executor)
 
 
@@ -182,7 +183,7 @@ def test_handler_can_offload() -> None:
     # A handler runs on the thread driving the run, not on a worker, so the
     # executor it is given works there as usual.
     handler = _OffloadingHandler()
-    with ThreadExecutor(workers=2) as executor:
-        handler.executor = executor
-        _run_one(executor=executor, handlers=[handler])
+    executor = ThreadExecutor(workers=2)
+    handler.executor = executor
+    _run_one(executor=executor, handlers=[handler])
     assert handler.outcome == "returned 16"

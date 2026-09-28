@@ -50,6 +50,7 @@ markers = [
     "hpc: submits to a real HPC cluster",
 ]
 filterwarnings = [
+    "error",
     'ignore:numpy.ndarray size changed, may indicate binary incompatibility.*:RuntimeWarning',
 ]
 

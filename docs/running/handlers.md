@@ -49,8 +49,8 @@ rather than interleaving with it:
 from ropt.simple import HistoryHandler, ThreadExecutor, optimize_many
 
 history = HistoryHandler()
-with ThreadExecutor(workers=4) as executor:
-    optimize_many(config, start_points, objective, executor=executor, handlers=[history])
+executor = ThreadExecutor(workers=4)
+optimize_many(config, start_points, objective, executor=executor, handlers=[history])
 
 print(history.results)
 ```

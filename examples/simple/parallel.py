@@ -54,8 +54,8 @@ def main(*, multiprocessing: bool = False) -> None:
         multiprocessing: Use a process executor instead of a thread executor.
     """
     build = ProcessExecutor if multiprocessing else ThreadExecutor
-    with build(workers=4) as executor:
-        result = optimize(CONFIG, INITIAL_VALUES, rosenbrock, executor=executor)
+    executor = build(workers=4)
+    result = optimize(CONFIG, INITIAL_VALUES, rosenbrock, executor=executor)
     assert result.results is not None
     print(f"optimal variables: {result.results.variables}")
     assert np.allclose(result.results.variables, 1.0, atol=1e-2)

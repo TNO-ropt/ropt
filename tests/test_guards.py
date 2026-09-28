@@ -14,7 +14,6 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 import pytest
 
-from ropt.enums import ExitCode
 from ropt.exceptions import ExecutionError, WorkflowError
 from ropt.simple import (
     HistoryHandler,
@@ -81,16 +80,7 @@ _TAKES_AN_EXECUTOR = pytest.mark.parametrize(
 
 @_TAKES_AN_EXECUTOR
 def test_live_executor_accepted(entry_point: Callable[..., None]) -> None:
-    with ThreadExecutor(workers=2) as executor:
-        entry_point(executor=executor)
-
-
-@_TAKES_AN_EXECUTOR
-def test_closed_executor_refused(entry_point: Callable[..., None]) -> None:
-    executor = ThreadExecutor(workers=1)
-    executor.close()
-    with pytest.raises(WorkflowError, match="closed"):
-        entry_point(executor=executor)
+    entry_point(executor=ThreadExecutor(workers=2))
 
 
 def _offload_again(executor: Executor) -> int:
@@ -110,19 +100,15 @@ def _optimize_again(
 
 @pytest.mark.timeout(30)
 def test_offload_to_the_executor_it_runs_on_refused() -> None:
-    with (
-        ThreadExecutor(workers=1) as executor,
-        pytest.raises(WorkflowError, match="already running on it"),
-    ):
+    executor = ThreadExecutor(workers=1)
+    with pytest.raises(WorkflowError, match="already running on it"):
         offload(partial(_offload_again, executor), executor=executor)
 
 
 @pytest.mark.timeout(30)
 def test_nested_run_on_the_executor_it_runs_on_refused() -> None:
-    with (
-        ThreadExecutor(workers=1) as executor,
-        pytest.raises(WorkflowError, match="already running on it"),
-    ):
+    executor = ThreadExecutor(workers=1)
+    with pytest.raises(WorkflowError, match="already running on it"):
         optimize(
             _CONFIG, _INITIAL, partial(_optimize_again, executor), executor=executor
         )
@@ -132,56 +118,9 @@ def test_nested_run_on_the_executor_it_runs_on_refused() -> None:
 def test_nested_run_on_a_second_executor_allowed() -> None:
     # The control: what makes the refusal above about *this* executor rather
     # than about nesting, which is supported.
-    with ThreadExecutor(workers=1) as inner, ThreadExecutor(workers=1) as outer:
-        optimize(_CONFIG, _INITIAL, partial(_optimize_again, inner), executor=outer)
-
-
-def _close_on_call(
-    executor: Executor,
-    calls: list[int],
-    call: int,
-    variables: NDArray[np.float64],
-    _: EvaluationFunctionContext,
-) -> float:
-    calls.append(1)
-    if len(calls) == call:
-        executor.close()
-    return float(np.sum(variables**2))
-
-
-_CLOSING_CONFIG = _CONFIG | {
-    "optimizer": {"max_functions": 20},
-    "gradient": {"number_of_perturbations": 5},
-}
-
-
-def test_executor_closed_under_a_waiting_run_stops_the_run() -> None:
-    # Closing while a batch is outstanding is not a misuse of the API but a
-    # failure of the workers, and it is reported as one. One worker, so the rest
-    # of the gradient batch is still queued when the first perturbation closes.
-    with ThreadExecutor(workers=1) as executor:
-        result = optimize(
-            _CLOSING_CONFIG,
-            _INITIAL,
-            partial(_close_on_call, executor, [], 2),
-            executor=executor,
-        )
-    assert result.exit_code == ExitCode.EXECUTOR_STOPPED
-
-
-def test_executor_closed_between_batches_refuses_the_next_one() -> None:
-    # The counterpart: nothing was outstanding at the close, so the next batch
-    # meets an executor that is simply closed.
-    with (
-        ThreadExecutor(workers=1) as executor,
-        pytest.raises(WorkflowError, match="closed"),
-    ):
-        optimize(
-            _CLOSING_CONFIG,
-            _INITIAL,
-            partial(_close_on_call, executor, [], 1),
-            executor=executor,
-        )
+    inner = ThreadExecutor(workers=1)
+    outer = ThreadExecutor(workers=1)
+    optimize(_CONFIG, _INITIAL, partial(_optimize_again, inner), executor=outer)
 
 
 def _evaluate_with(carried: Any, variables: NDArray[np.float64], _: Any) -> float:
@@ -209,8 +148,6 @@ def test_carrying_a_workflow_object_into_a_worker(carry: Callable[[], Any]) -> N
     # An evaluation function that closes over a workflow object cannot be sent:
     # the object holds a lock, so serializing the work item fails.
     function = partial(_evaluate_with, carry())
-    with (
-        ProcessExecutor(workers=2) as executor,
-        pytest.raises(ExecutionError, match="could not be sent to a worker"),
-    ):
+    executor = ProcessExecutor(workers=2)
+    with pytest.raises(ExecutionError, match="could not be sent to a worker"):
         optimize(_CONFIG, _INITIAL, function, executor=executor)

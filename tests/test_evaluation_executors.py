@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-# ruff: file-ignore[unused-function-argument, unused-method-argument, unused-lambda-argument, no-self-use, mutable-class-default, multiple-with-statements, private-member-access, subprocess-without-shell-equals-true]
+# ruff: file-ignore[unused-function-argument, unused-method-argument, unused-lambda-argument, no-self-use, mutable-class-default, private-member-access, subprocess-without-shell-equals-true]
 import collections
 import gc
 import importlib
@@ -15,7 +15,6 @@ import subprocess  # ruff: ignore[suspicious-subprocess-import]
 import sys
 import tempfile
 import threading
-import warnings
 import weakref
 from concurrent.futures import ProcessPoolExecutor
 from concurrent.futures.process import BrokenProcessPool
@@ -52,9 +51,9 @@ from ropt.components.executors._job_executor import (
     _StateUpdate,
 )
 from ropt.components.executors._picklable import picklable_exception
-from ropt.components.executors._process_executor import _run_payload
+from ropt.components.executors._process_executor import _run_payload, _terminate_workers
 from ropt.context import EnOptContext
-from ropt.exceptions import ExecutionError, ExecutorStopped, WorkflowError
+from ropt.exceptions import ExecutionError, WorkflowError
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
@@ -156,8 +155,9 @@ def _print_and_die(value: int) -> int:
     return value
 
 
-def _wait_for_local_cleanup(executor: LocalJobExecutor) -> None:
-    thread = executor._teardown_thread
+def _wait_for_local_cleanup(thread: threading.Thread) -> None:
+    # Takes the thread rather than the executor: the teardown runs from
+    # `__del__`, so holding the executor here would keep it alive.
     thread.join(10.0)
 
 
@@ -224,8 +224,7 @@ def test_executor_run_returns_results_in_input_order(
             executor = ThreadExecutor(workers=2)
         case "multiprocessing":
             executor = ProcessExecutor(workers=2)
-    with executor:
-        assert executor.run(items) == [1, 2]
+    assert executor.run(items) == [1, 2]
 
 
 def test_submitting_from_a_worker_thread_is_refused() -> None:
@@ -241,80 +240,8 @@ def test_submitting_from_a_worker_thread_is_refused() -> None:
             return str(exc)
         return "accepted"
 
-    with executor:
-        message = executor.run([WorkItem(function=_submit_back)])[0]
+    message = executor.run([WorkItem(function=_submit_back)])[0]
     assert "already running on it" in message
-
-
-@pytest.mark.slow
-@pytest.mark.timeout(30)
-def test_work_in_flight_aborted_on_close(tmp_path: Path) -> None:
-    listener = Listener(str(tmp_path / "work"))
-    executor = LocalJobExecutor(workdir=tmp_path, workers=1)
-    connection = None
-    outcome: list[BaseException] = []
-
-    def _run() -> None:
-        try:
-            executor.run(
-                [WorkItem(function=_block_until_disconnected, args=(listener.address,))]
-            )
-        except ExecutorStopped as exc:
-            outcome.append(exc)
-
-    try:
-        with executor:
-            runner = threading.Thread(target=_run)
-            runner.start()
-            connection = listener.accept()
-            executor.close()
-        runner.join(5.0)
-        assert not runner.is_alive()
-        assert isinstance(outcome[0], ExecutorStopped)
-    finally:
-        if connection is not None:
-            connection.close()
-        listener.close()
-
-
-def test_stopping_thread_executor_reports_running_work(
-    caplog: pytest.LogCaptureFixture,
-) -> None:
-    # Nothing can take a work item away from a thread, so the only help the user
-    # gets is being told what the program is waiting for.
-    barrier = threading.Barrier(3)
-    release = threading.Event()
-    items = [
-        WorkItem(function=_blocked_work_at_barrier, args=(barrier, release))
-        for _ in range(2)
-    ]
-    executor = ThreadExecutor(workers=2)
-    runner = threading.Thread(target=lambda: executor.run(items), daemon=True)
-    with caplog.at_level(logging.WARNING, logger="ropt"), executor:
-        runner.start()
-        barrier.wait(timeout=4.0)
-        executor.close()
-        release.set()
-        runner.join(5.0)
-    assert "Closing with 2 evaluation(s) still running" in caplog.text
-
-
-def test_stopping_thread_executor_after_work_reports_nothing(
-    caplog: pytest.LogCaptureFixture,
-) -> None:
-    # A work item that already returned is not something to wait for.
-    executor = ThreadExecutor(workers=1)
-    with caplog.at_level(logging.WARNING, logger="ropt"), executor:
-        assert executor.run([WorkItem(function=_function, args=(0,))]) == [1]
-    assert "still running" not in caplog.text
-
-
-def _resource_warnings(caught: list[warnings.WarningMessage]) -> list[str]:
-    return [
-        str(entry.message)
-        for entry in caught
-        if issubclass(entry.category, ResourceWarning)
-    ]
 
 
 def _teardown_threads() -> set[threading.Thread]:
@@ -334,14 +261,9 @@ def test_dropping_a_local_executor_removes_its_temporary_directory() -> None:
     thread = executor._teardown_thread
     assert workdir.is_dir()
     ref = weakref.ref(executor)
-    with warnings.catch_warnings(record=True) as caught:
-        warnings.simplefilter("always")
-        del executor
-        gc.collect()
+    del executor
+    gc.collect()
     assert ref() is None
-    assert _resource_warnings(caught) == [
-        "LocalJobExecutor was not closed; releasing its resources."
-    ]
     thread.join(10.0)
     assert not thread.is_alive()
     assert not workdir.exists()
@@ -352,10 +274,8 @@ def test_dropping_a_local_executor_keeps_a_directory_it_was_given(
     tmp_path: Path,
 ) -> None:
     executor = LocalJobExecutor(workdir=tmp_path, workers=1)
-    with warnings.catch_warnings(record=True):
-        warnings.simplefilter("always")
-        del executor
-        gc.collect()
+    del executor
+    gc.collect()
     assert tmp_path.is_dir()
 
 
@@ -370,17 +290,6 @@ def test_local_executor_rejecting_an_argument_leaves_no_thread_or_directory() ->
         LocalJobExecutor(workers=0)
     assert set(temp_root.glob("ropt-local-*")) == directories
     assert _teardown_threads() == threads
-
-
-@pytest.mark.skipif(os.name != "posix", reason="local jobs are POSIX only")
-def test_closing_a_local_executor_leaves_nothing_to_release() -> None:
-    executor = LocalJobExecutor(workers=1)
-    executor.close()
-    with warnings.catch_warnings(record=True) as caught:
-        warnings.simplefilter("always")
-        del executor
-        gc.collect()
-    assert _resource_warnings(caught) == []
 
 
 @pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
@@ -411,8 +320,8 @@ def test_hpc_reads_job_ids_from_the_scheduler_table(
         "ropt.components.executors._hpc_executor.pysqa.QueueAdapter",
         lambda *args, **kwargs: _TableScheduler(tmp_path),
     )
-    with HPCExecutor(workdir=tmp_path, workers=1, interval=0, template="") as executor:
-        assert executor.run([WorkItem(function=_function, args=(0,))]) == [1]
+    executor = HPCExecutor(workdir=tmp_path, workers=1, interval=0, template="")
+    assert executor.run([WorkItem(function=_function, args=(0,))]) == [1]
 
 
 @pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
@@ -430,15 +339,15 @@ def test_hpc_scheduler_query_fails_after_retry_limit(
             raise RuntimeError(msg)
 
     _mock_scheduler(monkeypatch, _UnreachableScheduler(tmp_path))
-    with HPCExecutor(
+    executor = HPCExecutor(
         workdir=tmp_path,
         workers=1,
         interval=0,
         retries=0,
         query_retries=2,
         template="",
-    ) as executor:
-        result = executor.run([WorkItem(function=_function, args=(0,))])[0]
+    )
+    result = executor.run([WorkItem(function=_function, args=(0,))])[0]
     assert isinstance(result, ExecutorFailure)
     assert "could not be queried" in result.message
     assert "after 3 attempts" in result.message
@@ -463,10 +372,10 @@ def test_hpc_scheduler_query_budget_resets_after_an_answer(
             return super().live_job_ids()
 
     _mock_scheduler(monkeypatch, _FlakyScheduler(tmp_path))
-    with HPCExecutor(
+    executor = HPCExecutor(
         workdir=tmp_path, workers=1, interval=0, query_retries=1, template=""
-    ) as executor:
-        assert executor.run([WorkItem(function=_function, args=(0,))]) == [1]
+    )
+    assert executor.run([WorkItem(function=_function, args=(0,))]) == [1]
     assert _FlakyScheduler.calls >= 4
 
 
@@ -486,10 +395,10 @@ def test_hpc_missing_output_file_fails_work(
             return set()
 
     _mock_scheduler(monkeypatch, _VanishingJob(tmp_path))
-    with HPCExecutor(
+    executor = HPCExecutor(
         workdir=tmp_path, workers=1, interval=0, retries=2, template=""
-    ) as executor:
-        result = executor.run([WorkItem(function=_function, args=(0,))])[0]
+    )
+    result = executor.run([WorkItem(function=_function, args=(0,))])[0]
     assert isinstance(result, ExecutorFailure)
     assert "never appeared" in result.message
 
@@ -511,10 +420,10 @@ def test_hpc_unreadable_output_file_fails_work(
             return set()
 
     _mock_scheduler(monkeypatch, _CorruptResult(tmp_path))
-    with HPCExecutor(
+    executor = HPCExecutor(
         workdir=tmp_path, workers=1, interval=0, retries=2, template=""
-    ) as executor:
-        result = executor.run([WorkItem(function=_function, args=(0,))])[0]
+    )
+    result = executor.run([WorkItem(function=_function, args=(0,))])[0]
     assert isinstance(result, ExecutorFailure)
     assert "No valid result" in result.message
 
@@ -542,10 +451,10 @@ def test_hpc_result_of_an_unknown_type_fails_work(
             return set()
 
     _mock_scheduler(monkeypatch, _AlienResult(tmp_path))
-    with HPCExecutor(
+    executor = HPCExecutor(
         workdir=tmp_path, workers=1, interval=0, retries=30, template=""
-    ) as executor:
-        result = executor.run([WorkItem(function=_function, args=(0,))])[0]
+    )
+    result = executor.run([WorkItem(function=_function, args=(0,))])[0]
     assert isinstance(result, ExecutorFailure)
     assert "could not be reconstructed" in result.message
     assert "collectionx" in result.message
@@ -571,10 +480,10 @@ def test_hpc_result_that_cannot_be_rebuilt_fails_work(
             return set()
 
     _mock_scheduler(monkeypatch, _UnrebuildableResult(tmp_path))
-    with HPCExecutor(
+    executor = HPCExecutor(
         workdir=tmp_path, workers=1, interval=0, retries=30, template=""
-    ) as executor:
-        result = executor.run([WorkItem(function=_function, args=(0,))])[0]
+    )
+    result = executor.run([WorkItem(function=_function, args=(0,))])[0]
     assert isinstance(result, ExecutorFailure)
     assert "could not be read" in result.message
     assert "this result cannot be rebuilt" in result.message
@@ -594,8 +503,8 @@ def test_hpc_job_command_uses_submitting_interpreter(
             return super().submit_job(job_name, command, **kwargs)
 
     _mock_scheduler(monkeypatch, _RecordingAdapter(tmp_path))
-    with HPCExecutor(workdir=tmp_path, workers=1, interval=0, template="") as executor:
-        assert executor.run([WorkItem(function=_function, args=(0,))]) == [1]
+    executor = HPCExecutor(workdir=tmp_path, workers=1, interval=0, template="")
+    assert executor.run([WorkItem(function=_function, args=(0,))]) == [1]
     assert commands
     assert commands[0].startswith(f"{sys.executable} -m ropt.components.executors ")
 
@@ -619,10 +528,10 @@ def test_hpc_failed_work_keeps_job_output(
             return set()
 
     _mock_scheduler(monkeypatch, _CrashingJob(tmp_path))
-    with HPCExecutor(
+    executor = HPCExecutor(
         workdir=tmp_path, workers=1, interval=0, retries=2, template=""
-    ) as executor:
-        result = executor.run([WorkItem(function=_function, args=(0,))])[0]
+    )
+    result = executor.run([WorkItem(function=_function, args=(0,))])[0]
     assert isinstance(result, ExecutorFailure)
     assert "No module named 'ropt'" in result.message
     assert list(tmp_path.glob("*.txt"))
@@ -654,26 +563,30 @@ def test_hpc_failure_names_the_output_file_it_could_not_quote(
 
     adapter = _SilentJob(tmp_path)
     _mock_scheduler(monkeypatch, adapter)
-    with HPCExecutor(
+    executor = HPCExecutor(
         workdir=tmp_path, workers=1, interval=0, retries=0, template=""
-    ) as executor:
-        result = executor.run([WorkItem(function=_function, args=(0,))])[0]
+    )
+    result = executor.run([WorkItem(function=_function, args=(0,))])[0]
     assert isinstance(result, ExecutorFailure)
     assert str(tmp_path / f"{adapter.submitted}.txt") in result.message
 
 
 @pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
-def test_stopping_hpc_executor_cancels_jobs(
+def test_hpc_batch_leaving_cancels_the_jobs_it_started(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    submitted = threading.Event()
+    # Nothing but the batch itself takes a job away, so the second submission
+    # failing has to take the first job with it.
     cancelled = threading.Event()
 
-    class _StuckAdapter(MockedHPCAdapter):
+    class _StuckThenRejecting(MockedHPCAdapter):
         def submit_job(self, job_name: str, command: str, **kwargs: Any) -> int:
+            if self._job_id >= 1:
+                msg = "sbatch: error: Batch job submission failed"
+                raise RuntimeError(msg)
+            # Registered but never run, so it is still live when the batch goes.
             self._job_id += 1
             self._jobs[self._job_id] = job_name
-            submitted.set()
             return self._job_id
 
         def delete_job(self, process_id: int) -> str:
@@ -681,63 +594,12 @@ def test_stopping_hpc_executor_cancels_jobs(
             cancelled.set()
             return deleted
 
-    adapter = _StuckAdapter(tmp_path)
+    adapter = _StuckThenRejecting(tmp_path)
     _mock_scheduler(monkeypatch, adapter)
-    executor = HPCExecutor(workdir=tmp_path, workers=1, interval=0, template="")
-    outcome: list[BaseException] = []
-
-    def _run() -> None:
-        try:
-            executor.run([WorkItem(function=_function, args=(0,))])
-        except ExecutorStopped as exc:
-            outcome.append(exc)
-
-    with executor:
-        runner = threading.Thread(target=_run)
-        runner.start()
-        assert submitted.wait(timeout=5.0)
-        executor.close()
-    runner.join(5.0)
-    assert isinstance(outcome[0], ExecutorStopped)
+    executor = HPCExecutor(workdir=tmp_path, workers=2, interval=0, template="")
+    with pytest.raises(RuntimeError, match="submission failed"):
+        executor.run([WorkItem(function=_function, args=(idx,)) for idx in range(2)])
     assert cancelled.wait(timeout=5.0)
-    assert adapter.deleted == [1]
-    assert not list(tmp_path.iterdir())
-
-
-@pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
-def test_hpc_job_submitted_during_close_is_cancelled(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    submitting = threading.Event()
-    stopped = threading.Event()
-
-    class _SlowAdapter(MockedHPCAdapter):
-        def submit_job(self, job_name: str, command: str, **kwargs: Any) -> int:
-            submitting.set()
-            stopped.wait(timeout=5.0)
-            self._job_id += 1
-            self._jobs[self._job_id] = job_name
-            return self._job_id
-
-    adapter = _SlowAdapter(tmp_path)
-    _mock_scheduler(monkeypatch, adapter)
-    executor = HPCExecutor(workdir=tmp_path, workers=1, interval=0, template="")
-    outcome: list[BaseException] = []
-
-    def _run() -> None:
-        try:
-            executor.run([WorkItem(function=_function, args=(0,))])
-        except ExecutorStopped as exc:
-            outcome.append(exc)
-
-    with executor:
-        runner = threading.Thread(target=_run)
-        runner.start()
-        assert submitting.wait(timeout=5.0)
-        executor.close()
-    stopped.set()
-    runner.join(5.0)
-    assert isinstance(outcome[0], ExecutorStopped)
     assert adapter.deleted == [1]
     assert not list(tmp_path.iterdir())
 
@@ -748,10 +610,8 @@ def test_queued_hpc_work_resumes_on_free_worker(
 ) -> None:
     _mock_scheduler(monkeypatch, MockedHPCAdapter(tmp_path))
     items = [WorkItem(function=_function, args=(idx,)) for idx in range(4)]
-    with HPCExecutor(
-        workdir=tmp_path, workers=1, interval=0.01, template=""
-    ) as executor:
-        assert executor.run(items) == [1, 2, 3, 4]
+    executor = HPCExecutor(workdir=tmp_path, workers=1, interval=0.01, template="")
+    assert executor.run(items) == [1, 2, 3, 4]
 
 
 @pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
@@ -762,9 +622,8 @@ def test_hpc_executor_refuses_to_overwrite_existing_work_item_files(
     executor = HPCExecutor(workdir=tmp_path, workers=1, interval=0, template="")
     item_id = uuid4()
     (tmp_path / f"{item_id}.out").touch()
-    with executor:
-        with pytest.raises(ExecutionError, match="already exist"):
-            executor._launch_job(item_id, [WorkItem(function=_function, args=(0,))])
+    with pytest.raises(ExecutionError, match="already exist"):
+        executor._launch_job(item_id, [WorkItem(function=_function, args=(0,))])
 
 
 @pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
@@ -784,10 +643,10 @@ def test_hpc_failing_submission_fails_own_work(
             return super().submit_job(job_name, command, **kwargs)
 
     _mock_scheduler(monkeypatch, _RejectsFirst(tmp_path))
-    with HPCExecutor(workdir=tmp_path, workers=1, interval=0, template="") as executor:
-        with pytest.raises(RuntimeError, match="submission failed"):
-            executor.run([WorkItem(function=_function, args=(0,))])
-        assert executor.run([WorkItem(function=_function, args=(1,))]) == [2]
+    executor = HPCExecutor(workdir=tmp_path, workers=1, interval=0, template="")
+    with pytest.raises(RuntimeError, match="submission failed"):
+        executor.run([WorkItem(function=_function, args=(0,))])
+    assert executor.run([WorkItem(function=_function, args=(1,))]) == [2]
 
 
 @pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
@@ -802,9 +661,9 @@ def test_rejected_hpc_submission_leaves_no_input_file(
             raise RuntimeError(msg)
 
     _mock_scheduler(monkeypatch, _RejectingScheduler(tmp_path))
-    with HPCExecutor(workdir=tmp_path, workers=1, interval=0, template="") as executor:
-        with pytest.raises(RuntimeError, match="submission failed"):
-            executor.run([WorkItem(function=_function, args=(0,))])
+    executor = HPCExecutor(workdir=tmp_path, workers=1, interval=0, template="")
+    with pytest.raises(RuntimeError, match="submission failed"):
+        executor.run([WorkItem(function=_function, args=(0,))])
     assert not list(tmp_path.iterdir())
 
 
@@ -940,68 +799,57 @@ def test_hpc_unserializable_work_item_fails_work(
     # Serializing happens before the job exists, so this failure belongs to the
     # work item, and it says what to install rather than what broke inside.
     _mock_scheduler(monkeypatch, MockedHPCAdapter(tmp_path))
-    with HPCExecutor(workdir=tmp_path, workers=1, interval=0, template="") as executor:
-        with pytest.raises(ExecutionError, match="could not be sent to a job"):
-            executor.run([WorkItem(function=_function, args=(threading.Lock(),))])
+    executor = HPCExecutor(workdir=tmp_path, workers=1, interval=0, template="")
+    with pytest.raises(ExecutionError, match="could not be sent to a job"):
+        executor.run([WorkItem(function=_function, args=(threading.Lock(),))])
     assert not list(tmp_path.iterdir())
 
 
 @pytest.mark.slow
 @pytest.mark.timeout(30)
 def test_worker_may_construct_workflow_objects() -> None:
-    with ProcessExecutor(workers=1) as executor:
-        assert executor.run(
-            [WorkItem(function=_construct_handler_in_worker, args=(0,))]
-        ) == ["ResultsHandler"]
+    executor = ProcessExecutor(workers=1)
+    assert executor.run(
+        [WorkItem(function=_construct_handler_in_worker, args=(0,))]
+    ) == ["ResultsHandler"]
 
 
 @pytest.mark.slow
 @pytest.mark.timeout(30)
 def test_max_tasks_per_child_restarts_worker() -> None:
     items = [WorkItem(function=_worker_pid, args=(index,)) for index in range(3)]
-    with ProcessExecutor(workers=1, max_tasks_per_child=1) as executor:
-        collected = executor.run(items)
+    executor = ProcessExecutor(workers=1, max_tasks_per_child=1)
+    collected = executor.run(items)
     assert len(set(collected)) == 3
 
 
 @pytest.mark.slow
 @pytest.mark.timeout(30)
 @pytest.mark.parametrize("public_api", [True, False])
-def test_stopping_kills_a_busy_worker(
+def test_terminating_workers_kills_a_busy_one(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, *, public_api: bool
 ) -> None:
     # An idle worker leaves on its own when the pool shuts down, so only a
-    # worker busy with work that never ends shows whether stopping stops it.
+    # worker busy with work that never ends shows whether terminating reaches
+    # it. This is the path a pool that could not be started takes.
     if not public_api:
         monkeypatch.delattr(ProcessPoolExecutor, "terminate_workers", raising=False)
     listener = Listener(str(tmp_path / "worker"))
     executor = ProcessExecutor(workers=1)
     connection = None
     try:
-        outcome: list[BaseException] = []
-
-        def _run() -> None:
-            try:
-                executor.run(
-                    [
-                        WorkItem(
-                            function=_block_until_disconnected, args=(listener.address,)
-                        )
-                    ]
-                )
-            except ExecutorStopped as exc:
-                outcome.append(exc)
-
-        with executor:
-            runner = threading.Thread(target=_run)
-            runner.start()
-            connection = listener.accept()
-            executor.close()
+        runner = threading.Thread(
+            target=lambda: executor.run(
+                [WorkItem(function=_block_until_disconnected, args=(listener.address,))]
+            ),
+            daemon=True,
+        )
+        runner.start()
+        connection = listener.accept()
+        _terminate_workers(executor._pool)
         assert connection.poll(10.0)
         with pytest.raises(EOFError):
             connection.recv()
-        runner.join(5.0)
-        assert isinstance(outcome[0], ExecutorStopped)
     finally:
         if connection is not None:
             connection.close()
@@ -1014,10 +862,10 @@ def test_dying_worker_reported_as_infrastructure_failure(
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     # A worker lost while the executor is running is not something it asked for,
-    # so it is reported, unlike the workers a stop kills on purpose.
+    # so it is reported.
+    executor = ProcessExecutor(workers=1)
     with caplog.at_level(logging.WARNING, logger="ropt"):
-        with ProcessExecutor(workers=1) as executor:
-            result = executor.run([WorkItem(function=_kill_own_process)])[0]
+        result = executor.run([WorkItem(function=_kill_own_process)])[0]
     assert isinstance(result, ExecutorFailure)
     assert "Worker process pool broken" in caplog.text
 
@@ -1056,12 +904,11 @@ def test_executor_error(
             executor = ThreadExecutor(workers=2)
         case "multiprocessing":
             executor = ProcessExecutor(workers=2)
-    with executor:
-        with pytest.raises(ValueError, match="Test error in function") as excinfo:
-            executor.run(items)
-        if executor_name in {"hpc", "multiprocessing"}:
-            notes = getattr(excinfo.value, "__notes__", [])
-            assert any("Traceback" in note for note in notes)
+    with pytest.raises(ValueError, match="Test error in function") as excinfo:
+        executor.run(items)
+    if executor_name in {"hpc", "multiprocessing"}:
+        notes = getattr(excinfo.value, "__notes__", [])
+        assert any("Traceback" in note for note in notes)
 
 
 initial_values = np.array([0.0, 0.0, 0.1])
@@ -1202,8 +1049,7 @@ def test_executor_evaluator_ok(
             executor = ThreadExecutor(workers=2)
         case "multiprocessing":
             executor = ProcessExecutor(workers=2)
-    with executor:
-        results = _opt_workflow(executor, config, eval_func())
+    results = _opt_workflow(executor, config, eval_func())
     assert results is not None
     assert np.allclose(results.variables, [0.0, 0.0, 0.5], atol=0.02)
 
@@ -1244,7 +1090,7 @@ def test_executor_evaluator_error(
             executor = ThreadExecutor(workers=2)
         case "multiprocessing":
             executor = ProcessExecutor(workers=2)
-    with executor, pytest.raises(ValueError, match="Test error in function"):
+    with pytest.raises(ValueError, match="Test error in function"):
         _opt_workflow(
             executor,
             config,
@@ -1269,34 +1115,16 @@ def test_executor_survives_user_code_error_and_is_reusable(
             executor: ExecutorBase = ThreadExecutor(workers=2)
         case "multiprocessing":
             executor = ProcessExecutor(workers=2)
-    with executor:
-        # A user-code error aborts only its own evaluation; the executor stays usable.
-        with pytest.raises(ValueError, match="Test error in function"):
-            _opt_workflow(
-                executor,
-                config,
-                partial(_opt_function, test_functions=test_functions, raise_error=True),
-            )
-        results = _opt_workflow(executor, config, eval_func())
-    assert results is not None
-    assert np.allclose(results.variables, [0.0, 0.0, 0.5], atol=0.02)
-
-
-def test_error_escaping_the_body_closes_the_executor(
-    config: dict[str, Any],
-    test_functions: Sequence[
-        Callable[[NDArray[np.float64], EvaluationFunctionContext], float]
-    ],
-) -> None:
-    # No explicit close: an error escaping the block must still close the executor.
-    executor = ThreadExecutor(workers=2)
-    with pytest.raises(ValueError, match="Test error in function"), executor:
+    # A user-code error aborts only its own evaluation; the executor stays usable.
+    with pytest.raises(ValueError, match="Test error in function"):
         _opt_workflow(
             executor,
             config,
             partial(_opt_function, test_functions=test_functions, raise_error=True),
         )
-    assert executor.closed
+    results = _opt_workflow(executor, config, eval_func())
+    assert results is not None
+    assert np.allclose(results.variables, [0.0, 0.0, 0.5], atol=0.02)
 
 
 @pytest.mark.parametrize(
@@ -1338,13 +1166,12 @@ def test_executor_evaluator_two_optimizations(
     def _run_once() -> None:
         results_list.append(_opt_workflow(executor, config, eval_func()))
 
-    with executor:
-        threads = [threading.Thread(target=_run_once) for _ in range(2)]
-        for thread in threads:
-            thread.start()
-        for thread in threads:
-            thread.join(30.0)
-            assert not thread.is_alive()
+    threads = [threading.Thread(target=_run_once) for _ in range(2)]
+    for thread in threads:
+        thread.start()
+    for thread in threads:
+        thread.join(30.0)
+        assert not thread.is_alive()
 
     assert len(results_list) == 2
     for results in results_list:
@@ -1367,11 +1194,10 @@ class _RecordingExecutor(ThreadExecutor):
 @pytest.mark.parametrize("bundle_size", [1, 2, 4, 0])
 def test_executor_bundles_work_items(bundle_size: int) -> None:
     executor = _RecordingExecutor()
-    with executor:
-        assert executor.run(
-            [WorkItem(function=_function, args=(idx,)) for idx in range(5)],
-            bundle_size=bundle_size,
-        ) == [1, 2, 3, 4, 5]
+    assert executor.run(
+        [WorkItem(function=_function, args=(idx,)) for idx in range(5)],
+        bundle_size=bundle_size,
+    ) == [1, 2, 3, 4, 5]
     expected_max = max(executor.sizes) if bundle_size == 0 else bundle_size
     assert executor.sizes
     assert all(1 <= size <= expected_max for size in executor.sizes)
@@ -1380,9 +1206,9 @@ def test_executor_bundles_work_items(bundle_size: int) -> None:
 def test_invalid_bundle_size() -> None:
     with pytest.raises(ValueError, match="bundle_size"):
         ThreadExecutor(bundle_size=-1)
-    with ThreadExecutor() as executor:
-        with pytest.raises(ValueError, match="bundle_size"):
-            executor.run([WorkItem(function=_function, args=(0,))], bundle_size=-1)
+    executor = ThreadExecutor()
+    with pytest.raises(ValueError, match="bundle_size"):
+        executor.run([WorkItem(function=_function, args=(0,))], bundle_size=-1)
 
 
 @pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
@@ -1400,7 +1226,7 @@ def test_broken_worker_pool_reported_at_startup(
     # here without paying for real subprocesses.
     class _BrokenPool:
         def __init__(self, *_args: Any, **_kwargs: Any) -> None:
-            # Closing the half-built executor reaches into these.
+            # Terminating the half-built pool reaches into these.
             self._shutdown_lock = threading.Lock()
             self._processes: dict[int, Any] = {}
 
@@ -1488,12 +1314,9 @@ def test_hpc_executor_builds_from_a_configuration_directory(
     executor = HPCExecutor(
         workdir=tmp_path, config_path=pysqa_config, cluster="cluster_b"
     )
-    try:
-        adapter = executor._queue_adapter
-        assert adapter.list_clusters() == ["cluster_a", "cluster_b"]
-        assert adapter.queue_list == ["bulk", "shared"]
-    finally:
-        executor.close()
+    adapter = executor._queue_adapter
+    assert adapter.list_clusters() == ["cluster_a", "cluster_b"]
+    assert adapter.queue_list == ["bulk", "shared"]
 
 
 @pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
@@ -1501,10 +1324,7 @@ def test_hpc_executor_selects_the_cluster_holding_the_queue(
     tmp_path: Path, pysqa_config: Path
 ) -> None:
     executor = HPCExecutor(workdir=tmp_path, config_path=pysqa_config, queue="bulk")
-    try:
-        assert executor._queue_adapter.queue_list == ["bulk", "shared"]
-    finally:
-        executor.close()
+    assert executor._queue_adapter.queue_list == ["bulk", "shared"]
 
 
 @pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
@@ -1547,11 +1367,8 @@ def test_hpc_configuration_rejects_a_scheduler(
 @pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
 def test_hpc_template_uses_the_scheduler_it_is_given(tmp_path: Path) -> None:
     executor = HPCExecutor(workdir=tmp_path, template="", scheduler="lsf")
-    try:
-        adapter = executor._queue_adapter._adapter
-        assert type(adapter._commands).__name__.lower().startswith("lsf")
-    finally:
-        executor.close()
+    adapter = executor._queue_adapter._adapter
+    assert type(adapter._commands).__name__.lower().startswith("lsf")
 
 
 @pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
@@ -1626,7 +1443,7 @@ def test_hpc_submit_options_reach_the_submission(
             return super().submit_job(job_name, command, **kwargs)
 
     _mock_scheduler(monkeypatch, _RecordingKwargs(tmp_path))
-    with HPCExecutor(
+    executor = HPCExecutor(
         workdir=tmp_path,
         workers=1,
         interval=0,
@@ -1634,8 +1451,8 @@ def test_hpc_submit_options_reach_the_submission(
         memory_max=8,
         run_time_max=600,
         submit_options={"account": "proj", "reservation": None},
-    ) as executor:
-        assert executor.run([WorkItem(function=_function, args=(1,))]) == [2]
+    )
+    assert executor.run([WorkItem(function=_function, args=(1,))]) == [2]
     assert _RecordingKwargs.seen["memory_max"] == 8
     assert _RecordingKwargs.seen["run_time_max"] == 600
     assert _RecordingKwargs.seen["account"] == "proj"
@@ -1669,7 +1486,7 @@ def test_hpc_submit_options_refuse_what_the_executor_sets(tmp_path: Path) -> Non
         ),
     ],
 )
-def test_run_on_closed_executor_raises_workflow_error(
+def test_executor_runs_an_empty_batch(
     executor_name: str, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     match executor_name:
@@ -1682,11 +1499,7 @@ def test_run_on_closed_executor_raises_workflow_error(
             executor = ThreadExecutor(workers=1)
         case "multiprocessing":
             executor = ProcessExecutor(workers=1)
-    executor.close()
-    executor.close()
-    assert executor.closed
-    with pytest.raises(WorkflowError, match="closed"):
-        executor.run([WorkItem(function=_function, args=(0,))])
+    assert executor.run([]) == []
 
 
 class _FatalError(BaseException):
@@ -1700,9 +1513,9 @@ def test_fatal_work_item_error_reaches_caller() -> None:
         msg = f"fatal {input_value}"
         raise _FatalError(msg)
 
-    with ThreadExecutor(workers=1) as executor:
-        with pytest.raises(_FatalError, match="fatal 0"):
-            executor.run([WorkItem(function=_raise_fatal, args=(0,))])
+    executor = ThreadExecutor(workers=1)
+    with pytest.raises(_FatalError, match="fatal 0"):
+        executor.run([WorkItem(function=_raise_fatal, args=(0,))])
 
 
 def test_handle_result_raises_on_executor_failure() -> None:
@@ -1736,8 +1549,7 @@ def test_multiprocessing_unguarded_main_reports_startup_error(tmp_path: Path) ->
     script = tmp_path / "unguarded.py"
     script.write_text(
         "from ropt.components.executors import ProcessExecutor\n\n"
-        "executor = ProcessExecutor(workers=1)\n"
-        "executor.close()\n"
+        "ProcessExecutor(workers=1)\n"
     )
     proc = subprocess.run(
         [sys.executable, str(script)], capture_output=True, check=False
@@ -1767,8 +1579,8 @@ def test_multiprocessing_cloudpickles_functions_and_results() -> None:
         WorkItem(function=local_double, args=(3,)),
         WorkItem(function=make_callable, args=(42,)),
     ]
-    with ProcessExecutor(workers=2) as executor:
-        results = executor.run(items)
+    executor = ProcessExecutor(workers=2)
+    results = executor.run(items)
     assert sorted(value for value in results if isinstance(value, int)) == [6, 12, 101]
     returned = [value for value in results if callable(value)]
     assert len(returned) == 1
@@ -1782,12 +1594,12 @@ def test_multiprocessing_unserializable_payload_reports_error() -> None:
     def use_lock() -> Any:
         return lock
 
-    with ProcessExecutor(workers=1) as executor:
-        # The serialization failure is delivered as ours rather than as an
-        # opaque pool error.
-        with pytest.raises(ExecutionError, match="could not be sent"):
-            executor.run([WorkItem(function=use_lock)])
-        assert not executor.closed
+    executor = ProcessExecutor(workers=1)
+    # The serialization failure is delivered as ours rather than as an opaque
+    # pool error, and leaves the executor usable.
+    with pytest.raises(ExecutionError, match="could not be sent"):
+        executor.run([WorkItem(function=use_lock)])
+    assert executor.run([WorkItem(function=_function, args=(0,))]) == [1]
 
 
 @pytest.mark.slow
@@ -1797,10 +1609,10 @@ def test_multiprocessing_without_cloudpickle_rejects_lambda(
     monkeypatch.setattr(
         "ropt.components.executors._process_executor.dumps", pickle.dumps
     )
-    with ProcessExecutor(workers=1) as executor:
-        with pytest.raises(ExecutionError, match="could not be sent"):
-            executor.run([WorkItem(function=lambda: 1)])
-        assert not executor.closed
+    executor = ProcessExecutor(workers=1)
+    with pytest.raises(ExecutionError, match="could not be sent"):
+        executor.run([WorkItem(function=lambda: 1)])
+    assert executor.run([WorkItem(function=_function, args=(0,))]) == [1]
 
 
 @pytest.mark.slow
@@ -1812,9 +1624,9 @@ def test_multiprocessing_without_cloudpickle_rejects_an_unpicklable_argument(
     monkeypatch.setattr(
         "ropt.components.executors._process_executor.dumps", pickle.dumps
     )
-    with ProcessExecutor(workers=1) as executor:
-        with pytest.raises(ExecutionError, match="could not be sent"):
-            executor.run([WorkItem(function=_call, args=(lambda: 1,))])
+    executor = ProcessExecutor(workers=1)
+    with pytest.raises(ExecutionError, match="could not be sent"):
+        executor.run([WorkItem(function=_call, args=(lambda: 1,))])
 
 
 def _return_captured(_handler: Any) -> int:
@@ -1841,12 +1653,10 @@ def _opt_function_capturing_handler(
 @pytest.mark.timeout(30)
 def test_work_item_capturing_a_workflow_object_is_refused() -> None:
     # The handler holds a lock, so the work item cannot be serialized at all.
-    with ProcessExecutor(workers=1) as executor:
-        with pytest.raises(ExecutionError, match="could not be sent to a worker"):
-            executor.run(
-                [WorkItem(function=_return_captured, args=(ResultsHandler(),))]
-            )
-        assert not executor.closed
+    executor = ProcessExecutor(workers=1)
+    with pytest.raises(ExecutionError, match="could not be sent to a worker"):
+        executor.run([WorkItem(function=_return_captured, args=(ResultsHandler(),))])
+    assert executor.run([WorkItem(function=_function, args=(0,))]) == [1]
 
 
 @pytest.mark.slow
@@ -1857,7 +1667,8 @@ def test_transfer_error_from_parallel_evaluation_bubbles_up(
         Callable[[NDArray[np.float64], EvaluationFunctionContext], float]
     ],
 ) -> None:
-    with ProcessExecutor(workers=1) as executor, pytest.raises(ExecutionError):
+    executor = ProcessExecutor(workers=1)
+    with pytest.raises(ExecutionError):
         _opt_workflow(
             executor,
             config,
@@ -1874,16 +1685,17 @@ def test_transfer_error_from_parallel_evaluation_bubbles_up(
 def test_local_jobs_evaluate_work() -> None:
     executor = LocalJobExecutor(workers=2)
     workdir = executor.workdir
-    with executor:
-        assert executor.run(
-            [WorkItem(function=_function, args=(i,)) for i in range(4)]
-        ) == [
-            1,
-            2,
-            3,
-            4,
-        ]
-    _wait_for_local_cleanup(executor)
+    thread = executor._teardown_thread
+    assert executor.run(
+        [WorkItem(function=_function, args=(i,)) for i in range(4)]
+    ) == [
+        1,
+        2,
+        3,
+        4,
+    ]
+    del executor
+    _wait_for_local_cleanup(thread)
     # Nothing failed and cleanup is on, so there is nothing in there to read.
     assert not workdir.exists()
 
@@ -1893,11 +1705,11 @@ def test_local_jobs_evaluate_work() -> None:
 def test_local_job_error_carries_its_traceback(tmp_path: Path) -> None:
     # The job is the only place the traceback existed, and it left no channel
     # back: it travels as a note on the exception or not at all.
-    with LocalJobExecutor(workdir=tmp_path, workers=1) as executor:
-        with pytest.raises(ValueError, match="Test error") as info:
-            executor.run(
-                [WorkItem(function=_function, args=(0,), kwargs={"raise_error": True})]
-            )
+    executor = LocalJobExecutor(workdir=tmp_path, workers=1)
+    with pytest.raises(ValueError, match="Test error") as info:
+        executor.run(
+            [WorkItem(function=_function, args=(0,), kwargs={"raise_error": True})]
+        )
     assert any("Traceback" in note for note in info.value.__notes__)
 
 
@@ -1907,46 +1719,48 @@ def test_local_jobs_run_in_separate_processes() -> None:
     # The point of a job over a thread: its own interpreter, which is also what
     # makes it killable.
     executor = LocalJobExecutor(workers=2)
-    with executor:
-        collected = executor.run([WorkItem(function=os.getpid) for _ in range(2)])
+    thread = executor._teardown_thread
+    collected = executor.run([WorkItem(function=os.getpid) for _ in range(2)])
     assert len(set(collected)) == 2
     assert os.getpid() not in collected
-    _wait_for_local_cleanup(executor)
+    del executor
+    _wait_for_local_cleanup(thread)
 
 
 @pytest.mark.slow
 @pytest.mark.timeout(30)
-def test_stopping_kills_a_local_job_and_its_children(tmp_path: Path) -> None:
-    # A job that started a process of its own: stopping has to reach that too,
-    # or it is orphaned and outlives the run that asked for it.
+def test_a_leaving_batch_kills_a_local_job_and_its_children(tmp_path: Path) -> None:
+    # A job that started a process of its own: cancelling has to reach that too,
+    # or it is orphaned and outlives the run that asked for it. The second work
+    # item fails, which is what takes the batch out from under the first.
     listener = Listener(str(tmp_path / "job"))
-    executor = LocalJobExecutor(workdir=tmp_path, workers=1)
+    executor = LocalJobExecutor(workdir=tmp_path, workers=2)
     connection = None
+    outcome: list[BaseException] = []
+
+    def _run() -> None:
+        try:
+            executor.run(
+                [
+                    WorkItem(function=_spawn_child_and_block, args=(listener.address,)),
+                    WorkItem(
+                        function=_function, args=(0,), kwargs={"raise_error": True}
+                    ),
+                ]
+            )
+        except ValueError as exc:
+            outcome.append(exc)
+
     try:
-        outcome: list[BaseException] = []
-
-        def _run() -> None:
-            try:
-                executor.run(
-                    [
-                        WorkItem(
-                            function=_spawn_child_and_block, args=(listener.address,)
-                        )
-                    ]
-                )
-            except ExecutorStopped as exc:
-                outcome.append(exc)
-
-        with executor:
-            runner = threading.Thread(target=_run)
-            runner.start()
-            connection = listener.accept()
-            executor.close()
-        assert connection.poll(10.0)
+        runner = threading.Thread(target=_run, daemon=True)
+        runner.start()
+        connection = listener.accept()
+        assert connection.poll(20.0)
         with pytest.raises(EOFError):
             connection.recv()
-        runner.join(5.0)
-        assert isinstance(outcome[0], ExecutorStopped)
+        runner.join(10.0)
+        assert not runner.is_alive()
+        assert isinstance(outcome[0], ValueError)
     finally:
         if connection is not None:
             connection.close()
@@ -1958,8 +1772,8 @@ def test_stopping_kills_a_local_job_and_its_children(tmp_path: Path) -> None:
 def test_local_job_that_dies_without_a_result_fails_work(tmp_path: Path) -> None:
     # Killed outright, so nothing was written: the only account of the job is
     # what it printed, and that has to reach the caller.
-    with LocalJobExecutor(workdir=tmp_path, workers=1) as executor:
-        result = executor.run([WorkItem(function=_print_and_die, args=(0,))])[0]
+    executor = LocalJobExecutor(workdir=tmp_path, workers=1)
+    result = executor.run([WorkItem(function=_print_and_die, args=(0,))])[0]
     assert isinstance(result, ExecutorFailure)
     assert "never appeared" in result.message
     assert "about to be killed" in result.message
@@ -1971,30 +1785,36 @@ def test_local_job_ids_are_not_pids(caplog: pytest.LogCaptureFixture) -> None:
     # Pids come round again, and job ids that were pids would come round with
     # them, letting a finished job be mistaken for one that is still running.
     executor = LocalJobExecutor(workers=1)
-    with caplog.at_level(logging.DEBUG, logger="ropt"), executor:
+    thread = executor._teardown_thread
+    with caplog.at_level(logging.DEBUG, logger="ropt"):
         for value in range(3):
             assert executor.run([WorkItem(function=_function, args=(value,))]) == [
                 value + 1
             ]
     started = [line for line in caplog.messages if line.startswith("Started local job")]
     assert [line.rsplit(" ", 1)[-1] for line in started] == ["1)", "2)", "3)"]
-    _wait_for_local_cleanup(executor)
+    del executor
+    _wait_for_local_cleanup(thread)
 
 
-def test_local_executor_removes_its_directory_when_it_closes() -> None:
+def test_local_executor_removes_its_directory_when_it_is_dropped() -> None:
     # The directory belongs to the executor, so it goes when the executor does.
     # It is the teardown thread that removes it, once the jobs it waits for are
     # gone.
-    with LocalJobExecutor() as executor:
-        workdir = executor.workdir
-        assert workdir.exists()
-    _wait_for_local_cleanup(executor)
+    executor = LocalJobExecutor()
+    workdir = executor.workdir
+    thread = executor._teardown_thread
+    assert workdir.exists()
+    del executor
+    _wait_for_local_cleanup(thread)
     assert not workdir.exists()
 
 
 def test_local_executor_keeps_a_directory_it_was_given(tmp_path: Path) -> None:
     executor = LocalJobExecutor(workdir=tmp_path, workers=1, cleanup=False)
-    executor.close()
+    thread = executor._teardown_thread
+    del executor
+    _wait_for_local_cleanup(thread)
     assert tmp_path.exists()
 
 
@@ -2007,11 +1827,12 @@ def test_local_executor_keeps_its_directory_when_a_job_fails(
     # it, which is the only account of why it failed.
     executor = LocalJobExecutor(workers=1)
     workdir = executor.workdir
+    thread = executor._teardown_thread
     with caplog.at_level(logging.WARNING, logger="ropt"):
-        with executor:
-            result = executor.run([WorkItem(function=_print_and_die, args=(0,))])[0]
-            assert isinstance(result, ExecutorFailure)
-        _wait_for_local_cleanup(executor)
+        result = executor.run([WorkItem(function=_print_and_die, args=(0,))])[0]
+        assert isinstance(result, ExecutorFailure)
+        del executor
+        _wait_for_local_cleanup(thread)
     assert workdir.exists()
     output = workdir / "".join(str(path.name) for path in workdir.glob("*.txt"))
     assert "about to be killed" in output.read_text()
@@ -2030,19 +1851,25 @@ def test_local_executor_keeps_its_directory_when_polling_gives_up() -> None:
     # the pass that removes their files, so this route has to keep the directory too.
     executor = LocalJobExecutor(workers=1)
     workdir = executor.workdir
+    thread = executor._teardown_thread
 
     def _unreachable() -> set[int]:
         msg = "cannot tell whether the job is alive"
         raise RuntimeError(msg)
 
     executor._live_job_ids = _unreachable  # type: ignore[method-assign]
-    with executor:
-        result = executor.run([WorkItem(function=_function, args=(0,))])[0]
-    _wait_for_local_cleanup(executor)
+    result = executor.run([WorkItem(function=_function, args=(0,))])[0]
     assert isinstance(result, ExecutorFailure)
     assert "could not be queried" in result.message
-    assert workdir.exists()
+    # Released directly rather than by dropping the executor: the poll's
+    # exception is logged, and the captured record holds a traceback whose
+    # frames still refer to the executor.
+    executor._release()
+    _wait_for_local_cleanup(thread)
+    # Giving up completes the work item without cancelling its job, so the
+    # teardown is what is left to reach it.
     assert executor._processes == {}
+    assert workdir.exists()
     shutil.rmtree(workdir)
 
 
@@ -2053,9 +1880,10 @@ def test_local_executor_keeps_its_directory_when_cleanup_is_off() -> None:
     # itself anyway would make the flag mean the opposite of what it says.
     executor = LocalJobExecutor(workers=1, cleanup=False)
     workdir = executor.workdir
-    with executor:
-        assert executor.run([WorkItem(function=_function, args=(0,))]) == [1]
-    _wait_for_local_cleanup(executor)
+    thread = executor._teardown_thread
+    assert executor.run([WorkItem(function=_function, args=(0,))]) == [1]
+    del executor
+    _wait_for_local_cleanup(thread)
     assert workdir.exists()
     assert list(workdir.glob("*.out")) != []
     shutil.rmtree(workdir)
@@ -2072,19 +1900,6 @@ def test_local_executor_refuses_a_non_posix_system(
     monkeypatch.setattr(os, "name", "nt")
     with pytest.raises(ExecutionError, match="POSIX"):
         LocalJobExecutor()
-
-
-@pytest.mark.skipif(os.name != "posix", reason="local jobs are POSIX only")
-def test_local_executor_refuses_to_start_a_job_after_releasing(tmp_path: Path) -> None:
-    # Starting and registering happen under one acquisition of the process lock,
-    # which is also what publishes the release, so a job cannot become this
-    # executor's after the teardown thread was told there would be no more: it
-    # would never be waited for, and its directory could go while it writes.
-    executor = LocalJobExecutor(workdir=tmp_path, workers=1)
-    executor.close()
-    with pytest.raises(ExecutorStopped):
-        executor._start_job(uuid4(), [sys.executable, "-c", ""])
-    assert not list(tmp_path.iterdir())
 
 
 class _ControlledJobExecutor(JobExecutorBase):
@@ -2158,17 +1973,17 @@ def test_job_executor_cancels_on_a_thread_the_interpreter_waits_for(
     # a daemon thread, which the interpreter would not wait for.
     executor = _ControlledJobExecutor(tmp_path)
     executor.release_pass.set()
-    closed = threading.Event()
+    cancelled = threading.Event()
 
-    def _close() -> None:
+    def _cancel() -> None:
         with executor._state._lock:
             executor._state._jobs[uuid4()] = 1
-        executor.close()
-        closed.set()
+        executor._cancel_all_jobs()
+        cancelled.set()
 
-    thread = threading.Thread(target=_close, daemon=True)
+    thread = threading.Thread(target=_cancel, daemon=True)
     thread.start()
-    assert closed.wait(5.0)
+    assert cancelled.wait(5.0)
     thread.join(5.0)
     assert not thread.is_alive()
     assert executor.cancelled == [1]
@@ -2185,13 +2000,12 @@ def test_job_executor_two_callers_share_one_backend(tmp_path: Path) -> None:
     def _run(value: int) -> None:
         results.append(executor.run([WorkItem(function=_function, args=(value,))]))
 
-    with executor:
-        threads = [threading.Thread(target=_run, args=(idx,)) for idx in (0, 10)]
-        for thread in threads:
-            thread.start()
-        for thread in threads:
-            thread.join(5.0)
-            assert not thread.is_alive()
+    threads = [threading.Thread(target=_run, args=(idx,)) for idx in (0, 10)]
+    for thread in threads:
+        thread.start()
+    for thread in threads:
+        thread.join(5.0)
+        assert not thread.is_alive()
     assert sorted(results) == [[1], [11]]
     assert executor.max_active_passes == 1
 
@@ -2206,10 +2020,9 @@ def test_job_executor_store_exception_releases_the_backend(tmp_path: Path) -> No
         msg = "caller rejected result"
         raise ValueError(msg)
 
-    with executor:
-        with pytest.raises(ValueError, match="caller rejected"):
-            executor._run_bundles([[WorkItem(function=_function, args=(0,))]], _reject)
-        assert executor.run([WorkItem(function=_function, args=(1,))]) == [2]
+    with pytest.raises(ValueError, match="caller rejected"):
+        executor._run_bundles([[WorkItem(function=_function, args=(0,))]], _reject)
+    assert executor.run([WorkItem(function=_function, args=(1,))]) == [2]
 
 
 def test_job_executor_result_stored_during_a_wait_is_taken(
@@ -2251,17 +2064,16 @@ def test_job_executor_base_exception_releases_waiting_callers(tmp_path: Path) ->
     def _surviving_run() -> None:
         survivor.append(executor.run([WorkItem(function=_function, args=(1,))]))
 
-    with executor:
-        first = threading.Thread(target=_failing_run)
-        second = threading.Thread(target=_surviving_run)
-        first.start()
-        assert executor.pass_entered.wait(timeout=5.0)
-        second.start()
-        executor.release_pass.set()
-        first.join(5.0)
-        second.join(5.0)
-        assert not first.is_alive()
-        assert not second.is_alive()
+    first = threading.Thread(target=_failing_run)
+    second = threading.Thread(target=_surviving_run)
+    first.start()
+    assert executor.pass_entered.wait(timeout=5.0)
+    second.start()
+    executor.release_pass.set()
+    first.join(5.0)
+    second.join(5.0)
+    assert not first.is_alive()
+    assert not second.is_alive()
     assert len(fatal) == 1
     assert survivor == [[2]]
 
@@ -2342,13 +2154,12 @@ def test_job_executor_launch_only_claim_spends_no_retry(
     with state._lock:
         state._query_failures = 1
         state._last_query = clock
-    with executor:
-        results: list[Any] = [None]
+    results: list[Any] = [None]
 
-        def _store(index: int, result: Any) -> None:
-            results[index] = result
+    def _store(index: int, result: Any) -> None:
+        results[index] = result
 
-        executor._run_bundles([[WorkItem(function=_function, args=(0,))]], _store)
+    executor._run_bundles([[WorkItem(function=_function, args=(0,))]], _store)
     assert results == [[1]]
     assert state._last_query == clock
     assert state._query_failures == 1

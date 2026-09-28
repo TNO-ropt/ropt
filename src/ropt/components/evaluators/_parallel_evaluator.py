@@ -67,9 +67,9 @@ class ParallelEvaluator(Evaluator):
 
         An infrastructure failure raises
         [`ExecutionError`][ropt.exceptions.ExecutionError]; a user-code
-        exception is re-raised unchanged, leaving the executor open. Raises
-        [`ExecutorStopped`][ropt.exceptions.ExecutorStopped] if the executor was
-        closed before every result arrived. See
+        exception is re-raised unchanged, leaving the executor usable. Raises
+        [`ExecutorStopped`][ropt.exceptions.ExecutorStopped] if the executor
+        could no longer run the work. See
         [error handling](../advanced/parallel.md#error-handling) for the full
         contract.
 

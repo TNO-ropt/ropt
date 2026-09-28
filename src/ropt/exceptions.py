@@ -20,7 +20,8 @@ class WorkflowError(RoptError):
     """A workflow or runtime object was used incorrectly.
 
     For example a compute step or evaluator used concurrently, an event handler
-    re-entered from inside itself, or a closed executor.
+    re-entered from inside itself, or an executor asked to run work from one of
+    its own workers.
     """
 
 
@@ -67,8 +68,9 @@ class TooFewRealizations(Exception):  # ruff: ignore[error-suffix-on-exception-n
 
 
 class ExecutorStopped(Exception):  # ruff: ignore[error-suffix-on-exception-name]
-    """Raised when the evaluation executor is no longer running.
+    """Raised when the evaluation executor can no longer run the work.
 
-    A generic signal, carrying no exit code, raised by the parallel evaluator
-    when its executor has stopped and the current evaluation cannot proceed.
+    A generic signal, carrying no exit code. In practice this happens at
+    interpreter shutdown, when the worker pool is gone and a run that outlived
+    its program is released rather than left waiting.
     """

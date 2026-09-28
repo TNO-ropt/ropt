@@ -44,11 +44,6 @@ Constructor parameters:
 How many of those work items travel to a worker together follows
 `bundle_size`. See [Bundling](#bundling).
 
-If the executor is closed when `eval()` is called, the evaluator raises a
-[`WorkflowError`][ropt.exceptions.WorkflowError]; if it closes while the call is
-waiting, an [`ExecutorStopped`][ropt.exceptions.ExecutorStopped] is raised
-instead.
-
 ## Executors
 
 An [`Executor`][ropt.components.executors.Executor] runs
@@ -57,16 +52,19 @@ executors share the same lifecycle:
 
 1. Create the executor instance.
 2. Use it (via `ParallelEvaluator`, or by calling `run()` directly).
-3. Release its workers with `close()`, or by using it as a context manager —
-   see [Stopping an executor](#stopping-an-executor) for what that does to work
-   that is already running.
+3. Drop it. There is nothing to close.
 
-An executor that is dropped without being closed still releases its workers when
-it is collected: the thread and process pools shut down with the executor, and a
-[`LocalJobExecutor`][ropt.components.executors.LocalJobExecutor] stops its
-teardown thread and removes a temporary directory it created, if nothing is left
-in it. The local case reports a `ResourceWarning`. Python ignores that category
-by default; run with `-W default::ResourceWarning` or `-X dev` to see it.
+Its workers are released when the last reference to it goes: the thread and
+process pools shut down with the executor, and a
+[`LocalJobExecutor`][ropt.components.executors.LocalJobExecutor] cancels
+whatever it still has out, stops its teardown thread, and removes a temporary
+directory it created. CPython releases on the last reference rather than at some
+later collection, so an executor built inside a function is released when that
+function returns.
+
+A batch is a scope of its own: `run()` releases whatever it started before it
+returns, however it returns, so a failing or interrupted batch leaves no job
+behind and takes no worker with it.
 
 One rule covers every executor that leaves the process: **out-of-process work
 needs importable, module-level callables.** A work item's function and arguments
@@ -209,8 +207,8 @@ the code that creates and uses the executor behind an
 
 ```python
 def main():
-    with ProcessExecutor(workers=4) as executor:
-        ...  # run work here
+    executor = ProcessExecutor(workers=4)
+    ...  # run work here
 ```
 
 ```python
@@ -269,13 +267,13 @@ exits, so waiting is dead time rather than politeness towards a scheduler.
 `retries` is `0` because a job writes and renames its result before exiting, so
 there is no shared filesystem that might not have caught up yet.
 
-**Stopping kills the job's whole process group.** Each job is started in a
-session of its own, so `close()` reaches whatever the job started itself, rather
-than leaving those orphaned. This needs process groups, so the executor is
-**POSIX only** and refuses to be constructed elsewhere.
+**Cancelling a job kills its whole process group.** Each job is started in a
+session of its own, so cancelling reaches whatever the job started itself,
+rather than leaving those orphaned. This needs process groups, so the executor
+is **POSIX only** and refuses to be constructed elsewhere.
 
-Waiting for a killed job to actually die happens on a thread of its own, so
-`close()` returns without waiting it out. That same thread removes a working
+Waiting for a killed job to actually die happens on a thread of its own, so the
+caller that cancels never waits it out. That same thread removes a working
 directory this executor created, once the jobs writing to it are gone.
 
 It removes it only when there is nothing left in it to read, though. A work item
@@ -296,10 +294,10 @@ disk, submitted to the queue, polled for completion, and its result is
 deserialized back. Requires `ropt[hpc]` to be installed. Add `ropt[cloudpickle]`
 to send functions the standard `pickle` module cannot.
 
-Closing the executor asks the scheduler to delete every job it has submitted, so
-an interrupted optimization does not leave orphan jobs behind consuming the
-cluster allocation. Cancellation is best effort: if the scheduler cannot be
-reached the failure is logged and closing continues.
+A batch that leaves asks the scheduler to delete every job it submitted, so an
+interrupted optimization does not leave orphan jobs behind consuming the cluster
+allocation. Cancellation is best effort: if the scheduler cannot be reached the
+failure is logged and the rest are still cancelled.
 
 | Parameter     | Description                                                              |
 | ------------- | ------------------------------------------------------------------------ |
@@ -422,47 +420,47 @@ Sites with more than one cluster use a `clusters.yaml` naming a `queue.yaml` per
 cluster, each declaring its own `queue_type`; see the
 [`pysqa` documentation](https://pysqa.readthedocs.io/en/latest/advanced.html#access-to-multiple-hpcs).
 
-## Stopping an executor
+## Releasing a batch
 
-`executor.close()` releases the executor's workers and returns immediately; it
-never waits for work that is already running. A caller blocked in `run()` when
-it happens is released with
-[`ExecutorStopped`][ropt.exceptions.ExecutorStopped]; a `run()` started after it
-is refused with a [`WorkflowError`][ropt.exceptions.WorkflowError]. What differs
-per executor is what keeps running afterwards, because what *can* be done to
-running work differs:
+`run()` releases whatever the batch started before it returns, however it
+returns. A caller that leaves — because a work item raised, or because the
+thread was interrupted — drops the bundles it had queued and cancels the jobs it
+had launched, without waiting for them. What differs per executor is what
+happens to work that had already begun, because what *can* be done to it
+differs:
 
 | Executor | Work already running | Work not yet started |
 | --- | --- | --- |
-| `ThreadExecutor` | **runs to completion** | dropped |
-| `ProcessExecutor` | the worker processes are **killed** | dropped |
+| `ThreadExecutor` | **runs to completion** | cancelled |
+| `ProcessExecutor` | **runs to completion** in its worker | never submitted |
 | `LocalJobExecutor` | each job's **process group is killed** | dropped |
 | `HPCExecutor` | the jobs are **deleted from the queue** | dropped |
 
+At most `workers × bundle_size` evaluations are in that first column, so that is
+what a leaving batch has to wait out or leave behind. With `bundle_size=0` the
+whole batch is one bundle, and nothing can be dropped once it starts.
+
 **Threads run to completion because a thread cannot be cancelled.** Python
 offers no way to interrupt one from outside, so an evaluation on a
-`ThreadExecutor` stops only when it returns. `close()` returns at once, but the
-program cannot leave until those evaluations return — the thread pool joins its
-threads at interpreter shutdown. Rather than let that look like a hang, the
-executor logs a `WARNING` naming how many are still running. An
+`ThreadExecutor` stops only when it returns, and the program cannot leave until
+it does — the thread pool joins its threads at interpreter shutdown. An
 evaluation that may run long and has to be interruptible belongs on one of the
-other three.
+job executors.
 
-**The kill is a `SIGTERM`, and the guarantee is partial.** In each of the other
-three cases the target is *asked* to end and is not waited for, so a process
-that blocks or ignores `SIGTERM`, or that sits in an uninterruptible system
-call, outlives the request. Stopping is a strong best effort — enough that an
+**The kill is a `SIGTERM`, and the guarantee is partial.** For the two job
+executors the target is *asked* to end and is not waited for, so a process that
+blocks or ignores `SIGTERM`, or that sits in an uninterruptible system call,
+outlives the request. Cancelling is a strong best effort — enough that an
 interrupted program exits instead of waiting for the current batch — not a
 promise that nothing of the run survives it.
 
 !!! warning "A process executor orphans whatever an evaluation launched itself"
 
-    [`ProcessExecutor`][ropt.components.executors.ProcessExecutor] terminates
-    its own worker processes and nothing else. It installs no process groups, so
-    a subprocess an evaluation started — a simulator, a solver, a shell
-    pipeline — is never signalled: it keeps running, and is re-parented when the
-    worker holding it dies. Nothing reports this, and the work continues
-    after the program that asked for it has gone.
+    [`ProcessExecutor`][ropt.components.executors.ProcessExecutor] installs no
+    process groups, so a subprocess an evaluation started — a simulator, a
+    solver, a shell pipeline — is never signalled: it keeps running, and is
+    re-parented when the worker holding it dies. Nothing reports this, and the
+    work continues after the program that asked for it has gone.
 
     [`LocalJobExecutor`][ropt.components.executors.LocalJobExecutor] is the
     backend that handles this, by giving each work item a session of its own and
@@ -547,9 +545,10 @@ propagating out of `eval()` (and out of the compute step) on the calling thread.
 Because the executor keeps running, its lifetime is owned by the **consumer's
 scope**, not by the error:
 
-- Left unhandled, the exception propagates out of the block that owns the
-  executor — a `with` statement on it, for example — whose unwinding closes it.
-- Caught before it reaches that block, the executor stays open and can be
+- Left unhandled, the exception propagates out of the scope that owns the
+  executor, whose unwinding drops the last reference to it and releases its
+  workers.
+- Caught before it reaches that scope, the executor stays usable and can be
   reused for further evaluations. This is what lets several compute steps share
   one executor and lets a bug in one be isolated from the others.
 

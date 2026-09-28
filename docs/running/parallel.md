@@ -15,16 +15,16 @@ is the full account of each:
 ```python
 from ropt.simple import ThreadExecutor
 
-with ThreadExecutor(workers=8) as executor:
-    result = optimize(config, x0, objective, executor=executor)
+executor = ThreadExecutor(workers=8)
+result = optimize(config, x0, objective, executor=executor)
 ```
 
 The runnable script for this section is
 [examples/simple/parallel.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/parallel.py),
 which takes `-m` to swap its thread executor for a process executor.
 
-An executor is a context manager: leaving the `with` block releases its
-workers. Nothing is implicit: a run evaluates on the executor you hand it, and
+An executor releases its workers when it is collected, so there is nothing to
+close. Nothing is implicit: a run evaluates on the executor you hand it, and
 on no other. A run given no executor evaluates in-process, wherever it is
 called from — including from a thread you started yourself.
 
@@ -100,9 +100,10 @@ machine's core count.
 You can keep several executors open at once and choose per run:
 
 ```python
-with ThreadExecutor(workers=8) as fast, ProcessExecutor(workers=4) as heavy:
-    cheap = optimize(config, x0, objective, executor=fast)
-    costly = optimize(config, x0, expensive_objective, executor=heavy)
+fast = ThreadExecutor(workers=8)
+heavy = ProcessExecutor(workers=4)
+cheap = optimize(config, x0, objective, executor=fast)
+costly = optimize(config, x0, expensive_objective, executor=heavy)
 ```
 
 !!! note "Executors inside an evaluation"
@@ -115,25 +116,20 @@ with ThreadExecutor(workers=8) as fast, ProcessExecutor(workers=4) as heavy:
     [Executors inside an evaluation](#executors-inside-an-evaluation) below.
 
 !!! tip "Releasing an executor early"
-    An executor holds its workers until it is closed. Build it in a `with`
-    block, or call `close()`, as soon as you are done with it — above all a
-    `ProcessExecutor`, which holds worker interpreters:
+    An executor holds its workers for as long as anything refers to it, and
+    releases them when the last reference goes. In a loop that means building it
+    inside the loop rather than outside, above all for a `ProcessExecutor`,
+    which holds a worker interpreter per worker:
 
     ```python
     for case in cases:
-        with ProcessExecutor(workers=4) as executor:
-            optimize(config, case, objective, executor=executor)
+        executor = ProcessExecutor(workers=4)
+        optimize(config, case, objective, executor=executor)
     ```
 
-    A closed executor cannot be reopened. A run that is *waiting* on it when it
-    closes returns with
-    [`ExitCode.EXECUTOR_STOPPED`][ropt.enums.ExitCode] rather than raising —
-    though on a thread executor the evaluations already running still finish
-    first, since a thread cannot be interrupted; see
-    [Stopping a run](#stopping-a-run). A run that asks a closed executor for its
-    *next* batch is refused with a
-    [`WorkflowError`][ropt.exceptions.WorkflowError] saying the executor is
-    closed.
+    A name kept alive keeps the workers alive with it: a module-level executor,
+    or one held by a traceback or a notebook's output history, is released only
+    when that reference goes. `del` is then the way to release it.
 
 ### Evaluating on threads { #thread-executor }
 
@@ -142,8 +138,8 @@ background threads inside your own process. Nothing is copied, so any Python
 function works as the objective and it can freely use the data around it:
 
 ```python
-with ThreadExecutor(workers=4) as executor:
-    result = optimize(config, x0, objective, executor=executor)
+executor = ThreadExecutor(workers=4)
+result = optimize(config, x0, objective, executor=executor)
 ```
 
 Use it when each evaluation spends most of its time **waiting** — starting an
@@ -163,8 +159,8 @@ handful of separate processes, reused across the run. Each has its own
 interpreter, so this is where heavy Python computation actually gets faster:
 
 ```python
-with ProcessExecutor(workers=4) as executor:
-    result = optimize(config, x0, objective, executor=executor)
+executor = ProcessExecutor(workers=4)
+result = optimize(config, x0, objective, executor=executor)
 ```
 
 This executor applies when the computation is **Python code**, or when each
@@ -181,12 +177,11 @@ only come **back** through the return value; see
 [Handlers and the process boundary](handlers.md#handlers-and-the-process-boundary).
 
 !!! warning "This executor does not clean up programs your objective started"
-    When a run is stopped — by Ctrl-C, or by closing the executor — the worker
-    processes are killed, but anything they had launched themselves is not: a
-    simulator or solver started by your objective keeps running, unattached,
-    after your program is gone. Nothing reports this. If your objective launches
-    external programs, use a `LocalJobExecutor` instead, which was built for
-    exactly this.
+    When a run is stopped by Ctrl-C the worker processes are killed, but
+    anything they had launched themselves is not: a simulator or solver started
+    by your objective keeps running, unattached, after your program is gone.
+    Nothing reports this. If your objective launches external programs, use a
+    `LocalJobExecutor` instead, which was built for exactly this.
 
 ### Running each evaluation as a local job { #local-executor }
 
@@ -198,8 +193,8 @@ minus the scheduler — so an objective that works on one works on the other:
 ```python
 from ropt.simple import LocalJobExecutor
 
-with LocalJobExecutor(workers=4) as executor:
-    result = optimize(config, x0, objective, executor=executor)
+executor = LocalJobExecutor(workers=4)
+result = optimize(config, x0, objective, executor=executor)
 ```
 
 | Parameter     | Description                                                                |
@@ -221,8 +216,8 @@ evaluation is a job rather than a function call:
 
 !!! note "Where the working directory goes"
     With no `workdir`, the executor works in a temporary directory of its own
-    and removes it when it closes, unless something in it is still readable. If
-    an evaluation **failed**, its captured output is kept, so the
+    and removes it again when it is dropped, unless something in it is still
+    readable. If an evaluation **failed**, its captured output is kept, so the
     directory is kept with it and its path is logged:
 
     ```
@@ -297,8 +292,8 @@ installation:
 ```python
 from ropt.simple import HPCExecutor
 
-with HPCExecutor(workers=10, workdir="/scratch/my-run") as executor:
-    result = optimize(config, x0, objective, executor=executor)
+executor = HPCExecutor(workers=10, workdir="/scratch/my-run")
+result = optimize(config, x0, objective, executor=executor)
 ```
 
 The runnable script is
@@ -524,15 +519,15 @@ work item is sent, rather than failing somewhere deep inside the run.
 
 ## Stopping a run
 
-Press Ctrl-C, or close the executor, and `ropt` stops dispatching new work at
-once. What happens to the evaluations already running depends on the executor,
-because what *can* be done to them differs:
+Press Ctrl-C and `ropt` stops dispatching new work at once. What happens to the
+evaluations already running depends on the executor, because what *can* be done
+to them differs:
 
 | Executor | Evaluations already running |
 | --- | --- |
 | none | the current one finishes |
 | `ThreadExecutor` | they **run to completion** — a thread cannot be interrupted |
-| `ProcessExecutor` | the worker processes are **killed**, but not what they launched |
+| `ProcessExecutor` | they run to completion in their worker |
 | `LocalJobExecutor` | each evaluation **and everything it launched** is killed |
 | `HPCExecutor` | the jobs are **deleted from the queue** |
 
@@ -540,10 +535,8 @@ Two consequences follow.
 
 **A thread executor cannot be hurried.** Python provides no way to interrupt a
 running thread from outside, so a long evaluation on a `ThreadExecutor` ends
-when it ends, and your program cannot exit before it does. `ropt` warns naming
-how many evaluations it is waiting for, because the wait is otherwise
-indistinguishable from a hang. If an evaluation may run long and has to be
-interruptible, put it on one of the other executors.
+when it ends, and your program cannot exit before it does. If an evaluation may
+run long and has to be interruptible, put it on one of the other executors.
 
 **Stopping is a request, not a guarantee.** On the executors that kill,
 everything is signalled to end and not waited for. A program that ignores the
@@ -573,9 +566,9 @@ To run several optimizations together, use
 ```python
 from ropt.simple import ThreadExecutor, optimize_many
 
-with ThreadExecutor(workers=4) as executor:
-    # One run per start point.
-    results = optimize_many(config, start_points, objective, executor=executor)
+executor = ThreadExecutor(workers=4)
+# One run per start point.
+results = optimize_many(config, start_points, objective, executor=executor)
 ```
 
 !!! tip "Give each run an ID"
@@ -667,12 +660,13 @@ runs](handlers.md#sharing-a-handler-across-concurrent-runs).
 The first run to raise propagates its exception immediately (fail-fast). Runs
 that have not started yet are skipped, but a run already in progress cannot be
 stopped from the outside: it is abandoned, and keeps going until it finishes on
-its own — so returning after a failure can still take as long as a full
-optimization. Closing the executor cuts that short: an abandoned run waiting on
-it returns with [`ExitCode.EXECUTOR_STOPPED`][ropt.enums.ExitCode], and one that
-asks for its next batch afterwards raises a
-[`WorkflowError`][ropt.exceptions.WorkflowError] on its own driver thread.
-Either way its result is discarded.
+its own. Its result is discarded, but until it ends it keeps calling your
+evaluation function, keeps the executor busy, and keeps feeding any handler you
+passed in `handlers`. Nothing can currently cut that short.
+
+The abandoned runs are driven from daemon threads, so a program that stops at
+the failure is unaffected: the interpreter exits and takes them with it. A
+program that catches the exception and carries on keeps them running.
 
 ## Running the optimizer in a separate process { #external-backend }
 
@@ -743,8 +737,8 @@ from functools import partial
 
 from ropt.simple import ProcessExecutor, offload
 
-with ProcessExecutor(workers=4) as executor:
-    result = offload(partial(expensive, data), executor=executor)
+executor = ProcessExecutor(workers=4)
+result = offload(partial(expensive, data), executor=executor)
 ```
 
 `offload` takes **zero-argument** callables — bind arguments with
@@ -753,10 +747,8 @@ concurrently and get a tuple of results in order; they may be entirely different
 functions:
 
 ```python
-with ProcessExecutor(workers=4) as executor:
-    first, second = offload(
-        [partial(expensive, x), partial(other, y)], executor=executor
-    )
+executor = ProcessExecutor(workers=4)
+first, second = offload([partial(expensive, x), partial(other, y)], executor=executor)
 ```
 
 As with the evaluation function on a process, local, or HPC executor, the

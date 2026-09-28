@@ -55,8 +55,7 @@ def offload(
 
     See [Running Optimizations](../running/running.md) for a walkthrough.
 
-    A closed executor raises a
-    [`WorkflowError`][ropt.exceptions.WorkflowError]. A call that the machinery
+    A call that the machinery
     could not run, for instance because its worker process was killed, raises an
     [`ExecutionError`][ropt.exceptions.ExecutionError]. Work offloaded from
     inside an evaluation needs an executor with workers of its own: the one it

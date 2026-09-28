@@ -21,7 +21,6 @@ import signal
 import subprocess  # ruff: ignore[suspicious-subprocess-import]
 import tempfile
 import threading
-import warnings
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -29,7 +28,6 @@ from ropt._logging import get_logger
 from ropt.exceptions import ExecutionError
 
 from ._job_executor import JobExecutorBase
-from .base import _stopped
 
 if TYPE_CHECKING:
     from uuid import UUID
@@ -38,11 +36,11 @@ _logger = get_logger(__name__)
 
 
 def _run_teardown(jobs: queue.Queue[subprocess.Popen[bytes] | Path | None]) -> None:
-    # Finishes closing a `LocalJobExecutor`, off the closing thread: cancelling
-    # a job may not wait there, but a killed job that is never waited for
-    # lingers as a zombie, and its directory may not go until it is truly gone.
-    # Nothing is read from the executor, so that it can be collected while this
-    # thread is still finishing.
+    # Finishes tearing a `LocalJobExecutor` down, off the thread that dropped
+    # it: cancelling a job may not wait there, but a killed job that is never
+    # waited for lingers as a zombie, and its directory may not go until it is
+    # truly gone. Nothing is read from the executor, so that it can be collected
+    # while this thread is still finishing.
     while True:
         item = jobs.get()
         if not isinstance(item, subprocess.Popen):
@@ -55,28 +53,10 @@ def _run_teardown(jobs: queue.Queue[subprocess.Popen[bytes] | Path | None]) -> N
         _logger.debug("Removed the local working directory %s", workdir)
 
 
-def _abandon_teardown(
-    jobs: queue.Queue[subprocess.Popen[bytes] | Path | None], workdir: Path | None
-) -> None:
-    # For an executor that is dropped without being closed. Its jobs belong to a
-    # batch and went with it, so the teardown thread is all that is left to
-    # stop, and holds nothing this has to wait for.
-    warnings.warn(
-        "LocalJobExecutor was not closed; releasing its resources.",
-        ResourceWarning,
-        stacklevel=2,
-    )
-    jobs.put(None)
-    if workdir is not None:
-        _remove_unused_workdir(workdir)
-
-
 def _remove_unused_workdir(workdir: Path) -> None:
-    # For an executor that is never closed: nothing else would remove its
-    # directory. `rmdir` refuses a directory with anything in it, which is what
-    # limits this to the unused case -- a closed executor either had its
-    # directory removed by the teardown thread already, or is keeping it
-    # deliberately because there is output in it to read.
+    # For a constructor that raised: nothing else would remove its directory.
+    # `rmdir` refuses a directory with anything in it, which is what limits this
+    # to the unused case.
     with contextlib.suppress(OSError):
         workdir.rmdir()
 
@@ -107,10 +87,10 @@ class LocalJobExecutor(JobExecutorBase):
         """Initialize the local job executor.
 
         The default `workdir` is a private temporary directory that this
-        executor creates and removes when it closes, unless there is something
-        in it to read: if a work item failed, or `cleanup` is off, the directory
-        is kept and its path logged. A work item that failed keeps its captured
-        output, which is the only record of why.
+        executor creates and removes again when it is dropped, unless there is
+        something in it to read: if a work item failed, or `cleanup` is off, the
+        directory is kept and its path logged. A work item that failed keeps its
+        captured output, which is the only record of why.
 
         A local process is finished the moment it exits, and writes and renames
         its result before it does, so the small `interval` is dead time rather
@@ -166,7 +146,6 @@ class LocalJobExecutor(JobExecutorBase):
         # as the module docstring of the base says.
         self._processes: dict[int, subprocess.Popen[bytes]] = {}
         self._processes_lock = threading.Lock()
-        self._released = False
         # Started last, with nothing left that can raise: a constructor that
         # fails must not leave a thread behind for `__del__` to find.
         self._teardown_queue: queue.Queue[subprocess.Popen[bytes] | Path | None] = (
@@ -181,13 +160,17 @@ class LocalJobExecutor(JobExecutorBase):
         self._teardown_thread.start()
 
     def __del__(self) -> None:
-        """Stop the teardown thread of an executor that was never closed."""
+        """Cancel whatever is left and remove a temporary working directory."""
         # Also runs on an object whose `__init__` raised before reaching the
-        # thread, which has no queue to read. The queue is assigned after the
-        # base is initialized, so `_closed` exists whenever the queue does.
-        jobs = getattr(self, "_teardown_queue", None)
-        if jobs is not None and not self._closed:
-            _abandon_teardown(jobs, self._workdir if self._own_workdir else None)
+        # thread, which has nothing to tear down. Everything `_release` touches
+        # is assigned before the thread starts, so the two go together.
+        if getattr(self, "_teardown_thread", None) is None:
+            return
+        # Nothing here may escape: an exception in `__del__` is printed and
+        # swallowed, and at interpreter shutdown the modules it needs may
+        # already be gone.
+        with contextlib.suppress(Exception):
+            self._release()
 
     @property
     def workdir(self) -> Path:
@@ -203,13 +186,10 @@ class LocalJobExecutor(JobExecutorBase):
 
     def _start_job(self, item_id: UUID, command: list[str]) -> int:
         output_file = self._workdir / f"{item_id}.txt"
-        # Starting and registering happen under one acquisition, and `_release`
-        # sets `_released` under the same one. A job can therefore not become
-        # this executor's after the teardown thread was told there would be no
-        # more, which would leave it a zombie and its directory removed under it.
+        # Started and registered under one acquisition, so that a poll never
+        # sees a job whose id has been handed out but is not yet in the
+        # register.
         with self._processes_lock:
-            if self._released:
-                raise _stopped()
             with output_file.open("wb") as fp:
                 process = subprocess.Popen(  # ruff: ignore[subprocess-without-shell-equals-true]
                     command,
@@ -261,13 +241,11 @@ class LocalJobExecutor(JobExecutorBase):
     def _release(self) -> None:
         # Cancels the jobs first, which is what fills the teardown queue; the
         # sentinel goes in behind them, so every one of them is waited for.
-        super()._release()
-        # Anything the base did not know to cancel: giving up on polling drops
+        self._cancel_all_jobs()
+        # Anything a batch did not know to cancel: giving up on polling drops
         # its jobs, and a dropped local job is a process of ours that would
-        # otherwise outlive the executor. `_released` is set here so that no
-        # further job can be registered behind the sentinel below.
+        # otherwise outlive the executor.
         with self._processes_lock:
-            self._released = True
             leftover = list(self._processes)
         for job_id in leftover:
             self._cancel_job(job_id)

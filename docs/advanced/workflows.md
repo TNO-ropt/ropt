@@ -204,7 +204,7 @@ returns nothing:
 | `MAX_FUNCTIONS_REACHED`      | Maximum number of function evaluations was reached.           |
 | `MAX_BATCHES_REACHED`        | Maximum number of evaluation batches was reached.             |
 | `USER_ABORT`                 | An event handler requested a stop via `event.source.stop()`.  |
-| `EXECUTOR_STOPPED`           | Aborted because the executor stopped before finishing.        |
+| `EXECUTOR_STOPPED`           | The executor could no longer run the work, which in practice means the interpreter was shutting down. |
 
 An event handler can stop its own optimization by calling `event.source.stop()`
 — for example after inspecting the `results` of a `FINISHED_EVALUATION` event and
