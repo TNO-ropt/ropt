@@ -10,6 +10,7 @@ import numpy as np
 import pytest
 
 from ropt.components.compute_steps import EvaluationStep, OptimizationStep
+from ropt.components.concurrency import StopSignal
 from ropt.components.evaluators import (
     EvaluationFunctionContext,
     EvaluationFunctionResult,
@@ -803,6 +804,39 @@ def test_stop_request_cleared_between_runs(config: Any, evaluator: Any) -> None:
     )
     assert first == ExitCode.USER_ABORT
     assert second != ExitCode.USER_ABORT
+
+
+def test_stop_signal_cancels_every_step_that_observes_it(
+    config: Any, evaluator: Any
+) -> None:
+    signal = StopSignal()
+    steps = [
+        OptimizationStep(evaluator=evaluator(), stop_signal=signal) for _ in range(2)
+    ]
+    signal.stop()
+    exit_codes = [
+        step.run(variables=initial_values, context=EnOptContext.model_validate(config))
+        for step in steps
+    ]
+    assert exit_codes == [ExitCode.CANCELLED, ExitCode.CANCELLED]
+
+
+def test_stop_signal_is_not_cleared_by_a_new_run(config: Any, evaluator: Any) -> None:
+    signal = StopSignal()
+    step = OptimizationStep(evaluator=evaluator(), stop_signal=signal)
+    first = step.run(
+        variables=initial_values, context=EnOptContext.model_validate(config)
+    )
+    signal.stop()
+    second = step.run(
+        variables=initial_values, context=EnOptContext.model_validate(config)
+    )
+    third = step.run(
+        variables=initial_values, context=EnOptContext.model_validate(config)
+    )
+    assert first != ExitCode.CANCELLED
+    assert second == ExitCode.CANCELLED
+    assert third == ExitCode.CANCELLED
 
 
 _EVALUATION_EVENTS = {

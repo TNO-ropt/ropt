@@ -5,3 +5,5 @@
         members: []
 
 ::: ropt.components.concurrency.run_concurrent
+
+::: ropt.components.concurrency.StopSignal

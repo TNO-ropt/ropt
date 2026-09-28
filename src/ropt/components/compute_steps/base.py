@@ -12,6 +12,7 @@ from ropt.exceptions import WorkflowError
 if TYPE_CHECKING:
     from numpy.typing import ArrayLike
 
+    from ropt.components.concurrency import StopSignal
     from ropt.context import EnOptContext
     from ropt.events import EnOptEvent
 
@@ -29,12 +30,17 @@ class ComputeStep(ABC, Generic[_ResultT]):
     The type parameter is what `run` returns.
     """
 
-    def __init__(self) -> None:
-        """Initialize the ComputeStep."""
+    def __init__(self, *, stop_signal: StopSignal | None = None) -> None:
+        """Initialize the ComputeStep.
+
+        Args:
+            stop_signal: An optional signal to stop on, besides `stop`.
+        """
         self._event_handlers: list[EventHandler] = []
         self._running = False
         self._run_lock = threading.Lock()
         self._stop_flag = threading.Event()
+        self._stop_signal = stop_signal
 
     def add_event_handler(self, handler: EventHandler) -> None:
         """Attach an event handler to receive this step's events.
@@ -83,9 +89,14 @@ class ComputeStep(ABC, Generic[_ResultT]):
         """Whether a stop has been requested for the current run.
 
         Returns:
-            `True` if `stop` has been called since the run started.
+            `True` if `stop` was called since the run started, or the step's
+            [`StopSignal`][ropt.components.concurrency.StopSignal] is stopping.
         """
-        return self._stop_flag.is_set()
+        return self._stop_flag.is_set() or self._signalled
+
+    @property
+    def _signalled(self) -> bool:
+        return self._stop_signal is not None and self._stop_signal.stopping
 
     @abstractmethod
     def _run(
@@ -134,7 +145,9 @@ class ComputeStep(ABC, Generic[_ResultT]):
                 msg = "The compute step is already running on another thread."
                 raise WorkflowError(msg)
             self._running = True
-        # A step reused after a stopped run must not start out stopped.
+        # A step reused after a stopped run must not start out stopped. Only
+        # this step's own request is cleared: a signal is shared, and is not
+        # this step's to reset.
         self._stop_flag.clear()
         try:
             return self._run(context, variables, metadata=metadata)

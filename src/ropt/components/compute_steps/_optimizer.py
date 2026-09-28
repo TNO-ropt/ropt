@@ -19,6 +19,7 @@ from .base import ComputeStep
 if TYPE_CHECKING:
     from numpy.typing import ArrayLike
 
+    from ropt.components.concurrency import StopSignal
     from ropt.components.evaluators import Evaluator
     from ropt.context import EnOptContext
     from ropt.results import Results
@@ -40,13 +41,16 @@ class OptimizationStep(ComputeStep[ExitCode]):
     for the full event lifecycle description.
     """
 
-    def __init__(self, *, evaluator: Evaluator) -> None:
+    def __init__(
+        self, *, evaluator: Evaluator, stop_signal: StopSignal | None = None
+    ) -> None:
         """Initialize a default optimizer.
 
         Args:
-            evaluator: The evaluator object to run function evaluations.
+            evaluator:   The evaluator object to run function evaluations.
+            stop_signal: An optional signal to stop on, besides `stop`.
         """
-        super().__init__()
+        super().__init__(stop_signal=stop_signal)
         self._evaluator = evaluator
 
     def _run(
@@ -138,5 +142,7 @@ class OptimizationStep(ComputeStep[ExitCode]):
                 ),
             )
         # Poll on the optimizer stack so a handler's stop() becomes a clean exit.
-        if self.stopped:
+        if self._stop_flag.is_set():
             raise OptimizerStop(ExitCode.USER_ABORT)
+        if self._signalled:
+            raise OptimizerStop(ExitCode.CANCELLED)

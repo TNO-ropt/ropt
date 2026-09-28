@@ -127,6 +127,13 @@ class ExitCode(IntEnum):
     EXECUTOR_STOPPED = 6
     """Returned when the executor could no longer run the evaluation."""
 
+    CANCELLED = 7
+    """Returned when the run was stopped through a
+    [`StopSignal`][ropt.components.concurrency.StopSignal]."""
+
+    FAILED = 8
+    """Returned when the run raised an exception."""
+
 
 class AxisName(StrEnum):
     """Enumerates the semantic meaning of axes in data arrays.
