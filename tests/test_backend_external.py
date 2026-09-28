@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import gc
 import multiprocessing
+import multiprocessing.synchronize
 import pickle  # ruff: ignore[suspicious-pickle-import]
 import sys
 from typing import TYPE_CHECKING, Any, ClassVar, cast
@@ -46,6 +48,14 @@ class _RegisteredDelegate(SciPyBackend):
 def _make_context() -> EnOptContext:
     return EnOptContext.model_validate(
         {"variables": {"variable_count": 2, "perturbation_magnitudes": 1e-6}}
+    )
+
+
+def _live_semaphores() -> int:
+    return sum(
+        1
+        for obj in gc.get_objects()
+        if isinstance(obj, multiprocessing.synchronize.SemLock)
     )
 
 
@@ -369,6 +379,32 @@ def test_a_closure_objective_runs_in_an_external_process(
     assert dumped
     assert result.results is not None
     assert np.allclose(result.results.variables, target, atol=0.02)
+
+
+@pytest.mark.external
+def test_a_run_leaves_no_queue_semaphores_behind() -> None:
+    """A finished run must free its queues without waiting for a collection.
+
+    The queues carry six semaphores registered with the multiprocessing
+    resource tracker. Freed on a later collection instead of here, unregistering
+    them can re-enter the tracker, which reports them as leaked.
+    """
+    target = 0.5
+
+    def _objective(variables: np.ndarray, _: Any) -> float:
+        return float(((variables - target) ** 2).sum())
+
+    config = {
+        "optimizer": {"max_functions": 3},
+        "backend": {"method": "external/slsqp"},
+        "variables": {"variable_count": 2, "perturbation_magnitudes": 0.01},
+    }
+
+    gc.collect()
+    before = _live_semaphores()
+    optimize(config, np.zeros(2), _objective)
+
+    assert _live_semaphores() == before
 
 
 @pytest.mark.external

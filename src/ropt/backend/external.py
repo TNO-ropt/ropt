@@ -160,6 +160,9 @@ class ExternalBackend(Backend):
                 result_queue.put(result)
         finally:
             _shutdown(process, request_queue, result_queue)
+            # The raise below pins this frame in a traceback, and closing a
+            # queue does not free its semaphores; only dropping it does.
+            del process, request_queue, result_queue
 
         if exception is not None:
             raise exception
