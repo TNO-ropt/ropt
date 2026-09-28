@@ -36,7 +36,7 @@ from ropt.simple import (
     HistoryHandler,
     OptimizationResult,
     evaluate,
-    evaluate_many,
+    evaluate_batch,
     offload,
     optimize,
     optimize_many,
@@ -456,12 +456,12 @@ def test_evaluate_accepts_a_local_handler(config: Any, test_functions: Any) -> N
     assert len(history["results"]) == 1
 
 
-def test_evaluate_many_accepts_a_local_handler(
+def test_evaluate_batch_accepts_a_local_handler(
     config: Any, test_functions: Any
 ) -> None:
     history = HistoryHandler()
     matrix = np.array([initial_values, np.zeros(initial_values.size)])
-    evaluate_many(config, matrix, test_functions[0], handlers=[history])
+    evaluate_batch(config, matrix, test_functions[0], handlers=[history])
     assert len(history["results"]) == 2
 
 
@@ -477,7 +477,7 @@ def test_evaluate_report_return_value_ignored(config: Any, test_functions: Any) 
     assert result.target_objective == pytest.approx(0.66)
 
 
-def test_evaluate_many_report_return_value_ignored(
+def test_evaluate_batch_report_return_value_ignored(
     config: Any, test_functions: Any
 ) -> None:
     # The callback returns True on the very first result, which stops the
@@ -490,7 +490,7 @@ def test_evaluate_many_report_return_value_ignored(
         return True
 
     matrix = np.array([initial_values, np.zeros(initial_values.size)])
-    results = evaluate_many(config, matrix, test_functions[0], report=_stop)
+    results = evaluate_batch(config, matrix, test_functions[0], report=_stop)
     assert len(reported) == 1
     assert len(results) == 2
 
@@ -501,9 +501,11 @@ def test_evaluate_rejects_matrix(config: Any, test_functions: Any) -> None:
         evaluate(config, matrix, test_functions[0])
 
 
-def test_evaluate_many_returns_result_per_row(config: Any, test_functions: Any) -> None:
+def test_evaluate_batch_returns_result_per_row(
+    config: Any, test_functions: Any
+) -> None:
     matrix = np.array([initial_values, np.zeros(initial_values.size)])
-    results = evaluate_many(config, matrix, test_functions[0])
+    results = evaluate_batch(config, matrix, test_functions[0])
     assert len(results) == 2
     assert all(isinstance(result, FunctionResults) for result in results)
     # Squared distance to [0.5, 0.5, 0.5]: row 0 = 0.5^2+0.5^2+0.4^2, row 1 = 3*0.5^2.
@@ -511,15 +513,15 @@ def test_evaluate_many_returns_result_per_row(config: Any, test_functions: Any) 
         assert result.target_objective == pytest.approx(expected)
 
 
-def test_evaluate_many_single_row(config: Any, test_functions: Any) -> None:
-    results = evaluate_many(config, initial_values.reshape(1, -1), test_functions[0])
+def test_evaluate_batch_single_row(config: Any, test_functions: Any) -> None:
+    results = evaluate_batch(config, initial_values.reshape(1, -1), test_functions[0])
     assert len(results) == 1
     assert results[0].target_objective == pytest.approx(0.66)
 
 
-def test_evaluate_many_rejects_vector(config: Any, test_functions: Any) -> None:
+def test_evaluate_batch_rejects_vector(config: Any, test_functions: Any) -> None:
     with pytest.raises(ValueError, match="2-D matrix"):
-        evaluate_many(config, initial_values, test_functions[0])
+        evaluate_batch(config, initial_values, test_functions[0])
 
 
 def test_evaluate_multiple_objectives(config: Any, eval_func: Any) -> None:
@@ -539,11 +541,13 @@ def test_evaluate_attaches_metadata_to_results(
     assert result.metadata["tag"] == "eval"
 
 
-def test_evaluate_many_attaches_metadata_to_every_result(
+def test_evaluate_batch_attaches_metadata_to_every_result(
     config: Any, test_functions: Any
 ) -> None:
     matrix = np.array([initial_values, np.zeros(initial_values.size)])
-    results = evaluate_many(config, matrix, test_functions[0], metadata={"tag": "eval"})
+    results = evaluate_batch(
+        config, matrix, test_functions[0], metadata={"tag": "eval"}
+    )
     assert len(results) == 2
     for result in results:
         assert result.metadata["tag"] == "eval"
@@ -718,11 +722,11 @@ def test_metadata_per_run_reaches_each_evaluation_function(
     assert all(item == {"run": 1} for item in second)
 
 
-def test_evaluate_many_with_a_thread_pool(
+def test_evaluate_batch_with_a_thread_pool(
     pools: Callable[..., WorkerPool], config: Any, test_functions: Any
 ) -> None:
     matrix = np.array([initial_values, np.zeros(initial_values.size)])
-    results = evaluate_many(config, matrix, test_functions[0], pool=pools(workers=2))
+    results = evaluate_batch(config, matrix, test_functions[0], pool=pools(workers=2))
     for result, expected in zip(results, [0.66, 0.75], strict=True):
         assert result.target_objective == pytest.approx(expected)
 
@@ -986,7 +990,7 @@ def test_concurrent_inner_runs_on_a_second_pool_feed_one_handler(
     barrier = threading.Barrier(len(_NESTED_POINTS), timeout=30)
     inner = pools(ProcessExecutor, workers=2) if processes else pools(workers=2)
     outer = pools(workers=len(_NESTED_POINTS))
-    evaluate_many(
+    evaluate_batch(
         _NESTED_OUTER,
         _NESTED_POINTS,
         partial(_nested_run, pool=inner, history=history, barrier=barrier),

@@ -31,7 +31,7 @@ from ropt.components.event_handlers import (
     ResultsHandler,
 )
 
-from ._evaluate import evaluate, evaluate_many
+from ._evaluate import evaluate, evaluate_batch
 from ._function import EvaluationFunction
 from ._offload import offload
 from ._optimize import optimize, optimize_many
@@ -54,7 +54,7 @@ __all__ = [
     "Session",
     "WorkerPool",
     "evaluate",
-    "evaluate_many",
+    "evaluate_batch",
     "offload",
     "optimize",
     "optimize_many",

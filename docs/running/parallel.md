@@ -63,7 +63,7 @@ machine's core count.
     transfers can dominate. Pass `bundle_size=` to
     [`optimize`][ropt.simple.optimize], [`optimize_many`][ropt.simple.optimize_many],
     [`evaluate`][ropt.simple.evaluate] or
-    [`evaluate_many`][ropt.simple.evaluate_many] to send several evaluations to
+    [`evaluate_batch`][ropt.simple.evaluate_batch] to send several evaluations to
     a worker together, or `bundle_size=0` to send a whole batch at once. The
     evaluations in one bundle run after each other, so `0` gives up parallelism
     inside the batch entirely: it is for a run whose parallelism comes from the

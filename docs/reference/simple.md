@@ -12,7 +12,7 @@
 ## Evaluating without optimizing
 
 ::: ropt.simple.evaluate
-::: ropt.simple.evaluate_many
+::: ropt.simple.evaluate_batch
 
 ## Evaluation functions
 

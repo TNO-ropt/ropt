@@ -18,7 +18,7 @@ from ropt.exceptions import ExecutionError, WorkflowError
 from ropt.simple import (
     HistoryHandler,
     evaluate,
-    evaluate_many,
+    evaluate_batch,
     offload,
     optimize,
     optimize_many,
@@ -63,8 +63,8 @@ def _evaluate(**kwargs: Any) -> None:
     evaluate(_CONFIG, _INITIAL, _sphere, **kwargs)
 
 
-def _evaluate_many(**kwargs: Any) -> None:
-    evaluate_many(_CONFIG, _MATRIX, _sphere, **kwargs)
+def _evaluate_batch(**kwargs: Any) -> None:
+    evaluate_batch(_CONFIG, _MATRIX, _sphere, **kwargs)
 
 
 def _offload(**kwargs: Any) -> None:
@@ -77,7 +77,7 @@ _TAKES_A_POOL = pytest.mark.parametrize(
         pytest.param(_optimize, id="optimize"),
         pytest.param(_optimize_many, id="optimize_many"),
         pytest.param(_evaluate, id="evaluate"),
-        pytest.param(_evaluate_many, id="evaluate_many"),
+        pytest.param(_evaluate_batch, id="evaluate_batch"),
         pytest.param(_offload, id="offload"),
     ],
 )

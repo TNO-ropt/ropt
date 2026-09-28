@@ -171,7 +171,7 @@ it had reached.
 
 !!! note "Nothing to stop on an evaluation"
     [`evaluate`][ropt.simple.evaluate] and
-    [`evaluate_many`][ropt.simple.evaluate_many] take `report=` as well, but
+    [`evaluate_batch`][ropt.simple.evaluate_batch] take `report=` as well, but
     there the return value is **ignored**. An evaluation is a single batch with
     no optimizer loop to interrupt, so the callback reports and nothing more.
 
@@ -180,7 +180,7 @@ it had reached.
 You can attach arbitrary **metadata** to a run, from two sources:
 
 - **Constant, per run** — pass a `metadata` dict to `optimize`, `optimize_many`,
-  `evaluate`, or `evaluate_many`. `ropt` copies it onto every result the run
+  `evaluate`, or `evaluate_batch`. `ropt` copies it onto every result the run
   produces, which is one way to tag a run:
 
   ```python
@@ -230,13 +230,13 @@ each appears in the pandas export. The full runnable script is
 
 Sometimes you only want the objective value for a point, without running an
 optimizer. Use [`evaluate`][ropt.simple.evaluate] for one point and
-[`evaluate_many`][ropt.simple.evaluate_many] for several:
+[`evaluate_batch`][ropt.simple.evaluate_batch] for several:
 
 ```python
-from ropt.simple import evaluate, evaluate_many
+from ropt.simple import evaluate, evaluate_batch
 
 single = evaluate(config, x, objective)             # one FunctionResults
-batch = evaluate_many(config, matrix, objective)    # one per row of the matrix
+batch = evaluate_batch(config, matrix, objective)    # one per row of the matrix
 ```
 
 Both return [`FunctionResults`][ropt.results.FunctionResults] objects, the

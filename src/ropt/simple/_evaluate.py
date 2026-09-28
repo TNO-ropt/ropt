@@ -1,4 +1,4 @@
-"""The high-level `evaluate` and `evaluate_many` entry points.
+"""The high-level `evaluate` and `evaluate_batch` entry points.
 
 The same shape as `optimize`, with an evaluation step in place of the optimizer:
 one batch of variable vectors, evaluated once, with no loop around it. The two
@@ -48,7 +48,7 @@ def evaluate(  # ruff: ignore[too-many-arguments]
 ) -> FunctionResults:
     """Evaluate a single variable vector without optimizing.
 
-    Use [`evaluate_many`][ropt.simple.evaluate_many] to evaluate several
+    Use [`evaluate_batch`][ropt.simple.evaluate_batch] to evaluate several
     vectors at once. See [Running Optimizations](../running/running.md) for a
     walkthrough.
 
@@ -84,7 +84,7 @@ def evaluate(  # ruff: ignore[too-many-arguments]
     """  # ruff: ignore[docstring-extraneous-exception]
     array = np.asarray(variables, dtype=np.float64)
     if array.ndim != 1:
-        msg = "evaluate() takes a single vector; use evaluate_many() for a batch."
+        msg = "evaluate() takes a single vector; use evaluate_batch() for a batch."
         raise ValueError(msg)
     results = _run_evaluation(
         (SerialPool() if pool is None else pool).executor,
@@ -99,7 +99,7 @@ def evaluate(  # ruff: ignore[too-many-arguments]
     return results[0]
 
 
-def evaluate_many(  # ruff: ignore[too-many-arguments]
+def evaluate_batch(  # ruff: ignore[too-many-arguments]
     config: dict[str, Any],
     variables: ArrayLike,
     function: EvaluationFunction,
@@ -149,7 +149,7 @@ def evaluate_many(  # ruff: ignore[too-many-arguments]
     array = np.asarray(variables, dtype=np.float64)
     if array.ndim != 2:  # ruff: ignore[magic-value-comparison]
         msg = (
-            "evaluate_many() takes a 2-D matrix of vectors (one per row); "
+            "evaluate_batch() takes a 2-D matrix of vectors (one per row); "
             "use evaluate() for a single vector."
         )
         raise ValueError(msg)

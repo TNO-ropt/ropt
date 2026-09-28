@@ -1,6 +1,6 @@
-"""Evaluate variable vectors without optimizing, via `evaluate`/`evaluate_many`.
+"""Evaluate variable vectors without optimizing, via `evaluate`/`evaluate_batch`.
 
-`evaluate` runs a single vector; `evaluate_many` runs the rows of a matrix and
+`evaluate` runs a single vector; `evaluate_batch` runs the rows of a matrix and
 returns one result per row. Neither runs an optimizer — they just compute the
 objective (and any constraints) for the vectors you supply.
 """
@@ -10,7 +10,7 @@ from typing import Any
 import numpy as np
 from numpy.typing import NDArray
 
-from ropt.simple import EvaluationFunctionContext, evaluate, evaluate_many
+from ropt.simple import EvaluationFunctionContext, evaluate, evaluate_batch
 
 DIM = 5
 CONFIG: dict[str, Any] = {
@@ -47,7 +47,7 @@ def main() -> None:
     assert np.isclose(single.target_objective, 0.0)
 
     matrix = np.array([np.zeros(DIM), np.ones(DIM), 2 * np.arange(DIM) / DIM + 0.5])
-    batch = evaluate_many(CONFIG, matrix, rosenbrock)
+    batch = evaluate_batch(CONFIG, matrix, rosenbrock)
     for vector, result in zip(matrix, batch, strict=True):
         print(f"objective at {vector}: {result.target_objective}")
     assert all(result.target_objective is not None for result in batch)
