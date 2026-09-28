@@ -4113,7 +4113,7 @@ several it is one whenever the waiting steps outnumber the free workers. <code>r
 detects the caller and raises
 <a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a> instead of hanging. Give the
 inner work an executor of its own; see
-<a href="../../running/nested/#two-executors-not-one">Two executors, not one</a>.</p>
+<a href="../../running/nested/#two-pools-not-one">Two pools, not one</a>.</p>
 <p><strong>Do not run a compute step from inside a handler that the step can reach.</strong> A
 handler holds its own lock while <code>_handle_event</code> runs, so a step started there
 that is attached to the same handler re-enters it. See

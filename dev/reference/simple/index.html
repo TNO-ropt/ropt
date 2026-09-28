@@ -2089,10 +2089,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#executors" class="md-nav__link">
+  <a href="#sessions-and-pools" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Executors
+        Sessions and pools
       
     </span>
   </a>
@@ -2100,103 +2100,30 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.simple.Executor" class="md-nav__link">
+  <a href="#ropt.simple.session" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Executor
+        session
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="Executor">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.simple.Executor.run" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        run
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.simple.ThreadExecutor" class="md-nav__link">
+  <a href="#ropt.simple.Session" class="md-nav__link">
     <span class="md-ellipsis">
       
-        ThreadExecutor
+        Session
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="ThreadExecutor">
+    <nav class="md-nav" aria-label="Session">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.simple.ThreadExecutor.__init__" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        __init__
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#ropt.simple.ProcessExecutor" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        ProcessExecutor
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="ProcessExecutor">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.simple.ProcessExecutor.__init__" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        __init__
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#ropt.simple.LocalJobExecutor" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        LocalJobExecutor
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="LocalJobExecutor">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.simple.LocalJobExecutor.__init__" class="md-nav__link">
+  <a href="#ropt.simple.Session.__init__" class="md-nav__link">
     <span class="md-ellipsis">
       
         __init__
@@ -2207,10 +2134,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.simple.LocalJobExecutor.__del__" class="md-nav__link">
+  <a href="#ropt.simple.Session.__enter__" class="md-nav__link">
     <span class="md-ellipsis">
       
-        __del__
+        __enter__
       
     </span>
   </a>
@@ -2218,10 +2145,54 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.simple.LocalJobExecutor.workdir" class="md-nav__link">
+  <a href="#ropt.simple.Session.__exit__" class="md-nav__link">
     <span class="md-ellipsis">
       
-        workdir
+        __exit__
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.simple.Session.thread_pool" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        thread_pool
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.simple.Session.process_pool" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        process_pool
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.simple.Session.local_pool" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        local_pool
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.simple.Session.hpc_pool" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        hpc_pool
       
     </span>
   </a>
@@ -2234,22 +2205,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.simple.HPCExecutor" class="md-nav__link">
+  <a href="#ropt.simple.WorkerPool" class="md-nav__link">
     <span class="md-ellipsis">
       
-        HPCExecutor
+        WorkerPool
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="HPCExecutor">
+    <nav class="md-nav" aria-label="WorkerPool">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.simple.HPCExecutor.__init__" class="md-nav__link">
+  <a href="#ropt.simple.WorkerPool.executor" class="md-nav__link">
     <span class="md-ellipsis">
       
-        __init__
+        executor
       
     </span>
   </a>
@@ -2262,10 +2233,38 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#offloading-work-to-an-executor" class="md-nav__link">
+  <a href="#ropt.simple.SerialPool" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Offloading work to an executor
+        SerialPool
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="SerialPool">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.simple.SerialPool.executor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        executor
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#offloading-work-to-a-pool" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Offloading work to a pool
       
     </span>
   </a>
@@ -3664,10 +3663,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#executors" class="md-nav__link">
+  <a href="#sessions-and-pools" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Executors
+        Sessions and pools
       
     </span>
   </a>
@@ -3675,103 +3674,30 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.simple.Executor" class="md-nav__link">
+  <a href="#ropt.simple.session" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Executor
+        session
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="Executor">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.simple.Executor.run" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        run
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.simple.ThreadExecutor" class="md-nav__link">
+  <a href="#ropt.simple.Session" class="md-nav__link">
     <span class="md-ellipsis">
       
-        ThreadExecutor
+        Session
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="ThreadExecutor">
+    <nav class="md-nav" aria-label="Session">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.simple.ThreadExecutor.__init__" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        __init__
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#ropt.simple.ProcessExecutor" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        ProcessExecutor
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="ProcessExecutor">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.simple.ProcessExecutor.__init__" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        __init__
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#ropt.simple.LocalJobExecutor" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        LocalJobExecutor
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="LocalJobExecutor">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.simple.LocalJobExecutor.__init__" class="md-nav__link">
+  <a href="#ropt.simple.Session.__init__" class="md-nav__link">
     <span class="md-ellipsis">
       
         __init__
@@ -3782,10 +3708,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.simple.LocalJobExecutor.__del__" class="md-nav__link">
+  <a href="#ropt.simple.Session.__enter__" class="md-nav__link">
     <span class="md-ellipsis">
       
-        __del__
+        __enter__
       
     </span>
   </a>
@@ -3793,10 +3719,54 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.simple.LocalJobExecutor.workdir" class="md-nav__link">
+  <a href="#ropt.simple.Session.__exit__" class="md-nav__link">
     <span class="md-ellipsis">
       
-        workdir
+        __exit__
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.simple.Session.thread_pool" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        thread_pool
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.simple.Session.process_pool" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        process_pool
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.simple.Session.local_pool" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        local_pool
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.simple.Session.hpc_pool" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        hpc_pool
       
     </span>
   </a>
@@ -3809,22 +3779,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.simple.HPCExecutor" class="md-nav__link">
+  <a href="#ropt.simple.WorkerPool" class="md-nav__link">
     <span class="md-ellipsis">
       
-        HPCExecutor
+        WorkerPool
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="HPCExecutor">
+    <nav class="md-nav" aria-label="WorkerPool">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.simple.HPCExecutor.__init__" class="md-nav__link">
+  <a href="#ropt.simple.WorkerPool.executor" class="md-nav__link">
     <span class="md-ellipsis">
       
-        __init__
+        executor
       
     </span>
   </a>
@@ -3837,10 +3807,38 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#offloading-work-to-an-executor" class="md-nav__link">
+  <a href="#ropt.simple.SerialPool" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Offloading work to an executor
+        SerialPool
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="SerialPool">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.simple.SerialPool.executor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        executor
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#offloading-work-to-a-pool" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Offloading work to a pool
       
     </span>
   </a>
@@ -4266,16 +4264,18 @@
 
         <p>The high-level convenience API for running optimizations.</p>
 <p>This module builds on the low-level <code>ropt</code> primitives. Import its names
-directly, for example <code>from ropt.simple import optimize, ProcessExecutor</code>. See
+directly, for example <code>from ropt.simple import optimize, session</code>. See
 <a href="../../running/running/">Running Optimizations</a> for a walkthrough.</p>
 <p>Enumerations used in the configuration and results (for example
 <a class="autorefs autorefs-internal" title="            ExitCode" href="../enums/#ropt.enums.ExitCode"><code>ExitCode</code></a> and <a class="autorefs autorefs-internal" title="            VariableType" href="../enums/#ropt.enums.VariableType"><code>VariableType</code></a>)
 are not re-exported here; import them from <a class="autorefs autorefs-internal" title="            ropt.enums" href="../enums/#ropt.enums"><code>ropt.enums</code></a>.</p>
 <p>Nothing about a run depends on where it is called from. Where its evaluations
-happen is decided by the executor it is given with <code>executor=</code>, and which
-handlers see its results by the <code>handlers=</code> it is given. A run given no executor
-evaluates in-process. This holds wherever the run is started from, including a
-thread you spawn yourself.</p>
+happen is decided by the pool it is given with <code>pool=</code>, and which handlers see
+its results by the <code>handlers=</code> it is given. A run given no pool evaluates
+in-process. This holds wherever the run is started from, including a thread you
+spawn yourself.</p>
+<p>Pools come from a <a class="autorefs autorefs-internal" title="            ropt.simple.session" href="#ropt.simple.session"><code>session</code></a>, which releases them when it
+closes. A run that evaluates in-process needs no session.</p>
 
 
 
@@ -4312,7 +4312,7 @@ thread you spawn yourself.</p>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">x0</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">function</span><span class="p">:</span> <span class="n">EvaluationFunction</span><span class="p">,</span>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="o">*</span><span class="p">,</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">executor</span><span class="p">:</span> <span class="n">Executor</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">pool</span><span class="p">:</span> <span class="n">WorkerPool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">handlers</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">EventHandler</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">report</span><span class="p">:</span> <span class="n">ReportCallback</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="n">constraint_tolerance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-10</span><span class="p">,</span>
@@ -4325,10 +4325,10 @@ thread you spawn yourself.</p>
 
         <p>Run a single optimization.</p>
 <p>See <a href="../../running/running/">Running Optimizations</a> for a walkthrough.</p>
-<p>Without an <code>executor</code> the evaluations run in-process, on the calling thread,
-and <code>bundle_size</code> does not apply. A
-run started from inside an evaluation needs an executor with workers of its
-own: the one it is already running on refuses the work.</p>
+<p>Without a <code>pool</code> the evaluations run in-process, on the calling thread, and
+<code>bundle_size</code> does not apply. A run started from inside an evaluation needs
+a pool with workers of its own: the one it is already running on refuses the
+work.</p>
 <p>The handlers in <code>handlers</code> are called in the order they are listed, and
 the same handler may also be given to other runs, sequential or concurrent,
 to accumulate results across them. A run started from inside a handler must
@@ -4402,14 +4402,14 @@ are not passed on.</p>
           </tr>
           <tr class="doc-section-item">
             <td>
-                <code>executor</code>
+                <code>pool</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.components.executors.Executor" href="../components_executors/#ropt.components.executors.Executor">Executor</a> | None</code>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.simple.WorkerPool (ropt.simple._pool.WorkerPool)" href="#ropt.simple.WorkerPool">WorkerPool</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The executor to evaluate on, or <code>None</code>.</p>
+                <p>The pool to evaluate on, or <code>None</code>.</p>
               </div>
             </td>
             <td>
@@ -4478,7 +4478,7 @@ are not passed on.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Evaluations per worker task, <code>None</code> for the executor's own.</p>
+                <p>Evaluations per worker task, <code>None</code> for the pool's own.</p>
               </div>
             </td>
             <td>
@@ -4538,6 +4538,29 @@ are not passed on.</p>
     </table>
 
 
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="WorkflowError">WorkflowError</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the pool's session has closed.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
     </div>
 
 </div>
@@ -4556,7 +4579,7 @@ are not passed on.</p>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">function</span><span class="p">:</span> <span class="n">EvaluationFunction</span>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="o">|</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">EvaluationFunction</span><span class="p">],</span>
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="o">*</span><span class="p">,</span>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">executor</span><span class="p">:</span> <span class="n">Executor</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">pool</span><span class="p">:</span> <span class="n">WorkerPool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">handlers</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">EventHandler</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="n">report</span><span class="p">:</span> <span class="n">ReportCallback</span>
 </span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    <span class="o">|</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">ReportCallback</span><span class="p">]</span>
@@ -4572,15 +4595,15 @@ are not passed on.</p>
 
     <div class="doc doc-contents first">
 
-        <p>Run several optimizations concurrently, sharing one executor.</p>
+        <p>Run several optimizations concurrently, sharing one pool.</p>
 <p>Each of <code>config</code>, <code>x0</code>, and <code>function</code> may be a single value (used for
 every run) or a sequence (one per run). Sequences set the number of runs and
 must agree in length; single values are broadcast. A single <code>x0</code> is a 1-D
 vector; a per-run sequence of <code>x0</code>s is a 2-D matrix with one vector per row.
 A sequence that is empty gives no runs, and returns no results.</p>
 <p>The runs execute concurrently on driver threads and all evaluate on the
-same <code>executor</code>, so its workers are shared between them; <code>limit</code> bounds how
-many run simultaneously. Without an <code>executor</code> the runs still overlap, but
+same <code>pool</code>, so its workers are shared between them; <code>limit</code> bounds how
+many run simultaneously. Without a <code>pool</code> the runs still overlap, but
 each evaluation runs in-process on its own driver thread, so <code>function</code> is
 then called by several threads at once and must tolerate that. See
 <a href="../../running/parallel/#many-optimizations-at-once">Parallel Execution and Many Runs</a>
@@ -4595,7 +4618,7 @@ from inside a handler must not be given that same handler: a nested
 <code>optimize_many</code> emits on its own driver threads, which then wait for a lock
 the calling thread holds. <code>report=</code>, being local by nature, is the
 opposite: it is given per run, or broadcast to all of them.</p>
-<p>A run started from inside an evaluation needs an executor with workers of
+<p>A run started from inside an evaluation needs a pool with workers of
 its own: the one it is already running on refuses the work. Returning <code>True</code>
 from a <code>report</code> callback stops that run early with <code>USER_ABORT</code>. <code>metadata</code> also reaches
 each run's <code>function</code> as <code>context.metadata</code>, which makes it a way to tag a
@@ -4663,14 +4686,14 @@ run, for example with <code>{"run_id": i}</code>.</p>
           </tr>
           <tr class="doc-section-item">
             <td>
-                <code>executor</code>
+                <code>pool</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.components.executors.Executor" href="../components_executors/#ropt.components.executors.Executor">Executor</a> | None</code>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.simple.WorkerPool (ropt.simple._pool.WorkerPool)" href="#ropt.simple.WorkerPool">WorkerPool</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The executor every run evaluates on, or <code>None</code>.</p>
+                <p>The pool every run evaluates on, or <code>None</code>.</p>
               </div>
             </td>
             <td>
@@ -4820,6 +4843,29 @@ run, for example with <code>{"run_id": i}</code>.</p>
     </table>
 
 
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="WorkflowError">WorkflowError</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the pool's session has closed.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
     </div>
 
 </div><h2 id="evaluating-without-optimizing">Evaluating without optimizing</h2>
@@ -4838,7 +4884,7 @@ run, for example with <code>{"run_id": i}</code>.</p>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">variables</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">function</span><span class="p">:</span> <span class="n">EvaluationFunction</span><span class="p">,</span>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="o">*</span><span class="p">,</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">executor</span><span class="p">:</span> <span class="n">Executor</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">pool</span><span class="p">:</span> <span class="n">WorkerPool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">handlers</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">EventHandler</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">report</span><span class="p">:</span> <span class="n">ReportCallback</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="n">bundle_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -4852,10 +4898,10 @@ run, for example with <code>{"run_id": i}</code>.</p>
 <p>Use <a class="autorefs autorefs-internal" title="            ropt.simple.evaluate_many" href="#ropt.simple.evaluate_many"><code>evaluate_many</code></a> to evaluate several
 vectors at once. See <a href="../../running/running/">Running Optimizations</a> for a
 walkthrough.</p>
-<p>Without an <code>executor</code> the evaluations run in-process, on the calling thread,
-and <code>bundle_size</code> does not apply. A
-run started from inside an evaluation needs an executor with workers of its
-own: the one it is already running on refuses the work. <code>handlers</code> takes
+<p>Without a <code>pool</code> the evaluations run in-process, on the calling thread, and
+<code>bundle_size</code> does not apply. A run started from inside an evaluation needs
+a pool with workers of its own: the one it is already running on refuses the
+work. <code>handlers</code> takes
 <a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventHandler" href="../components_event_handlers/#ropt.components.event_handlers.EventHandler"><code>EventHandler</code></a> objects, as
 <a class="autorefs autorefs-internal" title="            ropt.simple.optimize" href="#ropt.simple.optimize"><code>optimize</code></a> does.</p>
 <p>An evaluation is a single batch that has already run by the time <code>report</code>
@@ -4926,14 +4972,14 @@ reaches <code>function</code> as <code>context.metadata</code>.</p>
           </tr>
           <tr class="doc-section-item">
             <td>
-                <code>executor</code>
+                <code>pool</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.components.executors.Executor" href="../components_executors/#ropt.components.executors.Executor">Executor</a> | None</code>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.simple.WorkerPool (ropt.simple._pool.WorkerPool)" href="#ropt.simple.WorkerPool">WorkerPool</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The executor to evaluate on, or <code>None</code>.</p>
+                <p>The pool to evaluate on, or <code>None</code>.</p>
               </div>
             </td>
             <td>
@@ -4986,7 +5032,7 @@ reaches <code>function</code> as <code>context.metadata</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Evaluations per worker task, <code>None</code> for the executor's own.</p>
+                <p>Evaluations per worker task, <code>None</code> for the pool's own.</p>
               </div>
             </td>
             <td>
@@ -5065,6 +5111,16 @@ reaches <code>function</code> as <code>context.metadata</code>.</p>
               </div>
             </td>
           </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="WorkflowError">WorkflowError</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the pool's session has closed.</p>
+              </div>
+            </td>
+          </tr>
       </tbody>
     </table>
 
@@ -5086,7 +5142,7 @@ reaches <code>function</code> as <code>context.metadata</code>.</p>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">variables</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">function</span><span class="p">:</span> <span class="n">EvaluationFunction</span><span class="p">,</span>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="o">*</span><span class="p">,</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">executor</span><span class="p">:</span> <span class="n">Executor</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">pool</span><span class="p">:</span> <span class="n">WorkerPool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">handlers</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">EventHandler</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">report</span><span class="p">:</span> <span class="n">ReportCallback</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="n">bundle_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -5100,10 +5156,10 @@ reaches <code>function</code> as <code>context.metadata</code>.</p>
 <p>Each row of <code>variables</code> is one variable vector; the results are returned in
 the same order. See <a href="../../running/running/">Running Optimizations</a> for a
 walkthrough.</p>
-<p>Without an <code>executor</code> the evaluations run in-process, on the calling thread,
-and <code>bundle_size</code> does not apply. A
-run started from inside an evaluation needs an executor with workers of its
-own: the one it is already running on refuses the work. <code>handlers</code> takes
+<p>Without a <code>pool</code> the evaluations run in-process, on the calling thread, and
+<code>bundle_size</code> does not apply. A run started from inside an evaluation needs
+a pool with workers of its own: the one it is already running on refuses the
+work. <code>handlers</code> takes
 <a class="autorefs autorefs-internal" title="            ropt.components.event_handlers.EventHandler" href="../components_event_handlers/#ropt.components.event_handlers.EventHandler"><code>EventHandler</code></a> objects, as
 <a class="autorefs autorefs-internal" title="            ropt.simple.optimize" href="#ropt.simple.optimize"><code>optimize</code></a> does.</p>
 <p>An evaluation is a single batch that has already run by the time <code>report</code>
@@ -5174,14 +5230,14 @@ reaches <code>function</code> as <code>context.metadata</code>.</p>
           </tr>
           <tr class="doc-section-item">
             <td>
-                <code>executor</code>
+                <code>pool</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.components.executors.Executor" href="../components_executors/#ropt.components.executors.Executor">Executor</a> | None</code>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.simple.WorkerPool (ropt.simple._pool.WorkerPool)" href="#ropt.simple.WorkerPool">WorkerPool</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The executor to evaluate on, or <code>None</code>.</p>
+                <p>The pool to evaluate on, or <code>None</code>.</p>
               </div>
             </td>
             <td>
@@ -5234,7 +5290,7 @@ reaches <code>function</code> as <code>context.metadata</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Evaluations per worker task, <code>None</code> for the executor's own.</p>
+                <p>Evaluations per worker task, <code>None</code> for the pool's own.</p>
               </div>
             </td>
             <td>
@@ -5310,6 +5366,16 @@ reaches <code>function</code> as <code>context.metadata</code>.</p>
             <td>
               <div class="doc-md-description">
                 <p>If <code>variables</code> is not a 2-D matrix.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="WorkflowError">WorkflowError</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the pool's session has closed.</p>
               </div>
             </td>
           </tr>
@@ -5522,40 +5588,85 @@ reaches <code>function</code> as <code>context.metadata</code>.</p>
 
     </div>
 
-</div><h2 id="executors">Executors</h2>
+</div><h2 id="sessions-and-pools">Sessions and pools</h2>
 
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="ropt.simple.session" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">ropt.simple.session</span>
+
+
+</h2>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">session</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Session</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents first">
+
+        <p>Open a session that owns the pools built on it.</p>
+<p>Build pools with the session's factories, and pass them to the runs that
+should use them. Closing the session releases every pool it built, so most
+code needs no further cleanup:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">pool</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">thread_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">pool</span><span class="o">=</span><span class="n">pool</span><span class="p">)</span>
+</span></code></pre></div>
+<p>A run given no pool evaluates in-process and needs no session. See
+<a href="../../running/running/">Running Optimizations</a> for a walkthrough.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.simple.Session (ropt.simple._session.Session)" href="#ropt.simple.Session">Session</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A context manager binding the <a class="autorefs autorefs-internal" title="            ropt.simple.Session" href="#ropt.simple.Session"><code>Session</code></a>.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
 
 <div class="doc doc-object doc-class">
 
 
 
-<h2 id="ropt.simple.Executor" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.simple.Executor</span>
+<h2 id="ropt.simple.Session" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.simple.Session</span>
 
 
 </h2>
 
 
     <div class="doc doc-contents first">
-            <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-external" title="abc.ABC" href="https://docs.python.org/3/library/abc.html#abc.ABC">ABC</a></code></p>
 
 
 
-        <p>Abstract base class for executor components within an optimization workflow.</p>
-<p>An executor is constructed, run on, and dropped. Its workers are released
-when it is collected, so there is nothing to close.</p>
-<p>See <a href="../../advanced/parallel/#error-handling">Error handling</a> for the
-distinction an implementation must make between an infrastructure failure,
-returned in the call's position as an
-<a class="autorefs autorefs-internal" title="            ropt.components.executors.ExecutorFailure
-
-
-  
-      dataclass
-  " href="../components_executors/#ropt.components.executors.ExecutorFailure"><code>ExecutorFailure</code></a>, and an
-exception from the work item's own function, which is re-raised in the
-caller.</p>
+        <p>An open session, and the factories that build on it.</p>
+<p>A pool needs an owner that releases its workers, which is why pools are
+built here rather than constructed on their own. Everything a session
+creates is returned to the caller and passed on explicitly; nothing is
+discovered from the surroundings.</p>
+<p>Bind the session with <code>as</code> and call its factories inside the block. See
+<a href="../../running/running/">Running Optimizations</a> for a walkthrough.</p>
+<p>A session may be opened inside another, and pools from different sessions
+never interact. A session is single use — once closed it cannot be reopened.</p>
 
 
 
@@ -5578,91 +5689,42 @@ caller.</p>
 <div class="doc doc-object doc-function">
 
 
-<h3 id="ropt.simple.Executor.run" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">run</span>
+<h3 id="ropt.simple.Session.__init__" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">__init__</span>
 
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
-  </span>
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">run</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">calls</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">WorkItem</span><span class="p">],</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="o">*</span><span class="p">,</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">bundle_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">__init__</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
 
-        <p>Run the calls and return their results, in the order they were given.</p>
-<p>Blocks until every call has a result. A call the machinery could not run
-gets an <a class="autorefs autorefs-internal" title="            ropt.components.executors.ExecutorFailure
+        <p>Initialize the session.</p>
 
 
-  
-      dataclass
-  " href="../components_executors/#ropt.components.executors.ExecutorFailure"><code>ExecutorFailure</code></a>
-in its position; an exception raised by a call's own function is
-re-raised here, without waiting for the rest of the batch.</p>
-<p>May be called from any thread, except one of the executor's own workers:
-that caller would wait for workers it is itself occupying, so it is
-refused rather than left to deadlock.</p>
-<p>Whatever this batch started is released before this returns, however it
-returns.</p>
+    </div>
+
+</div>
 
 
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>calls</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" title="collections.abc.Sequence" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence">Sequence</a>[<a class="autorefs autorefs-internal" title="            ropt.components.executors.WorkItem
 
 
-  
-      dataclass
-   (ropt.components.executors.base.WorkItem)" href="../components_executors/#ropt.components.executors.WorkItem">WorkItem</a>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The work items to run.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>bundle_size</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/functions.html#int">int</a> | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Calls per worker task, <code>0</code> for all of them.</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-      </tbody>
-    </table>
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.simple.Session.__enter__" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">__enter__</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">__enter__</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Self</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Open the session.</p>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
@@ -5676,11 +5738,11 @@ returns.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#list">list</a>[<a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a>]</code>
+                  <code><a class="autorefs autorefs-external" title="typing.Self" href="https://docs.python.org/3/library/typing.html#typing.Self">Self</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>One result per call, in the order of <code>calls</code>.</p>
+                <p>The session itself.</p>
               </div>
             </td>
           </tr>
@@ -5703,17 +5765,7 @@ returns.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If the caller is one of the executor's workers.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            ExecutorStopped (ropt.exceptions.ExecutorStopped)" href="../exceptions/#ropt.exceptions.ExecutorStopped">ExecutorStopped</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>If the executor could no longer run the work.</p>
+                <p>If the session was already opened.</p>
               </div>
             </td>
           </tr>
@@ -5728,51 +5780,27 @@ returns.</p>
 
 
 
-  </div>
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.simple.Session.__exit__" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">__exit__</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">__exit__</span><span class="p">(</span><span class="o">*</span><span class="n">_exc</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Close the session, releasing every pool it built.</p>
+
 
     </div>
 
 </div>
-
-<div class="doc doc-object doc-class">
-
-
-
-<h2 id="ropt.simple.ThreadExecutor" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.simple.ThreadExecutor</span>
-
-
-</h2>
-
-
-    <div class="doc doc-contents first">
-            <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="            ropt.components.executors.ExecutorBase (ropt.components.executors.base.ExecutorBase)" href="../components_executors/#ropt.components.executors.ExecutorBase">ExecutorBase</a></code></p>
-
-
-
-        <p>An executor that dispatches work items to worker threads.</p>
-<p>The pool's own queue provides the worker cap and the arrival order across
-concurrent callers.</p>
-
-
-<details class="warning" open>
-  <summary>Warning</summary>
-  <p>A thread cannot be interrupted. Work that has already started runs to
-completion, and the interpreter waits for it before exiting.</p>
-</details>
-
-
-
-
-
-
-
-
-
-
-<div class="doc doc-children">
-
 
 
 
@@ -5782,17 +5810,22 @@ completion, and the interpreter waits for it before exiting.</p>
 <div class="doc doc-object doc-function">
 
 
-<h3 id="ropt.simple.ThreadExecutor.__init__" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">__init__</span>
+<h3 id="ropt.simple.Session.thread_pool" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">thread_pool</span>
 
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">__init__</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">workers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">bundle_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">thread_pool</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="o">*</span><span class="p">,</span> <span class="n">workers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">bundle_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WorkerPool</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
 
-        <p>Initialize the executor.</p>
+        <p>Create a pool that runs evaluations in worker threads.</p>
+<p>Use this where an evaluation spends its time waiting, or in a library
+that releases the GIL. See
+<a href="../../running/running/">Running Optimizations</a> for a walkthrough.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -5831,7 +5864,7 @@ completion, and the interpreter waits for it before exiting.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Calls per worker task, <code>0</code> for a whole batch.</p>
+                <p>Evaluations per worker task, <code>0</code> for a whole batch.</p>
               </div>
             </td>
             <td>
@@ -5842,7 +5875,7 @@ completion, and the interpreter waits for it before exiting.</p>
     </table>
 
 
-<p><span class="doc-section-title">Raises:</span></p>
+    <p><span class="doc-section-title">Returns:</span></p>
     <table>
       <thead>
         <tr>
@@ -5853,11 +5886,11 @@ completion, and the interpreter waits for it before exiting.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/exceptions.html#ValueError">ValueError</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.simple.WorkerPool (ropt.simple._pool.WorkerPool)" href="#ropt.simple.WorkerPool">WorkerPool</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If <code>workers</code> is less than one.</p>
+                <p>A pool backed by worker threads.</p>
               </div>
             </td>
           </tr>
@@ -5872,81 +5905,33 @@ completion, and the interpreter waits for it before exiting.</p>
 
 
 
-  </div>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-class">
-
-
-
-<h2 id="ropt.simple.ProcessExecutor" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.simple.ProcessExecutor</span>
-
-
-</h2>
-
-
-    <div class="doc doc-contents first">
-            <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="            ropt.components.executors.ExecutorBase (ropt.components.executors.base.ExecutorBase)" href="../components_executors/#ropt.components.executors.ExecutorBase">ExecutorBase</a></code></p>
-
-
-
-        <p>An executor that employs a pool of multiprocessing workers.</p>
-<p>See <a href="../../advanced/parallel/#processexecutor">Parallel Evaluation</a> for
-details, including the <code>if __name__ == "__main__":</code> guard that the entry
-point must use.</p>
-
-
-<details class="warning" open>
-  <summary>Warning</summary>
-  <p>A worker process runs its work item to the end. A program a work item
-started itself keeps running, without an error being raised. Use
-<a class="autorefs autorefs-internal" title="            ropt.components.executors.LocalJobExecutor" href="../components_executors/#ropt.components.executors.LocalJobExecutor"><code>LocalJobExecutor</code></a> where
-an evaluation launches external programs.</p>
-</details>
-
-
-
-
-
-
-
-
-
-
-<div class="doc doc-children">
-
-
-
-
-
 
 
 <div class="doc doc-object doc-function">
 
 
-<h3 id="ropt.simple.ProcessExecutor.__init__" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">__init__</span>
+<h3 id="ropt.simple.Session.process_pool" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">process_pool</span>
 
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">__init__</span><span class="p">(</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">process_pool</span><span class="p">(</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="o">*</span><span class="p">,</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">workers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">max_tasks_per_child</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">bundle_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WorkerPool</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
 
-        <p>Initialize the executor.</p>
-<p>The worker processes are started here, so an entry point that is not
-guarded with <code>if __name__ == "__main__":</code> fails at this call.</p>
+        <p>Create a pool that runs evaluations in worker processes.</p>
+<p>The evaluation function must be picklable. See
+<a href="../../running/running/">Running Optimizations</a> for a walkthrough.</p>
+<p>Releasing the pool terminates its worker processes and nothing else. A
+program an evaluation started itself keeps running, without an error
+being raised; use <a class="autorefs autorefs-internal" title="            local_pool" href="#ropt.simple.Session.local_pool"><code>local_pool</code></a> where
+an evaluation launches external programs.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -5969,7 +5954,7 @@ guarded with <code>if __name__ == "__main__":</code> fails at this call.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Number of worker processes.</p>
+                <p>The number of worker processes.</p>
               </div>
             </td>
             <td>
@@ -5985,7 +5970,7 @@ guarded with <code>if __name__ == "__main__":</code> fails at this call.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Restart workers after this many items, or never.</p>
+                <p>Evaluations before a worker is replaced.</p>
               </div>
             </td>
             <td>
@@ -6001,7 +5986,7 @@ guarded with <code>if __name__ == "__main__":</code> fails at this call.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Calls per worker task, <code>0</code> for a whole batch.</p>
+                <p>Evaluations per worker task, <code>0</code> for a batch.</p>
               </div>
             </td>
             <td>
@@ -6012,7 +5997,7 @@ guarded with <code>if __name__ == "__main__":</code> fails at this call.</p>
     </table>
 
 
-<p><span class="doc-section-title">Raises:</span></p>
+    <p><span class="doc-section-title">Returns:</span></p>
     <table>
       <thead>
         <tr>
@@ -6023,21 +6008,11 @@ guarded with <code>if __name__ == "__main__":</code> fails at this call.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/exceptions.html#ValueError">ValueError</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.simple.WorkerPool (ropt.simple._pool.WorkerPool)" href="#ropt.simple.WorkerPool">WorkerPool</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If <code>workers</code> is less than one.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            ExecutionError (ropt.exceptions.ExecutionError)" href="../exceptions/#ropt.exceptions.ExecutionError">ExecutionError</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>If the worker processes could not be started.</p>
+                <p>A pool backed by worker processes.</p>
               </div>
             </td>
           </tr>
@@ -6052,62 +6027,17 @@ guarded with <code>if __name__ == "__main__":</code> fails at this call.</p>
 
 
 
-  </div>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-class">
-
-
-
-<h2 id="ropt.simple.LocalJobExecutor" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.simple.LocalJobExecutor</span>
-
-
-</h2>
-
-
-    <div class="doc doc-contents first">
-            <p class="doc doc-class-bases">
-              Bases: <code><span title="ropt.components.executors._job_executor.JobExecutorBase">JobExecutorBase</span></code></p>
-
-
-
-        <p>An executor that runs each work item as a separate local process.</p>
-<p>Needs no extras and no configuration. See
-<a href="../../advanced/parallel/#localjobexecutor">Parallel Evaluation</a> for details.</p>
-<p>POSIX only: cancelling kills a job's whole process group, so that whatever
-the job started itself goes with it, and Windows has no equivalent.</p>
-
-
-
-
-
-
-
-
-
-
-
-<div class="doc doc-children">
-
-
-
-
-
 
 
 <div class="doc doc-object doc-function">
 
 
-<h3 id="ropt.simple.LocalJobExecutor.__init__" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">__init__</span>
+<h3 id="ropt.simple.Session.local_pool" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">local_pool</span>
 
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">__init__</span><span class="p">(</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">local_pool</span><span class="p">(</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="o">*</span><span class="p">,</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">workdir</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">workers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
@@ -6115,20 +6045,23 @@ the job started itself goes with it, and Windows has no equivalent.</p>
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">retries</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
 </span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">cleanup</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 </span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">bundle_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WorkerPool</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
 
-        <p>Initialize the local job executor.</p>
-<p>The default <code>workdir</code> is a private temporary directory that this
-executor creates and removes again when it is dropped, unless there is
-something in it to read: if a work item failed, or <code>cleanup</code> is off, the
-directory is kept and its path logged. A work item that failed keeps its
-captured output, which is the only record of why.</p>
-<p>A local process is finished the moment it exits, and writes and renames
-its result before it does, so the small <code>interval</code> is dead time rather
-than restraint towards a scheduler, and <code>retries=0</code> is enough.</p>
+        <p>Create a pool that runs each evaluation as a separate local process.</p>
+<p>Between a process pool and a cluster: every evaluation gets an
+interpreter of its own, which can be stopped outright and whose output
+is captured to a file, but there is no queueing system and nothing to
+install. This is the local stand-in for
+<a class="autorefs autorefs-internal" title="            hpc_pool" href="#ropt.simple.Session.hpc_pool"><code>hpc_pool</code></a>: the same job shape, so an
+evaluation function that works here works there.</p>
+<p>Each job is a fresh command rather than a re-import of your script, so
+the evaluation function must live in a module the job can import, or
+the <code>ropt[cloudpickle]</code> extra must be installed.</p>
+<p>POSIX only. See <a href="../../running/running/">Running Optimizations</a> for a
+walkthrough.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -6151,7 +6084,7 @@ than restraint towards a scheduler, and <code>retries=0</code> is enough.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Directory for each work item's files and captured output.</p>
+                <p>The working directory, or <code>None</code> for a temporary one.</p>
               </div>
             </td>
             <td>
@@ -6167,7 +6100,7 @@ than restraint towards a scheduler, and <code>retries=0</code> is enough.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Maximum number of jobs running at once.</p>
+                <p>The maximum number of concurrent jobs.</p>
               </div>
             </td>
             <td>
@@ -6183,7 +6116,7 @@ than restraint towards a scheduler, and <code>retries=0</code> is enough.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Polling interval in seconds.</p>
+                <p>Seconds between checks on the running jobs.</p>
               </div>
             </td>
             <td>
@@ -6199,7 +6132,7 @@ than restraint towards a scheduler, and <code>retries=0</code> is enough.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Number of extra polls to wait for a work item's result.</p>
+                <p>Times a failed job is retried.</p>
               </div>
             </td>
             <td>
@@ -6215,7 +6148,7 @@ than restraint towards a scheduler, and <code>retries=0</code> is enough.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Whether to remove a work item's files once it settles.</p>
+                <p>Whether to remove the job files afterwards.</p>
               </div>
             </td>
             <td>
@@ -6231,7 +6164,7 @@ than restraint towards a scheduler, and <code>retries=0</code> is enough.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Calls per job, <code>0</code> for a whole batch.</p>
+                <p>Evaluations per job, <code>0</code> for a whole batch.</p>
               </div>
             </td>
             <td>
@@ -6240,96 +6173,6 @@ than restraint towards a scheduler, and <code>retries=0</code> is enough.</p>
           </tr>
       </tbody>
     </table>
-
-
-<p><span class="doc-section-title">Raises:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/exceptions.html#ValueError">ValueError</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>If <code>workdir</code> is missing or an argument is out of range.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            ExecutionError (ropt.exceptions.ExecutionError)" href="../exceptions/#ropt.exceptions.ExecutionError">ExecutionError</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>If the system is not POSIX.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="ropt.simple.LocalJobExecutor.__del__" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">__del__</span>
-
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">__del__</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Cancel whatever is left and remove a temporary working directory.</p>
-
-
-    </div>
-
-</div>
-
-
-
-
-
-
-<div class="doc doc-object doc-attribute">
-
-
-
-<h3 id="ropt.simple.LocalJobExecutor.workdir" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">workdir</span>
-
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-property"><code>property</code></small>
-  </span>
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">workdir</span><span class="p">:</span> <span class="n">Path</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>The directory the jobs read and write.</p>
-<p>When no directory was passed, this is a temporary one, and this property
-is the only way to locate it while the executor is open.</p>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
@@ -6343,65 +6186,21 @@ is the only way to locate it while the executor is open.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.simple.WorkerPool (ropt.simple._pool.WorkerPool)" href="#ropt.simple.WorkerPool">WorkerPool</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The working directory.</p>
+                <p>A pool backed by local job processes.</p>
               </div>
             </td>
           </tr>
       </tbody>
     </table>
 
-    </div>
-
-</div>
-
-
-
-
-  </div>
 
     </div>
 
 </div>
-
-<div class="doc doc-object doc-class">
-
-
-
-<h2 id="ropt.simple.HPCExecutor" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.simple.HPCExecutor</span>
-
-
-</h2>
-
-
-    <div class="doc doc-contents first">
-            <p class="doc doc-class-bases">
-              Bases: <code><span title="ropt.components.executors._job_executor.JobExecutorBase">JobExecutorBase</span></code></p>
-
-
-
-        <p>An executor for submitting tasks to an HPC cluster.</p>
-<p>Interfaces with an HPC queueing system (for example Slurm) via <code>pysqa</code>.
-Requires <code>ropt[hpc]</code> to be installed.</p>
-<p>See <a href="../../advanced/parallel/#hpcexecutor">Parallel Evaluation</a> for full
-details on configuration and lifecycle.</p>
-
-
-
-
-
-
-
-
-
-
-
-<div class="doc doc-children">
-
 
 
 
@@ -6411,12 +6210,12 @@ details on configuration and lifecycle.</p>
 <div class="doc doc-object doc-function">
 
 
-<h3 id="ropt.simple.HPCExecutor.__init__" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">__init__</span>
+<h3 id="ropt.simple.Session.hpc_pool" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">hpc_pool</span>
 
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">__init__</span><span class="p">(</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">hpc_pool</span><span class="p">(</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="o">*</span><span class="p">,</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">workdir</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">workers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
@@ -6434,41 +6233,26 @@ details on configuration and lifecycle.</p>
 </span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>    <span class="n">query_retries</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">30</span><span class="p">,</span>
 </span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>    <span class="n">cleanup</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 </span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>    <span class="n">bundle_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
-</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WorkerPool</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
 
-        <p>Initialize the HPC executor.</p>
-<p>There are two ways to say how jobs are submitted, and they are mutually
-exclusive. Either a <code>pysqa</code> configuration supplies the clusters, the
-queues and their submission scripts — the normal case on an installed
-cluster, where only <code>queue</code> need be given — or a <code>template</code> supplies the
-submission script directly, in which case nothing is configured and
-<code>scheduler</code> names the queueing system.</p>
-<p><code>workdir</code> must be an existing absolute path, and concurrently running
-executors need distinct ones: work item files are never overwritten. A
-<code>queue</code> is not a scheduler partition; it selects a configured entry
-whose submission script names the partition. <code>retries</code> covers a result
-the shared filesystem does not yet show, <code>query_retries</code> a scheduler
-that cannot be reached; the grace period each allows is its count times
-<code>interval</code>.</p>
-<p><code>config_path</code> is the directory holding <code>queue.yaml</code> or <code>clusters.yaml</code>,
-and defaults to the configuration installed alongside <code>ropt</code>; <code>cluster</code>
-and <code>queue</code> default to the configured primary. <code>scheduler</code> is what
-<code>pysqa</code> calls <code>queue_type</code>, defaults to <code>"slurm"</code>, and is meaningful
-only with a <code>template</code>, which must itself carry everything the scheduler
-needs, the partition included.</p>
-<p>With a configuration, <code>cores</code> is clamped to the queue's minimum and
-maximum, <code>run_time_max</code> to its maximum and defaults to it when not
-given, and a numeric <code>memory_max</code> to its maximum — a string such as
-<code>"4G"</code> is passed through unchanged. Entries of <code>submit_options</code> that are
-<code>None</code> are dropped, so omitting a key and passing <code>None</code> mean the same
-thing; a name the executor sets itself is rejected. A work item that
-failed keeps its captured output even under <code>cleanup</code>, which is the only
-record of why.</p>
-<p>See <a href="../../advanced/parallel/#hpcexecutor">Parallel Evaluation</a> for
-configuration details.</p>
+        <p>Create a pool that runs evaluations on an HPC cluster.</p>
+<p>Interfaces with a cluster queue (for example Slurm) through <code>pysqa</code>;
+requires the <code>ropt[hpc]</code> extra. Each evaluation is a job started as its
+own command, so the evaluation function must live in a module the
+compute nodes can import, or the <code>ropt[cloudpickle]</code> extra must be
+installed. Develop against
+<a class="autorefs autorefs-internal" title="            local_pool" href="#ropt.simple.Session.local_pool"><code>local_pool</code></a> first: it has the same
+shape and the same rule, without a cluster. The cluster is selected from
+<code>cluster</code>/<code>queue</code>: give a queue to search for its cluster, a cluster to
+use its default queue, or both to be explicit.</p>
+<p>A <code>template</code> is the alternative to all of that: it submits without a
+configuration, so it cannot be combined with <code>config_path</code>, <code>cluster</code> or
+<code>queue</code>. See <a href="../../running/parallel/#running-on-an-hpc-cluster">Running on an HPC
+cluster</a> for the
+configuration layout and Slurm examples.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -6491,7 +6275,7 @@ configuration details.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Shared-filesystem directory for each work item's files.</p>
+                <p>The shared-filesystem working directory.</p>
               </div>
             </td>
             <td>
@@ -6507,7 +6291,7 @@ configuration details.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Maximum concurrent HPC jobs.</p>
+                <p>The maximum number of concurrent cluster jobs.</p>
               </div>
             </td>
             <td>
@@ -6523,7 +6307,7 @@ configuration details.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Polling interval in seconds.</p>
+                <p>Seconds between polls of the cluster.</p>
               </div>
             </td>
             <td>
@@ -6555,7 +6339,7 @@ configuration details.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional cluster name, for a multi-cluster configuration.</p>
+                <p>The cluster name.</p>
               </div>
             </td>
             <td>
@@ -6571,7 +6355,7 @@ configuration details.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional name of a queue defined in the configuration.</p>
+                <p>The queue name.</p>
               </div>
             </td>
             <td>
@@ -6587,7 +6371,7 @@ configuration details.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A submission script template, used instead of a configuration.</p>
+                <p>A submission-script template.</p>
               </div>
             </td>
             <td>
@@ -6619,7 +6403,7 @@ configuration details.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>CPUs per work item.</p>
+                <p>The number of CPUs per job.</p>
               </div>
             </td>
             <td>
@@ -6635,7 +6419,7 @@ configuration details.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Memory per work item.</p>
+                <p>The memory per job.</p>
               </div>
             </td>
             <td>
@@ -6651,7 +6435,7 @@ configuration details.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Run time per work item, typically in seconds.</p>
+                <p>The run time per job.</p>
               </div>
             </td>
             <td>
@@ -6683,7 +6467,7 @@ configuration details.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Extra polls to wait for a work item's result.</p>
+                <p>Times a failed job is retried.</p>
               </div>
             </td>
             <td>
@@ -6699,7 +6483,7 @@ configuration details.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Extra attempts to query the scheduler after one fails.</p>
+                <p>Times the cluster is re-polled for a result.</p>
               </div>
             </td>
             <td>
@@ -6715,7 +6499,7 @@ configuration details.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Whether to remove a work item's files once it settles.</p>
+                <p>Whether to remove the job files afterwards.</p>
               </div>
             </td>
             <td>
@@ -6731,7 +6515,7 @@ configuration details.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Calls per job, <code>0</code> for a whole batch.</p>
+                <p>Evaluations per job, <code>0</code> for a whole batch.</p>
               </div>
             </td>
             <td>
@@ -6742,7 +6526,7 @@ configuration details.</p>
     </table>
 
 
-<p><span class="doc-section-title">Raises:</span></p>
+    <p><span class="doc-section-title">Returns:</span></p>
     <table>
       <thead>
         <tr>
@@ -6753,21 +6537,11 @@ configuration details.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/exceptions.html#ValueError">ValueError</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.simple.WorkerPool (ropt.simple._pool.WorkerPool)" href="#ropt.simple.WorkerPool">WorkerPool</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If an argument is out of range or the modes are mixed.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            ExecutionError (ropt.exceptions.ExecutionError)" href="../exceptions/#ropt.exceptions.ExecutionError">ExecutionError</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>If the configuration, cluster or queue cannot be resolved.</p>
+                <p>A pool backed by an HPC cluster.</p>
               </div>
             </td>
           </tr>
@@ -6786,7 +6560,205 @@ configuration details.</p>
 
     </div>
 
-</div><h2 id="offloading-work-to-an-executor">Offloading work to an executor</h2>
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="ropt.simple.WorkerPool" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.simple.WorkerPool</span>
+
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-external" title="abc.ABC" href="https://docs.python.org/3/library/abc.html#abc.ABC">ABC</a></code></p>
+
+
+
+        <p>The workers that a run's evaluations are given to.</p>
+<p>Passed to a run with <code>pool=</code>. A pool with workers comes from a session
+factory such as <a class="autorefs autorefs-internal" title="            thread_pool" href="#ropt.simple.Session.thread_pool"><code>thread_pool</code></a> and lives
+until that session closes; a <a class="autorefs autorefs-internal" title="            ropt.simple.SerialPool" href="#ropt.simple.SerialPool"><code>SerialPool</code></a> is built
+directly and evaluates in-process. See
+<a href="../../running/running/">Running Optimizations</a> for a walkthrough.</p>
+<p>This is the type to annotate with when your own code takes a pool.</p>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="ropt.simple.WorkerPool.executor" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">executor</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">executor</span><span class="p">:</span> <span class="n">Executor</span> <span class="o">|</span> <span class="kc">None</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>The executor this pool's evaluations run on.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.components.executors.Executor" href="../components_executors/#ropt.components.executors.Executor">Executor</a> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The executor, or <code>None</code> to evaluate on the calling thread.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="ropt.simple.SerialPool" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.simple.SerialPool</span>
+
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="            ropt.simple.WorkerPool (ropt.simple._pool.WorkerPool)" href="#ropt.simple.WorkerPool">WorkerPool</a></code></p>
+
+
+
+        <p>A pool that evaluates in-process, on the calling thread.</p>
+<p>It has no workers, needs no session, and needs no releasing, so it is built
+directly:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">pool</span><span class="o">=</span><span class="n">SerialPool</span><span class="p">())</span>
+</span></code></pre></div>
+<p>A run given no pool at all evaluates the same way.</p>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="ropt.simple.SerialPool.executor" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">executor</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">executor</span><span class="p">:</span> <span class="n">Executor</span> <span class="o">|</span> <span class="kc">None</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>The executor this pool's evaluations run on.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.components.executors.Executor" href="../components_executors/#ropt.components.executors.Executor">Executor</a> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Always <code>None</code>: evaluations run on the calling thread.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+
+
+
+  </div>
+
+    </div>
+
+</div><h2 id="offloading-work-to-a-pool">Offloading work to a pool</h2>
 
 
 <div class="doc doc-object doc-function">
@@ -6799,40 +6771,38 @@ configuration details.</p>
 </h2>
           <div class="doc-overloads">
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">offload</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">work</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="n">_T</span><span class="p">],</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="o">*</span><span class="p">,</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">executor</span><span class="p">:</span> <span class="n">Executor</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_T</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">work</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="n">_T</span><span class="p">],</span> <span class="o">*</span><span class="p">,</span> <span class="n">pool</span><span class="p">:</span> <span class="n">WorkerPool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="o">...</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_T</span>
 </span></code></pre></div><div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">offload</span><span class="p">(</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">work</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[],</span> <span class="n">_T</span><span class="p">]],</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="o">*</span><span class="p">,</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">executor</span><span class="p">:</span> <span class="n">Executor</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">pool</span><span class="p">:</span> <span class="n">WorkerPool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">_T</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
 </span></code></pre></div>          </div>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">offload</span><span class="p">(</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">work</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="n">_T</span><span class="p">]</span> <span class="o">|</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[],</span> <span class="n">_T</span><span class="p">]],</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="o">*</span><span class="p">,</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">executor</span><span class="p">:</span> <span class="n">Executor</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">pool</span><span class="p">:</span> <span class="n">WorkerPool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_T</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">_T</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents first">
 
-        <p>Offload one or more callables to an executor.</p>
+        <p>Offload one or more callables to a pool.</p>
 <p>Pass a single zero-argument callable to run one call and return its result,
 or a sequence of callables to run them concurrently (they may be entirely
 different functions) and return a tuple of results in the order of <code>work</code>.
 Bind arguments with <code>functools.partial</code>.</p>
-<p>Without an executor the callables run inline on the calling thread, one
-after another. Code that may or may not have an executor to hand therefore
-needs no fallback: pass whatever it has, including <code>None</code>. The callables
-must be picklable for a process or job executor.</p>
+<p>Without a pool the callables run inline on the calling thread, one after
+another. Code that may or may not have a pool to hand therefore needs no
+fallback: pass whatever it has, including <code>None</code>. The callables must be
+picklable for a process or job pool.</p>
 <p>See <a href="../../running/running/">Running Optimizations</a> for a walkthrough.</p>
 <p>A call that the machinery
 could not run, for instance because its worker process was killed, raises an
 <a class="autorefs autorefs-internal" title="            ExecutionError" href="../exceptions/#ropt.exceptions.ExecutionError"><code>ExecutionError</code></a>. Work offloaded from
-inside an evaluation needs an executor with workers of its own: the one it
-is already running on refuses it.</p>
+inside an evaluation needs a pool with workers of its own: the one it is
+already running on refuses it.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -6864,14 +6834,14 @@ is already running on refuses it.</p>
           </tr>
           <tr class="doc-section-item">
             <td>
-                <code>executor</code>
+                <code>pool</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.components.executors.Executor" href="../components_executors/#ropt.components.executors.Executor">Executor</a> | None</code>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.simple.WorkerPool (ropt.simple._pool.WorkerPool)" href="#ropt.simple.WorkerPool">WorkerPool</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The executor to dispatch to, or <code>None</code> to run inline.</p>
+                <p>The pool to dispatch to, or <code>None</code> to run inline.</p>
               </div>
             </td>
             <td>
@@ -6898,6 +6868,29 @@ is already running on refuses it.</p>
             <td>
               <div class="doc-md-description">
                 <p>The single result, or a tuple of results in the order of <code>work</code>.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="WorkflowError">WorkflowError</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the pool's session has closed.</p>
               </div>
             </td>
           </tr>
