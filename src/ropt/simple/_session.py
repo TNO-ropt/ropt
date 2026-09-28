@@ -2,7 +2,8 @@
 
 A **session** is what a pool belongs to. Its factories are the only way to build
 a pool with workers, and closing the session releases every pool it built, so
-most code needs no further cleanup.
+most code needs no further cleanup. It is also what a run's stop requests reach:
+each run registers a signal while it lasts, and `stop()` sets them all.
 
 Everything a session hands out is passed to a run explicitly, never discovered
 by it, so any number of pools — and any number of sessions — can be open at
@@ -28,6 +29,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable
     from pathlib import Path
 
+    from ropt.components.concurrency import StopSignal
     from ropt.components.executors import Executor
 
 _CLOSED = (
@@ -54,6 +56,10 @@ class Session:
 
     A session may be opened inside another, and pools from different sessions
     never interact. A session is single use — once closed it cannot be reopened.
+
+    [`stop`][ropt.simple.Session.stop] cancels the runs that are using its
+    pools, which is what a caller on another thread — a signal handler, a user
+    interface — calls to bring them down.
     """
 
     def __init__(self) -> None:
@@ -62,6 +68,7 @@ class Session:
         self._lock = threading.Lock()
         self._pools: list[_ExecutorPool] | None = None
         self._entered = False
+        self._signals: set[StopSignal] = set()
 
     def __enter__(self) -> Self:
         """Open the session.
@@ -80,11 +87,40 @@ class Session:
         return self
 
     def __exit__(self, *_exc: object) -> None:
-        """Close the session, releasing every pool it built."""
+        """Close the session, stopping its runs and releasing every pool."""
+        self.stop()
         with self._lock:
             pools, self._pools = self._pools, None
         for pool in pools or ():
             pool._release()  # ruff: ignore[private-member-access]
+
+    def stop(self) -> None:
+        """Stop the runs that are in progress on this session's pools.
+
+        Each ends with `ExitCode.CANCELLED`, keeping the best result it had
+        reached. A run stops at its next evaluation boundary, so the evaluations
+        already in flight are still carried out and their workers are only free
+        once they return.
+
+        Only the runs registered at the moment of the call are stopped. A run
+        started afterwards is unaffected, so a loop that stops one attempt and
+        starts another keeps working. Closing the session stops its runs too,
+        and then releases its pools, which is what refuses a later run.
+
+        Calling this is thread-safe, and safe on a session that has no runs.
+        """
+        with self._lock:
+            signals = list(self._signals)
+        for signal in signals:
+            signal.stop()
+
+    def _register(self, signal: StopSignal) -> None:
+        with self._lock:
+            self._signals.add(signal)
+
+    def _deregister(self, signal: StopSignal) -> None:
+        with self._lock:
+            self._signals.discard(signal)
 
     def thread_pool(self, *, workers: int = 1, bundle_size: int = 1) -> WorkerPool:
         """Create a pool that runs evaluations in worker threads.
@@ -269,7 +305,7 @@ class Session:
         self._require_open()
         # Built outside the lock, because starting workers is slow. A session
         # that closes meanwhile is caught when the pool is registered.
-        pool = _ExecutorPool(make_executor())
+        pool = _ExecutorPool(self, make_executor())
         with self._lock:
             if self._pools is None:
                 pool._release()  # ruff: ignore[private-member-access]

@@ -21,6 +21,8 @@ from ropt.exceptions import WorkflowError
 if TYPE_CHECKING:
     from ropt.components.executors import Executor
 
+    from ._session import Session
+
 _RELEASED = (
     "This pool was released when its session closed; build a new one inside an "
     "open session, for example `with session() as s: pool = s.thread_pool()`."
@@ -38,6 +40,10 @@ class WorkerPool(ABC):
 
     This is the type to annotate with when your own code takes a pool.
     """
+
+    # The session that built this pool: a run evaluating here registers with
+    # it, so the session's `stop()` reaches that run.
+    _session: Session | None = None
 
     @property
     @abstractmethod
@@ -73,7 +79,8 @@ class SerialPool(WorkerPool):
 
 
 class _ExecutorPool(WorkerPool):
-    def __init__(self, executor: Executor) -> None:
+    def __init__(self, session: Session, executor: Executor) -> None:
+        self._session: Session | None = session
         self._executor: Executor | None = executor
 
     @property
@@ -86,3 +93,7 @@ class _ExecutorPool(WorkerPool):
         # Dropping the executor is what releases its workers. The pool itself
         # may outlive this, as a name the caller still holds.
         self._executor = None
+
+
+def _session_of(pool: WorkerPool | None) -> Session | None:
+    return None if pool is None else pool._session  # ruff: ignore[private-member-access]

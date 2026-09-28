@@ -175,6 +175,37 @@ it had reached.
     there the return value is **ignored**. An evaluation is a single batch with
     no optimizer loop to interrupt, so the callback reports and nothing more.
 
+### Stopping from outside the run { #stopping-from-outside }
+
+The `report` callback runs inside the run it stops, which is no use to a signal
+handler or a user interface. [`Session.stop`][ropt.simple.Session.stop] is the
+one that is called from another thread: it stops every run that is using the
+session's pools, and each ends with `CANCELLED`, keeping the best result it had
+reached.
+
+```python
+with session() as s:
+    pool = s.thread_pool(workers=4)
+    signal.signal(signal.SIGINT, lambda *_: s.stop())
+    result = optimize(config, x0, objective, pool=pool)
+
+if result.exit_code is ExitCode.CANCELLED:
+    print("stopped early, best so far:", result.results)
+```
+
+A run stops at its next evaluation boundary, so the evaluations already in
+flight are still carried out and their workers are free only once they return.
+
+`stop()` reaches the runs that are registered at the moment of the call, and
+nothing more: it is not a latch. A run started afterwards is unaffected, so a
+loop that stops one attempt and starts another keeps working. Leaving the
+session's `with` block stops its runs as well, and then releases its pools,
+which is what refuses a run started after that.
+
+A run given no pool, or a [`SerialPool`][ropt.simple.SerialPool], belongs to no
+session and cannot be stopped this way. It evaluates on the calling thread,
+which is the thread that would have to call `stop()`.
+
 ## Attaching metadata
 
 You can attach arbitrary **metadata** to a run, from two sources:
@@ -255,7 +286,8 @@ Not every problem is an exception. An optimization that cannot make progress
 still returns normally, and indicates why in `result.exit_code`:
 `TOO_FEW_REALIZATIONS` when not enough realizations produced a value,
 `EXECUTOR_STOPPED` when the pool it was evaluating on could no longer run
-the work, which in practice means the interpreter was shutting down under it.
+the work, which in practice means the interpreter was shutting down under it,
+and `CANCELLED` when [`Session.stop`](#stopping-from-outside) was called.
 `result.results` is `None` when no feasible result was ever recorded, whatever
 the reason the run ended; a run that fails part-way still returns the best
 result it had reached before that. A plain [`evaluate`][ropt.simple.evaluate]

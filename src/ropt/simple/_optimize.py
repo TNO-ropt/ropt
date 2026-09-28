@@ -17,7 +17,7 @@ from typing import TYPE_CHECKING, cast
 import numpy as np
 
 from ropt.components.compute_steps import OptimizationStep
-from ropt.components.concurrency import run_concurrent
+from ropt.components.concurrency import StopSignal, run_concurrent
 from ropt.components.event_handlers import ResultsHandler
 from ropt.context import EnOptContext
 
@@ -29,7 +29,7 @@ from ._broadcast import (
 )
 from ._evaluator import make_evaluator
 from ._handlers import attach_handlers
-from ._pool import SerialPool
+from ._pool import SerialPool, _session_of
 from ._result import OptimizationResult
 
 if TYPE_CHECKING:
@@ -39,7 +39,6 @@ if TYPE_CHECKING:
     from numpy.typing import ArrayLike
 
     from ropt.components.event_handlers import EventHandler
-    from ropt.components.executors import Executor
 
     from ._function import EvaluationFunction
     from ._pool import WorkerPool
@@ -97,7 +96,7 @@ def optimize(  # ruff: ignore[too-many-arguments]
         WorkflowError: If the pool's session has closed.
     """  # ruff: ignore[docstring-extraneous-exception]
     return _optimize(
-        (SerialPool() if pool is None else pool).executor,
+        SerialPool() if pool is None else pool,
         config,
         x0,
         function,
@@ -110,7 +109,7 @@ def optimize(  # ruff: ignore[too-many-arguments]
 
 
 def _optimize(  # ruff: ignore[too-many-arguments]
-    executor: Executor | None,
+    pool: WorkerPool,
     config: dict[str, Any],
     x0: ArrayLike,
     function: EvaluationFunction,
@@ -122,18 +121,26 @@ def _optimize(  # ruff: ignore[too-many-arguments]
     metadata: dict[str, Any] | None = None,
 ) -> OptimizationResult:
     context = EnOptContext.model_validate(config)
-    evaluator = make_evaluator(context, function, executor, bundle_size)
+    evaluator = make_evaluator(context, function, pool.executor, bundle_size)
     # This run's own handler, tracking the result the call returns; it is added
     # directly, so it stays out of the handlers the caller manages.
     result_handler = ResultsHandler(constraint_tolerance=constraint_tolerance)
-    step = OptimizationStep(evaluator=evaluator)
+    signal = StopSignal()
+    step = OptimizationStep(evaluator=evaluator, stop_signal=signal)
     step.add_event_handler(result_handler)
     attach_handlers(step, handlers, report)
-    exit_code = step.run(
-        context=context,
-        variables=np.asarray(x0, dtype=np.float64),
-        metadata=metadata,
-    )
+    session = _session_of(pool)
+    if session is not None:
+        session._register(signal)  # ruff: ignore[private-member-access]
+    try:
+        exit_code = step.run(
+            context=context,
+            variables=np.asarray(x0, dtype=np.float64),
+            metadata=metadata,
+        )
+    finally:
+        if session is not None:
+            session._deregister(signal)  # ruff: ignore[private-member-access]
     results = result_handler["results"]
     return OptimizationResult(
         exit_code=exit_code,
@@ -207,7 +214,7 @@ def optimize_many(  # ruff: ignore[too-many-arguments]
     Raises:
         WorkflowError: If the pool's session has closed.
     """  # ruff: ignore[docstring-extraneous-exception]
-    executor = (SerialPool() if pool is None else pool).executor
+    run_pool = SerialPool() if pool is None else pool
     runs = broadcast_runs(config, x0, function)
     reports = broadcast_reports(report, len(runs))
     metadatas = broadcast_metadata(metadata, len(runs))
@@ -215,7 +222,7 @@ def optimize_many(  # ruff: ignore[too-many-arguments]
     jobs: list[Callable[[], OptimizationResult]] = [
         partial(
             _optimize,
-            executor,
+            run_pool,
             run_config,
             run_x0,
             run_function,
