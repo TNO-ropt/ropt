@@ -839,6 +839,27 @@ def test_stop_signal_is_not_cleared_by_a_new_run(config: Any, evaluator: Any) ->
     assert third == ExitCode.CANCELLED
 
 
+def test_stop_signal_carries_the_exit_code_its_steps_end_with(
+    config: Any, evaluator: Any
+) -> None:
+    signal = StopSignal()
+    step = OptimizationStep(evaluator=evaluator(), stop_signal=signal)
+    signal.stop(ExitCode.FAILED_ELSEWHERE)
+    exit_code = step.run(
+        variables=initial_values, context=EnOptContext.model_validate(config)
+    )
+    assert exit_code == ExitCode.FAILED_ELSEWHERE
+
+
+def test_stop_signal_keeps_the_exit_code_of_the_first_stop() -> None:
+    # The reason a run is already stopping for is not overwritten by a later
+    # stop for another reason.
+    signal = StopSignal()
+    signal.stop(ExitCode.FAILED_ELSEWHERE)
+    signal.stop(ExitCode.CANCELLED)
+    assert signal.exit_code == ExitCode.FAILED_ELSEWHERE
+
+
 def test_stop_signal_runs_a_late_callback_at_once() -> None:
     # A caller that registers after the stop must not be left waiting for a
     # notification that has already been sent.

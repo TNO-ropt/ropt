@@ -289,7 +289,10 @@ still returns normally, and indicates why in `result.exit_code`:
 `TOO_FEW_REALIZATIONS` when not enough realizations produced a value,
 `EXECUTOR_STOPPED` when the pool it was evaluating on could no longer run
 the work, which in practice means the interpreter was shutting down under it,
-and `CANCELLED` when [`Session.stop`](#stopping-from-outside) was called.
+`CANCELLED` when [`Session.stop`](#stopping-from-outside) was called, and
+`FAILED_ELSEWHERE` when another run on the same session raised and brought this
+one down with it (see
+[Failure in one run](parallel.md#failure-in-one-run)).
 `result.results` is `None` when no feasible result was ever recorded, whatever
 the reason the run ended; a run that fails part-way still returns the best
 result it had reached before that. A plain [`evaluate`][ropt.simple.evaluate]

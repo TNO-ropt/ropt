@@ -21,6 +21,7 @@ from ropt.components.executors import (
     ProcessExecutor,
     ThreadExecutor,
 )
+from ropt.enums import ExitCode
 from ropt.exceptions import WorkflowError
 
 from ._evaluate import _evaluate, _evaluate_batch
@@ -76,13 +77,18 @@ class Session:
     calls to bring them down.
     """
 
-    def __init__(self) -> None:
-        """Initialize the session."""
+    def __init__(self, *, keep_going: bool = False) -> None:
+        """Initialize the session.
+
+        Args:
+            keep_going: The default for the runs started on this session.
+        """
         # A driver thread may build its own pool while the session is closing.
         self._lock = threading.Lock()
         self._pools: list[WorkerPool] | None = None
         self._entered = False
-        self._signals: set[StopSignal] = set()
+        self._keep_going = keep_going
+        self._signals: dict[StopSignal, bool] = {}
 
     def __enter__(self) -> Self:
         """Open the session.
@@ -116,6 +122,9 @@ class Session:
         already in flight are still carried out and their workers are only free
         once they return.
 
+        This reaches every run, `keep_going` or not: that flag exempts a run
+        from the stop a failing run triggers, not from one that was asked for.
+
         Only the runs registered at the moment of the call are stopped. A run
         started afterwards is unaffected, so a loop that stops one attempt and
         starts another keeps working. Closing the session stops its runs too,
@@ -128,15 +137,29 @@ class Session:
         for signal in signals:
             signal.stop()
 
-    def _register(self, signal: StopSignal) -> None:
+    def _fail(self) -> None:
+        # A run that failed brings down the rest, which is what makes a script
+        # stop at the first problem. `keep_going` exempts a run from being
+        # stopped, never from stopping the others.
+        with self._lock:
+            signals = [
+                signal for signal, keep_going in self._signals.items() if not keep_going
+            ]
+        for signal in signals:
+            signal.stop(ExitCode.FAILED_ELSEWHERE)
+
+    def _resolve_keep_going(self, *, keep_going: bool | None) -> bool:
+        return self._keep_going if keep_going is None else keep_going
+
+    def _register(self, signal: StopSignal, *, keep_going: bool) -> None:
         with self._lock:
             if self._pools is None:
                 raise WorkflowError(_CLOSED)
-            self._signals.add(signal)
+            self._signals[signal] = keep_going
 
     def _deregister(self, signal: StopSignal) -> None:
         with self._lock:
-            self._signals.discard(signal)
+            self._signals.pop(signal, None)
 
     def optimize(  # ruff: ignore[too-many-arguments]
         self,
@@ -147,6 +170,7 @@ class Session:
         handlers: Sequence[EventHandler] | None = None,
         report: ReportCallback | None = None,
         constraint_tolerance: float = 1e-10,
+        keep_going: bool | None = None,
         metadata: dict[str, Any] | None = None,
     ) -> OptimizationResult:
         """Run a single optimization in-process, on this session.
@@ -162,6 +186,8 @@ class Session:
             handlers:             Optional handlers, called in the order listed.
             report:               Optional callback invoked per evaluation.
             constraint_tolerance: The tolerance within which a constraint holds.
+            keep_going:           Whether to run on when another run in this
+                                  session fails, `None` for the session's own.
             metadata:             Optional dictionary attached to every result.
 
         Returns:
@@ -177,6 +203,7 @@ class Session:
             report=report,
             constraint_tolerance=constraint_tolerance,
             bundle_size=None,
+            keep_going=keep_going,
             metadata=metadata,
         )
 
@@ -190,6 +217,7 @@ class Session:
         report: ReportCallback | Sequence[ReportCallback] | None = None,
         limit: int | None = None,
         constraint_tolerance: float = 1e-10,
+        keep_going: bool | None = None,
         metadata: dict[str, Any] | Sequence[dict[str, Any]] | None = None,
     ) -> tuple[OptimizationResult, ...]:
         """Run several optimizations concurrently in-process, on this session.
@@ -209,6 +237,9 @@ class Session:
             report:               Optional callback, shared or one per run.
             limit:                The maximum number of runs at once.
             constraint_tolerance: The tolerance within which a constraint holds.
+            keep_going:           Whether a run carries on when another run in
+                                  this session fails, `None` for the session's
+                                  own.
             metadata:             Optional dictionary attached to every result.
 
         Returns:
@@ -225,6 +256,7 @@ class Session:
             limit=limit,
             constraint_tolerance=constraint_tolerance,
             bundle_size=None,
+            keep_going=keep_going,
             metadata=metadata,
         )
 
@@ -507,7 +539,7 @@ class Session:
                 raise WorkflowError(_CLOSED)
 
 
-def session() -> Session:
+def session(*, keep_going: bool = False) -> Session:
     """Open a session that owns the pools built on it.
 
     Build pools with the session's factories, and start on them the runs that
@@ -524,7 +556,14 @@ def session() -> Session:
     evaluates in-process and needs no session. See
     [Running Optimizations](../running/running.md) for a walkthrough.
 
+    By default a run that fails stops the other runs on the session, which is
+    what makes a script stop at the first problem. Pass `keep_going=True` to let
+    them finish instead; a failure is still raised to its own caller.
+
+    Args:
+        keep_going: The default for the runs started on this session.
+
     Returns:
         A context manager binding the [`Session`][ropt.simple.Session].
     """
-    return Session()
+    return Session(keep_going=keep_going)

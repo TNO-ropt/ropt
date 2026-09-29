@@ -6,6 +6,8 @@ import contextlib
 import threading
 from typing import TYPE_CHECKING
 
+from ropt.enums import ExitCode
+
 if TYPE_CHECKING:
     from collections.abc import Callable
 
@@ -31,19 +33,36 @@ class StopSignal:
         self._lock = threading.Lock()
         self._flag = threading.Event()
         self._callbacks: list[Callable[[], None]] = []
+        self._exit_code = ExitCode.CANCELLED
 
-    def stop(self) -> None:
+    def stop(self, exit_code: ExitCode = ExitCode.CANCELLED) -> None:
         """Request that everything observing this signal stops.
 
-        Calling this more than once has no further effect.
+        Calling this more than once has no further effect: the first call
+        decides the exit code, so a later stop for another reason cannot
+        overwrite the reason a run is already stopping for.
+
+        Args:
+            exit_code: The code the steps stopping on this signal end with.
         """
         with self._lock:
             if self._flag.is_set():
                 return
+            self._exit_code = exit_code
             self._flag.set()
             callbacks = list(self._callbacks)
         for callback in callbacks:
             callback()
+
+    @property
+    def exit_code(self) -> ExitCode:
+        """The exit code a step stopping on this signal ends with.
+
+        Returns:
+            The code passed to the first `stop` call.
+        """
+        with self._lock:
+            return self._exit_code
 
     @property
     def stopping(self) -> bool:

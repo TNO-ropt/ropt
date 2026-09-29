@@ -56,6 +56,7 @@ def _optimize(  # ruff: ignore[too-many-arguments]
     report: ReportCallback | None,
     constraint_tolerance: float,
     bundle_size: int | None,
+    keep_going: bool | None,
     metadata: dict[str, Any] | None,
 ) -> OptimizationResult:
     context = EnOptContext.model_validate(config)
@@ -67,13 +68,19 @@ def _optimize(  # ruff: ignore[too-many-arguments]
     step = OptimizationStep(evaluator=evaluator, stop_signal=signal)
     step.add_event_handler(result_handler)
     attach_handlers(step, handlers, report)
-    session._register(signal)  # ruff: ignore[private-member-access]
+    session._register(  # ruff: ignore[private-member-access]
+        signal,
+        keep_going=session._resolve_keep_going(keep_going=keep_going),  # ruff: ignore[private-member-access]
+    )
     try:
         exit_code = step.run(
             context=context,
             variables=np.asarray(x0, dtype=np.float64),
             metadata=metadata,
         )
+    except Exception:
+        session._fail()  # ruff: ignore[private-member-access]
+        raise
     finally:
         session._deregister(signal)  # ruff: ignore[private-member-access]
     results = result_handler["results"]
@@ -95,6 +102,7 @@ def _optimize_many(  # ruff: ignore[too-many-arguments]
     limit: int | None,
     constraint_tolerance: float,
     bundle_size: int | Sequence[int | None] | None,
+    keep_going: bool | None,
     metadata: dict[str, Any] | Sequence[dict[str, Any]] | None,
 ) -> tuple[OptimizationResult, ...]:
     runs = broadcast_runs(config, x0, function)
@@ -113,6 +121,7 @@ def _optimize_many(  # ruff: ignore[too-many-arguments]
             report=run_report,
             constraint_tolerance=constraint_tolerance,
             bundle_size=run_bundle_size,
+            keep_going=keep_going,
             metadata=run_metadata,
         )
         for (

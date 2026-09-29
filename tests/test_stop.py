@@ -50,6 +50,35 @@ def _waits_once(barrier: threading.Barrier) -> Any:
     return objective
 
 
+def _waits_then_holds(barrier: threading.Barrier, release: threading.Event) -> Any:
+    # Held inside the evaluation until the other run has failed, so this one is
+    # provably still going when it reaches the boundary that observes the stop.
+    waited = False
+
+    def objective(
+        variables: NDArray[np.float64], context: EvaluationFunctionContext
+    ) -> float:
+        nonlocal waited
+        if not waited:
+            waited = True
+            barrier.wait(timeout=30)
+            assert release.wait(timeout=30)
+        return _sphere(variables, context)
+
+    return objective
+
+
+def _fails_at(barrier: threading.Barrier) -> Any:
+    def objective(
+        _variables: NDArray[np.float64], _context: EvaluationFunctionContext
+    ) -> float:
+        barrier.wait(timeout=30)
+        msg = "boom"
+        raise ValueError(msg)
+
+    return objective
+
+
 @pytest.mark.timeout(60)
 def test_session_stop_cancels_a_run_keeping_its_best_result() -> None:
     with session() as opened:
@@ -148,3 +177,152 @@ def test_a_stop_does_not_reach_another_session() -> None:
         assert stopped_pool.optimize(_CONFIG, _INITIAL, _sphere).results is not None
 
     assert result.exit_code == ExitCode.OPTIMIZER_FINISHED
+
+
+def _run_beside_a_failure(
+    *, keep_going: bool | None, failure_keeps_going: bool | None = None
+) -> OptimizationResult:
+    # One run fails while a second is held inside an evaluation, so the second
+    # is certainly still going when the failure lands. Returns the second.
+    started = threading.Barrier(2, timeout=30)
+    release = threading.Event()
+    outcome: list[OptimizationResult] = []
+
+    with session() as opened:
+        pool = opened.thread_pool(workers=2)
+
+        def _survivor() -> None:
+            outcome.append(
+                pool.optimize(
+                    _CONFIG,
+                    _INITIAL,
+                    _waits_then_holds(started, release),
+                    keep_going=keep_going,
+                )
+            )
+
+        driver = threading.Thread(target=_survivor)
+        driver.start()
+        try:
+            with pytest.raises(ValueError, match="boom"):
+                pool.optimize(
+                    _CONFIG,
+                    _INITIAL,
+                    _fails_at(started),
+                    keep_going=failure_keeps_going,
+                )
+        finally:
+            release.set()
+            driver.join(timeout=30)
+
+    assert not driver.is_alive()
+    return outcome[0]
+
+
+@pytest.mark.timeout(60)
+def test_a_failing_run_stops_the_others_on_its_session() -> None:
+    result = _run_beside_a_failure(keep_going=None)
+    assert result.exit_code == ExitCode.FAILED_ELSEWHERE
+    assert result.results is not None
+
+
+@pytest.mark.timeout(60)
+def test_keep_going_lets_a_run_finish_when_another_fails() -> None:
+    result = _run_beside_a_failure(keep_going=True)
+    assert result.exit_code == ExitCode.OPTIMIZER_FINISHED
+
+
+@pytest.mark.timeout(60)
+def test_a_failing_run_that_keeps_going_still_stops_the_others() -> None:
+    # The flag exempts a run from being stopped, never from stopping the rest:
+    # a run that may outlive a failure must not be able to hide its own.
+    result = _run_beside_a_failure(keep_going=None, failure_keeps_going=True)
+    assert result.exit_code == ExitCode.FAILED_ELSEWHERE
+
+
+@pytest.mark.timeout(60)
+def test_a_run_takes_keep_going_from_its_session() -> None:
+    started = threading.Barrier(2, timeout=30)
+    release = threading.Event()
+    outcome: list[OptimizationResult] = []
+
+    with session(keep_going=True) as opened:
+        pool = opened.thread_pool(workers=2)
+
+        def _survivor() -> None:
+            outcome.append(
+                pool.optimize(_CONFIG, _INITIAL, _waits_then_holds(started, release))
+            )
+
+        driver = threading.Thread(target=_survivor)
+        driver.start()
+        try:
+            with pytest.raises(ValueError, match="boom"):
+                pool.optimize(_CONFIG, _INITIAL, _fails_at(started))
+        finally:
+            release.set()
+            driver.join(timeout=30)
+
+    assert outcome[0].exit_code == ExitCode.OPTIMIZER_FINISHED
+
+
+@pytest.mark.timeout(60)
+def test_keep_going_on_a_run_overrides_its_session() -> None:
+    started = threading.Barrier(2, timeout=30)
+    release = threading.Event()
+    outcome: list[OptimizationResult] = []
+
+    with session(keep_going=True) as opened:
+        pool = opened.thread_pool(workers=2)
+
+        def _survivor() -> None:
+            outcome.append(
+                pool.optimize(
+                    _CONFIG,
+                    _INITIAL,
+                    _waits_then_holds(started, release),
+                    keep_going=False,
+                )
+            )
+
+        driver = threading.Thread(target=_survivor)
+        driver.start()
+        try:
+            with pytest.raises(ValueError, match="boom"):
+                pool.optimize(_CONFIG, _INITIAL, _fails_at(started))
+        finally:
+            release.set()
+            driver.join(timeout=30)
+
+    assert outcome[0].exit_code == ExitCode.FAILED_ELSEWHERE
+
+
+@pytest.mark.timeout(60)
+def test_session_stop_reaches_a_run_that_keeps_going() -> None:
+    # Opting out is about a sibling's failure, not about being asked to stop,
+    # and the exit code says which of the two happened.
+    started = threading.Barrier(2, timeout=30)
+    release = threading.Event()
+    outcome: list[OptimizationResult] = []
+
+    with session() as opened:
+        pool = opened.thread_pool(workers=1)
+
+        def _survivor() -> None:
+            outcome.append(
+                pool.optimize(
+                    _CONFIG,
+                    _INITIAL,
+                    _waits_then_holds(started, release),
+                    keep_going=True,
+                )
+            )
+
+        driver = threading.Thread(target=_survivor)
+        driver.start()
+        started.wait(timeout=30)
+        opened.stop()
+        release.set()
+        driver.join(timeout=30)
+
+    assert outcome[0].exit_code == ExitCode.CANCELLED

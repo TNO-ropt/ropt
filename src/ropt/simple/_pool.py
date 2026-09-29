@@ -84,6 +84,7 @@ class WorkerPool:
         report: ReportCallback | None = None,
         constraint_tolerance: float = 1e-10,
         bundle_size: int | None = None,
+        keep_going: bool | None = None,
         metadata: dict[str, Any] | None = None,
     ) -> OptimizationResult:
         """Run a single optimization, evaluating on this pool.
@@ -99,6 +100,8 @@ class WorkerPool:
             constraint_tolerance: The tolerance within which a constraint holds.
             bundle_size:          Evaluations per worker task, `None` for the
                                   pool's own.
+            keep_going:           Whether to run on when another run in this
+                                  session fails, `None` for the session's own.
             metadata:             Optional dictionary attached to every result.
 
         Returns:
@@ -117,6 +120,7 @@ class WorkerPool:
             report=report,
             constraint_tolerance=constraint_tolerance,
             bundle_size=bundle_size,
+            keep_going=keep_going,
             metadata=metadata,
         )
 
@@ -131,6 +135,7 @@ class WorkerPool:
         limit: int | None = None,
         constraint_tolerance: float = 1e-10,
         bundle_size: int | Sequence[int | None] | None = None,
+        keep_going: bool | None = None,
         metadata: dict[str, Any] | Sequence[dict[str, Any]] | None = None,
     ) -> tuple[OptimizationResult, ...]:
         """Run several optimizations concurrently, all evaluating on this pool.
@@ -150,6 +155,8 @@ class WorkerPool:
             constraint_tolerance: The tolerance within which a constraint holds.
             bundle_size:          Evaluations per worker task, shared or one per
                                   run.
+            keep_going:           Whether to run on when another run in this
+                                  session fails, `None` for the session's own.
             metadata:             Optional dictionary attached to every result.
 
         Returns:
@@ -169,6 +176,7 @@ class WorkerPool:
             limit=limit,
             constraint_tolerance=constraint_tolerance,
             bundle_size=bundle_size,
+            keep_going=keep_going,
             metadata=metadata,
         )
 
@@ -288,4 +296,4 @@ class WorkerPool:
             ExecutionError: If the machinery could not run a call.
             WorkflowError:  If this pool's session has closed.
         """  # ruff: ignore[docstring-extraneous-exception]
-        return _offload(self._live_executor, work)
+        return _offload(self._session, self._live_executor, work)

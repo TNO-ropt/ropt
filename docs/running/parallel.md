@@ -660,14 +660,33 @@ runs](handlers.md#sharing-a-handler-across-concurrent-runs).
 
 ### Failure in one run
 
-A run that raises does not affect its siblings. Every run is carried through to
-its end, and when they have all finished the first exception that was raised is
-raised from the `optimize_many` call. The results of the runs that succeeded are
-not returned.
+A run that raises stops the other runs on its session. Each of those ends at its
+next evaluation boundary with `FAILED_ELSEWHERE`, keeping the best result it had
+reached, and the exception is raised from the `optimize_many` call. This is the
+default because most runs are started from a script with nobody watching: a
+problem should end the script rather than leave the rest of the work grinding on
+towards output that will not be used.
 
-While a failed run's siblings continue they keep calling your evaluation
-function, keep the pool busy, and keep feeding any handler you passed in
-`handlers`. Nothing can currently cut that short.
+The reach is the session, not the call, so a failure also stops runs that were
+started separately on the same session. A run started with the module-level
+[`optimize_many`][ropt.simple.optimize_many] has a session of its own, holding
+only the runs of that call.
+
+Pass `keep_going=True` to let a run finish anyway:
+
+```python
+results = pool.optimize_many(config, start_points, objective, keep_going=True)
+```
+
+or `session(keep_going=True)` to make that the default for everything on the
+session, which a single run can still override with `keep_going=False`.
+
+The flag decides only whether a run is *stopped*. A run that keeps going still
+stops the others if it fails itself, and its exception still reaches its caller,
+so opting out cannot turn a failure into silence.
+[`Session.stop`](running.md#stopping-from-outside) reaches every run whatever the
+flag says, and those end with `CANCELLED` instead: the exit code distinguishes a
+stop that was asked for from one another run caused.
 
 ## Running the optimizer in a separate process { #external-backend }
 

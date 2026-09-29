@@ -205,6 +205,7 @@ returns nothing:
 | `MAX_BATCHES_REACHED`        | Maximum number of evaluation batches was reached.             |
 | `USER_ABORT`                 | An event handler requested a stop via `event.source.stop()`.  |
 | `CANCELLED`                  | The step's [`StopSignal`][ropt.components.concurrency.StopSignal] was set. |
+| `FAILED_ELSEWHERE`           | The step's signal was set with this code, which `ropt.simple` uses when another run failed. |
 | `EXECUTOR_STOPPED`           | The executor could no longer run the work, which in practice means the interpreter was shutting down. |
 
 An event handler can stop its own optimization by calling `event.source.stop()`
@@ -227,10 +228,12 @@ steps = [OptimizationStep(evaluator=evaluator, stop_signal=signal) for ...]
 signal.stop()
 ```
 
-A step polls its signal wherever it polls `stop()`, and ends with `CANCELLED`
-rather than `USER_ABORT`, which is what distinguishes the two. The exit code
-names who decided: `USER_ABORT` the run itself, `CANCELLED` whoever holds the
-signal.
+A step polls its signal wherever it polls `stop()`, and ends with the code the
+signal carries, which is `CANCELLED` unless `stop` was given another one. That
+is what distinguishes it from `USER_ABORT`: the exit code names who decided,
+`USER_ABORT` the run itself and the signal's code whoever holds the signal.
+The first `stop` fixes the code, so a second one for another reason cannot
+overwrite the reason a run is already stopping for.
 
 A signal cannot be reset. `run()` clears the step's own stop request, so a step
 is reusable after a `USER_ABORT`, but a step whose signal is already stopping

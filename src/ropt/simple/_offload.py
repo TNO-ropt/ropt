@@ -22,19 +22,26 @@ if TYPE_CHECKING:
 
     from ropt.components.executors import Executor
 
+    from ._session import Session
+
 _T = TypeVar("_T")
 
 
 def _offload(
+    session: Session,
     executor: Executor,
     work: Callable[[], _T] | Sequence[Callable[[], _T]],
 ) -> _T | tuple[_T, ...]:
-    if callable(work):
-        return cast("_T", _run(executor, [work])[0])
-    functions = list(work)
-    if not functions:
-        return ()
-    return tuple(_run(executor, functions))
+    try:
+        if callable(work):
+            return cast("_T", _run(executor, [work])[0])
+        functions = list(work)
+        if not functions:
+            return ()
+        return tuple(_run(executor, functions))
+    except Exception:
+        session._fail()  # ruff: ignore[private-member-access]
+        raise
 
 
 def _run(executor: Executor, functions: list[Callable[[], Any]]) -> list[Any]:

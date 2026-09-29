@@ -134,6 +134,9 @@ class ExitCode(IntEnum):
     FAILED = 8
     """Returned when the run raised an exception."""
 
+    FAILED_ELSEWHERE = 9
+    """Returned when another run this one shares a session with failed."""
+
 
 class AxisName(StrEnum):
     """Enumerates the semantic meaning of axes in data arrays.

@@ -78,6 +78,7 @@ def optimize_many(  # ruff: ignore[too-many-arguments]
     report: ReportCallback | Sequence[ReportCallback] | None = None,
     limit: int | None = None,
     constraint_tolerance: float = 1e-10,
+    keep_going: bool | None = None,
     metadata: dict[str, Any] | Sequence[dict[str, Any]] | None = None,
 ) -> tuple[OptimizationResult, ...]:
     """Run several optimizations concurrently, in-process.
@@ -97,6 +98,8 @@ def optimize_many(  # ruff: ignore[too-many-arguments]
         report:               Optional callback, shared or one per run.
         limit:                The maximum number of runs at once.
         constraint_tolerance: The tolerance within which a constraint holds.
+        keep_going:           Whether a run carries on when another of these
+                              runs fails; they all fail fast by default.
         metadata:             Optional dictionary attached to every result.
 
     Returns:
@@ -111,6 +114,7 @@ def optimize_many(  # ruff: ignore[too-many-arguments]
             report=report,
             limit=limit,
             constraint_tolerance=constraint_tolerance,
+            keep_going=keep_going,
             metadata=metadata,
         )
 

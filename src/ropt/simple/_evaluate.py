@@ -121,13 +121,16 @@ def _run_evaluation(  # ruff: ignore[too-many-arguments]
     step = EvaluationStep(evaluator=evaluator, stop_signal=signal)
     step.add_event_handler(history)
     attach_handlers(step, handlers, report)
-    session._register(signal)  # ruff: ignore[private-member-access]
+    session._register(signal, keep_going=False)  # ruff: ignore[private-member-access]
     try:
         step.run(
             context=context,
             variables=np.asarray(variables, dtype=np.float64),
             metadata=metadata,
         )
+    except Exception:
+        session._fail()  # ruff: ignore[private-member-access]
+        raise
     finally:
         session._deregister(signal)  # ruff: ignore[private-member-access]
     return history["results"] or ()
