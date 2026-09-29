@@ -8,11 +8,13 @@
     [Optimizer Setup](../optimizer_setup/key_concepts.md), the same whichever way you run
     it.
 
-The workflow components are the layer beneath the
-[simple API](../running/running.md) — the compute steps, event handlers,
-evaluators and executors its convenience functions are assembled from, exposed
-directly. Everything those functions do is available here, along with the cases
-they cannot express; the cost is that you wire it together yourself.
+A **workflow** is an optimization assembled from components: compute steps,
+event handlers, evaluators and executors, wired together and run directly.
+These pages describe that API on its own terms. It is a second way to run an
+optimization, not a layer to reach into from the first: a workflow and a
+[`ropt.simple`](../running/running.md) run are alternatives, and combining
+them in one program is outside what these pages describe. Event handlers are
+the exception — the same handler objects serve both.
 
 These pages assume threads. Event handlers may be invoked from several threads
 at once, so the concurrency and process-boundary rules stated here are binding:
@@ -29,8 +31,6 @@ There are four core workflow components:
 
 The first three are covered below. Executors are only relevant for asynchronous
 and parallel execution and are discussed in [Parallel Evaluation](parallel.md).
-Writing your own implementation of any of the four is covered in
-[Implementing a Component](components.md).
 
 Compute steps emit [`EnOptEvent`][ropt.events.EnOptEvent] objects at key
 points during execution — for instance when an evaluation starts or finishes.

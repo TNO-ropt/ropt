@@ -142,7 +142,6 @@ nav:
           - "Optimization Workflows": advanced/workflows.md
           - "Writing Evaluation Callbacks": advanced/evaluation_callbacks.md
           - "Parallel Evaluation": advanced/parallel.md
-          - "Implementing a Component": advanced/components.md
           - "Workflow Examples": advanced/examples.md
       - "Plugins":
           - "Plugin Discovery": advanced/plugin_discovery.md

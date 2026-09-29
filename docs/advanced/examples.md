@@ -2,10 +2,10 @@
 
 Every script in the
 [examples/advanced](https://github.com/TNO-ropt/ropt/tree/main/examples/advanced)
-folder is listed here. They assemble the [workflow components](workflows.md) by
-hand, for the cases the simple API does not cover.
+folder is listed here. Each assembles a workflow from
+[components](workflows.md) and runs it directly.
 
-Scripts that use the simple API are listed under
+Scripts that use `ropt.simple` are listed under
 [Examples](../getting_started/examples.md).
 
 | Script | What it shows | Explained in |

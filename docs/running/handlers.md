@@ -215,18 +215,11 @@ other than results — the start or end of a run, for example; for results alone
 `report=` already does it. The rest belong to the component API, described in
 [Optimization Workflows](../advanced/workflows.md#event-handlers).
 
-## Custom handlers
-
-Handlers are not limited to the built-ins: you — or another package — can
-provide your own by implementing `ropt`'s event-handler interface. The
-[Optimization Workflows](../advanced/workflows.md#event-handlers) describes the event
-model, the handler protocol, and how to write one.
-
-A custom handler can also **stop its own optimization**: every event carries the
-compute step that emitted it, so calling `event.source.stop()` from `handle_event`
-ends that run gracefully with `USER_ABORT` (the [`report`](running.md#stopping-early-from-the-callback)
-callback above is just a convenience wrapper around this). Only the run that owns
-the emitting step is affected, so concurrent runs continue. See
+A handler can also **stop the run that fed it**: every event carries the compute
+step that emitted it, so calling `event.source.stop()` ends that run with
+`USER_ABORT` — the [`report`](running.md#stopping-early-from-the-callback)
+callback above is a convenience wrapper around this. Only the run that owns the
+emitting step is affected, so concurrent runs continue. See
 [Optimization Workflows](../advanced/workflows.md#exit-codes).
 
 ## Handlers and the process boundary

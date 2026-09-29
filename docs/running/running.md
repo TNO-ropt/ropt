@@ -240,9 +240,10 @@ You can attach arbitrary **metadata** to a run, from two sources:
   ```
 
   A key does not have to be set by every realization; those that do not set it
-  get `np.nan` for numeric values and `None` otherwise. See [Writing Evaluation
-  Callbacks](../advanced/evaluation_callbacks.md#using-functionevaluator) for
-  the effect on the column dtype.
+  get `np.nan` for numeric values and `None` otherwise, so a numeric column with
+  missing realizations is widened to `float64` — numpy has no integer NaN. A
+  key set by every realization keeps its natural dtype, and mixing strings and
+  non-strings under one key raises a `ValueError`.
 
   Returning an array instead of a scalar gives the key its own
   [user-defined axis](results.md#user-defined-axes), which

@@ -121,7 +121,7 @@ optimization as implemented by `ropt`.
 
 **Batch**
 :   A group of one or more variable vectors evaluated together in a single call
-    to the [evaluator](../advanced/evaluation_callbacks.md). These may include
+    to the evaluation function. These may include
     points in optimization space that the optimizer is exploring, or perturbed
     points for gradient calculations.
 
