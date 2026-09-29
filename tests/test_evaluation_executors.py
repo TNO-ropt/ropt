@@ -11,6 +11,7 @@ import pickle  # ruff: ignore[suspicious-pickle-import]
 import pkgutil
 import shutil
 import signal
+import socket
 import subprocess  # ruff: ignore[suspicious-subprocess-import]
 import sys
 import tempfile
@@ -139,6 +140,12 @@ def _raise_locally_defined_error() -> None:
     raise _LocalError(msg)
 
 
+# The socket below carries no data: it is a liveness token. The grandchild
+# belongs to the job, not to this process, so there is no exit status to wait
+# for, and a process that is killed writes no file on its way out. Connecting
+# proves it started, and the EOF when the connection closes is the only notice
+# that it died. An address is a string, which is what survives the pickle that
+# carries a work item out to a job -- a file descriptor would not.
 _GRANDCHILD_SOURCE = """
 import sys
 from multiprocessing.connection import Client
@@ -151,6 +158,26 @@ def _spawn_child_and_block(address: str) -> int:
     child = subprocess.Popen([sys.executable, "-c", _GRANDCHILD_SOURCE, address])
     child.wait()
     return 0
+
+
+def _connect_then_raise(address: str) -> int:
+    # Its stdin is closed and a file would have to be polled for, so a socket is
+    # again the way to tell a job in another process when to go on.
+    Client(address).recv()
+    msg = "Test error in function 0"
+    raise ValueError(msg)
+
+
+def _bounded_listeners(first: Path, second: Path) -> tuple[Listener, Listener]:
+    # A socket keeps the default timeout that was in force when it was created,
+    # so a connection that never arrives fails at the accept with the reason to
+    # hand, rather than hanging until pytest-timeout kills the whole test.
+    previous = socket.getdefaulttimeout()
+    socket.setdefaulttimeout(20.0)
+    try:
+        return Listener(str(first)), Listener(str(second))
+    finally:
+        socket.setdefaulttimeout(previous)
 
 
 def _print_and_die(value: int) -> int:
@@ -1860,39 +1887,44 @@ def test_local_jobs_run_in_separate_processes() -> None:
 def test_a_leaving_batch_kills_a_local_job_and_its_children(tmp_path: Path) -> None:
     # A job that started a process of its own: cancelling has to reach that too,
     # or it is orphaned and outlives the run that asked for it. The second work
-    # item fails, which is what takes the batch out from under the first.
-    listener = Listener(str(tmp_path / "job"))
+    # item fails only when told to, so the first is provably connected by then;
+    # left to race, the failure can tear the batch down first and the first job
+    # never connects at all.
+    spawner, failer = _bounded_listeners(tmp_path / "job", tmp_path / "failer")
     executor = LocalJobExecutor(workdir=tmp_path, workers=2)
-    connection = None
-    outcome: list[BaseException] = []
+    spawned = None
+    failing = None
+    outcome: list[Exception] = []
 
     def _run() -> None:
         try:
             executor.run(
                 [
-                    WorkItem(function=_spawn_child_and_block, args=(listener.address,)),
-                    WorkItem(
-                        function=_function, args=(0,), kwargs={"raise_error": True}
-                    ),
+                    WorkItem(function=_spawn_child_and_block, args=(spawner.address,)),
+                    WorkItem(function=_connect_then_raise, args=(failer.address,)),
                 ]
             )
-        except ValueError as exc:
+        except Exception as exc:  # ruff: ignore[blind-except]
             outcome.append(exc)
 
     try:
         runner = threading.Thread(target=_run, daemon=True)
         runner.start()
-        connection = listener.accept()
-        assert connection.poll(20.0)
+        spawned = spawner.accept()
+        failing = failer.accept()
+        failing.send(None)
+        assert spawned.poll(20.0)
         with pytest.raises(EOFError):
-            connection.recv()
+            spawned.recv()
         runner.join(10.0)
         assert not runner.is_alive()
-        assert isinstance(outcome[0], ValueError)
+        assert isinstance(outcome[0], ValueError), outcome
     finally:
-        if connection is not None:
-            connection.close()
-        listener.close()
+        for open_end in (spawned, failing):
+            if open_end is not None:
+                open_end.close()
+        spawner.close()
+        failer.close()
 
 
 @pytest.mark.slow
