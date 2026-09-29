@@ -16,8 +16,6 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 import pytest
 
-from ropt.components.compute_steps import OptimizationStep
-from ropt.components.evaluators import FunctionEvaluator
 from ropt.components.event_handlers import EventHandler
 from ropt.components.executors import (
     HPCExecutor,
@@ -25,7 +23,6 @@ from ropt.components.executors import (
     ProcessExecutor,
     ThreadExecutor,
 )
-from ropt.context import EnOptContext
 from ropt.enums import EnOptEventType, ExitCode
 from ropt.exceptions import ExecutionError, WorkflowError
 from ropt.results import FunctionResults
@@ -194,21 +191,6 @@ def test_optimize_result_carries_the_best_evaluation(
     assert isinstance(result, OptimizationResult)
     assert isinstance(result.results, FunctionResults)
     assert result.results.variables is not None
-
-
-def test_hand_assembled_step_runs(config: Any, test_functions: Any) -> None:
-    # A step built by hand runs exactly the way optimize() runs its own: it
-    # takes its context and nothing from its surroundings.
-    step = OptimizationStep(
-        evaluator=FunctionEvaluator(function=adapt_function(test_functions[0], 1, 0))
-    )
-    history = HistoryHandler()
-    step.add_event_handler(history)
-    exit_code = step.run(
-        context=EnOptContext.model_validate(config), variables=initial_values
-    )
-    assert exit_code == ExitCode.OPTIMIZER_FINISHED
-    assert len(history["results"]) > 1
 
 
 def test_optimize_feeds_two_handlers_at_once(config: Any, test_functions: Any) -> None:

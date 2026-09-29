@@ -43,8 +43,8 @@ if TYPE_CHECKING:
     from ._result import OptimizationResult
 
 _CLOSED = (
-    "This session is not open; build pools inside its `with` block, for "
-    "example `with session() as s: pool = s.thread_pool()`."
+    "This session is not open; build pools and start runs inside its `with` "
+    "block, for example `with session() as s: pool = s.thread_pool()`."
 )
 
 _REOPENED = (
@@ -130,6 +130,8 @@ class Session:
 
     def _register(self, signal: StopSignal) -> None:
         with self._lock:
+            if self._pools is None:
+                raise WorkflowError(_CLOSED)
             self._signals.add(signal)
 
     def _deregister(self, signal: StopSignal) -> None:
@@ -508,17 +510,18 @@ class Session:
 def session() -> Session:
     """Open a session that owns the pools built on it.
 
-    Build pools with the session's factories, and pass them to the runs that
-    should use them. Closing the session releases every pool it built, so most
-    code needs no further cleanup:
+    Build pools with the session's factories, and start on them the runs that
+    should evaluate there. Closing the session releases every pool it built, so
+    most code needs no further cleanup:
 
     ```python
     with session() as s:
         pool = s.thread_pool(workers=4)
-        result = optimize(config, x0, objective, pool=pool)
+        result = pool.optimize(config, x0, objective)
     ```
 
-    A run given no pool evaluates in-process and needs no session. See
+    A run started with the module-level [`optimize`][ropt.simple.optimize]
+    evaluates in-process and needs no session. See
     [Running Optimizations](../running/running.md) for a walkthrough.
 
     Returns:

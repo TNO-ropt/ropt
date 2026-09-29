@@ -1,10 +1,11 @@
-"""Tests for how the entry points behave with a pool that cannot serve them."""
+"""Tests for how a run behaves on a session or pool that cannot serve it."""
 
-# Every case is asserted at every run method a pool has. The methods do not
-# share a single code path, so a behaviour that changes for one is easy to miss
-# in another, and the parametrization is what makes that visible.
-# test_live_pool_accepted is the control: without it a refusal test would
-# still pass if the method had stopped working for any pool at all.
+# Every case is asserted at every run method the surface has. The methods do
+# not share a single code path, so a behaviour that changes for one is easy to
+# miss in another, and the parametrization is what makes that visible.
+# test_live_pool_accepted and test_run_on_an_open_session_accepted are the
+# controls: without them a refusal test would still pass if the method had
+# stopped working at all.
 
 from __future__ import annotations
 
@@ -90,6 +91,50 @@ def test_pool_from_a_closed_session_refused(
         pool = closing.thread_pool(workers=2)
     with pytest.raises(WorkflowError, match="released when its session closed"):
         entry_point(pool)
+
+
+def _session_optimize(opened: Session) -> None:
+    opened.optimize(_CONFIG, _INITIAL, _sphere)
+
+
+def _session_optimize_many(opened: Session) -> None:
+    opened.optimize_many(_CONFIG, _MATRIX, _sphere)
+
+
+def _session_evaluate(opened: Session) -> None:
+    opened.evaluate(_CONFIG, _INITIAL, _sphere)
+
+
+def _session_evaluate_batch(opened: Session) -> None:
+    opened.evaluate_batch(_CONFIG, _MATRIX, _sphere)
+
+
+_RUNS_ON_A_SESSION = pytest.mark.parametrize(
+    "entry_point",
+    [
+        pytest.param(_session_optimize, id="optimize"),
+        pytest.param(_session_optimize_many, id="optimize_many"),
+        pytest.param(_session_evaluate, id="evaluate"),
+        pytest.param(_session_evaluate_batch, id="evaluate_batch"),
+    ],
+)
+
+
+@_RUNS_ON_A_SESSION
+def test_run_on_an_open_session_accepted(
+    opened: Session, entry_point: Callable[[Session], None]
+) -> None:
+    entry_point(opened)
+
+
+@_RUNS_ON_A_SESSION
+def test_run_on_a_closed_session_refused(
+    entry_point: Callable[[Session], None],
+) -> None:
+    with session() as closing:
+        pass
+    with pytest.raises(WorkflowError, match="not open"):
+        entry_point(closing)
 
 
 def _offload_again(pool: WorkerPool) -> int:

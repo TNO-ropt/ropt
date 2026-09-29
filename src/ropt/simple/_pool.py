@@ -64,15 +64,7 @@ class WorkerPool:
         self._executor: Executor | None = executor
 
     @property
-    def executor(self) -> Executor:
-        """The executor this pool's evaluations run on.
-
-        Returns:
-            The executor.
-
-        Raises:
-            WorkflowError: If this pool's session has closed.
-        """
+    def _live_executor(self) -> Executor:
         if self._executor is None:
             raise WorkflowError(_RELEASED)
         return self._executor
@@ -117,7 +109,7 @@ class WorkerPool:
         """  # ruff: ignore[docstring-extraneous-exception]
         return _optimize(
             self._session,
-            self.executor,
+            self._live_executor,
             config,
             x0,
             function,
@@ -168,7 +160,7 @@ class WorkerPool:
         """  # ruff: ignore[docstring-extraneous-exception]
         return _optimize_many(
             self._session,
-            self.executor,
+            self._live_executor,
             config,
             x0,
             function,
@@ -213,7 +205,7 @@ class WorkerPool:
         """  # ruff: ignore[docstring-extraneous-exception]
         return _evaluate(
             self._session,
-            self.executor,
+            self._live_executor,
             config,
             variables,
             function,
@@ -258,7 +250,7 @@ class WorkerPool:
         """  # ruff: ignore[docstring-extraneous-exception]
         return _evaluate_batch(
             self._session,
-            self.executor,
+            self._live_executor,
             config,
             variables,
             function,
@@ -296,4 +288,4 @@ class WorkerPool:
             ExecutionError: If the machinery could not run a call.
             WorkflowError:  If this pool's session has closed.
         """  # ruff: ignore[docstring-extraneous-exception]
-        return _offload(self.executor, work)
+        return _offload(self._live_executor, work)

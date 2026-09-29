@@ -144,6 +144,7 @@ def test_a_stop_does_not_reach_another_session() -> None:
             return _sphere(variables, context)
 
         result = other_pool.optimize(_CONFIG, _INITIAL, objective)
-        assert stopped_pool.executor is not None
+        # A stop is not a release: the stopped session's pool still runs.
+        assert stopped_pool.optimize(_CONFIG, _INITIAL, _sphere).results is not None
 
     assert result.exit_code == ExitCode.OPTIMIZER_FINISHED
