@@ -16,7 +16,7 @@ import sys
 import tempfile
 import threading
 import weakref
-from concurrent.futures import ProcessPoolExecutor
+from concurrent.futures import Future, ProcessPoolExecutor
 from concurrent.futures.process import BrokenProcessPool
 from functools import partial
 from multiprocessing.connection import Client, Listener
@@ -1242,6 +1242,36 @@ def test_broken_worker_pool_reported_at_startup(
     )
     with pytest.raises(ExecutionError, match="guard the program entry point"):
         ProcessExecutor(workers=1)
+
+
+def test_worker_pool_broken_during_a_run_is_an_execution_error(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    # A pool that broke under a caller is a failure, not the interpreter
+    # shutting down, even though BrokenProcessPool is a RuntimeError.
+    class _BreaksAfterStartup:
+        def __init__(self, *_args: Any, **_kwargs: Any) -> None:
+            self._started = False
+            self._shutdown_lock = threading.Lock()
+            self._processes: dict[int, Any] = {}
+
+        def submit(self, *_args: Any, **_kwargs: Any) -> Future[Any]:
+            if self._started:
+                raise BrokenProcessPool
+            self._started = True
+            future: Future[Any] = Future()
+            future.set_result(None)
+            return future
+
+        def shutdown(self, *_args: Any, **_kwargs: Any) -> None: ...
+
+    monkeypatch.setattr(
+        "ropt.components.executors._process_executor.ProcessPoolExecutor",
+        _BreaksAfterStartup,
+    )
+    executor = ProcessExecutor(workers=1)
+    with pytest.raises(ExecutionError, match="worker processes are gone"):
+        executor.run([WorkItem(function=_function, args=(0,))])
 
 
 @pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")

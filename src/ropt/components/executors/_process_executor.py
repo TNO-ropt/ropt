@@ -140,6 +140,11 @@ class ProcessExecutor(ExecutorBase):
             raise ExecutionError(msg) from exc
         try:
             return self._pool.submit(_run_payload, payload)
+        except BrokenProcessPool as exc:
+            # Checked ahead of RuntimeError, which it subclasses: every worker
+            # is gone and the pool cannot be restarted, only replaced.
+            msg = "The worker processes are gone; this executor cannot run more work."
+            raise ExecutionError(msg) from exc
         except RuntimeError:
             # The pool is gone, which at interpreter shutdown is how a caller
             # that outlived its program is released rather than left waiting.
