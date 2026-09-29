@@ -3136,9 +3136,10 @@ raises a <code>TypeError</code> in the middle of the run.</p>
 </tbody>
 </table>
 <h2 id="pools-stopping-and-processes">Pools, stopping and processes</h2>
-<p><strong>A run uses the pool you hand it, and no other.</strong> Nothing is picked up from
-the surrounding code. A run given no <code>pool=</code> evaluates in-process, on the
-thread that called it — even if a pool exists next to it.</p>
+<p><strong>A run evaluates on the pool it was started on, and no other.</strong> Nothing is
+picked up from the surrounding code. A run started with the module-level
+<a class="autorefs autorefs-internal" title="            ropt.simple.optimize" href="../reference/simple/#ropt.simple.optimize"><code>optimize</code></a> evaluates in-process, on the thread that
+called it — even if a pool exists next to it.</p>
 <p><strong>Threads cannot be interrupted.</strong> Evaluations on a thread pool run to
 completion even after Ctrl-C, because Python cannot interrupt a thread from
 outside. If an evaluation may run long and has to be interruptible, put it on a

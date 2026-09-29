@@ -3275,7 +3275,7 @@ reached.</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
 </span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>    <span class="n">pool</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">thread_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
 </span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>    <span class="n">signal</span><span class="o">.</span><span class="n">signal</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">SIGINT</span><span class="p">,</span> <span class="k">lambda</span> <span class="o">*</span><span class="n">_</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">stop</span><span class="p">())</span>
-</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">pool</span><span class="o">=</span><span class="n">pool</span><span class="p">)</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>
 </span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>
 </span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">exit_code</span> <span class="ow">is</span> <span class="n">ExitCode</span><span class="o">.</span><span class="n">CANCELLED</span><span class="p">:</span>
 </span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>    <span class="nb">print</span><span class="p">(</span><span class="s2">"stopped early, best so far:"</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">results</span><span class="p">)</span>
@@ -3287,9 +3287,10 @@ nothing more: it is not a latch. A run started afterwards is unaffected, so a
 loop that stops one attempt and starts another keeps working. Leaving the
 session's <code>with</code> block stops its runs as well, and then releases its pools,
 which is what refuses a run started after that.</p>
-<p>A run given no pool, or a <a class="autorefs autorefs-internal" title="            ropt.simple.SerialPool" href="../../reference/simple/#ropt.simple.SerialPool"><code>SerialPool</code></a>, belongs to no
-session and cannot be stopped this way. It evaluates on the calling thread,
-which is the thread that would have to call <code>stop()</code>.</p>
+<p>A run started with the module-level <a class="autorefs autorefs-internal" title="            ropt.simple.optimize" href="../../reference/simple/#ropt.simple.optimize"><code>optimize</code></a> belongs
+to no session you hold and cannot be stopped this way. It evaluates on the
+calling thread, which is the thread that would have to call <code>stop()</code>. Start it
+on a session or one of its pools to bring it within reach.</p>
 <h2 id="attaching-metadata">Attaching metadata</h2>
 <p>You can attach arbitrary <strong>metadata</strong> to a run, from two sources:</p>
 <ul>
@@ -3402,7 +3403,8 @@ make still reach the <a href="../handlers/">handlers</a> attached to it.</p>
   checked as the run starts — and
   <a class="autorefs autorefs-internal" title="            ExecutionError" href="../../reference/exceptions/#ropt.exceptions.ExecutionError"><code>ExecutionError</code></a> when the machinery that
   runs your evaluations, or a call handed to
-  <a class="autorefs autorefs-internal" title="            ropt.simple.offload" href="../../reference/simple/#ropt.simple.offload"><code>offload</code></a>, cannot start or breaks down.</p>
+  <a class="autorefs autorefs-internal" title="            offload" href="../../reference/simple/#ropt.simple.WorkerPool.offload"><code>WorkerPool.offload</code></a>, cannot start or breaks
+  down.</p>
 </li>
 <li>
 <p><strong>Exceptions from your own evaluation function</strong> are not caught. They travel
