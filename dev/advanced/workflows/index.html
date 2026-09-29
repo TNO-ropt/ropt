@@ -1894,34 +1894,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../components/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Implementing a Component
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../examples/" class="md-nav__link">
         
   
@@ -3231,11 +3203,13 @@ its variables, objectives, constraints, and components — is set up in
 <a href="../../optimizer_setup/key_concepts/">Optimizer Setup</a>, the same whichever way you run
 it.</p>
 </div>
-<p>The workflow components are the layer beneath the
-<a href="../../running/running/">simple API</a> — the compute steps, event handlers,
-evaluators and executors its convenience functions are assembled from, exposed
-directly. Everything those functions do is available here, along with the cases
-they cannot express; the cost is that you wire it together yourself.</p>
+<p>A <strong>workflow</strong> is an optimization assembled from components: compute steps,
+event handlers, evaluators and executors, wired together and run directly.
+These pages describe that API on its own terms. It is a second way to run an
+optimization, not a layer to reach into from the first: a workflow and a
+<a href="../../running/running/"><code>ropt.simple</code></a> run are alternatives, and combining
+them in one program is outside what these pages describe. Event handlers are
+the exception — the same handler objects serve both.</p>
 <p>These pages assume threads. Event handlers may be invoked from several threads
 at once, so the concurrency and process-boundary rules stated here are binding:
 breaking one raises rather than misbehaving silently.</p>
@@ -3267,9 +3241,7 @@ breaking one raises rather than misbehaving silently.</p>
 </tbody>
 </table>
 <p>The first three are covered below. Executors are only relevant for asynchronous
-and parallel execution and are discussed in <a href="../parallel/">Parallel Evaluation</a>.
-Writing your own implementation of any of the four is covered in
-<a href="../components/">Implementing a Component</a>.</p>
+and parallel execution and are discussed in <a href="../parallel/">Parallel Evaluation</a>.</p>
 <p>Compute steps emit <a class="autorefs autorefs-internal" title="            EnOptEvent
 
 

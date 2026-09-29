@@ -955,17 +955,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#custom-handlers" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Custom handlers
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#handlers-and-the-process-boundary" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1797,34 +1786,6 @@
     
   
     Parallel Evaluation
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../advanced/components/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Implementing a Component
   
 
     
@@ -3029,17 +2990,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#custom-handlers" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Custom handlers
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#handlers-and-the-process-boundary" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3277,16 +3227,11 @@ calls a function for the event types you name. That is how you observe events
 other than results — the start or end of a run, for example; for results alone,
 <code>report=</code> already does it. The rest belong to the component API, described in
 <a href="../../advanced/workflows/#event-handlers">Optimization Workflows</a>.</p>
-<h2 id="custom-handlers">Custom handlers</h2>
-<p>Handlers are not limited to the built-ins: you — or another package — can
-provide your own by implementing <code>ropt</code>'s event-handler interface. The
-<a href="../../advanced/workflows/#event-handlers">Optimization Workflows</a> describes the event
-model, the handler protocol, and how to write one.</p>
-<p>A custom handler can also <strong>stop its own optimization</strong>: every event carries the
-compute step that emitted it, so calling <code>event.source.stop()</code> from <code>handle_event</code>
-ends that run gracefully with <code>USER_ABORT</code> (the <a href="../running/#stopping-early-from-the-callback"><code>report</code></a>
-callback above is just a convenience wrapper around this). Only the run that owns
-the emitting step is affected, so concurrent runs continue. See
+<p>A handler can also <strong>stop the run that fed it</strong>: every event carries the compute
+step that emitted it, so calling <code>event.source.stop()</code> ends that run with
+<code>USER_ABORT</code> — the <a href="../running/#stopping-early-from-the-callback"><code>report</code></a>
+callback above is a convenience wrapper around this. Only the run that owns the
+emitting step is affected, so concurrent runs continue. See
 <a href="../../advanced/workflows/#exit-codes">Optimization Workflows</a>.</p>
 <h2 id="handlers-and-the-process-boundary">Handlers and the process boundary</h2>
 <p>On a thread pool (or with no pool) your objective and your handlers run

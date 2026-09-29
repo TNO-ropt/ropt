@@ -1673,34 +1673,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../advanced/components/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Implementing a Component
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../advanced/examples/" class="md-nav__link">
         
   
@@ -2276,17 +2248,6 @@
     <span class="md-ellipsis">
       
         __init__
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.simple.WorkerPool.executor" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        executor
       
     </span>
   </a>
@@ -3928,17 +3889,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.simple.WorkerPool.executor" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        executor
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ropt.simple.WorkerPool.optimize" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -5489,14 +5439,15 @@ order. See <a href="../../running/running/">Running Optimizations</a> for a walk
     <div class="doc doc-contents first">
 
         <p>Open a session that owns the pools built on it.</p>
-<p>Build pools with the session's factories, and pass them to the runs that
-should use them. Closing the session releases every pool it built, so most
-code needs no further cleanup:</p>
+<p>Build pools with the session's factories, and start on them the runs that
+should evaluate there. Closing the session releases every pool it built, so
+most code needs no further cleanup:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">pool</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">thread_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">pool</span><span class="o">=</span><span class="n">pool</span><span class="p">)</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>
 </span></code></pre></div>
-<p>A run given no pool evaluates in-process and needs no session. See
+<p>A run started with the module-level <a class="autorefs autorefs-internal" title="            ropt.simple.optimize" href="#ropt.simple.optimize"><code>optimize</code></a>
+evaluates in-process and needs no session. See
 <a href="../../running/running/">Running Optimizations</a> for a walkthrough.</p>
 
 
@@ -7437,81 +7388,6 @@ evaluations happen and which session the run belongs to. See
       </tbody>
     </table>
 
-
-    </div>
-
-</div>
-
-
-
-
-
-
-<div class="doc doc-object doc-attribute">
-
-
-
-<h3 id="ropt.simple.WorkerPool.executor" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">executor</span>
-
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-property"><code>property</code></small>
-  </span>
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">executor</span><span class="p">:</span> <span class="n">Executor</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>The executor this pool's evaluations run on.</p>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.components.executors.Executor" href="../components_executors/#ropt.components.executors.Executor">Executor</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The executor.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-<p><span class="doc-section-title">Raises:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            WorkflowError (ropt.exceptions.WorkflowError)" href="../exceptions/#ropt.exceptions.WorkflowError">WorkflowError</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>If this pool's session has closed.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
 
     </div>
 
