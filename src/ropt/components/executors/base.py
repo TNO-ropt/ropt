@@ -31,6 +31,8 @@ from ._picklable import picklable_exception
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
 
+    from ropt.components.concurrency import StopSignal
+
 _ON_WORKER = (
     "This executor cannot be used from work that is already running on it: the "
     "caller would wait for the workers it is itself occupying, which deadlocks "
@@ -39,6 +41,8 @@ _ON_WORKER = (
 )
 
 _STOPPED = "The executor can no longer run this work."
+
+_NOT_RUN = "The work item was not run: the batch was stopped."
 
 
 @dataclass(kw_only=True)
@@ -143,6 +147,7 @@ class Executor(ABC):
         *,
         bundle_size: int | None = None,
         collect_errors: bool = False,
+        stop: StopSignal | None = None,
     ) -> list[Any]:
         """Run the calls and return their results, in the order they were given.
 
@@ -155,6 +160,11 @@ class Executor(ABC):
         waiting for the rest of the batch. With `collect_errors` it is placed in
         the call's position instead, and every call keeps its place.
 
+        A `stop` that fires abandons the batch: queued calls are never started,
+        started ones are cancelled where the mechanism allows it, and each
+        abandoned call gets a `WorkNotRun`. Calls already running on a worker
+        thread or process run to their end.
+
         May be called from any thread, except one of the executor's own workers:
         that caller would wait for workers it is itself occupying, so it is
         refused rather than left to deadlock.
@@ -166,6 +176,7 @@ class Executor(ABC):
             calls:          The work items to run.
             bundle_size:    Calls per worker task, `0` for all of them.
             collect_errors: Whether an exception is returned instead of raised.
+            stop:           An optional signal that abandons the batch.
 
         Returns:
             One result per call, in the order of `calls`.
@@ -215,6 +226,7 @@ class ExecutorBase(Executor):
         *,
         bundle_size: int | None = None,
         collect_errors: bool = False,
+        stop: StopSignal | None = None,
     ) -> list[Any]:
         """Run the calls and return their results, in the order they were given.
 
@@ -222,6 +234,7 @@ class ExecutorBase(Executor):
             calls:          The work items to run.
             bundle_size:    Calls per worker task, `0` for all of them.
             collect_errors: Whether an exception is returned instead of raised.
+            stop:           An optional signal that abandons the batch.
 
         Returns:
             One result per call, in the order of `calls`.
@@ -237,8 +250,10 @@ class ExecutorBase(Executor):
         size = self._resolve_bundle_size(len(items), bundle_size)
         bundles = [items[start : start + size] for start in range(0, len(items), size)]
         results: list[Any] = [None] * len(items)
+        stored: set[int] = set()
 
         def store(index: int, bundle_result: Any) -> None:  # ruff: ignore[any-type]
+            stored.add(index)
             _store(
                 results,
                 index * size,
@@ -247,7 +262,15 @@ class ExecutorBase(Executor):
                 collect_errors=collect_errors,
             )
 
-        self._run_bundles(bundles, store)
+        self._run_bundles(bundles, store, stop)
+        # A batch that was abandoned leaves its remaining slots empty, and an
+        # empty slot is indistinguishable from a call that returned None.
+        for index, bundle in enumerate(bundles):
+            if index not in stored:
+                offset = index * size
+                results[offset : offset + len(bundle)] = [WorkNotRun(_NOT_RUN)] * len(
+                    bundle
+                )
         return results
 
     def _resolve_bundle_size(self, count: int, bundle_size: int | None) -> int:
@@ -264,6 +287,7 @@ class ExecutorBase(Executor):
         self,
         bundles: list[list[WorkItem]],
         store: Callable[[int, Any], None],
+        stop: StopSignal | None,
     ) -> None:
         """Run the bundles, passing each one's result to `store` as it arrives.
 
@@ -274,9 +298,13 @@ class ExecutorBase(Executor):
         the caller: whatever this batch started must be released before that
         exception leaves.
 
+        A `stop` that fires must bring this call back promptly, leaving the
+        bundles it did not store for the caller to mark as not run.
+
         Args:
             bundles: The bundles to run.
             store:   Callback taking a bundle index and that bundle's result.
+            stop:    An optional signal that abandons the batch.
         """
 
 

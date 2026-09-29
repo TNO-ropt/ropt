@@ -8,6 +8,7 @@ import threading
 from collections import deque
 from concurrent.futures import Future, ProcessPoolExecutor
 from concurrent.futures.process import BrokenProcessPool
+from functools import partial
 from typing import TYPE_CHECKING, Any, cast
 
 from ropt._logging import get_logger
@@ -26,6 +27,8 @@ from .base import (
 
 if TYPE_CHECKING:
     from collections.abc import Callable
+
+    from ropt.components.concurrency import StopSignal
 
 _logger = get_logger(__name__)
 
@@ -97,15 +100,22 @@ class ProcessExecutor(ExecutorBase):
         self,
         bundles: list[list[WorkItem]],
         store: Callable[[int, Any], None],
+        stop: StopSignal | None,
     ) -> None:
         pending = deque(enumerate(bundles))
         # Finished bundles arrive here rather than through
         # `concurrent.futures.wait`, which would block forever on a future
         # cancelled before the pool dispatched it; a done callback still fires.
-        done: queue.SimpleQueue[Future[tuple[bool, bytes]]] = queue.SimpleQueue()
+        done: queue.SimpleQueue[Future[tuple[bool, bytes]] | None] = queue.SimpleQueue()
         futures: dict[Future[tuple[bool, bytes]], int] = {}
+        # The sentinel is what releases `done.get()` below; nothing else can.
+        wake = partial(done.put, None)
+        if stop is not None:
+            stop.add_callback(wake)
         try:
             while pending or futures:
+                if stop is not None and stop.stopping:
+                    break
                 # Waiting is safe only with nothing in flight: the slots this
                 # batch holds are given back further down, by this same loop.
                 while pending and self._payload_limit.acquire(blocking=not futures):
@@ -117,11 +127,15 @@ class ProcessExecutor(ExecutorBase):
                         raise
                     futures[future] = index
                     future.add_done_callback(done.put)
-                future = done.get()
-                index = futures.pop(future)
+                item = done.get()
+                if item is None:
+                    break
+                index = futures.pop(item)
                 self._payload_limit.release()
-                store(index, _bundle_result(future))
+                store(index, _bundle_result(item))
         finally:
+            if stop is not None:
+                stop.remove_callback(wake)
             for future in futures:
                 future.cancel()
                 self._payload_limit.release()

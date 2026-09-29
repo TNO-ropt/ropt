@@ -29,6 +29,7 @@ import pytest
 
 from ropt._serialize import HAVE_CLOUDPICKLE, dumps, loads
 from ropt.components.compute_steps import OptimizationStep
+from ropt.components.concurrency import StopSignal
 from ropt.components.evaluators import (
     EvaluationFunctionCallback,
     EvaluationFunctionContext,
@@ -1190,10 +1191,13 @@ class _RecordingExecutor(ThreadExecutor):
         self.sizes: list[int] = []
 
     def _run_bundles(
-        self, bundles: list[list[WorkItem]], store: Callable[[int, Any], None]
+        self,
+        bundles: list[list[WorkItem]],
+        store: Callable[[int, Any], None],
+        stop: StopSignal | None = None,
     ) -> None:
         self.sizes.extend(len(bundle) for bundle in bundles)
-        super()._run_bundles(bundles, store)
+        super()._run_bundles(bundles, store, stop)
 
 
 @pytest.mark.parametrize("bundle_size", [1, 2, 4, 0])
@@ -1319,6 +1323,53 @@ def test_a_returned_exception_is_a_result_rather_than_a_failure() -> None:
         [WorkItem(function=_return_an_error, args=(0,))]
     )
     assert isinstance(results[0], ValueError)
+
+
+def test_a_stop_wakes_a_blocked_executor() -> None:
+    # The first call holds the only worker, so the other two are still queued
+    # when the stop arrives and `run` must come back without waiting for it.
+    signal = StopSignal()
+    started = threading.Event()
+    release = threading.Event()
+    executor = ThreadExecutor(workers=1)
+    items = [
+        WorkItem(function=_blocked_work, args=(started, release)),
+        WorkItem(function=_function, args=(1,)),
+        WorkItem(function=_function, args=(2,)),
+    ]
+    results: list[Any] = []
+
+    def _drive() -> None:
+        results.extend(executor.run(items, stop=signal))
+
+    driver = threading.Thread(target=_drive)
+    try:
+        driver.start()
+        assert started.wait(timeout=4.0)
+        signal.stop()
+        driver.join(timeout=4.0)
+        assert not driver.is_alive()
+        # Still blocked, so the call above did not wait for it to finish.
+        assert not release.is_set()
+        assert all(isinstance(value, WorkNotRun) for value in results)
+    finally:
+        release.set()
+
+
+@pytest.mark.parametrize(
+    "build",
+    [
+        pytest.param(partial(ThreadExecutor, workers=1), id="thread"),
+        pytest.param(partial(ProcessExecutor, workers=1), id="process"),
+    ],
+)
+def test_a_stopped_signal_abandons_a_batch_before_it_starts(
+    build: Callable[[], ExecutorBase],
+) -> None:
+    signal = StopSignal()
+    signal.stop()
+    results = build().run([WorkItem(function=_function, args=(0,))], stop=signal)
+    assert isinstance(results[0], WorkNotRun)
 
 
 @pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
@@ -2098,7 +2149,9 @@ def test_job_executor_store_exception_releases_the_backend(tmp_path: Path) -> No
         raise ValueError(msg)
 
     with pytest.raises(ValueError, match="caller rejected"):
-        executor._run_bundles([[WorkItem(function=_function, args=(0,))]], _reject)
+        executor._run_bundles(
+            [[WorkItem(function=_function, args=(0,))]], _reject, None
+        )
     assert executor.run([WorkItem(function=_function, args=(1,))]) == [2]
 
 
@@ -2237,7 +2290,7 @@ def test_job_executor_launch_only_claim_spends_no_retry(
     def _store(index: int, result: Any) -> None:
         results[index] = result
 
-    executor._run_bundles([[WorkItem(function=_function, args=(0,))]], _store)
+    executor._run_bundles([[WorkItem(function=_function, args=(0,))]], _store, None)
     assert results == [[1]]
     assert state._last_query == clock
     assert state._query_failures == 1

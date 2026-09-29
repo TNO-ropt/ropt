@@ -839,6 +839,26 @@ def test_stop_signal_is_not_cleared_by_a_new_run(config: Any, evaluator: Any) ->
     assert third == ExitCode.CANCELLED
 
 
+def test_stop_signal_runs_a_late_callback_at_once() -> None:
+    # A caller that registers after the stop must not be left waiting for a
+    # notification that has already been sent.
+    signal = StopSignal()
+    signal.stop()
+    calls: list[int] = []
+    signal.add_callback(partial(calls.append, 1))
+    assert calls == [1]
+
+
+def test_stop_signal_does_not_run_a_removed_callback() -> None:
+    signal = StopSignal()
+    calls: list[int] = []
+    callback = partial(calls.append, 1)
+    signal.add_callback(callback)
+    signal.remove_callback(callback)
+    signal.stop()
+    assert calls == []
+
+
 _EVALUATION_EVENTS = {
     EnOptEventType.START_ENSEMBLE_EVALUATOR,
     EnOptEventType.START_EVALUATION,

@@ -60,6 +60,8 @@ if TYPE_CHECKING:
     from collections.abc import Callable
     from uuid import UUID
 
+    from ropt.components.concurrency import StopSignal
+
 _logger = get_logger(__name__)
 
 # How much of a failed job's captured output travels with its failure.
@@ -139,6 +141,12 @@ class _State:
         with self._condition:
             for index, bundle in enumerate(bundles):
                 self._queue.append((results, index, bundle))
+            self._condition.notify_all()
+
+    def wake(self) -> None:
+        # Releases every caller parked in `claim_backend`, so each can look at
+        # its own reason for being here again.
+        with self._condition:
             self._condition.notify_all()
 
     def pop_results(self, results: _Results) -> _Results:
@@ -401,12 +409,18 @@ class JobExecutorBase(ExecutorBase):
         self,
         bundles: list[list[WorkItem]],
         store: Callable[[int, Any], None],
+        stop: StopSignal | None,
     ) -> None:
         results: _Results = []
+        wake = self._state.wake
+        if stop is not None:
+            stop.add_callback(wake)
         try:
             self._state.queue(results, bundles)
             remaining = len(bundles)
             while remaining > 0:
+                if stop is not None and stop.stopping:
+                    break
                 ready = self._state.pop_results(results)
                 if ready:
                     remaining -= len(ready)
@@ -417,6 +431,8 @@ class JobExecutorBase(ExecutorBase):
                 else:
                     self._launch_and_collect(results)
         finally:
+            if stop is not None:
+                stop.remove_callback(wake)
             self._cancel_jobs(self._state.drop(results))
 
     def _launch_and_collect(self, results: _Results) -> None:
