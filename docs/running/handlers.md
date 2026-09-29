@@ -46,15 +46,14 @@ takes a lock around each call, so a second run waits for the first to finish
 rather than interleaving with it:
 
 ```python
-from ropt.simple import HistoryHandler, optimize_many, session
+from ropt.simple import HistoryHandler, session
 
 history = HistoryHandler()
 with session() as s:
-    optimize_many(
+    s.thread_pool(workers=4).optimize_many(
         config,
         start_points,
         objective,
-        pool=s.thread_pool(workers=4),
         handlers=[history],
     )
 

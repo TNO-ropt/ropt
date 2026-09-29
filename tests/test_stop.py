@@ -13,7 +13,7 @@ import numpy as np
 import pytest
 
 from ropt.enums import ExitCode
-from ropt.simple import optimize, optimize_many, session
+from ropt.simple import session
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray
@@ -65,7 +65,7 @@ def test_session_stop_cancels_a_run_keeping_its_best_result() -> None:
                 opened.stop()
             return _sphere(variables, context)
 
-        result = optimize(_CONFIG, _INITIAL, objective, pool=pool)
+        result = pool.optimize(_CONFIG, _INITIAL, objective)
 
     assert result.exit_code == ExitCode.CANCELLED
     assert result.results is not None
@@ -86,11 +86,10 @@ def test_session_stop_cancels_every_run_in_progress() -> None:
         stopper = threading.Thread(target=stop_once_all_have_started)
         stopper.start()
         try:
-            results = optimize_many(
+            results = pool.optimize_many(
                 _CONFIG,
                 np.tile(_INITIAL, (runs, 1)),
                 [_waits_once(started) for _ in range(runs)],
-                pool=pool,
             )
         finally:
             stopper.join(timeout=30)
@@ -107,7 +106,7 @@ def test_closing_a_session_cancels_a_run_on_another_thread() -> None:
         pool = opened.thread_pool(workers=1)
 
         def run() -> None:
-            outcome.append(optimize(_CONFIG, _INITIAL, _waits_once(started), pool=pool))
+            outcome.append(pool.optimize(_CONFIG, _INITIAL, _waits_once(started)))
 
         driver = threading.Thread(target=run)
         driver.start()
@@ -127,7 +126,7 @@ def test_a_run_started_after_a_stop_is_unaffected() -> None:
     with session() as opened:
         pool = opened.thread_pool(workers=1)
         opened.stop()
-        result = optimize(_CONFIG, _INITIAL, _sphere, pool=pool)
+        result = pool.optimize(_CONFIG, _INITIAL, _sphere)
 
     assert result.exit_code == ExitCode.OPTIMIZER_FINISHED
 
@@ -144,7 +143,7 @@ def test_a_stop_does_not_reach_another_session() -> None:
             stopped.stop()
             return _sphere(variables, context)
 
-        result = optimize(_CONFIG, _INITIAL, objective, pool=other_pool)
+        result = other_pool.optimize(_CONFIG, _INITIAL, objective)
         assert stopped_pool.executor is not None
 
     assert result.exit_code == ExitCode.OPTIMIZER_FINISHED

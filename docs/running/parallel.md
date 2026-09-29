@@ -8,15 +8,15 @@ go through a **pool**.
 
 By default [`optimize`][ropt.simple.optimize] runs on the calling thread, one
 evaluation at a time. To run the evaluations in parallel, open a
-[`session`][ropt.simple.session], build a **pool** on it and pass that to the
-run. [Running in Parallel](../getting_started/execution.md) introduces the four
-kinds; this page is the full account of each:
+[`session`][ropt.simple.session], build a **pool** on it and start the run on
+that pool. [Running in Parallel](../getting_started/execution.md) introduces the
+four kinds; this page is the full account of each:
 
 ```python
-from ropt.simple import optimize, session
+from ropt.simple import session
 
 with session() as s:
-    result = optimize(config, x0, objective, pool=s.thread_pool(workers=8))
+    result = s.thread_pool(workers=8).optimize(config, x0, objective)
 ```
 
 The runnable script for this section is
@@ -25,9 +25,10 @@ which takes `-m` to swap its thread pool for a process pool.
 
 The session owns the pools built on it and releases their workers when its
 block ends, so most code needs no further cleanup. Nothing is implicit: a run
-evaluates on the pool you hand it, and on no other. A run given no pool
-evaluates in-process and needs no session, wherever it is called from —
-including from a thread you started yourself.
+evaluates on the pool it was started on, and on no other. A run started with
+the module-level [`optimize`][ropt.simple.optimize] evaluates in-process and
+needs no session, wherever it is called from — including from a thread you
+started yourself.
 
 ### How many workers?
 
@@ -61,13 +62,14 @@ machine's core count.
     default, which spreads the batch as widely as the pool allows. Every
     transfer costs something, though, so when the evaluations are cheap the
     transfers can dominate. Pass `bundle_size=` to
-    [`optimize`][ropt.simple.optimize], [`optimize_many`][ropt.simple.optimize_many],
-    [`evaluate`][ropt.simple.evaluate] or
-    [`evaluate_batch`][ropt.simple.evaluate_batch] to send several evaluations to
-    a worker together, or `bundle_size=0` to send a whole batch at once. The
-    evaluations in one bundle run after each other, so `0` gives up parallelism
-    inside the batch entirely: it is for a run whose parallelism comes from the
-    layer above it, as in
+    [`WorkerPool.optimize`][ropt.simple.WorkerPool.optimize],
+    [`optimize_many`][ropt.simple.WorkerPool.optimize_many],
+    [`evaluate`][ropt.simple.WorkerPool.evaluate] or
+    [`evaluate_batch`][ropt.simple.WorkerPool.evaluate_batch] to send several
+    evaluations to a worker together, or `bundle_size=0` to send a whole batch
+    at once. The evaluations in one bundle run after each other, so `0` gives up
+    parallelism inside the batch entirely: it is for a run whose parallelism
+    comes from the layer above it, as in
     [Nested Optimization](nested.md#two-pools-not-one).
 
     `workers` and `bundle_size` are the two halves of matching work to capacity,
@@ -86,13 +88,13 @@ machine's core count.
     size for every run or as a sequence with one per run:
 
     ```python
-    optimize_many(config, x0, [cheap, costly], pool=pool, bundle_size=[25, 1])
+    pool.optimize_many(config, x0, [cheap, costly], bundle_size=[25, 1])
     ```
 
     Every pool honours it, including a thread pool: a bundle is one worker
     task, so `bundle_size=0` on a thread pool runs the whole batch on a single
-    thread. A run without a pool evaluates inline, where a bundle has nothing
-    to save.
+    thread. It is a pool argument only: a run started without one evaluates
+    inline, where a bundle has nothing to save.
 
     A pool also takes a `bundle_size` of its own, used by any run that does
     not state one.
@@ -103,8 +105,8 @@ You can keep several pools open at once and choose per run:
 with session() as s:
     fast = s.thread_pool(workers=8)
     heavy = s.process_pool(workers=4)
-    cheap = optimize(config, x0, objective, pool=fast)
-    costly = optimize(config, x0, expensive_objective, pool=heavy)
+    cheap = fast.optimize(config, x0, objective)
+    costly = heavy.optimize(config, x0, expensive_objective)
 ```
 
 !!! note "Pools inside an evaluation"
@@ -124,7 +126,7 @@ with session() as s:
     ```python
     for case in cases:
         with session() as s:
-            optimize(config, case, objective, pool=s.process_pool(workers=4))
+            s.process_pool(workers=4).optimize(config, case, objective)
     ```
 
     A pool used after its session has closed raises a
@@ -139,7 +141,7 @@ function works as the objective and it can freely use the data around it:
 
 ```python
 with session() as s:
-    result = optimize(config, x0, objective, pool=s.thread_pool(workers=4))
+    result = s.thread_pool(workers=4).optimize(config, x0, objective)
 ```
 
 Use it when each evaluation spends most of its time **waiting** — starting an
@@ -160,7 +162,7 @@ interpreter, so this is where heavy Python computation actually gets faster:
 
 ```python
 with session() as s:
-    result = optimize(config, x0, objective, pool=s.process_pool(workers=4))
+    result = s.process_pool(workers=4).optimize(config, x0, objective)
 ```
 
 This pool applies when the computation is **Python code**, or when each
@@ -194,7 +196,7 @@ that works on one works on the other:
 
 ```python
 with session() as s:
-    result = optimize(config, x0, objective, pool=s.local_pool(workers=4))
+    result = s.local_pool(workers=4).optimize(config, x0, objective)
 ```
 
 | Parameter     | Description                                                                |
@@ -292,7 +294,7 @@ installation:
 ```python
 with session() as s:
     pool = s.hpc_pool(workers=10, workdir="/scratch/my-run")
-    result = optimize(config, x0, objective, pool=pool)
+    result = pool.optimize(config, x0, objective)
 ```
 
 The runnable script is
@@ -563,12 +565,12 @@ To run several optimizations together, use
 `objective` may be a single value (used for every run) or a list (one per run):
 
 ```python
-from ropt.simple import optimize_many, session
+from ropt.simple import session
 
 with session() as s:
     # One run per start point.
-    results = optimize_many(
-        config, start_points, objective, pool=s.thread_pool(workers=4)
+    results = s.thread_pool(workers=4).optimize_many(
+        config, start_points, objective
     )
 ```
 
@@ -594,7 +596,7 @@ There are two independent levels of concurrency here:
   This is built into `optimize_many` and does not depend on the pool;
   the `limit` argument caps how many run at the same time.
 - **The function evaluations** inside those runs all happen on the one pool
-  you pass, and the pool determines how they are parallelized. With
+  the call was started on, and the pool determines how they are parallelized. With
   `thread_pool(workers=1)` the runs still progress together, but their
   evaluations are executed one at a time. A larger pool —
   `thread_pool(workers=n)`, or a process, local or HPC pool — runs several
@@ -724,20 +726,20 @@ Parallel](../getting_started/execution.md).
 ## Offloading your own work
 
 You can hand **your own** functions to a pool with
-[`offload`][ropt.simple.offload]. It is useful when code you control — a custom
-step, a custom component, or a helper you call between optimizations — has an
-expensive, self-contained piece of work you want to run on a pool instead
-of inline.
+[`WorkerPool.offload`][ropt.simple.WorkerPool.offload]. It is useful when code
+you control — a custom step, a custom component, or a helper you call between
+optimizations — has an expensive, self-contained piece of work you want to run
+on a pool instead of inline.
 
 Pass a single callable to run one call and get its result back:
 
 ```python
 from functools import partial
 
-from ropt.simple import offload, session
+from ropt.simple import session
 
 with session() as s:
-    result = offload(partial(expensive, data), pool=s.process_pool(workers=4))
+    result = s.process_pool(workers=4).offload(partial(expensive, data))
 ```
 
 `offload` takes **zero-argument** callables — bind arguments with
@@ -748,7 +750,7 @@ functions:
 ```python
 with session() as s:
     pool = s.process_pool(workers=4)
-    first, second = offload([partial(expensive, x), partial(other, y)], pool=pool)
+    first, second = pool.offload([partial(expensive, x), partial(other, y)])
 ```
 
 As with the evaluation function on a process, local, or HPC pool, the
@@ -781,17 +783,6 @@ separate processes.
     coordinated — counted, collected, or held to one budget — drive them from
     your own process instead.
 
-### Without a pool
-
-`offload` with no pool runs the callables inline, on the calling thread. So
-code that may or may not have a pool to hand needs no guard and no
-fallback: pass along whatever it has, including `None`.
-
-```python
-def transform(x, pool=None):
-    return offload(partial(expensive, x), pool=pool)
-```
-
 !!! warning "Offloading from a handler holds up the runs feeding it"
     A handler runs on the thread driving the run, so it can offload to a
     pool. While it waits, it holds its own lock, so every other run waiting
@@ -800,9 +791,7 @@ def transform(x, pool=None):
     An offloaded callable that reaches back into the same handler — by starting
     a run that carries it in `handlers=` — fails differently per pool. On a
     thread pool it blocks: the handler waits for the offloaded call, and the
-    call waits for the lock the handler holds. Without a pool the call runs
-    on the handler's own thread and raises a
-    [`WorkflowError`][ropt.exceptions.WorkflowError]. On a process pool it
+    call waits for the lock the handler holds. On a process pool it
     raises an [`ExecutionError`][ropt.exceptions.ExecutionError], since a
     handler holds a lock and cannot be serialized. See
     [Two hazards](../advanced/workflows.md#two-hazards).

@@ -15,7 +15,6 @@ from numpy.typing import NDArray
 
 from ropt.simple import (
     EvaluationFunctionContext,
-    optimize_many,
     session,
 )
 
@@ -53,11 +52,10 @@ def main() -> None:
     run_metadata = [{"run_id": idx} for idx in range(len(STARTS))]
     # --8<-- [start:run]
     with session() as s:
-        results = optimize_many(
+        results = s.thread_pool(workers=3).optimize_many(
             CONFIG,
             STARTS,
             rosenbrock,
-            pool=s.thread_pool(workers=3),
             metadata=run_metadata,
             limit=2,
         )

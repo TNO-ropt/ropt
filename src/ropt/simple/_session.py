@@ -5,9 +5,9 @@ a pool with workers, and closing the session releases every pool it built, so
 most code needs no further cleanup. It is also what a run's stop requests reach:
 each run registers a signal while it lasts, and `stop()` sets them all.
 
-Everything a session hands out is passed to a run explicitly, never discovered
-by it, so any number of pools — and any number of sessions — can be open at
-once, and nothing here is ambient.
+A run is started on the session or on one of its pools, so what it belongs to is
+stated at the call site and never discovered from the surroundings. Any number
+of pools — and any number of sessions — can be open at once.
 """
 
 from __future__ import annotations
@@ -23,14 +23,24 @@ from ropt.components.executors import (
 )
 from ropt.exceptions import WorkflowError
 
-from ._pool import WorkerPool, _ExecutorPool
+from ._evaluate import _evaluate, _evaluate_batch
+from ._optimize import _optimize, _optimize_many
+from ._pool import WorkerPool
 
 if TYPE_CHECKING:
-    from collections.abc import Callable
+    from collections.abc import Callable, Sequence
     from pathlib import Path
 
+    from numpy.typing import ArrayLike
+
     from ropt.components.concurrency import StopSignal
+    from ropt.components.event_handlers import EventHandler
     from ropt.components.executors import Executor
+    from ropt.results import FunctionResults
+
+    from ._function import EvaluationFunction
+    from ._report import ReportCallback
+    from ._result import OptimizationResult
 
 _CLOSED = (
     "This session is not open; build pools inside its `with` block, for "
@@ -54,19 +64,23 @@ class Session:
     Bind the session with `as` and call its factories inside the block. See
     [Running Optimizations](../running/running.md) for a walkthrough.
 
+    A run started on the session itself evaluates in-process, on the calling
+    thread; a run started on one of its pools evaluates on that pool's workers.
+    Either way the run belongs to this session.
+
     A session may be opened inside another, and pools from different sessions
     never interact. A session is single use — once closed it cannot be reopened.
 
-    [`stop`][ropt.simple.Session.stop] cancels the runs that are using its
-    pools, which is what a caller on another thread — a signal handler, a user
-    interface — calls to bring them down.
+    [`stop`][ropt.simple.Session.stop] cancels the runs that belong to it, which
+    is what a caller on another thread — a signal handler, a user interface —
+    calls to bring them down.
     """
 
     def __init__(self) -> None:
         """Initialize the session."""
         # A driver thread may build its own pool while the session is closing.
         self._lock = threading.Lock()
-        self._pools: list[_ExecutorPool] | None = None
+        self._pools: list[WorkerPool] | None = None
         self._entered = False
         self._signals: set[StopSignal] = set()
 
@@ -95,7 +109,7 @@ class Session:
             pool._release()  # ruff: ignore[private-member-access]
 
     def stop(self) -> None:
-        """Stop the runs that are in progress on this session's pools.
+        """Stop the runs that belong to this session.
 
         Each ends with `ExitCode.CANCELLED`, keeping the best result it had
         reached. A run stops at its next evaluation boundary, so the evaluations
@@ -121,6 +135,178 @@ class Session:
     def _deregister(self, signal: StopSignal) -> None:
         with self._lock:
             self._signals.discard(signal)
+
+    def optimize(  # ruff: ignore[too-many-arguments]
+        self,
+        config: dict[str, Any],
+        x0: ArrayLike,
+        function: EvaluationFunction,
+        *,
+        handlers: Sequence[EventHandler] | None = None,
+        report: ReportCallback | None = None,
+        constraint_tolerance: float = 1e-10,
+        metadata: dict[str, Any] | None = None,
+    ) -> OptimizationResult:
+        """Run a single optimization in-process, on this session.
+
+        The evaluations run on the calling thread. Start the run on one of this
+        session's pools to give them workers. See
+        [Running Optimizations](../running/running.md) for a walkthrough.
+
+        Args:
+            config:               The optimization configuration.
+            x0:                   The initial variable vector.
+            function:             The per-realization evaluation function.
+            handlers:             Optional handlers, called in the order listed.
+            report:               Optional callback invoked per evaluation.
+            constraint_tolerance: The tolerance within which a constraint holds.
+            metadata:             Optional dictionary attached to every result.
+
+        Returns:
+            An [`OptimizationResult`][ropt.simple.OptimizationResult].
+        """
+        return _optimize(
+            self,
+            None,
+            config,
+            x0,
+            function,
+            handlers=handlers,
+            report=report,
+            constraint_tolerance=constraint_tolerance,
+            bundle_size=None,
+            metadata=metadata,
+        )
+
+    def optimize_many(  # ruff: ignore[too-many-arguments]
+        self,
+        config: dict[str, Any] | Sequence[dict[str, Any]],
+        x0: ArrayLike,
+        function: EvaluationFunction | Sequence[EvaluationFunction],
+        *,
+        handlers: Sequence[EventHandler] | None = None,
+        report: ReportCallback | Sequence[ReportCallback] | None = None,
+        limit: int | None = None,
+        constraint_tolerance: float = 1e-10,
+        metadata: dict[str, Any] | Sequence[dict[str, Any]] | None = None,
+    ) -> tuple[OptimizationResult, ...]:
+        """Run several optimizations concurrently in-process, on this session.
+
+        The runs overlap on driver threads, but each evaluates on its own
+        thread, so `function` is called by several threads at once and must
+        tolerate that. Start them on one of this session's pools to give the
+        evaluations workers instead. See
+        [Parallel Execution and Many Runs](../running/parallel.md) for a
+        walkthrough.
+
+        Args:
+            config:               The configuration, or one per run.
+            x0:                   The initial vector, or one per row.
+            function:             The evaluation function, or one per run.
+            handlers:             Optional handlers, fed by every run.
+            report:               Optional callback, shared or one per run.
+            limit:                The maximum number of runs at once.
+            constraint_tolerance: The tolerance within which a constraint holds.
+            metadata:             Optional dictionary attached to every result.
+
+        Returns:
+            One [`OptimizationResult`][ropt.simple.OptimizationResult] per run.
+        """
+        return _optimize_many(
+            self,
+            None,
+            config,
+            x0,
+            function,
+            handlers=handlers,
+            report=report,
+            limit=limit,
+            constraint_tolerance=constraint_tolerance,
+            bundle_size=None,
+            metadata=metadata,
+        )
+
+    def evaluate(  # ruff: ignore[too-many-arguments]
+        self,
+        config: dict[str, Any],
+        variables: ArrayLike,
+        function: EvaluationFunction,
+        *,
+        handlers: Sequence[EventHandler] | None = None,
+        report: ReportCallback | None = None,
+        metadata: dict[str, Any] | None = None,
+    ) -> FunctionResults:
+        """Evaluate a single variable vector in-process, without optimizing.
+
+        See [Running Optimizations](../running/running.md) for a walkthrough.
+
+        Args:
+            config:    The optimization configuration.
+            variables: The variable vector to evaluate.
+            function:  The per-realization evaluation function.
+            handlers:  Optional handlers, called in the order listed.
+            report:    Optional callback invoked with the results.
+            metadata:  Optional dictionary attached to the results.
+
+        Returns:
+            The [`FunctionResults`][ropt.results.FunctionResults] for the vector.
+
+        Raises:
+            ValueError: If `variables` is not a single vector.
+        """  # ruff: ignore[docstring-extraneous-exception]
+        return _evaluate(
+            self,
+            None,
+            config,
+            variables,
+            function,
+            handlers=handlers,
+            report=report,
+            bundle_size=None,
+            metadata=metadata,
+        )
+
+    def evaluate_batch(  # ruff: ignore[too-many-arguments]
+        self,
+        config: dict[str, Any],
+        variables: ArrayLike,
+        function: EvaluationFunction,
+        *,
+        handlers: Sequence[EventHandler] | None = None,
+        report: ReportCallback | None = None,
+        metadata: dict[str, Any] | None = None,
+    ) -> tuple[FunctionResults, ...]:
+        """Evaluate a batch of variable vectors in-process, without optimizing.
+
+        Each row of `variables` is one vector, and the results come back in the
+        same order. See [Running Optimizations](../running/running.md) for a
+        walkthrough.
+
+        Args:
+            config:    The optimization configuration.
+            variables: The variable vectors to evaluate, one per row.
+            function:  The per-realization evaluation function.
+            handlers:  Optional handlers, called in the order listed.
+            report:    Optional callback invoked with each evaluation.
+            metadata:  Optional dictionary attached to every result.
+
+        Returns:
+            One [`FunctionResults`][ropt.results.FunctionResults] per vector.
+
+        Raises:
+            ValueError: If `variables` is not a 2-D matrix.
+        """  # ruff: ignore[docstring-extraneous-exception]
+        return _evaluate_batch(
+            self,
+            None,
+            config,
+            variables,
+            function,
+            handlers=handlers,
+            report=report,
+            bundle_size=None,
+            metadata=metadata,
+        )
 
     def thread_pool(self, *, workers: int = 1, bundle_size: int = 1) -> WorkerPool:
         """Create a pool that runs evaluations in worker threads.
@@ -305,7 +491,7 @@ class Session:
         self._require_open()
         # Built outside the lock, because starting workers is slow. A session
         # that closes meanwhile is caught when the pool is registered.
-        pool = _ExecutorPool(self, make_executor())
+        pool = WorkerPool(self, make_executor())
         with self._lock:
             if self._pools is None:
                 pool._release()  # ruff: ignore[private-member-access]

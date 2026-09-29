@@ -5,25 +5,25 @@ happen one after another, on the same thread that called
 [`optimize`][ropt.simple.optimize]. If each call is slow, you can run several at
 the same time by evaluating on a **pool**.
 
-Open a [`session`][ropt.simple.session], build a pool on it, and pass that to
-the run:
+Open a [`session`][ropt.simple.session], build a pool on it, and start the run
+on that pool:
 
 ```python
-from ropt.simple import optimize, session
+from ropt.simple import session
 
 with session() as s:
-    result = optimize(config, x0, objective, pool=s.thread_pool(workers=4))
+    result = s.thread_pool(workers=4).optimize(config, x0, objective)
 ```
 
 That is the whole pattern. You can build as many pools as you like, of any
-kind, and each run uses the one you give it — and only that one. The session
-owns them and releases their workers when its block ends, so there is nothing
-to close. The runnable script is
+kind, and each run evaluates on the pool it was started on — and only that one.
+The session owns them and releases their workers when its block ends, so there
+is nothing to close. The runnable script is
 [examples/simple/parallel.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/parallel.py),
 which evaluates one optimization on a thread pool, or on a process pool
 when it is passed `--multiprocessing`.
 
-Where your objective runs depends on which pool you pass (or none):
+Where your objective runs depends on which pool you start it on:
 
 ```mermaid
 flowchart TB
@@ -49,7 +49,7 @@ it, so the objective and its data are copied there.
 Only the evaluations ever leave. The optimizer itself, the pool object and
 your handlers all stay put, whichever pool you choose. Below, **your
 program** always means that one process — the one that opened the session and
-called `optimize`.
+started the run.
 
 ??? info "New to threads and processes?"
     A **process** is a running program with its own private memory. A **thread**
@@ -68,7 +68,8 @@ called `optimize`.
 
 ## The four choices
 
-Passing no pool evaluates in place, so there are four:
+The module-level [`optimize`][ropt.simple.optimize] evaluates in place, so there
+are four:
 
 | Pool | Evaluations run | Data | Applies when |
 | --- | --- | --- | --- |

@@ -187,7 +187,7 @@ reached.
 with session() as s:
     pool = s.thread_pool(workers=4)
     signal.signal(signal.SIGINT, lambda *_: s.stop())
-    result = optimize(config, x0, objective, pool=pool)
+    result = pool.optimize(config, x0, objective)
 
 if result.exit_code is ExitCode.CANCELLED:
     print("stopped early, best so far:", result.results)
@@ -202,9 +202,10 @@ loop that stops one attempt and starts another keeps working. Leaving the
 session's `with` block stops its runs as well, and then releases its pools,
 which is what refuses a run started after that.
 
-A run given no pool, or a [`SerialPool`][ropt.simple.SerialPool], belongs to no
-session and cannot be stopped this way. It evaluates on the calling thread,
-which is the thread that would have to call `stop()`.
+A run started with the module-level [`optimize`][ropt.simple.optimize] belongs
+to no session you hold and cannot be stopped this way. It evaluates on the
+calling thread, which is the thread that would have to call `stop()`. Start it
+on a session or one of its pools to bring it within reach.
 
 ## Attaching metadata
 
@@ -323,7 +324,8 @@ What *is* raised falls into three groups:
   checked as the run starts — and
   [`ExecutionError`][ropt.exceptions.ExecutionError] when the machinery that
   runs your evaluations, or a call handed to
-  [`offload`][ropt.simple.offload], cannot start or breaks down.
+  [`WorkerPool.offload`][ropt.simple.WorkerPool.offload], cannot start or breaks
+  down.
 
 - **Exceptions from your own evaluation function** are not caught. They travel
   back from wherever the evaluation ran — including a worker thread or process

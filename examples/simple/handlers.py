@@ -14,7 +14,6 @@ from numpy.typing import NDArray
 from ropt.simple import (
     EvaluationFunctionContext,
     HistoryHandler,
-    optimize_many,
     session,
 )
 
@@ -53,11 +52,10 @@ def main() -> None:
     per_run = HistoryHandler()
     # --8<-- [start:shared]
     with session() as s:
-        optimize_many(
+        s.thread_pool(workers=len(STARTS)).optimize_many(
             CONFIG,
             STARTS,
             rosenbrock,
-            pool=s.thread_pool(workers=len(STARTS)),
             handlers=[history, per_run],
         )
     # --8<-- [end:shared]

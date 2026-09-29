@@ -36,7 +36,6 @@ from ropt.simple import (
     OptimizationResult,
     evaluate,
     evaluate_batch,
-    offload,
     optimize,
     optimize_many,
     session,
@@ -359,12 +358,11 @@ def test_report_callback_stops_only_own_run(
         return None
 
     x0 = np.array([initial_values, initial_values])
-    results = optimize_many(
+    results = pools(workers=2).optimize_many(
         config,
         x0,
         test_functions[0],
         report=[_stop, _continue],
-        pool=pools(workers=2),
     )
     assert results[0].exit_code == ExitCode.USER_ABORT
     assert results[1].exit_code != ExitCode.USER_ABORT
@@ -555,12 +553,7 @@ def test_evaluate_batch_attaches_metadata_to_every_result(
 def test_optimize_with_a_thread_pool(
     pools: Callable[..., WorkerPool], config: Any, test_functions: Any
 ) -> None:
-    result = optimize(
-        config,
-        initial_values,
-        test_functions[0],
-        pool=pools(workers=2),
-    )
+    result = pools(workers=2).optimize(config, initial_values, test_functions[0])
     assert result.results is not None
     assert np.allclose(result.results.variables, 0.5, atol=0.02)
 
@@ -592,7 +585,7 @@ def test_optimize_evaluates_on_the_given_pool(
             seen.append(threading.current_thread().name)
         return 0.0
 
-    optimize(config, initial_values, _record_thread, pool=pools(workers=2))
+    pools(workers=2).optimize(config, initial_values, _record_thread)
     assert seen
     assert threading.current_thread().name not in seen
 
@@ -622,15 +615,15 @@ def test_batch_ids_are_unique_across_sequential_runs(
     # One program-wide counter, so no arrangement of pools can repeat an id.
     if arrangement == "shared":
         shared = pools(workers=2)
-        pair: list[WorkerPool | None] = [shared, shared]
+        pair: list[Callable[..., OptimizationResult]] = [shared.optimize] * 2
     elif arrangement == "separate":
-        pair = [pools(workers=2), pools(workers=2)]
+        pair = [pools(workers=2).optimize, pools(workers=2).optimize]
     else:
-        pair = [None, None]
+        pair = [optimize, optimize]
     sinks: list[list[int]] = [[], []]
     lock = threading.Lock()
-    for sink, pool in zip(sinks, pair, strict=True):
-        optimize(config, initial_values, _collect_batch_ids(sink, lock), pool=pool)
+    for sink, run in zip(sinks, pair, strict=True):
+        run(config, initial_values, _collect_batch_ids(sink, lock))
     assert all(sinks)
     assert not set(sinks[0]) & set(sinks[1])
 
@@ -641,11 +634,11 @@ def test_batch_ids_are_unique_across_concurrent_runs(
 ) -> None:
     sinks: list[list[int]] = [[], [], []]
     lock = threading.Lock()
-    optimize_many(
+    run = pools(workers=2).optimize_many if with_pool else optimize_many
+    run(
         config,
         initial_values,
         [_collect_batch_ids(sink, lock) for sink in sinks],
-        pool=pools(workers=2) if with_pool else None,
     )
     assert all(sinks)
     assert sum(len(set(sink)) for sink in sinks) == len(set().union(*sinks))
@@ -685,12 +678,11 @@ def test_metadata_reaches_the_evaluation_function_with_a_pool(
 ) -> None:
     seen: list[Any] = []
     lock = threading.Lock()
-    optimize(
+    pools(workers=2).optimize(
         config,
         initial_values,
         _record_metadata(seen, lock),
         metadata={"run": 7},
-        pool=pools(workers=2),
     )
     assert seen
     assert all(item == {"run": 7} for item in seen)
@@ -710,12 +702,11 @@ def test_metadata_per_run_reaches_each_evaluation_function(
     first: list[Any] = []
     second: list[Any] = []
     lock = threading.Lock()
-    optimize_many(
+    pools(workers=2).optimize_many(
         config,
         initial_values,
         [_record_metadata(first, lock), _record_metadata(second, lock)],
         metadata=[{"run": 0}, {"run": 1}],
-        pool=pools(workers=2),
     )
     assert all(item == {"run": 0} for item in first)
     assert all(item == {"run": 1} for item in second)
@@ -725,7 +716,7 @@ def test_evaluate_batch_with_a_thread_pool(
     pools: Callable[..., WorkerPool], config: Any, test_functions: Any
 ) -> None:
     matrix = np.array([initial_values, np.zeros(initial_values.size)])
-    results = evaluate_batch(config, matrix, test_functions[0], pool=pools(workers=2))
+    results = pools(workers=2).evaluate_batch(config, matrix, test_functions[0])
     for result, expected in zip(results, [0.66, 0.75], strict=True):
         assert result.target_objective == pytest.approx(expected)
 
@@ -733,12 +724,7 @@ def test_evaluate_batch_with_a_thread_pool(
 def test_evaluate_with_a_thread_pool(
     pools: Callable[..., WorkerPool], config: Any, test_functions: Any
 ) -> None:
-    result = evaluate(
-        config,
-        initial_values,
-        test_functions[0],
-        pool=pools(workers=2),
-    )
+    result = pools(workers=2).evaluate(config, initial_values, test_functions[0])
     assert result.target_objective == pytest.approx(0.66)
 
 
@@ -761,31 +747,18 @@ def _run_inner_optimization(variables: NDArray[np.float64], _context: Any) -> fl
     # pool of its own, nested inside whatever pool is running it. Nothing
     # ambient needs to be threaded through for that to work.
     with session() as inner:
-        result = optimize(
-            _INNER_CONFIG, variables, _sphere, pool=inner.thread_pool(workers=1)
+        result = inner.thread_pool(workers=1).optimize(
+            _INNER_CONFIG, variables, _sphere
         )
     assert result.results is not None
     assert result.results.target_objective is not None
     return float(result.results.target_objective)
 
 
-def _offload_from_evaluation(_variables: NDArray[np.float64], _context: Any) -> float:
-    return float(offload(_return_one))
-
-
-def _return_one() -> float:
-    return 1.0
-
-
 def test_evaluation_function_can_open_its_own_thread_pool(
     pools: Callable[..., WorkerPool], config: Any
 ) -> None:
-    result = optimize(
-        config,
-        initial_values,
-        _run_inner_optimization,
-        pool=pools(workers=2),
-    )
+    result = pools(workers=2).optimize(config, initial_values, _run_inner_optimization)
     assert result.results is not None
 
 
@@ -793,11 +766,8 @@ def test_evaluation_function_can_open_its_own_thread_pool(
 def test_evaluation_function_can_open_its_own_process_pool(
     pools: Callable[..., WorkerPool], config: Any
 ) -> None:
-    result = optimize(
-        config,
-        initial_values,
-        _run_inner_optimization,
-        pool=pools(ProcessExecutor, workers=2),
+    result = pools(ProcessExecutor, workers=2).optimize(
+        config, initial_values, _run_inner_optimization
     )
     assert result.results is not None
 
@@ -824,11 +794,10 @@ def test_bundle_size_sends_the_whole_batch_to_one_worker(
     # The evaluations in one bundle run after each other, so a whole-batch
     # bundle is observable as a single worker doing all four realizations.
     history = HistoryHandler()
-    evaluate(
+    pools(ProcessExecutor, workers=4).evaluate(
         _BUNDLE_CONFIG,
         np.zeros(2),
         _bundle_pid,
-        pool=pools(ProcessExecutor, workers=4),
         handlers=[history],
         bundle_size=0,
     )
@@ -854,7 +823,7 @@ def test_call_bundle_size_reaches_the_executor(
         return submit(self, bundle)
 
     monkeypatch.setattr(ProcessExecutor, "_submit", _recording_submit)
-    evaluate(_BUNDLE_CONFIG, np.zeros(2), _bundle_pid, pool=pool, bundle_size=0)
+    pool.evaluate(_BUNDLE_CONFIG, np.zeros(2), _bundle_pid, bundle_size=0)
     # Without the argument this would have been [1, 1, 1, 1].
     assert sizes == [4]
 
@@ -863,11 +832,10 @@ def test_negative_call_bundle_size_refused(pools: Callable[..., WorkerPool]) -> 
     with (
         pytest.raises(ValueError, match="bundle_size must be >= 0"),
     ):
-        evaluate(
+        pools().evaluate(
             _BUNDLE_CONFIG,
             np.zeros(2),
             _bundle_pid,
-            pool=pools(),
             bundle_size=-1,
         )
 
@@ -887,11 +855,10 @@ def test_thread_pool_bundles_a_whole_batch_onto_one_thread(
             threads.add(threading.get_ident())
         return EvaluationFunctionResult(objectives=float(np.sum(variables**2)))
 
-    results = evaluate(
+    results = pools(workers=4).evaluate(
         _BUNDLE_CONFIG,
         np.zeros(2),
         _record_thread,
-        pool=pools(workers=4),
         bundle_size=0,
     )
     assert results.functions is not None
@@ -911,19 +878,20 @@ def test_thread_pool_runs_unbundled_calls_at_once(
         barrier.wait(timeout=30)
         return EvaluationFunctionResult(objectives=float(np.sum(variables**2)))
 
-    results = evaluate(
+    results = pools(workers=4).evaluate(
         _BUNDLE_CONFIG,
         np.zeros(2),
         _wait_for_all,
-        pool=pools(workers=4),
         bundle_size=1,
     )
     assert results.functions is not None
 
 
-def test_bundle_size_sequence_length_must_match_runs() -> None:
+def test_bundle_size_sequence_length_must_match_runs(
+    pools: Callable[..., WorkerPool],
+) -> None:
     with pytest.raises(ValueError, match="bundle_size sequence length"):
-        optimize_many(
+        pools().optimize_many(
             _BUNDLE_CONFIG,
             np.zeros(2),
             [_bundle_pid, _bundle_pid],
@@ -960,11 +928,10 @@ def _nested_run(
     # Neither outer evaluation can pass until both have arrived, so if they were
     # run one after the other this breaks the barrier instead of quietly passing.
     barrier.wait()
-    result = optimize(
+    result = pool.optimize(
         _NESTED_INNER,
         variables,
         _pid_sphere,
-        pool=pool,
         handlers=[history],
         metadata={"outer": context.eval_idx},
     )
@@ -989,11 +956,10 @@ def test_concurrent_inner_runs_on_a_second_pool_feed_one_handler(
     barrier = threading.Barrier(len(_NESTED_POINTS), timeout=30)
     inner = pools(ProcessExecutor, workers=2) if processes else pools(workers=2)
     outer = pools(workers=len(_NESTED_POINTS))
-    evaluate_batch(
+    outer.evaluate_batch(
         _NESTED_OUTER,
         _NESTED_POINTS,
         partial(_nested_run, pool=inner, history=history, barrier=barrier),
-        pool=outer,
     )
 
     batches: dict[int, set[int]] = {}
@@ -1034,11 +1000,10 @@ def _inner_objective(
 def _bilevel_outer(variables: NDArray[np.float64], _context: Any) -> float:
     a = float(variables[0])
     with session() as inner_session:
-        inner = optimize(
+        inner = inner_session.thread_pool(workers=1).optimize(
             _BILEVEL_CONFIG,
             [0.0],
             partial(_inner_objective, outer_value=a),
-            pool=inner_session.thread_pool(workers=1),
         )
     assert inner.results is not None
     assert inner.results.target_objective is not None
@@ -1048,25 +1013,10 @@ def _bilevel_outer(variables: NDArray[np.float64], _context: Any) -> float:
 def test_nested_optimization_on_a_thread_pool(
     pools: Callable[..., WorkerPool],
 ) -> None:
-    result = optimize(_BILEVEL_CONFIG, [0.0], _bilevel_outer, pool=pools(workers=1))
+    result = pools(workers=1).optimize(_BILEVEL_CONFIG, [0.0], _bilevel_outer)
     assert result.results is not None
     assert result.results.variables[0] == pytest.approx(2.0, abs=0.05)
     assert result.results.target_objective == pytest.approx(0.0, abs=1e-2)
-
-
-def test_offload_in_evaluation_without_a_pool_runs_inline(
-    pools: Callable[..., WorkerPool], config: Any
-) -> None:
-    # A pool is only ever what is passed to a call, never what is found:
-    # `offload` inside the evaluation function is given none, so it runs
-    # inline even though the run itself is evaluating on a thread pool.
-    result = optimize(
-        config,
-        initial_values,
-        _offload_from_evaluation,
-        pool=pools(workers=2),
-    )
-    assert result.results is not None
 
 
 class _FatalWork(BaseException):
@@ -1084,7 +1034,7 @@ def test_fatal_worker_error_reaches_the_caller(
     # A worker cannot act on a BaseException, so it travels to the caller
     # unchanged rather than being folded into a group along the way.
     with pytest.raises(_FatalWork, match="worker died"):
-        offload(_fatal_work, pool=pools(workers=1))
+        pools(workers=1).offload(_fatal_work)
 
 
 def _double(value: float) -> float:
@@ -1093,9 +1043,8 @@ def _double(value: float) -> float:
 
 def _offload_in_own_pool(variables: NDArray[np.float64], _context: Any) -> float:
     with session() as inner:
-        doubled = offload(
+        doubled = inner.thread_pool(workers=2).offload(
             [partial(_double, 3.0), partial(_double, 4.0)],
-            pool=inner.thread_pool(workers=2),
         )
     assert doubled == (6.0, 8.0)
     return float(variables @ variables)
@@ -1113,23 +1062,15 @@ def _own_handlers_in_evaluation(variables: NDArray[np.float64], _context: Any) -
 def test_offload_in_evaluation_uses_its_own_pool(
     pools: Callable[..., WorkerPool], config: Any
 ) -> None:
-    result = optimize(
-        config,
-        initial_values,
-        _offload_in_own_pool,
-        pool=pools(workers=2),
-    )
+    result = pools(workers=2).optimize(config, initial_values, _offload_in_own_pool)
     assert result.results is not None
 
 
 def test_handlers_in_an_evaluation(
     pools: Callable[..., WorkerPool], config: Any
 ) -> None:
-    result = optimize(
-        config,
-        initial_values,
-        _own_handlers_in_evaluation,
-        pool=pools(workers=2),
+    result = pools(workers=2).optimize(
+        config, initial_values, _own_handlers_in_evaluation
     )
     assert result.results is not None
 
@@ -1138,17 +1079,9 @@ def test_handlers_in_an_evaluation(
 def test_sequential_pools_are_allowed(
     pools: Callable[..., WorkerPool], config: Any, test_functions: Any
 ) -> None:
-    first = optimize(
-        config,
-        initial_values,
-        test_functions[0],
-        pool=pools(workers=2),
-    )
-    second = optimize(
-        config,
-        initial_values,
-        test_functions[0],
-        pool=pools(ProcessExecutor, workers=2),
+    first = pools(workers=2).optimize(config, initial_values, test_functions[0])
+    second = pools(ProcessExecutor, workers=2).optimize(
+        config, initial_values, test_functions[0]
     )
     assert first.exit_code == second.exit_code
     assert first.results is not None
@@ -1164,7 +1097,7 @@ def test_thread_pool_objective_exception_propagates(
         raise ValueError(msg)
 
     with pytest.raises(ValueError, match="boom"):
-        optimize(config, initial_values, boom, pool=pools(workers=2))
+        pools(workers=2).optimize(config, initial_values, boom)
 
 
 def test_thread_pool_survives_objective_exception(
@@ -1176,9 +1109,9 @@ def test_thread_pool_survives_objective_exception(
 
     pool = pools(workers=2)
     with pytest.raises(ValueError, match="boom"):
-        optimize(config, initial_values, boom, pool=pool)
+        pool.optimize(config, initial_values, boom)
     # The pool survives a failed run and can still be used by the next one.
-    result = optimize(config, initial_values, test_functions[0], pool=pool)
+    result = pool.optimize(config, initial_values, test_functions[0])
     assert result.results is not None
     assert np.allclose(result.results.variables, 0.5, atol=0.02)
 
@@ -1187,11 +1120,8 @@ def test_thread_pool_survives_objective_exception(
 def test_optimize_with_a_process_pool(
     pools: Callable[..., WorkerPool], config: Any, test_functions: Any
 ) -> None:
-    result = optimize(
-        config,
-        initial_values,
-        test_functions[0],
-        pool=pools(ProcessExecutor, workers=2),
+    result = pools(ProcessExecutor, workers=2).optimize(
+        config, initial_values, test_functions[0]
     )
     assert result.results is not None
     assert np.allclose(result.results.variables, 0.5, atol=0.02)
@@ -1205,9 +1135,7 @@ def test_process_pool_without_cloudpickle(
         "ropt.components.executors._process_executor.dumps",
         pickle.dumps,
     )
-    result = optimize(
-        config, initial_values, _sphere, pool=pools(ProcessExecutor, workers=2)
-    )
+    result = pools(ProcessExecutor, workers=2).optimize(config, initial_values, _sphere)
     assert result.results is not None
     assert np.allclose(result.results.variables, 0.0, atol=0.02)
 
@@ -1220,9 +1148,7 @@ def test_evaluate_without_cloudpickle(
         "ropt.components.executors._process_executor.dumps",
         pickle.dumps,
     )
-    result = evaluate(
-        config, initial_values, _sphere, pool=pools(ProcessExecutor, workers=2)
-    )
+    result = pools(ProcessExecutor, workers=2).evaluate(config, initial_values, _sphere)
     assert result.target_objective == pytest.approx(0.01)
 
 
@@ -1230,7 +1156,7 @@ def test_optimize_many_broadcasts_config_and_objective(
     pools: Callable[..., WorkerPool], config: Any, test_functions: Any
 ) -> None:
     starts = np.array([initial_values, np.zeros(initial_values.size)])
-    results = optimize_many(config, starts, test_functions[0], pool=pools(workers=2))
+    results = pools(workers=2).optimize_many(config, starts, test_functions[0])
     assert len(results) == 2
     assert all(isinstance(result, OptimizationResult) for result in results)
     for result in results:
@@ -1241,11 +1167,10 @@ def test_optimize_many_broadcasts_config_and_objective(
 def test_optimize_many_per_run_objectives(
     pools: Callable[..., WorkerPool], config: Any, test_functions: Any
 ) -> None:
-    results = optimize_many(
+    results = pools(workers=2).optimize_many(
         config,
         initial_values,
         [test_functions[0], test_functions[1]],
-        pool=pools(workers=2),
     )
     assert len(results) == 2
     assert results[0].results is not None
@@ -1259,12 +1184,11 @@ def test_optimize_many_report_callback_shared_across_runs(
 ) -> None:
     reported: list[FunctionResults] = []
     starts = np.array([initial_values, np.zeros(initial_values.size)])
-    optimize_many(
+    pools(workers=2).optimize_many(
         config,
         starts,
         test_functions[0],
         report=reported.append,
-        pool=pools(workers=2),
     )
     assert reported
     assert all(isinstance(item, FunctionResults) for item in reported)
@@ -1276,12 +1200,11 @@ def test_optimize_many_accepts_a_report_per_run(
     first: list[FunctionResults] = []
     second: list[FunctionResults] = []
     starts = np.array([initial_values, np.zeros(initial_values.size)])
-    optimize_many(
+    pools(workers=2).optimize_many(
         config,
         starts,
         test_functions[0],
         report=[first.append, second.append],
-        pool=pools(workers=2),
     )
     assert first
     assert second
@@ -1300,12 +1223,11 @@ def test_optimize_many_broadcasts_a_single_metadata_dict(
     pools: Callable[..., WorkerPool], config: Any, test_functions: Any
 ) -> None:
     starts = np.array([initial_values, np.zeros(initial_values.size)])
-    results = optimize_many(
+    results = pools(workers=2).optimize_many(
         config,
         starts,
         test_functions[0],
         metadata={"group": "g"},
-        pool=pools(workers=2),
     )
     for result in results:
         assert result.results is not None
@@ -1316,12 +1238,11 @@ def test_optimize_many_accepts_metadata_per_run(
     pools: Callable[..., WorkerPool], config: Any, test_functions: Any
 ) -> None:
     starts = np.array([initial_values, np.zeros(initial_values.size)])
-    results = optimize_many(
+    results = pools(workers=2).optimize_many(
         config,
         starts,
         test_functions[0],
         metadata=[{"run_id": 0}, {"run_id": 1}],
-        pool=pools(workers=2),
     )
     assert len(results) == 2
     for idx, result in enumerate(results):
@@ -1341,12 +1262,11 @@ def test_optimize_many_respects_limit(
     pools: Callable[..., WorkerPool], config: Any, test_functions: Any
 ) -> None:
     starts = np.tile(initial_values, (4, 1))
-    results = optimize_many(
+    results = pools(workers=2).optimize_many(
         config,
         starts,
         test_functions[0],
         limit=2,
-        pool=pools(workers=2),
     )
     assert len(results) == 4
 
@@ -1392,11 +1312,10 @@ def test_optimize_many_raises_the_error_of_a_failing_run(
 
     starts = np.tile(initial_values, (3, 1))
     with pytest.raises(ValueError, match="boom"):
-        optimize_many(
+        pools(workers=2).optimize_many(
             config,
             starts,
             [test_functions[0], boom, test_functions[0]],
-            pool=pools(workers=2),
         )
 
 
@@ -1420,7 +1339,7 @@ def test_optimize_many_starts_every_run_after_one_fails(
     starts = np.tile(initial_values, (5, 1))
     pool = pools(workers=2)
     with pytest.raises(ValueError, match="boom"):
-        optimize_many(config, starts, boom, limit=1, pool=pool)
+        pool.optimize_many(config, starts, boom, limit=1)
     with lock:
         assert calls == 5
 
@@ -1455,7 +1374,7 @@ def test_optimize_many_leaves_the_pool_usable_after_a_failure(
     starts = np.tile(initial_values, (4, 1))
     pool = pools(workers=4)
     with pytest.raises(ValueError, match="boom"):
-        optimize_many(
+        pool.optimize_many(
             config,
             starts,
             [
@@ -1464,11 +1383,10 @@ def test_optimize_many_leaves_the_pool_usable_after_a_failure(
                 boom,
                 first_evaluation_waits(),
             ],
-            pool=pool,
         )
     # The siblings keep their workers until they finish, so the pool must stay
     # usable and must not deadlock against them.
-    result = optimize(config, initial_values, test_functions[0], pool=pool)
+    result = pool.optimize(config, initial_values, test_functions[0])
     assert result.exit_code == ExitCode.OPTIMIZER_FINISHED
 
 
@@ -1489,11 +1407,10 @@ def test_shared_handler_aggregates_across_optimize_many(
 
     shared = HistoryHandler()
     starts = np.tile(initial_values, (3, 1))
-    optimize_many(
+    pools(workers=2).optimize_many(
         config,
         starts,
         test_functions[0],
-        pool=pools(workers=2),
         handlers=[shared],
     )
 
@@ -1566,11 +1483,8 @@ def test_hpc_evaluates_through_the_simple_api(
     tmp_path: Path,
 ) -> None:
     _mock_scheduler(monkeypatch, _MockedHPCAdapter(tmp_path))
-    result = evaluate(
-        config,
-        initial_values,
-        test_functions[0],
-        pool=pools(HPCExecutor, workers=2, workdir=tmp_path, template=""),
+    result = pools(HPCExecutor, workers=2, workdir=tmp_path, template="").evaluate(
+        config, initial_values, test_functions[0]
     )
     assert result.target_objective is not None
 
@@ -1580,11 +1494,8 @@ def test_hpc_evaluates_through_the_simple_api(
 def test_local_jobs_evaluate_through_the_simple_api(
     pools: Callable[..., WorkerPool], config: Any, test_functions: Any, tmp_path: Path
 ) -> None:
-    result = evaluate(
-        config,
-        initial_values,
-        test_functions[0],
-        pool=pools(LocalJobExecutor, workers=2, workdir=tmp_path),
+    result = pools(LocalJobExecutor, workers=2, workdir=tmp_path).evaluate(
+        config, initial_values, test_functions[0]
     )
     assert result.target_objective is not None
 
@@ -1611,9 +1522,8 @@ def test_dying_worker_raises_instead_of_failing_a_realization(
     # A minimum of one success is enough to absorb the loss, so without the
     # raise this returns an answer computed from the workers that survived.
     with pytest.raises(ExecutionError, match="could not be run"):
-        evaluate(
+        pools(ProcessExecutor, workers=2).evaluate(
             _DYING_WORKER_CONFIG,
             np.zeros(2),
             _kill_worker_on_one_realization,
-            pool=pools(ProcessExecutor, workers=2),
         )

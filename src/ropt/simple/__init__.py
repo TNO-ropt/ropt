@@ -8,14 +8,15 @@ Enumerations used in the configuration and results (for example
 [`ExitCode`][ropt.enums.ExitCode] and [`VariableType`][ropt.enums.VariableType])
 are not re-exported here; import them from [`ropt.enums`][ropt.enums].
 
-Nothing about a run depends on where it is called from. Where its evaluations
-happen is decided by the pool it is given with `pool=`, and which handlers see
-its results by the `handlers=` it is given. A run given no pool evaluates
-in-process. This holds wherever the run is started from, including a thread you
-spawn yourself.
+Nothing about a run depends on where it is called from. What it is started on
+says where its evaluations happen and which session it belongs to: a module
+function runs in-process and belongs to nothing, a
+[`Session`][ropt.simple.Session] method runs in-process on that session, and a
+[`WorkerPool`][ropt.simple.WorkerPool] method runs on that pool's workers. This
+holds wherever the run is started from, including a thread you spawn yourself.
 
 Pools come from a [`session`][ropt.simple.session], which releases them when it
-closes. A run that evaluates in-process needs no session.
+closes.
 """
 
 from __future__ import annotations
@@ -31,11 +32,9 @@ from ropt.components.event_handlers import (
     ResultsHandler,
 )
 
-from ._evaluate import evaluate, evaluate_batch
 from ._function import EvaluationFunction
-from ._offload import offload
-from ._optimize import optimize, optimize_many
-from ._pool import SerialPool, WorkerPool
+from ._functions import evaluate, evaluate_batch, optimize, optimize_many
+from ._pool import WorkerPool
 from ._report import ReportCallback
 from ._result import OptimizationResult
 from ._session import Session, session
@@ -50,12 +49,10 @@ __all__ = [
     "OptimizationResult",
     "ReportCallback",
     "ResultsHandler",
-    "SerialPool",
     "Session",
     "WorkerPool",
     "evaluate",
     "evaluate_batch",
-    "offload",
     "optimize",
     "optimize_many",
     "session",

@@ -28,7 +28,6 @@ from numpy.typing import NDArray
 from ropt.results import FunctionResults
 from ropt.simple import (
     EvaluationFunctionContext,
-    optimize,
     session,
 )
 
@@ -114,11 +113,10 @@ def main(
                 workdir=Path.cwd() if workdir is None else workdir.resolve(),
             )
         )
-        result = optimize(
+        result = pool.optimize(
             CONFIG,
             INITIAL_VALUES,
             rosenbrock,
-            pool=pool,
             report=report,
             bundle_size=0,
         )

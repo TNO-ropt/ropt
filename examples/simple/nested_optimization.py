@@ -32,7 +32,6 @@ from ropt.simple import (
     EvaluationFunction,
     EvaluationFunctionContext,
     WorkerPool,
-    optimize,
     session,
 )
 
@@ -133,11 +132,10 @@ def inner_optimization(  # ruff: ignore[too-many-arguments]
     if key in memo:
         return memo[key]
 
-    result = optimize(
+    result = pool.optimize(
         INNER_CONFIG,
         np.where(MASK, INITIAL_VALUES, variables),
         function,
-        pool=pool,
         handlers=[tables],
         # A whole inner batch goes to one worker: the parallelism comes from the
         # outer runs.
@@ -182,7 +180,7 @@ def main() -> None:
     # this process; on a process pool each worker would get an empty copy.
     memo: dict[tuple[float, ...], float] = {}
     with session() as s:
-        optimize(
+        s.thread_pool(workers=2).optimize(
             OUTER_CONFIG,
             INITIAL_VALUES,
             partial(
@@ -192,7 +190,6 @@ def main() -> None:
                 function=partial(rosenbrock, a=a, b=b),
                 memo=memo,
             ),
-            pool=s.thread_pool(workers=2),
         )
     # --8<-- [end:run]
 

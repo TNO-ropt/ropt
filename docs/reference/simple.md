@@ -24,11 +24,6 @@
 ::: ropt.simple.session
 ::: ropt.simple.Session
 ::: ropt.simple.WorkerPool
-::: ropt.simple.SerialPool
-
-## Offloading work to a pool
-
-::: ropt.simple.offload
 
 ## Handlers
 

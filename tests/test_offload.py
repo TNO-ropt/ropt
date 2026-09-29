@@ -1,4 +1,4 @@
-"""Tests for the offload pool-dispatch helper."""
+"""Tests for the offload method on worker pools."""
 
 from __future__ import annotations
 
@@ -16,8 +16,8 @@ import pytest
 from ropt.components.event_handlers import EventHandler
 from ropt.components.executors import ProcessExecutor, ThreadExecutor
 from ropt.enums import EnOptEventType
-from ropt.exceptions import ExecutionError, WorkflowError
-from ropt.simple import offload, optimize, session
+from ropt.exceptions import ExecutionError
+from ropt.simple import session
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
@@ -67,38 +67,22 @@ def _kill_worker() -> int:
     os._exit(1)
 
 
-def test_offload_without_a_pool_runs_inline() -> None:
-    # Passing no pool means "run here", so a call site that may or may not
-    # have one needs no fallback of its own.
-    assert offload(partial(add, 3, 4)) == 7
-
-
-def test_offload_sequence_without_a_pool_runs_inline() -> None:
-    assert offload([partial(_square, 1), partial(_square, 2)]) == (1, 4)
-
-
-def test_offload_empty_sequence_without_a_pool_returns_empty() -> None:
-    assert offload([]) == ()
-
-
-def test_offload_empty_sequence_returns_empty_with_a_pool(
+def test_offload_empty_sequence_returns_empty(
     pools: Callable[..., WorkerPool],
 ) -> None:
-    assert offload([], pool=pools(workers=1)) == ()
+    assert pools(workers=1).offload([]) == ()
 
 
 def test_offload_single_call_with_a_thread_pool(
     pools: Callable[..., WorkerPool],
 ) -> None:
-    assert offload(partial(add, 3, 4), pool=pools(workers=2)) == 7
+    assert pools(workers=2).offload(partial(add, 3, 4)) == 7
 
 
 def test_offload_sequence_with_a_thread_pool(
     pools: Callable[..., WorkerPool],
 ) -> None:
-    assert offload(
-        [partial(_square, i) for i in range(1, 6)], pool=pools(workers=3)
-    ) == (
+    assert pools(workers=3).offload([partial(_square, i) for i in range(1, 6)]) == (
         1,
         4,
         9,
@@ -110,9 +94,7 @@ def test_offload_sequence_with_a_thread_pool(
 def test_offload_sequence_of_different_functions(
     pools: Callable[..., WorkerPool],
 ) -> None:
-    assert offload(
-        [partial(_square, 3), partial(_double, 5)], pool=pools(workers=2)
-    ) == (
+    assert pools(workers=2).offload([partial(_square, 3), partial(_double, 5)]) == (
         9,
         10,
     )
@@ -122,9 +104,8 @@ def test_offload_sequence_of_different_functions(
 def test_offload_sequence_with_a_process_pool(
     pools: Callable[..., WorkerPool],
 ) -> None:
-    assert offload(
-        [partial(_square, i) for i in (1, 2, 3)],
-        pool=pools(ProcessExecutor, workers=2),
+    assert pools(ProcessExecutor, workers=2).offload(
+        [partial(_square, i) for i in (1, 2, 3)]
     ) == (
         1,
         4,
@@ -138,7 +119,7 @@ def test_dying_worker_reported_to_offload_caller(
     pools: Callable[..., WorkerPool],
 ) -> None:
     with pytest.raises(ExecutionError, match="could not be run"):
-        offload(_kill_worker, pool=pools(ProcessExecutor, workers=1))
+        pools(ProcessExecutor, workers=1).offload(_kill_worker)
 
 
 def test_offload_preserves_order_across_workers(
@@ -158,14 +139,14 @@ def test_offload_preserves_order_across_workers(
         return (index + 1) * (index + 1)
 
     jobs = [partial(square, index) for index in range(count)]
-    assert offload(jobs, pool=pools(workers=count)) == (1, 4, 9, 16, 25)
+    assert pools(workers=count).offload(jobs) == (1, 4, 9, 16, 25)
 
 
 def test_offload_from_an_event_loop(pools: Callable[..., WorkerPool]) -> None:
     # Nothing in the pools touches asyncio, so a call from inside a
     # coroutine -- a notebook cell, say -- is an ordinary blocking call.
     async def _offload_in_a_cell(pool: WorkerPool) -> int:  # ruff: ignore[unused-async]
-        return offload(partial(_square, 4), pool=pool)
+        return pool.offload(partial(_square, 4))
 
     assert asyncio.run(_offload_in_a_cell(pools(workers=1))) == 16
 
@@ -178,48 +159,40 @@ def test_offload_base_exception_reaches_caller(
     # A worker thread cannot exit the interpreter on its own, so the exception
     # is delivered to the caller, which is where it means something.
     with pytest.raises((SystemExit, KeyboardInterrupt)):
-        offload(work, pool=pools(workers=2))
+        pools(workers=2).offload(work)
 
 
 class _OffloadingHandler(EventHandler):
-    """Record what `offload` does when called from inside a handler."""
+    """Record what offloading from inside a handler returns."""
 
-    def __init__(self) -> None:
+    def __init__(self, pool: WorkerPool) -> None:
         super().__init__()
-        self.pool: WorkerPool | None = None
-        self.outcome: str | None = None
+        self.pool = pool
+        self.outcome: int | None = None
 
     @property
     def event_types(self) -> set[EnOptEventType]:
         return {EnOptEventType.FINISHED_EVALUATION}
 
     def _handle_event(self, event: EnOptEvent) -> None:  # ruff: ignore[unused-method-argument]
-        if self.outcome is not None:
-            return
-        try:
-            offloaded = offload(partial(_square, 4), pool=self.pool)
-        except WorkflowError as exc:
-            self.outcome = f"raised {exc}"
-        else:
-            self.outcome = f"returned {offloaded}"
-
-
-def _run_one(**kwargs: Any) -> None:
-    config = {
-        "variables": {"variable_count": 2, "perturbation_magnitudes": 1e-6},
-        "optimizer": {"max_functions": 2},
-    }
-    optimize(
-        config, np.zeros(2), lambda variables, _: float(np.sum(variables**2)), **kwargs
-    )
+        if self.outcome is None:
+            self.outcome = self.pool.offload(partial(_square, 4))
 
 
 @pytest.mark.timeout(60)
 def test_handler_can_offload(pools: Callable[..., WorkerPool]) -> None:
     # A handler runs on the thread driving the run, not on a worker, so the
     # pool it is given works there as usual.
-    handler = _OffloadingHandler()
     pool = pools(workers=2)
-    handler.pool = pool
-    _run_one(pool=pool, handlers=[handler])
-    assert handler.outcome == "returned 16"
+    handler = _OffloadingHandler(pool)
+    config = {
+        "variables": {"variable_count": 2, "perturbation_magnitudes": 1e-6},
+        "optimizer": {"max_functions": 2},
+    }
+    pool.optimize(
+        config,
+        np.zeros(2),
+        lambda variables, _: float(np.sum(variables**2)),
+        handlers=[handler],
+    )
+    assert handler.outcome == 16

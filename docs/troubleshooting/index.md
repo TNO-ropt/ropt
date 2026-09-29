@@ -100,9 +100,10 @@ raises a `TypeError` in the middle of the run.
 
 ## Pools, stopping and processes
 
-**A run uses the pool you hand it, and no other.** Nothing is picked up from
-the surrounding code. A run given no `pool=` evaluates in-process, on the
-thread that called it — even if a pool exists next to it.
+**A run evaluates on the pool it was started on, and no other.** Nothing is
+picked up from the surrounding code. A run started with the module-level
+[`optimize`][ropt.simple.optimize] evaluates in-process, on the thread that
+called it — even if a pool exists next to it.
 
 **Threads cannot be interrupted.** Evaluations on a thread pool run to
 completion even after Ctrl-C, because Python cannot interrupt a thread from
