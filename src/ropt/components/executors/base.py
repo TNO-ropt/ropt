@@ -26,6 +26,8 @@ from typing import TYPE_CHECKING, Any
 
 from ropt.exceptions import ExecutorStopped, WorkflowError
 
+from ._picklable import picklable_exception
+
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
 
@@ -89,6 +91,13 @@ class WorkNotRun:
 _NO_RESULT = (ExecutorFailure, WorkNotRun)
 
 
+@dataclass(frozen=True)
+class _Raised:
+    # Marks an exception as *raised* by a call rather than returned by it, so
+    # that a function returning an exception does not abort its batch.
+    error: BaseException
+
+
 def _calls(
     bundle: Sequence[WorkItem],
 ) -> list[tuple[Callable[..., Any], tuple[Any, ...], dict[str, Any]]]:
@@ -97,10 +106,20 @@ def _calls(
 
 def _run_bundle(
     calls: Sequence[tuple[Callable[..., Any], tuple[Any, ...], dict[str, Any]]],
+    *,
+    sendable: bool = False,
 ) -> list[Any]:
     # Runs a whole bundle in one worker, so it must be reachable by name in a
-    # worker process and in a job interpreter.
-    return [function(*args, **kwargs) for function, args, kwargs in calls]
+    # worker process and in a job interpreter. A call that raises yields a
+    # `_Raised` rather than taking its bundle mates with it; `sendable` is set
+    # where the result has to survive serialization back to the caller.
+    results: list[Any] = []
+    for function, args, kwargs in calls:
+        try:
+            results.append(function(*args, **kwargs))
+        except Exception as exc:  # ruff: ignore[blind-except]
+            results.append(_Raised(picklable_exception(exc) if sendable else exc))
+    return results
 
 
 class Executor(ABC):
@@ -119,16 +138,22 @@ class Executor(ABC):
 
     @abstractmethod
     def run(
-        self, calls: Sequence[WorkItem], *, bundle_size: int | None = None
+        self,
+        calls: Sequence[WorkItem],
+        *,
+        bundle_size: int | None = None,
+        collect_errors: bool = False,
     ) -> list[Any]:
         """Run the calls and return their results, in the order they were given.
 
         Blocks until every call has a result. A call the machinery could not run
         gets an [`ExecutorFailure`][ropt.components.executors.ExecutorFailure]
         in its position, and a call that was never attempted gets a
-        [`WorkNotRun`][ropt.components.executors.WorkNotRun]; an exception
-        raised by a call's own function is re-raised here, without waiting for
-        the rest of the batch.
+        [`WorkNotRun`][ropt.components.executors.WorkNotRun].
+
+        An exception raised by a call's own function is re-raised here, without
+        waiting for the rest of the batch. With `collect_errors` it is placed in
+        the call's position instead, and every call keeps its place.
 
         May be called from any thread, except one of the executor's own workers:
         that caller would wait for workers it is itself occupying, so it is
@@ -138,8 +163,9 @@ class Executor(ABC):
         returns.
 
         Args:
-            calls:       The work items to run.
-            bundle_size: Calls per worker task, `0` for all of them.
+            calls:          The work items to run.
+            bundle_size:    Calls per worker task, `0` for all of them.
+            collect_errors: Whether an exception is returned instead of raised.
 
         Returns:
             One result per call, in the order of `calls`.
@@ -184,13 +210,18 @@ class ExecutorBase(Executor):
         self._thread_state = _ThreadState()
 
     def run(
-        self, calls: Sequence[WorkItem], *, bundle_size: int | None = None
+        self,
+        calls: Sequence[WorkItem],
+        *,
+        bundle_size: int | None = None,
+        collect_errors: bool = False,
     ) -> list[Any]:
         """Run the calls and return their results, in the order they were given.
 
         Args:
-            calls:       The work items to run.
-            bundle_size: Calls per worker task, `0` for all of them.
+            calls:          The work items to run.
+            bundle_size:    Calls per worker task, `0` for all of them.
+            collect_errors: Whether an exception is returned instead of raised.
 
         Returns:
             One result per call, in the order of `calls`.
@@ -208,7 +239,13 @@ class ExecutorBase(Executor):
         results: list[Any] = [None] * len(items)
 
         def store(index: int, bundle_result: Any) -> None:  # ruff: ignore[any-type]
-            _store(results, index * size, len(bundles[index]), bundle_result)
+            _store(
+                results,
+                index * size,
+                len(bundles[index]),
+                bundle_result,
+                collect_errors=collect_errors,
+            )
 
         self._run_bundles(bundles, store)
         return results
@@ -249,7 +286,14 @@ def _check_bundle_size(bundle_size: int) -> None:
         raise ValueError(msg)
 
 
-def _store(results: list[Any], offset: int, count: int, bundle_result: Any) -> None:  # ruff: ignore[any-type]
+def _store(
+    results: list[Any],
+    offset: int,
+    count: int,
+    bundle_result: Any,  # ruff: ignore[any-type]
+    *,
+    collect_errors: bool,
+) -> None:
     if not isinstance(bundle_result, _NO_RESULT) and (
         not isinstance(bundle_result, list) or len(bundle_result) != count
     ):
@@ -259,7 +303,15 @@ def _store(results: list[Any], offset: int, count: int, bundle_result: Any) -> N
     if isinstance(bundle_result, _NO_RESULT):
         results[offset : offset + count] = [bundle_result] * count
         return
-    results[offset : offset + count] = bundle_result
+    if not collect_errors:
+        # Raised as the bundle arrives, so a failure still does not wait for
+        # the rest of the batch.
+        for item in bundle_result:
+            if isinstance(item, _Raised):
+                raise item.error
+    results[offset : offset + count] = [
+        item.error if isinstance(item, _Raised) else item for item in bundle_result
+    ]
 
 
 def _stopped() -> ExecutorStopped:

@@ -131,7 +131,7 @@ class ProcessExecutor(ExecutorBase):
         # own serialization is used and a failure to build it is raised in the
         # caller instead of surfacing as an opaque pool failure.
         try:
-            payload = dumps((_run_bundle, (_calls(bundle),), {}))
+            payload = dumps((_run_bundle, (_calls(bundle),), {"sendable": True}))
         except Exception as exc:
             msg = (
                 "The work item could not be sent to a worker process: "

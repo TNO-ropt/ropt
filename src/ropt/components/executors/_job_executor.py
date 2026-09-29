@@ -553,7 +553,7 @@ class JobExecutorBase(ExecutorBase):
         tmp_path = Path(tmp_path_str)
         try:
             with os.fdopen(tmp_fd, "wb") as fp:
-                dump((_run_bundle, (_calls(bundle),), {}), fp)
+                dump((_run_bundle, (_calls(bundle),), {"sendable": True}), fp)
                 fp.flush()
                 os.fsync(fp.fileno())
             tmp_path.rename(input_file)

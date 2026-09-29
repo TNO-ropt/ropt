@@ -87,6 +87,10 @@ def _raise_unpicklable_error(_input: int) -> int:
     raise ValueError(threading.Lock())
 
 
+def _return_an_error(_input: int) -> ValueError:
+    return ValueError("returned, not raised")
+
+
 def _return_unpicklable() -> Any:
     return threading.Lock()
 
@@ -1273,6 +1277,48 @@ def test_worker_pool_broken_during_a_run_is_an_execution_error(
     executor = ProcessExecutor(workers=1)
     with pytest.raises(ExecutionError, match="worker processes are gone"):
         executor.run([WorkItem(function=_function, args=(0,))])
+
+
+def _mixed_bundle() -> list[WorkItem]:
+    return [
+        WorkItem(function=_function, args=(0,)),
+        WorkItem(function=_function, args=(1,), kwargs={"raise_error": True}),
+        WorkItem(function=_function, args=(2,)),
+    ]
+
+
+def test_collect_errors_keeps_a_failing_call_in_its_own_place() -> None:
+    # One bundle for the whole batch, so a call that raises would otherwise
+    # take its bundle mates with it.
+    results = ThreadExecutor(workers=1).run(
+        _mixed_bundle(), bundle_size=0, collect_errors=True
+    )
+    assert results[0] == 1
+    assert isinstance(results[1], ValueError)
+    assert results[2] == 3
+
+
+def test_collect_errors_carries_an_exception_out_of_a_worker_process() -> None:
+    results = ProcessExecutor(workers=1).run(
+        _mixed_bundle(), bundle_size=0, collect_errors=True
+    )
+    assert results[0] == 1
+    assert isinstance(results[1], ValueError)
+    assert "Test error in function 1" in str(results[1])
+    assert results[2] == 3
+
+
+def test_without_collect_errors_a_failing_call_still_raises() -> None:
+    with pytest.raises(ValueError, match="Test error in function 1"):
+        ThreadExecutor(workers=1).run(_mixed_bundle(), bundle_size=0)
+
+
+def test_a_returned_exception_is_a_result_rather_than_a_failure() -> None:
+    # Returning an exception is not raising one, so it must not end the batch.
+    results = ThreadExecutor(workers=1).run(
+        [WorkItem(function=_return_an_error, args=(0,))]
+    )
+    assert isinstance(results[0], ValueError)
 
 
 @pytest.mark.skipif(not _TEST_HPC, reason="hpc requirements are not installed")
