@@ -703,7 +703,7 @@ def test_optimization_abort(config: Any, evaluator: Any) -> None:
 
         last_evaluation += 1
         if last_evaluation == 1:
-            raise OptimizerStop(ExitCode.USER_ABORT)
+            raise OptimizerStop(ExitCode.STOPPED)
 
     result_handler = ResultsHandler()
     step = OptimizationStep(evaluator=evaluator())
@@ -717,11 +717,11 @@ def test_optimization_abort(config: Any, evaluator: Any) -> None:
         variables=initial_values, context=EnOptContext.model_validate(config)
     )
     assert result_handler["results"] is not None
-    assert exit_code == ExitCode.USER_ABORT
+    assert exit_code == ExitCode.STOPPED
     assert last_evaluation == 1
 
 
-def test_handler_stop_ends_with_user_abort(config: Any, evaluator: Any) -> None:
+def test_handler_stop_ends_with_stopped(config: Any, evaluator: Any) -> None:
     evaluations = 0
 
     def _observer(event: EnOptEvent) -> None:
@@ -741,7 +741,7 @@ def test_handler_stop_ends_with_user_abort(config: Any, evaluator: Any) -> None:
     exit_code = step.run(
         variables=initial_values, context=EnOptContext.model_validate(config)
     )
-    assert exit_code == ExitCode.USER_ABORT
+    assert exit_code == ExitCode.STOPPED
     assert evaluations == 1
 
 
@@ -774,7 +774,7 @@ def test_handler_stop_runs_remaining_handlers(config: Any, evaluator: Any) -> No
     exit_code = step.run(
         variables=initial_values, context=EnOptContext.model_validate(config)
     )
-    assert exit_code == ExitCode.USER_ABORT
+    assert exit_code == ExitCode.STOPPED
     assert stops == 1
     assert later_ran == 1
 
@@ -802,11 +802,11 @@ def test_stop_request_cleared_between_runs(config: Any, evaluator: Any) -> None:
     second = step.run(
         variables=initial_values, context=EnOptContext.model_validate(config)
     )
-    assert first == ExitCode.USER_ABORT
-    assert second != ExitCode.USER_ABORT
+    assert first == ExitCode.STOPPED
+    assert second != ExitCode.STOPPED
 
 
-def test_stop_signal_cancels_every_step_that_observes_it(
+def test_stop_signal_aborts_every_step_that_observes_it(
     config: Any, evaluator: Any
 ) -> None:
     signal = StopSignal()
@@ -818,7 +818,7 @@ def test_stop_signal_cancels_every_step_that_observes_it(
         step.run(variables=initial_values, context=EnOptContext.model_validate(config))
         for step in steps
     ]
-    assert exit_codes == [ExitCode.CANCELLED, ExitCode.CANCELLED]
+    assert exit_codes == [ExitCode.ABORTED, ExitCode.ABORTED]
 
 
 def test_stop_signal_is_not_cleared_by_a_new_run(config: Any, evaluator: Any) -> None:
@@ -834,9 +834,9 @@ def test_stop_signal_is_not_cleared_by_a_new_run(config: Any, evaluator: Any) ->
     third = step.run(
         variables=initial_values, context=EnOptContext.model_validate(config)
     )
-    assert first != ExitCode.CANCELLED
-    assert second == ExitCode.CANCELLED
-    assert third == ExitCode.CANCELLED
+    assert first != ExitCode.ABORTED
+    assert second == ExitCode.ABORTED
+    assert third == ExitCode.ABORTED
 
 
 def test_stop_signal_carries_the_exit_code_its_steps_end_with(
@@ -844,20 +844,20 @@ def test_stop_signal_carries_the_exit_code_its_steps_end_with(
 ) -> None:
     signal = StopSignal()
     step = OptimizationStep(evaluator=evaluator(), stop_signal=signal)
-    signal.stop(ExitCode.FAILED_ELSEWHERE)
+    signal.stop(ExitCode.ABORTED_ON_ERROR)
     exit_code = step.run(
         variables=initial_values, context=EnOptContext.model_validate(config)
     )
-    assert exit_code == ExitCode.FAILED_ELSEWHERE
+    assert exit_code == ExitCode.ABORTED_ON_ERROR
 
 
 def test_stop_signal_keeps_the_exit_code_of_the_first_stop() -> None:
     # The reason a run is already stopping for is not overwritten by a later
     # stop for another reason.
     signal = StopSignal()
-    signal.stop(ExitCode.FAILED_ELSEWHERE)
-    signal.stop(ExitCode.CANCELLED)
-    assert signal.exit_code == ExitCode.FAILED_ELSEWHERE
+    signal.stop(ExitCode.ABORTED_ON_ERROR)
+    signal.stop(ExitCode.ABORTED)
+    assert signal.exit_code == ExitCode.ABORTED_ON_ERROR
 
 
 def test_stop_signal_runs_a_late_callback_at_once() -> None:

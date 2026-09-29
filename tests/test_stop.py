@@ -1,6 +1,6 @@
-"""Tests for stopping the runs that are using a session's pools."""
+"""Tests for cutting off the runs that are using a session's pools."""
 
-# A stop takes effect at a run's next evaluation boundary, so every test here
+# An abort takes effect at a run's next evaluation boundary, so every test here
 # gets its ordering from a barrier or from the evaluation function itself:
 # waiting for the effect would only make the assertions likely to hold.
 
@@ -80,7 +80,7 @@ def _fails_at(barrier: threading.Barrier) -> Any:
 
 
 @pytest.mark.timeout(60)
-def test_session_stop_cancels_a_run_keeping_its_best_result() -> None:
+def test_session_abort_cuts_off_a_run_keeping_its_best_result() -> None:
     with session() as opened:
         pool = opened.thread_pool(workers=1)
         calls = 0
@@ -91,28 +91,28 @@ def test_session_stop_cancels_a_run_keeping_its_best_result() -> None:
             nonlocal calls
             calls += 1
             if calls == 1:
-                opened.stop()
+                opened.abort()
             return _sphere(variables, context)
 
         result = pool.optimize(_CONFIG, _INITIAL, objective)
 
-    assert result.exit_code == ExitCode.CANCELLED
+    assert result.exit_code == ExitCode.ABORTED
     assert result.results is not None
 
 
 @pytest.mark.timeout(60)
-def test_session_stop_cancels_every_run_in_progress() -> None:
+def test_session_abort_cuts_off_every_run_in_progress() -> None:
     runs = 3
     started = threading.Barrier(runs + 1)
 
     with session() as opened:
         pool = opened.thread_pool(workers=runs)
 
-        def stop_once_all_have_started() -> None:
+        def abort_once_all_have_started() -> None:
             started.wait(timeout=30)
-            opened.stop()
+            opened.abort()
 
-        stopper = threading.Thread(target=stop_once_all_have_started)
+        stopper = threading.Thread(target=abort_once_all_have_started)
         stopper.start()
         try:
             results = pool.optimize_many(
@@ -123,11 +123,11 @@ def test_session_stop_cancels_every_run_in_progress() -> None:
         finally:
             stopper.join(timeout=30)
 
-    assert [result.exit_code for result in results] == [ExitCode.CANCELLED] * runs
+    assert [result.exit_code for result in results] == [ExitCode.ABORTED] * runs
 
 
 @pytest.mark.timeout(60)
-def test_closing_a_session_cancels_a_run_on_another_thread() -> None:
+def test_closing_a_session_cuts_off_a_run_on_another_thread() -> None:
     started = threading.Barrier(2)
     outcome: list[OptimizationResult] = []
 
@@ -145,36 +145,36 @@ def test_closing_a_session_cancels_a_run_on_another_thread() -> None:
 
     driver.join(timeout=30)
     assert not driver.is_alive()
-    assert [result.exit_code for result in outcome] == [ExitCode.CANCELLED]
+    assert [result.exit_code for result in outcome] == [ExitCode.ABORTED]
 
 
 @pytest.mark.timeout(60)
-def test_a_run_started_after_a_stop_is_unaffected() -> None:
-    # The stop is not a latch: it reaches the runs registered at the moment of
-    # the call, which is what lets a loop stop one attempt and start another.
+def test_a_run_started_after_an_abort_is_unaffected() -> None:
+    # The abort is not a latch: it reaches the runs registered at the moment of
+    # the call, which is what lets a loop abandon one attempt and start another.
     with session() as opened:
         pool = opened.thread_pool(workers=1)
-        opened.stop()
+        opened.abort()
         result = pool.optimize(_CONFIG, _INITIAL, _sphere)
 
     assert result.exit_code == ExitCode.OPTIMIZER_FINISHED
 
 
 @pytest.mark.timeout(60)
-def test_a_stop_does_not_reach_another_session() -> None:
-    with session() as stopped, session() as other:
-        stopped_pool = stopped.thread_pool(workers=1)
+def test_an_abort_does_not_reach_another_session() -> None:
+    with session() as aborted, session() as other:
+        aborted_pool = aborted.thread_pool(workers=1)
         other_pool = other.thread_pool(workers=1)
 
         def objective(
             variables: NDArray[np.float64], context: EvaluationFunctionContext
         ) -> float:
-            stopped.stop()
+            aborted.abort()
             return _sphere(variables, context)
 
         result = other_pool.optimize(_CONFIG, _INITIAL, objective)
-        # A stop is not a release: the stopped session's pool still runs.
-        assert stopped_pool.optimize(_CONFIG, _INITIAL, _sphere).results is not None
+        # An abort is not a release: the aborted session's pool still runs.
+        assert aborted_pool.optimize(_CONFIG, _INITIAL, _sphere).results is not None
 
     assert result.exit_code == ExitCode.OPTIMIZER_FINISHED
 
@@ -220,9 +220,9 @@ def _run_beside_a_failure(
 
 
 @pytest.mark.timeout(60)
-def test_a_failing_run_stops_the_others_on_its_session() -> None:
+def test_a_failing_run_aborts_the_others_on_its_session() -> None:
     result = _run_beside_a_failure(keep_going=None)
-    assert result.exit_code == ExitCode.FAILED_ELSEWHERE
+    assert result.exit_code == ExitCode.ABORTED_ON_ERROR
     assert result.results is not None
 
 
@@ -233,11 +233,11 @@ def test_keep_going_lets_a_run_finish_when_another_fails() -> None:
 
 
 @pytest.mark.timeout(60)
-def test_a_failing_run_that_keeps_going_still_stops_the_others() -> None:
-    # The flag exempts a run from being stopped, never from stopping the rest:
+def test_a_failing_run_that_keeps_going_still_aborts_the_others() -> None:
+    # The flag exempts a run from being aborted, never from aborting the rest:
     # a run that may outlive a failure must not be able to hide its own.
     result = _run_beside_a_failure(keep_going=None, failure_keeps_going=True)
-    assert result.exit_code == ExitCode.FAILED_ELSEWHERE
+    assert result.exit_code == ExitCode.ABORTED_ON_ERROR
 
 
 @pytest.mark.timeout(60)
@@ -294,13 +294,13 @@ def test_keep_going_on_a_run_overrides_its_session() -> None:
             release.set()
             driver.join(timeout=30)
 
-    assert outcome[0].exit_code == ExitCode.FAILED_ELSEWHERE
+    assert outcome[0].exit_code == ExitCode.ABORTED_ON_ERROR
 
 
 @pytest.mark.timeout(60)
-def test_session_stop_reaches_a_run_that_keeps_going() -> None:
-    # Opting out is about a sibling's failure, not about being asked to stop,
-    # and the exit code says which of the two happened.
+def test_session_abort_reaches_a_run_that_keeps_going() -> None:
+    # Opting out is about a sibling's failure, not about being cut off on
+    # request, and the exit code says which of the two happened.
     started = threading.Barrier(2, timeout=30)
     release = threading.Event()
     outcome: list[OptimizationResult] = []
@@ -321,8 +321,8 @@ def test_session_stop_reaches_a_run_that_keeps_going() -> None:
         driver = threading.Thread(target=_survivor)
         driver.start()
         started.wait(timeout=30)
-        opened.stop()
+        opened.abort()
         release.set()
         driver.join(timeout=30)
 
-    assert outcome[0].exit_code == ExitCode.CANCELLED
+    assert outcome[0].exit_code == ExitCode.ABORTED

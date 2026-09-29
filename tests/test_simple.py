@@ -326,7 +326,7 @@ def test_report_callback_stops_optimization(config: Any, test_functions: Any) ->
         return True
 
     result = optimize(config, initial_values, test_functions[0], report=_report)
-    assert result.exit_code == ExitCode.USER_ABORT
+    assert result.exit_code == ExitCode.STOPPED
     assert reported == 1
 
 
@@ -346,8 +346,8 @@ def test_report_callback_stops_only_own_run(
         test_functions[0],
         report=[_stop, _continue],
     )
-    assert results[0].exit_code == ExitCode.USER_ABORT
-    assert results[1].exit_code != ExitCode.USER_ABORT
+    assert results[0].exit_code == ExitCode.STOPPED
+    assert results[1].exit_code != ExitCode.STOPPED
 
 
 def test_adapt_function_rejects_scalar_for_multiple_objectives() -> None:

@@ -203,22 +203,29 @@ returns nothing:
 | `TOO_FEW_REALIZATIONS`       | Too few realizations were evaluated successfully.             |
 | `MAX_FUNCTIONS_REACHED`      | Maximum number of function evaluations was reached.           |
 | `MAX_BATCHES_REACHED`        | Maximum number of evaluation batches was reached.             |
-| `USER_ABORT`                 | An event handler requested a stop via `event.source.stop()`.  |
-| `CANCELLED`                  | The step's [`StopSignal`][ropt.components.concurrency.StopSignal] was set. |
-| `FAILED_ELSEWHERE`           | The step's signal was set with this code, which `ropt.simple` uses when another run failed. |
-| `EXECUTOR_STOPPED`           | The executor could no longer run the work, which in practice means the interpreter was shutting down. |
+| `STOPPED`                    | An event handler asked the run to stop via `event.source.stop()`. |
+| `ABORTED`                    | The step's [`StopSignal`][ropt.components.concurrency.StopSignal] was set. |
+| `ABORTED_ON_ERROR`           | The step's signal was set with this code, which `ropt.simple` uses when another run raised. |
+| `EXECUTOR_SHUT_DOWN`         | The executor could no longer run the work, which in practice means the interpreter was shutting down. |
+
+A run either **stops** or is **aborted**, and the exit code says which. It
+stops when a condition on the optimization is met, so it ends where someone
+decided it should; the first four codes above are all of that kind. It is
+aborted when something cuts it off without consulting the optimization, and
+what comes back is then whatever it had reached.
 
 An event handler can stop its own optimization by calling `event.source.stop()`
 — for example after inspecting the `results` of a `FINISHED_EVALUATION` event and
 deciding no further evaluations are worthwhile. The remaining handlers for that
-event still run, and the optimizer then stops with `USER_ABORT` before the next
+event still run, and the optimizer then ends with `STOPPED` before the next
 evaluation. Only the run that owns the emitting step is affected, so concurrent
 optimizations continue. `stop()` merely sets a thread-safe flag, so it is safe
 to call from a handler attached to several steps at once.
 
-### Stopping several steps at once
+### Aborting several steps at once
 
-`stop()` reaches one step. To stop a set of them, construct them with the same
+`stop()` reaches one step, and only at a point that step chose. To cut a set of
+them off, construct them with the same
 [`StopSignal`][ropt.components.concurrency.StopSignal]:
 
 ```python
@@ -229,15 +236,13 @@ signal.stop()
 ```
 
 A step polls its signal wherever it polls `stop()`, and ends with the code the
-signal carries, which is `CANCELLED` unless `stop` was given another one. That
-is what distinguishes it from `USER_ABORT`: the exit code names who decided,
-`USER_ABORT` the run itself and the signal's code whoever holds the signal.
-The first `stop` fixes the code, so a second one for another reason cannot
-overwrite the reason a run is already stopping for.
+signal carries, which is `ABORTED` unless `stop` was given another one. The
+first `stop` fixes the code, so a second one for another reason cannot
+overwrite the reason a run is already ending for.
 
 A signal cannot be reset. `run()` clears the step's own stop request, so a step
-is reusable after a `USER_ABORT`, but a step whose signal is already stopping
-ends with `CANCELLED` at its first poll.
+is reusable after a `STOPPED`, but a step whose signal is already set ends with
+`ABORTED` at its first poll.
 
 ## Event handlers
 

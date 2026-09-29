@@ -144,7 +144,7 @@ optimizer chose it, so this is how you follow the path a run takes.
 
 The `report` callback doubles as a **user-defined stopping criterion**: return
 `True` and the optimization stops gracefully after the current evaluation, with
-exit code `USER_ABORT`. Any other return value (including `None`) lets it
+exit code `STOPPED`. Any other return value (including `None`) lets it
 continue.
 
 ```python
@@ -158,7 +158,7 @@ def report(result):
 
 
 result = optimize(config, x0, objective, report=report)
-assert result.exit_code is ExitCode.USER_ABORT
+assert result.exit_code is ExitCode.STOPPED
 ```
 
 With [`optimize_many`](parallel.md#many-optimizations-at-once) this stops only the run
@@ -175,36 +175,40 @@ it had reached.
     there the return value is **ignored**. An evaluation is a single batch with
     no optimizer loop to interrupt, so the callback reports and nothing more.
 
-### Stopping from outside the run { #stopping-from-outside }
+### Aborting a run from outside { #stopping-from-outside }
 
 The `report` callback runs inside the run it stops, which is no use to a signal
-handler or a user interface. [`Session.stop`][ropt.simple.Session.stop] is the
-one that is called from another thread: it stops every run that is using the
-session's pools, and each ends with `CANCELLED`, keeping the best result it had
+handler or a user interface. [`Session.abort`][ropt.simple.Session.abort] is
+the one that is called from another thread: it cuts off every run that belongs
+to the session, and each ends with `ABORTED`, keeping the best result it had
 reached.
 
 ```python
 with session() as s:
     pool = s.thread_pool(workers=4)
-    signal.signal(signal.SIGINT, lambda *_: s.stop())
+    signal.signal(signal.SIGINT, lambda *_: s.abort())
     result = pool.optimize(config, x0, objective)
 
-if result.exit_code is ExitCode.CANCELLED:
-    print("stopped early, best so far:", result.results)
+if result.exit_code is ExitCode.ABORTED:
+    print("cut off early, best so far:", result.results)
 ```
 
-A run stops at its next evaluation boundary, so the evaluations already in
+The two are not the same kind of ending, which is why they have different exit
+codes. A `report` callback stops the run *on a criterion*, at a point it chose.
+Aborting consults nothing: the result is whatever the run had reached.
+
+A run is cut off at its next evaluation boundary, so the evaluations already in
 flight are still carried out and their workers are free only once they return.
 
-`stop()` reaches the runs that are registered at the moment of the call, and
+`abort()` reaches the runs that are registered at the moment of the call, and
 nothing more: it is not a latch. A run started afterwards is unaffected, so a
-loop that stops one attempt and starts another keeps working. Leaving the
-session's `with` block stops its runs as well, and then releases its pools,
+loop that abandons one attempt and starts another keeps working. Leaving the
+session's `with` block aborts its runs as well, and then releases its pools,
 which is what refuses a run started after that.
 
 A run started with the module-level [`optimize`][ropt.simple.optimize] belongs
-to no session you hold and cannot be stopped this way. It evaluates on the
-calling thread, which is the thread that would have to call `stop()`. Start it
+to no session you hold and cannot be aborted this way. It evaluates on the
+calling thread, which is the thread that would have to call `abort()`. Start it
 on a session or one of its pools to bring it within reach.
 
 ## Attaching metadata
@@ -287,10 +291,10 @@ which evaluates a single vector and then a matrix of them.
 Not every problem is an exception. An optimization that cannot make progress
 still returns normally, and indicates why in `result.exit_code`:
 `TOO_FEW_REALIZATIONS` when not enough realizations produced a value,
-`EXECUTOR_STOPPED` when the pool it was evaluating on could no longer run
+`EXECUTOR_SHUT_DOWN` when the pool it was evaluating on could no longer run
 the work, which in practice means the interpreter was shutting down under it,
-`CANCELLED` when [`Session.stop`](#stopping-from-outside) was called, and
-`FAILED_ELSEWHERE` when another run on the same session raised and brought this
+`ABORTED` when [`Session.abort`](#stopping-from-outside) was called, and
+`ABORTED_ON_ERROR` when another run on the same session raised and brought this
 one down with it (see
 [Failure in one run](parallel.md#failure-in-one-run)).
 `result.results` is `None` when no feasible result was ever recorded, whatever

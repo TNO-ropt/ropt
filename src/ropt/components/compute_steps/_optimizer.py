@@ -143,7 +143,7 @@ class OptimizationStep(ComputeStep[ExitCode]):
             )
         # Poll on the optimizer stack so a handler's stop() becomes a clean exit.
         if self._stop_flag.is_set():
-            raise OptimizerStop(ExitCode.USER_ABORT)
+            raise OptimizerStop(ExitCode.STOPPED)
         if self._signalled:
             assert self._stop_signal is not None
             raise OptimizerStop(self._stop_signal.exit_code)

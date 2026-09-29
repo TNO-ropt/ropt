@@ -174,7 +174,7 @@ class EnsembleOptimizer:
         except TooFewRealizations:
             exit_code = ExitCode.TOO_FEW_REALIZATIONS
         except ExecutorStopped:
-            exit_code = ExitCode.EXECUTOR_STOPPED
+            exit_code = ExitCode.EXECUTOR_SHUT_DOWN
         except OptimizerStop as exc:
             exit_code = exc.exit_code
         return exit_code

@@ -29,7 +29,7 @@ def make_report_handler(report: ReportCallback) -> EventHandler:
     The callback is given the
     [`FunctionResults`][ropt.results.FunctionResults] of the evaluation;
     gradient results are skipped. If the callback returns `True`, the emitting
-    run stops gracefully (exit code `USER_ABORT`); any other return
+    run stops gracefully (exit code `STOPPED`); any other return
     value continues it. Reporting stops there: results after it in the same
     batch are not passed on.
 

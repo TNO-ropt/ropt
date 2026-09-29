@@ -661,7 +661,7 @@ runs](handlers.md#sharing-a-handler-across-concurrent-runs).
 ### Failure in one run
 
 A run that raises stops the other runs on its session. Each of those ends at its
-next evaluation boundary with `FAILED_ELSEWHERE`, keeping the best result it had
+next evaluation boundary with `ABORTED_ON_ERROR`, keeping the best result it had
 reached, and the exception is raised from the `optimize_many` call. This is the
 default because most runs are started from a script with nobody watching: a
 problem should end the script rather than leave the rest of the work grinding on
@@ -684,8 +684,9 @@ session, which a single run can still override with `keep_going=False`.
 The flag decides only whether a run is *stopped*. A run that keeps going still
 stops the others if it fails itself, and its exception still reaches its caller,
 so opting out cannot turn a failure into silence.
-[`Session.stop`](running.md#stopping-from-outside) reaches every run whatever the
-flag says, and those end with `CANCELLED` instead: the exit code distinguishes a
+[`Session.abort`](running.md#stopping-from-outside) reaches every run whatever
+the flag says, and those end with `ABORTED` instead: the exit code distinguishes
+a
 stop that was asked for from one another run caused.
 
 ## Running the optimizer in a separate process { #external-backend }

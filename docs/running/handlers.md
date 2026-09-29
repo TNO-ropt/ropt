@@ -217,7 +217,7 @@ other than results — the start or end of a run, for example; for results alone
 
 A handler can also **stop the run that fed it**: every event carries the compute
 step that emitted it, so calling `event.source.stop()` ends that run with
-`USER_ABORT` — the [`report`](running.md#stopping-early-from-the-callback)
+`STOPPED` — the [`report`](running.md#stopping-early-from-the-callback)
 callback above is a convenience wrapper around this. Only the run that owns the
 emitting step is affected, so concurrent runs continue. See
 [Optimization Workflows](../advanced/workflows.md#exit-codes).

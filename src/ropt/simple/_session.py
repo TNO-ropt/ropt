@@ -72,9 +72,9 @@ class Session:
     A session may be opened inside another, and pools from different sessions
     never interact. A session is single use — once closed it cannot be reopened.
 
-    [`stop`][ropt.simple.Session.stop] cancels the runs that belong to it, which
-    is what a caller on another thread — a signal handler, a user interface —
-    calls to bring them down.
+    [`abort`][ropt.simple.Session.abort] cuts off the runs that belong to it,
+    which is what a caller on another thread — a signal handler, a user
+    interface — calls to bring them down.
     """
 
     def __init__(self, *, keep_going: bool = False) -> None:
@@ -107,28 +107,33 @@ class Session:
         return self
 
     def __exit__(self, *_exc: object) -> None:
-        """Close the session, stopping its runs and releasing every pool."""
-        self.stop()
+        """Close the session, aborting its runs and releasing every pool."""
+        self.abort()
         with self._lock:
             pools, self._pools = self._pools, None
         for pool in pools or ():
             pool._release()  # ruff: ignore[private-member-access]
 
-    def stop(self) -> None:
-        """Stop the runs that belong to this session.
+    def abort(self) -> None:
+        """Cut off the runs that belong to this session.
 
-        Each ends with `ExitCode.CANCELLED`, keeping the best result it had
-        reached. A run stops at its next evaluation boundary, so the evaluations
+        Each ends with `ExitCode.ABORTED`, keeping the best result it had
+        reached. Nothing about the state of an optimization is consulted, so
+        what comes back is whatever the run had got to and not a point it
+        chose to stop at; a handler's own criterion ends a run with
+        `ExitCode.STOPPED` instead.
+
+        A run is cut off at its next evaluation boundary, so the evaluations
         already in flight are still carried out and their workers are only free
         once they return.
 
         This reaches every run, `keep_going` or not: that flag exempts a run
-        from the stop a failing run triggers, not from one that was asked for.
+        from the abort a failing run triggers, not from one that was asked for.
 
-        Only the runs registered at the moment of the call are stopped. A run
-        started afterwards is unaffected, so a loop that stops one attempt and
-        starts another keeps working. Closing the session stops its runs too,
-        and then releases its pools, which is what refuses a later run.
+        Only the runs registered at the moment of the call are reached. A run
+        started afterwards is unaffected, so a loop that abandons one attempt
+        and starts another keeps working. Closing the session aborts its runs
+        too, and then releases its pools, which is what refuses a later run.
 
         Calling this is thread-safe, and safe on a session that has no runs.
         """
@@ -140,13 +145,13 @@ class Session:
     def _fail(self) -> None:
         # A run that failed brings down the rest, which is what makes a script
         # stop at the first problem. `keep_going` exempts a run from being
-        # stopped, never from stopping the others.
+        # aborted, never from aborting the others.
         with self._lock:
             signals = [
                 signal for signal, keep_going in self._signals.items() if not keep_going
             ]
         for signal in signals:
-            signal.stop(ExitCode.FAILED_ELSEWHERE)
+            signal.stop(ExitCode.ABORTED_ON_ERROR)
 
     def _resolve_keep_going(self, *, keep_going: bool | None) -> bool:
         return self._keep_going if keep_going is None else keep_going

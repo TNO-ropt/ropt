@@ -3,7 +3,7 @@
 A run normally ends when the optimizer converges or hits its own budget. The
 `report` callback sees every result as it arrives, so it can also end the run
 itself: returning `True` stops the run, and it finishes with
-`USER_ABORT`.
+`STOPPED`.
 
 Stopping this way is graceful rather than abrupt. The run keeps the best result
 it has found, so a stopped run still returns a usable answer -- unlike a run
@@ -78,7 +78,7 @@ def main() -> None:
     result = optimize(CONFIG, INITIAL_VALUES, objective, report=stop_after_max_results)
 
     print(f"exit_code={result.exit_code.name} after {_seen} results")
-    assert result.exit_code == ExitCode.USER_ABORT
+    assert result.exit_code == ExitCode.STOPPED
     assert _seen == MAX_RESULTS
 
     # Stopping keeps what the run had already found.

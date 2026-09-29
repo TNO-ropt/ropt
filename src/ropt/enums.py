@@ -104,7 +104,15 @@ class EnOptEventType(IntEnum):
 
 
 class ExitCode(IntEnum):
-    """Enumerates the reasons for terminating an optimization."""
+    """Enumerates the reasons for terminating an optimization.
+
+    A run either **stops** or is **aborted**. It stops when a condition on the
+    optimization is met — the optimizer converged, a budget ran out, a handler
+    decided the results were good enough — so it ends at a point someone
+    declared acceptable. It is aborted when something cuts it off without
+    consulting the optimization at all, and the result is then whatever it had
+    reached, not a considered endpoint.
+    """
 
     UNKNOWN = 0
     """Unknown cause of termination."""
@@ -118,24 +126,32 @@ class ExitCode(IntEnum):
     MAX_BATCHES_REACHED = 3
     """Returned when the maximum number of evaluation batches is reached."""
 
-    USER_ABORT = 4
-    """Returned when the optimization is aborted by the user."""
+    STOPPED = 4
+    """Returned when an event handler asked the run to stop.
+
+    A graceful end at an evaluation boundary, on a criterion the caller
+    supplied. The `report` callback of `ropt.simple` is such a handler.
+    """
 
     OPTIMIZER_FINISHED = 5
     """Returned when an optimization step terminates normally."""
 
-    EXECUTOR_STOPPED = 6
-    """Returned when the executor could no longer run the evaluation."""
+    EXECUTOR_SHUT_DOWN = 6
+    """Returned when the executor could no longer run the evaluation.
 
-    CANCELLED = 7
-    """Returned when the run was stopped through a
-    [`StopSignal`][ropt.components.concurrency.StopSignal]."""
+    Not a failure: in practice the interpreter was shutting down and the worker
+    pool was gone, so the run is released rather than left waiting. An executor
+    that breaks raises [`ExecutionError`][ropt.exceptions.ExecutionError]
+    instead.
+    """
 
-    FAILED = 8
-    """Returned when the run raised an exception."""
+    ABORTED = 7
+    """Returned when the run was cut off through a
+    [`StopSignal`][ropt.components.concurrency.StopSignal], without regard to
+    where the optimization had got to."""
 
-    FAILED_ELSEWHERE = 9
-    """Returned when another run this one shares a session with failed."""
+    ABORTED_ON_ERROR = 8
+    """Returned when another run this one shares a session with raised."""
 
 
 class AxisName(StrEnum):

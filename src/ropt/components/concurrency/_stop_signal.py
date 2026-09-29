@@ -33,9 +33,9 @@ class StopSignal:
         self._lock = threading.Lock()
         self._flag = threading.Event()
         self._callbacks: list[Callable[[], None]] = []
-        self._exit_code = ExitCode.CANCELLED
+        self._exit_code = ExitCode.ABORTED
 
-    def stop(self, exit_code: ExitCode = ExitCode.CANCELLED) -> None:
+    def stop(self, exit_code: ExitCode = ExitCode.ABORTED) -> None:
         """Request that everything observing this signal stops.
 
         Calling this more than once has no further effect: the first call
