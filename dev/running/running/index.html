@@ -3340,7 +3340,10 @@ still returns normally, and indicates why in <code>result.exit_code</code>:
 <code>TOO_FEW_REALIZATIONS</code> when not enough realizations produced a value,
 <code>EXECUTOR_STOPPED</code> when the pool it was evaluating on could no longer run
 the work, which in practice means the interpreter was shutting down under it,
-and <code>CANCELLED</code> when <a href="#stopping-from-outside"><code>Session.stop</code></a> was called.
+<code>CANCELLED</code> when <a href="#stopping-from-outside"><code>Session.stop</code></a> was called, and
+<code>FAILED_ELSEWHERE</code> when another run on the same session raised and brought this
+one down with it (see
+<a href="../parallel/#failure-in-one-run">Failure in one run</a>).
 <code>result.results</code> is <code>None</code> when no feasible result was ever recorded, whatever
 the reason the run ended; a run that fails part-way still returns the best
 result it had reached before that. A plain <a class="autorefs autorefs-internal" title="            ropt.simple.evaluate" href="../../reference/simple/#ropt.simple.evaluate"><code>evaluate</code></a>

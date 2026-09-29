@@ -2772,6 +2772,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#ropt.components.concurrency.StopSignal.exit_code" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        exit_code
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ropt.components.concurrency.StopSignal.stopping" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2993,6 +3004,17 @@
     <span class="md-ellipsis">
       
         stop
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.components.concurrency.StopSignal.exit_code" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        exit_code
       
     </span>
   </a>
@@ -3281,14 +3303,105 @@ than left waiting for work it is about to abandon.</p>
 
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">stop</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">stop</span><span class="p">(</span><span class="n">exit_code</span><span class="p">:</span> <span class="n">ExitCode</span> <span class="o">=</span> <span class="n">ExitCode</span><span class="o">.</span><span class="n">CANCELLED</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
 
         <p>Request that everything observing this signal stops.</p>
-<p>Calling this more than once has no further effect.</p>
+<p>Calling this more than once has no further effect: the first call
+decides the exit code, so a later stop for another reason cannot
+overwrite the reason a run is already stopping for.</p>
 
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>exit_code</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ExitCode (ropt.enums.ExitCode)" href="../enums/#ropt.enums.ExitCode">ExitCode</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The code the steps stopping on this signal end with.</p>
+              </div>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            CANCELLED
+
+
+  
+      class-attribute
+      instance-attribute
+   (ropt.enums.ExitCode.CANCELLED)" href="../enums/#ropt.enums.ExitCode.CANCELLED">CANCELLED</a></code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="ropt.components.concurrency.StopSignal.exit_code" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">exit_code</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">exit_code</span><span class="p">:</span> <span class="n">ExitCode</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>The exit code a step stopping on this signal ends with.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ExitCode (ropt.enums.ExitCode)" href="../enums/#ropt.enums.ExitCode">ExitCode</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The code passed to the first <code>stop</code> call.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
     </div>
 

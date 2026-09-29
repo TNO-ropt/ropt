@@ -3570,6 +3570,10 @@ returns nothing:</p>
 <td>The step's <a class="autorefs autorefs-internal" title="            ropt.components.concurrency.StopSignal" href="../../reference/components_utils/#ropt.components.concurrency.StopSignal"><code>StopSignal</code></a> was set.</td>
 </tr>
 <tr>
+<td><code>FAILED_ELSEWHERE</code></td>
+<td>The step's signal was set with this code, which <code>ropt.simple</code> uses when another run failed.</td>
+</tr>
+<tr>
 <td><code>EXECUTOR_STOPPED</code></td>
 <td>The executor could no longer run the work, which in practice means the interpreter was shutting down.</td>
 </tr>
@@ -3590,10 +3594,12 @@ to call from a handler attached to several steps at once.</p>
 </span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="o">...</span>
 </span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="n">signal</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
 </span></code></pre></div>
-<p>A step polls its signal wherever it polls <code>stop()</code>, and ends with <code>CANCELLED</code>
-rather than <code>USER_ABORT</code>, which is what distinguishes the two. The exit code
-names who decided: <code>USER_ABORT</code> the run itself, <code>CANCELLED</code> whoever holds the
-signal.</p>
+<p>A step polls its signal wherever it polls <code>stop()</code>, and ends with the code the
+signal carries, which is <code>CANCELLED</code> unless <code>stop</code> was given another one. That
+is what distinguishes it from <code>USER_ABORT</code>: the exit code names who decided,
+<code>USER_ABORT</code> the run itself and the signal's code whoever holds the signal.
+The first <code>stop</code> fixes the code, so a second one for another reason cannot
+overwrite the reason a run is already stopping for.</p>
 <p>A signal cannot be reset. <code>run()</code> clears the step's own stop request, so a step
 is reusable after a <code>USER_ABORT</code>, but a step whose signal is already stopping
 ends with <code>CANCELLED</code> at its first poll.</p>
