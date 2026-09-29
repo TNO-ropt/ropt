@@ -2816,6 +2816,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#ropt.components.executors.WorkNotRun" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        WorkNotRun
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#ropt.components.executors.ThreadExecutor" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3212,6 +3223,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#ropt.components.executors.WorkNotRun" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        WorkNotRun
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#ropt.components.executors.ThreadExecutor" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3481,7 +3503,9 @@ caller.</p>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">calls</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">WorkItem</span><span class="p">],</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="o">*</span><span class="p">,</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">bundle_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">collect_errors</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">stop</span><span class="p">:</span> <span class="n">StopSignal</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -3494,8 +3518,20 @@ gets an <a class="autorefs autorefs-internal" title="            ropt.components
   
       dataclass
   " href="#ropt.components.executors.ExecutorFailure"><code>ExecutorFailure</code></a>
-in its position; an exception raised by a call's own function is
-re-raised here, without waiting for the rest of the batch.</p>
+in its position, and a call that was never attempted gets a
+<a class="autorefs autorefs-internal" title="            ropt.components.executors.WorkNotRun
+
+
+  
+      dataclass
+  " href="#ropt.components.executors.WorkNotRun"><code>WorkNotRun</code></a>.</p>
+<p>An exception raised by a call's own function is re-raised here, without
+waiting for the rest of the batch. With <code>collect_errors</code> it is placed in
+the call's position instead, and every call keeps its place.</p>
+<p>A <code>stop</code> that fires abandons the batch: queued calls are never started,
+started ones are cancelled where the mechanism allows it, and each
+abandoned call gets a <code>WorkNotRun</code>. Calls already running on a worker
+thread or process run to their end.</p>
 <p>May be called from any thread, except one of the executor's own workers:
 that caller would wait for workers it is itself occupying, so it is
 refused rather than left to deadlock.</p>
@@ -3545,6 +3581,38 @@ returns.</p>
             <td>
               <div class="doc-md-description">
                 <p>Calls per worker task, <code>0</code> for all of them.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>collect_errors</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/functions.html#bool">bool</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Whether an exception is returned instead of raised.</p>
+              </div>
+            </td>
+            <td>
+                  <code>False</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>stop</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.components.concurrency.StopSignal" href="../components_utils/#ropt.components.concurrency.StopSignal">StopSignal</a> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>An optional signal that abandons the batch.</p>
               </div>
             </td>
             <td>
@@ -3759,7 +3827,9 @@ cannot reach the executor, so it stays <code>False</code> there.</p>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">calls</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">WorkItem</span><span class="p">],</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="o">*</span><span class="p">,</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">bundle_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">collect_errors</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">stop</span><span class="p">:</span> <span class="n">StopSignal</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -3809,6 +3879,38 @@ cannot reach the executor, so it stays <code>False</code> there.</p>
             <td>
               <div class="doc-md-description">
                 <p>Calls per worker task, <code>0</code> for all of them.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>collect_errors</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/functions.html#bool">bool</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Whether an exception is returned instead of raised.</p>
+              </div>
+            </td>
+            <td>
+                  <code>False</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>stop</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.components.concurrency.StopSignal" href="../components_utils/#ropt.components.concurrency.StopSignal">StopSignal</a> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>An optional signal that abandons the batch.</p>
               </div>
             </td>
             <td>
@@ -4012,6 +4114,76 @@ stays available for further work.</p>
             <td>
               <div class="doc-md-description">
                 <p>What went wrong.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="ropt.components.executors.WorkNotRun" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.components.executors.WorkNotRun</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+
+
+
+        <p>A work item was never attempted.</p>
+<p>Returned in the work item's position when the batch it belonged to was
+abandoned, so nothing about the item or the executor failed.</p>
+
+
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.components.executors.WorkNotRun.message">message</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/builtins/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Why it was not attempted.</p>
               </div>
             </td>
           </tr>

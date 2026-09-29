@@ -3119,6 +3119,28 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#ropt.enums.ExitCode.CANCELLED" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CANCELLED
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.enums.ExitCode.FAILED" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FAILED
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -3588,6 +3610,28 @@
     <span class="md-ellipsis">
       
         EXECUTOR_STOPPED
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.enums.ExitCode.CANCELLED" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CANCELLED
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.enums.ExitCode.FAILED" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FAILED
       
     </span>
   </a>
@@ -4584,6 +4628,67 @@ description of when each event type fires and what data it carries.</p>
     <div class="doc doc-contents ">
 
         <p>Returned when the executor could no longer run the evaluation.</p>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="ropt.enums.ExitCode.CANCELLED" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">CANCELLED</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">CANCELLED</span> <span class="o">=</span> <span class="mi">7</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Returned when the run was stopped through a
+<a class="autorefs autorefs-internal" title="            ropt.components.concurrency.StopSignal" href="../components_utils/#ropt.components.concurrency.StopSignal"><code>StopSignal</code></a>.</p>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="ropt.enums.ExitCode.FAILED" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">FAILED</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">FAILED</span> <span class="o">=</span> <span class="mi">8</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Returned when the run raised an exception.</p>
 
     </div>
 

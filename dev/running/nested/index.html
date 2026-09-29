@@ -3128,10 +3128,13 @@ objective it found:</p>
 </span><span id="__span-1-15"><a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>    <span class="c1"># a realization, so realization alone would not identify the caller.</span>
 </span><span id="__span-1-16"><a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a>    <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">"outer_batch"</span><span class="p">:</span> <span class="n">context</span><span class="o">.</span><span class="n">batch_id</span><span class="p">,</span> <span class="s2">"outer_eval"</span><span class="p">:</span> <span class="n">context</span><span class="o">.</span><span class="n">eval_idx</span><span class="p">},</span>
 </span><span id="__span-1-17"><a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a><span class="p">)</span>
-</span><span id="__span-1-18"><a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a><span class="k">assert</span> <span class="n">result</span><span class="o">.</span><span class="n">results</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-</span><span id="__span-1-19"><a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a><span class="k">assert</span> <span class="n">result</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">target_objective</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-</span><span id="__span-1-20"><a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a><span class="n">memo</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">target_objective</span><span class="p">)</span>
-</span><span id="__span-1-21"><a id="__codelineno-1-21" name="__codelineno-1-21" href="#__codelineno-1-21"></a><span class="k">return</span> <span class="n">memo</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+</span><span id="__span-1-18"><a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a><span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">exit_code</span> <span class="ow">is</span> <span class="n">ExitCode</span><span class="o">.</span><span class="n">TOO_FEW_REALIZATIONS</span><span class="p">:</span>
+</span><span id="__span-1-19"><a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a>    <span class="n">memo</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="s2">"nan"</span><span class="p">)</span>
+</span><span id="__span-1-20"><a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a><span class="k">else</span><span class="p">:</span>
+</span><span id="__span-1-21"><a id="__codelineno-1-21" name="__codelineno-1-21" href="#__codelineno-1-21"></a>    <span class="k">assert</span> <span class="n">result</span><span class="o">.</span><span class="n">results</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+</span><span id="__span-1-22"><a id="__codelineno-1-22" name="__codelineno-1-22" href="#__codelineno-1-22"></a>    <span class="k">assert</span> <span class="n">result</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">target_objective</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+</span><span id="__span-1-23"><a id="__codelineno-1-23" name="__codelineno-1-23" href="#__codelineno-1-23"></a>    <span class="n">memo</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">target_objective</span><span class="p">)</span>
+</span><span id="__span-1-24"><a id="__codelineno-1-24" name="__codelineno-1-24" href="#__codelineno-1-24"></a><span class="k">return</span> <span class="n">memo</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
 </span></code></pre></div>
 <p><code>np.where(MASK, INITIAL_VALUES, variables)</code> builds the inner start point: the
 inner variables begin where they always do, and the outer ones carry the values
@@ -3139,6 +3142,11 @@ being tried. The <code>metadata</code> tags every inner result with the outer ev
 that caused it, which is what makes the collected results traceable. The <code>memo</code>
 lookup above it is covered in
 <a href="#reusing-an-outer-evaluation">Reusing an outer evaluation</a>.</p>
+<p>An inner run that ends with <code>TOO_FEW_REALIZATIONS</code> has no result, and the outer
+evaluation reports <code>NaN</code> for it. That is the same value an ordinary evaluation
+function returns for a realization that failed, so the outer run applies its own
+<a href="../../optimizer_setup/configuration_sections/#realizations"><code>realization_min_success</code></a>
+to it.</p>
 <h2 id="two-pools-not-one">Two pools, not one</h2>
 <p>Each layer evaluates on its own pool, and that is a requirement rather than
 a preference:</p>

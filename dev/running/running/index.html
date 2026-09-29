@@ -871,6 +871,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#stopping-from-outside" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Stopping from outside the run
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -3001,6 +3012,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#stopping-from-outside" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Stopping from outside the run
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -3240,19 +3262,43 @@ it had reached.</p>
 <div class="admonition note">
 <p class="admonition-title">Nothing to stop on an evaluation</p>
 <p><a class="autorefs autorefs-internal" title="            ropt.simple.evaluate" href="../../reference/simple/#ropt.simple.evaluate"><code>evaluate</code></a> and
-<a class="autorefs autorefs-internal" title="            ropt.simple.evaluate_many" href="../../reference/simple/#ropt.simple.evaluate_many"><code>evaluate_many</code></a> take <code>report=</code> as well, but
+<a class="autorefs autorefs-internal" title="            ropt.simple.evaluate_batch" href="../../reference/simple/#ropt.simple.evaluate_batch"><code>evaluate_batch</code></a> take <code>report=</code> as well, but
 there the return value is <strong>ignored</strong>. An evaluation is a single batch with
 no optimizer loop to interrupt, so the callback reports and nothing more.</p>
 </div>
+<h3 id="stopping-from-outside">Stopping from outside the run</h3>
+<p>The <code>report</code> callback runs inside the run it stops, which is no use to a signal
+handler or a user interface. <a class="autorefs autorefs-internal" title="            stop" href="../../reference/simple/#ropt.simple.Session.stop"><code>Session.stop</code></a> is the
+one that is called from another thread: it stops every run that is using the
+session's pools, and each ends with <code>CANCELLED</code>, keeping the best result it had
+reached.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>    <span class="n">pool</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">thread_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>    <span class="n">signal</span><span class="o">.</span><span class="n">signal</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">SIGINT</span><span class="p">,</span> <span class="k">lambda</span> <span class="o">*</span><span class="n">_</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">stop</span><span class="p">())</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">pool</span><span class="o">=</span><span class="n">pool</span><span class="p">)</span>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">exit_code</span> <span class="ow">is</span> <span class="n">ExitCode</span><span class="o">.</span><span class="n">CANCELLED</span><span class="p">:</span>
+</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>    <span class="nb">print</span><span class="p">(</span><span class="s2">"stopped early, best so far:"</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">results</span><span class="p">)</span>
+</span></code></pre></div>
+<p>A run stops at its next evaluation boundary, so the evaluations already in
+flight are still carried out and their workers are free only once they return.</p>
+<p><code>stop()</code> reaches the runs that are registered at the moment of the call, and
+nothing more: it is not a latch. A run started afterwards is unaffected, so a
+loop that stops one attempt and starts another keeps working. Leaving the
+session's <code>with</code> block stops its runs as well, and then releases its pools,
+which is what refuses a run started after that.</p>
+<p>A run given no pool, or a <a class="autorefs autorefs-internal" title="            ropt.simple.SerialPool" href="../../reference/simple/#ropt.simple.SerialPool"><code>SerialPool</code></a>, belongs to no
+session and cannot be stopped this way. It evaluates on the calling thread,
+which is the thread that would have to call <code>stop()</code>.</p>
 <h2 id="attaching-metadata">Attaching metadata</h2>
 <p>You can attach arbitrary <strong>metadata</strong> to a run, from two sources:</p>
 <ul>
 <li><strong>Constant, per run</strong> — pass a <code>metadata</code> dict to <code>optimize</code>, <code>optimize_many</code>,
-  <code>evaluate</code>, or <code>evaluate_many</code>. <code>ropt</code> copies it onto every result the run
+  <code>evaluate</code>, or <code>evaluate_batch</code>. <code>ropt</code> copies it onto every result the run
   produces, which is one way to tag a run:</li>
 </ul>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">"run_id"</span><span class="p">:</span> <span class="mi">7</span><span class="p">})</span>
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">"run_id"</span><span class="p">])</span>   <span class="c1"># 7</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">"run_id"</span><span class="p">:</span> <span class="mi">7</span><span class="p">})</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">"run_id"</span><span class="p">])</span>   <span class="c1"># 7</span>
 </span></code></pre></div>
 <p>The same dict also reaches the evaluation function itself, as
   <code>context.metadata</code> — useful when the evaluation needs to know which run it is
@@ -3270,11 +3316,11 @@ no optimizer loop to interrupt, so the callback reports and nothing more.</p>
   from the evaluation function with a <code>metadata</code> field. This value is stored per
   realization, next to the objective values:</li>
 </ul>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.simple</span><span class="w"> </span><span class="kn">import</span> <span class="n">EvaluationFunctionResult</span>
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>
-</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="k">def</span><span class="w"> </span><span class="nf">objective</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
-</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>    <span class="n">value</span> <span class="o">=</span> <span class="o">...</span>
-</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>    <span class="k">return</span> <span class="n">EvaluationFunctionResult</span><span class="p">(</span><span class="n">objectives</span><span class="o">=</span><span class="n">value</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">"seconds"</span><span class="p">:</span> <span class="mf">1.3</span><span class="p">})</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.simple</span><span class="w"> </span><span class="kn">import</span> <span class="n">EvaluationFunctionResult</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="k">def</span><span class="w"> </span><span class="nf">objective</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>    <span class="n">value</span> <span class="o">=</span> <span class="o">...</span>
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>    <span class="k">return</span> <span class="n">EvaluationFunctionResult</span><span class="p">(</span><span class="n">objectives</span><span class="o">=</span><span class="n">value</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">"seconds"</span><span class="p">:</span> <span class="mf">1.3</span><span class="p">})</span>
 </span></code></pre></div>
 <p>A key does not have to be set by every realization; those that do not set it
   get <code>np.nan</code> for numeric values and <code>None</code> otherwise. See <a href="../../advanced/evaluation_callbacks/#using-functionevaluator">Writing Evaluation
@@ -3295,11 +3341,11 @@ each appears in the pandas export. The full runnable script is
 <h2 id="evaluating-without-optimizing">Evaluating without optimizing</h2>
 <p>Sometimes you only want the objective value for a point, without running an
 optimizer. Use <a class="autorefs autorefs-internal" title="            ropt.simple.evaluate" href="../../reference/simple/#ropt.simple.evaluate"><code>evaluate</code></a> for one point and
-<a class="autorefs autorefs-internal" title="            ropt.simple.evaluate_many" href="../../reference/simple/#ropt.simple.evaluate_many"><code>evaluate_many</code></a> for several:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.simple</span><span class="w"> </span><span class="kn">import</span> <span class="n">evaluate</span><span class="p">,</span> <span class="n">evaluate_many</span>
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>
-</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="n">single</span> <span class="o">=</span> <span class="n">evaluate</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>             <span class="c1"># one FunctionResults</span>
-</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="n">batch</span> <span class="o">=</span> <span class="n">evaluate_many</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">matrix</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>    <span class="c1"># one per row of the matrix</span>
+<a class="autorefs autorefs-internal" title="            ropt.simple.evaluate_batch" href="../../reference/simple/#ropt.simple.evaluate_batch"><code>evaluate_batch</code></a> for several:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.simple</span><span class="w"> </span><span class="kn">import</span> <span class="n">evaluate</span><span class="p">,</span> <span class="n">evaluate_batch</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="n">single</span> <span class="o">=</span> <span class="n">evaluate</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>             <span class="c1"># one FunctionResults</span>
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="n">batch</span> <span class="o">=</span> <span class="n">evaluate_batch</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">matrix</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>    <span class="c1"># one per row of the matrix</span>
 </span></code></pre></div>
 <p>Both return <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
 
@@ -3319,7 +3365,8 @@ which evaluates a single vector and then a matrix of them.</p>
 still returns normally, and indicates why in <code>result.exit_code</code>:
 <code>TOO_FEW_REALIZATIONS</code> when not enough realizations produced a value,
 <code>EXECUTOR_STOPPED</code> when the pool it was evaluating on could no longer run
-the work, which in practice means the interpreter was shutting down under it.
+the work, which in practice means the interpreter was shutting down under it,
+and <code>CANCELLED</code> when <a href="#stopping-from-outside"><code>Session.stop</code></a> was called.
 <code>result.results</code> is <code>None</code> when no feasible result was ever recorded, whatever
 the reason the run ended; a run that fails part-way still returns the best
 result it had reached before that. A plain <a class="autorefs autorefs-internal" title="            ropt.simple.evaluate" href="../../reference/simple/#ropt.simple.evaluate"><code>evaluate</code></a>
@@ -3373,7 +3420,7 @@ function stay whatever you raised.</p>
 <a class="autorefs autorefs-internal" title="            VariableType" href="../../reference/enums/#ropt.enums.VariableType"><code>VariableType</code></a> for integer variables and
 <a class="autorefs autorefs-internal" title="            ExitCode" href="../../reference/enums/#ropt.enums.ExitCode"><code>ExitCode</code></a> for <code>result.exit_code</code>. These are <strong>not</strong> part
 of <code>ropt.simple</code>; import them from <a class="autorefs autorefs-internal" title="            ropt.enums" href="../../reference/enums/#ropt.enums"><code>ropt.enums</code></a>:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.enums</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExitCode</span><span class="p">,</span> <span class="n">VariableType</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.enums</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExitCode</span><span class="p">,</span> <span class="n">VariableType</span>
 </span></code></pre></div>
 
 

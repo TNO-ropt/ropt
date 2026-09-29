@@ -3388,7 +3388,7 @@ transfer costs something, though, so when the evaluations are cheap the
 transfers can dominate. Pass <code>bundle_size=</code> to
 <a class="autorefs autorefs-internal" title="            ropt.simple.optimize" href="../../reference/simple/#ropt.simple.optimize"><code>optimize</code></a>, <a class="autorefs autorefs-internal" title="            ropt.simple.optimize_many" href="../../reference/simple/#ropt.simple.optimize_many"><code>optimize_many</code></a>,
 <a class="autorefs autorefs-internal" title="            ropt.simple.evaluate" href="../../reference/simple/#ropt.simple.evaluate"><code>evaluate</code></a> or
-<a class="autorefs autorefs-internal" title="            ropt.simple.evaluate_many" href="../../reference/simple/#ropt.simple.evaluate_many"><code>evaluate_many</code></a> to send several evaluations to
+<a class="autorefs autorefs-internal" title="            ropt.simple.evaluate_batch" href="../../reference/simple/#ropt.simple.evaluate_batch"><code>evaluate_batch</code></a> to send several evaluations to
 a worker together, or <code>bundle_size=0</code> to send a whole batch at once. The
 evaluations in one bundle run after each other, so <code>0</code> gives up parallelism
 inside the batch entirely: it is for a run whose parallelism comes from the
@@ -4058,15 +4058,13 @@ Leave both unset here, and set <a href="../../optimizer_setup/configuration_sect
 unless you want the runs' reports interleaved on the terminal.</p>
 </div>
 <h3 id="failure-in-one-run">Failure in one run</h3>
-<p>The first run to raise propagates its exception immediately (fail-fast). Runs
-that have not started yet are skipped, but a run already in progress cannot be
-stopped from the outside: it is abandoned, and keeps going until it finishes on
-its own. Its result is discarded, but until it ends it keeps calling your
-evaluation function, keeps the pool busy, and keeps feeding any handler you
-passed in <code>handlers</code>. Nothing can currently cut that short.</p>
-<p>The abandoned runs are driven from daemon threads, so a program that stops at
-the failure is unaffected: the interpreter exits and takes them with it. A
-program that catches the exception and carries on keeps them running.</p>
+<p>A run that raises does not affect its siblings. Every run is carried through to
+its end, and when they have all finished the first exception that was raised is
+raised from the <code>optimize_many</code> call. The results of the runs that succeeded are
+not returned.</p>
+<p>While a failed run's siblings continue they keep calling your evaluation
+function, keep the pool busy, and keep feeding any handler you passed in
+<code>handlers</code>. Nothing can currently cut that short.</p>
 <h2 id="external-backend">Running the optimizer in a separate process</h2>
 <p>Prefix the method with <code>external/</code> to run the optimization algorithm in a
 process of its own:</p>

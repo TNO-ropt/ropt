@@ -2045,10 +2045,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.simple.evaluate_many" class="md-nav__link">
+  <a href="#ropt.simple.evaluate_batch" class="md-nav__link">
     <span class="md-ellipsis">
       
-        evaluate_many
+        evaluate_batch
       
     </span>
   </a>
@@ -2149,6 +2149,17 @@
     <span class="md-ellipsis">
       
         __exit__
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.simple.Session.stop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        stop
       
     </span>
   </a>
@@ -3619,10 +3630,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.simple.evaluate_many" class="md-nav__link">
+  <a href="#ropt.simple.evaluate_batch" class="md-nav__link">
     <span class="md-ellipsis">
       
-        evaluate_many
+        evaluate_batch
       
     </span>
   </a>
@@ -3723,6 +3734,17 @@
     <span class="md-ellipsis">
       
         __exit__
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.simple.Session.stop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        stop
       
     </span>
   </a>
@@ -4605,7 +4627,9 @@ A sequence that is empty gives no runs, and returns no results.</p>
 same <code>pool</code>, so its workers are shared between them; <code>limit</code> bounds how
 many run simultaneously. Without a <code>pool</code> the runs still overlap, but
 each evaluation runs in-process on its own driver thread, so <code>function</code> is
-then called by several threads at once and must tolerate that. See
+then called by several threads at once and must tolerate that. Every run is
+carried through; if any of them raised, the first of those exceptions is
+raised here. See
 <a href="../../running/parallel/#many-optimizations-at-once">Parallel Execution and Many Runs</a>
 for a walkthrough, and <a href="../../running/parallel/#failure-in-one-run">Failure in one run</a>
 for what happens when one raises.</p>
@@ -4895,7 +4919,7 @@ run, for example with <code>{"run_id": i}</code>.</p>
     <div class="doc doc-contents first">
 
         <p>Evaluate a single variable vector without optimizing.</p>
-<p>Use <a class="autorefs autorefs-internal" title="            ropt.simple.evaluate_many" href="#ropt.simple.evaluate_many"><code>evaluate_many</code></a> to evaluate several
+<p>Use <a class="autorefs autorefs-internal" title="            ropt.simple.evaluate_batch" href="#ropt.simple.evaluate_batch"><code>evaluate_batch</code></a> to evaluate several
 vectors at once. See <a href="../../running/running/">Running Optimizations</a> for a
 walkthrough.</p>
 <p>Without a <code>pool</code> the evaluations run in-process, on the calling thread, and
@@ -5132,12 +5156,12 @@ reaches <code>function</code> as <code>context.metadata</code>.</p>
 <div class="doc doc-object doc-function">
 
 
-<h2 id="ropt.simple.evaluate_many" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">ropt.simple.evaluate_many</span>
+<h2 id="ropt.simple.evaluate_batch" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">ropt.simple.evaluate_batch</span>
 
 
 </h2>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">evaluate_many</span><span class="p">(</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">evaluate_batch</span><span class="p">(</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">variables</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">function</span><span class="p">:</span> <span class="n">EvaluationFunction</span><span class="p">,</span>
@@ -5667,6 +5691,9 @@ discovered from the surroundings.</p>
 <a href="../../running/running/">Running Optimizations</a> for a walkthrough.</p>
 <p>A session may be opened inside another, and pools from different sessions
 never interact. A session is single use — once closed it cannot be reopened.</p>
+<p><a class="autorefs autorefs-internal" title="            stop" href="#ropt.simple.Session.stop"><code>stop</code></a> cancels the runs that are using its
+pools, which is what a caller on another thread — a signal handler, a user
+interface — calls to bring them down.</p>
 
 
 
@@ -5795,7 +5822,41 @@ never interact. A session is single use — once closed it cannot be reopened.</
 
     <div class="doc doc-contents ">
 
-        <p>Close the session, releasing every pool it built.</p>
+        <p>Close the session, stopping its runs and releasing every pool.</p>
+
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.simple.Session.stop" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">stop</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">stop</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Stop the runs that are in progress on this session's pools.</p>
+<p>Each ends with <code>ExitCode.CANCELLED</code>, keeping the best result it had
+reached. A run stops at its next evaluation boundary, so the evaluations
+already in flight are still carried out and their workers are only free
+once they return.</p>
+<p>Only the runs registered at the moment of the call are stopped. A run
+started afterwards is unaffected, so a loop that stops one attempt and
+starts another keeps working. Closing the session stops its runs too,
+and then releases its pools, which is what refuses a later run.</p>
+<p>Calling this is thread-safe, and safe on a session that has no runs.</p>
 
 
     </div>
