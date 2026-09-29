@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 
 from ropt._logging import get_logger
-from ropt.components.executors import ExecutorFailure, WorkItem
+from ropt.components.executors import ExecutorFailure, WorkItem, WorkNotRun
 from ropt.evaluation import EvaluationBatchContext, EvaluationBatchResult
 from ropt.exceptions import ExecutionError, WorkflowError
 
@@ -122,7 +122,7 @@ def _handle_result(
     metadata: dict[str, dict[int, Any]],
     objective_count: int,
 ) -> None:
-    if isinstance(value, ExecutorFailure):
+    if isinstance(value, (ExecutorFailure, WorkNotRun)):
         msg = f"An evaluation could not be run: {value.message}"
         raise ExecutionError(msg)
     if not isinstance(value, EvaluationFunctionResult):

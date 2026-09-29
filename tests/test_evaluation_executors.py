@@ -44,6 +44,7 @@ from ropt.components.executors import (
     ProcessExecutor,
     ThreadExecutor,
     WorkItem,
+    WorkNotRun,
 )
 from ropt.components.executors.__main__ import run_task
 from ropt.components.executors._job_executor import (
@@ -2108,9 +2109,10 @@ def test_job_executor_base_exception_releases_waiting_callers(tmp_path: Path) ->
     assert survivor == [[2]]
 
 
-def test_job_executor_unlaunched_item_fails_its_caller(tmp_path: Path) -> None:
+def test_job_executor_unlaunched_item_releases_its_caller(tmp_path: Path) -> None:
     # Work given a slot before the backend is claimed must still release its
-    # caller if the claim fails in that gap.
+    # caller if the claim fails in that gap. It was never attempted, so it is
+    # reported as not run rather than as a failure.
     executor = _ControlledJobExecutor(tmp_path)
     state = executor._state
     caller: list[tuple[int, Any]] = []
@@ -2122,7 +2124,7 @@ def test_job_executor_unlaunched_item_fails_its_caller(tmp_path: Path) -> None:
     state.apply_update(update, release_backend=False)
     index, result = caller[0]
     assert index == 0
-    assert isinstance(result, ExecutorFailure)
+    assert isinstance(result, WorkNotRun)
     assert "claim failed" in result.message
 
 

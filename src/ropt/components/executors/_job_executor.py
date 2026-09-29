@@ -51,6 +51,7 @@ from .base import (
     ExecutorBase,
     ExecutorFailure,
     WorkItem,
+    WorkNotRun,
     _calls,
     _run_bundle,
 )
@@ -264,7 +265,7 @@ class _State:
             if bundle_id not in self._active:
                 continue
             self._complete(
-                bundle_id, ExecutorFailure(f"The work item was not run: {reason}")
+                bundle_id, WorkNotRun(f"The work item was not run: {reason}")
             )
 
     def _note_query(self, error: BaseException | None) -> None:

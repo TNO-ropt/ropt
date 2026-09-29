@@ -15,7 +15,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, TypeVar, cast, overload
 
-from ropt.components.executors import ExecutorFailure, WorkItem
+from ropt.components.executors import ExecutorFailure, WorkItem, WorkNotRun
 from ropt.exceptions import ExecutionError
 
 from ._pool import SerialPool
@@ -95,7 +95,7 @@ def _run(executor: Executor | None, functions: list[Callable[[], Any]]) -> list[
         [WorkItem(function=function) for function in functions], bundle_size=1
     )
     for value in values:
-        if isinstance(value, ExecutorFailure):
+        if isinstance(value, (ExecutorFailure, WorkNotRun)):
             msg = f"An offloaded call could not be run: {value.message}"
             raise ExecutionError(msg)
     return values

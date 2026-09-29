@@ -71,6 +71,24 @@ class ExecutorFailure:
     message: str
 
 
+@dataclass(frozen=True)
+class WorkNotRun:
+    """A work item was never attempted.
+
+    Returned in the work item's position when the batch it belonged to was
+    abandoned, so nothing about the item or the executor failed.
+
+    Attributes:
+        message: Why it was not attempted.
+    """
+
+    message: str
+
+
+# The two outcomes that stand in for a result, wherever they are handled alike.
+_NO_RESULT = (ExecutorFailure, WorkNotRun)
+
+
 def _calls(
     bundle: Sequence[WorkItem],
 ) -> list[tuple[Callable[..., Any], tuple[Any, ...], dict[str, Any]]]:
@@ -107,8 +125,10 @@ class Executor(ABC):
 
         Blocks until every call has a result. A call the machinery could not run
         gets an [`ExecutorFailure`][ropt.components.executors.ExecutorFailure]
-        in its position; an exception raised by a call's own function is
-        re-raised here, without waiting for the rest of the batch.
+        in its position, and a call that was never attempted gets a
+        [`WorkNotRun`][ropt.components.executors.WorkNotRun]; an exception
+        raised by a call's own function is re-raised here, without waiting for
+        the rest of the batch.
 
         May be called from any thread, except one of the executor's own workers:
         that caller would wait for workers it is itself occupying, so it is
@@ -230,13 +250,13 @@ def _check_bundle_size(bundle_size: int) -> None:
 
 
 def _store(results: list[Any], offset: int, count: int, bundle_result: Any) -> None:  # ruff: ignore[any-type]
-    if not isinstance(bundle_result, ExecutorFailure) and (
+    if not isinstance(bundle_result, _NO_RESULT) and (
         not isinstance(bundle_result, list) or len(bundle_result) != count
     ):
         bundle_result = ExecutorFailure(
             f"A job returned a result that does not match its {count} work item(s)."
         )
-    if isinstance(bundle_result, ExecutorFailure):
+    if isinstance(bundle_result, _NO_RESULT):
         results[offset : offset + count] = [bundle_result] * count
         return
     results[offset : offset + count] = bundle_result
