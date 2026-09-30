@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 class Realizations(ResultField):
     """Per-realization activity, success, and weight information.
 
-    See [Working with Results](../running/results.md) for usage details.
+    See [Working with Results](../results/results.md) for usage details.
 
     **Result descriptions**
 

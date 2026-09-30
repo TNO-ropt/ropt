@@ -252,7 +252,7 @@ method. Once attached, the handler receives every event the step emits.
 The built-in [`ResultsHandler`][ropt.components.event_handlers.ResultsHandler],
 [`HistoryHandler`][ropt.components.event_handlers.HistoryHandler], and
 [`DataFrameHandler`][ropt.components.event_handlers.DataFrameHandler] are the same
-objects you meet in [Result Handlers](../running/handlers.md#built-in-handlers),
+objects you meet in [Result Handlers](../results/handlers.md#built-in-handlers),
 where they are described in full — there they are attached with
 `optimize(handlers=...)`, here with `add_event_handler`, and they behave
 identically. This section covers the underlying event model and the handlers
@@ -336,12 +336,12 @@ The result-collecting built-ins —
 [`ResultsHandler`][ropt.components.event_handlers.ResultsHandler],
 [`HistoryHandler`][ropt.components.event_handlers.HistoryHandler], and
 [`DataFrameHandler`][ropt.components.event_handlers.DataFrameHandler] — are
-described in full in [Result Handlers](../running/handlers.md#built-in-handlers).
+described in full in [Result Handlers](../results/handlers.md#built-in-handlers).
 They expose their state through dictionary access (`handler[key]`);
 `ResultsHandler` and `HistoryHandler` use the key `"results"`, while
 `DataFrameHandler` uses the table name. Stored results carry both the configured
 and the optimizer's domain; see
-[Working with Results](../running/results.md#scaling-of-results).
+[Working with Results](../results/results.md#scaling-of-results).
 
 One more handler exists only at this level, for wiring events:
 

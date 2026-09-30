@@ -9,7 +9,7 @@ result an optimization produces.
 It collects the full result objects —
 [`FunctionResults`][ropt.results.FunctionResults] and
 [`GradientResults`][ropt.results.GradientResults] — rather than the summary `optimize` returns; see
-[Working with Results](../running/results.md).
+[Working with Results](../results/results.md).
 
 ## A handler that collects everything
 
@@ -58,5 +58,5 @@ which [Restarting from the Best Point](../running/restart.md) walks through.
   (default), or the most recent.
 - **[`DataFrameHandler`][ropt.simple.DataFrameHandler]** — collects results into a `pandas` or `polars` table.
 
-See [Result handlers](../running/handlers.md) for the full
+See [Result handlers](../results/handlers.md) for the full
 list, and how to write your own.

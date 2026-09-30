@@ -4,7 +4,7 @@
 [`logging`](https://docs.python.org/3/library/logging.html) module. Switching it
 on takes one line and needs no code of your own. To *collect* what a run
 produces — to keep results, tabulate them, or stop a run early — use
-[result handlers](handlers.md) instead.
+[result handlers](../results/handlers.md) instead.
 
 ## Turning it on
 

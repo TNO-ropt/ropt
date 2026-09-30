@@ -110,4 +110,4 @@ full field descriptions.
 ## See also
 
 - What a run reports in each domain, and which fields are comparable between
-  runs: [Working with Results](../running/results.md#scaling-of-results).
+  runs: [Working with Results](../results/results.md#scaling-of-results).

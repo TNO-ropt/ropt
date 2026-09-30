@@ -23,7 +23,7 @@ with `handlers=` that observes every result an optimization produces; unlike
 the `report` callback (see
 [Running Optimizations](running.md#reporting-progress)), the same
 handler can be reused across several sequential calls to `optimize`, accumulating
-results as it goes. See [Result handlers](handlers.md) for
+results as it goes. See [Result handlers](../results/handlers.md) for
 the full explanation.
 
 Here we use [`HistoryHandler`][ropt.simple.HistoryHandler], which keeps every
@@ -61,4 +61,4 @@ print(f"best objective after {RESTARTS} restarts: {result.results.target_objecti
 
 - Restarting concurrent, rather than sequential, runs collects into the same
   handler:
-  [Result Handlers](handlers.md#sharing-a-handler-across-concurrent-runs).
+  [Result Handlers](../results/handlers.md#sharing-a-handler-across-concurrent-runs).

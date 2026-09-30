@@ -6,7 +6,7 @@ handler may be given to several runs at once, sequential or concurrent, because
 [`handle_event`][ropt.components.event_handlers.EventHandler.handle_event]
 serializes its own calls.
 
-See [Result Handlers](../running/handlers.md).
+See [Result Handlers](../results/handlers.md).
 """
 
 from __future__ import annotations

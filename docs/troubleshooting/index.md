@@ -16,7 +16,7 @@ constraint to within `constraint_tolerance`, which defaults to `1e-10` and
 applies to bounds and linear constraints as well as nonlinear ones. If no
 evaluation satisfies them, the run ends normally with `result.results`
 set to `None`. The evaluations themselves are not lost: every result, feasible
-or not, still reaches the [handlers](../running/handlers.md) attached to the run.
+or not, still reaches the [handlers](../results/handlers.md) attached to the run.
 
 **The return value is a summary, not the record of the run.** It holds a single
 result, the best feasible evaluation. The whole history is available instead:
@@ -68,7 +68,7 @@ from one computed over the whole ensemble.
 | `TOO_FEW_REALIZATIONS` although only one realization failed | [`realization_min_success`](../optimizer_setup/configuration_sections.md#realizations) defaults to all of them. Lower it. |
 | The run stopped long before `max_functions`, with `FINISHED` | The backend ended it: `max_iterations`, `convergence_tolerance`, or its own convergence test. Those are set in the `backend` section; see [Limiting the length of a run](../optimizer_setup/optimizer.md#limiting-the-length-of-a-run). |
 | `ExecutionError` part-way through a run | The machinery failed, not your objective. The message names the reason and how many evaluations went with it. |
-| Numbers do not match what you configured | Results carry the configured values and the optimizer's scaled ones side by side; see [Scaling of results](../running/results.md#scaling-of-results). |
+| Numbers do not match what you configured | Results carry the configured values and the optimizer's scaled ones side by side; see [Scaling of results](../results/results.md#scaling-of-results). |
 
 ## Your evaluation function
 
@@ -78,7 +78,7 @@ from one computed over the whole ensemble.
 your evaluation function is sent to a worker together with the data it uses. Anything
 it writes there — a global, a cache, a list it appends to — is thrown away when
 the worker finishes. Return what you need instead; see
-[Handlers and the process boundary](../running/handlers.md#handlers-and-the-process-boundary).
+[Handlers and the process boundary](../results/handlers.md#handlers-and-the-process-boundary).
 
 **Several runs may call your objective at the same time.**
 [`optimize_many`][ropt.simple.optimize_many] always runs its optimizations
@@ -148,7 +148,7 @@ own lock while it runs. A nested [`optimize`][ropt.simple.optimize] emits on
 that same thread and raises; a nested
 [`optimize_many`][ropt.simple.optimize_many] emits on its own driver threads
 and blocks. See [Result
-Handlers](../running/handlers.md#sharing-a-handler-across-concurrent-runs).
+Handlers](../results/handlers.md#sharing-a-handler-across-concurrent-runs).
 
 **Not every optimizer can run beside another.** A backend that needs its own
 working directory, writes to a fixed file name, or keeps state inside its
@@ -158,8 +158,8 @@ process of its own. Optimizer output capture is likewise for one run at a time.
 
 | What you see | Most likely cause |
 | --- | --- |
-| Results from a shared `report=` callback are jumbled or lost | The callback is called from every run's thread at once. Collect the results in a [handler](../running/handlers.md#sharing-a-handler-across-concurrent-runs) instead, or use one callback per run. |
-| A run started from a handler raises `WorkflowError` about the call stack, or hangs | Its handler list reaches a handler that is already running; see [Result Handlers](../running/handlers.md#sharing-a-handler-across-concurrent-runs). |
+| Results from a shared `report=` callback are jumbled or lost | The callback is called from every run's thread at once. Collect the results in a [handler](../results/handlers.md#sharing-a-handler-across-concurrent-runs) instead, or use one callback per run. |
+| A run started from a handler raises `WorkflowError` about the call stack, or hangs | Its handler list reaches a handler that is already running; see [Result Handlers](../results/handlers.md#sharing-a-handler-across-concurrent-runs). |
 | Many runs are slower than expected while the executor sits idle | A shared handler is serializing them. Make it cheaper. |
 | A second concurrent run raises `WorkflowError` about output capture | Only one run at a time may set `stdout` or `stderr`; see [Many optimizations at once](../running/parallel.md#many-optimizations-at-once). |
 

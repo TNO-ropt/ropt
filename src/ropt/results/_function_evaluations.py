@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 class FunctionEvaluations(ResultField):
     """Per-realization objective and constraint values for an evaluation batch.
 
-    See [Working with Results](../running/results.md) for usage details.
+    See [Working with Results](../results/results.md) for usage details.
 
     **Result descriptions**
 
@@ -64,7 +64,7 @@ class FunctionEvaluations(ResultField):
 
         An entry whose values are arrays rather than scalars has shape
         $(n_r, n_k)$ and carries a second, user-defined axis named after its
-        key. See [User-defined axes](../running/results.md#user-defined-axes).
+        key. See [User-defined axes](../results/results.md#user-defined-axes).
 
     Attributes:
         objectives:  The objective function values for each realization.

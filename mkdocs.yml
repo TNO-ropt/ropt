@@ -115,12 +115,13 @@ nav:
       - "Examples": getting_started/examples.md
   - "Running":
       - "Running Optimizations": running/running.md
-      - "Working with Results": running/results.md
-      - "Result Handlers": running/handlers.md
       - "Logging": running/logging.md
       - "Parallel Execution and Many Runs": running/parallel.md
       - "Nested Optimization": running/nested.md
       - "Restarting from the Best Point": running/restart.md
+  - "Results":
+      - "Working with Results": results/results.md
+      - "Result Handlers": results/handlers.md
   - "Optimizer Setup":
       - "Key Concepts": optimizer_setup/key_concepts.md
       - "Configuration": optimizer_setup/configuration.md

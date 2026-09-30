@@ -123,7 +123,7 @@ robust objective, which is what it optimizes.
 
 That evaluation carries much more than those two values — the per-realization
 objectives, the aggregates, the ensemble weights; see
-[Working with Results](../running/results.md).
+[Working with Results](../results/results.md).
 
 Because the coefficients are centered on the values used in the
 [Quickstart](quickstart.md), the robust optimum still lies close to where all

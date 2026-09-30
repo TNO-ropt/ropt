@@ -171,10 +171,10 @@ outer evaluations that were computed, not for every outer evaluation.
 ## Collecting results from runs that overlap
 
 The inner runs are concurrent, and [one
-handler](handlers.md#sharing-a-handler-across-concurrent-runs) collects them
+handler](../results/handlers.md#sharing-a-handler-across-concurrent-runs) collects them
 all: it takes a lock around every call, so the runs wait for each other rather
 than interleaving. Give every inner run the same
-[`DataFrameHandler`](handlers.md#dataframehandler) and every inner evaluation
+[`DataFrameHandler`](../results/handlers.md#dataframehandler) and every inner evaluation
 from every inner run lands in one table, keyed by the outer evaluation it
 belongs to.
 

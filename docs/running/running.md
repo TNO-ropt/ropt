@@ -106,8 +106,9 @@ result.results      # the best evaluation, or None if none was valid
 ```
 
 `results` is a [`FunctionResults`][ropt.results.FunctionResults] — the same
-object a [handler](handlers.md) receives — so the best point and its values are
-read from it at the paths described in [Working with Results](results.md):
+object a [handler](../results/handlers.md) receives — so the best point and its
+values are read from it at the paths described in
+[Working with Results](../results/results.md):
 
 ```python
 if result.results is not None:
@@ -250,16 +251,17 @@ You can attach arbitrary **metadata** to a run, from two sources:
   non-strings under one key raises a `ValueError`.
 
   Returning an array instead of a scalar gives the key its own
-  [user-defined axis](results.md#user-defined-axes), which
+  [user-defined axis](../results/results.md#user-defined-axes), which
   the `names` section of the configuration can label and which the
-  [`DataFrameHandler`](handlers.md#dataframehandler) spreads over one column
-  per entry.
+  [`DataFrameHandler`](../results/handlers.md#dataframehandler) spreads over one
+  column per entry.
 
 Neither kind is interpreted by `ropt`. Constant metadata ends up on
 `result.results.metadata`; per-evaluation metadata on
 `result.results.evaluations.metadata` (one entry per realization). Both kinds can
-be tabulated as columns by the [`DataFrameHandler`](handlers.md#dataframehandler). See
-[Working with Results](results.md#metadata) for how
+be tabulated as columns by the
+[`DataFrameHandler`](../results/handlers.md#dataframehandler). See
+[Working with Results](../results/results.md#metadata) for how
 each appears in the pandas export. The full runnable script is
 [examples/simple/metadata.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/metadata.py).
 
@@ -319,7 +321,7 @@ A run can also end with `FINISHED` and still leave those fields
 `1e-10` unless you pass another — applies to the bounds and the linear
 constraints as well as the nonlinear ones. A run that never reaches a feasible
 point therefore has no best result to return, although the evaluations it did
-make still reach the [handlers](handlers.md) attached to it.
+make still reach the [handlers](../results/handlers.md) attached to it.
 
 What *is* raised falls into three groups:
 

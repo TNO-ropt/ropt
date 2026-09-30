@@ -160,7 +160,7 @@ class AxisName(StrEnum):
     Labels what each dimension of a [`Results`][ropt.results.Results] field's
     multidimensional array represents, and is used to look up axis labels via
     [`get_axes`][ropt.results.AxisMetadata.get_axes]. See
-    [Working with Results](../running/results.md#axes-and-dimensionality)
+    [Working with Results](../results/results.md#axes-and-dimensionality)
     for a full table of fields and their axes.
     """
 

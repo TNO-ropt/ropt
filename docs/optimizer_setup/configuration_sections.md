@@ -224,7 +224,7 @@ Because the estimate divides the objective the optimizer reports, switching
 `auto_scale` on lowers `target_objective` without changing the solution. Two
 runs that differ in this setting can only be compared through
 `functions.objectives` or their variables; see
-[Scaling of results](../running/results.md#scaling-of-results).
+[Scaling of results](../results/results.md#scaling-of-results).
 
 ### Offsetting objectives { #objective-offsets }
 
@@ -657,7 +657,7 @@ Fields:
 
 Optional mapping from axis names to tuples of labels. These labels are used to
 produce human-readable multi-index DataFrames when results are exported (see
-[Working with Results](../running/results.md)).
+[Working with Results](../results/results.md)).
 
 Each key is an [`AxisName`][ropt.enums.AxisName] value that identifies a
 dimension of the optimization problem:
@@ -672,7 +672,7 @@ dimension of the optimization problem:
 | `"perturbation"`           | The perturbations used for gradient estimation       |
 
 A key may also be the name of a metadata key that carries array values, which
-labels the [user axis](../running/results.md#user-defined-axes) that metadata spans.
+labels the [user axis](../results/results.md#user-defined-axes) that metadata spans.
 
 The corresponding value is a tuple of strings (or integers) whose length must
 match the count of that axis. For example, with 3 variables and 2 objectives:
@@ -685,5 +685,5 @@ match the count of that axis. For example, with 3 variables and 2 objectives:
 ```
 
 You only need to provide labels for axes you want named — unlabelled axes
-default to integer indices. See [Working with Results](../running/results.md) for how
+default to integer indices. See [Working with Results](../results/results.md) for how
 these labels appear in exported DataFrames.

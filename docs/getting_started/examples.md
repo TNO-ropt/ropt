@@ -22,10 +22,10 @@ Scripts that assemble a workflow by hand are listed under
 | [`realization_filter.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/realization_filter.py) | A custom filter that reweights realizations | [Realization Filters](../optimizer_setup/realization_filters.md) |
 | [`function_estimator.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/function_estimator.py) | A custom estimator that aggregates realizations | [Function Estimators](../optimizer_setup/function_estimators.md) |
 | [`sampler.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/sampler.py) | A custom sampler that perturbs one variable at a time | [Samplers](../optimizer_setup/samplers.md) |
-| [`metadata.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/metadata.py) | Tagging a run, and recording per-realization data | [Working with Results](../running/results.md) |
-| [`export.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/export.py) | Exporting results to a pandas or polars frame | [Working with Results](../running/results.md) |
-| [`scaling.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/scaling.py) | Reading results in the configured and the optimizer's units | [Working with Results](../running/results.md) |
-| [`handlers.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/handlers.py) | Collecting results from runs that overlap in time | [Result Handlers](../running/handlers.md) |
+| [`metadata.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/metadata.py) | Tagging a run, and recording per-realization data | [Working with Results](../results/results.md) |
+| [`export.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/export.py) | Exporting results to a pandas or polars frame | [Working with Results](../results/results.md) |
+| [`scaling.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/scaling.py) | Reading results in the configured and the optimizer's units | [Working with Results](../results/results.md) |
+| [`handlers.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/handlers.py) | Collecting results from runs that overlap in time | [Result Handlers](../results/handlers.md) |
 | [`stopping.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/stopping.py) | Stopping a run from the `report` callback | [Running Optimizations](../running/running.md) |
 | [`failures.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/failures.py) | What a failing realization does, and how to allow some | [Common Pitfalls](../troubleshooting/index.md) |
 | [`restart.py`](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/restart.py) | Restarting from the best point, collecting every result | [Restarting from the Best Point](../running/restart.md) |

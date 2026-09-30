@@ -7,7 +7,7 @@ estimates, or both. Each is a frozen container of
 [`ResultField`][ropt.results.ResultField] sub-objects holding NumPy arrays with
 axis-name metadata.
 
-See [Working with Results](../running/results.md) for a narrative overview of
+See [Working with Results](../results/results.md) for a narrative overview of
 the result hierarchy, axis metadata, scaling, and pandas/polars export.
 """
 

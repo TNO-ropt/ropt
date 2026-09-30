@@ -252,7 +252,7 @@ names variables, objectives and realizations before exporting to a frame, and
 [examples/simple/metadata.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/metadata.py)
 names a metadata axis. The accepted axis names are listed under
 [`names`](configuration_sections.md#names), and
-[Working with Results](../running/results.md) shows how the labels appear in an
+[Working with Results](../results/results.md) shows how the labels appear in an
 exported table.
 
 ## A worked example

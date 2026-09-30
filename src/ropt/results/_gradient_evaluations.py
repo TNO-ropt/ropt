@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 class GradientEvaluations(ResultField):
     """Per-realization evaluation data for perturbed variables.
 
-    See [Working with Results](../running/results.md) for usage details.
+    See [Working with Results](../results/results.md) for usage details.
 
     **Result descriptions**
 
@@ -68,7 +68,7 @@ class GradientEvaluations(ResultField):
         An entry whose values are arrays rather than scalars has shape
         $(n_r, n_p, n_k)$ and carries a third, user-defined axis named after
         its key. See
-        [User-defined axes](../running/results.md#user-defined-axes).
+        [User-defined axes](../results/results.md#user-defined-axes).
 
     Attributes:
         perturbed_objectives:  Objective values per realization and perturbation.

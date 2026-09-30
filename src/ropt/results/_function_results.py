@@ -67,7 +67,7 @@ class FunctionResults(Results):
     objectives that may differ in both scale and direction, so it exists only in
     the optimizer's domain and has no scaled counterpart.
 
-    See [Working with Results](../running/results.md) for usage details.
+    See [Working with Results](../results/results.md) for usage details.
 
     **Result descriptions**
 

@@ -236,7 +236,7 @@ def my_function(
     raises a `ValueError`.
 
     A value may be a 1-D array rather than a scalar, which gives the key an
-    extra [user-defined axis](../running/results.md#user-defined-axes)
+    extra [user-defined axis](../results/results.md#user-defined-axes)
     named after the key. Every row must then return the same number of entries,
     and the key may not be named after an
     [`AxisName`][ropt.enums.AxisName] value or `batch_id`.

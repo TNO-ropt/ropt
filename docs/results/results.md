@@ -2,7 +2,8 @@
 
 `ropt` exposes the full intermediate and final state of an optimization through
 [`Results`][ropt.results.Results] objects. This page describes the result
-classes and how to inspect them; see [Running Optimizations](running.md) and
+classes and how to inspect them; see
+[Running Optimizations](../running/running.md) and
 [Optimization Workflows](../advanced/workflows.md) for how results are produced and
 delivered to your code.
 
@@ -11,10 +12,11 @@ delivered to your code.
     [`Results`][ropt.results.Results] is the record every part of `ropt`
     returns: one object per variable vector evaluated, carrying every field
     described below. Result handlers receive these, a `report` callback is given
-    one per evaluation, [`evaluate`][ropt.simple.evaluate] returns one, and
-    [`optimize`](running.md) puts the best one on the `results` field of the
-    [`OptimizationResult`][ropt.simple.OptimizationResult] it returns. Whichever
-    way you reach a result, it reads the same.
+    one per evaluation, and both
+    [`optimize`](../running/running.md) and
+    [`evaluate`](../running/running.md#evaluating-without-optimizing) put them
+    on the `results` field of the result object they return. Whichever way you
+    reach a result, it reads the same.
 
 ## The result hierarchy
 

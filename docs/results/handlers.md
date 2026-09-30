@@ -14,7 +14,7 @@ Everything a run produces is in them, at the field paths described in
 [Working with Results](results.md), which is the vocabulary the handlers below
 are configured in.
 
-The [`report`](running.md#reporting-progress) callback you may already be using
+The [`report`](../running/running.md#reporting-progress) callback you may already be using
 is only shorthand for this: `report=` builds a handler for you behind the
 scenes, added to the run it is given to.
 
@@ -39,7 +39,7 @@ Handlers that store results expose them through `handler["results"]` (and, for
 ## Sharing a handler across concurrent runs
 
 The same handler may also be given to runs that execute **concurrently** — the
-runs of an [`optimize_many`](parallel.md#many-optimizations-at-once), or runs
+runs of an [`optimize_many`](../running/parallel.md#many-optimizations-at-once), or runs
 you start on threads of your own. A handler's
 [`handle_event`][ropt.components.event_handlers.EventHandler.handle_event]
 takes a lock around each call, so a second run waits for the first to finish
@@ -217,7 +217,7 @@ other than results — the start or end of a run, for example; for results alone
 
 A handler can also **stop the run that fed it**: every event carries the compute
 step that emitted it, so calling `event.source.stop()` ends that run with
-`STOPPED` — the [`report`](running.md#stopping-early-from-the-callback)
+`STOPPED` — the [`report`](../running/running.md#stopping-early-from-the-callback)
 callback above is a convenience wrapper around this. Only the run that owns the
 emitting step is affected, so concurrent runs continue. See
 [Optimization Workflows](../advanced/workflows.md#exit-reasons).
@@ -283,7 +283,7 @@ handlers and your main program never see it.
 
 So to get extra information from an evaluation to a handler (or to a later part
 of your program), **return it** instead of stashing it in shared state: attach it
-to the result's `metadata` (see [Attaching metadata](running.md#attaching-metadata)), which
+to the result's `metadata` (see [Attaching metadata](../running/running.md#attaching-metadata)), which
 is returned with the result. Relying on shared state happens to work on a
 thread pool, but breaks the moment you switch to a process pool;
 returning the data works everywhere.

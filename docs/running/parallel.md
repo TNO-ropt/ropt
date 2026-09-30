@@ -176,7 +176,7 @@ which each worker re-imports — works as is; a lambda, a closure, or a
 function defined in a notebook cell needs the `cloudpickle` extra (see
 [Installation](../getting_started/installation.md#optional-extras)). Results can
 only come **back** through the return value; see
-[Handlers and the process boundary](handlers.md#handlers-and-the-process-boundary).
+[Handlers and the process boundary](../results/handlers.md#handlers-and-the-process-boundary).
 
 !!! warning "This pool does not clean up programs your objective started"
     When a run is stopped by Ctrl-C the worker processes are killed, but
@@ -577,7 +577,7 @@ with session() as s:
 !!! tip "Give each run an ID"
     Pass a per-run `metadata` list to tag every run with a user-defined
     identifier that travels with its results (and shows up in a
-    [`DataFrameHandler`](handlers.md#dataframehandler)'s tables):
+    [`DataFrameHandler`](../results/handlers.md#dataframehandler)'s tables):
 
     ```python
     labels = ["low", "mid", "high"]
@@ -618,14 +618,14 @@ The two callback arguments differ in the same way. `report=` is **per run**: one
 callback receives the results of every run, or pass a list with one callback per
 run. `handlers=` is **shared**: one list of handlers that all runs feed
 together — see [Sharing a handler across concurrent
-runs](handlers.md#sharing-a-handler-across-concurrent-runs).
+runs](../results/handlers.md#sharing-a-handler-across-concurrent-runs).
 
 !!! warning "One `report=` callback is called by every run at once"
     A single callback is wired into each run separately, and each run calls it
     on its own thread. Nothing serializes those calls, so a callback that
     appends to a list, updates a counter, or writes a file needs a lock of its
     own. Give each run its own callback when they must stay apart, or pass a
-    [handler](handlers.md#sharing-a-handler-across-concurrent-runs) in
+    [handler](../results/handlers.md#sharing-a-handler-across-concurrent-runs) in
     `handlers=`, which takes a lock around every call for you.
 
 !!! warning "A shared handler makes the runs wait for each other"
