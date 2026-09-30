@@ -83,7 +83,7 @@ def main() -> None:
     result = optimize(CONFIG, INITIAL_VALUES, rosenbrock, report=report)
     # --8<-- [end:run]
     # --8<-- [start:result]
-    print(f"exit code:         {result.exit_code}")
+    print(f"exit code:         {result.exit_reason}")
     if result.results is not None:
         print(f"optimal variables: {result.results.variables}")
         print(f"optimal objective: {result.results.target_objective}")

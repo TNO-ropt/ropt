@@ -16,7 +16,7 @@ from ropt.components.compute_steps import OptimizationStep
 from ropt.components.evaluators import BatchEvaluator, Evaluator
 from ropt.components.event_handlers import CallbackHandler, ResultsHandler
 from ropt.context import EnOptContext
-from ropt.enums import EnOptEventType, ExitCode
+from ropt.enums import EnOptEventType, ExitReason
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
@@ -113,7 +113,7 @@ class BasicOptimizer:
         """
         return self._results
 
-    def run(self, initial_values: ArrayLike) -> ExitCode:
+    def run(self, initial_values: ArrayLike) -> ExitReason:
         """Run the optimization process.
 
         Args:
@@ -137,12 +137,12 @@ class BasicOptimizer:
         for handler in _custom_event_handlers():
             optimizer.add_event_handler(handler())
 
-        exit_code = optimizer.run(
+        exit_reason = optimizer.run(
             variables=np.asarray(initial_values, dtype=np.float64),
             context=self._context,
         )
         self._results = result_handler["results"]
-        return exit_code
+        return exit_reason
 
     def set_results_callback(self, callback: Callable[..., None]) -> None:
         """Set a callback to report new results.

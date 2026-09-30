@@ -2,13 +2,13 @@
 
 A `ropt` run keeps going through a failed realization or an infeasible result,
 so it can end without a result to return and without raising an error. Check
-`exit_code` before using what comes back. This page collects the behaviours that
-most often cause confusion.
+`exit_reason` before using what comes back. This page collects the behaviours
+that most often cause confusion.
 
 Skim it once to know what is here, then come back with a symptom and read the
 table of the section it belongs to.
 
-## Results and exit codes
+## Results and exit reasons
 
 **The returned result is the best *feasible* one.**
 [`optimize`][ropt.simple.optimize] returns the best result that satisfies every
@@ -39,19 +39,19 @@ config = {
 
 [examples/simple/failures.py](https://github.com/TNO-ropt/ropt/blob/main/examples/simple/failures.py)
 runs the same problem twice, once with the default and once allowing the
-failure, and prints the exit code and result of each.
+failure, and prints the exit reason and result of each.
 
-**Not everything that goes wrong raises.** Check `exit_code` before using a
-result. The exit code gives the reason the run ended; the result is the best
+**Not everything that goes wrong raises.** Check `exit_reason` before using a
+result. The exit reason gives why the run ended; the result is the best
 feasible evaluation recorded before it did, and is `None` only when there was
 none. A run that fails part-way therefore still returns what it had reached.
 See [When something goes wrong](../running/running.md#when-something-goes-wrong).
 
-**`OPTIMIZER_FINISHED` does not mean a limit was reached.** It is the exit code
+**`FINISHED` does not mean a limit was reached.** It is the exit reason
 for every run the backend ended by itself — because it converged, or because it
 reached `max_iterations` or `convergence_tolerance`. Those two live in the
 `backend` section and are enforced by the algorithm rather than counted by
-`ropt`, so a run can stop far short of `max_functions`, and the exit code does
+`ropt`, so a run can stop far short of `max_functions`, and the exit reason does
 not distinguish which of the three applied. Only `MAX_FUNCTIONS_REACHED` and
 `MAX_BATCHES_REACHED` correspond to a limit `ropt` enforced itself.
 
@@ -64,9 +64,9 @@ from one computed over the whole ensemble.
 
 | What you see | Most likely cause |
 | --- | --- |
-| `result.results` is `None`, but `exit_code` is `OPTIMIZER_FINISHED` | No evaluation satisfied the constraints to within `constraint_tolerance` (default `1e-10`; bounds and linear constraints count too), so there is no best feasible result to return. The evaluations are still in the handlers. Raise the tolerance, or check that the constraints can be satisfied at all. |
+| `result.results` is `None`, but `exit_reason` is `FINISHED` | No evaluation satisfied the constraints to within `constraint_tolerance` (default `1e-10`; bounds and linear constraints count too), so there is no best feasible result to return. The evaluations are still in the handlers. Raise the tolerance, or check that the constraints can be satisfied at all. |
 | `TOO_FEW_REALIZATIONS` although only one realization failed | [`realization_min_success`](../optimizer_setup/configuration_sections.md#realizations) defaults to all of them. Lower it. |
-| The run stopped long before `max_functions`, with `OPTIMIZER_FINISHED` | The backend ended it: `max_iterations`, `convergence_tolerance`, or its own convergence test. Those are set in the `backend` section; see [Limiting the length of a run](../optimizer_setup/optimizer.md#limiting-the-length-of-a-run). |
+| The run stopped long before `max_functions`, with `FINISHED` | The backend ended it: `max_iterations`, `convergence_tolerance`, or its own convergence test. Those are set in the `backend` section; see [Limiting the length of a run](../optimizer_setup/optimizer.md#limiting-the-length-of-a-run). |
 | `ExecutionError` part-way through a run | The machinery failed, not your objective. The message names the reason and how many evaluations went with it. |
 | Numbers do not match what you configured | Results carry the configured values and the optimizer's scaled ones side by side; see [Scaling of results](../running/results.md#scaling-of-results). |
 

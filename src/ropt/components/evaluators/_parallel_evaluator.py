@@ -117,7 +117,7 @@ class ParallelEvaluator(Evaluator):
         if self._stop_signal is not None and any(
             isinstance(value, WorkNotRun) for value in values
         ):
-            raise OptimizerStop(self._stop_signal.exit_code)
+            raise OptimizerStop(self._stop_signal.exit_reason)
         for (eval_idx, _), value in zip(active, values, strict=True):
             _handle_result(eval_idx, value, results, metadata, no)
 

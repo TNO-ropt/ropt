@@ -189,28 +189,28 @@ The following events are emitted during execution:
   Emitted after the entire compute step, including result emission, is
   finished.
 
-### Exit codes
+### Exit reasons
 
 The [`OptimizationStep`][ropt.components.compute_steps.OptimizationStep]'s
-`run()` method returns an [`ExitCode`][ropt.enums.ExitCode] indicating why the
-optimizer finished; the
+`run()` method returns an [`ExitReason`][ropt.enums.ExitReason] indicating why
+the optimizer finished; the
 [`EvaluationStep`][ropt.components.compute_steps.EvaluationStep]'s `run()`
 returns nothing:
 
-| Exit code                    | Meaning                                                       |
+| Exit reason                  | Meaning                                                       |
 | ---------------------------- | ------------------------------------------------------------- |
-| `OPTIMIZER_FINISHED`         | The optimizer terminated normally.                            |
+| `FINISHED`                   | The optimizer terminated normally.                            |
 | `TOO_FEW_REALIZATIONS`       | Too few realizations were evaluated successfully.             |
 | `MAX_FUNCTIONS_REACHED`      | Maximum number of function evaluations was reached.           |
 | `MAX_BATCHES_REACHED`        | Maximum number of evaluation batches was reached.             |
 | `STOPPED`                    | An event handler asked the run to stop via `event.source.stop()`. |
 | `ABORTED`                    | The step's [`StopSignal`][ropt.components.concurrency.StopSignal] was set. |
-| `ABORTED_ON_ERROR`           | The step's signal was set with this code, which `ropt.simple` uses when another run raised. |
+| `ABORTED_ON_ERROR`           | The step's signal was set with this reason, which `ropt.simple` uses when another run raised. |
 | `EXECUTOR_SHUT_DOWN`         | The executor could no longer run the work, which in practice means the interpreter was shutting down. |
 
-A run either **stops** or is **aborted**, and the exit code says which. It
+A run either **stops** or is **aborted**, and the exit reason says which. It
 stops when a condition on the optimization is met, so it ends where someone
-decided it should; the first four codes above are all of that kind. It is
+decided it should; the first four reasons above are all of that kind. It is
 aborted when something cuts it off without consulting the optimization, and
 what comes back is then whatever it had reached.
 

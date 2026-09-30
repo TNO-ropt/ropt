@@ -12,7 +12,7 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 import pytest
 
-from ropt.enums import ExitCode
+from ropt.enums import ExitReason
 from ropt.simple import session
 
 if TYPE_CHECKING:
@@ -94,7 +94,7 @@ def test_session_abort_keeps_the_results_of_completed_batches() -> None:
             _CONFIG, _INITIAL, _sphere, report=_abort_on_first_result
         )
 
-    assert result.exit_code == ExitCode.ABORTED
+    assert result.exit_reason == ExitReason.ABORTED
     assert result.results is not None
 
 
@@ -121,7 +121,7 @@ def test_session_abort_abandons_the_batch_in_flight() -> None:
 
         result = pool.optimize(_CONFIG, _INITIAL, objective)
 
-    assert result.exit_code == ExitCode.ABORTED
+    assert result.exit_reason == ExitReason.ABORTED
     # A run that was let alone evaluates the vector and a perturbation per
     # variable, many times over; this one stopped almost immediately.
     with lock:
@@ -175,7 +175,7 @@ def test_session_abort_cuts_off_every_run_in_progress() -> None:
         finally:
             stopper.join(timeout=30)
 
-    assert [result.exit_code for result in results] == [ExitCode.ABORTED] * runs
+    assert [result.exit_reason for result in results] == [ExitReason.ABORTED] * runs
 
 
 @pytest.mark.timeout(60)
@@ -197,7 +197,7 @@ def test_closing_a_session_cuts_off_a_run_on_another_thread() -> None:
 
     driver.join(timeout=30)
     assert not driver.is_alive()
-    assert [result.exit_code for result in outcome] == [ExitCode.ABORTED]
+    assert [result.exit_reason for result in outcome] == [ExitReason.ABORTED]
 
 
 @pytest.mark.timeout(60)
@@ -209,7 +209,7 @@ def test_a_run_started_after_an_abort_is_unaffected() -> None:
         opened.abort()
         result = pool.optimize(_CONFIG, _INITIAL, _sphere)
 
-    assert result.exit_code == ExitCode.OPTIMIZER_FINISHED
+    assert result.exit_reason == ExitReason.FINISHED
 
 
 @pytest.mark.timeout(60)
@@ -228,7 +228,7 @@ def test_an_abort_does_not_reach_another_session() -> None:
         # An abort is not a release: the aborted session's pool still runs.
         assert aborted_pool.optimize(_CONFIG, _INITIAL, _sphere).results is not None
 
-    assert result.exit_code == ExitCode.OPTIMIZER_FINISHED
+    assert result.exit_reason == ExitReason.FINISHED
 
 
 def _run_beside_a_failure(
@@ -274,13 +274,13 @@ def _run_beside_a_failure(
 @pytest.mark.timeout(60)
 def test_a_failing_run_aborts_the_others_on_its_session() -> None:
     result = _run_beside_a_failure(keep_going=None)
-    assert result.exit_code == ExitCode.ABORTED_ON_ERROR
+    assert result.exit_reason == ExitReason.ABORTED_ON_ERROR
 
 
 @pytest.mark.timeout(60)
 def test_keep_going_lets_a_run_finish_when_another_fails() -> None:
     result = _run_beside_a_failure(keep_going=True)
-    assert result.exit_code == ExitCode.OPTIMIZER_FINISHED
+    assert result.exit_reason == ExitReason.FINISHED
 
 
 @pytest.mark.timeout(60)
@@ -288,7 +288,7 @@ def test_a_failing_run_that_keeps_going_still_aborts_the_others() -> None:
     # The flag exempts a run from being aborted, never from aborting the rest:
     # a run that may outlive a failure must not be able to hide its own.
     result = _run_beside_a_failure(keep_going=None, failure_keeps_going=True)
-    assert result.exit_code == ExitCode.ABORTED_ON_ERROR
+    assert result.exit_reason == ExitReason.ABORTED_ON_ERROR
 
 
 @pytest.mark.timeout(60)
@@ -314,7 +314,7 @@ def test_a_run_takes_keep_going_from_its_session() -> None:
             release.set()
             driver.join(timeout=30)
 
-    assert outcome[0].exit_code == ExitCode.OPTIMIZER_FINISHED
+    assert outcome[0].exit_reason == ExitReason.FINISHED
 
 
 @pytest.mark.timeout(60)
@@ -345,7 +345,7 @@ def test_keep_going_on_a_run_overrides_its_session() -> None:
             release.set()
             driver.join(timeout=30)
 
-    assert outcome[0].exit_code == ExitCode.ABORTED_ON_ERROR
+    assert outcome[0].exit_reason == ExitReason.ABORTED_ON_ERROR
 
 
 @pytest.mark.timeout(60)
@@ -376,4 +376,4 @@ def test_session_abort_reaches_a_run_that_keeps_going() -> None:
         release.set()
         driver.join(timeout=30)
 
-    assert outcome[0].exit_code == ExitCode.ABORTED
+    assert outcome[0].exit_reason == ExitReason.ABORTED

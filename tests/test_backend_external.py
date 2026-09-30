@@ -30,7 +30,7 @@ from ropt.backend.external import (
 from ropt.backend.scipy import SciPyBackend
 from ropt.config import BackendConfig
 from ropt.context import EnOptContext
-from ropt.enums import ExitCode
+from ropt.enums import ExitReason
 from ropt.exceptions import ExecutionError, OptimizerStop
 from ropt.plugins import get_plugin, get_plugin_name, register_plugin
 from ropt.simple import optimize
@@ -73,11 +73,11 @@ def _make_child_args() -> bytes:
     )
 
 
-def test_child_abort_forwards_exit_code(
+def test_child_abort_forwards_exit_reason(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     def _raise_abort(_self: SciPyBackend, *_args: Any, **_kwargs: Any) -> None:
-        raise OptimizerStop(ExitCode.MAX_FUNCTIONS_REACHED)
+        raise OptimizerStop(ExitReason.MAX_FUNCTIONS_REACHED)
 
     monkeypatch.setattr(SciPyBackend, "start", _raise_abort)
 
@@ -91,7 +91,7 @@ def test_child_abort_forwards_exit_code(
     sentinel = request_queue.get(timeout=5)
 
     assert abort_msg["stop"] is True
-    assert abort_msg["exit_code"] == ExitCode.MAX_FUNCTIONS_REACHED
+    assert abort_msg["exit_reason"] == ExitReason.MAX_FUNCTIONS_REACHED
     assert sentinel is None
 
 

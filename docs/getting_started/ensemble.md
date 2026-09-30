@@ -112,8 +112,8 @@ robust objective, which is what it optimizes.
 --8<-- "examples/simple/ensemble.py:result"
 ```
 
-- `result.exit_code` indicates why the run stopped (a member of the
-  [`ExitCode`][ropt.enums.ExitCode] enumeration).
+- `result.exit_reason` indicates why the run stopped (a member of the
+  [`ExitReason`][ropt.enums.ExitReason] enumeration).
 - `result.results` is the best evaluation the run reached, a
   [`FunctionResults`][ropt.results.FunctionResults] carrying every value that
   evaluation produced — the same object a handler receives. It is `None` if the

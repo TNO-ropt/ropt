@@ -5,8 +5,9 @@ directly, for example `from ropt.simple import optimize, session`. See
 [Running Optimizations](../running/running.md) for a walkthrough.
 
 Enumerations used in the configuration and results (for example
-[`ExitCode`][ropt.enums.ExitCode] and [`VariableType`][ropt.enums.VariableType])
-are not re-exported here; import them from [`ropt.enums`][ropt.enums].
+[`ExitReason`][ropt.enums.ExitReason] and
+[`VariableType`][ropt.enums.VariableType]) are not re-exported here; import them
+from [`ropt.enums`][ropt.enums].
 
 Nothing about a run depends on where it is called from. What it is started on
 says where its evaluations happen and which session it belongs to: a module

@@ -6,7 +6,7 @@ import contextlib
 import threading
 from typing import TYPE_CHECKING
 
-from ropt.enums import ExitCode
+from ropt.enums import ExitReason
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -33,36 +33,36 @@ class StopSignal:
         self._lock = threading.Lock()
         self._stopping = False
         self._callbacks: list[Callable[[], None]] = []
-        self._exit_code = ExitCode.ABORTED
+        self._exit_reason = ExitReason.ABORTED
 
-    def stop(self, exit_code: ExitCode = ExitCode.ABORTED) -> None:
+    def stop(self, exit_reason: ExitReason = ExitReason.ABORTED) -> None:
         """Request that everything observing this signal stops.
 
         Calling this more than once has no further effect: the first call
-        decides the exit code, so a later stop for another reason cannot
+        decides the exit reason, so a later stop for another reason cannot
         overwrite the reason a run is already stopping for.
 
         Args:
-            exit_code: The code the steps stopping on this signal end with.
+            exit_reason: The reason the steps stopping on this signal end with.
         """
         with self._lock:
             if self._stopping:
                 return
-            self._exit_code = exit_code
+            self._exit_reason = exit_reason
             self._stopping = True
             callbacks = list(self._callbacks)
         for callback in callbacks:
             callback()
 
     @property
-    def exit_code(self) -> ExitCode:
-        """The exit code a step stopping on this signal ends with.
+    def exit_reason(self) -> ExitReason:
+        """The reason a step stopping on this signal ends with.
 
         Returns:
-            The code passed to the first `stop` call.
+            The reason passed to the first `stop` call.
         """
         with self._lock:
-            return self._exit_code
+            return self._exit_reason
 
     @property
     def stopping(self) -> bool:

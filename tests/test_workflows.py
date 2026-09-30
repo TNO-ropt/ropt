@@ -24,7 +24,7 @@ from ropt.components.event_handlers import (
     ResultsHandler,
 )
 from ropt.context import EnOptContext
-from ropt.enums import EnOptEventType, ExitCode
+from ropt.enums import EnOptEventType, ExitReason
 from ropt.evaluation import EvaluationBatchContext, EvaluationBatchResult
 from ropt.exceptions import OptimizerStop, WorkflowError
 from ropt.results import FunctionResults
@@ -619,15 +619,15 @@ def test_results_handler_result_property_returns_selected_result(
 @pytest.mark.parametrize(
     ("max_criterion", "max_enum"),
     [
-        ("max_functions", ExitCode.MAX_FUNCTIONS_REACHED),
-        ("max_batches", ExitCode.MAX_BATCHES_REACHED),
+        ("max_functions", ExitReason.MAX_FUNCTIONS_REACHED),
+        ("max_batches", ExitReason.MAX_BATCHES_REACHED),
     ],
 )
-def test_exit_code(
+def test_exit_reason(
     config: dict[str, Any],
     evaluator: Any,
     max_criterion: str,
-    max_enum: ExitCode,
+    max_enum: ExitReason,
 ) -> None:
     config["gradient"] = {"evaluation_policy": "speculative"}
     match max_criterion:
@@ -637,10 +637,10 @@ def test_exit_code(
             config["optimizer"]["max_batches"] = 4
 
     step = OptimizationStep(evaluator=evaluator())
-    exit_code = step.run(
+    exit_reason = step.run(
         variables=initial_values, context=EnOptContext.model_validate(config)
     )
-    assert exit_code == max_enum
+    assert exit_reason == max_enum
 
 
 def test_nested_optimization(
@@ -703,7 +703,7 @@ def test_optimization_abort(config: Any, evaluator: Any) -> None:
 
         last_evaluation += 1
         if last_evaluation == 1:
-            raise OptimizerStop(ExitCode.STOPPED)
+            raise OptimizerStop(ExitReason.STOPPED)
 
     result_handler = ResultsHandler()
     step = OptimizationStep(evaluator=evaluator())
@@ -713,11 +713,11 @@ def test_optimization_abort(config: Any, evaluator: Any) -> None:
             event_types={EnOptEventType.FINISHED_EVALUATION}, callback=_observer
         )
     )
-    exit_code = step.run(
+    exit_reason = step.run(
         variables=initial_values, context=EnOptContext.model_validate(config)
     )
     assert result_handler["results"] is not None
-    assert exit_code == ExitCode.STOPPED
+    assert exit_reason == ExitReason.STOPPED
     assert last_evaluation == 1
 
 
@@ -738,10 +738,10 @@ def test_handler_stop_ends_with_stopped(config: Any, evaluator: Any) -> None:
             event_types={EnOptEventType.FINISHED_EVALUATION}, callback=_observer
         )
     )
-    exit_code = step.run(
+    exit_reason = step.run(
         variables=initial_values, context=EnOptContext.model_validate(config)
     )
-    assert exit_code == ExitCode.STOPPED
+    assert exit_reason == ExitReason.STOPPED
     assert evaluations == 1
 
 
@@ -771,10 +771,10 @@ def test_handler_stop_runs_remaining_handlers(config: Any, evaluator: Any) -> No
             event_types={EnOptEventType.FINISHED_EVALUATION}, callback=_later
         )
     )
-    exit_code = step.run(
+    exit_reason = step.run(
         variables=initial_values, context=EnOptContext.model_validate(config)
     )
-    assert exit_code == ExitCode.STOPPED
+    assert exit_reason == ExitReason.STOPPED
     assert stops == 1
     assert later_ran == 1
 
@@ -802,8 +802,8 @@ def test_stop_request_cleared_between_runs(config: Any, evaluator: Any) -> None:
     second = step.run(
         variables=initial_values, context=EnOptContext.model_validate(config)
     )
-    assert first == ExitCode.STOPPED
-    assert second != ExitCode.STOPPED
+    assert first == ExitReason.STOPPED
+    assert second != ExitReason.STOPPED
 
 
 def test_stop_signal_aborts_every_step_that_observes_it(
@@ -814,11 +814,11 @@ def test_stop_signal_aborts_every_step_that_observes_it(
         OptimizationStep(evaluator=evaluator(), stop_signal=signal) for _ in range(2)
     ]
     signal.stop()
-    exit_codes = [
+    exit_reasons = [
         step.run(variables=initial_values, context=EnOptContext.model_validate(config))
         for step in steps
     ]
-    assert exit_codes == [ExitCode.ABORTED, ExitCode.ABORTED]
+    assert exit_reasons == [ExitReason.ABORTED, ExitReason.ABORTED]
 
 
 def test_stop_signal_is_not_cleared_by_a_new_run(config: Any, evaluator: Any) -> None:
@@ -834,30 +834,30 @@ def test_stop_signal_is_not_cleared_by_a_new_run(config: Any, evaluator: Any) ->
     third = step.run(
         variables=initial_values, context=EnOptContext.model_validate(config)
     )
-    assert first != ExitCode.ABORTED
-    assert second == ExitCode.ABORTED
-    assert third == ExitCode.ABORTED
+    assert first != ExitReason.ABORTED
+    assert second == ExitReason.ABORTED
+    assert third == ExitReason.ABORTED
 
 
-def test_stop_signal_carries_the_exit_code_its_steps_end_with(
+def test_stop_signal_carries_the_exit_reason_its_steps_end_with(
     config: Any, evaluator: Any
 ) -> None:
     signal = StopSignal()
     step = OptimizationStep(evaluator=evaluator(), stop_signal=signal)
-    signal.stop(ExitCode.ABORTED_ON_ERROR)
-    exit_code = step.run(
+    signal.stop(ExitReason.ABORTED_ON_ERROR)
+    exit_reason = step.run(
         variables=initial_values, context=EnOptContext.model_validate(config)
     )
-    assert exit_code == ExitCode.ABORTED_ON_ERROR
+    assert exit_reason == ExitReason.ABORTED_ON_ERROR
 
 
-def test_stop_signal_keeps_the_exit_code_of_the_first_stop() -> None:
+def test_stop_signal_keeps_the_exit_reason_of_the_first_stop() -> None:
     # The reason a run is already stopping for is not overwritten by a later
     # stop for another reason.
     signal = StopSignal()
-    signal.stop(ExitCode.ABORTED_ON_ERROR)
-    signal.stop(ExitCode.ABORTED)
-    assert signal.exit_code == ExitCode.ABORTED_ON_ERROR
+    signal.stop(ExitReason.ABORTED_ON_ERROR)
+    signal.stop(ExitReason.ABORTED)
+    assert signal.exit_reason == ExitReason.ABORTED_ON_ERROR
 
 
 def test_stop_signal_runs_a_late_callback_at_once() -> None:

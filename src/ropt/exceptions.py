@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
-    from ropt.enums import ExitCode
+    from ropt.enums import ExitReason
     from ropt.simple import OptimizationResult
 
 
@@ -60,7 +60,7 @@ class RunsFailedError(RoptError):
     went wrong.
 
     The runs that did not fail were cut off when this one did and ended with
-    `ExitCode.ABORTED_ON_ERROR`, unless they were started with
+    `ExitReason.ABORTED_ON_ERROR`, unless they were started with
     `keep_going=True`. Each kept whatever its completed batches had produced;
     one cut off during its first batch has no result.
 
@@ -86,20 +86,20 @@ class RunsFailedError(RoptError):
 
 
 class OptimizerStop(Exception):  # ruff: ignore[error-suffix-on-exception-name]
-    """Raised internally to stop an optimization with a specific exit code.
+    """Raised internally to stop an optimization with a specific exit reason.
 
     Used only within the optimizer core to unwind the backend optimization loop
     (for example when a function or batch budget is reached). It carries the
-    [`ExitCode`][ropt.enums.ExitCode] the optimization terminates with.
+    [`ExitReason`][ropt.enums.ExitReason] the optimization terminates with.
     """
 
-    def __init__(self, exit_code: ExitCode) -> None:
+    def __init__(self, exit_reason: ExitReason) -> None:
         """Initialize the OptimizerStop exception.
 
         Args:
-            exit_code: The exit code the optimization terminates with.
+            exit_reason: The reason the optimization terminates with.
         """
-        self.exit_code = exit_code
+        self.exit_reason = exit_reason
         super().__init__()
 
 

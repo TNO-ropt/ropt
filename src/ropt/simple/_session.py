@@ -21,7 +21,7 @@ from ropt.components.executors import (
     ProcessExecutor,
     ThreadExecutor,
 )
-from ropt.enums import ExitCode
+from ropt.enums import ExitReason
 from ropt.exceptions import WorkflowError
 
 from ._evaluate import _evaluate, _evaluate_batch
@@ -118,10 +118,10 @@ class Session:
     def abort(self) -> None:
         """Cut off the runs that belong to this session.
 
-        Each ends with `ExitCode.ABORTED`. Nothing about the state of an
+        Each ends with `ExitReason.ABORTED`. Nothing about the state of an
         optimization is consulted, so what comes back is whatever the run had
         got to and not a point it chose to stop at; a handler's own criterion
-        ends a run with `ExitCode.STOPPED` instead.
+        ends a run with `ExitReason.STOPPED` instead.
 
         The evaluation batch in flight is abandoned rather than waited for, so a
         run keeps only what earlier batches produced. A run aborted during its
@@ -153,7 +153,7 @@ class Session:
                 signal for signal, keep_going in self._signals.items() if not keep_going
             ]
         for signal in signals:
-            signal.stop(ExitCode.ABORTED_ON_ERROR)
+            signal.stop(ExitReason.ABORTED_ON_ERROR)
 
     def _resolve_keep_going(self, *, keep_going: bool | None) -> bool:
         return self._keep_going if keep_going is None else keep_going

@@ -74,7 +74,7 @@ def _optimize(  # ruff: ignore[too-many-arguments]
         keep_going=session._resolve_keep_going(keep_going=keep_going),  # ruff: ignore[private-member-access]
     )
     try:
-        exit_code = step.run(
+        exit_reason = step.run(
             context=context,
             variables=np.asarray(x0, dtype=np.float64),
             metadata=metadata,
@@ -86,7 +86,7 @@ def _optimize(  # ruff: ignore[too-many-arguments]
         session._deregister(signal)  # ruff: ignore[private-member-access]
     results = result_handler["results"]
     return OptimizationResult(
-        exit_code=exit_code,
+        exit_reason=exit_reason,
         results=None if results is None or results.functions is None else results,
     )
 

@@ -16,7 +16,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from ropt.enums import ExitCode
+from ropt.enums import ExitReason
 from ropt.simple import optimize
 
 if TYPE_CHECKING:
@@ -77,8 +77,8 @@ def main() -> None:
     """Run until the callback calls a halt, then read the best point found."""
     result = optimize(CONFIG, INITIAL_VALUES, objective, report=stop_after_max_results)
 
-    print(f"exit_code={result.exit_code.name} after {_seen} results")
-    assert result.exit_code == ExitCode.STOPPED
+    print(f"exit_reason={result.exit_reason.name} after {_seen} results")
+    assert result.exit_reason == ExitReason.STOPPED
     assert _seen == MAX_RESULTS
 
     # Stopping keeps what the run had already found.

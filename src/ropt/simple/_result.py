@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from ropt.enums import ExitCode
+    from ropt.enums import ExitReason
     from ropt.results import FunctionResults
 
 
@@ -19,9 +19,9 @@ class OptimizationResult:
     [Running Optimizations](../running/running.md) for a walkthrough.
 
     Attributes:
-        exit_code: The exit code describing how the optimization terminated.
-        results:   The best evaluation, or `None` if there was no valid result.
+        exit_reason: Why the optimization terminated.
+        results:     The best evaluation, or `None` if there was no valid result.
     """
 
-    exit_code: ExitCode
+    exit_reason: ExitReason
     results: FunctionResults | None

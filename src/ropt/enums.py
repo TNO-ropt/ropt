@@ -103,15 +103,15 @@ class EnOptEventType(IntEnum):
     [`EvaluationStep`][ropt.components.compute_steps.EvaluationStep] finishes."""
 
 
-class ExitCode(IntEnum):
-    """Enumerates the reasons for terminating an optimization.
+class ExitReason(IntEnum):
+    """Enumerates the reasons a run ends.
 
-    A run either **stops** or is **aborted**. It stops when a condition on the
-    optimization is met — the optimizer converged, a budget ran out, a handler
-    decided the results were good enough — so it ends at a point someone
-    declared acceptable. It is aborted when something cuts it off without
-    consulting the optimization at all, and the result is then whatever it had
-    reached, not a considered endpoint.
+    A run is an optimization or a single evaluation. It either **stops** or is
+    **aborted**. It stops when a condition on the run is met — the optimizer
+    converged, a budget ran out, a handler decided the results were good enough
+    — so it ends at a point someone declared acceptable. It is aborted when
+    something cuts it off without consulting the run at all, and the result is
+    then whatever it had reached, not a considered endpoint.
     """
 
     UNKNOWN = 0
@@ -133,8 +133,8 @@ class ExitCode(IntEnum):
     supplied. The `report` callback of `ropt.simple` is such a handler.
     """
 
-    OPTIMIZER_FINISHED = 5
-    """Returned when an optimization step terminates normally."""
+    FINISHED = 5
+    """Returned when the run terminated normally."""
 
     EXECUTOR_SHUT_DOWN = 6
     """Returned when the executor could no longer run the evaluation.
@@ -148,7 +148,7 @@ class ExitCode(IntEnum):
     ABORTED = 7
     """Returned when the run was cut off through a
     [`StopSignal`][ropt.components.concurrency.StopSignal], without regard to
-    where the optimization had got to."""
+    where it had got to."""
 
     ABORTED_ON_ERROR = 8
     """Returned when another run this one shares a session with raised."""
