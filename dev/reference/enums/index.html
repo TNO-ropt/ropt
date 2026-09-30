@@ -3059,10 +3059,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.enums.ExitCode.USER_ABORT" class="md-nav__link">
+  <a href="#ropt.enums.ExitCode.STOPPED" class="md-nav__link">
     <span class="md-ellipsis">
       
-        USER_ABORT
+        STOPPED
       
     </span>
   </a>
@@ -3081,10 +3081,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.enums.ExitCode.EXECUTOR_STOPPED" class="md-nav__link">
+  <a href="#ropt.enums.ExitCode.EXECUTOR_SHUT_DOWN" class="md-nav__link">
     <span class="md-ellipsis">
       
-        EXECUTOR_STOPPED
+        EXECUTOR_SHUT_DOWN
       
     </span>
   </a>
@@ -3092,10 +3092,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.enums.ExitCode.CANCELLED" class="md-nav__link">
+  <a href="#ropt.enums.ExitCode.ABORTED" class="md-nav__link">
     <span class="md-ellipsis">
       
-        CANCELLED
+        ABORTED
       
     </span>
   </a>
@@ -3103,21 +3103,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.enums.ExitCode.FAILED" class="md-nav__link">
+  <a href="#ropt.enums.ExitCode.ABORTED_ON_ERROR" class="md-nav__link">
     <span class="md-ellipsis">
       
-        FAILED
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.enums.ExitCode.FAILED_ELSEWHERE" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        FAILED_ELSEWHERE
+        ABORTED_ON_ERROR
       
     </span>
   </a>
@@ -3567,10 +3556,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.enums.ExitCode.USER_ABORT" class="md-nav__link">
+  <a href="#ropt.enums.ExitCode.STOPPED" class="md-nav__link">
     <span class="md-ellipsis">
       
-        USER_ABORT
+        STOPPED
       
     </span>
   </a>
@@ -3589,10 +3578,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.enums.ExitCode.EXECUTOR_STOPPED" class="md-nav__link">
+  <a href="#ropt.enums.ExitCode.EXECUTOR_SHUT_DOWN" class="md-nav__link">
     <span class="md-ellipsis">
       
-        EXECUTOR_STOPPED
+        EXECUTOR_SHUT_DOWN
       
     </span>
   </a>
@@ -3600,10 +3589,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.enums.ExitCode.CANCELLED" class="md-nav__link">
+  <a href="#ropt.enums.ExitCode.ABORTED" class="md-nav__link">
     <span class="md-ellipsis">
       
-        CANCELLED
+        ABORTED
       
     </span>
   </a>
@@ -3611,21 +3600,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.enums.ExitCode.FAILED" class="md-nav__link">
+  <a href="#ropt.enums.ExitCode.ABORTED_ON_ERROR" class="md-nav__link">
     <span class="md-ellipsis">
       
-        FAILED
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.enums.ExitCode.FAILED_ELSEWHERE" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        FAILED_ELSEWHERE
+        ABORTED_ON_ERROR
       
     </span>
   </a>
@@ -4403,6 +4381,12 @@ description of when each event type fires and what data it carries.</p>
 
 
         <p>Enumerates the reasons for terminating an optimization.</p>
+<p>A run either <strong>stops</strong> or is <strong>aborted</strong>. It stops when a condition on the
+optimization is met — the optimizer converged, a budget ran out, a handler
+decided the results were good enough — so it ends at a point someone
+declared acceptable. It is aborted when something cuts it off without
+consulting the optimization at all, and the result is then whatever it had
+reached, not a considered endpoint.</p>
 
 
 
@@ -4546,8 +4530,8 @@ description of when each event type fires and what data it carries.</p>
 
 
 
-<h4 id="ropt.enums.ExitCode.USER_ABORT" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">USER_ABORT</span>
+<h4 id="ropt.enums.ExitCode.STOPPED" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">STOPPED</span>
 
 
   <span class="doc doc-labels">
@@ -4556,12 +4540,14 @@ description of when each event type fires and what data it carries.</p>
   </span>
 
 </h4>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">USER_ABORT</span> <span class="o">=</span> <span class="mi">4</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">STOPPED</span> <span class="o">=</span> <span class="mi">4</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
 
-        <p>Returned when the optimization is aborted by the user.</p>
+        <p>Returned when an event handler asked the run to stop.</p>
+<p>A graceful end at an evaluation boundary, on a criterion the caller
+supplied. The <code>report</code> callback of <code>ropt.simple</code> is such a handler.</p>
 
     </div>
 
@@ -4606,8 +4592,8 @@ description of when each event type fires and what data it carries.</p>
 
 
 
-<h4 id="ropt.enums.ExitCode.EXECUTOR_STOPPED" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">EXECUTOR_STOPPED</span>
+<h4 id="ropt.enums.ExitCode.EXECUTOR_SHUT_DOWN" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">EXECUTOR_SHUT_DOWN</span>
 
 
   <span class="doc doc-labels">
@@ -4616,12 +4602,16 @@ description of when each event type fires and what data it carries.</p>
   </span>
 
 </h4>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">EXECUTOR_STOPPED</span> <span class="o">=</span> <span class="mi">6</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">EXECUTOR_SHUT_DOWN</span> <span class="o">=</span> <span class="mi">6</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
 
         <p>Returned when the executor could no longer run the evaluation.</p>
+<p>Not a failure: in practice the interpreter was shutting down and the worker
+pool was gone, so the run is released rather than left waiting. An executor
+that breaks raises <a class="autorefs autorefs-internal" title="            ExecutionError" href="../exceptions/#ropt.exceptions.ExecutionError"><code>ExecutionError</code></a>
+instead.</p>
 
     </div>
 
@@ -4636,8 +4626,8 @@ description of when each event type fires and what data it carries.</p>
 
 
 
-<h4 id="ropt.enums.ExitCode.CANCELLED" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">CANCELLED</span>
+<h4 id="ropt.enums.ExitCode.ABORTED" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">ABORTED</span>
 
 
   <span class="doc doc-labels">
@@ -4646,13 +4636,14 @@ description of when each event type fires and what data it carries.</p>
   </span>
 
 </h4>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">CANCELLED</span> <span class="o">=</span> <span class="mi">7</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">ABORTED</span> <span class="o">=</span> <span class="mi">7</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
 
-        <p>Returned when the run was stopped through a
-<a class="autorefs autorefs-internal" title="            ropt.components.concurrency.StopSignal" href="../components_utils/#ropt.components.concurrency.StopSignal"><code>StopSignal</code></a>.</p>
+        <p>Returned when the run was cut off through a
+<a class="autorefs autorefs-internal" title="            ropt.components.concurrency.StopSignal" href="../components_utils/#ropt.components.concurrency.StopSignal"><code>StopSignal</code></a>, without regard to
+where the optimization had got to.</p>
 
     </div>
 
@@ -4667,8 +4658,8 @@ description of when each event type fires and what data it carries.</p>
 
 
 
-<h4 id="ropt.enums.ExitCode.FAILED" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">FAILED</span>
+<h4 id="ropt.enums.ExitCode.ABORTED_ON_ERROR" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">ABORTED_ON_ERROR</span>
 
 
   <span class="doc doc-labels">
@@ -4677,42 +4668,12 @@ description of when each event type fires and what data it carries.</p>
   </span>
 
 </h4>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">FAILED</span> <span class="o">=</span> <span class="mi">8</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">ABORTED_ON_ERROR</span> <span class="o">=</span> <span class="mi">8</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
 
-        <p>Returned when the run raised an exception.</p>
-
-    </div>
-
-</div>
-
-
-
-
-
-
-<div class="doc doc-object doc-attribute">
-
-
-
-<h4 id="ropt.enums.ExitCode.FAILED_ELSEWHERE" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">FAILED_ELSEWHERE</span>
-
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
-      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
-  </span>
-
-</h4>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">FAILED_ELSEWHERE</span> <span class="o">=</span> <span class="mi">9</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Returned when another run this one shares a session with failed.</p>
+        <p>Returned when another run this one shares a session with raised.</p>
 
     </div>
 

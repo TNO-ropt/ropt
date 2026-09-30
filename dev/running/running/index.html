@@ -875,7 +875,7 @@
   <a href="#stopping-from-outside" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Stopping from outside the run
+        Aborting a run from outside
       
     </span>
   </a>
@@ -2988,7 +2988,7 @@
   <a href="#stopping-from-outside" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Stopping from outside the run
+        Aborting a run from outside
       
     </span>
   </a>
@@ -3211,7 +3211,7 @@ optimizer chose it, so this is how you follow the path a run takes.</p>
 <h3 id="stopping-early-from-the-callback">Stopping early from the callback</h3>
 <p>The <code>report</code> callback doubles as a <strong>user-defined stopping criterion</strong>: return
 <code>True</code> and the optimization stops gracefully after the current evaluation, with
-exit code <code>USER_ABORT</code>. Any other return value (including <code>None</code>) lets it
+exit code <code>STOPPED</code>. Any other return value (including <code>None</code>) lets it
 continue.</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.enums</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExitCode</span>
 </span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
@@ -3223,7 +3223,7 @@ continue.</p>
 </span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>
 </span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>
 </span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">report</span><span class="o">=</span><span class="n">report</span><span class="p">)</span>
-</span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="k">assert</span> <span class="n">result</span><span class="o">.</span><span class="n">exit_code</span> <span class="ow">is</span> <span class="n">ExitCode</span><span class="o">.</span><span class="n">USER_ABORT</span>
+</span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="k">assert</span> <span class="n">result</span><span class="o">.</span><span class="n">exit_code</span> <span class="ow">is</span> <span class="n">ExitCode</span><span class="o">.</span><span class="n">STOPPED</span>
 </span></code></pre></div>
 <p>With <a href="../parallel/#many-optimizations-at-once"><code>optimize_many</code></a> this stops only the run
 whose callback returned <code>True</code>; the other runs continue.</p>
@@ -3238,30 +3238,33 @@ it had reached.</p>
 there the return value is <strong>ignored</strong>. An evaluation is a single batch with
 no optimizer loop to interrupt, so the callback reports and nothing more.</p>
 </div>
-<h3 id="stopping-from-outside">Stopping from outside the run</h3>
+<h3 id="stopping-from-outside">Aborting a run from outside</h3>
 <p>The <code>report</code> callback runs inside the run it stops, which is no use to a signal
-handler or a user interface. <a class="autorefs autorefs-internal" title="            stop" href="../../reference/simple/#ropt.simple.Session.stop"><code>Session.stop</code></a> is the
-one that is called from another thread: it stops every run that is using the
-session's pools, and each ends with <code>CANCELLED</code>, keeping the best result it had
+handler or a user interface. <a class="autorefs autorefs-internal" title="            abort" href="../../reference/simple/#ropt.simple.Session.abort"><code>Session.abort</code></a> is
+the one that is called from another thread: it cuts off every run that belongs
+to the session, and each ends with <code>ABORTED</code>, keeping the best result it had
 reached.</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
 </span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>    <span class="n">pool</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">thread_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>    <span class="n">signal</span><span class="o">.</span><span class="n">signal</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">SIGINT</span><span class="p">,</span> <span class="k">lambda</span> <span class="o">*</span><span class="n">_</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">stop</span><span class="p">())</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>    <span class="n">signal</span><span class="o">.</span><span class="n">signal</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">SIGINT</span><span class="p">,</span> <span class="k">lambda</span> <span class="o">*</span><span class="n">_</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">abort</span><span class="p">())</span>
 </span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>
 </span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>
-</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">exit_code</span> <span class="ow">is</span> <span class="n">ExitCode</span><span class="o">.</span><span class="n">CANCELLED</span><span class="p">:</span>
-</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>    <span class="nb">print</span><span class="p">(</span><span class="s2">"stopped early, best so far:"</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">results</span><span class="p">)</span>
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">exit_code</span> <span class="ow">is</span> <span class="n">ExitCode</span><span class="o">.</span><span class="n">ABORTED</span><span class="p">:</span>
+</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>    <span class="nb">print</span><span class="p">(</span><span class="s2">"cut off early, best so far:"</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">results</span><span class="p">)</span>
 </span></code></pre></div>
-<p>A run stops at its next evaluation boundary, so the evaluations already in
+<p>The two are not the same kind of ending, which is why they have different exit
+codes. A <code>report</code> callback stops the run <em>on a criterion</em>, at a point it chose.
+Aborting consults nothing: the result is whatever the run had reached.</p>
+<p>A run is cut off at its next evaluation boundary, so the evaluations already in
 flight are still carried out and their workers are free only once they return.</p>
-<p><code>stop()</code> reaches the runs that are registered at the moment of the call, and
+<p><code>abort()</code> reaches the runs that are registered at the moment of the call, and
 nothing more: it is not a latch. A run started afterwards is unaffected, so a
-loop that stops one attempt and starts another keeps working. Leaving the
-session's <code>with</code> block stops its runs as well, and then releases its pools,
+loop that abandons one attempt and starts another keeps working. Leaving the
+session's <code>with</code> block aborts its runs as well, and then releases its pools,
 which is what refuses a run started after that.</p>
 <p>A run started with the module-level <a class="autorefs autorefs-internal" title="            ropt.simple.optimize" href="../../reference/simple/#ropt.simple.optimize"><code>optimize</code></a> belongs
-to no session you hold and cannot be stopped this way. It evaluates on the
-calling thread, which is the thread that would have to call <code>stop()</code>. Start it
+to no session you hold and cannot be aborted this way. It evaluates on the
+calling thread, which is the thread that would have to call <code>abort()</code>. Start it
 on a session or one of its pools to bring it within reach.</p>
 <h2 id="attaching-metadata">Attaching metadata</h2>
 <p>You can attach arbitrary <strong>metadata</strong> to a run, from two sources:</p>
@@ -3338,10 +3341,10 @@ which evaluates a single vector and then a matrix of them.</p>
 <p>Not every problem is an exception. An optimization that cannot make progress
 still returns normally, and indicates why in <code>result.exit_code</code>:
 <code>TOO_FEW_REALIZATIONS</code> when not enough realizations produced a value,
-<code>EXECUTOR_STOPPED</code> when the pool it was evaluating on could no longer run
+<code>EXECUTOR_SHUT_DOWN</code> when the pool it was evaluating on could no longer run
 the work, which in practice means the interpreter was shutting down under it,
-<code>CANCELLED</code> when <a href="#stopping-from-outside"><code>Session.stop</code></a> was called, and
-<code>FAILED_ELSEWHERE</code> when another run on the same session raised and brought this
+<code>ABORTED</code> when <a href="#stopping-from-outside"><code>Session.abort</code></a> was called, and
+<code>ABORTED_ON_ERROR</code> when another run on the same session raised and brought this
 one down with it (see
 <a href="../parallel/#failure-in-one-run">Failure in one run</a>).
 <code>result.results</code> is <code>None</code> when no feasible result was ever recorded, whatever

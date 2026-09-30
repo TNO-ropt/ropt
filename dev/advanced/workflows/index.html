@@ -1735,10 +1735,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#stopping-several-steps-at-once" class="md-nav__link">
+  <a href="#aborting-several-steps-at-once" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Stopping several steps at once
+        Aborting several steps at once
       
     </span>
   </a>
@@ -3087,10 +3087,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#stopping-several-steps-at-once" class="md-nav__link">
+  <a href="#aborting-several-steps-at-once" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Stopping several steps at once
+        Aborting several steps at once
       
     </span>
   </a>
@@ -3562,32 +3562,38 @@ returns nothing:</p>
 <td>Maximum number of evaluation batches was reached.</td>
 </tr>
 <tr>
-<td><code>USER_ABORT</code></td>
-<td>An event handler requested a stop via <code>event.source.stop()</code>.</td>
+<td><code>STOPPED</code></td>
+<td>An event handler asked the run to stop via <code>event.source.stop()</code>.</td>
 </tr>
 <tr>
-<td><code>CANCELLED</code></td>
+<td><code>ABORTED</code></td>
 <td>The step's <a class="autorefs autorefs-internal" title="            ropt.components.concurrency.StopSignal" href="../../reference/components_utils/#ropt.components.concurrency.StopSignal"><code>StopSignal</code></a> was set.</td>
 </tr>
 <tr>
-<td><code>FAILED_ELSEWHERE</code></td>
-<td>The step's signal was set with this code, which <code>ropt.simple</code> uses when another run failed.</td>
+<td><code>ABORTED_ON_ERROR</code></td>
+<td>The step's signal was set with this code, which <code>ropt.simple</code> uses when another run raised.</td>
 </tr>
 <tr>
-<td><code>EXECUTOR_STOPPED</code></td>
+<td><code>EXECUTOR_SHUT_DOWN</code></td>
 <td>The executor could no longer run the work, which in practice means the interpreter was shutting down.</td>
 </tr>
 </tbody>
 </table>
+<p>A run either <strong>stops</strong> or is <strong>aborted</strong>, and the exit code says which. It
+stops when a condition on the optimization is met, so it ends where someone
+decided it should; the first four codes above are all of that kind. It is
+aborted when something cuts it off without consulting the optimization, and
+what comes back is then whatever it had reached.</p>
 <p>An event handler can stop its own optimization by calling <code>event.source.stop()</code>
 — for example after inspecting the <code>results</code> of a <code>FINISHED_EVALUATION</code> event and
 deciding no further evaluations are worthwhile. The remaining handlers for that
-event still run, and the optimizer then stops with <code>USER_ABORT</code> before the next
+event still run, and the optimizer then ends with <code>STOPPED</code> before the next
 evaluation. Only the run that owns the emitting step is affected, so concurrent
 optimizations continue. <code>stop()</code> merely sets a thread-safe flag, so it is safe
 to call from a handler attached to several steps at once.</p>
-<h3 id="stopping-several-steps-at-once">Stopping several steps at once</h3>
-<p><code>stop()</code> reaches one step. To stop a set of them, construct them with the same
+<h3 id="aborting-several-steps-at-once">Aborting several steps at once</h3>
+<p><code>stop()</code> reaches one step, and only at a point that step chose. To cut a set of
+them off, construct them with the same
 <a class="autorefs autorefs-internal" title="            ropt.components.concurrency.StopSignal" href="../../reference/components_utils/#ropt.components.concurrency.StopSignal"><code>StopSignal</code></a>:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">signal</span> <span class="o">=</span> <span class="n">StopSignal</span><span class="p">()</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">steps</span> <span class="o">=</span> <span class="p">[</span><span class="n">OptimizationStep</span><span class="p">(</span><span class="n">evaluator</span><span class="o">=</span><span class="n">evaluator</span><span class="p">,</span> <span class="n">stop_signal</span><span class="o">=</span><span class="n">signal</span><span class="p">)</span> <span class="k">for</span> <span class="o">...</span><span class="p">]</span>
@@ -3595,14 +3601,12 @@ to call from a handler attached to several steps at once.</p>
 </span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="n">signal</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
 </span></code></pre></div>
 <p>A step polls its signal wherever it polls <code>stop()</code>, and ends with the code the
-signal carries, which is <code>CANCELLED</code> unless <code>stop</code> was given another one. That
-is what distinguishes it from <code>USER_ABORT</code>: the exit code names who decided,
-<code>USER_ABORT</code> the run itself and the signal's code whoever holds the signal.
-The first <code>stop</code> fixes the code, so a second one for another reason cannot
-overwrite the reason a run is already stopping for.</p>
+signal carries, which is <code>ABORTED</code> unless <code>stop</code> was given another one. The
+first <code>stop</code> fixes the code, so a second one for another reason cannot
+overwrite the reason a run is already ending for.</p>
 <p>A signal cannot be reset. <code>run()</code> clears the step's own stop request, so a step
-is reusable after a <code>USER_ABORT</code>, but a step whose signal is already stopping
-ends with <code>CANCELLED</code> at its first poll.</p>
+is reusable after a <code>STOPPED</code>, but a step whose signal is already set ends with
+<code>ABORTED</code> at its first poll.</p>
 <h2 id="event-handlers">Event handlers</h2>
 <p>Event handlers are attached to a compute step via its <code>add_event_handler</code>
 method. Once attached, the handler receives every event the step emits.</p>

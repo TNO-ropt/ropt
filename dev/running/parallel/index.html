@@ -3998,7 +3998,7 @@ unless you want the runs' reports interleaved on the terminal.</p>
 </div>
 <h3 id="failure-in-one-run">Failure in one run</h3>
 <p>A run that raises stops the other runs on its session. Each of those ends at its
-next evaluation boundary with <code>FAILED_ELSEWHERE</code>, keeping the best result it had
+next evaluation boundary with <code>ABORTED_ON_ERROR</code>, keeping the best result it had
 reached, and the exception is raised from the <code>optimize_many</code> call. This is the
 default because most runs are started from a script with nobody watching: a
 problem should end the script rather than leave the rest of the work grinding on
@@ -4015,8 +4015,9 @@ session, which a single run can still override with <code>keep_going=False</code
 <p>The flag decides only whether a run is <em>stopped</em>. A run that keeps going still
 stops the others if it fails itself, and its exception still reaches its caller,
 so opting out cannot turn a failure into silence.
-<a href="../running/#stopping-from-outside"><code>Session.stop</code></a> reaches every run whatever the
-flag says, and those end with <code>CANCELLED</code> instead: the exit code distinguishes a
+<a href="../running/#stopping-from-outside"><code>Session.abort</code></a> reaches every run whatever
+the flag says, and those end with <code>ABORTED</code> instead: the exit code distinguishes
+a
 stop that was asked for from one another run caused.</p>
 <h2 id="external-backend">Running the optimizer in a separate process</h2>
 <p>Prefix the method with <code>external/</code> to run the optimization algorithm in a
