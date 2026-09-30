@@ -122,6 +122,7 @@ nav:
   - "Results":
       - "Working with Results": results/results.md
       - "Result Handlers": results/handlers.md
+      - "Exit Reasons": results/exit_reasons.md
   - "Optimizer Setup":
       - "Key Concepts": optimizer_setup/key_concepts.md
       - "Configuration": optimizer_setup/configuration.md

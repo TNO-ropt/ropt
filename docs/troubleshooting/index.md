@@ -2,8 +2,8 @@
 
 A `ropt` run keeps going through a failed realization or an infeasible result,
 so it can end without a result to return and without raising an error. Check
-`exit_reason` before using what comes back. This page collects the behaviours
-that most often cause confusion.
+[`exit_reason`](../results/exit_reasons.md) before using what comes back. This
+page collects the behaviours that most often cause confusion.
 
 Skim it once to know what is here, then come back with a symptom and read the
 table of the section it belongs to.

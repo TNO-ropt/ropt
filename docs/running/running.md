@@ -303,25 +303,17 @@ which evaluates a single vector and then a matrix of them.
 ## When something goes wrong
 
 Not every problem is an exception. An optimization that cannot make progress
-still returns normally, and indicates why in `result.exit_reason`:
-`TOO_FEW_REALIZATIONS` when not enough realizations produced a value,
-`EXECUTOR_SHUT_DOWN` when the pool it was evaluating on could no longer run
-the work, which in practice means the interpreter was shutting down under it,
-`ABORTED` when [`Session.abort`](#stopping-from-outside) was called, and
-`ABORTED_ON_ERROR` when another run on the same session raised and brought this
-one down with it (see
+still returns normally, and indicates why in `result.exit_reason` —
+`TOO_FEW_REALIZATIONS` when not enough realizations produced a value, for
+instance, or `ABORTED_ON_ERROR` when another run on the same session raised and
+brought this one down with it (see
 [Failure in one run](parallel.md#failure-in-one-run)).
-`result.results` is `None` when no feasible result was ever recorded, whatever
-the reason the run ended; a run that fails part-way still returns the best
-result it had reached before that.
-
-A run can also end with `FINISHED` and still leave those fields
-`None`. Only a result that satisfies every constraint to within
-`constraint_tolerance` can be returned as the best one, and that tolerance —
-`1e-10` unless you pass another — applies to the bounds and the linear
-constraints as well as the nonlinear ones. A run that never reaches a feasible
-point therefore has no best result to return, although the evaluations it did
-make still reach the [handlers](../results/handlers.md) attached to it.
+[Exit Reasons](../results/exit_reasons.md) lists them all, and explains why a
+reason and a result are independent: `result.results` is `None` when no feasible
+result was ever recorded, whatever the reason the run ended, and a run that fails
+part-way still returns the best result it had reached before that. The
+evaluations it did make reach the [handlers](../results/handlers.md) attached to
+it either way.
 
 What *is* raised falls into three groups:
 

@@ -195,32 +195,19 @@ The [`OptimizationStep`][ropt.components.compute_steps.OptimizationStep]'s
 `run()` method returns an [`ExitReason`][ropt.enums.ExitReason] indicating why
 the optimizer finished; the
 [`EvaluationStep`][ropt.components.compute_steps.EvaluationStep]'s `run()`
-returns nothing:
+returns nothing, and a caller that needs to know whether it was cut off reads
+its [`AbortSignal`][ropt.components.concurrency.AbortSignal]. What each reason
+means is listed under [Exit Reasons](../results/exit_reasons.md).
 
-| Exit reason                  | Meaning                                                       |
-| ---------------------------- | ------------------------------------------------------------- |
-| `FINISHED`                   | The optimizer terminated normally.                            |
-| `TOO_FEW_REALIZATIONS`       | Too few realizations were evaluated successfully.             |
-| `MAX_FUNCTIONS_REACHED`      | Maximum number of function evaluations was reached.           |
-| `MAX_BATCHES_REACHED`        | Maximum number of evaluation batches was reached.             |
-| `STOPPED`                    | An event handler asked the run to stop via `event.source.stop()`. |
-| `ABORTED`                    | The step's [`AbortSignal`][ropt.components.concurrency.AbortSignal] was set. |
-| `ABORTED_ON_ERROR`           | The step's signal was set with this reason, which `ropt.simple` uses when another run raised. |
-| `EXECUTOR_SHUT_DOWN`         | The executor could no longer run the work, which in practice means the interpreter was shutting down. |
-
-A run either **stops** or is **aborted**, and the exit reason says which. It
-stops when a condition on the optimization is met, so it ends where someone
-decided it should; the first four reasons above are all of that kind. It is
-aborted when something cuts it off without consulting the optimization, and
-what comes back is then whatever it had reached.
-
-An event handler can stop its own optimization by calling `event.source.stop()`
-— for example after inspecting the `results` of a `FINISHED_EVALUATION` event and
-deciding no further evaluations are worthwhile. The remaining handlers for that
-event still run, and the optimizer then ends with `STOPPED` before the next
-evaluation. Only the run that owns the emitting step is affected, so concurrent
-optimizations continue. `stop()` merely sets a thread-safe flag, so it is safe
-to call from a handler attached to several steps at once.
+Two of them are produced here rather than by the optimizer. An event handler can
+stop its own optimization by calling `event.source.stop()` — for example after
+inspecting the `results` of a `FINISHED_EVALUATION` event and deciding no
+further evaluations are worthwhile. The remaining handlers for that event still
+run, and the optimizer then ends with `STOPPED` before the next evaluation. Only
+the run that owns the emitting step is affected, so concurrent optimizations
+continue. `stop()` merely sets a thread-safe flag, so it is safe to call from a
+handler attached to several steps at once. A step given an `AbortSignal` ends
+with `ABORTED` instead, or with whatever reason that signal was given.
 
 ### Aborting several steps at once
 
