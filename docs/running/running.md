@@ -338,7 +338,12 @@ What *is* raised falls into three groups:
 - **Exceptions from your own evaluation function** are not caught. They travel
   back from wherever the evaluation ran — including a worker thread or process
   — and are re-raised from the `optimize` call. Return `float("nan")` instead
-  if a failed realization should be tolerated rather than fatal.
+  if a failed realization should be tolerated rather than fatal. With
+  [`optimize_many`][ropt.simple.optimize_many] there is no single exception to
+  re-raise, so the call raises
+  [`RunsFailedError`][ropt.exceptions.RunsFailedError] carrying what every run
+  raised or reached; see
+  [Failure in one run](parallel.md#failure-in-one-run).
 
 Catching [`RoptError`][ropt.exceptions.RoptError] catches all of `ropt`'s own
 errors at once. It deliberately does not cover the first and third groups:

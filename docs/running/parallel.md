@@ -660,14 +660,38 @@ runs](handlers.md#sharing-a-handler-across-concurrent-runs).
 
 ### Failure in one run
 
-A run that raises stops the other runs on its session. Each of those ends at its
-next evaluation boundary with `ABORTED_ON_ERROR`, keeping the best result it had
-reached, and the exception is raised from the `optimize_many` call. This is the
-default because most runs are started from a script with nobody watching: a
-problem should end the script rather than leave the rest of the work grinding on
-towards output that will not be used.
+A run that raises aborts the other runs on its session. Each of those ends at
+its next evaluation boundary with `ABORTED_ON_ERROR`, keeping the best result it
+had reached. This is the default because most runs are started from a script
+with nobody watching: a problem should end the script rather than leave the rest
+of the work grinding on towards output that will not be used.
 
-The reach is the session, not the call, so a failure also stops runs that were
+The call then raises
+[`RunsFailedError`][ropt.exceptions.RunsFailedError]. With several runs there is
+no single exception to re-raise and no single set of results to return, so the
+error carries both. `outcomes` has one entry per run, in the order the runs were
+given, holding either that run's
+[`OptimizationResult`][ropt.simple.OptimizationResult] or the exception it
+raised:
+
+```python
+try:
+    results = pool.optimize_many(config, start_points, objective)
+except RunsFailedError as failure:
+    for index, outcome in enumerate(failure.outcomes):
+        if isinstance(outcome, Exception):
+            print(f"run {index} raised: {outcome}")
+        else:
+            print(f"run {index} ended with {outcome.exit_code.name}")
+```
+
+Without this the work the other runs did would be thrown away along with the run
+that failed, which matters more now that they are cut off deliberately. The
+first exception is chained, so a traceback still shows what went wrong, and a
+`KeyboardInterrupt` or `SystemExit` travels on untouched rather than into the
+carrier — that is the program going down, not a run reporting a problem.
+
+The reach is the session, not the call, so a failure also aborts runs that were
 started separately on the same session. A run started with the module-level
 [`optimize_many`][ropt.simple.optimize_many] has a session of its own, holding
 only the runs of that call.
@@ -681,13 +705,12 @@ results = pool.optimize_many(config, start_points, objective, keep_going=True)
 or `session(keep_going=True)` to make that the default for everything on the
 session, which a single run can still override with `keep_going=False`.
 
-The flag decides only whether a run is *stopped*. A run that keeps going still
-stops the others if it fails itself, and its exception still reaches its caller,
-so opting out cannot turn a failure into silence.
+The flag decides only whether a run is *aborted*. A run that keeps going still
+aborts the others if it fails itself, and its exception still reaches its
+caller, so opting out cannot turn a failure into silence.
 [`Session.abort`](running.md#stopping-from-outside) reaches every run whatever
 the flag says, and those end with `ABORTED` instead: the exit code distinguishes
-a
-stop that was asked for from one another run caused.
+an abort that was asked for from one another run caused.
 
 ## Running the optimizer in a separate process { #external-backend }
 

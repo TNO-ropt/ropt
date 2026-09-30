@@ -20,6 +20,7 @@ from ropt.components.compute_steps import OptimizationStep
 from ropt.components.concurrency import StopSignal, run_concurrent
 from ropt.components.event_handlers import ResultsHandler
 from ropt.context import EnOptContext
+from ropt.exceptions import RunsFailedError
 
 from ._broadcast import (
     broadcast_bundle_sizes,
@@ -135,6 +136,13 @@ def _optimize_many(  # ruff: ignore[too-many-arguments]
     # while waiting for evaluations that would queue behind it in such a pool.
     outcomes = run_concurrent(jobs, limit)
     for outcome in outcomes:
-        if isinstance(outcome, BaseException):
+        # A KeyboardInterrupt or SystemExit is the program going down, not a run
+        # reporting a problem, so it travels on rather than into a carrier.
+        if isinstance(outcome, BaseException) and not isinstance(outcome, Exception):
             raise outcome
+    errors = [outcome for outcome in outcomes if isinstance(outcome, Exception)]
+    if errors:
+        raise RunsFailedError(
+            cast("list[OptimizationResult | Exception]", outcomes)
+        ) from errors[0]
     return cast("tuple[OptimizationResult, ...]", tuple(outcomes))

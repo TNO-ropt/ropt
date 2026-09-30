@@ -1,6 +1,14 @@
 """Exceptions raised within the `ropt` library."""
 
-from ropt.enums import ExitCode
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+
+    from ropt.enums import ExitCode
+    from ropt.simple import OptimizationResult
 
 
 class RoptError(Exception):
@@ -40,6 +48,40 @@ class UnsupportedError(RoptError):
     For example a required extra (such as pandas or polars) is not installed,
     or the selected plugin does not support the requested method.
     """
+
+
+class RunsFailedError(RoptError):
+    """One of several concurrent runs raised.
+
+    Several runs produce several outcomes, so there is neither a single
+    exception to re-raise nor a single set of results to return. This carries
+    both, so the work the other runs did is not thrown away with the one that
+    failed. The first exception is chained, so a traceback still shows what
+    went wrong.
+
+    The runs that did not fail were cut off when this one did and ended with
+    `ExitCode.ABORTED_ON_ERROR`, unless they were started with
+    `keep_going=True`. Either way their results are the best each had reached.
+
+    Attributes:
+        outcomes: Per run, in the order the runs were given, its
+                  [`OptimizationResult`][ropt.simple.OptimizationResult] or the
+                  exception it raised.
+    """
+
+    def __init__(self, outcomes: Sequence[OptimizationResult | Exception]) -> None:
+        """Initialize the error.
+
+        Args:
+            outcomes: Per run, its result or the exception it raised.
+        """
+        self.outcomes = tuple(outcomes)
+        failed = sum(1 for item in self.outcomes if isinstance(item, Exception))
+        msg = (
+            f"{failed} of {len(self.outcomes)} runs raised; `outcomes` holds"
+            " what each run raised or reached."
+        )
+        super().__init__(msg)
 
 
 class OptimizerStop(Exception):  # ruff: ignore[error-suffix-on-exception-name]

@@ -24,7 +24,7 @@ from ropt.components.executors import (
     ThreadExecutor,
 )
 from ropt.enums import EnOptEventType, ExitCode
-from ropt.exceptions import ExecutionError, WorkflowError
+from ropt.exceptions import ExecutionError, RunsFailedError, WorkflowError
 from ropt.results import FunctionResults
 from ropt.simple import (
     EvaluationFunctionContext,
@@ -1285,20 +1285,35 @@ def test_optimize_many_without_a_pool(config: Any, test_functions: Any) -> None:
         assert np.allclose(result.results.variables, 0.5, atol=0.02)
 
 
-def test_optimize_many_raises_the_error_of_a_failing_run(
+def test_optimize_many_carries_the_outcome_of_every_run_when_one_fails(
     pools: Callable[..., WorkerPool], config: Any, test_functions: Any
 ) -> None:
+    # The runs that did not fail were cut off by the one that did, so what they
+    # reached is only reachable through the carrier.
     def boom(_v: Any, _c: Any) -> float:
         msg = "boom"
         raise ValueError(msg)
 
     starts = np.tile(initial_values, (3, 1))
-    with pytest.raises(ValueError, match="boom"):
+    with pytest.raises(RunsFailedError) as raised:
         pools(workers=2).optimize_many(
             config,
             starts,
             [test_functions[0], boom, test_functions[0]],
         )
+
+    outcomes = raised.value.outcomes
+    assert len(outcomes) == 3
+    assert isinstance(outcomes[1], ValueError)
+    assert str(outcomes[1]) == "boom"
+    assert isinstance(raised.value.__cause__, ValueError)
+    for index in (0, 2):
+        outcome = outcomes[index]
+        assert isinstance(outcome, OptimizationResult)
+        assert outcome.exit_code in {
+            ExitCode.ABORTED_ON_ERROR,
+            ExitCode.OPTIMIZER_FINISHED,
+        }
 
 
 @pytest.mark.timeout(60)
@@ -1320,7 +1335,7 @@ def test_optimize_many_starts_every_run_after_one_fails(
     # still let through, each reaching its first evaluation.
     starts = np.tile(initial_values, (5, 1))
     pool = pools(workers=2)
-    with pytest.raises(ValueError, match="boom"):
+    with pytest.raises(RunsFailedError):
         pool.optimize_many(config, starts, boom, limit=1)
     with lock:
         assert calls == 5
@@ -1355,7 +1370,7 @@ def test_optimize_many_leaves_the_pool_usable_after_a_failure(
 
     starts = np.tile(initial_values, (4, 1))
     pool = pools(workers=4)
-    with pytest.raises(ValueError, match="boom"):
+    with pytest.raises(RunsFailedError):
         pool.optimize_many(
             config,
             starts,
