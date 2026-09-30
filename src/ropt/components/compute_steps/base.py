@@ -39,7 +39,8 @@ class ComputeStep(ABC, Generic[_ResultT]):
         self._event_handlers: list[EventHandler] = []
         self._running = False
         self._run_lock = threading.Lock()
-        self._stop_flag = threading.Event()
+        # Set once and read; assignment is atomic, so no lock of its own.
+        self._stop_requested = False
         self._stop_signal = stop_signal
 
     def add_event_handler(self, handler: EventHandler) -> None:
@@ -82,7 +83,7 @@ class ComputeStep(ABC, Generic[_ResultT]):
         attached to several steps at once may call it too. A new `run` clears
         any earlier request.
         """
-        self._stop_flag.set()
+        self._stop_requested = True
 
     @property
     def stopped(self) -> bool:
@@ -92,7 +93,7 @@ class ComputeStep(ABC, Generic[_ResultT]):
             `True` if `stop` was called since the run started, or the step's
             [`StopSignal`][ropt.components.concurrency.StopSignal] is stopping.
         """
-        return self._stop_flag.is_set() or self._signalled
+        return self._stop_requested or self._signalled
 
     @property
     def _signalled(self) -> bool:
@@ -148,7 +149,7 @@ class ComputeStep(ABC, Generic[_ResultT]):
         # A step reused after a stopped run must not start out stopped. Only
         # this step's own request is cleared: a signal is shared, and is not
         # this step's to reset.
-        self._stop_flag.clear()
+        self._stop_requested = False
         try:
             return self._run(context, variables, metadata=metadata)
         finally:

@@ -31,7 +31,7 @@ class StopSignal:
     def __init__(self) -> None:
         """Initialize a signal that is not stopping."""
         self._lock = threading.Lock()
-        self._flag = threading.Event()
+        self._stopping = False
         self._callbacks: list[Callable[[], None]] = []
         self._exit_code = ExitCode.ABORTED
 
@@ -46,10 +46,10 @@ class StopSignal:
             exit_code: The code the steps stopping on this signal end with.
         """
         with self._lock:
-            if self._flag.is_set():
+            if self._stopping:
                 return
             self._exit_code = exit_code
-            self._flag.set()
+            self._stopping = True
             callbacks = list(self._callbacks)
         for callback in callbacks:
             callback()
@@ -71,7 +71,8 @@ class StopSignal:
         Returns:
             `True` once `stop` has been called.
         """
-        return self._flag.is_set()
+        with self._lock:
+            return self._stopping
 
     def add_callback(self, callback: Callable[[], None]) -> None:
         """Register a callback to run when this signal stops.
@@ -86,7 +87,7 @@ class StopSignal:
             callback: The zero-argument callable to run.
         """
         with self._lock:
-            if not self._flag.is_set():
+            if not self._stopping:
                 self._callbacks.append(callback)
                 return
         callback()
