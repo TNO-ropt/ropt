@@ -812,14 +812,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../running/logging/" class="md-nav__link">
+      <a href="../running/parallel/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Logging
+    Evaluating in Parallel
   
 
     
@@ -840,14 +840,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../running/parallel/" class="md-nav__link">
+      <a href="../running/many_runs/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Parallel Execution and Many Runs
+    Many Runs at Once
   
 
     
@@ -904,6 +904,34 @@
     
   
     Restarting from the Best Point
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../running/logging/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Logging
   
 
     
@@ -3189,7 +3217,7 @@ the worker finishes. Return what you need instead; see
 concurrently. Given a pool, their evaluations go there; given none, each run
 evaluates on its own driver thread, so your evaluation function is called from
 several threads at once and has to tolerate that. See
-<a href="../running/parallel/#many-optimizations-at-once">Many optimizations at once</a>.</p>
+<a href="../running/many_runs/">Many Runs at Once</a>.</p>
 <p><strong>Metadata is copied with <code>copy.deepcopy</code>.</strong> Every result gets its own copy of
 the <code>metadata</code> you passed, so keep it to plain data — numbers, strings, lists,
 arrays. A lock, an open file, or a database connection cannot be copied and
@@ -3293,7 +3321,7 @@ Handlers</a>.</p>
 <p><strong>Not every optimizer can run beside another.</strong> A backend that needs its own
 working directory, writes to a fixed file name, or keeps state inside its
 library cannot run concurrently in one process; select it as
-<a href="../running/parallel/#external-backend"><code>external/...</code></a> to give it a
+<a href="../optimizer_setup/optimizer/#external-backend"><code>external/...</code></a> to give it a
 process of its own. Optimizer output capture is likewise for one run at a time.</p>
 <table>
 <thead>
@@ -3317,7 +3345,7 @@ process of its own. Optimizer output capture is likewise for one run at a time.<
 </tr>
 <tr>
 <td>A second concurrent run raises <code>WorkflowError</code> about output capture</td>
-<td>Only one run at a time may set <code>stdout</code> or <code>stderr</code>; see <a href="../running/parallel/#many-optimizations-at-once">Many optimizations at once</a>.</td>
+<td>Only one run at a time may set <code>stdout</code> or <code>stderr</code>; see <a href="../running/many_runs/">Many Runs at Once</a>.</td>
 </tr>
 </tbody>
 </table>

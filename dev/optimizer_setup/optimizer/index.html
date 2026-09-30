@@ -812,14 +812,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../running/logging/" class="md-nav__link">
+      <a href="../../running/parallel/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Logging
+    Evaluating in Parallel
   
 
     
@@ -840,14 +840,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../running/parallel/" class="md-nav__link">
+      <a href="../../running/many_runs/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Parallel Execution and Many Runs
+    Many Runs at Once
   
 
     
@@ -904,6 +904,34 @@
     
   
     Restarting from the Best Point
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../running/logging/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Logging
   
 
     
@@ -1393,6 +1421,17 @@
     <span class="md-ellipsis">
       
         Selecting a method
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#external-backend" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Running the method in a separate process
       
     </span>
   </a>
@@ -3010,6 +3049,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#external-backend" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Running the method in a separate process
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#gradient-based-or-gradient-free" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3106,6 +3156,52 @@ rejected when the run starts rather than ignored; see
 one case that <em>is</em> ignored silently is integer variables; see
 <a href="../discrete/">Discrete and Mixed-Integer Variables</a>.</p>
 </div>
+<h2 id="external-backend">Running the method in a separate process</h2>
+<p>Prefix the method with <code>external/</code> to run the optimization algorithm in a
+process of its own:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="s2">"backend"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"method"</span><span class="p">:</span> <span class="s2">"external/scipy/slsqp"</span><span class="p">}</span>
+</span></code></pre></div>
+<p><code>ropt</code> spawns a child process, creates the named backend there, and lets it
+drive the optimization. The function and gradient evaluations still happen in
+the original process: the child sends each set of variables back, the parent
+evaluates it as usual, and the values are passed to the child. An error raised
+in the child is re-raised in the parent. This is unrelated to evaluating in
+parallel, which is about where your <em>objective</em> runs; see
+<a href="../../running/parallel/">Evaluating in Parallel</a>.</p>
+<p>This is useful when a backend cannot safely share a process with the rest of
+your program — for example one that crashes the interpreter, leaks memory,
+keeps state between runs, or links against native libraries that clash with
+your other dependencies.</p>
+<p>It is also the answer for a backend that <strong>cannot run concurrently in-process</strong>.
+Some optimizers need a working directory of their own, write to a file whose
+name is fixed, or keep state inside the library that a second simultaneous run
+corrupts. What such a backend rules out is not merely a second run of its own
+kind: changing the working directory applies to the whole process, so it breaks
+another run's relative output path, and any file your evaluation function opens
+by relative name, just as surely. Each backend states in its own documentation
+whether this applies to it; where it does, <code>external/</code> is what lets it run
+alongside anything else, because the state it needs is then its own. This
+matters as soon as runs overlap — see
+<a href="../../running/many_runs/">Many Runs at Once</a>.</p>
+<p>Two details differ from the other backends:</p>
+<ul>
+<li>The method must name the delegate in full, as <code>external/plugin/method</code> or
+  <code>external/method</code>. The <code>external/</code> prefix is removed and the rest is resolved
+  like any other method string. <code>external</code> is never selected implicitly, so it
+  is used only when you ask for it by name.</li>
+<li>The problem is sent to the child process, so everything describing it must be
+  serializable. The built-in plugins are, and so is any plugin class defined in
+  a module that can be imported. Only if you pass a plugin instance of a class
+  defined inside a function or a notebook do you need the optional
+  <code>cloudpickle</code> extra (see
+  <a href="../../getting_started/installation/#optional-extras">Installation</a>). Without
+  it the two differ in <em>where</em> they fail: a class defined inside a function
+  cannot be sent at all, and is refused here with an
+  <a class="autorefs autorefs-internal" title="            ExecutionError" href="../../reference/exceptions/#ropt.exceptions.ExecutionError"><code>ExecutionError</code></a>; a class defined in a
+  notebook is sent by name, and the failure arrives from the child, which
+  reports the name it could not find. Your objective function is never
+  affected: it stays in this process.</li>
+</ul>
 <h2 id="gradient-based-or-gradient-free">Gradient-based or gradient-free</h2>
 <p>Most <code>ropt</code> methods are gradient-based, and since a black-box objective has no
 analytic derivative, they rely on the estimated gradients described in
@@ -3152,11 +3248,11 @@ when any variable is an integer.</p>
 evaluations itself, so those belong to <code>optimizer</code>. Iterations and convergence
 are the algorithm's own criteria — their exact meaning depends on the method,
 and not every backend supports them — so they belong to <code>backend</code>.</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">CONFIG</span> <span class="o">=</span> <span class="p">{</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    <span class="s2">"variables"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"variable_count"</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="s2">"perturbation_magnitudes"</span><span class="p">:</span> <span class="mf">1e-6</span><span class="p">},</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    <span class="s2">"optimizer"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"max_functions"</span><span class="p">:</span> <span class="mi">500</span><span class="p">},</span>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    <span class="s2">"backend"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"method"</span><span class="p">:</span> <span class="s2">"scipy/slsqp"</span><span class="p">,</span> <span class="s2">"convergence_tolerance"</span><span class="p">:</span> <span class="mf">1e-8</span><span class="p">},</span>
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="p">}</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">CONFIG</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="s2">"variables"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"variable_count"</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="s2">"perturbation_magnitudes"</span><span class="p">:</span> <span class="mf">1e-6</span><span class="p">},</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    <span class="s2">"optimizer"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"max_functions"</span><span class="p">:</span> <span class="mi">500</span><span class="p">},</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="s2">"backend"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"method"</span><span class="p">:</span> <span class="s2">"scipy/slsqp"</span><span class="p">,</span> <span class="s2">"convergence_tolerance"</span><span class="p">:</span> <span class="mf">1e-8</span><span class="p">},</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="p">}</span>
 </span></code></pre></div>
 <p>Which limit applies depends on which resource constrains the run. When each
 evaluation is expensive, <code>max_functions</code> bounds the total number of evaluations
@@ -3175,7 +3271,7 @@ scaling changes what the optimizer sees.</p>
 as the runnable version.</p>
 <h2 id="output-from-the-optimizer">Output from the optimizer</h2>
 <p>Backends can report their own progress, which is disabled by default:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="s2">"backend"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"verbose"</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="s2">"backend"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"verbose"</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
 </span></code></pre></div>
 <p><code>verbose</code> determines whether output is produced at all. Where it goes is separate:
 <code>optimizer.stdout</code> and <code>optimizer.stderr</code> capture it to files, resolved against

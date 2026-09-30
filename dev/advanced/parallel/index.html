@@ -814,14 +814,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../running/logging/" class="md-nav__link">
+      <a href="../../running/parallel/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Logging
+    Evaluating in Parallel
   
 
     
@@ -842,14 +842,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../running/parallel/" class="md-nav__link">
+      <a href="../../running/many_runs/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Parallel Execution and Many Runs
+    Many Runs at Once
   
 
     
@@ -906,6 +906,34 @@
     
   
     Restarting from the Best Point
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../running/logging/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Logging
   
 
     
@@ -3906,7 +3934,7 @@ failure is logged and the rest are still cancelled.</p>
 two are mutually exclusive; combining them raises a <code>ValueError</code> at
 construction. Selecting a queue or a cluster, asking for resources and writing a
 template are covered in
-<a href="../../running/parallel/#running-on-an-hpc-cluster">Parallel Execution and Many Runs</a>.
+<a href="../../running/parallel/#running-on-an-hpc-cluster">Evaluating in Parallel</a>.
 What follows is the executor's own behaviour, and the layout of a configuration
 directory.</p>
 <p>A finished job's result is not always readable at once: the job may have died

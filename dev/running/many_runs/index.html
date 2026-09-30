@@ -9,10 +9,10 @@
       
       
       
-        <link rel="prev" href="../configuration_sections/">
+        <link rel="prev" href="../parallel/">
       
       
-        <link rel="next" href="../objectives/">
+        <link rel="next" href="../nested/">
       
       
         
@@ -23,7 +23,7 @@
     
     
       
-        <title>Variables - ropt Documentation</title>
+        <title>Many Runs at Once - ropt Documentation</title>
       
     
     
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#variables" class="md-skip">
+        <a href="#many-runs-at-once" class="md-skip">
           Skip to content
         </a>
       
@@ -118,7 +118,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Variables
+              Many Runs at Once
             
           </span>
         </div>
@@ -260,11 +260,13 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="../../running/running/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../running/" class="md-tabs__link">
           
   
   
@@ -300,13 +302,11 @@
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="../key_concepts/" class="md-tabs__link">
+      <li class="md-tabs__item">
+        <a href="../../optimizer_setup/key_concepts/" class="md-tabs__link">
           
   
   
@@ -727,28 +727,31 @@
       
   
   
+    
   
   
+  
     
     
     
     
+      
+        
+        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
         
           
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
-        
-          
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
             
   
   
@@ -766,7 +769,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_3">
             <span class="md-nav__icon md-icon"></span>
             
@@ -784,7 +787,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../running/running/" class="md-nav__link">
+      <a href="../running/" class="md-nav__link">
         
   
   
@@ -812,7 +815,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../running/parallel/" class="md-nav__link">
+      <a href="../parallel/" class="md-nav__link">
         
   
   
@@ -837,10 +840,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../../running/many_runs/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Many Runs at Once
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -856,6 +886,59 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#two-levels-of-concurrency" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Two levels of concurrency
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#watching-runs-that-overlap" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Watching runs that overlap
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#failure-in-one-run" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Failure in one run
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -868,7 +951,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../running/nested/" class="md-nav__link">
+      <a href="../nested/" class="md-nav__link">
         
   
   
@@ -896,7 +979,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../running/restart/" class="md-nav__link">
+      <a href="../restart/" class="md-nav__link">
         
   
   
@@ -924,7 +1007,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../running/logging/" class="md-nav__link">
+      <a href="../logging/" class="md-nav__link">
         
   
   
@@ -1101,31 +1184,28 @@
       
   
   
-    
   
   
-  
     
     
     
     
-      
-        
-        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
         
           
-          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
             
   
   
@@ -1143,7 +1223,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1161,7 +1241,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../key_concepts/" class="md-nav__link">
+      <a href="../../optimizer_setup/key_concepts/" class="md-nav__link">
         
   
   
@@ -1189,7 +1269,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../configuration/" class="md-nav__link">
+      <a href="../../optimizer_setup/configuration/" class="md-nav__link">
         
   
   
@@ -1217,7 +1297,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../configuration_sections/" class="md-nav__link">
+      <a href="../../optimizer_setup/configuration_sections/" class="md-nav__link">
         
   
   
@@ -1242,37 +1322,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Variables
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../optimizer_setup/variables/" class="md-nav__link">
         
   
   
@@ -1288,70 +1341,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#holding-variables-fixed" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Holding variables fixed
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#integer-variables" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Integer variables
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#scaling" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Scaling
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#perturbations" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Perturbations
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1364,7 +1353,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../objectives/" class="md-nav__link">
+      <a href="../../optimizer_setup/objectives/" class="md-nav__link">
         
   
   
@@ -1392,7 +1381,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../constraints/" class="md-nav__link">
+      <a href="../../optimizer_setup/constraints/" class="md-nav__link">
         
   
   
@@ -1420,7 +1409,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../discrete/" class="md-nav__link">
+      <a href="../../optimizer_setup/discrete/" class="md-nav__link">
         
   
   
@@ -1448,7 +1437,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../optimizer/" class="md-nav__link">
+      <a href="../../optimizer_setup/optimizer/" class="md-nav__link">
         
   
   
@@ -1476,7 +1465,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../gradients/" class="md-nav__link">
+      <a href="../../optimizer_setup/gradients/" class="md-nav__link">
         
   
   
@@ -1504,7 +1493,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../samplers/" class="md-nav__link">
+      <a href="../../optimizer_setup/samplers/" class="md-nav__link">
         
   
   
@@ -1532,7 +1521,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../realization_filters/" class="md-nav__link">
+      <a href="../../optimizer_setup/realization_filters/" class="md-nav__link">
         
   
   
@@ -1560,7 +1549,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../function_estimators/" class="md-nav__link">
+      <a href="../../optimizer_setup/function_estimators/" class="md-nav__link">
         
   
   
@@ -3016,10 +3005,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#holding-variables-fixed" class="md-nav__link">
+  <a href="#two-levels-of-concurrency" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Holding variables fixed
+        Two levels of concurrency
       
     </span>
   </a>
@@ -3027,10 +3016,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#integer-variables" class="md-nav__link">
+  <a href="#watching-runs-that-overlap" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Integer variables
+        Watching runs that overlap
       
     </span>
   </a>
@@ -3038,21 +3027,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#scaling" class="md-nav__link">
+  <a href="#failure-in-one-run" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Scaling
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#perturbations" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Perturbations
+        Failure in one run
       
     </span>
   </a>
@@ -3079,77 +3057,155 @@
   
 
 
-<h1 id="variables">Variables</h1>
-<p>The variable vector is the one thing every configuration must define: the values
-the optimizer is allowed to change. <code>variable_count</code> sets how many there are,
-and everything else about them — bounds, types, which are held fixed, and the
-units the optimizer works in — is optional.</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">CONFIG</span> <span class="o">=</span> <span class="p">{</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="s2">"variables"</span><span class="p">:</span> <span class="p">{</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>        <span class="s2">"variable_count"</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>        <span class="s2">"lower_bounds"</span><span class="p">:</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>        <span class="s2">"upper_bounds"</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">],</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="p">},</span>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">}</span>
+<h1 id="many-runs-at-once">Many Runs at Once</h1>
+<p>Several optimizations can run together rather than one after another, each on
+its own driver thread, sharing one pool for their evaluations. Use
+<a class="autorefs autorefs-internal" title="            ropt.simple.optimize_many" href="../../reference/simple/#ropt.simple.optimize_many"><code>optimize_many</code></a>. Any of <code>config</code>, <code>x0</code>, or
+<code>objective</code> may be a single value (used for every run) or a list (one per run):</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.simple</span><span class="w"> </span><span class="kn">import</span> <span class="n">session</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="c1"># One run per start point.</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">results</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">thread_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span><span class="o">.</span><span class="n">optimize_many</span><span class="p">(</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>        <span class="n">config</span><span class="p">,</span> <span class="n">start_points</span><span class="p">,</span> <span class="n">objective</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="p">)</span>
 </span></code></pre></div>
-<p>A single value is broadcast to every variable, so <code>lower_bounds</code> above applies
-to all three. The defaults are <span class="arithmatex">\(-\infty\)</span> and <span class="arithmatex">\(+\infty\)</span>, which is to say
-unbounded. The field-by-field description is under
-<a href="../configuration_sections/#variables"><code>variables</code></a>.</p>
-<h2 id="holding-variables-fixed">Holding variables fixed</h2>
-<p>The <code>mask</code> field marks which variables the optimizer may change. It takes one
-boolean per variable, <code>True</code> for free and <code>False</code> for fixed, and defaults to all
-free:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="s2">"variables"</span><span class="p">:</span> <span class="p">{</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    <span class="s2">"variable_count"</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    <span class="s2">"mask"</span><span class="p">:</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">],</span>   <span class="c1"># the third variable is held at its start value</span>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="p">}</span>
+<div class="admonition tip">
+<p class="admonition-title">Give each run an ID</p>
+<p>Pass a per-run <code>metadata</code> list to tag every run with a user-defined
+identifier that travels with its results (and shows up in a
+<a href="../../results/handlers/#dataframehandler"><code>DataFrameHandler</code></a>'s tables):</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"low"</span><span class="p">,</span> <span class="s2">"mid"</span><span class="p">,</span> <span class="s2">"high"</span><span class="p">]</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">results</span> <span class="o">=</span> <span class="n">optimize_many</span><span class="p">(</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    <span class="n">config</span><span class="p">,</span> <span class="n">start_points</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">[{</span><span class="s2">"run_id"</span><span class="p">:</span> <span class="n">x</span><span class="p">}</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">labels</span><span class="p">]</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="p">)</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">"run_id"</span><span class="p">])</span>
 </span></code></pre></div>
-<p>A fixed variable keeps the value it had in the initial vector, is never
-perturbed, and is reported back unchanged. This is the way to explore a subset
-of a larger problem without rewriting the configuration around it.</p>
-<h2 id="integer-variables">Integer variables</h2>
-<p>The <code>types</code> field makes variables integer-valued rather than continuous. That
-choice constrains the rest of the configuration, because an integer variable
-cannot be differentiated — see
-<a href="../discrete/">Discrete and Mixed-Integer Variables</a>.</p>
-<h2 id="scaling">Scaling</h2>
-<p>Variables reach the optimizer as <span class="arithmatex">\(y = (x - o)/s\)</span>, using the <code>scales</code> and
-<code>offsets</code> fields, and are reported back as <span class="arithmatex">\(x = s\,y + o\)</span>. Both directions come
-from the same two arrays, so they cannot disagree.</p>
-<p>This matters when variables differ by orders of magnitude. An optimizer takes a
-step of the same size in every direction and judges convergence with a single
-tolerance for all of them, and neither is meaningful unless the variables are
-comparable in size. The bounds are one source of scales, and
-<a class="autorefs autorefs-internal" title="            scales_and_offsets_from_bounds" href="../../reference/utils/#ropt.utils.scales_and_offsets_from_bounds"><code>scales_and_offsets_from_bounds</code></a>
-derives them:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">scales_and_offsets_from_bounds</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">scales</span><span class="p">,</span> <span class="n">offsets</span> <span class="o">=</span> <span class="n">scales_and_offsets_from_bounds</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">100.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">600.0</span><span class="p">])</span>
-</span></code></pre></div>
-<p>That maps both variables onto <span class="arithmatex">\([0, 1]\)</span>. Scales must be positive, since a scale
-is a change of units and nothing else. There is no <code>auto_scale</code> for variables:
-the bounds are the only information available before the run starts, and using
-them is a choice rather than a default.</p>
-<p>Everything describing the variables moves with them — the bounds, the absolute
-perturbation magnitudes, and the linear constraints — so scaling is not
-something that has to be applied consistently by hand. The details are under
-<a href="../configuration_sections/#variable-scales">Scaling the variables</a>.</p>
-<div class="admonition warning">
-<p class="admonition-title">Scaling changes what a run reports</p>
-<p>Results carry both domains: <code>variables</code> in the units configured here, and
-<code>scaled.variables</code> in the optimizer's. Only the first is comparable between
-runs that scale differently. The runnable demonstration is
-<a href="https://github.com/TNO-ropt/ropt/blob/main/examples/simple/scaling.py">examples/simple/scaling.py</a>,
-and <a href="../../results/results/#scaling-of-results">Working with Results</a>
-describes which fields have two domains.</p>
+<p>See <a href="../running/#attaching-metadata">Attaching metadata</a> for details.</p>
 </div>
-<h2 id="perturbations">Perturbations</h2>
-<p>The remaining fields of the section — <code>perturbation_magnitudes</code>,
-<code>perturbation_types</code>, <code>boundary_types</code>, <code>samplers</code> and <code>seed</code> — describe how
-variables are perturbed when a gradient is estimated, rather than the variables
-themselves. They are covered in
-<a href="../gradients/">Stochastic Gradients</a> and <a href="../samplers/">Samplers</a>.</p>
+<h2 id="two-levels-of-concurrency">Two levels of concurrency</h2>
+<p>There are two independent levels of concurrency here:</p>
+<ul>
+<li><strong>The optimizations</strong> always run concurrently, each on its own driver thread.
+  This is built into <code>optimize_many</code> and does not depend on the pool;
+  the <code>limit</code> argument caps how many run at the same time.</li>
+<li><strong>The function evaluations</strong> inside those runs all happen on the one pool
+  the call was started on, and the pool determines how they are parallelized. With
+  <code>thread_pool(workers=1)</code> the runs still progress together, but their
+  evaluations are executed one at a time. A larger pool —
+  <code>thread_pool(workers=n)</code>, or a process, local or HPC pool — runs several
+  evaluations at once.</li>
+</ul>
+<p>One pool is one budget: <code>workers=10</code> means ten evaluations at a time across
+the whole batch of runs, not ten per run. Batch IDs stay distinct whatever you
+pass, since every run in the program draws them from one counter.</p>
+<p><a href="https://github.com/TNO-ropt/ropt/blob/main/examples/simple/optimize_many.py">examples/simple/optimize_many.py</a>
+runs one optimization per start vector, capping how many go at once and tagging
+each with its own metadata:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">with</span> <span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    <span class="n">results</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">thread_pool</span><span class="p">(</span><span class="n">workers</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">optimize_many</span><span class="p">(</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>        <span class="n">CONFIG</span><span class="p">,</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>        <span class="n">STARTS</span><span class="p">,</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>        <span class="n">rosenbrock</span><span class="p">,</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>        <span class="n">metadata</span><span class="o">=</span><span class="n">run_metadata</span><span class="p">,</span>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>        <span class="n">limit</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>    <span class="p">)</span>
+</span></code></pre></div>
+<h2 id="watching-runs-that-overlap">Watching runs that overlap</h2>
+<p>The two callback arguments differ. <code>report=</code> is <strong>per run</strong>: one
+callback receives the results of every run, or pass a list with one callback per
+run. <code>handlers=</code> is <strong>shared</strong>: one list of handlers that all runs feed
+together — see <a href="../../results/handlers/#sharing-a-handler-across-concurrent-runs">Sharing a handler across concurrent
+runs</a>.</p>
+<div class="admonition warning">
+<p class="admonition-title">One <code>report=</code> callback is called by every run at once</p>
+<p>A single callback is wired into each run separately, and each run calls it
+on its own thread. Nothing serializes those calls, so a callback that
+appends to a list, updates a counter, or writes a file needs a lock of its
+own. Give each run its own callback when they must stay apart, or pass a
+<a href="../../results/handlers/#sharing-a-handler-across-concurrent-runs">handler</a> in
+<code>handlers=</code>, which takes a lock around every call for you.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">A shared handler makes the runs wait for each other</p>
+<p>That lock is not free. A run that emits a result waits until the handler
+has finished with it, and a second run waits for the first. A slow handler
+therefore throttles the whole batch, once per result produced.</p>
+<p>So keep a shared handler cheap. A handler that must do slow work — writing
+a file, talking to a database — holds up every run feeding it.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Without a pool the driver threads do the evaluating</p>
+<p><code>optimize_many</code> needs no pool. Without one, the runs still execute
+concurrently, but each evaluates in-process on its own driver thread — so
+your evaluation function is called by several threads at once and must
+tolerate that. Give the call a pool when it must not be.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Not every backend can take part</p>
+<p>An optimizer that needs a working directory of its own, writes to a file
+whose name is fixed, or keeps state inside its library between calls cannot
+run while anything else is running in the same process — another run of its
+own kind included. Each backend documents whether this applies to it.
+Select it as
+<a href="../../optimizer_setup/optimizer/#external-backend"><code>external/...</code></a> and
+it gets a process of its own, where none of that is shared.</p>
+<p>Optimizer output capture is likewise for one run at a time. If more than
+one of these runs sets
+<a href="../../optimizer_setup/configuration_sections/#optimizer"><code>stdout</code> or <code>stderr</code></a>, the
+second to start raises <a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a>.
+Leave both unset here, and set <a href="../../optimizer_setup/configuration_sections/#backend"><code>verbose=False</code></a>
+unless you want the runs' reports interleaved on the terminal.</p>
+</div>
+<h2 id="failure-in-one-run">Failure in one run</h2>
+<p>A run that raises aborts the other runs on its session. Each of those ends at
+its next evaluation boundary with <code>ABORTED_ON_ERROR</code>, keeping the best result it
+had reached. This is the default because most runs are started from a script
+with nobody watching: a problem should end the script rather than leave the rest
+of the work grinding on towards output that will not be used.</p>
+<p>The call then raises
+<a class="autorefs autorefs-internal" title="            RunsFailedError" href="../../reference/exceptions/#ropt.exceptions.RunsFailedError"><code>RunsFailedError</code></a>. With several runs there is
+no single exception to re-raise and no single set of results to return, so the
+error carries both. <code>outcomes</code> has one entry per run, in the order the runs were
+given, holding either that run's
+<a class="autorefs autorefs-internal" title="            ropt.simple.OptimizationResult
+
+
+  
+      dataclass
+  " href="../../reference/simple/#ropt.simple.OptimizationResult"><code>OptimizationResult</code></a> or the exception it
+raised:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">try</span><span class="p">:</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="n">results</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">optimize_many</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">start_points</span><span class="p">,</span> <span class="n">objective</span><span class="p">)</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="k">except</span> <span class="n">RunsFailedError</span> <span class="k">as</span> <span class="n">failure</span><span class="p">:</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">outcome</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">failure</span><span class="o">.</span><span class="n">outcomes</span><span class="p">):</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">outcome</span><span class="p">,</span> <span class="ne">Exception</span><span class="p">):</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"run </span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2"> raised: </span><span class="si">{</span><span class="n">outcome</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>        <span class="k">else</span><span class="p">:</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"run </span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2"> ended with </span><span class="si">{</span><span class="n">outcome</span><span class="o">.</span><span class="n">exit_reason</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</span></code></pre></div>
+<p>Without this the work the other runs did would be thrown away along with the run
+that failed, which matters more now that they are cut off deliberately. The
+first exception is chained, so a traceback still shows what went wrong, and a
+<code>KeyboardInterrupt</code> or <code>SystemExit</code> travels on untouched rather than into the
+carrier — that is the program going down, not a run reporting a problem.</p>
+<p>The reach is the session, not the call, so a failure also aborts runs that were
+started separately on the same session. A run started with the module-level
+<a class="autorefs autorefs-internal" title="            ropt.simple.optimize_many" href="../../reference/simple/#ropt.simple.optimize_many"><code>optimize_many</code></a> has a session of its own, holding
+only the runs of that call.</p>
+<p>Pass <code>keep_going=True</code> to let a run finish anyway:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">results</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">optimize_many</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">start_points</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">keep_going</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span></code></pre></div>
+<p>or <code>session(keep_going=True)</code> to make that the default for everything on the
+session, which a single run can still override with <code>keep_going=False</code>.</p>
+<p>The flag decides only whether a run is <em>aborted</em>. A run that keeps going still
+aborts the others if it fails itself, and its exception still reaches its
+caller, so opting out cannot turn a failure into silence.
+<a href="../running/#stopping-from-outside"><code>Session.abort</code></a> reaches every run whatever
+the flag says, and those end with <code>ABORTED</code> instead: the exit reason
+distinguishes an abort that was asked for from one another run caused. See
+<a href="../../results/exit_reasons/">Exit Reasons</a> for what each one means.</p>
 
 
 
@@ -3185,7 +3241,7 @@ themselves. They are covered in
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../configuration_sections/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Configuration Sections">
+          <a href="../parallel/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Evaluating in Parallel">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -3195,20 +3251,20 @@ themselves. They are covered in
                 Previous
               </span>
               <div class="md-ellipsis">
-                Configuration Sections
+                Evaluating in Parallel
               </div>
             </div>
           </a>
         
         
           
-          <a href="../objectives/" class="md-footer__link md-footer__link--next" aria-label="Next: Objectives">
+          <a href="../nested/" class="md-footer__link md-footer__link--next" aria-label="Next: Nested Optimization">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Objectives
+                Nested Optimization
               </div>
             </div>
             <div class="md-footer__button md-icon">

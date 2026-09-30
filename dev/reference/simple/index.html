@@ -812,14 +812,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../running/logging/" class="md-nav__link">
+      <a href="../../running/parallel/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Logging
+    Evaluating in Parallel
   
 
     
@@ -840,14 +840,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../running/parallel/" class="md-nav__link">
+      <a href="../../running/many_runs/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Parallel Execution and Many Runs
+    Many Runs at Once
   
 
     
@@ -904,6 +904,34 @@
     
   
     Restarting from the Best Point
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../running/logging/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Logging
   
 
     
@@ -4754,7 +4782,7 @@ session you hold.</p>
         <p>Run several optimizations concurrently, in-process.</p>
 <p>The runs overlap on driver threads, but each evaluates on its own thread, so
 <code>function</code> is called by several threads at once and must tolerate that. See
-<a href="../../running/parallel/">Parallel Execution and Many Runs</a> for a
+<a href="../../running/parallel/">Evaluating in Parallel</a> for a
 walkthrough, and
 <a class="autorefs autorefs-internal" title="            optimize_many" href="#ropt.simple.WorkerPool.optimize_many"><code>WorkerPool.optimize_many</code></a> to give
 the evaluations workers.</p>
@@ -6225,7 +6253,7 @@ session's pools to give them workers. See
 thread, so <code>function</code> is called by several threads at once and must
 tolerate that. Start them on one of this session's pools to give the
 evaluations workers instead. See
-<a href="../../running/parallel/">Parallel Execution and Many Runs</a> for a
+<a href="../../running/parallel/">Evaluating in Parallel</a> for a
 walkthrough.</p>
 
 
@@ -8136,7 +8164,7 @@ evaluations happen and which session the run belongs to. See
         <p>Run several optimizations concurrently, all evaluating on this pool.</p>
 <p>Each of <code>config</code>, <code>x0</code> and <code>function</code> is either one value used by every
 run, or a sequence with one per run. See
-<a href="../../running/parallel/">Parallel Execution and Many Runs</a> for a
+<a href="../../running/parallel/">Evaluating in Parallel</a> for a
 walkthrough.</p>
 
 

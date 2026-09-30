@@ -812,14 +812,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../running/logging/" class="md-nav__link">
+      <a href="../../running/parallel/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Logging
+    Evaluating in Parallel
   
 
     
@@ -840,14 +840,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../running/parallel/" class="md-nav__link">
+      <a href="../../running/many_runs/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Parallel Execution and Many Runs
+    Many Runs at Once
   
 
     
@@ -904,6 +904,34 @@
     
   
     Restarting from the Best Point
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../running/logging/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Logging
   
 
     
@@ -3176,7 +3204,7 @@ passed to several <code>optimize</code> calls, accumulating the results of each 
 <code>HistoryHandler</code>, the <code>history.results</code> shortcut).</p>
 <h2 id="sharing-a-handler-across-concurrent-runs">Sharing a handler across concurrent runs</h2>
 <p>The same handler may also be given to runs that execute <strong>concurrently</strong> — the
-runs of an <a href="../../running/parallel/#many-optimizations-at-once"><code>optimize_many</code></a>, or runs
+runs of an <a href="../../running/many_runs/"><code>optimize_many</code></a>, or runs
 you start on threads of your own. A handler's
 <a class="autorefs autorefs-internal" title="            handle_event" href="../../reference/components_event_handlers/#ropt.components.event_handlers.EventHandler.handle_event"><code>handle_event</code></a>
 takes a lock around each call, so a second run waits for the first to finish

@@ -730,10 +730,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#the-four-choices" class="md-nav__link">
+  <a href="#where-evaluations-run" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The four choices
+        Where evaluations run
       
     </span>
   </a>
@@ -906,14 +906,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../running/logging/" class="md-nav__link">
+      <a href="../../running/parallel/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Logging
+    Evaluating in Parallel
   
 
     
@@ -934,14 +934,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../running/parallel/" class="md-nav__link">
+      <a href="../../running/many_runs/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Parallel Execution and Many Runs
+    Many Runs at Once
   
 
     
@@ -998,6 +998,34 @@
     
   
     Restarting from the Best Point
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../running/logging/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Logging
   
 
     
@@ -2988,10 +3016,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#the-four-choices" class="md-nav__link">
+  <a href="#where-evaluations-run" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The four choices
+        Where evaluations run
       
     </span>
   </a>
@@ -3108,9 +3136,9 @@ longer than starting a thread. A process also need not be on this machine:
 an HPC pool runs each evaluation as a job on a cluster, which is the
 same arrangement spread over more machines.</p>
 </details>
-<h2 id="the-four-choices">The four choices</h2>
-<p>The module-level <a class="autorefs autorefs-internal" title="            ropt.simple.optimize" href="../../reference/simple/#ropt.simple.optimize"><code>optimize</code></a> evaluates in place, so there
-are four:</p>
+<h2 id="where-evaluations-run">Where evaluations run</h2>
+<p>The module-level <a class="autorefs autorefs-internal" title="            ropt.simple.optimize" href="../../reference/simple/#ropt.simple.optimize"><code>optimize</code></a> evaluates in place, so a
+pool is a choice between five arrangements:</p>
 <table>
 <thead>
 <tr>
@@ -3155,7 +3183,7 @@ are four:</p>
 </table>
 <p>A pool costs something to set up and to hand work to. Below a certain
 evaluation cost, that setup is all it adds.</p>
-<p><a href="../../running/parallel/">Parallel Execution and Many Runs</a> covers each of these
+<p><a href="../../running/parallel/">Evaluating in Parallel</a> covers each of these
 in full — how many workers to ask for, which functions can be sent where, what
 stopping does, and how to choose between them.</p>
 <h2 id="the-rule-to-settle-first">The rule to settle first</h2>
@@ -3187,7 +3215,7 @@ together rather than one after another:</p>
 <p>The runs are concurrent, and there is more to it than this call shows: how many
 run at a time, which pool their evaluations share, and how to collect
 results from runs that overlap are all covered in
-<a href="../../running/parallel/#many-optimizations-at-once">Parallel Execution and Many Runs</a>.</p>
+<a href="../../running/many_runs/">Many Runs at Once</a>.</p>
 <div class="admonition warning">
 <p class="admonition-title">Your objective is now called from several threads at once</p>
 <p>The call above passes no pool, so each run evaluates on its own thread.

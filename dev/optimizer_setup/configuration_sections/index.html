@@ -812,14 +812,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../running/logging/" class="md-nav__link">
+      <a href="../../running/parallel/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Logging
+    Evaluating in Parallel
   
 
     
@@ -840,14 +840,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../running/parallel/" class="md-nav__link">
+      <a href="../../running/many_runs/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Parallel Execution and Many Runs
+    Many Runs at Once
   
 
     
@@ -904,6 +904,34 @@
     
   
     Restarting from the Best Point
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../running/logging/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Logging
   
 
     
@@ -3873,7 +3901,7 @@ to the terminal as usual.</p>
 <p class="admonition-title">Capture is for one run at a time</p>
 <p>Capturing rewires process-global state, so only one optimization at a time
 can do it. A second run that tries while another holds it — a concurrent run
-of <a href="../../running/parallel/#many-optimizations-at-once"><code>optimize_many</code></a>, or
+of <a href="../../running/many_runs/"><code>optimize_many</code></a>, or
 an optimization started from inside an evaluation callback — raises
 <a class="autorefs autorefs-internal" title="            WorkflowError" href="../../reference/exceptions/#ropt.exceptions.WorkflowError"><code>WorkflowError</code></a>. Leave <code>stdout</code> and
 <code>stderr</code> unset on runs that overlap.</p>
@@ -3943,7 +3971,7 @@ constraint it cannot handle is only rejected when the run starts, with
 <a class="autorefs autorefs-internal" title="            UnsupportedError" href="../../reference/exceptions/#ropt.exceptions.UnsupportedError"><code>UnsupportedError</code></a>, after the rest of the
 configuration has already been written.</p>
 <p>A backend can also be run in a process of its own, by prefixing the method with
-<code>external/</code>; see <a href="../../running/parallel/#external-backend">Running the optimizer in a separate
+<code>external/</code>; see <a href="../optimizer/#external-backend">Running the optimizer in a separate
 process</a>.</p>
 <h2 id="gradient"><code>gradient</code></h2>
 <p>Validated into <a class="autorefs autorefs-internal" title="            GradientConfig" href="../../reference/config/#ropt.config.GradientConfig"><code>GradientConfig</code></a>.</p>

@@ -12,7 +12,7 @@
         <link rel="prev" href="../../getting_started/examples/">
       
       
-        <link rel="next" href="../logging/">
+        <link rel="next" href="../parallel/">
       
       
         
@@ -967,14 +967,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../logging/" class="md-nav__link">
+      <a href="../parallel/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Logging
+    Evaluating in Parallel
   
 
     
@@ -995,14 +995,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../parallel/" class="md-nav__link">
+      <a href="../many_runs/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Parallel Execution and Many Runs
+    Many Runs at Once
   
 
     
@@ -1059,6 +1059,34 @@
     
   
     Restarting from the Best Point
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../logging/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Logging
   
 
     
@@ -3335,7 +3363,7 @@ continue.</p>
 </span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="n">result</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">objective</span><span class="p">,</span> <span class="n">report</span><span class="o">=</span><span class="n">report</span><span class="p">)</span>
 </span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="k">assert</span> <span class="n">result</span><span class="o">.</span><span class="n">exit_reason</span> <span class="ow">is</span> <span class="n">ExitReason</span><span class="o">.</span><span class="n">STOPPED</span>
 </span></code></pre></div>
-<p>With <a href="../parallel/#many-optimizations-at-once"><code>optimize_many</code></a> this stops only the run
+<p>With <a href="../many_runs/"><code>optimize_many</code></a> this stops only the run
 whose callback returned <code>True</code>; the other runs continue.</p>
 <p>The runnable script is
 <a href="https://github.com/TNO-ropt/ropt/blob/main/examples/simple/stopping.py">examples/simple/stopping.py</a>,
@@ -3390,7 +3418,7 @@ on a session or one of its pools to bring it within reach.</p>
   <code>context.metadata</code> — useful when the evaluation needs to know which run it is
   part of. With <code>optimize_many</code>, this is how runs are told apart:
   give one dict (shared by all runs) or a list with one dict per run; see
-  <a href="../parallel/#many-optimizations-at-once">Give each run an ID</a>.</p>
+  <a href="../many_runs/">Give each run an ID</a>.</p>
 <ul>
 <li><strong>Per evaluation</strong> — return an
   <a class="autorefs autorefs-internal" title="            ropt.components.evaluators.EvaluationFunctionResult
@@ -3475,7 +3503,7 @@ still returns normally, and indicates why in <code>result.exit_reason</code> —
 <code>TOO_FEW_REALIZATIONS</code> when not enough realizations produced a value, for
 instance, or <code>ABORTED_ON_ERROR</code> when another run on the same session raised and
 brought this one down with it (see
-<a href="../parallel/#failure-in-one-run">Failure in one run</a>).
+<a href="../many_runs/#failure-in-one-run">Failure in one run</a>).
 <a href="../../results/exit_reasons/">Exit Reasons</a> lists them all, and explains why a
 reason and a result are independent: <code>result.results</code> is <code>None</code> when no feasible
 result was ever recorded, whatever the reason the run ended, and a run that fails
@@ -3518,7 +3546,7 @@ it either way.</p>
   re-raise, so the call raises
   <a class="autorefs autorefs-internal" title="            RunsFailedError" href="../../reference/exceptions/#ropt.exceptions.RunsFailedError"><code>RunsFailedError</code></a> carrying what every run
   raised or reached; see
-  <a href="../parallel/#failure-in-one-run">Failure in one run</a>.</p>
+  <a href="../many_runs/#failure-in-one-run">Failure in one run</a>.</p>
 </li>
 </ul>
 <p>Catching <a class="autorefs autorefs-internal" title="            RoptError" href="../../reference/exceptions/#ropt.exceptions.RoptError"><code>RoptError</code></a> catches all of <code>ropt</code>'s own
@@ -3584,13 +3612,13 @@ function stay whatever you raised.</p>
         
         
           
-          <a href="../logging/" class="md-footer__link md-footer__link--next" aria-label="Next: Logging">
+          <a href="../parallel/" class="md-footer__link md-footer__link--next" aria-label="Next: Evaluating in Parallel">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Logging
+                Evaluating in Parallel
               </div>
             </div>
             <div class="md-footer__button md-icon">
